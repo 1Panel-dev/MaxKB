@@ -74,6 +74,47 @@ class ToolExecutor:
     except Exception as e:
         maxkb_logger.error(f'Exception: {e}', exc_info=True)
 
+    def exist_function(self, code_str, name):
+        _id = str(uuid.uuid7())
+        python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
+        set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
+        _exec_code = f"""
+try:
+    import os, sys, json
+    path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+    sys.path = [p for p in sys.path if p not in path_to_exclude]
+    sys.path += {python_paths}
+    locals_v={{}}
+    globals_v={{}}
+    {set_run_user}
+    os.environ.clear()
+    exec({dedent(code_str)!a}, globals_v, locals_v)
+    exec_result=locals_v.__contains__('{name}')
+    sys.stdout.write("\\n{_id}:")
+    json.dump({{'code':200,'msg':'success','data':exec_result}}, sys.stdout, default=str)
+except Exception as e:
+    if isinstance(e, MemoryError): e = Exception("Cannot allocate more memory: exceeded the limit of {_process_limit_mem_mb} MB.")
+    sys.stdout.write("\\n{_id}:")
+    json.dump({{'code':500,'msg':str(e),'data':False}}, sys.stdout, default=str)
+sys.stdout.flush()    
+        """
+        maxkb_logger.debug(f"Sandbox execute code: {_exec_code}")
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=True) as f:
+            f.write(_exec_code)
+            f.flush()
+            subprocess_result = self._exec(f.name)
+        if subprocess_result.returncode != 0:
+            raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
+        lines = subprocess_result.stdout.splitlines()
+        result_line = [line for line in lines if line.startswith(_id)]
+        if not result_line:
+            maxkb_logger.error("\n".join(lines))
+            raise Exception("No result found.")
+        result = json.loads(result_line[-1].split(":", 1)[1])
+        if result.get('code') == 200:
+            return result.get('data')
+        raise Exception(result.get('msg'))
+
     def exec_code(self, code_str, keywords, function_name=None):
         _id = str(uuid.uuid7())
         action_function = f'({function_name !a}, locals_v.get({function_name !a}))' if function_name else 'locals_v.popitem()'
@@ -213,7 +254,7 @@ exec({dedent(code)!a})
             ],
             'cwd': _sandbox_path,
             'env': {
-               'LD_PRELOAD': f'{_sandbox_path}/lib/sandbox.so',
+                'LD_PRELOAD': f'{_sandbox_path}/lib/sandbox.so',
             },
             'transport': 'stdio',
         }

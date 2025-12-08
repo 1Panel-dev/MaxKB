@@ -6,7 +6,8 @@
     @date：2024/8/8 17:49
     @desc:
 """
-import base64
+
+import ast
 import io
 import json
 import mimetypes
@@ -195,31 +196,23 @@ class BaseToolLibNodeNode(IToolLibNode):
         else:
             all_params = init_params_default_value | params
         if self.node.properties.get('kind') == 'data-source':
-            download_file_list = []
-            download_list = function_executor.exec_code(
-                tool_lib.code,
-                {**all_params, **self.workflow_params.get('data_source')},
-                function_name='get_down_file_list'
-            )
-            for item in download_list:
-                result = function_executor.exec_code(
-                    tool_lib.code,
-                    {**all_params, **self.workflow_params.get('data_source'),
-                     'download_item': item},
-                    function_name='download'
-                )
-                file_bytes = result.get('file_bytes', [])
-                chunks = []
-                for chunk in file_bytes:
-                    chunks.append(base64.b64decode(chunk))
-                file = bytes_to_uploaded_file(b''.join(chunks), result.get('name'))
-                file_url = self.upload_knowledge_file(file)
-                download_file_list.append({'file_id': file_url.split('/')[-1], 'name': result.get('name')})
-            all_params = {
-                **all_params, **self.workflow_params.get('data_source'),
-                'download_file_list': download_file_list
-            }
-            result = download_file_list
+            exist = function_executor.exist_function(tool_lib.code, 'get_download_file_list')
+            if exist:
+                download_file_list = []
+                download_list = function_executor.exec_code(tool_lib.code,
+                                                            {**all_params, **self.workflow_params.get('data_source')},
+                                                            function_name='get_download_file_list')
+                for item in download_list:
+                    result = function_executor.exec_code(tool_lib.code,
+                                                         {**all_params, **self.workflow_params.get('data_source'),
+                                                          'download_item': item},
+                                                         function_name='download')
+                    file = bytes_to_uploaded_file(ast.literal_eval(result.get('file_bytes')), result.get('name'))
+                    file_url = self.upload_knowledge_file(file)
+                    download_file_list.append({'file_id': file_url, 'name': result.get('name')})
+                result = download_file_list
+            else:
+                result = function_executor.exec_code(tool_lib.code, all_params)
         else:
             result = function_executor.exec_code(tool_lib.code, all_params)
         return NodeResult({'result': result},
@@ -237,7 +230,7 @@ class BaseToolLibNodeNode(IToolLibNode):
             'meta': meta,
             'source_id': knowledge_id,
             'source_type': FileSourceType.KNOWLEDGE.value
-        }).upload()
+        }).upload().replace("./oss/file/", '')
         file.close()
         return file_url
 
