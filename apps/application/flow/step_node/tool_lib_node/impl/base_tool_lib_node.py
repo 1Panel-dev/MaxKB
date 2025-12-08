@@ -196,7 +196,7 @@ class BaseToolLibNodeNode(IToolLibNode):
         else:
             all_params = init_params_default_value | params
         if self.node.properties.get('kind') == 'data-source':
-            exist = function_executor.exec_code(f'{tool_lib.code}\\ndef function_exist(function_name): return callable(globals().get(function_name))', {'function_name': 'get_download_file_list'})
+            exist = function_executor.exec_code(f'{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))', {'function_name': 'get_download_file_list'})
             if exist:
                 download_file_list = []
                 download_list = function_executor.exec_code(tool_lib.code,
