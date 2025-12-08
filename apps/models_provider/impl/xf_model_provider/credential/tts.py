@@ -7,12 +7,21 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-from common.utils.logger import maxkb_logger
+
 
 class XunFeiTTSModelGeneralParams(BaseForm):
-    vcn = forms.SingleSelect(
-        TooltipLabel(_('Speaker'),
-                     _('Speaker, optional value: Please go to the console to add a trial or purchase speaker. After adding, the speaker parameter value will be displayed.')),
+    api_version = forms.Radio('API Version', required=False, text_field='label', value_field='value',
+                              option_list=[
+                                  {'label': '在线语音', 'value': 'online'},
+                                  {'label': '超拟人语音', 'value': 'super_humanoid'}
+                              ],
+                              default_value='online',
+                              provider='',
+                              method='',
+                              props_info={'item_style': {'display': 'none'}})
+
+    vcn_online = forms.SingleSelect(
+        TooltipLabel(_('Speaker'), _('Speaker selection for standard TTS service')),
         required=True, default_value='xiaoyan',
         text_field='value',
         value_field='value',
@@ -22,7 +31,35 @@ class XunFeiTTSModelGeneralParams(BaseForm):
             {'text': _('iFlytek Xiaoping'), 'value': 'aisxping'},
             {'text': _('iFlytek Xiaojing'), 'value': 'aisjinger'},
             {'text': _('iFlytek Xuxiaobao'), 'value': 'aisbabyxu'},
-        ])
+        ],
+        relation_show_field_dict={"api_version": ["online"]})
+
+    vcn_super = forms.SingleSelect(
+        TooltipLabel(_('Speaker'), _('Speaker selection for super-humanoid TTS service')),
+        required=True, default_value='x5_lingxiaoxuan_flow',
+        text_field='value',
+        value_field='value',
+        option_list=[
+            {'text': _('Super-humanoid: Lingxiaoxuan Flow'), 'value': 'x5_lingxiaoxuan_flow'},
+            {'text': _('Super-humanoid: Lingyuyan Flow'), 'value': 'x5_lingyuyan_flow'},
+            {'text': _('Super-humanoid: Lingfeiyi Flow'), 'value': 'x5_lingfeiyi_flow'},
+            {'text': _('Super-humanoid: Lingxiaoyue Flow'), 'value': 'x5_lingxiaoyue_flow'},
+            {'text': _('Super-humanoid: Sun Dasheng Flow'), 'value': 'x5_sundasheng_flow'},
+            {'text': _('Super-humanoid: Lingyuzhao Flow'), 'value': 'x5_lingyuzhao_flow'},
+            {'text': _('Super-humanoid: Lingxiaotang Flow'), 'value': 'x5_lingxiaotang_flow'},
+            {'text': _('Super-humanoid: Lingxiaorong Flow'), 'value': 'x5_lingxiaorong_flow'},
+            {'text': _('Super-humanoid: Xinyun Flow'), 'value': 'x5_xinyun_flow'},
+            {'text': _('Super-humanoid: Grant (EN)'), 'value': 'x5_EnUs_Grant_flow'},
+            {'text': _('Super-humanoid: Lila (EN)'), 'value': 'x5_EnUs_Lila_flow'},
+            {'text': _('Super-humanoid: Lingwanwan Pro'), 'value': 'x6_lingwanwan_pro'},
+            {'text': _('Super-humanoid: Yiyi Pro'), 'value': 'x6_yiyi_pro'},
+            {'text': _('Super-humanoid: Huifangnv Pro'), 'value': 'x6_huifangnv_pro'},
+            {'text': _('Super-humanoid: Lingxiaoying Pro'), 'value': 'x6_lingxiaoying_pro'},
+            {'text': _('Super-humanoid: Lingfeibo Pro'), 'value': 'x6_lingfeibo_pro'},
+            {'text': _('Super-humanoid: Lingyuyan Pro'), 'value': 'x6_lingyuyan_pro'},
+        ],
+        relation_show_field_dict={"api_version": ["super_humanoid"]})
+
     speed = forms.SliderField(
         TooltipLabel(_('speaking speed'), _('Speech speed, optional value: [0-100], default is 50')),
         required=True, default_value=50,
@@ -33,7 +70,21 @@ class XunFeiTTSModelGeneralParams(BaseForm):
 
 
 class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
-    spark_api_url = forms.TextInputField('API URL', required=True, default_value='wss://tts-api.xfyun.cn/v2/tts')
+    api_version = forms.Radio('API Version', required=True, text_field='label', value_field='value',
+                              option_list=[
+                                  {'label': '在线合成', 'value': 'online'},
+                                  {'label': '超拟人合成', 'value': 'super_humanoid'}
+                              ],
+                              default_value='online',
+                              provider='',
+                              method='', )
+
+    spark_api_url = forms.TextInputField('API URL', required=True,
+                                         default_value='wss://tts-api.xfyun.cn/v2/tts',
+                                         relation_show_field_dict={"api_version": ["online"]})
+    spark_api_url_super = forms.TextInputField('API URL', required=True,
+                                               default_value='wss://cbm01.cn-huabei-1.xf-yun.com/v1/private/mcd9m97e6',
+                                               relation_show_field_dict={"api_version": ["super_humanoid"]})
     spark_app_id = forms.TextInputField('APP ID', required=True)
     spark_api_key = forms.PasswordInputField("API Key", required=True)
     spark_api_secret = forms.PasswordInputField('API Secret', required=True)
@@ -45,7 +96,13 @@ class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
-        for key in ['spark_api_url', 'spark_app_id', 'spark_api_key', 'spark_api_secret']:
+        api_version = model_credential.get('api_version', 'online')
+        if api_version == 'super_humanoid':
+            required_keys = ['spark_api_url_super', 'spark_app_id', 'spark_api_key', 'spark_api_secret']
+        else:
+            required_keys = ['spark_api_url', 'spark_app_id', 'spark_api_key', 'spark_api_secret']
+
+        for key in required_keys:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
@@ -55,7 +112,6 @@ class XunFeiTTSModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
