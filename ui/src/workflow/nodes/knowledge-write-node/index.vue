@@ -8,36 +8,33 @@
         label-position="top"
         require-asterisk-position="right"
         label-width="auto"
-        ref="IntentClassifyNodeFormRef"
+        ref="KnowledgeWriteRef"
         hide-required-asterisk
       >
         <el-form-item
-        prop="document_list"
-        :label="$t('common.inputContent')"
-        :rules="{
+          prop="document_list"
+          :label="$t('common.inputContent')"
+          :rules="{
             message: $t('workflow.nodes.textToSpeechNode.content.label'),
             trigger: 'change',
             required: true,
-        }"
-      >
-        <template #label>
+          }"
+        >
+          <template #label>
             <div class="flex-between">
               <div>
-                <span
-                  >{{ $t('common.inputContent')
-                  }}<span class="color-danger">*</span></span
-                >
+                <span>{{ $t('common.inputContent') }}<span class="color-danger">*</span></span>
               </div>
             </div>
-        </template>
-        <NodeCascader
+          </template>
+          <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.nodes.textToSpeechNode.content.label')"
             v-model="form_data.document_list"
           />
-      </el-form-item>
+        </el-form-item>
       </el-form>
     </el-card>
   </NodeContainer>
@@ -45,14 +42,26 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import { isLastNode } from '@/workflow/common/data'
 
 const props = defineProps<{ nodeModel: any }>()
-
+const KnowledgeWriteRef = ref()
+const nodeCascaderRef = ref()
 const form = {
   document_list: [],
+}
+
+const validate = async () => {
+  let ps = [
+    KnowledgeWriteRef.value?.validate(),
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+  ]
+  return Promise.all(ps).catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
 }
 
 const form_data = computed({
@@ -67,6 +76,15 @@ const form_data = computed({
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
   },
+})
+
+onMounted(() => {
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
+  }
+  set(props.nodeModel, 'validate', validate)
 })
 </script>
 
