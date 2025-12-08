@@ -1,5 +1,5 @@
 <template>
-  <LoopBodyContainer :nodeModel="nodeModel">
+  <LoopBodyContainer :nodeModel="nodeModel" ref="LoopBodyContainerRef">
     <div ref="containerRef" @wheel.stop style="height: 100%; width: 100%"></div>
   </LoopBodyContainer>
 </template>
@@ -19,7 +19,7 @@ const loop_workflow_mode = inject('loopWorkflowMode') || WorkflowMode.Applicatio
 const nodes: any = import.meta.glob('@/workflow/nodes/**/index.ts', { eager: true })
 const props = defineProps<{ nodeModel: any }>()
 const containerRef = ref()
-
+const LoopBodyContainerRef = ref<InstanceType<typeof LoopBodyContainer>>()
 const validate = () => {
   const workflow = new WorkFlowInstance(lf.value.getGraphData(), WorkflowMode.ApplicationLoop)
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
@@ -159,6 +159,7 @@ const renderGraphData = (data?: any) => {
 }
 
 const loopLayout = () => {
+  LoopBodyContainerRef.value?.zoom()
   lf.value?.extension?.dagre.layout()
 }
 onMounted(() => {

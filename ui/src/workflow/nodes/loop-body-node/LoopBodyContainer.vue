@@ -217,6 +217,12 @@ function enlargeHandle() {
     props.nodeModel.setHeight(height.value)
   }
 }
+const zoom = () => {
+  if (enlarge.value) {
+    enlargeHandle()
+  }
+}
+defineExpose({ close, zoom })
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {
