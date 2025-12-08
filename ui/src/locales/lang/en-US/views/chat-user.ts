@@ -1,7 +1,7 @@
 export default {
   title: 'Chat Users',
-  syncUsers: 'Sync Users',
-  syncUsersTip: 'Only sync newly added users',
+  syncUsers: 'Import Users',
+  syncUsersTip: 'Only import newly added users',
   setUserGroups: 'Configure User Groups',
   knowledgeTitleTip:
     'This configuration will only take effect after enabling chat user login authentication in the associated application',

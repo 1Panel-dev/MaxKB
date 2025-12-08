@@ -93,6 +93,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
             return float(value)
         return value
     try:
+        value = node.workflow_manage.generate_prompt(value)
         if _type == 'int':
             return int(value)
         if _type == 'float':
@@ -136,14 +137,18 @@ class BaseToolLibNodeNode(IToolLibNode):
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
         valid_function(tool_lib, workspace_id)
-        params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
-                                                   field.get('is_required'),
-                                                   field.get('source'), self)
-                  for field in
-                  [{'value': get_field_value(input_field_list, field.get('name'), field.get('is_required'),
-                                             ), **field}
-                   for field in
-                   tool_lib.input_field_list]}
+        params = {
+            field.get('name'):  convert_value(
+                field.get('name'), field.get('value'), field.get('type'),
+                field.get('is_required'),
+                field.get('source'), self
+            )
+            for field in [
+                {
+                    'value': get_field_value(input_field_list, field.get('name'), field.get('is_required'), ), **field
+                } for field in tool_lib.input_field_list
+            ]
+        }
 
         self.context['params'] = params
         # 合并初始化参数

@@ -11,11 +11,11 @@
     >
       <template v-for="(item, index) in form_data.variable_list" :key="item.id">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
-          <el-form-item :label="$t('views.applicationWorkflow.variable.label')">
+          <el-form-item >
             <template #label>
               <div class="flex-between">
                 <div>
-                  {{ $t('views.applicationWorkflow.variable.label') }}
+                  {{ $t('common.variable') }}
                   <span class="color-danger">*</span>
                 </div>
                 <el-button
@@ -44,7 +44,7 @@
             >
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
               <el-option
-                :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                :label="$t('views.applicationWorkflow.variable.Referencing')"
                 value="referencing"
               />
               <el-option :label="$t('common.custom')" value="custom" />

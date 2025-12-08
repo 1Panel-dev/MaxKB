@@ -28,6 +28,15 @@
           <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
         </el-select>
       </el-form-item>
+      <el-form-item :label="$t('dynamicsForm.paramForm.tooltip.label')">
+        <el-input
+          v-model="form.desc"
+          :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
+          :maxlength="128"
+          show-word-limit
+          @blur="form.desc = form.desc?.trim()"
+        />
+      </el-form-item>
       <el-form-item :label="$t('views.tool.form.source.label')">
         <el-select v-model="form.source">
           <el-option :label="$t('views.tool.form.source.reference')" value="reference" />
@@ -64,6 +73,7 @@ const isEdit = ref(false)
 const form = ref<any>({
   name: '',
   type: typeOptions[0],
+  desc: '',
   source: 'reference',
   is_required: true,
 })
@@ -85,6 +95,7 @@ watch(dialogVisible, (bool) => {
     form.value = {
       name: '',
       type: typeOptions[0],
+      desc: '',
       source: 'reference',
       is_required: true,
     }

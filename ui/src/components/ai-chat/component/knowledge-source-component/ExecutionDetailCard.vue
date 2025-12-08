@@ -22,7 +22,8 @@
             data.type === WorkflowType.ImageUnderstandNode ||
             data.type === WorkflowType.ImageGenerateNode ||
             data.type === WorkflowType.Application ||
-            data.type == WorkflowType.IntentNode
+            data.type == WorkflowType.IntentNode ||
+            data.type === WorkflowType.VideoUnderstandNode
           "
           >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
         >
@@ -97,6 +98,21 @@
                         :src="f.url"
                         controls
                         style="width: 300px; height: 43px"
+                        class="border-r-6"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div v-if="data.video_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.image') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.video_list" :key="i">
+                      <video
+                        :src="f.url"
+                        style="width: 170px; display: block"
+                        controls
+                        autoplay
                         class="border-r-6"
                       />
                     </template>
@@ -554,6 +570,90 @@
               </div>
             </div>
           </template>
+          <!-- 视频理解 -->
+          <template v-if="data.type == WorkflowType.VideoUnderstandNode">
+            <div class="card-never border-r-6" v-if="data.type !== WorkflowType.Application">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
+              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span>
+
+                    <span v-if="Array.isArray(history.content)">
+                      <template v-for="(h, i) in history.content" :key="i">
+                        <video
+                          v-if="h.type === 'video_url'"
+                          :src="h.video_url.url"
+                          style="width: 40px; height: 40px; display: inline-block"
+                          class="border-r-6 mr-8"
+                        />
+
+                        <span v-else>{{ h.text }}<br /></span>
+                      </template>
+                    </span>
+
+                    <span v-else>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('chat.executionDetails.currentChat') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-if="data.video_list?.length > 0">
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.video_list" :key="i">
+                      <video
+                        :src="f.url"
+                        style="width: 100px; display: block"
+                        class="border-r-6"
+                        autoplay
+                        controls
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div>
+                  {{ data.question || '-' }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  data.type == WorkflowType.Application
+                    ? $t('common.param.outputParam')
+                    : $t('chat.executionDetails.answer')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
           <!-- 图片生成 -->
           <template v-if="data.type == WorkflowType.ImageGenerateNode">
             <div class="card-never border-r-6 mt-8">
@@ -742,7 +842,7 @@
                 </div>
               </div>
             </div>
-            <div class="card-never border-r-6">
+            <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
                 {{ $t('common.param.outputParam') }}
               </h5>
@@ -754,6 +854,67 @@
             </div>
           </template>
 
+          <!-- 变量拆分 -->
+          <template
+            v-if="
+              data.type === WorkflowType.VariableSplittingNode ||
+              data.type == WorkflowType.ParameterExtractionNode
+            "
+          >
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.request || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 变量聚合 -->
+          <template v-if="data.type === WorkflowType.VariableAggregationNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.applicationWorkflow.nodes.variableAggregationNode.Strategy') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.strategy }}
+              </div>
+            </div>
+            <div
+              class="card-never border-r-6 mt-8"
+              v-for="(group, groupI) in data.group_list"
+              :key="groupI"
+            >
+              <h5 class="p-8-12">
+                {{ group.label+ ' '+ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in group.variable_list" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span> {{ f.value }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+          </template>
           <!-- MCP 节点 -->
           <template v-if="data.type === WorkflowType.McpNode">
             <div class="card-never border-r-6">
@@ -894,6 +1055,24 @@
               </div>
             </div>
           </template>
+          <!-- 文档检索 -->
+          <template v-if="data.type === WorkflowType.SearchDocument">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12 flex align-center">
+                <span class="mr-4"> {{ $t('common.param.outputParam') }}</span>
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"> knowledge_list:</span>
+                  {{ data.knowledge_items?.map((v: any) => v.name).join(',') }}
+                </div>
+                <div class="mb-8">
+                  <span class="color-secondary"> document_list:</span>
+                  {{ data.document_items?.map((v: any) => v.name).join(',') }}
+                </div>
+              </div>
+            </div>
+          </template>
           <slot></slot>
         </template>
         <template v-else>
@@ -916,6 +1095,7 @@ import { getImgUrl } from '@/utils/common'
 import { arraySort } from '@/utils/array'
 
 import { t } from '@/locales'
+
 const props = defineProps<{
   data: any
 }>()

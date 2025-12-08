@@ -69,8 +69,31 @@
                 clearable
               />
             </div>
-            <el-button @click="exportLog" style="margin-left: 10px"
+            <el-button
+              @click="exportLog"
+              style="margin-left: 10px"
+              v-hasPermission="
+                new ComplexPermission(
+                  [RoleConst.ADMIN],
+                  [PermissionConst.OPERATION_LOG_EXPORT],
+                  [EditionConst.IS_EE, EditionConst.IS_PE],
+                  'OR',
+                )
+              "
               >{{ $t('common.export') }}
+            </el-button>
+            <el-button
+              @click="dialogVisible = true"
+              v-hasPermission="
+                new ComplexPermission(
+                  [RoleConst.ADMIN],
+                  [PermissionConst.OPERATION_LOG_CLEAR_POLICY],
+                  [EditionConst.IS_EE, EditionConst.IS_PE],
+                  'OR',
+                )
+              "
+            >
+              {{ $t('views.chatLog.buttons.clearStrategy') }}
             </el-button>
           </div>
         </div>
@@ -233,7 +256,11 @@
           <el-table-column :label="$t('common.operation')" width="60" align="left" fixed="right">
             <template #default="{ row }">
               <span class="mr-4">
-                <el-tooltip effect="dark" :content="$t('views.operateLog.table.opt.label')" placement="top">
+                <el-tooltip
+                  effect="dark"
+                  :content="$t('views.operateLog.table.opt.label')"
+                  placement="top"
+                >
                   <el-button type="primary" text @click.stop="showDetails(row)" class="text-button">
                     <AppIcon iconName="app-operate-log"></AppIcon>
                   </el-button>
@@ -245,8 +272,36 @@
       </div>
       <DetailDialog ref="DetailDialogRef" />
     </el-card>
+    <el-dialog
+      :title="$t('views.chatLog.buttons.clearStrategy')"
+      v-model="dialogVisible"
+      width="25%"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+    >
+      <span>{{ $t('common.delete') }}</span>
+      <el-input-number
+        v-model="days"
+        controls-position="right"
+        :min="1"
+        :max="100000"
+        :value-on-clear="0"
+        step-strictly
+        style="width: 110px; margin-left: 8px; margin-right: 8px"
+      ></el-input-number>
+      <span>{{ $t('views.chatLog.daysText') }}</span>
+      <template #footer>
+        <div class="dialog-footer" style="margin-top: 16px">
+          <el-button @click="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="saveCleanTime">
+            {{ $t('common.save') }}
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import operateLog from '@/api/system/operate-log'
@@ -255,6 +310,11 @@ import { t } from '@/locales'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import useStore from '@/stores'
 import WorkspaceApi from '@/api/system/workspace.ts'
+import { hasPermission } from '@/utils/permission'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data.ts'
+import { ComplexPermission } from '@/utils/permission/type.ts'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { MsgSuccess } from '@/utils/message.ts'
 
 const { user } = useStore()
 const popoverVisible = ref(false)
@@ -278,6 +338,8 @@ const daterange = ref({
   end_time: '',
 })
 const daterangeValue = ref('')
+const dialogVisible = ref(false)
+const days = ref<number>(180)
 const dayOptions = [
   {
     value: 7,
@@ -430,8 +492,31 @@ async function getWorkspaceList() {
   }
 }
 
+function saveCleanTime() {
+  const obj = {
+    clean_time: days.value,
+  }
+  operateLog
+    .saveCleanTime(obj, loading)
+    .then(() => {
+      MsgSuccess(t('common.saveSuccess'))
+      dialogVisible.value = false
+      getCleanTime()
+    })
+    .catch(() => {
+      dialogVisible.value = false
+    })
+}
+
+function getCleanTime() {
+  operateLog.getCleanTime().then((res) => {
+    days.value = res.data
+  })
+}
+
 onMounted(() => {
   getMenuList()
+  getCleanTime()
   getWorkspaceList()
   changeDayHandle(history_day.value)
 })

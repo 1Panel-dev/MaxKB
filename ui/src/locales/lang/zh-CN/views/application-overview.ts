@@ -41,6 +41,7 @@ export default {
         '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
       loginMethod: '登录方式',
       loginMethodRequired: '请选择登录方式',
+      displayCodeRequired: '请输入失败次数',
       toSettingChatUser: '去配置对话用户',
     },
     SettingAPIKeyDialog: {

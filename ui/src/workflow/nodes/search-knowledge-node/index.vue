@@ -9,17 +9,42 @@
         require-asterisk-position="right"
         label-width="auto"
         ref="knowledgeNodeFormRef"
+        hide-required-asterisk
       >
-        <el-form-item :label="$t('views.chatLog.selectKnowledge')">
+        <el-form-item>
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.chatLog.selectKnowledge') }}</span>
-              <el-button type="primary" link @click="openknowledgeDialog">
-                <AppIcon iconName="app-add-outlined"></AppIcon>
-              </el-button>
+              <span>
+                {{ $t('views.applicationWorkflow.nodes.searchDocumentNode.selectKnowledge') }}</span
+              >
+              <span>
+                <el-button
+                  v-if="form_data.search_scope_type === 'custom'"
+                  type="primary"
+                  link
+                  @click="openknowledgeDialog"
+                >
+                  <AppIcon iconName="app-add-outlined"></AppIcon>
+                </el-button>
+                <el-select
+                  :teleported="false"
+                  size="small"
+                  v-model="form_data.search_scope_type"
+                  style="width: 85px"
+                >
+                  <el-option
+                    :label="$t('views.applicationWorkflow.nodes.searchDocumentNode.custom')"
+                    value="custom"
+                  />
+                  <el-option
+                    :label="$t('views.applicationWorkflow.variable.Referencing')"
+                    value="referencing"
+                  />
+                </el-select>
+              </span>
             </div>
           </template>
-          <div class="w-full">
+          <div class="w-full" v-if="form_data.search_scope_type === 'custom'">
             <el-text type="info" v-if="form_data.knowledge_id_list?.length === 0">
               {{ $t('views.application.form.relatedKnowledge.placeholder') }}
             </el-text>
@@ -42,15 +67,63 @@
               </div>
             </template>
           </div>
+          <div class="w-full" v-else>
+            <el-form-item
+              prop="search_scope_reference"
+              :rules="{
+                message: $t('views.applicationWorkflow.variable.placeholder'),
+                trigger: 'blur',
+                required: true,
+              }"
+            >
+              <template #label>
+                <div class="flex-between">
+                  <span>
+                    {{ $t('views.applicationWorkflow.nodes.searchDocumentNode.select_variable') }}
+                    <span class="color-danger">*</span>
+                  </span>
+                  <span>
+                    <el-select
+                      :teleported="false"
+                      size="small"
+                      v-model="form_data.search_scope_source"
+                      style="width: 95px"
+                      @change="form_data.search_scope_reference = []"
+                    >
+                      <el-option
+                        :label="
+                          $t('views.applicationWorkflow.nodes.searchDocumentNode.knowledge_list')
+                        "
+                        value="knowledge"
+                      />
+                      <el-option
+                        :label="
+                          $t('views.applicationWorkflow.nodes.searchDocumentNode.document_list')
+                        "
+                        value="document"
+                      />
+                    </el-select>
+                  </span>
+                </div>
+              </template>
+              <NodeCascader
+                ref="nodeCascaderRef"
+                :nodeModel="nodeModel"
+                class="w-full"
+                :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+                v-model="form_data.search_scope_reference"
+              />
+            </el-form-item>
+          </div>
         </el-form-item>
         <el-form-item
           :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')"
         >
           <template #label>
             <div class="flex-between">
-              <span>{{
-                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')
-              }}</span>
+              <span
+                >{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam') }}
+              </span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
@@ -86,7 +159,6 @@
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
             message: $t(
@@ -96,6 +168,14 @@
             required: true,
           }"
         >
+          <template #label>
+            <div class="flex-between">
+              <span>
+                {{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label') }}
+                <span class="color-danger">*</span></span
+              >
+            </div>
+          </template>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
@@ -107,7 +187,6 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.label')"
           prop="show_knowledge"
           :rules="{
             message: $t(
@@ -118,6 +197,14 @@
           }"
           @click.prevent
         >
+          <template #label>
+            <div class="flex-between">
+              <span>
+                {{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.label') }}
+                <span class="color-danger">*</span></span
+              >
+            </div>
+          </template>
           <el-switch size="small" v-model="form_data.show_knowledge" />
         </el-form-item>
       </el-form>
@@ -142,6 +229,7 @@ import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted } from 'vue'
 import { relatedObject } from '@/utils/array'
 import { SearchMode } from '@/enums/application'
+import AppIcon from '@/components/app-icon/AppIcon.vue'
 
 const props = defineProps<{ nodeModel: any }>()
 const nodeCascaderRef = ref()
@@ -155,6 +243,9 @@ const form = {
   },
   question_reference_address: [],
   show_knowledge: false,
+  search_scope_type: 'custom',
+  search_scope_source: 'knowledge',
+  search_scope_reference: [],
 }
 
 const form_data = computed({
@@ -196,6 +287,7 @@ function addKnowledge(val: Array<any>) {
     'knowledge_id_list',
     val.map((item) => item.id),
   )
+  set(props.nodeModel.properties.node_data, 'knowledge_list', val)
   knowledgeList.value = val
 }
 
@@ -220,6 +312,15 @@ onMounted(() => {
   form_data.value.show_knowledge = form_data.value.show_knowledge
     ? form_data.value.show_knowledge
     : false
+  form_data.value.search_scope_type = form_data.value.search_scope_type
+    ? form_data.value.search_scope_type
+    : 'custom'
+  form_data.value.search_scope_source = form_data.value.search_scope_source
+    ? form_data.value.search_scope_source
+    : 'knowledge'
+  form_data.value.knowledge_id_list = form_data.value.knowledge_id_list
+    ? form_data.value.knowledge_id_list
+    : []
   set(props.nodeModel, 'validate', validate)
 })
 </script>

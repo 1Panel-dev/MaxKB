@@ -1,18 +1,18 @@
 <template>
-  <LayoutContainer showCollapse class="tool-manage">
+  <LayoutContainer showCollapse resizable class="tool-manage">
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.tool.title') }}</h4>
-      <div class="p-8">
-        <folder-tree
-          :source="SourceTypeEnum.TOOL"
-          :data="folderList"
-          :currentNodeKey="folder.currentFolder?.id"
-          @handleNodeClick="folderClickHandle"
-          @refreshTree="refreshFolder"
-          :shareTitle="$t('views.shared.shared_tool')"
-          :showShared="permissionPrecise['is_share']()"
-        />
-      </div>
+
+      <folder-tree
+        :source="SourceTypeEnum.TOOL"
+        :data="folderList"
+        :currentNodeKey="folder.currentFolder?.id"
+        @handleNodeClick="folderClickHandle"
+        @refreshTree="refreshFolder"
+        :shareTitle="$t('views.shared.shared_tool')"
+        :showShared="permissionPrecise['is_share']()"
+        :draggable="true"
+      />
     </template>
     <ToolListContainer @refreshFolder="refreshFolder">
       <template #header>
@@ -40,6 +40,7 @@ import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
+import bus from '@/bus'
 const route = useRoute()
 const { folder, tool } = useStore()
 

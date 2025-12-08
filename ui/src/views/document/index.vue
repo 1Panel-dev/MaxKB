@@ -57,6 +57,7 @@
                 >
                   {{ $t('common.setting') }}
                 </el-button>
+
                 <el-dropdown v-if="MoreFilledPermission0(id)">
                   <el-button class="ml-12 mr-12">
                     <AppIcon iconName="app-more"></AppIcon>
@@ -69,6 +70,12 @@
                         v-if="permissionPrecise.doc_migrate(id)"
                       >
                         {{ $t('views.document.setting.migration') }}
+                      </el-dropdown-item>
+                      <el-dropdown-item
+                        @click="openAddTagDialog()"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="permissionPrecise.doc_tag(id)"
+                        >{{ $t('views.document.tag.addTag') }}
                       </el-dropdown-item>
                       <el-dropdown-item
                         divided
@@ -84,6 +91,7 @@
                         v-if="knowledgeDetail?.type === 2 && permissionPrecise.doc_sync(id)"
                         >{{ $t('views.document.syncDocument') }}
                       </el-dropdown-item>
+
                       <el-dropdown-item
                         divided
                         @click="deleteMulDocument"
@@ -96,15 +104,40 @@
                 </el-dropdown>
               </template>
             </div>
-
-            <el-input
-              v-model="filterText"
-              :placeholder="$t('common.searchBar.placeholder')"
-              prefix-icon="Search"
-              class="w-240"
-              @change="getList"
-              clearable
-            />
+            <div class="flex">
+              <div class="flex-between complex-search">
+                <el-select
+                  class="complex-search__left"
+                  v-model="search_type"
+                  style="width: 120px"
+                  @change="search_type_change"
+                >
+                  <el-option :label="$t('dynamicsForm.tag.label')" value="tag" />
+                  <el-option :label="$t('views.tool.form.toolName.label')" value="name" />
+                </el-select>
+                <el-input
+                  v-if="search_type === 'name'"
+                  v-model="search_form.name"
+                  @change="refresh"
+                  :placeholder="$t('common.searchBar.placeholder')"
+                  style="width: 220px"
+                  clearable
+                />
+                <el-input
+                  v-if="search_type === 'tag'"
+                  v-model="search_form.tag"
+                  @change="refresh"
+                  :placeholder="$t('views.document.tag.requiredMessage3')"
+                  style="width: 220px"
+                  clearable
+                />
+              </div>
+              <el-button @click="openTagDrawer" class="ml-12"
+                v-if="permissionPrecise.tag_read(id)"
+              >
+                {{ $t('views.document.tag.label') }}
+              </el-button>
+            </div>
           </div>
           <app-table
             ref="multipleTableRef"
@@ -265,13 +298,13 @@
                           :class="filterMethod['is_active'] === true ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('is_active', true)"
-                          >{{ $t('views.document.enableStatus.enable') }}
+                          >{{ $t('common.status.enabled') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                           :class="filterMethod['is_active'] === false ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('is_active', false)"
-                          >{{ $t('views.document.enableStatus.close') }}
+                          >{{ $t('common.status.disabled') }}
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
@@ -448,6 +481,13 @@
                             ></AppIcon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
+                          <el-dropdown-item @click="openTagSettingDrawer(row)"
+                            v-if="permissionPrecise.doc_tag(id)"
+                          >
+                            <AppIcon iconName="app-tag" class="color-secondary"></AppIcon>
+
+                            {{ $t('views.document.tag.setting') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             @click="openknowledgeDialog(row)"
                             v-if="permissionPrecise.doc_migrate(id)"
@@ -478,6 +518,22 @@
                             </el-icon>
                             {{ $t('views.document.setting.download') }}
                           </el-dropdown-item>
+                          <el-upload
+                            v-if="permissionPrecise.doc_replace(id)"
+                            ref="elUploadRef"
+                            :file-list="[]"
+                            action="#"
+                            :auto-upload="false"
+                            :show-file-list="false"
+                            :on-change="(file: any, fileList: any) => replaceDocument(file, row)"
+                          >
+                            <el-dropdown-item>
+                              <el-icon class="color-secondary">
+                                <Upload />
+                              </el-icon>
+                              {{ $t('views.document.setting.replace') }}
+                            </el-dropdown-item>
+                          </el-upload>
                           <el-dropdown-item
                             @click.stop="deleteDocument(row)"
                             v-if="permissionPrecise.doc_delete(id)"
@@ -549,6 +605,13 @@
                             <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
                             {{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
                           >
+                          <el-dropdown-item @click="openTagSettingDrawer(row)"
+                            v-if="permissionPrecise.doc_tag(id)"
+                          >
+                            <AppIcon iconName="app-tag" class="color-secondary"></AppIcon>
+
+                            {{ $t('views.document.tag.setting') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             v-if="
                               permissionPrecise.doc_generate(id) &&
@@ -645,12 +708,15 @@
       :workspaceId="knowledgeDetail?.workspace_id"
     />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" :apiType="apiType" />
+    <TagDrawer ref="tagDrawerRef" />
+    <TagSettingDrawer ref="tagSettingDrawerRef" />
+    <AddTagDialog ref="addTagDialogRef" @addTags="addTags" :apiType="apiType" />
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-import { ElTable } from 'element-plus'
+import type { ElTable } from 'element-plus'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
@@ -666,6 +732,9 @@ import { TaskType, State } from '@/utils/status'
 import { t } from '@/locales'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import TagDrawer from './tag/TagDrawer.vue'
+import TagSettingDrawer from './tag/TagSettingDrawer.vue'
+import AddTagDialog from '@/views/document/tag/MulAddTagDialog.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -714,7 +783,7 @@ const MoreFilledPermission0 = (id: string) => {
     permissionPrecise.value.doc_migrate(id) ||
     (knowledgeDetail?.value.type === 1 && permissionPrecise.value.doc_sync(id)) ||
     (knowledgeDetail?.value.type === 2 && permissionPrecise.value.doc_sync(id)) ||
-    permissionPrecise.value.doc_delete(id)
+    permissionPrecise.value.doc_delete(id) || permissionPrecise.value.doc_tag(id)
   )
 }
 
@@ -724,7 +793,9 @@ const MoreFilledPermission1 = (id: string) => {
     permissionPrecise.value.doc_migrate(id) ||
     permissionPrecise.value.doc_export(id) ||
     permissionPrecise.value.doc_download(id) ||
-    permissionPrecise.value.doc_delete(id)
+    permissionPrecise.value.doc_delete(id) ||
+    permissionPrecise.value.doc_tag(id) ||
+    permissionPrecise.value.doc_replace(id)
   )
 }
 
@@ -742,6 +813,12 @@ const getTaskState = (status: string, taskType: number) => {
   const statusList = status.split('').reverse()
   return taskType - 1 > statusList.length + 1 ? 'n' : statusList[taskType - 1]
 }
+
+const search_type = ref('name')
+const search_form = ref<any>({
+  name: '',
+  tag: '',
+})
 
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
@@ -978,12 +1055,19 @@ function syncMulDocument() {
       arr.push(v.id)
     }
   })
-  loadSharedApi({ type: 'document', systemType: apiType.value })
-    .putMulSyncDocument(id, arr, loading)
+  MsgConfirm(t('views.document.sync.confirmTitle'), t('views.document.sync.confirmMessage1'), {
+    confirmButtonText: t('views.document.sync.label'),
+    confirmButtonClass: 'danger',
+  })
     .then(() => {
-      MsgSuccess(t('views.document.sync.successMessage'))
-      getList()
+      loadSharedApi({ type: 'document', systemType: apiType.value })
+        .putMulSyncDocument(id, arr, loading)
+        .then(() => {
+          MsgSuccess(t('views.document.sync.successMessage'))
+          getList()
+        })
     })
+    .catch(() => {})
 }
 
 function syncLarkMulDocument() {
@@ -1047,6 +1131,20 @@ function downloadDocument(row: any) {
     .then(() => {
       getList()
     })
+}
+
+const elUploadRef = ref()
+
+function replaceDocument(file: any, row: any) {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .postReplaceSourceFile(id, row.id, formData, loading)
+    .then(() => {
+      getList()
+    })
+    .catch((e: any) => {})
 }
 
 function deleteDocument(row: any) {
@@ -1125,10 +1223,12 @@ function handleSortChange({ prop, order }: { prop: string; order: string }) {
 
 function getList(bool?: boolean) {
   const param = {
-    ...(filterText.value && { name: filterText.value }),
     ...filterMethod.value,
     order_by: orderBy.value,
     folder_id: folderId,
+  }
+  if (search_form.value[search_type.value]) {
+    param[search_type.value] = search_form.value[search_type.value]
   }
   loadSharedApi({ type: 'document', isShared: isShared.value, systemType: apiType.value })
     .getDocumentPage(id as string, paginationConfig.value, param, bool ? undefined : loading)
@@ -1136,6 +1236,10 @@ function getList(bool?: boolean) {
       documentData.value = res.data.records
       paginationConfig.value.total = res.data.total
     })
+}
+
+const search_type_change = () => {
+  search_form.value = { name: '', tag: '' }
 }
 
 function getDetail() {
@@ -1171,6 +1275,34 @@ function openGenerateDialog(row?: any) {
   }
 
   GenerateRelatedDialogRef.value.open(arr, 'document')
+}
+
+const tagDrawerRef = ref()
+function openTagDrawer() {
+  tagDrawerRef.value.open()
+}
+
+const tagSettingDrawerRef = ref()
+function openTagSettingDrawer(doc: any) {
+  tagSettingDrawerRef.value.open(doc)
+}
+
+const addTagDialogRef = ref()
+
+function openAddTagDialog() {
+  addTagDialogRef.value?.open()
+}
+
+function addTags(tags: any) {
+  const arr: string[] = multipleSelection.value.map((v) => v.id)
+
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .postMulDocumentTags(id, { tag_ids: tags, document_ids: arr }, loading)
+    .then(() => {
+      addTagDialogRef.value?.close()
+      getList()
+      clearSelection()
+    })
 }
 
 onMounted(() => {

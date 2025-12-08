@@ -42,6 +42,7 @@
           <ModelSelect
             @wheel="wheel"
             :teleported="false"
+            @change="sttModelChange"
             v-model="form_data.stt_model_id"
             :placeholder="$t('views.application.form.voiceInput.placeholder')"
             :options="modelOptions"
@@ -192,9 +193,16 @@ const openSTTParamSettingDialog = () => {
 }
 
 const refreshSTTForm = (data: any) => {
-  form_data.value.model_params_setting = data
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
 
+function sttModelChange(model_id: string) {
+  if (model_id) {
+    STTModeParamSettingDialogRef.value?.reset_default(model_id, id)
+  } else {
+    refreshSTTForm({})
+  }
+}
 
 const application = getApplicationDetail()
 function getSelectModel() {

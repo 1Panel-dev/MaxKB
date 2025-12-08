@@ -3,14 +3,14 @@
     <DynamicsForm
       :read-only="view"
       :style="formStyle"
-      label-position="top"
-      require-asterisk-position="right"
       ref="dynamicsFormRef"
       v-model="data"
       :other-params="other"
       :render_data="formField.children ? formField.children : []"
       v-bind="$attrs"
       :parent_field="formField.field"
+      label-position="top"
+      require-asterisk-position="right"
     ></DynamicsForm>
   </el-card>
 </template>
@@ -38,7 +38,7 @@ const data = computed({
   },
   set: ($event) => {
     emit('update:modelValue', $event)
-  }
+  },
 })
 
 const other = computed(() => {
@@ -69,7 +69,7 @@ function validate() {
   return Promise.resolve()
 }
 defineExpose({
-  validate
+  validate,
 })
 </script>
 <style lang="scss" scoped></style>

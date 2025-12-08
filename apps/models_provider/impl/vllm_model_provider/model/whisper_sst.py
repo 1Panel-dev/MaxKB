@@ -52,11 +52,11 @@ class VllmWhisperSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 api_key=self.api_key,
                 base_url=base_url
             )
-
+            buf = audio_file.read()
             filter_params = {k: v for k, v in self.params.items() if k not in {'model_id', 'use_local', 'streaming'}}
             transcription_params = {
                 'model': self.model,
-                'file': audio_file,
+                'file': buf,
                 'language': 'zh',
             }
             result = client.audio.transcriptions.create(

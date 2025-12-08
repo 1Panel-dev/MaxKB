@@ -169,7 +169,19 @@ def parse_level(text, pattern: str):
 
 
 def re_findall(pattern, text):
-    result = re.findall(pattern, text, flags=0)
+    # 检查 pattern 是否为空或无效
+    if pattern is None:
+        return []
+
+    # 如果是字符串类型，检查是否为空字符串
+    if isinstance(pattern, str) and (not pattern or not pattern.strip()):
+        return []
+
+    try:
+        result = re.findall(pattern, text, flags=0)
+    except re.error:
+        return []
+
     return list(filter(lambda r: r is not None and len(r) > 0, reduce(lambda x, y: [*x, *y], list(
         map(lambda row: [*(row if isinstance(row, tuple) else [row])], result)),
                                                                       [])))
@@ -262,6 +274,55 @@ def post_handler_paragraph(content: str, limit: int):
     return reduce(lambda x, y: [*x, *y], map(lambda row: re.findall(pattern, row), result), [])
 
 
+def smart_split_paragraph(content: str, limit: int):
+    """
+    智能分段:在limit前找到合适的分割点(句号、回车等)
+    :param content: 需要分段的文本
+    :param limit: 最大字符限制
+    :return: 分段后的文本列表
+    """
+    if len(content) <= limit:
+        return [content]
+
+    result = []
+    start = 0
+
+    while start < len(content):
+        end = start + limit
+
+        if end >= len(content):
+            # 剩余文本不超过限制,直接添加
+            result.append(content[start:])
+            break
+
+        # 在limit范围内寻找最佳分割点
+        best_split = end
+
+        # 优先级:句号 > 感叹号/问号 > 回车
+        split_chars = [
+            ('。', 0), ('!', 0), ('?', 0),  # 句子结束符,包含在当前段
+            ('\n', 0),  # 回车符
+        ]
+
+        # 从后往前找分割点
+        for i in range(end - 1, start + limit // 2, -1):  # 至少保留一半内容
+            for char, offset in split_chars:
+                if content[i] == char:
+                    best_split = i + 1  # 包含分隔符在当前段
+                    break
+            if best_split != end:
+                break
+
+        # 如果找不到合适分割点,使用原始limit
+        if best_split == end and end < len(content):
+            best_split = end
+
+        result.append(content[start:best_split])
+        start = best_split
+
+    return [text for text in result if text.strip()]
+
+
 replace_map = {
     re.compile('\n+'): '\n',
     re.compile(' +'): ' ',
@@ -304,7 +365,7 @@ class SplitModel:
         """
         level_content_list = parse_title_level(text, self.content_level_pattern, index)
         if len(level_content_list) == 0:
-            return [to_tree_obj(row, 'block') for row in post_handler_paragraph(text, limit=self.limit)]
+            return [to_tree_obj(row, 'block') for row in smart_split_paragraph(text, limit=self.limit)]
         if index == 0 and text.lstrip().index(level_content_list[0]["content"].lstrip()) != 0:
             level_content_list.insert(0, to_tree_obj(""))
 
@@ -313,7 +374,7 @@ class SplitModel:
         for i in range(len(level_title_content_list)):
             start_content: str = level_title_content_list[i].get('content')
             if cursor < text.index(start_content, cursor):
-                for row in post_handler_paragraph(text[cursor:   text.index(start_content, cursor)], limit=self.limit):
+                for row in smart_split_paragraph(text[cursor:   text.index(start_content, cursor)], limit=self.limit):
                     level_content_list.insert(0, to_tree_obj(row, 'block'))
 
             block, cursor = get_level_block(text, level_title_content_list, i, cursor)

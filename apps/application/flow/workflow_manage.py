@@ -94,6 +94,7 @@ class WorkflowManage:
                  base_to_response: BaseToResponse = SystemToResponse(), form_data=None, image_list=None,
                  document_list=None,
                  audio_list=None,
+                 video_list=None,
                  other_list=None,
                  start_node_id=None,
                  start_node_data=None, chat_record=None, child_node=None):
@@ -105,12 +106,15 @@ class WorkflowManage:
             document_list = []
         if audio_list is None:
             audio_list = []
+        if video_list is None:
+            video_list = []
         if other_list is None:
             other_list = []
         self.start_node_id = start_node_id
         self.start_node = None
         self.form_data = form_data
         self.image_list = image_list
+        self.video_list = video_list
         self.document_list = document_list
         self.audio_list = audio_list
         self.other_list = other_list
@@ -198,6 +202,9 @@ class WorkflowManage:
                     {**self.start_node.node_params, 'form_data': start_node_data}, self.start_node.workflow_params)
                 if self.start_node.type == 'loop-node':
                     loop_node_data = node_details.get('loop_node_data', {})
+                    for k, v in node_details.get('loop_context_data').items():
+                        if v is not None:
+                            self.start_node.context[k] = v
                     self.start_node.context['loop_node_data'] = loop_node_data
                     self.start_node.context['current_index'] = node_details.get('current_index')
                     self.start_node.context['current_item'] = node_details.get('current_item')

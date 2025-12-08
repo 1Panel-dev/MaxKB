@@ -1,9 +1,12 @@
-import { WorkflowMode } from './../../../enums/application'
 import LoopNode from './index.vue'
+import { t } from '@/locales'
 import { AppNode, AppNodeModel } from '@/workflow/common/app-node'
 class LoopBodyNodeView extends AppNode {
   constructor(props: any) {
     super(props, LoopNode)
+  }
+  getNodeName() {
+    return t('views.applicationWorkflow.nodes.loopBodyNode.label')
   }
   get_up_node_field_list(contain_self: boolean, use_cache: boolean) {
     const loop_node_id = this.props.model.properties.loop_node_id

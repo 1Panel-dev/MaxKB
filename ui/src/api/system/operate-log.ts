@@ -1,18 +1,18 @@
-import { Result } from '@/request/Result'
-import { get, exportExcelPost } from '@/request/index'
-import type { pageRequest } from '@/api/type/common'
-import { type Ref } from 'vue'
+import {Result} from '@/request/Result'
+import {get, exportExcelPost, post} from '@/request/index'
+import type {pageRequest} from '@/api/type/common'
+import {type Ref} from 'vue'
 
 const prefix = '/operate_log'
 /**
  * 日志分页列表
  * @param 参数
  * page  {
-              "current_page": "string",
-              "page_size": "string",
-            }
+ "current_page": "string",
+ "page_size": "string",
+ }
  * @query 参数
-   param: any
+ param: any
  */
 const getOperateLog: (
   page: pageRequest,
@@ -39,8 +39,20 @@ const exportOperateLog: (
   )
 }
 
+const saveCleanTime: (
+  data: any,
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}/save`, data, undefined, loading)
+}
+const getCleanTime: () => Promise<Result<any>> = () => {
+  return get(`${prefix}/get_clean_time`, undefined, undefined)
+}
+
 export default {
   getOperateLog,
   getMenuList,
-  exportOperateLog
+  exportOperateLog,
+  saveCleanTime,
+  getCleanTime
 }

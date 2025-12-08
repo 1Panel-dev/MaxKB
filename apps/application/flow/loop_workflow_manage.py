@@ -99,7 +99,7 @@ class LoopWorkflowManage(WorkflowManage):
         self.loop_field_list = []
         super().__init__(flow, params, work_flow_post_handler, base_to_response, None, None, None,
                          None,
-                         None, start_node_id, start_node_data, chat_record, child_node)
+                         None, None, start_node_id, start_node_data, chat_record, child_node)
 
     def get_node_cls_by_id(self, node_id, up_node_id_list=None,
                            get_node_params=lambda node: node.properties.get('node_data')):

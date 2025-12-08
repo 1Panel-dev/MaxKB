@@ -20,6 +20,9 @@ const workspace = {
       ],
       'OR'
     ),
+  folderRead: () => true,
+  folderManage: () => true,
+  folderAuth: () => false,
   folderCreate: () =>
     hasPermission(
       [

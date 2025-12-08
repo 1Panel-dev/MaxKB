@@ -92,6 +92,28 @@
             v-model="form_data.audio_list"
           />
         </el-form-item>
+        <el-form-item
+          v-if="form_data.hasOwnProperty('video_list') || 'video_list' in form_data"
+          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.video.label')"
+          prop="video_list"
+          :rules="{
+            message: $t(
+              'views.applicationWorkflow.nodes.videoUnderstandNode.video.requiredMessage',
+            ),
+            trigger: 'blur',
+            required: false,
+          }"
+        >
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="
+              $t('views.applicationWorkflow.nodes.videoUnderstandNode.video.requiredMessage')
+            "
+            v-model="form_data.video_list"
+          />
+        </el-form-item>
         <div v-for="(field, index) in form_data.api_input_field_list" :key="'api-input-' + index">
           <el-form-item
             :label="field.variable"
@@ -191,6 +213,7 @@ const form = {
   document_list: ['start-node', 'document'],
   image_list: ['start-node', 'image'],
   audio_list: ['start-node', 'audio'],
+  video_list: ['start-node', 'video'],
 }
 
 const applicationNodeFormRef = ref<FormInstance>()
@@ -294,8 +317,9 @@ const update_field = () => {
           handleFileUpload('document', fileUploadSetting.document)
           handleFileUpload('image', fileUploadSetting.image)
           handleFileUpload('audio', fileUploadSetting.audio)
+          handleFileUpload('video', fileUploadSetting.video)
         } else {
-          ;['document_list', 'image_list', 'audio_list'].forEach((list) => {
+          ;['document_list', 'image_list', 'audio_list', 'video_list'].forEach((list) => {
             // eslint-disable-next-line vue/no-mutating-props
             delete props.nodeModel.properties.node_data[list]
           })

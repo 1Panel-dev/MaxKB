@@ -26,7 +26,7 @@
                   @mouseleave="mouseId = ''"
                 >
                   <template #default="{ row }">
-                    <span class="ellipsis-1" :title="row.role_name">{{ row.role_name }}</span>
+                    <span class="ellipsis-1" :title="row.role_name">{{ i18n_name(row.role_name) }}</span>
                   </template>
                   <template #empty>
                     <span></span>
@@ -119,7 +119,7 @@
           <div class="flex-between mb-16">
             <div class="flex align-center">
               <h4>
-                {{ currentRole?.role_name }}
+                {{ i18n_name(currentRole?.role_name as string) }}
               </h4>
               <span
                 v-if="currentRole?.type && !currentRole.internal"
@@ -155,6 +155,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { t } from '@/locales'
+import { i18n_name } from '@/utils/common'
 import PermissionConfiguration from './component/PermissionConfiguration.vue'
 import Member from './component/Member.vue'
 import CreateOrUpdateRoleDialog from './component/CreateOrUpdateRoleDialog.vue'

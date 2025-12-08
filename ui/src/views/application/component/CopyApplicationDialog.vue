@@ -23,7 +23,7 @@
           show-word-limit
         />
       </el-form-item>
-      <el-form-item :label="$t('views.application.form.appDescription.label')">
+      <el-form-item :label="$t('common.desc')">
         <el-input
           v-model="applicationForm.desc"
           type="textarea"

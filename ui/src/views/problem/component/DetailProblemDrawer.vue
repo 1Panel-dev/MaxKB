@@ -19,7 +19,7 @@
               <template v-for="(item, index) in paragraphList" :key="index">
                 <CardBox
                   :title="item.title || '-'"
-                  class="cursor mb-8"
+                  class="cursor mb-8 w-full"
                   :showIcon="false"
                   @click.stop="permissionPrecise.doc_edit(id as string) && editParagraph(item)"
                   style="height: 210px"

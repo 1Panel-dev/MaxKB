@@ -9,7 +9,7 @@
 import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext as _
 from langchain_core.messages import HumanMessage, AIMessage
 
 from application.models import Application

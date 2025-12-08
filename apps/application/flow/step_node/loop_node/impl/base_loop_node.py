@@ -129,7 +129,8 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
     is_interrupt_exec = False
     loop_node_data = node.context.get('loop_node_data') or []
     loop_answer_data = node.context.get("loop_answer_data") or []
-    current_index = node.context.get("current_index") or 0
+    start_index = node.context.get("current_index") or 0
+    current_index = start_index
     node_params = node.node_params
     start_node_id = node_params.get('child_node', {}).get('runtime_node_id')
     loop_type = node_params.get('loop_type')
@@ -144,7 +145,7 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
                                  details=loop_node_data[current_index])
 
     for item, index in generate_loop(current_index):
-        if 0 < max_loop_count <= index - current_index and loop_type == 'LOOP':
+        if 0 < max_loop_count <= index - start_index and loop_type == 'LOOP':
             raise Exception(_('Exceeding the maximum number of cycles'))
         """
         指定次数循环
@@ -223,8 +224,17 @@ class LoopWorkFlowPostHandler(WorkFlowPostHandler):
 
 class BaseLoopNode(ILoopNode):
     def save_context(self, details, workflow_manage):
+        self.context['loop_context_data'] = details.get('loop_context_data')
+        self.context['loop_answer_data'] = details.get('loop_answer_data')
+        self.context['loop_node_data'] = details.get('loop_node_data')
         self.context['result'] = details.get('result')
-        self.answer_text = str(details.get('result'))
+        self.context['params'] = details.get('params')
+        self.context['run_time'] = details.get('run_time')
+        self.context['index'] = details.get('current_index')
+        self.context['item'] = details.get('current_item')
+        for key, value in (details.get('loop_context_data') or {}).items():
+            self.context[key] = value
+        self.answer_text = ""
 
     def get_answer_list(self) -> List[Answer] | None:
         result = []
@@ -261,7 +271,13 @@ class BaseLoopNode(ILoopNode):
                           _write_context=get_write_context(loop_type, array, number, loop_body, stream),
                           _is_interrupt=_is_interrupt_exec)
 
+    def get_loop_context_data(self):
+        fields = self.node.properties.get('config', []).get('fields', []) or []
+        return {f.get('value'): self.context.get(f.get('value')) for f in fields if
+                self.context.get(f.get('value')) is not None}
+
     def get_details(self, index: int, **kwargs):
+
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -275,6 +291,7 @@ class BaseLoopNode(ILoopNode):
             "current_item": self.context.get("item"),
             'loop_type': self.node_params_serializer.data.get('loop_type'),
             'status': self.status,
+            'loop_context_data': self.get_loop_context_data(),
             'loop_node_data': self.context.get("loop_node_data"),
             'loop_answer_data': self.context.get("loop_answer_data"),
             'err_message': self.err_message

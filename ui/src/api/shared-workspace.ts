@@ -180,6 +180,14 @@ const getAllMemberList: (arg: string, loading?: Ref<boolean>) => Promise<Result<
   return get('/user/list', undefined, loading)
 }
 
+const getTags: (knowledge_id: string, params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  params,
+  loading,
+) => {
+  return get(`${prefix}/${prefix_workspace.value}/knowledge/${knowledge_id}/tags`, params, loading)
+}
+
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
@@ -193,5 +201,6 @@ export default {
   getToolListPage,
   getUserGroupList,
   getUserGroupUserList,
-  getAllMemberList
+  getAllMemberList,
+  getTags
 }

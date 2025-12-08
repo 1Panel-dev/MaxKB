@@ -24,7 +24,6 @@ const {
 } = route as any
 
 const currentTemplate = computed(() => {
-  console.log(common.isMobile())
   let modeName = ''
   if (chatUser.application) {
     if (!mode || mode === 'pc') {

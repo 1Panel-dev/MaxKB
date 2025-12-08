@@ -5,12 +5,12 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		("paragraph_id") ( 1 - distince ),* ,(1 - distince) AS comprehensive_score
+		("paragraph_id") ( 1 - distance ),* ,(1 - distance) AS comprehensive_score
 	FROM
-		( SELECT *, ( embedding.embedding::vector(%s) <=>  %s ) AS distince FROM embedding ${embedding_query} ORDER BY distince) TEMP
+		( SELECT *, ( embedding.embedding::vector(%s) <=>  %s ) AS distance FROM embedding ${embedding_query} ORDER BY distance) TEMP
 	ORDER BY
 		paragraph_id,
-		distince
+		distance
 	) DISTINCT_TEMP
 WHERE comprehensive_score>%s
 ORDER BY comprehensive_score DESC

@@ -11,7 +11,7 @@ export default {
     RadioCard: '選項卡',
     RadioRow: '單行選項卡',
     UploadInput: '文件上傳',
-    TextareaInput: '多行文字方塊',
+    TextareaInput: '多行文字框',
     MultiRow: '單行多選卡',
   },
   default: {

@@ -30,7 +30,8 @@ import { onBeforeRouteLeave, useRouter, useRoute } from 'vue-router'
 import { resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
-const { common, folder } = useStore()
+import permissionMap from '@/permission'
+const { common, folder,user } = useStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -48,6 +49,20 @@ const apiType = computed(() => {
   } else {
     return 'workspace'
   }
+})
+
+const folderType = computed(() => {
+  if (route.path.includes('application')) {
+    return 'application'
+  }
+  if (route.path.includes('knowledge')) {
+    return 'knowledge'
+  }
+  else {return 'application'}
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap[folderType.value!]['workspace']
 })
 
 const shareDisabled = computed(() => {
@@ -108,14 +123,13 @@ function getApplicationDetail() {
 function toBack() {
   if (isKnowledge.value) {
     folder.setCurrentFolder({
-      id: folderId,
+      id: permissionPrecise.value.folderRead(folderId)? folderId : user.getWorkspaceId(),
     })
   } else if (isApplication.value) {
     folder.setCurrentFolder({
-      id: current.value.folder,
+      id: permissionPrecise.value.folderRead(current.value.folder)? current.value.folder : user.getWorkspaceId(),
     })
   }
-
   router.push({ path: toBackPath.value })
 }
 

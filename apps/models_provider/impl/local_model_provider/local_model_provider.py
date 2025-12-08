@@ -8,15 +8,16 @@
 """
 import os
 
+from django.utils.translation import gettext as _
+
 from common.utils.common import get_file_content
+from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst, ModelInfo, IModelProvider, \
     ModelInfoManage
 from models_provider.impl.local_model_provider.credential.embedding import LocalEmbeddingCredential
 from models_provider.impl.local_model_provider.credential.reranker import LocalRerankerCredential
 from models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
 from models_provider.impl.local_model_provider.model.reranker import LocalReranker
-from maxkb.conf import PROJECT_DIR
-from django.utils.translation import gettext as _
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
                                             LocalEmbeddingCredential(), LocalEmbedding)

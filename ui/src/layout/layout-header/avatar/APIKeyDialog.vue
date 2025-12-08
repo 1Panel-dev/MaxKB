@@ -126,7 +126,7 @@ function changeState(bool: boolean, row: any) {
   const obj = {
     is_active: bool,
   }
-  const str = bool ? t('common.enabled') : t('common.disabled')
+  const str = bool ? t('common.status.enabled') : t('common.status.disabled')
   systemKeyApi.putAPIKey(row.id, obj, loading).then((res) => {
     MsgSuccess(str)
     getApiKeyList()

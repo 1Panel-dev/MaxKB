@@ -1,16 +1,16 @@
 <template>
-  <LayoutContainer showCollapse class="application-manage">
+  <LayoutContainer showCollapse resizable class="application-manage">
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.application.title') }}</h4>
-      <div class="p-8">
-        <folder-tree
-          :source="SourceTypeEnum.APPLICATION"
-          :data="folderList"
-          :currentNodeKey="folder.currentFolder?.id"
-          @handleNodeClick="folderClickHandle"
-          @refreshTree="refreshFolder"
-        />
-      </div>
+
+      <folder-tree
+        :source="SourceTypeEnum.APPLICATION"
+        :data="folderList"
+        :currentNodeKey="folder.currentFolder?.id"
+        @handleNodeClick="folderClickHandle"
+        @refreshTree="refreshFolder"
+        :draggable="true"
+      />
     </template>
     <ContentContainer>
       <template #header>
@@ -155,7 +155,7 @@
         >
           <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
             <template v-for="(item, index) in applicationList" :key="index">
-              <el-col
+              <!-- <el-col
                 v-if="item.resource_type === 'folder'"
                 :xs="24"
                 :sm="12"
@@ -177,12 +177,12 @@
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary lighter" size="small">
-                      {{ $t('common.creator') }}: {{ item.nick_name }}
+                      {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
                     </el-text>
                   </template>
                 </CardBox>
-              </el-col>
-              <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+              </el-col> -->
+              <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
                 <CardBox
                   :title="item.name"
                   :description="item.desc"
@@ -197,7 +197,7 @@
                   <template #subTitle>
                     <el-text class="color-secondary lighter" size="small">
                       <auto-tooltip :content="item.username">
-                        {{ $t('common.creator') }}: {{ item.nick_name }}
+                        {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
                       </auto-tooltip>
                     </el-text>
                   </template>
@@ -330,6 +330,7 @@ import ApplicationApi from '@/api/application/application'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { i18n_name } from '@/utils/common'
 import { useRouter, useRoute } from 'vue-router'
 import { isWorkFlow } from '@/utils/application'
 import { resetUrl } from '@/utils/common'
@@ -529,35 +530,39 @@ const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 
-const apiInputParams = ref([])
-
 function toChat(row: any) {
-  row?.work_flow?.nodes
-    ?.filter((v: any) => v.id === 'base-node')
-    .map((v: any) => {
-      apiInputParams.value = v.properties.api_input_field_list
-        ? v.properties.api_input_field_list.map((v: any) => {
-            return {
-              name: v.variable,
-              value: v.default_value,
-            }
-          })
-        : v.properties.input_field_list
-          ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
-          : []
+  const api =
+    row.type == 'WORK_FLOW'
+      ? (id: string) => ApplicationApi.getApplicationDetail(id)
+      : (id: string) => Promise.resolve({ data: row })
+  api(row.id).then((ok) => {
+    let aips = ok.data?.work_flow?.nodes
+      ?.filter((v: any) => v.id === 'base-node')
+      .map((v: any) => {
+        return v.properties.api_input_field_list
+          ? v.properties.api_input_field_list.map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
+          : v.properties.input_field_list
+            ? v.properties.input_field_list
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
+            : []
+      })
+      .reduce((x: Array<any>, y: Array<any>) => [...x, ...y])
+    aips = aips ? aips : []
+    const apiParams = mapToUrlParams(aips) ? '?' + mapToUrlParams(aips) : ''
+    ApplicationApi.getAccessToken(row.id, loading).then((res: any) => {
+      window.open(application.location + res?.data?.access_token + apiParams)
     })
-  const apiParams = mapToUrlParams(apiInputParams.value)
-    ? '?' + mapToUrlParams(apiInputParams.value)
-    : ''
-  ApplicationApi.getAccessToken(row.id, loading).then((res: any) => {
-    window.open(application.location + res?.data?.access_token + apiParams)
   })
 }
 

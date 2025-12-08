@@ -6,7 +6,8 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import Permission, Group, Operate, RoleConstants
+from common.constants.permission_constants import Permission, Group, Operate, RoleConstants, ViewPermission, \
+    PermissionConstants, CompareConstants
 from common.log.log import log
 from common.result import result
 from folders.api.folder import FolderCreateAPI, FolderEditAPI, FolderReadAPI, FolderTreeReadAPI, FolderDeleteAPI
@@ -37,9 +38,17 @@ class FolderView(APIView):
         tags=[_('Folder')]  # type: ignore
     )
     @has_permissions(
+        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{r.data.get('parent_id')}"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                     ),
+        lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                         [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
+                                                     operate=Operate.EDIT,
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{r.data.get('parent_id')}"
+                                                     )], CompareConstants.AND),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
     )
     @log(
         menu='folder', operate='Create folder',
@@ -63,7 +72,8 @@ class FolderView(APIView):
         tags=[_('Folder')]  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_WORKSPACE_USER_RESOURCE_PERMISSION"), operate= Operate.READ,
+        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_WORKSPACE_USER_RESOURCE_PERMISSION"),
+                                     operate=Operate.READ,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.READ,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
@@ -73,7 +83,7 @@ class FolderView(APIView):
     def get(self, request: Request, workspace_id: str, source: str):
         return result.success(FolderTreeSerializer(
             data={'workspace_id': workspace_id, 'source': source}
-        ).get_folder_tree(request.query_params.get('name')))
+        ).get_folder_tree(request.user, request.query_params.get('name')))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -90,8 +100,17 @@ class FolderView(APIView):
         )
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
-                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                         ),
+            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
+                                         ),
+            lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                             [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
+                                                         operate=Operate.EDIT,
+                                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
+                                                         )], CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         @log(
             menu='folder', operate='Edit folder',
@@ -133,8 +152,17 @@ class FolderView(APIView):
         )
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
-                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}"),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                         ),
+            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
+                                         ),
+            lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                             [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
+                                                         operate=Operate.EDIT,
+                                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
+                                                         )], CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         @log(
             menu='folder', operate='Delete folder',

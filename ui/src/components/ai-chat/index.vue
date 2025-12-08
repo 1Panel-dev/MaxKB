@@ -5,7 +5,6 @@
     :class="type"
     :style="{
       height: firsUserInput ? '100%' : undefined,
-      paddingBottom: applicationDetails.disclaimer ? '20px' : 0,
     }"
   >
     <div
@@ -114,6 +113,7 @@ import {
   onMounted,
   onBeforeUnmount,
   provide,
+  onBeforeMount,
 } from 'vue'
 import { useRoute } from 'vue-router'
 import applicationApi from '@/api/application/application'
@@ -169,7 +169,7 @@ const emit = defineEmits([
   'openParagraph',
   'openParagraphDocument',
 ])
-const { application, common } = useStore()
+const { application, common, chatUser } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
@@ -523,6 +523,8 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
             : [],
         audio_list:
           other_params_data && other_params_data.audio_list ? other_params_data.audio_list : [],
+        video_list:
+          other_params_data && other_params_data.video_list ? other_params_data.video_list : [],
         other_list:
           other_params_data && other_params_data.other_list ? other_params_data.other_list : [],
       },
@@ -581,16 +583,17 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         if (props.chatId === 'new') {
           emit('refresh', chartOpenId.value)
         }
-        if (props.type === 'debug-ai-chat') {
-          getSourceDetail(chat)
-        } else {
-          if (
-            props.applicationDetails &&
-            (props.applicationDetails.show_exec || props.applicationDetails.show_source)
-          ) {
-            getSourceDetail(chat)
-          }
-        }
+        getSourceDetail(chat)
+        // if (props.type === 'debug-ai-chat') {
+        //   getSourceDetail(chat)
+        // } else {
+        //   if (
+        //     props.applicationDetails &&
+        //     (props.applicationDetails.show_exec || props.applicationDetails.show_source)
+        //   ) {
+        //     getSourceDetail(chat)
+        //   }
+        // }
       })
       .finally(() => {
         ChatManagement.close(chat.id)
@@ -645,7 +648,16 @@ const handleScroll = () => {
     }
   }
 }
-
+onBeforeMount(() => {
+  window.chatUserProfile = () => {
+    if (props.type === 'ai-chat') {
+      if (chatUser.chat_profile?.authentication_type === 'login') {
+        return chatUser.getChatUserProfile()
+      }
+    }
+    return Promise.resolve(null)
+  }
+})
 onMounted(() => {
   if (isUserInput.value && localStorage.getItem(`${accessToken}userForm`)) {
     const userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
@@ -668,6 +680,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.sendMessage = null
+  window.chatUserProfile = null
 })
 
 function setScrollBottom() {

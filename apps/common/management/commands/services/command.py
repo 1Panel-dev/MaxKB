@@ -1,18 +1,16 @@
 import math
+import os
 
 from django.core.management.base import BaseCommand
 from django.db.models import TextChoices
 
-from .hands import *
 from .utils import ServicesUtil
-import os
 
 
 class Services(TextChoices):
     gunicorn = 'gunicorn', 'gunicorn'
     celery_default = 'celery_default', 'celery_default'
     local_model = 'local_model', 'local_model'
-    scheduler = 'scheduler', 'scheduler'
     web = 'web', 'web'
     celery = 'celery', 'celery'
     celery_model = 'celery_model', 'celery_model'
@@ -26,7 +24,6 @@ class Services(TextChoices):
             cls.gunicorn.value: services.GunicornService,
             cls.celery_default: services.CeleryDefaultService,
             cls.local_model: services.GunicornLocalModelService,
-            cls.scheduler: services.SchedulerService,
         }
         return services_map.get(name)
 
@@ -42,13 +39,10 @@ class Services(TextChoices):
     def task_services(cls):
         return cls.celery_services()
 
-    @classmethod
-    def scheduler_services(cls):
-        return [cls.scheduler]
 
     @classmethod
     def all_services(cls):
-        return cls.web_services() + cls.task_services() + cls.scheduler_services()
+        return cls.web_services() + cls.task_services()
 
     @classmethod
     def export_services_values(cls):
@@ -102,7 +96,7 @@ class BaseActionCommand(BaseCommand):
         )
         parser.add_argument('-d', '--daemon', nargs="?", const=True)
         parser.add_argument('-w', '--worker', type=int, nargs="?",
-                            default=3 if os.cpu_count() > 6 else math.floor(os.cpu_count() / 2))
+                            default=3 if os.cpu_count() > 6 else max(1, math.floor(os.cpu_count() / 2)))
         parser.add_argument('-f', '--force', nargs="?", const=True)
 
     def initial_util(self, *args, **options):

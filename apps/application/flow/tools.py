@@ -252,7 +252,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_ena
             except StopAsyncIteration:
                 break
     except Exception as e:
-        maxkb_logger.error(f'Exception: {e}', traceback.format_exc())
+        maxkb_logger.error(f'Exception: {e}', exc_info=True)
     finally:
         loop.close()
 

@@ -33,11 +33,7 @@
             v-if="permissionPrecise.doc_edit(id)"
           >
             <el-button text @click.stop="editParagraph(data)">
-              <AppIcon
-                iconName="app-edit"
-                :size="16"
-                class="color-secondary"
-              ></AppIcon>
+              <AppIcon iconName="app-edit" :size="16" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
         </span>
@@ -97,13 +93,13 @@
                   <template #dropdown>
                     <el-dropdown-menu>
                       <el-dropdown-item
-                        :disabled="props.showMoveUp"
+                        :disabled="!props.showMoveUp"
                         @click.stop="emit('move', 'up')"
                       >
                         {{ $t('views.document.movePosition.moveUp') }}
                       </el-dropdown-item>
                       <el-dropdown-item
-                        :disabled="props.showMoveDown"
+                        :disabled="!props.showMoveDown"
                         @click.stop="emit('move', 'down')"
                       >
                         {{ $t('views.document.movePosition.moveDown') }}
@@ -144,7 +140,6 @@
       ref="SelectDocumentDialogRef"
       @refresh="refreshMigrateParagraph"
       :apiType="apiType"
-      :workspace-id="knowledgeDetail.workspace_id"
     />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="refresh" :apiType="apiType" />
   </el-card>
@@ -169,8 +164,12 @@ const props = defineProps<{
 const route = useRoute()
 const {
   params: { id, documentId },
-  query: { from },
+  query: { from, isShared },
 } = route as any
+
+const shareDisabled = computed(() => {
+  return isShared === 'true'
+})
 
 const apiType = computed(() => {
   return from as 'systemShare' | 'workspace' | 'systemManage'
@@ -195,7 +194,6 @@ const emit = defineEmits([
 ])
 const loading = ref(false)
 const changeStateloading = ref(false)
-const knowledgeDetail = ref<any>({})
 const show = ref(false)
 // card上面存在dropdown菜单
 const subHovered = ref(false)
@@ -220,13 +218,6 @@ async function changeState(row: any) {
     })
     .catch(() => {
       return false
-    })
-}
-function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getKnowledgeDetail(id, loading)
-    .then((res: any) => {
-      knowledgeDetail.value = res.data
     })
 }
 
@@ -304,10 +295,6 @@ const dialogVisible = computed(
     GenerateRelatedDialogRef.value?.dialogVisible,
 )
 
-onMounted(() => {
-  getDetail()
-})
-
 watch(dialogVisible, (val: boolean) => {
   emit('dialogVisibleChange', val)
 })
@@ -320,7 +307,7 @@ watch(dialogVisible, (val: boolean) => {
   position: relative;
   overflow: inherit;
   &:hover {
-    background: rgba(31, 35, 41, 0.1);
+    background: var(--app-text-color-light-1);
     border: 1px solid #dee0e3;
   }
   &.disabled {

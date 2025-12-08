@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from common.db.search import page_search
-from common.event import ListenerManagement
+from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
 from knowledge.models import Paragraph, Problem, Document, ProblemParagraphMapping, SourceType, TaskType, State, \

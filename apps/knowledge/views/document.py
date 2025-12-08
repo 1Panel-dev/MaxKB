@@ -13,7 +13,7 @@ from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentB
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
     DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
-    DocumentExportAPI, DocumentMigrateAPI, DocumentDownloadSourceAPI
+    DocumentExportAPI, DocumentMigrateAPI, DocumentDownloadSourceAPI, DocumentTagsAPI
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.views.common import get_knowledge_document_operation_object, get_document_operation_object_batch, \
@@ -506,6 +506,37 @@ class DocumentView(APIView):
                     data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
                 ).batch_refresh(request.data))
 
+    class BatchAddTag(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            summary=_('Batch add tags to documents'),
+            operation_id=_('Batch add tags to documents'),  # type: ignore
+            request=DocumentTagsAPI.get_request(),
+            parameters=DocumentTagsAPI.get_parameters(),
+            responses=DocumentTagsAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        @log(
+            menu='document', operate="Batch add tags to documents",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object_batch(r.data.get('document_ids'))
+            ),
+        )
+        def post(self, request: Request, workspace_id: str, knowledge_id: str):
+            return result.success(DocumentSerializers.Batch(
+                data={'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
+            ).batch_add_tag(request.data))
+
     class BatchGenerateRelated(APIView):
         authentication_classes = [TokenAuth]
 
@@ -566,6 +597,7 @@ class DocumentView(APIView):
                     'knowledge_id': knowledge_id,
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
+                    'tag': request.query_params.get('tag'),
                     'desc': request.query_params.get("desc"),
                     'user_id': request.query_params.get('user_id'),
                     'status': request.query_params.get('status'),
@@ -654,6 +686,111 @@ class DocumentView(APIView):
             return DocumentSerializers.Operate(data={
                 'workspace_id': workspace_id, 'document_id': document_id, 'knowledge_id': knowledge_id
             }).download_source_file()
+
+    class ReplaceSourceFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Replace source file'),
+            operation_id=_('Replace source file'),  # type: ignore
+            parameters=DocumentDownloadSourceAPI.get_parameters(),
+            responses=DocumentDownloadSourceAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_REPLACE.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_REPLACE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.ReplaceSourceFile(data={
+                'workspace_id': workspace_id,
+                'document_id': document_id,
+                'knowledge_id': knowledge_id,
+                'file': request.FILES.get('file')
+            }).replace())
+
+    class Tags(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Get document tags'),
+            description=_('Get document tags'),
+            operation_id=_('Get document tags'),  # type: ignore
+            parameters=DocumentTagsAPI.get_parameters(),
+            responses=DocumentTagsAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Tags(data={
+                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id,
+                'name': request.query_params.get('name')
+            }).list())
+
+        @extend_schema(
+            summary=_('Add document tags'),
+            description=_('Add document tags'),
+            operation_id=_('Add document tags'),  # type: ignore
+            parameters=DocumentTagsAPI.get_parameters(),
+            responses=DocumentTagsAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.AddTags(data={
+                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'document_id': document_id,
+                'tag_ids': request.data
+            }).add_tags())
+
+        class BatchDelete(APIView):
+            authentication_classes = [TokenAuth]
+
+            @extend_schema(
+                summary=_('Delete document tags'),
+                description=_('Delete document tags'),
+                operation_id=_('Delete document tags'),  # type: ignore
+                parameters=DocumentTagsAPI.get_parameters(),
+                request=DocumentTagsAPI.get_request(),
+                responses=DocumentTagsAPI.get_response(),
+                tags=[_('Knowledge Base/Documentation')]  # type: ignore
+            )
+            @has_permissions(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ViewPermission([RoleConstants.USER.get_workspace_role()],
+                               [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                               CompareConstants.AND),
+            )
+            @log(
+                menu='document', operate="Delete document tags",
+                get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                    get_knowledge_operation_object(keywords.get('knowledge_id')),
+                    get_document_operation_object(keywords.get('document_id'))
+                ),
+            )
+            def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+                return result.success(DocumentSerializers.DeleteTags(data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'document_id': document_id,
+                    'tag_ids': request.data
+                }).delete_tags())
 
     class Migrate(APIView):
         authentication_classes = [TokenAuth]

@@ -48,11 +48,9 @@ export default {
       requiredMessage: '请输入MCP名称',
     },
     toolDescription: {
-      label: '描述',
       placeholder: '请输入工具的描述',
     },
     mcpDescription: {
-      label: '描述',
       placeholder: '请输入MCP的描述',
     },
     paramName: {

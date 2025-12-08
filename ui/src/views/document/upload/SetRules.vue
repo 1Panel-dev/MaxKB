@@ -47,6 +47,7 @@
                           <el-select
                             v-model="form.patterns"
                             multiple
+                            :reserve-keyword="false"
                             allow-create
                             default-first-option
                             filterable

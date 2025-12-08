@@ -63,7 +63,7 @@
           </div>
         </div>
         <PermissionTable
-          :data="permissionData"
+          :data="treeData"
           :type="activeData.type"
           ref="PermissionTableRef"
           :getData="getPermissionList"
@@ -156,22 +156,62 @@ const PermissionTableRef = ref()
 const getPermissionList = () => {
   const workspaceId = currentWorkspaceId.value || user.getWorkspaceId() || 'default'
   const params: any = {}
-  if (PermissionTableRef.value.searchForm[PermissionTableRef.value.searchType]) {
-    params[PermissionTableRef.value.searchType] =
-      PermissionTableRef.value.searchForm[PermissionTableRef.value.searchType]
-  }
   AuthorizationApi.getResourceAuthorization(
     workspaceId,
     currentUser.value,
     (route.meta?.resource as string) || 'APPLICATION',
-    PermissionTableRef.value.paginationConfig,
     params,
     rLoading,
   ).then((res) => {
-    permissionData.value = res.data.records || []
-    PermissionTableRef.value.paginationConfig.total = res.data.total || 0
+    const resourceType = (route.meta?.resource as string) || 'APPLICATION'
+
+    if (resourceType === 'MODEL') {
+      permissionData.value = res.data || []
+    } else {
+      permissionData.value = res.data.map((item: any) => {
+      if (!item.folder_id && item.permission === 'NOT_AUTH') {
+        return {...item, permission: 'VIEW'}
+      }
+      return item}) || []
+    }
   })
 }
+
+const toTree = (nodeList: any, pField: any) => {
+  if (!nodeList || nodeList.length === 0) return []
+
+  const list = JSON.parse(JSON.stringify(nodeList))
+
+  if (!pField) {
+    pField = 'parentId'
+  }
+  const nodeMap = Object.fromEntries(list.map((item: any) => [item.id, item]))
+
+  for (let index = 0; index < nodeList.length; index++) {
+    const element = list[index];
+    if (!element.children) {
+      element.children = []
+    }
+    if (element[pField]) {
+      const pNode = nodeMap[element[pField]]
+      if (pNode) {
+        if (!pNode.children) {
+           pNode.children = []
+        }
+        pNode.children.push(element)
+      }
+    }
+  }
+  return list.filter((item: any) => !item[pField])
+}
+
+const treeData = computed(() => {
+  const resourceType = (route.meta?.resource as string) || 'APPLICATION'
+  if (resourceType === 'MODEL') {
+    return permissionData.value
+  }
+  return toTree(permissionData.value, 'folder_id')
+})
 
 function clickMemberHandle(item: any) {
   currentUser.value = item.id

@@ -74,10 +74,13 @@ export default {
     editParam: 'Edit Parameter',
     addParam: 'Add Parameter',
   },
+  aggregationStrategy: 'Aggregation Strategy',
   inputPlaceholder: 'Please input',
   selectPlaceholder: 'Please select',
   title: 'Title',
   content: 'Content',
+  desc: 'Description',
+  descPlaceholder: 'Please enter description',
   rename: 'Rename',
   renameSuccess: 'Successful',
   EditAvatarDialog: {
@@ -114,4 +117,5 @@ export default {
     label: 'Prompt',
     placeholder: 'Please enter prompt',
   },
+  variable: 'Variable',
 }

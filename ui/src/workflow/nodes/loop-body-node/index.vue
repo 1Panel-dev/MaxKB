@@ -6,7 +6,7 @@
 <script setup lang="ts">
 import { set, cloneDeep } from 'lodash'
 import AppEdge from '@/workflow/common/edge'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import LogicFlow from '@logicflow/core'
 import Dagre from '@/workflow/plugins/dagre'
 import { initDefaultShortcut } from '@/workflow/common/shortcut'
@@ -14,12 +14,13 @@ import LoopBodyContainer from '@/workflow/nodes/loop-body-node/LoopBodyContainer
 import { WorkflowMode } from '@/enums/application'
 import { WorkFlowInstance } from '@/workflow/common/validate'
 import { t } from '@/locales'
+import { disconnectByFlow } from '@/workflow/common/teleport'
 const nodes: any = import.meta.glob('@/workflow/nodes/**/index.ts', { eager: true })
 const props = defineProps<{ nodeModel: any }>()
 const containerRef = ref()
 
 const validate = () => {
-  const workflow = new WorkFlowInstance(lf.value.getGraphData())
+  const workflow = new WorkFlowInstance(lf.value.getGraphData(), WorkflowMode.ApplicationLoop)
   return Promise.all(lf.value.graphModel.nodes.map((element: any) => element?.validate?.()))
     .then(() => {
       const loop_node_id = props.nodeModel.properties.loop_node_id
@@ -62,7 +63,9 @@ const set_loop_body = () => {
 const refresh_loop_fields = (fields: Array<any>) => {
   const loop_node_id = props.nodeModel.properties.loop_node_id
   const loop_node = props.nodeModel.graphModel.getNodeModelById(loop_node_id)
-  loop_node.properties.config.fields = fields
+  if (loop_node) {
+    loop_node.properties.config.fields = fields
+  }
 }
 
 const lf = ref()
@@ -157,6 +160,10 @@ onMounted(() => {
   renderGraphData(cloneDeep(props.nodeModel.properties.workflow))
   set(props.nodeModel, 'validate', validate)
   set(props.nodeModel, 'set_loop_body', set_loop_body)
+})
+onUnmounted(() => {
+  disconnectByFlow(lf.value.graphModel.flowId)
+  lf.value = null
 })
 </script>
 <style lang="scss" scoped></style>

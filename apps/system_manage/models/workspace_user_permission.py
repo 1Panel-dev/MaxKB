@@ -38,7 +38,7 @@ class WorkspaceUserResourcePermission(models.Model):
     auth_target_type = models.CharField(verbose_name='授权目标', max_length=128, choices=AuthTargetType.choices,
                                         default=AuthTargetType.KNOWLEDGE, db_index=True)
     # 授权的知识库或者应用的id
-    target = models.UUIDField(max_length=128, verbose_name="知识库/应用id", db_index=True)
+    target = models.CharField(max_length=128, verbose_name="知识库/应用id", db_index=True)
 
     # 授权类型 如果是Role那么就是角色的权限  如果是PERMISSION
     auth_type = models.CharField(default=False, verbose_name="授权类型", choices=ResourceAuthType.choices,
@@ -57,3 +57,4 @@ class WorkspaceUserResourcePermission(models.Model):
 
     class Meta:
         db_table = "workspace_user_resource_permission"
+        unique_together = ('workspace_id', 'user', 'auth_target_type', 'target')

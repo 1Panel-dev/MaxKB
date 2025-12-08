@@ -3,14 +3,34 @@
     {{ breadcrumbData[0]?.name }}
   </h2>
   <el-breadcrumb separator-icon="ArrowRight" style="line-height: normal" class="mt-4" v-else>
-    <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index">
-      <h5 class="ml-4 ellipsis" v-if="index === breadcrumbData.length - 1" :title="item.name">
-        {{ item.name }}
-      </h5>
-      <el-button v-else link @click="handleClick(item)" :title="item.name">
-        <span class="ellipsis"> {{ item.name }}</span>
-      </el-button>
-    </el-breadcrumb-item>
+    <template v-if="breadcrumbData?.length > 3">
+      <el-breadcrumb-item>
+        <el-button link @click="handleClick(breadcrumbData[0])" :title="breadcrumbData[0].name">
+          <span class="ellipsis"> {{ breadcrumbData[0].name }}</span>
+        </el-button>
+      </el-breadcrumb-item>
+      <el-breadcrumb-item>
+        <el-button link @click="handleClick(breadcrumbData[breadcrumbData.length - 2])">
+          <el-icon><MoreFilled /></el-icon>
+        </el-button>
+      </el-breadcrumb-item>
+      <el-breadcrumb-item>
+        <h5 class="ml-4 ellipsis" :title="breadcrumbData[breadcrumbData.length - 1].name">
+          {{ breadcrumbData[breadcrumbData.length - 1].name }}
+        </h5>
+      </el-breadcrumb-item>
+    </template>
+    <template v-else>
+      <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index">
+        <h5 class="ml-4 ellipsis" v-if="index === breadcrumbData.length - 1" :title="item.name">
+          {{ item.name }}
+        </h5>
+
+        <el-button v-else link @click="handleClick(item)" :title="item.name">
+          <span class="ellipsis"> {{ item.name }}</span>
+        </el-button>
+      </el-breadcrumb-item>
+    </template>
   </el-breadcrumb>
 </template>
 

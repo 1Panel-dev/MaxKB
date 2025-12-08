@@ -54,7 +54,7 @@
                   @mouseenter="showicon = index"
                   @mouseleave="showicon = null"
                 >
-                  <span style="max-width: 92%">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                  <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
                   <el-tooltip
                     effect="dark"
                     :content="$t('views.applicationWorkflow.setting.copyParam')"

@@ -1,7 +1,7 @@
 export default {
   title: '對話用戶',
-  syncUsers: '同步用戶',
-  syncUsersTip: '僅同步新增用戶',
+  syncUsers: '导入用戶',
+  syncUsersTip: '僅导入新增用戶',
   setUserGroups: '設定用戶組',
   knowledgeTitleTip: '該配置需要關聯的應用開啟對話用戶登入認證後才會生效',
   applicationTitleTip: '該配置需要應用開啟登入認證後生效',

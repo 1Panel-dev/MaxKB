@@ -29,6 +29,7 @@ interface User {
   language?: string
   workspace_list?: Array<any>
   role_name?: Array<any>
+  source?: string
 }
 
 interface LoginRequest {

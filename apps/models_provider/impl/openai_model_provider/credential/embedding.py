@@ -13,8 +13,26 @@ from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
+
+class OpenAIEmbeddingModelParams(BaseForm):
+    dimensions = forms.SingleSelect(
+        TooltipLabel(
+            _('Dimensions'),
+            _('')
+        ),
+        required=True,
+        default_value=1024,
+        value_field='value',
+        text_field='label',
+        option_list=[
+            {'label': '1536', 'value': '1536'},
+            {'label': '1024', 'value': '1024'},
+            {'label': '768', 'value': '768'},
+            {'label': '512', 'value': '512'},
+        ]
+    )
 
 
 class OpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
@@ -48,6 +66,9 @@ class OpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
 
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
+
+    def get_model_params_setting_form(self, model_name):
+        return OpenAIEmbeddingModelParams()
 
     api_base = forms.TextInputField('API URL', required=True)
     api_key = forms.PasswordInputField('API Key', required=True)

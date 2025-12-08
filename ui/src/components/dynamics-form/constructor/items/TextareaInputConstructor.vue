@@ -78,7 +78,7 @@
       :minlength="formValue.minlength"
       :placeholder="$t('dynamicsForm.default.placeholder')"
       show-word-limit
-      :autosize="{ minRows: 3, maxRows: 3 }"
+      :rows="3"
       type="textarea"
     />
   </el-form-item>
@@ -113,7 +113,7 @@ const getData = () => {
       maxlength: formValue.value.maxlength,
       minlength: formValue.value.minlength,
       'show-word-limit': true,
-      autosize: { minRows: 3, maxRows: 3 },
+      rows: 3,
     },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,

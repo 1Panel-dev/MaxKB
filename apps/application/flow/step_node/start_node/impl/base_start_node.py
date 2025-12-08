@@ -48,6 +48,7 @@ class BaseStartStepNode(IStarNode):
         self.context['document'] = details.get('document_list')
         self.context['image'] = details.get('image_list')
         self.context['audio'] = details.get('audio_list')
+        self.context['video'] = details.get('video_list')
         self.context['other'] = details.get('other_list')
         self.status = details.get('status')
         self.err_message = details.get('err_message')
@@ -73,6 +74,7 @@ class BaseStartStepNode(IStarNode):
             'image': self.workflow_manage.image_list,
             'document': self.workflow_manage.document_list,
             'audio': self.workflow_manage.audio_list,
+            'video': self.workflow_manage.video_list,
             'other': self.workflow_manage.other_list,
 
         }
@@ -97,6 +99,7 @@ class BaseStartStepNode(IStarNode):
             'status': self.status,
             'err_message': self.err_message,
             'image_list': self.context.get('image'),
+            'video_list': self.context.get('video'),
             'document_list': self.context.get('document'),
             'audio_list': self.context.get('audio'),
             'other_list': self.context.get('other'),

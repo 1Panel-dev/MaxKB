@@ -237,7 +237,7 @@ class ListenerManagement:
         next_index = taskType.value + 1
         current_index = taskType.value
         status_number = state.value
-        current_time = timezone.now().strftime('%Y-%m-%d %H:%M:%S.%f') + '+00'
+        current_time = timezone.now().astimezone(timezone.get_default_timezone()).strftime('%Y-%m-%d %H:%M:%S.%f%z')
         params_dict = {'${bit_number}': bit_number, '${up_index}': up_index,
                        '${status_number}': status_number, '${next_index}': next_index,
                        '${table_name}': query_set.model._meta.db_table, '${current_index}': current_index,

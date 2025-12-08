@@ -138,11 +138,12 @@ const getDingCallback: (code: string, accessToken: string, loading?: Ref<boolean
   return get('auth/dingtalk', {code, accessToken: accessToken}, loading)
 }
 
-const getDingOauth2Callback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const getDingOauth2Callback: (code: string, accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
+  accessToken,
   loading,
 ) => {
-  return get('auth/dingtalk/oauth2', {code}, loading)
+  return get('auth/dingtalk/oauth2', {code, accessToken: accessToken}, loading)
 }
 
 const getWecomCallback: (code: string, accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
@@ -152,11 +153,12 @@ const getWecomCallback: (code: string, accessToken: string, loading?: Ref<boolea
 ) => {
   return get('auth/wecom', {code, accessToken: accessToken}, loading)
 }
-const getLarkCallback: (code: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const getLarkCallback: (code: string, accessToken: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   code,
+  accessToken,
   loading,
 ) => {
-  return get('auth/lark/oauth2', {code}, loading)
+  return get('auth/lark/oauth2', {code, accessToken: accessToken}, loading)
 }
 
 /**

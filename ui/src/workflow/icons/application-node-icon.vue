@@ -2,13 +2,13 @@
   <el-avatar
     v-if="isAppIcon(item?.icon)"
     shape="square"
-    :size="32"
+    :size="size || 32"
     style="background: none"
     class="mr-8"
   >
     <img :src="item?.icon" alt="" />
   </el-avatar>
-  <LogoIcon v-else height="32px" />
+  <LogoIcon v-else :height="`${size}px`" />
 </template>
 <script setup lang="ts">
 import { isAppIcon } from '@/utils/common'
@@ -17,5 +17,6 @@ const props = defineProps<{
     name: string
     icon: string
   }
+  size?: string | number
 }>()
 </script>

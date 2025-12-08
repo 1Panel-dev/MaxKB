@@ -1,6 +1,7 @@
-import { type Dict } from '@/api/type/common'
-import { type Ref } from 'vue'
+import {type Dict} from '@/api/type/common'
+import {type Ref} from 'vue'
 import bus from '@/bus'
+
 interface ApplicationFormType {
   name?: string
   desc?: string
@@ -35,6 +36,7 @@ interface ApplicationFormType {
   tool_ids?: string[]
   mcp_output_enable?: boolean
 }
+
 interface Chunk {
   real_node_id: string
   chat_id: string
@@ -50,6 +52,7 @@ interface Chunk {
   runtime_node_id: string
   child_node: any
 }
+
 interface chatType {
   id: string
   problem_text: string
@@ -82,6 +85,7 @@ interface chatType {
     document_list: Array<any>
     image_list: Array<any>
     audio_list: Array<any>
+    video_list: Array<any>
     other_list: Array<any>
   }
 }
@@ -95,6 +99,7 @@ interface Node {
   index: number
   is_end: boolean
 }
+
 interface WriteNodeInfo {
   current_node: any
   answer_text_list_index: number
@@ -102,6 +107,7 @@ interface WriteNodeInfo {
   divider_content?: Array<string>
   divider_reasoning_content?: Array<string>
 }
+
 export class ChatRecordManage {
   id?: any
   ms: number
@@ -112,6 +118,7 @@ export class ChatRecordManage {
   loading?: Ref<boolean>
   node_list: Array<any>
   write_node_info?: WriteNodeInfo
+
   constructor(chat: chatType, ms?: number, loading?: Ref<boolean>) {
     this.ms = ms ? ms : 10
     this.chat = chat
@@ -121,6 +128,7 @@ export class ChatRecordManage {
     this.write_ed = false
     this.node_list = []
   }
+
   append_answer(
     chunk_answer: string,
     reasoning_content: string,
@@ -157,8 +165,9 @@ export class ChatRecordManage {
       }
     }
     this.chat.answer_text = this.chat.answer_text + chunk_answer
-    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: false })
+    bus.emit('change:answer', {record_id: this.chat.record_id, is_end: false})
   }
+
   get_current_up_node(run_node: any) {
     const index = this.node_list.findIndex((item) => item == run_node)
     if (index > 0) {
@@ -167,6 +176,7 @@ export class ChatRecordManage {
     }
     return undefined
   }
+
   get_run_node() {
     if (
       this.write_node_info &&
@@ -225,6 +235,7 @@ export class ChatRecordManage {
     }
     return undefined
   }
+
   findIndex<T>(array: Array<T>, find: (item: T) => boolean, type: 'last' | 'index') {
     let set_index = -1
     for (let index = 0; index < array.length; index++) {
@@ -238,13 +249,14 @@ export class ChatRecordManage {
     }
     return set_index
   }
+
   closeInterval() {
     this.chat.write_ed = true
     this.write_ed = true
     if (this.loading) {
       this.loading.value = false
     }
-    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: true })
+    bus.emit('change:answer', {record_id: this.chat.record_id, is_end: true})
     if (this.id) {
       clearInterval(this.id)
     }
@@ -257,6 +269,7 @@ export class ChatRecordManage {
       this.chat.answer_text_list.splice(last_index, 1)
     }
   }
+
   write() {
     this.chat.is_stop = false
     this.is_stop = false
@@ -277,21 +290,21 @@ export class ChatRecordManage {
         }
         return
       }
-      const { current_node, answer_text_list_index } = node_info
+      const {current_node, answer_text_list_index} = node_info
 
       if (current_node.buffer.length > 20) {
         const context = current_node.is_end
           ? current_node.buffer.splice(0)
           : current_node.buffer.splice(
-              0,
-              current_node.is_end ? undefined : current_node.buffer.length - 20,
-            )
+            0,
+            current_node.is_end ? undefined : current_node.buffer.length - 20,
+          )
         const reasoning_content = current_node.is_end
           ? current_node.reasoning_content_buffer.splice(0)
           : current_node.reasoning_content_buffer.splice(
-              0,
-              current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20,
-            )
+            0,
+            current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20,
+          )
         this.append_answer(
           context.join(''),
           reasoning_content.join(''),
@@ -354,6 +367,7 @@ export class ChatRecordManage {
       }
     }, this.ms)
   }
+
   stop() {
     clearInterval(this.id)
     this.is_stop = true
@@ -362,13 +376,16 @@ export class ChatRecordManage {
       this.loading.value = false
     }
   }
+
   close() {
     this.is_close = true
   }
+
   open() {
     this.is_close = false
     this.is_stop = false
   }
+
   appendChunk(chunk: Chunk) {
     let n = this.node_list.find((item) => item.real_node_id == chunk.real_node_id)
     if (n) {
@@ -401,6 +418,7 @@ export class ChatRecordManage {
       n['is_end'] = true
     }
   }
+
   append(answer_text_block: string, reasoning_content?: string) {
     let set_index = this.findIndex(
       this.chat.answer_text_list,
@@ -425,24 +443,28 @@ export class ChatManagement {
   static addChatRecord(chat: chatType, ms: number, loading?: Ref<boolean>) {
     this.chatMessageContainer[chat.id] = new ChatRecordManage(chat, ms, loading)
   }
+
   static appendChunk(chatRecordId: string, chunk: Chunk) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     if (chatRecord) {
       chatRecord.appendChunk(chunk)
     }
   }
+
   static append(chatRecordId: string, content: string, reasoning_content?: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     if (chatRecord) {
       chatRecord.append(content, reasoning_content)
     }
   }
+
   static updateStatus(chatRecordId: string, code: number) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     if (chatRecord) {
       chatRecord.chat.status = code
     }
   }
+
   /**
    * 持续从缓存区 写出数据
    * @param chatRecordId 对话记录id
@@ -453,12 +475,14 @@ export class ChatManagement {
       chatRecord.write()
     }
   }
+
   static open(chatRecordId: string) {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     if (chatRecord) {
       chatRecord.open()
     }
   }
+
   /**
    * 等待所有数据输出完毕后 才会关闭流
    * @param chatRecordId 对话记录id
@@ -470,6 +494,7 @@ export class ChatManagement {
       chatRecord.close()
     }
   }
+
   /**
    * 停止输出 立即关闭定时任务输出
    * @param chatRecordId 对话记录id
@@ -481,6 +506,7 @@ export class ChatManagement {
       chatRecord.stop()
     }
   }
+
   /**
    * 判断是否输出完成
    * @param chatRecordId 对话记录id
@@ -490,6 +516,7 @@ export class ChatManagement {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     return chatRecord ? chatRecord.is_close && chatRecord.write_ed : false
   }
+
   /**
    * 判断是否停止输出
    * @param chatRecordId 对话记录id
@@ -499,6 +526,7 @@ export class ChatManagement {
     const chatRecord = this.chatMessageContainer[chatRecordId]
     return chatRecord ? chatRecord.is_stop : false
   }
+
   /**
    * 清除无用数据 也就是被close掉的和stop的数据
    */
@@ -510,4 +538,5 @@ export class ChatManagement {
     }
   }
 }
-export type { ApplicationFormType, chatType }
+
+export type {ApplicationFormType, chatType}

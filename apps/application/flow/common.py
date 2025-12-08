@@ -20,7 +20,8 @@ from models_provider.tools import get_model_credential
 from tools.models.tool import Tool
 
 end_nodes = ['ai-chat-node', 'reply-node', 'function-node', 'function-lib-node', 'application-node',
-             'image-understand-node', 'speech-to-text-node', 'text-to-speech-node', 'image-generate-node']
+             'image-understand-node', 'speech-to-text-node', 'text-to-speech-node', 'image-generate-node',
+             'variable-assign-node']
 
 
 class Answer:

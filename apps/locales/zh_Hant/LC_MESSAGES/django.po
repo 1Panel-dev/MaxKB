@@ -2214,8 +2214,8 @@ msgid "parent id"
 msgstr "父級 ID"
 
 #: apps/folders/serializers/folder.py:75
-msgid "Folder depth cannot exceed 3 levels"
-msgstr "文件夾深度不能超過3級"
+msgid "Folder depth cannot exceed 5 levels"
+msgstr "文件夾深度不能超過5級"
 
 #: apps/folders/serializers/folder.py:100
 msgid "folder user id"
@@ -6796,8 +6796,8 @@ msgid "Phone"
 msgstr "手機"
 
 #: apps/users/serializers/user.py:120 apps/xpack/serializers/chat_user.py:68
-msgid "Username must be 4-20 characters long"
-msgstr "用戶名必須為4-20個字符"
+msgid "Username must be 4-64 characters long"
+msgstr "用戶名必須為4-64個字符"
 
 #: apps/users/serializers/user.py:133 apps/users/serializers/user.py:298
 #: apps/xpack/serializers/chat_user.py:81
@@ -8854,3 +8854,43 @@ msgstr "如果未傳入，則預設值為 16000"
 
 msgid "Sample Rate"
 msgstr "採樣率"
+
+msgid "Captcha is required"
+msgstr "驗證碼是必填項"
+
+msgid "Tag"
+msgstr "標籤管理"
+
+msgid "Tag Setting"
+msgstr "標籤設定"
+
+msgid "Download Original Document"
+msgstr "下載原文件"
+
+msgid "Replace Original Document"
+msgstr "替換原文件"
+
+msgid "Update License"
+msgstr "更新許可證"
+
+msgid "Tag Key"
+msgstr "標籤"
+
+msgid "Tag Value"
+msgstr "標籤值"
+
+msgid "Tag id does not exist"
+msgstr "標籤ID不存在"
+
+msgid "Tag key already exists"
+msgstr "標籤已存在"
+
+msgid "Tag value already exists"
+msgstr "標籤值已存在"
+
+msgid "Non-existent id"
+msgstr "不存在的ID"
+
+msgid "No permission for the target folder"
+msgstr "沒有目標資料夾的權限"
+

@@ -121,7 +121,9 @@ class BaseFormNode(IFormNode):
         context = self.workflow_manage.get_workflow_content()
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
-        value = prompt_template.format(form=form, context=context)
+        value = prompt_template.format(form=form, context=context, runtime_node_id=self.runtime_node_id,
+                                       chat_record_id=self.flow_params_serializer.data.get("chat_record_id"),
+                                       form_field_list=form_field_list)
 
         return NodeResult(
             {'result': value, 'form_field_list': form_field_list, 'form_content_format': form_content_format}, {},
@@ -138,7 +140,9 @@ class BaseFormNode(IFormNode):
         context = self.workflow_manage.get_workflow_content()
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
-        value = prompt_template.format(form=form, context=context)
+        value = prompt_template.format(form=form, context=context, runtime_node_id=self.runtime_node_id,
+                                       chat_record_id=self.flow_params_serializer.data.get("chat_record_id"),
+                                       form_field_list=form_field_list)
         return [Answer(value, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], None,
                        self.runtime_node_id, '')]
 
@@ -153,7 +157,9 @@ class BaseFormNode(IFormNode):
         context = self.workflow_manage.get_workflow_content()
         form_content_format = self.workflow_manage.reset_prompt(form_content_format)
         prompt_template = PromptTemplate.from_template(form_content_format, template_format='jinja2')
-        value = prompt_template.format(form=form, context=context)
+        value = prompt_template.format(form=form, context=context, runtime_node_id=self.runtime_node_id,
+                                       chat_record_id=self.flow_params_serializer.data.get("chat_record_id"),
+                                       form_field_list=form_field_list)
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,

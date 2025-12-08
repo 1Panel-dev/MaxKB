@@ -97,6 +97,7 @@ class PGVector(BaseVectorStore):
                 return search_handle.handle(query_set, query_text, embedding_query, top_number, similarity, search_mode)
 
     def query(self, query_text: str, query_embedding: List[float], knowledge_id_list: list[str],
+              document_id_list: list[str],
               exclude_document_id_list: list[str],
               exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float,
               search_mode: SearchMode):
@@ -104,6 +105,8 @@ class PGVector(BaseVectorStore):
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
         query_set = QuerySet(Embedding).filter(knowledge_id__in=knowledge_id_list, is_active=is_active)
+        if document_id_list is not None and len(document_id_list) > 0:
+            query_set = query_set.filter(document_id__in=document_id_list)
         if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
             query_set = query_set.exclude(document_id__in=exclude_document_id_list)
         if exclude_paragraph_list is not None and len(exclude_paragraph_list) > 0:

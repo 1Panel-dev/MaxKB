@@ -74,6 +74,7 @@ export default {
     imageMessage: '请解析图片内容',
     documentMessage: '请理解文档内容',
     audioMessage: '请理解音频内容',
+    videoMessage: '请理解视频内容',
     otherMessage: '请理解文件内容',
     errorMessage: '上传失败',
     fileMessage: '请解析文件内容',

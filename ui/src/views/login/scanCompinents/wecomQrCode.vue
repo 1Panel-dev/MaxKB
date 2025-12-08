@@ -1,25 +1,11 @@
 <template>
-  <div id="wecom-qr" class="wecom-qr flex"></div>
+  <iframe :src="iframeUrl" width="100%" height="380px" frameborder="0"
+          style="margin-top: -30px"></iframe>
 </template>
 
 <script lang="ts" setup>
-import { useRouter } from 'vue-router'
-import * as ww from '@wecom/jssdk'
-import {
-  WWLoginLangType,
-  WWLoginPanelSizeType,
-  WWLoginRedirectType,
-  WWLoginType
-} from '@wecom/jssdk'
-import { ref, nextTick, defineProps } from 'vue'
-import { MsgError } from '@/utils/message'
-import useStore from '@/stores'
-import { getBrowserLang } from '@/locales'
-const router = useRouter()
-const { login } = useStore()
-const wwLogin = ref({})
-const obj = ref<any>({ isWeComLogin: false })
-
+import {ref, nextTick, defineProps} from 'vue'
+import {getBrowserLang} from '@/locales'
 
 const props = defineProps<{
   config: {
@@ -27,45 +13,28 @@ const props = defineProps<{
     app_key: string
     corp_id?: string
     agent_id?: string
+    callback_url: string
   }
 }>()
 
+const iframeUrl = ref('')
 const init = async () => {
   await nextTick() // 确保DOM已更新
   const data = {
     corpId: props.config.corp_id,
-    agentId: props.config.agent_id
+    agentId: props.config.agent_id,
+    redirectUri: props.config.callback_url,
   }
-  const lang = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-  const redirectUri = window.location.origin
-  try {
-    wwLogin.value = ww.createWWLoginPanel({
-      el: '#wecom-qr',
-      params: {
-        login_type: WWLoginType.corpApp,
-        appid: data.corpId || '',
-        agentid: data.agentId,
-        redirect_uri: redirectUri,
-        state: 'fit2cloud-wecom-qr',
-        lang: lang === 'zh-CN' || lang === 'zh-Hant' ? WWLoginLangType.zh : WWLoginLangType.en,
-        redirect_type: WWLoginRedirectType.callback,
-        panel_size: WWLoginPanelSizeType.small
-      },
-      onCheckWeComLogin: obj.value,
-      async onLoginSuccess({ code }: any) {
-        login.wecomCallback(code).then(() => {
-          setTimeout(() => {
-            router.push({ name: 'home' })
-          })
-        })
-      },
-      onLoginFail(err) {
-        MsgError(`${err.errMsg}`)
-      }
-    })
-  } catch (error) {
-    console.error('Error initializing login panel:', error)
+  let lang = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
+  if (lang === 'en-US') {
+    lang = 'en'
+  } else {
+    lang = 'zh'
   }
+  const redirectUri = encodeURIComponent(data.redirectUri)
+  console.log('redirectUri', data.redirectUri)
+  // 手动构建生成二维码的url
+  iframeUrl.value = `https://login.work.weixin.qq.com/wwlogin/sso/login?login_type=CorpApp&appid=${data.corpId}&agentid=${data.agentId}&redirect_uri=${redirectUri}&state=fit2cloud-wecom-qr&lang=${lang}&panel_size=small`
 }
 
 init()

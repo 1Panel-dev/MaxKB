@@ -41,7 +41,7 @@
                 >
                   <template #default="{ row }">
                     <div class="flex-between">
-                      <span class="ellipsis" :title="row.name">{{ row.name }}</span>
+                      <span class="ellipsis" :title="row.name">{{ i18n_name(row.name) }}</span>
                       <div @click.stop v-show="mouseId === row.id">
                         <el-dropdown
                           :teleported="false"
@@ -87,7 +87,7 @@
         <!-- 右边 -->
         <div class="workspace-right p-24" v-loading="loading">
           <div class="flex align-center mb-16">
-            <h4 class="medium">{{ currentWorkspace?.name }}</h4>
+            <h4 class="medium">{{ i18n_name(currentWorkspace?.name as string) }}</h4>
             <el-divider direction="vertical" class="mr-8 ml-8" />
             <el-icon class="color-input-placeholder"><UserFilled /></el-icon>
             <span class="color-input-placeholder ml-4">
@@ -106,6 +106,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from 'vue'
 import { t } from '@/locales'
+import { i18n_name } from '@/utils/common'
 import Member from './component/Member.vue'
 import CreateOrUpdateWorkspaceDialog from './component/CreateOrUpdateWorkspaceDialog.vue'
 import type { WorkspaceItem } from '@/api/type/workspace'

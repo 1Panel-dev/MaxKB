@@ -137,7 +137,7 @@ interface FormField {
   /**
    * {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
    */
-  relation_trigger_field_dict?: Dict<Array<any>>
+  relation_trigger_field_dict?: Dict<any>
   /**
    * 执行器类型  OPTION_LIST请求Option_list数据 CHILD_FORMS请求子表单
    */
@@ -172,5 +172,6 @@ interface FormField {
   method?: string
 
   children?: Array<FormField>
+  required_asterisk?: boolean
 }
 export type { FormField }

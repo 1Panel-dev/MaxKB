@@ -26,7 +26,7 @@ from common.utils.logger import maxkb_logger
 from knowledge.models import Document
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from maxkb.conf import PROJECT_DIR
-from models_provider.tools import get_model
+from models_provider.tools import get_model, get_model_default_params
 
 
 class MetaSerializer(serializers.Serializer):
@@ -119,17 +119,29 @@ def get_embedding_model_by_knowledge_id_list(knowledge_id_list: List):
         raise Exception(_('The knowledge base is inconsistent with the vector model'))
     if len(knowledge_list) == 0:
         raise Exception(_('Knowledge base setting error, please reset the knowledge base'))
-    return ModelManage.get_model(str(knowledge_list[0].embedding_model_id),
-                                 lambda _id: get_model(knowledge_list[0].embedding_model))
+
+    default_params = get_model_default_params(knowledge_list[0].embedding_model)
+
+    return ModelManage.get_model(
+        str(knowledge_list[0].embedding_model_id),
+        lambda _id: get_model(knowledge_list[0].embedding_model, **{**default_params})
+    )
 
 
 def get_embedding_model_by_knowledge_id(knowledge_id: str):
     knowledge = QuerySet(Knowledge).select_related('embedding_model').filter(id=knowledge_id).first()
-    return ModelManage.get_model(str(knowledge.embedding_model_id), lambda _id: get_model(knowledge.embedding_model))
+
+    default_params = get_model_default_params(knowledge.embedding_model)
+
+    return ModelManage.get_model(str(knowledge.embedding_model_id),
+                                 lambda _id: get_model(knowledge.embedding_model, **{**default_params}))
 
 
 def get_embedding_model_by_knowledge(knowledge):
-    return ModelManage.get_model(str(knowledge.embedding_model_id), lambda _id: get_model(knowledge.embedding_model))
+    default_params = get_model_default_params(knowledge.embedding_model)
+
+    return ModelManage.get_model(str(knowledge.embedding_model_id),
+                                 lambda _id: get_model(knowledge.embedding_model, **{**default_params}))
 
 
 def get_embedding_model_id_by_knowledge_id(knowledge_id):
@@ -241,7 +253,7 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
         result = sql_execute(sql, [])
         if len(result) == 0:
             return
-        dims = result[0]['dims'] 
+        dims = result[0]['dims']
         sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
         update_execute(sql, [])
         maxkb_logger.info(f'Created index for knowledge ID: {k_id}')

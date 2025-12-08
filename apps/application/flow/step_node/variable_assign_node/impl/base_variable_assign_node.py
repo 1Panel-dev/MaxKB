@@ -86,9 +86,9 @@ class BaseVariableAssignNode(IVariableAssignNode):
         return NodeResult({'variable_list': variable_list, 'result_list': result_list}, {})
 
     def get_reference_content(self, fields: List[str]):
-        return str(self.workflow_manage.get_reference_field(
+        return self.workflow_manage.get_reference_field(
             fields[0],
-            fields[1:]))
+            fields[1:])
 
     def get_details(self, index: int, **kwargs):
         return {

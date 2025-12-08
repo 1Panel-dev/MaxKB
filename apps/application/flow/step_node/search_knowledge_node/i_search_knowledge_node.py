@@ -10,12 +10,11 @@ import re
 from typing import Type
 
 from django.core import validators
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.flow.i_step_node import INode, NodeResult
 from common.utils.common import flat_map
-
-from django.utils.translation import gettext_lazy as _
 
 
 class DatasetSettingSerializer(serializers.Serializer):
@@ -43,6 +42,17 @@ class SearchDatasetStepNodeSerializer(serializers.Serializer):
 
     show_knowledge = serializers.BooleanField(required=True,
                                               label=_("The results are displayed in the knowledge sources"))
+    search_scope_type = serializers.ChoiceField(
+        required=False, choices=['custom', 'referencing'], label=_("search scope type"),
+        allow_null=True, default='custom'
+    )
+    search_scope_source = serializers.ChoiceField(
+        required=False, choices=['document', 'knowledge'],
+        label=_("search scope variable type"), default='knowledge'
+    )
+    search_scope_reference = serializers.ListField(
+        required=False, label=_("search scope variable"), default=list
+    )
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -76,7 +86,9 @@ class ISearchKnowledgeStepNode(INode):
         return self.execute(**self.node_params_serializer.data, question=str(question),
                             exclude_paragraph_id_list=exclude_paragraph_id_list)
 
-    def execute(self, dataset_id_list, dataset_setting, question, show_knowledge,
+    def execute(self, dataset_id_list, dataset_setting, question, show_knowledge, search_scope_type,
+                search_scope_source,
+                search_scope_reference,
                 exclude_paragraph_id_list=None,
                 **kwargs) -> NodeResult:
         pass

@@ -32,13 +32,21 @@
             >
               <template #label>
                 <div class="flex-between">
-                  <div class="flex">
-                    <span class="flex">
+                  <div class="flex align-center">
+                    <div class="mr-4">
                       <auto-tooltip :content="item.name" style="max-width: 130px">
                         {{ item.name }}
                       </auto-tooltip>
-                      <span class="color-danger" v-if="item.is_required">*</span>
-                    </span>
+                    </div>
+                    <el-tooltip v-if="item.desc" effect="dark" placement="right" popper-class="max-w-200">
+                      <template #content>
+                        {{ item.desc }}
+                      </template>
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+
+                    <span class="color-danger" v-if="item.is_required">*</span>
+
                     <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
                   <div>

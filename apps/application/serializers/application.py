@@ -58,6 +58,15 @@ def get_base_node_work_flow(work_flow):
     return None
 
 
+def hand_node(node, update_tool_map):
+    if node.get('type') == 'tool-lib-node':
+        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
+        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id,
+                                                                                             tool_lib_id)
+    if node.get('type') == 'search-knowledge-node':
+        node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
+
+
 class MKInstance:
 
     def __init__(self, application: dict, function_lib_list: List[dict], version: str, tool_list: List[dict]):
@@ -333,7 +342,7 @@ class Query(serializers.Serializer):
             folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
             application_query_set = application_query_set.filter(workspace_id=workspace_id)
         folder_id = instance.get('folder_id')
-        if folder_id is not None:
+        if folder_id is not None and folder_id != workspace_id:
             folder_query_set = folder_query_set.filter(parent=folder_id)
             application_query_set = application_query_set.filter(folder_id=folder_id)
         if name is not None:
@@ -345,16 +354,17 @@ class Query(serializers.Serializer):
         if create_user is not None:
             application_query_set = application_query_set.filter(user_id=create_user)
         application_custom_sql_query_set = application_query_set
-        application_query_set = application_query_set.order_by("-update_time")
+        application_query_set = application_query_set.order_by("-create_time")
 
-        return {'folder_query_set': folder_query_set,
-                'application_query_set': application_query_set,
-                'workspace_user_resource_permission_query_set': QuerySet(WorkspaceUserResourcePermission).filter(
-                    auth_target_type="APPLICATION",
-                    workspace_id=workspace_id,
-                    user_id=user_id)} if (
+        resource_and_folder_query_set = QuerySet(WorkspaceUserResourcePermission).filter(
+            auth_target_type="APPLICATION",
+            workspace_id=workspace_id,
+            user_id=user_id)
+
+        return {'application_query_set': application_query_set,
+                'workspace_user_resource_permission_query_set': resource_and_folder_query_set,
+                } if (
             not workspace_manage) else {
-            'folder_query_set': folder_query_set,
             'application_query_set': application_query_set,
             'application_custom_sql': application_custom_sql_query_set
         }
@@ -581,12 +591,10 @@ class ApplicationSerializer(serializers.Serializer):
     def to_application(application, workspace_id, user_id, update_tool_map, folder_id):
         work_flow = application.get('work_flow')
         for node in work_flow.get('nodes', []):
-            if node.get('type') == 'tool-lib-node':
-                tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
-                node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id,
-                                                                                                     tool_lib_id)
-            if node.get('type') == 'search-knowledge-node':
-                node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
+            hand_node(node, update_tool_map)
+            if node.get('type') == 'loop-node':
+                for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
+                    hand_node(n, update_tool_map)
         return Application(id=uuid.uuid7(),
                            user_id=user_id,
                            name=application.get('name'),
@@ -683,7 +691,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application = QuerySet(Application).filter(id=application_id).first()
             tool_id_list = [node.get('properties', {}).get('node_data', {}).get('tool_lib_id') for node
                             in
-                            application.work_flow.get('nodes', []) if
+                            application.work_flow.get('nodes', []) + reduce(lambda x, y: [*x, *y], [
+                                n.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []) for n
+                                in
+                                application.work_flow.get('nodes', []) if n.get('type') == 'loop-node'], []) if
                             node.get('type') == 'tool-lib-node']
             tool_list = []
             if len(tool_id_list) > 0:
@@ -761,7 +772,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -966,7 +977,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application = QuerySet(ApplicationVersion).filter(application_id=application_id).order_by(
                 '-create_time').first()
         if application.stt_model_enable:
-            model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id, **application.stt_model_params_setting)
+            model = get_model_instance_by_model_workspace_id(application.stt_model_id, application.workspace_id,
+                                                             **application.stt_model_params_setting)
             text = model.speech_to_text(instance.get('file'))
             return text
 

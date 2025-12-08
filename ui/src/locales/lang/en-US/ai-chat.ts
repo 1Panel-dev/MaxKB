@@ -76,6 +76,7 @@ export default {
     imageMessage: 'Please process the image content',
     documentMessage: 'Please understand the content of the document',
     audioMessage: 'Please understand the audio content',
+    videoMessage: 'Please understand the video content',
     otherMessage: 'Please understand the file content',
     errorMessage: 'Upload Failed',
     fileMessage: 'Please process the file content',

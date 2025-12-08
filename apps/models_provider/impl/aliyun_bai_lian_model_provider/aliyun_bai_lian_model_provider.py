@@ -50,7 +50,7 @@ qwentti_model_credential = QwenTextToImageModelCredential()
 aliyun_bai_lian_ttv_model_credential = TextToVideoModelCredential()
 aliyun_bai_lian_itv_model_credential = ImageToVideoModelCredential()
 
-model_info_list = [ModelInfo('gte-rerank',
+model_info_list = [ModelInfo('gte-rerank-v2',
                              _('With the GTE-Rerank text sorting series model developed by Alibaba Tongyi Lab, developers can integrate high-quality text retrieval and sorting through the LlamaIndex framework.'),
                              ModelTypeConst.RERANKER, aliyun_bai_lian_model_credential, AliyunBaiLianReranker),
                    ModelInfo('paraformer-realtime-v2',

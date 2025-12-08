@@ -122,7 +122,6 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  // echarts?.getInstanceByDom(document.getElementById(props.id)!)?.dispose()
   window.removeEventListener('resize', changeChartSize)
 })
 </script>

@@ -70,7 +70,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch, reactive, computed, onMounted} from 'vue'
+import { ref, watch, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -93,16 +93,27 @@ const apiType = computed(() => {
   }
 })
 
-const postKnowledgeHandler = (knowledgeList: Array<any>) => { 
-  return knowledgeList.filter(item => {
+const postKnowledgeHandler = (knowledgeList: Array<any>) => {
+  return knowledgeList.filter((item) => {
     if (apiType.value === 'workspace') {
-      return hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),
-      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspacePermissionWorkspaceManageRole,
-      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspaceResourcePermission('KNOWLEDGE', item.id)], 'OR')
+      return hasPermission(
+        [
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),
+          new Permission('KNOWLEDGE_DOCUMENT:READ+EDIT').getWorkspacePermissionWorkspaceManageRole,
+          new Permission('KNOWLEDGE_DOCUMENT:READ+EDIT').getWorkspaceResourcePermission(
+            'KNOWLEDGE',
+            item.id,
+          ),
+        ],
+        'OR',
+      )
     } else if (apiType.value === 'systemManage') {
-      return hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT],'OR')
+      return hasPermission(
+        [RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT],
+        'OR',
+      )
     }
-  }) 
+  })
 }
 
 const emit = defineEmits(['refresh'])
@@ -202,6 +213,7 @@ function changeDocument(document_id: string) {
 }
 
 const open = (data: any) => {
+  getDetail()
   form.value.chat_id = data.chat_id
   form.value.record_id = data.id
   form.value.problem_text = data.problem_text ? data.problem_text.substring(0, 256) : ''
@@ -245,10 +257,6 @@ function getDetail(isLoading = false) {
       detail.value = res.data
     })
 }
-
-onMounted(()=>{
-  getDetail()
-})
 
 defineExpose({ open })
 </script>

@@ -20,6 +20,13 @@
         </span>
       </template>
     </el-table-column>
+    <el-table-column prop="desc" :label="$t('common.desc')">
+      <template #default="{ row }">
+        <span class="ellipsis-1" :title="row.desc">
+          {{ row.desc }}
+        </span>
+      </template>
+    </el-table-column>
     <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.default_value">

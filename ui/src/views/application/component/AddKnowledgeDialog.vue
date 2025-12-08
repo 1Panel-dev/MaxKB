@@ -27,18 +27,16 @@
     </template>
     <LayoutContainer class="application-manage">
       <template #left>
-        <div class="p-8">
-          <folder-tree
-            :data="folderList"
-            :currentNodeKey="currentFolder?.id"
-            @handleNodeClick="folderClickHandle"
-            v-loading="folderLoading"
-            :canOperation="false"
-            showShared
-            :shareTitle="$t('views.shared.shared_knowledge')"
-            :treeStyle="{ height: 'calc(100vh - 240px)' }"
-          />
-        </div>
+        <folder-tree
+          :data="folderList"
+          :currentNodeKey="currentFolder?.id"
+          @handleNodeClick="folderClickHandle"
+          v-loading="folderLoading"
+          :canOperation="false"
+          showShared
+          :shareTitle="$t('views.shared.shared_knowledge')"
+          :treeStyle="{ height: 'calc(100vh - 240px)' }"
+        />
       </template>
       <div class="layout-bg">
         <div class="flex-between p-16 ml-8">

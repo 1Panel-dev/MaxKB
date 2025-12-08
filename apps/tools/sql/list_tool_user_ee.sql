@@ -20,7 +20,7 @@ FROM (SELECT tool."id"::text,
              tool."is_active"
       FROM (SELECT tool.*
             FROM tool tool ${tool_query_set}
-             AND tool.id IN (SELECT target
+             AND tool.id::text IN (SELECT target
                    FROM workspace_user_resource_permission ${workspace_user_resource_permission_query_set}
                 AND CASE
                 WHEN auth_type = 'ROLE' THEN
@@ -36,26 +36,5 @@ FROM (SELECT tool."id"::text,
                 END
                 )) AS tool
                LEFT JOIN "user" ON "user".id = user_id
-      UNION
-      SELECT tool_folder."id",
-             tool_folder."name",
-             tool_folder."desc",
-             'folder'                AS "tool_type",
-             ''                      AS scope,
-             'folder'                AS "resource_type",
-             tool_folder."workspace_id",
-             tool_folder."parent_id" AS "folder_id",
-             tool_folder."user_id",
-             "user".nick_name        AS "nick_name",
-             ''                      AS "icon",
-             ''                      AS label,
-             ''                      AS "template_id",
-             tool_folder."create_time",
-             tool_folder."update_time",
-             '[]'::jsonb             AS init_field_list,
-             '[]'::jsonb             AS input_field_list,
-             ''                      AS version,
-             'true'                  AS "is_active"
-      FROM tool_folder
-               LEFT JOIN "user" ON "user".id = user_id ${folder_query_set}) temp
+      ) temp
        ${default_query_set}

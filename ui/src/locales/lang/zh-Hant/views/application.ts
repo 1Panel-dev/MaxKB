@@ -5,7 +5,7 @@ export default {
   importApplication: '匯入應用',
   copyApplication: '複製應用',
   workflow: '進階編排',
-  simple: '簡單配置',
+  simple: '簡易應用',
   simplePlaceholder: '適用於初級用戶使用表單設定構建AI對話助手',
   workflowPlaceholder: '適用於高階用戶使用低代碼拖拉拽方式構建複雜邏輯的AI對話助手',
   appTest: '調試預覽',
@@ -65,7 +65,6 @@ export default {
       requiredMessage: '請輸入應用名稱',
     },
     appDescription: {
-      label: '描述',
       placeholder: '描述該應用的應用場景及用途，如：XXX 小助手回答用戶提出的 XXX 產品使用問題',
     },
     appType: {

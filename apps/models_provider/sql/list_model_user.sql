@@ -13,6 +13,6 @@ FROM (SELECT model."id"::text, model."name",
              model.workspace_id
       from model
                left join "user" on user_id = "user".id
-      where model."id" in (select target
+      where model."id"::text in (select target
                            from workspace_user_resource_permission ${workspace_user_resource_permission_query_set}
         and 'VIEW' = any (permission_list)) ) temp ${model_query_set}

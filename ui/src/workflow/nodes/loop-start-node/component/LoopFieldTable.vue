@@ -1,7 +1,7 @@
 <template>
   <div class="flex-between mb-16">
     <h5 class="break-all ellipsis lighter" style="max-width: 80%">
-      {{ $t('views.applicationWorkflow.variable.loop', '循环变量') }}
+      {{ $t('views.applicationWorkflow.variable.loop') }}
     </h5>
     <div>
       <span class="ml-4">

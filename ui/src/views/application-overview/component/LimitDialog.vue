@@ -14,7 +14,7 @@
           v-model="form.access_num"
           :min="0"
           :step="1"
-          :max="10000"
+          :max="10000000"
           :value-on-clear="0"
           controls-position="right"
           style="width: 268px"

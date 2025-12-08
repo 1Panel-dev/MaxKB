@@ -124,6 +124,9 @@ export default {
       roleDesc: '根据用户角色中的权限授权用户对该资源的操作权限',
       notAuthorized: '不授权',
       configure: '配置权限',
+      currentOnly: '仅当前资源',
+      includeAll: '包含所有子资源',
+      effectiveResource: '生效资源',
     },
   },
   resource_management: {

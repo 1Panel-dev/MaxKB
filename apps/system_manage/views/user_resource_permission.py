@@ -117,7 +117,7 @@ class WorkspaceResourceUserPermissionView(APIView):
     @has_permissions(
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),
@@ -151,7 +151,7 @@ class WorkspaceResourceUserPermissionView(APIView):
     @has_permissions(
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),
@@ -164,7 +164,7 @@ class WorkspaceResourceUserPermissionView(APIView):
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource, })
-                              .edit(instance=request.data))
+                              .edit(instance=request.data, current_user_id=request.user.id))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
@@ -181,7 +181,7 @@ class WorkspaceResourceUserPermissionView(APIView):
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                          operate=Operate.AUTH,
-                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/ROLE/WORKSPACE_MANAGE"),
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource')}/{kwargs.get('target')}"),

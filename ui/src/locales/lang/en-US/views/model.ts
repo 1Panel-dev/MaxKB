@@ -1,5 +1,5 @@
 export default {
-  title: 'Models',
+  title: 'Model',
   provider: 'Provider',
   providerPlaceholder: 'Select Provider',
   addModel: 'Add Model',

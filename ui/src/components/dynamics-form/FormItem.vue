@@ -5,13 +5,16 @@
     :prop="formfield.field"
     :key="formfield.field"
     :rules="rules"
+    :class="formfield.required_asterisk ? 'hide-asterisk' : ''"
   >
     <template #label v-if="formfield.label">
       <FormItemLabel v-if="isString(formfield.label)" :form-field="formfield"></FormItemLabel>
       <component
         v-else
         :is="formfield.label.input_type"
-        :label="formfield.label.label"
+        :label="formfield.label"
+        v-model="labelValue"
+        :form-value="formValue"
         v-bind="label_attrs"
       ></component>
     </template>
@@ -36,6 +39,7 @@ import FormItemLabel from './FormItemLabel.vue'
 import type { Dict } from '@/api/type/common'
 import bus from '@/utils/bus'
 import { t } from '@/locales'
+import { get } from 'lodash'
 const props = defineProps<{
   // 双向绑定的值
   modelValue: any
@@ -47,7 +51,13 @@ const props = defineProps<{
   // 调用接口所需要的其他参数
   otherParams: any
   // 获取Options
-  trigger: (formItem: FormField, loading: Ref<boolean>) => Promise<any>
+  trigger: (
+    trigger_field: string,
+    trigger_value: any,
+    trigger_setting: any,
+    self: any,
+    loading: Ref<boolean>,
+  ) => void
   // 初始化默认数据
   initDefaultData: (formItem: FormField) => void
   // 默认每个宽度
@@ -60,13 +70,22 @@ const props = defineProps<{
   parent_field?: string
 }>()
 
-const emit = defineEmits(['change'])
+const emit = defineEmits(['change', 'changeLabel'])
 
 const loading = ref<boolean>(false)
 
 const isString = (value: any) => {
   return typeof value === 'string'
 }
+const labelValue = computed({
+  get: () => {
+    return props.formValue[props.formfield.label.field]
+  },
+  set: (value: any) => {
+    emit('changeLabel', value)
+    bus.emit(props.formfield.label.field, value)
+  },
+})
 const itemValue = computed({
   get: () => {
     return props.modelValue
@@ -147,32 +166,50 @@ const componentStyle = computed(() => {
 const attrs = computed(() => {
   return props.formfield.attrs ? props.formfield.attrs : {}
 })
-
+const initTrigger = (self: any, trigger_field_dict?: Dict<any>) => {
+  if (trigger_field_dict) {
+    Object.keys(trigger_field_dict).forEach((key) => {
+      const setting = trigger_field_dict[key]
+      const triggerValues = setting['values']
+      const value = get(props.formValue, key)
+      if (triggerValues && triggerValues.length > 0) {
+        if (triggerValues.includes(value)) {
+          props.trigger(key, value, setting, self, loading)
+        }
+      } else {
+        props.trigger(key, value, setting, self, loading)
+      }
+    })
+  }
+}
 onMounted(() => {
   props.initDefaultData(props.formfield)
-  if (props.formfield.provider && props.formfield.method) {
-    props.trigger(props.formfield, loading)
-  }
-  // 监听字段变化
-  const trigger_field_dict = props.formfield.relation_trigger_field_dict
+  initTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
+  initTrigger(props.formfield.label, props.formfield.label?.relation_trigger_field_dict)
+  isString(props.formfield.label)
+    ? undefined
+    : onTrigger(props.formfield.label, props.formfield.label.relation_trigger_field_dict)
+  onTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
+})
+const onTrigger = (self: any, trigger_field_dict?: Dict<any>) => {
   if (trigger_field_dict) {
     const keys = Object.keys(trigger_field_dict)
     keys.forEach((key) => {
-      const value = trigger_field_dict[key]
+      const setting = trigger_field_dict[key]
+      const values: Array<any> = setting.values
       // 添加关系
       bus.on(key, (v: any) => {
-        if (value && value.length > 0) {
-          if (value.includes(v)) {
-            props.trigger(props.formfield, loading)
+        if (values && values.length > 0) {
+          if (values.includes(v)) {
+            props.trigger(key, v, setting, self, loading)
           }
         } else {
-          props.trigger(props.formfield, loading)
+          props.trigger(key, v, setting, self, loading)
         }
       })
     })
   }
-})
-
+}
 const validate = () => {
   if (props.formfield.trigger_type === 'CHILD_FORMS' && componentFormRef.value) {
     return componentFormRef.value.validate()
@@ -181,4 +218,10 @@ const validate = () => {
 }
 defineExpose({ validate })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.hide-asterisk {
+  ::after {
+    display: none;
+  }
+}
+</style>

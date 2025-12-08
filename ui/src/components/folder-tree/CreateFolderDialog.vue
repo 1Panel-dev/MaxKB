@@ -24,11 +24,11 @@
           @blur="folderForm.name = folderForm.name.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('components.folder.description')" prop="desc">
+      <el-form-item :label="$t('common.desc')" prop="desc">
         <el-input
           v-model="folderForm.desc"
           type="textarea"
-          :placeholder="$t('components.folder.descriptionPlaceholder')"
+          :placeholder="$t('common.descPlaceholder')"
           maxlength="128"
           show-word-limit
           :autosize="{ minRows: 3 }"
@@ -54,7 +54,7 @@ import folderApi from '@/api/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
-const { tool, knowledge, folder } = useStore()
+const { user, tool, knowledge, folder } = useStore()
 const emit = defineEmits(['refresh'])
 
 const props = defineProps({
@@ -129,7 +129,13 @@ const submitHandle = async () => {
             dialogVisible.value = false
           })
       } else {
-        folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
+        folderApi.postFolder(sourceType.value, folderForm.value, loading)
+          .then((res) => {
+            return user.profile().then(() => {
+              return res
+            })
+          })
+          .then((res) => {
           MsgSuccess(t('common.createSuccess'))
           folder.setCurrentFolder(res.data)
           folder.asyncGetFolder(sourceType.value, {}, loading)

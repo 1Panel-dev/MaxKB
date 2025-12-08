@@ -4,8 +4,6 @@
       <DynamicsForm
         :style="formStyle"
         :view="view"
-        label-position="top"
-        require-asterisk-position="right"
         ref="ceFormRef"
         v-model="_data[index]"
         :model="_data[index]"
@@ -13,6 +11,8 @@
         :render_data="render_data()"
         v-bind="attr"
         :parent_field="formField.field + '.' + index"
+        label-position="top"
+        require-asterisk-position="right"
       ></DynamicsForm>
       <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">

@@ -1,6 +1,6 @@
-import type {RouteRecordRaw} from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 
-const modules: any = import.meta.glob('./modules/*.ts', {eager: true})
+const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
 
 const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modules[key].default)]
 
@@ -33,7 +33,7 @@ export const routes: Array<RouteRecordRaw> = [
   {
     path: '/application/:from/:id/workflow',
     name: 'ApplicationWorkflow',
-    meta: {activeMenu: '/application'},
+    meta: { activeMenu: '/application' },
     component: () => import('@/views/application-workflow/index.vue'),
   },
   // 对话
@@ -41,6 +41,11 @@ export const routes: Array<RouteRecordRaw> = [
     path: '/chat/:accessToken',
     name: 'Chat',
     component: () => import('@/views/chat/index.vue'),
+  },
+  {
+    path: '/demo',
+    name: 'demo',
+    component: () => import('@/views/demo/index.vue'),
   },
 
   // 对话用户登录

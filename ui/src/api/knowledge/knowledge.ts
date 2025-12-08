@@ -255,6 +255,55 @@ const putLarkKnowledge: (
   return put(`${prefix.value}/lark/${knowledge_id}`, data, undefined, loading)
 }
 
+const getAllTags: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(`${prefix.value}/tags`, params, loading)
+}
+
+const getTags: (knowledge_id: string, params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  params,
+  loading,
+) => {
+  return get(`${prefix.value}/${knowledge_id}/tags`, params, loading)
+}
+
+const postTags: (knowledge_id: string, tags: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  tags,
+  loading,
+) => {
+  return post(`${prefix.value}/${knowledge_id}/tags`, tags, null, loading)
+}
+
+const putTag: (knowledge_id: string, tag_id: string, tag: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  tag_id,
+  tag,
+  loading,
+) => {
+  return put(`${prefix.value}/${knowledge_id}/tags/${tag_id}`, tag, null, loading)
+}
+
+const delTag: (knowledge_id: string, tag_id: string, type: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  tag_id,
+  type,
+  loading,
+) => {
+  return del(`${prefix.value}/${knowledge_id}/tags/${tag_id}/${type}`, null, loading)
+}
+
+const delMulTag: (knowledge_id: string, tags: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  knowledge_id,
+  tags,
+  loading,
+) => {
+  return put(`${prefix.value}/${knowledge_id}/tags/batch_delete`, tags, null, loading)
+}
+
 export default {
   getKnowledgeList,
   getKnowledgeListPage,
@@ -271,5 +320,11 @@ export default {
   getKnowledgeModel,
   postWebKnowledge,
   postLarkKnowledge,
-  putLarkKnowledge
+  putLarkKnowledge,
+  getAllTags,
+  getTags,
+  postTags,
+  putTag,
+  delTag,
+  delMulTag
 }

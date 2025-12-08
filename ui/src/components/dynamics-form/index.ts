@@ -2,13 +2,13 @@ import type { App } from 'vue'
 import type { Dict } from '@/api/type/common'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 let components: Dict<any> = import.meta.glob('@/components/dynamics-form/**/**.vue', {
-  eager: true
+  eager: true,
 })
 components = {
   ...components,
   ...import.meta.glob('@/components/dynamics-form/**/**/**.vue', {
-    eager: true
-  })
+    eager: true,
+  }),
 }
 
 const install = (app: App) => {

@@ -21,7 +21,13 @@ export default {
     serialNo: '序列號',
     remark: '備註',
     update: '更新',
-    authorize: '授權給'
+    authorize: '授權給',
+    inner_admin: '系統管理員',
+    inner_wsm: '工作空間管理員',
+    inner_user: '普通用戶',
+    root: '根目錄',
+    default_workspace: '預設工作空間',
+    default_user_group: '預設使用者群組',
   },
   time: {
     daysLater: '天後',

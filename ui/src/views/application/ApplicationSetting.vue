@@ -61,7 +61,7 @@
                     @blur="applicationForm.name = applicationForm.name?.trim()"
                   />
                 </el-form-item>
-                <el-form-item :label="$t('views.application.form.appDescription.label')">
+                <el-form-item :label="$t('common.desc')">
                   <el-input
                     v-model="applicationForm.desc"
                     type="textarea"
@@ -304,7 +304,7 @@
                   />
                 </el-form-item>
                 <!-- MCP-->
-                <el-form-item @click.prevent>
+                <el-form-item @click.prevent v-if="toolPermissionPrecise.read()">
                   <template #label>
                     <div class="flex-between">
                       <span>MCP</span>
@@ -326,8 +326,10 @@
                 <div
                   class="w-full mb-16"
                   v-if="
+                  (
                     (applicationForm.mcp_tool_ids && applicationForm.mcp_tool_ids.length > 0) ||
                     (applicationForm.mcp_servers && applicationForm.mcp_servers.length > 0)
+                  ) && toolPermissionPrecise.read()
                   "
                 >
                   <template v-for="(item, index) in applicationForm.mcp_tool_ids" :key="index">
@@ -368,7 +370,7 @@
                   </template>
                 </div>
                 <!-- 工具       -->
-                <el-form-item @click.prevent>
+                <el-form-item @click.prevent v-if="toolPermissionPrecise.read()">
                   <template #label>
                     <div class="flex-between">
                       <span class="mr-4">
@@ -395,7 +397,7 @@
                 </el-form-item>
                 <div
                   class="w-full mb-16"
-                  v-if="applicationForm.tool_ids && applicationForm.tool_ids.length > 0"
+                  v-if="applicationForm.tool_ids && applicationForm.tool_ids.length > 0 && toolPermissionPrecise.read()"
                 >
                   <template v-for="(item, index) in applicationForm.tool_ids" :key="index">
                     <div
@@ -433,7 +435,7 @@
                 </div>
                 <el-form-item
                   @click.prevent
-                  v-if="applicationForm.mcp_enable || applicationForm.tool_enable"
+                  v-if="(applicationForm.mcp_enable || applicationForm.tool_enable) && toolPermissionPrecise.read()"
                 >
                   <template #label>
                     <div class="flex-between">
@@ -671,6 +673,10 @@ const apiType = computed(() => {
 })
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
+})
+
+const toolPermissionPrecise = computed(() => {
+  return permissionMap['tool'][apiType.value]
 })
 
 const defaultPrompt = t('views.application.form.prompt.defaultPrompt', {
@@ -1109,8 +1115,10 @@ onMounted(() => {
   getDetail()
   getSTTModel()
   getTTSModel()
-  getToolSelectOptions()
-  getMcpToolSelectOptions()
+  if (toolPermissionPrecise.value.read()) {
+    getToolSelectOptions();
+    getMcpToolSelectOptions()
+  }
 })
 </script>
 <style lang="scss" scoped>

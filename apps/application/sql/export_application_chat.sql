@@ -1,4 +1,5 @@
 SELECT
+    application_chat_record_temp.id AS id,
 	application_chat."id" as chat_id,
     application_chat.abstract as abstract,
     application_chat_record_temp.problem_text as problem_text,

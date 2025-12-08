@@ -12,8 +12,6 @@
             <DynamicsForm
               :style="formStyle"
               :view="view"
-              label-position="top"
-              require-asterisk-position="right"
               ref="ceFormRef"
               v-model="_data[index]"
               :model="_data[index]"
@@ -21,6 +19,8 @@
               :render_data="render_data()"
               v-bind="attr"
               :parent_field="formField.field + '.' + index"
+              label-position="top"
+              require-asterisk-position="right"
             ></DynamicsForm>
           </el-card>
         </template>
@@ -66,7 +66,7 @@ const _data = computed<Array<any>>({
   },
   set(value) {
     emit('update:modelValue', value)
-  }
+  },
 })
 
 const props_info = computed(() => {
@@ -117,7 +117,7 @@ const handleTabsEdit = (targetName: TabPaneName | undefined, action: 'remove' | 
 
 defineExpose({
   validate,
-  field: props.field
+  field: props.field,
 })
 </script>
 <style lang="scss" scoped></style>

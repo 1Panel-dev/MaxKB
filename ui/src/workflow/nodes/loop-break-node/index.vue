@@ -94,8 +94,9 @@
                 <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </el-col>
-          </el-row> </template
-      ></el-form>
+          </el-row>
+        </template>
+      </el-form>
 
       <el-button link type="primary" @click="addCondition()">
         <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>

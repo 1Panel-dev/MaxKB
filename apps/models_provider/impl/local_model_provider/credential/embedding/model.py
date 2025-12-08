@@ -1,9 +1,9 @@
 # coding=utf-8
 """
     @project: MaxKB
-    @Author：虎
-    @file： embedding.py
-    @date：2024/7/11 11:06
+    @Author：虎虎
+    @file： model.py.py
+    @date：2025/11/7 14:02
     @desc:
 """
 import traceback

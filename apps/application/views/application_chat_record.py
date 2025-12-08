@@ -93,8 +93,8 @@ class ApplicationChatRecordOperateAPI(APIView):
     )
     @has_permissions(PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_CHAT_LOG_READ.get_workspace_permission_workspace_manage_role(),
-                     PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
-                     PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
                                     CompareConstants.AND),
@@ -128,7 +128,7 @@ class ApplicationChatRecordAddKnowledge(APIView):
                                     CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, application_id: str):
-        return result.success(ApplicationChatRecordAddKnowledgeSerializer().post_improve(
+        return result.success(ApplicationChatRecordAddKnowledgeSerializer(data = {'workspace_id': workspace_id, 'application_id': application_id, **request.data}).post_improve(
             {'workspace_id': workspace_id, 'application_id': application_id, **request.data}, request=request))
 
 

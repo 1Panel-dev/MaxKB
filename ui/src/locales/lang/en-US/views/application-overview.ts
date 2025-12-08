@@ -42,6 +42,7 @@ export default {
       loginMethod: 'Login Method',
       loginMethodRequired: 'Please select login method',
       toSettingChatUser: 'Go to configure chat user',
+      displayCodeRequired: 'Please enter the number of failed attempts',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: 'Allow Cross-Domain Access',

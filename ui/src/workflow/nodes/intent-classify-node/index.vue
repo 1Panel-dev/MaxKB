@@ -89,8 +89,7 @@
             :step-strictly="true"
           />
         </el-form-item>
-        <el-form-item
-        >
+        <el-form-item>
           <template #label>
             <div class="flex-between">
               <div>
@@ -100,47 +99,44 @@
                 >
               </div>
               <el-button @click="addClassfiyBranch" type="primary" size="large" link>
-                <el-icon><Plus /></el-icon>
+                <AppIcon iconName="app-add-outlined" />
               </el-button>
             </div>
           </template>
           <div>
-            <div
-              v-for="(item, index) in form_data.branch"
-              :key="item.id"
-            >
-            <el-form-item
-            :prop="`branch.${index}.content`"
-            :rules="{
-            message: $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder'),
-            trigger: 'change',
-            required: true,
-          }"
-            >
-              <el-row class="mb-8" :gutter="12" align="middle">
-                <el-col :span="21">
-                  <el-input
-                    v-model="item.content"
-                    style="width: 210px"
-                    :disabled="item.isOther"
-                    :placeholder="
-                      $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')
-                    "
-                  />
-                </el-col>
-                <el-col :span="3">
-                  <el-button
-                    link
-                    size="large"
-                    v-if="!item.isOther"
-                    :disabled="form_data.branch.filter((b: any) => !b.isOther).length <= 1"
-                    @click="deleteClassifyBranch(item.id)"
-                  >
-                    <el-icon><Delete /></el-icon>
-                  </el-button>
-                </el-col>
-              </el-row>
-            </el-form-item>
+            <div v-for="(item, index) in form_data.branch" :key="item.id" class="mb-8">
+              <el-form-item
+                :prop="`branch.${index}.content`"
+                :rules="{
+                  message: $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder'),
+                  trigger: 'change',
+                  required: true,
+                }"
+              >
+                <el-row :gutter="12" align="middle">
+                  <el-col :span="21">
+                    <el-input
+                      v-model="item.content"
+                      style="width: 210px"
+                      :disabled="item.isOther"
+                      :placeholder="
+                        $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')
+                      "
+                    />
+                  </el-col>
+                  <el-col :span="3">
+                    <el-button
+                      link
+                      size="large"
+                      v-if="!item.isOther"
+                      :disabled="form_data.branch.filter((b: any) => !b.isOther).length <= 1"
+                      @click="deleteClassifyBranch(item.id)"
+                    >
+                      <AppIcon iconName="app-delete"></AppIcon>
+                    </el-button>
+                  </el-col>
+                </el-row>
+              </el-form-item>
             </div>
           </div>
         </el-form-item>
@@ -330,17 +326,21 @@ const IntentClassifyNodeFormRef = ref<FormInstance>()
 const modelOptions = ref<any>(null)
 
 const validate = () => {
-
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
     IntentClassifyNodeFormRef.value?.validate(),
-  ]).then(() => {
-    if (form_data.value.branch.length != new Set(form_data.value.branch.map((item: any) => item.content)).size) {
-      throw t('views.applicationWorkflow.nodes.intentNode.error2')
-    }
-  }).catch((err: any) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
-  })
+  ])
+    .then(() => {
+      if (
+        form_data.value.branch.length !=
+        new Set(form_data.value.branch.map((item: any) => item.content)).size
+      ) {
+        throw t('views.applicationWorkflow.nodes.intentNode.error2')
+      }
+    })
+    .catch((err: any) => {
+      return Promise.reject({ node: props.nodeModel, errMessage: err })
+    })
 }
 
 const application = getApplicationDetail()

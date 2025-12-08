@@ -1,7 +1,7 @@
 export default {
   title: '对话用户',
-  syncUsers: '同步用户',
-  syncUsersTip: '仅同步新增用户',
+  syncUsers: '导入用户',
+  syncUsersTip: '仅导入新增用户',
   setUserGroups: '设置用户组',
   knowledgeTitleTip: '该配置需要关联的应用开启对话用户登录认证后才会生效',
   applicationTitleTip: '该配置需要应用开启登录认证后生效',

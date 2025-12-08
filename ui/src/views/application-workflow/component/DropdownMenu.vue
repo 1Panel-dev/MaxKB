@@ -1,5 +1,9 @@
 <template>
-  <div v-show="show" class="workflow-dropdown-menu border border-r-6 white-bg" :style="{ width: activeName === 'base' ? '400px':'640px' }">
+  <div
+    v-show="show"
+    class="workflow-dropdown-menu border border-r-6 white-bg"
+    :style="{ width: activeName === 'base' ? '400px' : '640px' }"
+  >
     <el-tabs v-model="activeName" class="workflow-dropdown-tabs" @tab-change="handleClick">
       <div
         v-show="activeName === 'base'"
@@ -71,17 +75,16 @@
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <LayoutContainer>
           <template #left>
-            <div class="p-8">
-              <folder-tree
-                :source="SourceTypeEnum.TOOL"
-                :data="toolTreeData"
-                :currentNodeKey="folder.currentFolder?.id"
-                @handleNodeClick="folderClickHandle"
-                :shareTitle="$t('views.shared.shared_tool')"
-                :showShared="permissionPrecise['is_share']()"
-                :canOperation="false"
-              />
-            </div>
+            <folder-tree
+              :source="SourceTypeEnum.TOOL"
+              :data="toolTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              :shareTitle="$t('views.shared.shared_tool')"
+              :showShared="permissionPrecise['is_share']()"
+              :canOperation="false"
+              :treeStyle="{ height: '400px' }"
+            />
           </template>
           <el-scrollbar height="450">
             <NodeContent
@@ -96,15 +99,14 @@
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <LayoutContainer>
           <template #left>
-            <div class="p-8">
-              <folder-tree
-                :source="SourceTypeEnum.APPLICATION"
-                :data="applicationTreeData"
-                :currentNodeKey="folder.currentFolder?.id"
-                @handleNodeClick="folderClickHandle"
-                :canOperation="false"
-              />
-            </div>
+            <folder-tree
+              :source="SourceTypeEnum.APPLICATION"
+              :data="applicationTreeData"
+              :currentNodeKey="folder.currentFolder?.id"
+              @handleNodeClick="folderClickHandle"
+              :canOperation="false"
+              :treeStyle="{ height: '400px' }"
+            />
           </template>
           <el-scrollbar height="450">
             <NodeContent
@@ -341,10 +343,6 @@ onMounted(() => {})
 
   :deep(.el-tabs__header) {
     margin-bottom: 0;
-  }
-
-  :deep(.tree-height) {
-    height: 400px;
   }
 }
 </style>

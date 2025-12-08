@@ -147,7 +147,7 @@
       >
         <el-row v-if="knowledge.knowledgeList.length > 0" :gutter="15" class="w-full">
           <template v-for="(item, index) in knowledge.knowledgeList" :key="index">
-            <el-col
+            <!-- <el-col
               v-if="item.resource_type === 'folder'"
               :xs="24"
               :sm="12"
@@ -169,19 +169,19 @@
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.nick_name }}
+                    {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
                   </el-text>
                 </template>
               </CardBox>
-            </el-col>
-            <el-col v-else :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+            </el-col> -->
+            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox
                 :title="item.name"
                 :description="item.desc"
                 class="cursor"
                 @click="
                   router.push({
-                    path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/document`,
+                    path: `/knowledge/${item.id}/${folder.currentFolder.id ? (folder.currentFolder.id !== 'share' ? item.folder_id : 'share') : 'shared'}/document`,
                   })
                 "
               >
@@ -190,7 +190,7 @@
                 </template>
                 <template #subTitle>
                   <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ item.nick_name }}
+                    {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
                   </el-text>
                 </template>
                 <template #tag>
@@ -208,11 +208,11 @@
                       <el-divider direction="vertical" />
                       <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
                       <span class="color-secondary">{{ $t('common.character') }}</span>
-                      <el-divider direction="vertical" />
+                      <!-- <el-divider direction="vertical" />
                       <span class="bold mr-4">{{ item?.application_mapping_count || 0 }}</span>
                       <span class="color-secondary">{{
                         $t('views.knowledge.relatedApp_count')
-                      }}</span>
+                      }}</span> -->
                     </div>
                   </div>
                 </template>
@@ -361,6 +361,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import { t } from '@/locales'
+import { i18n_name } from '@/utils/common'
 import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
@@ -533,7 +534,7 @@ function openCreateFolder() {
 watch(
   () => folder.currentFolder,
   (newValue) => {
-    if (newValue && newValue.id) {
+    if (newValue && newValue.id && !isSystemShare.value) {
       paginationConfig.current_page = 1
       knowledge.setKnowledgeList([])
       getList()

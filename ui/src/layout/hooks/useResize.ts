@@ -12,16 +12,16 @@ export default () => {
     return rect.width - 1 < WIDTH
   }
 
-  const _resizeHandler = () => {
-    if (!document.hidden) {
-      const isMobile = _isMobile()
-      common.toggleDevice(isMobile ? DeviceType.Mobile : DeviceType.Desktop)
-    }
-  }
+  // const _resizeHandler = () => {
+  //   if (!document.hidden) {
+  //     const isMobile = _isMobile()
+  //     common.toggleDevice(isMobile ? DeviceType.Mobile : DeviceType.Desktop)
+  //   }
+  // }
 
-  onBeforeMount(() => {
-    window.addEventListener('resize', _resizeHandler)
-  })
+  // onBeforeMount(() => {
+  //   window.addEventListener('resize', _resizeHandler)
+  // })
 
   onMounted(() => {
     nextTick(() => {

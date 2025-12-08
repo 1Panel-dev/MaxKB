@@ -52,7 +52,7 @@ defineExpose({ open })
     position: absolute;
     top: 12px;
     right: 12px;
-    box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
+    box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
     z-index: 2;
   }
   .config-textarea {

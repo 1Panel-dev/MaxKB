@@ -162,6 +162,35 @@ class Document(AppModelMixin):
     class Meta:
         db_table = "document"
 
+class Tag(AppModelMixin):
+    """
+    标签表 - 存储标签的key-value定义
+    """
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, verbose_name="知识库", db_constraint=False)
+    key = models.CharField(max_length=64, verbose_name="标签键", db_index=True)
+    value = models.CharField(max_length=128, verbose_name="标签值", db_index=True)
+
+    class Meta:
+        db_table = "tag"
+        unique_together = [['knowledge', 'key', 'value']]  # 在同一知识库内key-value组合唯一
+        indexes = [
+            models.Index(fields=['knowledge', 'key']),
+        ]
+
+
+class DocumentTag(AppModelMixin):
+    """
+    文档标签关联表
+    """
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, verbose_name="文档", db_constraint=False)
+    tag = models.ForeignKey(Tag, on_delete=models.DO_NOTHING, verbose_name="标签", db_constraint=False)
+
+    class Meta:
+        db_table = "document_tag"
+        unique_together = [['document', 'tag']]  # 文档和标签的组合唯一
+
 
 class Paragraph(AppModelMixin):
     """

@@ -36,8 +36,11 @@ const share = {
       'OR',
     ),
   auth: () => false,
+  folderRead: () => false,
+  folderManage: () => false,
   folderCreate: () => false,
   folderEdit: () => false,
+  folderAuth: () => false,
   folderDelete: () => false,
 }
 export default share

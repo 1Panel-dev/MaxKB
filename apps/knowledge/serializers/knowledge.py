@@ -3,6 +3,7 @@ import json
 import os
 import re
 import traceback
+from collections import defaultdict
 from functools import reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
@@ -13,6 +14,7 @@ from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
+from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -22,15 +24,16 @@ from common.config.embedding_config import VectorStore
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
 from common.db.sql_execute import select_list
-from common.event import ListenerManagement
+from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import post, get_file_content, parse_image
 from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File
-from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, get_embedding_model_id_by_knowledge_id, MetaSerializer, \
+    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag
+from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
+    get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
@@ -148,7 +151,8 @@ class KnowledgeSerializer(serializers.Serializer):
             if "workspace_id" in self.data and self.data.get('workspace_id') is not None:
                 query_set = query_set.filter(**{'temp.workspace_id': self.data.get("workspace_id")})
                 folder_query_set = folder_query_set.filter(**{'workspace_id': self.data.get("workspace_id")})
-            if "folder_id" in self.data and self.data.get('folder_id') is not None:
+            if "folder_id" in self.data and self.data.get('folder_id') is not None and self.data.get(
+                    'workspace_id') != self.data.get('folder_id'):
                 query_set = query_set.filter(**{'temp.folder_id': self.data.get("folder_id")})
                 folder_query_set = folder_query_set.filter(**{'parent_id': self.data.get("folder_id")})
             if "scope" in self.data and self.data.get('scope') is not None:
@@ -161,7 +165,7 @@ class KnowledgeSerializer(serializers.Serializer):
             query_set_dict['knowledge_custom_sql'] = QuerySet(model=get_dynamics_model({
                 'knowledge.workspace_id': models.CharField(),
             })).filter(**{'knowledge.workspace_id': workspace_id})
-            query_set_dict['folder_query_set'] = folder_query_set
+            # query_set_dict['folder_query_set'] = folder_query_set
             if not workspace_manage:
                 query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
                     WorkspaceUserResourcePermission).filter(
@@ -321,7 +325,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 'knowledge_custom_sql': QuerySet(
                     model=get_dynamics_model({'knowledge.id': models.CharField()})
                 ).filter(**{'knowledge.id': self.data.get("knowledge_id")}),
-                'folder_query_set': QuerySet(KnowledgeFolder)
             }
             if not workspace_manage:
                 query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
@@ -765,3 +768,50 @@ class KnowledgeSerializer(serializers.Serializer):
                     'comprehensive_score': hit_dict.get(p.get('id')).get('comprehensive_score')
                 } for p in p_list
             ]
+
+    class Tags(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
+        knowledge_ids = serializers.ListField(
+            required=True, label=_('knowledge ids'),
+            child=serializers.UUIDField(required=True, label=_('id'))
+        )
+
+        def list(self):
+            self.is_valid(raise_exception=True)
+            if self.data.get('name'):
+                name = self.data.get('name')
+                tags = QuerySet(Tag).filter(
+                    knowledge_id__in=self.data.get('knowledge_ids')
+                ).filter(
+                    Q(key__icontains=name) | Q(value__icontains=name)
+                ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
+            else:
+                # 获取所有标签，按创建时间排序保持稳定顺序
+                tags = QuerySet(Tag).filter(
+                    knowledge_id__in=self.data.get('knowledge_ids')
+                ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
+
+            # 按key分组
+            grouped_tags = defaultdict(list)
+            for tag in tags:
+                grouped_tags[tag['key']].append({
+                    'id': tag['id'],
+                    'value': tag['value'],
+                    'create_time': tag['create_time'],
+                    'update_time': tag['update_time']
+                })
+
+            # 转换为期望的格式，保持key的顺序
+            result = []
+            # 按key排序以确保结果顺序一致
+            for key in sorted(grouped_tags.keys()):
+                values = grouped_tags[key]
+                # 按创建时间对values进行排序
+                values.sort(key=lambda x: x['create_time'])
+                result.append({
+                    'key': key,
+                    'values': values,
+                })
+
+            return result

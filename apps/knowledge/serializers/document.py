@@ -3,6 +3,7 @@ import json
 import os
 import re
 import traceback
+from collections import defaultdict
 from functools import reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
@@ -15,8 +16,8 @@ from django.core import validators
 from django.db import transaction, models
 from django.db.models import QuerySet, Func, F, Value
 from django.db.models.aggregates import Max
-from django.db.models.fields.json import KeyTextTransform
-from django.db.models.functions import Substr, Reverse, Coalesce, Cast
+from django.db.models.functions import Substr, Reverse
+from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -24,9 +25,10 @@ from rest_framework import serializers
 from xlwt import Utils
 
 from common.db.search import native_search, get_dynamics_model, native_page_search
-from common.event import ListenerManagement
+from common.event.listener_manage import ListenerManagement
 from common.event.common import work_thread_pool
 from common.exception.app_exception import AppApiException
+from common.field.common import UploadedFileField
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
@@ -47,7 +49,7 @@ from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model, flat_map
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
-    TaskType, File, FileSourceType
+    TaskType, File, FileSourceType, Tag, DocumentTag
 from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, write_image, zip_dir
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
@@ -387,6 +389,7 @@ class DocumentSerializers(serializers.Serializer):
         task_type = serializers.IntegerField(required=False, label=_('task type'))
         status = serializers.CharField(required=False, label=_('status'), allow_null=True, allow_blank=True)
         order_by = serializers.CharField(required=False, label=_('order by'), allow_null=True, allow_blank=True)
+        tag = serializers.CharField(required=False, label=_('tag'), allow_null=True, allow_blank=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -412,6 +415,12 @@ class DocumentSerializers(serializers.Serializer):
                         query_set = query_set.filter(status__icontains=status)
                     else:
                         query_set = query_set.filter(status__iregex='^[2n]*$')
+            if 'tag' in self.data and self.data.get('tag') not in [None, '']:
+                tag_name = self.data.get('tag')
+                document_id_list = QuerySet(DocumentTag).filter(
+                    Q(tag__key__icontains=tag_name) | Q(tag__value__icontains=tag_name)
+                ).values_list('document_id', flat=True)
+                query_set = query_set.filter(id__in=document_id_list)
             order_by = self.data.get('order_by', '')
             order_by_query_set = QuerySet(model=get_dynamics_model(
                 {'char_length': models.CharField(), 'paragraph_count': models.IntegerField(),
@@ -674,12 +683,14 @@ class DocumentSerializers(serializers.Serializer):
             ]
             QuerySet(File).filter(id__in=source_file_ids).delete()
             QuerySet(File).filter(source_id=document_id, source_type=FileSourceType.DOCUMENT).delete()
+            paragraph_ids = QuerySet(model=Paragraph).filter(document_id=document_id).values_list("id", flat=True)
+            # 删除问题
+            delete_problems_and_mappings(paragraph_ids)
             # 删除段落
             QuerySet(model=Paragraph).filter(document_id=document_id).delete()
-            # 删除问题
-            delete_problems_and_mappings([document_id])
             # 删除向量库
             delete_embedding_by_document(document_id)
+            QuerySet(model=DocumentTag).filter(document_id=document_id).delete()
             QuerySet(model=Document).filter(id=document_id).delete()
             return True
 
@@ -1207,8 +1218,12 @@ class DocumentSerializers(serializers.Serializer):
                                Document.objects.filter(id__in=document_id_list).values("meta")]
             QuerySet(File).filter(id__in=source_file_ids).delete()
             QuerySet(Document).filter(id__in=document_id_list).delete()
+            QuerySet(DocumentTag).filter(document_id__in=document_id_list).delete()
+            paragraph_ids = QuerySet(Paragraph).filter(document_id__in=document_id_list).values_list("id", flat=True)
+            # 删除问题关系
+            delete_problems_and_mappings(paragraph_ids)
+            # 删除段落
             QuerySet(Paragraph).filter(document_id__in=document_id_list).delete()
-            delete_problems_and_mappings(document_id_list)
             # 删除向量库
             delete_embedding_by_document_list(document_id_list)
             return True
@@ -1286,6 +1301,35 @@ class DocumentSerializers(serializers.Serializer):
                 except AlreadyQueued as e:
                     pass
 
+        def batch_add_tag(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("document_ids")
+            tag_id_list = instance.get("tag_ids")
+            # 批量查询已存在的标签关联关系
+            existing_relations = {
+                (str(doc_id), str(tag_id))
+                for doc_id, tag_id in QuerySet(DocumentTag).filter(
+                    document_id__in=document_id_list,
+                    tag_id__in=tag_id_list
+                ).values_list('document_id', 'tag_id')
+            }
+
+            # 批量创建不存在的关联关系
+            new_relations = [
+                DocumentTag(
+                    id=uuid.uuid7(),
+                    document_id=document_id,
+                    tag_id=tag_id,
+                )
+                for document_id in document_id_list
+                for tag_id in tag_id_list
+                if (document_id, tag_id) not in existing_relations
+            ]
+
+            if new_relations:
+                QuerySet(DocumentTag).bulk_create(new_relations)
+
     class BatchGenerateRelated(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
@@ -1328,9 +1372,214 @@ class DocumentSerializers(serializers.Serializer):
                 QuerySet(Document).filter(id__in=document_id_list))()
             try:
                 for document_id in document_id_list:
-                    generate_related_by_document_id.delay(document_id, model_id, model_params_setting, prompt, state_list)
+                    generate_related_by_document_id.delay(
+                        document_id, model_id, model_params_setting, prompt, state_list
+                    )
             except AlreadyQueued as e:
                 pass
+
+    class Tags(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('search value'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id and workspace_id != 'None':
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            if not QuerySet(Document).filter(
+                    id=self.data.get('document_id'),
+                    knowledge_id=self.data.get('knowledge_id')
+            ).exists():
+                raise AppApiException(500, _('Document id does not exist'))
+
+        def list(self):
+            self.is_valid(raise_exception=True)
+
+            tag_ids = QuerySet(DocumentTag).filter(
+                document_id=self.data.get('document_id')
+            ).values_list('tag_id', flat=True)
+
+            if self.data.get('name'):
+                tag_ids = QuerySet(Tag).filter(
+                    knowledge_id=self.data.get('knowledge_id'),
+                    id__in=tag_ids,
+                ).filter(
+                    Q(key__icontains=self.data.get('name')) | Q(value__icontains=self.data.get('name'))
+                ).values_list('id', flat=True)
+
+            # 获取所有标签，按创建时间排序保持稳定顺序
+            tags = QuerySet(Tag).filter(
+                knowledge_id=self.data.get('knowledge_id'),
+                id__in=tag_ids
+            ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
+
+            # 按key分组
+            grouped_tags = defaultdict(list)
+            for tag in tags:
+                grouped_tags[tag['key']].append({
+                    'id': tag['id'],
+                    'value': tag['value'],
+                    'create_time': tag['create_time'],
+                    'update_time': tag['update_time']
+                })
+
+            # 转换为期望的格式，保持key的顺序
+            result = []
+            # 按key排序以确保结果顺序一致
+            for key in sorted(grouped_tags.keys()):
+                values = grouped_tags[key]
+                # 按创建时间对values进行排序
+                values.sort(key=lambda x: x['create_time'])
+                result.append({
+                    'key': key,
+                    'values': values,
+                })
+
+            return result
+
+    class AddTags(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        tag_ids = serializers.ListField(
+            required=True, label=_('tag ids'), child=serializers.UUIDField(required=True, label=_('tag id'))
+        )
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id and workspace_id != 'None':
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            if not QuerySet(Document).filter(
+                    id=self.data.get('document_id'),
+                    knowledge_id=self.data.get('knowledge_id')
+            ).exists():
+                raise AppApiException(500, _('Document id does not exist'))
+
+        def add_tags(self):
+            self.is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            tag_ids = self.data.get('tag_ids')
+            existing_tag_ids = set(
+                str(tag_id) for tag_id in QuerySet(DocumentTag).filter(
+                    document_id=document_id, tag_id__in=tag_ids
+                ).values_list('tag_id', flat=True)
+            )
+            new_tags = [
+                DocumentTag(
+                    id=uuid.uuid7(),
+                    document_id=document_id,
+                    tag_id=tag_id
+                ) for tag_id in set(tag_ids) if tag_id not in existing_tag_ids
+            ]
+            if new_tags:
+                QuerySet(DocumentTag).bulk_create(new_tags)
+
+    class DeleteTags(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        tag_ids = serializers.ListField(
+            required=True, label=_('tag ids'), child=serializers.UUIDField(required=True, label=_('tag id'))
+        )
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id and workspace_id != 'None':
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            if not QuerySet(Document).filter(
+                    id=self.data.get('document_id'),
+                    knowledge_id=self.data.get('knowledge_id')
+            ).exists():
+                raise AppApiException(500, _('Document id does not exist'))
+
+        def delete_tags(self):
+            self.is_valid(raise_exception=True)
+            document_id = self.data.get('document_id')
+            tag_ids = self.data.get('tag_ids')
+            QuerySet(DocumentTag).filter(
+                document_id=document_id,
+                tag_id__in=tag_ids
+            ).delete()
+
+    class ReplaceSourceFile(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        document_id = serializers.UUIDField(required=True, label=_('document id'))
+        file = UploadedFileField(required=True, label=_("file"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id and workspace_id != 'None':
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            if not QuerySet(Document).filter(
+                    id=self.data.get('document_id'),
+                    knowledge_id=self.data.get('knowledge_id')
+            ).exists():
+                raise AppApiException(500, _('Document id does not exist'))
+
+        @transaction.atomic
+        def replace(self):
+            self.is_valid(raise_exception=True)
+            file = self.data.get('file')
+            source_file = QuerySet(File).filter(source_id=self.data.get('document_id')).first()
+
+            if not source_file:
+                # 不存在手动关联一个文档
+                new_source_file_id = uuid.uuid7()
+                new_source_file = File(
+                    id=new_source_file_id,
+                    file_name=file.name,
+                    source_type=FileSourceType.DOCUMENT,
+                    source_id=self.data.get('document_id'),
+                )
+                new_source_file.save(file.read())
+                # 更新Document的meta字段
+                QuerySet(Document).filter(id=self.data.get('document_id')).update(
+                    meta=Func(
+                        F("meta"),
+                        Value(["source_file_id"]),
+                        Value(json.dumps(str(new_source_file_id))),
+                        Value(True),  # create_missing = true
+                        function="jsonb_set",
+                        output_field=JSONField(),
+                    )
+                )
+            else:
+                # 获取原文件的sha256_hash
+                original_hash = source_file.sha256_hash
+
+                # 读取新文件内容
+                file_content = file.read()
+
+                # 查找所有具有相同sha256_hash的文件
+                files_to_update = QuerySet(File).filter(
+                    sha256_hash=original_hash,
+                    source_id__in=[self.data.get('knowledge_id'), self.data.get('document_id')]
+                )
+
+                # 更新所有相同hash的文件
+                for file_obj in files_to_update:
+                    file_obj.save(file_content)
+
+            return True
 
 
 class FileBufferHandle:

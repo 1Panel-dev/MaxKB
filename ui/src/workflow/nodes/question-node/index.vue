@@ -201,8 +201,8 @@ const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}
 
 const form = {
   model_id: '',
-  system: defaultPrompt,
-  prompt: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
+  system: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
+  prompt: defaultPrompt,
   dialogue_number: 1,
   is_result: false,
 }

@@ -123,7 +123,6 @@ export default {
       label: '自定义',
     },
     ref_variables: {
-      label: '引用变量 ',
       popover: '变量的值必须符合',
       json_format: 'JSON 格式',
       popover_label: '标签',

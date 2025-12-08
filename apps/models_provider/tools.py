@@ -115,6 +115,21 @@ def get_model_by_id(_id, workspace_id):
         raise Exception(_("Model does not exist"))
     return model
 
+def get_model_default_params(model):
+    def convert_to_int(value):
+        if isinstance(value, str):
+            try:
+                return int(value)
+            except ValueError:
+                return value
+        return value
+
+    return {
+        p.get('field'): convert_to_int(p.get('default_value'))
+        for p in model.model_params_form
+        if p.get('default_value') is not None
+    }
+
 
 def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     """
@@ -124,5 +139,5 @@ def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     @return:                模型实例
     """
     model = get_model_by_id(model_id, workspace_id)
-    s = {p.get('field'): p.get('default_value') for p in model.model_params_form if p.get('default_value') is not None}
+    s = get_model_default_params(model)
     return ModelManage.get_model(model_id, lambda _id: get_model(model, **{**s, **kwargs}))

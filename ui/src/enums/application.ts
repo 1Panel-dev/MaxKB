@@ -9,6 +9,7 @@ export enum WorkflowType {
   Start = 'start-node',
   AiChat = 'ai-chat-node',
   SearchKnowledge = 'search-knowledge-node',
+  SearchDocument = 'search-document-node',
   Question = 'question-node',
   Condition = 'condition-node',
   Reply = 'reply-node',
@@ -32,6 +33,10 @@ export enum WorkflowType {
   LoopStartNode = 'loop-start-node',
   LoopContinueNode = 'loop-continue-node',
   LoopBreakNode = 'loop-break-node',
+  VariableSplittingNode = 'variable-splitting-node',
+  VariableAggregationNode = 'variable-aggregation-node',
+  VideoUnderstandNode = 'video-understand-node',
+  ParameterExtractionNode = 'parameter-extraction-node',
 }
 export enum WorkflowMode {
   // 应用工作流

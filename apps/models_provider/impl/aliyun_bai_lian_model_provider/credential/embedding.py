@@ -13,9 +13,26 @@ from django.utils.translation import gettext as _
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from models_provider.impl.aliyun_bai_lian_model_provider.model.embedding import AliyunBaiLianEmbedding
+
+class BaiLianEmbeddingModelParams(BaseForm):
+    dimensions = forms.SingleSelect(
+        TooltipLabel(
+            _('Dimensions'),
+            _('')
+        ),
+        required=True,
+        default_value=1024,
+        value_field='value',
+        text_field='label',
+        option_list=[
+            {'label': '1024', 'value': '1024'},
+            {'label': '768', 'value': '768'},
+            {'label': '512', 'value': '512'},
+        ]
+    )
 
 
 class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
@@ -70,5 +87,9 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
         """
         api_key = model.get('dashscope_api_key', '')
         return {**model, 'dashscope_api_key': super().encryption(api_key)}
+
+
+    def get_model_params_setting_form(self, model_name):
+        return BaiLianEmbeddingModelParams()
 
     dashscope_api_key = forms.PasswordInputField('API Key', required=True)

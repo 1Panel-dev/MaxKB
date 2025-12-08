@@ -12,12 +12,11 @@ const getResourceAuthorization: (
   workspace_id: string,
   user_id: string,
   resource: string,
-  page: pageRequest,
   params?: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any>> = (workspace_id, user_id, resource, page, params, loading) => {
+) => Promise<Result<any>> = (workspace_id, user_id, resource, params, loading) => {
   return get(
-    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}/${page.current_page}/${page.page_size}`,
+    `${prefix}/${workspace_id}/user_resource_permission/user/${user_id}/resource/${resource}`,
     params,
     loading,
   )

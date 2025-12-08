@@ -5,17 +5,17 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		( "paragraph_id" ) ( 1 - distince + ts_similarity ) as similarity, *,
-		(1 - distince + ts_similarity) AS comprehensive_score
+		( "paragraph_id" ) ( 1 - distance + ts_similarity ) as similarity, *,
+		(1 - distance + ts_similarity) AS comprehensive_score
 	FROM
 		(
 		SELECT
 			*,
-			(embedding.embedding::vector(%s) <=>  %s) as distince,
+			(embedding.embedding::vector(%s) <=>  %s) as distance,
 			(ts_rank_cd( embedding.search_vector, websearch_to_tsquery('simple', %s ), 32 )) AS ts_similarity
 		FROM
 			embedding ${embedding_query}
-		    ORDER BY distince
+		    ORDER BY distance
 		) TEMP
 	ORDER BY
 		paragraph_id,

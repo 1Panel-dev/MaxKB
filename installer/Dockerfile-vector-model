@@ -25,7 +25,10 @@ COPY --from=vector-model /opt/maxkb/app/model /opt/maxkb-app/model
 COPY --from=vector-model /opt/maxkb/app/model/base/hub /opt/maxkb-app/model/tokenizer
 COPY --from=tmp-stage1 model/tokenizer /opt/maxkb-app/model/tokenizer
 RUN rm -rf /opt/maxkb-app/model/embedding/shibing624_text2vec-base-chinese/onnx
-
+RUN apk add --update --no-cache curl && \
+    mkdir -p openai-tiktoken-cl100k-base && \
+    curl -Lf  https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken > openai-tiktoken-cl100k-base/cl100k_base.tiktoken && \
+    mv -f openai-tiktoken-cl100k-base /opt/maxkb-app/model/tokenizer/
 
 
 FROM scratch

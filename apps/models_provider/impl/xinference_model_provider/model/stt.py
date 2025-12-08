@@ -17,6 +17,7 @@ class XInferenceSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_base: str
     api_key: str
     model: str
+    params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -40,6 +41,7 @@ class XInferenceSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             model=model_name,
             api_base=model_credential.get('api_base'),
             api_key=model_credential.get('api_key'),
+            params=model_kwargs,
             **optional_params,
         )
 

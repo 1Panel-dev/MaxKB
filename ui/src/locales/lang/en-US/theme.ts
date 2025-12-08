@@ -11,7 +11,7 @@ export default {
   green: 'Green',
   purple: 'Purple',
   red: 'Red',
-  custom: 'theme.custom',
+  custom: 'Custom',
   loginBackground: 'Login Background Image',
   loginLogo: 'Login Logo',
   websiteLogo: 'Website Logo',

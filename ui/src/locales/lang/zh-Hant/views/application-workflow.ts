@@ -50,13 +50,14 @@ export default {
     beautify: '一鍵美化',
   },
   variable: {
-    label: '變量',
     global: '全局變量',
     Referencing: '引用變量',
     ReferencingRequired: '引用變量必填',
     ReferencingError: '引用變量錯誤',
     NoReferencing: '不存在的引用變量',
     placeholder: '請選擇變量',
+    inputPlaceholder: '請輸入變量',
+    loop: '循環變量',
   },
   condition: {
     title: '執行條件',
@@ -76,13 +77,14 @@ export default {
     needConnect1: '節點的',
     needConnect2: '分支需要連接',
     cannotEndNode: '節點不能當做結束節點',
-    loopNodeBreakNodeRequired: '無線迴圈必須存在Break節點',
+    loopNodeBreakNodeRequired: '無限循環必須存在Break節點',
   },
   nodes: {
     classify: {
       aiCapability: 'AI能力',
       businessLogic: '業務邏輯',
       other: '其他',
+      dataProcessing: '數據處理',
     },
     startNode: {
       label: '開始',
@@ -109,6 +111,7 @@ export default {
           label: '上傳的文件類型',
           documentText: '需要使用「文檔內容提取」節點解析文檔內容',
           imageText: '需要使用「圖片理解」節點解析圖片內容',
+          videoText: '需要使用「視頻理解」節點解析視頻內容',
           audioText: '需要使用「語音轉文本」節點解析音頻內容',
         },
       },
@@ -124,6 +127,7 @@ export default {
       },
       defaultPrompt: '已知信息',
       think: '思考過程',
+      historyMessage: '歷史聊天記錄',
     },
     searchKnowledgeNode: {
       label: '知識庫檢索',
@@ -133,6 +137,31 @@ export default {
       result: '檢索結果',
       directly_return: '滿足直接回答的分段內容',
       searchParam: '檢索參數',
+      searchQuestion: {
+        label: '檢索問題',
+        placeholder: '請選擇檢索問題',
+        requiredMessage: '請選擇檢索問題',
+      },
+    },
+    searchDocumentNode: {
+      label: '文檔標籤檢索',
+      text: '從設定的檢索範圍中，根據文檔標籤檢索出符合條件的文檔',
+      selectKnowledge: '檢索範圍',
+      searchSetting: '檢索設定',
+      custom: '手動',
+      customTooltip: '手動設置標籤過濾條件',
+      auto: '自動',
+      autoTooltip: '根據檢索問題自動匹配文檔標簽',
+      document_list: '文件清單',
+      knowledge_list: '知識庫列表',
+      result: '檢索結果',
+      searchParam: '檢索參數',
+      select_variable: '選擇變數',
+      valueMessage: `值或變量`,
+      showKnowledge: {
+        label: '結果顯示在知識來源',
+        requiredMessage: '請設定參數',
+      },
       searchQuestion: {
         label: '檢索問題',
         placeholder: '請選擇檢索問題',
@@ -172,11 +201,7 @@ export default {
     replyNode: {
       label: '指定回覆',
       text: '指定回覆內容，引用變量會轉換為字符串進行輸出',
-      content: '內容',
-      replyContent: {
-        label: '回覆內容',
-        reference: '引用變量',
-      },
+      replyContent: '回覆內容',
     },
     rerankerNode: {
       label: '多路召回',
@@ -219,8 +244,8 @@ export default {
       text: '識別出圖片中的物件、場景等信息回答用戶問題',
       answer: 'AI 回答內容',
       model: {
-        label: '圖片理解模型',
-        requiredMessage: '請選擇圖片理解模型',
+        label: '視覺模型',
+        requiredMessage: '請選擇視覺模型',
       },
       image: {
         label: '選擇圖片',
@@ -231,6 +256,19 @@ export default {
       label: '變數賦值',
       text: '更新全域變數的值',
       assign: '賦值',
+    },
+    variableAggregationNode: {
+      label: '變量聚合',
+      text: '按聚合策略聚合每組的變量',
+      Strategy: '聚合策略',
+      placeholder: '返回每組的第一個非空值',
+      placeholder1: '返回每組變量的集合',
+      group: {
+        noneError: '名稱不能為空',
+        dupError: '名稱不能重複',
+      },
+      addGroup: '添加分組',
+      editGroup: '編輯分組',
     },
     mcpNode: {
       label: 'MCP 調用',
@@ -373,7 +411,6 @@ export default {
       label: '循環開始',
       loopIndex: '下標',
       loopItem: '循環元素',
-      loopVariable: '循環變量',
     },
     loopBodyNode: { label: '循環體', text: '循環體' },
     loopContinueNode: {
@@ -382,6 +419,30 @@ export default {
       isContinue: 'Continue',
     },
     loopBreakNode: { label: 'Break', text: '終止當前循環，跳出循環體', isBreak: 'Break' },
+    variableSplittingNode: {
+      label: '變量拆分',
+      text: '通過配置 JSON Path 表達式，對輸入的 JSON 格式變量進行解析和拆分',
+      result: '結果',
+      splitVariables: '拆分變量',
+      inputVariables: '輸入變量',
+      addVariables: '添加變量',
+      editVariables: '編輯變量',
+      variableListPlaceholder: '請添加折開變數',
+      expression: {
+        label: '表達式',
+        placeholder: '請輸入表達式',
+        tooltip: '請使用JSON Path 表達式拆分變量，例如：$.store.book',
+      },
+    },
+    parameterExtractionNode: {
+      label: '參數提取',
+      text: '利用 AI 模型提取結構化參數',
+      extractParameters: {
+        label: '提取參數',
+        variableListPlaceholder: '請添加選取參數',
+        parameterType: '參數類型',
+      },
+    },
   },
   compare: {
     is_null: '為空',

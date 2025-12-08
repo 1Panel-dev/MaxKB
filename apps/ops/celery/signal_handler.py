@@ -17,12 +17,28 @@ from .logger import CeleryThreadTaskFileHandler
 logger = logging.getLogger(__file__)
 safe_str = lambda x: x
 
+def init_scheduler():
+    from common import job
+
+    job.run()
+
+    try:
+        from xpack import job as xpack_job
+
+        xpack_job.run()
+    except ImportError:
+        pass 
+
+
 
 @worker_ready.connect
 def on_app_ready(sender=None, headers=None, **kwargs):
     if cache.get("CELERY_APP_READY", 0) == 1:
         return
     cache.set("CELERY_APP_READY", 1, 10)
+    # 初始化定时任务
+    init_scheduler()
+
     tasks = get_after_app_ready_tasks()
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))

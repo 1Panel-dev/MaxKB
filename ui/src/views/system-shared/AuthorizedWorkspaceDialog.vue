@@ -22,7 +22,7 @@
         >
           <template #prefix>
             <el-icon>
-              <Search></Search>
+              <Search />
             </el-icon>
           </template>
         </el-input>

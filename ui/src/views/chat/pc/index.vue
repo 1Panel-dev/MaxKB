@@ -542,7 +542,7 @@ function closeExecutionDetail() {
       position: absolute;
       top: 20px;
       right: -13px;
-      box-shadow: 0px 5px 10px 0px rgba(31, 35, 41, 0.1);
+      box-shadow: 0px 5px 10px 0px var(--app-text-color-light-1);
       z-index: 1;
       width: 24px;
       height: 24px;

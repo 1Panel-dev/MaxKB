@@ -1,24 +1,24 @@
 # coding=utf-8
 import ast
-import os
 import json
+import os
 import subprocess
 import sys
 from textwrap import dedent
-
+import socket
 import uuid_utils.compat as uuid
-
+from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
+from common.utils.logger import maxkb_logger
 
 python_directory = sys.executable
-
 
 class ToolExecutor:
     def __init__(self, sandbox=False):
         self.sandbox = sandbox
         if sandbox:
-            self.sandbox_path = '/opt/maxkb-app/sandbox'
+            self.sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox')
             self.user = 'sandbox'
         else:
             self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
@@ -27,6 +27,21 @@ class ToolExecutor:
         if self.sandbox:
             os.system(f"chown -R {self.user}:root {self.sandbox_path}")
         self.banned_keywords = CONFIG.get("SANDBOX_PYTHON_BANNED_KEYWORDS", 'nothing_is_banned').split(',');
+        try:
+            banned_hosts_file_path = f'{self.sandbox_path}/.SANDBOX_BANNED_HOSTS'
+            if os.path.exists(banned_hosts_file_path):
+                os.remove(banned_hosts_file_path)
+            banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
+            if banned_hosts:
+                hostname = socket.gethostname()
+                local_ip = socket.gethostbyname(hostname)
+                banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
+                with open(banned_hosts_file_path, "w") as f:
+                    f.write(banned_hosts)
+                os.chmod(banned_hosts_file_path, 0o644)
+        except Exception as e:
+            maxkb_logger.error(f'Failed to init SANDBOX_BANNED_HOSTS due to exception: {e}', exc_info=True)
+            pass
 
     def _createdir(self):
         old_mask = os.umask(0o077)
@@ -52,13 +67,9 @@ try:
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
-    env = dict(os.environ)
-    for key in list(env.keys()):
-        if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
-            del os.environ[key]
     locals_v={'{}'}
     keywords={keywords}
-    globals_v=globals()
+    globals_v={'{}'}
     exec({dedent(code_str)!a}, globals_v, locals_v)
     f_name, f = locals_v.popitem()
     for local in locals_v:
@@ -154,13 +165,14 @@ except Exception as e:
         return f"""
 import os
 import sys
+import logging
+logging.basicConfig(level=logging.WARNING)
+logging.getLogger("mcp").setLevel(logging.ERROR)
+logging.getLogger("mcp.server").setLevel(logging.ERROR)
+
 path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
 sys.path = [p for p in sys.path if p not in path_to_exclude]
 sys.path += {python_paths}
-env = dict(os.environ)
-for key in list(env.keys()):
-    if key in os.environ and (key.startswith('MAXKB') or key.startswith('POSTGRES') or key.startswith('PG') or key.startswith('REDIS') or key == 'PATH'):
-        del os.environ[key]
 exec({dedent(code)!a})
 """
 
@@ -182,6 +194,9 @@ exec({dedent(code)!a})
                     self.user,
                 ],
                 'cwd': self.sandbox_path,
+                'env': {
+                    'LD_PRELOAD': f'{self.sandbox_path}/sandbox.so',
+                },
                 'transport': 'stdio',
             }
         else:
@@ -198,6 +213,9 @@ exec({dedent(code)!a})
             file.write(_code)
             os.system(f"chown {self.user}:root {exec_python_file}")
         kwargs = {'cwd': BASE_DIR}
+        kwargs['env'] = {
+            'LD_PRELOAD': f'{self.sandbox_path}/sandbox.so',
+        }
         subprocess_result = subprocess.run(
             ['su', '-s', python_directory, '-c', "exec(open('" + exec_python_file + "').read())", self.user],
             text=True,
@@ -209,6 +227,12 @@ exec({dedent(code)!a})
         matched = next((bad for bad in self.banned_keywords if bad in code_str), None)
         if matched:
             raise Exception(f"keyword '{matched}' is banned in the tool.")
+
+    def validate_mcp_transport(self, code_str):
+        servers = json.loads(code_str)
+        for server, config in servers.items():
+            if config.get('transport') not in ['sse', 'streamable_http']:
+                raise Exception(_('Only support transport=sse or transport=streamable_http'))
 
     @staticmethod
     def _exec(_code):

@@ -49,7 +49,10 @@
           :auto-upload="false"
           :show-file-list="false"
           :on-change="onChange"
-          v-hasPermission="new Role('ADMIN')"
+          v-if="hasPermission([
+            RoleConst.ADMIN,
+            PermissionConst.ABOUT_UPDATE
+          ],'OR')"
         >
           <el-button class="border-primary mr-16"
           >{{ $t('layout.about.update') }} License
@@ -70,6 +73,8 @@ import {fromNowDate} from '@/utils/time'
 import {Role} from '@/utils/permission/type'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 const {user, theme} = useStore()
 const isDefaultTheme = computed(() => {
   return theme.isDefaultTheme()

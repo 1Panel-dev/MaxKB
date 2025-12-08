@@ -219,12 +219,9 @@
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item
-                    @click.stop="openAuthorization(row)"
+                    @click.stop="openParamSetting(row)"
                     v-if="
-                      (row.model_type === 'TTS' ||
-                        row.model_type === 'LLM' ||
-                        row.model_type === 'IMAGE' ||
-                        row.model_type === 'TTI') &&
+                      ['TTS','LLM','IMAGE','TTI','STT','EMBEDDING'].includes(row.model_type) &&
                       permissionPrecise.paramSetting()
                     "
                   >
@@ -296,7 +293,6 @@ const paginationConfig = reactive({
   total: 0,
 })
 
-// sync generete edit export delete
 const MoreFilledPermission = () => {
   return permissionPrecise.value.delete() || permissionPrecise.value.modify()
 }

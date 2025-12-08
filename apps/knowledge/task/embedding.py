@@ -1,6 +1,5 @@
 # coding=utf-8
 
-import logging
 import traceback
 from typing import List
 
@@ -9,15 +8,14 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.config.embedding_config import ModelManage
-from common.event import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingKnowledgeIdArgs, \
+from common.event.listener_manage import ListenerManagement, UpdateProblemArgs, UpdateEmbeddingKnowledgeIdArgs, \
     UpdateEmbeddingDocumentIdArgs
 from common.utils.logger import maxkb_logger
 from knowledge.models import Document, TaskType, State
 from knowledge.serializers.common import drop_knowledge_index
-from models_provider.tools import get_model
 from models_provider.models import Model
+from models_provider.tools import get_model, get_model_default_params
 from ops import celery_app
-
 
 
 def get_embedding_model(model_id, exception_handler=lambda e: maxkb_logger.error(
@@ -27,7 +25,10 @@ def get_embedding_model(model_id, exception_handler=lambda e: maxkb_logger.error
     ))):
     try:
         model = QuerySet(Model).filter(id=model_id).first()
-        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
+
+        default_params = get_model_default_params(model)
+
+        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model, **{**default_params}))
     except Exception as e:
         exception_handler(e)
         raise e
@@ -77,6 +78,7 @@ def embedding_by_document(document_id, model_id, state_list=None):
             ))
 
     embedding_model = get_embedding_model(model_id, exception_handler)
+    #
     ListenerManagement.embedding_by_document(document_id, embedding_model, state_list)
 
 

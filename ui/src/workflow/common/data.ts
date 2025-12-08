@@ -82,6 +82,10 @@ export const aiChatNode = {
           label: t('views.applicationWorkflow.nodes.aiChatNode.think'),
           value: 'reasoning_content',
         },
+        {
+          label: t('views.applicationWorkflow.nodes.aiChatNode.historyMessage'),
+          value: 'history_message',
+        },
       ],
     },
   },
@@ -120,6 +124,33 @@ export const searchKnowledgeNode = {
     },
   },
 }
+
+/**
+ * 知识库检索配置数据
+ */
+export const searchDocumentNode = {
+  type: WorkflowType.SearchDocument,
+  text: t('views.applicationWorkflow.nodes.searchDocumentNode.text'),
+  label: t('views.applicationWorkflow.nodes.searchDocumentNode.label'),
+  height: 355,
+  properties: {
+    width: 600,
+    stepName: t('views.applicationWorkflow.nodes.searchDocumentNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.searchDocumentNode.knowledge_list'),
+          value: 'knowledge_list',
+        },
+        {
+          label: t('views.applicationWorkflow.nodes.searchDocumentNode.document_list'),
+          value: 'document_list',
+        },
+      ],
+    },
+  },
+}
+
 export const questionNode = {
   type: WorkflowType.Question,
   text: t('views.applicationWorkflow.nodes.questionNode.text'),
@@ -137,6 +168,43 @@ export const questionNode = {
     },
   },
 }
+export const variableSplittingNode = {
+  type: WorkflowType.VariableSplittingNode,
+  text: t('views.applicationWorkflow.nodes.variableSplittingNode.text'),
+  label: t('views.applicationWorkflow.nodes.variableSplittingNode.label'),
+  height: 345,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.variableSplittingNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('common.result'),
+          value: 'result',
+        },
+      ],
+    },
+  },
+}
+
+export const parameterExtractionNode = {
+  type: WorkflowType.ParameterExtractionNode,
+  text: t('views.applicationWorkflow.nodes.parameterExtractionNode.text'),
+  label: t('views.applicationWorkflow.nodes.parameterExtractionNode.label'),
+  height: 345,
+  properties: {
+    width: 430,
+    stepName: t('views.applicationWorkflow.nodes.parameterExtractionNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('common.result'),
+          value: 'result',
+        },
+      ],
+    },
+  },
+}
+
 export const conditionNode = {
   type: WorkflowType.Condition,
   text: t('views.applicationWorkflow.nodes.conditionNode.text'),
@@ -165,7 +233,7 @@ export const replyNode = {
     config: {
       fields: [
         {
-          label: t('views.applicationWorkflow.nodes.replyNode.content'),
+          label: t('common.content'),
           value: 'answer',
         },
       ],
@@ -249,6 +317,36 @@ export const imageUnderstandNode = {
           value: 'answer',
         },
       ],
+    },
+  },
+}
+
+export const videoUnderstandNode = {
+  type: WorkflowType.VideoUnderstandNode,
+  text: t('views.applicationWorkflow.nodes.videoUnderstandNode.text'),
+  label: t('views.applicationWorkflow.nodes.videoUnderstandNode.label'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.videoUnderstandNode.label'),
+    config: {
+      fields: [
+        {
+          label: t('views.applicationWorkflow.nodes.videoUnderstandNode.answer'),
+          value: 'answer',
+        },
+      ],
+    },
+  },
+}
+export const variableAggregationNode = {
+  type: WorkflowType.VariableAggregationNode,
+  text: t('views.applicationWorkflow.nodes.variableAggregationNode.text'),
+  label: t('views.applicationWorkflow.nodes.variableAggregationNode.label'),
+  height: 252,
+  properties: {
+    stepName: t('views.applicationWorkflow.nodes.variableAggregationNode.label'),
+    config: {
+      fields: [],
     },
   },
 }
@@ -526,23 +624,36 @@ export const menuNodes = [
     list: [
       aiChatNode,
       intentNode,
-      imageGenerateNode,
-      imageUnderstandNode,
       textToSpeechNode,
       speechToTextNode,
+      imageGenerateNode,
+      imageUnderstandNode,
       textToVideoNode,
       imageToVideoNode,
+      videoUnderstandNode,
       questionNode,
     ],
   },
-  { label: t('views.knowledge.title'), list: [searchKnowledgeNode, rerankerNode] },
+  {
+    label: t('views.knowledge.title'),
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
+  },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
-    list: [conditionNode, formNode, variableAssignNode, replyNode, loopNode],
+    list: [conditionNode, formNode, replyNode, loopNode],
+  },
+  {
+    label: t('views.applicationWorkflow.nodes.classify.dataProcessing'),
+    list: [
+      variableAssignNode,
+      variableAggregationNode,
+      variableSplittingNode,
+      parameterExtractionNode,
+    ],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.other'),
-    list: [mcpNode, documentExtractNode, toolNode],
+    list: [mcpNode, toolNode],
   },
 ]
 export const applicationLoopMenuNodes = [
@@ -551,23 +662,36 @@ export const applicationLoopMenuNodes = [
     list: [
       aiChatNode,
       intentNode,
-      questionNode,
-      imageGenerateNode,
-      imageUnderstandNode,
       textToSpeechNode,
       speechToTextNode,
+      imageGenerateNode,
+      imageUnderstandNode,
       textToVideoNode,
       imageToVideoNode,
+      videoUnderstandNode,
+      questionNode,
     ],
   },
-  { label: t('views.knowledge.title'), list: [searchKnowledgeNode, rerankerNode] },
+  {
+    label: t('views.knowledge.title'),
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
+  },
   {
     label: t('views.applicationWorkflow.nodes.classify.businessLogic'),
-    list: [conditionNode, formNode, variableAssignNode, replyNode, loopContinueNode, loopBreakNode],
+    list: [conditionNode, formNode, replyNode, loopContinueNode, loopBreakNode],
+  },
+  {
+    label: t('views.applicationWorkflow.nodes.classify.dataProcessing', '数据处理'),
+    list: [
+      variableAssignNode,
+      variableSplittingNode,
+      parameterExtractionNode,
+      variableAggregationNode,
+    ],
   },
   {
     label: t('views.applicationWorkflow.nodes.classify.other'),
-    list: [mcpNode, documentExtractNode, toolNode],
+    list: [mcpNode, toolNode],
   },
 ]
 
@@ -636,11 +760,14 @@ export const compareList = [
   { value: 'len_lt', label: t('views.applicationWorkflow.compare.len_lt') },
   { value: 'is_true', label: t('views.applicationWorkflow.compare.is_true') },
   { value: 'is_not_true', label: t('views.applicationWorkflow.compare.is_not_true') },
+  { value: 'start_with', label: 'startWith' },
+  { value: 'end_with', label: 'endWith' },
 ]
 
 export const nodeDict: any = {
   [WorkflowType.AiChat]: aiChatNode,
   [WorkflowType.SearchKnowledge]: searchKnowledgeNode,
+  [WorkflowType.SearchDocument]: searchDocumentNode,
   [WorkflowType.Question]: questionNode,
   [WorkflowType.Condition]: conditionNode,
   [WorkflowType.Base]: baseNode,
@@ -666,7 +793,12 @@ export const nodeDict: any = {
   [WorkflowType.LoopStartNode]: loopStartNode,
   [WorkflowType.LoopBreakNode]: loopBodyNode,
   [WorkflowType.LoopContinueNode]: loopContinueNode,
+  [WorkflowType.VariableSplittingNode]: variableSplittingNode,
+  [WorkflowType.VideoUnderstandNode]: videoUnderstandNode,
+  [WorkflowType.ParameterExtractionNode]: parameterExtractionNode,
+  [WorkflowType.VariableAggregationNode]: variableAggregationNode,
 }
+
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
 }

@@ -246,7 +246,7 @@ class ToolSerializer(serializers.Serializer):
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
                 default_query_set = default_query_set.filter(workspace_id=workspace_id)
-            if folder_id is not None:
+            if folder_id is not None and folder_id != workspace_id:
                 folder_query_set = folder_query_set.filter(parent=folder_id)
                 default_query_set = default_query_set.filter(folder_id=folder_id)
             if name is not None:
@@ -267,7 +267,6 @@ class ToolSerializer(serializers.Serializer):
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {
-                'folder_query_set': folder_query_set,
                 'tool_query_set': tool_query_set,
                 'default_query_set': default_query_set,
             }
@@ -356,6 +355,8 @@ class ToolSerializer(serializers.Serializer):
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
+                if instance.get('tool_type') == ToolType.MCP:
+                    ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
             tool_id = uuid.uuid7()
             Tool(
@@ -391,6 +392,8 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             # 校验代码是否包括禁止的关键字
             ToolExecutor().validate_banned_keywords(self.data.get('code', ''))
+            ToolExecutor().validate_mcp_transport(self.data.get('code', ''))
+
             # 校验mcp json
             validate_mcp_config(json.loads(self.data.get('code')))
             return True
@@ -484,7 +487,8 @@ class ToolSerializer(serializers.Serializer):
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
                 ToolExecutor().validate_banned_keywords(instance.get('code', ''))
-
+                if instance.get('tool_type') == ToolType.MCP:
+                    ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
             if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
                 raise serializers.ValidationError(_('Tool not found'))
@@ -772,7 +776,7 @@ class ToolSerializer(serializers.Serializer):
                 finally:
                     # 清理临时文件
                     os.unlink(temp_zip_path)
-            except requests.RequestException as e:
+            except Exception as e:
                 maxkb_logger.error(f"fetch appstore tools error: {e}")
                 return {'apps': [], 'additionalProperties': {'tags': []}}
 
@@ -916,7 +920,7 @@ class ToolTreeSerializer(serializers.Serializer):
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
                 default_query_set = default_query_set.filter(workspace_id=workspace_id)
-            if folder_id is not None:
+            if folder_id is not None and folder_id != workspace_id:
                 folder_query_set = folder_query_set.filter(parent=folder_id)
                 default_query_set = default_query_set.filter(folder_id=folder_id)
             if name is not None:
@@ -937,7 +941,6 @@ class ToolTreeSerializer(serializers.Serializer):
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {
-                'folder_query_set': folder_query_set,
                 'tool_query_set': tool_query_set,
                 'default_query_set': default_query_set,
             }

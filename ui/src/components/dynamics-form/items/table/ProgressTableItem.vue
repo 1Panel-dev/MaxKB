@@ -55,7 +55,7 @@ const view_card = computed(() => {
 </script>
 <style lang="scss" scoped>
 @mixin valueScss() {
-  color: rgba(31, 35, 41, 1);
+  color: var(--el-text-color-primary);
   font-weight: 500;
   font-size: 12px;
   line-height: 22px;

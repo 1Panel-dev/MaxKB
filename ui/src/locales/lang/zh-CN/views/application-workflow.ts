@@ -50,7 +50,6 @@ export default {
     beautify: '一键美化',
   },
   variable: {
-    label: '变量',
     global: '全局变量',
     chat: '会话变量',
     Referencing: '引用变量',
@@ -58,6 +57,7 @@ export default {
     ReferencingError: '引用变量错误',
     NoReferencing: '不存在的引用变量',
     placeholder: '请选择变量',
+    inputPlaceholder: '请输入变量',
     loop: '循环变量',
   },
   condition: {
@@ -78,13 +78,14 @@ export default {
     needConnect1: '节点的',
     needConnect2: '分支需要连接',
     cannotEndNode: '节点不能当做结束节点',
-    loopNodeBreakNodeRequired: '无线循环 必须存在 Break 节点',
+    loopNodeBreakNodeRequired: '无限循环 必须存在 Break 节点',
   },
   nodes: {
     classify: {
       aiCapability: 'AI能力',
       businessLogic: '业务逻辑',
       other: '其他',
+      dataProcessing: '数据处理',
     },
     startNode: {
       label: '开始',
@@ -112,6 +113,7 @@ export default {
           documentText: '需要使用“文档内容提取”节点解析文档内容',
           imageText: '需要使用“视觉模型”节点解析图片内容',
           audioText: '需要使用“语音转文本”节点解析音频内容',
+          videoText: '需要使用“视频理解”节点解析视频内容',
           otherText: '需要自行解析该类型文件',
         },
       },
@@ -127,6 +129,7 @@ export default {
       },
       defaultPrompt: '已知信息',
       think: '思考过程',
+      historyMessage: '历史聊天记录',
     },
     searchKnowledgeNode: {
       label: '知识库检索',
@@ -136,6 +139,31 @@ export default {
       result: '检索结果',
       directly_return: '满足直接回答的分段内容',
       searchParam: '检索参数',
+      showKnowledge: {
+        label: '结果显示在知识来源中',
+        requiredMessage: '请设置参数',
+      },
+      searchQuestion: {
+        label: '检索问题',
+        placeholder: '请选择检索问题',
+        requiredMessage: '请选择检索问题',
+      },
+    },
+    searchDocumentNode: {
+      label: '文档标签检索',
+      text: '从设定的检索范围中，根据文档标签检索出满足条件的文档',
+      selectKnowledge: '检索范围',
+      searchSetting: '检索设置',
+      custom: '手动',
+      customTooltip: '手动设置标签过滤条件',
+      auto: '自动',
+      autoTooltip: '根据检索问题自动匹配文档标签',
+      document_list: '文档列表',
+      knowledge_list: '知识库列表',
+      result: '检索结果',
+      searchParam: '检索参数',
+      select_variable: '选择变量',
+      valueMessage: `值或变量`,
       showKnowledge: {
         label: '结果显示在知识来源中',
         requiredMessage: '请设置参数',
@@ -179,11 +207,7 @@ export default {
     replyNode: {
       label: '指定回复',
       text: '指定回复内容，引用变量会转换为字符串进行输出',
-      content: '内容',
-      replyContent: {
-        label: '回复内容',
-        reference: '引用变量',
-      },
+      replyContent: '回复内容',
     },
     rerankerNode: {
       label: '多路召回',
@@ -233,6 +257,19 @@ export default {
         label: '选择图片',
         requiredMessage: '请选择图片',
       },
+    },
+    variableAggregationNode: {
+      label: '变量聚合',
+      text: '按聚合策略聚合每组的变量',
+      Strategy: '聚合策略',
+      placeholder: '返回每组的第一个非空值',
+      placeholder1: '返回每组变量的集合',
+      group: {
+        noneError: '名称不能为空',
+        dupError: '名称不能重复',
+      },
+      addGroup: '添加分组',
+      editGroup: '编辑分组',
     },
     variableAssignNode: {
       label: '变量赋值',
@@ -284,6 +321,19 @@ export default {
         label: '提示词(负向)',
         tooltip: '反向提示词，用来描述不希望在视频中看到的内容，可以对视频进行限制。',
         placeholder: '请描述不想生成的视频内容，比如：颜色、血腥内容',
+      },
+    },
+    videoUnderstandNode: {
+      label: '视频理解',
+      text: '识别出视频中的对象、场景等信息回答用户问题',
+      answer: 'AI 回答内容',
+      model: {
+        label: '视觉模型',
+        requiredMessage: '请选择视觉模型',
+      },
+      image: {
+        label: '选择视频',
+        requiredMessage: '请选择视频',
       },
     },
     imageToVideoGenerate: {
@@ -380,7 +430,6 @@ export default {
       label: '循环开始',
       loopIndex: '下标',
       loopItem: '循环元素',
-      loopVariable: '循环变量',
     },
     loopBodyNode: {
       label: '循环体',
@@ -395,6 +444,29 @@ export default {
       label: 'Break',
       text: '终止当前循环，跳出循环体',
       isBreak: 'Break',
+    },
+    variableSplittingNode: {
+      label: '变量拆分',
+      text: '通过配置JSON Path 表达式，对输入的 JSON 格式变量进行解析和拆分',
+      splitVariables: '拆分变量',
+      inputVariables: '输入变量',
+      addVariables: '添加变量',
+      editVariables: '编辑变量',
+      variableListPlaceholder: '请添加拆分变量',
+      expression: {
+        label: '表达式',
+        placeholder: '请输入表达式',
+        tooltip: '请使用JSON Path 表达式拆分变量，例如：$.store.book',
+      },
+    },
+    parameterExtractionNode: {
+      label: '参数提取',
+      text: '利用 AI 模型提取结构化参数',
+      extractParameters: {
+        label: '提取参数',
+        variableListPlaceholder: '请添加提取参数',
+        parameterType: '参数类型',
+      },
     },
   },
   compare: {

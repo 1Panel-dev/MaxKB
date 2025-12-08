@@ -23,6 +23,9 @@ instance.interceptors.request.use(
     if (config.headers === undefined) {
       config.headers = new AxiosHeaders()
     }
+    if (config.url && config.url.startsWith('http')) {
+      return config
+    }
     const { user, login } = useStore()
     const token = login.getToken()
     const language = user.getLanguage()
@@ -250,32 +253,33 @@ export const exportExcel: (
 }
 
 function extractFilename(contentDisposition: string) {
-  if (!contentDisposition) return null;
+  if (!contentDisposition) return null
 
   // 处理 URL 编码的文件名
-  const urlEncodedMatch = contentDisposition.match(/filename=([^;]*)/i) ||
-                         contentDisposition.match(/filename\*=UTF-8''([^;]*)/i);
+  const urlEncodedMatch =
+    contentDisposition.match(/filename=([^;]*)/i) ||
+    contentDisposition.match(/filename\*=UTF-8''([^;]*)/i)
   if (urlEncodedMatch && urlEncodedMatch[1]) {
     try {
-      return decodeURIComponent(urlEncodedMatch[1].replace(/"/g, ''));
+      return decodeURIComponent(urlEncodedMatch[1].replace(/"/g, ''))
     } catch (e) {
-      console.error("解码URL编码文件名失败:", e);
+      console.error('解码URL编码文件名失败:', e)
     }
   }
 
   // 处理 Base64 编码的文件名
-  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1];
+  const base64Part = contentDisposition.match(/=\?utf-8\?b\?(.*?)\?=/i)?.[1]
   if (base64Part) {
     try {
-      const decoded = decodeURIComponent(escape(atob(base64Part)));
-      const filenameMatch = decoded.match(/filename="(.*?)"/i);
-      return filenameMatch ? filenameMatch[1] : null;
+      const decoded = decodeURIComponent(escape(atob(base64Part)))
+      const filenameMatch = decoded.match(/filename="(.*?)"/i)
+      return filenameMatch ? filenameMatch[1] : null
     } catch (e) {
-      console.error("解码Base64文件名失败:", e);
+      console.error('解码Base64文件名失败:', e)
     }
   }
 
-  return null;
+  return null
 }
 
 export const exportFile: (
@@ -320,20 +324,22 @@ export const exportFile: (
       ],
     }),
     loading,
-  ).then((res: any) => {
-    if (res) {
-      const blob = new Blob([res], {
-        type: 'application/octet-stream',
-      })
-      const link = document.createElement('a')
-      link.href = window.URL.createObjectURL(blob)
-      link.download = fileName
-      link.click()
-      //释放内存
-      window.URL.revokeObjectURL(link.href)
-    }
-    return true
-  }).catch(()=>{})
+  )
+    .then((res: any) => {
+      if (res) {
+        const blob = new Blob([res], {
+          type: 'application/octet-stream',
+        })
+        const link = document.createElement('a')
+        link.href = window.URL.createObjectURL(blob)
+        link.download = fileName
+        link.click()
+        //释放内存
+        window.URL.revokeObjectURL(link.href)
+      }
+      return true
+    })
+    .catch(() => {})
 }
 
 export const exportExcelPost: (

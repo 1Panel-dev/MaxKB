@@ -77,8 +77,6 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image,
                 **kwargs) -> NodeResult:
         # 处理不正确的参数
-        if image is None or not isinstance(image, list):
-            image = []
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         image_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
                                                                **model_params_setting)
@@ -91,7 +89,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         message_list = self.generate_message_list(image_model, system, prompt,
                                                   self.get_history_message(history_chat_record, dialogue_number), image)
         self.context['message_list'] = message_list
-        self.context['image_list'] = image
+        self.generate_context_image(image)
         self.context['dialogue_type'] = dialogue_type
         if stream:
             r = image_model.stream(message_list)
@@ -103,6 +101,12 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             return NodeResult({'result': r, 'chat_model': image_model, 'message_list': message_list,
                                'history_message': history_message, 'question': question.content}, {},
                               _write_context=write_context)
+
+    def generate_context_image(self, image):
+        if isinstance(image, str) and image.startswith('http'):
+            self.context['image_list'] = [{'url': image}]
+        elif image is not None and len(image) > 0:
+            self.context['image_list'] = image
 
     def get_history_message_for_details(self, history_chat_record, dialogue_number):
         start_index = len(history_chat_record) - dialogue_number
@@ -164,10 +168,14 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
     def generate_prompt_question(self, prompt):
         return HumanMessage(self.workflow_manage.generate_prompt(prompt))
 
-    def generate_message_list(self, image_model, system: str, prompt: str, history_message, image):
-        if image is not None and len(image) > 0:
-            # 处理多张图片
-            images = []
+    def _process_images(self, image):
+        """
+        处理图像数据，转换为模型可识别的格式
+        """
+        images = []
+        if isinstance(image, str) and image.startswith('http'):
+            images.append({'type': 'image_url', 'image_url': {'url': image}})
+        elif image is not None and len(image) > 0:
             for img in image:
                 file_id = img['file_id']
                 file = QuerySet(File).filter(id=file_id).first()
@@ -176,13 +184,16 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 image_format = what(None, image_bytes)
                 images.append(
                     {'type': 'image_url', 'image_url': {'url': f'data:image/{image_format};base64,{base64_image}'}})
-            messages = [HumanMessage(
-                content=[
-                    {'type': 'text', 'text': self.workflow_manage.generate_prompt(prompt)},
-                    *images
-                ])]
+        return images
+
+    def generate_message_list(self, image_model, system: str, prompt: str, history_message, image):
+        prompt_text = self.workflow_manage.generate_prompt(prompt)
+        images = self._process_images(image)
+
+        if images:
+            messages = [HumanMessage(content=[{'type': 'text', 'text': prompt_text}, *images])]
         else:
-            messages = [HumanMessage(self.workflow_manage.generate_prompt(prompt))]
+            messages = [HumanMessage(prompt_text)]
 
         if system is not None and len(system) > 0:
             return [

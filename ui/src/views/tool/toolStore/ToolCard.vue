@@ -1,5 +1,5 @@
 <template>
-  <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor">
+  <CardBox :title="props.tool.name" :description="props.tool.desc" class="cursor tool-card">
     <template #icon>
       <el-avatar
         v-if="isAppIcon(props.tool?.icon)"
@@ -31,10 +31,10 @@
       </el-text>
     </template>
     <template #footer>
-      <span class="card-footer-left color-secondary">
-        {{ `${$t('common.author')}: MaxKB` }}
+      <span class="card-footer-left color-secondary" v-if="props.tool?.downloads!= undefined">
+        {{ `${$t('views.document.upload.download')}: ${numberFormat(props.tool.downloads || 0)} ` }}
       </span>
-      <div class="card-footer-operation" @click.stop>
+      <div class="card-footer-operation mb-8" @click.stop>
         <el-button @click="emit('handleDetail')">
           {{ $t('common.detail') }}
         </el-button>
@@ -48,8 +48,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { isAppIcon, resetUrl } from '@/utils/common'
-
+import { isAppIcon, resetUrl, numberFormat } from '@/utils/common'
 const props = defineProps<{
   tool: any
   getSubTitle: (v: any) => string
@@ -63,7 +62,7 @@ const emit = defineEmits<{
 </script>
 
 <style lang="scss" scoped>
-.el-card {
+.tool-card {
   :deep(.card-footer) {
     & > div:first-of-type {
       flex: 1;

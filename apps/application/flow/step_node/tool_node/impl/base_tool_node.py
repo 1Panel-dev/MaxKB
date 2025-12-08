@@ -79,6 +79,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
             return float(value)
         return value
     try:
+        value = node.workflow_manage.generate_prompt(value)
         if _type == 'int':
             return int(value)
         if _type == 'float':

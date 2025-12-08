@@ -91,16 +91,18 @@ const paragraph_list = computed(() => {
 })
 
 const next = () => {
+  if (loading.value) return
   loading.value = true
   setTimeout(() => {
-    current_page.value += 1
     loading.value = false
-  }, 100) // 添加小延迟让UI有时间更新
+  }, 100)
 }
 
 const editHandle = (item: any, cIndex: number) => {
   // 计算实际索引，考虑分页
-  currentCIndex.value = cIndex + page_size.value * (current_page.value - 1)
+  currentCIndex.value = cIndex
+  // currentCIndex.value = cIndex + page_size.value * (current_page.value - 1)
+  // console.log('Edit index:', cIndex, page_size.value, current_page.value, currentCIndex.value)
   EditParagraphDialogRef.value.open(item)
 }
 

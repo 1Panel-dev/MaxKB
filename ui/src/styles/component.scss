@@ -262,3 +262,23 @@
     padding: 4px 16px 12px 12px;
   }
 }
+// 拖拽排序
+.drag-card.no-drag {
+  .handle {
+    .handle-img {
+      display: none;
+    }
+  }
+}
+.drag-card:not(.no-drag) {
+  .handle {
+    .handle-img {
+      display: none;
+    }
+    &:hover {
+      .handle-img {
+        display: block;
+      }
+    }
+  }
+}

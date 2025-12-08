@@ -7,7 +7,7 @@
     destroy-on-close
     :close-on-click-modal="false"
     :close-on-press-escape="false"
-    @click.stop
+    append-to-body
   >
     <el-row v-loading="loading">
       <el-col :span="18">

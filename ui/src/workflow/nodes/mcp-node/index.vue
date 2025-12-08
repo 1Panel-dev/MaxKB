@@ -130,7 +130,8 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel v-if="item.label.attrs.tooltip" :label="item.label" :tooltip="item.label.attrs.tooltip" />
+                  <span v-else>{{ item.label.label }}</span>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
@@ -138,10 +139,10 @@
                   v-model="item.source"
                   size="small"
                   style="width: 85px"
-                  @change="form_data.tool_params[form_data.params_nested] = {}"
+                  @change="form_data.tool_params[form_data.params_nested][item.label.label] = ''"
                 >
                   <el-option
-                    :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                    :label="$t('views.applicationWorkflow.variable.Referencing')"
                     value="referencing"
                   />
                   <el-option :label="$t('common.custom')" value="custom" />
@@ -199,7 +200,8 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel :label="item.label.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel v-if="item.label.attrs.tooltip" :label="item.label" :tooltip="item.label.attrs.tooltip" />
+                  <span v-else>{{ item.label.label }}</span>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
                 <el-select
@@ -207,9 +209,10 @@
                   v-model="item.source"
                   size="small"
                   style="width: 85px"
+                  @change="form_data.tool_params[item.label.label] = ''"
                 >
                   <el-option
-                    :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                    :label="$t('views.applicationWorkflow.variable.Referencing')"
                     value="referencing"
                   />
                   <el-option :label="$t('common.custom')" value="custom" />
@@ -245,8 +248,8 @@
         </el-form>
       </div>
     </template>
+    <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
   </NodeContainer>
-  <McpServerInputDialog ref="mcpServerInputDialogRef" @refresh="handleMcpVariables" />
 </template>
 <script setup lang="ts">
 import { cloneDeep, set } from 'lodash'
@@ -257,7 +260,7 @@ import { t } from '@/locales'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import TooltipLabel from '@/components/dynamics-form/items/label/TooltipLabel.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import McpServerInputDialog from "./component/McpServerInputDialog.vue";
+import McpServerInputDialog from './component/McpServerInputDialog.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl } from '@/utils/common'
@@ -355,7 +358,7 @@ function getTools() {
 }
 
 function _getTools(mcp_servers: any) {
-   loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({ type: 'application', systemType: apiType.value })
     .getMcpTools(id, mcp_servers, loading)
     .then((res: any) => {
       form_data.value.mcp_tools = res.data
@@ -370,32 +373,32 @@ function _getTools(mcp_servers: any) {
 const mcpServerInputDialogRef = ref()
 // 提取 JSON 中所有占位符（{{...}}）的变量路径
 function extractPlaceholders(input: unknown): string[] {
-  const re = /\{\{\s*([a-zA-Z_][\w.]*)\s*\}\}/g; // 捕获 {{ path.like.this }}
-  const found = new Set<string>();
+  const re = /\{\{\s*([a-zA-Z_][\w.]*)\s*\}\}/g // 捕获 {{ path.like.this }}
+  const found = new Set<string>()
 
   const visit = (v: unknown) => {
     if (typeof v === 'string') {
-      let m: RegExpExecArray | null;
-      while ((m = re.exec(v)) !== null) found.add(m[1]);
+      let m: RegExpExecArray | null
+      while ((m = re.exec(v)) !== null) found.add(m[1])
     } else if (Array.isArray(v)) {
-      v.forEach(visit);
+      v.forEach(visit)
     } else if (v && typeof v === 'object') {
-      Object.values(v as Record<string, unknown>).forEach(visit);
+      Object.values(v as Record<string, unknown>).forEach(visit)
     }
-  };
+  }
 
   // 如果传入的是 JSON 字符串，尝试解析，否则按字符串/对象处理
   if (typeof input === 'string') {
     try {
-      visit(JSON.parse(input));
+      visit(JSON.parse(input))
     } catch {
-      visit(input);
+      visit(input)
     }
   } else {
-    visit(input);
+    visit(input)
   }
 
-  return [...found];
+  return [...found]
 }
 
 function handleMcpVariables(vars: any) {
@@ -590,7 +593,10 @@ onMounted(() => {
       set(props.nodeModel.properties.node_data, 'is_result', true)
     }
   }
-  if (props.nodeModel.properties.node_data.mcp_servers && !props.nodeModel.properties.node_data.mcp_source) {
+  if (
+    props.nodeModel.properties.node_data.mcp_servers &&
+    !props.nodeModel.properties.node_data.mcp_source
+  ) {
     set(props.nodeModel.properties.node_data, 'mcp_source', 'custom')
   }
   getMcpToolSelectOptions()

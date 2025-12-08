@@ -17,7 +17,6 @@ from django.db.models import QuerySet
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage
 
-
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, mcp_response_generator
@@ -89,7 +88,6 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
            'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
                                                                              False) else ''}
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
-
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -194,12 +192,16 @@ class BaseChatNode(IChatNode):
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                               'history_message': history_message, 'question': question.content}, {},
+                               'history_message': [{'content': message.content, 'role': message.type} for message in
+                                                   (history_message if history_message is not None else [])],
+                               'question': question.content}, {},
                               _write_context=write_context_stream)
         else:
             r = chat_model.invoke(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                               'history_message': history_message, 'question': question.content}, {},
+                               'history_message': [{'content': message.content, 'role': message.type} for message in
+                                                   (history_message if history_message is not None else [])],
+                               'question': question.content}, {},
                               _write_context=write_context)
 
     def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
@@ -250,7 +252,9 @@ class BaseChatNode(IChatNode):
             r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable)
             return NodeResult(
                 {'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                 'history_message': history_message, 'question': question.content}, {},
+                 'history_message': [{'content': message.content, 'role': message.type} for message in
+                                     (history_message if history_message is not None else [])],
+                 'question': question.content}, {},
                 _write_context=write_context_stream)
 
         return None
@@ -316,9 +320,7 @@ class BaseChatNode(IChatNode):
             "index": index,
             'run_time': self.context.get('run_time'),
             'system': self.context.get('system'),
-            'history_message': [{'content': message.content, 'role': message.type} for message in
-                                (self.context.get('history_message') if self.context.get(
-                                    'history_message') is not None else [])],
+            'history_message': self.context.get('history_message'),
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
             'reasoning_content': self.context.get('reasoning_content'),

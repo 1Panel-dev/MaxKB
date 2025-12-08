@@ -73,7 +73,7 @@
 <script setup lang="ts">
 import { set, throttle } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { loopBodyNode, loopStartNode } from '@/workflow/common/data'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
@@ -141,7 +141,7 @@ const mountLoopBodyNode = () => {
     }
     if (props.nodeModel.properties.node_data.loop) {
       x = props.nodeModel.properties.node_data.loop.x
-      y = props.nodeModel.properties.node_data.loop.y - 330
+      y = props.nodeModel.properties.node_data.loop.y
     }
     const nodeModel = props.nodeModel.graphModel.addNode({
       type: loopBodyNode.type,
@@ -170,7 +170,9 @@ onMounted(() => {
     }
   }
   set(props.nodeModel, 'validate', validate)
-  mountLoopBodyNode()
+  if (!props.nodeModel.virtual) {
+    mountLoopBodyNode()
+  }
 })
 </script>
 <style lang="scss" scoped></style>

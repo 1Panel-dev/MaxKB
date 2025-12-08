@@ -39,6 +39,18 @@ export function disconnect(id: string) {
     delete items[id]
   }
 }
+export function disconnectByFlow(flowId: string) {
+  Object.keys(items).forEach((key) => {
+    if (key.startsWith(flowId)) {
+      delete items[key]
+    }
+  })
+}
+export function disconnectAll() {
+  Object.keys(items).forEach((key) => {
+    delete items[key]
+  })
+}
 
 export function isActive() {
   return active

@@ -20,26 +20,5 @@ from (select tool."id"::text,
              tool."is_active"
       from tool
                left join "user" on "user".id = user_id ${tool_query_set}
-      UNION
-      select tool_folder."id",
-             tool_folder."name",
-             tool_folder."desc",
-             'folder'                as "tool_type",
-             ''                      as scope,
-             'folder'                as "resource_type",
-             tool_folder."workspace_id",
-             tool_folder."parent_id" as "folder_id",
-             tool_folder."user_id",
-             "user".nick_name        as "nick_name",
-             ''                      as "icon",
-             ''                      as label,
-             ''                      as "template_id",
-             tool_folder."create_time",
-             tool_folder."update_time",
-             '[]'::jsonb             as init_field_list,
-             '[]'::jsonb             as input_field_list,
-             ''                      as version,
-             'true'                  as "is_active"
-      from tool_folder
-               left join "user" on "user".id = user_id ${folder_query_set}) temp
+      ) temp
      ${default_query_set}

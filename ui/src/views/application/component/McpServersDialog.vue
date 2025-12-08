@@ -38,7 +38,7 @@
           {{ `MCP ${$t('views.tool.title')}` }}
           <span class="color-danger">*</span>
         </template>
-        <el-select v-model="form.mcp_tool_ids" filterable multiple>
+        <el-select v-model="form.mcp_tool_ids" filterable multiple :reserve-keyword="false">
           <el-option
             v-for="mcpTool in mcpToolSelectOptions"
             :key="mcpTool.id"

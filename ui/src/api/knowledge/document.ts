@@ -1,14 +1,14 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportExcel, exportFile } from '@/request/index'
+import { del, exportExcel, exportFile, get, post, put } from '@/request/index'
 import type { Ref } from 'vue'
-import type { KeyValue } from '@/api/type/common'
-import type { pageRequest } from '@/api/type/common'
+import type { KeyValue, pageRequest } from '@/api/type/common'
 
 import useStore from '@/stores'
-const prefix: any = { _value: '/workspace/' }
+
+const prefix: any = {_value: '/workspace/'}
 Object.defineProperty(prefix, 'value', {
   get: function () {
-    const { user } = useStore()
+    const {user} = useStore()
     return this._value + user.getWorkspaceId() + '/knowledge'
   },
 })
@@ -18,7 +18,7 @@ Object.defineProperty(prefix, 'value', {
  * @param 参数  knowledge_id,
  * param {
  "   name": "string",
-  }
+ }
  */
 
 const getDocumentList: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
@@ -32,9 +32,9 @@ const getDocumentList: (knowledge_id: string, loading?: Ref<boolean>) => Promise
  * 文档分页列表
  * @param 参数  knowledge_id,
  * param {
-      "name": "string",
-      folder_id: "string",
-  }
+ "name": "string",
+ folder_id: "string",
+ }
  */
 
 const getDocumentPage: (
@@ -69,9 +69,9 @@ const getDocumentDetail: (
  * @param 参数
  * knowledge_id, document_id,
  * {
-    "name": "string",
-    "is_active": true,
-    "meta": {}
+ "name": "string",
+ "is_active": true,
+ "meta": {}
  }
  */
 const putDocument: (
@@ -99,11 +99,11 @@ const delDocument: (
  * 批量取消文档任务
  * @param 参数 knowledge_id,
  *{
-  "id_list": [
-    "3fa85f64-5717-4562-b3fc-2c963f66afa6"
-  ],
-  "type": 0
-}
+ "id_list": [
+ "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+ ],
+ "type": 0
+ }
  */
 
 const putBatchCancelTask: (
@@ -142,6 +142,14 @@ const getDownloadSourceFile: (knowledge_id: string, document_id: string, documen
   document_name,
 ) => {
   return exportFile(document_name, `${prefix.value}/${knowledge_id}/document/${document_id}/download_source_file`, {}, undefined)
+}
+
+const postReplaceSourceFile: (knowledge_id: string, document_id: string, data: any) => Promise<Result<any>> = (
+  knowledge_id,
+  document_id,
+  data,
+) => {
+  return post(`${prefix.value}/${knowledge_id}/document/${document_id}/replace_source_file`, data, {}, undefined)
 }
 
 /**
@@ -192,10 +200,10 @@ const exportDocumentZip: (
  * @param 参数
  * knowledge_id, document_id,
  * {
-  "state_list": [
-    "string"
-  ]
-}
+ "state_list": [
+ "string"
+ ]
+ }
  */
 const putDocumentRefresh: (
   knowledge_id: string,
@@ -205,7 +213,7 @@ const putDocumentRefresh: (
 ) => Promise<Result<any>> = (knowledge_id, document_id, state_list, loading) => {
   return put(
     `${prefix.value}/${knowledge_id}/document/${document_id}/refresh`,
-    { state_list },
+    {state_list},
     undefined,
     loading,
   )
@@ -232,23 +240,23 @@ const putDocumentSync: (
 /**
  * 创建批量文档
  * @param 参数
-{
-  "name": "string",
-  "paragraphs": [
-    {
-      "content": "string",
-      "title": "string",
-      "problem_list": [
-        {
-          "id": "string",
-          "content": "string"
-        }
-      ],
-      "is_active": true
-    }
-  ],
-  "source_file_id": string
-}
+ {
+ "name": "string",
+ "paragraphs": [
+ {
+ "content": "string",
+ "title": "string",
+ "problem_list": [
+ {
+ "id": "string",
+ "content": "string"
+ }
+ ],
+ "is_active": true
+ }
+ ],
+ "source_file_id": string
+ }
  */
 const putMulDocument: (
   knowledge_id: string,
@@ -268,8 +276,8 @@ const putMulDocument: (
  * 批量删除文档
  * @param 参数 knowledge_id,
  * {
-  "id_list": [String]
-}
+ "id_list": [String]
+ }
  */
 const delMulDocument: (
   knowledge_id: string,
@@ -278,7 +286,7 @@ const delMulDocument: (
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
   return put(
     `${prefix.value}/${knowledge_id}/document/batch_delete`,
-    { id_list: data },
+    {id_list: data},
     undefined,
     loading,
   )
@@ -287,16 +295,16 @@ const delMulDocument: (
 /**
  * 批量关联
  * @param 参数 knowledge_id,
-{
-  "document_id_list": [
-    "string"
-  ],
-  "model_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-  "prompt": "string",
-  "state_list": [
-    "string"
-  ]
-}
+ {
+ "document_id_list": [
+ "string"
+ ],
+ "model_id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+ "prompt": "string",
+ "state_list": [
+ "string"
+ ]
+ }
  */
 const putBatchGenerateRelated: (
   knowledge_id: string,
@@ -336,14 +344,14 @@ const putBatchEditHitHandling: (
  * 批量刷新文档向量库
  * @param knowledge_id 知识库id
  * @param data
-{
-  "id_list": [
-    "string"
-  ],
-  "state_list": [
-    "string"
-  ]
-}
+ {
+ "id_list": [
+ "string"
+ ],
+ "state_list": [
+ "string"
+ ]
+ }
  * @param loading
  * @returns
  */
@@ -355,7 +363,7 @@ const putBatchRefresh: (
 ) => Promise<Result<boolean>> = (knowledge_id, data, stateList, loading) => {
   return put(
     `${prefix.value}/${knowledge_id}/document/batch_refresh`,
-    { id_list: data, state_list: stateList },
+    {id_list: data, state_list: stateList},
     undefined,
     loading,
   )
@@ -372,7 +380,7 @@ const putMulSyncDocument: (
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
   return put(
     `${prefix.value}/${knowledge_id}/document/batch_sync`,
-    { id_list: data },
+    {id_list: data},
     undefined,
     loading,
   )
@@ -462,7 +470,7 @@ const exportQATemplate: (fileName: string, type: string, loading?: Ref<boolean>)
   type,
   loading,
 ) => {
-  return exportExcel(fileName, `/workspace/knowledge/document/template/export`, { type }, loading)
+  return exportExcel(fileName, `/workspace/knowledge/document/template/export`, {type}, loading)
 }
 
 /**
@@ -477,7 +485,7 @@ const exportTableTemplate: (fileName: string, type: string, loading?: Ref<boolea
   return exportExcel(
     fileName,
     `/workspace/knowledge/document/table_template/export`,
-    { type },
+    {type},
     loading,
   )
 }
@@ -550,7 +558,7 @@ const putMulLarkSyncDocument: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
-  return put(`${prefix.value}/lark/${knowledge_id}/_batch`, { id_list: data }, undefined, loading)
+  return put(`${prefix.value}/lark/${knowledge_id}/_batch`, {id_list: data}, undefined, loading)
 }
 
 /**
@@ -564,6 +572,41 @@ const importLarkDocument: (
   return post(`${prefix.value}/lark/${knowledge_id}/import`, data, null, loading)
 }
 
+const getDocumentTags: (
+  knowledge_id: string,
+  document_id: string,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<string>>> = (knowledge_id, document_id, params, loading) => {
+  return get(`${prefix.value}/${knowledge_id}/document/${document_id}/tags`, params, loading)
+}
+
+const postDocumentTags: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/document/${document_id}/tags`, data, null, loading)
+}
+
+const postMulDocumentTags: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/document/batch_add_tag`, data, null, loading)
+}
+
+const delMulDocumentTag: (
+  knowledge_id: string,
+  document_id: string,
+  tags: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, tags, loading) => {
+  return put(`${prefix.value}/${knowledge_id}/document/${document_id}/tags/batch_delete`, tags, null, loading)
+}
+
 export default {
   getDocumentList,
   getDocumentPage,
@@ -573,6 +616,7 @@ export default {
   putBatchCancelTask,
   putCancelTask,
   getDownloadSourceFile,
+  postReplaceSourceFile,
   exportDocument,
   exportDocumentZip,
   putDocumentRefresh,
@@ -595,4 +639,8 @@ export default {
   putLarkDocumentSync,
   putMulLarkSyncDocument,
   importLarkDocument,
+  getDocumentTags,
+  postDocumentTags,
+  postMulDocumentTags,
+  delMulDocumentTag
 }

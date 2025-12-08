@@ -36,7 +36,7 @@
         <el-pagination
           v-model:current-page="paginationConfig.current_page"
           v-model:page-size="paginationConfig.page_size"
-          :page-sizes="paginationConfig.page_sizes|| pageSizes"
+          :page-sizes="paginationConfig.page_sizes || pageSizes"
           :total="paginationConfig.total"
           layout="total, prev, pager, next, sizes"
           @size-change="handleSizeChange"
@@ -138,8 +138,16 @@ function handleCurrentChange() {
 function clearSelection() {
   appTableRef.value?.clearSelection()
 }
+function toggleRowSelection(row: any, selected?: boolean, ignoreSelectable = true) {
+  appTableRef.value?.toggleRowSelection(row, selected, ignoreSelectable)
+}
+function getSelectionRows() {
+  return appTableRef.value?.getSelectionRows()
+}
 defineExpose({
   clearSelection,
+  toggleRowSelection,
+  getSelectionRows,
 })
 
 onMounted(() => {

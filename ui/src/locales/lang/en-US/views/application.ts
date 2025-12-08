@@ -69,7 +69,6 @@ export default {
       requiredMessage: 'APP name is required',
     },
     appDescription: {
-      label: 'Description',
       placeholder:
         'Describe the APP scenario and use, e.g.: XXX assistant answering user questions about XXX product usage',
     },

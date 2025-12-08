@@ -50,13 +50,14 @@ export default {
     beautify: 'Auto-Arrange',
   },
   variable: {
-    label: 'Variable',
     global: 'Global Variable',
     Referencing: 'Referenced Variable',
     ReferencingRequired: 'Referenced variable is required',
     ReferencingError: 'Invalid referenced variable',
     NoReferencing: 'Referenced variable does not exist',
     placeholder: 'Please select a variable',
+    inputPlaceholder: 'Please enter variable',
+    loop: 'Loop Variable',
   },
   condition: {
     title: 'Execution Condition',
@@ -82,6 +83,7 @@ export default {
       aiCapability: 'AI capability',
       businessLogic: 'Business logic',
       other: 'Other',
+      dataProcessing: 'Data Processing',
     },
     startNode: {
       label: 'Start',
@@ -108,6 +110,7 @@ export default {
           label: 'File types allowed for upload',
           documentText: 'Requires "Document Content Extraction" node to parse document content',
           imageText: 'Requires "Image Understanding" node to parse image content',
+          videoText: 'Requires "Video Understanding" node to parse video content',
           audioText: 'Requires "Speech-to-Text" node to parse audio content',
         },
       },
@@ -123,6 +126,7 @@ export default {
       },
       defaultPrompt: 'Known Information',
       think: 'Thinking Process',
+      historyMessage: 'Historical chat records',
     },
     searchKnowledgeNode: {
       label: 'Knowledge Retrieval',
@@ -134,6 +138,31 @@ export default {
       searchParam: 'Retrieval Parameters',
       searchQuestion: {
         label: 'Question',
+        placeholder: 'Please select a search question',
+        requiredMessage: 'Please select a search question',
+      },
+    },
+    searchDocumentNode: {
+      label: 'Document Tag Retrieval',
+      text: 'Search for documents that meet the conditions based on the document label within the specified search scope',
+      selectKnowledge: 'Search Scope',
+      searchSetting: 'Search Settings',
+      custom: 'Manual',
+      customTooltip: 'Manually set tag filtering conditions',
+      auto: 'Automatic',
+      autoTooltip: 'Automatically filter setting tag conditions based on the search question',
+      document_list: 'Document List',
+      knowledge_list: 'Knowledge Base List',
+      result: 'Search Results',
+      searchParam: 'Search Parameters',
+      select_variable: 'Select Variable',
+      valueMessage: `Value or name `,
+      showKnowledge: {
+        label: 'Results are displayed in the knowledge source',
+        requiredMessage: 'Please set parameters',
+      },
+      searchQuestion: {
+        label: 'Search Question',
         placeholder: 'Please select a search question',
         requiredMessage: 'Please select a search question',
       },
@@ -171,11 +200,7 @@ You are a master of problem optimization, adept at accurately inferring user int
     replyNode: {
       label: 'Specified Reply',
       text: 'Specify reply content, referenced variables will be converted to strings for output',
-      content: 'Content',
-      replyContent: {
-        label: 'Reply Content',
-        reference: 'Reference Variable',
-      },
+      replyContent: 'Reply Content',
     },
     rerankerNode: {
       label: 'Multi-path Recall',
@@ -231,6 +256,19 @@ You are a master of problem optimization, adept at accurately inferring user int
       label: 'Variable Assign',
       text: 'Update the value of the global variable',
       assign: 'Set Value',
+    },
+    variableAggregationNode: {
+      label: 'Variable Aggregation',
+      text: 'Aggregate variables of each group according to the aggregation strategy',
+      Strategy: 'Aggregation Strategy',
+      placeholder: 'Return the first non-null value of each group',
+      placeholder1: 'Return the set of variables for each group',
+      group: {
+        noneError: 'Name cannot be empty',
+        dupError: 'Name cannot be duplicated',
+      },
+      addGroup: 'Add Group',
+      editGroup: 'Edit Group',
     },
     mcpNode: {
       label: 'MCP Node',
@@ -380,7 +418,6 @@ You are a master of problem optimization, adept at accurately inferring user int
       label: 'Loop Start',
       loopIndex: 'Index',
       loopItem: 'Loop Element',
-      loopVariable: 'Loop Variable',
     },
     loopBodyNode: {
       label: 'Loop Body',
@@ -395,6 +432,30 @@ You are a master of problem optimization, adept at accurately inferring user int
       label: 'Break',
       text: 'Terminate the current loop and exit the loop body',
       isBreak: 'Break',
+    },
+    variableSplittingNode: {
+      label: 'Variable Splitting',
+      text: 'By configuring JSON Path expressions, parse and split the input JSON format variable',
+      result: 'Result',
+      splitVariables: 'Split Variables',
+      inputVariables: 'Input Variable',
+      addVariables: 'Add Variables',
+      editVariables: 'Edit Variables',
+      variableListPlaceholder: 'Please add split variables',
+      expression: {
+        label: 'Expression',
+        placeholder: 'Please enter expression',
+        tooltip: 'Please use JSON Path expressions to split variables, e.g.: $.store.book',
+      },
+    },
+    parameterExtractionNode: {
+      label: 'Parameter Extraction',
+      text: 'Use AI models to extract structured parameters',
+      extractParameters: {
+        label: 'Extract Parameters',
+        variableListPlaceholder: 'Please add extraction parameters',
+        parameterType: 'Parameter Type',
+      },
     },
   },
   compare: {

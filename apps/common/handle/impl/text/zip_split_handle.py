@@ -15,7 +15,6 @@ from urllib.parse import urljoin
 
 import uuid_utils.compat as uuid
 from charset_normalizer import detect
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_split_handle import BaseSplitHandle
@@ -37,7 +36,6 @@ class FileBufferHandle:
         if self.buffer is None:
             self.buffer = file.read()
         return self.buffer
-
 
 
 default_split_handle = TextSplitHandle()

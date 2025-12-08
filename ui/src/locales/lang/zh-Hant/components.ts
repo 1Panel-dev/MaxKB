@@ -15,8 +15,6 @@ export default {
     addChildFolder: '添加子文件夾',
     editFolder: '編輯文件夾',
     folderNamePlaceholder: '請輸入名稱',
-    description: '描述',
-    descriptionPlaceholder: '請輸入描述',
     requiredMessage: '請選擇文件夾',
     deleteConfirmMessage: '文件夹下的資源會被刪除，請謹慎操作。',
   },

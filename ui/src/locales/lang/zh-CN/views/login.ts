@@ -1,5 +1,5 @@
 export default {
-  title: '普通登录',
+  title: '账号登录',
   loginForm: {
     username: {
       label: '用户名',

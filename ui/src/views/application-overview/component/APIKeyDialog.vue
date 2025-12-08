@@ -122,8 +122,8 @@ async function changeState(row: any) {
     is_active: !row.is_active,
   }
   const str = obj.is_active
-    ? t('views.applicationOverview.appInfo.APIKeyDialog.enabledSuccess')
-    : t('views.applicationOverview.appInfo.APIKeyDialog.disabledSuccess')
+    ? t('common.status.enabled')
+    : t('common.status.disabled')
   await loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
     .putAPIKey(id as string, row.id, obj, loading)
     .then(() => {

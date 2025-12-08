@@ -10,9 +10,12 @@
   >
     <template #default="{ node, data }">
       <span class="flex align-center" @wheel="wheel">
-        <component :is="iconComponent(`${data.type}-icon`)" class="mr-8" :size="18" />{{
-          data.label
-        }}</span
+        <component
+          :is="iconComponent(`${data.type}-icon`)"
+          class="mr-8"
+          :size="18"
+          :item="data"
+        />{{ data.label }}</span
       >
     </template>
   </el-cascader>

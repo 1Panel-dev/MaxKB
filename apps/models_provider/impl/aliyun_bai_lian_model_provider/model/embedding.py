@@ -6,61 +6,46 @@
     @date：2024/10/16 16:34
     @desc:
 """
-from functools import reduce
 from typing import Dict, List
 
-from langchain_community.embeddings import DashScopeEmbeddings
-from langchain_community.embeddings.dashscope import embed_with_retry
+from openai import OpenAI
 
 from models_provider.base_model_provider import MaxKBBaseModel
 
 
-def proxy_embed_documents(texts: List[str], step_size, embed_documents):
-    value = [embed_documents(texts[start_index:start_index + step_size]) for start_index in
-             range(0, len(texts), step_size)]
-    return reduce(lambda x, y: [*x, *y], value, [])
+class AliyunBaiLianEmbedding(MaxKBBaseModel):
+    model_name: str
+    optional_params: dict
 
+    def __init__(self, api_key, model_name: str, optional_params: dict):
+        self.client = OpenAI(api_key=api_key, base_url='https://dashscope.aliyuncs.com/compatible-mode/v1').embeddings
+        self.model_name = model_name
+        self.optional_params = optional_params
 
-class AliyunBaiLianEmbedding(MaxKBBaseModel, DashScopeEmbeddings):
+    def is_cache_model(self):
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return AliyunBaiLianEmbedding(
-            model=model_name,
-            dashscope_api_key=model_credential.get('dashscope_api_key')
+            api_key=model_credential.get('dashscope_api_key'),
+            model_name=model_name,
+            optional_params=optional_params
         )
 
-    def embed_documents(self, texts: List[str]) -> List[List[float]]:
-        if self.model == 'text-embedding-v3':
-            return proxy_embed_documents(texts, 6, self._embed_documents)
-        return self._embed_documents(texts)
+    def embed_query(self, text: str):
+        res = self.embed_documents([text])
+        return res[0]
 
-    def _embed_documents(self, texts: List[str]) -> List[List[float]]:
-        """Call out to DashScope's embedding endpoint for embedding search docs.
-
-        Args:
-            texts: The list of texts to embed.
-            chunk_size: The chunk size of embeddings. If None, will use the chunk size
-                specified by the class.
-
-        Returns:
-            List of embeddings, one for each text.
-        """
-        embeddings = embed_with_retry(
-            self, input=texts, text_type="document", model=self.model
-        )
-        embedding_list = [item["embedding"] for item in embeddings]
-        return embedding_list
-
-    def embed_query(self, text: str) -> List[float]:
-        """Call out to DashScope's embedding endpoint for embedding query text.
-
-        Args:
-            text: The text to embed.
-
-        Returns:
-            Embedding for the text.
-        """
-        embedding = embed_with_retry(
-            self, input=[text], text_type="document", model=self.model
-        )[0]["embedding"]
-        return embedding
+    def embed_documents(
+            self, texts: List[str], chunk_size: int | None = None
+    ) -> List[List[float]]:
+        if len(self.optional_params) > 0:
+            res = self.client.create(
+                input=texts, model=self.model_name, encoding_format="float",
+                **self.optional_params
+            )
+        else:
+            res = self.client.create(input=texts, model=self.model_name, encoding_format="float")
+        return [e.embedding for e in res.data]

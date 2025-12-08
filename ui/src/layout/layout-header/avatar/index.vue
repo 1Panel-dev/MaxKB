@@ -4,7 +4,7 @@
       <el-avatar :size="30">
         <img src="@/assets/user-icon.svg" style="width: 54%" alt=""/>
       </el-avatar>
-      <span class="ml-8 color-text-primary">{{ user.userInfo?.username }}</span>
+      <span class="ml-8 color-text-primary ellipsis" :title="user.userInfo?.nick_name">{{ user.userInfo?.nick_name }}</span>
       <el-icon class="el-icon--right">
         <CaretBottom/>
       </el-icon>
@@ -19,11 +19,11 @@
             </el-avatar>
           </div>
           <div style="width: 90%">
-            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.username }}</p>
+            <p class="bold mb-4" style="font-size: 14px">{{ user.userInfo?.nick_name }} <span class="color-secondary lighter">({{ user.userInfo?.username }})</span></p>
             <template v-if="user.userInfo?.role_name && user.userInfo.role_name.length > 0">
               <TagGroup
                 size="small"
-                :tags="user.userInfo?.role_name"
+                :tags="role_list"
                 v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
               />
             </template>
@@ -150,9 +150,10 @@
   <!-- <UserPwdDialog ref="UserPwdDialogRef" /> -->
 </template>
 <script setup lang="ts">
-import {ref, onMounted} from 'vue'
+import {ref, onMounted, computed} from 'vue'
 import useStore from '@/stores'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
+import {t} from "@/locales"
 import ResetPassword from './ResetPassword.vue'
 import AboutDialog from './AboutDialog.vue'
 // import UserPwdDialog from '@/views/user-manage/component/UserPwdDialog.vue'
@@ -185,10 +186,30 @@ function openAPIKeyDialog() {
 const openResetPassword = () => {
   resetPasswordRef.value?.open()
 }
-
+const m:any = {
+  "系统管理员": 'layout.about.inner_admin',
+  "工作空间管理员": 'layout.about.inner_wsm',
+  "普通用户":'layout.about.inner_user'
+}
+const role_list = computed(() => {
+  if (!user.userInfo) {
+return []
+  }
+ return user.userInfo?.role_name?.map(name => {
+    const inner = m[name]
+    if (inner) {
+      return t(inner)
+    }
+    return name
+  })
+})
 const logout = () => {
   login.logout().then(() => {
-    router.push({name: 'login', query: {login_mode: 'manual'}})
+    if (user?.userInfo?.source && ['CAS', 'OIDC', 'OAuth2'].includes(user.userInfo.source)) {
+      router.push({name: 'login', query: {login_mode: 'manual'}})
+    } else {
+      router.push({name: 'login'})
+    }
   })
 }
 
@@ -201,6 +222,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .avatar-dropdown {
   min-width: 210px;
+  max-width: 400px;
 
   .userInfo {
     padding: 12px 11px;

@@ -1,7 +1,7 @@
 FROM python:3.11-slim-trixie AS python-stage
 RUN python3 -m venv /opt/py3
 
-FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.2 AS vector-model
+FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.3 AS vector-model
 
 FROM postgres:17.6-trixie
 COPY --from=python-stage /usr/local /usr/local
@@ -45,8 +45,10 @@ ENV PATH=/opt/py3/bin:$PATH \
     MAXKB_CONFIG_TYPE=ENV \
     MAXKB_LOG_LEVEL=INFO \
     MAXKB_SANDBOX=1 \
+    MAXKB_SANDBOX_HOME=/opt/maxkb-app/sandbox \
     MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS="/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages" \
     MAXKB_SANDBOX_PYTHON_BANNED_KEYWORDS="subprocess.,system(,exec(,execve(,pty.,eval(,compile(,shutil.,input(,__import__" \
+    MAXKB_SANDBOX_PYTHON_BANNED_HOSTS="127.0.0.1,localhost,host.docker.internal,maxkb,pgsql,redis" \
     MAXKB_ADMIN_PATH=/admin
 
 EXPOSE 6379

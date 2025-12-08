@@ -3,6 +3,14 @@ import {ComplexPermission} from '@/utils/permission/type'
 import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
 
 const systemManage = {
+  read: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_READ,
+      ],
+      'OR',
+    ),
   is_share: () =>
     hasPermission(
       new ComplexPermission(
@@ -57,7 +65,7 @@ const systemManage = {
       'OR',
     ),
 
-  auth: () => 
+  auth: () =>
     hasPermission(
       [
         RoleConst.ADMIN,
@@ -65,8 +73,12 @@ const systemManage = {
       ],
       'OR',
     ),
+  
+  folderRead: () => false,
+  folderManage: () => false,
   folderCreate: () => false,
   folderEdit: () => false,
+  folderAuth: () => false,
   folderDelete: () => false,
 
 }

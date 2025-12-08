@@ -16,7 +16,7 @@
           v-model="form.access_num"
           :min="0"
           :step="1"
-          :max="10000"
+          :max="10000000"
           :value-on-clear="0"
           controls-position="right"
           style="width: 268px"
@@ -116,7 +116,11 @@
             </el-checkbox-group>
           </el-form-item>
           <el-form-item
-            v-if="form.authentication_value.type === 'login' && form.authentication_value?.login_value?.includes('LOCAL')"
+            class="ml-24"
+            v-if="
+              form.authentication_value.type === 'login' &&
+              form.authentication_value?.login_value?.includes('LOCAL')
+            "
             :label="$t('views.system.display_code')"
             :rules="[
               {
@@ -127,23 +131,23 @@
             ]"
             prop="authentication_value.max_attempts"
           >
-             <span style="font-size: 13px;">
-      {{ $t('views.system.loginFailed') }}
-    </span>
+            <span style="font-size: 13px">
+              {{ $t('views.system.loginFailed') }}
+            </span>
             <el-input-number
-              style="margin-left: 8px;"
+              style="margin-left: 8px"
               v-model="form.authentication_value.max_attempts"
               :min="-1"
               :max="10"
               :step="1"
               controls-position="right"
             />
-            <span style="margin-left: 8px; font-size: 13px;">
-      {{ $t('views.system.loginFailedMessage') }}
-    </span>
-            <span style="margin-left: 8px; color: #909399; font-size: 12px;">
-      ({{ $t('views.system.display_codeTip') }})
-    </span>
+            <span style="margin-left: 8px; font-size: 13px">
+              {{ $t('views.system.loginFailedMessage') }}
+            </span>
+            <span style="margin-left: 8px; color: #909399; font-size: 12px">
+              ({{ $t('views.system.display_codeTip') }})
+            </span>
           </el-form-item>
         </el-card>
       </el-radio-group>
@@ -233,6 +237,9 @@ const open = (data: any) => {
     !form.value.authentication_value.password_value
   ) {
     refreshAuthentication()
+  }
+  if (!form.value.authentication_value.max_attempts) {
+    form.value.authentication_value.max_attempts = 1
   }
   form.value.authentication = data.authentication
   dialogVisible.value = true

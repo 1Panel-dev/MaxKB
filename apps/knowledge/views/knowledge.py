@@ -382,6 +382,29 @@ class KnowledgeView(APIView):
                 }
             ).list(workspace_id, True))
 
+    class Tags(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Get all tags of knowledge base'),
+            summary=_('Get all tags of knowledge base'),
+            operation_id=_('Get all tags of knowledge base'),  # type: ignore
+            parameters=KnowledgeReadAPI.get_parameters(),
+            responses=KnowledgeReadAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        )
+        def get(self, request: Request, workspace_id: str):
+            return result.success(KnowledgeSerializer.Tags(data={
+                'user_id': request.user.id,
+                'workspace_id': workspace_id,
+                'knowledge_ids': request.query_params.getlist('knowledge_ids[]')
+            }).list())
+
 
 class KnowledgeBaseView(APIView):
     authentication_classes = [TokenAuth]

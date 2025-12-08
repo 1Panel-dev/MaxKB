@@ -14,6 +14,7 @@ export default {
     cancelGenerate: '取消生成',
     export: '导出',
     download: '下载原文档',
+    replace: '替换原文档',
   },
   tip: {
     saveMessage: '当前的更改尚未保存，确认退出吗?',
@@ -93,6 +94,23 @@ export default {
     import: '开始导入',
     preview: '生成预览',
   },
+  tag: {
+    label: '标签管理',
+    key: '标签',
+    value: '标签值',
+    addTag: '添加标签',
+    addValue: '添加标签值',
+    setting: '标签设置',
+    create: '创建标签',
+    createValue: '创建标签值',
+    edit: '编辑标签',
+    editValue: '编辑标签值',
+    deleteConfirm: '是否删除标签: ',
+    deleteTip: '删除后使用该标签的资源将会删除该标签，请谨慎操作!',
+    requiredMessage1: '请输入标签',
+    requiredMessage2: '请输入标签值',
+    requiredMessage3: '请输入标签或标签值',
+  },
   table: {
     name: '文件名称',
     char_length: '字符数',
@@ -153,7 +171,7 @@ export default {
     },
     allow_download: {
       label: '允许在知识库来源中下载',
-    }
+    },
   },
   hitHandlingMethod: {
     optimization: '模型优化',

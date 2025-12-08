@@ -9,10 +9,10 @@
         label-width="auto"
         ref="replyNodeFormRef"
       >
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.label')">
+        <el-form-item :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.replyNode.replyContent.label') }}</span>
+              <span>{{ $t('views.applicationWorkflow.nodes.replyNode.replyContent') }}</span>
               <el-select
                 :teleported="false"
                 v-model="form_data.reply_type"
@@ -20,7 +20,7 @@
                 style="width: 85px"
               >
                 <el-option
-                  :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent.reference')"
+                  :label="$t('views.applicationWorkflow.variable.Referencing')"
                   value="referencing"
                 />
                 <el-option
@@ -34,7 +34,7 @@
           <MdEditorMagnify
             v-if="form_data.reply_type === 'content'"
             @wheel="wheel"
-            :title="$t('views.applicationWorkflow.nodes.replyNode.replyContent.label')"
+            :title="$t('views.applicationWorkflow.nodes.replyNode.replyContent')"
             v-model="form_data.content"
             style="height: 150px"
             @submitDialog="submitDialog"

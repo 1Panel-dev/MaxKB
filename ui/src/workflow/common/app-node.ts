@@ -7,24 +7,12 @@ import { h as lh } from '@logicflow/core'
 import { createApp, h } from 'vue'
 import directives from '@/directives'
 import i18n from '@/locales'
-import { WorkflowType } from '@/enums/application'
+import { WorkflowMode, WorkflowType } from '@/enums/application'
 import { nodeDict } from '@/workflow/common/data'
 import { isActive, connect, disconnect } from './teleport'
 import { t } from '@/locales'
 import { type Dict } from '@/api/type/common'
-const getNodeName = (nodes: Array<any>, baseName: string) => {
-  let index = 0
-  let name = baseName
-  while (true) {
-    if (index > 0) {
-      name = baseName + index
-    }
-    if (!nodes.some((node: any) => node.properties.stepName === name.trim())) {
-      return name
-    }
-    index++
-  }
-}
+
 class AppNode extends HtmlResize.view {
   isMounted
   r?: any
@@ -45,15 +33,31 @@ class AppNode extends HtmlResize.view {
     if (props.model.properties.noRender) {
       delete props.model.properties.noRender
     } else {
-      props.model.properties.stepName = getNodeName(
+      props.model.properties.stepName = this.getNodeName(
         props.graphModel.nodes.filter((node: any) => node.id !== props.model.id),
         props.model.properties.stepName,
       )
     }
 
-    props.model.properties.config = nodeDict[props.model.type].properties.config
+    props.model.properties.config = this.getConfig(props)
     if (props.model.properties.height) {
       props.model.height = props.model.properties.height
+    }
+  }
+  getConfig(props: any) {
+    return nodeDict[props.model.type].properties.config
+  }
+  getNodeName(nodes: Array<any>, baseName: string) {
+    let index = 0
+    let name = baseName
+    while (true) {
+      if (index > 0) {
+        name = baseName + index
+      }
+      if (!nodes.some((node: any) => node.properties.stepName === name.trim())) {
+        return name
+      }
+      index++
     }
   }
   get_node_field_list() {
@@ -74,6 +78,7 @@ class AppNode extends HtmlResize.view {
     }
     result.push({
       value: this.props.model.id,
+      icon: this.props.model.properties.node_data?.icon,
       label: this.props.model.properties.stepName,
       type: this.props.model.type,
       children: this.props.model.properties?.config?.fields || [],
@@ -241,6 +246,7 @@ class AppNode extends HtmlResize.view {
             return {
               getNode: () => model,
               getGraph: () => graphModel,
+              workflowMode: WorkflowMode.Application,
             }
           },
         })
@@ -386,8 +392,11 @@ class AppNodeModel extends HtmlResize.model {
         if (targetNode.id == sourceNode.id) {
           return false
         }
-        const up_node_list = this.graphModel.getNodeIncomingNode(targetNode.id)
-        const is_c = up_node_list.find((up_node) => up_node.id == sourceNode.id)
+        const up_edge_list = this.graphModel.getNodeIncomingEdge(targetNode.id)
+        const is_c = up_edge_list.find(
+          (up_edge) =>
+            up_edge.targetAnchorId == targetAnchor.id && up_edge.sourceAnchorId == sourceAnchor.id,
+        )
         return !is_c && !isLoop(sourceNode.id, targetNode.id)
       },
     })

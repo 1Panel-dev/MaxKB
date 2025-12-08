@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    width="1000"
+    width="1200"
     append-to-body
     class="tool-store-dialog"
     align-center
@@ -10,7 +10,7 @@
   >
     <template #header="{ titleId }">
       <div class="dialog-header flex-between mb-8">
-        <h4 :id="titleId" class="medium">
+        <h4 :id="titleId" class="medium w-240 mr-8">
           {{ $t('views.tool.toolStore.title') }}
         </h4>
         <el-radio-group v-model="toolType" @change="radioChange" class="app-radio-button-group">
@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import { onBeforeMount, ref, watch } from 'vue'
 import ToolStoreApi from '@/api/tool/store'
 import { t } from '@/locales'
 import ToolCard from './ToolCard.vue'
@@ -127,9 +127,8 @@ const dialogVisible = ref(false)
 const loading = ref(false)
 const searchValue = ref('')
 const folderId = ref('')
-const toolType = ref('INTERNAL')
-
-const categories = ref<ToolCategory[]>([
+const toolType = ref('APPSTORE')
+const defaultCategories = ref<ToolCategory[]>([
   // 第一版不上
   // {
   //   id: 'recommend',
@@ -162,7 +161,15 @@ const categories = ref<ToolCategory[]>([
   //   tools: []
   // }
 ])
+const categories = ref<ToolCategory[]>([...defaultCategories.value])
+
 const filterList = ref<any>(null)
+
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    toolType.value = 'APPSTORE'
+  }
+})
 
 function getSubTitle(tool: any) {
   return categories.value.find((i) => i.id === tool.label)?.title ?? ''
@@ -172,11 +179,9 @@ function open(id: string) {
   folderId.value = id
   filterList.value = null
   dialogVisible.value = true
-}
 
-onBeforeMount(() => {
   getList()
-})
+}
 
 async function getList() {
   if (toolType.value === 'INTERNAL') {
@@ -188,6 +193,7 @@ async function getList() {
 
 async function getInternalToolList() {
   try {
+    categories.value = defaultCategories.value
     const res = await ToolStoreApi.getInternalToolList({ name: searchValue.value }, loading)
     if (searchValue.value.length) {
       filterList.value = res.data
@@ -211,17 +217,20 @@ async function getStoreToolList() {
     const res = await ToolStoreApi.getStoreToolList({ name: searchValue.value }, loading)
     const tags = res.data.additionalProperties.tags
     const storeTools = res.data.apps
-
-    if (storeTools.length === 0) {
-      filterList.value = []
-      return
+    //
+    storeTools.forEach((tool: any) => {
+      tool.desc = tool.description
+    })
+    if (searchValue.value.length) {
+      filterList.value = res.data.apps
+    } else {
+      filterList.value = null
+      categories.value = tags.map((tag: any) => ({
+        id: tag.key,
+        title: tag.name, // 国际化
+        tools: storeTools.filter((tool: any) => tool.label === tag.key),
+      }))
     }
-
-    categories.value = tags.map((tag: any) => ({
-      id: tag.key,
-      title: tag.name, // 国际化
-      tools: storeTools.filter((tool: any) => tool.label === tag.key),
-    }))
   } catch (error) {
     console.error(error)
   }
@@ -297,6 +306,7 @@ async function handleStoreAdd(tool: any) {
 }
 
 function radioChange() {
+  searchValue.value = ''
   getList()
 }
 
@@ -327,6 +337,11 @@ defineExpose({ open })
 
   .layout-container__left {
     background-color: var(--app-layout-bg-color);
+    border-radius: 0 0 0 8px;
+  }
+  .layout-container__right {
+    background-color: var(--app-layout-bg-color);
+    border-radius: 0 0 8px 0;
   }
 
   .el-anchor {
@@ -357,8 +372,8 @@ defineExpose({ open })
   }
 
   .category-scrollbar {
-    max-height: calc(100vh - 260px);
-    min-height: 500px;
+    height: calc(100vh - 200px);
+    // min-height: 500px;
   }
 }
 </style>

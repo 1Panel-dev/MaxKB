@@ -8,7 +8,7 @@
     <el-button text style="font-size: 14px" class="workspace-dropdown__button">
       <AppIcon iconName="app-workspace" style="font-size: 18px"></AppIcon>
       <span class="ellipsis" style="max-width: 155px" :title="currentWorkspace?.name">
-        {{ currentWorkspace?.name }}
+        {{ i18n_name(currentWorkspace?.name) }}
       </span>
       <el-icon class="el-icon--right">
         <CaretBottom />
@@ -55,6 +55,7 @@
 
 <script setup lang="ts">
 import { watch, ref } from 'vue'
+import { i18n_name } from '@/utils/common'
 import type { WorkspaceItem } from '@/api/type/workspace'
 import useStore from '@/stores'
 const props = defineProps({

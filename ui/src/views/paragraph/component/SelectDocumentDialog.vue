@@ -26,7 +26,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch, reactive, computed, onMounted} from 'vue'
+import { ref, watch, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import SelectKnowledgeDocument from '@/components/select-knowledge-document/index.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
@@ -37,7 +37,12 @@ const props = defineProps<{
 const route = useRoute()
 const {
   params: { id, documentId }, // id为knowledgeID
+  query: { from, isShared },
 } = route as any
+
+const shareDisabled = computed(() => {
+  return isShared === 'true'
+})
 
 const emit = defineEmits(['refresh'])
 const SelectKnowledgeDocumentRef = ref()
@@ -55,6 +60,7 @@ watch(dialogVisible, (bool) => {
 })
 
 const open = (list: any) => {
+  getDetail()
   paragraphList.value = list
   dialogVisible.value = true
 }
@@ -80,17 +86,12 @@ const submitForm = async () => {
 }
 
 function getDetail() {
-  loadSharedApi({ type: 'knowledge', systemType: props.apiType })
+  loadSharedApi({ type: 'knowledge', systemType: props.apiType, isShared: shareDisabled.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       knowledgeDetail.value = res.data
     })
 }
-
-onMounted(() => {
-  getDetail()
-})
-
 
 function changeKnowledge(dataset_id: string) {
   localStorage.setItem(id + 'chat_dataset_id', dataset_id)

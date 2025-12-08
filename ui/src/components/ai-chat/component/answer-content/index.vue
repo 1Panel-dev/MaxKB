@@ -156,7 +156,18 @@ function showSource(row: any) {
 }
 
 const regenerationChart = (chat: chatType) => {
-  props.sendMessage(chat.problem_text, { re_chat: true })
+  const container = props.chatRecord?.upload_meta
+    ? props.chatRecord.upload_meta
+    : props.chatRecord.execution_details?.find((detail) => detail.type === 'start-node')
+
+  props.sendMessage(chat.problem_text, {
+    re_chat: true,
+    image_list: container?.image_list || [],
+    document_list: container?.document_list || [],
+    audio_list: container?.audio_list || [],
+    video_list: container?.video_list || [],
+    other_list: container?.other_list || [],
+  })
 }
 const stopChat = (chat: chatType) => {
   props.chatManagement.stop(chat.id)

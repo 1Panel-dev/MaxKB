@@ -133,6 +133,22 @@ const share = {
       ],
       'OR'
     ),
+  doc_tag: () => 
+    hasPermission (
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_TAG
+      ],
+      'OR'
+    ),
+  doc_replace: () => 
+    hasPermission (
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_REPLACE
+      ],
+      'OR'
+    ),
   problem_create: () => 
     hasPermission (
       [
@@ -182,11 +198,47 @@ const share = {
       ],
       'OR'
     ),
+  tag_read: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_TAG_READ
+      ],
+      'OR',
+    ),
+  tag_create: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_TAG_CREATE
+      ],
+      'OR',
+    ),
+  tag_edit: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_TAG_EDIT
+      ],
+      'OR',
+    ),
+  tag_delete: () => 
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_TAG_DELETE
+      ],
+      'OR',
+    ),
+
   chat_user_edit: () =>false,
 
   auth: () => false,
+  folderRead: () => false,
+  folderManage: () => false,
   folderCreate: () => false,
   folderEdit: () => false,
+  folderAuth: () => false,
   folderDelete: () => false,
   hit_test: () => false,
 }

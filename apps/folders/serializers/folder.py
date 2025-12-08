@@ -2,7 +2,8 @@
 
 import uuid_utils.compat as uuid
 from django.db import transaction
-from django.db.models import QuerySet, Q
+from django.db.models import QuerySet, Q, Func, F, TextField
+from django.db.models.functions import Cast
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -16,6 +17,7 @@ from knowledge.models import KnowledgeFolder, Knowledge
 from knowledge.serializers.knowledge import KnowledgeSerializer
 from knowledge.serializers.knowledge_folder import KnowledgeFolderTreeSerializer
 from system_manage.models import WorkspaceUserResourcePermission
+from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import ToolFolder, Tool
 from tools.serializers.tool import ToolSerializer
 from tools.serializers.tool_folder import ToolFolderTreeSerializer
@@ -55,7 +57,7 @@ def get_folder_tree_serializer(source):
         return None
 
 
-FOLDER_DEPTH = 2  # Folder 不能超过3层
+FOLDER_DEPTH = 10000
 
 
 def check_depth(source, parent_id, workspace_id, current_depth=0):
@@ -77,7 +79,7 @@ def check_depth(source, parent_id, workspace_id, current_depth=0):
 
         # 验证层级深度
         if depth + current_depth > FOLDER_DEPTH:
-            raise serializers.ValidationError(_('Folder depth cannot exceed 3 levels'))
+            raise serializers.ValidationError(_('Folder depth cannot exceed 10000 levels'))
 
 
 def get_max_depth(current_node):
@@ -96,6 +98,12 @@ def get_max_depth(current_node):
     max_depth = max_level - current_level
 
     return max_depth
+
+
+def has_target_permission(workspace_id, source, user_id, target):
+    return QuerySet(WorkspaceUserResourcePermission).filter(workspace_id=workspace_id, user_id=user_id,
+                                                            auth_target_type=source, target=target,
+                                                            permission_list__contains=['MANAGE']).exists()
 
 
 class FolderSerializer(serializers.Serializer):
@@ -139,6 +147,13 @@ class FolderSerializer(serializers.Serializer):
                 parent_id=parent_id
             )
             folder.save()
+
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': self.data.get('source')
+            }).auth_resource(str(folder.id), is_folder=True)
+
             return FolderSerializer(folder).data
 
     class Operate(serializers.Serializer):
@@ -174,13 +189,27 @@ class FolderSerializer(serializers.Serializer):
                     field in instance and instance.get(field) is not None)}
 
             QuerySet(Folder).filter(id=current_id).update(**edit_dict)
+            current_node.refresh_from_db()
 
             if parent_id is not None and current_id != current_node.workspace_id and current_node.parent_id != parent_id:
-                # Folder 不能超过3层
-                current_depth = get_max_depth(current_node)
-                check_depth(self.data.get('source'), parent_id, current_node.workspace_id, current_depth)
-                parent = Folder.objects.get(id=parent_id)
-                current_node.move_to(parent)
+
+                source_type = self.data.get('source')
+                if has_target_permission(current_node.workspace_id, source_type, self.data.get('user_id'),
+                                         parent_id) or is_workspace_manage(self.data.get('user_id'),
+                                                                           current_node.workspace_id):
+                    current_depth = get_max_depth(current_node)
+                    check_depth(self.data.get('source'), parent_id, current_node.workspace_id, current_depth)
+                    parent = Folder.objects.get(id=parent_id)
+
+                    if QuerySet(Folder).filter(name=current_node.name, parent_id=parent_id,
+                                               workspace_id=current_node.workspace_id).exists():
+                        raise serializers.ValidationError(_('Folder name already exists'))
+
+                    current_node.parent = parent
+                    current_node.save()
+                    current_node.refresh_from_db()
+                else:
+                    raise AppApiException(403, _('No permission for the target folder'))
 
             return self.one()
 
@@ -216,7 +245,9 @@ class FolderSerializer(serializers.Serializer):
                 nodes = Folder.objects.filter(id=self.data.get('id')).get_descendants(include_self=True)
                 for node in nodes:
                     # 删除相关的资源
-                    source_ids = Source.objects.filter(folder_id=node.id).values_list('id', flat=True)
+                    source_ids = (Source.objects.filter(folder_id=node.id)
+                                  .annotate(id_str=Cast('id', TextField()))
+                                  .values_list('id_str', flat=True))
                     # 检查文件夹是否存在未授权当前用户的资源
                     auth_list = QuerySet(WorkspaceUserResourcePermission).filter(
                         Q(workspace_id=self.data.get('workspace_id')) &
@@ -269,7 +300,8 @@ class FolderTreeSerializer(serializers.Serializer):
                 return True  # 需要重建
         return False
 
-    def get_folder_tree(self, name=None):
+    def get_folder_tree(self,
+                        current_user, name=None):
         self.is_valid(raise_exception=True)
         Folder = get_folder_type(self.data.get('source'))  # noqa
 
@@ -280,16 +312,23 @@ class FolderTreeSerializer(serializers.Serializer):
         if self._check_tree_integrity(workspace_folders):
             Folder.objects.rebuild()
 
+        workspace_manage = is_workspace_manage(current_user.id, self.data.get('workspace_id'))
+
+        base_q = Q(workspace_id=self.data.get('workspace_id'))
+
         if name is not None:
-            nodes = Folder.objects.filter(
-                Q(workspace_id=self.data.get('workspace_id')) &
-                Q(name__contains=name)
-            ).get_cached_trees()
-        else:
-            nodes = Folder.objects.filter(
-                Q(workspace_id=self.data.get('workspace_id'))
-            ).get_cached_trees()
+            base_q &= Q(name__contains=name)
+        if not workspace_manage:
+            base_q &= (Q(id__in=WorkspaceUserResourcePermission.objects.filter(user_id=current_user.id,
+                                                                               auth_target_type=self.data.get('source'),
+                                                                               workspace_id=self.data.get(
+                                                                                   'workspace_id'),
+                                                                               permission_list__contains=['VIEW'])
+            .values_list(
+                'target', flat=True)) | Q(id=self.data.get('workspace_id')))
+
+        nodes = Folder.objects.filter(base_q).get_cached_trees()
 
         TreeSerializer = get_folder_tree_serializer(self.data.get('source'))  # noqa
         serializer = TreeSerializer(nodes, many=True)
-        return serializer.data  # 这是可序列化的字典
+        return [d for d in serializer.data if d.get('id') == d.get('workspace_id')]  # 这是可序列化的字典

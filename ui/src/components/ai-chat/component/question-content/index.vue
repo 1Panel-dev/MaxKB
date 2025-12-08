@@ -9,12 +9,12 @@
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
-                    <Download />
+                    <Download/>
                   </el-icon>
                   {{ $t('chat.download') }}
                 </div>
                 <div class="show flex align-center">
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
                   <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
@@ -57,18 +57,33 @@
             </template>
           </el-space>
         </div>
+        <div class="mb-8" v-if="video_list.length">
+          <el-space wrap>
+            <template v-for="(item, index) in video_list" :key="index">
+              <div class="file cursor border-r-6" v-if="item.url">
+                <video
+                  :src="item.url"
+                  style="width: 170px; display: block"
+                  class="border-r-6"
+                  controls
+                  autoplay
+                />
+              </div>
+            </template>
+          </el-space>
+        </div>
         <div class="mb-8" v-if="other_list.length">
           <el-space wrap class="w-full media-file-width">
             <template v-for="(item, index) in other_list" :key="index">
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
-                    <Download />
+                    <Download/>
                   </el-icon>
                   {{ $t('chat.download') }}
                 </div>
                 <div class="show flex align-center">
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
                   <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
@@ -89,16 +104,17 @@
         style="width: 28px; height: 28px; display: block"
       />
       <el-avatar v-else :size="28">
-        <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
+        <img src="@/assets/user-icon.svg" style="width: 50%" alt=""/>
       </el-avatar>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import { type chatType } from '@/api/type/application'
-import { getImgUrl, downloadByURL } from '@/utils/common'
-import { getAttrsArray } from '@/utils/array'
-import { onMounted, computed } from 'vue'
+import {type chatType} from '@/api/type/application'
+import {getImgUrl, downloadByURL} from '@/utils/common'
+import {getAttrsArray} from '@/utils/array'
+import {onMounted, computed} from 'vue'
+
 const props = defineProps<{
   application: any
   chatRecord: chatType
@@ -127,6 +143,15 @@ const image_list = computed(() => {
   )
   return startNode?.image_list || []
 })
+const video_list = computed(() => {
+  if (props.chatRecord?.upload_meta) {
+    return props.chatRecord.upload_meta?.video_list || []
+  }
+  const startNode = props.chatRecord.execution_details?.find(
+    (detail) => detail.type === 'start-node',
+  )
+  return startNode?.video_list || []
+})
 const audio_list = computed(() => {
   if (props.chatRecord?.upload_meta) {
     return props.chatRecord.upload_meta?.audio_list || []
@@ -154,11 +179,13 @@ const getClassName = computed(() => {
         ? `media_${other_list.value.length}`
         : `media_0`
 })
+
 function downloadFile(item: any) {
   downloadByURL(item.url, item.name)
 }
 
-onMounted(() => {})
+onMounted(() => {
+})
 </script>
 <style lang="scss" scoped>
 .question-content {
@@ -196,21 +223,26 @@ onMounted(() => {})
       display: none;
     }
   }
+
   .media-file-width {
     :deep(.el-space__item) {
       width: 49% !important;
     }
   }
+
   .media_2 {
     flex: 1;
   }
+
   .media_0 {
     flex: inherit;
   }
+
   .media_1 {
     width: 50%;
   }
 }
+
 @media only screen and (max-width: 768px) {
   .question-content {
     .media-file-width {
@@ -218,11 +250,13 @@ onMounted(() => {})
         min-width: 100% !important;
       }
     }
+
     .media_1 {
       width: 100%;
     }
   }
 }
+
 .debug-ai-chat {
   .question-content {
     .media-file-width {
@@ -230,6 +264,7 @@ onMounted(() => {})
         min-width: 100% !important;
       }
     }
+
     .media_1 {
       width: 100%;
     }

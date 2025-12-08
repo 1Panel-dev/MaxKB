@@ -1,5 +1,20 @@
 <template>
   <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
+    <el-button
+      @click="changeCursor(true)"
+      style="border: none; padding: 4px; height: 24px"
+      :class="{ 'is-drag-active': isDrag }"
+    >
+      <el-icon :size="16"><Position /></el-icon>
+    </el-button>
+    <el-button
+      @click="changeCursor(false)"
+      style="border: none; padding: 4px; height: 24px;margin-left: 8px;"
+      :class="{ 'is-drag-active': !isDrag }"
+    >
+      <AppIcon iconName="app-raisehand" :size="16"></AppIcon>
+    </el-button>
+    <el-divider direction="vertical" />
     <el-button link @click="zoomOut" style="border: none">
       <el-tooltip
         effect="dark"
@@ -78,9 +93,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 const props = defineProps({
   lf: Object || String || null,
 })
+
+const isDrag = ref(false)
 
 function zoomIn() {
   props.lf?.zoom(true, [0, 0])
@@ -106,5 +124,22 @@ const extend = () => {
     element.properties.showNode = true
   })
 }
+const changeCursor = (bool: boolean) => {
+  const element: HTMLElement = document.querySelector('.lf-drag-able') as HTMLElement
+  isDrag.value = bool
+  if (bool) {
+    element.style.cursor = 'default'
+    props.lf?.openSelectionSelect()
+    props.lf?.extension.selectionSelect.setSelectionSense(true, false)
+  } else {
+    element.style.cursor = 'pointer'
+    props.lf?.closeSelectionSelect()
+  }
+}
 </script>
-<style scoped></style>
+<style scoped lang="scss">
+.is-drag-active {
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+</style>

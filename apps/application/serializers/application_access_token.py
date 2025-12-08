@@ -24,7 +24,7 @@ class AccessTokenEditSerializer(serializers.Serializer):
     access_token_reset = serializers.BooleanField(required=False,
                                                   label=_("Reset Token"))
     is_active = serializers.BooleanField(required=False, label=_("Is it enabled"))
-    access_num = serializers.IntegerField(required=False, max_value=10000,
+    access_num = serializers.IntegerField(required=False, max_value=10000000,
                                           min_value=0,
                                           label=_("Number of visits"))
     white_active = serializers.BooleanField(required=False,

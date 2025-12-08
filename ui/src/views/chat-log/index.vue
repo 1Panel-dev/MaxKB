@@ -256,7 +256,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { Permission } from '@/utils/permission/type'
 import { hasPermission } from '@/utils/permission'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
- 
+
 const route = useRoute()
 
 const apiType = computed(() => {
@@ -354,17 +354,22 @@ const filter = ref<any>({
   min_trample: 0,
   comparer: 'and',
 })
-const postKnowledgeHandler = (knowledgeList: Array<any>) => { 
+const postKnowledgeHandler = (knowledgeList: Array<any>) => {
   return knowledgeList.filter(item => {
     if (apiType.value === 'workspace') {
-      return hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),
-      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspacePermissionWorkspaceManageRole,
-      new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspaceResourcePermission('KNOWLEDGE', item.id)], 'OR')
+      if (item.resource_type === 'folder') {
+        return true
+      }
+      if (item.resource_type === 'knowledge') {
+        return hasPermission([RoleConst.WORKSPACE_MANAGE.getWorkspaceRole(),
+            new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspacePermissionWorkspaceManageRole,
+            new Permission("KNOWLEDGE_DOCUMENT:READ+EDIT").getWorkspaceResourcePermission('KNOWLEDGE', item.id)], 'OR')
+      }
     } else if (apiType.value === 'systemManage') {
       return hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT],'OR')
     }
-  }) 
-  
+  })
+
 }
 function filterChange(val: string) {
   if (val === 'clear') {

@@ -60,7 +60,7 @@
           </div>
         </el-form-item>
 
-        <el-form-item :label="$t('views.tool.form.toolDescription.label')">
+        <el-form-item :label="$t('common.desc')">
           <el-input
             v-model="form.desc"
             type="textarea"
@@ -415,9 +415,10 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid: any) => {
     if (valid) {
+      loading.value = true
       if (isEdit.value) {
         loadSharedApi({ type: 'tool', systemType: apiType.value })
-          .putTool(form.value?.id as string, form.value, loading)
+          .putTool(form.value?.id as string, form.value)
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
             emit('refresh', res.data)
@@ -426,13 +427,16 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then(() => {
             visible.value = false
           })
+          .finally(() => {
+            loading.value = false
+          })
       } else {
         const obj = {
           folder_id: folder.currentFolder?.id,
           ...form.value,
         }
         loadSharedApi({ type: 'tool', systemType: apiType.value })
-          .postTool(obj, loading)
+          .postTool(obj)
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             emit('refresh')
@@ -440,6 +444,9 @@ const submit = async (formEl: FormInstance | undefined) => {
           })
           .then(() => {
             visible.value = false
+          })
+          .finally(() => {
+            loading.value = false
           })
       }
     }

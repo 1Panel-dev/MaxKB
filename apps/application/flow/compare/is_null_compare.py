@@ -18,4 +18,7 @@ class IsNullCompare(Compare):
             return True
 
     def compare(self, source_value, compare, target_value):
-        return source_value is None or len(source_value) == 0
+        try:
+            return source_value is None or len(source_value) == 0
+        except Exception as e:
+            return False

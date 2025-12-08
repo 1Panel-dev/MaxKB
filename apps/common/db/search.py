@@ -16,9 +16,10 @@ from common.db.compiler import AppSQLCompiler
 from common.db.sql_execute import select_one, select_list, update_execute
 from common.result import Page
 
-
 # 添加模型缓存
 _model_cache = {}
+
+
 def get_dynamics_model(attr: dict, table_name='dynamics'):
     """
     获取一个动态的django模型
@@ -29,24 +30,24 @@ def get_dynamics_model(attr: dict, table_name='dynamics'):
     # 创建缓存键，基于属性和表名
     cache_key = hashlib.md5(f"{table_name}_{str(sorted(attr.items()))}".encode()).hexdigest()
     # print(f'cache_key: {cache_key}')
-    
+
     # 如果模型已存在，直接返回缓存的模型
     if cache_key in _model_cache:
         return _model_cache[cache_key]
-    
+
     attributes = {
         "__module__": "knowledge.models",
         "Meta": type("Meta", (), {'db_table': table_name}),
         **attr
     }
-    
+
     # 使用唯一的类名避免冲突
     class_name = f'Dynamics_{cache_key[:8]}'
     model_class = type(class_name, (models.Model,), attributes)
-    
+
     # 缓存模型
     _model_cache[cache_key] = model_class
-    
+
     return model_class
 
 
@@ -187,6 +188,51 @@ def native_page_search(current_page: int, page_size: int, queryset: QuerySet | D
     page_sql = exec_sql + " " + limit_sql
     result = select_list(page_sql, exec_params)
     return Page(total.get("count"), list(map(post_records_handler, result)), current_page, page_size)
+
+
+def native_page_handler(page_size: int,
+                        queryset: QuerySet | Dict[str, QuerySet],
+                        select_string: str,
+                        field_replace_dict=None,
+                        with_table_name=False,
+                        primary_key=None,
+                        get_primary_value=None,
+                        primary_queryset: str = None,
+                        ):
+    if isinstance(queryset, Dict):
+        exec_sql, exec_params = generate_sql_by_query_dict({**queryset,
+            primary_queryset: queryset[primary_queryset].order_by(
+                primary_key)}, select_string, field_replace_dict, with_table_name)
+    else:
+        exec_sql, exec_params = generate_sql_by_query(queryset.order_by(
+            primary_key), select_string, field_replace_dict, with_table_name)
+    total_sql = "SELECT \"count\"(*) FROM (%s) temp" % exec_sql
+    total = select_one(total_sql, exec_params)
+    processed_count = 0
+    last_id = None
+    while processed_count < total.get("count"):
+        if last_id is not None:
+            if isinstance(queryset, Dict):
+                exec_sql, exec_params = generate_sql_by_query_dict({**queryset,
+                    primary_queryset: queryset[primary_queryset].filter(
+                        **{f"{primary_key}__gt": last_id}).order_by(
+                        primary_key)},
+                    select_string, field_replace_dict,
+                    with_table_name)
+            else:
+                exec_sql, exec_params = generate_sql_by_query(
+                    queryset.filter(**{f"{primary_key}__gt": last_id}).order_by(
+                        primary_key),
+                    select_string, field_replace_dict,
+                    with_table_name)
+        limit_sql = connections[DEFAULT_DB_ALIAS].ops.limit_offset_sql(
+            0, page_size
+        )
+        page_sql = exec_sql + " " + limit_sql
+        result = select_list(page_sql, exec_params)
+        yield result
+        processed_count += page_size
+        last_id = get_primary_value(result[-1])
 
 
 def get_field_replace_dict(queryset: QuerySet):

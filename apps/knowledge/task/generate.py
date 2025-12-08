@@ -1,4 +1,3 @@
-import logging
 import traceback
 
 from celery_once import QueueOnce
@@ -8,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage
 
 from common.config.embedding_config import ModelManage
-from common.event import ListenerManagement
+from common.event.listener_manage import ListenerManagement
 from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page, page_desc
 from knowledge.models import Paragraph, Document, Status, TaskType, State

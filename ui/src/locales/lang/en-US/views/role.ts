@@ -1,5 +1,5 @@
 export default {
-  title: 'Role management',
+  title: 'Role Management',
   internalRole: 'System built-in roles',
   customRole: 'Custom roles',
   systemAdmin: 'System admin',

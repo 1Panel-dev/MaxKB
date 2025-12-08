@@ -56,7 +56,7 @@ class IntentModel extends AppNodeModel {
                 anchors.push({
                 x: x + width / 2 - 10,
                 y: showNode
-                        ? y - height / 2 + FORM_ITEMS_HEIGHT  + index *41.3
+                        ? y - height / 2 + FORM_ITEMS_HEIGHT  + index *41.36
                         : y - 15,
                 id: `${id}_${element.id}_right`,
                 type: 'right'

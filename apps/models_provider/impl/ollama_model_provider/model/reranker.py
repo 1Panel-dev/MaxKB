@@ -1,11 +1,11 @@
-from typing import Sequence, Optional, Any, Dict
+from typing import Sequence, Optional, Dict
 
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import Document
-from models_provider.base_model_provider import MaxKBBaseModel
-from sklearn.metrics.pairwise import cosine_similarity
 from pydantic import BaseModel, Field
+
+from models_provider.base_model_provider import MaxKBBaseModel
 
 
 class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
@@ -22,6 +22,7 @@ class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
             Sequence[Document]:
+        from sklearn.metrics.pairwise import cosine_similarity
         """Rank documents based on their similarity to the query.
 
               Args:
@@ -37,7 +38,7 @@ class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
         document_embeddings = self.embed_documents(documents)
         # 计算相似度
         similarities = cosine_similarity([query_embedding], document_embeddings)[0]
-        ranked_docs = [(doc,_) for _, doc in sorted(zip(similarities, documents), reverse=True)][:self.top_n]
+        ranked_docs = [(doc, _) for _, doc in sorted(zip(similarities, documents), reverse=True)][:self.top_n]
         return [
             Document(
                 page_content=doc,  # 第一个值是文档内容
@@ -45,5 +46,3 @@ class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
             )
             for doc, score in ranked_docs
         ]
-
-

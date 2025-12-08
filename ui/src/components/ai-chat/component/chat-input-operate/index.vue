@@ -3,7 +3,8 @@
     <div class="text-center mb-8" v-if="loading">
       <el-button class="border-primary video-stop-button" @click="stopChat">
         <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
-        {{ $t('chat.operation.stopChat') }}</el-button
+        {{ $t('chat.operation.stopChat') }}
+      </el-button
       >
     </div>
 
@@ -42,7 +43,7 @@
                   @mouseleave.stop="mouseleave()"
                 >
                   <div class="flex align-center">
-                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
                     <div class="ml-4 ellipsis-1" :title="item && item?.name">
                       {{ item && item?.name }}
                     </div>
@@ -53,7 +54,7 @@
                     v-if="showDelete === item.url"
                   >
                     <el-icon style="font-size: 16px; top: 2px">
-                      <CircleCloseFilled />
+                      <CircleCloseFilled/>
                     </el-icon>
                   </div>
                 </div>
@@ -80,7 +81,7 @@
                   @mouseleave.stop="mouseleave()"
                 >
                   <div class="flex align-center">
-                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
                     <div class="ml-4 ellipsis-1" :title="item && item?.name">
                       {{ item && item?.name }}
                     </div>
@@ -91,7 +92,7 @@
                     v-if="showDelete === item.url"
                   >
                     <el-icon style="font-size: 16px; top: 2px">
-                      <CircleCloseFilled />
+                      <CircleCloseFilled/>
                     </el-icon>
                   </div>
                 </div>
@@ -115,7 +116,7 @@
                   @mouseleave.stop="mouseleave()"
                 >
                   <div class="flex align-center">
-                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
                     <div class="ml-4 ellipsis-1" :title="item && item?.name">
                       {{ item && item?.name }}
                     </div>
@@ -126,7 +127,7 @@
                     v-if="showDelete === item.url"
                   >
                     <el-icon style="font-size: 16px; top: 2px">
-                      <CircleCloseFilled />
+                      <CircleCloseFilled/>
                     </el-icon>
                   </div>
                 </div>
@@ -146,7 +147,7 @@
                   v-if="showDelete === item.url"
                 >
                   <el-icon style="font-size: 16px; top: 2px">
-                    <CircleCloseFilled />
+                    <CircleCloseFilled/>
                   </el-icon>
                 </div>
                 <el-image
@@ -156,6 +157,32 @@
                   fit="cover"
                   style="width: 40px; height: 40px; display: block"
                   class="border-r-6"
+                />
+              </div>
+            </template>
+          </el-space>
+          <el-space wrap>
+            <template v-for="(item, index) in uploadVideoList" :key="index">
+              <div
+                class="file file-image cursor border border-r-6"
+                @mouseenter.stop="mouseenter(item)"
+                @mouseleave.stop="mouseleave()"
+              >
+                <div
+                  @click="deleteFile(item)"
+                  class="delete-icon color-secondary"
+                  v-if="showDelete === item.url"
+                >
+                  <el-icon style="font-size: 16px; top: 2px">
+                    <CircleCloseFilled/>
+                  </el-icon>
+                </div>
+                <video
+                  v-if="item.url"
+                  :src="item.url"
+                  controls style="width: 100px; display: block"
+                  class="border-r-6"
+                  autoplay
                 />
               </div>
             </template>
@@ -186,7 +213,7 @@
 
       <div class="operate flex-between">
         <div>
-          <slot name="userInput" />
+          <slot name="userInput"/>
         </div>
         <div class="flex align-center">
           <template v-if="props.applicationDetails.stt_model_enable">
@@ -196,7 +223,7 @@
                 <AppIcon v-if="isMicrophone" iconName="app-keyboard"></AppIcon>
                 <el-icon v-else>
                   <!-- 录音 -->
-                  <Microphone />
+                  <Microphone/>
                 </el-icon>
               </el-button>
             </span>
@@ -208,13 +235,13 @@
                 v-if="recorderStatus === 'STOP'"
               >
                 <el-icon>
-                  <Microphone />
+                  <Microphone/>
                 </el-icon>
               </el-button>
 
               <div v-else class="operate flex align-center">
                 <el-text type="info"
-                  >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
+                >00:{{ recorderTime < 10 ? `0${recorderTime}` : recorderTime }}</el-text
                 >
                 <el-button
                   text
@@ -248,16 +275,18 @@
                 >
                   <template #content>
                     <div class="break-all pre-wrap">
-                      {{ $t('chat.uploadFile.label') }}：{{ $t('chat.uploadFile.most')
-                      }}{{ props.applicationDetails.file_upload_setting.maxFiles
+                      {{ $t('chat.uploadFile.label') }}：{{
+                        $t('chat.uploadFile.most')
+                      }}{{
+                        props.applicationDetails.file_upload_setting.maxFiles
                       }}{{ $t('chat.uploadFile.limit') }}
-                      {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
+                      {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br/>{{
                         $t('chat.uploadFile.fileType')
                       }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
                     </div>
                   </template>
                   <el-button text :disabled="checkMaxFilesLimit() || loading" class="mt-4">
-                    <el-icon><Paperclip /></el-icon>
+                    <el-icon><Paperclip/></el-icon>
                   </el-button>
                 </el-tooltip>
               </el-upload>
@@ -280,14 +309,14 @@
                 src="@/assets/icon_send.svg"
                 alt=""
               />
-              <SendIcon v-show="!isDisabledChat && !loading && !uploadLoading" />
+              <SendIcon v-show="!isDisabledChat && !loading && !uploadLoading"/>
             </el-button>
           </template>
         </div>
       </div>
     </div>
 
-    <div class="text-center" v-if="applicationDetails.disclaimer" style="margin-top: 8px">
+    <div class="text-center mt-8" v-if="applicationDetails.disclaimer">
       <el-text type="info" v-if="applicationDetails.disclaimer" style="font-size: 12px">
         <auto-tooltip :content="applicationDetails.disclaimer_value">
           {{ applicationDetails.disclaimer_value }}
@@ -297,24 +326,25 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick, reactive, type Ref } from 'vue'
-import { t } from '@/locales'
+import {ref, computed, onMounted, nextTick, reactive, type Ref} from 'vue'
+import {t} from '@/locales'
 import Recorder from 'recorder-core'
 import TouchChat from './TouchChat.vue'
 import applicationApi from '@/api/application/application'
-import { MsgAlert } from '@/utils/message'
-import { type chatType } from '@/api/type/application'
-import { useRoute, useRouter } from 'vue-router'
-import { getImgUrl } from '@/utils/common'
+import {MsgAlert} from '@/utils/message'
+import {type chatType} from '@/api/type/application'
+import {useRoute, useRouter} from 'vue-router'
+import {getImgUrl} from '@/utils/common'
 import bus from '@/bus'
 import 'recorder-core/src/engine/mp3'
 import 'recorder-core/src/engine/mp3-engine'
-import { MsgWarning } from '@/utils/message'
+import {MsgWarning} from '@/utils/message'
 import chatAPI from '@/api/chat/chat'
+
 const router = useRouter()
 const route = useRoute()
 const {
-  query: { mode, question },
+  query: {mode, question},
 } = route as any
 const quickInputRef = ref()
 const props = withDefaults(
@@ -373,12 +403,12 @@ const upload = ref()
 
 const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const documentExtensions = ['PDF', 'DOCX', 'TXT', 'XLS', 'XLSX', 'MD', 'HTML', 'CSV']
-const videoExtensions: any = []
+const videoExtensions: any = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
 const otherExtensions = ref(['PPT', 'DOC'])
 
 const getAcceptList = () => {
-  const { image, document, audio, video, other } = props.applicationDetails.file_upload_setting
+  const {image, document, audio, video, other} = props.applicationDetails.file_upload_setting
   let accepts: any = []
   if (image) {
     accepts = [...imageExtensions]
@@ -408,15 +438,15 @@ const checkMaxFilesLimit = () => {
   return (
     props.applicationDetails.file_upload_setting.maxFiles <=
     uploadImageList.value.length +
-      uploadDocumentList.value.length +
-      uploadAudioList.value.length +
-      uploadVideoList.value.length +
-      uploadOtherList.value.length
+    uploadDocumentList.value.length +
+    uploadAudioList.value.length +
+    uploadVideoList.value.length +
+    uploadOtherList.value.length
   )
 }
 const filePromisionDict: any = ref<any>({})
 const uploadFile = async (file: any, fileList: any) => {
-  const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
+  const {maxFiles, fileLimit} = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
   const file_limit_once =
     uploadImageList.value.length +
@@ -582,14 +612,17 @@ const TouchEnd = (bool?: boolean) => {
   }
 }
 // 取消录音控制台日志
-Recorder.CLog = function () {}
+Recorder.CLog = function () {
+}
 
 class RecorderManage {
   recorder?: any
   uploadRecording: (blob: Blob, duration: number) => void
+
   constructor(uploadRecording: (blob: Blob, duration: number) => void) {
     this.uploadRecording = uploadRecording
   }
+
   open(callback?: () => void) {
     const recorder = new Recorder({
       type: 'mp3',
@@ -605,6 +638,7 @@ class RecorderManage {
       }, this.errorCallBack)
     }
   }
+
   start() {
     if (this.recorder) {
       this.recorder.start()
@@ -624,6 +658,7 @@ class RecorderManage {
       }, this.errorCallBack)
     }
   }
+
   stop() {
     if (this.recorder) {
       this.recorder.stop(
@@ -643,6 +678,7 @@ class RecorderManage {
       )
     }
   }
+
   close() {
     if (this.recorder) {
       this.recorder.close()
@@ -673,6 +709,7 @@ class RecorderManage {
     }
   }
 }
+
 const getSpeechToTextAPI = () => {
   if (props.type === 'ai-chat') {
     return (id?: any, data?: any, loading?: Ref<boolean>) => {
@@ -770,6 +807,7 @@ const getQuestion = () => {
       uploadImageList.value.length > 0,
       uploadDocumentList.value.length > 0,
       uploadAudioList.value.length > 0,
+      uploadVideoList.value.length > 0,
       uploadOtherList.value.length > 0,
     ]
     if (fileLength.filter((f) => f).length > 1) {
@@ -781,12 +819,15 @@ const getQuestion = () => {
     } else if (fileLength[2]) {
       return t('chat.uploadFile.audioMessage')
     } else if (fileLength[3]) {
+      return t('chat.uploadFile.videoMessage')
+    } else if (fileLength[4]) {
       return t('chat.uploadFile.otherMessage')
     }
   }
 
   return inputValue.value.trim()
 }
+
 function autoSendMessage() {
   props
     .validate()
@@ -835,6 +876,7 @@ function sendChatHandle(event?: any) {
     insertNewlineAtCursor(event)
   }
 }
+
 const insertNewlineAtCursor = (event?: any) => {
   const textarea = quickInputRef.value.$el.querySelector(
     '.el-textarea__inner',
@@ -865,6 +907,7 @@ function mouseleave() {
 function stopChat() {
   bus.emit('chat:stop')
 }
+
 onMounted(() => {
   bus.on('chat-input', (message: string) => {
     inputValue.value = message
@@ -876,16 +919,16 @@ onMounted(() => {
       // 获取当前路由信息
       const route = router.currentRoute.value
       // 复制query对象
-      const query = { ...route.query }
+      const query = {...route.query}
       // 删除特定的参数
       delete query.question
       const newRoute =
         Object.entries(query)?.length > 0
           ? route.path +
-            '?' +
-            Object.entries(query)
-              .map(([key, value]) => `${key}=${value}`)
-              .join('&')
+          '?' +
+          Object.entries(query)
+            .map(([key, value]) => `${key}=${value}`)
+            .join('&')
           : route.path
 
       history.pushState(null, '', '/chat' + newRoute)
@@ -929,12 +972,14 @@ onMounted(() => {
 
       .operate {
         padding: 6px 10px;
+
         .el-icon {
           font-size: 20px;
         }
 
         .sent-button {
           max-height: none;
+
           .el-icon {
             font-size: 24px;
           }
@@ -950,6 +995,7 @@ onMounted(() => {
         }
       }
     }
+
     .file-image {
       position: relative;
       overflow: inherit;
@@ -974,12 +1020,14 @@ onMounted(() => {
       position: fixed;
       bottom: 0;
       font-size: 1rem;
+
       .el-icon {
         font-size: 1.4rem !important;
       }
     }
   }
 }
+
 .popperUserInput {
   position: absolute;
   z-index: 999;

@@ -59,7 +59,7 @@
                 >
                   <template #default="{ row }">
                     <div class="flex-between">
-                      <span class="ellipsis" :title="row.name">{{ row.name }}</span>
+                      <span class="ellipsis" :title="row.name">{{ i18n_name(row.name) }}</span>
                       <div @click.stop v-show="mouseId === row.id">
                         <el-dropdown
                           :teleported="false"
@@ -105,7 +105,7 @@
         <!-- 右边 -->
         <div class="user-right" v-loading="rightLoading">
           <div class="flex align-center">
-            <h4 class="medium ellipsis" :title="current?.name">{{ current?.name }}</h4>
+            <h4 class="medium ellipsis" :title="current?.name">{{ i18n_name(current?.name as string) }}</h4>
             <el-divider direction="vertical" class="mr-8 ml-8" />
             <AppIcon
               iconName="app-workspace"
@@ -269,6 +269,7 @@
 import { onMounted, ref, watch, reactive } from 'vue'
 import SystemGroupApi from '@/api/system/user-group'
 import { t } from '@/locales'
+import { i18n_name } from '@/utils/common'
 import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
 import CreateOrUpdateGroupDialog from './component/CreateOrUpdateGroupDialog.vue'
 import CreateGroupUserDialog from './component/CreateGroupUserDialog.vue'

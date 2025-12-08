@@ -28,26 +28,5 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                           GROUP BY knowledge_id) app_knowledge_temp
                          ON temp_knowledge."id" = "app_knowledge_temp".knowledge_id
                left join "user" on "user".id = temp_knowledge.user_id
-      UNION
-      SELECT knowledge_folder."id",
-             knowledge_folder."name",
-             knowledge_folder."desc",
-             0                            as "type",
-             'folder'                     as "resource_type",
-             knowledge_folder."workspace_id",
-             knowledge_folder."parent_id" as "folder_id",
-             knowledge_folder."user_id",
-             "user"."nick_name"           as "nick_name",
-             knowledge_folder."create_time",
-             knowledge_folder."update_time",
-             0                            as file_size_limit,
-             0                            as file_count_limit,
-             'WORKSPACE'                  as "scope",
-             ''                           as "embedding_model_id",
-             0 as char_length,
-             '{}'::jsonb as meta,
-                0 as application_mapping_count,
-                0 as document_count
-      from knowledge_folder left join "user"
-      on "user".id = user_id ${folder_query_set}) temp
+      ) temp
     ${default_sql}

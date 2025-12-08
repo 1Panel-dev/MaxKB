@@ -139,10 +139,7 @@
           :description="$t('views.model.tip.emptyMessage1')"
         />
         <el-empty
-          v-else-if="
-            base_form_data.model_type === 'RERANKER' ||
-            base_form_data.model_type === 'EMBEDDING'
-          "
+          v-else-if="base_form_data.model_type === 'RERANKER'"
           :description="$t('views.model.tip.emptyMessage2')"
         />
         <div class="flex-between mb-8" v-else>
@@ -150,9 +147,13 @@
           <el-button
             type="text"
             @click.stop="openAddDrawer()"
-            :disabled="!['TTS', 'LLM', 'IMAGE', 'TTI', 'TTV', 'ITV','STT'].includes(base_form_data.model_type)"
+            :disabled="
+              !['TTS', 'LLM', 'IMAGE', 'TTI', 'TTV', 'ITV', 'STT', 'EMBEDDING'].includes(
+                base_form_data.model_type,
+              )
+            "
           >
-            <AppIcon iconName="app-add-outlined" class="mr-4"/> {{ $t('common.add') }}
+            <AppIcon iconName="app-add-outlined" class="mr-4" /> {{ $t('common.add') }}
           </el-button>
         </div>
         <el-table
@@ -465,7 +466,7 @@ defineExpose({ open, close })
 
 .active-breadcrumb {
   font-size: 16px;
-  color: rgba(31, 35, 41, 1);
+  color: var(--el-text-color-primary);
   font-weight: 500;
   line-height: 24px;
 }

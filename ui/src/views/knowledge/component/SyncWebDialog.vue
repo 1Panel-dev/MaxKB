@@ -97,7 +97,7 @@ defineExpose({ open })
 }
 .active-breadcrumb {
   font-size: 16px;
-  color: rgba(31, 35, 41, 1);
+  color: var(--el-text-color-primary);
   font-weight: 500;
   line-height: 24px;
 }

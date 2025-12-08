@@ -144,13 +144,13 @@ const getModel = inject('getModel') as any
 const assignment_method_option_list = computed(() => {
   const option_list = [
     {
-      label: t('dynamicsForm.AssignmentMethod.custom.label', '自定义'),
+      label: t('common.custom'),
       value: 'custom',
     },
   ]
   if (getModel) {
     option_list.push({
-      label: t('dynamicsForm.AssignmentMethod.ref_variables.label', '引用变量'),
+      label: t('views.applicationWorkflow.variable.Referencing'),
       value: 'ref_variables',
     })
   }
@@ -182,7 +182,7 @@ const default_ref_variables_value_rule = {
     console.log(value.length)
     if (!(Array.isArray(value) && value.length > 1)) {
       callback(
-        t('dynamicsForm.AssignmentMethod.ref_variables.label', '引用变量') + t('common.required'),
+        t('views.applicationWorkflow.variable.Referencing') + t('common.required'),
       )
     }
 

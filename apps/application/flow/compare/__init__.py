@@ -8,6 +8,7 @@
 """
 
 from .contain_compare import *
+from .end_with import EndWithCompare
 from .equal_compare import *
 from .ge_compare import *
 from .gt_compare import *
@@ -23,8 +24,10 @@ from .len_le_compare import *
 from .len_lt_compare import *
 from .lt_compare import *
 from .not_contain_compare import *
+from .start_with import StartWithCompare
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
                        LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
                        IsNullCompare(),
-                       IsNotNullCompare(), NotContainCompare(), IsTrueCompare(), IsNotTrueCompare()]
+                       IsNotNullCompare(), NotContainCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
+                       EndWithCompare()]

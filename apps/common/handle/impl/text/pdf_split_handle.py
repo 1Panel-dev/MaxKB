@@ -19,7 +19,7 @@ from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger
-from common.utils.split_model import SplitModel
+from common.utils.split_model import SplitModel, smart_split_paragraph
 
 default_pattern_list = [re.compile('(?<=^)# .*|(?<=\\n)# .*'),
                         re.compile('(?<=\\n)(?<!#)## (?!#).*|(?<=^)(?<!#)## (?!#).*'),
@@ -183,7 +183,7 @@ class PdfSplitHandle(BaseSplitHandle):
             real_chapter_title = chapter_title[:256]
             # 限制章节内容长度
             if 0 < limit < len(chapter_text):
-                split_text = PdfSplitHandle.split_text(chapter_text, limit)
+                split_text = smart_split_paragraph(chapter_text, limit)
                 for text in split_text:
                     chapters.append({"title": real_chapter_title, "content": text})
             else:
@@ -262,7 +262,7 @@ class PdfSplitHandle(BaseSplitHandle):
 
                     # 限制章节内容长度
                     if 0 < limit < len(chapter_text):
-                        split_text = PdfSplitHandle.split_text(chapter_text, limit)
+                        split_text = smart_split_paragraph(chapter_text, limit)
                         for text in split_text:
                             chapters.append({"title": link_title, "content": text})
                     else:
@@ -295,29 +295,6 @@ class PdfSplitHandle(BaseSplitHandle):
                 pre_toc = split_model.parse(page_content)
             chapters = pre_toc + chapters
         return chapters
-
-    @staticmethod
-    def split_text(text, length):
-        segments = []
-        current_segment = ""
-
-        for char in text:
-            current_segment += char
-            if len(current_segment) >= length:
-                # 查找最近的句号
-                last_period_index = current_segment.rfind('.')
-                if last_period_index != -1:
-                    segments.append(current_segment[:last_period_index + 1])
-                    current_segment = current_segment[last_period_index + 1:]  # 更新当前段落
-                else:
-                    segments.append(current_segment)
-                    current_segment = ""
-
-        # 处理剩余的部分
-        if current_segment:
-            segments.append(current_segment)
-
-        return segments
 
     @staticmethod
     def handle_chapter_title(title):

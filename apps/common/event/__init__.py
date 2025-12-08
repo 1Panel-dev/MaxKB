@@ -7,9 +7,10 @@
     @desc:
 """
 from django.core.cache import cache
+from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
-from .listener_manage import *
+
 from ..constants.cache_version import Cache_Version
 from ..db.sql_execute import update_execute
 from ..utils.lock import RedisLock

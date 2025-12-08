@@ -46,7 +46,7 @@
             filterable
             style="width: 220px"
           >
-            <el-option v-for="u in type_options" :value="u.value" :label="u.label"/>
+            <el-option v-for="u in type_options" :key="u.id" :value="u.value" :label="u.label"/>
           </el-select>
         </div>
       </div>

@@ -24,7 +24,7 @@ from knowledge.models import Paragraph, Knowledge
 from knowledge.models import SearchMode
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
-from models_provider.tools import get_model, get_model_by_id
+from models_provider.tools import get_model, get_model_by_id, get_model_default_params
 
 
 def reset_meta(meta):
@@ -64,10 +64,11 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         if model.model_type != "EMBEDDING":
             raise Exception(_("Model does not exist"))
         self.context['model_name'] = model.name
-        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model))
+        default_params = get_model_default_params(model)
+        embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model, **{**default_params}))
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
-        embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, exclude_document_id_list,
+        embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, None, exclude_document_id_list,
                                       exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []

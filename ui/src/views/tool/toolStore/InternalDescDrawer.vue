@@ -45,12 +45,6 @@
             </el-button>
           </div>
         </div>
-
-        <div class="mt-16">
-          <el-text type="info">
-            <div>{{ $t('common.author') }}: MaxKB</div>
-          </el-text>
-        </div>
       </div>
       <MdPreview
         ref="editorRef"
@@ -66,7 +60,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import { isAppIcon } from '@/utils/common'
+import { isAppIcon, numberFormat } from '@/utils/common'
 const emit = defineEmits(['refresh', 'addTool'])
 
 const visibleInternalDesc = ref(false)
@@ -93,7 +87,7 @@ const addInternalTool = (data: any) => {
 }
 
 defineExpose({
-  open
+  open,
 })
 </script>
 <style lang="scss"></style>

@@ -40,6 +40,7 @@ export default {
         '請輸入允許嵌入第三方的來源位址，一行一個，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
       loginMethod: '登陸方式',
       loginMethodRequired: '請選擇登陸方式',
+      displayCodeRequired: '請輸入失敗次數',
       toSettingChatUser: '去配置對話用戶',
     },
     SettingAPIKeyDialog: {

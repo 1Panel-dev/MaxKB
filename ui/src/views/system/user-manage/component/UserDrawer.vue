@@ -21,7 +21,7 @@
         <el-input
           v-model="userForm.username"
           :placeholder="$t('views.login.loginForm.username.placeholder')"
-          maxlength="20"
+          maxlength="64"
           show-word-limit
           :disabled="isEdit"
         >
@@ -31,7 +31,7 @@
         <el-input
           v-model="userForm.nick_name"
           :placeholder="$t('views.userManage.userForm.nick_name.placeholder')"
-          maxlength="20"
+          maxlength="64"
           show-word-limit
         >
         </el-input>
@@ -77,18 +77,18 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch, onBeforeMount, computed } from 'vue'
-import type { FormInstance } from 'element-plus'
+import {ref, reactive, watch, onBeforeMount, computed} from 'vue'
+import type {FormInstance} from 'element-plus'
 import userManageApi from '@/api/system/user-manage'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import type { FormItemModel } from '@/api/type/role'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import type {FormItemModel} from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import { RoleTypeEnum } from '@/enums/system'
+import {RoleTypeEnum} from '@/enums/system'
 import useStore from '@/stores'
 
-const { user } = useStore()
+const {user} = useStore()
 const props = defineProps({
   title: String,
 })
@@ -206,7 +206,7 @@ onBeforeMount(async () => {
     }
     formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
   }
-  list.value = [{ role_id: '', workspace_ids: [] }]
+  list.value = [{role_id: '', workspace_ids: []}]
 })
 
 const rules = reactive({
@@ -218,7 +218,7 @@ const rules = reactive({
     },
     {
       min: 4,
-      max: 20,
+      max: 64,
       message: t('views.login.loginForm.username.lengthMessage'),
       trigger: 'blur',
     },
@@ -231,7 +231,7 @@ const rules = reactive({
     },
     {
       min: 1,
-      max: 20,
+      max: 64,
       message: t('views.userManage.userForm.nick_name.lengthMessage'),
       trigger: 'blur',
     },
@@ -278,7 +278,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
-    list.value = [{ role_id: '', workspace_ids: [] }]
+    list.value = [{role_id: '', workspace_ids: []}]
     userFormRef.value?.clearValidate()
   }
 })
@@ -301,6 +301,9 @@ const open = (data: any) => {
       userForm.value.password = res.data.password
     })
   }
+  if (memberFormContentRef.value) {
+    memberFormContentRef.value.resetValidation()
+  }
 
   visible.value = true
 }
@@ -319,12 +322,12 @@ const submit = async (formEl: FormInstance | undefined) => {
 
           // 如果是管理员角色，则设置为 ['None']
           if (isAdminRole) {
-            return { ...item, workspace_ids: ['None'] }
+            return {...item, workspace_ids: ['None']}
           }
 
           // 如果是普通用户且是 PE 类型，则设置为 ['default']
           if (user.isPE()) {
-            return { ...item, workspace_ids: ['default'] }
+            return {...item, workspace_ids: ['default']}
           }
 
           // 其他情况保持原样
@@ -366,6 +369,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>

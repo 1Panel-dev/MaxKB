@@ -54,11 +54,9 @@ export default {
       requiredMessage: 'Please enter the MCP name',
     },
     toolDescription: {
-      label: 'Description',
       placeholder: 'Please enter a description of the tool',
     },
     mcpDescription: {
-      label: 'Description',
       placeholder: 'Please enter a description of the MCP',
     },
     paramName: {

@@ -134,6 +134,16 @@ const getDownloadSourceFile: (knowledge_id: string, document_id: string, documen
   return exportFile(document_name, `${prefix}/${knowledge_id}/document/${document_id}/download_source_file`, {}, undefined)
 }
 
+const postReplaceSourceFile: (knowledge_id: string, document_id: string, data: any) => Promise<Result<any>> = (
+  knowledge_id,
+  document_id,
+  data,
+) => {
+  return post(`${prefix}/${knowledge_id}/document/${document_id}/replace_source_file`, data, {}, undefined)
+}
+
+
+
 /**
  * 导出文档
  * @param document_name 文档名称
@@ -523,6 +533,40 @@ const importLarkDocument: (
   return post(`${prefix}/lark/${knowledge_id}/import`, data, null, loading)
 }
 
+const getDocumentTags: (
+  knowledge_id: string,
+  document_id: string,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<Array<string>>> = (knowledge_id, document_id, params, loading) => {
+  return get(`${prefix}/${knowledge_id}/document/${document_id}/tags`, params, loading)
+}
+
+const postDocumentTags: (
+  knowledge_id: string,
+  document_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/${document_id}/tags`, data, null, loading)
+}
+
+const postMulDocumentTags: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/document/batch_add_tag`, data, null, loading)
+}
+
+const delMulDocumentTag: (
+  knowledge_id: string,
+  document_id: string,
+  tags: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, document_id, tags, loading) => {
+  return put(`${prefix}/${knowledge_id}/document/${document_id}/tags/batch_delete`, tags, null, loading)
+}
 
 export default {
   getDocumentList,
@@ -533,6 +577,7 @@ export default {
   putBatchCancelTask,
   putCancelTask,
   getDownloadSourceFile,
+  postReplaceSourceFile,
   exportDocument,
   exportDocumentZip,
   putDocumentRefresh,
@@ -555,4 +600,8 @@ export default {
   putLarkDocumentSync,
   putMulLarkSyncDocument,
   importLarkDocument,
+  getDocumentTags,
+  postDocumentTags,
+  postMulDocumentTags,
+  delMulDocumentTag
 }

@@ -1,9 +1,9 @@
 # coding=utf-8
 """
     @project: MaxKB
-    @Author：虎
-    @file： reranker.py
-    @date：2024/9/3 14:33
+    @Author：虎虎
+    @file： model.py
+    @date：2025/11/7 14:23
     @desc:
 """
 import traceback
@@ -15,7 +15,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-from models_provider.impl.local_model_provider.model.reranker import LocalBaseReranker
+from models_provider.impl.local_model_provider.model.reranker import LocalReranker
 from django.utils.translation import gettext_lazy as _, gettext
 
 
@@ -33,7 +33,7 @@ class LocalRerankerCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model: LocalBaseReranker = provider.get_model(model_type, model_name, model_credential)
+            model: LocalReranker = provider.get_model(model_type, model_name, model_credential)
             model.compress_documents([Document(page_content=gettext('Hello'))], gettext('Hello'))
         except Exception as e:
             traceback.print_exc()

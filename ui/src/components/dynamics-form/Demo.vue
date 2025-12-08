@@ -5,6 +5,7 @@
       :model="form_data"
       :render_data="damo_data"
       ref="dynamicsFormRef"
+      :other-params="{ current_workspace_id: 'default' }"
     >
       <template #default="scope">
         <el-form-item label="其他字段">
@@ -21,7 +22,30 @@ import { ref } from 'vue'
 import type { Dict } from '@/api/type/common'
 
 const damo_data: Array<FormField> = [
-  { field: 'name', input_type: 'PasswordInput', label: '用戶名', required: false },
+  {
+    field: 'name',
+    input_type: 'PasswordInput',
+    label: {
+      label: '用戶名',
+      input_type: 'SettingLabel',
+      field: 'name_setting',
+      relation_show_field_dict: {
+        name: {
+          values: ['01993837-5b09-7f20-9360-801d11d43d28'],
+        },
+      },
+      relation_trigger_field_dict: {
+        name: {
+          values: ['01993837-5b09-7f20-9360-801d11d43d28'],
+          request:
+            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
+          url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
+        },
+      },
+      children: [],
+    },
+    required: false,
+  },
   { field: 'json_text', input_type: 'JsonInput', label: 'aa', required: false },
   {
     field: 'array_object_card_field',
@@ -33,8 +57,8 @@ const damo_data: Array<FormField> = [
     children: [
       { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
       { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' }
-    ]
+      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
+    ],
   },
   {
     field: 'maxkb_tokens',
@@ -46,9 +70,9 @@ const damo_data: Array<FormField> = [
       step: 1,
       precision: 1,
       'show-input-controls': false,
-      'show-input': true
+      'show-input': true,
     },
-    label: { label: '温度', attrs: { tooltip: 'sss' }, input_type: 'TooltipLabel' }
+    label: { label: '温度', attrs: { tooltip: 'sss' }, input_type: 'TooltipLabel' },
   },
   {
     field: 'object_card_field',
@@ -60,8 +84,8 @@ const damo_data: Array<FormField> = [
     children: [
       { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
       { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' }
-    ]
+      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
+    ],
   },
   {
     field: 'tab_card_field',
@@ -70,39 +94,54 @@ const damo_data: Array<FormField> = [
     trigger_type: 'CHILD_FORMS',
     attrs: { 'label-width': '120px', 'label-suffix': ':ssss', 'label-position': 'left' },
     required: false,
-    relation_trigger_field_dict: {
-      'array_object_card_field.0.name1': ['111']
-    },
     props_info: { tabs_label: '用户' },
     children: [
       { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
       { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' }
-    ]
+      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
+    ],
   },
   {
     field: 'single_select_field',
     input_type: 'SingleSelect',
-    label: '测试单选',
+    text_field: 'name',
+    value_field: 'id',
     required: true,
     attrs: { placeholder: '请选择' },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test'
+    required_asterisk: true,
+    label: {
+      label: '测试单选',
+      input_type: 'SettingLabel',
+      field: 'name_setting',
+      relation_show_field_dict: {
+        single_select_field: {
+          values: [],
+        },
       },
-      {
-        key: '测试1',
-        value: 'test1'
-      }
-    ]
+      relation_trigger_field_dict: {
+        single_select_field: {
+          values: [],
+          request:
+            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
+          url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
+        },
+      },
+      children: [],
+    },
+    relation_trigger_field_dict: {
+      name: {
+        values: [],
+        url: '/workspace/${current_workspace_id}/model_list?model_type=LLM',
+        change_field: 'option_list',
+      },
+    },
   },
   {
     field: 'multi_select_field',
     input_type: 'MultiSelect',
     default_value: ['test1'],
     relation_show_field_dict: {
-      'object_card_field.name1': []
+      'object_card_field.name1': [],
     },
     label: '测试多选下拉',
     required: true,
@@ -110,13 +149,13 @@ const damo_data: Array<FormField> = [
     option_list: [
       {
         key: '测试',
-        value: 'test'
+        value: 'test',
       },
       {
         key: '测试1',
-        value: 'test1'
-      }
-    ]
+        value: 'test1',
+      },
+    ],
   },
   {
     field: 'radio_field',
@@ -127,13 +166,13 @@ const damo_data: Array<FormField> = [
     option_list: [
       {
         key: '测试',
-        value: 'test'
+        value: 'test',
       },
       {
         key: '测试1',
-        value: 'test1'
-      }
-    ]
+        value: 'test1',
+      },
+    ],
   },
   {
     field: 'radio_button_field',
@@ -144,13 +183,13 @@ const damo_data: Array<FormField> = [
     option_list: [
       {
         key: '测试',
-        value: 'test'
+        value: 'test',
       },
       {
         key: '测试1',
-        value: 'test1'
-      }
-    ]
+        value: 'test1',
+      },
+    ],
   },
   {
     field: 'radio_card_field',
@@ -161,13 +200,13 @@ const damo_data: Array<FormField> = [
     option_list: [
       {
         key: '测试',
-        value: 'test'
+        value: 'test',
       },
       {
         key: '测试111111',
-        value: 'test1'
-      }
-    ]
+        value: 'test1',
+      },
+    ],
   },
   {
     field: 'table_radio_field',
@@ -181,7 +220,7 @@ const damo_data: Array<FormField> = [
         {
           property: '`${row.key}${row.number}`',
           label: '名称',
-          type: 'eval'
+          type: 'eval',
         },
         {
           property: 'ProgressTableItem',
@@ -194,8 +233,8 @@ const damo_data: Array<FormField> = [
               { color: '#e6a23c', percentage: 40 },
               { color: '#5cb87a', percentage: 60 },
               { color: '#1989fa', percentage: 80 },
-              { color: '#6f7ad3', percentage: 100 }
-            ]
+              { color: '#6f7ad3', percentage: 100 },
+            ],
           },
           props_info: {
             view_card: [
@@ -203,31 +242,31 @@ const damo_data: Array<FormField> = [
                 type: 'eval',
                 title: '测试',
                 value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`'
+                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
               },
               {
                 type: 'eval',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`'
-              }
-            ]
-          }
-        }
+                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+              },
+            ],
+          },
+        },
       ],
-      style: { width: '500px' }
+      style: { width: '500px' },
     },
     option_list: [
       {
         key: '测试',
         value: 'test',
-        number: 10
+        number: 10,
       },
       {
         key: '测试111111',
         value: 'test1',
-        number: 100
-      }
-    ]
+        number: 100,
+      },
+    ],
   },
   {
     field: 'table_checkbox_field',
@@ -241,7 +280,7 @@ const damo_data: Array<FormField> = [
         {
           property: '`${row.key}${row.number}`',
           label: '名称',
-          type: 'eval'
+          type: 'eval',
         },
         {
           property: 'ProgressTableItem',
@@ -254,8 +293,8 @@ const damo_data: Array<FormField> = [
               { color: '#e6a23c', percentage: 40 },
               { color: '#5cb87a', percentage: 60 },
               { color: '#1989fa', percentage: 80 },
-              { color: '#6f7ad3', percentage: 100 }
-            ]
+              { color: '#6f7ad3', percentage: 100 },
+            ],
           },
           props_info: {
             view_card: [
@@ -263,32 +302,32 @@ const damo_data: Array<FormField> = [
                 type: 'eval',
                 title: '测试',
                 value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`'
+                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
               },
               {
                 type: 'eval',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`'
-              }
-            ]
-          }
-        }
+                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+              },
+            ],
+          },
+        },
       ],
-      style: { width: '500px' }
+      style: { width: '500px' },
     },
     option_list: [
       {
         key: '测试',
         value: 'test',
-        number: 10
+        number: 10,
       },
       {
         key: '测试111111',
         value: 'test1',
-        number: 100
-      }
-    ]
-  }
+        number: 100,
+      },
+    ],
+  },
 ]
 const form_data = ref<Dict<any>>({})
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()

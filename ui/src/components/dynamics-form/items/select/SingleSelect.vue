@@ -42,7 +42,7 @@ const _modelValue = computed({
   set(value) {
     emit('update:modelValue', value)
     emit('change', props.formField)
-  }
+  },
 })
 const textField = computed(() => {
   return props.formField.text_field ? props.formField.text_field : 'key'

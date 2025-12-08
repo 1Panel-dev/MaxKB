@@ -73,6 +73,8 @@ def encryption(message: str):
     :param message:
     :return:
     """
+    if not message:  # 处理空字符串情况
+        return "***************"
     max_pre_len = 8
     max_post_len = 4
     message_len = len(message)
@@ -335,5 +337,6 @@ def parse_image(content: str):
 def generate_uuid(tag: str):
     return str(uuid.uuid5(uuid.NAMESPACE_DNS, tag))
 
+
 def filter_workspace(query_list):
-    return [q for q in query_list if q.name!="workspace_id"]
+    return [q for q in query_list if q.name != "workspace_id"]
