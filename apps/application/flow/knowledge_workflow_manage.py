@@ -6,6 +6,7 @@
     @date：2025/11/13 19:02
     @desc:
 """
+import time
 import traceback
 from concurrent.futures import ThreadPoolExecutor
 
@@ -43,6 +44,7 @@ class KnowledgeWorkflowManage(WorkflowManage):
         return start_node_list[0]
 
     def run(self):
+        self.context['start_time'] = time.time()
         executor.submit(self._run)
 
     def _run(self):

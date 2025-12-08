@@ -105,8 +105,11 @@ class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
         self.knowledge_action_id = knowledge_action_id
 
     def handler(self, workflow):
+        err = [True for key, value in workflow.get_runtime_details().items() if value.get('status') == 500]
         QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(
-            state=State.SUCCESS)
+            state=State.FAILURE if any(err) else State.SUCCESS,
+            run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
+                'start_time') is not None else 0)
 
 
 class NodeResult:
