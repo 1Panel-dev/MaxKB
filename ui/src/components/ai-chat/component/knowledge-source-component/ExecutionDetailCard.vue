@@ -1001,7 +1001,7 @@
                 <template
                   v-for="(cLoop, cIndex) in Object.values(
                     data.loop_node_data?.[currentLoopNode] || [],
-                  )"
+                  ).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))"
                   :key="cIndex"
                 >
                   <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
