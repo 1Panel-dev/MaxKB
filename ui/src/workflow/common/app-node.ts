@@ -93,13 +93,17 @@ class AppNode extends HtmlResize.view {
         children: globalFields,
       })
     }
-    result.push({
+    const value: any = {
       value: this.props.model.id,
       icon: this.props.model.properties.node_data?.icon,
       label: this.props.model.properties.stepName,
       type: this.props.model.type,
       children: this.props.model.properties?.config?.fields || [],
-    })
+    }
+    if (this.props.model.properties.kind) {
+      value['kind'] = this.props.model.properties.kind
+    }
+    result.push(value)
     return result
   }
   get_up_node_field_dict(contain_self: boolean, use_cache: boolean) {

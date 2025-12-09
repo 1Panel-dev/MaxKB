@@ -8,7 +8,9 @@
   >
     <img :src="item?.icon" alt="" />
   </el-avatar>
-
+  <el-avatar v-else-if="item?.kind === 'data-source'" class="avatar-purple" shape="square">
+    <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
+  </el-avatar>
   <el-avatar v-else-if="item?.tool_type === 'DATA_SOURCE'" class="avatar-purple" shape="square">
     <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
   </el-avatar>
@@ -23,6 +25,7 @@ const props = defineProps<{
     name: string
     icon: string
     tool_type: string
+    kind?: string
   }
 }>()
 </script>
