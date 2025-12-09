@@ -47,7 +47,7 @@ class AliyunBaiLianOmiSTTModelCredential(BaseForm, BaseModelCredential):
                 return False
 
         try:
-            model = provider.get_model(model_type, model_name, model_credential)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
             maxkb_logger.error(f'Exception: {e}', exc_info=True)

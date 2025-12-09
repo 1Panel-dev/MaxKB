@@ -116,7 +116,7 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             return asyncio.run(handle())
         except Exception as err:
             maxkb_logger.error(f"语音识别错误: {str(err)}: {traceback.format_exc()}")
-            return ""
+            raise
 
     def merge_params_to_frame(self, frame,params):
 
