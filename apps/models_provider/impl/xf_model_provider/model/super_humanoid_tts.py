@@ -26,8 +26,8 @@ ssl_context.check_hostname = False
 ssl_context.verify_mode = ssl.CERT_NONE
 
 
-class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
-    """讯飞在线语音合成 (Online TTS)"""
+class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
+    """讯飞超拟人语音合成 (Super Humanoid TTS)"""
     spark_app_id: str
     spark_api_key: str
     spark_api_secret: str
@@ -48,15 +48,15 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        spark_api_url = model_credential.get('spark_api_url')
-        vcn = model_kwargs.get('vcn_online', 'xiaoyan')
+        spark_api_url = model_credential.get('spark_api_url_super')
+        vcn = model_kwargs.get('vcn_super', 'x5_lingxiaoxuan_flow')
 
         params = {'vcn': vcn}
         for k, v in model_kwargs.items():
             if k not in ['model_id', 'use_local', 'streaming', 'vcn_online', 'vcn_super', 'api_version']:
                 params[k] = v
 
-        return XFSparkTextToSpeech(
+        return XFSparkSuperHumanoidTextToSpeech(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
@@ -132,19 +132,20 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             res = await ws.recv()
             message = json.loads(res)
 
-            if "code" in message:
-                code = message["code"]
-                sid = message.get("sid", "unknown")
+            if "header" in message and "code" in message["header"]:
+                code = message["header"]["code"]
+                sid = message["header"].get("sid", "unknown")
 
                 if code != 0:
-                    errMsg = message.get("message", "Unknown error")
+                    errMsg = message["header"].get("message", "Unknown error")
                     raise Exception(f"sid: {sid} call error: {errMsg} code is: {code}")
 
-                audio = base64.b64decode(message["data"]["audio"])
-                audio_bytes += audio
+                if "payload" in message and "audio" in message["payload"]:
+                    audio = base64.b64decode(message["payload"]["audio"]["audio"])
+                    audio_bytes += audio
 
-                if message["data"]["status"] == 2:
-                    break
+                    if message["payload"]["audio"].get("status") == 2:
+                        break
             else:
                 raise Exception(
                     f"Unexpected response from iFlytek API. Response: {json.dumps(message, ensure_ascii=False)}"
@@ -153,29 +154,42 @@ class XFSparkTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return audio_bytes
 
     async def send(self, ws, text):
-        vcn_value = self.params.get("vcn", "xiaoyan")
-        encoded_text = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+        vcn_value = self.params.get("vcn", "x5_lingxiaoxuan_flow")
 
-        business = {
-            "aue": "lame",
-            "sfl": 1,
-            "auf": "audio/L16;rate=16000",
-            "tte": "utf8"
+        # 确保 vcn 值符合超拟人格式
+        if not vcn_value or not (str(vcn_value).startswith('x5_') or str(vcn_value).startswith('x6_')):
+            vcn_value = 'x5_lingxiaoxuan_flow'
+
+        audio_params = {
+            "encoding": self.params.get("encoding", "lame"),
+            "sample_rate": self.params.get("sample_rate", 24000),
+            "channels": self.params.get("channels", 1),
+            "bit_depth": self.params.get("bit_depth", 16),
+            "frame_size": self.params.get("frame_size", 0)
         }
 
-        if "speed" in self.params:
-            business["speed"] = self.params.get("speed")
-        if "volume" in self.params:
-            business["volume"] = self.params.get("volume")
-        if "pitch" in self.params:
-            business["pitch"] = self.params.get("pitch")
-        if vcn_value:
-            business["vcn"] = vcn_value
+        tts_params = {
+            "vcn": vcn_value,
+            "audio": audio_params,
+            "volume": self.params.get("volume", 50),
+            "speed": self.params.get("speed", 50),
+            "pitch": self.params.get("pitch", 50)
+        }
+
+        encoded_text = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+        payload_text_obj = {
+            "encoding": "utf8",
+            "compress": "raw",
+            "format": "plain",
+            "status": 2,
+            "seq": 0,
+            "text": encoded_text
+        }
 
         d = {
-            "common": {"app_id": self.spark_app_id},
-            "business": business,
-            "data": {"status": 2, "text": encoded_text},
+            "header": {"app_id": self.spark_app_id, "status": 2},
+            "parameter": {"tts": tts_params},
+            "payload": {"text": payload_text_obj}
         }
 
         await ws.send(json.dumps(d))

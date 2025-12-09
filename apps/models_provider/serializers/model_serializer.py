@@ -471,7 +471,22 @@ class ModelSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             model_id = self.data.get('id')
             model = QuerySet(Model).filter(id=model_id).first()
-            return model.model_params_form
+            model_params_form = model.model_params_form
+
+            # 从 credential 中获取 api_version 值，并注入到 params 表单中
+            # 这样前端隐藏的 api_version 字段会使用正确的值
+            try:
+                credential = json.loads(rsa_long_decrypt(model.credential))
+                api_version = credential.get('api_version')
+                if api_version:
+                    for param in model_params_form:
+                        if param.get('field') == 'api_version':
+                            param['default_value'] = api_version
+                            break
+            except Exception:
+                pass  # 如果解密失败，使用原始的 params 表单
+
+            return model_params_form
 
         def save_model_params_form(self, model_params_form, with_valid=True):
             if with_valid:

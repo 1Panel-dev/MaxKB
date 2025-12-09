@@ -22,7 +22,7 @@ from models_provider.impl.xf_model_provider.model.embedding import XFEmbedding
 from models_provider.impl.xf_model_provider.model.image import XFSparkImage
 from models_provider.impl.xf_model_provider.model.llm import XFChatSparkLLM
 from models_provider.impl.xf_model_provider.model.stt import XFSparkSpeechToText
-from models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
+from models_provider.impl.xf_model_provider.model.default_tts import XFSparkDefaultTextToSpeech
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
@@ -44,7 +44,7 @@ model_info_list = [
               XFSparkSpeechToText),
     ModelInfo('slm', _('Chinese and English recognition'), ModelTypeConst.STT, zh_en_stt_credential,
               XFZhEnSparkSpeechToText),
-    ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech),
+    ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkDefaultTextToSpeech),
     ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding)
 ]
 
@@ -58,7 +58,7 @@ model_info_manage = (
                   XFSparkSpeechToText),
     )
     .append_default_model_info(
-        ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkTextToSpeech))
+        ModelInfo('tts', '', ModelTypeConst.TTS, tts_model_credential, XFSparkDefaultTextToSpeech))
     .append_default_model_info(
         ModelInfo('embedding', '', ModelTypeConst.EMBEDDING, embedding_model_credential, XFEmbedding))
     .build()
