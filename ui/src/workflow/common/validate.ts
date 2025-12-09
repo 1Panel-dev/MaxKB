@@ -45,7 +45,7 @@ const end_nodes_dict = {
   [WorkflowMode.Application]: end_nodes,
   [WorkflowMode.Knowledge]: [WorkflowType.KnowledgeWriteNode],
   [WorkflowMode.ApplicationLoop]: loop_end_nodes,
-  [WorkflowMode.KnowledgeLoop]: loop_end_nodes,
+  [WorkflowMode.KnowledgeLoop]: [...loop_end_nodes, WorkflowType.KnowledgeWriteNode],
 }
 
 export class WorkFlowInstance {
@@ -218,9 +218,11 @@ export class WorkFlowInstance {
 
 export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
   is_valid_start_node() {
-    const start_node_list = this.nodes.filter(
-      (item) => item.properties.kind === WorkflowKind.DataSource,
-    )
+    const start_node_list =
+      this.workflowModel == WorkflowMode.Knowledge
+        ? this.nodes.filter((item) => item.properties.kind === WorkflowKind.DataSource)
+        : this.nodes.filter((item) => item.type === WorkflowType.LoopStartNode)
+
     if (start_node_list.length == 0) {
       throw t('workflow.validate.startNodeRequired')
     }
@@ -239,9 +241,7 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
 
   is_valid_work_flow() {
     this.workFlowNodes = []
-    const start_node_list = this.nodes.filter(
-      (item) => item.properties.kind === WorkflowKind.DataSource,
-    )
+    const start_node_list = this.get_start_nodes()
     start_node_list.forEach((n) => {
       this._is_valid_work_flow(n)
     })
@@ -250,10 +250,12 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
       .filter(
         (node: any) =>
           node.id !== WorkflowType.KnowledgeBase &&
+          node.type !== WorkflowType.LoopStartNode &&
           node.properties.kind !== WorkflowKind.DataSource,
       )
       .filter((node) => !this.workFlowNodes.includes(node))
     if (notInWorkFlowNodes.length > 0) {
+      console.log('ss')
       throw `${t('workflow.validate.notInWorkFlowNode')}:${notInWorkFlowNodes.map((node) => node.properties.stepName).join('，')}`
     }
     this.workFlowNodes = []
@@ -263,12 +265,98 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
     for (const node of this.nodes) {
       if (
         node.type !== WorkflowType.KnowledgeBase &&
+        node.type !== WorkflowType.LoopStartNode &&
         node.properties.kind !== WorkflowKind.DataSource
       ) {
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `${t('workflow.validate.notInWorkFlowNode')}:${node.properties.stepName}`
         }
       }
+    }
+  }
+  get_start_nodes() {
+    if (this.workflowModel == WorkflowMode.Knowledge) {
+      return this.nodes.filter((item) => item.properties.kind === WorkflowKind.DataSource)
+    } else {
+      return this.nodes.filter((item) => item.type === WorkflowType.LoopStartNode)
+    }
+  }
+  get_end_nodes() {
+    const start_node_list = this.get_start_nodes()
+    return start_node_list.flatMap((n) => {
+      return this._get_end_nodes(n, [])
+    })
+  }
+  _get_end_nodes(startNode: any, value: Array<any>) {
+    const next = this.get_next_nodes(startNode)
+    if (next.length == 0) {
+      value.push(startNode)
+    } else {
+      next.forEach((n) => {
+        this._get_end_nodes(n, value)
+      })
+    }
+    return value
+  }
+
+  /**
+   * 获取流程下一个节点列表
+   * @param node 节点
+   * @returns 节点列表
+   */
+  get_next_nodes(node: any) {
+    const edge_list = this.edges.filter((edge) => edge.sourceNodeId == node.id)
+    const node_list = edge_list
+      .map((edge) => this.nodes.filter((node) => node.id == edge.targetNodeId))
+      .reduce((x, y) => [...x, ...y], [])
+
+    return node_list
+  }
+
+  /**
+   * 校验节点
+   * @param node 节点
+   */
+  is_valid_node(node: any) {
+    if (node.properties.status && node.properties.status === 500) {
+      throw `${node.properties.stepName} ${t('workflow.validate.nodeUnavailable')}`
+    }
+    if (node.type === WorkflowType.Condition) {
+      const branch_list = node.properties.node_data.branch
+      for (const branch of branch_list) {
+        const source_anchor_id = `${node.id}_${branch.id}_right`
+        const edge_list = this.edges.filter((edge) => edge.sourceAnchorId == source_anchor_id)
+        if (edge_list.length == 0) {
+          throw `${node.properties.stepName} ${t('workflow.validate.needConnect1')}${branch.type}${t('workflow.validate.needConnect2')}`
+        }
+      }
+    } else {
+      const edge_list = this.edges.filter((edge) => edge.sourceNodeId == node.id)
+      const end = end_nodes_dict[this.workflowModel]
+      if (this.workflowModel == WorkflowMode.KnowledgeLoop) {
+        if (edge_list.length == 0 && !end.includes(node.type)) {
+          throw `${node.properties.stepName} ${t('workflow.validate.cannotEndNode')}`
+        }
+        return
+      }
+      if (edge_list.length == 0 && !end.includes(node.type)) {
+        if (node.type == WorkflowType.LoopNode) {
+          if (node.properties.node_data.loop_body) {
+            const end_nodes = new KnowledgeWorkFlowInstance(
+              node.properties.node_data.loop_body,
+              WorkflowMode.KnowledgeLoop,
+            ).get_end_nodes()
+            if (!end_nodes.every((n) => end.includes(n.type))) {
+              throw `${node.properties.stepName} ${t('workflow.validate.cannotEndNode')}`
+            }
+          }
+        } else {
+          throw `${node.properties.stepName} ${t('workflow.validate.cannotEndNode')}`
+        }
+      }
+    }
+    if (node.properties.status && node.properties.status !== 200) {
+      throw `${node.properties.stepName} ${t('workflow.validate.nodeUnavailable')}`
     }
   }
 }
