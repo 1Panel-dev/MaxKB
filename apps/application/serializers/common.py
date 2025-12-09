@@ -224,7 +224,33 @@ class ChatInfo:
             else:
                 QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
             # 插入会话记录
-            chat_record.save()
+            QuerySet(ChatRecord).update_or_create(id=chat_record.id,
+                                                  create_defaults={'id': chat_record.id,
+                                                                   'chat_id': chat_record.chat_id,
+                                                                   "vote_status": chat_record.vote_status,
+                                                                   'problem_text': chat_record.problem_text,
+                                                                   'answer_text': chat_record.answer_text,
+                                                                   'answer_text_list': chat_record.answer_text_list,
+                                                                   'message_tokens': chat_record.message_tokens,
+                                                                   'answer_tokens': chat_record.answer_tokens,
+                                                                   'const': chat_record.const,
+                                                                   'details': chat_record.details,
+                                                                   'improve_paragraph_id_list': chat_record.improve_paragraph_id_list,
+                                                                   'run_time': chat_record.run_time,
+                                                                   'index': chat_record.index},
+                                                  defaults={
+                                                      "vote_status": chat_record.vote_status,
+                                                      'problem_text': chat_record.problem_text,
+                                                      'answer_text': chat_record.answer_text,
+                                                      'answer_text_list': chat_record.answer_text_list,
+                                                      'message_tokens': chat_record.message_tokens,
+                                                      'answer_tokens': chat_record.answer_tokens,
+                                                      'const': chat_record.const,
+                                                      'details': chat_record.details,
+                                                      'improve_paragraph_id_list': chat_record.improve_paragraph_id_list,
+                                                      'run_time': chat_record.run_time,
+                                                      'index': chat_record.index
+                                                  })
             ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()
 
     def to_dict(self):
