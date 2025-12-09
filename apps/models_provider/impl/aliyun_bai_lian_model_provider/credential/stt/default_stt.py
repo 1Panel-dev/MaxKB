@@ -18,13 +18,13 @@ from django.utils.translation import gettext as _
 
 
 class AliyunBaiLianDefaultSTTModelCredential(BaseForm, BaseModelCredential):
-    type = forms.Radio(_("Type"), required=True, text_field='label', default_value='qwen', provider='', method='',
+    type = forms.SingleSelect(_("API"), required=True, text_field='label', default_value='qwen', provider='', method='',
                        value_field='value', option_list=[
             {'label': _('Audio file recognition - Tongyi Qwen'),
              'value': 'qwen'},
             {'label': _('Qwen-Omni'),
              'value': 'omni'},
-            {'label': _('Audio file recognition - Fun-ASR/Paraformer/SenseVoice'),
+            {'label': _('Real-time speech recognition - Fun-ASR/Paraformer'),
              'value': 'other'}
         ])
     api_url = forms.TextInputField(_('API URL'), required=True, relation_show_field_dict={'type': ['qwen', 'omni']})
