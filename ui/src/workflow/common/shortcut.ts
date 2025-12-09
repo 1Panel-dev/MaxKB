@@ -4,6 +4,7 @@ import { type GraphModel } from '@logicflow/core'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { WorkflowType } from '@/enums/application'
 import { t } from '@/locales'
+import { getMenuNodes } from './data'
 let selected: any | null = null
 
 function translationNodeData(nodeData: any, distance: any) {
@@ -73,6 +74,9 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
   const paste_node = () => {
     if (!keyboardOptions?.enabled) return true
     if (graph.textEditElement) return true
+    const menus = getMenuNodes(lf.graphModel.get_provide(null, null).workflowMode)
+    const nodes = menus?.flatMap((m: any) => m.list).map((n) => n.type)
+    selected.nodes = selected.nodes.filter((n: any) => nodes?.includes(n.type))
     if (selected && (selected.nodes || selected.edges)) {
       lf.clearSelectElements()
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
