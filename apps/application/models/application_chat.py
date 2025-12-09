@@ -26,7 +26,7 @@ class ChatUserType(models.TextChoices):
 
 
 def default_asker():
-    return {'user_name': '游客'}
+    return {'username': '游客'}
 
 
 class Chat(AppModelMixin):
