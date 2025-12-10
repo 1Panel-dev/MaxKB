@@ -89,7 +89,7 @@ export default {
       text: '将输入的分段列表写入当前知识库，并完成向量化处理',
     },
     dataSourceWebNode: {
-      label: 'Web站点',
+      label: 'Web 站点',
       text: '输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表',
       field_label: '文档列表',
     },
@@ -109,7 +109,7 @@ export default {
       },
     },
     classify: {
-      aiCapability: 'AI能力',
+      aiCapability: 'AI 能力',
       businessLogic: '业务逻辑',
       other: '其他',
       dataProcessing: '数据处理',

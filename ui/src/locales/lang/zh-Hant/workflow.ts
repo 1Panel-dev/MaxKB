@@ -85,7 +85,7 @@ export default {
       text: '將輸入的分段列表寫入當前知識庫，並完成向量化處理',
     },
     dataSourceWebNode: {
-      label: 'Web網站',
+      label: 'Web 網站',
       text: '輸入根地址自動抓取Web數據（單鏈接對應單文檔），輸出含內容的文檔列表',
       field_label: '文件列表',
     },
@@ -105,7 +105,7 @@ export default {
       },
     },
     classify: {
-      aiCapability: 'AI能力',
+      aiCapability: 'AI 能力',
       businessLogic: '業務邏輯',
       other: '其他',
       dataProcessing: '數據處理',
