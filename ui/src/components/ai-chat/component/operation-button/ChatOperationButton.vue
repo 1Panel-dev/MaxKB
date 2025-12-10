@@ -178,6 +178,8 @@ function markdownToPlainText(md: string) {
       .replace(/`(.*?)`/g, '$1')
       // 移除代码块 ```code```
       .replace(/```[\s\S]*?```/g, '')
+      // 移除html标签
+      .replace(/<[^>]+>/g, '')
       // 移除多余的换行符
       .replace(/\n{2,}/g, '\n')
       .trim()
