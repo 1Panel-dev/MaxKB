@@ -8815,3 +8815,54 @@ msgstr ""
 
 msgid "Qwen-Omni"
 msgstr ""
+
+msgid "Super-humanoid: Lingxiaoxuan Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuyan Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingfeiyi Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaoyue Flow"
+msgstr ""
+
+msgid "Super-humanoid: Sun Dasheng Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuzhao Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaotang Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaorong Flow"
+msgstr ""
+
+msgid "Super-humanoid: Xinyun Flow"
+msgstr ""
+
+msgid "Super-humanoid: Grant (EN)"
+msgstr ""
+
+msgid "Super-humanoid: Lila (EN)"
+msgstr ""
+
+msgid "Super-humanoid: Lingwanwan Pro"
+msgstr ""
+
+msgid "Super-humanoid: Yiyi Pro"
+msgstr ""
+
+msgid "Super-humanoid: Huifangnv Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaoying Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingfeibo Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuyan Pro"
+msgstr ""

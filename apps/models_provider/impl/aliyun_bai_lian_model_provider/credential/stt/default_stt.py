@@ -39,7 +39,6 @@ class AliyunBaiLianDefaultSTTModelCredential(BaseForm, BaseModelCredential):
                  raise_exception: bool = False
                  ) -> bool:
         model_type_list = provider.get_model_type_list()
-        model_type_list = provider.get_model_type_list()
         if not any(mt.get('value') == model_type for mt in model_type_list):
             raise AppApiException(
                 ValidCode.valid_error.value,

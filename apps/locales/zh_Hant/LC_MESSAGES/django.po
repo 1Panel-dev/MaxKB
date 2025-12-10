@@ -8941,3 +8941,54 @@ msgstr "實時語音識別-Fun-ASR/Paraformer"
 
 msgid "Qwen-Omni"
 msgstr "多模態"
+
+msgid "Super-humanoid: Lingxiaoxuan Flow"
+msgstr "聆小璇"
+
+msgid "Super-humanoid: Lingyuyan Flow"
+msgstr "聆玉言"
+
+msgid "Super-humanoid: Lingfeiyi Flow"
+msgstr "聆飛逸"
+
+msgid "Super-humanoid: Lingxiaoyue Flow"
+msgstr "聆小玥"
+
+msgid "Super-humanoid: Sun Dasheng Flow"
+msgstr "孫大聖"
+
+msgid "Super-humanoid: Lingyuzhao Flow"
+msgstr "聆玉昭"
+
+msgid "Super-humanoid: Lingxiaotang Flow"
+msgstr "聆小糖"
+
+msgid "Super-humanoid: Lingxiaorong Flow"
+msgstr "聆小蓉"
+
+msgid "Super-humanoid: Xinyun Flow"
+msgstr "心雲"
+
+msgid "Super-humanoid: Grant (EN)"
+msgstr "Grant"
+
+msgid "Super-humanoid: Lila (EN)"
+msgstr "Lila"
+
+msgid "Super-humanoid: Lingwanwan Pro"
+msgstr "聆萬萬"
+
+msgid "Super-humanoid: Yiyi Pro"
+msgstr "依依"
+
+msgid "Super-humanoid: Huifangnv Pro"
+msgstr "惠芳女"
+
+msgid "Super-humanoid: Lingxiaoying Pro"
+msgstr "聆小穎"
+
+msgid "Super-humanoid: Lingfeibo Pro"
+msgstr "聆飛博"
+
+msgid "Super-humanoid: Lingyuyan Pro"
+msgstr "聆玉言"

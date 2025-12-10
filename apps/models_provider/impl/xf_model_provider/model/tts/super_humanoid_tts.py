@@ -48,20 +48,20 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        spark_api_url = model_credential.get('spark_api_url')
-        vcn = model_kwargs.get('vcn', 'x5_lingxiaoxuan_flow')
+        # vcn = model_kwargs.get('vcn', 'x5_lingxiaoxuan_flow')
 
-        params = {'vcn': vcn}
+        params = {}
         for k, v in model_kwargs.items():
-            if k not in ['model_id', 'use_local', 'streaming', 'vcn']:
+            if k not in ['model_id', 'use_local', 'streaming']:
                 params[k] = v
 
         return XFSparkSuperHumanoidTextToSpeech(
             spark_app_id=model_credential.get('spark_app_id'),
             spark_api_key=model_credential.get('spark_api_key'),
             spark_api_secret=model_credential.get('spark_api_secret'),
-            spark_api_url=spark_api_url,
-            params=params
+            spark_api_url=model_credential.get('spark_api_url'),
+            params=params,
+            **model_kwargs
         )
 
     def create_url(self):
@@ -154,11 +154,6 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return audio_bytes
 
     async def send(self, ws, text):
-        vcn_value = self.params.get("vcn", "x5_lingxiaoxuan_flow")
-
-        # 确保 vcn 值符合超拟人格式
-        if not vcn_value or not (str(vcn_value).startswith('x5_') or str(vcn_value).startswith('x6_')):
-            vcn_value = 'x5_lingxiaoxuan_flow'
 
         audio_params = {
             "encoding": self.params.get("encoding", "lame"),
@@ -169,7 +164,9 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         }
 
         tts_params = {
-            "vcn": vcn_value,
+            **{key: v for key, v in self.params.items() if
+               not ['parameter', 'streaming', 'model_id', 'use_local'].__contains__(key)},
+            "vcn": self.params.get("vcn") or "x5_lingxiaoxuan_flow",
             "audio": audio_params,
             "volume": self.params.get("volume", 50),
             "speed": self.params.get("speed", 50),
@@ -185,10 +182,13 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             "seq": 0,
             "text": encoded_text
         }
+        s = {"tts": tts_params}
+        # "parameter": {"oar":"xxxx"}
+        parameter = self.params.get("parameter") or {}
 
         d = {
             "header": {"app_id": self.spark_app_id, "status": 2},
-            "parameter": {"tts": tts_params},
+            "parameter": {"tts": tts_params} | parameter,
             "payload": {"text": payload_text_obj}
         }
 

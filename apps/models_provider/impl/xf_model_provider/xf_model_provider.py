@@ -17,16 +17,15 @@ from models_provider.impl.xf_model_provider.credential.image import XunFeiImageM
 from models_provider.impl.xf_model_provider.credential.llm import XunFeiLLMModelCredential
 from models_provider.impl.xf_model_provider.credential.stt import XunFeiSTTModelCredential
 from models_provider.impl.xf_model_provider.credential.tts import XunFeiTTSModelCredential
-from models_provider.impl.xf_model_provider.credential.super_humanoid_tts import XunFeiSuperHumanoidTTSModelCredential
-from models_provider.impl.xf_model_provider.credential.default_tts import XunFeiDefaultTTSModelCredential
+from models_provider.impl.xf_model_provider.credential.tts.super_humanoid_tts import XunFeiSuperHumanoidTTSModelCredential
+from models_provider.impl.xf_model_provider.credential.tts.default_tts import XunFeiDefaultTTSModelCredential
 from models_provider.impl.xf_model_provider.credential.zh_en_stt import ZhEnXunFeiSTTModelCredential
 from models_provider.impl.xf_model_provider.model.embedding import XFEmbedding
-from models_provider.impl.xf_model_provider.model.image import XFSparkImage
 from models_provider.impl.xf_model_provider.model.llm import XFChatSparkLLM
 from models_provider.impl.xf_model_provider.model.stt import XFSparkSpeechToText
 from models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
-from models_provider.impl.xf_model_provider.model.super_humanoid_tts import XFSparkSuperHumanoidTextToSpeech
-from models_provider.impl.xf_model_provider.model.default_tts import XFSparkDefaultTextToSpeech
+from models_provider.impl.xf_model_provider.model.tts.super_humanoid_tts import XFSparkSuperHumanoidTextToSpeech
+from models_provider.impl.xf_model_provider.model.tts.default_tts import XFSparkDefaultTextToSpeech
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
