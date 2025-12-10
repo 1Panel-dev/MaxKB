@@ -205,6 +205,7 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
     node.context['loop_answer_data'] = loop_answer_data
     node.context["index"] = current_index
     node.context["item"] = current_index
+    node.context['run_time'] = time.time() - node.context.get("start_time")
 
 
 def get_write_context(loop_type, array, number, loop_body):
