@@ -69,6 +69,7 @@ const refresh_loop_fields = (fields: Array<any>) => {
   const loop_node = props.nodeModel.graphModel.getNodeModelById(loop_node_id)
   if (loop_node) {
     loop_node.properties.config.fields = fields
+    loop_node.clear_next_node_field(true)
   }
 }
 
