@@ -46,7 +46,7 @@ import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import debounce from 'lodash/debounce'
+import { throttle } from 'lodash'
 
 defineOptions({ name: 'CodemirrorEditor' })
 
@@ -79,22 +79,34 @@ const data = computed({
 
 function getRangeFromLineAndColumn(state: any, line: number, column: number, end_column?: number) {
   const l = state.doc.line(line)
-  const form = l.from + column
-  const to_end_column = l.from + end_column
+  const lineLength = l.length
+  const safeColumn = Math.max(0, Math.min(column, lineLength))
+  const fromPos = l.from + safeColumn
+  let safeEndColumn
+  if (end_column !== undefined) {
+    safeEndColumn = Math.max(0, Math.min(end_column, lineLength))
+  } else {
+    safeEndColumn = lineLength
+  }
+  const toPos = l.from + safeEndColumn
+  const finalFrom = Math.min(fromPos, toPos)
+  const finalTo = Math.max(fromPos, toPos)
   return {
-    form: form > l.to ? l.to : form,
-    to: end_column && to_end_column < l.to ? to_end_column : l.to,
+    from: finalFrom,
+    to: finalTo,
   }
 }
-
-const asyncLint = debounce(async (doc: string) => {
-  const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).postPylint(doc)
+const asyncLint = throttle(async (view: any) => {
+  const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).postPylint(
+    view.state.doc.toString(),
+  )
   return res.data
 }, 500)
 
 const regexpLinter = linter(async (view) => {
+  const currentstate = view.state
   const diagnostics: Diagnostic[] = []
-  const lintResults = await asyncLint(view.state.doc.toString())
+  const lintResults = await asyncLint(view)
   if (!lintResults || lintResults.length === 0) {
     return diagnostics
   }
@@ -105,15 +117,15 @@ const regexpLinter = linter(async (view) => {
   limitedResults.forEach((element: any) => {
     try {
       const range = getRangeFromLineAndColumn(
-        view.state,
+        currentstate,
         element.line,
         element.column,
         element.endColumn,
       )
       // 验证范围有效性
-      if (range.form >= 0 && range.to >= range.form) {
+      if (range.from >= 0 && range.to >= range.from) {
         diagnostics.push({
-          from: range.form,
+          from: range.from,
           to: range.to,
           severity: element.type === 'error' ? 'error' : 'warning',
           message: element.message,
@@ -125,7 +137,7 @@ const regexpLinter = linter(async (view) => {
   })
   return diagnostics
 })
-const extensions = [python(), regexpLinter, oneDark]
+const extensions = [python(), oneDark, regexpLinter]
 const codemirrorStyle = {
   height: '210px!important',
   width: '100%',
