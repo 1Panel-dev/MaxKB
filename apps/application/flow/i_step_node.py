@@ -105,11 +105,34 @@ class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
         self.knowledge_action_id = knowledge_action_id
 
     def handler(self, workflow):
-        err = [True for key, value in workflow.get_runtime_details().items() if value.get('status') == 500]
+        state = get_workflow_state(workflow)
         QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(
-            state=State.FAILURE if any(err) else State.SUCCESS,
+            state=state,
             run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
                 'start_time') is not None else 0)
+
+
+def get_loop_workflow_node(node_list):
+    result = []
+    for item in node_list:
+        if item.get('type') == 'loop-node':
+            for loop_item in item.get('loop_node_data') or []:
+                for inner_item in loop_item.values():
+                    result.append(inner_item)
+    return result
+
+
+def get_workflow_state(workflow):
+    details = workflow.get_runtime_details()
+    node_list = details.values()
+    all_node = [*node_list, *get_loop_workflow_node(node_list)]
+    err = any([True for value in all_node if value.get('status') == 500])
+    if err:
+        return State.FAILURE
+    write_is_exist = any([True for value in all_node if value.get('type') == 'knowledge-write-node'])
+    if not write_is_exist:
+        return State.FAILURE
+    return State.SUCCESS
 
 
 class NodeResult:
