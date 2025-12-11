@@ -15,6 +15,13 @@ from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUpload
 
 
 class SystemEncoder(json.JSONEncoder):
+    def encode(self, obj):
+        # 先序列化为字符串
+        json_str = super().encode(obj)
+        # 移除所有空字符
+        json_str = json_str.replace('\\u0000', '')
+        return json_str
+
     def default(self, obj):
         if isinstance(obj, uuid.UUID):
             return str(obj)
