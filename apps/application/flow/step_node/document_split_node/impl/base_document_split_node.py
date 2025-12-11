@@ -161,6 +161,18 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         return list(set(problem_list))
 
     def get_details(self, index: int, **kwargs):
+        paragraph_list = self.context.get('paragraph_list', [])
+        # 每个文档保留前5个分段
+        limited_paragraph_list = []
+        for doc in paragraph_list:
+            if doc.get('paragraphs'):
+                doc_copy = doc.copy()
+                doc_copy['paragraphs'] = doc['paragraphs'][:5]
+                limited_paragraph_list.append(doc_copy)
+            else:
+                limited_paragraph_list.append(doc)
+        paragraph_list = limited_paragraph_list
+
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -168,11 +180,11 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message,
-            'paragraph_list': self.context.get('paragraph_list', []),
+            'paragraph_list': paragraph_list,
             'limit': self.context.get('limit'),
             'chunk_size': self.context.get('chunk_size'),
             'with_filter': self.context.get('with_filter'),
             'patterns': self.context.get('patterns'),
             'split_strategy': self.context.get('split_strategy'),
-            'document_list': self.context.get('document_list', []),
+            # 'document_list': self.context.get('document_list', []),
         }
