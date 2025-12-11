@@ -31,7 +31,8 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
 
 class IImageUnderstandNode(INode):
     type = 'image-understand-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ImageUnderstandNodeSerializer
@@ -39,9 +40,14 @@ class IImageUnderstandNode(INode):
     def _run(self):
         res = self.workflow_manage.get_reference_field(self.node_params_serializer.data.get('image_list')[0],
                                                        self.node_params_serializer.data.get('image_list')[1:])
-        return self.execute(image=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.execute(image=res, **self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'history_chat_record': [], 'stream': True,  'chat_record_id': None})
+        else:
+            return self.execute(image=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id,
+    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream,
                 model_params_setting,
                 chat_record_id,
                 image,
