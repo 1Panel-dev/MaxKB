@@ -71,7 +71,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
-    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id,
+    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream,
                 model_params_setting,
                 chat_record_id,
                 image,
