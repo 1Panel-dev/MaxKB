@@ -130,10 +130,10 @@ const accept = computed(() => {
   return (attrs.file_type_list || []).map((item: any) => '.' + item.toLowerCase()).join(',')
 })
 const file_type_list = computed(() => {
-  return attrs.file_type_list || []
+  return attrs.file_type_list.map((item: any) => item.toUpperCase()) || []
 })
 const formats = computed(() => {
-  return (attrs.file_type_list || []).map((item: any) => item.toUpperCase()).join('、')
+  return file_type_list.value.join('、')
 })
 const file_size_limit = computed(() => {
   return attrs.file_size_limit || 50
