@@ -109,7 +109,6 @@ class BaseChatOpenAI(ChatOpenAI):
                     if isinstance(e, ReadTimeout):
                         raise  # 继续抛出
                     else:
-                        maxkb_logger.error("except:", e)
                         tokenizer = TokenizerManage.get_tokenizer()
                         return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
