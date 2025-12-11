@@ -12,7 +12,9 @@ import pwd
 import resource
 import getpass
 import random
+import time
 import uuid_utils.compat as uuid
+from contextlib import contextmanager
 from common.utils.logger import maxkb_logger
 from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG
@@ -108,7 +110,8 @@ sys.stdout.flush()
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=True) as f:
             f.write(_exec_code)
             f.flush()
-            subprocess_result = self._exec(f.name)
+            with execution_timer(_id):
+                subprocess_result = self._exec(f.name)
         if subprocess_result.returncode != 0:
             raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
@@ -244,3 +247,12 @@ exec({dedent(code)!a})
         for server, config in servers.items():
             if config.get('transport') not in ['sse', 'streamable_http']:
                 raise Exception(_('Only support transport=sse or transport=streamable_http'))
+
+
+@contextmanager
+def execution_timer(id=""):
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        maxkb_logger.debug(f"Tool execution({id}) takes {time.perf_counter() - start:.6f} seconds.")
