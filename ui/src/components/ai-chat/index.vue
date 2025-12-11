@@ -717,11 +717,11 @@ onMounted(() => {
       if (event.target) {
         const target = event.target as HTMLElement
         // 假设打开状态的图片具有特定类名
-        if (target.className && target.className.includes('medium-zoom-overlay')) {
+        if (target.classList && target.classList.contains('medium-zoom-overlay')) {
           event.preventDefault()
           event.stopPropagation()
         }
-        if (target.className && target.className.includes('medium-zoom-image--opened')) {
+        if (target.classList && target.classList.contains('medium-zoom-image--opened')) {
           event.preventDefault()
           event.stopPropagation()
 
