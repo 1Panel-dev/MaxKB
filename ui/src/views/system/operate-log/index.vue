@@ -99,7 +99,7 @@
         </div>
 
         <app-table
-          class="mt-16"
+          class="mt-16 w-full"
           :data="tableData"
           :pagination-config="paginationConfig"
           @sizeChange="handleSizeChange"
@@ -158,7 +158,6 @@
           <el-table-column
             prop="operate"
             :label="$t('views.operateLog.table.detail')"
-            width="160"
             :tooltip-formatter="
               ({ row }: any) =>
                 row.operate + (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
@@ -171,7 +170,7 @@
             </template>
           </el-table-column>
           <el-table-column
-            width="120"
+            width="140"
             prop="user.username"
             :label="$t('views.operateLog.table.user')"
           />
