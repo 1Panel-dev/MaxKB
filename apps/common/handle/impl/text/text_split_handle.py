@@ -32,7 +32,7 @@ class TextSplitHandle(BaseSplitHandle):
         if file_name.endswith(".md") or file_name.endswith('.txt') or file_name.endswith('.TXT') or file_name.endswith(
                 '.MD'):
             return True
-        if file_name.index('.') > 0:
+        if '.' in file_name:
             return False
         buffer = get_buffer(file)
         result = detect(buffer)
