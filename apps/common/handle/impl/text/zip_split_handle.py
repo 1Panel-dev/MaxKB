@@ -101,6 +101,37 @@ def get_image_list(result_list: list, zip_files: List[str]):
     return image_file_list
 
 
+def get_image_list_by_content(name: str, content: str, zip_files: List[str]):
+    image_file_list = []
+    image_list = parse_md_image(content)
+    for image in image_list:
+        search = re.search("\(.*\)", image)
+        if search:
+            new_image_id = str(uuid.uuid7())
+            source_image_path = search.group().replace('(', '').replace(')', '')
+            source_image_path = source_image_path.strip().split(" ")[0]
+            image_path = urljoin(name, '.' + source_image_path if source_image_path.startswith(
+                '/') else source_image_path)
+            if not zip_files.__contains__(image_path):
+                continue
+            if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
+                image_id = image_path.replace('oss/file/', '').replace('oss/file/', '')
+                if is_valid_uuid(image_id):
+                    image_file_list.append({'source_file': image_path,
+                                            'image_id': image_id})
+                else:
+                    image_file_list.append({'source_file': image_path,
+                                            'image_id': new_image_id})
+                    content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
+
+            else:
+                image_file_list.append({'source_file': image_path,
+                                        'image_id': new_image_id})
+                content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
+
+    return image_file_list, content
+
+
 def get_file_name(file_name):
     try:
         file_name_code = file_name.encode('cp437')
@@ -171,17 +202,12 @@ class ZipSplitHandle(BaseSplitHandle):
         """
         buffer = file.read() if hasattr(file, 'read') else None
         bytes_io = io.BytesIO(buffer) if buffer is not None else io.BytesIO(file)
-        md_items = []  # 存储 (md_text, source_file_path)
-        image_mode_list = []
-
-        import posixpath
-
-        def is_image_name(name: str):
-            ext = posixpath.splitext(name.lower())[1]
-            return ext in ('.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg')
+        image_list = []
+        content_parts = []
 
         with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
             files = zip_ref.namelist()
+            file_content_list = []
             for inner_name in files:
                 if inner_name.endswith('/') or inner_name.startswith('__MACOSX'):
                     continue
@@ -190,77 +216,35 @@ class ZipSplitHandle(BaseSplitHandle):
                         real_name = get_file_name(zf.name)
                     except Exception:
                         real_name = zf.name
-                    raw = zf.read()
-                    # 图片直接收集
-                    if is_image_name(real_name):
-                        image_id = str(uuid.uuid7())
-                        fmodel = File(
-                            id=image_id,
-                            file_name=os.path.basename(real_name),
-                            meta={'debug': False, 'content': raw}
-                        )
-                        image_mode_list.append(fmodel)
-                        continue
 
                     # 为 split_handle 提供可重复读取的 file-like 对象
-                    inner_file = io.BytesIO(raw)
-                    inner_file.name = real_name
-
-                    # 尝试使用已注册的 split handle 的 get_content
-                    md_text = None
+                    zf.name = real_name
                     for split_handle in split_handles:
                         # 准备一个简单的 get_buffer 回调，返回当前 raw
-                        get_buffer = lambda f, _raw=raw: _raw
-                        if split_handle.support(inner_file, get_buffer):
-                            inner_file.seek(0)
-                            md_text = split_handle.get_content(inner_file, save_image)
+                        get_buffer = FileBufferHandle().get_buffer
+                        if split_handle.support(zf, get_buffer):
+                            row = get_buffer(zf)
+                            md_text = split_handle.get_content(io.BytesIO(row), save_image)
+                            file_content_list.append({'content': md_text, 'name': real_name})
                             break
-
-                    # 如果没有任何 split_handle 处理，按文本解码作为后备
-                    if md_text is None:
-                        enc = detect(raw).get('encoding') or 'utf-8'
-                        try:
-                            md_text = raw.decode(enc, errors='ignore')
-                        except Exception:
-                            md_text = raw.decode('utf-8', errors='ignore')
-
-                    if isinstance(md_text, str) and md_text.strip():
-                        # 保存 md 文本与其所在的文件路径，后面统一做图片路径替换
-                        md_items.append((md_text, real_name))
+            for file_content in file_content_list:
+                _image_list, content = get_image_list_by_content(file_content.get('name'), file_content.get("content"),
+                                                                files)
+                content_parts.append(content)
+                for image in _image_list:
+                    image_list.append(image)
 
             # 将收集到的图片通过回调保存（一次性）
-            if image_mode_list:
+            if image_list:
+                image_mode_list = []
+                for image in image_list:
+                    with zip_ref.open(image.get('source_file')) as f:
+                        i = File(
+                            id=image.get('image_id'),
+                            file_name=os.path.basename(image.get('source_file')),
+                            meta={'debug': False, 'content': f.read()}  # 这里的content是二进制数据
+                        )
+                        image_mode_list.append(i)
                 save_image(image_mode_list)
 
-        # 后处理：在每个 md 片段中将相对/绝对引用替换为已保存图片的 oss 路径
-        content_parts = []
-        for md_text, base_name in md_items:
-            image_refs = parse_md_image(md_text)
-            for image in image_refs:
-                search = re.search(r"\(.*\)", image)
-                if not search:
-                    continue
-                source_image_path = search.group().strip("()").split(" ")[0]
-
-                # 规范化 zip 内部路径：若以 '/' 开头，视为相对于 zip 根，否则相对于 base_name 的目录
-                if source_image_path.startswith('/'):
-                    joined = posixpath.normpath(source_image_path.lstrip('/'))
-                else:
-                    base_dir = posixpath.dirname(base_name)
-                    joined = posixpath.normpath(posixpath.join(base_dir, source_image_path))
-
-                # 匹配已收集图片：以文件名做匹配（zip 中的文件名通常是不含反斜杠的 POSIX 风格）
-                matched = None
-                for img_model in image_mode_list:
-                    if img_model.file_name == posixpath.basename(joined):
-                        matched = img_model
-                        break
-
-                if matched:
-                    md_text = md_text.replace(source_image_path, f'./oss/file/{matched.id}')
-
-            content_parts.append(md_text)
-
         return '\n\n'.join(content_parts)
-
-
