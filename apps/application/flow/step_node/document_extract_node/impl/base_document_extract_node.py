@@ -53,7 +53,8 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     source_id=meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
                     meta=meta
                 )
-                new_file.save(file_bytes)
+                if not QuerySet(File).filter(id=new_file.id).exists():
+                    new_file.save(file_bytes)
 
         document_list = []
         for doc in document:
