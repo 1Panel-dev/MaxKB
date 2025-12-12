@@ -9,6 +9,7 @@
 import asyncio
 import json
 import queue
+import re
 import threading
 from typing import Iterator
 
@@ -283,6 +284,31 @@ def get_global_loop():
     return _global_loop
 
 
+def _extract_tool_id(raw_id):
+    """从 raw_id 中提取最后一个符合 call_... 模式的 id，若无匹配则返回原值或 None"""
+    if not raw_id:
+        return None
+    if not isinstance(raw_id, str):
+        raw_id = str(raw_id)
+
+    s = raw_id
+    prefix = 'call_'
+    positions = [m.start() for m in re.finditer(re.escape(prefix), s)]
+    if not positions:
+        return raw_id
+
+    # 取最后一个前缀位置，截到下一个前缀或结尾
+    start = positions[-1]
+    end = len(s)
+    for pos in positions:
+        if pos > start:
+            end = pos
+            break
+
+    tool_id = s[start:end]
+    return tool_id or raw_id
+
+
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True):
     try:
         client = MultiServerMCPClient(json.loads(mcp_servers))
@@ -342,7 +368,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
                 yield chunk[0]
 
             if mcp_output_enable and isinstance(chunk[0], ToolMessage):
-                tool_id = chunk[0].tool_call_id
+                tool_id = _extract_tool_id(chunk[0].tool_call_id)
                 if tool_id in tool_calls_info:
                     tool_info = tool_calls_info[tool_id]
                     content = generate_tool_message_complete(
