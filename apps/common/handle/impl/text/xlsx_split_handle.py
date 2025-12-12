@@ -19,6 +19,7 @@ from common.utils.logger import maxkb_logger
 
 splitter = '\n`-----------------------------------`\n'
 
+
 def post_cell(image_dict, cell_value):
     image = image_dict.get(cell_value, None)
     if image is not None:
@@ -152,7 +153,7 @@ class XlsxSplitHandle(BaseSplitHandle):
                 md_table = '| ' + ' | '.join(headers) + ' |\n'
                 md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
                 for row in rows:
-                    r = [f'{value}' for key, value in row.items()]
+                    r = [f'{value}' if value is not None else '' for key, value in row.items()]
                     md_table += '| ' + ' | '.join(
                         [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in r]) + ' |\n'
 
