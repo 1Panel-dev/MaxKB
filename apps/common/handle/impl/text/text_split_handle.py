@@ -25,6 +25,10 @@ default_pattern_list = [
     re.compile("(?<=\\n)(?<!#)###### (?!#).*|(?<=^)(?<!#)###### (?!#).*")
 ]
 
+end = [".mp4", ".avi", ".mov", ".mkv", ".flv", ".wmv", ".webm", ".mpeg", ".mpg", ".3gp", ".ts", ".rmvb",
+       ".mp3", ".wav", ".flac", ".aac", ".ogg", ".m4a", ".wma", ".opus", ".alac", ".aiff", ".amr",
+       ".jpg", ".jpeg", ".png", ".gif", ".bmp", ".tiff", ".webp", ".heif", ".raw", ".ico", ".svg", ".pdf"]
+
 
 class TextSplitHandle(BaseSplitHandle):
     def support(self, file, get_buffer):
@@ -32,7 +36,8 @@ class TextSplitHandle(BaseSplitHandle):
         if file_name.endswith(".md") or file_name.endswith('.txt') or file_name.endswith('.TXT') or file_name.endswith(
                 '.MD'):
             return True
-        if '.' in file_name:
+        lower_name = file_name.lower()
+        if any([True for item in end if lower_name.endswith(item)]):
             return False
         buffer = get_buffer(file)
         result = detect(buffer)
