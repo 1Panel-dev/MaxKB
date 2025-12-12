@@ -216,12 +216,10 @@ class ZipSplitHandle(BaseSplitHandle):
                         real_name = get_file_name(zf.name)
                     except Exception:
                         real_name = zf.name
-
                     # 为 split_handle 提供可重复读取的 file-like 对象
                     zf.name = real_name
+                    get_buffer = FileBufferHandle().get_buffer
                     for split_handle in split_handles:
-                        # 准备一个简单的 get_buffer 回调，返回当前 raw
-                        get_buffer = FileBufferHandle().get_buffer
                         if split_handle.support(zf, get_buffer):
                             row = get_buffer(zf)
                             md_text = split_handle.get_content(io.BytesIO(row), save_image)
@@ -229,7 +227,7 @@ class ZipSplitHandle(BaseSplitHandle):
                             break
             for file_content in file_content_list:
                 _image_list, content = get_image_list_by_content(file_content.get('name'), file_content.get("content"),
-                                                                files)
+                                                                 files)
                 content_parts.append(content)
                 for image in _image_list:
                     image_list.append(image)
