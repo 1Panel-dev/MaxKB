@@ -836,9 +836,9 @@ export const applicationLoopMenuNodes = [
     label: t('workflow.nodes.classify.dataProcessing'),
     list: [
       variableAssignNode,
+      variableAggregationNode,
       variableSplittingNode,
       parameterExtractionNode,
-      variableAggregationNode,
     ],
   },
   {
@@ -878,9 +878,9 @@ export const knowledgeLoopMenuNodes = [
     label: t('workflow.nodes.classify.dataProcessing'),
     list: [
       variableAssignNode,
+      variableAggregationNode,
       variableSplittingNode,
       parameterExtractionNode,
-      variableAggregationNode,
     ],
   },
   {
