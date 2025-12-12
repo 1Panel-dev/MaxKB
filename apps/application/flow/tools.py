@@ -12,7 +12,7 @@ import queue
 import re
 import threading
 from typing import Iterator
-
+from maxkb.const import CONFIG
 from django.http import StreamingHttpResponse
 from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -313,7 +313,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
     try:
         client = MultiServerMCPClient(json.loads(mcp_servers))
         tools = await client.get_tools()
-        agent = create_react_agent(chat_model, tools)
+        agent = create_react_agent(chat_model, tools).configure(recursion_limit=(int(CONFIG.get("LANGCHAIN_GRAPH_RECURSION_LIMIT", '25'))))
         response = agent.astream({"messages": message_list}, stream_mode='messages')
 
         # 用于存储工具调用信息（按 tool_id）以及按 index 聚合分片
