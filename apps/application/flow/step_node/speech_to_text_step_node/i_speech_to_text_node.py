@@ -2,10 +2,11 @@
 
 from typing import Type
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
-from django.utils.translation import gettext_lazy as _
 
 
 class SpeechToTextNodeSerializer(serializers.Serializer):
@@ -22,6 +23,8 @@ class SpeechToTextNodeSerializer(serializers.Serializer):
 
 class ISpeechToTextNode(INode):
     type = 'speech-to-text-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return SpeechToTextNodeSerializer
@@ -36,7 +39,7 @@ class ISpeechToTextNode(INode):
 
         return self.execute(audio=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, stt_model_id, chat_id,
+    def execute(self, stt_model_id,
                 audio, model_params_setting=None,
                 **kwargs) -> NodeResult:
         pass

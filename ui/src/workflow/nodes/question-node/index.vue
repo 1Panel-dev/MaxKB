@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -71,7 +71,7 @@
             v-model="form_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('workflow.SystemPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -103,7 +103,7 @@
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
-            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('workflow.UserPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item :label="$t('views.application.form.historyRecord.label')">
@@ -118,19 +118,18 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -155,7 +154,9 @@ import { isLastNode } from '@/workflow/common/data'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-const getApplicationDetail = inject('getApplicationDetail') as any
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
 const {
@@ -197,11 +198,11 @@ function submitSystemDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'system', val)
 }
 
-const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
-  system: t('views.applicationWorkflow.nodes.questionNode.systemDefault'),
+  system: t('workflow.nodes.questionNode.systemDefault'),
   prompt: defaultPrompt,
   dialogue_number: 1,
   is_result: false,
@@ -240,13 +241,13 @@ const validate = () => {
   })
 }
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'LLM',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'LLM',

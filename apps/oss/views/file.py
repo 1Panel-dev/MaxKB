@@ -4,12 +4,11 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.views import Request
-
 from common.auth import TokenAuth
 from common.log.log import log
 from common.result import result
 from knowledge.api.file import FileUploadAPI, FileGetAPI
-from oss.serializers.file import FileSerializer
+from oss.serializers.file import FileSerializer, get_url_content
 
 
 class FileRetrievalView(APIView):
@@ -66,3 +65,19 @@ class FileView(APIView):
         @log(menu='file', operate='Delete file')
         def delete(self, request: Request, file_id: str):
             return result.success(FileSerializer.Operate(data={'id': file_id}).delete())
+
+
+class GetUrlView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        summary=_('Get url'),
+        description=_('Get url'),
+        operation_id=_('Get url'),  # type: ignore
+        tags=[_('Chat')]  # type: ignore
+    )
+    def get(self, request: Request, application_id: str):
+        url = request.query_params.get('url')
+        result_data = get_url_content(url, application_id)
+        return result.success(result_data)

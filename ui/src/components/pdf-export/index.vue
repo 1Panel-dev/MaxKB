@@ -10,7 +10,12 @@
   >
     <div
       v-loading="loading"
-      style="max-height: calc(100vh - 200px); overflow-y: auto; display: flex; justify-content: center"
+      style="
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+        display: flex;
+        justify-content: center;
+      "
     >
       <div ref="cloneContainerRef" style="width: 100%"></div>
       <div ref="svgContainerRef"></div>
@@ -117,6 +122,8 @@ const exportPDF = () => {
     nextTick(() => {
       html2Canvas(svgContainerRef.value, {
         logging: false,
+        allowTaint: true,
+        useCORS: true,
       })
         .then((canvas) => {
           const doc = new jsPDF('p', 'mm', 'a4')
@@ -162,6 +169,8 @@ const exportJepg = () => {
     nextTick(() => {
       html2Canvas(svgContainerRef.value, {
         logging: false,
+        allowTaint: true,
+        useCORS: true,
       })
         .then((canvas) => {
           // 将canvas转换为图片

@@ -1,5 +1,5 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put } from '@/request/index'
+import {Result} from '@/request/Result'
+import {get, post, del, put} from '@/request/index'
 
 const prefix = '/oss/file'
 /**
@@ -11,5 +11,5 @@ const postImage: (data: any) => Promise<Result<any>> = (data) => {
 }
 
 export default {
-  postImage,
+  postImage
 }

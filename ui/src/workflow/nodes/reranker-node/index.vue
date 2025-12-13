@@ -11,12 +11,12 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.rerankerNode.rerankerContent.label')"
+          :label="$t('workflow.nodes.rerankerNode.rerankerContent.label')"
           prop="reranker_reference_list"
           :rules="{
             type: 'array',
             message: $t(
-              'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage',
+              'workflow.nodes.rerankerNode.rerankerContent.requiredMessage',
             ),
             trigger: 'change',
             required: true,
@@ -25,7 +25,7 @@
           <template #label>
             <div class="flex-between">
               <span
-                >{{ $t('views.applicationWorkflow.nodes.rerankerNode.rerankerContent.label')
+                >{{ $t('workflow.nodes.rerankerNode.rerankerContent.label')
                 }}<span class="color-danger">*</span></span
               >
               <el-button @click="add_reranker_reference" link type="primary">
@@ -46,7 +46,7 @@
                 :rules="{
                   type: 'array',
                   required: true,
-                  message: $t('views.applicationWorkflow.variable.placeholder'),
+                  message: $t('workflow.variable.placeholder'),
                   trigger: 'change',
                 }"
               >
@@ -56,7 +56,7 @@
                   class="w-full"
                   :placeholder="
                     $t(
-                      'views.applicationWorkflow.nodes.rerankerNode.rerankerContent.requiredMessage',
+                      'workflow.nodes.rerankerNode.rerankerContent.requiredMessage',
                     )
                   "
                   v-model="form_data.reranker_reference_list[index]"
@@ -71,12 +71,12 @@
           </el-row>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')"
+          :label="$t('workflow.nodes.searchKnowledgeNode.searchParam')"
         >
           <template #label>
             <div class="flex-between">
               <span>{{
-                $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchParam')
+                $t('workflow.nodes.searchKnowledgeNode.searchParam')
               }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <AppIcon iconName="app-setting"></AppIcon>
@@ -87,7 +87,7 @@
             <el-row>
               <el-col :span="12" class="color-secondary lighter">
                 Score
-                {{ $t('views.applicationWorkflow.nodes.rerankerNode.higher') }}</el-col
+                {{ $t('workflow.nodes.rerankerNode.higher') }}</el-col
               >
               <el-col :span="12" class="lighter">
                 {{ form_data.reranker_setting.similarity?.toFixed(3) }}</el-col
@@ -98,7 +98,7 @@
               <el-col :span="12" class="lighter"> {{ form_data.reranker_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">
                 {{
-                  $t('views.applicationWorkflow.nodes.rerankerNode.max_paragraph_char_number')
+                  $t('workflow.nodes.rerankerNode.max_paragraph_char_number')
                 }}</el-col
               >
               <el-col :span="12" class="lighter">
@@ -108,11 +108,11 @@
           </div>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')"
+          :label="$t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
+              'workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
             ),
             trigger: 'blur',
             required: true,
@@ -121,7 +121,7 @@
           <template #label>
             <div class="flex-between">
               <span
-                >{{ $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')
+                >{{ $t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')
                 }}<span class="color-danger">*</span></span
               >
             </div>
@@ -131,24 +131,24 @@
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.label')
+              $t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')
             "
             v-model="form_data.question_reference_address"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.label')"
+          :label="$t('workflow.nodes.rerankerNode.reranker_model.label')"
           prop="reranker_model_id"
           :rules="{
             required: true,
-            message: $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder'),
+            message: $t('workflow.nodes.rerankerNode.reranker_model.placeholder'),
             trigger: 'change',
           }"
         >
           <template #label>
             <div class="flex-between">
               <span
-                >{{ $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.label')
+                >{{ $t('workflow.nodes.rerankerNode.reranker_model.label')
                 }}<span class="color-danger">*</span></span
               >
             </div>
@@ -158,7 +158,7 @@
             :teleported="false"
             v-model="form_data.reranker_model_id"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.rerankerNode.reranker_model.placeholder')
+              $t('workflow.nodes.rerankerNode.reranker_model.placeholder')
             "
             :options="modelOptions"
             @submitModel="getSelectModel"
@@ -167,7 +167,7 @@
           ></ModelSelect>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.searchKnowledgeNode.showKnowledge.label')"
+          :label="$t('workflow.nodes.searchKnowledgeNode.showKnowledge.label')"
           prop="show_knowledge"
           required
           @click.prevent
@@ -187,7 +187,7 @@ import ParamSettingDialog from './ParamSettingDialog.vue'
 import { ref, computed, onMounted, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-const getApplicationDetail = inject('getApplicationDetail') as any
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
 const {
@@ -252,13 +252,13 @@ function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'RERANKER',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'RERANKER',

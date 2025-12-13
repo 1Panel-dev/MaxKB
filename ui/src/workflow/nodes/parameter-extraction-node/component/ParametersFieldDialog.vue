@@ -42,22 +42,17 @@
         />
       </el-form-item>
       <el-form-item
-        :label="
-          $t(
-            'views.applicationWorkflow.nodes.parameterExtractionNode.extractParameters.parameterType',
-          )
-        "
+        :label="$t('workflow.nodes.parameterExtractionNode.extractParameters.parameterType')"
         :required="true"
         prop="parameter_type"
         :rules="rules.label"
       >
         <el-select
+          :teleported="false"
           v-model="form.parameter_type"
           :placeholder="
             $t('common.selectPlaceholder') +
-            $t(
-              'views.applicationWorkflow.nodes.parameterExtractionNode.extractParameters.parameterType',
-            )
+            $t('workflow.nodes.parameterExtractionNode.extractParameters.parameterType')
           "
           style="width: 100%"
         >

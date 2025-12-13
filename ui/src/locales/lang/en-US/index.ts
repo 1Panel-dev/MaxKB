@@ -6,6 +6,7 @@ import theme from './theme'
 import common from './common'
 import dynamicsForm from './dynamics-form'
 import chat from './ai-chat'
+import workflow from './workflow'
 export default {
   lang: 'English',
   layout,
@@ -15,5 +16,6 @@ export default {
   en,
   common,
   dynamicsForm,
-  chat
+  chat,
+  workflow
 }

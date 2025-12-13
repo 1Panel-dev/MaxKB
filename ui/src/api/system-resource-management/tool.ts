@@ -79,6 +79,13 @@ const putTool: (tool_id: string, data: toolData, loading?: Ref<boolean>) => Prom
   return put(`${prefix}/${tool_id}`, data, undefined, loading)
 }
 
+const postToolTestConnection: (data: toolData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`${prefix}/test_connection`, data, undefined, loading)
+}
+
 
 /**
  * 删除工具
@@ -133,4 +140,5 @@ export default {
   exportTool,
   putToolIcon,
   delTool,
+  postToolTestConnection
 }

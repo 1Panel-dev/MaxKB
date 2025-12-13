@@ -40,7 +40,8 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                         if cell.coordinate in merged_range:
                             cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
                             break
-
+                if cell_value is None:
+                    cell_value = ''
                 image = image_dict.get(cell_value, None)
                 if image is not None:
                     cell_value = f'![](./oss/file/{image.id})'
@@ -90,14 +91,17 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 maxkb_logger.error(f'Exception: {e}')
                 image_dict = {}
             md_tables = ''
-            # 如果未指定 sheet_name，则使用第一个工作表
+            # 遍历所有工作表
             for sheetname in workbook.sheetnames:
-                sheet = workbook[sheetname] if sheetname else workbook.active
+                sheet = workbook[sheetname]
                 rows = self.fill_merged_cells(sheet, image_dict)
                 if len(rows) == 0:
                     continue
-                # 提取表头和内容
 
+                # 添加 sheet 名称作为标题
+                md_tables += f'## {sheetname}\n\n'
+
+                # 提取表头和内容
                 headers = [f"{key}" for key, value in rows[0].items()]
 
                 # 构建 Markdown 表格
@@ -112,5 +116,5 @@ class XlsxParseTableHandle(BaseParseTableHandle):
 
             return md_tables
         except Exception as e:
-            max_kb.error(f'excel split handle error: {e}')
+            maxkb_logger.error(f'excel split handle error: {e}')
             return f'error: {e}'

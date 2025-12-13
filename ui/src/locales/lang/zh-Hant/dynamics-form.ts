@@ -22,10 +22,7 @@ export default {
   },
   tip: {
     requiredMessage: '不能為空',
-    jsonMessage: 'JSON格式不正確',
-  },
-  searchBar: {
-    placeholder: '請輸入關鍵字搜索',
+    jsonMessage: 'JSON 格式不正確',
   },
   paramForm: {
     field: {

@@ -38,7 +38,7 @@
           type="primary"
           @click="
             router.push({
-              path: `/knowledge/${data?.id}/${folderId}/document`,
+              path: `/knowledge/${data?.id}/${folderId}/${type}/document`,
             })
           "
           >{{ $t('views.knowledge.ResultSuccess.buttons.toDocument') }}</el-button
@@ -49,7 +49,8 @@
       <p class="bolder">{{ $t('views.knowledge.ResultSuccess.documentList') }}</p>
       <el-card
         shadow="never"
-        class="file-List-card mt-8"
+        class="mt-8"
+        style="--el-card-padding: 8px 12px; line-height: normal"
         v-for="(item, index) in data?.document_list"
         :key="index"
       >
@@ -96,7 +97,7 @@ const props = defineProps({
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { id, folderId }, // id为knowledgeID
+  params: { id, folderId, type }, // id为knowledgeID
 } = route as any
 
 const apiType = computed(() => {

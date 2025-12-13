@@ -3,12 +3,10 @@ export default {
   delete: {
     confirmTitle: 'Confirm deletion of question:',
     confirmMessage1: 'Deleting this question will cancel the association of',
-    confirmMessage2: 'segments. Please proceed with caution.'
+    confirmMessage2: 'segments. Please proceed with caution.',
   },
   buttons: {
     clearStrategy: 'Cleanup Strategy',
-    prev: 'Previous',
-    next: 'Next'
   },
   table: {
     abstract: 'Title',
@@ -18,10 +16,10 @@ export default {
     feedback: {
       label: 'User Feedback',
       star: 'Agree',
-      trample: 'Disagree'
+      trample: 'Disagree',
     },
     mark: 'Marks',
-    recenTimes: 'Last Chat Time'
+    recenTimes: 'Last Chat Time',
   },
   addToKnowledge: 'Add to Knowledge',
   daysText: 'Days ago',
@@ -33,10 +31,10 @@ export default {
   editMark: 'Edit Label',
   form: {
     content: {
-      placeholder: 'Please enter the content'
+      placeholder: 'Please enter the content',
     },
     title: {
-      placeholder: 'Please set a title for the current content for management and viewing'
-    }
-  }
+      placeholder: 'Please set a title for the current content for management and viewing',
+    },
+  },
 }

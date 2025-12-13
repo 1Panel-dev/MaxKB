@@ -1,7 +1,6 @@
 # coding=utf-8
 import base64
 import os
-import traceback
 from typing import Dict
 
 from langchain_core.messages import HumanMessage
@@ -12,7 +11,7 @@ from common.forms import BaseForm, TooltipLabel
 from django.utils.translation import gettext_lazy as _, gettext
 
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-
+from common.utils.logger import maxkb_logger
 
 class RegoloImageModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel(_('Temperature'),
@@ -53,10 +52,8 @@ class RegoloImageModelCredential(BaseForm, BaseModelCredential):
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             res = model.stream([HumanMessage(content=[{"type": "text", "text": gettext('Hello')}])])
-            for chunk in res:
-                print(chunk)
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

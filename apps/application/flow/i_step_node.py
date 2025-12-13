@@ -21,6 +21,7 @@ from application.flow.common import Answer, NodeChunk
 from application.models import ApplicationChatUserStats
 from application.models import ChatRecord, ChatUserType
 from common.field.common import InstanceField
+from knowledge.models.knowledge_action import KnowledgeAction, State
 
 chat_cache = cache
 
@@ -78,7 +79,8 @@ class WorkFlowPostHandler:
                                      message_tokens=message_tokens,
                                      answer_tokens=answer_tokens,
                                      answer_text_list=answer_text_list,
-                                     run_time=time.time() - workflow.context['start_time'],
+                                     run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
+                                         'start_time') is not None else 0,
                                      index=0)
 
         self.chat_info.append_chat_record(chat_record)
@@ -94,6 +96,43 @@ class WorkFlowPostHandler:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1
                 application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
                 application_public_access_client.save()
+        self.chat_info = None
+
+
+class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
+    def __init__(self, chat_info, knowledge_action_id):
+        super().__init__(chat_info)
+        self.knowledge_action_id = knowledge_action_id
+
+    def handler(self, workflow):
+        state = get_workflow_state(workflow)
+        QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(
+            state=state,
+            run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
+                'start_time') is not None else 0)
+
+
+def get_loop_workflow_node(node_list):
+    result = []
+    for item in node_list:
+        if item.get('type') == 'loop-node':
+            for loop_item in item.get('loop_node_data') or []:
+                for inner_item in loop_item.values():
+                    result.append(inner_item)
+    return result
+
+
+def get_workflow_state(workflow):
+    details = workflow.get_runtime_details()
+    node_list = details.values()
+    all_node = [*node_list, *get_loop_workflow_node(node_list)]
+    err = any([True for value in all_node if value.get('status') == 500])
+    if err:
+        return State.FAILURE
+    write_is_exist = any([True for value in all_node if value.get('type') == 'knowledge-write-node'])
+    if not write_is_exist:
+        return State.FAILURE
+    return State.SUCCESS
 
 
 class NodeResult:
@@ -152,6 +191,14 @@ class FlowParamsSerializer(serializers.Serializer):
     debug = serializers.BooleanField(required=True, label="是否debug")
 
 
+class KnowledgeFlowParamsSerializer(serializers.Serializer):
+    knowledge_id = serializers.UUIDField(required=True, label="知识库id")
+    workspace_id = serializers.CharField(required=True, label="工作空间id")
+    knowledge_action_id = serializers.UUIDField(required=True, label="知识库任务执行器id")
+    data_source = serializers.DictField(required=True, label="数据源")
+    knowledge_base = serializers.DictField(required=False, label="知识库设置")
+
+
 class INode:
     view_type = 'many_view'
 
@@ -164,7 +211,8 @@ class INode:
             return None
         reasoning_content_enable = self.context.get('model_setting', {}).get('reasoning_content_enable', False)
         return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params['chat_record_id'], {},
+            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params.get('chat_record_id'),
+                   {},
                    self.runtime_node_id, self.context.get('reasoning_content', '') if reasoning_content_enable else '')]
 
     def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
@@ -221,13 +269,14 @@ class INode:
         pass
 
     def get_flow_params_serializer_class(self) -> Type[serializers.Serializer]:
-        return FlowParamsSerializer
+        return self.workflow_manage.get_params_serializer_class()
 
     def get_write_error_context(self, e):
         self.status = 500
         self.answer_text = str(e)
         self.err_message = str(e)
-        self.context['run_time'] = time.time() - self.context['start_time']
+        current_time = time.time()
+        self.context['run_time'] = current_time - (self.context.get('start_time') or current_time)
 
         def write_error_context(answer, status=200):
             pass

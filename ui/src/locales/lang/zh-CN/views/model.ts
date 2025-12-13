@@ -16,7 +16,7 @@ export default {
     updateSuccessMessage: '修改模型成功',
     saveSuccessMessage: '模型参数保存成功',
     downloadError: '下载失败',
-    noModel: '模型在Ollama不存在',
+    noModel: '模型在 Ollama 不存在',
   },
   modelType: {
     allModel: '全部模型',

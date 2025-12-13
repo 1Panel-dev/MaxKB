@@ -14,7 +14,7 @@ const getRoleList: (loading?: Ref<boolean>) => Promise<Result<{ internal_role: R
 }
 
 /**
- * 根据类型获取角色权限模版列表
+ * 根据类型获取角色权限模板列表
  */
 const getRoleTemplate: (role_type: RoleTypeEnum, loading?: Ref<boolean>) => Promise<Result<RolePermissionItem[]>> = (role_type, loading) => {
   return get(`${prefix}/template/${role_type}`, undefined, loading)

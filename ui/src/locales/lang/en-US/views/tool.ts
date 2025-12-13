@@ -6,9 +6,19 @@ export default {
   createMcpTool: 'Create MCP',
   editMcpTool: 'Edit MCP',
   copyTool: 'Copy Tool',
+  copyMcpTool: 'Copy MCP',
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
   mcpConfig: 'MCP Service Config',
+  updatedVersion: 'Updated Version',
+  dataSource: {
+    title: 'Data Source',
+    createDataSource: 'Create Data Source',
+    editDataSource: 'Edit Data Source',
+    copyDataSource: 'Copy Data Source',
+    selectDataSource: 'Select Data Source',
+    requiredMessage: 'Please select data source',
+  },
   toolStore: {
     title: 'Tool Store',
     createFromToolStore: 'Create from Tool Store',
@@ -22,9 +32,6 @@ export default {
     searchResult: '{count} search results for',
     confirmTip: 'Are you sure to update tool: ',
     updateStoreToolMessage: 'Updating tools may affect resources in use, so proceed with caution.',
-  },
-  searchBar: {
-    placeholder: 'Search by tool name',
   },
   tip: {
     saveMessage: 'Unsaved changes will be lost. Are you sure you want to exit?',
@@ -42,13 +49,11 @@ export default {
 
   form: {
     toolName: {
-      label: 'Name',
       name: 'Tool Name',
       placeholder: 'Please enter the tool name',
       requiredMessage: 'Please enter the tool name',
     },
     mcpName: {
-      label: 'Name',
       name: 'MCP Name',
       placeholder: 'Please enter the MCP name',
       requiredMessage: 'Please enter the MCP name',

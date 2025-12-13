@@ -27,9 +27,14 @@
           "
           >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
         >
-        <span class="mr-16 color-secondary">{{ data?.run_time?.toFixed(2) || 0.0 }} s</span>
+        <span class="mr-16 color-secondary" v-if="data.status != 202"
+          >{{ data?.run_time?.toFixed(2) || 0.0 }} s</span
+        >
         <el-icon class="color-success" :size="16" v-if="data.status === 200">
           <CircleCheck />
+        </el-icon>
+        <el-icon class="is-loading" :size="16" v-else-if="data.status === 202">
+          <Loading />
         </el-icon>
         <el-icon class="color-danger" :size="16" v-else>
           <CircleClose />
@@ -224,7 +229,7 @@
             </div>
             <div class="card-never border-r-6 mt-8" v-if="data.type == WorkflowType.AiChat">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.aiChatNode.think') }}
+                {{ $t('workflow.nodes.aiChatNode.think') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.reasoning_content || '-' }}
@@ -289,7 +294,7 @@
                 </el-tooltip>
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                <el-scrollbar height="150">
+                <el-scrollbar height="200">
                   <el-card
                     shadow="never"
                     style="--el-card-padding: 8px"
@@ -305,6 +310,7 @@
                       style="background: none"
                       noImgZoomIn
                     />
+
                     <template v-else> -</template>
                   </el-card>
                 </el-scrollbar>
@@ -396,7 +402,7 @@
           <template
             v-if="data.type === WorkflowType.ToolLib || data.type === WorkflowType.ToolLibCustom"
           >
-            <div class="card-never border-r-6 mt-8">
+            <div class="card-never border-r-6 mt-8" v-if="data.index != 0">
               <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.params || '-' }}
@@ -535,7 +541,7 @@
                   <el-space wrap>
                     <template v-for="(f, i) in data.image_list" :key="i">
                       <el-image
-                        :src="f.url"
+                        :src="f.url || f.file_id ? `./oss/file/${f.file_id}` : ''"
                         alt=""
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"
@@ -666,7 +672,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -704,7 +710,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -743,7 +749,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageGenerateNode.negative_prompt.label') }}
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.negative_prompt || '-' }}
@@ -751,7 +757,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.first_frame.label') }}
+                {{ $t('workflow.nodes.imageToVideoGenerate.first_frame.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="typeof data.first_frame_url === 'string'">
@@ -780,7 +786,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.imageToVideoGenerate.last_frame.label') }}
+                {{ $t('workflow.nodes.imageToVideoGenerate.last_frame.label') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="typeof data.last_frame_url === 'string'">
@@ -884,10 +890,14 @@
           <template v-if="data.type === WorkflowType.VariableAggregationNode">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.variableAggregationNode.Strategy') }}
+                {{ $t('workflow.nodes.variableAggregationNode.Strategy') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
-                {{ data.strategy }}
+                {{
+                  data.strategy === 'variable_to_json'
+                    ? t('workflow.nodes.variableAggregationNode.placeholder1')
+                    : t('workflow.nodes.variableAggregationNode.placeholder')
+                }}
               </div>
             </div>
             <div
@@ -896,23 +906,28 @@
               :key="groupI"
             >
               <h5 class="p-8-12">
-                {{ group.label+ ' '+ $t('common.param.inputParam') }}
+                {{ group.label + ' ' + $t('common.param.inputParam') }}
               </h5>
-              <div class="p-8-12 border-t-dashed lighter">
-                <div v-for="(f, i) in group.variable_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span> {{ f.value }}
+              <el-scrollbar height="200">
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in group.variable_list" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span>
+                    {{ f.value }}
+                  </div>
                 </div>
-              </div>
+              </el-scrollbar>
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
                 {{ $t('common.param.outputParam') }}
               </h5>
-              <div class="p-8-12 border-t-dashed lighter">
-                <div v-for="(f, i) in data.result" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+              <el-scrollbar height="200">
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
                 </div>
-              </div>
+              </el-scrollbar>
             </div>
           </template>
           <!-- MCP 节点 -->
@@ -930,7 +945,7 @@
             </div>
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}
+                {{ $t('workflow.nodes.mcpNode.toolParam') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(value, name) in data.tool_params" :key="name" class="mb-8">
@@ -952,19 +967,19 @@
           <!-- 循环 节点 -->
           <div class="card-never border-r-6" v-if="data.type === WorkflowType.LoopNode">
             <h5 class="p-8-12">
-              {{ $t('views.applicationWorkflow.nodes.loopNode.loopSetting') }}
+              {{ $t('workflow.nodes.loopNode.loopSetting') }}
             </h5>
 
             <div class="p-8-12 border-t-dashed lighter">
               <div class="mb-8">
                 <span class="color-secondary">
-                  {{ $t('views.applicationWorkflow.nodes.loopNode.loopType.label') }}:</span
+                  {{ $t('workflow.nodes.loopNode.loopType.label') }}:</span
                 >
                 {{ data.loop_type || '-' }}
               </div>
               <div>
                 <span class="color-secondary">
-                  {{ $t('views.applicationWorkflow.nodes.loopNode.loopArray.label') }}:</span
+                  {{ $t('workflow.nodes.loopNode.loopArray.label') }}:</span
                 >
                 {{
                   data.loop_type === 'NUMBER'
@@ -974,7 +989,7 @@
               </div>
             </div>
             <h5 class="p-8-12">
-              {{ $t('views.applicationWorkflow.nodes.loopNode.loopDetail') }}
+              {{ $t('workflow.nodes.loopNode.loopDetail') }}
             </h5>
             <div class="p-8-12 border-t-dashed lighter">
               <template v-if="data.type === WorkflowType.LoopNode">
@@ -986,7 +1001,7 @@
                 <template
                   v-for="(cLoop, cIndex) in Object.values(
                     data.loop_node_data?.[currentLoopNode] || [],
-                  )"
+                  ).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))"
                   :key="cIndex"
                 >
                   <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
@@ -1004,14 +1019,14 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopStartNode.loopItem') }}:</span
+                    {{ $t('workflow.nodes.loopStartNode.loopItem') }}:</span
                   >
 
                   {{ data.current_item }}
                 </div>
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopStartNode.loopIndex') }}:</span
+                    {{ $t('workflow.nodes.loopStartNode.loopIndex') }}:</span
                   >
 
                   {{ data.current_index }}
@@ -1029,7 +1044,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopContinueNode.isContinue') }}:</span
+                    {{ $t('workflow.nodes.loopContinueNode.isContinue') }}:</span
                   >
 
                   {{ data.is_continue }}
@@ -1047,7 +1062,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary">
-                    {{ $t('views.applicationWorkflow.nodes.loopBreakNode.isBreak') }}:</span
+                    {{ $t('workflow.nodes.loopBreakNode.isBreak') }}:</span
                   >
 
                   {{ data.is_break }}
@@ -1070,6 +1085,154 @@
                   <span class="color-secondary"> document_list:</span>
                   {{ data.document_items?.map((v: any) => v.name).join(',') }}
                 </div>
+              </div>
+            </div>
+          </template>
+          <!-- 文本文件 -->
+          <template v-if="data.type === WorkflowType.DataSourceLocalNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  {{ data.file_list || '-' }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 文档分段 -->
+          <template v-if="data.type === WorkflowType.DocumentSplitNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"
+                    >{{ $t('chat.executionDetails.paragraphRules') }}:</span
+                  >
+                  {{ data.split_strategy }}
+                </div>
+                <div class="mb-8">
+                  <span class="color-secondary"
+                    >{{ $t('workflow.nodes.documentSplitNode.chunk_length.label') }}:</span
+                  >
+                  {{ data.chunk_size }}
+                </div>
+                {{ data.size }}
+                <div class="mb-8">
+                  <span class="color-secondary">{{ $t('common.inputContent') }}:</span>
+                  {{ data.document_list?.map((v: any) => v.name).join(',') }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}（{{
+                  $t('chat.executionDetails.documentSplitTip')
+                }}）
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-tabs v-model="currentParagraph" class="paragraph-tabs">
+                  <template v-for="(item, index) in data.paragraph_list" :key="index">
+                    <el-tab-pane :label="item.name" :name="index">
+                      <template #label>
+                        <div class="flex-center">
+                          <span class="ml-4">{{ item?.name }}</span>
+                        </div>
+                      </template>
+
+                      <template v-for="(paragraph, pId) in item?.paragraphs" :key="pId">
+                        <ParagraphCard :data="paragraph" :content="paragraph.content" :index="pId">
+                          <template #footer>
+                            <span class="color-secondary">
+                              {{ $t('common.character') }}：{{ paragraph.content.length }}</span
+                            >
+                          </template>
+                        </ParagraphCard>
+                      </template>
+                    </el-tab-pane>
+                  </template>
+                </el-tabs>
+              </div>
+            </div>
+          </template>
+          <!-- 知识库写入 -->
+          <template v-if="data.type === WorkflowType.KnowledgeWriteNode">
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('chat.executionDetails.writeContent') }}（{{
+                  $t('chat.executionDetails.documentSplitTip')
+                }}）
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-tabs v-model="currentWriteContent" class="paragraph-tabs">
+                  <template v-for="(item, index) in data.write_content" :key="index">
+                    <el-tab-pane :label="item.name" :name="index">
+                      <template #label>
+                        <div class="flex-center">
+                          <span class="ml-4">{{ item?.name }}</span>
+                        </div>
+                      </template>
+
+                      <template v-for="(paragraph, pId) in item?.paragraphs" :key="pId">
+                        <ParagraphCard :data="paragraph" :content="paragraph.content" :index="pId">
+                          <template #footer>
+                            <span class="color-secondary">
+                              {{ $t('common.character') }}：{{ paragraph.content.length }}</span
+                            >
+                          </template>
+                        </ParagraphCard>
+                      </template>
+                    </el-tab-pane>
+                  </template>
+                </el-tabs>
+              </div>
+            </div>
+          </template>
+          <!-- Web站点 -->
+          <template v-if="data.type === WorkflowType.DataSourceWebNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <p class="mb-8 color-secondary">
+                  {{ $t('views.document.form.selector.label') }}: {{ data.input_params.selector }}
+                </p>
+                <p class="mb-8 color-secondary">
+                  {{ $t('views.document.form.source_url.label') }}:
+                  {{ data.input_params.source_url }}
+                </p>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-scrollbar height="200">
+                  <el-card
+                    shadow="never"
+                    style="--el-card-padding: 8px"
+                    v-for="(file_content, index) in data.output_params"
+                    :key="index"
+                    class="mb-8"
+                  >
+                    <h4>{{ file_content.name }}</h4>
+                    <MdPreview
+                      v-if="file_content"
+                      ref="editorRef"
+                      editorId="preview-only"
+                      :modelValue="file_content.content"
+                      style="background: none"
+                      noImgZoomIn
+                    />
+                    <template v-else> -</template>
+                  </el-card>
+                </el-scrollbar>
               </div>
             </div>
           </template>
@@ -1100,5 +1263,7 @@ const props = defineProps<{
   data: any
 }>()
 const currentLoopNode = ref(0)
+const currentParagraph = ref(0)
+const currentWriteContent = ref(0)
 </script>
 <style lang="scss" scoped></style>

@@ -15,9 +15,6 @@ export default {
     batchDelete: 'Bulk Delete',
     cancelRelated: 'Cancel Association'
   },
-  searchBar: {
-    placeholder: 'Search by name'
-  },
   table: {
     paragraph_count: 'Related Segments',
     updateTime: 'Update Time'

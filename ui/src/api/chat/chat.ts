@@ -332,6 +332,10 @@ const postUploadFile: (
   fd.append('source_type', sourceType)
   return post(`/oss/file`, fd, undefined, loading)
 }
+
+const getFile: (application_id: string, params: any) => Promise<Result<any>> = (application_id, params) => {
+  return get(`/oss/get_url/${application_id}`, params)
+}
 export default {
   open,
   chat,
@@ -362,4 +366,5 @@ export default {
   clearChat,
   modifyChat,
   postUploadFile,
+  getFile
 }

@@ -9,6 +9,8 @@
 from .ai_chat_step_node import *
 from .application_node import BaseApplicationNode
 from .condition_node import *
+from .data_source_local_node.impl.base_data_source_local_node import BaseDataSourceLocalNode
+from .data_source_web_node.impl.base_data_source_web_node import BaseDataSourceWebNode
 from .direct_reply_node import *
 from .document_extract_node import *
 from .form_node import *
@@ -16,6 +18,7 @@ from .image_generate_step_node import *
 from .image_to_video_step_node import BaseImageToVideoNode
 from .image_understand_step_node import *
 from .intent_node import *
+from .knowledge_write_node.impl.base_knowledge_write_node import BaseKnowledgeWriteNode
 from .loop_break_node import BaseLoopBreakNode
 from .loop_continue_node import BaseLoopContinueNode
 from .loop_node import *
@@ -36,6 +39,7 @@ from .variable_aggregation_node.impl.base_variable_aggregation_node import BaseV
 from .variable_assign_node import BaseVariableAssignNode
 from .variable_splitting_node import BaseVariableSplittingNode
 from .video_understand_step_node import BaseVideoUnderstandNode
+from .document_split_node import BaseDocumentSplitNode
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearchDocumentNode, BaseQuestionNode,
              BaseConditionNode, BaseReplyNode,
@@ -46,11 +50,11 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearc
              BaseVideoUnderstandNode,
              BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
              BaseLoopContinueNode,
-             BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode]
+             BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode,
+             BaseDataSourceLocalNode, BaseDataSourceWebNode, BaseKnowledgeWriteNode, BaseDocumentSplitNode]
+
+node_map = {n.type: {w: n for w in n.support} for n in node_list}
 
 
-def get_node(node_type):
-    find_list = [node for node in node_list if node.type == node_type]
-    if len(find_list) > 0:
-        return find_list[0]
-    return None
+def get_node(node_type, workflow_model):
+    return node_map.get(node_type).get(workflow_model)

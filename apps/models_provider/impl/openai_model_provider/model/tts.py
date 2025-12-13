@@ -63,6 +63,3 @@ class OpenAITextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 **self.params
         ) as response:
             return response.read()
-
-    def is_cache_model(self):
-        return False

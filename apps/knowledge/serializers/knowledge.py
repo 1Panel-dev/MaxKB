@@ -31,7 +31,7 @@ from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag
+    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, KnowledgeWorkflow
 from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
@@ -342,8 +342,18 @@ class KnowledgeSerializer(serializers.Serializer):
                     )
                 )
             ), with_search_one=True)
+            workflow = {}
+
+            if knowledge_dict.get('type') == 4:
+                from knowledge.models import KnowledgeWorkflow
+                k = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_dict.get('id')).first()
+                if k:
+                    workflow['work_flow'] = k.work_flow
+                    workflow['is_publish'] = k.is_publish
+                    workflow['publish_time'] = k.publish_time
             return {
                 **knowledge_dict,
+                **workflow,
                 'meta': json.loads(knowledge_dict.get('meta', '{}')),
                 'application_id_list': list(filter(
                     lambda application_id: all_application_list.__contains__(application_id),
@@ -360,12 +370,6 @@ class KnowledgeSerializer(serializers.Serializer):
         def edit(self, instance: Dict, select_one=True):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
-            if QuerySet(Knowledge).filter(
-                    workspace_id=knowledge.workspace_id,
-                    name=instance.get('name'),
-                    folder_id=knowledge.folder_id
-            ).exclude(id=knowledge.id).exists():
-                raise AppApiException(500, _('Knowledge base name duplicate!'))
             KnowledgeEditRequest(data=instance).is_valid(knowledge=knowledge)
             if 'embedding_model_id' in instance:
                 knowledge.embedding_model_id = instance.get('embedding_model_id')
@@ -406,7 +410,6 @@ class KnowledgeSerializer(serializers.Serializer):
                         application_id=application_id, knowledge_id=self.data.get('knowledge_id')
                     ) for application_id in application_id_list
                 ]) if len(application_id_list) > 0 else None
-
             knowledge.save()
             if select_one:
                 return self.one()
@@ -533,10 +536,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 KnowledgeBaseCreateRequest(data=instance).is_valid(raise_exception=True)
             folder_id = instance.get('folder_id', self.data.get('workspace_id'))
-            if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
-                                          folder_id=folder_id,
-                                          name=instance.get('name')).exists():
-                raise AppApiException(500, _('Knowledge base name duplicate!'))
 
             knowledge_id = uuid.uuid7()
             knowledge = Knowledge(
@@ -600,10 +599,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 KnowledgeWebCreateRequest(data=instance).is_valid(raise_exception=True)
 
             folder_id = instance.get('folder_id', self.data.get('workspace_id'))
-            if QuerySet(Knowledge).filter(workspace_id=self.data.get('workspace_id'),
-                                          folder_id=folder_id,
-                                          name=instance.get('name')).exists():
-                raise AppApiException(500, _('Knowledge base name duplicate!'))
 
             knowledge_id = uuid.uuid7()
             knowledge = Knowledge(

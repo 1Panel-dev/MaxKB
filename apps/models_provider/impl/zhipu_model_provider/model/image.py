@@ -3,7 +3,6 @@ from typing import Dict
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
-
 class ZhiPuImage(MaxKBBaseModel, BaseChatOpenAI):
 
     @staticmethod

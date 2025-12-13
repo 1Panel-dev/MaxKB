@@ -11,7 +11,7 @@
     >
       <template v-for="(item, index) in form_data.variable_list" :key="item.id">
         <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
-          <el-form-item >
+          <el-form-item>
             <template #label>
               <div class="flex-between">
                 <div>
@@ -31,7 +31,7 @@
               ref="nodeCascaderRef"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('workflow.variable.placeholder')"
               v-model="item.fields"
               :global="true"
               @change="variableChange(item)"
@@ -39,14 +39,11 @@
           </el-form-item>
           <div class="flex-between mb-8">
             <span class="lighter"
-              >{{ $t('views.applicationWorkflow.nodes.variableAssignNode.assign')
+              >{{ $t('workflow.nodes.variableAssignNode.assign')
               }}<span class="color-danger">*</span></span
             >
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
-              <el-option
-                :label="$t('views.applicationWorkflow.variable.Referencing')"
-                value="referencing"
-              />
+              <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
               <el-option :label="$t('common.custom')" value="custom" />
             </el-select>
           </div>
@@ -139,7 +136,7 @@
                 required: true,
               }"
             >
-              <el-select v-model="item.value" style="width: 155px">
+              <el-select v-model="item.value" style="width: 155px" :teleported="false">
                 <el-option label="true" :value="true" />
                 <el-option label="false" :value="false" />
               </el-select>
@@ -150,7 +147,7 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('workflow.variable.placeholder')"
               v-model="item.reference"
             />
           </el-form-item>

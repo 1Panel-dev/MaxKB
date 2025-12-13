@@ -5,6 +5,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 
@@ -31,14 +32,21 @@ class TextToVideoNodeSerializer(serializers.Serializer):
 
 class ITextToVideoNode(INode):
     type = 'text-to-video-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return TextToVideoNodeSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
+        else:
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record, chat_id,
+    def execute(self, model_id, prompt, negative_prompt, dialogue_number, dialogue_type, history_chat_record,
                 model_params_setting,
                 chat_record_id,
                 **kwargs) -> NodeResult:

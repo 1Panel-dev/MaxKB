@@ -1,5 +1,5 @@
 <template>
-  <div class="radio_content" :style="radioContentStyle">
+  <div class="radio-card" :style="radioContentStyle">
     <el-row :gutter="12" class="w-full">
       <template v-for="(item, index) in option_list" :key="index">
         <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
@@ -74,7 +74,7 @@ const option_list = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
-.radio_content {
+.radio-card {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-start;
@@ -94,7 +94,6 @@ const option_list = computed(() => {
     color: var(--el-color-primary);
   }
   .item {
-    line-height: 22px;
     cursor: pointer;
     display: flex;
     justify-content: center;

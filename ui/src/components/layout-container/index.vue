@@ -3,6 +3,7 @@
     <div
       :class="`layout-container__left border-r ${isCollapse ? 'hidden' : ''}`"
       :style="{ width: isCollapse ? 0 : `${leftWidth}px` }"
+      v-if="showLeft"
     >
       <div class="layout-container__left_content">
         <slot name="left"></slot>
@@ -47,6 +48,10 @@ const props = defineProps({
   maxLeftWidth: {
     type: Number,
     default: 400,
+  },
+  showLeft: {
+    type: Boolean,
+    default: true,
   },
 })
 

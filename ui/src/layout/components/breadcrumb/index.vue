@@ -1,6 +1,6 @@
 <template>
   <div class="breadcrumb ml-4 mt-4 mb-12 flex align-center">
-    <back-button  @click="toBack"></back-button>
+    <back-button @click="toBack"></back-button>
     <div class="flex align-center">
       <el-avatar
         v-if="isApplication"
@@ -17,7 +17,7 @@
         style="width: 28px; height: 28px; display: block"
         class="mr-8"
       /> -->
-      <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" class="mr-8" />
+      <KnowledgeIcon v-else-if="isKnowledge" :type="current?.type" class="mr-8" :size="24" />
 
       <div class="ellipsis" :title="current?.name">{{ current?.name }}</div>
     </div>
@@ -31,7 +31,7 @@ import { resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 import permissionMap from '@/permission'
-const { common, folder,user } = useStore()
+const { common, folder, user } = useStore()
 const route = useRoute()
 const router = useRouter()
 
@@ -57,8 +57,9 @@ const folderType = computed(() => {
   }
   if (route.path.includes('knowledge')) {
     return 'knowledge'
+  } else {
+    return 'application'
   }
-  else {return 'application'}
 })
 
 const permissionPrecise = computed(() => {
@@ -123,11 +124,13 @@ function getApplicationDetail() {
 function toBack() {
   if (isKnowledge.value) {
     folder.setCurrentFolder({
-      id: permissionPrecise.value.folderRead(folderId)? folderId : user.getWorkspaceId(),
+      id: permissionPrecise.value.folderRead(folderId) ? folderId : user.getWorkspaceId(),
     })
   } else if (isApplication.value) {
     folder.setCurrentFolder({
-      id: permissionPrecise.value.folderRead(current.value.folder)? current.value.folder : user.getWorkspaceId(),
+      id: permissionPrecise.value.folderRead(current.value.folder)
+        ? current.value.folder
+        : user.getWorkspaceId(),
     })
   }
   router.push({ path: toBackPath.value })

@@ -41,32 +41,6 @@ defineProps({
 const activeName = ref(0)
 </script>
 <style scoped lang="scss">
-.paragraph-tabs {
-  :deep(.el-tabs__item) {
-    background: var(--app-text-color-light-1);
-    margin: 4px;
-    border-radius: 4px;
-    padding: 5px 10px 5px 8px !important;
-    height: auto;
-    &:nth-child(2) {
-      margin-left: 0;
-    }
-    &:last-child {
-      margin-right: 0;
-    }
-    &.is-active {
-      border: 1px solid var(--el-color-primary);
-      background: var(--el-color-primary-light-9);
-      color: var(--el-text-color-primary);
-    }
-  }
-  :deep(.el-tabs__nav-wrap::after) {
-    display: none;
-  }
-  :deep(.el-tabs__active-bar) {
-    display: none;
-  }
-}
 .paragraph-list {
   height: calc(100vh - 319px);
 }

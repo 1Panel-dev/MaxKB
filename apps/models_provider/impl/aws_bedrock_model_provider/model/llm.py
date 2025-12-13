@@ -3,7 +3,7 @@ import re
 from typing import Dict, List
 
 from botocore.config import Config
-from langchain_community.chat_models import BedrockChat
+from langchain_aws import ChatBedrock
 from langchain_core.messages import BaseMessage, get_buffer_string
 
 from common.config.tokenizer_manage_config import TokenizerManage
@@ -33,7 +33,7 @@ def get_max_tokens_keyword(model_name):
         return 'max_tokens'
 
 
-class BedrockModel(MaxKBBaseModel, BedrockChat):
+class BedrockModel(MaxKBBaseModel, ChatBedrock):
 
     @staticmethod
     def is_cache_model():

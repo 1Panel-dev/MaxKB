@@ -20,7 +20,7 @@ from common.handle.base_to_response import BaseToResponse
 
 
 class OpenaiToResponse(BaseToResponse):
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens, prompt_tokens,
+    def to_block_response(self, chat_id, chat_record_id, content, is_end, prompt_tokens, completion_tokens,
                           other_params: dict = None,
                           _status=status.HTTP_200_OK):
         if other_params is None:
@@ -37,8 +37,8 @@ class OpenaiToResponse(BaseToResponse):
         return JsonResponse(data=data, status=_status)
 
     def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end,
-                                 completion_tokens,
-                                 prompt_tokens, other_params: dict = None):
+                                 prompt_tokens,
+                                 completion_tokens, other_params: dict = None):
         if other_params is None:
             other_params = {}
         chunk = ChatCompletionChunk(id=chat_record_id, model='', object='chat.completion.chunk',

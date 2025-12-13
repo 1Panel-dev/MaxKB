@@ -13,7 +13,7 @@
         </span>
       </div>
 
-      <el-scrollbar :max-height="first ? 0 : 450">
+      <el-scrollbar :max-height="first ? '' : 450">
         <div class="mt-16" style="padding: 0 8px; height: calc(100% - 100px)">
           <DynamicsForm
             :key="dynamicsFormRefresh"

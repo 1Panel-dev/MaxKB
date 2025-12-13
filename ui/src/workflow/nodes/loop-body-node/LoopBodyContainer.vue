@@ -16,6 +16,7 @@
             />
             <h4 class="ellipsis-1 break-all">{{ nodeModel.properties.stepName }}</h4>
           </div>
+
           <!-- 放大缩小按钮 -->
           <el-button link @click="enlargeHandle">
             <AppIcon
@@ -33,8 +34,8 @@
               class="mb-16"
               :title="
                 props.nodeModel.type === 'application-node'
-                  ? $t('views.applicationWorkflow.tip.applicationNodeError')
-                  : $t('views.applicationWorkflow.tip.functionNodeError')
+                  ? $t('workflow.tip.applicationNodeError')
+                  : $t('workflow.tip.functionNodeError')
               "
               type="error"
               show-icon
@@ -57,7 +58,7 @@
                   <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
                   <el-tooltip
                     effect="dark"
-                    :content="$t('views.applicationWorkflow.setting.copyParam')"
+                    :content="$t('workflow.setting.copyParam')"
                     placement="top"
                     v-if="showicon === index"
                   >
@@ -74,7 +75,7 @@
     </div>
 
     <el-dialog
-      :title="$t('views.applicationWorkflow.nodeName')"
+      :title="$t('workflow.nodeName')"
       v-model="nodeNameDialogVisible"
       :close-on-click-modal="false"
       :close-on-press-escape="false"
@@ -110,16 +111,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, provide } from 'vue'
+import { ref, computed, provide, inject } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../../icons/utils'
 import { copyClick } from '@/utils/clipboard'
 import { ElMessage } from 'element-plus'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
-import { WorkflowMode } from '@/enums/application'
+provide('workflowMode', inject('loopWorkflowMode'))
 
-provide('workflowMode', WorkflowMode.ApplicationLoop)
+const props = defineProps<{
+  nodeModel: any
+}>()
 
 const titleFormRef = ref()
 const nodeNameDialogVisible = ref<boolean>(false)
@@ -160,7 +163,7 @@ const editName = async (formEl: FormInstance | undefined) => {
         nodeNameDialogVisible.value = false
         formEl.resetFields()
       } else {
-        ElMessage.error(t('views.applicationWorkflow.tip.repeatedNodeError'))
+        ElMessage.error(t('workflow.tip.repeatedNodeError'))
       }
     }
   })
@@ -176,9 +179,6 @@ const showicon = ref<number | null>(null)
 
 const height = ref<number>(600)
 
-const props = defineProps<{
-  nodeModel: any
-}>()
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.config.fields) {
     const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
@@ -217,6 +217,12 @@ function enlargeHandle() {
     props.nodeModel.setHeight(height.value)
   }
 }
+const zoom = () => {
+  if (enlarge.value) {
+    enlargeHandle()
+  }
+}
+defineExpose({ close, zoom })
 </script>
 <style lang="scss" scoped>
 .workflow-node-container {

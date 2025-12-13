@@ -13,6 +13,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/publish', views.ApplicationAPI.Publish.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key', views.ApplicationKey.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_stats', views.ApplicationStats.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/application_token_usage', views.ApplicationStats.TokenUsageStatistics.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/top_questions', views.ApplicationStats.TopQuestionsStatistics.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_key/<str:api_key_id>', views.ApplicationKey.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/export', views.ApplicationAPI.Export.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/application_version', views.ApplicationVersionView.as_view()),

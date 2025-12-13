@@ -1,9 +1,7 @@
 # coding=utf-8
-import base64
-import mimetypes
+
 import time
 from functools import reduce
-from imghdr import what
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -12,7 +10,6 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AI
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.video_understand_step_node.i_video_understand_node import IVideoUnderstandNode
 from knowledge.models import File
-from models_provider.impl.volcanic_engine_model_provider.model.image import get_video_format
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
@@ -73,7 +70,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
-    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream, chat_id,
+    def execute(self, model_id, system, prompt, dialogue_number, dialogue_type, history_chat_record, stream,
                 model_params_setting,
                 chat_record_id,
                 video,
@@ -134,11 +131,17 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
                 # 增加对 None 和空列表的检查
                 if not video_list or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
-                file_id_list = [video.get('file_id') for video in video_list]
+                file_id_list = []
+                url_list = []
+                for image in video_list:
+                    if 'file_id' in image:
+                        file_id_list.append(image.get('file_id'))
+                    elif 'url' in image:
+                        url_list.append(image.get('url'))
                 return HumanMessage(content=[
                     {'type': 'text', 'text': data['question']},
-                    *[{'type': 'video_url', 'video_url': {'url': f'./oss/file/{file_id}'}} for file_id in file_id_list]
-
+                    *[{'type': 'video_url', 'video_url': {'url': f'./oss/file/{file_id}'}} for file_id in file_id_list],
+                    *[{'type': 'video_url', 'video_url': {'url': url}} for url in url_list],
                 ])
         return HumanMessage(content=chat_record.problem_text)
 
@@ -156,8 +159,15 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'video_list' in data:
                 video_list = data['video_list']
-                if len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
+                if video_list is None or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
+                file_id_list = []
+                url_list = []
+                for image in video_list:
+                    if 'file_id' in image:
+                        file_id_list.append(image.get('file_id'))
+                    elif 'url' in image:
+                        url_list.append(image.get('url'))
                 video_base64_list = [file_id_to_base64(video.get('file_id'), video_model) for video in video_list]
                 return HumanMessage(
                     content=[
@@ -177,11 +187,15 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
             videos.append({'type': 'video_url', 'video_url': {'url': image}})
         elif image is not None and len(image) > 0:
             for img in image:
-                file_id = img['file_id']
-                file = QuerySet(File).filter(id=file_id).first()
-                url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
-                videos.append(
-                    {'type': 'video_url', 'video_url': {'url': url}})
+                if 'file_id' in img:
+                    file_id = img['file_id']
+                    file = QuerySet(File).filter(id=file_id).first()
+                    url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
+                    videos.append(
+                        {'type': 'video_url', 'video_url': {'url': url}})
+                elif 'url' in img and img['url'].startswith('http'):
+                    videos.append(
+                        {'type': 'video_url', 'video_url': {'url': img['url']}})
         return videos
 
     def generate_message_list(self, video_model, system: str, prompt: str, history_message, video):

@@ -129,6 +129,7 @@ watch(
       'model_local_provider',
       'model_xinference_provider',
       'model_vllm_provider',
+      'model_docker_ai_provider'
     ]
     list
       .filter((v) => v.provider)

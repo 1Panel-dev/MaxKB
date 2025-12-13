@@ -49,7 +49,7 @@
                 </div>
 
                 <h4 class="ellipsis">
-                  {{ detail?.name || $t('views.application.form.appName.label') }}
+                  {{ detail?.name || $t('common.name') }}
                 </h4>
               </div>
               <div class="mr-16">

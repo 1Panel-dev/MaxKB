@@ -32,7 +32,6 @@ class LocalReranker(MaxKBBaseModel, BaseModel, BaseDocumentCompressor):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        print('ssss', kwargs.get('model_id', None))
         self.model_id = kwargs.get('model_id', None)
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \

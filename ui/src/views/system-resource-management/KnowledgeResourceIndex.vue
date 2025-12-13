@@ -17,7 +17,7 @@
           >
             <el-option :label="$t('common.creator')" value="create_user" />
             <el-option :label="$t('common.name')" value="name" />
-            <el-option :label="$t('views.system.resource_management.type')" value="type" />
+            <el-option :label="$t('common.type')" value="type" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -71,7 +71,7 @@
 
         <el-table-column
           prop="tool_type"
-          :label="$t('views.system.resource_management.type')"
+          :label="$t('common.type')"
           width="110"
         >
           <template #default="{ row }">
@@ -80,6 +80,9 @@
             }}</span>
             <span v-else-if="row.type === 2">{{
               $t('views.knowledge.knowledgeType.larkKnowledge')
+            }}</span>
+            <span v-else-if="row.type === 4">{{
+              $t('views.knowledge.knowledgeType.workflowKnowledge')
             }}</span>
             <span v-else>{{ $t('views.knowledge.knowledgeType.generalKnowledge') }}</span>
           </template>
@@ -170,7 +173,7 @@
                   :title="$t('views.system.resource_management.management')"
                   @click="
                     router.push({
-                      path: `/knowledge/${row.id}/resource-management/document`,
+                      path: `/knowledge/${row.id}/resource-management/${row.type}/document`,
                     })
                   "
                 >
@@ -219,7 +222,7 @@
                   <el-dropdown-item
                     @click="
                       router.push({
-                        path: `/knowledge/${row.id}/resource-management/setting`,
+                        path: `/knowledge/${row.id}/resource-management/${row.type}/setting`,
                       })
                     "
                     v-if="permissionPrecise.edit()"
@@ -290,6 +293,8 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
 import { t } from '@/locales'
 import useStore from '@/stores'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 const router = useRouter()
 const { user } = useStore()
 
@@ -303,7 +308,8 @@ const ManagePermission = () => {
     permissionPrecise.value.problem_read() ||
     permissionPrecise.value.edit() ||
     permissionPrecise.value.knowledge_chat_user_read() ||
-    permissionPrecise.value.hit_test()
+    permissionPrecise.value.hit_test() ||
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ],'OR')
   )
 }
 
@@ -337,6 +343,10 @@ const type_options = ref<any[]>([
   {
     label: t('views.knowledge.knowledgeType.larkKnowledge'),
     value: '2',
+  },
+  {
+    label: t('views.knowledge.knowledgeType.workflowKnowledge'),
+    value: '4',
   },
 ])
 const loading = ref(false)

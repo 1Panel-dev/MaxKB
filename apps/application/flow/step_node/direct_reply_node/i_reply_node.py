@@ -10,6 +10,7 @@ from typing import Type
 
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 from common.exception.app_exception import AppApiException
 
@@ -38,12 +39,19 @@ class ReplyNodeParamsSerializer(serializers.Serializer):
 
 class IReplyNode(INode):
     type = 'reply-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP,
+               WorkflowMode.KNOWLEDGE]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ReplyNodeParamsSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'stream': True})
+        else:
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, reply_type, stream, fields=None, content=None, **kwargs) -> NodeResult:
         pass

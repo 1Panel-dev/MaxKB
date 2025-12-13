@@ -17,7 +17,7 @@ from application.flow.step_node.tool_node.i_tool_node import IToolNode
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
 
-function_executor = ToolExecutor(CONFIG.get('SANDBOX'))
+function_executor = ToolExecutor()
 
 
 def write_context(step_variable: Dict, global_variable: Dict, node, workflow):

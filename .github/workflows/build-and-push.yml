@@ -7,7 +7,7 @@ on:
     inputs:
       dockerImageTag:
         description: 'Image Tag'
-        default: 'v2.3.0-dev'
+        default: 'v2.4.0-dev'
         required: true
       dockerImageTagWithLatest:
         description: '是否发布latest tag（正式发版时选择，测试版本切勿选择）'

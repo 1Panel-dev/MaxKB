@@ -11,13 +11,11 @@ from typing import List
 
 from common.chunk.i_chunk_handle import IChunkHandle
 
-max_chunk_len = 256
-split_chunk_pattern = r'.{1,%d}[。| |\\.|！|;|；|!|\n]' % max_chunk_len
-max_chunk_pattern = r'.{1,%d}' % max_chunk_len
-
-
 class MarkChunkHandle(IChunkHandle):
-    def handle(self, chunk_list: List[str]):
+    def handle(self, chunk_list: List[str], chunk_size: int = 256):
+        split_chunk_pattern = r'.{1,%d}[。| |\\.|！|;|；|!|\n]' % chunk_size
+        max_chunk_pattern = r'.{1,%d}' % chunk_size
+
         result = []
         for chunk in chunk_list:
             chunk_result = re.findall(split_chunk_pattern, chunk, flags=re.DOTALL)
@@ -28,7 +26,7 @@ class MarkChunkHandle(IChunkHandle):
             other_chunk_list = re.split(split_chunk_pattern, chunk, flags=re.DOTALL)
             for other_chunk in other_chunk_list:
                 if len(other_chunk) > 0:
-                    if len(other_chunk) < max_chunk_len:
+                    if len(other_chunk) < chunk_size:
                         if len(other_chunk.strip()) > 0:
                             result.append(other_chunk.strip())
                     else:

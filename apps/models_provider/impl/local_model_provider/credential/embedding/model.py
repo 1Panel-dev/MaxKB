@@ -6,7 +6,6 @@
     @date：2025/11/7 14:02
     @desc:
 """
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -16,7 +15,7 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from models_provider.impl.local_model_provider.model.embedding import LocalEmbedding
-
+from common.utils.logger import maxkb_logger
 
 class LocalEmbeddingCredential(BaseForm, BaseModelCredential):
 
@@ -35,7 +34,7 @@ class LocalEmbeddingCredential(BaseForm, BaseModelCredential):
             model: LocalEmbedding = provider.get_model(model_type, model_name, model_credential)
             model.embed_query(gettext('Hello'))
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

@@ -361,15 +361,6 @@ class KnowledgeView(APIView):
     class EmbeddingModel(APIView):
         authentication_classes = [TokenAuth]
 
-        @extend_schema(
-            methods=['GET'],
-            summary=_('Get embedding model for knowledge base'),
-            description=_('Get embedding model for knowledge base'),
-            operation_id=_('Get embedding model for knowledge base'),  # type: ignore
-            parameters=GetModelAPI.get_parameters(),
-            responses=GetModelAPI.get_response(),
-            tags=[_('Knowledge Base')]  # type: ignore
-        )
         @has_permissions(
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()

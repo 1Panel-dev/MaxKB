@@ -1,14 +1,23 @@
 export default {
   title: '工具',
-  all: '全部',
   createTool: '创建工具',
   editTool: '编辑工具',
-  createMcpTool: '创建MCP',
-  editMcpTool: '编辑MCP',
+  createMcpTool: '创建 MCP',
+  editMcpTool: '编辑 MCP',
   copyTool: '复制工具',
+  copyMcpTool: '复制 MCP',
   importTool: '导入工具',
   settingTool: '设置工具',
   mcpConfig: 'MCP服务配置',
+  updatedVersion: '更新版本',
+  dataSource: {
+    title: '数据源',
+    createDataSource: '创建数据源',
+    editDataSource: '编辑数据源',
+    copyDataSource: '复制数据源',
+    selectDataSource: '选择数据源',
+    requiredMessage: '请选择数据源',
+  },
   toolStore: {
     title: '工具商店',
     createFromToolStore: '从工具商店创建',
@@ -36,22 +45,20 @@ export default {
   },
   form: {
     toolName: {
-      label: '名称',
       name: '工具名称',
       placeholder: '请输入工具名称',
       requiredMessage: '请输入工具名称',
     },
     mcpName: {
-      label: '名称',
-      name: 'MCP名称',
-      placeholder: '请输入MCP名称',
-      requiredMessage: '请输入MCP名称',
+      name: 'MCP 名称',
+      placeholder: '请输入 MCP 名称',
+      requiredMessage: '请输入 MCP 名称',
     },
     toolDescription: {
       placeholder: '请输入工具的描述',
     },
     mcpDescription: {
-      placeholder: '请输入MCP的描述',
+      placeholder: '请输入 MCP 的描述',
     },
     paramName: {
       label: '参数名',
@@ -78,8 +85,8 @@ export default {
     mcp: {
       title: 'MCP 服务',
       label: 'MCP Server Config',
-      placeholder: '请输入MCP Server配置',
-      tip: '仅支持SSE、Streamable HTTP调用方式',
+      placeholder: '请输入 MCP Server 配置',
+      tip: '仅支持 SSE、Streamable HTTP 调用方式',
       requiredMessage: '请输入 MCP Server Config',
     },
     debug: {

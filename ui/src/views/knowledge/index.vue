@@ -52,13 +52,15 @@ const folderList = ref<any[]>([])
 
 function getFolder(bool?: boolean) {
   const params = {}
-  folder.asyncGetFolder(SourceTypeEnum.KNOWLEDGE, params, loading).then((res: any) => {
-    folderList.value = res.data
-    if (bool) {
-      // 初始化刷新
-      folder.setCurrentFolder(res.data?.[0] || {})
-    }
-  })
+  folder
+    .asyncGetFolder(SourceTypeEnum.KNOWLEDGE, params, apiType.value, loading)
+    .then((res: any) => {
+      folderList.value = res.data
+      if (bool) {
+        // 初始化刷新
+        folder.setCurrentFolder(res.data?.[0] || {})
+      }
+    })
 }
 
 function folderClickHandle(row: any) {

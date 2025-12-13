@@ -12,7 +12,7 @@
           </div>
           <div style="width: 90%">
             <slot name="title">
-              <span class="ellipsis-1 mb-4" :title="title" style="width: 80%">
+              <span class="ellipsis-1" :title="title" style="width: 80%">
                 {{ title }}
               </span>
             </slot>

@@ -11,18 +11,10 @@ export default {
   simplePlaceholder: '适用于初级用户使用表单设置构建AI对话助手',
   workflowPlaceholder: '适用于高级用户使用低代码拖拉拽方式构建复杂逻辑的AI对话助手',
   appTest: '调试预览',
-  searchBar: {
-    placeholder: '按名称搜索',
-  },
-  status: {
-    published: '已发布',
-    unpublished: '未发布',
-  },
 
   operation: {
     addModel: '添加模型',
     toChat: '去对话',
-    publish: '发布',
   },
   delete: {
     confirmTitle: '是否删除应用：',
@@ -34,6 +26,7 @@ export default {
     professionalMessage: '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。',
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
     loadingErrorMessage: '加载配置失败，请检查输入或稍后再试',
+    noDocPermission: '无文档创建权限',
   },
   editIcon: '编辑图标',
   iconType: '图标类型',
@@ -63,7 +56,6 @@ export default {
   chatPageConfig: '对话页面配置',
   form: {
     appName: {
-      label: '名称',
       placeholder: '请输入应用名称',
       requiredMessage: '请输入应用名称',
     },
@@ -71,7 +63,6 @@ export default {
       placeholder: '描述该应用的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题',
     },
     appType: {
-      label: '类型',
       simplePlaceholder: '适合新手创建小助手',
       workflowPlaceholder: '适合高级用户自定义小助手的工作流',
     },
@@ -142,7 +133,7 @@ export default {
       requiredMessage: '请选择语音播放模型',
       autoPlay: '自动播放',
       browser: '浏览器播放(免费)',
-      tts: 'TTS模型',
+      tts: 'TTS 模型',
       listeningTest: '试听',
     },
     reasoningContent: {
@@ -151,7 +142,7 @@ export default {
       start: '开始',
       end: '结束',
     },
-    mcp_output_enable: '输出MCP/工具执行过程',
+    mcp_output_enable: '输出 MCP/ 工具执行过程',
   },
   generateDialog: {
     label: '生成',
@@ -214,10 +205,10 @@ export default {
       title: '企业微信应用配置',
       cropId: '企业 ID',
       cropIdPlaceholder: '请输入企业 ID',
-      agentIdPlaceholder: '请输入Agent ID',
-      secretPlaceholder: '请输入Secret',
-      tokenPlaceholder: '请输入Token',
-      encodingAesKeyPlaceholder: '请输入EncodingAESKey',
+      agentIdPlaceholder: '请输入 Agent ID',
+      secretPlaceholder: '请输入 Secret',
+      tokenPlaceholder: '请输入 Token',
+      encodingAesKeyPlaceholder: '请输入 EncodingAESKey',
       authenticationSuccessful: '认证成功',
       urlInfo: '-应用管理-自建-创建的应用-接收消息-设置 API 接收的 "URL" 中',
     },
@@ -227,14 +218,14 @@ export default {
     },
     dingtalkSetting: {
       title: '钉钉应用配置',
-      clientIdPlaceholder: '请输入Client ID',
-      clientSecretPlaceholder: '请输入Client Secret',
-      urlInfo: '-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面URL填写到"消息接收地址"中',
+      clientIdPlaceholder: '请输入 Client ID',
+      clientSecretPlaceholder: '请输入 Client Secret',
+      urlInfo: '-机器人页面，设置 "消息接收模式" 为 HTTP模式 ，并把上面 URL 填写到"消息接收地址"中',
     },
     wechatSetting: {
       title: '公众号应用配置',
       appId: '开发者ID (APP ID)',
-      appIdPlaceholder: '请输入开发者ID (APP ID)',
+      appIdPlaceholder: '请输入开发者 ID (APP ID)',
       appSecret: '开发者密钥 (APP SECRET)',
       appSecretPlaceholder: '请输入开发者密钥 (APP SECRET)',
       token: '令牌 (TOKEN)',
@@ -245,11 +236,11 @@ export default {
     },
     larkSetting: {
       title: '飞书应用配置',
-      appIdPlaceholder: '请输入App ID',
-      appSecretPlaceholder: '请输入App Secret',
-      verificationTokenPlaceholder: '请输入Verification Token',
+      appIdPlaceholder: '请输入 App ID',
+      appSecretPlaceholder: '请输入 App Secret',
+      verificationTokenPlaceholder: '请输入 Verification Token',
       urlInfo: '-事件与回调-事件配置-配置订阅方式的 "请求地址" 中',
-      folderTokenPlaceholder: '请输入Folder Token',
+      folderTokenPlaceholder: '请输入 Folder Token',
     },
     slackSetting: {
       title: 'Slack 应用配置',
@@ -265,4 +256,5 @@ export default {
     emptyMessage2: '没有命中的分段',
   },
   publishTime: '发布时间',
+  publishStatus: '发布状态',
 }

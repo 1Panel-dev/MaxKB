@@ -93,6 +93,7 @@ const workspace = {
       ],
       'OR'
     ),
+  debug: () => false,
 }
 
 export default workspace

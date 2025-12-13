@@ -7,11 +7,16 @@ from models_provider.base_model_provider import (
     IModelProvider, ModelProvideInfo, ModelInfo, ModelTypeConst, ModelInfoManage
 )
 from models_provider.impl.aws_bedrock_model_provider.credential.embedding import BedrockEmbeddingCredential
+from models_provider.impl.aws_bedrock_model_provider.credential.image import BedrockVLModelCredential
 from models_provider.impl.aws_bedrock_model_provider.credential.llm import BedrockLLMModelCredential
+from models_provider.impl.aws_bedrock_model_provider.credential.reranker import BedrockRerankerCredential
 from models_provider.impl.aws_bedrock_model_provider.model.embedding import BedrockEmbeddingModel
+from models_provider.impl.aws_bedrock_model_provider.model.image import BedrockVLModel
 from models_provider.impl.aws_bedrock_model_provider.model.llm import BedrockModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
+
+from models_provider.impl.aws_bedrock_model_provider.model.reranker import BedrockRerankerModel
 
 
 def _create_model_info(model_name, description, model_type, credential_class, model_class):
@@ -127,11 +132,56 @@ def _initialize_model_info():
         ),
     ]
 
+    reranker_model_info_list = [
+        _create_model_info(
+            'amazon.rerank-v1:0',
+            '',
+            ModelTypeConst.RERANKER,
+            BedrockRerankerCredential,
+            BedrockRerankerModel
+        ),
+        _create_model_info(
+            'cohere.rerank-v3-5:0',
+            '',
+            ModelTypeConst.RERANKER,
+            BedrockRerankerCredential,
+            BedrockRerankerModel
+        )
+    ]
+    vl_model_info_list = [
+
+        _create_model_info(
+            'global.anthropic.claude-sonnet-4-5-20250929-v1:0',
+            '',
+            ModelTypeConst.IMAGE,
+            BedrockVLModelCredential,
+            BedrockVLModel
+        ),
+        _create_model_info(
+            'us.anthropic.claude-sonnet-4-5-20250929-v1:0',
+            '',
+            ModelTypeConst.IMAGE,
+            BedrockVLModelCredential,
+            BedrockVLModel
+        ),
+        _create_model_info(
+            'global.anthropic.claude-haiku-4-5-20251001-v1:0',
+            '',
+            ModelTypeConst.IMAGE,
+            BedrockVLModelCredential,
+            BedrockVLModel
+        ),
+    ]
+
     model_info_manage = ModelInfoManage.builder() \
         .append_model_info_list(model_info_list) \
         .append_default_model_info(model_info_list[0]) \
         .append_model_info_list(embedded_model_info_list) \
         .append_default_model_info(embedded_model_info_list[0]) \
+        .append_model_info_list(vl_model_info_list) \
+        .append_default_model_info(vl_model_info_list[0]) \
+        .append_model_info_list(reranker_model_info_list) \
+        .append_default_model_info(reranker_model_info_list[0]) \
         .build()
 
     return model_info_manage

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -53,9 +53,9 @@
         </el-form-item>
         <el-form-item
           prop="content_list"
-          :label="$t('views.applicationWorkflow.nodes.intentNode.input.label')"
+          :label="$t('workflow.nodes.intentNode.input.label')"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.textToSpeechNode.content.label'),
+            message: $t('workflow.nodes.textToSpeechNode.content.label'),
             trigger: 'change',
             required: true,
           }"
@@ -64,7 +64,7 @@
             <div class="flex-between">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.intentNode.input.label')
+                  >{{ $t('workflow.nodes.intentNode.input.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -74,7 +74,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.textToSpeechNode.content.label')"
+            :placeholder="$t('workflow.nodes.textToSpeechNode.content.label')"
             v-model="form_data.content_list"
           />
         </el-form-item>
@@ -94,7 +94,7 @@
             <div class="flex-between">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.intentNode.classify.label')
+                  >{{ $t('workflow.nodes.intentNode.classify.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -108,7 +108,7 @@
               <el-form-item
                 :prop="`branch.${index}.content`"
                 :rules="{
-                  message: $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder'),
+                  message: $t('common.inputPlaceholder'),
                   trigger: 'change',
                   required: true,
                 }"
@@ -119,9 +119,7 @@
                       v-model="item.content"
                       style="width: 210px"
                       :disabled="item.isOther"
-                      :placeholder="
-                        $t('views.applicationWorkflow.nodes.intentNode.classify.placeholder')
-                      "
+                      :placeholder="$t('common.inputPlaceholder')"
                     />
                   </el-col>
                   <el-col :span="3">
@@ -158,7 +156,7 @@ import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { randomId } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-const getApplicationDetail = inject('getApplicationDetail') as any
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
 const {
@@ -289,7 +287,7 @@ const form = {
     },
     {
       id: randomId(),
-      content: t('views.applicationWorkflow.nodes.intentNode.other'),
+      content: t('workflow.nodes.intentNode.other'),
       isOther: true,
     },
   ],
@@ -335,7 +333,7 @@ const validate = () => {
         form_data.value.branch.length !=
         new Set(form_data.value.branch.map((item: any) => item.content)).size
       ) {
-        throw t('views.applicationWorkflow.nodes.intentNode.error2')
+        throw t('workflow.nodes.intentNode.error2')
       }
     })
     .catch((err: any) => {
@@ -343,13 +341,13 @@ const validate = () => {
     })
 }
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'LLM',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'LLM',

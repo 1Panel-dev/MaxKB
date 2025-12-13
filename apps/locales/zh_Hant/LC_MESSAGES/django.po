@@ -2952,8 +2952,8 @@ msgstr "批量刷新文檔向量庫"
 
 #: apps/knowledge/views/document.py:466 apps/knowledge/views/document.py:467
 #: apps/knowledge/views/document.py:468
-msgid "Batch generate related documents"
-msgstr "批量生成相關文檔"
+msgid "Batch generate related problems"
+msgstr "批量生成相關問題"
 
 #: apps/knowledge/views/document.py:496 apps/knowledge/views/document.py:497
 #: apps/knowledge/views/document.py:498
@@ -5251,8 +5251,8 @@ msgstr "批量刷新文檔向量庫"
 #: apps/resource_manage/views/document.py:261
 #: apps/resource_manage/views/document.py:262
 #: apps/resource_manage/views/document.py:263
-msgid "Batch generate related system document"
-msgstr "批量生成相關文檔"
+msgid "Batch generate related system problems"
+msgstr "批量生成相關問題"
 
 #: apps/resource_manage/views/document.py:290
 #: apps/resource_manage/views/document.py:291
@@ -6071,8 +6071,8 @@ msgstr "批量刷新共享文檔向量庫"
 #: apps/shared/views/shared_document.py:262
 #: apps/shared/views/shared_document.py:263
 #: apps/shared/views/shared_document.py:264
-msgid "Batch generate related shared documents"
-msgstr "批量生成相關共享文檔"
+msgid "Batch generate related shared problems"
+msgstr "批量生成相關問題"
 
 #: apps/shared/views/shared_document.py:291
 #: apps/shared/views/shared_document.py:292
@@ -8894,3 +8894,101 @@ msgstr "不存在的ID"
 msgid "No permission for the target folder"
 msgstr "沒有目標資料夾的權限"
 
+msgid "Application token usage statistics"
+msgstr "應用令牌使用統計"
+
+msgid "Application top question statistics"
+msgstr "應用提問次數統計"
+
+msgid "SAML2 Metadata"
+msgstr "SAML2 元數據"
+
+msgid "SAML2 Log in"
+msgstr "SAML2 登入"
+
+msgid "SAML2 SSO"
+msgstr "SAML2 單點登入"
+
+msgid "Workflow"
+msgstr "工作流"
+
+msgid "Web source url"
+msgstr "Web 根地址"
+
+msgid "Web knowledge selector"
+msgstr "選擇器"
+
+msgid "The default is body, you can enter .classname/#idname/tagname"
+msgstr "默認為 body，可輸入 .classname/#idname/tagname"
+
+msgid "Please enter the Web root address"
+msgstr "請輸入 Web 根地址"
+
+msgid "File size exceeds limit"
+msgstr "文件大小超出限制"
+
+msgid "File upload is not enabled"
+msgstr "文件上傳未啟用"
+
+msgid "Blocked unsafe redirect to internal host"
+msgstr "阻止不安全的重定向到內部主機"
+
+msgid "Audio file recognition - Tongyi Qwen"
+msgstr "錄音文件識別-通義千問"
+
+msgid "Real-time speech recognition - Fun-ASR/Paraformer"
+msgstr "實時語音識別-Fun-ASR/Paraformer"
+
+msgid "Qwen-Omni"
+msgstr "多模態"
+
+msgid "Super-humanoid: Lingxiaoxuan Flow"
+msgstr "聆小璇"
+
+msgid "Super-humanoid: Lingyuyan Flow"
+msgstr "聆玉言"
+
+msgid "Super-humanoid: Lingfeiyi Flow"
+msgstr "聆飛逸"
+
+msgid "Super-humanoid: Lingxiaoyue Flow"
+msgstr "聆小玥"
+
+msgid "Super-humanoid: Sun Dasheng Flow"
+msgstr "孫大聖"
+
+msgid "Super-humanoid: Lingyuzhao Flow"
+msgstr "聆玉昭"
+
+msgid "Super-humanoid: Lingxiaotang Flow"
+msgstr "聆小糖"
+
+msgid "Super-humanoid: Lingxiaorong Flow"
+msgstr "聆小蓉"
+
+msgid "Super-humanoid: Xinyun Flow"
+msgstr "心雲"
+
+msgid "Super-humanoid: Grant (EN)"
+msgstr "Grant"
+
+msgid "Super-humanoid: Lila (EN)"
+msgstr "Lila"
+
+msgid "Super-humanoid: Lingwanwan Pro"
+msgstr "聆萬萬"
+
+msgid "Super-humanoid: Yiyi Pro"
+msgstr "依依"
+
+msgid "Super-humanoid: Huifangnv Pro"
+msgstr "惠芳女"
+
+msgid "Super-humanoid: Lingxiaoying Pro"
+msgstr "聆小穎"
+
+msgid "Super-humanoid: Lingfeibo Pro"
+msgstr "聆飛博"
+
+msgid "Super-humanoid: Lingyuyan Pro"
+msgstr "聆玉言"

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -31,7 +31,7 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 
@@ -56,6 +56,19 @@ const form_data = computed({
   }
 })
 
+const nodeCascaderRef = ref()
+const validate = () => {
+  return Promise.all([
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+  ]).catch((err: any) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
+}
+
+onMounted(() => {
+
+  set(props.nodeModel, 'validate', validate)
+})
 </script>
 
 <style lang="scss" scoped>

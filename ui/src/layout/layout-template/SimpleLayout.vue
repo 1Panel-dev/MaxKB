@@ -16,10 +16,11 @@ const {
 } = route as any
 const isShared = computed(() => {
   return (
-    folderId === 'shared' ||
-    from === 'systemShare' ||
-    from === 'systemManage' ||
-    route.path.includes('resource-management')
+    (folderId === 'shared' ||
+      from === 'systemShare' ||
+      from === 'systemManage' ||
+      route.path.includes('resource-management')) &&
+    route.fullPath != '/application'
   )
 })
 </script>
@@ -35,6 +36,7 @@ const isShared = computed(() => {
         show-icon
         :closable="false"
       />
+
       <SystemHeader v-if="isShared"></SystemHeader>
       <UserHeader v-else />
     </div>

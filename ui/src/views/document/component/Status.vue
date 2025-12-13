@@ -79,9 +79,9 @@ const stateMap: any = {
   [State.PENDING]: (type: number) => t('views.document.fileStatus.PENDING'),
   [State.STARTED]: (type: number) => startedMap[type],
   [State.REVOKE]: (type: number) => t('views.document.fileStatus.REVOKE'),
-  [State.REVOKED]: (type: number) => t('views.document.fileStatus.SUCCESS'),
-  [State.FAILURE]: (type: number) => t('views.document.fileStatus.FAILURE'),
-  [State.SUCCESS]: (type: number) => t('views.document.fileStatus.SUCCESS'),
+  [State.REVOKED]: (type: number) => t('common.status.success'),
+  [State.FAILURE]: (type: number) => t('common.status.fail'),
+  [State.SUCCESS]: (type: number) => t('common.status.success'),
 }
 </script>
 <style lang="scss" scoped></style>

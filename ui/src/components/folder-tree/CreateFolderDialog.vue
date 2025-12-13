@@ -50,7 +50,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
-import folderApi from '@/api/folder'
+import folderApi from '@/api/workspace/folder'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -138,7 +138,7 @@ const submitHandle = async () => {
           .then((res) => {
           MsgSuccess(t('common.createSuccess'))
           folder.setCurrentFolder(res.data)
-          folder.asyncGetFolder(sourceType.value, {}, loading)
+          folder.asyncGetFolder(sourceType.value, {}, 'workspace',loading)
           clearData()
           emit('refresh')
           dialogVisible.value = false

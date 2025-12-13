@@ -4,8 +4,8 @@
       <span style="height: 32px; width: 32px" :innerHTML="icon"></span>
     </template>
     <template #title>
-      <div class="flex" style="height: 22px">
-        <span class="ellipsis-1 mb-4" :title="model.name" style="max-width: 80%">
+      <div class="flex">
+        <span class="ellipsis-1" :title="model.name" style="max-width: 80%">
           {{ model.name }}
         </span>
         <span v-if="currentModel.status === 'ERROR'">

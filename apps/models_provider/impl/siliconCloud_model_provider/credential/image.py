@@ -1,7 +1,6 @@
 # coding=utf-8
 import base64
 import os
-import traceback
 from typing import Dict
 
 from langchain_core.messages import HumanMessage
@@ -56,7 +55,7 @@ class SiliconCloudImageModelCredential(BaseForm, BaseModelCredential):
             for chunk in res:
                 maxkb_logger.info(chunk)
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

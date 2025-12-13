@@ -27,17 +27,26 @@ const ModelRouter = {
 
     // 上传文档
     {
-      path: '/knowledge/document/upload/:folderId',
+      path: '/knowledge/document/upload/:folderId/:type',
       name: 'UploadDocument',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/UploadDocument.vue'),
       hidden: true,
     },
+    // 上传文档 - 飞书文档
     {
-      path: '/knowledge/import/:folderId',
+      path: '/knowledge/import/lark/:folderId',
       name: 'ImportLarkDocument',
       meta: { activeMenu: '/knowledge' },
       component: () => import('@/views/document/ImportLarkDocument.vue'),
+      hidden: true,
+    },
+    // 上传文档 - 工作流
+    {
+      path: '/knowledge/import/workflow/:folderId',
+      name: 'ImportWorkflowDocument',
+      meta: { activeMenu: '/knowledge' },
+      component: () => import('@/views/document/ImportWorkflowDocument.vue'),
       hidden: true,
     },
   ],

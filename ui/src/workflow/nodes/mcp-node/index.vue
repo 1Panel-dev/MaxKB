@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <div class="border-r-6 p-8-12 mb-8 layout-bg lighter">
       <el-form
         @submit.prevent
@@ -24,10 +24,7 @@
                 size="small"
                 style="width: 85px"
               >
-                <el-option
-                  :label="$t('views.applicationWorkflow.nodes.mcpNode.reference')"
-                  value="referencing"
-                />
+                <el-option :label="$t('workflow.nodes.mcpNode.reference')" value="referencing" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
             </div>
@@ -42,6 +39,7 @@
             :placeholder="mcpServerJson"
           />
           <el-select
+            :teleported="false"
             v-else
             v-model="form_data.mcp_tool_id"
             filterable
@@ -78,11 +76,16 @@
               <span>{{ $t('views.tool.title') }}</span>
               <el-button type="primary" link @click="getTools()">
                 <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-                {{ $t('views.applicationWorkflow.nodes.mcpNode.getTool') }}
+                {{ $t('workflow.nodes.mcpNode.getTool') }}
               </el-button>
             </div>
           </template>
-          <el-select v-model="form_data.mcp_tool" @change="changeTool" filterable>
+          <el-select
+            v-model="form_data.mcp_tool"
+            @change="changeTool"
+            filterable
+            :teleported="false"
+          >
             <el-option
               v-for="item in form_data.mcp_tools"
               :key="item.value"
@@ -106,7 +109,7 @@
       </el-form>
     </div>
     <h5 class="title-decoration-1 mb-8">
-      {{ $t('views.applicationWorkflow.nodes.mcpNode.toolParam') }}
+      {{ $t('workflow.nodes.mcpNode.toolParam') }}
     </h5>
     <template v-if="form_data.tool_params[form_data.params_nested]">
       <div class="p-8-12" v-if="!form_data.mcp_tool">
@@ -130,7 +133,11 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel v-if="item.label.attrs.tooltip" :label="item.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel
+                    v-if="item.label.attrs.tooltip"
+                    :label="item.label"
+                    :tooltip="item.label.attrs.tooltip"
+                  />
                   <span v-else>{{ item.label.label }}</span>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
@@ -141,10 +148,7 @@
                   style="width: 85px"
                   @change="form_data.tool_params[form_data.params_nested][item.label.label] = ''"
                 >
-                  <el-option
-                    :label="$t('views.applicationWorkflow.variable.Referencing')"
-                    value="referencing"
-                  />
+                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
                   <el-option :label="$t('common.custom')" value="custom" />
                 </el-select>
               </div>
@@ -171,7 +175,7 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('workflow.variable.placeholder')"
               v-model="form_data.tool_params[form_data.params_nested][item.label.label]"
             />
           </el-form-item>
@@ -200,7 +204,11 @@
             <template #label>
               <div class="flex-between">
                 <div>
-                  <TooltipLabel v-if="item.label.attrs.tooltip" :label="item.label" :tooltip="item.label.attrs.tooltip" />
+                  <TooltipLabel
+                    v-if="item.label.attrs.tooltip"
+                    :label="item.label"
+                    :tooltip="item.label.attrs.tooltip"
+                  />
                   <span v-else>{{ item.label.label }}</span>
                   <span v-if="item.required" class="color-danger">*</span>
                 </div>
@@ -211,10 +219,7 @@
                   style="width: 85px"
                   @change="form_data.tool_params[item.label.label] = ''"
                 >
-                  <el-option
-                    :label="$t('views.applicationWorkflow.variable.Referencing')"
-                    value="referencing"
-                  />
+                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
                   <el-option :label="$t('common.custom')" value="custom" />
                 </el-select>
               </div>
@@ -241,7 +246,7 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+              :placeholder="$t('workflow.variable.placeholder')"
               v-model="form_data.tool_params[item.label.label]"
             />
           </el-form-item>
@@ -264,6 +269,7 @@ import McpServerInputDialog from './component/McpServerInputDialog.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl } from '@/utils/common'
+import { WorkflowMode } from '@/enums/application'
 
 const props = defineProps<{ nodeModel: any }>()
 
@@ -271,8 +277,9 @@ const route = useRoute()
 const {
   params: { id },
 } = route as any
-const getApplicationDetail = inject('getApplicationDetail') as any
-const applicationDetail = getApplicationDetail()
+const getResourceDetail = inject('getResourceDetail') as any
+const workflow_mode: WorkflowMode = inject('workflowMode') || WorkflowMode.Application
+const resource = getResourceDetail()
 
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
@@ -329,17 +336,17 @@ async function mcpToolSelectChange() {
 
 function getTools() {
   if (form_data.value.mcp_source === 'referencing' && !form_data.value.mcp_tool_id) {
-    MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'))
+    MsgError(t('workflow.nodes.mcpNode.mcpToolTip'))
     return
   }
   if (form_data.value.mcp_source === 'referencing' && form_data.value.mcp_tool_id) {
     if (!mcpToolSelectOptions.value.find((item) => item.id === form_data.value.mcp_tool_id)) {
-      MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'))
+      MsgError(t('workflow.nodes.mcpNode.mcpToolTip'))
       return
     }
   }
   if (form_data.value.mcp_source === 'custom' && !form_data.value.mcp_servers) {
-    MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+    MsgError(t('workflow.nodes.mcpNode.mcpServerTip'))
     return
   }
   try {
@@ -350,7 +357,7 @@ function getTools() {
       return
     }
   } catch (e) {
-    MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+    MsgError(t('workflow.nodes.mcpNode.mcpServerTip'))
     return
   }
   // 一切正常，获取tool
@@ -358,11 +365,16 @@ function getTools() {
 }
 
 function _getTools(mcp_servers: any) {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
+  loadSharedApi({
+    type: [WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflow_mode)
+      ? 'application'
+      : 'knowledge',
+    systemType: apiType.value,
+  })
     .getMcpTools(id, mcp_servers, loading)
     .then((res: any) => {
       form_data.value.mcp_tools = res.data
-      MsgSuccess(t('views.applicationWorkflow.nodes.mcpNode.getToolsSuccess'))
+      MsgSuccess(t('workflow.nodes.mcpNode.getToolsSuccess'))
       // 修改了json，刷新mcp_server
       form_data.value.mcp_server = form_data.value.mcp_tools.find(
         (item: any) => item.name === form_data.value.mcp_tool,
@@ -553,13 +565,13 @@ const validate = async () => {
     if (!form.mcp_servers) {
       return Promise.reject({
         node: props.nodeModel,
-        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'),
+        errMessage: t('workflow.nodes.mcpNode.mcpServerTip'),
       })
     }
     if (!form.mcp_tool) {
       return Promise.reject({
         node: props.nodeModel,
-        errMessage: t('views.applicationWorkflow.nodes.mcpNode.mcpToolTip'),
+        errMessage: t('workflow.nodes.mcpNode.mcpToolTip'),
       })
     }
   }
@@ -571,7 +583,7 @@ function getMcpToolSelectOptions() {
       ? {
           scope: 'WORKSPACE',
           tool_type: 'MCP',
-          workspace_id: applicationDetail.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           scope: 'WORKSPACE',

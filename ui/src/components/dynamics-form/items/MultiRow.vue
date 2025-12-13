@@ -1,5 +1,5 @@
 <template>
-  <div class="radio_content">
+  <div class="multi_row">
     <div
       v-for="item in option_list"
       :key="item.value"
@@ -68,8 +68,8 @@ const option_list = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
-.radio_content {
-  height: 32px;
+.multi_row {
+  // height: 32px;
   display: inline-flex;
   border: 1px solid #bbbfc4;
   border-radius: 4px;

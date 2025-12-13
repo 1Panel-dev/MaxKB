@@ -140,7 +140,7 @@ import ResourceAuthorizationDrawer from '@/components/resource-authorization-dra
 import { t } from '@/locales'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
 import { i18n_name } from '@/utils/common'
-import folderApi from '@/api/folder'
+import folderApi from '@/api/workspace/folder'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import useStore from '@/stores'
@@ -249,7 +249,6 @@ const handleDrop = (draggingNode: any, dropNode: any, dropType: string, ev: Drag
     .putFolder(dragData.id, props.source, obj, loading)
     .then(() => {
       MsgSuccess(t('common.saveSuccess'))
-      emit('refreshTree')
     })
     .catch(() => {
       emit('refreshTree')

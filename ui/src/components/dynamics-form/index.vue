@@ -36,7 +36,7 @@
 import type { Dict } from '@/api/type/common'
 import FormItem from '@/components/dynamics-form/FormItem.vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { ref, onBeforeMount, watch, type Ref, computed } from 'vue'
+import { ref, onBeforeMount, watch, type Ref, nextTick } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type Result from '@/request/Result'
 import _ from 'lodash'
@@ -215,31 +215,34 @@ const render = (
     | (() => Promise<Result<Array<FormField>>>),
   data?: Dict<any>,
 ) => {
-  if (typeof render_data == 'string') {
-    get(render_data, {}, loading).then((ok) => {
-      formFieldList.value = ok.data
-    })
-  } else if (render_data instanceof Array) {
-    formFieldList.value = render_data
-  } else if (typeof render_data === 'function') {
-    render_data().then((ok: any) => {
-      formFieldList.value = ok.data
-      const form_data = data ? data : {}
-      if (form_data) {
-        const value = getFormDefaultValue(formFieldList.value, form_data)
-        formValue.value = _.cloneDeep(value)
-      }
-    })
-  } else {
-    render_data.then((ok) => {
-      formFieldList.value = ok.data
-    })
-  }
-  const form_data = data ? data : {}
-  if (form_data) {
-    const value = getFormDefaultValue(formFieldList.value, form_data)
-    formValue.value = _.cloneDeep(value)
-  }
+  formFieldList.value = []
+  nextTick(() => {
+    if (typeof render_data == 'string') {
+      get(render_data, {}, loading).then((ok) => {
+        formFieldList.value = ok.data
+      })
+    } else if (render_data instanceof Array) {
+      formFieldList.value = render_data
+    } else if (typeof render_data === 'function') {
+      render_data().then((ok: any) => {
+        formFieldList.value = ok.data
+        const form_data = data ? data : {}
+        if (form_data) {
+          const value = getFormDefaultValue(formFieldList.value, form_data)
+          formValue.value = _.cloneDeep(value)
+        }
+      })
+    } else {
+      render_data.then((ok) => {
+        formFieldList.value = ok.data
+      })
+    }
+    const form_data = data ? data : {}
+    if (form_data) {
+      const value = getFormDefaultValue(formFieldList.value, form_data)
+      formValue.value = _.cloneDeep(value)
+    }
+  })
 }
 const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
   form_data = form_data ? form_data : {}

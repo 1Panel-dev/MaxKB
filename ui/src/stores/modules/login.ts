@@ -86,6 +86,10 @@ const useLoginStore = defineStore('login', {
         return ok.data
       })
     },
+    async samlLogin() {
+      return LoginApi.samlLogin().then((ok) => {
+      })
+    }
   },
 })
 

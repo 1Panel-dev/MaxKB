@@ -4,9 +4,6 @@ export default {
   syncDocument: 'Sync Document',
   items: 'Items',
   migrateDocument: 'Migrate to',
-  searchBar: {
-    placeholder: 'Search by document name',
-  },
   setting: {
     migration: 'Move',
     cancelGenerateQuestion: 'Cancel Generating Questions',
@@ -25,9 +22,12 @@ export default {
     nameMessage: 'Document name cannot be empty!',
     importMessage: 'Successful',
     migrationSuccess: 'Successful',
+    replaceSuccess: 'Successful',
     fileLimitCountTip1: 'Maximum upload per time',
     fileLimitCountTip2: 'files',
     fileLimitSizeTip1: 'each file must not exceed',
+    toImportDocConfirm:
+      'The workflow of the current knowledge base is not published, and documents cannot be imported. Please publish the workflow first.',
   },
   upload: {
     selectFile: 'Select File',
@@ -94,10 +94,9 @@ export default {
     },
   },
   buttons: {
-    prev: 'Previous',
-    next: 'Next',
     import: 'Start Import',
     preview: 'Apply',
+    continueImporting: 'Continue Importing Documents',
   },
   tag: {
     label: 'Tag Management',
@@ -204,6 +203,5 @@ export default {
     selectDocument: 'Select Document',
     tip1: 'Only documents and tables are supported. Documents will be segmented based on titles, and tables will be converted to Markdown format before segmentation.',
     tip2: 'Before importing the document, it is recommended to standardize the document segmentation markers.',
-    allCheck: 'Select All',
   },
 }

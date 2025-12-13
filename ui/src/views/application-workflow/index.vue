@@ -6,18 +6,18 @@
         <h4 class="ellipsis" style="max-width: 300px" :title="detail?.name">{{ detail?.name }}</h4>
         <div v-if="showHistory && disablePublic">
           <el-text type="info" class="ml-16 color-secondary"
-            >{{ $t('views.applicationWorkflow.info.previewVersion') }}
+            >{{ $t('workflow.info.previewVersion') }}
             {{ currentVersion.name || datetimeFormat(currentVersion.update_time) }}</el-text
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
-          >{{ $t('views.applicationWorkflow.info.saveTime')
+          >{{ $t('workflow.info.saveTime')
           }}{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
       <div v-if="showHistory && disablePublic">
         <el-button type="primary" class="mr-8" @click="refreshVersion()">
-          {{ $t('views.applicationWorkflow.setting.restoreVersion') }}
+          {{ $t('workflow.setting.restoreVersion') }}
         </el-button>
         <el-divider direction="vertical" />
         <el-button text @click="closeHistory">
@@ -29,18 +29,18 @@
       <div v-else>
         <el-button @click="showPopover = !showPopover">
           <AppIcon iconName="app-add-outlined" class="mr-4" />
-          {{ $t('views.applicationWorkflow.setting.addComponent') }}
+          {{ $t('workflow.setting.addComponent') }}
         </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
-          {{ $t('views.applicationWorkflow.setting.debug') }}
+          {{ $t('common.debug') }}
         </el-button>
         <el-button @click="saveApplication(true)" v-if="permissionPrecise.edit(id)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
         <el-button type="primary" @click="publish" v-if="permissionPrecise.edit(id)">
-          {{ $t('views.application.operation.publish') }}
+          {{ $t('common.publish') }}
         </el-button>
 
         <el-dropdown trigger="click">
@@ -58,11 +58,11 @@
 
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
-                {{ $t('views.applicationWorkflow.setting.releaseHistory') }}
+                {{ $t('workflow.setting.releaseHistory') }}
               </el-dropdown-item>
               <el-dropdown-item>
                 <AppIcon iconName="app-save-outlined" class="color-secondary"></AppIcon>
-                {{ $t('views.applicationWorkflow.setting.autoSave') }}
+                {{ $t('workflow.setting.autoSave') }}
                 <div class="ml-4">
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
                 </div>
@@ -106,7 +106,7 @@
               </div>
 
               <h4 class="ellipsis" style="max-width: 270px" :title="detail?.name">
-                {{ detail?.name || $t('views.application.form.appName.label') }}
+                {{ detail?.name || $t('common.name') }}
               </h4>
             </div>
             <div class="mr-16">
@@ -145,7 +145,7 @@ import { ref, onMounted, onBeforeUnmount, computed, nextTick, provide } from 'vu
 import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
-import DropdownMenu from '@/views/application-workflow/component/DropdownMenu.vue'
+import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
@@ -159,7 +159,10 @@ import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-provide('getApplicationDetail', () => detail)
+import { WorkflowMode } from '@/enums/application'
+provide('getResourceDetail', () => detail)
+provide('workflowMode', WorkflowMode.Application)
+provide('loopWorkflowMode', WorkflowMode.ApplicationLoop)
 const { theme } = useStore()
 const router = useRouter()
 const route = useRoute()
@@ -209,9 +212,9 @@ const shareUrl = computed(
 
 function back() {
   if (JSON.stringify(cloneWorkFlow.value) !== JSON.stringify(getGraphData())) {
-    MsgConfirm(t('common.tip'), t('views.applicationWorkflow.tip.saveMessage'), {
-      confirmButtonText: t('views.applicationWorkflow.setting.exitSave'),
-      cancelButtonText: t('views.applicationWorkflow.setting.exit'),
+    MsgConfirm(t('common.tip'), t('workflow.tip.saveMessage'), {
+      confirmButtonText: t('workflow.setting.exitSave'),
+      cancelButtonText: t('workflow.setting.exit'),
       distinguishCancelAndClose: true,
     })
       .then(() => {
@@ -348,14 +351,14 @@ const publish = () => {
           if (typeof err_message == 'string') {
             MsgError(
               res.node.properties?.stepName +
-                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                ` ${t('workflow.node').toLowerCase()} ` +
                 err_message.toLowerCase(),
             )
           } else {
             const keys = Object.keys(err_message)
             MsgError(
               node.properties?.stepName +
-                ` ${t('views.applicationWorkflow.node').toLowerCase()} ` +
+                ` ${t('workflow.node').toLowerCase()} ` +
                 err_message[keys[0]]?.[0]?.message.toLowerCase(),
             )
           }
@@ -366,13 +369,13 @@ const publish = () => {
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message,
+          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-            ` ${t('views.applicationWorkflow.node')}，` +
+            ` ${t('workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
       }
@@ -404,13 +407,13 @@ const clickShowDebug = () => {
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
         MsgError(
-          res.node.properties?.stepName + ` ${t('views.applicationWorkflow.node')}，` + err_message,
+          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
         )
       } else {
         const keys = Object.keys(err_message)
         MsgError(
           node.properties?.stepName +
-            ` ${t('views.applicationWorkflow.node')}，` +
+            ` ${t('workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
       }

@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,7 +12,7 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.speechToTextNode.stt_model.label')"
+          :label="$t('workflow.nodes.speechToTextNode.stt_model.label')"
           prop="stt_model_id"
           :rules="{
             required: true,
@@ -24,7 +24,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.stt_model.label')
+                  >{{ $t('workflow.nodes.speechToTextNode.stt_model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -51,10 +51,10 @@
           ></ModelSelect>
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')"
+          :label="$t('workflow.nodes.speechToTextNode.audio.label')"
           prop="audio_list"
           :rules="{
-            message: $t('views.applicationWorkflow.nodes.speechToTextNode.audio.label'),
+            message: $t('workflow.nodes.speechToTextNode.audio.label'),
             trigger: 'change',
             required: true,
           }"
@@ -63,7 +63,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.speechToTextNode.audio.label')
+                  >{{ $t('workflow.nodes.speechToTextNode.audio.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -73,25 +73,24 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.nodes.speechToTextNode.audio.placeholder')"
+            :placeholder="$t('workflow.nodes.speechToTextNode.audio.placeholder')"
             v-model="form_data.audio_list"
           />
         </el-form-item>
 
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -116,8 +115,10 @@ import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import STTModeParamSettingDialog from '@/views/application/component/STTModelParamSettingDialog.vue'
-const getApplicationDetail = inject('getApplicationDetail') as any
+import { WorkflowMode } from '@/enums/application'
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const {
   params: { id },
@@ -134,7 +135,6 @@ const apiType = computed(() => {
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
 const STTModeParamSettingDialogRef = ref<InstanceType<typeof STTModeParamSettingDialog>>()
-
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const nodeCascaderRef = ref()
@@ -178,18 +178,13 @@ const form_data = computed({
   },
 })
 
-
 const openSTTParamSettingDialog = () => {
   const model_id = form_data.value.stt_model_id
   if (!model_id) {
     MsgSuccess(t('views.application.form.voiceInput.requiredMessage'))
     return
   }
-  STTModeParamSettingDialogRef.value?.open(
-      model_id,
-      id,
-      form_data.value.model_params_setting,
-    )
+  STTModeParamSettingDialogRef.value?.open(model_id, id, form_data.value.model_params_setting)
 }
 
 const refreshSTTForm = (data: any) => {
@@ -204,13 +199,13 @@ function sttModelChange(model_id: string) {
   }
 }
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'STT',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'STT',

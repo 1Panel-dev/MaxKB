@@ -38,7 +38,7 @@ from system_manage.serializers.user_resource_permission import UserResourcePermi
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
 from users.serializers.user import is_workspace_manage
 
-tool_executor = ToolExecutor(CONFIG.get('SANDBOX'))
+tool_executor = ToolExecutor()
 
 
 class ToolInstance:
@@ -354,7 +354,6 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
                 if instance.get('tool_type') == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
@@ -391,7 +390,6 @@ class ToolSerializer(serializers.Serializer):
         def test_connection(self):
             self.is_valid(raise_exception=True)
             # 校验代码是否包括禁止的关键字
-            ToolExecutor().validate_banned_keywords(self.data.get('code', ''))
             ToolExecutor().validate_mcp_transport(self.data.get('code', ''))
 
             # 校验mcp json
@@ -433,7 +431,7 @@ class ToolSerializer(serializers.Serializer):
 
         @staticmethod
         def convert_value(name: str, value: str, _type: str, is_required: bool):
-            if not is_required and value is None:
+            if not is_required and (value is None or (isinstance(value, str) and len(value.strip()) == 0)):
                 return None
             try:
                 if _type == 'int':
@@ -486,7 +484,6 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                ToolExecutor().validate_banned_keywords(instance.get('code', ''))
                 if instance.get('tool_type') == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
@@ -610,6 +607,7 @@ class ToolSerializer(serializers.Serializer):
                 workspace_id=self.data.get('workspace_id'),
                 input_field_list=tool.get('input_field_list'),
                 init_field_list=tool.get('init_field_list', []),
+                tool_type=tool.get('tool_type'),
                 folder_id=folder_id,
                 scope=scope,
                 is_active=False
@@ -810,7 +808,7 @@ class ToolSerializer(serializers.Serializer):
                 input_field_list=tool_data.get('input_field_list', []),
                 init_field_list=tool_data.get('init_field_list', []),
                 scope=ToolScope.WORKSPACE,
-                tool_type=ToolType.CUSTOM,
+                tool_type=tool_data.get('tool_type', ToolType.CUSTOM),
                 folder_id=instance.get('folder_id', self.data.get('workspace_id')),
                 template_id=self.data.get('tool_id'),
                 label=instance.get('label'),

@@ -1,4 +1,3 @@
-import traceback
 
 from common import forms
 from common.exception.app_exception import AppApiException
@@ -6,7 +5,7 @@ from common.forms import BaseForm, TooltipLabel
 from django.utils.translation import gettext_lazy as _, gettext
 
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-
+from common.utils.logger import maxkb_logger
 
 class TencentSSTModelParams(BaseForm):
     EngSerViceType = forms.SingleSelect(
@@ -71,7 +70,7 @@ class TencentSTTModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if raise_exception:
                 raise AppApiException(ValidCode.valid_error.value,
                                       gettext(

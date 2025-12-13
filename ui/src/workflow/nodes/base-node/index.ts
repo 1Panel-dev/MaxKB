@@ -15,8 +15,9 @@ class BaseModel extends AppNodeModel {
     return 600
   }
 }
+
 export default {
   type: 'base-node',
   model: BaseModel,
-  view: BaseNode
+  view: BaseNode,
 }

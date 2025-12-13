@@ -15,9 +15,6 @@ export default {
     batchDelete: '批量刪除',
     cancelRelated: '取消關聯'
   },
-  searchBar: {
-    placeholder: '按名稱搜尋'
-  },
   table: {
     paragraph_count: '關聯分段數',
     updateTime: '更新時間'

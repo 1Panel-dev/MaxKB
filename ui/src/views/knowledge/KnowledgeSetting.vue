@@ -8,7 +8,7 @@
             <h4 class="title-decoration-1 mb-16">
               {{ $t('common.info') }}
             </h4>
-            <BaseForm ref="BaseFormRef" :data="detail" :apiType="apiType"/>
+            <BaseForm ref="BaseFormRef" :data="detail" :apiType="apiType" />
 
             <el-form
               ref="webFormRef"
@@ -26,12 +26,12 @@
                 >
                   <div class="flex align-center">
                     <el-avatar class="mr-8 avatar-blue" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div>
                       <div>{{ $t('views.knowledge.knowledgeType.generalKnowledge') }}</div>
                       <el-text type="info"
-                      >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -44,7 +44,7 @@
                 >
                   <div class="flex align-center">
                     <el-avatar class="mr-8 avatar-purple" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div>
                       <div>{{ $t('views.knowledge.knowledgeType.webKnowledge') }}</div>
@@ -61,15 +61,42 @@
                   v-if="detail?.type === 2"
                 >
                   <div class="flex align-center">
-                    <el-avatar shape="square" :size="32" style="background: none">
-                      <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt=""/>
+                    <el-avatar
+                      class="mr-8"
+                      shape="square"
+                      :size="32"
+                      style="background: none"
+                    >
+                      <img src="@/assets/knowledge/logo_lark.svg" style="width: 100%" alt="" />
                     </el-avatar>
                     <div>
                       <p>
                         <el-text>{{ $t('views.knowledge.knowledgeType.larkKnowledge') }}</el-text>
                       </p>
                       <el-text type="info"
-                      >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
+                      </el-text>
+                    </div>
+                  </div>
+                </el-card>
+                <el-card
+                  shadow="never"
+                  class="mb-8 w-full layout-bg"
+                  style="line-height: 22px"
+                  v-if="detail?.type === 4"
+                >
+                  <div class="flex align-center">
+                    <el-avatar class="mr-8 avatar-orange" shape="square" :size="32">
+                      <img src="@/assets/knowledge/logo_workflow.svg" style="width: 60%" alt="" />
+                    </el-avatar>
+                    <div>
+                      <p>
+                        <el-text>{{
+                          $t('views.knowledge.knowledgeType.workflowKnowledge')
+                        }}</el-text>
+                      </p>
+                      <el-text type="info">
+                        {{ $t('views.knowledge.knowledgeType.workflowInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -141,7 +168,7 @@
                   <template #label>
                     <div class="flex align-center">
                       <span class="mr-4"
-                      >{{ $t('views.knowledge.form.file_size_limit.label') }}
+                        >{{ $t('views.knowledge.form.file_size_limit.label') }}
                       </span>
                       <el-tooltip
                         effect="dark"
@@ -170,8 +197,7 @@
                 v-if="!route.path.includes('share/') && permissionPrecise.edit(id)"
               >
                 {{ $t('common.save') }}
-              </el-button
-              >
+              </el-button>
             </div>
           </div>
         </el-scrollbar>
@@ -180,18 +206,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import {ref, onMounted, reactive, computed} from 'vue'
-import {useRoute} from 'vue-router'
+import { ref, onMounted, reactive, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import BaseForm from '@/views/knowledge/component/BaseForm.vue'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
 import permissionMap from '@/permission'
 
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const route = useRoute()
 const {
-  params: {id, folderId},
+  params: { id, folderId },
 } = route as any
 
 const apiType = computed(() => {
@@ -266,16 +292,16 @@ async function submit() {
         const obj =
           detail.value.type === 1 || detail.value.type === 2
             ? {
-              meta: form.value,
-              file_count_limit: form.value.file_count_limit,
-              file_size_limit: form.value.file_size_limit,
-              ...BaseFormRef.value.form,
-            }
+                meta: form.value,
+                file_count_limit: form.value.file_count_limit,
+                file_size_limit: form.value.file_size_limit,
+                ...BaseFormRef.value.form,
+              }
             : {
-              file_count_limit: form.value.file_count_limit,
-              file_size_limit: form.value.file_size_limit,
-              ...BaseFormRef.value.form,
-            }
+                file_count_limit: form.value.file_count_limit,
+                file_size_limit: form.value.file_size_limit,
+                ...BaseFormRef.value.form,
+              }
 
         if (cloneModelId.value !== BaseFormRef.value.form.embedding_model_id) {
           MsgConfirm(t('common.tip'), t('views.knowledge.tip.updateModeMessage'), {
@@ -283,20 +309,20 @@ async function submit() {
           })
             .then(() => {
               if (detail.value.type === 2) {
-                loadSharedApi({type: 'knowledge', systemType: apiType.value})
+                loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                   .putLarkKnowledge(id, obj, loading)
                   .then(() => {
-                    loadSharedApi({type: 'knowledge', systemType: apiType.value})
+                    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                       .putReEmbeddingKnowledge(id)
                       .then(() => {
                         MsgSuccess(t('common.saveSuccess'))
                       })
                   })
               } else {
-                loadSharedApi({type: 'knowledge', systemType: apiType.value})
+                loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                   .putKnowledge(id, obj, loading)
                   .then(() => {
-                    loadSharedApi({type: 'knowledge', systemType: apiType.value})
+                    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
                       .putReEmbeddingKnowledge(id)
                       .then(() => {
                         MsgSuccess(t('common.saveSuccess'))
@@ -304,17 +330,16 @@ async function submit() {
                   })
               }
             })
-            .catch(() => {
-            })
+            .catch(() => {})
         } else {
           if (detail.value.type === 2) {
-            loadSharedApi({type: 'knowledge', systemType: apiType.value})
+            loadSharedApi({ type: 'knowledge', systemType: apiType.value })
               .putLarkKnowledge(id, obj, loading)
               .then(() => {
                 MsgSuccess(t('common.saveSuccess'))
               })
           } else {
-            loadSharedApi({type: 'knowledge', systemType: apiType.value})
+            loadSharedApi({ type: 'knowledge', systemType: apiType.value })
               .putKnowledge(id, obj, loading)
               .then(() => {
                 MsgSuccess(t('common.saveSuccess'))
@@ -327,7 +352,7 @@ async function submit() {
 }
 
 function getDetail() {
-  loadSharedApi({type: 'knowledge', isShared: isShared.value, systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
     .getKnowledgeDetail(id, loading)
     .then((res: any) => {
       detail.value = res.data

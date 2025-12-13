@@ -89,5 +89,5 @@ class XlsParseTableHandle(BaseParseTableHandle):
 
             return md_tables
         except Exception as e:
-            max_kb.error(f'excel split handle error: {e}')
+            maxkb_logger.error(f'excel split handle error: {e}')
             return f'error: {e}'

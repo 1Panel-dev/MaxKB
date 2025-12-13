@@ -16,7 +16,7 @@
         v-loading="loading"
         @submit.prevent
       >
-        <el-form-item :label="$t('views.tool.form.toolName.label')" prop="name">
+        <el-form-item :label="$t('common.name')" prop="name">
           <div class="flex w-full">
             <div
               v-if="form.id"
@@ -34,7 +34,7 @@
                 <img :src="String(form.icon)" alt="" />
               </el-Avatar>
               <el-avatar v-else class="avatar-green" shape="square" :size="32">
-                <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+                <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -48,7 +48,7 @@
               </el-Avatar>
             </div>
             <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
-              <img src="@/assets/workflow/icon_tool.svg" style="width: 58%" alt="" />
+              <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-input
               v-model="form.name"

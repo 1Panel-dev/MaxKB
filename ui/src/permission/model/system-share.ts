@@ -42,5 +42,6 @@ const share = {
   folderEdit: () => false,
   folderAuth: () => false,
   folderDelete: () => false,
+  debug: () => false,
 }
 export default share

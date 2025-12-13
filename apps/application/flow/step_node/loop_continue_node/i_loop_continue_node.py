@@ -8,10 +8,11 @@
 """
 from typing import Type
 
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
-from django.utils.translation import gettext_lazy as _
 
 
 class ConditionSerializer(serializers.Serializer):
@@ -27,6 +28,7 @@ class LoopContinueNodeSerializer(serializers.Serializer):
 
 class ILoopContinueNode(INode):
     type = 'loop-continue-node'
+    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return LoopContinueNodeSerializer

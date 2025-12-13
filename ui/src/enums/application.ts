@@ -6,6 +6,7 @@ export enum SearchMode {
 
 export enum WorkflowType {
   Base = 'base-node',
+  KnowledgeBase = 'knowledge-base-node',
   Start = 'start-node',
   AiChat = 'ai-chat-node',
   SearchKnowledge = 'search-knowledge-node',
@@ -18,6 +19,7 @@ export enum WorkflowType {
   RerankerNode = 'reranker-node',
   Application = 'application-node',
   DocumentExtractNode = 'document-extract-node',
+  DocumentSplitNode = 'document-split-node',
   ImageUnderstandNode = 'image-understand-node',
   VariableAssignNode = 'variable-assign-node',
   FormNode = 'form-node',
@@ -37,10 +39,20 @@ export enum WorkflowType {
   VariableAggregationNode = 'variable-aggregation-node',
   VideoUnderstandNode = 'video-understand-node',
   ParameterExtractionNode = 'parameter-extraction-node',
+  DataSourceLocalNode = 'data-source-local-node',
+  DataSourceWebNode = 'data-source-web-node',
+  KnowledgeWriteNode = 'knowledge-write-node',
+}
+export enum WorkflowKind {
+  DataSource = 'data-source',
 }
 export enum WorkflowMode {
   // 应用工作流
   Application = 'application',
   // 应用工作流循环
   ApplicationLoop = 'application-loop',
+  // 知识库工作流
+  Knowledge = 'knowledge',
+  // 知识库工作流循环体
+  KnowledgeLoop = 'knowledge-loop',
 }

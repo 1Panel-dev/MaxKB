@@ -11,6 +11,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 from common.exception.app_exception import AppApiException
 
@@ -40,6 +41,7 @@ class ILoopNodeSerializer(serializers.Serializer):
 
 class ILoopNode(INode):
     type = 'loop-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.KNOWLEDGE]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ILoopNodeSerializer
@@ -52,5 +54,5 @@ class ILoopNode(INode):
                 array[1:])
         return self.execute(**{**self.node_params_serializer.data, "array": array}, **self.flow_params_serializer.data)
 
-    def execute(self, loop_type, array, number, loop_body, stream, **kwargs) -> NodeResult:
+    def execute(self, loop_type, array, number, loop_body, **kwargs) -> NodeResult:
         pass

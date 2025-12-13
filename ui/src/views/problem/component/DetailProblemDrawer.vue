@@ -74,10 +74,10 @@
           $t('views.problem.relateParagraph.title')
         }}</el-button>
         <el-button @click="pre" :disabled="pre_disable || loading">{{
-          $t('views.chatLog.buttons.prev')
+          $t('common.pages.prev')
         }}</el-button>
         <el-button @click="next" :disabled="next_disable || loading">{{
-          $t('views.chatLog.buttons.next')
+          $t('common.pages.next')
         }}</el-button>
       </div>
     </template>

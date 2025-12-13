@@ -25,20 +25,5 @@ class VolcanicEngineImage(MaxKBBaseModel, BaseChatOpenAI):
     def is_cache_model():
         return False
 
-    def upload_file_and_get_url(self, file_stream, file_name):
-        """上传文件并获取文件URL"""
-        base64_video = base64.b64encode(file_stream).decode("utf-8")
-        video_format = get_video_format(file_name)
-        return f'data:{video_format};base64,{base64_video}'
 
 
-
-def get_video_format(file_name):
-    extension = file_name.split('.')[-1].lower()
-    format_map = {
-        'mp4': 'video/mp4',
-        'avi': 'video/avi',
-        'mov': 'video/mov',
-        'wmv': 'video/x-ms-wmv'
-    }
-    return format_map.get(extension, 'video/mp4')

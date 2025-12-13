@@ -6,7 +6,7 @@
     @date：2024/12/11 17:57
     @desc:
 """
-
+from enum import Enum
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -90,6 +90,16 @@ class EdgeNode:
         self.node = node
 
 
+class WorkflowMode(Enum):
+    APPLICATION = "application"
+
+    APPLICATION_LOOP = "application-loop"
+
+    KNOWLEDGE = "knowledge"
+
+    KNOWLEDGE_LOOP = "knowledge-loop"
+
+
 class Workflow:
     """
     节点列表
@@ -112,7 +122,10 @@ class Workflow:
     """
     next_node_map: Dict[str, List[EdgeNode]]
 
-    def __init__(self, nodes: List[Node], edges: List[Edge]):
+    workflow_mode: WorkflowMode
+
+    def __init__(self, nodes: List[Node], edges: List[Edge],
+                 workflow_mode: WorkflowMode = WorkflowMode.APPLICATION.value):
         self.nodes = nodes
         self.edges = edges
         self.node_map = {node.id: node for node in nodes}
@@ -125,6 +138,7 @@ class Workflow:
         self.next_node_map = {key: [EdgeNode(edge, self.node_map.get(edge.targetNodeId)) for edge in edges] for
                               key, edges in
                               group_by(edges, key=lambda edge: edge.sourceNodeId).items()}
+        self.workflow_mode = workflow_mode
 
     def get_node(self, node_id):
         """
@@ -167,13 +181,13 @@ class Workflow:
         return [en.node for en in self.next_node_map.get(node_id, [])]
 
     @staticmethod
-    def new_instance(flow_obj: Dict):
+    def new_instance(flow_obj: Dict, workflow_mode: WorkflowMode = WorkflowMode.APPLICATION):
         nodes = flow_obj.get('nodes')
         edges = flow_obj.get('edges')
         nodes = [Node(node.get('id'), node.get('type'), **node)
                  for node in nodes]
         edges = [Edge(edge.get('id'), edge.get('type'), **edge) for edge in edges]
-        return Workflow(nodes, edges)
+        return Workflow(nodes, edges, workflow_mode)
 
     def get_start_node(self):
         return self.get_node('start-node')
@@ -190,10 +204,9 @@ class Workflow:
         self.is_valid_base_node()
         self.is_valid_work_flow()
 
-    @staticmethod
-    def is_valid_node_params(node: Node):
+    def is_valid_node_params(self, node: Node):
         from application.flow.step_node import get_node
-        get_node(node.type)(node, None, None)
+        get_node(node.type, self.workflow_mode)(node, None, None)
 
     def is_valid_node(self, node: Node):
         self.is_valid_node_params(node)

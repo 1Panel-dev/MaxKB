@@ -3,6 +3,7 @@ import zipfile
 from enum import Enum
 
 import uuid_utils.compat as uuid
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.db.models import QuerySet
@@ -23,6 +24,7 @@ class KnowledgeType(models.IntegerChoices):
     WEB = 1, 'web站点类型'
     LARK = 2, '飞书类型'
     YUQUE = 3, '语雀类型'
+    WORKFLOW = 4, '工作流类型'
 
 
 class TaskType(Enum):
@@ -135,6 +137,38 @@ class Knowledge(AppModelMixin):
         db_table = "knowledge"
 
 
+class KnowledgeWorkflow(AppModelMixin):
+    """
+    知识库工作流表
+    """
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.OneToOneField(Knowledge, on_delete=models.CASCADE, verbose_name="知识库",
+                                     db_constraint=False, related_name='workflow')
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    is_publish = models.BooleanField(verbose_name="是否发布", default=False, db_index=True)
+    publish_time = models.DateTimeField(verbose_name="发布时间", null=True, blank=True)
+
+    class Meta:
+        db_table = "knowledge_workflow"
+
+
+class KnowledgeWorkflowVersion(AppModelMixin):
+    """
+    知识库工作流版本表 - 记录工作流历史版本
+    """
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.CASCADE, verbose_name="知识库", db_constraint=False)
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
+    name = models.CharField(verbose_name="版本名称", max_length=128, default="")
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    publish_user_id = models.UUIDField(verbose_name="发布者id", max_length=128, default=None, null=True)
+    publish_user_name = models.CharField(verbose_name="发布者名称", max_length=128, default="")
+
+    class Meta:
+        db_table = "knowledge_workflow_version"
+
+
 def get_default_status():
     return Status('').__str__()
 
@@ -161,6 +195,7 @@ class Document(AppModelMixin):
 
     class Meta:
         db_table = "document"
+
 
 class Tag(AppModelMixin):
     """
@@ -206,6 +241,7 @@ class Paragraph(AppModelMixin):
     hit_num = models.IntegerField(verbose_name="命中次数", default=0)
     is_active = models.BooleanField(default=True, db_index=True)
     position = models.IntegerField(verbose_name="段落顺序", default=0, db_index=True)
+    chunks = ArrayField(verbose_name="块", base_field=models.CharField(), default=list)
 
     class Meta:
         db_table = "paragraph"

@@ -10,6 +10,7 @@ from typing import Type
 
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 from django.utils.translation import gettext_lazy as _
@@ -41,6 +42,7 @@ class RerankerStepNodeSerializer(serializers.Serializer):
 
 class IRerankerNode(INode):
     type = 'reranker-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return RerankerStepNodeSerializer
@@ -57,6 +59,6 @@ class IRerankerNode(INode):
 
                             reranker_list=reranker_list)
 
-    def execute(self, question, reranker_setting, reranker_list, reranker_model_id,show_knowledge,
+    def execute(self, question, reranker_setting, reranker_list, reranker_model_id, show_knowledge,
                 **kwargs) -> NodeResult:
         pass

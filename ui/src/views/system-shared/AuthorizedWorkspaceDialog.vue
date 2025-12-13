@@ -5,7 +5,7 @@
       <el-text class="color-secondary lighter">{{ $t('views.shared.authorized_tip') }}</el-text>
     </template>
 
-    <p class="mb-8 lighter">{{ $t('views.shared.type') }}</p>
+    <p class="mb-8 lighter">{{ $t('common.type') }}</p>
     <el-radio-group v-model="listType">
       <el-radio value="WHITE_LIST">{{ $t('views.shared.WHITE_LIST') }}</el-radio>
       <el-radio value="BLACK_LIST">{{ $t('views.shared.BLACK_LIST') }}</el-radio>
@@ -35,7 +35,7 @@
             @change="handleCheckAllChange"
             v-if="!search"
           >
-            {{ $t('views.shared.allCheck') }}
+            {{ $t('common.allCheck') }}
           </el-checkbox>
           <el-scrollbar max-height="205" wrap-class="p-16 pt-0">
             <el-checkbox-group

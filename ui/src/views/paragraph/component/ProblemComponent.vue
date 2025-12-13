@@ -34,7 +34,9 @@
             :label="item.content"
             :value="item.id"
           >
-            {{ item.content }}
+            <span class="ellipsis" :title="item.content" style="max-width: 255px" >
+              {{ item.content }}
+            </span>
           </el-option>
         </el-select>
         <template v-for="(item, index) in problemList" :key="index">

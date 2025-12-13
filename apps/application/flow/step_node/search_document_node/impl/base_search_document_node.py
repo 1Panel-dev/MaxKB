@@ -120,6 +120,9 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 field_value = self.workflow_manage.generate_prompt(condition['value'])
                 compare_type = condition['compare']
 
+                if not field_value or field_value == 'None' or len(field_value) == 0 :
+                    continue
+
                 # 构建查询条件
                 if compare_type == 'not_contain':
                     # 反向查询:找出包含该标签的文档,然后排除
@@ -155,6 +158,9 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 tag_key = condition['key']
                 field_value = self.workflow_manage.generate_prompt(condition['value'])
                 compare_type = condition['compare']
+
+                if not field_value or field_value == 'None' or len(field_value) == 0 :
+                    continue
 
                 if compare_type == 'not_contain':
                     # 反向查询:找出包含该标签的文档,然后用全集减去

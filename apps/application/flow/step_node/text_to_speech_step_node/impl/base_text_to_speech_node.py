@@ -4,6 +4,7 @@ import mimetypes
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.text_to_speech_step_node.i_text_to_speech_node import ITextToSpeechNode
 from common.utils.common import _remove_empty_lines
@@ -42,7 +43,7 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
-    def execute(self, tts_model_id, chat_id,
+    def execute(self, tts_model_id,
                 content, model_params_setting=None,
                 max_length=1024, **kwargs) -> NodeResult:
         # 分割文本为合理片段
@@ -77,25 +78,10 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
         output_buffer = io.BytesIO()
         combined_audio.export(output_buffer, format="mp3")
         combined_bytes = output_buffer.getvalue()
-
-        # 存储合并后的音频文件
         file_name = 'combined_audio.mp3'
         file = bytes_to_uploaded_file(combined_bytes, file_name)
-
-        application = self.workflow_manage.work_flow_post_handler.chat_info.application
-        meta = {
-            'debug': False if application.id else True,
-            'chat_id': chat_id,
-            'application_id': str(application.id) if application.id else None,
-        }
-
-        file_url = FileSerializer(data={
-            'file': file,
-            'meta': meta,
-            'source_id': meta['application_id'],
-            'source_type': FileSourceType.APPLICATION.value
-        }).upload()
-
+        # 存储合并后的音频文件
+        file_url = self.upload_file(file)
         # 生成音频标签
         audio_label = f'<audio src="{file_url}" controls style="width: 300px; height: 43px"></audio>'
         file_id = file_url.split('/')[-1]
@@ -110,6 +96,42 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             'answer': audio_label,
             'result': audio_list
         }, {})
+
+    def upload_file(self, file):
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.upload_knowledge_file(file)
+        return self.upload_application_file(file)
+
+    def upload_knowledge_file(self, file):
+        knowledge_id = self.workflow_params.get('knowledge_id')
+        meta = {
+            'debug': False,
+            'knowledge_id': knowledge_id,
+        }
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': knowledge_id,
+            'source_type': FileSourceType.KNOWLEDGE.value
+        }).upload()
+        return file_url
+
+    def upload_application_file(self, file):
+        application = self.workflow_manage.work_flow_post_handler.chat_info.application
+        chat_id = self.workflow_params.get('chat_id')
+        meta = {
+            'debug': False if application.id else True,
+            'chat_id': chat_id,
+            'application_id': str(application.id) if application.id else None,
+        }
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': meta['application_id'],
+            'source_type': FileSourceType.APPLICATION.value
+        }).upload()
+        return file_url
 
     def get_details(self, index: int, **kwargs):
         return {

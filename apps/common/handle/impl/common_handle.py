@@ -105,9 +105,17 @@ def xlsx_embed_cells_images(buffer) -> {}:
         cell_images_xml[cnv] = cell_images_rel.get(embed)
     result = {}
     for key, img in cell_images_xml.items():
-        image_excel_id_list = [_xl for _xl in
-                               reduce(lambda x, y: [*x, *y], [sheet for sheet_id, sheet in sheet_list.items()], []) if
-                               key in _xl]
+        all_cells = [
+            cell
+            for _sheet_id, sheet in sheet_list.items()
+            if sheet is not None
+            for cell in sheet or []
+        ]
+
+        image_excel_id_list = [
+            cell for cell in all_cells
+            if isinstance(cell, str) and key in cell
+        ]
         # print(key, img)
         if img is None:
             continue

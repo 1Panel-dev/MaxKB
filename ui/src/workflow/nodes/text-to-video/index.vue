@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,11 +12,11 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.textToVideoGenerate.model.label')"
+          :label="$t('workflow.nodes.textToVideoGenerate.model.label')"
           prop="model_id"
           :rules="{
             required: true,
-            message: $t('views.applicationWorkflow.nodes.textToVideoGenerate.model.requiredMessage'),
+            message: $t('workflow.nodes.textToVideoGenerate.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -24,7 +24,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.textToVideoGenerate.model.label')
+                  >{{ $t('workflow.nodes.textToVideoGenerate.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -43,12 +43,10 @@
           <ModelSelect
             @change="model_change"
             @wheel="wheel"
-             @focus="getSelectModel"
+            @focus="getSelectModel"
             :teleported="false"
             v-model="form_data.model_id"
-            :placeholder="
-              $t('views.applicationWorkflow.nodes.textToVideoGenerate.model.requiredMessage')
-            "
+            :placeholder="$t('workflow.nodes.textToVideoGenerate.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             :model-type="'TTV'"
@@ -56,7 +54,7 @@
         </el-form-item>
 
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.textToVideoGenerate.prompt.label')"
+          :label="$t('workflow.nodes.textToVideoGenerate.prompt.label')"
           prop="prompt"
           :rules="{
             required: true,
@@ -68,13 +66,13 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.applicationWorkflow.nodes.textToVideoGenerate.prompt.label')
+                  >{{ $t('workflow.nodes.textToVideoGenerate.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{ $t('views.applicationWorkflow.nodes.textToVideoGenerate.prompt.tooltip') }}
+                  >{{ $t('workflow.nodes.textToVideoGenerate.prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -82,14 +80,14 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            :title="$t('views.applicationWorkflow.nodes.textToVideoGenerate.prompt.label')"
+            :title="$t('workflow.nodes.textToVideoGenerate.prompt.label')"
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.textToVideoGenerate.negative_prompt.label')"
+          :label="$t('workflow.nodes.textToVideoGenerate.negative_prompt.label')"
           prop="prompt"
           :rules="{
             required: false,
@@ -101,14 +99,12 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span>{{
-                  $t('views.applicationWorkflow.nodes.textToVideoGenerate.negative_prompt.label')
+                  $t('workflow.nodes.textToVideoGenerate.negative_prompt.label')
                 }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
-                  >{{
-                    $t('views.applicationWorkflow.nodes.textToVideoGenerate.negative_prompt.tooltip')
-                  }}
+                  >{{ $t('workflow.nodes.textToVideoGenerate.negative_prompt.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -116,29 +112,28 @@
           </template>
           <MdEditorMagnify
             @wheel="wheel"
-            :title="$t('views.applicationWorkflow.nodes.textToVideoGenerate.negative_prompt.label')"
+            :title="$t('workflow.nodes.textToVideoGenerate.negative_prompt.label')"
             v-model="form_data.negative_prompt"
             :placeholder="
-              $t('views.applicationWorkflow.nodes.textToVideoGenerate.negative_prompt.placeholder')
+              $t('workflow.nodes.textToVideoGenerate.negative_prompt.placeholder')
             "
             style="height: 150px"
             @submitDialog="submitNegativeDialog"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -161,8 +156,10 @@ import AIModeParamSettingDialog from '@/views/application/component/AIModeParamS
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-const getApplicationDetail = inject('getApplicationDetail') as any
+import { WorkflowMode } from '@/enums/application'
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const {
   params: { id },
@@ -197,7 +194,7 @@ const wheel = (e: any) => {
   }
 }
 
-const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
@@ -225,13 +222,13 @@ const form_data = computed({
   },
 })
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
           model_type: 'TTV',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'TTV',

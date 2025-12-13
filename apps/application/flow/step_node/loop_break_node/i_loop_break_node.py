@@ -11,6 +11,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode
 from application.flow.i_step_node import NodeResult
 
@@ -28,6 +29,7 @@ class LoopBreakNodeSerializer(serializers.Serializer):
 
 class ILoopBreakNode(INode):
     type = 'loop-break-node'
+    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return LoopBreakNodeSerializer

@@ -4,9 +4,6 @@ export default {
   createSuccess: '创建成功',
   copy: '复制',
   copySuccess: '复制成功',
-  publishStatus: '发布状态',
-  published: '已发布',
-  unpublished: '未发布',
   copyError: '复制失败',
   save: '保存',
   saveSuccess: '保存成功',
@@ -51,6 +48,7 @@ export default {
   classify: '分类',
   reason: '理由',
   removeSuccess: '移除成功',
+  publish: '发布',
   searchBar: {
     placeholder: '按名称搜索',
   },
@@ -62,6 +60,9 @@ export default {
     other: '其他文件',
     addExtensions: '添加后缀名',
     existingExtensionsTip: '文件后缀已存在',
+    localUpload: '本地文件',
+    urlUpload: 'URL 地址',
+    uploadMethodTip: '请选择上传方式',
   },
   status: {
     label: '状态',
@@ -70,6 +71,12 @@ export default {
     disabled: '已禁用',
     enableSuccess: '启用成功',
     disableSuccess: '禁用成功',
+    published: '已发布',
+    unpublished: '未发布',
+    success: '成功',
+    fail: '失败',
+    all: '全部',
+    padding: '执行中',
   },
   param: {
     outputParam: '输出参数',
@@ -80,6 +87,7 @@ export default {
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '请输入',
+  inputContent: '输入内容',
   selectPlaceholder: '请选择',
   title: '标题',
   content: '内容',
@@ -121,4 +129,14 @@ export default {
     placeholder: '请输入提示词',
   },
   variable: '变量',
+  allCheck: '全选',
+  type: '类型',
+  pages: {
+    prev: '上一条',
+    next: '下一条',
+  },
+  steps: {
+    prev: '上一步',
+    next: '下一步',
+  },
 }

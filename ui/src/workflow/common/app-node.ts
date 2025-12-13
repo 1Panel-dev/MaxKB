@@ -1,3 +1,4 @@
+import { WorkflowKind } from './../../enums/application'
 import Components from '@/components'
 import ElementPlus from 'element-plus'
 import * as ElementPlusIcons from '@element-plus/icons-vue'
@@ -65,24 +66,44 @@ class AppNode extends HtmlResize.view {
     if (this.props.model.type === 'start-node') {
       result.push({
         value: 'global',
-        label: t('views.applicationWorkflow.variable.global'),
+        label: t('workflow.variable.global'),
         type: 'global',
         children: this.props.model.properties?.config?.globalFields || [],
       })
       result.push({
         value: 'chat',
-        label: t('views.applicationWorkflow.variable.chat'),
+        label: t('workflow.variable.chat'),
         type: 'chat',
         children: this.props.model.properties?.config?.chatFields || [],
       })
     }
-    result.push({
+    if (this.props.model.type === 'knowledge-base-node') {
+      let globalFields = []
+      if (this.props.model.properties.user_input_field_list) {
+        globalFields = this.props.model.properties.user_input_field_list.map((item: any) => ({
+          label: typeof item.label == 'string' ? item.label : item.label.label,
+          value: item.field,
+        }))
+      }
+
+      result.push({
+        value: 'global',
+        label: t('workflow.variable.global'),
+        type: 'global',
+        children: globalFields,
+      })
+    }
+    const value: any = {
       value: this.props.model.id,
       icon: this.props.model.properties.node_data?.icon,
       label: this.props.model.properties.stepName,
       type: this.props.model.type,
       children: this.props.model.properties?.config?.fields || [],
-    })
+    }
+    if (this.props.model.properties.kind) {
+      value['kind'] = this.props.model.properties.kind
+    }
+    result.push(value)
     return result
   }
   get_up_node_field_dict(contain_self: boolean, use_cache: boolean) {
@@ -107,10 +128,17 @@ class AppNode extends HtmlResize.view {
       (pre, next) => [...pre, ...next],
       [],
     )
-    const start_node_field_list = (
-      this.props.graphModel.getNodeModelById('start-node') ||
-      this.props.graphModel.getNodeModelById('loop-start-node')
-    ).get_node_field_list()
+    const start_node_field_list =
+      (
+        this.props.graphModel.getNodeModelById('start-node') ||
+        this.props.graphModel.getNodeModelById('loop-start-node')
+      )?.get_node_field_list() || []
+    const kbn = this.props.graphModel.getNodeModelById('knowledge-base-node')
+    if (kbn) {
+      const knowledgeBaseFieldList = kbn.get_node_field_list()
+      return [...knowledgeBaseFieldList, ...start_node_field_list, ...result]
+    }
+
     return [...start_node_field_list, ...result]
   }
 
@@ -381,13 +409,13 @@ class AppNodeModel extends HtmlResize.model {
       return false
     }
     const circleOnlyAsTarget = {
-      message: t('views.applicationWorkflow.tip.onlyRight'),
+      message: t('workflow.tip.onlyRight'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any) => {
         return sourceAnchor.type === 'right'
       },
     }
     this.sourceRules.push({
-      message: t('views.applicationWorkflow.tip.notRecyclable'),
+      message: t('workflow.tip.notRecyclable'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
         if (targetNode.id == sourceNode.id) {
           return false
@@ -403,7 +431,7 @@ class AppNodeModel extends HtmlResize.model {
 
     this.sourceRules.push(circleOnlyAsTarget)
     this.targetRules.push({
-      message: t('views.applicationWorkflow.tip.onlyLeft'),
+      message: t('workflow.tip.onlyLeft'),
       validate: (sourceNode: any, targetNode: any, sourceAnchor: any, targetAnchor: any) => {
         return targetAnchor.type === 'left'
       },
@@ -413,9 +441,11 @@ class AppNodeModel extends HtmlResize.model {
     const { id, x, y, width } = this
     const showNode = this.properties.showNode === undefined ? true : this.properties.showNode
     const anchors: any = []
-
-    if (this.type !== WorkflowType.Base) {
-      if (![WorkflowType.Start, WorkflowType.LoopStartNode.toString()].includes(this.type)) {
+    if (![WorkflowType.Base as string, WorkflowType.KnowledgeBase as string].includes(this.type)) {
+      if (
+        ![WorkflowType.Start, WorkflowType.LoopStartNode.toString()].includes(this.type) &&
+        this.properties.kind != WorkflowKind.DataSource
+      ) {
         anchors.push({
           x: x - width / 2 + 10,
           y: showNode ? y : y - 15,

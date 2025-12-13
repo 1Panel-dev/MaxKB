@@ -17,7 +17,7 @@
         v-loading="loading"
         @submit.prevent
       >
-        <el-form-item :label="$t('views.tool.form.mcpName.label')" prop="name">
+        <el-form-item :label="$t('common.name')" prop="name">
           <div class="flex w-full">
             <div
               v-if="form.id"
@@ -36,7 +36,7 @@
               </el-Avatar>
 
               <el-avatar v-else shape="square" :size="32">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <el-Avatar
                 v-if="showEditIcon"
@@ -51,7 +51,7 @@
             </div>
 
             <el-avatar v-else shape="square" :size="32" class="mr-12">
-              <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+              <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
             </el-avatar>
             <el-input
               v-model="form.name"
@@ -253,7 +253,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           throw new Error('Code must be a valid JSON object')
         }
       } catch (e) {
-        MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+        MsgError(t('workflow.nodes.mcpNode.mcpServerTip'))
         return
       }
       loading.value = true

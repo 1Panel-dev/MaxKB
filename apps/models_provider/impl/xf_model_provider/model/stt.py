@@ -159,7 +159,6 @@ class XFSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                         "audio": str(base64.b64encode(buf), 'utf-8'),
                         "encoding": "lame"}
                 }
-                print(d)
                 d = json.dumps(d)
                 await ws.send(d)
                 status = STATUS_CONTINUE_FRAME

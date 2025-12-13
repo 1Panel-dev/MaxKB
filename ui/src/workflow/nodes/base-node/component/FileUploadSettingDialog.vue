@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.title')"
+    :title="$t('workflow.nodes.baseNode.FileUploadSetting.title')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -19,9 +19,7 @@
           :model="form_data"
           require-asterisk-position="right"
         >
-          <el-form-item
-            :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.maxFiles')"
-          >
+          <el-form-item :label="$t('workflow.nodes.baseNode.FileUploadSetting.maxFiles')">
             <el-slider
               v-model="form_data.maxFiles"
               show-input
@@ -30,9 +28,7 @@
               :max="100"
             />
           </el-form-item>
-          <el-form-item
-            :label="$t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileLimit')"
-          >
+          <el-form-item :label="$t('workflow.nodes.baseNode.FileUploadSetting.fileLimit')">
             <el-slider
               v-model="form_data.fileLimit"
               show-input
@@ -42,9 +38,7 @@
             />
           </el-form-item>
           <el-form-item
-            :label="
-              $t('views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')
-            "
+            :label="$t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.label')"
           >
             <el-card
               shadow="hover"
@@ -62,7 +56,7 @@
                       <el-text class="color-secondary"
                         >{{
                           $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText',
+                            'workflow.nodes.baseNode.FileUploadSetting.fileUploadType.documentText',
                           )
                         }}
                       </el-text>
@@ -91,9 +85,7 @@
                       {{ $t('common.fileUpload.image') }}
                       <el-text class="color-secondary"
                         >{{
-                          $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText',
-                          )
+                          $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.imageText')
                         }}
                       </el-text>
                     </p>
@@ -122,9 +114,7 @@
                       {{ $t('common.fileUpload.audio') }}
                       <el-text class="color-secondary"
                         >{{
-                          $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText',
-                          )
+                          $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.audioText')
                         }}
                       </el-text>
                     </p>
@@ -157,9 +147,7 @@
                       {{ $t('common.fileUpload.video') }}
                       <el-text class="color-secondary"
                         >{{
-                          $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.videoText',
-                          )
+                          $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.videoText')
                         }}
                       </el-text>
                     </p>
@@ -187,9 +175,7 @@
                       {{ $t('common.fileUpload.other') }}
                       <el-text class="color-secondary"
                         >{{
-                          $t(
-                            'views.applicationWorkflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText',
-                          )
+                          $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.otherText')
                         }}
                       </el-text>
                     </p>
@@ -230,6 +216,24 @@
                 />
               </div>
             </el-card>
+            <el-form-item
+              :label="$t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')"
+            >
+              <template #label>
+                <span>
+                  {{ $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')
+                  }}<span class="color-danger">*</span>
+                </span>
+              </template>
+              <div class="flex align-center">
+                <el-checkbox v-model="form_data.local_upload" class="mr-16">
+                  {{ $t('common.fileUpload.localUpload') }}
+                </el-checkbox>
+                <el-checkbox v-model="form_data.url_upload">
+                  {{ $t('common.fileUpload.urlUpload') }}
+                </el-checkbox>
+              </div>
+            </el-form-item>
           </el-form-item>
         </el-form>
       </div>
@@ -276,6 +280,8 @@ const form_data = ref({
   video: false,
   other: false,
   otherExtensions: ['PPT', 'DOC'],
+  local_upload: true,
+  url_upload: false,
 })
 
 function open(data: any) {
@@ -321,6 +327,10 @@ const handleInputConfirm = () => {
 
 async function submit() {
   const formEl = fieldFormRef.value
+  if (!form_data.value.local_upload && !form_data.value.url_upload) {
+    MsgWarning(t('common.fileUpload.uploadMethodTip'))
+    return
+  }
   if (!formEl) return
   await formEl.validate().then(() => {
     const formattedData = cloneDeep(form_data.value)

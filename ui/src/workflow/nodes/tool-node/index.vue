@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-16">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-16">{{ $t('workflow.nodeSetting') }}</h5>
     <div class="flex-between">
       <h5 class="lighter mb-8">{{ $t('common.param.inputParam') }}</h5>
       <el-button link type="primary" @click="openAddDialog()">
@@ -38,7 +38,12 @@
                         {{ item.name }}
                       </auto-tooltip>
                     </div>
-                    <el-tooltip v-if="item.desc" effect="dark" placement="right" popper-class="max-w-200">
+                    <el-tooltip
+                      v-if="item.desc"
+                      effect="dark"
+                      placement="right"
+                      popper-class="max-w-200"
+                    >
                       <template #content>
                         {{ item.desc }}
                       </template>
@@ -94,19 +99,18 @@
       </div>
 
       <el-form-item
-        :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+        :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
         @click.prevent
+        v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
       >
         <template #label>
           <div class="flex align-center">
             <div class="mr-4">
-              <span>{{
-                $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-              }}</span>
+              <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
             </div>
             <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
               <template #content>
-                {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
               </template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>
@@ -123,10 +127,11 @@ import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import FieldFormDialog from '@/views/tool/component/FieldFormDialog.vue'
 import { isLastNode } from '@/workflow/common/data'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const props = defineProps<{ nodeModel: any }>()
 
 const wheel = (e: any) => {

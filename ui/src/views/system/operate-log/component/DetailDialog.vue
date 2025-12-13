@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.operateLog.table.opt.label')"
+    :title="$t('views.operateLog.table.opt')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -15,7 +15,7 @@
     <template #footer>
       <span class="dialog-footer mt-16">
         <el-button @click.prevent="dialogVisible = false">
-          {{ $t('views.operateLog.close') }}
+          {{ $t('common.close') }}
         </el-button>
       </span>
     </template>

@@ -30,6 +30,7 @@ from common.event.common import work_thread_pool
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
+from common.handle.impl.qa.md_parse_qa_handle import MarkdownParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
 from common.handle.impl.qa.zip_parse_qa_handle import ZipParseQAHandle
@@ -75,6 +76,7 @@ split_handles = [
     default_split_handle
 ]
 
+md_qa_split_handle = MarkdownParseQAHandle()
 parse_qa_handle_list = [XlsParseQAHandle(), CsvParseQAHandle(), XlsxParseQAHandle(), ZipParseQAHandle()]
 parse_table_handle_list = [CsvParseTableHandle(), XlsParseTableHandle(), XlsxParseTableHandle()]
 
@@ -555,7 +557,7 @@ class DocumentSerializers(serializers.Serializer):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get('workspace_id')
             query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
-            if workspace_id:
+            if workspace_id and workspace_id != 'None':
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _('Knowledge id does not exist'))
@@ -816,7 +818,7 @@ class DocumentSerializers(serializers.Serializer):
 
         @post(post_function=post_embedding)
         @transaction.atomic
-        def save(self, instance: Dict, with_valid=False, **kwargs):
+        def save(self, instance: Dict, with_valid=True, **kwargs):
             if with_valid:
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
@@ -1568,6 +1570,11 @@ class DocumentSerializers(serializers.Serializer):
 
                 # 读取新文件内容
                 file_content = file.read()
+
+                QuerySet(File).filter(
+                    sha256_hash=original_hash,
+                    source_id__in=[self.data.get('knowledge_id'), self.data.get('document_id')]
+                ).update(file_name=file.name)
 
                 # 查找所有具有相同sha256_hash的文件
                 files_to_update = QuerySet(File).filter(

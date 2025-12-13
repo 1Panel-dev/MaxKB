@@ -131,12 +131,10 @@ const promptTemplates = {
   INIT_TEMPLATE: `
 请根据用户描述生成一个完整的AI角色人设模板:
 
-应用名称：{application_name}
-应用描述：{detail}
 用户需求：{userInput}
 
 重要说明：
-1. 角色设定必须服务于"{application_name}"应用的核心功能
+1. 角色设定必须服务于"{userInput}"内容设定应用的核心功能
 2. 允许用户对角色设定的具体内容进行调整和优化
 3. 如果用户要求修改某个技能或部分，在保持应用主题的前提下进行相应调整
 

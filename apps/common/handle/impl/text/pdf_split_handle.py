@@ -91,42 +91,59 @@ class PdfSplitHandle(BaseSplitHandle):
 
     @staticmethod
     def handle_pdf_content(file, pdf_document):
+        # 第一步:收集所有字体大小
+        font_sizes = []
+        for page_num in range(len(pdf_document)):
+            page = pdf_document.load_page(page_num)
+            blocks = page.get_text("dict")["blocks"]
+            for block in blocks:
+                if block["type"] == 0:
+                    for line in block["lines"]:
+                        for span in line["spans"]:
+                            if span["size"] > 0:
+                                font_sizes.append(span["size"])
+
+        # 计算正文字体大小(众数)
+        if not font_sizes:
+            body_font_size = 12
+        else:
+            from collections import Counter
+            body_font_size = Counter(font_sizes).most_common(1)[0][0]
+
+        # 第二步:提取内容
         content = ""
         for page_num in range(len(pdf_document)):
             start_time = time.time()
             page = pdf_document.load_page(page_num)
-            text = page.get_text()
+            blocks = page.get_text("dict")["blocks"]
 
-            if text and text.strip():  # 如果页面中有文本内容
-                page_content = text
-            else:
-                try:
-                    new_doc = fitz.open()
-                    new_doc.insert_pdf(pdf_document, from_page=page_num, to_page=page_num)
-                    page_num_pdf = tempfile.gettempdir() + f"/{file.name}_{page_num}.pdf"
-                    new_doc.save(page_num_pdf)
-                    new_doc.close()
+            for block in blocks:
+                if block["type"] == 0:  # 文本块
+                    for line in block["lines"]:
+                        if not line["spans"]:
+                            continue
 
-                    loader = PyPDFLoader(page_num_pdf, extract_images=True)
-                    page_content = "\n" + loader.load()[0].page_content
-                except NotImplementedError as e:
-                    # 文件格式不支持，直接退出
-                    raise e
-                except BaseException as e:
-                    # 当页出错继续进行下一页，防止一个页面出错导致整个文件解析失败
-                    maxkb_logger.error(f"File: {file.name}, Page: {page_num + 1}, error: {e}")
-                    continue
-                finally:
-                    os.remove(page_num_pdf)
+                        text = "".join([span["text"] for span in line["spans"]])
+                        font_size = line["spans"][0]["size"]
 
-            content += page_content
+                        # 根据与正文字体的差值判断
+                        size_diff = font_size - body_font_size
 
-            # Null characters are not allowed.
+                        if size_diff > 2:  # 明显大于正文
+                            content += f"## {text}\n\n"
+                        elif size_diff > 0.5:  # 略大于正文
+                            content += f"### {text}\n\n"
+                        else:  # 正文
+                            content += f"{text}\n"
+
+                elif block["type"] == 1:  # 图片块
+                    content += f"![image](image_{page_num}_{block['number']})\n\n"
+
             content = content.replace('\0', '')
 
             elapsed_time = time.time() - start_time
             maxkb_logger.debug(
-                f"File: {file.name}, Page: {page_num + 1}, Time : {elapsed_time: .3f}s,   content-length: {len(page_content)}")
+                f"File: {file.name}, Page: {page_num + 1}, Time: {elapsed_time:.3f}s")
 
         return content
 

@@ -97,26 +97,21 @@
                   </div>
                 </div>
               </el-dropdown-item>
-              <!-- <el-dropdown-item>
+              <el-dropdown-item @click="openCreateDialog(CreateWorkflowKnowledgeDialog)">
                 <div class="flex">
-                  <el-avatar
-                    class="avatar-purple mt-4"
-                    shape="square"
-                    :size="32"
-                    style="background: none"
-                  >
-                    <img src="@/assets/knowledge/logo_yuque.svg" alt="" />
+                  <el-avatar class="avatar-orange mt-4" shape="square" :size="32">
+                    <img src="@/assets/knowledge/logo_workflow.svg" style="width: 60%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">
-                      {{ $t('views.knowledge.knowledgeType.yuqueKnowledge') }}
+                      {{ $t('views.knowledge.knowledgeType.workflowKnowledge') }}
                     </div>
                     <el-text type="info" size="small"
-                      >{{ $t('views.knowledge.knowledgeType.yuqueInfo') }}
+                      >{{ $t('views.knowledge.knowledgeType.workflowInfo') }}
                     </el-text>
                   </div>
                 </div>
-              </el-dropdown-item> -->
+              </el-dropdown-item>
               <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -147,33 +142,6 @@
       >
         <el-row v-if="knowledge.knowledgeList.length > 0" :gutter="15" class="w-full">
           <template v-for="(item, index) in knowledge.knowledgeList" :key="index">
-            <!-- <el-col
-              v-if="item.resource_type === 'folder'"
-              :xs="24"
-              :sm="12"
-              :md="12"
-              :lg="8"
-              :xl="6"
-              class="mb-16"
-            >
-              <CardBox
-                :title="item.name"
-                :description="item.desc || $t('components.noDesc')"
-                class="cursor"
-                @click="clickFolder(item)"
-              >
-                <template #icon>
-                  <el-avatar shape="square" :size="32" style="background: none">
-                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                  </el-avatar>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
-                  </el-text>
-                </template>
-              </CardBox>
-            </el-col> -->
             <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
               <CardBox
                 :title="item.name"
@@ -181,7 +149,7 @@
                 class="cursor"
                 @click="
                   router.push({
-                    path: `/knowledge/${item.id}/${folder.currentFolder.id ? (folder.currentFolder.id !== 'share' ? item.folder_id : 'share') : 'shared'}/document`,
+                    path: `/knowledge/${item.id}/${folder.currentFolder.id ? (folder.currentFolder.id !== 'share' ? item.folder_id : 'share') : 'shared'}/${item.type}/document`,
                   })
                 "
               >
@@ -208,11 +176,6 @@
                       <el-divider direction="vertical" />
                       <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
                       <span class="color-secondary">{{ $t('common.character') }}</span>
-                      <!-- <el-divider direction="vertical" />
-                      <span class="bold mr-4">{{ item?.application_mapping_count || 0 }}</span>
-                      <span class="color-secondary">{{
-                        $t('views.knowledge.relatedApp_count')
-                      }}</span> -->
                     </div>
                   </div>
                 </template>
@@ -279,7 +242,7 @@
                           <el-dropdown-item
                             @click.stop="
                               router.push({
-                                path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/setting`,
+                                path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/${item.type}/setting`,
                               })
                             "
                             v-if="permissionPrecise.edit(item.id)"
@@ -351,6 +314,7 @@ import { cloneDeep, get } from 'lodash'
 import CreateKnowledgeDialog from '@/views/knowledge/create-component/CreateKnowledgeDialog.vue'
 import CreateWebKnowledgeDialog from '@/views/knowledge/create-component/CreateWebKnowledgeDialog.vue'
 import CreateLarkKnowledgeDialog from '@/views/knowledge/create-component/CreateLarkKnowledgeDialog.vue'
+import CreateWorkflowKnowledgeDialog from '@/views/knowledge/create-component/CreateWorkflowKnowledgeDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'

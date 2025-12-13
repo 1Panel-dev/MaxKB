@@ -331,4 +331,5 @@ class FolderTreeSerializer(serializers.Serializer):
 
         TreeSerializer = get_folder_tree_serializer(self.data.get('source'))  # noqa
         serializer = TreeSerializer(nodes, many=True)
-        return [d for d in serializer.data if d.get('id') == d.get('workspace_id')]  # 这是可序列化的字典
+
+        return [d for d in serializer.data if d.get('id') == d.get('workspace_id')] if name is None else serializer.data  # 这是可序列化的字典

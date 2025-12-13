@@ -116,13 +116,16 @@
           </div> -->
         </div>
       </template>
-      <div class="mb-8">
-        <component
-          :is="currentComponent"
-          :detail="currentChatDetail"
-          :appType="appType"
-        ></component>
-      </div>
+
+      <el-scrollbar>
+        <div class="mb-8 p-8" style="max-height: calc(100vh - 260px)">
+          <component
+            :is="currentComponent"
+            :detail="currentChatDetail"
+            :appType="appType"
+          ></component>
+        </div>
+      </el-scrollbar>
     </el-dialog>
   </div>
 </template>

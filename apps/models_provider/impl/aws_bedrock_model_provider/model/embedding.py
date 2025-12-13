@@ -1,4 +1,4 @@
-from langchain_community.embeddings import BedrockEmbeddings
+from langchain_aws import BedrockEmbeddings
 
 from models_provider.base_model_provider import MaxKBBaseModel
 from typing import Dict, List

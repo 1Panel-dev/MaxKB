@@ -13,6 +13,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 from common.field.common import ObjectField
 from tools.models.tool import Tool
@@ -40,6 +41,8 @@ class FunctionLibNodeParamsSerializer(serializers.Serializer):
 
 class IToolLibNode(INode):
     type = 'tool-lib-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
+               WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FunctionLibNodeParamsSerializer

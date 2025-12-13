@@ -171,6 +171,14 @@ class BaseApplicationNode(IApplicationNode):
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
+    def get_chat_asker(self, kwargs):
+        asker = kwargs.get('asker')
+        if asker:
+            if isinstance(asker, dict):
+                return asker
+            return {'username': asker}
+        return self.workflow_manage.work_flow_post_handler.chat_info.get_chat_user()
+
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat,
                 chat_user_id,
                 chat_user_type,
@@ -185,7 +193,8 @@ class BaseApplicationNode(IApplicationNode):
             'application_id': application_id,
             'abstract': message[0:1024],
             'chat_user_id': chat_user_id,
-            'chat_user_type': chat_user_type
+            'chat_user_type': chat_user_type,
+            'asker': self.get_chat_asker(kwargs)
         })
         if app_document_list is None:
             app_document_list = []

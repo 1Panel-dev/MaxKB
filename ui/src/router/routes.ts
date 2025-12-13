@@ -36,6 +36,13 @@ export const routes: Array<RouteRecordRaw> = [
     meta: { activeMenu: '/application' },
     component: () => import('@/views/application-workflow/index.vue'),
   },
+  // 知识库工作流
+  {
+    path: '/knowledge/:id/:folderId/workflow',
+    name: 'KnowledgeWorkflow',
+    meta: { activeMenu: '/knowledge' },
+    component: () => import('@/views/knowledge-workflow/index.vue'),
+  },
   // 对话
   {
     path: '/chat/:accessToken',

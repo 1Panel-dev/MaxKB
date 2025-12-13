@@ -1,7 +1,6 @@
 # coding=utf-8
 import base64
 import os
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -12,7 +11,7 @@ from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from models_provider.impl.xf_model_provider.model.image import ImageMessage
-
+from common.utils.logger import maxkb_logger
 
 class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
     spark_api_url = forms.TextInputField('API URL', required=True,
@@ -42,7 +41,7 @@ class XunFeiImageModelCredential(BaseForm, BaseModelCredential):
                                 HumanMessage(_('Please outline this picture'))]
                 model.stream(message_list)
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

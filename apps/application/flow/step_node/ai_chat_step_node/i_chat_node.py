@@ -11,6 +11,7 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
 
 
@@ -34,7 +35,8 @@ class ChatNodeSerializer(serializers.Serializer):
     mcp_enable = serializers.BooleanField(required=False, label=_("Whether to enable MCP"))
     mcp_servers = serializers.JSONField(required=False, label=_("MCP Server"))
     mcp_tool_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Tool ID"))
-    mcp_tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True, label=_("MCP Tool IDs"), )
+    mcp_tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
+                                         label=_("MCP Tool IDs"), )
     mcp_source = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Source"))
 
     tool_enable = serializers.BooleanField(required=False, default=False, label=_("Whether to enable tools"))
@@ -42,14 +44,22 @@ class ChatNodeSerializer(serializers.Serializer):
                                      label=_("Tool IDs"), )
     mcp_output_enable = serializers.BooleanField(required=False, default=True, label=_("Whether to enable MCP output"))
 
+
 class IChatNode(INode):
     type = 'ai-chat-node'
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP,
+               WorkflowMode.KNOWLEDGE]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ChatNodeSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
+        else:
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
                 chat_record_id,

@@ -6,7 +6,7 @@
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, inject } from 'vue'
 import AppEdge from './common/edge'
 import loopEdge from './common/loopEdge'
 import Control from './common/NodeControl.vue'
@@ -18,6 +18,8 @@ import Dagre from '@/workflow/plugins/dagre'
 import { disconnectAll, getTeleport } from '@/workflow/common/teleport'
 import { WorkflowMode } from '@/enums/application'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
+const workflow_mode = inject('workflowMode') || WorkflowMode.Application
+const loop_workflow_mode = inject('loopWorkflowMode') || WorkflowMode.ApplicationLoop
 
 defineOptions({ name: 'WorkFlow' })
 const TeleportContainer = getTeleport()
@@ -78,7 +80,6 @@ const renderGraphData = (data?: any) => {
         strokeWidth: 1,
       },
     })
-    lf.value.graphModel.get = 'sdasdaad'
     lf.value.on('graph:rendered', () => {
       flowId.value = lf.value.graphModel.flowId
     })
@@ -96,7 +97,8 @@ const renderGraphData = (data?: any) => {
       return {
         getNode: () => node,
         getGraph: () => graph,
-        workflowMode: WorkflowMode.Application,
+        workflowMode: workflow_mode,
+        loopWorkflowMode: loop_workflow_mode,
       }
     }
     lf.value.graphModel.eventCenter.on('delete_edge', (id_list: Array<string>) => {
@@ -108,8 +110,6 @@ const renderGraphData = (data?: any) => {
       // 清除当前节点下面的子节点的所有缓存
       data.nodeModel.clear_next_node_field(false)
     })
-    // lf.value.openSelectionSelect()
-    // lf.value.extension.selectionSelect.setSelectionSense(true, false)
     setTimeout(() => {
       lf.value?.fitView()
     }, 500)

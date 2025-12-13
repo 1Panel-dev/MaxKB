@@ -19,7 +19,7 @@
       <el-form-item>
         <el-radio-group v-model="form.mcp_source" @change="mcpSourceChange">
           <el-radio value="referencing">
-            {{ $t('views.applicationWorkflow.nodes.mcpNode.reference') }}
+            {{ $t('workflow.nodes.mcpNode.reference') }}
           </el-radio>
           <el-radio value="custom">{{ $t('common.custom') }}</el-radio>
         </el-radio-group>
@@ -56,7 +56,7 @@
                 <img :src="resetUrl(mcpTool?.icon)" alt="" />
               </el-avatar>
               <el-avatar v-else shape="square" :size="20" class="mr-8">
-                <img src="@/assets/workflow/icon_mcp.svg" style="width: 75%" alt="" />
+                <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
               <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
@@ -171,7 +171,7 @@ const submit = () => {
       try {
         JSON.parse(form.value.mcp_servers || '{}')
       } catch (e) {
-        MsgError(t('views.applicationWorkflow.nodes.mcpNode.mcpServerTip'))
+        MsgError(t('workflow.nodes.mcpNode.mcpServerTip'))
         return
       }
       emit('refresh', form.value)

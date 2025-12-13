@@ -99,17 +99,18 @@
         </div>
 
         <app-table
-          class="mt-16"
+          class="mt-16 w-full"
           :data="tableData"
           :pagination-config="paginationConfig"
           @sizeChange="handleSizeChange"
           @changePage="getList"
           v-loading="loading"
+          show-overflow-tooltip
         >
-          <el-table-column prop="menu" :label="$t('views.operateLog.table.menu.label')" width="160">
+          <el-table-column prop="menu" :label="$t('views.operateLog.table.menu')" width="160">
             <template #header>
               <div>
-                <span>{{ $t('views.operateLog.table.menu.label') }}</span>
+                <span>{{ $t('views.operateLog.table.menu') }}</span>
                 <el-popover :width="200" trigger="click" :visible="popoverVisible">
                   <template #reference>
                     <el-button
@@ -154,29 +155,24 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column prop="operate" :label="$t('views.operateLog.table.operate.detail')">
+          <el-table-column
+            prop="operate"
+            :label="$t('views.operateLog.table.detail')"
+            :tooltip-formatter="
+              ({ row }: any) =>
+                row.operate + (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
+            "
+          >
             <template #default="{ row }">
-              <el-tooltip
-                :content="
-                  row.operate +
-                  (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
-                "
-                effect="dark"
-                placement="top"
-              >
-                <span class="text-ellipsis">
-                  {{
-                    row.operate +
-                    (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
-                  }}
-                </span>
-              </el-tooltip>
+              {{
+                row.operate + (row.operation_object?.name ? `【${row.operation_object.name}】` : '')
+              }}
             </template>
           </el-table-column>
           <el-table-column
-            width="120"
+            width="140"
             prop="user.username"
-            :label="$t('views.operateLog.table.user.label')"
+            :label="$t('views.operateLog.table.user')"
           />
           <el-table-column
             v-if="user.isEE()"
@@ -231,41 +227,31 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column
-            prop="status"
-            :label="$t('views.operateLog.table.status.label')"
-            width="100"
-          >
+          <el-table-column prop="status" :label="$t('common.status.label')" width="100">
             <template #default="{ row }">
-              <span v-if="row.status === 200">{{
-                $t('views.operateLog.table.status.success')
-              }}</span>
-              <span v-else style="color: red">{{ $t('views.operateLog.table.status.fail') }}</span>
+              <span v-if="row.status === 200">{{ $t('common.status.success') }}</span>
+              <span v-else style="color: red">{{ $t('common.status.fail') }}</span>
             </template>
           </el-table-column>
           <el-table-column
             prop="ip_address"
-            :label="$t('views.operateLog.table.ip_address.label')"
+            :label="$t('views.operateLog.table.ip_address')"
             width="160"
           ></el-table-column>
-          <el-table-column :label="$t('views.operateLog.table.operateTime.label')" width="180">
+          <el-table-column :label="$t('views.operateLog.table.operateTime')" width="180">
             <template #default="{ row }">
               {{ datetimeFormat(row.create_time) }}
             </template>
           </el-table-column>
           <el-table-column :label="$t('common.operation')" width="60" align="left" fixed="right">
             <template #default="{ row }">
-              <span class="mr-4">
-                <el-tooltip
-                  effect="dark"
-                  :content="$t('views.operateLog.table.opt.label')"
-                  placement="top"
-                >
-                  <el-button type="primary" text @click.stop="showDetails(row)" class="text-button">
-                    <AppIcon iconName="app-operate-log"></AppIcon>
-                  </el-button>
-                </el-tooltip>
-              </span>
+              <!-- <span class="mr-4"> -->
+              <el-tooltip effect="dark" :content="$t('views.operateLog.table.opt')" placement="top">
+                <el-button type="primary" text @click.stop="showDetails(row)">
+                  <AppIcon iconName="app-operate-log"></AppIcon>
+                </el-button>
+              </el-tooltip>
+              <!-- </span> -->
             </template>
           </el-table-column>
         </app-table>
@@ -310,10 +296,8 @@ import { t } from '@/locales'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import useStore from '@/stores'
 import WorkspaceApi from '@/api/system/workspace.ts'
-import { hasPermission } from '@/utils/permission'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data.ts'
 import { ComplexPermission } from '@/utils/permission/type.ts'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import { MsgSuccess } from '@/utils/message.ts'
 
 const { user } = useStore()
@@ -365,25 +349,25 @@ const dayOptions = [
 const filterOptions = [
   {
     value: 'user',
-    label: t('views.operateLog.table.user.label'),
+    label: t('views.operateLog.table.user'),
   },
   {
     value: 'status',
-    label: t('views.operateLog.table.status.label'),
+    label: t('common.status.label'),
   },
   {
     value: 'ip_address',
-    label: t('views.operateLog.table.ip_address.label'),
+    label: t('views.operateLog.table.ip_address'),
   },
 ]
 const statusOptions = [
   {
     value: '200',
-    label: t('views.operateLog.table.status.success'),
+    label: t('common.status.success'),
   },
   {
     value: '500',
-    label: t('views.operateLog.table.status.fail'),
+    label: t('common.status.fail'),
   },
 ]
 const operateOptions = ref<any[]>([])
@@ -521,16 +505,4 @@ onMounted(() => {
   changeDayHandle(history_day.value)
 })
 </script>
-<style lang="scss" scoped>
-.text-button {
-  font-size: 14px;
-}
-
-.text-ellipsis {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  display: block;
-}
-</style>
+<style lang="scss" scoped></style>

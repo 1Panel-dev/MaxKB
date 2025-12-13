@@ -187,12 +187,12 @@
   <el-row :gutter="8" v-if="form.fileList?.length">
     <template v-for="(item, index) in form.fileList" :key="index">
       <el-col :span="12" class="mb-8">
-        <el-card shadow="never" class="file-List-card">
+        <el-card shadow="never" style="--el-card-padding: 8px 12px; line-height: normal">
           <div class="flex-between">
             <div class="flex">
               <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
               <div class="ml-8">
-                <p>{{ item && item?.name }}</p>
+                <p class="ellipsis-1" :title="item && item?.name">{{ item && item?.name }}</p>
                 <el-text type="info" size="small">{{
                   filesize(item && item?.size) || '0K'
                 }}</el-text>

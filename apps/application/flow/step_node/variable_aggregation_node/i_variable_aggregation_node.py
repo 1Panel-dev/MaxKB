@@ -5,9 +5,8 @@ from typing import Type
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import INode, NodeResult
-
-
 
 
 class VariableListSerializer(serializers.Serializer):
@@ -29,15 +28,13 @@ class VariableAggregationNodeSerializer(serializers.Serializer):
 
 class IVariableAggregation(INode):
     type = 'variable-aggregation-node'
-
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return VariableAggregationNodeSerializer
 
     def _run(self):
-        return  self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
-    def execute(self,strategy,group_list,**kwargs) -> NodeResult:
+    def execute(self, strategy, group_list, **kwargs) -> NodeResult:
         pass
-
-

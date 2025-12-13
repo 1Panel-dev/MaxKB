@@ -58,7 +58,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
             result['output_value'] = reference
         return result
 
-    def execute(self, variable_list, stream, **kwargs) -> NodeResult:
+    def execute(self, variable_list, **kwargs) -> NodeResult:
         #
         result_list = []
         is_chat = False

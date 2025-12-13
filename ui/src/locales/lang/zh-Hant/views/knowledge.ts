@@ -3,9 +3,6 @@ export default {
   relatedApplications: '關聯應用',
   document_count: '文檔數',
   relatedApp_count: '關聯應用',
-  searchBar: {
-    placeholder: '按名稱搜尋',
-  },
   setting: {
     vectorization: '向量化',
     sync: '同步',
@@ -25,11 +22,14 @@ export default {
     generalKnowledge: '通用知識庫',
     webKnowledge: 'Web 知識庫',
     larkKnowledge: '飛書知識庫',
+    workflowKnowledge: '工作流知識庫',
     yuqueKnowledge: '語雀知識庫',
     generalInfo: '上傳本地檔案',
-    webInfo: '同步Web網站文字資料',
+    webInfo: '同步 Web 網站文字資料',
     larkInfo: '通過飛書文檔構建知識庫',
     yuqueInfo: '通過語雀文檔構建知識庫',
+    createWorkflowKnowledge: '建立工作流知識庫',
+    workflowInfo: '通過自定義工作流管道構建知識庫',
   },
   form: {
     knowledgeName: {
@@ -64,6 +64,15 @@ export default {
     file_size_limit: {
       label: '上傳的每個文件最大(MB)',
       placeholder: '建议根据服务器配置调整，否則會造成服務宕机',
+    },
+    appTemplate: {
+      blank: {
+        title: '空白創建',
+      },
+      basic: {
+        title: '基礎模板',
+        description: '支持本地文件、飛書文檔、Web 站點數據源的基礎工作流模板',
+      },
     },
   },
 

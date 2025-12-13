@@ -19,6 +19,7 @@ import paragraphSystemShareApi from '@/api/system-shared/paragraph'
 import problemSystemShareApi from '@/api/system-shared/problem'
 import chatUserSystemShareApi from '@/api/system-shared/chat-user'
 import workspaceApi from '@/api/workspace/workspace'
+import folderWorkspaceApi from '@/api/workspace/folder'
 import systemUserApi from '@/api/user/user'
 import ToolResourceApi from '@/api/system-resource-management/tool'
 import knowledgeResourceApi from '@/api/system-resource-management/knowledge'
@@ -32,7 +33,7 @@ import applicationKeyResourceApi from '@/api/system-resource-management/applicat
 import workflowVersionResourceApi from '@/api/system-resource-management/workflow-version'
 import chatLogResourceApi from '@/api/system-resource-management/chat-log'
 import resourceAuthorizationResourceApi from '@/api/system-resource-management/resource-authorization'
-
+import folderResourceApi from '@/api/system-resource-management/folder'
 // 普通 API
 const workspaceApiMap = {
   knowledge: knowledgeWorkspaceApi,
@@ -48,6 +49,7 @@ const workspaceApiMap = {
   workflowVersion: workflowVersionWorkspaceApi,
   chatLog: chatLogWorkspaceApi,
   resourceAuthorization: resourceAuthorizationWorkspaceApi,
+  folder: folderWorkspaceApi,
 } as any
 
 // 系统分享 API
@@ -76,6 +78,7 @@ const systemManageApiMap = {
   workflowVersion: workflowVersionResourceApi,
   chatLog: chatLogResourceApi,
   resourceAuthorization: resourceAuthorizationResourceApi,
+  folder: folderResourceApi,
 } as any
 
 const data = {

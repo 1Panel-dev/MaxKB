@@ -12,7 +12,7 @@
                   type="primary"
                   @click="
                     router.push({
-                      path: `/knowledge/document/upload/${folderId}`,
+                      path: `/knowledge/document/upload/${folderId}/${type}`,
                       query: { id: id },
                     })
                   "
@@ -29,13 +29,19 @@
                   type="primary"
                   @click="
                     router.push({
-                      path: `/knowledge/import/${folderId}`,
+                      path: `/knowledge/import/lark/${folderId}`,
                       query: {
                         id: id,
                         folder_token: knowledgeDetail?.meta.folder_token,
                       },
                     })
                   "
+                  >{{ $t('views.document.importDocument') }}
+                </el-button>
+                <el-button
+                  v-if="knowledgeDetail?.type === 4 && permissionPrecise.doc_create(id)"
+                  type="primary"
+                  @click="toImportWorkflow"
                   >{{ $t('views.document.importDocument') }}
                 </el-button>
                 <el-button
@@ -113,7 +119,7 @@
                   @change="search_type_change"
                 >
                   <el-option :label="$t('dynamicsForm.tag.label')" value="tag" />
-                  <el-option :label="$t('views.tool.form.toolName.label')" value="name" />
+                  <el-option :label="$t('common.name')" value="name" />
                 </el-select>
                 <el-input
                   v-if="search_type === 'name'"
@@ -132,9 +138,13 @@
                   clearable
                 />
               </div>
-              <el-button @click="openTagDrawer" class="ml-12"
-                v-if="permissionPrecise.tag_read(id)"
-              >
+
+              <el-tooltip effect="dark" :content="$t('workflow.ExecutionRecord')" placement="top">
+                <el-button @click="openListAction" class="ml-12">
+                  <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
+                </el-button>
+              </el-tooltip>
+              <el-button @click="openTagDrawer" class="ml-12" v-if="permissionPrecise.tag_read(id)">
                 {{ $t('views.document.tag.label') }}
               </el-button>
             </div>
@@ -200,19 +210,19 @@
                           :class="filterMethod['status'] ? '' : 'is-active'"
                           :command="beforeCommand('status', '')"
                           class="justify-center"
-                          >{{ $t('views.document.table.all') }}
+                          >{{ $t('common.status.all') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                           :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('status', State.SUCCESS)"
-                          >{{ $t('views.document.fileStatus.SUCCESS') }}
+                          >{{ $t('common.status.success') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                           :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('status', State.FAILURE)"
-                          >{{ $t('views.document.fileStatus.FAILURE') }}
+                          >{{ $t('common.status.fail') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                           :class="
@@ -292,7 +302,7 @@
                           :class="filterMethod['is_active'] === '' ? 'is-active' : ''"
                           :command="beforeCommand('is_active', '')"
                           class="justify-center"
-                          >{{ $t('views.document.table.all') }}
+                          >{{ $t('common.status.all') }}
                         </el-dropdown-item>
                         <el-dropdown-item
                           :class="filterMethod['is_active'] === true ? 'is-active' : ''"
@@ -348,7 +358,7 @@
                           :class="filterMethod['hit_handling_method'] ? '' : 'is-active'"
                           :command="beforeCommand('hit_handling_method', '')"
                           class="justify-center"
-                          >{{ $t('views.document.table.all') }}
+                          >{{ $t('common.status.all') }}
                         </el-dropdown-item>
                         <template v-for="(value, key) of hitHandlingMethod" :key="key">
                           <el-dropdown-item
@@ -407,7 +417,7 @@
                   />
                 </span>
                 <el-divider direction="vertical" />
-                <template v-if="knowledgeDetail?.type === 0">
+                <template v-if="knowledgeDetail?.type === 0 || knowledgeDetail?.type === 4">
                   <el-tooltip
                     effect="dark"
                     :content="$t('views.document.setting.cancelVectorization')"
@@ -481,7 +491,8 @@
                             ></AppIcon>
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item @click="openTagSettingDrawer(row)"
+                          <el-dropdown-item
+                            @click="openTagSettingDrawer(row)"
                             v-if="permissionPrecise.doc_tag(id)"
                           >
                             <AppIcon iconName="app-tag" class="color-secondary"></AppIcon>
@@ -605,7 +616,8 @@
                             <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
                             {{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
                           >
-                          <el-dropdown-item @click="openTagSettingDrawer(row)"
+                          <el-dropdown-item
+                            @click="openTagSettingDrawer(row)"
                             v-if="permissionPrecise.doc_tag(id)"
                           >
                             <AppIcon iconName="app-tag" class="color-secondary"></AppIcon>
@@ -700,7 +712,6 @@
     <EmbeddingContentDialog ref="embeddingContentDialogRef"></EmbeddingContentDialog>
 
     <ImportDocumentDialog ref="ImportDocumentDialogRef" :title="title" @refresh="refresh" />
-    <SyncWebDialog ref="SyncWebDialogRef" @refresh="refresh" />
     <!-- 选择知识库 -->
     <SelectKnowledgeDialog
       ref="selectKnowledgeDialogRef"
@@ -711,6 +722,8 @@
     <TagDrawer ref="tagDrawerRef" />
     <TagSettingDrawer ref="tagSettingDrawerRef" />
     <AddTagDialog ref="addTagDialogRef" @addTags="addTags" :apiType="apiType" />
+    <!-- 执行详情 -->
+    <ExecutionRecord ref="ListActionRef"></ExecutionRecord>
   </div>
 </template>
 <script setup lang="ts">
@@ -718,7 +731,6 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import type { ElTable } from 'element-plus'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
-import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
@@ -735,11 +747,12 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import TagDrawer from './tag/TagDrawer.vue'
 import TagSettingDrawer from './tag/TagSettingDrawer.vue'
 import AddTagDialog from '@/views/document/tag/MulAddTagDialog.vue'
+import ExecutionRecord from '@/views/knowledge-workflow/component/execution-record/ExecutionRecordDrawer.vue'
 
 const route = useRoute()
 const router = useRouter()
 const {
-  params: { id, folderId }, // id为knowledgeID
+  params: { id, folderId, type }, // id为knowledgeID
 } = route as any
 const { common } = useStore()
 const storeKey = 'documents'
@@ -783,7 +796,8 @@ const MoreFilledPermission0 = (id: string) => {
     permissionPrecise.value.doc_migrate(id) ||
     (knowledgeDetail?.value.type === 1 && permissionPrecise.value.doc_sync(id)) ||
     (knowledgeDetail?.value.type === 2 && permissionPrecise.value.doc_sync(id)) ||
-    permissionPrecise.value.doc_delete(id) || permissionPrecise.value.doc_tag(id)
+    permissionPrecise.value.doc_delete(id) ||
+    permissionPrecise.value.doc_tag(id)
   )
 }
 
@@ -823,7 +837,7 @@ const search_form = ref<any>({
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
 const embeddingContentDialogRef = ref<InstanceType<typeof EmbeddingContentDialog>>()
-const SyncWebDialogRef = ref()
+const ListActionRef = ref<InstanceType<typeof ExecutionRecord>>()
 const loading = ref(false)
 let interval: any
 const filterText = ref('')
@@ -845,6 +859,29 @@ const multipleSelection = ref<any[]>([])
 const title = ref('')
 
 const selectKnowledgeDialogRef = ref()
+
+const openListAction = () => {
+  ListActionRef.value?.open(id)
+}
+
+const toImportWorkflow = () => {
+  if (knowledgeDetail.value.is_publish) {
+    router.push({
+      path: `/knowledge/import/workflow/${folderId}`,
+      query: {
+        id: id,
+      },
+    })
+  } else {
+    MsgConfirm(t('common.tip'), t('views.document.tip.toImportDocConfirm'), {
+      cancelButtonText: t('common.close'),
+      showConfirmButton: false,
+      type: 'warning',
+    })
+      .then(() => {})
+      .catch(() => {})
+  }
+}
 
 const exportDocument = (document: any) => {
   loadSharedApi({ type: 'document', systemType: apiType.value })
@@ -1142,6 +1179,7 @@ function replaceDocument(file: any, row: any) {
   loadSharedApi({ type: 'document', systemType: apiType.value })
     .postReplaceSourceFile(id, row.id, formData, loading)
     .then(() => {
+      MsgSuccess(t('views.document.tip.replaceSuccess'))
       getList()
     })
     .catch((e: any) => {})

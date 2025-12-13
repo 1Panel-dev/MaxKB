@@ -3,9 +3,6 @@ export default {
   relatedApplications: 'Linked App',
   document_count: 'docs',
   relatedApp_count: 'linked apps',
-  searchBar: {
-    placeholder: 'Search by name',
-  },
   setting: {
     vectorization: 'Vectorization',
     sync: 'Sync',
@@ -27,6 +24,7 @@ export default {
     generalKnowledge: 'General Knowledge',
     webKnowledge: 'Web Knowledge',
     larkKnowledge: 'Lark Knowledge',
+    workflowKnowledge: 'Workflow Knowledge',
     yuqueKnowledge: 'Yuque Knowledge',
     generalInfo: 'Upload local documents',
     webInfo: 'Sync text data from a web site',
@@ -36,6 +34,8 @@ export default {
     createWebKnowledge: 'Create Web Knowledge',
     createLarkKnowledge: 'Create Lark Knowledge',
     createYuqueKnowledge: 'Create Yuque Knowledge',
+    createWorkflowKnowledge: 'Create Workflow Knowledge',
+    workflowInfo: 'Building a knowledge base through custom workflow methods',
   },
   form: {
     knowledgeName: {
@@ -70,6 +70,15 @@ export default {
     file_size_limit: {
       label: 'Maximum size of each document(MB)',
       placeholder: 'Suggest based on server configuration, otherwise may cause service shutdown',
+    },
+    appTemplate: {
+      blank: {
+        title: 'Blank Creation',
+      },
+      basic: {
+        title: 'Basic Template',
+        description: 'Supports basic workflow templates for local files, Lark documents, and web site data sources',
+      },
     },
   },
 

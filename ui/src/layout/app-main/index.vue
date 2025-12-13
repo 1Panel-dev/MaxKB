@@ -14,11 +14,8 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-
-
 const cachedViews: any = ref([])
 onBeforeUpdate(() => {
-
   const { name, meta } = route
   if (name && !cachedViews.value.includes(name)) {
     cachedViews.value.push(name)

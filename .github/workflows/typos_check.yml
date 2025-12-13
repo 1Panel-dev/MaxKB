@@ -21,7 +21,8 @@ jobs:
         extend-exclude = [
           "**/*_svg",
           "**/migrations/**",
-          "**/tencent_model_provider/**"
+          "**/loopEdge.ts",
+          "**/edge.ts",
         ]
         EOF
     - name: Check spelling

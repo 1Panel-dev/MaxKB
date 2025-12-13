@@ -29,7 +29,7 @@
 
               <el-option :label="$t('common.name')" value="name" />
 
-              <el-option :label="$t('common.publishStatus')" value="publish_status" />
+              <el-option :label="$t('views.application.publishStatus')" value="publish_status" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -57,8 +57,8 @@
               clearable
               style="width: 220px"
             >
-              <el-option :label="$t('common.published')" value="published" />
-              <el-option :label="$t('common.unpublished')" value="unpublished" />
+              <el-option :label="$t('common.status.published')" value="published" />
+              <el-option :label="$t('common.status.unpublished')" value="unpublished" />
             </el-select>
           </div>
           <el-dropdown trigger="click" v-if="permissionPrecise.create()">
@@ -155,33 +155,6 @@
         >
           <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
             <template v-for="(item, index) in applicationList" :key="index">
-              <!-- <el-col
-                v-if="item.resource_type === 'folder'"
-                :xs="24"
-                :sm="12"
-                :md="12"
-                :lg="8"
-                :xl="6"
-                class="mb-16"
-              >
-                <CardBox
-                  :title="item.name"
-                  :description="item.desc || $t('components.noDesc')"
-                  class="cursor"
-                  @click="clickFolder(item)"
-                >
-                  <template #icon>
-                    <el-avatar shape="square" :size="32" style="background: none">
-                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                    </el-avatar>
-                  </template>
-                  <template #subTitle>
-                    <el-text class="color-secondary lighter" size="small">
-                      {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
-                    </el-text>
-                  </template>
-                </CardBox>
-              </el-col> -->
               <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
                 <CardBox
                   :title="item.name"
@@ -216,7 +189,7 @@
                         <SuccessFilled />
                       </el-icon>
                       <span class="color-secondary">
-                        {{ $t('views.application.status.published') }}
+                        {{ $t('common.status.published') }}
                       </span>
                       <el-divider direction="vertical" />
                       <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
@@ -226,7 +199,7 @@
                     <div v-else class="flex align-center">
                       <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
                       <span class="color-secondary">
-                        {{ $t('views.application.status.unpublished') }}
+                        {{ $t('common.status.unpublished') }}
                       </span>
                     </div>
                   </template>
@@ -242,9 +215,11 @@
                               <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
                               {{ $t('views.application.operation.toChat') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
-                              @click.stop="settingApplication(item)"
+                              @mousedown.stop="settingApplication($event, item)"
                               v-if="permissionPrecise.edit(item.id)"
+                              @click.stop
                             >
                               <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
                               {{ $t('common.setting') }}
@@ -561,7 +536,8 @@ function toChat(row: any) {
     aips = aips ? aips : []
     const apiParams = mapToUrlParams(aips) ? '?' + mapToUrlParams(aips) : ''
     ApplicationApi.getAccessToken(row.id, loading).then((res: any) => {
-      window.open(application.location + res?.data?.access_token + apiParams)
+      const newUrl = application.location + res?.data?.access_token + apiParams
+      window.open(newUrl)
     })
   })
 }
@@ -587,9 +563,18 @@ function copyApplication(row: any) {
   })
 }
 
-function settingApplication(row: any) {
+function settingApplication(event: any, row: any) {
   if (isWorkFlow(row.type)) {
-    router.push({ path: `/application/workspace/${row.id}/workflow` })
+    if (event?.ctrlKey) {
+      event?.preventDefault()
+      event.stopPropagation()
+      const newUrl = router.resolve({
+        path: `/application/workspace/${row.id}/workflow`,
+      }).href
+      window.open(newUrl)
+    } else {
+      router.push({ path: `/application/workspace/${row.id}/workflow` })
+    }
   } else {
     router.push({ path: `/application/workspace/${row.id}/${row.type}/setting` })
   }
@@ -661,14 +646,16 @@ function openCreateFolder() {
 
 function getFolder(bool?: boolean) {
   const params = {}
-  folder.asyncGetFolder(SourceTypeEnum.APPLICATION, params, loading).then((res: any) => {
-    folderList.value = res.data
-    if (bool) {
-      // 初始化刷新
-      folder.setCurrentFolder(res.data?.[0] || {})
-    }
-    getList()
-  })
+  folder
+    .asyncGetFolder(SourceTypeEnum.APPLICATION, params, apiType.value, loading)
+    .then((res: any) => {
+      folderList.value = res.data
+      if (bool) {
+        // 初始化刷新
+        folder.setCurrentFolder(res.data?.[0] || {})
+      }
+      getList()
+    })
 }
 
 function clickFolder(item: any) {

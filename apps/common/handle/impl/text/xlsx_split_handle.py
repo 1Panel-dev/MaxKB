@@ -11,10 +11,13 @@ import traceback
 from typing import List
 
 import openpyxl
+from openpyxl import load_workbook
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.handle.impl.common_handle import xlsx_embed_cells_images
 from common.utils.logger import maxkb_logger
+
+splitter = '\n`-----------------------------------`\n'
 
 
 def post_cell(image_dict, cell_value):
@@ -63,6 +66,40 @@ def handle_sheet(file_name, sheet, image_dict, limit: int):
 
 
 class XlsxSplitHandle(BaseSplitHandle):
+    def fill_merged_cells(self, sheet, image_dict):
+        data = []
+
+        # 获取第一行作为标题行
+        headers = []
+        for idx, cell in enumerate(sheet[1]):
+            if cell.value is None:
+                headers.append(' ' * (idx + 1))
+            else:
+                headers.append(cell.value)
+
+        # 从第二行开始遍历每一行
+        for row in sheet.iter_rows(min_row=2, values_only=False):
+            row_data = {}
+            for col_idx, cell in enumerate(row):
+                cell_value = cell.value
+
+                # 如果单元格为空，并且该单元格在合并单元格内，获取合并单元格的值
+                if cell_value is None:
+                    for merged_range in sheet.merged_cells.ranges:
+                        if cell.coordinate in merged_range:
+                            cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
+                            break
+
+                image = image_dict.get(cell_value, None)
+                if image is not None:
+                    cell_value = f'![](./oss/file/{image.id})'
+
+                # 使用标题作为键，单元格的值作为值存入字典
+                row_data[headers[col_idx]] = cell_value
+            data.append(row_data)
+
+        return data
+
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
@@ -88,7 +125,44 @@ class XlsxSplitHandle(BaseSplitHandle):
             return [{'name': file.name, 'content': []}]
 
     def get_content(self, file, save_image):
-        pass
+        try:
+            # 加载 Excel 文件
+            workbook = load_workbook(file)
+            try:
+                image_dict: dict = xlsx_embed_cells_images(file)
+                if len(image_dict) > 0:
+                    save_image(image_dict.values())
+            except Exception as e:
+                maxkb_logger.error(f'Exception: {e}')
+                image_dict = {}
+            md_tables = ''
+            # 遍历所有工作表
+            for sheetname in workbook.sheetnames:
+                sheet = workbook[sheetname]
+                rows = self.fill_merged_cells(sheet, image_dict)
+                if len(rows) == 0:
+                    continue
+
+                # 添加 sheet 名称作为标题
+                md_tables += f'## {sheetname}\n\n'
+
+                # 提取表头和内容
+                headers = [f"{key}" for key, value in rows[0].items()]
+
+                # 构建 Markdown 表格
+                md_table = '| ' + ' | '.join(headers) + ' |\n'
+                md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
+                for row in rows:
+                    r = [f'{value}' if value is not None else '' for key, value in row.items()]
+                    md_table += '| ' + ' | '.join(
+                        [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in r]) + ' |\n'
+
+                md_tables += md_table + '\n\n'
+
+            return md_tables
+        except Exception as e:
+            maxkb_logger.error(f'excel split handle error: {e}')
+            return f'error: {e}'
 
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()

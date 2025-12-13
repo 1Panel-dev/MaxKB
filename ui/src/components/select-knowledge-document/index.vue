@@ -9,6 +9,7 @@
   >
     <el-form-item :label="$t('views.chatLog.selectKnowledge')" prop="knowledge_id">
       <el-tree-select
+        :key="treeKey"
         v-model="form.knowledge_id"
         :props="defaultProps"
         node-key="id"
@@ -78,7 +79,7 @@ const form = ref<any>({
   knowledge_id: '',
   document_id: '',
 })
-
+const treeKey = ref(0)
 const rules = reactive<FormRules>({
   knowledge_id: [
     { required: true, message: t('views.chatLog.selectKnowledgePlaceholder'), trigger: 'change' },
@@ -100,12 +101,14 @@ const defaultProps = {
 
 const loadTree = async (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
-  const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
+  const folder_id = node.level === 0
+    ? (props.workspaceId || user.getWorkspaceId())
+    : node.data.id
   const obj =
    props.apiType === 'systemManage'
       ? {
           workspace_id: props.workspaceId,
-          folder_id:  node.level === 0 ? props.workspaceId : node.data.id,
+          folder_id:  folder_id,
         }
       : {
           folder_id: folder_id,
@@ -155,6 +158,16 @@ watch(
       form.value.knowledge_id = value.knowledge_id
       form.value.document_id = value.document_id
     }
+  },
+  {
+    immediate: true,
+  },
+)
+
+watch(
+  () => props.workspaceId,
+  (value: any) => {
+    treeKey.value++
   },
   {
     immediate: true,

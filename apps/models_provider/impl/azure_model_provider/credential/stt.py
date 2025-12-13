@@ -1,5 +1,4 @@
 # coding=utf-8
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -8,7 +7,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-
+from common.utils.logger import maxkb_logger
 
 class AzureOpenAISTTModelCredential(BaseForm, BaseModelCredential):
     api_version = forms.TextInputField("API Version", required=True)
@@ -32,7 +31,7 @@ class AzureOpenAISTTModelCredential(BaseForm, BaseModelCredential):
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:

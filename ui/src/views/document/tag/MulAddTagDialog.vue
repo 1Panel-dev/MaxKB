@@ -1,5 +1,11 @@
 <template>
-  <el-dialog v-model="dialogVisible" :title="$t('views.document.tag.addTag')" :before-close="close">
+  <el-dialog
+    v-model="dialogVisible"
+    :title="$t('views.document.tag.addTag')"
+    :before-close="close"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <el-form
       ref="FormRef"
       :model="{ tagList }"

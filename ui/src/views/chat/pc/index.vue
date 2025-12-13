@@ -196,17 +196,20 @@
               </span>
             </div>
           </div>
-          <div class="execution-detail-content" v-loading="rightPanelLoading">
-            <ParagraphSourceContent
-              v-if="rightPanelType === 'knowledgeSource'"
-              :detail="rightPanelDetail"
-            />
-            <ExecutionDetailContent
-              v-if="rightPanelType === 'executionDetail'"
-              :detail="executionDetail"
-              :appType="applicationDetail?.type"
-            />
-            <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+
+          <div class="execution-detail-content mb-8" v-loading="rightPanelLoading">
+            <el-scrollbar>
+              <ParagraphSourceContent
+                v-if="rightPanelType === 'knowledgeSource'"
+                :detail="rightPanelDetail"
+              />
+              <ExecutionDetailContent
+                v-if="rightPanelType === 'executionDetail'"
+                :detail="executionDetail"
+                :appType="applicationDetail?.type"
+              />
+              <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+            </el-scrollbar>
           </div>
         </div>
       </div>
@@ -569,7 +572,7 @@ function closeExecutionDetail() {
       .execution-detail-content {
         flex: 1;
         overflow: hidden;
-        height: calc(100% - 63px);
+        height: calc(100% - 45px);
 
         .execution-details {
           padding: 16px;

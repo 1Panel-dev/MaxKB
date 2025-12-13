@@ -1,14 +1,23 @@
 export default {
   title: '工具',
-  all: '全部',
-  createTool: '建立工具',
+  createTool: '创建工具',
   editTool: '編輯工具',
-  createMcpTool: '建立MCP',
-  editMcpTool: '編輯MCP',
+  createMcpTool: '建立 MCP',
+  editMcpTool: '編輯 MCP',
   copyTool: '複製工具',
+  copyMcpTool: '複製 MCP',
   importTool: '匯入工具',
   settingTool: '設定工具',
   mcpConfig: 'MCP服務配置',
+  updatedVersion: '更新版本',
+  dataSource: {
+    title: '數據源',
+    createDataSource: '創建數據源',
+    editDataSource: '編輯數據源',
+    copyDataSource: '複製數據源',
+    selectDataSource: '選擇數據源',
+    requiredMessage: '請選擇數據源',
+  },
   toolStore: {
     title: '工具商店',
     createFromToolStore: '從工具商店創建',
@@ -23,9 +32,6 @@ export default {
     confirmTip: '是否更新工具：',
     updateStoreToolMessage: '更新工具可能會影響正在使用的資源，請謹慎操作。',
   },
-  searchBar: {
-    placeholder: '按工具名稱搜尋',
-  },
   tip: {
     saveMessage: '當前的更改尚未保存，確認退出嗎？',
   },
@@ -39,22 +45,20 @@ export default {
   },
   form: {
     toolName: {
-      label: '名稱',
       name: '工具名稱',
       placeholder: '請輸入工具名稱',
       requiredMessage: '請輸入工具名稱',
     },
     mcpName: {
-      label: '名稱',
-      name: 'MCP名稱',
-      placeholder: '請輸入MCP名稱',
-      requiredMessage: '請輸入MCP名稱',
+      name: 'MCP 名稱',
+      placeholder: '請輸入 MCP 名稱',
+      requiredMessage: '請輸入 MCP 名稱',
     },
     toolDescription: {
       placeholder: '請輸入工具的描述',
     },
     mcpDescription: {
-      placeholder: '請輸入MCP的描述',
+      placeholder: '請輸入 MCP 的描述',
     },
     paramName: {
       label: '參數名',
@@ -81,8 +85,8 @@ export default {
     mcp: {
       title: 'MCP 服務',
       label: 'MCP Server Config',
-      placeholder: '請輸入MCP Server配置',
-      tip: '僅支援SSE、Streamable HTTP呼叫方式',
+      placeholder: '請輸入 MCP Server配置',
+      tip: '僅支援 SSE、Streamable HTTP 呼叫方式',
       requiredMessage: '請輸入 MCP Server Config',
     },
     debug: {

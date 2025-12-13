@@ -4,9 +4,6 @@ export default {
   syncDocument: '同步文檔',
   items: '項',
   migrateDocument: '文檔遷移到',
-  searchBar: {
-    placeholder: '按 文檔名稱 搜索',
-  },
   setting: {
     migration: '遷移',
     cancelGenerateQuestion: '取消生成問題',
@@ -24,9 +21,11 @@ export default {
     nameMessage: '文件名稱不能为空！',
     importMessage: '導入成功',
     migrationSuccess: '遷移成功',
+    replaceSuccess: '替換成功',
     fileLimitCountTip1: '每次最多上傳',
     fileLimitCountTip2: '個文件',
     fileLimitSizeTip1: '每個文件不超過',
+    toImportDocConfirm: '當前知識庫的工作流未發布，無法導入文檔，請先發布工作流。',
   },
   upload: {
     selectFile: '選擇文件',
@@ -92,10 +91,9 @@ export default {
     },
   },
   buttons: {
-    prev: '上一步',
-    next: '下一步',
     import: '開始導入',
     preview: '生成預覽',
+    continueImporting: '繼續導入文檔',
   },
   tag: {
     label: '標籤管理',
@@ -117,13 +115,10 @@ export default {
     name: '文件名稱',
     char_length: '字符數',
     paragraph: '分段',
-    all: '全部',
     updateTime: '更新時間',
   },
   fileStatus: {
     label: '文件狀態',
-    SUCCESS: '成功',
-    FAILURE: '失敗',
     EMBEDDING: '索引中',
     PENDING: '排隊中',
     GENERATE: '生成中',
@@ -198,6 +193,5 @@ export default {
     selectDocument: '選擇文檔',
     tip1: '僅支持文檔和表格類型，文檔會根據標題分段，表格會轉為Markdown格式後再分段。',
     tip2: '導入文檔前，建議規範文檔的分段標識。',
-    allCheck: '全選',
   },
 }

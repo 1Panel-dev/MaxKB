@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :node-model="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never">
       <el-form
         @submit.prevent
@@ -12,13 +12,11 @@
         hide-required-asterisk
       >
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.model.label')"
+          :label="$t('workflow.nodes.videoUnderstandNode.model.label')"
           prop="model_id"
           :rules="{
             required: true,
-            message: $t(
-              'views.applicationWorkflow.nodes.videoUnderstandNode.model.requiredMessage',
-            ),
+            message: $t('workflow.nodes.videoUnderstandNode.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -26,8 +24,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                >{{
-                    t('views.applicationWorkflow.nodes.videoUnderstandNode.model.label')
+                  >{{ t('workflow.nodes.videoUnderstandNode.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -47,9 +44,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.model_id"
-            :placeholder="
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.model.requiredMessage')
-            "
+            :placeholder="$t('workflow.nodes.videoUnderstandNode.model.requiredMessage')"
             :options="modelOptions"
             showFooter
             :model-type="'IMAGE'"
@@ -84,7 +79,7 @@
             v-model="form_data.system"
             style="height: 100px"
             @submitDialog="submitSystemDialog"
-            :placeholder="`${t('views.applicationWorkflow.SystemPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('workflow.SystemPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item
@@ -100,8 +95,7 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                >{{
-                    $t('views.application.form.prompt.label')
+                  >{{ $t('views.application.form.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -110,7 +104,6 @@
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
-
           </template>
           <MdEditorMagnify
             @wheel="wheel"
@@ -118,16 +111,21 @@
             v-model="form_data.prompt"
             style="height: 150px"
             @submitDialog="submitDialog"
-            :placeholder="`${t('views.applicationWorkflow.UserPromptPlaceholder')}{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`"
+            :placeholder="`${t('workflow.UserPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
         <el-form-item>
           <template #label>
             <div class="flex-between">
               <div>{{ $t('views.application.form.historyRecord.label') }}</div>
-              <el-select v-model="form_data.dialogue_type" type="small" style="width: 100px">
-                <el-option :label="$t('views.applicationWorkflow.node')" value="NODE"/>
-                <el-option :label="$t('views.applicationWorkflow.workflow')" value="WORKFLOW"/>
+              <el-select
+                v-model="form_data.dialogue_type"
+                type="small"
+                style="width: 100px"
+                :teleported="false"
+              >
+                <el-option :label="$t('workflow.node')" value="NODE" />
+                <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -142,76 +140,71 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.videoUnderstandNode.image.label')"
+          :label="$t('workflow.nodes.videoUnderstandNode.image.label')"
           :rules="{
             type: 'array',
             required: true,
-            message: $t(
-              'views.applicationWorkflow.nodes.videoUnderstandNode.image.requiredMessage',
-            ),
+            message: $t('workflow.nodes.videoUnderstandNode.image.requiredMessage'),
             trigger: 'change',
           }"
         >
           <template #label
-          >{{
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.image.label')
+            >{{ $t('workflow.nodes.videoUnderstandNode.image.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('views.applicationWorkflow.nodes.videoUnderstandNode.image.requiredMessage')
-            "
+            :placeholder="$t('workflow.nodes.videoUnderstandNode.image.requiredMessage')"
             v-model="form_data.video_list"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                    $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                  }}</span>
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result"/>
+          <el-switch size="small" v-model="form_data.is_result" />
         </el-form-item>
       </el-form>
     </el-card>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam"/>
-    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef"/>
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import {computed, onMounted, ref, inject} from 'vue'
-import {groupBy, set} from 'lodash'
+import { computed, onMounted, ref, inject } from 'vue'
+import { groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type {FormInstance} from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-import {t} from '@/locales'
-import {useRoute} from 'vue-router'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
-import GeneratePromptDialog from "@/views/application/component/GeneratePromptDialog.vue";
-
-const getApplicationDetail = inject('getApplicationDetail') as any
+import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
+const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
 const {
-  params: {id},
+  params: { id },
 } = route as any
 
 const apiType = computed(() => {
@@ -233,7 +226,7 @@ const validate = () => {
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
-    return Promise.reject({node: props.nodeModel, errMessage: err})
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
 
@@ -247,7 +240,7 @@ const wheel = (e: any) => {
   }
 }
 
-const defaultPrompt = `{{${t('views.applicationWorkflow.nodes.startNode.label')}.question}}`
+const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
@@ -275,19 +268,19 @@ const form_data = computed({
   },
 })
 
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-        model_type: 'IMAGE',
-        workspace_id: application.value?.workspace_id,
-      }
+          model_type: 'IMAGE',
+          workspace_id: resource.value?.workspace_id,
+        }
       : {
-        model_type: 'IMAGE',
-      }
-  loadSharedApi({type: 'model', systemType: apiType.value})
+          model_type: 'IMAGE',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')

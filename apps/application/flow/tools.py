@@ -8,7 +8,9 @@
 """
 import asyncio
 import json
-import traceback
+import queue
+import re
+import threading
 from typing import Iterator
 
 from django.http import StreamingHttpResponse
@@ -47,6 +49,21 @@ class Reasoning:
             return r
         return {'content': '', 'reasoning_content': ''}
 
+    def _normalize_content(self, content):
+        """将不同类型的内容统一转换为字符串"""
+        if isinstance(content, str):
+            return content
+        elif isinstance(content, list):
+            # 处理包含多种内容类型的列表
+            normalized_parts = []
+            for item in content:
+                if isinstance(item, dict):
+                    if item.get('type') == 'text':
+                        normalized_parts.append(item.get('text', ''))
+            return ''.join(normalized_parts)
+        else:
+            return str(content)
+
     def get_reasoning_content(self, chunk):
         # 如果没有开始思考过程标签那么就全是结果
         if self.reasoning_content_start_tag is None or len(self.reasoning_content_start_tag) == 0:
@@ -55,6 +72,7 @@ class Reasoning:
         # 如果没有结束思考过程标签那么就全部是思考过程
         if self.reasoning_content_end_tag is None or len(self.reasoning_content_end_tag) == 0:
             return {'content': '', 'reasoning_content': chunk.content}
+        chunk.content = self._normalize_content(chunk.content)
         self.all_content += chunk.content
         if not self.reasoning_content_is_start and len(self.all_content) >= self.reasoning_content_start_tag_len:
             if self.all_content.startswith(self.reasoning_content_start_tag):
@@ -201,17 +219,6 @@ def to_stream_response_simple(stream_event):
     r['Cache-Control'] = 'no-cache'
     return r
 
-tool_message_template = """
-<details>
-    <summary>
-        <strong>Called MCP Tool: <em>%s</em></strong>
-    </summary>
-
-%s
-
-</details>
-
-"""
 
 tool_message_json_template = """
 ```json
@@ -219,42 +226,202 @@ tool_message_json_template = """
 ```
 """
 
+tool_message_complete_template = """
+<details>
+    <summary>
+        <strong>Called MCP Tool: <em>%s</em></strong>
+    </summary>
 
-def generate_tool_message_template(name, context):
-    if '```' in context:
-        return tool_message_template % (name, context)
+**Input:**
+%s
+
+**Output:**
+%s
+
+</details>
+
+"""
+
+
+def generate_tool_message_complete(name, input_content, output_content):
+    """生成包含输入和输出的工具消息模版"""
+    # 格式化输入
+    if '```' not in input_content:
+        input_formatted = tool_message_json_template % input_content
     else:
-        return tool_message_template % (name, tool_message_json_template % (context))
+        input_formatted = input_content
+
+    # 格式化输出
+    if '```' not in output_content:
+        output_formatted = tool_message_json_template % output_content
+    else:
+        output_formatted = output_content
+
+    return tool_message_complete_template % (name, input_formatted, output_formatted)
+
+
+# 全局单例事件循环
+_global_loop = None
+_loop_thread = None
+_loop_lock = threading.Lock()
+
+
+def get_global_loop():
+    """获取全局共享的事件循环"""
+    global _global_loop, _loop_thread
+
+    with _loop_lock:
+        if _global_loop is None:
+            _global_loop = asyncio.new_event_loop()
+
+            def run_forever():
+                asyncio.set_event_loop(_global_loop)
+                _global_loop.run_forever()
+
+            _loop_thread = threading.Thread(target=run_forever, daemon=True, name="GlobalAsyncLoop")
+            _loop_thread.start()
+
+    return _global_loop
+
+
+def _extract_tool_id(raw_id):
+    """从 raw_id 中提取最后一个符合 call_... 模式的 id，若无匹配则返回原值或 None"""
+    if not raw_id:
+        return None
+    if not isinstance(raw_id, str):
+        raw_id = str(raw_id)
+
+    s = raw_id
+    prefix = 'call_'
+    positions = [m.start() for m in re.finditer(re.escape(prefix), s)]
+    if not positions:
+        return raw_id
+
+    # 取最后一个前缀位置，截到下一个前缀或结尾
+    start = positions[-1]
+    end = len(s)
+    for pos in positions:
+        if pos > start:
+            end = pos
+            break
+
+    tool_id = s[start:end]
+    return tool_id or raw_id
 
 
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True):
-    client = MultiServerMCPClient(json.loads(mcp_servers))
-    tools = await client.get_tools()
-    agent = create_react_agent(chat_model, tools)
-    response = agent.astream({"messages": message_list}, stream_mode='messages')
-    async for chunk in response:
-        if mcp_output_enable and isinstance(chunk[0], ToolMessage):
-            content = generate_tool_message_template(chunk[0].name, chunk[0].content)
-            chunk[0].content = content
-            yield chunk[0]
-        if isinstance(chunk[0], AIMessageChunk):
-            yield chunk[0]
+    try:
+        client = MultiServerMCPClient(json.loads(mcp_servers))
+        tools = await client.get_tools()
+        agent = create_react_agent(chat_model, tools)
+        response = agent.astream({"messages": message_list}, stream_mode='messages')
+
+        # 用于存储工具调用信息（按 tool_id）以及按 index 聚合分片
+        tool_calls_info = {}
+        _tool_fragments = {}  # index -> {'id':..., 'name':..., 'arguments':...}
+
+        async for chunk in response:
+            if isinstance(chunk[0], AIMessageChunk):
+                tool_calls = chunk[0].additional_kwargs.get('tool_calls', [])
+                for tool_call in tool_calls:
+                    idx = tool_call.get('index')
+                    if idx is None:
+                        continue
+                    entry = _tool_fragments.setdefault(idx, {'id': '', 'name': '', 'arguments': ''})
+
+                    # 更新 id 与 name（如果有）
+                    if tool_call.get('id'):
+                        entry['id'] = tool_call.get('id')
+
+                    func = tool_call.get('function', {})
+                    # arguments 可能在 function.arguments 或顶层 arguments
+                    part_args = ''
+                    if isinstance(func, dict) and 'arguments' in func:
+                        part_args = func.get('arguments') or ''
+                        if func.get('name'):
+                            entry['name'] = func.get('name')
+                    else:
+                        part_args = tool_call.get('arguments', '') or ''
+
+                    # 统一为字符串
+                    if not isinstance(part_args, str):
+                        try:
+                            part_args = json.dumps(part_args, ensure_ascii=False)
+                        except Exception:
+                            part_args = str(part_args)
+
+                    entry['arguments'] += part_args
+
+                    # 尝试判断 JSON 是否完整（若 arguments 是 JSON），完整则提交到 tool_calls_info
+                    try:
+                        json.loads(entry['arguments'])
+                        if entry['id']:
+                            tool_calls_info[entry['id']] = {
+                                'name': entry.get('name', ''),
+                                'input': entry['arguments']
+                            }
+                            _tool_fragments.pop(idx, None)
+                    except Exception:
+                        # 如果不是完整 JSON，继续等待后续片段
+                        pass
+
+                yield chunk[0]
+
+            if mcp_output_enable and isinstance(chunk[0], ToolMessage):
+                tool_id = _extract_tool_id(chunk[0].tool_call_id)
+                if tool_id in tool_calls_info:
+                    tool_info = tool_calls_info[tool_id]
+                    content = generate_tool_message_complete(
+                        tool_info['name'],
+                        tool_info['input'],
+                        chunk[0].content
+                    )
+                    chunk[0].content = content
+                yield chunk[0]
+
+    except ExceptionGroup as eg:
+
+        def get_real_error(exc):
+            if isinstance(exc, ExceptionGroup):
+                return get_real_error(exc.exceptions[0])
+            return exc
+
+        real_error = get_real_error(eg)
+        error_msg = f"{type(real_error).__name__}: {str(real_error)}"
+        raise RuntimeError(error_msg) from None
+
+    except Exception as e:
+        error_msg = f"{type(e).__name__}: {str(e)}"
+        raise RuntimeError(error_msg) from None
+
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True):
-    loop = asyncio.new_event_loop()
-    try:
-        async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable)
-        while True:
-            try:
-                chunk = loop.run_until_complete(anext_async(async_gen))
-                yield chunk
-            except StopAsyncIteration:
-                break
-    except Exception as e:
-        maxkb_logger.error(f'Exception: {e}', exc_info=True)
-    finally:
-        loop.close()
+    """使用全局事件循环，不创建新实例"""
+    result_queue = queue.Queue()
+    loop = get_global_loop()  # 使用共享循环
+
+    async def _run():
+        try:
+            async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable)
+            async for chunk in async_gen:
+                result_queue.put(('data', chunk))
+        except Exception as e:
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            result_queue.put(('error', e))
+        finally:
+            result_queue.put(('done', None))
+
+    # 在全局循环中调度任务
+    asyncio.run_coroutine_threadsafe(_run(), loop)
+
+    while True:
+        msg_type, data = result_queue.get()
+        if msg_type == 'done':
+            break
+        if msg_type == 'error':
+            raise data
+        yield data
 
 
 async def anext_async(agen):

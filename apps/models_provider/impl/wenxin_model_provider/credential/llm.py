@@ -6,7 +6,6 @@
     @date：2024/7/12 10:19
     @desc:
 """
-import traceback
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -16,7 +15,7 @@ from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
-
+from common.utils.logger import maxkb_logger
 
 class WenxinLLMModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel(_('Temperature'),
@@ -66,7 +65,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
             model.invoke(
                 [HumanMessage(content=gettext('Hello'))])
         except Exception as e:
-            traceback.print_exc()
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
             raise e
         return True
 

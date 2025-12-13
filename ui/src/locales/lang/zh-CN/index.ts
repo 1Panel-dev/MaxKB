@@ -6,6 +6,7 @@ import layout from './layout'
 import dynamicsForm from './dynamics-form'
 import common from './common'
 import chat from './ai-chat'
+import workflow from './workflow'
 export default {
   lang: '简体中文',
   zhCn,
@@ -16,5 +17,5 @@ export default {
   common,
   chat,
   components,
-
+  workflow,
 }

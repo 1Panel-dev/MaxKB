@@ -29,6 +29,8 @@ const systemManage = {
   folderEdit: () => false,
   folderAuth: () => false,
   folderDelete: () => false,
+  debug: () => false,
+  
 }
 
 export default systemManage

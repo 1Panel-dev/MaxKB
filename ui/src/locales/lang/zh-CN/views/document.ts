@@ -4,9 +4,7 @@ export default {
   syncDocument: '同步文档',
   items: '项',
   migrateDocument: '文档迁移到',
-  searchBar: {
-    placeholder: '按 文档名称 搜索',
-  },
+
   setting: {
     migration: '迁移',
     cancelGenerateQuestion: '取消生成问题',
@@ -24,9 +22,11 @@ export default {
     nameMessage: '文件名称不能为空！',
     importMessage: '导入成功',
     migrationSuccess: '迁移成功',
+    replaceSuccess: '替换成功',
     fileLimitCountTip1: '每次最多上传',
     fileLimitCountTip2: '个文件',
     fileLimitSizeTip1: '每个文件不超过',
+    toImportDocConfirm: '当前知识库的工作流未发布，无法导入文档，请先发布工作流。',
   },
   upload: {
     selectFile: '选择文件',
@@ -37,7 +37,7 @@ export default {
     errorMessage2: '文件格式不支持',
     errorMessage3: '文件不能为空',
     // errorMessage4: '每次最多上传50个文件',
-    template: '模版',
+    template: '模板',
     download: '下载',
   },
 
@@ -48,13 +48,13 @@ export default {
     },
     table: {
       label: '表格',
-      tip1: '1、点击下载对应模版并完善信息：',
+      tip1: '1、点击下载对应模板并完善信息：',
       tip2: '2、第一行必须是列标题，且列标题必须是有意义的术语，表中每条记录将作为一个分段',
       tip3: '3、上传的表格文件中每个 sheet 会作为一个文档，sheet名称为文档名称',
     },
     QA: {
       label: 'QA 问答对',
-      tip1: '1、点击下载对应模版并完善信息',
+      tip1: '1、点击下载对应模板并完善信息',
       tip2: '2、上传的表格文件中每个 sheet 会作为一个文档，sheet名称为文档名称',
     },
     lark: {},
@@ -89,10 +89,9 @@ export default {
     },
   },
   buttons: {
-    prev: '上一步',
-    next: '下一步',
     import: '开始导入',
     preview: '生成预览',
+    continueImporting: '继续导入文档',
   },
   tag: {
     label: '标签管理',
@@ -115,13 +114,10 @@ export default {
     name: '文件名称',
     char_length: '字符数',
     paragraph: '分段',
-    all: '全部',
     updateTime: '更新时间',
   },
   fileStatus: {
     label: '文件状态',
-    SUCCESS: '成功',
-    FAILURE: '失败',
     EMBEDDING: '索引中',
     PENDING: '排队中',
     GENERATE: '生成中',
@@ -194,9 +190,8 @@ export default {
   },
   feishu: {
     selectDocument: '选择文档',
-    tip1: '支持文档和表格类型，包含TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP格式；',
+    tip1: '支持文档和表格类型，包含 TXT、Markdown、PDF、DOCX、HTML、XLS、XLSX、CSV、ZIP 格式；',
     tip2: '导入文档前，建议规范文档的分段标识。',
-    allCheck: '全选',
     errorMessage1: '请选择文档',
   },
 }

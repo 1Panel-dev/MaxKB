@@ -19,7 +19,7 @@
           :disabled="loading"
           v-if="permissionPrecise.edit(id)"
         >
-          {{ $t('views.application.operation.publish') }}
+          {{ $t('common.publish') }}
         </el-button>
       </div>
     </div>
@@ -48,7 +48,7 @@
                   <template #label>
                     <div class="flex-between">
                       <span
-                        >{{ $t('views.application.form.appName.label') }}
+                        >{{ $t('common.name') }}
                         <span class="color-danger">*</span></span
                       >
                     </div>

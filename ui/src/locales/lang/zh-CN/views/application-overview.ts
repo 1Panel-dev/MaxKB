@@ -22,8 +22,8 @@ export default {
 
     APIKeyDialog: {
       saveSettings: '保存设置',
-      msgConfirm1: '是否删除API Key',
-      msgConfirm2: '删除API Key后将无法恢复，请确认是否删除？',
+      msgConfirm1: '是否删除 API Key',
+      msgConfirm2: '删除 API Key 后将无法恢复，请确认是否删除？',
     },
     EmbedDialog: {
       fullscreenModeTitle: '全屏模式',
@@ -43,6 +43,8 @@ export default {
       loginMethodRequired: '请选择登录方式',
       displayCodeRequired: '请输入失败次数',
       toSettingChatUser: '去配置对话用户',
+      authenticationTooltip:
+        '开启登录认证后，应用和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: '允许跨域地址',
@@ -97,6 +99,8 @@ export default {
       userSatisfaction: '用户满意度',
       approval: '赞同',
       disapproval: '反对',
+      tokenUsage: '用户消耗 Tokens',
+      topQuestions: '用户提问次数',
     },
   },
 }

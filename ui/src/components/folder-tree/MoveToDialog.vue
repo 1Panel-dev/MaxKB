@@ -30,7 +30,7 @@
 </template>
 <script setup lang="ts">
 import { ref, watch, reactive } from 'vue'
-import folderApi from '@/api/folder'
+import folderApi from '@/api/workspace/folder'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -77,7 +77,7 @@ const open = (data: any, is_folder?: any) => {
 
 function getFolder() {
   const params = {}
-  folder.asyncGetFolder(props.source, params, loading).then((res: any) => {
+  folder.asyncGetFolder(props.source, params, 'workspace', loading).then((res: any) => {
     folderList.value = res.data
     if (folderList.value?.length > 0) {
       currentNodeKey.value = folderList.value[0]?.id
@@ -154,7 +154,7 @@ defineExpose({ open })
     border-radius: 6px;
   }
   :deep(.el-tree) {
-    height: calc(100vh - 320px)!important;
+    height: calc(100vh - 320px) !important;
   }
 }
 </style>

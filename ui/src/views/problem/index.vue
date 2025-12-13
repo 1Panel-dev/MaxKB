@@ -31,7 +31,7 @@
 
             <el-input
               v-model="filterText"
-              :placeholder="$t('views.problem.searchBar.placeholder')"
+              :placeholder="$t('common.searchBar.placeholder')"
               prefix-icon="Search"
               class="w-240"
               @change="getList"

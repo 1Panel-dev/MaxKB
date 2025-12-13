@@ -27,6 +27,9 @@
     border: 1px solid var(--el-card-border-color);
     box-shadow: none !important;
   }
+  .el-card__body {
+    overflow: inherit;
+  }
 }
 
 // tree
@@ -382,4 +385,15 @@
 }
 .el-tabs__active-bar {
   height: 3px;
+}
+
+// el-upload
+.el-upload {
+  --el-upload-dragger-padding-horizontal: 32px;
+}
+
+// el-switch
+.el-switch__core {
+  border: 1px solid var(--app-border-color-dark);
+  background: var(--app-border-color-dark);
 }

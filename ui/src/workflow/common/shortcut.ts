@@ -4,6 +4,7 @@ import { type GraphModel } from '@logicflow/core'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { WorkflowType } from '@/enums/application'
 import { t } from '@/locales'
+import { getMenuNodes } from './data'
 let selected: any | null = null
 
 function translationNodeData(nodeData: any, distance: any) {
@@ -61,18 +62,21 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       (node: any) => node.type === WorkflowType.Start || node.type === WorkflowType.Base,
     )
     if (base_nodes.length > 0) {
-      MsgError(base_nodes[0]?.properties?.stepName + t('views.applicationWorkflow.tip.cannotCopy'))
+      MsgError(base_nodes[0]?.properties?.stepName + t('workflow.tip.cannotCopy'))
       return
     }
     selected = cloneDeep(elements)
     selected.nodes.forEach((node: any) => translationNodeData(node, TRANSLATION_DISTANCE))
     selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
-    MsgSuccess(t('views.applicationWorkflow.tip.copyError'))
+    MsgSuccess(t('workflow.tip.copyError'))
     return false
   }
   const paste_node = () => {
     if (!keyboardOptions?.enabled) return true
     if (graph.textEditElement) return true
+    const menus = getMenuNodes(lf.graphModel.get_provide(null, null).workflowMode)
+    const nodes = menus?.flatMap((m: any) => m.list).map((n) => n.type)
+    selected.nodes = selected.nodes.filter((n: any) => nodes?.includes(n.type))
     if (selected && (selected.nodes || selected.edges)) {
       lf.clearSelectElements()
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
@@ -98,15 +102,19 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return
     }
     const nodes = elements.nodes.filter((node) =>
-      ['start-node', 'base-node', 'loop-body-node', 'loop-start-node'].includes(node.type),
+      [
+        'start-node',
+        'base-node',
+        'loop-body-node',
+        'loop-start-node',
+        'knowledge-base-node',
+      ].includes(node.type),
     )
     if (nodes.length > 0) {
-      MsgError(
-        `${nodes[0].properties?.stepName}${t('views.applicationWorkflow.delete.deleteMessage')}`,
-      )
+      MsgError(`${nodes[0].properties?.stepName}${t('workflow.delete.deleteMessage')}`)
       return
     }
-    MsgConfirm(t('common.tip'), t('views.applicationWorkflow.delete.confirmTitle'), {
+    MsgConfirm(t('common.tip'), t('workflow.delete.confirmTitle'), {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger',
     }).then(() => {

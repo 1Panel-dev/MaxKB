@@ -9,7 +9,7 @@
     </el-button>
     <el-button
       @click="changeCursor(false)"
-      style="border: none; padding: 4px; height: 24px;margin-left: 8px;"
+      style="border: none; padding: 4px; height: 24px; margin-left: 8px"
       :class="{ 'is-drag-active': !isDrag }"
     >
       <AppIcon iconName="app-raisehand" :size="16"></AppIcon>
@@ -18,10 +18,10 @@
     <el-button link @click="zoomOut" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.zoomOut')"
+        :content="$t('workflow.control.zoomOut')"
         placement="top"
       >
-        <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomOut')"
+        <el-icon :size="16" :title="$t('workflow.control.zoomOut')"
           ><ZoomOut
         /></el-icon>
       </el-tooltip>
@@ -29,10 +29,10 @@
     <el-button link @click="zoomIn" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.zoomIn')"
+        :content="$t('workflow.control.zoomIn')"
         placement="top"
       >
-        <el-icon :size="16" :title="$t('views.applicationWorkflow.control.zoomIn')"
+        <el-icon :size="16" :title="$t('workflow.control.zoomIn')"
           ><ZoomIn
         /></el-icon>
       </el-tooltip>
@@ -40,12 +40,12 @@
     <el-button link @click="fitView" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.fitView')"
+        :content="$t('workflow.control.fitView')"
         placement="top"
       >
         <AppIcon
           iconName="app-fitview"
-          :title="$t('views.applicationWorkflow.control.fitView')"
+          :title="$t('workflow.control.fitView')"
         ></AppIcon>
       </el-tooltip>
     </el-button>
@@ -53,39 +53,39 @@
     <el-button link @click="retract" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.retract')"
+        :content="$t('workflow.control.retract')"
         placement="top"
       >
         <AppIcon
           style="font-size: 16px"
           iconName="app-retract"
-          :title="$t('views.applicationWorkflow.control.retract')"
+          :title="$t('workflow.control.retract')"
         ></AppIcon>
       </el-tooltip>
     </el-button>
     <el-button link @click="extend" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.extend')"
+        :content="$t('workflow.control.extend')"
         placement="top"
       >
         <AppIcon
           style="font-size: 16px"
           iconName="app-extend"
-          :title="$t('views.applicationWorkflow.control.extend')"
+          :title="$t('workflow.control.extend')"
         ></AppIcon>
       </el-tooltip>
     </el-button>
     <el-button link @click="layout" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('views.applicationWorkflow.control.beautify')"
+        :content="$t('workflow.control.beautify')"
         placement="top"
       >
         <AppIcon
           style="font-size: 16px"
           iconName="app-beautify"
-          :title="$t('views.applicationWorkflow.control.beautify')"
+          :title="$t('workflow.control.beautify')"
         ></AppIcon>
       </el-tooltip>
     </el-button>
@@ -113,6 +113,12 @@ function fitView() {
 }
 const layout = () => {
   props.lf?.extension.dagre.layout()
+  console.log(props.lf)
+  props.lf?.graphModel.nodes.forEach((node: any) => {
+    if (node.type === 'loop-body-node') {
+      node?.loopLayout?.()
+    }
+  })
 }
 const retract = () => {
   props.lf?.graphModel.nodes.forEach((element: any) => {

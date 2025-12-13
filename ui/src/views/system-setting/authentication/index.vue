@@ -23,6 +23,7 @@ import CAS from './component/CAS.vue'
 import OIDC from './component/OIDC.vue'
 import SCAN from './component/SCAN.vue'
 import OAuth2 from './component/OAuth2.vue'
+import Saml2 from "./component/Saml2.vue";
 import Setting from './component/Setting.vue'
 import { t } from '@/locales'
 import useStore from '@/stores'
@@ -56,6 +57,11 @@ const tabList = [
     label: t('views.system.authentication.oauth2.title'),
     name: 'OAuth2',
     component: OAuth2,
+  },
+  {
+    label: t('views.system.authentication.saml2.title'),
+    name: 'SAML2',
+    component: Saml2,
   },
   {
     label: t('views.system.authentication.scanTheQRCode.title'),

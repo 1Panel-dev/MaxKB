@@ -24,9 +24,6 @@ export default {
     requiredMessage: 'cannot be empty',
     jsonMessage: 'Incorrect JSON format',
   },
-  searchBar: {
-    placeholder: 'Please enter keywords to search',
-  },
   paramForm: {
     field: {
       label: 'Parameter',

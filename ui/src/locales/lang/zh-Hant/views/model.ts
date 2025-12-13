@@ -16,7 +16,7 @@ export default {
     updateSuccessMessage: '修改模型成功',
     saveSuccessMessage: '模型參數儲存成功',
     downloadError: '下載失敗',
-    noModel: '模型在Ollama不存在',
+    noModel: '模型在 Ollama 不存在',
   },
   modelType: {
     allModel: '全部模型',
@@ -55,7 +55,7 @@ export default {
     model_type: {
       label: '模型類型',
       placeholder: '請選擇模型類型',
-      tooltip1: '大語言模型：在應用中與AI對話的推理模型。',
+      tooltip1: '大語言模型：在應用中與 AI 對話的推理模型。',
       tooltip2: '向量模型：在知識庫中對文件內容進行向量化化的模型。',
       tooltip3: '語音辨識：在應用中開啟語音辨識後用於語音轉文字的模型。',
       tooltip4: '語音合成：在應用中開啟語音播放後用於文字轉語音的模型。',

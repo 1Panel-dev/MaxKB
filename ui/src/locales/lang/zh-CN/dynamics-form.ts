@@ -7,7 +7,7 @@ export default {
     SingleSelect: '单选框',
     MultiSelect: '多选框',
     DatePicker: '日期',
-    JsonInput: 'JSON文本框',
+    JsonInput: 'JSON 文本框',
     RadioCard: '选项卡',
     RadioRow: '单行选项卡',
     UploadInput: '文件上传',
@@ -22,10 +22,7 @@ export default {
   },
   tip: {
     requiredMessage: '不能为空',
-    jsonMessage: 'JSON格式不正确',
-  },
-  searchBar: {
-    placeholder: '请输入关键字搜索',
+    jsonMessage: 'JSON 格式不正确',
   },
   paramForm: {
     field: {
@@ -88,7 +85,7 @@ export default {
     step: {
       label: '步长值',
       requiredMessage1: '步长值必填',
-      requiredMessage2: '步长不能为0',
+      requiredMessage2: '步长不能为 0',
     },
   },
   TextInput: {

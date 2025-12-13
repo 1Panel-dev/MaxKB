@@ -30,9 +30,9 @@
       </template>
       <div v-if="configType === 'wechat'" class="flex align-center mb-16">
         <span class="lighter mr-8">{{
-            $t('views.application.applicationAccess.wecomSetting.authenticationSuccessful')
-          }}</span>
-        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification"/>
+          $t('views.application.applicationAccess.wecomSetting.authenticationSuccessful')
+        }}</span>
+        <el-switch v-if="configType === 'wechat'" v-model="form[configType].is_certification" />
       </div>
 
       <h4 class="title-decoration-1 mb-16">
@@ -56,7 +56,7 @@
             class="color-primary"
             href="https://mp.weixin.qq.com/advanced/advanced?action=dev&t=advanced/dev"
             target="_blank"
-          >{{ $t('views.application.applicationAccess.wechatPlatform') }}</a
+            >{{ $t('views.application.applicationAccess.wechatPlatform') }}</a
           >{{ $t('views.application.applicationAccess.wechatSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'dingtalk'">
@@ -65,7 +65,7 @@
             class="color-primary"
             href="https://open-dev.dingtalk.com/fe/app?hash=%23%2Fcorp%2Fapp#/corp/app"
             target="_blank"
-          >{{ $t('views.application.applicationAccess.dingtalkPlatform') }}</a
+            >{{ $t('views.application.applicationAccess.dingtalkPlatform') }}</a
           >{{ $t('views.application.applicationAccess.dingtalkSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'wecom'">
@@ -74,14 +74,14 @@
             class="color-primary"
             href="https://work.weixin.qq.com/wework_admin/frame#apps"
             target="_blank"
-          >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
+            >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
           >{{ $t('views.application.applicationAccess.wecomSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'lark'">
           {{ $t('views.application.applicationAccess.copyUrl') }}
-          <a class="primary" href="https://open.feishu.cn/app/" target="_blank">{{
-              $t('views.application.applicationAccess.larkPlatform')
-            }}</a
+          <a class="color-primary" href="https://open.feishu.cn/app/" target="_blank">{{
+            $t('views.application.applicationAccess.larkPlatform')
+          }}</a
           >{{ $t('views.application.applicationAccess.larkSetting.urlInfo') }}
         </el-text>
         <el-text type="info" v-if="configType === 'wecomBot'">
@@ -90,10 +90,9 @@
             class="color-primary"
             href="https://work.weixin.qq.com/wework_admin/frame#/manageTools"
             target="_blank"
-          >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
+            >{{ $t('views.application.applicationAccess.wecomPlatform') }}</a
           >{{ $t('views.application.applicationAccess.wecomBotSetting.urlInfo') }}
         </el-text>
-
       </el-form-item>
     </el-form>
 
@@ -109,20 +108,20 @@
 </template>
 
 <script setup lang="ts">
-import {ref, reactive, computed} from 'vue'
-import type {FormInstance} from 'element-plus'
-import {useRoute} from 'vue-router'
-import {MsgError, MsgSuccess} from '@/utils/message'
-import {copyClick} from '@/utils/clipboard'
-import {t} from '@/locales'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { ref, reactive, computed } from 'vue'
+import type { FormInstance } from 'element-plus'
+import { useRoute } from 'vue-router'
+import { MsgError, MsgSuccess } from '@/utils/message'
+import { copyClick } from '@/utils/clipboard'
+import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 type PlatformType = 'wechat' | 'dingtalk' | 'wecom' | 'lark' | 'slack' | 'wecomBot'
 
 const route = useRoute()
 
 const {
-  params: {id},
+  params: { id },
 } = route as any
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
@@ -147,7 +146,7 @@ const form = reactive<any>({
     is_certification: false,
     callback_url: '',
   },
-  dingtalk: {client_id: '', client_secret: '', callback_url: ''},
+  dingtalk: { client_id: '', client_secret: '', callback_url: '' },
   wecom: {
     app_id: '',
     agent_id: '',
@@ -156,13 +155,13 @@ const form = reactive<any>({
     encoding_aes_key: '',
     callback_url: '',
   },
-  lark: {app_id: '', app_secret: '', verification_token: '', callback_url: ''},
-  slack: {signing_secret: '', bot_user_token: '', callback_url: ''},
+  lark: { app_id: '', app_secret: '', verification_token: '', callback_url: '' },
+  slack: { signing_secret: '', bot_user_token: '', callback_url: '' },
   wecomBot: {
     token: '',
     encoding_aes_key: '',
     callback_url: '',
-  }
+  },
 })
 
 const rules = reactive<{ [propName: string]: any }>({
@@ -316,38 +315,38 @@ const configFields: { [propName: string]: { [propName: string]: any } } = {
       label: t('views.application.applicationAccess.wechatSetting.appSecret'),
       placeholder: '',
     },
-    token: {label: t('views.application.applicationAccess.wechatSetting.token'), placeholder: ''},
+    token: { label: t('views.application.applicationAccess.wechatSetting.token'), placeholder: '' },
     encoding_aes_key: {
       label: t('views.application.applicationAccess.wechatSetting.aesKey'),
       placeholder: '',
     },
   },
   dingtalk: {
-    client_id: {label: 'Client ID', placeholder: ''},
-    client_secret: {label: 'Client Secret', placeholder: ''},
+    client_id: { label: 'Client ID', placeholder: '' },
+    client_secret: { label: 'Client Secret', placeholder: '' },
   },
   wecom: {
     app_id: {
       label: t('views.application.applicationAccess.wecomSetting.cropId'),
       placeholder: '',
     },
-    agent_id: {label: 'Agent ID', placeholder: ''},
-    secret: {label: 'Secret', placeholder: ''},
-    token: {label: 'Token', placeholder: ''},
-    encoding_aes_key: {label: 'EncodingAESKey', placeholder: ''},
+    agent_id: { label: 'Agent ID', placeholder: '' },
+    secret: { label: 'Secret', placeholder: '' },
+    token: { label: 'Token', placeholder: '' },
+    encoding_aes_key: { label: 'EncodingAESKey', placeholder: '' },
   },
   wecomBot: {
-    token: {label: 'Token', placeholder: ''},
-    encoding_aes_key: {label: 'EncodingAESKey', placeholder: ''},
+    token: { label: 'Token', placeholder: '' },
+    encoding_aes_key: { label: 'EncodingAESKey', placeholder: '' },
   },
   lark: {
-    app_id: {label: 'App ID', placeholder: ''},
-    app_secret: {label: 'App Secret', placeholder: ''},
-    verification_token: {label: 'Verification Token', placeholder: ''},
+    app_id: { label: 'App ID', placeholder: '' },
+    app_secret: { label: 'App Secret', placeholder: '' },
+    verification_token: { label: 'Verification Token', placeholder: '' },
   },
   slack: {
-    signing_secret: {label: 'Signing Secret', placeholder: ''},
-    bot_user_token: {label: 'Bot User Token', placeholder: ''},
+    signing_secret: { label: 'Signing Secret', placeholder: '' },
+    bot_user_token: { label: 'Bot User Token', placeholder: '' },
   },
 }
 
@@ -407,7 +406,7 @@ const submit = async () => {
   formRef.value?.validate(async (valid) => {
     if (valid) {
       try {
-        loadSharedApi({type: 'application', systemType: apiType.value})
+        loadSharedApi({ type: 'application', systemType: apiType.value })
           .updatePlatformConfig(id, configType.value, form[configType.value], loading)
           .then(() => {
             MsgSuccess(t('common.saveSuccess'))
@@ -445,5 +444,5 @@ const open = async (id: string, type: PlatformType) => {
   }
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>

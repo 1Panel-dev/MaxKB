@@ -18,7 +18,7 @@
             <el-option :label="$t('common.creator')" value="create_user"/>
 
             <el-option :label="$t('common.name')" value="name"/>
-            <el-option :label="$t('views.system.resource_management.type')" value="type"/>
+            <el-option :label="$t('common.type')" value="type"/>
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -74,7 +74,7 @@
 
         <el-table-column
           prop="tool_type"
-          :label="$t('views.system.resource_management.type')"
+          :label="$t('common.type')"
           width="160"
         >
           <template #default="scope">
@@ -142,13 +142,13 @@
                 <SuccessFilled/>
               </el-icon>
               <span class="color-text-primary">
-                {{ $t('views.application.status.published') }}
+                {{ $t('common.status.published') }}
               </span>
             </div>
             <div v-else class="flex align-center">
               <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
               <span class="color-text-primary">
-                {{ $t('views.application.status.unpublished') }}
+                {{ $t('common.status.unpublished') }}
               </span>
             </div>
           </template>
@@ -462,11 +462,11 @@ const statusVisible = ref(false)
 const statusArr = ref<any[]>([])
 const statusOptions = ref<any[]>([
   {
-    label: t('views.application.status.published'),
+    label: t('common.status.published'),
     value: true,
   },
   {
-    label: t('views.application.status.unpublished'),
+    label: t('common.status.unpublished'),
     value: false,
   },
 ])

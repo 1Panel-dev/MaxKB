@@ -62,21 +62,21 @@ function visibleChange(bool: boolean) {
 const validate = () => {
   const incomingNodeValue = getOptionsValue()
   if (!data.value || data.value.length === 0) {
-    return Promise.reject(t('views.applicationWorkflow.variable.ReferencingRequired'))
+    return Promise.reject(t('workflow.variable.ReferencingRequired'))
   }
   if (data.value.length < 2) {
-    return Promise.reject(t('views.applicationWorkflow.variable.ReferencingError'))
+    return Promise.reject(t('workflow.variable.ReferencingError'))
   }
   const node_id = data.value[0]
   const node_field = data.value[1]
   const nodeParent = incomingNodeValue.find((item: any) => item.value === node_id)
   if (!nodeParent) {
     data.value = []
-    return Promise.reject(t('views.applicationWorkflow.variable.NoReferencing'))
+    return Promise.reject(t('workflow.variable.NoReferencing'))
   }
   if (!nodeParent.children.some((item: any) => item.value === node_field)) {
     data.value = []
-    return Promise.reject(t('views.applicationWorkflow.variable.NoReferencing'))
+    return Promise.reject(t('workflow.variable.NoReferencing'))
   }
   return Promise.resolve('')
 }
@@ -93,7 +93,7 @@ const get_up_node_field_list = (contain_self: boolean, use_cache: boolean) => {
   return result.filter((v: any) => v.children && v.children.length > 0)
 }
 const getOptionsValue = () => {
-  if (workflowMode == WorkflowMode.ApplicationLoop) {
+  if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop].includes(workflowMode)) {
     return props.global
       ? get_up_node_field_list(false, true).filter(
           (v: any) =>
@@ -101,7 +101,7 @@ const getOptionsValue = () => {
         )
       : get_up_node_field_list(false, true).filter((v: any) => v.children && v.children.length > 0)
   } else {
-    return props.global
+    const result = props.global
       ? props.nodeModel
           .get_up_node_field_list(false, true)
           .filter(
@@ -110,6 +110,7 @@ const getOptionsValue = () => {
       : props.nodeModel
           .get_up_node_field_list(false, true)
           .filter((v: any) => v.children && v.children.length > 0)
+    return result
   }
 }
 const initOptions = () => {

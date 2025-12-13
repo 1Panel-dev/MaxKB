@@ -1,102 +1,130 @@
 # coding=utf-8
 import ast
+import base64
+import gzip
 import json
 import os
+import socket
 import subprocess
 import sys
-from textwrap import dedent
-import socket
+import tempfile
+import pwd
+import resource
+import getpass
+import random
+import time
 import uuid_utils.compat as uuid
+from contextlib import contextmanager
+from common.utils.logger import maxkb_logger
 from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
-from common.utils.logger import maxkb_logger
+from textwrap import dedent
 
-python_directory = sys.executable
+_enable_sandbox = bool(CONFIG.get('SANDBOX', 0))
+_run_user = 'sandbox' if _enable_sandbox else getpass.getuser()
+_sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox') if _enable_sandbox else os.path.join(PROJECT_DIR, 'data', 'sandbox')
+_process_limit_timeout_seconds = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_TIMEOUT_SECONDS", '3600'))
+_process_limit_cpu_cores = min(max(int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_CPU_CORES", '1')), 1), len(os.sched_getaffinity(0))) if sys.platform.startswith("linux") else os.cpu_count() # 只支持linux，window和mac不支持
+_process_limit_mem_mb = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_MEM_MB", '256'))
 
 class ToolExecutor:
-    def __init__(self, sandbox=False):
-        self.sandbox = sandbox
-        if sandbox:
-            self.sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox')
-            self.user = 'sandbox'
-        else:
-            self.sandbox_path = os.path.join(PROJECT_DIR, 'data', 'sandbox')
-            self.user = None
-        self._createdir()
-        if self.sandbox:
-            os.system(f"chown -R {self.user}:root {self.sandbox_path}")
-        self.banned_keywords = CONFIG.get("SANDBOX_PYTHON_BANNED_KEYWORDS", 'nothing_is_banned').split(',');
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def init_sandbox_dir():
+        if not _enable_sandbox:
+            # 不启用sandbox就不初始化目录
+            return
         try:
-            banned_hosts_file_path = f'{self.sandbox_path}/.SANDBOX_BANNED_HOSTS'
-            if os.path.exists(banned_hosts_file_path):
-                os.remove(banned_hosts_file_path)
-            banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
-            if banned_hosts:
-                hostname = socket.gethostname()
-                local_ip = socket.gethostbyname(hostname)
-                banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
-                with open(banned_hosts_file_path, "w") as f:
-                    f.write(banned_hosts)
-                os.chmod(banned_hosts_file_path, 0o644)
+            # 只初始化一次
+            fd = os.open(os.path.join(PROJECT_DIR, 'tmp', 'tool_executor_init_dir.lock'),
+                         os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            os.close(fd)
+        except FileExistsError:
+            # 文件已存在 → 已初始化过
+            return
+        maxkb_logger.info("Init sandbox dir.")
+        try:
+            os.system("chmod -R g-rwx /dev/shm /dev/mqueue")
+            os.system("chmod o-rwx /run/postgresql")
         except Exception as e:
-            maxkb_logger.error(f'Failed to init SANDBOX_BANNED_HOSTS due to exception: {e}', exc_info=True)
+            maxkb_logger.warning(f'Exception: {e}', exc_info=True)
             pass
+        if CONFIG.get("SANDBOX_TMP_DIR_ENABLED", '0') == "1":
+            os.system("chmod g+rwx /tmp")
+        # 初始化sandbox配置文件
+        sandbox_lib_path = os.path.dirname(f'{_sandbox_path}/lib/sandbox.so')
+        sandbox_conf_file_path = f'{sandbox_lib_path}/.sandbox.conf'
+        if os.path.exists(sandbox_conf_file_path):
+            os.remove(sandbox_conf_file_path)
+        allow_subprocess = CONFIG.get("SANDBOX_PYTHON_ALLOW_SUBPROCESS", '0')
+        banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
+        if banned_hosts:
+            hostname = socket.gethostname()
+            local_ip = socket.gethostbyname(hostname)
+            banned_hosts = f"{banned_hosts},{hostname},{local_ip}"
+        with open(sandbox_conf_file_path, "w") as f:
+            f.write(f"SANDBOX_PYTHON_BANNED_HOSTS={banned_hosts}\n")
+            f.write(f"SANDBOX_PYTHON_ALLOW_SUBPROCESS={allow_subprocess}\n")
+        os.system(f"chmod -R 550 {_sandbox_path}")
 
-    def _createdir(self):
-        old_mask = os.umask(0o077)
-        try:
-            os.makedirs(self.sandbox_path, 0o700, exist_ok=True)
-            os.makedirs(os.path.join(self.sandbox_path, 'execute'), 0o700, exist_ok=True)
-            os.makedirs(os.path.join(self.sandbox_path, 'result'), 0o700, exist_ok=True)
-        finally:
-            os.umask(old_mask)
+    try:
+        init_sandbox_dir()
+    except Exception as e:
+        maxkb_logger.error(f'Exception: {e}', exc_info=True)
 
-    def exec_code(self, code_str, keywords):
-        self.validate_banned_keywords(code_str)
+    def exec_code(self, code_str, keywords, function_name=None):
         _id = str(uuid.uuid7())
-        success = '{"code":200,"msg":"成功","data":exec_result}'
-        err = '{"code":500,"msg":str(e),"data":None}'
-        result_path = f'{self.sandbox_path}/result/{_id}.result'
+        action_function = f'({function_name !a}, locals_v.get({function_name !a}))' if function_name else 'locals_v.popitem()'
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
+        set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
         _exec_code = f"""
 try:
-    import os
-    import sys
-    import json
+    import os, sys, json
+    from contextlib import redirect_stdout
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {python_paths}
-    locals_v={'{}'}
+    locals_v={{}}
     keywords={keywords}
-    globals_v={'{}'}
-    exec({dedent(code_str)!a}, globals_v, locals_v)
-    f_name, f = locals_v.popitem()
-    for local in locals_v:
-        globals_v[local] = locals_v[local]
-    exec_result=f(**keywords)
-    with open({result_path!a}, 'w') as file:
-        file.write(json.dumps({success}, default=str))
+    globals_v={{}}
+    {set_run_user}
+    os.environ.clear()
+    with redirect_stdout(open(os.devnull, 'w')):
+        exec({dedent(code_str)!a}, globals_v, locals_v)
+        f_name, f = {action_function}
+        globals_v.update(locals_v)
+        exec_result=f(**keywords)
+    sys.stdout.write("\\n{_id}:")
+    json.dump({{'code':200,'msg':'success','data':exec_result}}, sys.stdout, default=str)
 except Exception as e:
-    with open({result_path!a}, 'w') as file:
-        file.write(json.dumps({err}))
+    if isinstance(e, MemoryError): e = Exception("Cannot allocate more memory: exceeded the limit of {_process_limit_mem_mb} MB.")
+    sys.stdout.write("\\n{_id}:")
+    json.dump({{'code':500,'msg':str(e),'data':None}}, sys.stdout, default=str)
+sys.stdout.flush()
 """
-        if self.sandbox:
-            subprocess_result = self._exec_sandbox(_exec_code, _id)
-        else:
-            subprocess_result = self._exec(_exec_code)
-        if subprocess_result.returncode == 1:
-            raise Exception(subprocess_result.stderr)
-        with open(result_path, 'r') as file:
-            result = json.loads(file.read())
-        os.remove(result_path)
+        maxkb_logger.debug(f"Sandbox execute code: {_exec_code}")
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=True) as f:
+            f.write(_exec_code)
+            f.flush()
+            with execution_timer(_id):
+                subprocess_result = self._exec(f.name)
+        if subprocess_result.returncode != 0:
+            raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
+        lines = subprocess_result.stdout.splitlines()
+        result_line = [line for line in lines if line.startswith(_id)]
+        if not result_line:
+            maxkb_logger.error("\n".join(lines))
+            raise Exception("No result found.")
+        result = json.loads(result_line[-1].split(":", 1)[1])
         if result.get('code') == 200:
             return result.get('data')
-        raise Exception(result.get('msg'))
+        raise Exception(result.get('msg') + (f'\n{subprocess_result.stderr}' if subprocess_result.stderr else ''))
 
     def _generate_mcp_server_code(self, _code, params):
-        self.validate_banned_keywords(_code)
-
         # 解析代码，提取导入语句和函数定义
         try:
             tree = ast.parse(_code)
@@ -162,71 +190,57 @@ except Exception as e:
     def generate_mcp_server_code(self, code_str, params):
         python_paths = CONFIG.get_sandbox_python_package_paths().split(',')
         code = self._generate_mcp_server_code(code_str, params)
+        set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
         return f"""
-import os
-import sys
-import logging
+import os, sys, logging
 logging.basicConfig(level=logging.WARNING)
 logging.getLogger("mcp").setLevel(logging.ERROR)
 logging.getLogger("mcp.server").setLevel(logging.ERROR)
-
 path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
 sys.path = [p for p in sys.path if p not in path_to_exclude]
 sys.path += {python_paths}
+{set_run_user}
+os.environ.clear()
 exec({dedent(code)!a})
 """
 
     def get_tool_mcp_config(self, code, params):
-        code = self.generate_mcp_server_code(code, params)
-
-        _id = uuid.uuid7()
-        code_path = f'{self.sandbox_path}/execute/{_id}.py'
-        with open(code_path, 'w') as f:
-            f.write(code)
-        if self.sandbox:
-            os.system(f"chown {self.user}:root {code_path}")
-
-            tool_config = {
-                'command': 'su',
-                'args': [
-                    '-s', sys.executable,
-                    '-c', f"exec(open('{code_path}', 'r').read())",
-                    self.user,
-                ],
-                'cwd': self.sandbox_path,
-                'env': {
-                    'LD_PRELOAD': f'{self.sandbox_path}/sandbox.so',
-                },
-                'transport': 'stdio',
-            }
-        else:
-            tool_config = {
-                'command': sys.executable,
-                'args': [code_path],
-                'transport': 'stdio',
-            }
-        return _id, tool_config
-
-    def _exec_sandbox(self, _code, _id):
-        exec_python_file = f'{self.sandbox_path}/execute/{_id}.py'
-        with open(exec_python_file, 'w') as file:
-            file.write(_code)
-            os.system(f"chown {self.user}:root {exec_python_file}")
-        kwargs = {'cwd': BASE_DIR}
-        kwargs['env'] = {
-            'LD_PRELOAD': f'{self.sandbox_path}/sandbox.so',
+        _code = self.generate_mcp_server_code(code, params)
+        maxkb_logger.debug(f"Python code of mcp tool: {_code}")
+        compressed_and_base64_encoded_code_str = base64.b64encode(gzip.compress(_code.encode())).decode()
+        tool_config = {
+            'command': sys.executable,
+            'args': [
+                '-c',
+                f'import base64,gzip; exec(gzip.decompress(base64.b64decode(\'{compressed_and_base64_encoded_code_str}\')).decode())',
+            ],
+            'cwd': _sandbox_path,
+            'env': {
+                'LD_PRELOAD': f'{_sandbox_path}/lib/sandbox.so',
+            },
+            'transport': 'stdio',
         }
-        subprocess_result = subprocess.run(
-            ['su', '-s', python_directory, '-c', "exec(open('" + exec_python_file + "').read())", self.user],
-            text=True,
-            capture_output=True, **kwargs)
-        os.remove(exec_python_file)
-        return subprocess_result
+        return tool_config
 
-    def validate_banned_keywords(self, code_str):
-        matched = next((bad for bad in self.banned_keywords if bad in code_str), None)
-        if matched:
-            raise Exception(f"keyword '{matched}' is banned in the tool.")
+    def _exec(self, execute_file):
+        kwargs = {'cwd': BASE_DIR, 'env': {
+            'LD_PRELOAD': f'{_sandbox_path}/lib/sandbox.so',
+        }}
+        try:
+            subprocess_result = subprocess.run(
+                [sys.executable, execute_file],
+                timeout=_process_limit_timeout_seconds,
+                text=True,
+                capture_output=True,
+                **kwargs,
+                preexec_fn=(lambda: None if (not _enable_sandbox or not sys.platform.startswith("linux")) else (
+                    resource.setrlimit(resource.RLIMIT_AS, (_process_limit_mem_mb * 1024 * 1024,) * 2),
+                    os.sched_setaffinity(0, set(random.sample(list(os.sched_getaffinity(0)), _process_limit_cpu_cores)))
+                ))
+            )
+            return subprocess_result
+        except subprocess.TimeoutExpired:
+            raise Exception(_(f"Process execution timed out after {_process_limit_timeout_seconds} seconds."))
 
     def validate_mcp_transport(self, code_str):
         servers = json.loads(code_str)
@@ -234,6 +248,11 @@ exec({dedent(code)!a})
             if config.get('transport') not in ['sse', 'streamable_http']:
                 raise Exception(_('Only support transport=sse or transport=streamable_http'))
 
-    @staticmethod
-    def _exec(_code):
-        return subprocess.run([python_directory, '-c', _code], text=True, capture_output=True)
+
+@contextmanager
+def execution_timer(id=""):
+    start = time.perf_counter()
+    try:
+        yield
+    finally:
+        maxkb_logger.debug(f"Tool execution({id}) takes {time.perf_counter() - start:.6f} seconds.")

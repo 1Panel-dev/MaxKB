@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-8">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
     <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
       <el-form
         @submit.prevent
@@ -55,7 +55,7 @@
         <el-form-item
           prop="input_variable"
           :rules="{
-            message: $t('views.applicationWorkflow.variable.placeholder'),
+            message: $t('workflow.variable.placeholder'),
             trigger: 'blur',
             required: true,
           }"
@@ -63,7 +63,7 @@
           <template #label>
             <div class="flex-between">
               <div>
-                {{ $t('views.applicationWorkflow.nodes.variableSplittingNode.inputVariables') }}
+                {{ $t('workflow.nodes.variableSplittingNode.inputVariables') }}
                 <span class="color-danger">*</span>
               </div>
             </div>
@@ -72,7 +72,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('views.applicationWorkflow.variable.placeholder')"
+            :placeholder="$t('workflow.variable.placeholder')"
             v-model="form_data.input_variable"
           />
         </el-form-item>
@@ -80,7 +80,7 @@
           prop="variable_list"
           :rules="{
             message: $t(
-              'views.applicationWorkflow.nodes.parameterExtractionNode.extractParameters.variableListPlaceholder',
+              'workflow.nodes.parameterExtractionNode.extractParameters.variableListPlaceholder',
             ),
             trigger: 'blur',
             required: true,
@@ -105,7 +105,7 @@ import ParametersFieldTable from '@/workflow/nodes/parameter-extraction-node/com
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { set, groupBy } from 'lodash'
-const getApplicationDetail = inject('getApplicationDetail') as any
+const getResourceDetail = inject('getResourceDetail') as any
 const props = defineProps<{ nodeModel: any }>()
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const route = useRoute()
@@ -120,7 +120,7 @@ const openAIParamSettingDialog = (modelId: string) => {
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
 }
-const application = getApplicationDetail()
+const resource = getResourceDetail()
 const modelOptions = ref<any>(null)
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -143,7 +143,7 @@ function getSelectModel() {
     apiType.value === 'systemManage'
       ? {
           model_type: 'LLM',
-          workspace_id: application.value?.workspace_id,
+          workspace_id: resource.value?.workspace_id,
         }
       : {
           model_type: 'LLM',

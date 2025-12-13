@@ -9,24 +9,18 @@
         label-width="auto"
         ref="replyNodeFormRef"
       >
-        <el-form-item :label="$t('views.applicationWorkflow.nodes.replyNode.replyContent')">
+        <el-form-item :label="$t('workflow.nodes.replyNode.replyContent')">
           <template #label>
             <div class="flex-between">
-              <span>{{ $t('views.applicationWorkflow.nodes.replyNode.replyContent') }}</span>
+              <span>{{ $t('workflow.nodes.replyNode.replyContent') }}</span>
               <el-select
                 :teleported="false"
                 v-model="form_data.reply_type"
                 size="small"
                 style="width: 85px"
               >
-                <el-option
-                  :label="$t('views.applicationWorkflow.variable.Referencing')"
-                  value="referencing"
-                />
-                <el-option
-                  :label="$t('common.custom')"
-                  value="content"
-                />
+                <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
+                <el-option :label="$t('common.custom')" value="content" />
               </el-select>
             </div>
           </template>
@@ -34,7 +28,7 @@
           <MdEditorMagnify
             v-if="form_data.reply_type === 'content'"
             @wheel="wheel"
-            :title="$t('views.applicationWorkflow.nodes.replyNode.replyContent')"
+            :title="$t('workflow.nodes.replyNode.replyContent')"
             v-model="form_data.content"
             style="height: 150px"
             @submitDialog="submitDialog"
@@ -44,26 +38,23 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('views.applicationWorkflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
-            "
+            :placeholder="$t('workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')"
             v-model="form_data.fields"
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
-                  {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
                 </template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
@@ -79,9 +70,10 @@
 import { set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
-
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const props = defineProps<{ nodeModel: any }>()
 
 const wheel = (e: any) => {
@@ -111,7 +103,7 @@ const form_data = computed({
   },
   set: (value) => {
     set(props.nodeModel.properties, 'node_data', value)
-  }
+  },
 })
 
 function submitDialog(val: string) {
@@ -123,7 +115,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
-    replyNodeFormRef.value?.validate()
+    replyNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })

@@ -34,4 +34,4 @@ class LocalRerankerCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return model
 
-    cache_folder = forms.TextInputField(_('Model catalog'), required=True)
+    cache_dir = forms.TextInputField(_('Model catalog'), required=True)

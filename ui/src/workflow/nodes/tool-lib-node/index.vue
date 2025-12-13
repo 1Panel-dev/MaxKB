@@ -1,6 +1,6 @@
 <template>
   <NodeContainer :nodeModel="nodeModel">
-    <h5 class="title-decoration-1 mb-16">{{ $t('views.applicationWorkflow.nodeSetting') }}</h5>
+    <h5 class="title-decoration-1 mb-16">{{ $t('workflow.nodeSetting') }}</h5>
     <h5 class="lighter mb-8">{{ $t('common.param.inputParam') }}</h5>
     <el-form
       @submit.prevent
@@ -71,19 +71,20 @@
         <el-text type="info" v-else> {{ $t('common.noData') }} </el-text>
       </el-card>
       <el-form-item
-        :label="$t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')"
+        :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
         @click.prevent
+        v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
       >
         <template #label>
           <div class="flex align-center">
             <div class="mr-4">
               <span>{{
-                $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.label')
+                $t('workflow.nodes.aiChatNode.returnContent.label')
               }}</span>
             </div>
             <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
               <template #content>
-                {{ $t('views.applicationWorkflow.nodes.aiChatNode.returnContent.tooltip') }}
+                {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
               </template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>
@@ -100,16 +101,20 @@ import { useRoute } from 'vue-router'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { WorkflowMode } from '@/enums/application'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const props = defineProps<{ nodeModel: any }>()
 
 const route = useRoute()
 
 const apiType = computed(() => {
-  if (route.path.includes('resource-management')) {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
     return 'systemManage'
   } else {
     return 'workspace'

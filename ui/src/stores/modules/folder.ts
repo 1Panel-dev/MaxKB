@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { type Ref } from 'vue'
-import folderApi from '@/api/folder'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const useFolderStore = defineStore('folder', {
   state: () => ({
@@ -10,14 +10,18 @@ const useFolderStore = defineStore('folder', {
     setCurrentFolder(folder: any) {
       this.currentFolder = folder
     },
-    async asyncGetFolder(source: string, data: any, loading?: Ref<boolean>) {
+    async asyncGetFolder(source: string, data: any, systemType: any, loading?: Ref<boolean>) {
       return new Promise((resolve, reject) => {
-        folderApi
+        loadSharedApi({
+          type: 'folder',
+          isShared: this.currentFolder?.id === 'share',
+          systemType,
+        })
           .getFolder(source, data, loading)
-          .then((res) => {
+          .then((res: any) => {
             resolve(res)
           })
-          .catch((error) => {
+          .catch((error: any) => {
             reject(error)
           })
       })

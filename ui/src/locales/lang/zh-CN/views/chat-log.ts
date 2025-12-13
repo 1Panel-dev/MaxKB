@@ -7,8 +7,6 @@ export default {
   },
   buttons: {
     clearStrategy: '清除策略',
-    prev: '上一条',
-    next: '下一条'
   },
   table: {
     abstract: '摘要',

@@ -1,75 +1,73 @@
 <template>
-  <el-scrollbar>
-    <div class="execution-details p-8">
-      <div v-if="isWorkFlow(props.appType)">
-        <template v-for="(item, index) in arraySort(props.detail ?? [], 'index')" :key="index">
-          <ExecutionDetailCard :data="item"> </ExecutionDetailCard>
-        </template>
-      </div>
-
-      <template v-else>
-        <div class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.question') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <span class="mb-8">user: {{ problem }}</span>
-          </div>
-        </div>
-        <div v-if="paddedProblem" class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('chat.paragraphSource.questionPadded') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <span class="mb-8">user: {{ paddedProblem }}</span>
-          </div>
-        </div>
-        <div v-if="system" class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('views.application.form.roleSettings.label') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <span class="mb-8">{{ system }}</span>
-          </div>
-        </div>
-
-        <div class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('chat.history') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <div v-for="(msg, index) in historyRecord" :key="index">
-              <span>{{ msg.role }}: </span>
-              <span>{{ msg.content }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('chat.executionDetails.currentChat') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <div class="mb-8">{{ $t('chat.executionDetails.knowedMessage') }}:</div>
-            <div v-for="(msg, index) in currentChat" :key="index">
-              <span>{{ msg.content }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="card-never border-r-6 mb-12">
-          <h5 class="p-8-12">
-            {{ $t('chat.executionDetails.answer') }}
-          </h5>
-          <div class="p-8-12 border-t-dashed lighter">
-            <div v-for="(msg, index) in AiResponse" :key="index">
-              <span>{{ msg.content }}</span>
-            </div>
-          </div>
-        </div>
+  <div class="execution-details">
+    <div v-if="isWorkFlow(props.appType)">
+      <template v-for="(item, index) in arraySort(props.detail ?? [], 'index')" :key="index">
+        <ExecutionDetailCard :data="item"> </ExecutionDetailCard>
       </template>
     </div>
-  </el-scrollbar>
+
+    <template v-else>
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('chat.paragraphSource.question') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">user: {{ problem }}</span>
+        </div>
+      </div>
+      <div v-if="paddedProblem" class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('chat.paragraphSource.questionPadded') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">user: {{ paddedProblem }}</span>
+        </div>
+      </div>
+      <div v-if="system" class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('views.application.form.roleSettings.label') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">{{ system }}</span>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('chat.history') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div v-for="(msg, index) in historyRecord" :key="index">
+            <span>{{ msg.role }}: </span>
+            <span>{{ msg.content }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('chat.executionDetails.currentChat') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div class="mb-8">{{ $t('chat.executionDetails.knowedMessage') }}:</div>
+          <div v-for="(msg, index) in currentChat" :key="index">
+            <span>{{ msg.content }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('chat.executionDetails.answer') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div v-for="(msg, index) in AiResponse" :key="index">
+            <span>{{ msg.content }}</span>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
@@ -145,13 +143,9 @@ const AiResponse = computed(() => {
   const messages = messageList.value?.filter((item: any) => item.role != 'system')
   return messages.slice(messages.length - 1, messages.length)
 })
-
-
 </script>
 <style lang="scss" scoped>
 .execution-details {
-  max-height: calc(100vh - 260px);
-
   .arrow-icon {
     transition: 0.2s;
   }

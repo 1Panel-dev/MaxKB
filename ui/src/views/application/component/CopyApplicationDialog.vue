@@ -15,7 +15,7 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="$t('views.application.form.appName.label')" prop="name">
+      <el-form-item :label="$t('common.name')" prop="name">
         <el-input
           v-model="applicationForm.name"
           maxlength="64"

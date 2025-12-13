@@ -212,7 +212,7 @@ function folderClickHandle(row: any) {
 
 function getFolder() {
   const params = {}
-  folder.asyncGetFolder('KNOWLEDGE', params, folderLoading).then((res: any) => {
+  folder.asyncGetFolder('KNOWLEDGE', params,apiType.value, folderLoading).then((res: any) => {
     folderList.value = res.data
     currentFolder.value = res.data?.[0] || {}
     getList()

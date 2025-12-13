@@ -2945,7 +2945,7 @@ msgstr ""
 
 #: apps/knowledge/views/document.py:466 apps/knowledge/views/document.py:467
 #: apps/knowledge/views/document.py:468
-msgid "Batch generate related documents"
+msgid "Batch generate related problems"
 msgstr ""
 
 #: apps/knowledge/views/document.py:496 apps/knowledge/views/document.py:497
@@ -5126,7 +5126,7 @@ msgstr ""
 #: apps/resource_manage/views/document.py:261
 #: apps/resource_manage/views/document.py:262
 #: apps/resource_manage/views/document.py:263
-msgid "Batch generate related system document"
+msgid "Batch generate related system problems"
 msgstr ""
 
 #: apps/resource_manage/views/document.py:290
@@ -5946,7 +5946,7 @@ msgstr ""
 #: apps/shared/views/shared_document.py:262
 #: apps/shared/views/shared_document.py:263
 #: apps/shared/views/shared_document.py:264
-msgid "Batch generate related shared documents"
+msgid "Batch generate related shared problems"
 msgstr ""
 
 #: apps/shared/views/shared_document.py:291
@@ -8766,4 +8766,103 @@ msgid "Non-existent id"
 msgstr ""
 
 msgid "No permission for the target folder"
+msgstr ""
+
+msgid "Application token usage statistics"
+msgstr ""
+
+msgid "Application top question statistics"
+msgstr ""
+
+msgid "SAML2 Metadata"
+msgstr ""
+
+msgid "SAML2 Log in"
+msgstr ""
+
+msgid "SAML2 SSO"
+msgstr ""
+
+msgid "Workflow"
+msgstr ""
+
+msgid "Web source url"
+msgstr ""
+
+msgid "Web knowledge selector"
+msgstr ""
+
+msgid "The default is body, you can enter .classname/#idname/tagname"
+msgstr ""
+
+msgid "Please enter the Web root address"
+msgstr ""
+
+msgid "File size exceeds limit"
+msgstr ""
+
+msgid "File upload is not enabled"
+msgstr ""
+
+msgid "Blocked unsafe redirect to internal host"
+msgstr ""
+
+msgid "Audio file recognition - Tongyi Qwen"
+msgstr ""
+
+msgid "Real-time speech recognition - Fun-ASR/Paraformer"
+msgstr ""
+
+msgid "Qwen-Omni"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaoxuan Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuyan Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingfeiyi Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaoyue Flow"
+msgstr ""
+
+msgid "Super-humanoid: Sun Dasheng Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuzhao Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaotang Flow"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaorong Flow"
+msgstr ""
+
+msgid "Super-humanoid: Xinyun Flow"
+msgstr ""
+
+msgid "Super-humanoid: Grant (EN)"
+msgstr ""
+
+msgid "Super-humanoid: Lila (EN)"
+msgstr ""
+
+msgid "Super-humanoid: Lingwanwan Pro"
+msgstr ""
+
+msgid "Super-humanoid: Yiyi Pro"
+msgstr ""
+
+msgid "Super-humanoid: Huifangnv Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingxiaoying Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingfeibo Pro"
+msgstr ""
+
+msgid "Super-humanoid: Lingyuyan Pro"
 msgstr ""
