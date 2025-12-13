@@ -1,3 +1,44 @@
+一、命令行准备：把上游的 1.4.0 搬到你本地
+
+下面步骤在 项目目录里用命令行执行（Git Bash / Terminal 都可以）：
+
+确认已经有 upstream（原始开源仓库）
+如果之前没配过，就加一个：
+
+git remote -v   # 看看现在只有 origin 还是也有 upstream
+
+
+如果没有 upstream：
+
+git remote add upstream https://github.com/原作者账号/原项目名.git
+
+
+拉取上游的代码和 tag（关键一步）
+
+git fetch upstream --tags
+
+
+这一步会把 upstream 的分支和所有 tag（包括 1.4.0）拉到本地。
+
+确认 tag 存在
+
+git tag -l "*1.4.0*"
+
+
+如果看到 1.4.0 或 v1.4.0 就 OK 了。
+
+从 tag 建一个本地分支（Desktop 后面就能用它了）
+
+假设 tag 叫 1.4.0：
+
+git checkout -b release-1.4.0 1.4.0
+
+
+如果 tag 叫 v1.4.0：
+
+git checkout -b release-1.4.0 v1.4.0
+
+
 # MaxKB 本地开发部署文档
 
 ## 环境要求

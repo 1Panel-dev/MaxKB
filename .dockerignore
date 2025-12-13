@@ -67,7 +67,7 @@ docs/
 examples/
 
 # 安装和部署相关
-installer/
+
 deployment/
 scripts/
 *.sh

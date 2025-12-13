@@ -466,6 +466,19 @@ const putApplicationFloatIcon: (
   return put(`${prefix.value}/${application_id}/float_icon`, fd, undefined, loading)
 }
 
+/**
+ * 获取文件URL信息
+ * @param application_id 应用id
+ * @param params 参数
+ * @returns
+ */
+const getFile: (application_id: string, params: any) => Promise<Result<any>> = (
+  application_id,
+  params,
+) => {
+  return get(`/oss/get_url/${application_id}`, params)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -499,4 +512,5 @@ export default {
   putApplicationAvatar,
   putApplicationUserAvatar,
   putApplicationFloatIcon,
+  getFile,
 }
