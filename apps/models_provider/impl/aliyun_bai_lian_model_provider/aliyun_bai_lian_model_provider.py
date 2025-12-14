@@ -147,6 +147,7 @@ model_info_manage = (
     .append_default_model_info(model_info_list[3])
     .append_default_model_info(model_info_list[4])
     .append_default_model_info(model_info_list[0])
+    .append_default_model_info(model_info_list[2])
     .append_model_info_list(model_info_ttv_list)
     .append_default_model_info(model_info_ttv_list[0])
     .append_model_info_list(module_info_itv_list)

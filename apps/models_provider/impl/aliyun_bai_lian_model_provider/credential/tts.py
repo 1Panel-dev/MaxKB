@@ -54,13 +54,55 @@ class AliyunBaiLianTTSModelGeneralParams(BaseForm):
     )
 
 
+class AliyunBaiLianTTSQwenFlashParams(BaseForm):
+    """
+    Parameters class for the qwen TTS models.
+    """
+    voice = SingleSelect(
+        TooltipLabel(_('Voice'), _('Voice options for qwen TTS models')),
+        required=True,
+        default_value='Cherry',
+        text_field='value',
+        value_field='value',
+        option_list=[
+            {'text': '芊悦', 'value': 'Cherry'},
+            {'text': '苏瑶', 'value': 'Serena'},
+            {'text': '晨煦', 'value': 'Ethan'},
+            {'text': '千雪', 'value': 'Chelsie'},
+            {'text': '月白', 'value': 'Moon'},
+            {'text': '四月', 'value': 'Maia'},
+            {'text': '凯', 'value': 'Kai'},
+        ]
+    )
+
+    language_type = SingleSelect(
+        TooltipLabel(_('Language Type'), _('Language type for the speech synthesis')),
+        required=True,
+        default_value='Chinese',
+        text_field='value',
+        value_field='value',
+        option_list=[
+            {'text': _('Chinese'), 'value': 'Chinese'},
+            {'text': _('English'), 'value': 'English'},
+            {'text': _('German'), 'value': 'German'},
+            {'text': _('Italian'), 'value': 'Italian'},
+            {'text': _('Portuguese'), 'value': 'Portuguese'},
+            {'text': _('Spanish'), 'value': 'Spanish'},
+            {'text': _('Japanese'), 'value': 'Japanese'},
+            {'text': _('Korean'), 'value': 'Korean'},
+            {'text': _('French'), 'value': 'French'},
+            {'text': _('Russian'), 'value': 'Russian'},
+        ]
+    )
+
+
 class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
     """
     Credential class for the Aliyun BaiLian TTS (Text-to-Speech) model.
     Provides validation and encryption for the model credentials.
     """
 
-    api_base = forms.TextInputField(_('API URL'), required=False, default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
+    api_base = forms.TextInputField(_('API URL'), required=False, default_value='https://dashscope.aliyuncs.com')
     api_key = PasswordInputField("API Key", required=True)
 
     def is_valid(
@@ -137,4 +179,9 @@ class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
         :param model_name: Name of the model.
         :return: Parameter setting form.
         """
-        return AliyunBaiLianTTSModelGeneralParams()
+        # 根据模型名称返回不同的参数设置表单
+        if model_name in ['cosyvoice-v1']:
+            return AliyunBaiLianTTSModelGeneralParams()
+        else:
+            # 其他模型（包括qwen-tts系列）使用新的参数表单
+            return AliyunBaiLianTTSQwenFlashParams()
