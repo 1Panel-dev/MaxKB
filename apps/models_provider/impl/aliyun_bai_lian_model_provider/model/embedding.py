@@ -17,8 +17,9 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
     model_name: str
     optional_params: dict
 
-    def __init__(self, api_key, model_name: str, optional_params: dict):
-        self.client = OpenAI(api_key=api_key, base_url='https://dashscope.aliyuncs.com/compatible-mode/v1').embeddings
+    def __init__(self, api_key, api_base, model_name: str, optional_params: dict):
+        api_base = api_base or 'https://dashscope.aliyuncs.com/compatible-mode/v1'
+        self.client = OpenAI(api_key=api_key, base_url=api_base).embeddings
         self.model_name = model_name
         self.optional_params = optional_params
 
@@ -30,6 +31,7 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return AliyunBaiLianEmbedding(
             api_key=model_credential.get('dashscope_api_key'),
+            api_base=model_credential.get('api_base'),
             model_name=model_name,
             optional_params=optional_params
         )

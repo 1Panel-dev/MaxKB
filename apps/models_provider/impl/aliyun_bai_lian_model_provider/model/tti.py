@@ -15,12 +15,14 @@ from models_provider.impl.base_tti import BaseTextToImage
 
 class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
     api_key: str
+    api_base: str
     model_name: str
     params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.api_base = kwargs.get('api_base')
         self.model_name = kwargs.get('model_name')
         self.params = kwargs.get('params')
 
@@ -37,6 +39,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
         chat_tong_yi = QwenTextToImageModel(
             model_name=model_name,
             api_key=model_credential.get('api_key'),
+            api_base=model_credential.get('api_base'),
             **optional_params,
         )
         return chat_tong_yi
@@ -47,9 +50,11 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
         if self.model_name.startswith("wan"):
+            # 如果提供了api_base，则使用自定义base_url，否则使用默认URL
+            base_url = self.api_base or 'https://dashscope.aliyuncs.com/compatible-mode/v1'
             rsp = ImageSynthesis.call(api_key=self.api_key,
                                       model=self.model_name,
-                                      base_url='https://dashscope.aliyuncs.com/compatible-mode/v1',
+                                      base_url=base_url,
                                       prompt=prompt,
                                       negative_prompt=negative_prompt,
                                       **self.params)
@@ -73,12 +78,14 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                     ]
                 }
             ]
+            # 如果提供了api_base，则使用自定义base_url，否则使用默认URL
+            base_url = self.api_base or 'https://dashscope.aliyuncs.com/v1'
             rsp = MultiModalConversation.call(
                 api_key=self.api_key,
                 model=self.model_name,
                 messages=messages,
                 result_format='message',
-                base_url='https://dashscope.aliyuncs.com/v1',
+                base_url=base_url,
                 stream=False,
                 negative_prompt=negative_prompt,
                 **self.params

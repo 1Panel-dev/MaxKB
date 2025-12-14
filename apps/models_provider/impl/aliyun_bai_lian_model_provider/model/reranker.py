@@ -20,6 +20,7 @@ from models_provider.base_model_provider import MaxKBBaseModel
 class AliyunBaiLianReranker(MaxKBBaseModel, BaseDocumentCompressor):
     model: Optional[str]
     api_key: Optional[str]
+    api_base: Optional[str]
 
     top_n: Optional[int] = 3  # 取前 N 个最相关的结果
 
@@ -31,6 +32,7 @@ class AliyunBaiLianReranker(MaxKBBaseModel, BaseDocumentCompressor):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return AliyunBaiLianReranker(model=model_name,
                                      api_key=model_credential.get('dashscope_api_key'),
+                                     api_base=model_credential.get('api_base'),
                                      top_n=model_kwargs.get('top_n', 3))
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
@@ -39,6 +41,9 @@ class AliyunBaiLianReranker(MaxKBBaseModel, BaseDocumentCompressor):
             return []
 
         texts = [doc.page_content for doc in documents]
+        # 如果提供了api_base，则配置dashscope使用自定义endpoint
+        if self.api_base:
+            dashscope.base_http_url = self.api_base
         resp = dashscope.TextReRank.call(
             model=self.model,
             query=query,

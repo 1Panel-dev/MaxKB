@@ -12,12 +12,14 @@ from models_provider.impl.base_stt import BaseSpeechToText
 
 class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     api_key: str
+    api_base: str
     model: str
     params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.api_base = kwargs.get('api_base')
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
 
@@ -36,6 +38,7 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return AliyunBaiLianSpeechToText(
             model=model_name,
             api_key=model_credential.get('api_key'),
+            api_base=model_credential.get('api_base'),
             params=model_kwargs,
             **optional_params,
         )
@@ -47,6 +50,9 @@ class AliyunBaiLianSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def speech_to_text(self, audio_file):
         dashscope.api_key = self.api_key
+        # 如果提供了api_base，则配置dashscope使用自定义endpoint
+        if self.api_base:
+            dashscope.base_http_url = self.api_base
         recognition_params = {
             'model': self.model,
             'format': 'mp3',

@@ -32,7 +32,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         return AliyunBaiLianOmiSpeechToText(
             model=model_name,
             api_key=model_credential.get('api_key'),
-            api_url=model_credential.get('api_url') ,
+            api_url=model_credential.get('api_base') ,
             params= model_kwargs,
             **model_kwargs
         )

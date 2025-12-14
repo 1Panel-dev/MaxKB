@@ -92,4 +92,5 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
     def get_model_params_setting_form(self, model_name):
         return BaiLianEmbeddingModelParams()
 
+    api_base = forms.TextInputField(_('API URL'), required=False, default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
     dashscope_api_key = forms.PasswordInputField('API Key', required=True)
