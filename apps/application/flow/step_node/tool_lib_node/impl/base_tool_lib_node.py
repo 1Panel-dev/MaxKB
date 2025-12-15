@@ -197,16 +197,18 @@ class BaseToolLibNodeNode(IToolLibNode):
         else:
             all_params = init_params_default_value | params
         if self.node.properties.get('kind') == 'data-source':
-            exist = function_executor.exec_code(f'{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))', {'function_name': 'get_download_file_list'})
+            exist = function_executor.exec_code(
+                f'{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))',
+                {'function_name': 'get_download_file_list'})
+            all_params = {**all_params, **self.workflow_params.get('data_source')}
             if exist:
                 download_file_list = []
                 download_list = function_executor.exec_code(tool_lib.code,
-                                                            {**all_params, **self.workflow_params.get('data_source')},
+                                                            all_params,
                                                             function_name='get_download_file_list')
                 for item in download_list:
                     result = function_executor.exec_code(tool_lib.code,
-                                                         {**all_params, **self.workflow_params.get('data_source'),
-                                                          'download_item': item},
+                                                         {**all_params, 'download_item': item},
                                                          function_name='download')
                     file_bytes = result.get('file_bytes', [])
                     chunks = []
