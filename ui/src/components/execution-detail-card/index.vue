@@ -186,10 +186,72 @@
               </div>
             </div>
           </template>
-          <!-- AI 对话 / 问题优化 / 意图识别-->
+          <!-- AI 对话 -->
+          <template v-if="data.type == WorkflowType.AiChat">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
+              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span
+                    ><span>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('chat.executionDetails.currentChat')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.question || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.reasoning_content || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('chat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 问题优化 / 意图识别-->
           <template
             v-if="
-              data.type == WorkflowType.AiChat ||
               data.type == WorkflowType.Question ||
               data.type == WorkflowType.Application ||
               data.type == WorkflowType.IntentNode
@@ -225,14 +287,6 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.question || '-' }}
-              </div>
-            </div>
-            <div class="card-never border-r-6 mt-8" v-if="data.type == WorkflowType.AiChat">
-              <h5 class="p-8-12">
-                {{ $t('workflow.nodes.aiChatNode.think') }}
-              </h5>
-              <div class="p-8-12 border-t-dashed lighter pre-wrap">
-                {{ data.reasoning_content || '-' }}
               </div>
             </div>
             <div class="card-never border-r-6 mt-8">
@@ -492,7 +546,7 @@
           </template>
           <!-- 图片理解 -->
           <template v-if="data.type == WorkflowType.ImageUnderstandNode">
-            <div class="card-never border-r-6" v-if="data.type !== WorkflowType.Application">
+            <div class="card-never border-r-6">
               <h5 class="p-8-12">
                 {{ $t('views.application.form.roleSettings.label') }}
               </h5>
@@ -500,7 +554,7 @@
                 {{ data.system || '-' }}
               </div>
             </div>
-            <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
               <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
@@ -534,7 +588,11 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('chat.executionDetails.currentChat')
+                }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="data.image_list?.length > 0">
@@ -557,11 +615,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{
-                  data.type == WorkflowType.Application
-                    ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
-                }}
+                {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -578,7 +632,7 @@
           </template>
           <!-- 视频理解 -->
           <template v-if="data.type == WorkflowType.VideoUnderstandNode">
-            <div class="card-never border-r-6" v-if="data.type !== WorkflowType.Application">
+            <div class="card-never border-r-6">
               <h5 class="p-8-12">
                 {{ $t('views.application.form.roleSettings.label') }}
               </h5>
@@ -586,7 +640,7 @@
                 {{ data.system || '-' }}
               </div>
             </div>
-            <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
               <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
@@ -618,7 +672,11 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('chat.executionDetails.currentChat')
+                }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 <div v-if="data.video_list?.length > 0">
@@ -641,11 +699,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{
-                  data.type == WorkflowType.Application
-                    ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
-                }}
+                {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -680,11 +734,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{
-                  data.type == WorkflowType.Application
-                    ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
-                }}
+                {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -718,11 +768,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{
-                  data.type == WorkflowType.Application
-                    ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
-                }}
+                {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -817,11 +863,7 @@
 
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{
-                  data.type == WorkflowType.Application
-                    ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
-                }}
+                {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -1249,7 +1291,7 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, type PropType } from 'vue'
 import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
 import { iconComponent } from '@/workflow/icons/utils'
@@ -1259,9 +1301,17 @@ import { arraySort } from '@/utils/array'
 
 import { t } from '@/locales'
 
-const props = defineProps<{
-  data: any
-}>()
+const props = defineProps({
+  data: {
+    type: Object as PropType<any>,
+    default: null,
+  },
+  type: {
+    type: String as PropType<'application' | 'knowledge'>,
+    default: 'application',
+  },
+})
+const isKnowLedge = computed(() => props.type === 'knowledge')
 const currentLoopNode = ref(0)
 const currentParagraph = ref(0)
 const currentWriteContent = ref(0)

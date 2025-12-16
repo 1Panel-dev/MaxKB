@@ -71,7 +71,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import ExecutionDetailCard from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailCard.vue'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 import { arraySort } from '@/utils/array'
 import { isWorkFlow } from '@/utils/application'
 

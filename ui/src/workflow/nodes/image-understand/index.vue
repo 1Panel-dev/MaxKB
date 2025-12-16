@@ -114,7 +114,9 @@
             :placeholder="`${t('workflow.UserPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
-        <el-form-item>
+        <el-form-item
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+        >
           <template #label>
             <div class="flex-between">
               <div>{{ $t('views.application.form.historyRecord.label') }}</div>
