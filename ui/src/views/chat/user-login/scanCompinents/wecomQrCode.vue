@@ -3,9 +3,9 @@
 </template>
 
 <script lang="ts" setup>
-import {nextTick, defineProps, onBeforeUnmount} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import {getBrowserLang} from '@/locales'
+import { nextTick, defineProps, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getBrowserLang } from '@/locales'
 import useStore from '@/stores'
 
 const WE_COM_ORIGIN = 'https://login.work.weixin.qq.com'
@@ -22,10 +22,10 @@ const props = defineProps<{
 
 const router = useRouter()
 const route = useRoute()
-const {chatUser} = useStore()
+const { chatUser } = useStore()
 
 const {
-  params: {accessToken},
+  params: { accessToken },
 } = route as any
 
 let iframe: HTMLIFrameElement | null = null
@@ -43,7 +43,7 @@ function createTransparentIFrame(el: string) {
   iframeEl.referrerPolicy = 'origin'
   iframeEl.setAttribute('frameborder', '0')
   iframeEl.setAttribute('allowtransparency', 'true')
-
+  iframeEl.setAttribute('allow', 'local-network-access')
   container.appendChild(iframeEl)
   return iframeEl
 }
@@ -77,21 +77,18 @@ const init = async () => {
     `&panel_size=small` +
     `&redirect_type=self`
   iframe.addEventListener('load', (e) => {
-    console.log('load', iframe)
     if (iframe?.contentWindow) {
-      iframe.contentWindow.stop()
-      const searchParams = new URLSearchParams(iframe.contentWindow.location.search)
-      const code = searchParams.get('code')
-      if (code) {
-        chatUser.wecomCallback(code, accessToken).then((ok) => {
-          router.push({
-            name: 'chat',
-            params: {accessToken},
-            query: route.query,
-          })
-          cleanup()
-        })
-      }
+      iframe.contentWindow.postMessage('getToken', '*')
+    }
+  })
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'token') {
+      chatUser.setToken(event.data.value)
+      router.push({
+        name: 'chat',
+        params: { accessToken },
+        query: route.query,
+      })
     }
   })
 }
