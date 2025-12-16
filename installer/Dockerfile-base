@@ -46,7 +46,7 @@ ENV PATH=/opt/py3/bin:$PATH \
     MAXKB_SANDBOX=1 \
     MAXKB_SANDBOX_HOME=/opt/maxkb-app/sandbox \
     MAXKB_SANDBOX_PYTHON_PACKAGE_PATHS="/opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages" \
-    MAXKB_SANDBOX_PYTHON_BANNED_HOSTS="127.0.0.0/8,localhost,host.docker.internal,172.17.0.0/16,maxkb,pgsql,redis,172.31.250.192/26,0.0.0.0/32,::1/128" \
+    MAXKB_SANDBOX_PYTHON_BANNED_HOSTS="127.0.0.0/8,localhost,host.docker.internal,172.17.0.0/16,maxkb,pgsql,redis,172.31.250.192/26,0.0.0.0/32,::/0" \
     MAXKB_ADMIN_PATH=/admin
 
 EXPOSE 6379
