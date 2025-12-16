@@ -471,6 +471,8 @@ class WorkflowManage:
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
+            if current_node.status == 500:
+                return None
             return current_result
         except Exception as e:
             # 添加节点
