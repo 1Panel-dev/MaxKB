@@ -8,6 +8,7 @@
 #include <regex.h>
 #include <unistd.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #include <errno.h>
 #include <limits.h>
 #include <libgen.h>
@@ -89,109 +90,158 @@ static int is_sandbox_user() {
  * 限制网络访问
  */
 // ------------------ 匹配 域名 黑名单 ------------------
-static int match_banned_domain(const char *target, const char *env_val) {
-    if (!target || !env_val || !*env_val) return 0;
-    char *patterns = strdup(env_val);
-    char *token = strtok(patterns, ",");
+static int match_banned_domain(const char *target, const char *rules) {
+    if (!target || !rules || !*rules) return 0;
+    char *list = strdup(rules);
+    char *token = strtok(list, ",");
     int matched = 0;
     while (token) {
         while (*token == ' ' || *token == '\t') token++;
-        char *end = token + strlen(token) - 1;
-        while (end > token && (*end == ' ' || *end == '\t')) *end-- = '\0';
         if (*token) {
-            regex_t regex;
-            char fullpattern[512];
-            snprintf(fullpattern, sizeof(fullpattern), "^%s$", token);
-            if (regcomp(&regex, fullpattern, REG_EXTENDED | REG_NOSUB | REG_ICASE) == 0) {
-                if (regexec(&regex, target, 0, NULL, 0) == 0) {
+            regex_t re;
+            char buf[512];
+            snprintf(buf, sizeof(buf), "^%s$", token);
+            if (regcomp(&re, buf, REG_EXTENDED | REG_NOSUB | REG_ICASE) == 0) {
+                if (regexec(&re, target, 0, NULL, 0) == 0)
                     matched = 1;
-                    regfree(&regex);
-                    break;
-                }
-                regfree(&regex);
+                regfree(&re);
             }
         }
+        if (matched) break;
         token = strtok(NULL, ",");
     }
-    free(patterns);
+    free(list);
     return matched;
 }
 // ------------------ 匹配 IP/CIDR 黑名单 ------------------
-static int match_banned_ip(const char *ip_str, const char *banned_list) {
-    if (!ip_str || !banned_list || !*banned_list) return 0;
-    char *list = strdup(banned_list);
+static int match_banned_ip(const char *ip_str, const char *rules) {
+    if (!ip_str || !rules || !*rules) return 0;
+    struct in_addr  ip4;
+    struct in6_addr ip6;
+    int is_v4 = inet_pton(AF_INET, ip_str, &ip4) == 1;
+    int is_v6 = inet_pton(AF_INET6, ip_str, &ip6) == 1;
+    if (!is_v4 && !is_v6) return 0;
+    char *list = strdup(rules);
     char *token = strtok(list, ",");
     int blocked = 0;
     while (token) {
         while (*token == ' ' || *token == '\t') token++;
-        char *end = token + strlen(token) - 1;
-        while (end > token && (*end == ' ' || *end == '\t')) *end-- = '\0';
-        if (*token) {
-            char *slash = strchr(token, '/');
-            if (!slash) {
-                if (strcmp(ip_str, token) == 0) {
-                    blocked = 1;
-                    break;
-                }
-            } else {
-                *slash = 0;
-                int prefix = atoi(slash + 1);
-                struct in_addr ip, net, mask;
-                if (inet_pton(AF_INET, token, &net) == 1 &&
-                    inet_pton(AF_INET, ip_str, &ip) == 1) {
-                    mask.s_addr = prefix == 0 ? 0 : htonl(0xFFFFFFFF << (32 - prefix));
-                    if ((ip.s_addr & mask.s_addr) == (net.s_addr & mask.s_addr)) {
+        if (!*token) goto next;
+        char *slash = strchr(token, '/');
+        int prefix = -1;
+        if (slash) {
+            *slash++ = '\0';
+            prefix = atoi(slash);
+        }
+        /* ---------- IPv4 ---------- */
+        if (is_v4) {
+            struct in_addr net4;
+            if (inet_pton(AF_INET, token, &net4) == 1) {
+                if (prefix < 0) {
+                    /* 单 IP */
+                    if (ip4.s_addr == net4.s_addr) {
+                        blocked = 1;
+                        break;
+                    }
+                } else if (prefix >= 0 && prefix <= 32) {
+                    uint32_t mask = prefix == 0
+                        ? 0
+                        : htonl(0xFFFFFFFFu << (32 - prefix));
+                    if ((ip4.s_addr & mask) == (net4.s_addr & mask)) {
                         blocked = 1;
                         break;
                     }
                 }
             }
         }
+        /* ---------- IPv6 ---------- */
+        if (is_v6) {
+            struct in6_addr net6;
+            if (inet_pton(AF_INET6, token, &net6) == 1) {
+                if (prefix < 0) {
+                    /* 单 IP */
+                    if (memcmp(&ip6, &net6, sizeof(ip6)) == 0) {
+                        blocked = 1;
+                        break;
+                    }
+                } else if (prefix >= 0 && prefix <= 128) {
+                    int full = prefix / 8;
+                    int rem  = prefix % 8;
+                    if (full &&
+                        memcmp(ip6.s6_addr, net6.s6_addr, full) != 0)
+                        goto next;
+                    if (rem) {
+                        uint8_t mask = (uint8_t)(0xFF << (8 - rem));
+                        if ((ip6.s6_addr[full] & mask) !=
+                            (net6.s6_addr[full] & mask))
+                            goto next;
+                    }
+                    blocked = 1;
+                    break;
+                }
+            }
+        }
+    next:
         token = strtok(NULL, ",");
     }
     free(list);
     return blocked;
 }
+
 // ------------------ 网络拦截 ------------------
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
     static int (*real_connect)(int, const struct sockaddr *, socklen_t) = NULL;
     if (!real_connect)
         real_connect = dlsym(RTLD_NEXT, "connect");
     ensure_config_loaded();
+    if (is_sandbox_user() && addr->sa_family == AF_UNIX) {
+        struct sockaddr_un *un = (struct sockaddr_un *)addr;
+        fprintf(stderr,
+            "Permission denied to access unix socket: %s\n",
+            un->sun_path[0] ? un->sun_path : "(abstract)");
+        errno = EACCES;
+        return -1;
+    }
     char ip[INET6_ADDRSTRLEN] = {0};
-    if (addr->sa_family == AF_INET)
-        inet_ntop(AF_INET, &((struct sockaddr_in *)addr)->sin_addr, ip, sizeof(ip));
-    else if (addr->sa_family == AF_INET6)
-        inet_ntop(AF_INET6, &((struct sockaddr_in6 *)addr)->sin6_addr, ip, sizeof(ip));
-
-    if (is_sandbox_user() && banned_hosts && *banned_hosts) {
-        if (ip[0] && match_banned_ip(ip, banned_hosts)) {
-            fprintf(stderr, "Permission denied to access %s.\n", ip);
-            errno = EACCES;  // Permission denied
-            return -1;
+    if (addr->sa_family == AF_INET) {
+        inet_ntop(AF_INET,
+                  &((struct sockaddr_in *)addr)->sin_addr,
+                  ip, sizeof(ip));
+    } else if (addr->sa_family == AF_INET6) {
+        struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)addr;
+        if (IN6_IS_ADDR_V4MAPPED(&sin6->sin6_addr)) {
+            struct in_addr v4;
+            memcpy(&v4, &sin6->sin6_addr.s6_addr[12], sizeof(v4));
+            inet_ntop(AF_INET, &v4, ip, sizeof(ip));
+        } else {
+            inet_ntop(AF_INET6, &sin6->sin6_addr, ip, sizeof(ip));
         }
+    }
+    if (is_sandbox_user() && match_banned_ip(ip, banned_hosts)) {
+        fprintf(stderr, "Permission denied to access %s.\n", ip);
+        errno = EACCES;
+        return -1;
     }
     return real_connect(sockfd, addr, addrlen);
 }
 int getaddrinfo(const char *node, const char *service,
-                const struct addrinfo *hints, struct addrinfo **res) {
+                const struct addrinfo *hints,
+                struct addrinfo **res) {
     static int (*real_getaddrinfo)(const char *, const char *,
-                                   const struct addrinfo *, struct addrinfo **) = NULL;
+                                   const struct addrinfo *,
+                                   struct addrinfo **) = NULL;
     if (!real_getaddrinfo)
         real_getaddrinfo = dlsym(RTLD_NEXT, "getaddrinfo");
     ensure_config_loaded();
-    if (banned_hosts && *banned_hosts && node && is_sandbox_user()) {
-        struct in_addr ipv4;
-        struct in6_addr ipv6;
-        int is_ip = inet_pton(AF_INET, node, &ipv4) == 1 ||
-                    inet_pton(AF_INET6, node, &ipv6) == 1;
-        if (!is_ip) {
-            // 仅对域名进行阻塞
-            if (match_banned_domain(node, banned_hosts)) {
-                fprintf(stderr, "Permission denied to access %s.\n", node);
-                errno = EACCES;
-                return EAI_SYSTEM;
-            }
+    if (node && is_sandbox_user()) {
+        struct in_addr ip4;
+        struct in6_addr ip6;
+        int is_ip = inet_pton(AF_INET, node, &ip4) == 1 ||
+                    inet_pton(AF_INET6, node, &ip6) == 1;
+        if (!is_ip && match_banned_domain(node, banned_hosts)) {
+            fprintf(stderr, "Permission denied to access %s.\n", node);
+            errno = EACCES;
+            return EAI_SYSTEM;
         }
     }
     return real_getaddrinfo(node, service, hints, res);
