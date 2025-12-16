@@ -38,7 +38,7 @@ import { SourceTypeEnum } from '@/enums/common'
 import KnowledgeApi from '@/api/knowledge/knowledge'
 import ApplicationApi from '@/api/application/application'
 import ToolApi from '@/api/tool/tool'
-const { folder, application } = useStore()
+const { folder } = useStore()
 const emit = defineEmits(['refresh'])
 
 const props = defineProps({

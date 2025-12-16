@@ -365,8 +365,11 @@ function openMoveToDialog(data: any) {
 }
 
 function refreshApplicationList(row: any) {
-  const index = applicationList.value.findIndex((v) => v.id === row.id)
-  applicationList.value.splice(index, 1)
+  // 不是根目录才会移除
+  if (folder.currentFolder?.parent_id) {
+    const index = applicationList.value.findIndex((v) => v.id === row.id)
+    applicationList.value.splice(index, 1)
+  }
 }
 
 const goApp = (item: any) => {
@@ -650,6 +653,7 @@ function getFolder(bool?: boolean) {
     .asyncGetFolder(SourceTypeEnum.APPLICATION, params, apiType.value, loading)
     .then((res: any) => {
       folderList.value = res.data
+
       if (bool) {
         // 初始化刷新
         folder.setCurrentFolder(res.data?.[0] || {})

@@ -35,6 +35,8 @@
 // tree
 .el-tree {
   background: none;
+  color: var(--el-text-color-primary);
+  font-weight: 400;
 }
 .el-tree-node__content {
   border-radius: var(--el-border-radius-base);
@@ -46,6 +48,7 @@
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
   background: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
+  font-weight: 500;
 }
 .el-tree-node__expand-icon {
   color: var(--app-text-color-secondary);
