@@ -97,9 +97,13 @@ function getRangeFromLineAndColumn(state: any, line: number, column: number, end
   }
 }
 const asyncLint = throttle(async (view: any) => {
+  const sendString = view.state.doc.toString()
   const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).postPylint(
     view.state.doc.toString(),
   )
+  if (sendString !== view.state.doc.toString()) {
+    return []
+  }
   return res.data
 }, 500)
 
