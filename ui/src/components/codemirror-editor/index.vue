@@ -1,15 +1,16 @@
 <template>
   <div class="codemirror-editor w-full">
-    <Codemirror
-      v-model="data"
-      ref="cmRef"
-      :extensions="extensions"
-      :style="codemirrorStyle"
-      :tab-size="4"
-      :autofocus="true"
-      v-bind="$attrs"
-    />
-
+    <form @submit.prevent>
+      <Codemirror
+        v-model="data"
+        ref="cmRef"
+        :extensions="extensions"
+        :style="codemirrorStyle"
+        :tab-size="4"
+        :autofocus="true"
+        v-bind="$attrs"
+      />
+    </form>
     <div class="codemirror-editor__footer">
       <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
         <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
@@ -17,18 +18,20 @@
     </div>
     <!-- Codemirror 弹出层 -->
     <el-dialog v-model="dialogVisible" :title="title" append-to-body fullscreen>
-      <Codemirror
-        v-model="cloneContent"
-        :extensions="extensions"
-        :style="codemirrorStyle"
-        :tab-size="4"
-        :autofocus="true"
-        style="
-          height: calc(100vh - 160px) !important;
-          border: 1px solid #bbbfc4;
-          border-radius: 4px;
-        "
-      />
+      <form @submit.prevent>
+        <Codemirror
+          v-model="cloneContent"
+          :extensions="extensions"
+          :style="codemirrorStyle"
+          :tab-size="4"
+          :autofocus="true"
+          style="
+            height: calc(100vh - 160px) !important;
+            border: 1px solid #bbbfc4;
+            border-radius: 4px;
+          "
+        />
+      </form>
       <template #footer>
         <div class="dialog-footer mt-24">
           <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
