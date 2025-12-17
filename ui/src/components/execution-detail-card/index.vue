@@ -1046,7 +1046,7 @@
                   ).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))"
                   :key="cIndex"
                 >
-                  <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
+                  <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
                 </template>
               </template>
             </div>
