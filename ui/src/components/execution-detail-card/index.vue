@@ -1298,6 +1298,7 @@ import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/application'
 import { getImgUrl } from '@/utils/common'
 import { arraySort } from '@/utils/array'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 
 import { t } from '@/locales'
 
