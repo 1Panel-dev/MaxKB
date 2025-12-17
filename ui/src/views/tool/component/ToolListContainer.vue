@@ -171,12 +171,7 @@
                 :disabled="permissionPrecise.edit(item.id)"
               >
                 <template #icon>
-                  <el-avatar
-                    v-if="item?.icon"
-                    shape="square"
-                    :size="32"
-                    style="background: none"
-                  >
+                  <el-avatar v-if="item?.icon" shape="square" :size="32" style="background: none">
                     <img :src="resetUrl(item?.icon)" alt="" />
                   </el-avatar>
                   <ToolIcon v-else :size="32" :type="item?.tool_type" />
@@ -473,10 +468,13 @@ function openMoveToDialog(data: any) {
 }
 
 function refreshToolList(row: any) {
-  const list = cloneDeep(tool.toolList)
-  const index = list.findIndex((v) => v.id === row.id)
-  list.splice(index, 1)
-  tool.setToolList(list)
+  // 不是根目录才会移除
+  if (folder.currentFolder?.parent_id) {
+    const list = cloneDeep(tool.toolList)
+    const index = list.findIndex((v) => v.id === row.id)
+    list.splice(index, 1)
+    tool.setToolList(list)
+  }
 }
 
 const AuthorizedWorkspaceDialogRef = ref()

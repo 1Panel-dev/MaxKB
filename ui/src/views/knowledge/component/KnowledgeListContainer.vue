@@ -404,10 +404,13 @@ function openMoveToDialog(data: any) {
 }
 
 function refreshKnowledgeList(row: any) {
-  const list = cloneDeep(knowledge.knowledgeList)
-  const index = list.findIndex((v) => v.id === row.id)
-  list.splice(index, 1)
-  knowledge.setKnowledgeList(list)
+  // 不是根目录才会移除
+  if (folder.currentFolder?.parent_id) {
+    const list = cloneDeep(knowledge.knowledgeList)
+    const index = list.findIndex((v) => v.id === row.id)
+    list.splice(index, 1)
+    knowledge.setKnowledgeList(list)
+  }
 }
 
 const CreateKnowledgeDialogRef = ref()
@@ -477,6 +480,7 @@ function deleteKnowledge(row: any) {
           const index = list.findIndex((v) => v.id === row.id)
           list.splice(index, 1)
           knowledge.setKnowledgeList(list)
+
           MsgSuccess(t('common.deleteSuccess'))
         })
     })
