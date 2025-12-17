@@ -11,8 +11,7 @@
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
-          >{{ $t('workflow.info.saveTime')
-          }}{{ datetimeFormat(saveTime) }}</el-text
+          >{{ $t('workflow.info.saveTime') }}{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
       <div v-if="showHistory && disablePublic">
@@ -207,7 +206,10 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => `${window.location.origin}/chat/` + detail.value?.access_token + urlParams.value,
+  () =>
+    `${window.location.origin}${window.MaxKB.chatPrefix}/` +
+    detail.value?.access_token +
+    urlParams.value,
 )
 
 function back() {
@@ -368,9 +370,7 @@ const publish = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(
-          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
-        )
+        MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
         MsgError(
@@ -406,9 +406,7 @@ const clickShowDebug = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(
-          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
-        )
+        MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
         MsgError(
