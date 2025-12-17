@@ -20,28 +20,6 @@ class DocumentSplitAPI(APIMixin):
                 location='path',
                 required=True,
             ),
-
-            OpenApiParameter(
-                name="limit",
-                description="分段长度",
-                type=OpenApiTypes.INT,
-                location='query',
-                required=False,
-            ),
-            OpenApiParameter(
-                name="patterns",
-                description="分段正则列表",
-                type=OpenApiTypes.STR,
-                location='query',
-                required=False,
-            ),
-            OpenApiParameter(
-                name="with_filter",
-                description="是否清除特殊字符",
-                type=OpenApiTypes.BOOL,
-                location='query',
-                required=False,
-            ),
         ]
 
     @staticmethod
@@ -53,6 +31,18 @@ class DocumentSplitAPI(APIMixin):
                     'file': {
                         'type': 'string',
                         'format': 'binary'  # Tells Swagger it's a file
+                    },
+                    'limit': {
+                        'type': 'integer',
+                        'description': '分段长度'
+                    },
+                    'patterns': {
+                        'type': 'string',
+                        'description': '分段正则列表'
+                    },
+                    'with_filter': {
+                        'type': 'boolean',
+                        'description': '是否清除特殊字符'
                     }
                 }
             }
