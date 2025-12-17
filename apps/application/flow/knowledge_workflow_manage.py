@@ -89,6 +89,8 @@ class KnowledgeWorkflowManage(WorkflowManage):
             if result is not None:
                 # 阻塞获取结果
                 list(result)
+            if current_node.status == 500:
+                return None
             return current_result
         except Exception as e:
             traceback.print_exc()
