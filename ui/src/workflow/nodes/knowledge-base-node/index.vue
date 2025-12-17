@@ -51,7 +51,7 @@ const nodeFields = computed(() => {
     const fields = props.nodeModel.properties.user_input_field_list.map((item: any) => ({
       label: typeof item.label == 'string' ? item.label : item.label.label,
       value: item.field,
-      globeLabel: `{{global.${typeof item.label == 'string' ? item.label : item.label.label}}}`,
+      globeLabel: `{{global.${item.field}}}`,
       globeValue: `{{context['global'].${item.field}}}`,
     }))
     set(props.nodeModel.properties.config, 'globalFields', fields)
