@@ -30,10 +30,10 @@ class KnowledgeWorkflowManage(WorkflowManage):
                  work_flow_post_handler: WorkFlowPostHandler,
                  base_to_response: BaseToResponse = SystemToResponse(),
                  start_node_id=None,
-                 start_node_data=None, chat_record=None, child_node=None):
+                 start_node_data=None, chat_record=None, child_node=None, is_the_task_interrupted=lambda: False):
         super().__init__(flow, params, work_flow_post_handler, base_to_response, None, None, None,
                          None,
-                         None, None, start_node_id, start_node_data, chat_record, child_node)
+                         None, None, start_node_id, start_node_data, chat_record, child_node, is_the_task_interrupted)
 
     def get_params_serializer_class(self):
         return KnowledgeFlowParamsSerializer
@@ -90,6 +90,9 @@ class KnowledgeWorkflowManage(WorkflowManage):
                 # 阻塞获取结果
                 list(result)
             if current_node.status == 500:
+                return None
+            if self.is_the_task_interrupted():
+                current_node.status = 201
                 return None
             return current_result
         except Exception as e:

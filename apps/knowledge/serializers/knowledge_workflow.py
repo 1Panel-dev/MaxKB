@@ -15,6 +15,7 @@ from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from application.serializers.application import get_mcp_tools
+from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
@@ -22,7 +23,7 @@ from common.utils.tool_code import ToolExecutor
 from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow, KnowledgeWorkflowVersion
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.knowledge import KnowledgeModelSerializer
-from maxkb.const import CONFIG
+from django.core.cache import cache
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool
@@ -52,7 +53,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
     knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
     def get_query_set(self, instance: Dict):
-        query_set = QuerySet(KnowledgeAction).filter(knowledge_id=self.data.get('knowledge_id')).values('id','knowledge_id',"state",'meta','run_time',"create_time")
+        query_set = QuerySet(KnowledgeAction).filter(knowledge_id=self.data.get('knowledge_id')).values('id',
+                                                                                                        'knowledge_id',
+                                                                                                        "state", 'meta',
+                                                                                                        'run_time',
+                                                                                                        "create_time")
         if instance.get("user_name"):
             query_set = query_set.filter(meta__user_name__icontains=instance.get('user_name'))
         if instance.get('state'):
@@ -73,7 +78,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             KnowledgeWorkflowActionListQuerySerializer(data=instance).is_valid(raise_exception=True)
         return page_search(current_page, page_size, self.get_query_set(instance),
                            lambda a: {'id': a.get("id"), 'knowledge_id': a.get("knowledge_id"), 'state': a.get("state"),
-                 'meta': a.get("meta"), 'run_time': a.get("run_time"), 'create_time': a.get("create_time")})
+                                      'meta': a.get("meta"), 'run_time': a.get("run_time"),
+                                      'create_time': a.get("create_time")})
 
     def action(self, instance: Dict, user, with_valid=True):
         if with_valid:
@@ -91,7 +97,10 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
              'workspace_id': self.data.get("workspace_id"),
              **instance},
-            KnowledgeWorkflowPostHandler(None, knowledge_action_id))
+            KnowledgeWorkflowPostHandler(None, knowledge_action_id),
+            is_the_task_interrupted=lambda: cache.get(
+                Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
+                version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version()) or False)
         work_flow_manage.run()
         return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
                 'details': {}, 'meta': meta}
@@ -134,6 +143,15 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                     'state': knowledge_action.state,
                     'details': knowledge_action.details,
                     'meta': knowledge_action.meta}
+
+        def cancel(self, is_valid=True):
+            if is_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_action_id = self.data.get("id")
+            cache.set(Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id), True,
+                      version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version())
+            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(state=State.REVOKE)
+            return True
 
 
 class KnowledgeWorkflowSerializer(serializers.Serializer):

@@ -64,6 +64,14 @@
             <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             {{ $t('common.status.fail') }}
           </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKED'">
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+            {{ $t('common.status.REVOKED', '已取消') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKE'">
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
+            {{ $t('views.document.fileStatus.REVOKE', '取消中') }}
+          </el-text>
           <el-text class="color-text-primary" v-else>
             <el-icon class="is-loading color-primary"><Loading /></el-icon>
             {{ $t('common.status.padding') }}
@@ -87,11 +95,22 @@
 
       <el-table-column :label="$t('common.operation')" width="80">
         <template #default="{ row }">
-          <el-tooltip effect="dark" :content="$t('chat.executionDetails.title')" placement="top">
-            <el-button type="primary" text @click.stop="toDetails(row)">
-              <AppIcon iconName="app-operate-log"></AppIcon>
-            </el-button>
-          </el-tooltip>
+          <div class="flex">
+            <el-tooltip effect="dark" :content="$t('chat.executionDetails.title')" placement="top">
+              <el-button type="primary" text @click.stop="toDetails(row)">
+                <AppIcon iconName="app-operate-log"></AppIcon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('chat.executionDetails.cancel', '取消')"
+              placement="top"
+            >
+              <el-button type="primary" text @click.stop="cancel(row)">
+                <el-icon><CircleCloseFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
         </template>
       </el-table-column>
     </app-table-infinite-scroll>
@@ -157,6 +176,11 @@ const toDetails = (row: any) => {
   ExecutionDetailDrawerRef.value?.open()
 }
 
+const cancel = (row: any) => {
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .cancelWorkflowAction(active_knowledge_id.value, row.id, loading)
+    .then((ok: any) => {})
+}
 const changeFilterHandle = () => {
   query.value = { user_name: '', status: '' }
 }

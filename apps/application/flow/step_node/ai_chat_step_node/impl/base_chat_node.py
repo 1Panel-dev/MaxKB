@@ -63,6 +63,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     response_reasoning_content = False
 
     for chunk in response:
+        if workflow.is_the_task_interrupted():
+            break
         reasoning_chunk = reasoning.get_reasoning_content(chunk)
         content_chunk = reasoning_chunk.get('content')
         if 'reasoning_content' in chunk.additional_kwargs:
@@ -110,7 +112,8 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     if 'reasoning_content' in meta:
         reasoning_content = (meta.get('reasoning_content', '') or '')
     else:
-        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (reasoning_result_end.get('reasoning_content') or '')
+        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (
+                reasoning_result_end.get('reasoning_content') or '')
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 

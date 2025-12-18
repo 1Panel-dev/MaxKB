@@ -47,6 +47,20 @@
                   <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
                   {{ $t('common.status.fail') }}
                 </el-text>
+                <el-text
+                  class="color-text-primary"
+                  v-else-if="props.currentContent?.state === 'REVOKED'"
+                >
+                  <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+                  {{ $t('common.status.REVOKED', '已取消') }}
+                </el-text>
+                <el-text
+                  class="color-text-primary"
+                  v-else-if="props.currentContent?.state === 'REVOKE'"
+                >
+                  <el-icon class="is-loading color-primary"><Loading /></el-icon>
+                  {{ $t('views.document.fileStatus.REVOKE', '取消中') }}
+                </el-text>
                 <el-text class="color-text-primary" v-else>
                   <el-icon class="is-loading color-primary"><Loading /></el-icon>
                   {{ $t('common.status.padding') }}

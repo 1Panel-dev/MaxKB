@@ -92,14 +92,14 @@ class LoopWorkflowManage(WorkflowManage):
                  get_loop_context,
                  base_to_response: BaseToResponse = SystemToResponse(),
                  start_node_id=None,
-                 start_node_data=None, chat_record=None, child_node=None):
+                 start_node_data=None, chat_record=None, child_node=None, is_the_task_interrupted=lambda: False):
         self.parentWorkflowManage = parentWorkflowManage
         self.loop_params = loop_params
         self.get_loop_context = get_loop_context
         self.loop_field_list = []
         super().__init__(flow, params, work_flow_post_handler, base_to_response, None, None, None,
                          None,
-                         None, None, start_node_id, start_node_data, chat_record, child_node)
+                         None, None, start_node_id, start_node_data, chat_record, child_node, is_the_task_interrupted)
 
     def get_node_cls_by_id(self, node_id, up_node_id_list=None,
                            get_node_params=lambda node: node.properties.get('node_data')):
