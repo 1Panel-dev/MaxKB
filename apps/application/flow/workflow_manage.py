@@ -97,7 +97,7 @@ class WorkflowManage:
                  video_list=None,
                  other_list=None,
                  start_node_id=None,
-                 start_node_data=None, chat_record=None, child_node=None):
+                 start_node_data=None, chat_record=None, child_node=None, is_the_task_interrupted=lambda: False):
         if form_data is None:
             form_data = {}
         if image_list is None:
@@ -138,6 +138,7 @@ class WorkflowManage:
         self.global_field_list = []
         self.chat_field_list = []
         self.init_fields()
+        self.is_the_task_interrupted = is_the_task_interrupted
         if start_node_id is not None:
             self.load_node(chat_record, start_node_id, start_node_data)
         else:

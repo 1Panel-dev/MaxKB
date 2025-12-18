@@ -268,7 +268,8 @@ class BaseLoopNode(ILoopNode):
                                 start_node_id=start_node_id,
                                 start_node_data=start_node_data,
                                 chat_record=chat_record,
-                                child_node=child_node
+                                child_node=child_node,
+                                is_the_task_interrupted=self.workflow_manage.is_the_task_interrupted
                                 )
 
             return workflow_manage

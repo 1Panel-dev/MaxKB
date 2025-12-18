@@ -433,7 +433,13 @@ const getWorkflowAction: (
 ) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
   return get(`${prefix.value}/${knowledge_id}/action/${knowledge_action_id}`, {}, loading)
 }
-
+const cancelWorkflowAction: (
+  knowledge_id: string,
+  knowledge_action_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/action/${knowledge_action_id}/cancel`, {}, loading)
+}
 /**
  * mcp 节点
  */
@@ -480,4 +486,5 @@ export default {
   putKnowledgeWorkflow,
   workflowUpload,
   getWorkflowActionPage,
+  cancelWorkflowAction,
 }

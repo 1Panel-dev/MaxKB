@@ -123,6 +123,8 @@ def get_loop_workflow_node(node_list):
 
 
 def get_workflow_state(workflow):
+    if workflow.is_the_task_interrupted():
+        return State.REVOKED
     details = workflow.get_runtime_details()
     node_list = details.values()
     all_node = [*node_list, *get_loop_workflow_node(node_list)]

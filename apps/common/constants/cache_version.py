@@ -26,7 +26,7 @@ class Cache_Version(Enum):
     SYSTEM = "SYSTEM", lambda key: key
     # 应用对接三方应用的缓存
     APPLICATION_THIRD_PARTY = "APPLICATION:THIRD_PARTY", lambda key: key
-
+    KNOWLEDGE_WORKFLOW_INTERRUPTED = "KNOWLEDGE_WORKFLOW_INTERRUPTED", lambda action_id: action_id
     # 对话
     CHAT = "CHAT", lambda key: key
 

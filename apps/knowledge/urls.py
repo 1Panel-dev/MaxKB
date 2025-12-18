@@ -76,6 +76,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/action/<int:current_page>/<int:page_size>', views.KnowledgeWorkflowActionView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/upload_document', views.KnowledgeWorkflowUploadDocumentView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/action/<str:knowledge_action_id>', views.KnowledgeWorkflowActionView.Operate.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/action/<str:knowledge_action_id>/cancel', views.KnowledgeWorkflowActionView.Cancel.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/mcp_tools', views.McpServers.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version', views.KnowledgeWorkflowVersionView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version/<int:current_page>/<int:page_size>', views.KnowledgeWorkflowVersionView.Page.as_view()),
