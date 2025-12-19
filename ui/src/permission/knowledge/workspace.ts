@@ -587,6 +587,21 @@ const workspace = {
       ],
       'OR',
     ),
+  workflow_export: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   hit_test: () => false,
 }
 

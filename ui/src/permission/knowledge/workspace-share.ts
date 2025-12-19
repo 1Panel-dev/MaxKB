@@ -47,8 +47,9 @@ const workspaceShare = {
   folderAuth: () => false,
   folderDelete: () => false,
   hit_test: () => false,
-  debug: () => true,
-  workflow_edit: () => true,
+  debug: () => false,
+  workflow_edit: () => false,
+  workflow_export: () => false,
 }
 
 export default workspaceShare

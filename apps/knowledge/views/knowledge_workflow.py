@@ -7,12 +7,12 @@ from rest_framework.views import APIView
 
 from application.api.application_api import SpeechToTextAPI
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
+from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi, KnowledgeWorkflowActionApi, \
-    KnowledgeWorkflowActionPageApi
+    KnowledgeWorkflowActionPageApi, KnowledgeWorkflowExportApi, KnowledgeWorkflowImportApi
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer, KnowledgeWorkflowActionSerializer, \
     KnowledgeWorkflowMcpSerializer
@@ -243,6 +243,73 @@ class KnowledgeWorkflowView(APIView):
                 KnowledgeWorkflowSerializer.Operate(
                     data={'knowledge_id': knowledge_id, 'user_id': request.user.id,
                           'workspace_id': workspace_id, }).publish())
+
+    class Export(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Export knowledge workflow'),
+            summary=_('Export knowledge workflow'),
+            operation_id=_('Export knowledge workflow'),  # type: ignore
+            parameters=KnowledgeWorkflowExportApi.get_parameters(),
+            request=None,
+            responses=KnowledgeWorkflowExportApi.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_WORKFLOW_EXPORT.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_EXPORT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                CompareConstants.AND
+            )
+        )
+        @log(menu='Knowledge', operate="Export knowledge workflow",
+             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
+             )
+        def get(self, request: Request, workspace_id: str, knowledge_id: str):
+            return KnowledgeWorkflowSerializer.Export(
+                data={'knowledge_id': knowledge_id,'user_id': request.user.id,'workspace_id': workspace_id}
+            ).export()
+
+    class Import(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_('Import knowledge workflow'),
+            summary=_('Import knowledge workflow'),
+            operation_id=_('Import knowledge workflow'),  # type: ignore
+            parameters=KnowledgeWorkflowImportApi.get_parameters(),
+            request=KnowledgeWorkflowImportApi.get_request(),
+            responses=KnowledgeWorkflowImportApi.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_WORKFLOW_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                CompareConstants.AND
+            )
+        )
+        @log(menu='Knowledge', operate="Import knowledge workflow",
+             get_operation_object=lambda r, k: get_knowledge_operation_object(k.get('knowledge_id')),
+             )
+        def post(self, request: Request, workspace_id:str, knowledge_id: str):
+            is_import_tool = get_is_permissions(request, workspace_id=workspace_id)(
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            )
+            return result.success(KnowledgeWorkflowSerializer.Import(data={
+                'knowledge_id': knowledge_id, 'user_id': request.user.id, 'workspace_id': workspace_id
+            }).import_({'file': request.FILES.get('file')}, is_import_tool))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

@@ -197,6 +197,12 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_EDIT
     ],'OR'
     ), 
+  workflow_export: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_EXPORT
+    ],'OR'
+    ), 
   chat_user_edit: () =>false,
 
   

@@ -60,7 +60,8 @@ const share = {
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
   workflow_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EDIT], 'OR'),
-  
+  workflow_export: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EXPORT], 'OR'),  
   chat_user_edit: () => false,
 
   auth: () => false,

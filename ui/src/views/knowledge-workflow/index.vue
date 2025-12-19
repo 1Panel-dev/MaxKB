@@ -52,6 +52,30 @@
                 <AppIcon iconName="app-to-import-doc" class="color-secondary"></AppIcon>
                 {{ $t('workflow.operation.toImportDoc') }}
               </el-dropdown-item>
+              <el-dropdown-item
+                @click.stop="exportKnowledgeWorkflow(detail.name, detail.id)"
+                v-if="permissionPrecise.workflow_export(id)"
+              >
+                <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                {{ $t('common.export') }}
+              </el-dropdown-item>
+              <el-upload
+                class="import-button"
+                ref="elUploadRef"
+                :file-list="[]"
+                action="#"
+                multiple
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                :on-change="(file: any, fileList: any) => importKnowledgeWorkflow(file)"
+                v-if="permissionPrecise.workflow_edit(id)"
+              >
+                <el-dropdown-item>
+                  <AppIcon iconName="app-import" class="color-secondary"></AppIcon>
+                  {{ $t('common.import', '导入') }}
+                </el-dropdown-item>
+              </el-upload>
               <el-dropdown-item @click="openListAction" divided>
                 <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
                 {{ $t('workflow.ExecutionRecord') }}
@@ -362,6 +386,40 @@ const publish = () => {
             ` ${t('workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
+      }
+    })
+}
+
+const elUploadRef = ref()
+const importKnowledgeWorkflow = (file: any) => {
+  const formData = new FormData()
+  formData.append('file', file.raw)
+  elUploadRef.value.clearFiles()
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+    .importKnowledgeWorkflow(id, formData, loading)
+    .then(() => {
+      getDetail()
+    })
+    .catch((error: any) => {
+      if (error.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
+}
+
+function exportKnowledgeWorkflow(name: string, id: string) {
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+    .exportKnowledgeWorkflow(id, name, loading)
+    .catch((error: any) => {
+      if (error.response.status !== 403) {
+        error.response.data.text().then((res: string) => {
+          MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+        })
       }
     })
 }

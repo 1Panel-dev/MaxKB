@@ -1,14 +1,17 @@
 # coding=utf-8
 import asyncio
 import json
-from typing import Dict
+import pickle
+from functools import reduce
+from typing import Dict, List
 
 import uuid_utils.compat as uuid
 from django.db import transaction
 from django.db.models import QuerySet
+from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import KnowledgeWorkflowPostHandler
@@ -18,6 +21,9 @@ from application.serializers.application import get_mcp_tools
 from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
+from common.field.common import UploadedFileField
+from common.result import result
+from common.utils.common import restricted_loads, generate_uuid
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow, KnowledgeWorkflowVersion
@@ -26,10 +32,20 @@ from knowledge.serializers.knowledge import KnowledgeModelSerializer
 from django.core.cache import cache
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool
+from tools.models import Tool, ToolScope
+from tools.serializers.tool import ToolExportModelSerializer
 from users.models import User
 
 tool_executor = ToolExecutor()
+
+
+def hand_node(node, update_tool_map):
+    if node.get('type') == 'tool-lib-node':
+        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
+        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id, tool_lib_id)
+
+    if node.get('type') == 'search-knowledge-node':
+        node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
 
 
 class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
@@ -43,10 +59,24 @@ class KnowledgeWorkflowActionRequestSerializer(serializers.Serializer):
     knowledge_base = serializers.DictField(required=True, label=_('knowledge base data'))
 
 
+class KnowledgeWorkflowImportRequest(serializers.Serializer):
+    file = UploadedFileField(required=True, label=_("file"))
+
+
 class KnowledgeWorkflowActionListQuerySerializer(serializers.Serializer):
     user_name = serializers.CharField(required=False, label=_('Name'), allow_blank=True, allow_null=True)
     state = serializers.CharField(required=False, label=_("State"), allow_blank=True, allow_null=True)
 
+class KBWFInstance:
+
+    def __init__(self, knowledge_workflow: dict, function_lib_list: List[dict], version: str, tool_list: List[dict]):
+        self.knowledge_workflow = knowledge_workflow
+        self.function_lib_list = function_lib_list
+        self.version = version
+        self.tool_list = tool_list
+
+    def get_tool_list(self):
+        return [*(self.tool_list or []), *(self.function_lib_list or [])]
 
 class KnowledgeWorkflowActionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -216,6 +246,130 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             knowledge_workflow.save()
 
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
+
+    class Import(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def import_(self, instance: dict, is_import_tool, with_valid=True):
+            if with_valid:
+                self.is_valid()
+                KnowledgeWorkflowImportRequest(data=instance).is_valid(raise_exception=True)
+            user_id = self.data.get('user_id')
+            workspace_id = self.data.get('workspace_id')
+            knowledge_id = self.data.get('knowledge_id')
+            kbwf_instance_bytes = instance.get('file').read()
+            try:
+                kbwf_instance = restricted_loads(kbwf_instance_bytes)
+            except Exception as e:
+                raise AppApiException(1001, _("Unsupported file format"))
+            knowledge_workflow = kbwf_instance.knowledge_workflow
+            tool_list = kbwf_instance.get_tool_list()
+            update_tool_map = {}
+            if len(tool_list) > 0:
+                tool_id_list = reduce(lambda x, y: [*x, *y],
+                                      [[tool.get('id'), generate_uuid((tool.get('id') + workspace_id or ''))]
+                                       for tool
+                                       in
+                                       tool_list], [])
+                # 存在的工具列表
+                exits_tool_id_list = [str(tool.id) for tool in
+                                      QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
+                # 需要更新的工具集合
+                update_tool_map = {tool.get('id'): generate_uuid((tool.get('id') + workspace_id or '')) for tool
+                                   in
+                                   tool_list if
+                                   not exits_tool_id_list.__contains__(
+                                       tool.get('id'))}
+
+                tool_list = [{**tool, 'id': update_tool_map.get(tool.get('id'))} for tool in tool_list if
+                             not exits_tool_id_list.__contains__(
+                                 tool.get('id')) and not exits_tool_id_list.__contains__(
+                                 generate_uuid((tool.get('id') + workspace_id or '')))]
+
+            work_flow = self.to_knowledge_workflow(
+                knowledge_workflow,
+                update_tool_map,
+            )
+            tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
+            KnowledgeWorkflow.objects.filter(workspace_id=workspace_id,knowledge_id=knowledge_id).update(
+                work_flow=work_flow
+            )
+
+            if is_import_tool:
+                if len(tool_model_list) > 0:
+                    QuerySet(Tool).bulk_create(tool_model_list)
+                    UserResourcePermissionSerializer(data={
+                        'workspace_id': self.data.get('workspace_id'),
+                        'user_id': self.data.get('user_id'),
+                        'auth_target_type': AuthTargetType.TOOL.value
+                    }).auth_resource_batch([t.id for t in tool_model_list])
+                return True
+
+        @staticmethod
+        def to_knowledge_workflow(knowledge_workflow, update_tool_map):
+            work_flow = knowledge_workflow.get("work_flow")
+            for node in work_flow.get('nodes', []):
+                hand_node(node, update_tool_map)
+                if node.get('type') == 'loop_node':
+                    for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
+                        hand_node(n, update_tool_map)
+            return work_flow
+
+        @staticmethod
+        def to_tool(tool, workspace_id, user_id):
+            return Tool(id=tool.get('id'),
+                        user_id=user_id,
+                        name=tool.get('name'),
+                        code=tool.get('code'),
+                        template_id=tool.get('template_id'),
+                        input_field_list=tool.get('input_field_list'),
+                        init_field_list=tool.get('init_field_list'),
+                        is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
+                        scope=ToolScope.WORKSPACE,
+                        folder_id=workspace_id,
+                        workspace_id=workspace_id)
+
+    class Export(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+
+        def export(self, with_valid=True):
+            try:
+                if with_valid:
+                    self.is_valid()
+                knowledge_id = self.data.get('knowledge_id')
+                knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
+                knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+                tool_id_list = [node.get('properties', {}).get('node_data', {}).get('tool_lib_id') for node
+                                in
+                                knowledge_workflow.work_flow.get('nodes', []) + reduce(lambda x, y: [*x, *y], [
+                                    n.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', [])
+                                    for n
+                                    in
+                                    knowledge_workflow.work_flow.get('nodes', []) if n.get('type') == 'loop-node'], [])
+                                if
+                                node.get('type') == 'tool-lib-node']
+                tool_list = []
+                if len(tool_id_list) > 0:
+                    tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                knowledge_workflow_dict = KnowledgeWorkflowModelSerializer(knowledge_workflow).data
+
+                kbwf_instance = KBWFInstance(
+                    knowledge_workflow_dict,
+                    [],
+                    'v2',
+                    [ToolExportModelSerializer(tool).data for tool in tool_list]
+                )
+                knowledge_workflow_pickle = pickle.dumps(kbwf_instance)
+                response = HttpResponse(content_type='text/plain', content=knowledge_workflow_pickle)
+                response['Content-Disposition'] = f'attachment; filename="{knowledge.name}.kbwf"'
+                return response
+            except Exception as e:
+                return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))

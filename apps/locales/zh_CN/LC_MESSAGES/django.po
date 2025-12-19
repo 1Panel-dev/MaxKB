@@ -9001,3 +9001,9 @@ msgstr "该账号已被锁定 %s 分钟，请稍后再试"
 
 msgid "User does not have permission to use API Key"
 msgstr "用户没有使用 API Key 的权限"
+
+msgid "Import knowledge workflow"
+msgstr "导入知识工作流"
+
+msgid "Export knowledge workflow"
+msgstr "导出知识工作流"

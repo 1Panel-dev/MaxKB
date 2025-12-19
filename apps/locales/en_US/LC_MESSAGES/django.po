@@ -8875,3 +8875,9 @@ msgstr ""
 
 msgid "User does not have permission to use API Key"
 msgstr ""
+
+msgid "Import knowledge workflow"
+msgstr ""
+
+msgid "Export knowledge workflow"
+msgstr ""

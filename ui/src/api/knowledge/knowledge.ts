@@ -5,6 +5,7 @@ import type { Dict, pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
 import useStore from '@/stores'
+import knowledge from '../system-shared/knowledge'
 const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
@@ -395,6 +396,37 @@ const putKnowledgeWorkflow: (
   return put(`${prefix.value}/${knowledge_id}/workflow`, data, undefined, loading)
 }
 
+/**
+ * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportKnowledgeWorkflow = (
+  knowledge_id: string,
+  knowledge_name: string,
+  loading?: Ref<boolean>
+) => {
+  return exportFile(
+    knowledge_name + '.kbwf',
+    `${prefix.value}/${knowledge_id}/workflow/export`,
+    undefined,
+    loading
+  )
+}
+/**
+ * 导入知识库工作流
+ */
+const importKnowledgeWorkflow: (
+  knowledge_id: string,
+  data: any,
+  loading?:Ref<boolean>
+) => Promise<Result<any>> = (knowledge_id, data, loading)=>{
+  return post(`${prefix.value}/${knowledge_id}/workflow/import`,data,undefined,loading)
+}
+
+
 const listKnowledgeVersion: (
   knowledge_id: string,
   loading?: Ref<boolean>,
@@ -487,4 +519,6 @@ export default {
   workflowUpload,
   getWorkflowActionPage,
   cancelWorkflowAction,
+  exportKnowledgeWorkflow,
+  importKnowledgeWorkflow
 }
