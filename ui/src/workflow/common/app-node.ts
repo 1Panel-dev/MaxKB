@@ -454,6 +454,15 @@ class AppNodeModel extends HtmlResize.model {
           type: 'left',
         })
       }
+ 
+      if (this.properties.enableException) { 
+          anchors.push({
+        x: x + width / 2 - 10,
+        y: y+(this.height/2) -80,
+        id: `${id}_exception_right`,
+        type: 'right',
+      })
+      }
       anchors.push({
         x: x + width / 2 - 10,
         y: showNode ? y : y - 15,

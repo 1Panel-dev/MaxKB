@@ -90,9 +90,16 @@
             />
             <slot></slot>
             <template v-if="nodeFields.length > 0">
-              <h5 class="title-decoration-1 mb-8 mt-8">
-                {{ $t('common.param.outputParam') }}
-              </h5>
+              <div class="flex-between">
+                <h5 class="title-decoration-1 mb-8 mt-8">
+                  {{ $t('common.param.outputParam') }}
+                </h5>
+                <el-switch
+                  v-if="exceptionNodeList.includes(nodeModel.type)"
+                  v-model="enable_exception"
+                />
+              </div>
+
               <template v-for="(item, index) in nodeFields" :key="index">
                 <div
                   class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
@@ -324,10 +331,25 @@ function clickNodes(item: any) {
 
   closeNodeMenu()
 }
-
-const props = defineProps<{
-  nodeModel: any
-}>()
+const enable_exception = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'enableException', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.enableException !== undefined) {
+      return props.nodeModel.properties.enableException
+    }
+    set(props.nodeModel.properties, 'enableException', false)
+    return false
+  },
+})
+const props = withDefaults(
+  defineProps<{
+    nodeModel: any
+    exceptionNodeList?: string[]
+  }>(),
+  { exceptionNodeList: () => ['ai-chat-node'] },
+)
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.config.fields) {
     const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
@@ -338,6 +360,17 @@ const nodeFields = computed(() => {
         globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
       }
     })
+    if (enable_exception.value) {
+      return [
+        ...fields,
+        {
+          label: '异常信息',
+          value: 'exception',
+          globeLabel: `{{${props.nodeModel.properties.stepName}.exception}}`,
+          globeValue: `{{context['${props.nodeModel.id}'].exception}}`,
+        },
+      ]
+    }
     return fields
   }
   return []
