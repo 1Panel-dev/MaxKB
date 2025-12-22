@@ -394,22 +394,35 @@ const elUploadRef = ref()
 const importKnowledgeWorkflow = (file: any) => {
   const formData = new FormData()
   formData.append('file', file.raw)
+  const name = file.name.replace('.kbwf', '')
   elUploadRef.value.clearFiles()
-  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
-    .importKnowledgeWorkflow(id, formData, loading)
+  debugger
+  MsgConfirm(
+    t('common.tip'),
+    `${t('views.application.tip.confirmUse')} ${name} ${t('views.application.tip.overwrite')}?`,
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    },
+  )
     .then(() => {
-      getDetail()
-    })
-    .catch((error: any) => {
-      if (error.code === 400) {
-        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
-          cancelButtonText: t('common.confirm'),
-          confirmButtonText: t('common.professional'),
-        }).then(() => {
-          window.open('https://maxkb.cn/pricing.html', '_blank')
+      loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+        .importKnowledgeWorkflow(id, formData, loading)
+        .then(() => {
+          getDetail()
         })
-      }
+        .catch((error: any) => {
+          if (error.code === 400) {
+            MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+              cancelButtonText: t('common.confirm'),
+              confirmButtonText: t('common.professional'),
+            }).then(() => {
+              window.open('https://maxkb.cn/pricing.html', '_blank')
+            })
+          }
+        })
     })
+    .catch(() => {})
 }
 
 function exportKnowledgeWorkflow(name: string, id: string) {

@@ -27,6 +27,8 @@ export default {
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
     loadingErrorMessage: '加载配置失败，请检查输入或稍后再试',
     noDocPermission: '无文档创建权限',
+    confirmUse: '确定使用',
+    overwrite: '覆盖当前工作流',
   },
   form: {
     appName: {

@@ -27,6 +27,8 @@ export default {
     saveErrorMessage: 'Saving failed, please check your input or try again later',
     loadingErrorMessage: 'Failed to load configuration, please check your input or try again later',
     noDocPermission: 'No permission to create documents',
+    confirmUse: 'Are you sure you want to use',
+    overwrite: 'overwrite the current workflow',
   },
 
   form: {

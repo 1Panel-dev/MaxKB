@@ -24,6 +24,8 @@ export default {
     saveErrorMessage: '儲存失敗，請檢查輸入或稍後再試',
     loadingErrorMessage: '載入配置失敗，請檢查輸入或稍後再試',
     noDocPermission: '無文檔創建權限',
+    confirmUse: '確定使用',
+    overwrite: '覆蓋當前工作流',
   },
   form: {
     appName: {
