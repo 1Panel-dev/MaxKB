@@ -30,6 +30,7 @@ from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
+from application.serializers.common import update_resource_mapping_by_application
 from common import result
 from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -780,6 +781,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application_access_token.save()
         else:
             access_token = application_access_token.access_token
+        update_resource_mapping_by_application(self.data.get("application_id"))
         del_application_access_token(access_token)
         return self.one(with_valid=False)
 

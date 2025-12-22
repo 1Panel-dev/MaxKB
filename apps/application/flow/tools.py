@@ -315,7 +315,8 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         tools = await client.get_tools()
         agent = create_react_agent(chat_model, tools)
         recursion_limit = int(CONFIG.get("LANGCHAIN_GRAPH_RECURSION_LIMIT", '25'))
-        response = agent.astream({"messages": message_list}, config={"recursion_limit": recursion_limit}, stream_mode='messages')
+        response = agent.astream({"messages": message_list}, config={"recursion_limit": recursion_limit},
+                                 stream_mode='messages')
 
         # 用于存储工具调用信息（按 tool_id）以及按 index 聚合分片
         tool_calls_info = {}
@@ -396,7 +397,6 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         raise RuntimeError(error_msg) from None
 
 
-
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True):
     """使用全局事件循环，不创建新实例"""
     result_queue = queue.Queue()
@@ -427,3 +427,82 @@ def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_ena
 
 async def anext_async(agen):
     return await agen.__anext__()
+
+
+target_source_node_mapping = {
+    'TOOL': {'tool-lib-node': lambda n: [n.get('properties').get('node_data').get('tool_lib_id')]},
+    'MODEL': {'ai-chat-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'question-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'speech-to-text-node': lambda n: [n.get('properties').get('node_data').get('stt_model_id')],
+              'text-to-speech-node': lambda n: [n.get('properties').get('node_data').get('tts_model_id')],
+              'image-to-video-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'image-generate-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'intent-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'image-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'parameter-extraction-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'video-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')]
+              },
+    'KNOWLEDGE': {'search-knowledge-node': lambda n: n.get('properties').get('node_data').get('knowledge_id_list')},
+    'APPLICATION': {
+        'application-node': lambda n: [n.get('properties').get('node_data').get('application_id')]
+    }
+}
+
+
+def get_node_handle_callback(source_type, source_id):
+    def node_handle_callback(node):
+        from system_manage.models.resource_mapping import ResourceMapping
+        response = []
+        for key, value in target_source_node_mapping.items():
+            if node.get('type') in value:
+                call = value.get(node.get('type'))
+                target_source_id_list = call(node)
+                for target_source_id in target_source_id_list:
+                    if target_source_id:
+                        response.append(ResourceMapping(source_type=source_type, target_type=key, source_id=source_id,
+                                                        target_id=target_source_id))
+        return response
+
+    return node_handle_callback
+
+
+def get_workflow_resource(workflow, node_handle):
+    response = []
+    if 'nodes' in workflow:
+        for node in workflow.get('nodes'):
+            rs = node_handle(node)
+            if rs:
+                for r in rs:
+                    response.append(r)
+            if node.get('type') == 'loop-node':
+                r = get_workflow_resource(node.get('properties', {}).get('node_data', {}).get('loop_body'), node_handle)
+                for rn in r:
+                    response.append(rn)
+        return list({(str(item.target_type) + str(item.target_id)): item for item in response}.values())
+    return []
+
+
+def get_instance_resource(instance, source_type, source_id, target_type, field_call_list):
+    response = []
+    from system_manage.models.resource_mapping import ResourceMapping
+    for field_call in field_call_list:
+        target_id = field_call(instance)
+        if target_id:
+            response.append(ResourceMapping(source_type=source_type, target_type=target_type, source_id=source_id,
+                                            target_id=target_id))
+    return response
+
+
+def save_workflow_mapping(workflow, source_type, source_id, other_resource_mapping=None):
+    if not other_resource_mapping:
+        other_resource_mapping = []
+    from system_manage.models.resource_mapping import ResourceMapping
+    from django.db.models import QuerySet
+    QuerySet(ResourceMapping).filter(source_type=source_type, source_id=source_id).delete()
+    resource_mapping_list = get_workflow_resource(workflow,
+                                                  get_node_handle_callback(source_type,
+                                                                           source_id))
+    if resource_mapping_list:
+        resource_mapping_list += other_resource_mapping
+        QuerySet(ResourceMapping).bulk_create(
+            {(str(item.target_type) + str(item.target_id)): item for item in resource_mapping_list}.values())

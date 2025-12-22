@@ -6,21 +6,18 @@
     @date：2025/6/9 13:42
     @desc:
 """
-import json
 from typing import List
 
 from django.core.cache import cache
 from django.db.models import QuerySet
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
 from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
     ApplicationKnowledgeMapping
 from application.serializers.application_chat import ChatCountSerializer
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.encoder.encoder import SystemEncoder
 from common.exception.app_exception import ChatException
 from knowledge.models import Document
 from models_provider.models import Model
@@ -165,7 +162,7 @@ class ChatInfo:
             'mcp_output_enable': self.application.mcp_output_enable,
         }
 
-    def to_pipeline_manage_params(self, problem_text: str, post_response_handler: PostResponseHandler,
+    def to_pipeline_manage_params(self, problem_text: str, post_response_handler,
                                   exclude_paragraph_id_list, chat_user_id: str, chat_user_type, stream=True,
                                   form_data=None):
         if form_data is None:
@@ -319,3 +316,19 @@ class ChatInfo:
         if chat_info_dict:
             return ChatInfo.map_to_chat_info(chat_info_dict)
         return None
+
+
+def update_resource_mapping_by_application(application_id: str):
+    from application.flow.tools import get_instance_resource, save_workflow_mapping
+    from system_manage.models.resource_mapping import ResourceType
+    application = QuerySet(Application).filter(id=application_id).first()
+    instance_mapping = get_instance_resource(application, ResourceType.APPLICATION, str(application.id),
+                                             ResourceType.MODEL,
+                                             [lambda i: i.tts_model_id, lambda i: i.stt_model_id, ])
+    if application.type == 'WORK_FLOW':
+        save_workflow_mapping(application.work_flow, ResourceType.APPLICATION, str(application_id),
+                              instance_mapping)
+        return
+    else:
+        save_workflow_mapping({}, ResourceType.APPLICATION, str(application_id),
+                              instance_mapping)

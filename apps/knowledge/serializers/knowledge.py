@@ -19,6 +19,7 @@ from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.tools import get_workflow_resource, get_node_handle_callback, save_workflow_mapping
 from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -34,7 +35,8 @@ from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document,
     ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, KnowledgeWorkflow
 from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, \
-    GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir
+    GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir, \
+    update_resource_mapping_by_knowledge
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
@@ -42,6 +44,7 @@ from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.models.resource_mapping import ResourceType, ResourceMapping
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage
 
@@ -373,6 +376,7 @@ class KnowledgeSerializer(serializers.Serializer):
             KnowledgeEditRequest(data=instance).is_valid(knowledge=knowledge)
             if 'embedding_model_id' in instance:
                 knowledge.embedding_model_id = instance.get('embedding_model_id')
+                update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
             if "name" in instance:
                 knowledge.name = instance.get("name")
             if 'desc' in instance:
