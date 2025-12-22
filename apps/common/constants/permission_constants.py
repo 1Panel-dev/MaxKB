@@ -572,7 +572,12 @@ class PermissionConstants(Enum):
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     TOOL_FOLDER_DELETE = Permission(
-        group=Group.TOOL_FOLDER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        group=Group.TOOL_FOLDER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
+    TOOL_FOLDER_AUTH = Permission(
+        group=Group.TOOL_FOLDER, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
@@ -638,6 +643,11 @@ class PermissionConstants(Enum):
     )
     KNOWLEDGE_FOLDER_DELETE = Permission(
         group=Group.KNOWLEDGE_FOLDER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_FOLDER_AUTH = Permission(
+        group=Group.KNOWLEDGE_FOLDER, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
@@ -954,7 +964,7 @@ class PermissionConstants(Enum):
                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                          resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]
                                          )
-    APPLICATION_FOLDER_CREATE = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.EDIT,
+    APPLICATION_FOLDER_CREATE = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.CREATE,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
@@ -965,6 +975,11 @@ class PermissionConstants(Enum):
                                          resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
                                          )
     APPLICATION_FOLDER_DELETE = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.DELETE,
+                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                           parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
+                                           )
+    APPLICATION_FOLDER_AUTH = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.AUTH,
                                            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                            parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                            resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]

@@ -23,7 +23,11 @@
           <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
           <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
           <el-option :label="$t('views.model.modelForm.permissionType.label')" value="permission" />
-          <el-option v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')" :label="$t('views.role.member.role')" value="role" />
+          <el-option
+            v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
+            :label="$t('views.role.member.role')"
+            value="role"
+          />
         </el-select>
         <el-input
           v-if="searchType === 'nick_name'"
@@ -93,14 +97,15 @@
         show-overflow-tooltip
         :label="$t('views.login.loginForm.username.label')"
       />
-      <el-table-column v-if="hasPermission([EditionConst.IS_EE,EditionConst.IS_PE],'OR')" prop="role_name" :label="$t('views.role.member.role')" width="210">
+      <el-table-column
+        v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
+        prop="role_name"
+        :label="$t('views.role.member.role')"
+        width="210"
+      >
         <template #default="{ row }">
-              <TagGroup
-                class="cursor"
-                style="width: fit-content"
-                :tags="row.role_name"
-              />
-            </template>
+          <TagGroup class="cursor" style="width: fit-content" :tags="row.role_name" />
+        </template>
       </el-table-column>
       <el-table-column :label="$t('common.operation')" align="left" width="340">
         <template #default="{ row }">
@@ -292,7 +297,7 @@ function confirmSinglePermission() {
 const permissionOptionMap = computed(() => {
   return {
     rootFolder: getPermissionOptions(true, true),
-    folder: getPermissionOptions(true, false),
+    folder: getPermissionOptions(false, false),
   }
 })
 

@@ -198,7 +198,7 @@ watch(
 const permissionOptionMap = computed(() => {
   return {
     rootFolder: getPermissionOptions(true, true),
-    folder: getPermissionOptions(true, false),
+    folder: getPermissionOptions(false, false),
     resource: getPermissionOptions(false, false),
   }
 })

@@ -80,7 +80,7 @@
             class="flex align-center w-full custom-tree-node"
           >
             <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
-            <span class="tree-label ml-8 " :title="node.label">{{ i18n_name(node.label) }}</span>
+            <span class="tree-label ml-8" :title="node.label">{{ i18n_name(node.label) }}</span>
 
             <div
               v-if="canOperation && MoreFilledPermission(node, data)"
@@ -148,7 +148,7 @@
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" :title="title" />
     <MoveToDialog ref="MoveToDialogRef" :source="props.source" @refresh="emit('refreshTree')" />
     <ResourceAuthorizationDrawer
-      :type="props.source"
+      :type="`${props.source}_FOLDER`"
       :is-folder="true"
       :is-root-folder="!currentNode?.parent_id"
       ref="ResourceAuthorizationDrawerRef"

@@ -45,8 +45,8 @@ const workspace = {
             [
               new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              PermissionConst.TOOL_FOLDER_EDIT.getToolWorkspaceResourcePermission(folder_id),
-              PermissionConst.TOOL_CREATE.getWorkspacePermissionWorkspaceManageRole,  
+              PermissionConst.TOOL_FOLDER_CREATE.getToolWorkspaceResourcePermission(folder_id),
+              PermissionConst.TOOL_FOLDER_CREATE.getWorkspacePermissionWorkspaceManageRole,  
             ],
             'OR'
     ),
@@ -56,7 +56,7 @@ const workspace = {
               new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_FOLDER_READ.getToolWorkspaceResourcePermission(folder_id),
-              PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,  
+              PermissionConst.TOOL_FOLDER_READ.getWorkspacePermissionWorkspaceManageRole,  
             ],
             'OR'
     ),
@@ -66,7 +66,7 @@ const workspace = {
               new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_FOLDER_EDIT.getToolWorkspaceResourcePermission(folder_id),
-              PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,  
+              PermissionConst.TOOL_FOLDER_EDIT.getWorkspacePermissionWorkspaceManageRole,  
             ],
             'OR'
     ),
@@ -75,8 +75,8 @@ const workspace = {
             [
               new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              PermissionConst.TOOL_FOLDER_EDIT.getToolWorkspaceResourcePermission(folder_id),
-              PermissionConst.TOOL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole,  
+              PermissionConst.TOOL_FOLDER_AUTH.getToolWorkspaceResourcePermission(folder_id),
+              PermissionConst.TOOL_FOLDER_AUTH.getWorkspacePermissionWorkspaceManageRole,  
             ],
             'OR'
     ),
@@ -85,8 +85,8 @@ const workspace = {
             [
               new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-              PermissionConst.TOOL_FOLDER_EDIT.getToolWorkspaceResourcePermission(folder_id),
-              PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole,  
+              PermissionConst.TOOL_FOLDER_DELETE.getToolWorkspaceResourcePermission(folder_id),
+              PermissionConst.TOOL_FOLDER_DELETE.getWorkspacePermissionWorkspaceManageRole,  
             ],
             'OR'
     ),
