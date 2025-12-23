@@ -18,11 +18,11 @@ from chat.api.vote_api import VoteAPI
 from chat.serializers.chat_record import VoteSerializer, HistoricalConversationSerializer, \
     HistoricalConversationRecordSerializer, HistoricalConversationOperateSerializer
 from common import result
-from common.auth import TokenAuth
+from common.auth import ChatTokenAuth
 
 
 class VoteView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['PUT'],
@@ -42,7 +42,7 @@ class VoteView(APIView):
 
 
 class HistoricalConversationView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['GET'],
@@ -61,7 +61,7 @@ class HistoricalConversationView(APIView):
             }).list())
 
     class Operate(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [ChatTokenAuth]
 
         @extend_schema(
             methods=['PUT'],
@@ -100,7 +100,7 @@ class HistoricalConversationView(APIView):
                 }).logic_delete())
 
     class BatchDelete(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [ChatTokenAuth]
 
         @extend_schema(
             methods=['DELETE'],
@@ -118,7 +118,7 @@ class HistoricalConversationView(APIView):
             }).batch_logic_delete())
 
     class PageView(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [ChatTokenAuth]
 
         @extend_schema(
             methods=['GET'],
@@ -138,7 +138,7 @@ class HistoricalConversationView(APIView):
 
 
 class HistoricalConversationRecordView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['GET'],
@@ -158,7 +158,7 @@ class HistoricalConversationRecordView(APIView):
             }).list())
 
     class PageView(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [ChatTokenAuth]
 
         @extend_schema(
             methods=['GET'],
@@ -179,7 +179,7 @@ class HistoricalConversationRecordView(APIView):
 
 
 class ChatRecordView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['GET'],
