@@ -135,7 +135,8 @@
         :show="showAnchor"
         :inner="true"
         :id="id"
-        style="left: 100%; top: 50%; transform: translate(0, -50%)"
+        style="left: 100%; transform: translate(0, -50%)"
+        :style="dropdownMenuStyle"
         @clickNodes="clickNodes"
       />
     </el-collapse-transition>
@@ -177,7 +178,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, inject } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -187,6 +188,7 @@ import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
+
 const route = useRoute()
 const {
   params: { id },
@@ -203,6 +205,13 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
+const dropdownMenuStyle = computed(() => {
+  return {
+    top: anchorData.value
+      ? anchorData.value.y - props.nodeModel.y + props.nodeModel.height / 2 + 'px'
+      : '0px',
+  }
+})
 const titleFormRef = ref()
 const nodeNameDialogVisible = ref<boolean>(false)
 const form = ref<any>({
@@ -348,8 +357,16 @@ const props = withDefaults(
     nodeModel: any
     exceptionNodeList?: string[]
   }>(),
-  { exceptionNodeList: () => ['ai-chat-node'] },
+  {
+    exceptionNodeList: () => [
+      'ai-chat-node',
+      'video-understand-node',
+      'image-generate-node',
+      'image-understand-node',
+    ],
+  },
 )
+
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.config.fields) {
     const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
@@ -365,15 +382,25 @@ const nodeFields = computed(() => {
         ...fields,
         {
           label: '异常信息',
-          value: 'exception',
-          globeLabel: `{{${props.nodeModel.properties.stepName}.exception}}`,
-          globeValue: `{{context['${props.nodeModel.id}'].exception}}`,
+          value: 'exception_message',
+          globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
+          globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
         },
       ]
     }
     return fields
   }
   return []
+})
+watch(enable_exception, () => {
+  props.nodeModel.graphModel.eventCenter.emit(
+    'delete_edge',
+    props.nodeModel.outgoing.edges
+      .filter((item: any) =>
+        [`${props.nodeModel.id}_exception_right`].includes(item.sourceAnchorId),
+      )
+      .map((item: any) => item.id),
+  )
 })
 
 function showOperate(type: string) {

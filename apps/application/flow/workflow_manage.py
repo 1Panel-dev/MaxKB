@@ -153,6 +153,8 @@ class WorkflowManage:
             node_name = properties.get('stepName')
             node_id = node.id
             node_config = properties.get('config')
+            field_list.append(
+                {'label': '异常信息', 'value': 'exception_message', 'node_id': node_id, 'node_name': node_name})
             if node_config is not None:
                 fields = node_config.get('fields')
                 if fields is not None:
@@ -473,7 +475,12 @@ class WorkflowManage:
                 else:
                     list(result)
             if current_node.status == 500:
-                return None
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                r = NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                               _is_interrupt=lambda node, step_variable, global_variable: False)
+                r.write_context(current_node, self)
+                return r
             return current_result
         except Exception as e:
             # 添加节点
@@ -494,7 +501,11 @@ class WorkflowManage:
             current_node.node_chunk.add_chunk(chunk)
             current_node.get_write_error_context(e)
             self.status = 500
-            return None
+            current_node.context['exception_message'] = current_node.err_message
+            current_node.context['branch_id'] = 'exception'
+            return NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                              _is_interrupt=lambda node, step_variable, global_variable: False)
+
         finally:
             current_node.node_chunk.end()
             # 归还链接到连接池

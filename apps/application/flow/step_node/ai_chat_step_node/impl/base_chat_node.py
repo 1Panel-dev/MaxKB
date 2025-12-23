@@ -177,7 +177,8 @@ class BaseChatNode(IChatNode):
                                                               **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
                                                    self.runtime_node_id)
-        self.context['history_message'] = history_message
+        self.context['history_message'] = [{'content': message.content, 'role': message.type} for message in
+                                           (history_message if history_message is not None else [])]
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
         system = self.workflow_manage.generate_prompt(system)
@@ -197,8 +198,6 @@ class BaseChatNode(IChatNode):
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                               'history_message': [{'content': message.content, 'role': message.type} for message in
-                                                   (history_message if history_message is not None else [])],
                                'question': question.content}, {},
                               _write_context=write_context_stream)
         else:
