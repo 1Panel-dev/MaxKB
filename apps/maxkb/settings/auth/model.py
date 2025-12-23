@@ -9,3 +9,5 @@
 
 AUTH_HANDLES = [
 ]
+CHAT_AUTH_HANDLES = [
+]

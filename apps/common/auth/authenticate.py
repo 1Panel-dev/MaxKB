@@ -51,6 +51,7 @@ def new_instance_by_class_path(class_path: str):
 
 
 handles = [new_instance_by_class_path(class_path) for class_path in settings.AUTH_HANDLES]
+chat_handles = [new_instance_by_class_path(class_path) for class_path in settings.CHAT_AUTH_HANDLES]
 
 
 class TokenDetails:
@@ -84,6 +85,32 @@ class TokenAuth(TokenAuthentication):
             token = auth[7:]
             token_details = TokenDetails(token)
             for handle in handles:
+                if handle.support(request, token, token_details.get_token_details):
+                    return handle.handle(request, token, token_details.get_token_details)
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
+        except Exception as e:
+            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            if isinstance(e, AppEmbedIdentityFailed) or isinstance(e, AppChatNumOutOfBoundsFailed) or isinstance(e,
+                                                                                                                 AppApiException):
+                raise e
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
+
+
+class ChatTokenAuth(TokenAuthentication):
+    keyword = "Bearer"
+
+    # 重新 authenticate 方法，自定义认证规则
+    def authenticate(self, request):
+        auth = request.META.get('HTTP_AUTHORIZATION')
+        # 未认证
+        if auth is None:
+            raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
+        if not auth.startswith("Bearer "):
+            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
+        try:
+            token = auth[7:]
+            token_details = TokenDetails(token)
+            for handle in chat_handles:
                 if handle.support(request, token, token_details.get_token_details):
                     return handle.handle(request, token, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
