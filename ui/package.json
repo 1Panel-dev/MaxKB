@@ -45,6 +45,7 @@
     "nprogress": "^0.2.0",
     "pinia": "^3.0.1",
     "recorder-core": "^1.3.25011100",
+    "sanitize-html": "^2.17.0",
     "screenfull": "^6.0.2",
     "sortablejs": "^1.15.6",
     "svg2pdf.js": "^2.5.0",
