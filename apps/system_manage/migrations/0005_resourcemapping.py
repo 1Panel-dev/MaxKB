@@ -15,29 +15,38 @@ def resource_mapping(apps, schema_editor):
     from application.models import Application
     from knowledge.models import KnowledgeWorkflow
     resource_mapping_list = []
-    for application in QuerySet(Application):
-        workflow_mapping = get_workflow_resource(application.work_flow,
-                                                 get_node_handle_callback(ResourceType.APPLICATION,
-                                                                          application.id))
-        instance_mapping = get_instance_resource(application, ResourceType.APPLICATION, str(application.id),
-                                                 ResourceType.MODEL,
-                                                 [lambda i: i.tts_model_id, lambda i: i.stt_model_id, ])
-        resource_mapping_list += workflow_mapping
-        resource_mapping_list += instance_mapping
-    knowledge_workflow_dict = {str(kw.knowledge_id): kw for kw in QuerySet(KnowledgeWorkflow)}
-    for knowledge in QuerySet(Knowledge):
-        knowledge_workflow = knowledge_workflow_dict.get(str(knowledge.id))
-        if knowledge_workflow:
-            workflow_mapping = get_workflow_resource(knowledge_workflow.work_flow,
-                                                     get_node_handle_callback(ResourceType.KNOWLEDGE,
-                                                                              str(knowledge_workflow.knowledge_id)))
+    ids = list(Application.objects.values_list('id', flat=True))
+    for app_id in ids:
+        try:
+            application = Application.objects.get(id=app_id)
+            workflow_mapping = get_workflow_resource(application.work_flow,
+                                                     get_node_handle_callback(ResourceType.APPLICATION,
+                                                                              application.id))
+            instance_mapping = get_instance_resource(application, ResourceType.APPLICATION, str(application.id),
+                                                     ResourceType.MODEL,
+                                                     [lambda i: i.tts_model_id, lambda i: i.stt_model_id, ])
             resource_mapping_list += workflow_mapping
-        instance_mapping = get_instance_resource(knowledge, ResourceType.KNOWLEDGE, str(knowledge.id),
-                                                 ResourceType.MODEL,
-                                                 [lambda i: i.embedding_model_id])
+            resource_mapping_list += instance_mapping
+        except:
+            continue
+    knowledge_ids = list(Knowledge.objects.values_list('id', flat=True))
+    for knowledge_id in knowledge_ids:
+        try:
+            knowledge = Knowledge.objects.get(id=knowledge_id)
+            if knowledge.type == 4:
+                knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
+                if knowledge_workflow:
+                    workflow_mapping = get_workflow_resource(knowledge_workflow.work_flow,
+                                                             get_node_handle_callback(ResourceType.KNOWLEDGE,
+                                                                                      str(knowledge_workflow.knowledge_id)))
+                    resource_mapping_list += workflow_mapping
+            instance_mapping = get_instance_resource(knowledge, ResourceType.KNOWLEDGE, str(knowledge.id),
+                                                     ResourceType.MODEL,
+                                                     [lambda i: i.embedding_model_id])
 
-        resource_mapping_list += instance_mapping
-
+            resource_mapping_list += instance_mapping
+        except:
+            continue
     QuerySet(ResourceMapping).bulk_create(resource_mapping_list)
 
 
