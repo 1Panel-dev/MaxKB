@@ -1,5 +1,5 @@
 <template>
-  <MdEditor :language="language" noIconfont noPrettier v-bind="$attrs" :sanitize="sanitize">
+  <MdEditor :language="language" noIconfont noPrettier v-bind="$attrs">
     <template #defFooters>
       <slot name="defFooters"> </slot>
     </template>
@@ -13,7 +13,6 @@ import { getBrowserLang } from '@/locales/index'
 import './assets/markdown-iconfont.js'
 // 引入公共库中的语言配置
 import ZH_TW from '@vavt/cm-extension/dist/locale/zh-TW'
-import sanitizeHtml from 'sanitize-html'
 defineOptions({ name: 'MdEditor' })
 const language = computed(() => localStorage.getItem('MaxKB-locale') || getBrowserLang() || '')
 config({
@@ -23,7 +22,4 @@ config({
     },
   },
 })
-const sanitize = (html: any) => {
-  return sanitizeHtml(html)
-}
 </script>
