@@ -279,8 +279,8 @@ function addOrderToTree(nodes: any, parentId: string): Node[] {
 
   nodes.forEach((node: any) => {
     if (positions[node.id] === undefined) {
-      const existingPostions: any = Object.values(positions)
-      const maxPos = existingPostions.length > 0 ? Math.max(...existingPostions) : 0
+      const existingPositions: any = Object.values(positions)
+      const maxPos = existingPositions.length > 0 ? Math.max(...existingPositions) : 0
 
       positions[node.id] = maxPos + encode(1, 0)
       needSave = true
