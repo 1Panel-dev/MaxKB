@@ -5,6 +5,7 @@ from typing import Dict, Any
 from django.utils.translation import gettext_lazy as _, gettext
 
 from common.exception.app_exception import AppApiException
+from common import forms
 from common.forms import BaseForm, PasswordInputField, SingleSelect, SliderField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
@@ -68,6 +69,7 @@ class QwenTextToImageModelCredential(BaseForm, BaseModelCredential):
     Provides validation and encryption for the model credentials.
     """
 
+    api_base = forms.TextInputField(_('API URL'), required=False, default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
     api_key = PasswordInputField('API Key', required=True)
 
     def is_valid(

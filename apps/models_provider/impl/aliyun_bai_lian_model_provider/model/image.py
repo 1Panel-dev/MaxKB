@@ -24,10 +24,11 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        api_base = model_credential.get('api_base') or 'https://dashscope.aliyuncs.com/compatible-mode/v1'
         chat_tong_yi = QwenVLChatModel(
             model_name=model_name,
             openai_api_key=model_credential.get('api_key'),
-            openai_api_base='https://dashscope.aliyuncs.com/compatible-mode/v1',
+            openai_api_base=api_base,
             # stream_options={"include_usage": True},
             streaming=True,
             stream_usage=True,
@@ -41,7 +42,15 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
 
     def get_upload_policy(self, api_key, model_name):
         """获取文件上传凭证"""
-        url = "https://dashscope.aliyuncs.com/api/v1/uploads"
+        # 如果有自定义api_base，提取host部分，否则使用默认URL
+        if hasattr(self, 'openai_api_base') and self.openai_api_base:
+            # 从api_base中提取host，替换默认URL
+            from urllib.parse import urlparse
+            parsed_url = urlparse(self.openai_api_base)
+            base_url = f"{parsed_url.scheme}://{parsed_url.netloc}"
+            url = f"{base_url}/api/v1/uploads"
+        else:
+            url = "https://dashscope.aliyuncs.com/api/v1/uploads"
         headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -109,7 +118,11 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
             stop: Optional[list[str]] = None,
             **kwargs: Any,
     ) -> Iterator[BaseMessageChunk]:
-        url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
+        # 如果有自定义api_base，使用它，否则使用默认URL
+        if hasattr(self, 'openai_api_base') and self.openai_api_base:
+            url = f"{self.openai_api_base}/chat/completions"
+        else:
+            url = "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions"
 
         headers = {
             "Authorization": f"Bearer {self.openai_api_key.get_secret_value()}",

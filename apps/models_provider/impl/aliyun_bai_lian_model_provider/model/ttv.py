@@ -14,6 +14,7 @@ from common.utils.logger import maxkb_logger
 
 class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     api_key: str
+    api_base: Optional[str]
     model_name: str
     params: dict
     max_retries: int = 3
@@ -22,6 +23,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.api_base = kwargs.get('api_base')
         self.model_name = kwargs.get('model_name')
         self.params = kwargs.get('params', {})
         self.max_retries = kwargs.get('max_retries', 3)
@@ -40,6 +42,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         return GenerationVideoModel(
             model_name=model_name,
             api_key=model_credential.get('api_key'),
+            api_base=model_credential.get('api_base'),
             **optional_params,
         )
 
@@ -83,6 +86,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         params.update(self.params)
 
         # --- 异步提交任务 ---
+        # 如果提供了api_base，则配置dashscope使用自定义endpoint
+        if self.api_base:
+            params['base_url'] = self.api_base
         rsp = self._safe_call(VideoSynthesis.async_call, **params)
         if rsp.status_code != HTTPStatus.OK:
             maxkb_logger.info(f'提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')

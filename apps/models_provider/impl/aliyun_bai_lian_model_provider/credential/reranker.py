@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from langchain_core.documents import Document
 
 from common.exception.app_exception import AppApiException
+from common import forms
 from common.forms import BaseForm, PasswordInputField
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
@@ -17,6 +18,7 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
     Provides validation and encryption for the model credentials.
     """
 
+    api_base = forms.TextInputField(_('API URL'), required=False, default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
     dashscope_api_key = PasswordInputField('API Key', required=True)
 
     def is_valid(
