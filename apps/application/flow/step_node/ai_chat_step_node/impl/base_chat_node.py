@@ -35,7 +35,6 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['message_tokens'] = message_tokens
     node.context['answer_tokens'] = answer_tokens
     node.context['answer'] = answer
-    node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
     node.context['reasoning_content'] = reasoning_content

@@ -36,6 +36,16 @@ export default {
     continue: '继续',
     stopChat: '停止回答',
     startChat: '开始对话',
+    likeTitle: '你觉得什么让你满意？',
+    opposeTitle: '请告诉我们不满意的原因',
+    vote: {
+      accurate: '内容准确',
+      inaccurate: '回答不准确',
+      complete: '内容完善',
+      irrelevantAnswer: '回答不相关',
+      other: '其他',
+      placeholder: '告诉我们更多关于你的相关体验',
+    },
   },
   tip: {
     error500Message: '抱歉，当前正在维护，无法提供服务，请稍后再试！',

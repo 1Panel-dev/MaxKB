@@ -8,7 +8,12 @@
     <div>
       <!-- 语音播放 -->
       <span v-if="tts">
-        <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-if="!audioPlayerStatus">
+        <el-tooltip
+          effect="dark"
+          :content="$t('chat.operation.play')"
+          placement="top"
+          v-if="!audioPlayerStatus"
+        >
           <el-button text @click="playAnswerText(data?.answer_text)">
             <AppIcon iconName="app-video-play"></AppIcon>
           </el-button>
@@ -27,8 +32,12 @@
       </el-tooltip>
       <el-divider direction="vertical" />
       <template v-if="permissionPrecise.chat_log_add_knowledge(id)">
-        <el-tooltip v-if="buttonData.improve_paragraph_id_list.length === 0" effect="dark"
-          :content="$t('views.chatLog.editContent')" placement="top">
+        <el-tooltip
+          v-if="buttonData.improve_paragraph_id_list.length === 0"
+          effect="dark"
+          :content="$t('views.chatLog.editContent')"
+          placement="top"
+        >
           <el-button text @click="editContent(data)">
             <AppIcon iconName="app-edit"></AppIcon>
           </el-button>
@@ -52,8 +61,31 @@
       <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
       <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
       <!-- 先渲染，不然不能播放   -->
-      <audio ref="audioPlayer" v-for="item in audioList" :key="item" controls hidden="hidden"></audio>
+      <audio
+        ref="audioPlayer"
+        v-for="item in audioList"
+        :key="item"
+        controls
+        hidden="hidden"
+      ></audio>
     </div>
+  </div>
+  <div>
+    <el-card
+      class="mt-16"
+      shadow="always"
+      v-if="buttonData?.vote_status !== '-1' && data.vote_reason"
+    >
+      <VoteReasonContent
+        :vote-type="buttonData?.vote_status"
+        :chat-id="buttonData?.chat_id"
+        :record-id="buttonData?.id"
+        readonly
+        :default-reason="data.vote_reason"
+        :default-other-content="data.vote_other_content"
+      >
+      </VoteReasonContent>
+    </el-card>
   </div>
 </template>
 <script setup lang="ts">
@@ -67,16 +99,16 @@ import { useRoute } from 'vue-router'
 import permissionMap from '@/permission'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
+import VoteReasonContent from '@/components/ai-chat/component/operation-button/VoteReasonContent.vue'
 const route = useRoute()
 const {
   params: { id },
 } = route as any
 
-
 const props = defineProps({
   data: {
     type: Object,
-    default: () => { },
+    default: () => {},
   },
   applicationId: {
     type: String,

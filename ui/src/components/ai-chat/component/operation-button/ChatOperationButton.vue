@@ -52,44 +52,73 @@
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
-        <el-tooltip
-          effect="dark"
-          :content="$t('chat.operation.like')"
-          placement="top"
-          v-if="buttonData?.vote_status === '-1'"
-        >
-          <el-button text @click="voteHandle('0')" :disabled="loading">
-            <AppIcon iconName="app-like"></AppIcon>
-          </el-button>
-        </el-tooltip>
+        <el-popover ref="likePopoverRef" trigger="click" placement="bottom-start" :width="400">
+          <template #reference>
+            <span>
+              <el-tooltip
+                effect="dark"
+                :content="$t('chat.operation.like')"
+                placement="top"
+                v-if="buttonData?.vote_status === '-1'"
+              >
+                <el-button text :disabled="loading">
+                  <AppIcon iconName="app-like"></AppIcon>
+                </el-button>
+              </el-tooltip>
+            </span>
+          </template>
+          <VoteReasonContent
+            vote-type="0"
+            :chat-id="props.chatId"
+            :record-id="props.data.record_id"
+            @success="handleVoteSuccess"
+            @close="closePopover"
+          >
+          </VoteReasonContent>
+        </el-popover>
+
         <el-tooltip
           effect="dark"
           :content="$t('chat.operation.cancelLike')"
           placement="top"
           v-if="buttonData?.vote_status === '0'"
         >
-          <el-button text @click="voteHandle('-1')" :disabled="loading">
+          <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
             <AppIcon iconName="app-like-color"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
-        <el-tooltip
-          effect="dark"
-          :content="$t('chat.operation.oppose')"
-          placement="top"
-          v-if="buttonData?.vote_status === '-1'"
-        >
-          <el-button text @click="voteHandle('1')" :disabled="loading">
-            <AppIcon iconName="app-oppose"></AppIcon>
-          </el-button>
-        </el-tooltip>
+        <el-popover ref="opposePopoverRef" trigger="click" placement="bottom-start" :width="400">
+          <template #reference>
+            <span>
+              <el-tooltip
+                effect="dark"
+                :content="$t('chat.operation.oppose')"
+                placement="top"
+                v-if="buttonData?.vote_status === '-1'"
+              >
+                <el-button text :disabled="loading">
+                  <AppIcon iconName="app-oppose"></AppIcon>
+                </el-button>
+              </el-tooltip>
+            </span>
+          </template>
+          <VoteReasonContent
+            vote-type="1"
+            :chat-id="props.chatId"
+            :record-id="props.data.record_id"
+            @success="handleVoteSuccess"
+            @close="closePopover"
+          >
+          </VoteReasonContent>
+        </el-popover>
         <el-tooltip
           effect="dark"
           :content="$t('chat.operation.cancelOppose')"
           placement="top"
           v-if="buttonData?.vote_status === '1'"
         >
-          <el-button text @click="voteHandle('-1')" :disabled="loading">
+          <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
             <AppIcon iconName="app-oppose-color"></AppIcon>
           </el-button>
         </el-tooltip>
@@ -106,6 +135,7 @@ import applicationApi from '@/api/application/application'
 import chatAPI from '@/api/chat/chat'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
+import VoteReasonContent from '@/components/ai-chat/component/operation-button/VoteReasonContent.vue'
 import bus from '@/bus'
 const copy = (data: any) => {
   try {
@@ -116,6 +146,12 @@ const copy = (data: any) => {
   } catch (e: any) {
     copyClick(removeFormRander(data?.answer_text.trim()))
   }
+}
+const likePopoverRef = ref()
+const opposePopoverRef = ref()
+const closePopover = () => {
+  likePopoverRef.value.hide()
+  opposePopoverRef.value.hide()
 }
 const route = useRoute()
 const {
@@ -145,15 +181,20 @@ const audioPlayer = ref<HTMLAudioElement[] | null>([])
 const audioCiontainer = ref<HTMLDivElement>()
 const buttonData = ref(props.data)
 const loading = ref(false)
-
 const audioList = ref<string[]>([])
 
 function regeneration() {
   emit('regeneration')
 }
 
-function voteHandle(val: string) {
-  chatAPI.vote(props.chatId, props.data.record_id, val, loading).then(() => {
+function handleVoteSuccess(voteStatus: string) {
+  buttonData.value['vote_status'] = voteStatus
+  emit('update:data', buttonData.value)
+  closePopover()
+}
+
+function cancelVoteHandle(val: string) {
+  chatAPI.vote(props.chatId, props.data.record_id, val, undefined, '', loading).then(() => {
     buttonData.value['vote_status'] = val
     emit('update:data', buttonData.value)
   })

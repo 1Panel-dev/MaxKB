@@ -13,7 +13,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
-from application.models import VoteChoices, ChatRecord, Chat, ApplicationAccessToken
+from application.models import VoteChoices, ChatRecord, Chat, ApplicationAccessToken, VoteReasonChoices
 from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.application_chat_record import ChatRecordSerializerModel, \
     ApplicationChatRecordQuerySerializers
@@ -25,7 +25,9 @@ from common.utils.lock import RedisLock
 class VoteRequest(serializers.Serializer):
     vote_status = serializers.ChoiceField(choices=VoteChoices.choices,
                                           label=_("Bidding Status"))
+    vote_reason = serializers.ChoiceField(choices=VoteReasonChoices.choices, label=_("Vote Reason"), required=False, allow_null=True)
 
+    vote_other_content = serializers.CharField(required=False, allow_blank=True,label=_("Vote other content"))
 
 class HistoryChatModel(serializers.ModelSerializer):
     class Meta:
@@ -59,19 +61,33 @@ class VoteSerializer(serializers.Serializer):
             if chat_record_details_model is None:
                 raise AppApiException(500, gettext("Non-existent conversation chat_record_id"))
             vote_status = instance.get("vote_status")
+
+            # 未投票状态，可以进行投票
             if chat_record_details_model.vote_status == VoteChoices.UN_VOTE:
+                # 投票时获取字段
+                vote_reason = instance.get("vote_reason")
+                vote_other_content = instance.get("vote_other_content") or ''
+
                 if vote_status == VoteChoices.STAR:
                     # 点赞
                     chat_record_details_model.vote_status = VoteChoices.STAR
+                    chat_record_details_model.vote_reason = vote_reason
+                    chat_record_details_model.vote_other_content = vote_other_content
 
                 if vote_status == VoteChoices.TRAMPLE:
                     # 点踩
                     chat_record_details_model.vote_status = VoteChoices.TRAMPLE
+                    chat_record_details_model.vote_reason = vote_reason
+                    chat_record_details_model.vote_other_content = vote_other_content
+
                 chat_record_details_model.save()
+            # 已投票状态
             else:
                 if vote_status == VoteChoices.UN_VOTE:
                     # 取消点赞
                     chat_record_details_model.vote_status = VoteChoices.UN_VOTE
+                    chat_record_details_model.vote_reason = None
+                    chat_record_details_model.vote_other_content = ''
                     chat_record_details_model.save()
                 else:
                     raise AppApiException(500, gettext("Already voted, please cancel first and then vote again"))
