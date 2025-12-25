@@ -558,7 +558,7 @@ class PermissionConstants(Enum):
     )
     TOOL_FOLDER_READ = Permission(
         group=Group.TOOL_FOLDER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        parent_group=[UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
     )
     TOOL_FOLDER_CREATE = Permission(
@@ -629,7 +629,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_READ = Permission(
         group=Group.KNOWLEDGE_FOLDER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
-    parent_group = [WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    parent_group = [UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_FOLDER_CREATE = Permission(
         group=Group.KNOWLEDGE_FOLDER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -961,7 +961,7 @@ class PermissionConstants(Enum):
                                                     )
     APPLICATION_FOLDER_READ = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.READ,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                         parent_group=[UserGroup.APPLICATION],
                                          resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]
                                          )
     APPLICATION_FOLDER_CREATE = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.CREATE,

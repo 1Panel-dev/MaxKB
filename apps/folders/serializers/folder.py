@@ -10,7 +10,8 @@ from rest_framework import serializers
 from application.models.application import Application, ApplicationFolder
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.application_folder import ApplicationFolderTreeSerializer
-from common.constants.permission_constants import Group, ResourcePermission, ResourcePermissionRole
+from common.constants.permission_constants import Group, ResourcePermission, ResourcePermissionRole, RoleConstants
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from folders.api.folder import FolderCreateRequest
 from knowledge.models import KnowledgeFolder, Knowledge
@@ -300,30 +301,52 @@ class FolderTreeSerializer(serializers.Serializer):
                 return True  # 需要重建
         return False
 
+    @staticmethod
+    def _having_read_permission_by_role(user_id: str, workspace_id: str, source: str):
+        workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
+        role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
+        is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+        if is_x_pack_ee:
+            return QuerySet(workspace_user_role_mapping_model).select_related('role', 'user').filter(
+                workspace_id=workspace_id, user_id=user_id,
+                role__type=RoleConstants.USER.value.__str__(),
+                role__rolepermission__permission_id=f"{source}_FOLDER:READ"
+            ).exists()
+
+        return False
+
     def get_folder_tree(self,
                         current_user, name=None):
         self.is_valid(raise_exception=True)
-        Folder = get_folder_type(self.data.get('source'))  # noqa
+        user_id = current_user.id
+        workspace_id = self.data.get('workspace_id')
+        source = self.data.get('source')
+
+        Folder = get_folder_type(source)  # noqa
 
         # 检查特定工作空间的树结构完整性
-        workspace_folders = Folder.objects.filter(workspace_id=self.data.get('workspace_id'))
-
+        workspace_folders = Folder.objects.filter(workspace_id=workspace_id)
         # 如果发现数据不一致，重建整个表（这是 MPTT 的限制）
         if self._check_tree_integrity(workspace_folders):
             Folder.objects.rebuild()
 
-        workspace_manage = is_workspace_manage(current_user.id, self.data.get('workspace_id'))
+        workspace_manage = is_workspace_manage(user_id, workspace_id)
 
-        base_q = Q(workspace_id=self.data.get('workspace_id'))
+        base_q = Q(workspace_id=workspace_id)
 
         if name is not None:
             base_q &= Q(name__contains=name)
         if not workspace_manage:
+            having_read_permission_by_role = self._having_read_permission_by_role(user_id, workspace_id, source)
+            permission_condition = ['VIEW']
+            if having_read_permission_by_role:
+                permission_condition = ['VIEW', 'ROLE']
+
             base_q &= (Q(id__in=WorkspaceUserResourcePermission.objects.filter(user_id=current_user.id,
                                                                                auth_target_type=self.data.get('source'),
                                                                                workspace_id=self.data.get(
                                                                                    'workspace_id'),
-                                                                               permission_list__contains=['VIEW'])
+                                                                               permission_list__overlap=permission_condition)
             .values_list(
                 'target', flat=True)) | Q(id=self.data.get('workspace_id')))
 
@@ -332,4 +355,5 @@ class FolderTreeSerializer(serializers.Serializer):
         TreeSerializer = get_folder_tree_serializer(self.data.get('source'))  # noqa
         serializer = TreeSerializer(nodes, many=True)
 
-        return [d for d in serializer.data if d.get('id') == d.get('workspace_id')] if name is None else serializer.data  # 这是可序列化的字典
+        return [d for d in serializer.data if
+                d.get('id') == d.get('workspace_id')] if name is None else serializer.data  # 这是可序列化的字典
