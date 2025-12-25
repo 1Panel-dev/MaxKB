@@ -781,14 +781,7 @@ export const menuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [
-      searchKnowledgeNode,
-      searchDocumentNode,
-      rerankerNode,
-      documentExtractNode,
-      documentSplitNode,
-      knowledgeWriteNode,
-    ],
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
