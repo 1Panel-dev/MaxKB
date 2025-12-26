@@ -212,6 +212,12 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_AUTH
     ],'OR'
     ),
+  relate_map: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_RELATE_RESOURCE_VIEW
+    ],'OR'
+    ),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

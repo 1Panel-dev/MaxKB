@@ -53,6 +53,16 @@ const workspace = {
       ],
       'OR'
     ),
+  relate_map: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.MODEL_RELATE_RESOURCE_VIEW.getModelWorkspaceResourcePermission(source_id),
+        PermissionConst.MODEL_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
   folderEdit: () =>
     hasPermission(
       [

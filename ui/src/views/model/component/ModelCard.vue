@@ -111,7 +111,11 @@
               <AppIcon iconName="app-resource-authorization" class="color-secondary"></AppIcon>
               {{ $t('views.system.resourceAuthorization.title') }}
             </el-dropdown-item>
-            <el-dropdown-item text @click.stop="openResourceMappingDrawer(model)">
+            <el-dropdown-item
+              text
+              @click.stop="openResourceMappingDrawer(model)"
+              v-if="permissionPrecise.relate_map(model.id)"
+            >
               <AppIcon iconName="app-resource-mapping" class="color-secondary"></AppIcon>
               {{ $t('views.system.resourceMapping.title', '查看关联资源') }}
             </el-dropdown-item>
@@ -186,6 +190,7 @@ const MoreFilledPermission = (id: any) => {
     permissionPrecise.value.modify(id) ||
     permissionPrecise.value.delete(id) ||
     permissionPrecise.value.auth(id) ||
+    permissionPrecise.value.relate_map(id) ||
     isSystemShare.value
   )
 }

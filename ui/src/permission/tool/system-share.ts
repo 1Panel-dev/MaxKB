@@ -77,6 +77,7 @@ const share = {
     ),
 
   auth: () => false,
+  relate_map: () => false,
 
   folderRead: () => false,
   folderManage: () => false,

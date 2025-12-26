@@ -291,7 +291,11 @@
                             ></AppIcon>
                             {{ $t('views.system.resourceAuthorization.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item text @click.stop="openResourceMappingDrawer(item)">
+                          <el-dropdown-item
+                            text
+                            @click.stop="openResourceMappingDrawer(item)"
+                            v-if="permissionPrecise.relate_map(item.id)"
+                          >
                             <AppIcon
                               iconName="app-resource-mapping"
                               class="color-secondary"
@@ -437,6 +441,7 @@ const MoreFieldPermission = (id: any) => {
     permissionPrecise.value.export(id) ||
     permissionPrecise.value.delete(id) ||
     permissionPrecise.value.auth(id) ||
+    permissionPrecise.value.relate_map(id) ||
     isSystemShare.value
   )
 }

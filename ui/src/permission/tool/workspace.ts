@@ -151,6 +151,16 @@ const workspace = {
       ],
       'OR'
     ),
+  relate_map: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_RELATE_RESOURCE_VIEW.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR'
+    ),
   debug: () =>
     hasPermission(
       [

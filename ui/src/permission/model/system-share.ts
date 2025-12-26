@@ -36,6 +36,7 @@ const share = {
       'OR',
     ),
   auth: () => false,
+  relate_map: () => false,
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

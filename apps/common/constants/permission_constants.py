@@ -182,7 +182,7 @@ class Operate(Enum):
     TAG = "READ+TAG"  # 标签设置
     REPLACE = "READ+REPLACE"  # 标签设置
     UPDATE = "READ+UPDATE"  # 更新license
-
+    RELATE_VIEW = "READ+RELATE_VIEW"
 
 class RoleGroup(Enum):
     # 系统用户
@@ -360,6 +360,7 @@ Permission_Label = {
     Operate.AUTH.value: _('resource authorization'),
     Operate.TAG.value: _('Tag Setting'),
     Operate.REPLACE.value: _('Replace Original Document'),
+    Operate.RELATE_VIEW.value: _('View related resources'),
 
     Group.APPLICATION_OVERVIEW.value: _('Overview'),
     Group.APPLICATION_ACCESS.value: _('Application Access'),
@@ -518,6 +519,11 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
         resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
     )
+    MODEL_RELATE_RESOURCE_VIEW = Permission(
+        group=Group.MODEL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.MODEL, UserGroup.MODEL],
+        resource_permission_group_list=[ResourcePermissionConst.MODEL_MANGE]
+    )
     TOOL_READ = Permission(
         group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
@@ -553,6 +559,11 @@ class PermissionConstants(Enum):
     )
     TOOL_RESOURCE_AUTHORIZATION = Permission(
         group=Group.TOOL, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
+    TOOL_RELATE_RESOURCE_VIEW = Permission(
+        group=Group.TOOL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
@@ -625,6 +636,11 @@ class PermissionConstants(Enum):
         group=Group.KNOWLEDGE, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_RELATE_RESOURCE_VIEW = Permission(
+        group=Group.KNOWLEDGE, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE]
     )
     KNOWLEDGE_FOLDER_READ = Permission(
         group=Group.KNOWLEDGE_FOLDER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],

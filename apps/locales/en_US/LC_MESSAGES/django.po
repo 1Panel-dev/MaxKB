@@ -8893,3 +8893,6 @@ msgstr ""
 
 msgid "Resources mapping"
 msgstr ""
+
+msgid "View related resources"
+msgstr ""

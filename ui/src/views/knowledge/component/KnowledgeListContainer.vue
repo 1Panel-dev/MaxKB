@@ -239,7 +239,11 @@
                             ></AppIcon>
                             {{ $t('views.system.resourceAuthorization.title') }}
                           </el-dropdown-item>
-                          <el-dropdown-item text @click.stop="openResourceMappingDrawer(item)">
+                          <el-dropdown-item
+                            text
+                            @click.stop="openResourceMappingDrawer(item)"
+                            v-if="permissionPrecise.relate_map(item.id)"
+                          >
                             <AppIcon
                               iconName="app-resource-mapping"
                               class="color-secondary"
@@ -347,15 +351,12 @@ import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
-<<<<<<< Updated upstream
-=======
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
 
 const openResourceMappingDrawer = (knowledge: any) => {
   resourceMappingDrawerRef.value?.open('KNOWLEDGE', knowledge.id)
 }
->>>>>>> Stashed changes
 const router = useRouter()
 const route = useRoute()
 const { folder, user, knowledge } = useStore()
@@ -395,6 +396,7 @@ const MoreFilledPermission = (item: any) => {
     permissionPrecise.value.export(item.id) ||
     permissionPrecise.value.auth(item.id) ||
     permissionPrecise.value.delete(item.id) ||
+    permissionPrecise.value.relate_map(item.id) ||
     isSystemShare.value
   )
 }

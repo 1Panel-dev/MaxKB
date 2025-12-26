@@ -178,6 +178,23 @@ const workspace = {
       ],
       'OR',
     ),
+    relate_map: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_RELATE_RESOURCE_VIEW.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   export: (source_id: string) =>
     hasPermission(
       [

@@ -9019,3 +9019,6 @@ msgstr "獲取資源的關係分頁清單"
 
 msgid "Resources mapping"
 msgstr "資源映射"
+
+msgid "View related resources"
+msgstr "查看關聯資源"

@@ -11,7 +11,8 @@ const workspaceShare = {
   export: () => false,
   delete: () => false,
   auth: () => false,
-
+  relate_map: () => false,
+  
   doc_read: () => false,
   doc_create: () => false,
   doc_vector: () => false,

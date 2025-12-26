@@ -22,6 +22,12 @@ const systemManage = {
 
   auth: () => 
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_AUTH], 'OR'),
+  relate_map: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_MODEL_RELATE_RESOURCE_VIEW
+    ],'OR'
+    ),
   
   folderRead: () => false,
   folderManage: () => false,

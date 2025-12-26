@@ -65,6 +65,7 @@ const share = {
   chat_user_edit: () => false,
 
   auth: () => false,
+  relate_map: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,
