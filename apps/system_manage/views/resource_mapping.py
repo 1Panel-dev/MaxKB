@@ -33,5 +33,7 @@ class ResourceMappingView(APIView):
         return result.success(ResourceMappingSerializer({
             'resource': resource,
             'resource_id': resource_id,
-            'resource_name': request.query_params.get('resource_name')
+            'resource_name': request.query_params.get('resource_name'),
+            'user_name': request.query_params.get('user_name'),
+            'source_type': request.query_params.getlist('source_type[]'),
         }).page(current_page, page_size))

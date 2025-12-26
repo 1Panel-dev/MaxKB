@@ -21,13 +21,19 @@ from maxkb.conf import PROJECT_DIR
 class ResourceMappingSerializer(serializers.Serializer):
     resource = serializers.CharField(required=True, label=_('resource'))
     resource_id = serializers.UUIDField(required=True, label=_('resource Id'))
-    resource_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('resource'))
+    resource_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('resource Name'))
+    source_type = serializers.ListField(
+        label=_('source Type'),
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('source Type')))
+    user_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('creator'))
 
     def get_query_set(self):
         queryset = QuerySet(model=get_dynamics_model({
             'name': models.CharField(),
             'target_id': models.CharField(),
-            "target_type": models.CharField()
+            "target_type": models.CharField(),
+            "u.username": models.CharField(),
+            'rm.source_type': models.CharField()
         }))
 
         queryset = queryset.filter(target_id=self.data.get('resource_id'),
@@ -35,7 +41,10 @@ class ResourceMappingSerializer(serializers.Serializer):
 
         if self.data.get('resource_name'):
             queryset = queryset.filter(name__icontains=self.data.get('resource_name'))
-
+        if self.data.get('user_name'):
+            queryset = queryset.filter(**{'u.username__icontains': self.data.get('user_name')})
+        if self.data.get("source_type"):
+            queryset = queryset.filter(**{'rm.source_type__in': self.data.get('source_type')})
         return queryset
 
     def page(self, current_page, page_size):

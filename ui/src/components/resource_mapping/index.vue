@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="visible"
-    :title="$t('views.system.resourceAuthorization.title')"
+    :title="$t('views.system.resourceMapping.title', '关联资源')"
     size="60%"
     :append-to-body="true"
   >
@@ -9,8 +9,16 @@
       <div class="flex-between complex-search">
         <el-select class="complex-search__left" v-model="searchType" style="width: 100px">
           <el-option
-            :label="$t('views.userManage.userForm.resourceName.label')"
+            :label="$t('views.userManage.userForm.resourceName.label', '名称')"
             value="resource_name"
+          />
+          <el-option
+            :label="$t('views.userManage.userForm.user_name.label', '创建者')"
+            value="user_name"
+          />
+          <el-option
+            :label="$t('views.userManage.userForm.source_type.label', '资源类型')"
+            value="source_type"
           />
         </el-select>
         <el-input
@@ -21,6 +29,29 @@
           clearable
           @keyup.enter="pageResouceMapping()"
         />
+        <el-input
+          v-if="searchType === 'user_name'"
+          v-model="query.user_name"
+          :placeholder="$t('common.search')"
+          style="width: 220px"
+          clearable
+          @keyup.enter="pageResouceMapping()"
+        />
+        <el-select
+          v-else-if="searchType === 'source_type'"
+          v-model="query.source_type"
+          @change="pageResouceMapping()"
+          filterable
+          clearable
+          multiple
+          :reserve-keyword="false"
+          collapse-tags
+          collapse-tags-tooltip
+          style="width: 220px"
+        >
+          <el-option label="应用" value="APPLICATION" />
+          <el-option label="知识库" value="KNOWLEDGE" />
+        </el-select>
       </div>
     </div>
 
@@ -35,18 +66,10 @@
       :row-key="(row: any) => row.id"
       v-loading="loading"
     >
-      <el-table-column
-        prop="name"
-        :label="$t('views.userManage.userForm.name.label', '名称')"
-        min-width="120"
-        show-overflow-tooltip
-      />
-      <el-table-column
-        prop="desc"
-        min-width="120"
-        show-overflow-tooltip
-        :label="$t('views.login.loginForm.desc.label', '描述')"
-      />
+      <el-table-column prop="name" label="名称" min-width="120" show-overflow-tooltip />
+      <el-table-column prop="desc" min-width="120" show-overflow-tooltip label="描述" />
+      <el-table-column prop="source_type" min-width="120" show-overflow-tooltip label="资源类型" />
+      <el-table-column prop="username" min-width="120" show-overflow-tooltip label="创建者" />
     </app-table>
   </el-drawer>
 </template>
@@ -60,6 +83,8 @@ const { user } = useStore()
 const searchType = ref<string>('resource_name')
 const query = ref<any>({
   resource_name: '',
+  user_name: '',
+  source_type: '',
 })
 const loading = ref<boolean>(false)
 const tableData = ref<Array<any>>()

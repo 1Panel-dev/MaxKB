@@ -291,6 +291,13 @@
                             ></AppIcon>
                             {{ $t('views.system.resourceAuthorization.title') }}
                           </el-dropdown-item>
+                          <el-dropdown-item text @click.stop="openResourceMappingDrawer(item)">
+                            <AppIcon
+                              iconName="app-resource-mapping"
+                              class="color-secondary"
+                            ></AppIcon>
+                            {{ $t('views.system.resourceMapping.title', '查看关联资源') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
@@ -361,6 +368,7 @@
     v-if="apiType === 'workspace'"
   />
   <ToolStoreDescDrawer ref="toolStoreDescDrawerRef" />
+  <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
 </template>
 
 <script lang="ts" setup>
@@ -388,8 +396,14 @@ import { t } from '@/locales'
 import { i18n_name } from '@/utils/common'
 import ToolStoreApi from '@/api/tool/store.ts'
 import ToolStoreDescDrawer from '@/views/tool/component/ToolStoreDescDrawer.vue'
+
 import bus from '@/bus'
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
 const route = useRoute()
+const openResourceMappingDrawer = (tool: any) => {
+  resourceMappingDrawerRef.value?.open('TOOL', tool.id)
+}
 const { folder, user, tool } = useStore()
 onBeforeRouteLeave((to, from) => {
   tool.setToolList([])

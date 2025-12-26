@@ -239,6 +239,13 @@
                             ></AppIcon>
                             {{ $t('views.system.resourceAuthorization.title') }}
                           </el-dropdown-item>
+                          <el-dropdown-item text @click.stop="openResourceMappingDrawer(item)">
+                            <AppIcon
+                              iconName="app-resource-mapping"
+                              class="color-secondary"
+                            ></AppIcon>
+                            {{ $t('views.system.resourceMapping.title', '查看关联资源') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
                             v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
@@ -314,6 +321,7 @@
     v-if="apiType === 'workspace'"
   />
   <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList" />
+  <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
 </template>
 
 <script lang="ts" setup>
@@ -339,6 +347,15 @@ import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
+<<<<<<< Updated upstream
+=======
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
+
+const openResourceMappingDrawer = (knowledge: any) => {
+  resourceMappingDrawerRef.value?.open('KNOWLEDGE', knowledge.id)
+}
+>>>>>>> Stashed changes
 const router = useRouter()
 const route = useRoute()
 const { folder, user, knowledge } = useStore()
