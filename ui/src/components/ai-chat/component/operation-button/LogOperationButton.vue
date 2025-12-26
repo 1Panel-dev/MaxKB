@@ -1,91 +1,94 @@
 <template>
-  <div class="flex-between mt-8">
-    <div>
-      <el-text type="info">
-        <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
-      </el-text>
-    </div>
-    <div>
-      <!-- 语音播放 -->
-      <span v-if="tts">
-        <el-tooltip
-          effect="dark"
-          :content="$t('chat.operation.play')"
-          placement="top"
-          v-if="!audioPlayerStatus"
-        >
-          <el-button text @click="playAnswerText(data?.answer_text)">
-            <AppIcon iconName="app-video-play"></AppIcon>
-          </el-button>
-        </el-tooltip>
-        <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
-          <el-button type="primary" text @click="pausePlayAnswerText()">
-            <AppIcon iconName="app-video-pause"></AppIcon>
+  <div>
+    <div class="flex-between mt-8">
+      <div>
+        <el-text type="info">
+          <span class="ml-4">{{ datetimeFormat(data.create_time) }}</span>
+        </el-text>
+      </div>
+      <div>
+        <!-- 语音播放 -->
+        <span v-if="tts">
+          <el-tooltip
+            effect="dark"
+            :content="$t('chat.operation.play')"
+            placement="top"
+            v-if="!audioPlayerStatus"
+          >
+            <el-button text @click="playAnswerText(data?.answer_text)">
+              <AppIcon iconName="app-video-play"></AppIcon>
+            </el-button>
+          </el-tooltip>
+          <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
+            <el-button type="primary" text @click="pausePlayAnswerText()">
+              <AppIcon iconName="app-video-pause"></AppIcon>
+            </el-button>
+          </el-tooltip>
+          <el-divider direction="vertical" />
+        </span>
+        <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
+          <el-button text @click="copyClick(data?.answer_text)">
+            <AppIcon iconName="app-copy"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
-      </span>
-      <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-        <el-button text @click="copyClick(data?.answer_text)">
-          <AppIcon iconName="app-copy"></AppIcon>
+        <template v-if="permissionPrecise.chat_log_add_knowledge(id)">
+          <el-tooltip
+            v-if="buttonData.improve_paragraph_id_list.length === 0"
+            effect="dark"
+            :content="$t('views.chatLog.editContent')"
+            placement="top"
+          >
+            <el-button text @click="editContent(data)">
+              <AppIcon iconName="app-edit"></AppIcon>
+            </el-button>
+          </el-tooltip>
+
+          <el-tooltip v-else effect="dark" :content="$t('views.chatLog.editMark')" placement="top">
+            <el-button text @click="editMark(data)">
+              <AppIcon iconName="app-document-active" class="primary"></AppIcon>
+            </el-button>
+          </el-tooltip>
+        </template>
+
+        <el-divider direction="vertical" v-if="buttonData?.vote_status !== '-1'" />
+        <el-button text disabled v-if="buttonData?.vote_status === '0'">
+          <AppIcon iconName="app-like-color"></AppIcon>
         </el-button>
-      </el-tooltip>
-      <el-divider direction="vertical" />
-      <template v-if="permissionPrecise.chat_log_add_knowledge(id)">
-        <el-tooltip
-          v-if="buttonData.improve_paragraph_id_list.length === 0"
-          effect="dark"
-          :content="$t('views.chatLog.editContent')"
-          placement="top"
-        >
-          <el-button text @click="editContent(data)">
-            <AppIcon iconName="app-edit"></AppIcon>
-          </el-button>
-        </el-tooltip>
 
-        <el-tooltip v-else effect="dark" :content="$t('views.chatLog.editMark')" placement="top">
-          <el-button text @click="editMark(data)">
-            <AppIcon iconName="app-document-active" class="primary"></AppIcon>
-          </el-button>
-        </el-tooltip>
-      </template>
-
-      <el-divider direction="vertical" v-if="buttonData?.vote_status !== '-1'" />
-      <el-button text disabled v-if="buttonData?.vote_status === '0'">
-        <AppIcon iconName="app-like-color"></AppIcon>
-      </el-button>
-
-      <el-button text disabled v-if="buttonData?.vote_status === '1'">
-        <AppIcon iconName="app-oppose-color"></AppIcon>
-      </el-button>
-      <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
-      <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
-      <!-- 先渲染，不然不能播放   -->
-      <audio
-        ref="audioPlayer"
-        v-for="item in audioList"
-        :key="item"
-        controls
-        hidden="hidden"
-      ></audio>
+        <el-button text disabled v-if="buttonData?.vote_status === '1'">
+          <AppIcon iconName="app-oppose-color"></AppIcon>
+        </el-button>
+        <EditContentDialog ref="EditContentDialogRef" @refresh="refreshContent" />
+        <EditMarkDialog ref="EditMarkDialogRef" @refresh="refreshMark" />
+        <!-- 先渲染，不然不能播放   -->
+        <audio
+          ref="audioPlayer"
+          v-for="item in audioList"
+          :key="item"
+          controls
+          hidden="hidden"
+        ></audio>
+      </div>
     </div>
-  </div>
-  <div>
-    <el-card
-      class="mt-16"
-      shadow="always"
-      v-if="buttonData?.vote_status !== '-1' && data.vote_reason"
-    >
-      <VoteReasonContent
-        :vote-type="buttonData?.vote_status"
-        :chat-id="buttonData?.chat_id"
-        :record-id="buttonData?.id"
-        readonly
-        :default-reason="data.vote_reason"
-        :default-other-content="data.vote_other_content"
+    <div>
+      <el-card
+        class="mt-16"
+        shadow="always"
+        v-if="buttonData?.vote_status !== '-1' && data.vote_reason"
       >
-      </VoteReasonContent>
-    </el-card>
+        <VoteReasonContent
+          v-if="buttonData?.id"
+          :vote-type="buttonData?.vote_status"
+          :chat-id="buttonData?.chat_id"
+          :record-id="buttonData?.id"
+          readonly
+          :default-reason="data.vote_reason"
+          :default-other-content="data.vote_other_content"
+        >
+        </VoteReasonContent>
+      </el-card>
+    </div>
   </div>
 </template>
 <script setup lang="ts">

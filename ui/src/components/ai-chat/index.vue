@@ -197,7 +197,7 @@ const initialApiFormData = ref({})
 
 const isUserInput = computed(
   () =>
-    props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+    props.applicationDetails?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
       ?.properties.user_input_field_list.length > 0,
 )
 

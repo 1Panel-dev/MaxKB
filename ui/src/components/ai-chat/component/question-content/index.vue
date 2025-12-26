@@ -102,7 +102,11 @@
             <el-button class="flex mr-8" text @click="cancelReQuestion"
               ><el-icon><Close /></el-icon
             ></el-button>
-            <el-button :disabled="!editText.trim()" text @click="sendReQuestionMessage(chatRecord)">
+            <el-button
+              :disabled="!editText.trim() || editText.trim() === chatRecord.problem_text.trim()"
+              text
+              @click="sendReQuestionMessage(chatRecord)"
+            >
               <el-icon><Comment /></el-icon>
             </el-button>
           </el-button-group>
@@ -130,7 +134,12 @@
     v-if="!isReQuestion"
   >
     <div class="text-right">
-      <el-tooltip effect="dark" :content="$t('common.edit')" placement="top" v-if="props.isLast">
+      <el-tooltip
+        effect="dark"
+        :content="$t('common.edit')"
+        placement="top"
+        v-if="props.isLast && props.type !== 'log'"
+      >
         <el-button text @click="handleEdit(chatRecord)">
           <AppIcon iconName="app-edit"></AppIcon>
         </el-button>

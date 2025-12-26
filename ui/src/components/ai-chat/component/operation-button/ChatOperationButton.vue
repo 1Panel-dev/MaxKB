@@ -68,6 +68,7 @@
             </span>
           </template>
           <VoteReasonContent
+            v-if="props.data.record_id"
             vote-type="0"
             :chat-id="props.chatId"
             :record-id="props.data.record_id"
@@ -104,6 +105,7 @@
             </span>
           </template>
           <VoteReasonContent
+            v-if="props.data.record_id"
             vote-type="1"
             :chat-id="props.chatId"
             :record-id="props.data.record_id"
