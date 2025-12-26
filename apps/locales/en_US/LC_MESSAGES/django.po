@@ -8887,3 +8887,9 @@ msgstr ""
 
 msgid "Some roles do not exist"
 msgstr ""
+
+msgid "Authorized pagination list for obtaining resources"
+msgstr ""
+
+msgid "Resources mapping"
+msgstr ""

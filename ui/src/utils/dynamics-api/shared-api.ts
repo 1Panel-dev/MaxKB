@@ -2,6 +2,7 @@ import knowledgeWorkspaceApi from '@/api/knowledge/knowledge'
 import documentWorkspaceApi from '@/api/knowledge/document'
 import paragraphWorkspaceApi from '@/api/knowledge/paragraph'
 import problemWorkspaceApi from '@/api/knowledge/problem'
+import resourceMappingApi from '@/api/workspace/resource-mapping'
 import modelWorkspaceApi from '@/api/model/model'
 import toolWorkspaceApi from '@/api/tool/tool'
 import chatUserWorkspaceApi from '@/api/chat-user/chat-user'
@@ -34,6 +35,7 @@ import workflowVersionResourceApi from '@/api/system-resource-management/workflo
 import chatLogResourceApi from '@/api/system-resource-management/chat-log'
 import resourceAuthorizationResourceApi from '@/api/system-resource-management/resource-authorization'
 import folderResourceApi from '@/api/system-resource-management/folder'
+
 // 普通 API
 const workspaceApiMap = {
   knowledge: knowledgeWorkspaceApi,
@@ -50,6 +52,7 @@ const workspaceApiMap = {
   chatLog: chatLogWorkspaceApi,
   resourceAuthorization: resourceAuthorizationWorkspaceApi,
   folder: folderWorkspaceApi,
+  resourceMapping: resourceMappingApi,
 } as any
 
 // 系统分享 API

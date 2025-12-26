@@ -9013,3 +9013,9 @@ msgstr "角色 ID 不能为空"
 
 msgid "Some roles do not exist"
 msgstr "部分角色不存在"
+
+msgid "Authorized pagination list for obtaining resources"
+msgstr "获取资源的关系分页列表"
+
+msgid "Resources mapping"
+msgstr "资源映射"
