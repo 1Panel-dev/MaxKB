@@ -1,7 +1,7 @@
 <template>
   <!-- 问题内容 -->
-  <div class="question-content item-content mb-16 lighter">
-    <div class="content p-12-16 border-r-8" :class="getClassName">
+  <div class="question-content item-content mb-4 lighter">
+    <div v-if="!isReQuestion" class="content p-12-16 border-r-8" :class="getClassName">
       <div class="text break-all pre-wrap">
         <div class="mb-8" v-if="document_list.length">
           <el-space wrap class="w-full media-file-width">
@@ -9,12 +9,12 @@
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
-                    <Download/>
+                    <Download />
                   </el-icon>
                   {{ $t('chat.download') }}
                 </div>
                 <div class="show flex align-center">
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
                   <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
@@ -78,12 +78,12 @@
               <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                 <div class="download-button flex align-center" @click="downloadFile(item)">
                   <el-icon class="mr-4">
-                    <Download/>
+                    <Download />
                   </el-icon>
                   {{ $t('chat.download') }}
                 </div>
                 <div class="show flex align-center">
-                  <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
+                  <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
                   <div class="ml-4 ellipsis-1" :title="item && item?.name">
                     {{ item && item?.name }}
                   </div>
@@ -95,6 +95,20 @@
         <span> {{ chatRecord.problem_text }}</span>
       </div>
     </div>
+    <el-input v-else v-model="editText">
+      <template #append>
+        <div class="flex" style="gap: 8px">
+          <el-button-group class="flex ml-8 mr-8">
+            <el-button class="flex mr-8" text @click="cancelReQuestion"
+              ><el-icon><Close /></el-icon
+            ></el-button>
+            <el-button :disabled="!editText.trim()" text @click="sendReQuestionMessage(chatRecord)">
+              <el-icon><Comment /></el-icon>
+            </el-button>
+          </el-button-group>
+        </div>
+      </template>
+    </el-input>
     <div class="avatar ml-8" v-if="showAvatar">
       <el-image
         v-if="application.user_avatar"
@@ -104,22 +118,50 @@
         style="width: 28px; height: 28px; display: block"
       />
       <el-avatar v-else :size="28">
-        <img src="@/assets/user-icon.svg" style="width: 50%" alt=""/>
+        <img src="@/assets/user-icon.svg" style="width: 50%" alt="" />
       </el-avatar>
+    </div>
+  </div>
+  <div
+    class="text-right mb-8"
+    :style="{
+      'padding-right': showAvatar ? '36px' : '0',
+    }"
+    v-if="!isReQuestion"
+  >
+    <div class="text-right">
+      <el-tooltip effect="dark" :content="$t('common.edit')" placement="top" v-if="props.isLast">
+        <el-button text @click="handleEdit(chatRecord)">
+          <AppIcon iconName="app-edit"></AppIcon>
+        </el-button>
+      </el-tooltip>
+      <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
+        <el-button text @click="copyClick(chatRecord?.problem_text)">
+          <AppIcon iconName="app-copy"></AppIcon>
+        </el-button>
+      </el-tooltip>
     </div>
   </div>
 </template>
 <script setup lang="ts">
-import {type chatType} from '@/api/type/application'
-import {getImgUrl, downloadByURL} from '@/utils/common'
-import {getAttrsArray} from '@/utils/array'
-import {onMounted, computed} from 'vue'
+import { type chatType } from '@/api/type/application'
+import { getImgUrl, downloadByURL } from '@/utils/common'
+import { getAttrsArray } from '@/utils/array'
+import { onMounted, computed, ref } from 'vue'
+import { copyClick } from '@/utils/clipboard'
 
 const props = defineProps<{
   application: any
   chatRecord: chatType
+  chatManagement: any
+  sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
+  isLast: boolean
 }>()
+
+const isReQuestion = ref<boolean>(false)
+const editText = ref<string>('')
+const direction = ref<'horizontal' | 'vertical'>('horizontal')
 
 const showAvatar = computed(() => {
   return props.application.show_user_avatar == undefined ? true : props.application.show_user_avatar
@@ -184,8 +226,48 @@ function downloadFile(item: any) {
   downloadByURL(item.url, item.name)
 }
 
-onMounted(() => {
-})
+function handleEdit(chatRecord: any) {
+  isReQuestion.value = true
+  editText.value = chatRecord.problem_text
+}
+
+const cancelReQuestion = () => {
+  isReQuestion.value = false
+}
+
+const emit = defineEmits(['reQuestion'])
+
+function sendReQuestionMessage(chat: chatType) {
+  const container = props.chatRecord?.upload_meta
+    ? props.chatRecord.upload_meta
+    : props.chatRecord.execution_details?.find((detail) => detail.type === 'start-node')
+
+  props.chatRecord.problem_text = editText.value
+  reset_answer_text_list(props.chatRecord.answer_text_list)
+  props.chatRecord.write_ed = false
+
+  isReQuestion.value = false
+  props.sendMessage(
+    editText.value,
+    {
+      re_chat: true,
+      image_list: container?.image_list || [],
+      document_list: container?.document_list || [],
+      audio_list: container?.audio_list || [],
+      video_list: container?.video_list || [],
+      other_list: container?.other_list || [],
+      chat_record_id: props.chatRecord.record_id ? props.chatRecord.record_id : props.chatRecord.id,
+    },
+    { ...props.chatRecord, problem_text: editText.value },
+  )
+}
+
+const reset_answer_text_list = (answer_text_list: any) => {
+  answer_text_list.splice(0, answer_text_list.length)
+  answer_text_list.push([])
+}
+
+onMounted(() => {})
 </script>
 <style lang="scss" scoped>
 .question-content {

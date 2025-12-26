@@ -64,6 +64,7 @@ class WorkFlowPostHandler:
             answer_text_list)
         if workflow.chat_record is not None:
             chat_record = workflow.chat_record
+            chat_record.problem_text = question
             chat_record.answer_text = answer_text
             chat_record.details = details
             chat_record.message_tokens = message_tokens

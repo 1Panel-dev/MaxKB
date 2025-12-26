@@ -327,6 +327,7 @@ class ChatSerializers(serializers.Serializer):
         chat_user_id = self.data.get('chat_user_id')
         chat_user_type = self.data.get('chat_user_type')
         form_data = instance.get("form_data")
+        chat_record_id = instance.get('chat_record_id')
         pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
@@ -350,6 +351,8 @@ class ChatSerializers(serializers.Serializer):
         # 构建运行参数
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
                                                      chat_user_id, chat_user_type, stream, form_data)
+        if chat_record_id:
+            params['chat_record_id'] = chat_record_id
         chat_info.set_chat(message)
         # 运行流水线作业
         pipeline_message.run(params)

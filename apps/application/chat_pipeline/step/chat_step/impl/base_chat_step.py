@@ -351,7 +351,7 @@ class BaseChatStep(IChatStep):
                                                          mcp_servers, mcp_source, tool_enable, tool_ids,
                                                          application_enable, application_ids,
                                                          mcp_output_enable)
-        chat_record_id = uuid.uuid7()
+        chat_record_id = self.context.get('step_args',{}).get('chat_record_id') if self.context.get('step_args',{}).get('chat_record_id') else uuid.uuid7()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,

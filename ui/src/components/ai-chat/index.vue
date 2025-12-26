@@ -36,9 +36,12 @@
           <template v-for="(item, index) in chatList" :key="index">
             <!-- 问题 -->
             <QuestionContent
+              :chat-management="ChatManagement"
               :type="type"
               :application="applicationDetails"
+              :send-message="sendMessage"
               :chat-record="item"
+              :is-last="index >= chatList.length - 1"
             ></QuestionContent>
             <!-- 回答 -->
             <AnswerContent

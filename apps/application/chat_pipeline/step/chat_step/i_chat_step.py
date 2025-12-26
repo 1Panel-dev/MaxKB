@@ -69,6 +69,7 @@ class IChatStep(IBaseChatPipelineStep):
         # 是否使用流的形式输出
         stream = serializers.BooleanField(required=False, label=_("Streaming Output"))
         chat_user_id = serializers.CharField(required=True, label=_("Chat user id"))
+        chat_record_id = serializers.CharField(required=False, label=_("Chat record id"))
 
         chat_user_type = serializers.CharField(required=True, label=_("Chat user Type"))
         # 未查询到引用分段

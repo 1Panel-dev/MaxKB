@@ -563,7 +563,7 @@ class WorkflowManage:
         details_result = {}
         for index in range(len(self.node_context)):
             node = self.node_context[index]
-            if self.chat_record is not None and self.chat_record.details is not None:
+            if self.chat_record is not None and self.chat_record.details is not None and self.start_node:
                 details = self.chat_record.details.get(node.runtime_node_id)
                 if details is not None and self.start_node.runtime_node_id != node.runtime_node_id:
                     details_result[node.runtime_node_id] = details
