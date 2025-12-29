@@ -25,9 +25,11 @@ from common.utils.lock import RedisLock
 class VoteRequest(serializers.Serializer):
     vote_status = serializers.ChoiceField(choices=VoteChoices.choices,
                                           label=_("Bidding Status"))
-    vote_reason = serializers.ChoiceField(choices=VoteReasonChoices.choices, label=_("Vote Reason"), required=False, allow_null=True)
+    vote_reason = serializers.ChoiceField(choices=VoteReasonChoices.choices, label=_("Vote Reason"), required=False,
+                                          allow_null=True)
 
-    vote_other_content = serializers.CharField(required=False, allow_blank=True,label=_("Vote other content"))
+    vote_other_content = serializers.CharField(required=False, allow_blank=True, label=_("Vote other content"))
+
 
 class HistoryChatModel(serializers.ModelSerializer):
     class Meta:
@@ -105,7 +107,7 @@ class HistoricalConversationSerializer(serializers.Serializer):
         chat_user_id = self.data.get('chat_user_id')
         application_id = self.data.get("application_id")
         return QuerySet(Chat).filter(application_id=application_id, chat_user_id=chat_user_id,
-                                     is_deleted=False).order_by('-update_time')
+                                     is_deleted=False).order_by('-update_time', 'id')
 
     def list(self):
         self.is_valid(raise_exception=True)
