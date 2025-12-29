@@ -15,6 +15,7 @@ export default {
   chatId: '对话 ID',
   chatUserId: '对话用户 ID',
   chatUserType: '对话用户类型',
+  chatUserGroup: '对话用户组',
   userInput: '用户输入',
   quote: '引用',
   download: '点击下载文件',

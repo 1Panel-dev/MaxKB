@@ -22,6 +22,7 @@ from common.exception.app_exception import ChatException
 from knowledge.models import Document
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
+from system_manage.models import UserGroupRelation
 
 
 class ChatInfo:
@@ -113,6 +114,21 @@ class ChatInfo:
             else:
                 self.chat_user = {'username': '游客'}
         return self.chat_user
+
+    def get_chat_user_group(self, asker=None):
+        chat_user  = self.get_chat_user(asker=asker)
+        chat_user_id = chat_user.get('id')
+
+        if not chat_user_id:
+            return  []
+
+        user_group_relation_model = DatabaseModelManage.get_model("user_group_relation")
+        if user_group_relation_model:
+            return [{
+                        'id': user_group_relation.group_id,
+                        'name': user_group_relation.group.name
+                    } for user_group_relation  in QuerySet(user_group_relation_model).select_related('group').filter(user_id=chat_user_id)]
+        return []
 
     def to_base_pipeline_manage_params(self):
         self.get_application()

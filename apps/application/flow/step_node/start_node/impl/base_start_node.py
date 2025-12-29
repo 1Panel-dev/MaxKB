@@ -34,7 +34,9 @@ def get_global_variable(node):
             'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data,
             'chat_user_id': body.get('chat_user_id'),
             'chat_user_type': body.get('chat_user_type'),
-            'chat_user': body.get('chat_user')}
+            'chat_user': body.get('chat_user'),
+            'chat_user_group': body.get('chat_user_group')
+            }
 
 
 class BaseStartStepNode(IStarNode):

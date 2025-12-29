@@ -5,7 +5,6 @@ import type { Dict, pageRequest } from '@/api/type/common'
 import type { knowledgeData } from '@/api/type/knowledge'
 
 import useStore from '@/stores'
-import knowledge from '../system-shared/knowledge'
 const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {

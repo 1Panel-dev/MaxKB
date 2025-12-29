@@ -15,6 +15,7 @@ export default {
   chatId: 'Chat ID',
   chatUserId: 'Chat User ID',
   chatUserType: 'Chat User Type',
+  chatUserGroup: 'Chat User Group',
   userInput: 'User Input',
   quote: 'Quote',
   download: 'Click to Download',

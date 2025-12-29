@@ -403,6 +403,7 @@ class ChatSerializers(serializers.Serializer):
                                            'workspace_id': workspace_id,
                                            'debug': debug,
                                            'chat_user': chat_info.get_chat_user(),
+                                           'chat_user_group': chat_info.get_chat_user_group(),
                                            'application_id': str(chat_info.application_id)},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,

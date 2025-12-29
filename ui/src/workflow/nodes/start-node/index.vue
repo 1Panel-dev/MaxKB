@@ -69,6 +69,10 @@ const globalFields = [
     value: 'chat_user_type',
   },
   {
+    label: t('chat.chatUserGroup'),
+    value: 'chat_user_group',
+  },
+  {
     label: t('views.chatUser.title'),
     value: 'chat_user',
   },
