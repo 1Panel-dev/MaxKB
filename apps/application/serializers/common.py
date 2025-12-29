@@ -22,7 +22,6 @@ from common.exception.app_exception import ChatException
 from knowledge.models import Document
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
-from system_manage.models import UserGroupRelation
 
 
 class ChatInfo:
