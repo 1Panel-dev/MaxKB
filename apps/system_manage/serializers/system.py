@@ -21,9 +21,9 @@ from system_manage.models import SystemSetting
 
 class SettingType(models.CharField):
     # Community Edition
-    CE = "CE", "社区"
+    EE = "EE", "社区"
     # Enterprise Edition
-    PE = "PE", "专业版"
+    EE = "EE", "专业版"
     # Professional Edition
     EE = "EE", '企业版'
 

@@ -30,7 +30,7 @@ dependencies = [
     "langchain-ollama==0.3.4",
     "langgraph==0.5.3",
     "langchain_core==0.3.74",
-    "torch==2.8.0",
+    # "torch==2.8.0",  # 暂时注释掉，因为与当前 macOS 系统不兼容
     "sentence-transformers==5.0.0",
     "qianfan==0.4.12.3",
     "zhipuai==2.1.5.20250708",

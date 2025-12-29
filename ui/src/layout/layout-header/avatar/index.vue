@@ -130,12 +130,12 @@
             </template>
           </el-dropdown>
         </el-dropdown-item>
-        <el-dropdown-item
-          @click="openAbout"
-          v-if="hasPermission([RoleConst.ADMIN, PermissionConst.ABOUT_READ], 'OR')"
-        >
-          {{ $t('layout.about.title') }}
-        </el-dropdown-item>
+<!--        <el-dropdown-item-->
+<!--          @click="openAbout"-->
+<!--          v-if="hasPermission([RoleConst.ADMIN, PermissionConst.ABOUT_READ], 'OR')"-->
+<!--        >-->
+<!--          {{ $t('layout.about.title') }}-->
+<!--        </el-dropdown-item>-->
 
         <el-dropdown-item class="border-t" @click="logout">
           {{ $t('layout.logout') }}

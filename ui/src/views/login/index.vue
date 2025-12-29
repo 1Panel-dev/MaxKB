@@ -291,7 +291,7 @@ function uuidv4() {
 }
 
 const newDefaultSlogan = computed(() => {
-  const default_login = '强大易用的企业级智能体平台'
+  const default_login = '融合AI-RAG技术的智能知识问答及思维导图综合平台'
   if (!theme.themeInfo?.slogan || default_login == theme.themeInfo?.slogan) {
     return t('theme.defaultSlogan')
   } else {

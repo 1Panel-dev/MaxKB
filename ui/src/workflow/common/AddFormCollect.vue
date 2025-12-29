@@ -7,7 +7,7 @@
     :destroy-on-close="true"
     :before-close="close"
     append-to-body
-  >
+  >l
     <DynamicsFormConstructor
       v-model="dynamicsFormData"
       label-position="top"

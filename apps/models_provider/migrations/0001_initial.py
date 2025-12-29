@@ -14,8 +14,8 @@ default_embedding_model_id = '42f63a3d-427e-11ef-b3ec-a8a1595801ab'
 
 def save_default_embedding_model(apps, schema_editor):
     ModelModel = apps.get_model('models_provider', 'Model')
-    cache_folder = CONFIG.get('EMBEDDING_MODEL_PATH')
-    model_name = CONFIG.get('EMBEDDING_MODEL_NAME')
+    cache_folder = CONFIG.get('EMBEDDING_MODEL_PATH') or '/opt/maxkb-app/model/base'
+    model_name = CONFIG.get('EMBEDDING_MODEL_NAME') or 'text2vec-base-chinese'
     credential = {'cache_folder': cache_folder}
     model_credential_str = json.dumps(credential)
     model = ModelModel(id=default_embedding_model_id, name='maxkb-embedding', status=Status.SUCCESS,

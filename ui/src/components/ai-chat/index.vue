@@ -1,4 +1,4 @@
-<template>
+duo<template>
   <div
     ref="aiChatRef"
     class="ai-chat"

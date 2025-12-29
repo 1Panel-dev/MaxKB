@@ -1,6 +1,6 @@
 export default {
   title: '外观设置',
-  defaultSlogan: '强大易用的企业级智能体平台',
+  defaultSlogan: '融合AI-RAG技术的智能知识问答及思维导图综合平台',
   platformDisplayTheme: '平台显示主题',
   customTheme: '自定义主题',
   platformLoginSettings: '平台登录设置',
