@@ -283,7 +283,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
     class Import(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
         @transaction.atomic
@@ -364,13 +364,13 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                         input_field_list=tool.get('input_field_list'),
                         init_field_list=tool.get('init_field_list'),
                         is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
-                        scope=ToolScope.WORKSPACE,
-                        folder_id=workspace_id,
+                        scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
+                        folder_id='default' if workspace_id == 'None' else workspace_id,
                         workspace_id=workspace_id)
 
     class Export(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
 
         def export(self, with_valid=True):
