@@ -71,6 +71,14 @@ def hand_node(node, update_tool_map):
                                                                                              tool_lib_id)
     if node.get('type') == 'search-knowledge-node':
         node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
+    if node.get('type') == 'ai-chat-node':
+        node_data = node.get('properties', {}).get('node_data', {})
+        mcp_tool_ids = node_data.get('mcp_tool_ids') or []
+        node_data['mcp_tool_ids'] = [update_tool_map.get(tool_id,
+                                                         tool_id) for tool_id in mcp_tool_ids]
+        tool_ids = node_data.get('tool_ids') or []
+        node_data['tool_ids'] = [update_tool_map.get(tool_id,
+                                                     tool_id) for tool_id in tool_ids]
 
 
 class MKInstance:
@@ -781,13 +789,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 self.is_valid()
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
-            tool_id_list = [node.get('properties', {}).get('node_data', {}).get('tool_lib_id') for node
-                            in
-                            application.work_flow.get('nodes', []) + reduce(lambda x, y: [*x, *y], [
-                                n.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []) for n
-                                in
-                                application.work_flow.get('nodes', []) if n.get('type') == 'loop-node'], []) if
-                            node.get('type') == 'tool-lib-node']
+            from application.flow.tools import get_tool_id_list
+            tool_id_list = get_tool_id_list(application.work_flow)
             tool_list = []
             if len(tool_id_list) > 0:
                 tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
@@ -863,7 +866,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:

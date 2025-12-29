@@ -506,3 +506,23 @@ def save_workflow_mapping(workflow, source_type, source_id, other_resource_mappi
         resource_mapping_list += other_resource_mapping
         QuerySet(ResourceMapping).bulk_create(
             {(str(item.target_type) + str(item.target_id)): item for item in resource_mapping_list}.values())
+
+
+def get_tool_id_list(workflow):
+    _result = []
+    for node in workflow.get('nodes', []):
+        if node.get('type') == 'tool-lib-node':
+            tool_id = node.get('properties', {}).get('node_data', {}).get('tool_lib_id')
+            if tool_id:
+                _result.append(tool_id)
+        elif node.get('type') == 'loop-node':
+            r = get_tool_id_list(node.get('properties', {}).get('node_data', {}).get('loop_body', {}))
+            for item in r:
+                _result.append(item)
+        elif node.get('type') == 'ai-chat-node':
+            node_data = node.get('properties', {}).get('node_data', {})
+            mcp_tool_ids = node_data.get('mcp_tool_ids') or []
+            tool_ids = node_data.get('tool_ids') or []
+            for _id in mcp_tool_ids + tool_ids:
+                _result.append(_id)
+    return _result
