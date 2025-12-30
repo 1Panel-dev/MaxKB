@@ -308,9 +308,10 @@ class FolderTreeSerializer(serializers.Serializer):
         is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
         if is_x_pack_ee:
             return QuerySet(workspace_user_role_mapping_model).select_related('role', 'user').filter(
-                workspace_id=workspace_id, user_id=user_id,
+                Q(role__rolepermission__permission_id=f"{source}_FOLDER:READ") | Q(role__internal=True),
+                workspace_id=workspace_id,
+                user_id=user_id,
                 role__type=RoleConstants.USER.value.__str__(),
-                role__rolepermission__permission_id=f"{source}_FOLDER:READ"
             ).exists()
 
         return False
