@@ -154,7 +154,7 @@ const putKnowledgeHitTest: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/hit_test`, data, undefined, loading)
+  return post(`${prefix}/${knowledge_id}/hit_test`, data, undefined, loading)
 }
 
 /**
@@ -340,7 +340,7 @@ const putKnowledgeWorkflow: (
 const exportKnowledgeWorkflow = (
   knowledge_id: string,
   knowledge_name: string,
-  loading?: Ref<boolean>
+  loading?: Ref<boolean>,
 ) => {
   return exportFile(
     knowledge_name + '.kbwf',
@@ -372,7 +372,6 @@ const workflowUpload: (
 ) => Promise<Result<any>> = (knowledge_id: string, instance, loading) => {
   return post(`${prefix}/${knowledge_id}/upload_document`, instance, {}, loading)
 }
-
 
 const publish: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   knowledge_id: string,
@@ -418,7 +417,7 @@ export default {
   workflowUpload,
   getWorkflowActionPage,
   exportKnowledgeWorkflow,
-  importKnowledgeWorkflow
+  importKnowledgeWorkflow,
 } as {
   [key: string]: any
 }

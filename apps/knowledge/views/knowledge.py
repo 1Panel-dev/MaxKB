@@ -192,7 +192,7 @@ class KnowledgeView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=['POST'],
             summary=_('Hit test list'),
             description=_('Hit test list'),
             operation_id=_('Hit test list'),  # type: ignore
@@ -208,7 +208,7 @@ class KnowledgeView(APIView):
             ViewPermission([RoleConstants.USER.get_workspace_role()],
                            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
         )
-        def put(self, request: Request, workspace_id: str, knowledge_id: str):
+        def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.HitTest(
                 data={
                     'workspace_id': workspace_id,

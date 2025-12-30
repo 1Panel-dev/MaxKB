@@ -163,7 +163,7 @@ const putKnowledgeHitTest: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return put(`${prefix.value}/${knowledge_id}/hit_test`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/hit_test`, data, undefined, loading)
 }
 
 /**
