@@ -25,7 +25,7 @@ from tools.serializers.tool_folder import ToolFolderTreeSerializer
 from users.serializers.user import is_workspace_manage
 
 
-def has_exact_permission_by_role(user_id: str, workspace_id: str, permission_id: str):
+def has_exact_permission_by_role(user_id: str, workspace_id: str, permission_id: str, role_type: str):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
     is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
@@ -34,7 +34,7 @@ def has_exact_permission_by_role(user_id: str, workspace_id: str, permission_id:
             Q(role__rolepermission__permission_id=permission_id) | Q(role__internal=True),
             workspace_id=workspace_id,
             user_id=user_id,
-            role__type=RoleConstants.USER.value.__str__(),
+            role__type=role_type,
         ).exists()
 
     return False
@@ -352,7 +352,7 @@ class FolderTreeSerializer(serializers.Serializer):
         if name is not None:
             base_q &= Q(name__contains=name)
         if not workspace_manage:
-            having_read_permission_by_role = has_exact_permission_by_role(user_id, workspace_id, f"{source}_FOLDER:READ")
+            having_read_permission_by_role = has_exact_permission_by_role(user_id, workspace_id, f"{source}_FOLDER:READ", RoleConstants.USER.value.__str__())
             permission_condition = ['VIEW']
             if having_read_permission_by_role:
                 permission_condition = ['VIEW', 'ROLE']
