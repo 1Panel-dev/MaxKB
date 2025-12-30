@@ -438,6 +438,9 @@ class ToolSerializer(serializers.Serializer):
             try:
                 if _type == 'int':
                     return int(value)
+                if _type == 'boolean':
+                    value = 0 if ['0', '[]'].__contains__(value) else value
+                    return bool(value)
                 if _type == 'float':
                     return float(value)
                 if _type == 'dict':

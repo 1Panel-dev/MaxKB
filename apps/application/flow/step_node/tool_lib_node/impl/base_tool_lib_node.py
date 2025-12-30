@@ -56,6 +56,8 @@ def valid_reference_value(_type, value, name):
     try:
         if _type == 'int':
             instance_type = int | float
+        elif _type == 'boolean':
+            instance_type = bool
         elif _type == 'float':
             instance_type = float | int
         elif _type == 'dict':
@@ -103,6 +105,9 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.generate_prompt(value)
         if _type == 'int':
             return int(value)
+        if _type == 'boolean':
+            value = 0 if ['0', '[]'].__contains__(value) else value
+            return bool(value)
         if _type == 'float':
             return float(value)
         if _type == 'dict':

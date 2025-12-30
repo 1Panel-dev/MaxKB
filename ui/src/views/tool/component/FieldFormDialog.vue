@@ -62,7 +62,7 @@ import { ref, reactive, watch } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { t } from '@/locales'
-const typeOptions = ['string', 'int', 'dict', 'array', 'float']
+const typeOptions = ['string', 'int', 'dict', 'array', 'float', 'boolean']
 
 const emit = defineEmits(['refresh'])
 
