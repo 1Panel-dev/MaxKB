@@ -211,7 +211,7 @@ def batch_add_document_tag(document_tag_map: Dict[str, List[str]]):
 class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
 
     def save_context(self, details, workflow_manage):
-        pass
+        self.context['exception_message'] = details.get('err_message')
 
     def save(self, document_list):
         serializer = KnowledgeWriteParamSerializer(data=document_list, many=True)

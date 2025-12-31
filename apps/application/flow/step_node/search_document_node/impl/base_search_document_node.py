@@ -20,6 +20,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
         self.context['knowledge_items'] = details.get('knowledge_items')
         self.context['question'] = details.get('question')
         self.context['run_time'] = details.get('run_time')
+        self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
         return self.workflow_manage.get_reference_field(fields[0], fields[1:])
@@ -120,7 +121,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 field_value = self.workflow_manage.generate_prompt(condition['value'])
                 compare_type = condition['compare']
 
-                if not field_value or field_value == 'None' or len(field_value) == 0 :
+                if not field_value or field_value == 'None' or len(field_value) == 0:
                     continue
 
                 # 构建查询条件
@@ -159,7 +160,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 field_value = self.workflow_manage.generate_prompt(condition['value'])
                 compare_type = condition['compare']
 
-                if not field_value or field_value == 'None' or len(field_value) == 0 :
+                if not field_value or field_value == 'None' or len(field_value) == 0:
                     continue
 
                 if compare_type == 'not_contain':

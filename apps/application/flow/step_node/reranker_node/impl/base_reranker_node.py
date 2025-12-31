@@ -82,6 +82,7 @@ class BaseRerankerNode(IRerankerNode):
         self.context['run_time'] = details.get('run_time')
         self.context['result_list'] = details.get('result_list')
         self.context['result'] = details.get('result')
+        self.context['exception_message'] = details.get('err_message')
 
     def execute(self, question, reranker_setting, reranker_list, reranker_model_id, show_knowledge,
                 **kwargs) -> NodeResult:

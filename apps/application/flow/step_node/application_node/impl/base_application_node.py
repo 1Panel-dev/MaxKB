@@ -168,6 +168,7 @@ class BaseApplicationNode(IApplicationNode):
         self.context['question'] = details.get('question')
         self.context['type'] = details.get('type')
         self.context['reasoning_content'] = details.get('reasoning_content')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 

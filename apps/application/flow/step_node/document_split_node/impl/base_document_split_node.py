@@ -39,6 +39,7 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
 class BaseDocumentSplitNode(IDocumentSplitNode):
     def save_context(self, details, workflow_manage):
         self.context['content'] = details.get('content')
+        self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
         return self.workflow_manage.get_reference_field(fields[0], fields[1:])

@@ -174,6 +174,7 @@ def bytes_to_uploaded_file(file_bytes, file_name="unknown"):
 class BaseToolLibNodeNode(IToolLibNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result'):
             self.answer_text = str(details.get('result'))
 

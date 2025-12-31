@@ -10,6 +10,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
     def save_context(self, details, workflow_manage):
         self.context['variable_list'] = details.get('variable_list')
         self.context['result_list'] = details.get('result_list')
+        self.context['exception_message'] = details.get('err_message')
 
     def global_evaluation(self, variable, value):
         from application.flow.loop_workflow_manage import LoopWorkflowManage

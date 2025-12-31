@@ -16,6 +16,7 @@ splitter = '\n`-----------------------------------`\n'
 class BaseDocumentExtractNode(IDocumentExtractNode):
     def save_context(self, details, workflow_manage):
         self.context['content'] = details.get('content')
+        self.context['exception_message'] = details.get('err_message')
 
     def execute(self, document, chat_id=None, **kwargs):
         get_buffer = FileBufferHandle().get_buffer

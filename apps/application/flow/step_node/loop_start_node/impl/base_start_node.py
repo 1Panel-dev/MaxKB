@@ -19,6 +19,7 @@ class BaseLoopStartStepNode(ILoopStarNode):
     def save_context(self, details, workflow_manage):
         self.context['index'] = details.get('current_index')
         self.context['item'] = details.get('current_item')
+        self.context['exception_message'] = details.get('err_message')
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         pass

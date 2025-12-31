@@ -14,6 +14,9 @@ from application.flow.step_node.loop_continue_node.i_loop_continue_node import I
 
 
 class BaseLoopContinueNode(ILoopContinueNode):
+    def save_context(self, details, workflow_manage):
+        self.context['exception_message'] = details.get('err_message')
+
     def execute(self, condition, condition_list, **kwargs) -> NodeResult:
         condition_list = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
                           condition_list]

@@ -17,6 +17,7 @@ class BaseConditionNode(IConditionNode):
     def save_context(self, details, workflow_manage):
         self.context['branch_id'] = details.get('branch_id')
         self.context['branch_name'] = details.get('branch_name')
+        self.context['exception_message'] = details.get('err_message')
 
     def execute(self, **kwargs) -> NodeResult:
         branch_list = self.node_params_serializer.data['branch']

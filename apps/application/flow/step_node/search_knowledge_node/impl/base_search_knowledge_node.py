@@ -67,6 +67,7 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
             [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
              result])[0:knowledge_setting.get('max_paragraph_char_number', 5000)]
         self.context['directly_return'] = directly_return
+        self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
         return self.workflow_manage.get_reference_field(fields[0], fields[1:])

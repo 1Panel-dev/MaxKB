@@ -52,6 +52,7 @@ class BaseStartStepNode(IStarNode):
         self.context['audio'] = details.get('audio_list')
         self.context['video'] = details.get('video_list')
         self.context['other'] = details.get('other_list')
+        self.context['exception_message'] = details.get('err_message')
         self.status = details.get('status')
         self.err_message = details.get('err_message')
         for key, value in workflow_variable.items():

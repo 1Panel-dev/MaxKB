@@ -37,6 +37,7 @@ class BaseVariableSplittingNode(IVariableSplittingNode):
             self.context[key] = value
         self.context['result'] = details.get('result')
         self.context['request'] = details.get('request')
+        self.context['exception_message'] = details.get('err_message')
 
     def execute(self, input_variable, variable_list, **kwargs) -> NodeResult:
         self.context['request'] = input_variable

@@ -9,6 +9,7 @@
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.variable_aggregation_node.i_variable_aggregation_node import IVariableAggregation
 
+
 def _filter_file_bytes(data):
     """递归过滤掉所有层级的 file_bytes"""
     if isinstance(data, dict):
@@ -27,6 +28,7 @@ class BaseVariableAggregationNode(IVariableAggregation):
         self.context['result'] = details.get('result')
         self.context['strategy'] = details.get('strategy')
         self.context['group_list'] = details.get('group_list')
+        self.context['exception_message'] = details.get('err_message')
 
     def get_first_non_null(self, variable_list):
 

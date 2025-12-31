@@ -22,6 +22,9 @@ def _write_context(step_variable: Dict, global_variable: Dict, node, workflow):
 
 
 class BaseLoopBreakNode(ILoopBreakNode):
+    def save_context(self, details, workflow_manage):
+        self.context['exception_message'] = details.get('err_message')
+
     def execute(self, condition, condition_list, **kwargs) -> NodeResult:
         r = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
              condition_list]

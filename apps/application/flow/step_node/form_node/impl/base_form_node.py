@@ -68,6 +68,7 @@ class BaseFormNode(IFormNode):
         self.context['start_time'] = details.get('start_time')
         self.context['form_data'] = form_data
         self.context['is_submit'] = details.get('is_submit')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('result')
         if form_data is not None:

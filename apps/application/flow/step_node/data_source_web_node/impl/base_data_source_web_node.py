@@ -44,7 +44,7 @@ def get_collect_handler(workflow_manage):
                 })
 
             except Exception as e:
-                    maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
+                maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
         if workflow_manage.is_the_task_interrupted():
             raise InterruptedTaskException('Task interrupted')
 
@@ -53,7 +53,7 @@ def get_collect_handler(workflow_manage):
 
 class BaseDataSourceWebNode(IDataSourceWebNode):
     def save_context(self, details, workflow_manage):
-        pass
+        self.context['exception_message'] = details.get('err_message')
 
     @staticmethod
     def get_form_list(node):
@@ -77,7 +77,7 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
                               self.workflow_manage.params.get('knowledge_base') or {})
 
         except Exception as e:
-            if isinstance(e,InterruptedTaskException):
+            if isinstance(e, InterruptedTaskException):
                 return NodeResult({'document_list': document_list, 'source_url': source_url, 'selector': selector},
                                   self.workflow_manage.params.get('knowledge_base') or {})
             maxkb_logger.error(_('data source web node:{node_id} error{error}{traceback}').format(

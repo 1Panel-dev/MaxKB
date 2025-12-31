@@ -16,8 +16,9 @@ class BaseMcpNode(IMcpNode):
         self.context['result'] = details.get('result')
         self.context['tool_params'] = details.get('tool_params')
         self.context['mcp_tool'] = details.get('mcp_tool')
+        self.context['exception_message'] = details.get('err_message')
 
-    def execute(self, mcp_servers, mcp_server, mcp_tool, mcp_tool_id, mcp_source, tool_params,**kwargs) -> NodeResult:
+    def execute(self, mcp_servers, mcp_server, mcp_tool, mcp_tool_id, mcp_source, tool_params, **kwargs) -> NodeResult:
         if mcp_source == 'referencing':
             if not mcp_tool_id:
                 raise ValueError("MCP tool ID is required when mcp_source is 'referencing'.")

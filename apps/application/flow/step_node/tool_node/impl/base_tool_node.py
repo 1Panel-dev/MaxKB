@@ -109,6 +109,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
 class BaseToolNodeNode(IToolNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = str(details.get('result'))
 

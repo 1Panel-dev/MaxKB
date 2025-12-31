@@ -14,8 +14,8 @@ from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
 from .prompt_template import PROMPT_TEMPLATE
 
-def get_default_model_params_setting(model_id):
 
+def get_default_model_params_setting(model_id):
     model = QuerySet(Model).filter(id=model_id).first()
     credential = get_model_credential(model.provider, model.model_type, model.model_name)
     model_params_setting = credential.get_model_params_setting_form(
@@ -24,7 +24,6 @@ def get_default_model_params_setting(model_id):
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
-
     chat_model = node_variable.get('chat_model')
     message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
@@ -41,7 +40,6 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
-
     response = node_variable.get('result')
     answer = response.content
     _write_context(node_variable, workflow_variable, node, workflow, answer)
@@ -49,12 +47,10 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
 
 class BaseIntentNode(IIntentNode):
 
-
     def save_context(self, details, workflow_manage):
-
+        self.context['exception_message'] = details.get('err_message')
         self.context['branch_id'] = details.get('branch_id')
         self.context['category'] = details.get('category')
-
 
     def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch,
                 model_params_setting=None, **kwargs) -> NodeResult:
@@ -78,7 +74,6 @@ class BaseIntentNode(IIntentNode):
 
         # 构建分类提示词
         prompt = self.build_classification_prompt(user_input, branch)
-
 
         # 生成消息列表
         system = self.build_system_prompt()
@@ -130,7 +125,6 @@ class BaseIntentNode(IIntentNode):
                 message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
-
     def build_system_prompt(self) -> str:
         """构建系统提示词"""
         return "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
@@ -161,7 +155,6 @@ class BaseIntentNode(IIntentNode):
             classification_list=classification_list,
             user_input=user_input
         )
-
 
     def generate_message_list(self, system: str, prompt: str, history_message):
         """生成消息列表"""
@@ -236,7 +229,6 @@ class BaseIntentNode(IIntentNode):
             if b.get('isOther'):
                 return b
         return None
-
 
     def get_details(self, index: int, **kwargs):
         """获取节点执行详情"""
