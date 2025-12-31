@@ -5,6 +5,7 @@
     direction="rtl"
     size="800px"
     :before-close="close"
+    destroy-on-close
   >
     <div class="flex mb-16">
       <div class="flex-between complex-search">
@@ -40,14 +41,16 @@
       </div>
     </div>
 
-    <app-table-infinite-scroll
+    <app-table
+      ref="multipleTableRef"
+      class="mt-16 document-table"
       :data="data"
-      class="w-full"
+      :maxTableHeight="200"
+      :pagination-config="paginationConfig"
+      @sizeChange="changeSize"
+      @changePage="getList(true)"
       v-loading="loading"
-      @changePage="changePage"
-      :maxTableHeight="150"
-      :paginationConfig="paginationConfig"
-      :row-class-name="setRowClass"
+      :row-key="(row: any) => row.id"
     >
       <el-table-column prop="user_name" :label="$t('workflow.initiator')">
         <template #default="{ row }">
@@ -105,7 +108,7 @@
               effect="dark"
               :content="$t('chat.executionDetails.cancel')"
               placement="top"
-              v-if="row.state === 'PADDING'"
+              v-if="['PADDING', 'STARTED'].includes(row.state)"
             >
               <el-button type="danger" text @click.stop="cancelExecution(row)">
                 <el-icon><CircleCloseFilled /></el-icon>
@@ -114,7 +117,8 @@
           </div>
         </template>
       </el-table-column>
-    </app-table-infinite-scroll>
+    </app-table>
+
     <ExecutionDetailDrawer
       ref="ExecutionDetailDrawerRef"
       v-model:currentId="currentId"
@@ -128,10 +132,9 @@
 </template>
 <script setup lang="ts">
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import AppTableInfiniteScroll from '@/components/app-table-infinite-scroll/index.vue'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
-import { computed, ref, reactive } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { computed, ref, reactive, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
 import { datetimeFormat } from '@/utils/time'
 import type { Dict } from '@/api/type/common'
 import { MsgError, MsgConfirm } from '@/utils/message'
@@ -150,7 +153,7 @@ const apiType = computed(() => {
 })
 const paginationConfig = reactive({
   current_page: 1,
-  page_size: 50,
+  page_size: 10,
   total: 0,
 })
 const query = ref<any>({
@@ -192,21 +195,22 @@ const cancelExecution = (row: any) => {
 const changeFilterHandle = () => {
   query.value = { user_name: '', status: '' }
 }
-const changePage = () => {
-  paginationConfig.current_page += 1
+const changeSize = () => {
+  paginationConfig.current_page = 1
   getList()
 }
 
-const getList = (clear?: boolean) => {
-  if (clear) {
-    paginationConfig.current_page = 1
-    data.value = []
-  }
+const getList = (isLoading?: boolean) => {
   return loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .getWorkflowActionPage(active_knowledge_id.value, paginationConfig, query.value, loading)
+    .getWorkflowActionPage(
+      active_knowledge_id.value,
+      paginationConfig,
+      query.value,
+      isLoading ? loading : undefined,
+    )
     .then((ok: any) => {
       paginationConfig.total = ok.data?.total
-      data.value = data.value.concat(ok.data.records)
+      data.value = ok.data.records
     })
 }
 
@@ -220,10 +224,7 @@ const next_disable = computed(() => {
   return index >= data.value.length && index >= paginationConfig.total - 1
 })
 
-const setRowClass = ({ row }: any) => {
-  return currentId.value === row?.id ? 'highlight' : ''
-}
-
+const interval = ref<any>()
 /**
  * 下一页
  */
@@ -234,7 +235,7 @@ const nextRecord = () => {
       return
     }
     paginationConfig.current_page = paginationConfig.current_page + 1
-    getList().then(() => {
+    getList(true).then(() => {
       currentId.value = data.value[index].id
       currentContent.value = data.value[index]
     })
@@ -257,8 +258,11 @@ const preRecord = () => {
 }
 
 const open = (knowledge_id: string) => {
+  interval.value = setInterval(() => {
+    getList(false)
+  }, 6000)
   active_knowledge_id.value = knowledge_id
-  getList()
+  getList(true)
   drawer.value = true
 }
 const close = () => {
@@ -266,7 +270,15 @@ const close = () => {
   paginationConfig.total = 0
   data.value = []
   drawer.value = false
+  if (interval.value) {
+    clearInterval(interval.value)
+  }
 }
+onBeforeUnmount(() => {
+  if (interval.value) {
+    clearInterval(interval.value)
+  }
+})
 defineExpose({ open, close })
 </script>
 <style lang="scss" scoped></style>

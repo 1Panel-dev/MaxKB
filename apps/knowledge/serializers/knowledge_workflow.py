@@ -170,7 +170,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
              'workspace_id': self.data.get("workspace_id"),
              **instance},
-            KnowledgeWorkflowPostHandler(None, knowledge_action_id))
+            KnowledgeWorkflowPostHandler(None, knowledge_action_id),
+            is_the_task_interrupted=lambda: cache.get(
+                Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
+                version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version()) or False
+        )
         work_flow_manage.run()
         return {'id': knowledge_action_id, 'knowledge_id': self.data.get("knowledge_id"), 'state': State.STARTED,
                 'details': {}, 'meta': meta}
@@ -196,7 +200,8 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             knowledge_action_id = self.data.get("id")
             cache.set(Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id), True,
                       version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version())
-            QuerySet(KnowledgeAction).filter(id=knowledge_action_id).update(state=State.REVOKE)
+            QuerySet(KnowledgeAction).filter(id=knowledge_action_id, state__in=[State.STARTED, State.PENDING]).update(
+                state=State.REVOKE)
             return True
 
 

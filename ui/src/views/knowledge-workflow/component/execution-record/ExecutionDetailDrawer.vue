@@ -105,11 +105,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Result from '@/views/knowledge-workflow/component/action/Result.vue'
 import { datetimeFormat } from '@/utils/time'
-import { t } from '@/locales'
 const props = withDefaults(
   defineProps<{
     /**
