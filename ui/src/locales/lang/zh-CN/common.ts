@@ -86,6 +86,7 @@ export default {
     initParam: '启动参数',
     editParam: '编辑参数',
     addParam: '添加参数',
+    exception: '异常捕获',
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '请输入',

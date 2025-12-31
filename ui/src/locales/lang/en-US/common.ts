@@ -85,6 +85,7 @@ export default {
     initParam: 'Startup Parameters',
     editParam: 'Edit Parameter',
     addParam: 'Add Parameter',
+    exception: 'Exception capture',
   },
   aggregationStrategy: 'Aggregation Strategy',
   inputPlaceholder: 'Please input',
@@ -140,5 +141,5 @@ export default {
     prev: 'Previous',
     next: 'Next',
   },
-   use: 'Use',
+  use: 'Use',
 }

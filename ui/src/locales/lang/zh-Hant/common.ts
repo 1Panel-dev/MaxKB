@@ -85,6 +85,7 @@ export default {
     initParam: '啟動參數',
     editParam: '編輯參數',
     addParam: '新增參數',
+    exception: '异常捕獲',
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '請輸入',
