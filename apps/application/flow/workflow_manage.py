@@ -484,21 +484,21 @@ class WorkflowManage:
             return current_result
         except Exception as e:
             # 添加节点
-
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
-            chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
-                                                                   self.params.get('chat_id'),
-                                                                   current_node.id,
-                                                                   current_node.up_node_id_list,
-                                                                   'Exception:' + str(e), False, 0, 0,
-                                                                   {'node_is_end': True,
-                                                                    'runtime_node_id': current_node.runtime_node_id,
-                                                                    'node_type': current_node.type,
-                                                                    'view_type': current_node.view_type,
-                                                                    'child_node': {},
-                                                                    'real_node_id': real_node_id,
-                                                                    'node_status': 'ERROR'})
-            current_node.node_chunk.add_chunk(chunk)
+            if not current_node.node.properties.get('enableException'):
+                chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                       self.params.get('chat_id'),
+                                                                       current_node.id,
+                                                                       current_node.up_node_id_list,
+                                                                       'Exception:' + str(e), False, 0, 0,
+                                                                       {'node_is_end': True,
+                                                                        'runtime_node_id': current_node.runtime_node_id,
+                                                                        'node_type': current_node.type,
+                                                                        'view_type': current_node.view_type,
+                                                                        'child_node': {},
+                                                                        'real_node_id': real_node_id,
+                                                                        'node_status': 'ERROR'})
+                current_node.node_chunk.add_chunk(chunk)
             current_node.get_write_error_context(e)
             self.status = 500
             current_node.context['exception_message'] = current_node.err_message
