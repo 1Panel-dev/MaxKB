@@ -93,12 +93,21 @@ class AppNode extends HtmlResize.view {
         children: globalFields,
       })
     }
+    const children = [...(this.props.model.properties?.config?.fields || [])]
+    if (this.props.model.properties.enableException) {
+      children.push({
+        label: '异常信息',
+        value: 'exception_message',
+        globeLabel: `{{${this.props.model.properties.stepName}.exception_message}}`,
+        globeValue: `{{context['${this.props.model.id}'].exception_message}}`,
+      })
+    }
     const value: any = {
       value: this.props.model.id,
       icon: this.props.model.properties.node_data?.icon,
       label: this.props.model.properties.stepName,
       type: this.props.model.type,
-      children: this.props.model.properties?.config?.fields || [],
+      children: children,
     }
     if (this.props.model.properties.kind) {
       value['kind'] = this.props.model.properties.kind
