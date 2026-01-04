@@ -26,6 +26,6 @@ export const SORT_MENU_CONFIG = [
     ],
   },
   {
-    items: [{ label: t('components.folder.sortDrop'), value: SORT_TYPES.CUSTOM }],
+    items: [{ label: t('components.folder.custom'), value: SORT_TYPES.CUSTOM }],
   },
 ]

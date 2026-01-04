@@ -9,7 +9,7 @@
       />
       <el-dropdown trigger="click" :teleported="false" @command="switchSortMethod">
         <el-button class="ml-4">
-          <el-icon><Operation /></el-icon>
+          <AppIcon :iconName="sortIconName"></AppIcon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu class="w-180">
@@ -299,6 +299,17 @@ function addOrderToTree(nodes: any, parentId: string): Node[] {
         : node.children,
   }))
 }
+
+const sortIconName = computed(() => {
+  const sort = currentSort.value
+  if (sort.endsWith('asc')) {
+    return 'app-folder-asc'
+  }
+  if (sort.endsWith('desc')) {
+    return 'app-folder-desc'
+  }
+  return 'app-folder-custom'
+})
 
 const currentSort = ref<SortType>(SORT_TYPES.CREATE_TIME_DESC)
 const sortedData = computed(() => {
