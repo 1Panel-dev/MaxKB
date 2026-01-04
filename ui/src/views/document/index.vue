@@ -143,7 +143,7 @@
                 effect="dark"
                 :content="$t('workflow.ExecutionRecord')"
                 placement="top"
-                v-if="knowledgeDetail?.type === 4"
+                v-if="knowledgeDetail?.type === 4 && permissionPrecise.doc_create(id)"
               >
                 <el-button @click="openListAction" class="ml-12">
                   <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>

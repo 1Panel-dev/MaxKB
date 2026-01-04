@@ -86,7 +86,11 @@
                 {{ $t('workflow.operation.exportWorkflow') }}
               </el-dropdown-item>
 
-              <el-dropdown-item @click="openListAction" divided>
+              <el-dropdown-item
+                @click="openListAction"
+                divided
+                v-if="permissionPrecise.doc_create(id)"
+              >
                 <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
                 {{ $t('workflow.ExecutionRecord') }}
               </el-dropdown-item>
