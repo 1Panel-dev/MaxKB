@@ -21,6 +21,6 @@ export default {
     descTime: '按創建時間降序',
     ascName: '按名稱升序',
     descName: '按名稱降序',
-    sortDrop: '按用戶拖拽排序',
+    custom: '按用戶拖拽排序',
   },
 }
