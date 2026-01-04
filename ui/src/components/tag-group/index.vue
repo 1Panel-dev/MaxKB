@@ -1,7 +1,7 @@
 <template>
   <div class="tag-group" v-if="props.tags.length">
     <el-tag :size="props.size" class="default-tag tag-ellipsis" :title="props.tags[0]">
-      {{ props.tags[0] }}
+      {{ i18n_name(props.tags[0]) }}
     </el-tag>
     <el-tooltip effect="light" :disabled="tooltipDisabled">
       <el-tag :size="props.size" class="info-tag ml-4 cursor" v-if="props.tags?.length > 1">
@@ -21,6 +21,8 @@
   </div>
 </template>
 <script setup lang="ts">
+import { i18n_name } from '@/utils/common'
+
 const props = defineProps<{
   tags: string[]
   size?: 'large' | 'default' | 'small'

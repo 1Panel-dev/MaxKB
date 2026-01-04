@@ -292,6 +292,7 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { i18n_name } from '@/utils/common'
 
 const { user, common } = useStore()
 const search_type = ref('username')
@@ -338,10 +339,13 @@ function getList() {
   return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
     userTableData.value = res.data.records.map((item: any) => ({
       ...item,
+      nick_name: i18n_name(item.nick_name),
       role_workspace: Object.entries(item.role_workspace ?? {}).map(([role, workspaces]) => ({
-        role,
+        role: i18n_name(role),
         workspace:
-          (workspaces as string[])?.[0] === 'None' ? '-' : (workspaces as string[])?.join(', '),
+          (workspaces as string[])?.[0] === 'None'
+            ? '-'
+            : (workspaces as string[])?.map((ws) => i18n_name(ws)).join(', '),
       })),
     }))
     paginationConfig.total = res.data.total
