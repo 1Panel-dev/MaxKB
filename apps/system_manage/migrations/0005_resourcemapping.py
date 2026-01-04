@@ -15,6 +15,7 @@ def get_initialization_resource_mapping():
     from system_manage.models.resource_mapping import ResourceType
     from application.models import Application
     from knowledge.models import KnowledgeWorkflow
+    from application.flow.tools import application_instance_field_call_dict, knowledge_instance_field_call_dict
     resource_mapping_list = []
     ids = list(Application.objects.values_list('id', flat=True))
     for app_id in ids:
@@ -24,8 +25,7 @@ def get_initialization_resource_mapping():
                                                      get_node_handle_callback(ResourceType.APPLICATION,
                                                                               application.id))
             instance_mapping = get_instance_resource(application, ResourceType.APPLICATION, str(application.id),
-                                                     ResourceType.MODEL,
-                                                     [lambda i: i.tts_model_id, lambda i: i.stt_model_id, ])
+                                                     application_instance_field_call_dict)
             resource_mapping_list += workflow_mapping
             resource_mapping_list += instance_mapping
         except:
@@ -42,8 +42,7 @@ def get_initialization_resource_mapping():
                                                                                       str(knowledge_workflow.knowledge_id)))
                     resource_mapping_list += workflow_mapping
             instance_mapping = get_instance_resource(knowledge, ResourceType.KNOWLEDGE, str(knowledge.id),
-                                                     ResourceType.MODEL,
-                                                     [lambda i: i.embedding_model_id])
+                                                     knowledge_instance_field_call_dict)
 
             resource_mapping_list += instance_mapping
         except:

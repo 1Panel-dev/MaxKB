@@ -30,7 +30,7 @@ from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
-from application.models.application import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
+from application.models.application import Application, ApplicationTypeChoices, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
 from application.serializers.common import update_resource_mapping_by_application
@@ -541,7 +541,9 @@ class ApplicationSerializer(serializers.Serializer):
 
     @staticmethod
     def to_application_knowledge_mapping(application_id: str, knowledge_id: str):
-        return ApplicationKnowledgeMapping(id=uuid.uuid7(), application_id=application_id, knowledge_id=knowledge_id)
+        return ResourceMapping(id=uuid.uuid7(), source_id=application_id, target_id=knowledge_id,
+                               source_type="APPLICATION",
+                               target_type="KNOWLEDGE")
 
     def insert_simple(self, instance: Dict):
         self.is_valid(raise_exception=True)
@@ -560,7 +562,7 @@ class ApplicationSerializer(serializers.Serializer):
         ApplicationAccessToken(application_id=application_model.id,
                                access_token=hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]).save()
         # 插入关联数据
-        QuerySet(ApplicationKnowledgeMapping).bulk_create(application_knowledge_mapping_model_list)
+        QuerySet(ResourceMapping).bulk_create(application_knowledge_mapping_model_list)
         return ApplicationCreateSerializer.ApplicationResponse(application_model).data
 
     @transaction.atomic
@@ -785,7 +787,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.is_valid()
         application_id = self.data.get('application_id')
         QuerySet(ApplicationVersion).filter(application_id=application_id).delete()
-        QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id).delete()
         QuerySet(ResourceMapping).filter(
             Q(target_id=application_id) | Q(source_id=application_id)
         ).delete()
@@ -884,7 +885,6 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application_access_token.save()
         else:
             access_token = application_access_token.access_token
-        update_resource_mapping_by_application(self.data.get("application_id"))
         del_application_access_token(access_token)
         return self.one(with_valid=False)
 
@@ -921,6 +921,19 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 if 'name' in node_data:
                     instance['name'] = node_data['name']
                 break
+        knowledge_node_list = ApplicationOperateSerializer.get_search_node(instance.get('work_flow'))
+        for knowledge_node in knowledge_node_list:
+            node_data = knowledge_node.get('properties').get('node_data')
+            # 全部知识库id
+            all_knowledge_id_list = node_data.get('all_knowledge_id_list') or []
+            # 用户修改的知识库id
+            knowledge_id_list = node_data.get('knowledge_id_list') or []
+            # 用户可以看到的知识库
+            knowledge_list = node_data.get('knowledge_list') or []
+            view_knowledge_id_list = [knowledge.get('id') for knowledge in knowledge_list]
+            other_knowledge_id_list = [knowledge_id for knowledge_id in all_knowledge_id_list if
+                                       not view_knowledge_id_list.__contains__(knowledge_id)]
+            node_data['knowledge_id_list'] = other_knowledge_id_list + knowledge_id_list
 
     @transaction.atomic
     def edit(self, instance: Dict, with_valid=True):
@@ -972,19 +985,25 @@ class ApplicationOperateSerializer(serializers.Serializer):
             if update_key in instance and instance.get(update_key) is not None:
                 application.__setattr__(update_key, instance.get(update_key))
         application.save()
-
+        # 当前用户可修改关联的知识库列表
+        application_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
+                                         self.list_knowledge(with_valid=False)]
+        knowledge_id_list = []
         if 'knowledge_id_list' in instance:
-            knowledge_id_list = instance.get('knowledge_id_list')
             # 当前用户可修改关联的知识库列表
             application_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
                                              self.list_knowledge(with_valid=False)]
+            knowledge_id_list = instance.get('knowledge_id_list')
             for knowledge_id in knowledge_id_list:
                 if not application_knowledge_id_list.__contains__(knowledge_id):
                     message = lazy_format(_('Unknown knowledge base id {dataset_id}, unable to associate'),
                                           dataset_id=knowledge_id)
                     raise AppApiException(500, str(message))
 
-            self.save_application_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, application_id)
+        update_resource_mapping_by_application(application_id,
+                                               self.get_application_knowledge_mapping(application_knowledge_id_list,
+                                                                                      knowledge_id_list,
+                                                                                      application_id))
         return self.one(with_valid=False)
 
     def update_template_workflow(self, instance: Dict, app: Application):
@@ -1074,9 +1093,11 @@ class ApplicationOperateSerializer(serializers.Serializer):
         knowledge_list = []
         knowledge_id_list = []
         if application.type == 'SIMPLE':
-            mapping_knowledge_list = QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id)
-            knowledge_list = [available_knowledge_dict.get(str(km.knowledge_id)) for km in mapping_knowledge_list if
-                              available_knowledge_dict.__contains__(str(km.knowledge_id))]
+            mapping_knowledge_list = QuerySet(ResourceMapping).filter(source_id=application_id,
+                                                                      source_type="APPLICATION",
+                                                                      target_type="KNOWLEDGE")
+            knowledge_list = [available_knowledge_dict.get(str(km.target_id)) for km in mapping_knowledge_list if
+                              available_knowledge_dict.__contains__(str(km.target_id))]
             knowledge_id_list = [k.get('id') for k in knowledge_list]
         else:
             self.update_knowledge_node(application.work_flow, available_knowledge_dict)
@@ -1089,7 +1110,17 @@ class ApplicationOperateSerializer(serializers.Serializer):
     def get_search_node(work_flow):
         if work_flow is None:
             return []
-        return [node for node in work_flow.get('nodes', []) if node.get('type', '') == 'search-knowledge-node']
+        response = []
+        if 'nodes' in work_flow:
+            for node in work_flow.get('nodes'):
+                if node.get('type', '') == 'search-knowledge-node':
+                    response.append(node)
+                if node.get('type') == 'loop-node':
+                    r = ApplicationOperateSerializer.get_search_node(
+                        node.get('properties', {}).get('node_data', {}).get('loop_body'))
+                    for rn in r:
+                        response.append(rn)
+        return response
 
     def update_knowledge_node(self, workflow, available_knowledge_dict):
         """
@@ -1143,13 +1174,38 @@ class ApplicationOperateSerializer(serializers.Serializer):
     def save_application_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, application_id):
         # 需要排除已删除的数据集
         knowledge_id_list = [knowledge.id for knowledge in QuerySet(Knowledge).filter(id__in=knowledge_id_list)]
+
         # 删除已经关联的id
-        QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id__in=application_knowledge_id_list,
-                                                     application_id=application_id).delete()
+        QuerySet(ResourceMapping).filter(target_id__in=application_knowledge_id_list,
+                                         source_id=application_id,
+                                         source_type='APPLICATION',
+                                         target_type="KNOWLEDGE").delete()
         # 插入
-        QuerySet(ApplicationKnowledgeMapping).bulk_create(
-            [ApplicationKnowledgeMapping(application_id=application_id, knowledge_id=knowledge_id) for knowledge_id in
+        QuerySet(ResourceMapping).bulk_create(
+            [ResourceMapping(source_id=application_id, target_id=knowledge_id, source_type='APPLICATION',
+                             target_type="KNOWLEDGE") for knowledge_id in
              knowledge_id_list]) if len(knowledge_id_list) > 0 else None
+
+    @staticmethod
+    def get_application_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, application_id):
+        """
+
+        @param application_knowledge_id_list:  当前应用可修改的知识库列表
+        @param knowledge_id_list:              用户修改的知识库列表
+        @param application_id:                 应用id
+        @return:
+        """
+        # 当前知识库和应用已关联列表
+        knowledge_application_mapping_list = QuerySet(ResourceMapping).filter(source_id=application_id,
+                                                                              source_type='APPLICATION',
+                                                                              target_type="KNOWLEDGE",
+                                                                              ).exclude(
+            target_id__in=application_knowledge_id_list)
+        edit_knowledge_list = [ResourceMapping(source_id=application_id, target_id=knowledge_id,
+                                               source_type='APPLICATION',
+                                               target_type="KNOWLEDGE")
+                               for knowledge_id in knowledge_id_list]
+        return list(knowledge_application_mapping_list) + edit_knowledge_list
 
     def speech_to_text(self, instance, debug=True, with_valid=True):
         if with_valid:

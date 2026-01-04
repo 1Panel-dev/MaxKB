@@ -13,9 +13,7 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from application.flow.tools import save_simple_mapping
-from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
-    ApplicationKnowledgeMapping
+from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices
 from application.serializers.application_chat import ChatCountSerializer
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -23,6 +21,7 @@ from common.exception.app_exception import ChatException
 from knowledge.models import Document
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
+from system_manage.models.resource_mapping import ResourceMapping
 
 
 class ChatInfo:
@@ -77,9 +76,10 @@ class ChatInfo:
                 raise ChatException(500, _("The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE.value:
             # 数据集id列表
-            knowledge_id_list = [str(row.knowledge_id) for row in
-                                 QuerySet(ApplicationKnowledgeMapping).filter(
-                                     application_id=self.application_id)]
+            knowledge_id_list = [str(row.target_id) for row in
+                                 QuerySet(ResourceMapping).filter(source_id=self.application_id,
+                                                                  source_type='APPLICATION',
+                                                                  target_type='KNOWLEDGE')]
 
             # 需要排除的文档
             exclude_document_id_list = [str(document.id) for document in
@@ -116,18 +116,19 @@ class ChatInfo:
         return self.chat_user
 
     def get_chat_user_group(self, asker=None):
-        chat_user  = self.get_chat_user(asker=asker)
+        chat_user = self.get_chat_user(asker=asker)
         chat_user_id = chat_user.get('id')
 
         if not chat_user_id:
-            return  []
+            return []
 
         user_group_relation_model = DatabaseModelManage.get_model("user_group_relation")
         if user_group_relation_model:
             return [{
-                        'id': user_group_relation.group_id,
-                        'name': user_group_relation.group.name
-                    } for user_group_relation  in QuerySet(user_group_relation_model).select_related('group').filter(user_id=chat_user_id)]
+                'id': user_group_relation.group_id,
+                'name': user_group_relation.group.name
+            } for user_group_relation in
+                QuerySet(user_group_relation_model).select_related('group').filter(user_id=chat_user_id)]
         return []
 
     def to_base_pipeline_manage_params(self):
@@ -336,16 +337,19 @@ class ChatInfo:
         return None
 
 
-def update_resource_mapping_by_application(application_id: str):
-    from application.flow.tools import get_instance_resource, save_workflow_mapping
+def update_resource_mapping_by_application(application_id: str, other_resource_mapping=None):
+    from application.flow.tools import get_instance_resource, save_workflow_mapping, \
+        application_instance_field_call_dict
     from system_manage.models.resource_mapping import ResourceType
+    if other_resource_mapping is None:
+        other_resource_mapping = []
     application = QuerySet(Application).filter(id=application_id).first()
     instance_mapping = get_instance_resource(application, ResourceType.APPLICATION, str(application.id),
-                                             ResourceType.MODEL,
-                                             [lambda i: i.tts_model_id, lambda i: i.stt_model_id, ])
+                                             application_instance_field_call_dict)
     if application.type == 'WORK_FLOW':
         save_workflow_mapping(application.work_flow, ResourceType.APPLICATION, str(application_id),
-                              instance_mapping)
+                              instance_mapping + other_resource_mapping)
         return
     else:
-        save_simple_mapping(application, ResourceType.APPLICATION, str(application_id))
+        save_workflow_mapping({}, ResourceType.APPLICATION, str(application_id),
+                              instance_mapping + other_resource_mapping)

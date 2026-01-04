@@ -22,7 +22,6 @@ from django.http import HttpResponse
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationKnowledgeMapping
 from common.config.embedding_config import VectorStore
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, get_dynamics_model, native_page_search
@@ -368,7 +367,9 @@ class KnowledgeSerializer(serializers.Serializer):
                         str(
                             application_knowledge_mapping.application_id
                         ) for application_knowledge_mapping in
-                        QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=self.data.get('knowledge_id'))
+                        QuerySet(ResourceMapping).filter(source_type='APPLICATION',
+                                                         target_type='KNOWLEDGE',
+                                                         target_id=self.data.get('knowledge_id'))
                     ]
                 ))
             }
@@ -408,14 +409,19 @@ class KnowledgeSerializer(serializers.Serializer):
                             ).format(knowledge_id=knowledge_id)
                         )
 
-                QuerySet(ApplicationKnowledgeMapping).filter(
-                    application_id__in=application_knowledge_id_list,
-                    knowledge_id=self.data.get("knowledge_id")
+                QuerySet(ResourceMapping).filter(
+                    source_id__in=application_knowledge_id_list,
+                    source_type='APPLICATION',
+                    target_type='KNOWLEDGE',
+                    target_id=self.data.get("knowledge_id")
                 ).delete()
                 # 插入
-                QuerySet(ApplicationKnowledgeMapping).bulk_create([
-                    ApplicationKnowledgeMapping(
-                        application_id=application_id, knowledge_id=self.data.get('knowledge_id')
+                QuerySet(ResourceMapping).bulk_create([
+                    ResourceMapping(
+                        source_id=application_id,
+                        source_type='APPLICATION',
+                        target_type='KNOWLEDGE',
+                        target_id=self.data.get('knowledge_id')
                     ) for application_id in application_id_list
                 ]) if len(application_id_list) > 0 else None
             knowledge.save()
@@ -432,7 +438,6 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(Paragraph).filter(knowledge=knowledge).delete()
             QuerySet(Problem).filter(knowledge=knowledge).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
-            QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=knowledge.id).delete()
             drop_knowledge_index(knowledge_id=knowledge.id)
             knowledge.delete()
             File.objects.filter(
