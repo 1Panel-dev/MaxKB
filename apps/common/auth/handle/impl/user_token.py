@@ -19,7 +19,7 @@ from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import Auth, PermissionConstants, ResourcePermissionGroup, \
     get_permission_list_by_resource_group, ResourceAuthType, \
     ResourcePermissionRole, get_default_role_permission_mapping_list, get_default_workspace_user_role_mapping_list, \
-    RoleConstants, ResourcePermission, Resource
+    RoleConstants, ResourcePermission, Resource, WorkspaceGroup
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppAuthenticationFailed
 from common.utils.common import group_by
@@ -27,6 +27,7 @@ from maxkb.const import CONFIG
 from system_manage.models.workspace_user_permission import WorkspaceUserResourcePermission
 from users.models import User
 
+permission_constants_dict = {p.value.__str__(): p for p in PermissionConstants}
 
 def get_permission(permission_id):
     """
@@ -114,7 +115,6 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
     @param workspace_user_role_mapping_dict:   工作空间用户角色关联字典  key为role_id
     @return: 工作空间用户资源的权限列表
     """
-
     role_permission_mapping_list = [role_permission_mapping_dict.get(workspace_user_role_mapping.role_id, []) for
                                     workspace_user_role_mapping in
                                     workspace_user_role_mapping_dict.get(
@@ -126,7 +126,8 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
                 ResourcePermissionRole.ROLE)):
         return [
             f"{role_permission_mapping.permission_id}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
-            for role_permission_mapping in role_permission_mapping_list] + [
+            for role_permission_mapping in role_permission_mapping_list if (permission_constants_dict.get(role_permission_mapping.permission_id).value.parent_group or []).__contains__(
+                                        WorkspaceGroup(workspace_user_resource_permission.auth_target_type))] + [
             f"{workspace_user_resource_permission.auth_target_type}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"]
 
     elif workspace_user_resource_permission.auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP:
