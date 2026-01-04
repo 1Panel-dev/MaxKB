@@ -663,16 +663,17 @@ class WorkflowManage:
         else:
             for edge_node in next_edge_node_list:
                 edge = edge_node.edge
-                next_node = edge_node.node
-                if next_node.properties.get('condition', "AND") == 'AND':
-                    if self.dependent_node_been_executed(edge.targetNodeId):
+                if edge.sourceNodeId + '_right' == edge.sourceAnchorId:
+                    next_node = edge_node.node
+                    if next_node.properties.get('condition', "AND") == 'AND':
+                        if self.dependent_node_been_executed(edge.targetNodeId):
+                            node_list.append(
+                                self.get_node_cls_by_id(edge.targetNodeId,
+                                                        [*current_node.up_node_id_list, current_node.node.id]))
+                    else:
                         node_list.append(
                             self.get_node_cls_by_id(edge.targetNodeId,
                                                     [*current_node.up_node_id_list, current_node.node.id]))
-                else:
-                    node_list.append(
-                        self.get_node_cls_by_id(edge.targetNodeId,
-                                                [*current_node.up_node_id_list, current_node.node.id]))
 
         return node_list
 
