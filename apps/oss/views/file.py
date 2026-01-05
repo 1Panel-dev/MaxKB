@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView
 from rest_framework.views import Request
-from common.auth import TokenAuth
+from common.auth import TokenAuth, AllTokenAuth
 from common.log.log import log
 from common.result import result
 from knowledge.api.file import FileUploadAPI, FileGetAPI
@@ -29,7 +29,7 @@ class FileRetrievalView(APIView):
 
 
 class FileView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [AllTokenAuth]
     parser_classes = [MultiPartParser]
 
     @extend_schema(
