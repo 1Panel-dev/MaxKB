@@ -47,5 +47,6 @@ class BaseDataSourceLocalNode(IDataSourceLocalNode):
             'file_list': self.context.get('file_list'),
             'knowledge_base': self.workflow_params.get('knowledge_base'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

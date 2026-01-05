@@ -85,5 +85,6 @@ class BaseVariableAggregationNode(IVariableAggregation):
             'strategy': self.context.get('strategy'),
             'group_list': group_list,
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

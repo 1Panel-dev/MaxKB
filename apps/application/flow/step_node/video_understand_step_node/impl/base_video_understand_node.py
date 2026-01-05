@@ -246,5 +246,6 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
             'status': self.status,
             'err_message': self.err_message,
             'video_list': self.context.get('video_list'),
-            'dialogue_type': self.context.get('dialogue_type')
+            'dialogue_type': self.context.get('dialogue_type'),
+            'enableException': self.node.properties.get('enableException'),
         }

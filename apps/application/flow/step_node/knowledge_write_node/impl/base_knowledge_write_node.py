@@ -325,5 +325,6 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
             'type': self.node.type,
             'write_content': self.context.get("write_content"),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

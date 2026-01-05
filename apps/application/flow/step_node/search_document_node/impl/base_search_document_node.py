@@ -200,5 +200,6 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
             'knowledge_items': self.context.get('knowledge_items'),
             'type': self.node.type,
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

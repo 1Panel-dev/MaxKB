@@ -287,5 +287,6 @@ class BaseApplicationNode(IApplicationNode):
             'image_list': self.workflow_manage.image_list,
             'audio_list': self.workflow_manage.audio_list,
             'video_list': self.workflow_manage.video_list,
-            'application_node_dict': self.context.get('application_node_dict')
+            'application_node_dict': self.context.get('application_node_dict'),
+            'enableException': self.node.properties.get('enableException'),
         }

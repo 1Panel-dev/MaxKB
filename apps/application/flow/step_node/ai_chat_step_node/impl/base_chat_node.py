@@ -332,6 +332,7 @@ class BaseChatNode(IChatNode):
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
             'reasoning_content': self.context.get('reasoning_content'),
+            'enableException': self.node.properties.get('enableException'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

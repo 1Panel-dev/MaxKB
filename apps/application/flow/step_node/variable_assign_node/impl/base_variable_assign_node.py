@@ -100,5 +100,6 @@ class BaseVariableAssignNode(IVariableAssignNode):
             'variable_list': self.context.get('variable_list'),
             'result_list': self.context.get('result_list'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

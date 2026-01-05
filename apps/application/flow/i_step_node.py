@@ -129,7 +129,7 @@ def get_workflow_state(workflow):
     details = workflow.get_runtime_details()
     node_list = details.values()
     all_node = [*node_list, *get_loop_workflow_node(node_list)]
-    err = any([True for value in all_node if value.get('status') == 500])
+    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
     if err:
         return State.FAILURE
     write_is_exist = any([True for value in all_node if value.get('type') == 'knowledge-write-node'])

@@ -85,5 +85,6 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
             'content': [file_content[:500] for file_content in content],
             'status': self.status,
             'err_message': self.err_message,
-            'document_list': self.context.get('document_list')
+            'document_list': self.context.get('document_list'),
+            'enableException': self.node.properties.get('enableException'),
         }

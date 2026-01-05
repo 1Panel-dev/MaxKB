@@ -155,4 +155,5 @@ class BaseImageGenerateNode(IImageGenerateNode):
             'image_list': self.context.get('image_list'),
             'dialogue_type': self.context.get('dialogue_type'),
             'negative_prompt': self.context.get('negative_prompt'),
+            'enableException': self.node.properties.get('enableException'),
         }

@@ -70,4 +70,5 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
             'status': self.status,
             'err_message': self.err_message,
             'audio_list': self.context.get('audio_list'),
+            'enableException': self.node.properties.get('enableException'),
         }

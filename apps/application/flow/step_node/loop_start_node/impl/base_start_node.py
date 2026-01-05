@@ -55,4 +55,5 @@ class BaseLoopStartStepNode(ILoopStarNode):
             'type': self.node.type,
             'status': self.status,
             'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

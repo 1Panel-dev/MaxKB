@@ -182,4 +182,5 @@ class BaseImageToVideoNode(IImageToVideoNode):
             'last_frame_url': self.context.get('last_frame_url'),
             'dialogue_type': self.context.get('dialogue_type'),
             'negative_prompt': self.context.get('negative_prompt'),
+            'enableException': self.node.properties.get('enableException'),
         }

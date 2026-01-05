@@ -106,5 +106,6 @@ class BaseStartStepNode(IStarNode):
             'document_list': self.context.get('document'),
             'audio_list': self.context.get('audio'),
             'other_list': self.context.get('other'),
-            'global_fields': global_fields
+            'global_fields': global_fields,
+            'enableException': self.node.properties.get('enableException'),
         }

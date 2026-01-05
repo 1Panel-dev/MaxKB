@@ -187,5 +187,6 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
             'with_filter': self.context.get('with_filter'),
             'patterns': self.context.get('patterns'),
             'split_strategy': self.context.get('split_strategy'),
+            'enableException': self.node.properties.get('enableException'),
             # 'document_list': self.context.get('document_list', []),
         }

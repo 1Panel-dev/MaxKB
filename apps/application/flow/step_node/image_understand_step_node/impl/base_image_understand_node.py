@@ -254,5 +254,6 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             'status': self.status,
             'err_message': self.err_message,
             'image_list': self.context.get('image_list'),
-            'dialogue_type': self.context.get('dialogue_type')
+            'dialogue_type': self.context.get('dialogue_type'),
+            'enableException': self.node.properties.get('enableException'),
         }

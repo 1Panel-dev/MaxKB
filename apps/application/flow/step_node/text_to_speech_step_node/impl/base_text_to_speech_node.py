@@ -144,4 +144,5 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             'content': self.context.get('content'),
             'err_message': self.err_message,
             'answer': self.context.get('answer'),
+            'enableException': self.node.properties.get('enableException'),
         }

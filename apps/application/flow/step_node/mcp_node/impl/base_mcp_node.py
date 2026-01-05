@@ -73,4 +73,5 @@ class BaseMcpNode(IMcpNode):
             'mcp_tool': self.context.get('mcp_tool'),
             'tool_params': self.context.get('tool_params'),
             'result': self.context.get('result'),
+            'enableException': self.node.properties.get('enableException'),
         }

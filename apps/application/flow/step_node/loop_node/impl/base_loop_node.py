@@ -303,5 +303,6 @@ class BaseLoopNode(ILoopNode):
             'loop_context_data': self.get_loop_context_data(),
             'loop_node_data': self.context.get("loop_node_data"),
             'loop_answer_data': self.context.get("loop_answer_data"),
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

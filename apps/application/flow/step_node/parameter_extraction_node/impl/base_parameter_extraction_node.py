@@ -113,5 +113,6 @@ class BaseParameterExtractionNode(IParameterExtractionNode):
             'request': self.context.get('request'),
             'result': self.context.get('result'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }
