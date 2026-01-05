@@ -251,8 +251,8 @@ function openMoveToDialog(data: any) {
   MoveToDialogRef.value.open(obj, true)
 }
 
-const CUSTOM_STORAGE_KEY = `${user.userInfo?.id}-${props.source}-folder-custom-positions`
-const FOLDER_SORT_TYPE = `${user.userInfo?.id}-${props.source}-folder-sort-type`
+const CUSTOM_STORAGE_KEY = `${user.userInfo?.id}-${user.getWorkspaceId()}-${props.source}-folder-custom-positions`
+const FOLDER_SORT_TYPE = `${user.userInfo?.id}-${user.getWorkspaceId()}-${props.source}-folder-sort-type`
 
 const dataWithOrder = computed(() => {
   if (currentSort.value !== SORT_TYPES.CUSTOM || !props.data?.length) {
