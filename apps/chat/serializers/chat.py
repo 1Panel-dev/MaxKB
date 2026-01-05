@@ -396,7 +396,7 @@ class ChatSerializers(serializers.Serializer):
         work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
-                                              uuid.uuid7()) if chat_record is None else chat_record.id,
+                                              uuid.uuid7()) if chat_record is None else str(chat_record.id),
                                            'stream': stream,
                                            're_chat': re_chat,
                                            'chat_user_id': chat_user_id,
