@@ -200,6 +200,8 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
         instance._cleanup()
         if break_outer:
             break
+        if instance.is_the_task_interrupted():
+            break
     node.context['is_interrupt_exec'] = is_interrupt_exec
     node.context['loop_node_data'] = loop_node_data
     node.context['loop_answer_data'] = loop_answer_data

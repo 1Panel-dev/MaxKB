@@ -475,17 +475,29 @@ class WorkflowManage:
                 else:
                     list(result)
             if current_node.status == 500:
+                enableException = current_node.node.properties.get('enableException')
+                if not enableException:
+                    return None
                 current_node.context['exception_message'] = current_node.err_message
                 current_node.context['branch_id'] = 'exception'
                 r = NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
                                _is_interrupt=lambda node, step_variable, global_variable: False)
                 r.write_context(current_node, self)
                 return r
+            if self.is_the_task_interrupted():
+                current_node.status = 201
+                return None
             return current_result
         except Exception as e:
             # 添加节点
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
-            if not current_node.node.properties.get('enableException'):
+            enableException = current_node.node.properties.get('enableException')
+            current_node.get_write_error_context(e)
+            self.status = 500
+            if self.is_the_task_interrupted():
+                current_node.status = 201
+                return None
+            if not enableException:
                 chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
                                                                        self.params.get('chat_id'),
                                                                        current_node.id,
@@ -499,13 +511,12 @@ class WorkflowManage:
                                                                         'real_node_id': real_node_id,
                                                                         'node_status': 'ERROR'})
                 current_node.node_chunk.add_chunk(chunk)
-            current_node.get_write_error_context(e)
-            self.status = 500
-            current_node.context['exception_message'] = current_node.err_message
-            current_node.context['branch_id'] = 'exception'
-            return NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
-                              _is_interrupt=lambda node, step_variable, global_variable: False)
-
+                return None
+            else:
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                return NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                                  _is_interrupt=lambda node, step_variable, global_variable: False)
         finally:
             current_node.node_chunk.end()
             # 归还链接到连接池

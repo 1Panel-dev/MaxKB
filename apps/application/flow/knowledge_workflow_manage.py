@@ -14,7 +14,7 @@ from django.db.models import QuerySet
 from django.utils.translation import get_language
 
 from application.flow.common import Workflow
-from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer
+from application.flow.i_step_node import WorkFlowPostHandler, KnowledgeFlowParamsSerializer, NodeResult
 from application.flow.workflow_manage import WorkflowManage
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
@@ -90,7 +90,15 @@ class KnowledgeWorkflowManage(WorkflowManage):
                 # 阻塞获取结果
                 list(result)
             if current_node.status == 500:
-                return None
+                enableException = current_node.node.properties.get('enableException')
+                if not enableException:
+                    return None
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                r = NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                               _is_interrupt=lambda node, step_variable, global_variable: False)
+                r.write_context(current_node, self)
+                return r
             if self.is_the_task_interrupted():
                 current_node.status = 201
                 return None
@@ -100,6 +108,15 @@ class KnowledgeWorkflowManage(WorkflowManage):
             self.status = 500
             current_node.get_write_error_context(e)
             self.answer += str(e)
+            if self.is_the_task_interrupted():
+                current_node.status = 201
+                return None
+            enableException = current_node.node.properties.get('enableException')
+            if enableException:
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                return NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                                  _is_interrupt=lambda node, step_variable, global_variable: False)
             QuerySet(KnowledgeAction).filter(id=self.params.get('knowledge_action_id')).update(state=State.FAILURE)
         finally:
             current_node.node_chunk.end()

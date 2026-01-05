@@ -348,6 +348,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                         'auth_target_type': AuthTargetType.TOOL.value
                     }).auth_resource_batch([t.id for t in tool_model_list])
                 return True
+            update_resource_mapping_by_knowledge(knowledge_id)
 
         @staticmethod
         def to_knowledge_workflow(knowledge_workflow, update_tool_map):
@@ -429,7 +430,6 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             QuerySet(KnowledgeWorkflow).filter(
                 knowledge_id=self.data.get("knowledge_id")
             ).update(is_publish=True, publish_time=timezone.now())
-            update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
             return True
 
         def edit(self, instance: Dict):
@@ -446,6 +446,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                                                              defaults={
                                                                  'work_flow': instance.get('work_flow')
                                                              })
+                update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
                 return self.one()
             if instance.get("work_flow_template"):
                 template_instance = instance.get('work_flow_template')

@@ -496,9 +496,7 @@ application_instance_field_call_dict = {
               lambda instance: [instance.stt_model_id] if instance.stt_model_id else []]
 }
 knowledge_instance_field_call_dict = {
-    'MODEL': [lambda instance: [instance.model_id] if instance.model_id else [],
-              lambda instance: [instance.tts_model_id] if instance.tts_model_id else [],
-              lambda instance: [instance.stt_model_id] if instance.stt_model_id else []],
+    'MODEL': [lambda instance: [instance.embedding_model_id] if instance.embedding_model_id else []],
 }
 
 

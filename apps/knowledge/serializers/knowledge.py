@@ -365,7 +365,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     lambda application_id: all_application_list.__contains__(application_id),
                     [
                         str(
-                            application_knowledge_mapping.application_id
+                            application_knowledge_mapping.source_id
                         ) for application_knowledge_mapping in
                         QuerySet(ResourceMapping).filter(source_type='APPLICATION',
                                                          target_type='KNOWLEDGE',
@@ -381,7 +381,6 @@ class KnowledgeSerializer(serializers.Serializer):
             KnowledgeEditRequest(data=instance).is_valid(knowledge=knowledge)
             if 'embedding_model_id' in instance:
                 knowledge.embedding_model_id = instance.get('embedding_model_id')
-                update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
             if "name" in instance:
                 knowledge.name = instance.get("name")
             if 'desc' in instance:
@@ -394,37 +393,8 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge.file_size_limit = instance.get('file_size_limit')
             if 'file_count_limit' in instance:
                 knowledge.file_count_limit = instance.get('file_count_limit')
-            if 'application_id_list' in instance and instance.get('application_id_list') is not None:
-                application_id_list = instance.get('application_id_list')
-                # 当前用户可修改关联的知识库列表
-                application_knowledge_id_list = [
-                    str(knowledge_dict.get('id')) for knowledge_dict in self.list_application(with_valid=False)
-                ]
-                for knowledge_id in application_id_list:
-                    if not application_knowledge_id_list.__contains__(knowledge_id):
-                        raise AppApiException(
-                            500,
-                            _(
-                                'Unknown application id {knowledge_id}, cannot be associated'
-                            ).format(knowledge_id=knowledge_id)
-                        )
-
-                QuerySet(ResourceMapping).filter(
-                    source_id__in=application_knowledge_id_list,
-                    source_type='APPLICATION',
-                    target_type='KNOWLEDGE',
-                    target_id=self.data.get("knowledge_id")
-                ).delete()
-                # 插入
-                QuerySet(ResourceMapping).bulk_create([
-                    ResourceMapping(
-                        source_id=application_id,
-                        source_type='APPLICATION',
-                        target_type='KNOWLEDGE',
-                        target_id=self.data.get('knowledge_id')
-                    ) for application_id in application_id_list
-                ]) if len(application_id_list) > 0 else None
             knowledge.save()
+            update_resource_mapping_by_knowledge(str(knowledge.id))
             if select_one:
                 return self.one()
             return None
@@ -601,6 +571,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 'user_id': self.data.get('user_id'),
                 'auth_target_type': AuthTargetType.KNOWLEDGE.value
             }).auth_resource(str(knowledge_id))
+            update_resource_mapping_by_knowledge(str(knowledge_id))
             return {
                 **KnowledgeModelSerializer(knowledge).data,
                 'user_id': self.data.get('user_id'),
@@ -642,6 +613,7 @@ class KnowledgeSerializer(serializers.Serializer):
             }).auth_resource(str(knowledge_id))
 
             sync_web_knowledge.delay(str(knowledge_id), instance.get('source_url'), instance.get('selector'))
+            update_resource_mapping_by_knowledge(str(knowledge_id))
             return {**KnowledgeModelSerializer(knowledge).data, 'document_list': []}
 
     class SyncWeb(serializers.Serializer):
