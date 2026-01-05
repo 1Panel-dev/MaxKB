@@ -479,7 +479,18 @@ function refresh(id: string) {
 async function exportMarkdown(): Promise<void> {
   const suggestedName: string = `${currentChatId.value}.md`
   const markdownContent: string = currentRecordList.value
-    .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
+    .map((record: any) => {
+      let answerText = ''
+      if (Array.isArray(record.answer_text_list)) {
+        answerText = record.answer_text_list
+          .flat()
+          .map((item: any) => item?.content || '')
+          .join('\n\n')
+      } else {
+        answerText = record.answer_text || ''
+      }
+      return `# ${record.problem_text}\n\n${answerText}\n\n`
+    })
     .join('\n')
 
   const blob: Blob = new Blob([markdownContent], { type: 'text/markdown;charset=utf-8' })
@@ -489,7 +500,18 @@ async function exportMarkdown(): Promise<void> {
 async function exportHTML(): Promise<void> {
   const suggestedName: string = `${currentChatId.value}.html`
   const markdownContent: string = currentRecordList.value
-    .map((record: any) => `# ${record.problem_text}\n\n${record.answer_text}\n\n`)
+    .map((record: any) => {
+      let answerText = ''
+      if (Array.isArray(record.answer_text_list)) {
+        answerText = record.answer_text_list
+          .flat()
+          .map((item: any) => item?.content || '')
+          .join('\n\n')
+      } else {
+        answerText = record.answer_text || ''
+      }
+      return `# ${record.problem_text}\n\n${answerText}\n\n`
+    })
     .join('\n')
   const htmlContent: any = marked(markdownContent)
 

@@ -1,9 +1,6 @@
 <template>
   <!-- 问题内容 -->
-  <div
-    @mouseenter.stop="showIcon = true"
-    @mouseleave.stop="showIcon = false"
-  >
+  <div @mouseenter.stop="showIcon = true" @mouseleave.stop="showIcon = false">
     <div class="question-content item-content lighter">
       <div v-if="!isReQuestion" class="content p-12-16 border-r-8" :class="getClassName">
         <div class="text break-all pre-wrap">
@@ -253,7 +250,7 @@ function sendReQuestionMessage(event?: any) {
             ? props.chatRecord.record_id
             : props.chatRecord.id,
         },
-        { ...props.chatRecord, problem_text: editText.value },
+        props.chatRecord,
       )
     }
   } else {
