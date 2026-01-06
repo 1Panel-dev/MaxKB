@@ -436,8 +436,9 @@ async def anext_async(agen):
 
 target_source_node_mapping = {
     'TOOL': {'tool-lib-node': lambda n: [n.get('properties').get('node_data').get('tool_lib_id')],
-             'ai-chat-node': lambda n: [*([n.get('properties').get('node_data').get('mcp_tool_ids')] or []),
-                                        *([n.get('properties').get('node_data').get('tool_ids')] or [])]},
+             'ai-chat-node': lambda n: [*(n.get('properties').get('node_data').get('mcp_tool_ids') or []),
+                                        *(n.get('properties').get('node_data').get('tool_ids') or [])]
+             },
     'MODEL': {'ai-chat-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               'question-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               'speech-to-text-node': lambda n: [n.get('properties').get('node_data').get('stt_model_id')],
