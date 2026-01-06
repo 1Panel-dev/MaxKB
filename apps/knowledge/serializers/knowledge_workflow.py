@@ -370,6 +370,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                         input_field_list=tool.get('input_field_list'),
                         init_field_list=tool.get('init_field_list'),
                         is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
+                        tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                         scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
                         folder_id='default' if workspace_id == 'None' else workspace_id,
                         workspace_id=workspace_id)

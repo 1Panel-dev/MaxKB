@@ -31,7 +31,7 @@ from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
 from application.models.application import Application, ApplicationTypeChoices, \
-    ApplicationFolder, ApplicationVersion
+    ApplicationFolder, ApplicationVersion, ApplicationKnowledgeMapping
 from application.models.application_access_token import ApplicationAccessToken
 from application.serializers.common import update_resource_mapping_by_application
 from common import result
@@ -641,6 +641,7 @@ class ApplicationSerializer(serializers.Serializer):
                     input_field_list=tool.get('input_field_list'),
                     init_field_list=tool.get('init_field_list'),
                     is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
+                    tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                     scope=ToolScope.WORKSPACE,
                     folder_id=workspace_id,
                     workspace_id=workspace_id)
@@ -790,6 +791,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         QuerySet(ResourceMapping).filter(
             Q(target_id=application_id) | Q(source_id=application_id)
         ).delete()
+        QuerySet(ApplicationKnowledgeMapping).filter(application_id=application_id).delete()
         QuerySet(Application).filter(id=application_id).delete()
         return True
 
