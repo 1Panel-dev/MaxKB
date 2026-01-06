@@ -210,6 +210,17 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
     node.context['run_time'] = time.time() - node.context.get("start_time")
 
 
+def get_tokens(loop_node_data):
+    message_tokens = 0
+    answer_tokens = 0
+    for details in loop_node_data:
+        message_tokens += sum([row.get('message_tokens') for row in details.values() if
+                               'message_tokens' in row and row.get('message_tokens') is not None])
+        answer_tokens += sum([row.get('answer_tokens') for row in details.values() if
+                              'answer_tokens' in row and row.get('answer_tokens') is not None])
+    return {'message_tokens': message_tokens, 'answer_tokens': answer_tokens}
+
+
 def get_write_context(loop_type, array, number, loop_body):
     def inner_write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
         if loop_type == 'ARRAY':
@@ -286,7 +297,7 @@ class BaseLoopNode(ILoopNode):
                 self.context.get(f.get('value')) is not None}
 
     def get_details(self, index: int, **kwargs):
-
+        tokens = get_tokens(self.context.get("loop_node_data"))
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -305,4 +316,6 @@ class BaseLoopNode(ILoopNode):
             'loop_answer_data': self.context.get("loop_answer_data"),
             'err_message': self.err_message,
             'enableException': self.node.properties.get('enableException'),
+            'message_tokens': tokens.get('message_tokens') or 0,
+            'answer_tokens': tokens.get('answer_tokens') or 0,
         }
