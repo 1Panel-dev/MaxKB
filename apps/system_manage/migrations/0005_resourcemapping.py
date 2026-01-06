@@ -16,6 +16,8 @@ def get_initialization_resource_mapping():
     from application.models import Application
     from knowledge.models import KnowledgeWorkflow
     from application.flow.tools import application_instance_field_call_dict, knowledge_instance_field_call_dict
+    from application.models.application import ApplicationKnowledgeMapping
+    from system_manage.models.resource_mapping import ResourceMapping
     resource_mapping_list = []
     ids = list(Application.objects.values_list('id', flat=True))
     for app_id in ids:
@@ -47,8 +49,13 @@ def get_initialization_resource_mapping():
             resource_mapping_list += instance_mapping
         except:
             pass
-
-    return resource_mapping_list
+    application_knowledge_mapping = [
+        ResourceMapping(source_type=ResourceType.APPLICATION, target_type=ResourceType.KNOWLEDGE,
+                        source_id=str(akm.application_id), target_id=str(akm.knowledge_id)) for akm in
+        QuerySet(ApplicationKnowledgeMapping).all()]
+    resource_mapping_list += application_knowledge_mapping
+    return {(str(item.target_type) + str(item.target_id) + str(item.source_type) + str(item.source_id)): item for item
+            in resource_mapping_list}.values()
 
 
 def resource_mapping(apps, schema_editor):
