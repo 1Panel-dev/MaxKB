@@ -10,6 +10,7 @@ const workspace = {
         [EditionConst.IS_EE],'OR'),
       'OR',
     ),
+  jump_read: () => false,
   create: () =>
     hasPermission(
       [

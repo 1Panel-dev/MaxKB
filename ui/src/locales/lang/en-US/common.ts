@@ -48,6 +48,7 @@ export default {
   reason: 'Reason',
   removeSuccess: 'Successful',
   publish: 'Publish',
+  noTargetPermission: 'No target resource permission',
   searchBar: {
     placeholder: 'Search by name',
   },

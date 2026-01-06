@@ -4,6 +4,7 @@ import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
 
 const share = {
   is_share: () => false,
+  jump_read: () => false,
   create: () =>
     hasPermission(
       [

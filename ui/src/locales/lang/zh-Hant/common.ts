@@ -48,6 +48,7 @@ export default {
   reason: '理由',
   removeSuccess: '移除成功',
   publish: '發佈',
+  noTargetPermission: '無目標資源權限',
   searchBar: {
     placeholder: '按名稱搜尋',
   },

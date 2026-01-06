@@ -11,6 +11,7 @@ const systemManage = {
       ],
       'OR',
     ),
+  jump_read: () => false,
   is_share: () =>
     hasPermission(
       new ComplexPermission(

@@ -49,6 +49,7 @@ export default {
   reason: '理由',
   removeSuccess: '移除成功',
   publish: '发布',
+  noTargetPermission: '无目标资源权限',
   searchBar: {
     placeholder: '按名称搜索',
   },

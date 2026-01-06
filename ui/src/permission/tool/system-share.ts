@@ -11,6 +11,7 @@ const share = {
       ],
       'OR',
     ),
+  jump_read: () => false,  
   is_share: () => false,
   create: () =>
     hasPermission(

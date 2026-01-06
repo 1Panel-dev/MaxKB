@@ -216,6 +216,28 @@ const workspace = {
             'OR'
     ),
     overview_read: () => false,
+    jump_read: (source_id: string) => {
+      hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
+          source_id,
+          ),
+        PermissionConst.APPLICATION_READ.getApplicationWorkspaceResourcePermission(
+          source_id,
+        ),
+      ],
+      'OR',
+    )
+    },
     access_read: () => false,
     chat_user_read: () => false,
     chat_log_read: () => false

@@ -12,6 +12,8 @@ const share = {
   delete: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DELETE], 'OR'),
 
   doc_read: () => false,
+  jump_read: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
   doc_create: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE], 'OR'),
   doc_vector: () =>

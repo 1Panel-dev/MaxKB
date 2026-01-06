@@ -53,8 +53,14 @@ const systemManage = {
   doc_read: () => 
     hasPermission([
       RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ,
+      PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ,
+    ], 'OR'),
+  jump_read: () => 
+    hasPermission([
+      RoleConst.ADMIN,
       PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ
-    ],'OR'),  
+    ],'OR'),
   doc_create: () => hasPermission(
     [
       RoleConst.ADMIN,

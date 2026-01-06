@@ -13,6 +13,7 @@ const systemManage = {
       'OR',
     ),
   create: () => false,
+  jump_read: () => false,
   modify: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_EDIT], 'OR'),
   paramSetting: () =>

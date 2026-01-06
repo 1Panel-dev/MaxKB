@@ -14,6 +14,7 @@ const workspaceShare = {
   relate_map: () => false,
   
   doc_read: () => false,
+  jump_read: () => false,
   doc_create: () => false,
   doc_vector: () => false,
   doc_generate: () => false,

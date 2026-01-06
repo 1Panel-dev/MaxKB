@@ -226,6 +226,27 @@ const workspace = {
       'OR',
     ),
   doc_read: () => false,
+  jump_read: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   doc_create: (source_id: string) =>
     hasPermission(
       [
