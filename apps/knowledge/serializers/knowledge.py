@@ -416,7 +416,7 @@ class KnowledgeSerializer(serializers.Serializer):
             ).delete()
             QuerySet(ApplicationKnowledgeMapping).filter(knowledge_id=knowledge.id).delete()
             QuerySet(ResourceMapping).filter(
-                Q(target_id=knowledge) | Q(source_id=knowledge)
+                Q(target_id=self.data.get('knowledge_id')) | Q(source_id=self.data.get('knowledge_id'))
             ).delete()
             delete_embedding_by_knowledge(self.data.get('knowledge_id'))
             return True
