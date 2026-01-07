@@ -425,6 +425,8 @@ const {
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
   } else {
     return 'workspace'
   }
@@ -651,11 +653,14 @@ function getMcpToolSelectOptions() {
 
 const applicationSelectOptions = ref<any[]>([])
 function getApplicationSelectOptions() {
-  loadSharedApi({ type: 'application', systemType: apiType.value })
-    .getAllApplication({ folder_id: resource.value?.workspace_id })
-    .then((res: any) => {
-      applicationSelectOptions.value = res.data.filter((item: any) => item.is_publish)
-    })
+  ;(apiType.value === 'systemShare'
+    ? Promise.resolve({ data: [] })
+    : loadSharedApi({ type: 'application', systemType: apiType.value }).getAllApplication({
+        folder_id: resource.value?.workspace_id,
+      })
+  ).then((res: any) => {
+    applicationSelectOptions.value = res.data.filter((item: any) => item.is_publish)
+  })
 }
 
 const applicationDialogRef = ref()

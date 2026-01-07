@@ -98,9 +98,7 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('workflow.nodes.imageToVideoGenerate.negative_prompt.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.imageToVideoGenerate.negative_prompt.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
@@ -114,9 +112,7 @@
             @wheel="wheel"
             :title="$t('workflow.nodes.imageToVideoGenerate.negative_prompt.label')"
             v-model="form_data.negative_prompt"
-            :placeholder="
-              $t('workflow.nodes.imageToVideoGenerate.negative_prompt.placeholder')
-            "
+            :placeholder="$t('workflow.nodes.imageToVideoGenerate.negative_prompt.placeholder')"
             style="height: 150px"
             @submitDialog="submitNegativeDialog"
           />
@@ -138,9 +134,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('workflow.nodes.imageToVideoGenerate.first_frame.requiredMessage')
-            "
+            :placeholder="$t('workflow.nodes.imageToVideoGenerate.first_frame.requiredMessage')"
             v-model="form_data.first_frame_url"
           />
         </el-form-item>
@@ -160,9 +154,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('workflow.nodes.imageToVideoGenerate.last_frame.requiredMessage')
-            "
+            :placeholder="$t('workflow.nodes.imageToVideoGenerate.last_frame.requiredMessage')"
             clearable
             v-model="form_data.last_frame_url"
           />
@@ -215,6 +207,8 @@ const {
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
   } else {
     return 'workspace'
   }

@@ -98,9 +98,7 @@
           <template #label>
             <div class="flex align-center">
               <div class="mr-4">
-                <span>{{
-                  $t('workflow.nodes.imageGenerateNode.negative_prompt.label')
-                }}</span>
+                <span>{{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}</span>
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content
@@ -166,6 +164,8 @@ const {
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
   } else {
     return 'workspace'
   }
