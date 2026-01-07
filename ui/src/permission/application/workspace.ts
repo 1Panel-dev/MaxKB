@@ -216,7 +216,7 @@ const workspace = {
             'OR'
     ),
     overview_read: () => false,
-    jump_read: (source_id: string) => {
+    jump_read: (source_id: string) => 
       hasPermission(
       [
         new ComplexPermission(
@@ -237,7 +237,7 @@ const workspace = {
       ],
       'OR',
     )
-    },
+    ,
     access_read: () => false,
     chat_user_read: () => false,
     chat_log_read: () => false

@@ -352,7 +352,7 @@ async function getWorkspaceList() {
 const hasResourceWorkspacePermission = (row: any) => {
   return permissionMap[row.source_type.toLowerCase() as 'application' | 'knowledge'][
     'workspace'
-  ].jump_read(row.id)
+  ].jump_read(row.source_id)
 }
 
 const hasResourceSystemManagePermission = (row: any) => {
