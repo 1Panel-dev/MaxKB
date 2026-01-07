@@ -285,7 +285,7 @@ def update_resource_mapping_by_knowledge(knowledge_id: str):
                                              knowledge_instance_field_call_dict)
     if knowledge.type == KnowledgeType.WORKFLOW:
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(
-            id=knowledge_id).order_by(
+            knowledge_id=knowledge_id).order_by(
             '-create_time')[0:1].first()
         if knowledge_workflow:
             save_workflow_mapping(knowledge_workflow.work_flow, ResourceType.KNOWLEDGE,
