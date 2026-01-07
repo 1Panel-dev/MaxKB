@@ -546,4 +546,8 @@ def get_tool_id_list(workflow):
             tool_ids = node_data.get('tool_ids') or []
             for _id in mcp_tool_ids + tool_ids:
                 _result.append(_id)
+        elif node.get('type') == 'mcp-node':
+            mcp_tool_id = node.get('properties', {}).get('node_data', {}).get('mcp_tool_id')
+            if mcp_tool_id:
+                _result.append(mcp_tool_id)
     return _result

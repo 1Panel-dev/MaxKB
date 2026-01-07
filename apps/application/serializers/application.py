@@ -81,6 +81,10 @@ def hand_node(node, update_tool_map):
         tool_ids = node_data.get('tool_ids') or []
         node_data['tool_ids'] = [update_tool_map.get(tool_id,
                                                      tool_id) for tool_id in tool_ids]
+    if node.get('type') == 'mcp-node':
+        mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
+        node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
+                                                                                             mcp_tool_id)
 
 
 class MKInstance:
