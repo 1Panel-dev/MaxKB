@@ -169,8 +169,12 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
              key, node in search_dataset_node_list])
         improve_paragraph_list = row.get('improve_paragraph_list') or []
         vote_status_map = {'-1': '未投票', '0': '赞同', '1': '反对'}
+        vote_reason_map = {'accurate': gettext('accurate'),'complete': gettext('complete'),
+                       'inaccurate': gettext('inaccurate'),'incomplete': gettext('incomplete'),'other': gettext('Other'),}
         return [str(row.get('chat_id')), row.get('abstract'), row.get('problem_text'), padding_problem_text,
-                row.get('answer_text'), vote_status_map.get(row.get('vote_status')), reference_paragraph_len,
+                row.get('answer_text'), vote_status_map.get(row.get('vote_status')),vote_reason_map.get(row.get('vote_reason')),
+                row.get('vote_other_content'),
+                reference_paragraph_len,
                 reference_paragraph,
                 "\n".join([
                     f"{improve_paragraph_list[index].get('title')}\n{improve_paragraph_list[index].get('content')}"
@@ -202,7 +206,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
             page_size = 500
             headers = [gettext('Conversation ID'), gettext('summary'), gettext('User Questions'),
                        gettext('Problem after optimization'),
-                       gettext('answer'), gettext('User feedback'),
+                       gettext('answer'), gettext('User feedback'),gettext('Feedback reason'),gettext('Other reason content'),
                        gettext('Reference segment number'),
                        gettext('Section title + content'),
                        gettext('Annotation'), gettext('USER'), gettext('Consuming tokens'),

@@ -9028,3 +9028,21 @@ msgstr "角色设置不能为空"
 
 msgid "View related resources"
 msgstr "查看关联资源"
+
+msgid "Feedback reason"
+msgstr "反馈理由"
+
+msgid "Other reason content"
+msgstr "其他反馈理由内容"
+
+msgid "accurate"
+msgstr "内容准确"
+
+msgid "complete"
+msgstr "内容完善"
+
+msgid "inaccurate"
+msgstr "内容不准确"
+
+msgid "incomplete"
+msgstr "内容不完善"

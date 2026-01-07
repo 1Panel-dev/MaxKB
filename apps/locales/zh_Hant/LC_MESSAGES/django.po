@@ -9028,3 +9028,22 @@ msgstr "角色設置不能為空"
 
 msgid "View related resources"
 msgstr "查看關聯資源"
+
+msgid "Feedback reason"
+msgstr "反饋理由"
+
+msgid "Other reason content"
+msgstr "其他反饋理由內容"
+
+msgid "accurate"
+msgstr "內容準確"
+
+msgid "complete"
+msgstr "內容完善"
+
+msgid "inaccurate"
+msgstr "內容不準確"
+
+msgid "incomplete"
+msgstr "內容不完善"
+

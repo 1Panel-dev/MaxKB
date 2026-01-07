@@ -8908,3 +8908,21 @@ msgstr ""
 
 msgid "View related resources"
 msgstr ""
+
+msgid "Feedback reason"
+msgstr ""
+
+msgid "Other reason content"
+msgstr ""
+
+msgid "accurate"
+msgstr "accurate"
+
+msgid "complete"
+msgstr "complete"
+
+msgid "inaccurate"
+msgstr "inaccurate"
+
+msgid "incomplete"
+msgstr "incomplete"
