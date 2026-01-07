@@ -419,7 +419,7 @@ function toSetting(row: any) {
       window.open(newUrl)
     } else {
       const newUrl = router.resolve({
-        path: `/application/${from}/${row.source_id}/SIMPLE/setting`,
+        path: `/application/${from === 'shared' ? 'resource-management' : from}/${row.source_id}/SIMPLE/setting`,
       }).href
       window.open(newUrl)
     }
