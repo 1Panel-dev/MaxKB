@@ -34,7 +34,7 @@ class ResourceMappingSerializer(serializers.Serializer):
 
     def get_query_set(self):
         queryset = QuerySet(model=get_dynamics_model({
-            'name': models.CharField(),
+            'sdc.name': models.CharField(),
             'target_id': models.CharField(),
             "target_type": models.CharField(),
             "u.username": models.CharField(),
@@ -46,7 +46,7 @@ class ResourceMappingSerializer(serializers.Serializer):
                                    target_type=self.data.get('resource'))
 
         if self.data.get('resource_name'):
-            queryset = queryset.filter(name__icontains=self.data.get('resource_name'))
+            queryset = queryset.filter(**{'sdc.name__icontains': self.data.get('resource_name')})
         if self.data.get('user_name'):
             queryset = queryset.filter(**{'u.username__icontains': self.data.get('user_name')})
         if self.data.get("source_type"):
