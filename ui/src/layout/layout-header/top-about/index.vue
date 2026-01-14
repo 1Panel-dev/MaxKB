@@ -1,11 +1,22 @@
 <template>
   <div class="flex align-center">
-    <el-button round @click="toUrl('https://maxkb.cn/pricing.html')" class="pricing-button mr-8"
+    <el-button
+      round
+      @click="toUrl('https://maxkb.cn/pricing.html')"
+      class="pricing-button mr-8"
       v-hasPermission="EditionConst.IS_CE"
     >
       <AppIcon iconName="app-pricing" class="mr-8"></AppIcon>
       {{ $t('common.upgrade') }}
     </el-button>
+    <el-tooltip effect="dark" :content="$t('layout.trigger', '触发器')" placement="top" v-if="true">
+      <AppIcon
+        iconName="app-trigger"
+        class="cursor color-secondary mr-8 ml-8"
+        style="font-size: 20px"
+        @click=""
+      ></AppIcon>
+    </el-tooltip>
     <el-tooltip
       effect="dark"
       :content="$t('layout.github')"
@@ -49,7 +60,7 @@
 </template>
 <script setup lang="ts">
 import useStore from '@/stores'
-import { EditionConst, RoleConst } from '@/utils/permission/data';
+import { EditionConst, RoleConst } from '@/utils/permission/data'
 const { theme, user } = useStore()
 
 function toUrl(url: string) {

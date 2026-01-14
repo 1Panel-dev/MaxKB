@@ -41,6 +41,7 @@ urlpatterns = [
     path(admin_api_prefix, include("knowledge.urls")),
     path(admin_api_prefix, include("system_manage.urls")),
     path(admin_api_prefix, include("application.urls")),
+    path(admin_api_prefix, include("trigger.urls")),
     path(admin_api_prefix, include("oss.urls")),
     path(chat_api_prefix, include("oss.urls")),
     path(chat_api_prefix, include("chat.urls")),
