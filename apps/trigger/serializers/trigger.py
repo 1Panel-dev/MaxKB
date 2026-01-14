@@ -37,7 +37,7 @@ from application.serializers.common import update_resource_mapping_by_applicatio
 from common import result
 from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import native_search, native_page_search
+from common.db.search import native_search, native_page_search, page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.utils.common import get_file_content, restricted_loads, generate_uuid, _remove_empty_lines, \
@@ -59,9 +59,9 @@ from users.models import User
 from users.serializers.user import is_workspace_manage
 
 
-
 class TriggerTaskCreateRequest(serializers.Serializer):
     pass
+
 
 class TriggerCreateRequest(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('trigger name'))
@@ -73,11 +73,11 @@ class TriggerCreateRequest(serializers.Serializer):
     trigger_task = serializers
 
 
-
 class TriggerResponse(serializers.ModelSerializer):
     class Meta:
         model = Trigger
         fields = "__all__"
+
 
 class TriggerSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -102,24 +102,43 @@ class TriggerSerializer(serializers.Serializer):
         )
         trigger_model.save()
 
-
-
         return TriggerResponse(trigger_model).data
 
+
 class TriggerOperateSerializer(serializers.Serializer):
-        trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
-        user_id = serializers.UUIDField(required=True, label=_("User ID"))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
-        def is_valid(self, *, raise_exception=False):
-            super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Trigger).filter(id=self.data.get('trigger_id'))
-            if workspace_id:
-                query_set = query_set.filter(workspace_id=workspace_id)
-            if not query_set.exists():
-                raise AppApiException(500, _('Trigger id does not exist'))
-
-
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Trigger).filter(id=self.data.get('trigger_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Trigger id does not exist'))
 
 
+class TriggerQuerySerializer(serializers.Serializer):
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Trigger name'))
+    type = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger type'))
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+    def get_query_set(self):
+        query_set = QuerySet(Trigger).filter(workspace_id=self.data.get("workspace_id"))
+        if self.data.get("name"):
+            query_set = query_set.filter(name__contains=self.data.get('name'))
+        if self.data.get('type'):
+            query_set = query_set.filter(trigger_type=self.data.get('type'))
+        return query_set
+
+    def page(self, current_page: int, page_size: int, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        return page_search(current_page, page_size, self.get_query_set(), lambda row: TriggerResponse(data=row).data)
+
+    def list(self, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        return [TriggerResponse(data=row).data for row in self.get_query_set()]
