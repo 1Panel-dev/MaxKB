@@ -15,6 +15,12 @@ from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
 from trigger.serializers.trigger import TriggerSerializer, TriggerQuerySerializer
+from common.auth.authentication import has_permissions, get_is_permissions
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.log.log import log
+from tools.api.tool import GetInternalToolAPI
+from trigger.api.trigger import TriggerCreateAPI
+from trigger.serializers.trigger import TriggerSerializer
 
 
 class TriggerView(APIView):
@@ -25,9 +31,9 @@ class TriggerView(APIView):
         description=_('Create trigger'),
         summary=_('Create trigger'),
         operation_id=_('Create trigger'),  # type: ignore
-        parameters=ApplicationCreateAPI.get_parameters(),
-        request=ApplicationCreateAPI.get_request(),
-        responses=ApplicationCreateAPI.get_response(),
+        parameters=TriggerCreateAPI.get_parameters(),
+        request=TriggerCreateAPI.get_request(),
+        responses=TriggerCreateAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     def post(self, request: Request, workspace_id: str):

@@ -6,71 +6,32 @@
     @date：2026/1/14 11:48
     @desc:
 """
-import asyncio
-import hashlib
-import json
-import os
-import pickle
-import re
-import tempfile
-import zipfile
-from functools import reduce
-from typing import Dict, List
 
-import requests
 import uuid_utils.compat as uuid
-from django.core import validators
 from django.db import models, transaction
-from django.db.models import QuerySet, Q
-from django.http import HttpResponse
-from django.utils import timezone
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from rest_framework import serializers, status
-from rest_framework.utils.formatting import lazy_format
+from rest_framework import serializers
 
-from application.flow.common import Workflow
-from application.models.application import Application, ApplicationTypeChoices, \
-    ApplicationFolder, ApplicationVersion, ApplicationKnowledgeMapping
-from application.models.application_access_token import ApplicationAccessToken
-from application.serializers.common import update_resource_mapping_by_application
-from common import result
-from common.cache_data.application_access_token_cache import del_application_access_token
-from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import native_search, native_page_search, page_search
+from common.db.search import page_search
 from common.exception.app_exception import AppApiException
-from common.field.common import UploadedFileField
-from common.utils.common import get_file_content, restricted_loads, generate_uuid, _remove_empty_lines, \
-    bytes_to_uploaded_file
-from common.utils.logger import maxkb_logger
-from knowledge.models import Knowledge, KnowledgeScope
-from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
-from maxkb.conf import PROJECT_DIR
-from models_provider.models import Model
-from models_provider.tools import get_model_instance_by_model_workspace_id
-from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
-from system_manage.models.resource_mapping import ResourceMapping
-from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
-from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolScope
-from tools.serializers.tool import ToolExportModelSerializer
-from trigger.models import TriggerTypeChoices, Trigger
-from users.models import User
-from users.serializers.user import is_workspace_manage
+from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
 
 
 class TriggerTaskCreateRequest(serializers.Serializer):
-    pass
+    source_type = serializers.ChoiceField(required=True, choices=TriggerTaskTypeChoices)
+    source_id = serializers.CharField(required=True, label=_('source_id'))
+    is_active = serializers.BooleanField(required=False, label=_('Is active'))
 
 
 class TriggerCreateRequest(serializers.Serializer):
     name = serializers.CharField(required=True, label=_('trigger name'))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('trigger description'))
-    trigger_type = serializers.ChoiceField(choices=TriggerTypeChoices)
+    trigger_type = serializers.ChoiceField(required=True, choices=TriggerTypeChoices)
     trigger_setting = serializers.DictField(required=True, label=_("trigger setting"))
-    meta = models.JSONField(required=False, allow_null=True, allow_blank=True, default=dict)
+    meta = models.JSONField(default=dict)
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
-    trigger_task = serializers
+    trigger_task = TriggerTaskCreateRequest(many=True)
 
 
 class TriggerResponse(serializers.ModelSerializer):
@@ -89,8 +50,10 @@ class TriggerSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             TriggerCreateRequest(data=instance).is_valid(raise_exception=True)
 
+        trigger_id = uuid.uuid7()
+
         trigger_model = Trigger(
-            id=uuid.uuid7(),
+            id=trigger_id,
             name=instance.get('name'),
             workspace_id=self.data.get('workspace_id'),
             desc=instance.get('desc'),
@@ -102,7 +65,29 @@ class TriggerSerializer(serializers.Serializer):
         )
         trigger_model.save()
 
+        trigger_tasks = instance.get('trigger_task')
+        if trigger_tasks:
+            trigger_task_models = [
+                self.to_trigger_task_model(trigger_id, task.get('source_type'), task.get('source_id')) for task in
+                trigger_tasks
+            ]
+            TriggerTask.objects.bulk_create(trigger_task_models)
+        else:
+            raise AppApiException(500, _('Trigger task can not be empty'))
+
+
         return TriggerResponse(trigger_model).data
+
+    @staticmethod
+    def to_trigger_task_model(trigger_id: str, source_type: str, source_id: str):
+        return TriggerTask(
+            id=uuid.uuid7(),
+            trigger_id=trigger_id,
+            source_type=source_type,
+            source_id=source_id,
+            is_active=False
+        )
+
 
 
 class TriggerOperateSerializer(serializers.Serializer):
@@ -136,9 +121,9 @@ class TriggerQuerySerializer(serializers.Serializer):
     def page(self, current_page: int, page_size: int, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        return page_search(current_page, page_size, self.get_query_set(), lambda row: TriggerResponse(data=row).data)
+        return page_search(current_page, page_size, self.get_query_set(), lambda row: TriggerResponse(row).data)
 
     def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        return [TriggerResponse(data=row).data for row in self.get_query_set()]
+        return [TriggerResponse(row).data for row in self.get_query_set()]

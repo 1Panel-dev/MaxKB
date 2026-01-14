@@ -47,6 +47,8 @@ class TriggerTask(AppModelMixin):
     )
     source_id = models.UUIDField(verbose_name="资源id", blank=True, null=True)
     is_active = models.BooleanField(default=True, db_index=True)
+    parameter = models.JSONField(default=list)
+    meta = models.JSONField(default=dict)
 
     class Meta:
         db_table = "event_trigger_task"
