@@ -6,6 +6,7 @@
     @date：2026/1/14 11:48
     @desc:
 """
+from typing import Dict
 
 import uuid_utils.compat as uuid
 from django.db import models, transaction
@@ -24,6 +25,12 @@ class TriggerTaskCreateRequest(serializers.Serializer):
     source_type = serializers.ChoiceField(required=True, choices=TriggerTaskTypeChoices)
     source_id = serializers.CharField(required=True, label=_('source_id'))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
+    meta = models.JSONField(default=dict)
+    parameter = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+        default=list
+    )
 
 
 class TriggerCreateRequest(serializers.Serializer):
@@ -158,20 +165,24 @@ class TriggerCreateRequest(serializers.Serializer):
                 'trigger_setting': 'body must be an array'
             })
 
+
 class TriggerModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trigger
         fields = "__all__"
+
 
 class TriggerTaskModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = TriggerTask
         fields = "__all__"
 
+
 class ApplicationTriggerTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Application
         fields = ['id', 'name', 'work_flow', 'icon', 'type']
+
 
 class ToolTriggerTaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -213,7 +224,7 @@ class TriggerSerializer(serializers.Serializer):
         trigger_tasks = instance.get('trigger_task')
         if trigger_tasks:
             trigger_task_models = [
-                self.to_trigger_task_model(trigger_id, task.get('source_type'), task.get('source_id')) for task in
+                self.to_trigger_task_model(trigger_id, task) for task in
                 trigger_tasks
             ]
             TriggerTask.objects.bulk_create(trigger_task_models)
@@ -223,13 +234,15 @@ class TriggerSerializer(serializers.Serializer):
         return TriggerResponse(trigger_model).data
 
     @staticmethod
-    def to_trigger_task_model(trigger_id: str, source_type: str, source_id: str):
+    def to_trigger_task_model(trigger_id: str, task_data: dict):
         return TriggerTask(
             id=uuid.uuid7(),
             trigger_id=trigger_id,
-            source_type=source_type,
-            source_id=source_id,
-            is_active=False
+            source_type=task_data.get('source_type'),
+            source_id=task_data.get('source_id'),
+            is_active=task_data.get('is_active', False),
+            parameter=task_data.get('parameter', []),
+            meta=task_data.get('meta', {})
         )
 
 
@@ -247,8 +260,39 @@ class TriggerOperateSerializer(serializers.Serializer):
         if not query_set.exists():
             raise AppApiException(500, _('Trigger id does not exist'))
 
-    def edit(self):
-        pass
+    @transaction.atomic
+    def edit(self, instance: Dict, with_valid=True):
+        if with_valid:
+            self.is_valid()
+            TriggerCreateRequest(data=instance).is_valid(raise_exception=True)
+        trigger_id = self.data.get('trigger_id')
+        trigger = Trigger.objects.filter(id=trigger_id).first()
+        if not trigger:
+            raise serializers.ValidationError(_('Trigger not found'))
+
+        trigger_edit_field_list = ['name', 'desc', 'trigger_type', 'trigger_setting', 'meta', 'is_active']
+
+        for field in trigger_edit_field_list:
+            if field in instance:
+                trigger.__setattr__(field, instance.get(field))
+        trigger.save()
+        # 处理trigger task
+        TriggerTask.objects.filter(trigger_id=trigger_id).delete()
+        trigger_tasks = instance.get('trigger_task')
+        if trigger_tasks:
+            trigger_task_model_list = [TriggerTask(
+                id=uuid.uuid7(),
+                trigger_id=trigger_id,
+                source_type=task_data.get('source_type'),
+                source_id=task_data.get('source_id'),
+                is_active=task_data.get('is_active', False),
+                parameter=task_data.get('parameter', []),
+                meta=task_data.get('meta', {})
+            ) for task_data in trigger_tasks]
+            TriggerTask.objects.bulk_create(trigger_task_model_list)
+        else:
+            raise AppApiException(500, _('Trigger task can not be empty'))
+        return self.one(with_valid=False)
 
     def one(self, with_valid=True):
         if with_valid:
@@ -257,20 +301,21 @@ class TriggerOperateSerializer(serializers.Serializer):
         trigger = QuerySet(Trigger).filter(id=trigger_id).first()
 
         trigger_tasks = QuerySet(TriggerTask).filter(trigger_id=trigger_id)
-        application_ids = [str(task.source_id) for task in trigger_tasks if task.source_type == TriggerTaskTypeChoices.APPLICATION]
+        application_ids = [str(task.source_id) for task in trigger_tasks if
+                           task.source_type == TriggerTaskTypeChoices.APPLICATION]
         tool_ids = [str(task.source_id) for task in trigger_tasks if task.source_type == TriggerTaskTypeChoices.TOOL]
 
-
         application_task_list = [ApplicationTriggerTaskSerializer(application).data for application in
-                            QuerySet(Application).filter(id__in=application_ids)]
+                                 QuerySet(Application).filter(id__in=application_ids)]
 
         tool_task_list = [ToolTriggerTaskSerializer(tool).data for tool in QuerySet(Tool).filter(id__in=tool_ids)]
 
         return {
             **TriggerModelSerializer(trigger).data,
-            'application_task_list':application_task_list,
-            'tool_task_list':tool_task_list,
+            'application_task_list': application_task_list,
+            'tool_task_list': tool_task_list,
         }
+
 
 class TriggerQuerySerializer(serializers.Serializer):
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Trigger name'))

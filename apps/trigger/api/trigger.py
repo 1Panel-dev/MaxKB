@@ -8,6 +8,7 @@
 """
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from trigger.serializers.trigger import TriggerCreateRequest, TriggerResponse
@@ -62,3 +63,10 @@ class TriggerOperateAPI(APIMixin):
     @staticmethod
     def get_response():
         return TriggerResponse
+class RequestSE(serializers.Serializer):
+        pass
+
+class TriggerEditAPI(APIMixin):
+    @staticmethod
+    def get_request():
+        return TriggerCreateRequest
