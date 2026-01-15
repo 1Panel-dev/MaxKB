@@ -10,6 +10,13 @@ from trigger.handler.base_trigger import BaseTrigger
 
 
 class ScheduledTrigger(BaseTrigger):
+    """
+    定时任务触发器
+    """
+
+    @staticmethod
+    def execute(trigger, **kwargs):
+        pass
 
     def support(self, trigger, **kwargs):
         return trigger.get('trigger_type') == 'SCHEDULED'

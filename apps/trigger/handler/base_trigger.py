@@ -26,3 +26,8 @@ class BaseTrigger(ABC):
     @abstractmethod
     def undeploy(self, trigger, **kwargs):
         pass
+
+    @staticmethod
+    @abstractmethod
+    def execute(trigger, **kwargs):
+        pass

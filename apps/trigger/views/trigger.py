@@ -70,7 +70,7 @@ class TriggerView(APIView):
         )
         def get(self, request: Request, workspace_id: str, trigger_id: str):
             return result.success(TriggerOperateSerializer(
-                data={'trigger_id': trigger_id, 'workspace_id': workspace_id,'user_id': request.user.id}
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).one())
 
         @extend_schema(
@@ -87,10 +87,6 @@ class TriggerView(APIView):
             return result.success(TriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).edit(request.data))
-
-
-
-
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

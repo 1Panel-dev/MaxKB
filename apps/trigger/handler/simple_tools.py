@@ -9,9 +9,9 @@
 from trigger.handler.impl.task.application_task import ApplicationTask
 from trigger.handler.impl.trigger.scheduled_trigger import ScheduledTrigger
 
-simple_task_handlers = [ApplicationTask]
+simple_task_handlers = [ApplicationTask()]
 
-simple_trigger_handlers = [ScheduledTrigger]
+simple_trigger_handlers = [ScheduledTrigger()]
 
 
 def execute(trigger_task, **kwargs):

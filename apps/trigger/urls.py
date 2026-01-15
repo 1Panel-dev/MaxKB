@@ -9,6 +9,7 @@
 from django.urls import path
 
 from . import views
+from .handler.impl.trigger.event_trigger import EventTriggerView
 
 app_name = "trigger"
 
@@ -18,4 +19,5 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/trigger/<int:current_page>/<int:page_size>', views.TriggerView.Page.as_view(),
          name='trigger_page'),
     path('workspace/<str:workspace_id>/task', views.TriggerTaskView.as_view(), name='task'),
+    path('trigger/v1/webhook/<str:trigger_id>', EventTriggerView.as_view(), name='trigger_webhook')
 ]

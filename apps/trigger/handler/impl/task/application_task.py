@@ -14,4 +14,4 @@ class ApplicationTask(BaseTriggerTask):
         return trigger_task.get('source_type') == 'APPLICATION'
 
     def execute(self, trigger_task, **kwargs):
-        pass
+        print("执行", trigger_task, kwargs)
