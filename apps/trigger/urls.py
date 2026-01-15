@@ -14,6 +14,7 @@ app_name = "trigger"
 
 urlpatterns = [
     path('workspace/<str:workspace_id>/trigger', views.TriggerView.as_view(), name='trigger'),
+    path('workspace/<str:workspace_id>/trigger/<str:trigger_id>', views.TriggerView.Operate.as_view(), name='trigger'),
     path('workspace/<str:workspace_id>/trigger/<int:current_page>/<int:page_size>', views.TriggerView.Page.as_view(),
          name='trigger_page'),
     path('workspace/<str:workspace_id>/task', views.TriggerTaskView.as_view(), name='task'),
