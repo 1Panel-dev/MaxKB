@@ -359,6 +359,10 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
 
                     entry['arguments'] += part_args
 
+                    # 若 arguments 为空字符串，替换为 '{}'
+                    if entry['arguments'] == '':
+                        entry['arguments'] = '{}'
+
                     # 尝试判断 JSON 是否完整（若 arguments 是 JSON），完整则提交到 tool_calls_info
                     try:
                         json.loads(entry['arguments'])
