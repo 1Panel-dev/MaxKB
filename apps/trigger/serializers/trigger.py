@@ -294,6 +294,12 @@ class TriggerOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _('Trigger task can not be empty'))
         return self.one(with_valid=False)
 
+    def delete(self):
+        self.is_valid(raise_exception=True)
+        trigger_id = self.data.get('trigger_id')
+        Trigger.objects.filter(id=trigger_id).delete()
+        return True
+
     def one(self, with_valid=True):
         if with_valid:
             self.is_valid()

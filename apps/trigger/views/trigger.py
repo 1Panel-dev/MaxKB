@@ -88,6 +88,22 @@ class TriggerView(APIView):
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).edit(request.data))
 
+        @extend_schema(
+            methods=['DELETE'],
+            description=_('Delete the trigger'),
+            summary=_('Delete the trigger'),
+            operation_id=_('Delete the trigger'),  # type: ignore
+            parameters=TriggerOperateAPI.get_parameters(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def delete(self, request: Request, workspace_id: str, trigger_id: str):
+            return result.success(TriggerOperateSerializer(
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
+            ).delete())
+
+
+
     class Page(APIView):
         authentication_classes = [TokenAuth]
 
