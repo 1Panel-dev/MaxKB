@@ -85,8 +85,8 @@ class TriggerTaskCreateRequest(serializers.Serializer):
     source_type = serializers.ChoiceField(required=True, choices=TriggerTaskTypeChoices)
     source_id = serializers.CharField(required=True, label=_('source_id'))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
-    meta = models.JSONField(default=dict)
-    parameter = serializers.JSONField(default=dict)
+    meta = serializers.DictField(default=dict, required=False)
+    parameter = serializers.DictField(default=dict, required=False)
 
     def validate(self, attrs):
         source_type = attrs.get('source_type')
@@ -108,7 +108,7 @@ class TriggerCreateRequest(serializers.Serializer):
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('trigger description'))
     trigger_type = serializers.ChoiceField(required=True, choices=TriggerTypeChoices)
     trigger_setting = serializers.DictField(required=True, label=_("trigger setting"))
-    meta = models.JSONField(default=dict)
+    meta = serializers.DictField(default=dict, required=False)
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
     trigger_task = TriggerTaskCreateRequest(many=True)
 
