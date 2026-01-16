@@ -9,13 +9,14 @@
 
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _, gettext_lazy
-from drf_spectacular.utils import extend_schema, OpenApiExample
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common import result
-from common.exception.app_exception import AppApiException
+from common.exception.app_exception import AppApiException, AppAuthenticationFailed
 from common.result import Result
 from trigger.handler.base_trigger import BaseTrigger
 from trigger.models import TriggerTask, Trigger
@@ -67,6 +68,7 @@ class EventTriggerRequest(serializers.Serializer):
 
 
 class EventTriggerView(APIView):
+
     @extend_schema(
         methods=['POST'],
         description=gettext_lazy('Event Trigger WebHook'),
@@ -80,6 +82,16 @@ class EventTriggerView(APIView):
                 }
             }
         },
+        parameters=[
+            OpenApiParameter(
+                name='Authorization',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.HEADER,
+                description='Token格式:Bearer <your_token>',
+                required=True
+            ),
+
+        ],
         tags=[gettext_lazy('Trigger')],  # type: ignore
         examples=[
             OpenApiExample(
@@ -106,17 +118,21 @@ class EventTrigger(BaseTrigger):
 
     @staticmethod
     def execute(trigger, request=None, **kwargs):
+        trigger_setting = trigger.get('trigger_setting')
+        if trigger_setting.get('token'):
+            token = request.META.get('HTTP_AUTHORIZATION')
+            if trigger_setting.get('token') != token:
+                raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         is_active = trigger.get('is_active')
         if not is_active:
             return Result(code=404, message="404", status=404)
-        trigger_setting = trigger.get('trigger_setting')
         body = trigger_setting.get('body')
         parameters = get_parameters(body, request)
         trigger_task_list = [TriggerTaskResponse(trigger_task).data for trigger_task in
                              QuerySet(TriggerTask).filter(trigger__id=trigger.get('id'), is_active=True)]
         from trigger.handler.simple_tools import execute
         for trigger_task in trigger_task_list:
-            execute(trigger_task, parameters=parameters)
+            execute(trigger_task, body=parameters)
         return result.success(True)
 
     def support(self, trigger, **kwargs):
