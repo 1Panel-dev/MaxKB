@@ -6,9 +6,11 @@
     @date：2026/1/14 11:48
     @desc:
 """
+import re
 from typing import Dict
 
 import uuid_utils.compat as uuid
+from django.core import validators
 from django.db import models, transaction
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -17,8 +19,66 @@ from rest_framework import serializers
 from application.models import Application
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
+from common.field.common import ObjectField
 from tools.models import Tool
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
+
+
+class InputField(serializers.Serializer):
+    source = serializers.CharField(required=True, label=_("source"), validators=[
+        validators.RegexValidator(regex=re.compile("^custom|reference$"),
+                                  message=_("The field only supports custom|reference"), code=500)
+    ])
+    value = ObjectField(required=True, label=_("Variable Value"), model_type_list=[str, list])
+
+
+class ApplicationTaskParameterSerializer(serializers.Serializer):
+    question = InputField(required=True)
+    api_input_field_list = serializers.JSONField(required=False)
+    user_input_field_list = serializers.JSONField(required=False)
+    image_list = InputField(required=False)
+    document_list = InputField(required=False)
+    audio_list = InputField(required=False)
+    video_list = InputField(required=False)
+    other_list = InputField(required=False)
+
+    @staticmethod
+    def _validate_input_dict(value, field_name):
+        if not value:
+            return value
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(f"{field_name} must be a dict")
+
+        for key, val in value.items():
+            serializer = InputField(data=val)
+            if not serializer.is_valid():
+                raise serializers.ValidationError({f"{field_name}.{key}": serializer.errors})
+        return value
+
+    def validate_api_input_field_list(self, value):
+        return self._validate_input_dict(value, 'api_input_field_list')
+
+    def validate_user_input_field_list(self, value):
+        return self._validate_input_dict(value, 'user_input_field_list')
+
+
+class ToolTaskParameterSerializer(serializers.Serializer):
+    input_field_list = serializers.JSONField(required=False)
+
+    def validate_input_field_list(self,value):
+        if not value:
+            return value
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("input_field_list must be a dict")
+
+        for key, val in value.items():
+            serializer = InputField(data=val)
+            if not serializer.is_valid():
+                raise serializers.ValidationError({
+                    key: serializer.errors
+                })
+
+        return value
 
 
 class TriggerTaskCreateRequest(serializers.Serializer):
@@ -26,11 +86,21 @@ class TriggerTaskCreateRequest(serializers.Serializer):
     source_id = serializers.CharField(required=True, label=_('source_id'))
     is_active = serializers.BooleanField(required=False, label=_('Is active'))
     meta = models.JSONField(default=dict)
-    parameter = serializers.ListField(
-        child=serializers.DictField(),
-        required=False,
-        default=list
-    )
+    parameter = serializers.JSONField(default=dict)
+
+    def validate(self, attrs):
+        source_type = attrs.get('source_type')
+        parameter = attrs.get('parameter')
+        if source_type == TriggerTaskTypeChoices.APPLICATION:
+            serializer = ApplicationTaskParameterSerializer(data=parameter)
+            serializer.is_valid(raise_exception=True)
+            attrs['parameter'] = serializer.validated_data
+        if source_type == TriggerTaskTypeChoices.TOOL:
+            serializer = ToolTaskParameterSerializer(data=parameter)
+            serializer.is_valid(raise_exception=True)
+            attrs['parameter'] = serializer.validated_data
+
+        return attrs
 
 
 class TriggerCreateRequest(serializers.Serializer):
@@ -241,7 +311,7 @@ class TriggerSerializer(serializers.Serializer):
             source_type=task_data.get('source_type'),
             source_id=task_data.get('source_id'),
             is_active=task_data.get('is_active', False),
-            parameter=task_data.get('parameter', []),
+            parameter=task_data.get('parameter', {}),
             meta=task_data.get('meta', {})
         )
 
