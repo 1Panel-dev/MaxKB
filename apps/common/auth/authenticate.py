@@ -147,3 +147,11 @@ class AllTokenAuth(TokenAuthentication):
                                                                                                                  AppApiException):
                 raise e
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
+
+
+class WebhookAuth(TokenAuthentication):
+    keyword = "Bearer"
+
+    # 重新 authenticate 方法，自定义认证规则
+    def authenticate(self, request):
+        return None, {}

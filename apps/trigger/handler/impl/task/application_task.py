@@ -8,7 +8,7 @@
 """
 import uuid
 
-from application.models import ChatUserType
+from application.models import ChatUserType, Chat
 from chat.serializers.chat import ChatSerializers
 from trigger.handler.base_task import BaseTriggerTask
 
@@ -35,7 +35,7 @@ def get_application_execute_parameters(parameter_setting, kwargs):
     parameters = {'form_data': {}}
     question_setting = parameter_setting.get('question')
     if question_setting:
-        parameters['question'] = get_field_value(question_setting, kwargs)
+        parameters['message'] = get_field_value(question_setting, kwargs)
     filed_list = ['image_list', 'document_list', 'audio_list', 'video_list', 'other_list']
     for field in filed_list:
         field_setting = parameter_setting.get(field)
@@ -59,26 +59,24 @@ class ApplicationTask(BaseTriggerTask):
     def execute(self, trigger_task, **kwargs):
         parameter_setting = trigger_task.get('parameter')
         parameters = get_application_execute_parameters(parameter_setting, kwargs)
-        chat_id = uuid.UUID()
-        chat_user_id = uuid.UUID()
+        parameters['re_chat'] = False
+        parameters['stream'] = True
+        chat_id = uuid.uuid1()
+        chat_user_id = str(uuid.uuid1())
         application_id = trigger_task.get('source_id')
+        message = parameters.get('message')
+        Chat.objects.get_or_create(id=chat_id, defaults={
+            'application_id': application_id,
+            'abstract': message,
+            'chat_user_id': chat_user_id,
+            'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
+            'asker': {'username': "游客"}
+        })
+
         list(ChatSerializers(data={
             "chat_id": chat_id,
             "chat_user_id": chat_user_id,
             'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
             'application_id': application_id,
             'debug': False
-        }).chat(instance=
-                {'message': parameters.get('question'),
-                 're_chat': False,
-                 'stream': True,
-                 'document_list': parameters.get('document_list'),
-                 'image_list': parameters.get('image_list'),
-                 'audio_list': parameters.get('audio_list'),
-                 'video_list': parameters.get('video_list'),
-                 'runtime_node_id': None,
-                 'chat_record_id': None,
-                 'child_node': None,
-                 'node_data': None,
-                 'form_data': parameters.get("form_data")}
-                ))
+        }).chat(instance=parameters))

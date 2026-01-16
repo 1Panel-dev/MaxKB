@@ -9,13 +9,13 @@
 
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _, gettext_lazy
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common import result
+from common.auth import WebhookAuth
 from common.exception.app_exception import AppApiException, AppAuthenticationFailed
 from common.result import Result
 from trigger.handler.base_trigger import BaseTrigger
@@ -68,6 +68,7 @@ class EventTriggerRequest(serializers.Serializer):
 
 
 class EventTriggerView(APIView):
+    authentication_classes = [WebhookAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -82,16 +83,6 @@ class EventTriggerView(APIView):
                 }
             }
         },
-        parameters=[
-            OpenApiParameter(
-                name='Authorization',
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.HEADER,
-                description='Token格式:Bearer <your_token>',
-                required=True
-            ),
-
-        ],
         tags=[gettext_lazy('Trigger')],  # type: ignore
         examples=[
             OpenApiExample(
@@ -121,11 +112,11 @@ class EventTrigger(BaseTrigger):
         trigger_setting = trigger.get('trigger_setting')
         if trigger_setting.get('token'):
             token = request.META.get('HTTP_AUTHORIZATION')
-            if trigger_setting.get('token') != token:
+            if trigger_setting.get('token') != token.replace('Bearer ', ''):
                 raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         is_active = trigger.get('is_active')
         if not is_active:
-            return Result(code=404, message="404", status=404)
+            return Result(code=404, message="404", response_status=404)
         body = trigger_setting.get('body')
         parameters = get_parameters(body, request)
         trigger_task_list = [TriggerTaskResponse(trigger_task).data for trigger_task in
