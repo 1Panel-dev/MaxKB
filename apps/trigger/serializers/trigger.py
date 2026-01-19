@@ -20,9 +20,14 @@ from application.models import Application
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import ObjectField
+from knowledge.serializers.common import BatchSerializer
 from tools.models import Tool
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
 
+
+class BatchActiveSerializer(serializers.Serializer):
+    id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_('id list'))
+    is_active = serializers.BooleanField(required=True, label=_("is_active"))
 
 class InputField(serializers.Serializer):
     source = serializers.CharField(required=True, label=_("source"), validators=[
@@ -65,7 +70,7 @@ class ApplicationTaskParameterSerializer(serializers.Serializer):
 class ToolTaskParameterSerializer(serializers.Serializer):
     input_field_list = serializers.JSONField(required=False)
 
-    def validate_input_field_list(self,value):
+    def validate_input_field_list(self, value):
         if not value:
             return value
         if not isinstance(value, dict):
@@ -315,6 +320,36 @@ class TriggerSerializer(serializers.Serializer):
             meta=task_data.get('meta', {})
         )
 
+    class Batch(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+
+        @transaction.atomic
+        def batch_delete(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Trigger, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            trigger_id_list = instance.get("id_list")
+
+            TriggerTask.objects.filter(trigger_id__in=trigger_id_list).delete()
+            Trigger.objects.filter(workspace_id=workspace_id, id__in=trigger_id_list).delete()
+
+            return True
+
+        def batch_switch(self, instance: Dict, with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Trigger, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            trigger_id_list = instance.get("id_list")
+            is_active = instance.get("is_active")
+            Trigger.objects.filter(workspace_id=workspace_id, id__in=trigger_id_list).update(is_active=is_active)
+
+            return True
 
 class TriggerOperateSerializer(serializers.Serializer):
     trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
@@ -367,6 +402,7 @@ class TriggerOperateSerializer(serializers.Serializer):
     def delete(self):
         self.is_valid(raise_exception=True)
         trigger_id = self.data.get('trigger_id')
+        TriggerTask.objects.filter(trigger_id=trigger_id).delete()
         Trigger.objects.filter(id=trigger_id).delete()
         return True
 

@@ -8,19 +8,16 @@
 """
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
-from trigger.serializers.trigger import TriggerSerializer, TriggerQuerySerializer, TriggerOperateSerializer
-from common.auth.authentication import has_permissions, get_is_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
-from common.log.log import log
-from tools.api.tool import GetInternalToolAPI
-from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI
+from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSerializer
+
+from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI, TriggerBatchDeleteAPI, \
+    TriggerBatchActiveAPI
 from trigger.serializers.trigger import TriggerSerializer
 
 
@@ -102,7 +99,41 @@ class TriggerView(APIView):
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
             ).delete())
 
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
 
+        @extend_schema(
+            methods=['PUT'],
+            description=_('Delete trigger in batches'),
+            summary=_('Delete trigger in batches'),
+            operation_id=_('Delete trigger in batches'),  # type: ignore
+            parameters=TriggerBatchDeleteAPI.get_parameters(),
+            request=TriggerBatchDeleteAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def put(self, request: Request, workspace_id: str):
+            return result.success(TriggerSerializer.Batch(
+                data={'workspace_id': workspace_id, 'user_id': request.user.id}
+            ).batch_delete(request.data))
+
+    class BatchActivate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_('Activate trigger in batches'),
+            summary=_('Activate trigger in batches'),
+            operation_id=_('Activate trigger in batches'),  # type: ignore
+            parameters=TriggerBatchDeleteAPI.get_parameters(),
+            request=TriggerBatchActiveAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def put(self, request: Request, workspace_id: str):
+            return result.success(TriggerSerializer.Batch(
+                data={'workspace_id': workspace_id, 'user_id': request.user.id}
+            ).batch_switch(request.data))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]
