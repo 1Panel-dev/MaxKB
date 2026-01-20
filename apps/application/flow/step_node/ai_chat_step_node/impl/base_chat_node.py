@@ -7,22 +7,23 @@
     @desc:
 """
 import json
-import os
 import re
 import time
 from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext as _
 from langchain.schema import HumanMessage, SystemMessage
 from langchain_core.messages import BaseMessage, AIMessage
 
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, mcp_response_generator
+from application.models import Application, ApplicationApiKey, ApplicationAccessToken
+from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
-from maxkb.const import CONFIG
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool
@@ -36,7 +37,6 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['message_tokens'] = message_tokens
     node.context['answer_tokens'] = answer_tokens
     node.context['answer'] = answer
-    node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
     node.context['reasoning_content'] = reasoning_content
@@ -63,6 +63,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     response_reasoning_content = False
 
     for chunk in response:
+        if workflow.is_the_task_interrupted():
+            break
         reasoning_chunk = reasoning.get_reasoning_content(chunk)
         content_chunk = reasoning_chunk.get('content')
         if 'reasoning_content' in chunk.additional_kwargs:
@@ -110,7 +112,8 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     if 'reasoning_content' in meta:
         reasoning_content = (meta.get('reasoning_content', '') or '')
     else:
-        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (reasoning_result_end.get('reasoning_content') or '')
+        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (
+                reasoning_result_end.get('reasoning_content') or '')
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
@@ -143,6 +146,7 @@ class BaseChatNode(IChatNode):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
         self.context['reasoning_content'] = details.get('reasoning_content')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -150,13 +154,12 @@ class BaseChatNode(IChatNode):
                 model_params_setting=None,
                 dialogue_type=None,
                 model_setting=None,
-                mcp_enable=False,
                 mcp_servers=None,
                 mcp_tool_id=None,
                 mcp_tool_ids=None,
                 mcp_source=None,
-                tool_enable=False,
                 tool_ids=None,
+                application_ids=None,
                 mcp_output_enable=True,
                 **kwargs) -> NodeResult:
         if dialogue_type is None:
@@ -173,7 +176,8 @@ class BaseChatNode(IChatNode):
                                                               **model_params_setting)
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
                                                    self.runtime_node_id)
-        self.context['history_message'] = history_message
+        self.context['history_message'] = [{'content': message.content, 'role': message.type} for message in
+                                           (history_message if history_message is not None else [])]
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
         system = self.workflow_manage.generate_prompt(system)
@@ -183,7 +187,8 @@ class BaseChatNode(IChatNode):
 
         # 处理 MCP 请求
         mcp_result = self._handle_mcp_request(
-            mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids, mcp_output_enable,
+            mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
+            application_ids, mcp_output_enable,
             chat_model, message_list, history_message, question
         )
         if mcp_result:
@@ -192,8 +197,6 @@ class BaseChatNode(IChatNode):
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
-                               'history_message': [{'content': message.content, 'role': message.type} for message in
-                                                   (history_message if history_message is not None else [])],
                                'question': question.content}, {},
                               _write_context=write_context_stream)
         else:
@@ -204,47 +207,71 @@ class BaseChatNode(IChatNode):
                                'question': question.content}, {},
                               _write_context=write_context)
 
-    def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
+    def _handle_mcp_request(self, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
+                            application_ids,
                             mcp_output_enable, chat_model, message_list, history_message, question):
-        if not mcp_enable and not tool_enable:
-            return None
 
         mcp_servers_config = {}
 
         # 迁移过来mcp_source是None
         if mcp_source is None:
             mcp_source = 'custom'
-        if mcp_enable:
-            # 兼容老数据
-            if not mcp_tool_ids:
-                mcp_tool_ids = []
-            if mcp_tool_id:
-                mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
-            if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
-                mcp_servers_config = json.loads(mcp_servers)
-                mcp_servers_config = self.handle_variables(mcp_servers_config)
-            elif mcp_tool_ids:
-                mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
-                for mcp_tool in mcp_tools:
-                    if mcp_tool and mcp_tool['is_active']:
-                        mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
-                        mcp_servers_config = self.handle_variables(mcp_servers_config)
+        # 兼容老数据
+        if not mcp_tool_ids:
+            mcp_tool_ids = []
+        if mcp_tool_id:
+            mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
+        if mcp_source == 'custom' and mcp_servers and '"stdio"' not in mcp_servers:
+            mcp_servers_config = json.loads(mcp_servers)
+            mcp_servers_config = self.handle_variables(mcp_servers_config)
+        elif mcp_tool_ids:
+            mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
+            for mcp_tool in mcp_tools:
+                if mcp_tool and mcp_tool['is_active']:
+                    mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
+                    mcp_servers_config = self.handle_variables(mcp_servers_config)
 
-        if tool_enable:
-            if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
-                self.context['tool_ids'] = tool_ids
-                for tool_id in tool_ids:
-                    tool = QuerySet(Tool).filter(id=tool_id).first()
-                    if not tool.is_active:
-                        continue
-                    executor = ToolExecutor()
-                    if tool.init_params is not None:
-                        params = json.loads(rsa_long_decrypt(tool.init_params))
-                    else:
-                        params = {}
-                    tool_config = executor.get_tool_mcp_config(tool.code, params)
+        if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
+            self.context['tool_ids'] = tool_ids
+            for tool_id in tool_ids:
+                tool = QuerySet(Tool).filter(id=tool_id).first()
+                if not tool.is_active:
+                    continue
+                executor = ToolExecutor()
+                if tool.init_params is not None:
+                    params = json.loads(rsa_long_decrypt(tool.init_params))
+                else:
+                    params = {}
+                tool_config = executor.get_tool_mcp_config(tool.code, params, tool.name, tool.desc)
 
-                    mcp_servers_config[str(tool.id)] = tool_config
+                mcp_servers_config[str(tool.id)] = tool_config
+
+        if application_ids and len(application_ids) > 0:
+            self.context['application_ids'] = application_ids
+            for application_id in application_ids:
+                app = QuerySet(Application).filter(id=application_id, is_publish=True).first()
+                if app is None:
+                    continue
+                app_key = QuerySet(ApplicationApiKey).filter(application_id=application_id, is_active=True).first()
+                if app_key is not None:
+                    api_key = app_key.secret_key
+                    application_access_token = QuerySet(ApplicationAccessToken).filter(
+                        application_id=app_key.application_id
+                    ).first()
+                    if application_access_token is not None and application_access_token.authentication:
+                        raise AppApiException(
+                            500,
+                            _('Agent 【{name}】 access token authentication is not supported for agent tool').format(
+                                name=app.name)
+                        )
+                else:
+                    raise AppApiException(
+                        500,
+                        _('Agent Key is required for agent tool 【{name}】').format(name=app.name)
+                    )
+                executor = ToolExecutor()
+                app_config = executor.get_app_mcp_config(api_key)
+                mcp_servers_config[app.name] = app_config
 
         if len(mcp_servers_config) > 0:
             r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable)
@@ -314,6 +341,7 @@ class BaseChatNode(IChatNode):
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
             'reasoning_content': self.context.get('reasoning_content'),
+            'enableException': self.node.properties.get('enableException'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

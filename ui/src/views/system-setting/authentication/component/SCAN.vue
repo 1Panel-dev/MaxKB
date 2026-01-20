@@ -2,7 +2,7 @@
   <div v-loading="loading" class="scan-height">
     <el-scrollbar>
       <div v-for="item in platforms" :key="item.key" class="mb-16">
-        <el-card class="border-none mb-16" shadow="none">
+        <el-card class="border-none mb-16" shadow="never">
           <div class="flex-between">
             <div class="flex align-center">
               <img :src="item.logoSrc" alt="" width="24px" />

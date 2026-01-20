@@ -8,6 +8,7 @@ export default {
     confirmTitle: 'Delete Model：',
     confirmMessage:
       'Deleting the model will affect the resources currently using it. Please proceed with caution.',
+    resourceCountMessage: 'This model is associated with {count} resources, and will be unavailable after deletion. Please proceed with caution.',
   },
   tip: {
     createSuccessMessage: 'Model created successfully',
@@ -57,20 +58,20 @@ export default {
     model_type: {
       label: 'Model Type',
       placeholder: 'Select a model type',
-      tooltip1: 'LLM: An inference model for AI chats in the APP.',
+      tooltip1: 'LLM: An inference model for AI chats in the agent.',
       tooltip2: 'Embedding Model: A model for vectorizing document content in the knowledge.',
-      tooltip3: 'Speech2Text: A model used for speech recognition in the APP.',
-      tooltip4: 'TTS: A model used for TTS in the APP.',
+      tooltip3: 'Speech2Text: A model used for speech recognition in the agent.',
+      tooltip4: 'TTS: A model used for TTS in the agent.',
       tooltip5:
-        'Rerank: A model used to reorder candidate segments when using multi-route recall in advanced orchestration APP.',
+        'Rerank: A model used to reorder candidate segments when using multi-route recall in advanced orchestration agent.',
       tooltip6:
-        'Vision Model: A visual model used for image understanding in advanced orchestration APP.',
+        'Vision Model: A visual model used for image understanding in advanced orchestration agent.',
       tooltip7:
-        'Image Generation: A visual model used for image generation in advanced orchestration APP.',
+        'Image Generation: A visual model used for image generation in advanced orchestration agent.',
       tooltip8:
-        'Text-to-Video: A visual model used for text-to-video in the APP.',
+        'Text-to-Video: A visual model used for text-to-video in the agent.',
       tooltip9:
-        'Image-to-Video: A visual model used for image-to-video in the APP.',
+        'Image-to-Video: A visual model used for image-to-video in the agent.',
       requiredMessage: 'Model type cannot be empty',
     },
     base_model: {

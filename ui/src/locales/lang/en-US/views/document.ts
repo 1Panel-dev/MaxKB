@@ -130,7 +130,6 @@ export default {
     PENDING: 'Queuing',
     GENERATE: 'Generating',
     SYNC: 'Syncing',
-    REVOKE: 'Cancelling',
     finish: 'Finish',
   },
   enableStatus: {

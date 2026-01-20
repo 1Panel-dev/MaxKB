@@ -26,6 +26,7 @@ from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
+from tools.api.tool import GetInternalToolAPI
 
 
 def get_application_operation_object(application_id):
@@ -253,6 +254,23 @@ class ApplicationAPI(APIView):
                 ApplicationOperateSerializer(
                     data={'application_id': application_id, 'user_id': request.user.id,
                           'workspace_id': workspace_id, }).publish(request.data))
+
+    class StoreApplication(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get Appstore apps"),
+            summary=_("Get Appstore apps"),
+            operation_id=_("Get Appstore apps"),  # type: ignore
+            responses=GetInternalToolAPI.get_response(),
+            tags=[_("Application")]  # type: ignore
+        )
+        def get(self, request: Request):
+            return result.success(ApplicationSerializer.StoreApplication(data={
+                'user_id': request.user.id,
+                'name': request.query_params.get('name', ''),
+            }).get_appstore_templates())
 
 
 class McpServers(APIView):

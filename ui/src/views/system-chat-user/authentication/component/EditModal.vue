@@ -161,7 +161,7 @@ const open = async (platform: Platform) => {
         currentPlatform.config.agent_id = currentPlatform.config.app_key
         delete currentPlatform.config.app_key
       }
-      currentPlatform.config.callback_url = `${defaultCallbackUrl}/auth/wecom`
+        currentPlatform.config.callback_url = `${defaultCallbackUrl}/auth/wecom`
       break
     case 'dingtalk':
       if (currentPlatform.config.agent_id) {

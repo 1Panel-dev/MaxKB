@@ -11,6 +11,7 @@ const systemManage = {
       ],
       'OR',
     ),
+  jump_read: () => false,
   is_share: () =>
     hasPermission(
       new ComplexPermission(
@@ -72,6 +73,14 @@ const systemManage = {
         PermissionConst.RESOURCE_TOOL_AUTH,
       ],
       'OR',
+    ),
+  relate_map: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_RELATE_RESOURCE_VIEW
+      ],
+      'OR'
     ),
   
   folderRead: () => false,

@@ -124,7 +124,11 @@
       />
     </div>
 
-    <el-select v-model="formValue.default_value" :teleported="false" popper-class="default-select">
+    <el-select
+      v-model="formValue.default_value"
+      :teleported="false"
+      popper-class="max-w-350"
+    >
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
@@ -181,9 +185,7 @@ const default_ref_variables_value_rule = {
   validator: (rule: any, value: any, callback: any) => {
     console.log(value.length)
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback(
-        t('workflow.variable.Referencing') + t('common.required'),
-      )
+      callback(t('workflow.variable.Referencing') + t('common.required'))
     }
 
     return true
@@ -241,11 +243,5 @@ onMounted(() => {
     top: -35px;
   }
 }
-:deep(.el-form-item__label) {
-  display: block;
-}
 
-:deep(.el-select-dropdown) {
-  max-width: 400px;
-}
 </style>

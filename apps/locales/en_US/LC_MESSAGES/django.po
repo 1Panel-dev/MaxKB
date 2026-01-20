@@ -58,7 +58,7 @@ msgstr ""
 #: apps/application/serializers/application.py:282
 #: apps/application/serializers/application.py:368
 msgid "Application Name"
-msgstr ""
+msgstr "Agent Name"
 
 #: apps/application/api/application_api.py:80
 #: apps/application/serializers/application.py:152
@@ -67,7 +67,7 @@ msgstr ""
 #: apps/application/serializers/application.py:284
 #: apps/application/serializers/application.py:370
 msgid "Application Description"
-msgstr ""
+msgstr "Agent Description"
 
 #: apps/application/api/application_api.py:87
 #: apps/application/chat_pipeline/step/chat_step/i_chat_step.py:78
@@ -236,7 +236,7 @@ msgstr ""
 msgid ""
 "Sorry, the AI model is not configured. Please go to the application to set "
 "up the AI model first."
-msgstr ""
+msgstr "Sorry, the agent's AI model is not configured. Please go to the agent settings to set up the AI model first."
 
 #: apps/application/chat_pipeline/step/generate_human_message_step/i_generate_human_message_step.py:26
 #: apps/application/chat_pipeline/step/reset_problem_step/i_reset_problem_step.py:24
@@ -461,7 +461,7 @@ msgstr ""
 #: apps/xpack/api/application_setting.py:31 apps/xpack/api/platform.py:29
 #: apps/xpack/api/platform.py:70
 msgid "Application ID"
-msgstr ""
+msgstr "Agent ID"
 
 #: apps/application/flow/step_node/application_node/i_application_node.py:15
 msgid "API Input Fields"
@@ -781,11 +781,11 @@ msgstr ""
 
 #: apps/application/serializers/application.py:191
 msgid "application name"
-msgstr ""
+msgstr "Agent name"
 
 #: apps/application/serializers/application.py:194
 msgid "application describe"
-msgstr ""
+msgstr "Agent description"
 
 #: apps/application/serializers/application.py:197
 #: apps/application/serializers/application.py:372
@@ -829,11 +829,11 @@ msgstr ""
 
 #: apps/application/serializers/application.py:217
 msgid "Application Type"
-msgstr ""
+msgstr "Agent Type"
 
 #: apps/application/serializers/application.py:221
 msgid "Application type only supports SIMPLE|WORK_FLOW"
-msgstr ""
+msgstr "Agent type only supports SIMPLE|WORK_FLOW"
 
 #: apps/application/serializers/application.py:226
 #: apps/application/serializers/application.py:394
@@ -881,7 +881,7 @@ msgstr ""
 
 #: apps/application/serializers/application.py:286
 msgid "Application type"
-msgstr ""
+msgstr "Agent type"
 
 #: apps/application/serializers/application.py:287
 #: apps/xpack/serializers/resource_chat_user.py:34
@@ -1006,7 +1006,7 @@ msgstr ""
 
 #: apps/application/serializers/application.py:545
 msgid "Application id does not exist"
-msgstr ""
+msgstr "Agent id does not exist"
 
 #: apps/application/serializers/application.py:591
 msgid "work_flow is a required field"
@@ -1070,7 +1070,7 @@ msgstr ""
 #: apps/xpack/serializers/application_setting_serializer.py:77
 #: apps/xpack/serializers/dataset_lark_serializer.py:295
 msgid "application id"
-msgstr ""
+msgstr "Agent id"
 
 #: apps/application/serializers/application_api_key.py:41
 #: apps/chat/serializers/chat.py:277 apps/chat/serializers/chat.py:332
@@ -1080,7 +1080,7 @@ msgstr ""
 #: apps/xpack/serializers/platform_serializer.py:138
 #: apps/xpack/serializers/platform_serializer.py:149
 msgid "Application does not exist"
-msgstr ""
+msgstr "Agent does not exist"
 
 #: apps/application/serializers/application_api_key.py:66
 msgid "ApiKeyId"
@@ -1198,7 +1198,7 @@ msgstr ""
 
 #: apps/application/serializers/application_chat_record.py:51
 msgid "Application authentication information does not exist"
-msgstr ""
+msgstr "Agent authentication information does not exist"
 
 #: apps/application/serializers/application_chat_record.py:53
 msgid "Displaying knowledge sources is not enabled"
@@ -1311,13 +1311,13 @@ msgstr ""
 #: apps/application/views/application.py:61
 #: apps/application/views/application.py:62
 msgid "Get the application list"
-msgstr ""
+msgstr "Get the agent list"
 
 #: apps/application/views/application.py:77
 #: apps/application/views/application.py:78
 #: apps/application/views/application.py:79
 msgid "Get the application list by page"
-msgstr ""
+msgstr "Get the agent list by page"
 
 #: apps/application/views/application.py:97
 #: apps/application/views/application.py:98
@@ -1347,7 +1347,7 @@ msgstr ""
 #: apps/application/views/application.py:182
 #: apps/application/views/application.py:183
 msgid "Get application details"
-msgstr ""
+msgstr "Get agent details"
 
 #: apps/application/views/application.py:200
 #: apps/application/views/application.py:201
@@ -1359,47 +1359,47 @@ msgstr ""
 #: apps/application/views/application_access_token.py:28
 #: apps/application/views/application_access_token.py:29
 msgid "Modify application access restriction information"
-msgstr ""
+msgstr "Modify agent access restriction information"
 
 #: apps/application/views/application_access_token.py:43
 #: apps/application/views/application_access_token.py:44
 #: apps/application/views/application_access_token.py:45
 msgid "Get application access restriction information"
-msgstr ""
+msgstr "Get agent access restriction information"
 
 #: apps/application/views/application_api_key.py:31
 #: apps/application/views/application_api_key.py:32
 #: apps/application/views/application_api_key.py:33
 msgid "Create application ApiKey"
-msgstr ""
+msgstr "Create agent ApiKey"
 
 #: apps/application/views/application_api_key.py:37
 #: apps/application/views/application_api_key.py:57
 #: apps/application/views/application_api_key.py:77
 #: apps/application/views/application_api_key.py:99
 msgid "Application Api Key"
-msgstr ""
+msgstr "Agent Api Key"
 
 #: apps/application/views/application_api_key.py:52
 msgid "GET application ApiKey List"
-msgstr ""
+msgstr "GET agent ApiKey List"
 
 #: apps/application/views/application_api_key.py:53
 #: apps/application/views/application_api_key.py:54
 msgid "Create application ApiKey List"
-msgstr ""
+msgstr "Create agent ApiKey List"
 
 #: apps/application/views/application_api_key.py:71
 #: apps/application/views/application_api_key.py:72
 #: apps/application/views/application_api_key.py:73
 msgid "Modify application API_KEY"
-msgstr ""
+msgstr "Modify agent API_KEY"
 
 #: apps/application/views/application_api_key.py:93
 #: apps/application/views/application_api_key.py:94
 #: apps/application/views/application_api_key.py:95
 msgid "Delete Application API_KEY"
-msgstr ""
+msgstr "Delete Agent API_KEY"
 
 #: apps/application/views/application_chat.py:35
 #: apps/application/views/application_chat.py:36
@@ -1418,7 +1418,7 @@ msgstr ""
 #: apps/application/views/application_chat_record.py:145
 #: apps/application/views/application_chat_record.py:171
 msgid "Application/Conversation Log"
-msgstr ""
+msgstr "Agent/Conversation Log"
 
 #: apps/application/views/application_chat.py:55
 #: apps/application/views/application_chat.py:56
@@ -1436,7 +1436,7 @@ msgstr ""
 #: apps/application/views/application_chat.py:98
 #: apps/application/views/application_chat.py:99
 msgid "Get a temporary session id based on the application id"
-msgstr ""
+msgstr "Get a temporary session id based on the agent id"
 
 #: apps/application/views/application_chat.py:116
 #: apps/application/views/application_chat.py:117
@@ -1491,32 +1491,32 @@ msgstr ""
 #: apps/application/views/application_version.py:31
 #: apps/application/views/application_version.py:32
 msgid "Get the application version list"
-msgstr ""
+msgstr "Get the agent version list"
 
 #: apps/application/views/application_version.py:35
 #: apps/application/views/application_version.py:55
 #: apps/application/views/application_version.py:76
 #: apps/application/views/application_version.py:94
 msgid "Application/Version"
-msgstr ""
+msgstr "Agent/Version"
 
 #: apps/application/views/application_version.py:50
 #: apps/application/views/application_version.py:51
 #: apps/application/views/application_version.py:52
 msgid "Get the list of application versions by page"
-msgstr ""
+msgstr "Get the list of agent versions by page"
 
 #: apps/application/views/application_version.py:71
 #: apps/application/views/application_version.py:72
 #: apps/application/views/application_version.py:73
 msgid "Get application version details"
-msgstr ""
+msgstr "Get agent version details"
 
 #: apps/application/views/application_version.py:88
 #: apps/application/views/application_version.py:89
 #: apps/application/views/application_version.py:90
 msgid "Modify application version information"
-msgstr ""
+msgstr "Modify agent version information"
 
 #: apps/chat/api/chat_authentication_api.py:38
 #: apps/chat/serializers/chat_authentication.py:28
@@ -1597,7 +1597,7 @@ msgstr ""
 
 #: apps/chat/serializers/chat.py:306 apps/chat/serializers/chat.py:357
 msgid "The application has not been published. Please use it after publishing."
-msgstr ""
+msgstr "The agent has not been published. Please use it after publishing."
 
 #: apps/chat/serializers/chat_authentication.py:50
 #: apps/xpack/serializers/chat_auth.py:53
@@ -1615,7 +1615,7 @@ msgstr ""
 #: apps/chat/views/chat.py:37 apps/chat/views/chat.py:38
 #: apps/chat/views/chat.py:39
 msgid "Application Anonymous Certification"
-msgstr ""
+msgstr "Agent Anonymous Certification"
 
 #: apps/chat/views/chat.py:42 apps/chat/views/chat.py:64
 #: apps/chat/views/chat.py:81 apps/chat/views/chat.py:99
@@ -1627,17 +1627,17 @@ msgstr ""
 #: apps/chat/views/chat.py:59 apps/chat/views/chat.py:60
 #: apps/chat/views/chat.py:61
 msgid "Get application related information"
-msgstr ""
+msgstr "Get agent related information"
 
 #: apps/chat/views/chat.py:76 apps/chat/views/chat.py:77
 #: apps/chat/views/chat.py:78
 msgid "Get application authentication information"
-msgstr ""
+msgstr "Get agent authentication information"
 
 #: apps/chat/views/chat.py:115 apps/chat/views/chat.py:116
 #: apps/chat/views/chat.py:117
 msgid "Get the session id according to the application id"
-msgstr ""
+msgstr "Get the session id according to the agent id"
 
 #: apps/chat/views/chat.py:131 apps/chat/views/chat.py:132
 #: apps/chat/views/chat.py:133 apps/users/views/login.py:70
@@ -2609,7 +2609,7 @@ msgstr ""
 #: apps/knowledge/serializers/knowledge.py:73
 #: apps/xpack/serializers/dataset_lark_serializer.py:296
 msgid "application id list"
-msgstr ""
+msgstr "Agent ID list"
 
 #: apps/knowledge/serializers/knowledge.py:75
 msgid "file size limit"
@@ -2660,7 +2660,7 @@ msgstr ""
 #: apps/xpack/serializers/dataset_lark_serializer.py:359
 #, python-brace-format
 msgid "Unknown application id {knowledge_id}, cannot be associated"
-msgstr ""
+msgstr "Unknown Agent ID {knowledge_id}, cannot be associated"
 
 #: apps/knowledge/serializers/knowledge.py:449
 #: apps/shared/serializers/shared_knowledge.py:62
@@ -4474,6 +4474,12 @@ msgid ""
 "application focus optimization in fields such as multi-language translation, "
 "finance, law, and medical care"
 msgstr ""
+"The most effective version of the current hybrid model, the trillion-level "
+"parameter scale MOE-32K long article model. Reaching the absolute leading "
+"level on various benchmarks, with complex instructions and reasoning, "
+"complex mathematical capabilities, support for function call, and "
+"agent focus optimization in fields such as multi-language translation, "
+"finance, law, and medical care"
 
 #: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py:45
 msgid ""
@@ -7975,13 +7981,13 @@ msgstr ""
 #: apps/xpack/views/application_setting.py:25
 #: apps/xpack/views/application_setting.py:26
 msgid "Modify Application Settings"
-msgstr ""
+msgstr "Modify Agent Settings"
 
 #: apps/xpack/views/application_setting.py:42
 #: apps/xpack/views/application_setting.py:43
 #: apps/xpack/views/application_setting.py:44
 msgid "Get Application Settings"
-msgstr ""
+msgstr "Get Agent Settings"
 
 #: apps/xpack/views/auth.py:52 apps/xpack/views/auth.py:53
 #: apps/xpack/views/auth.py:54 apps/xpack/views/chat_user_auth.py:46
@@ -8168,7 +8174,7 @@ msgstr ""
 #: apps/xpack/views/chat_user_auth.py:415
 #: apps/xpack/views/chat_user_auth.py:416
 msgid "Application Password Certification"
-msgstr ""
+msgstr "Agent Password Certification"
 
 #: apps/xpack/views/license.py:31 apps/xpack/views/license.py:32
 #: apps/xpack/views/license.py:33
@@ -8210,7 +8216,7 @@ msgstr ""
 
 #: apps/xpack/views/platform.py:65 apps/xpack/views/platform.py:79
 msgid "Application/application access"
-msgstr ""
+msgstr "Agent/agent access"
 
 #: apps/xpack/views/platform.py:73 apps/xpack/views/platform.py:74
 #: apps/xpack/views/platform.py:75
@@ -8224,7 +8230,7 @@ msgstr ""
 
 #: apps/xpack/views/platform.py:98 apps/xpack/views/platform.py:118
 msgid "Application/Get platform status"
-msgstr ""
+msgstr "Agent/Get platform status"
 
 #: apps/xpack/views/platform.py:113 apps/xpack/views/platform.py:114
 #: apps/xpack/views/platform.py:115
@@ -8348,7 +8354,7 @@ msgid "Update appearance settings"
 msgstr ""
 
 msgid "Application Access"
-msgstr ""
+msgstr "Agent Access"
 
 msgid "Display execution details"
 msgstr ""
@@ -8492,7 +8498,7 @@ msgid "Add ApiKey"
 msgstr ""
 
 msgid "Delete application API_KEY"
-msgstr ""
+msgstr "Delete agent API_KEY"
 
 msgid "knowledge Base"
 msgstr ""
@@ -8516,7 +8522,7 @@ msgid "Generate related documents"
 msgstr ""
 
 msgid "Modify application access token"
-msgstr ""
+msgstr "Modify agent access token"
 
 msgid "File not exist. Only manually uploaded documents are supported"
 msgstr ""
@@ -8769,10 +8775,10 @@ msgid "No permission for the target folder"
 msgstr ""
 
 msgid "Application token usage statistics"
-msgstr ""
+msgstr "Agent token usage statistics"
 
 msgid "Application top question statistics"
-msgstr ""
+msgstr "Agent top question statistics"
 
 msgid "SAML2 Metadata"
 msgstr ""
@@ -8866,3 +8872,57 @@ msgstr ""
 
 msgid "Super-humanoid: Lingyuyan Pro"
 msgstr ""
+
+msgid "Login failed %s times, account will be locked, you have %s more chances !"
+msgstr ""
+
+msgid "This account has been locked for %s minutes, please try again later"
+msgstr ""
+
+msgid "User does not have permission to use API Key"
+msgstr ""
+
+msgid "Import knowledge workflow"
+msgstr ""
+
+msgid "Export knowledge workflow"
+msgstr ""
+
+msgid "Role IDs cannot be empty"
+msgstr ""
+
+msgid "Some roles do not exist"
+msgstr ""
+
+msgid "Authorized pagination list for obtaining resources"
+msgstr ""
+
+msgid "Resources mapping"
+msgstr ""
+
+msgid "Batch set user roles"
+msgstr ""
+
+msgid "Role Setting cannot be empty"
+msgstr ""
+
+msgid "View related resources"
+msgstr ""
+
+msgid "Feedback reason"
+msgstr ""
+
+msgid "Other reason content"
+msgstr ""
+
+msgid "accurate"
+msgstr "accurate"
+
+msgid "complete"
+msgstr "complete"
+
+msgid "inaccurate"
+msgstr "inaccurate"
+
+msgid "incomplete"
+msgstr "incomplete"

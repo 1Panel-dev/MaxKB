@@ -29,8 +29,4 @@ const topMenuList = computed(() => {
   return menu
 })
 </script>
-<style lang="scss" scope>
-.top-menu-container {
-  line-height: var(--app-header-height);
-}
-</style>
+<style lang="scss" scope></style>

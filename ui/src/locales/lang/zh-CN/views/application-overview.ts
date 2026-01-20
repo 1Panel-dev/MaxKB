@@ -1,7 +1,6 @@
 export default {
   title: '概览',
   appInfo: {
-    header: '应用信息',
     publicAccessLink: '公开访问链接',
     openText: '开',
     closeText: '关',
@@ -44,7 +43,7 @@ export default {
       displayCodeRequired: '请输入失败次数',
       toSettingChatUser: '去配置对话用户',
       authenticationTooltip:
-        '开启登录认证后，应用和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索',
+        '开启登录认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: '允许跨域地址',

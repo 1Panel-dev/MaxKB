@@ -115,9 +115,6 @@ export default {
   },
   AssignmentMethod: {
     label: '賦值方式',
-    custom: {
-      label: '自定義',
-    },
     ref_variables: {
       label: '參考變量',
       popover: '變量的值必須符合',

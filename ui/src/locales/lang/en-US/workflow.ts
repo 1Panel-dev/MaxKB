@@ -11,6 +11,8 @@ export default {
   },
   operation: {
     toImportDoc: 'Go to Import Documents',
+    importWorkflow: 'Import Workflow',
+    exportWorkflow: 'Export Workflow',
   },
   setting: {
     restoreVersion: 'Restore Previous Version"',
@@ -23,6 +25,7 @@ export default {
     debug: 'Run',
     exit: 'Exit',
     exitSave: 'Save & Exit',
+    templateCenter: 'Template Center',
   },
   tip: {
     noData: 'No related results found',
@@ -30,7 +33,7 @@ export default {
     onlyRight: 'Connections can only be made from the right anchor',
     notRecyclable: 'Loop connections are not allowed',
     onlyLeft: 'Connections can only be made to the left anchor',
-    applicationNodeError: 'This application is unavailable',
+    applicationNodeError: 'This agent is unavailable',
     toolNodeError: 'This tool node is unavailable',
     repeatedNodeError: 'A node with this name already exists',
     cannotCopy: 'Cannot be copied',
@@ -116,13 +119,6 @@ export default {
       currentTime: 'Current Time',
     },
     baseNode: {
-      label: 'Base Information',
-      appName: {
-        label: 'App Name',
-      },
-      appDescription: {
-        label: 'App Description',
-      },
       fileUpload: {
         label: 'File Upload',
         tooltip: 'When enabled, the Q&A page will display a file upload button.',
@@ -309,7 +305,7 @@ You are a master of problem optimization, adept at accurately inferring user int
         label: 'Vision Model',
         requiredMessage: 'Please select a vision model',
       },
-      image: {
+      video: {
         label: 'Select Video',
         requiredMessage: 'Please select a video',
       },
@@ -333,7 +329,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       editGroup: 'Edit Group',
     },
     mcpNode: {
-      label: 'MCP Node',
+      label: 'MCP Call',
       text: 'Call external MCP services to process data',
       getToolsSuccess: 'Tools fetched successfully',
       getTool: 'Fetch Tools',
@@ -451,10 +447,10 @@ You are a master of problem optimization, adept at accurately inferring user int
       },
     },
     applicationNode: {
-      label: 'APP Node',
+      label: 'Agent Node',
     },
     loopNode: {
-      label: 'Loop Node',
+      label: 'Loop',
       text: 'Repeat a series of tasks by setting the number of loops and logic',
       loopType: {
         label: 'Loop Type',

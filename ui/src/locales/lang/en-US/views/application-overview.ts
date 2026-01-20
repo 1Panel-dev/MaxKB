@@ -1,7 +1,6 @@
 export default {
   title: 'Overview',
   appInfo: {
-    header: 'App Information',
     publicAccessLink: 'Public URL',
     openText: 'On',
     closeText: 'Off',
@@ -44,7 +43,7 @@ export default {
       toSettingChatUser: 'Go to configure chat user',
       displayCodeRequired: 'Please enter the number of failed attempts',
       authenticationTooltip:
-        'Enabling login authentication requires chat users to have authorization configured for both the app and its associated knowledge bases. Without proper authorization, users will not be able to log in or access knowledge base retrieval features.',
+        'Enabling login authentication requires chat users to have authorization configured for both the agent and its associated knowledge bases. Without proper authorization, users will not be able to log in or access knowledge base retrieval features.',
     },
     SettingAPIKeyDialog: {
       allowCrossDomainLabel: 'Allow Cross-Domain Access',

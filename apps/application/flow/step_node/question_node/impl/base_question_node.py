@@ -79,6 +79,7 @@ class BaseQuestionNode(IQuestionNode):
         self.context['answer'] = details.get('answer')
         self.context['message_tokens'] = details.get('message_tokens')
         self.context['answer_tokens'] = details.get('answer_tokens')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -155,5 +156,6 @@ class BaseQuestionNode(IQuestionNode):
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

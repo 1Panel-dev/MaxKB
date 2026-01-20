@@ -55,7 +55,7 @@
             </div>
             <div v-if="item.type" class="status-tag" style="margin-left: auto">
               <el-tag class="warning-tag" v-if="isWorkFlow(item.type)">
-                {{ $t('views.application.workflow') }}
+                {{ $t('views.application.senior') }}
               </el-tag>
               <el-tag class="blue-tag" v-else>
                 {{ $t('views.application.simple') }}

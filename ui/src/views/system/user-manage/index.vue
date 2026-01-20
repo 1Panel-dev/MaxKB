@@ -3,12 +3,29 @@
     <h2 class="mb-16">{{ $t('views.userManage.title') }}</h2>
     <el-card class="main-calc-height">
       <div class="flex-between mb-16">
-        <el-button
-          type="primary"
-          @click="createUser"
-          v-hasPermission="[RoleConst.ADMIN, PermissionConst.USER_CREATE]"
-          >{{ $t('views.userManage.createUser') }}
-        </el-button>
+        <div>
+          <el-button
+            type="primary"
+            @click="createUser"
+            v-hasPermission="[RoleConst.ADMIN, PermissionConst.USER_CREATE]"
+            >{{ $t('views.userManage.createUser') }}
+          </el-button>
+          <el-button
+            v-if="user.isPE() || user.isEE()"
+            :disabled="multipleSelection.length === 0"
+            @click="setUserRoles"
+            v-hasPermission="[RoleConst.ADMIN, PermissionConst.USER_EDIT]"
+          >
+            {{ $t('views.userManage.settingRole') }}
+          </el-button>
+          <el-button
+            :disabled="multipleSelection.length === 0"
+            @click="handleBatchDelete"
+            v-hasPermission="[RoleConst.ADMIN, PermissionConst.USER_DELETE]"
+          >
+            {{ $t('common.delete') }}
+          </el-button>
+        </div>
         <div class="flex-between complex-search">
           <el-select
             class="complex-search__left"
@@ -86,8 +103,10 @@
         @sizeChange="handleSizeChange"
         @changePage="getList"
         v-loading="loading"
+        @selection-change="handleSelectionChange"
         :maxTableHeight="280"
       >
+        <el-table-column type="selection" width="55" />
         <el-table-column
           prop="nick_name"
           :label="$t('views.userManage.userForm.nick_name.label')"
@@ -201,14 +220,18 @@
               />
             </span>
             <el-divider direction="vertical" />
-            <el-tooltip effect="dark" :content="$t('common.edit')" placement="top">
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
+            >
               <span class="mr-8">
                 <el-button
                   type="primary"
                   text
                   @click.stop="editUser(row)"
                   :title="$t('common.edit')"
-                  v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
                 >
                   <AppIcon iconName="app-edit"></AppIcon>
                 </el-button>
@@ -218,6 +241,7 @@
               effect="dark"
               :content="$t('views.userManage.setting.updatePwd')"
               placement="top"
+              v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
             >
               <span class="mr-8">
                 <el-button
@@ -225,20 +249,23 @@
                   text
                   @click.stop="editPwdUser(row)"
                   :title="$t('views.userManage.setting.updatePwd')"
-                  v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_EDIT], 'OR')"
                 >
                   <AppIcon iconName="app-key"></AppIcon>
                 </el-button>
               </span>
             </el-tooltip>
-            <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.delete')"
+              placement="top"
+              v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_DELETE], 'OR')"
+            >
               <el-button
                 :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
                 type="primary"
                 text
                 @click.stop="deleteUserManage(row)"
                 :title="$t('common.delete')"
-                v-if="hasPermission([RoleConst.ADMIN, PermissionConst.USER_DELETE], 'OR')"
               >
                 <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
@@ -249,21 +276,23 @@
     </el-card>
     <UserDrawer :title="title" ref="UserDrawerRef" @refresh="refresh" />
     <UserPwdDialog ref="UserPwdDialogRef" @refresh="refresh" />
+    <SetUserRoleDialog ref="setUserRoleRef" @refresh="refresh" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, reactive, watch } from 'vue'
+import { onMounted, ref, reactive, watch, computed, onBeforeMount } from 'vue'
 import UserDrawer from './component/UserDrawer.vue'
 import UserPwdDialog from './component/UserPwdDialog.vue'
+import SetUserRoleDialog from './component/SetUserRoleDialog.vue'
 import userManageApi from '@/api/system/user-manage'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
-import { ValidCount, ValidType } from '@/enums/common.ts'
 import useStore from '@/stores'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
+import { i18n_name } from '@/utils/common'
 
 const { user, common } = useStore()
 const search_type = ref('username')
@@ -290,7 +319,6 @@ const paginationConfig = reactive({
   page_size: 20,
   total: 0,
 })
-
 const userTableData = ref<any[]>([])
 
 const search_type_change = () => {
@@ -311,10 +339,13 @@ function getList() {
   return userManageApi.getUserManage(paginationConfig, params, loading).then((res) => {
     userTableData.value = res.data.records.map((item: any) => ({
       ...item,
+      nick_name: i18n_name(item.nick_name),
       role_workspace: Object.entries(item.role_workspace ?? {}).map(([role, workspaces]) => ({
-        role,
+        role: i18n_name(role),
         workspace:
-          (workspaces as string[])?.[0] === 'None' ? '-' : (workspaces as string[])?.join(', '),
+          (workspaces as string[])?.[0] === 'None'
+            ? '-'
+            : (workspaces as string[])?.map((ws) => i18n_name(ws)).join(', '),
       })),
     }))
     paginationConfig.total = res.data.total
@@ -375,6 +406,37 @@ function editPwdUser(row: any) {
 
 function refresh() {
   getList()
+}
+
+const multipleSelection = ref<any[]>([])
+
+function handleSelectionChange(val: any[]) {
+  multipleSelection.value = val
+}
+
+function handleBatchDelete() {
+  MsgConfirm(t('views.chatUser.batchDeleteUser', { count: multipleSelection.value.length }), '', {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  })
+    .then(() => {
+      userManageApi
+        .batchDelete(
+          multipleSelection.value.map((item) => item.id),
+          loading,
+        )
+        .then(async () => {
+          MsgSuccess(t('common.deleteSuccess'))
+          await getList()
+        })
+    })
+    .catch(() => {})
+}
+
+const setUserRoleRef = ref<InstanceType<typeof SetUserRoleDialog>>()
+
+function setUserRoles() {
+  setUserRoleRef.value?.open(multipleSelection.value.map((item) => item.id))
 }
 
 onMounted(() => {

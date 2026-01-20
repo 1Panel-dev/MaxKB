@@ -11,6 +11,8 @@ const applicationRouter = {
       PermissionConst.APPLICATION_READ.getWorkspacePermissionWorkspaceManageRole,
       PermissionConst.APPLICATION_READ.getWorkspacePermission,
     ],
+    icon: 'app-agent',
+    iconActive: 'app-agent-active',
     group: 'workspace',
     order: 1,
   },
@@ -20,7 +22,7 @@ const applicationRouter = {
     {
       path: '/application',
       name: 'application-index',
-      meta: { title: '应用主页', activeMenu: '/application', sameRoute: 'application' },
+      meta: { title: '智能体主页', activeMenu: '/application', sameRoute: 'application' },
       component: () => import('@/views/application/index.vue'),
       hidden: true,
     },

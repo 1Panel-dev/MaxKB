@@ -60,6 +60,8 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
+                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                                   (rsp.status_code, rsp.code, rsp.message))
             return file_urls
         elif self.model_name.startswith("qwen"):
             messages = [
@@ -89,5 +91,7 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                     file_urls.append(result.message.content[0].get('image'))
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
+                                   (rsp.status_code, rsp.code, rsp.message))
+                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
             return file_urls

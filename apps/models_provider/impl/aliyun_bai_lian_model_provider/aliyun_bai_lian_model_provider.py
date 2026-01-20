@@ -140,6 +140,7 @@ model_info_manage = (
     .append_model_info_list(module_info_tti_list)
     .append_default_model_info(module_info_tti_list[0])
     .append_default_model_info(model_info_list[1])
+    .append_default_model_info(model_info_list[2])
     .append_default_model_info(ModelInfo('default',
                              _('default'),
                              ModelTypeConst.STT, aliyun_bai_lian_default_stt_model_credential,

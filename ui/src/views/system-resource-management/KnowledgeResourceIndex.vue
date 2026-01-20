@@ -69,11 +69,7 @@
           </template>
         </el-table-column>
 
-        <el-table-column
-          prop="tool_type"
-          :label="$t('common.type')"
-          width="110"
-        >
+        <el-table-column prop="tool_type" :label="$t('common.type')" width="110">
           <template #default="{ row }">
             <span v-if="row.type === 1">{{
               $t('views.knowledge.knowledgeType.webKnowledge')
@@ -244,24 +240,32 @@
                     @click.stop="exportKnowledge(row)"
                     v-if="permissionPrecise.export()"
                   >
-                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                    >{{ $t('views.document.setting.export') }} Excel
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.export') }} Excel
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="exportZipKnowledge(row)"
                     v-if="permissionPrecise.export()"
                   >
-                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                    >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.export') }} ZIP
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    text
+                    @click.stop="openResourceMappingDrawer(row)"
+                    v-if="permissionPrecise.relate_map()"
                   >
+                    <AppIcon iconName="app-resource-mapping" class="color-secondary"></AppIcon>
+                    {{ $t('views.system.resourceMapping.title') }}
+                  </el-dropdown-item>
                   <el-dropdown-item
                     type="danger"
                     @click.stop="deleteKnowledge(row)"
                     v-if="permissionPrecise.delete()"
                   >
                     <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
-                    {{ $t('common.delete') }}</el-dropdown-item
-                  >
+                    {{ $t('common.delete') }}
+                  </el-dropdown-item>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -275,6 +279,7 @@
       :type="SourceTypeEnum.KNOWLEDGE"
       ref="ResourceAuthorizationDrawerRef"
     />
+    <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
   </div>
 </template>
 
@@ -295,6 +300,8 @@ import { t } from '@/locales'
 import useStore from '@/stores'
 import { hasPermission } from '@/utils/permission'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+
 const router = useRouter()
 const { user } = useStore()
 
@@ -309,18 +316,13 @@ const ManagePermission = () => {
     permissionPrecise.value.edit() ||
     permissionPrecise.value.knowledge_chat_user_read() ||
     permissionPrecise.value.hit_test() ||
-    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ],'OR')
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ], 'OR')
   )
 }
 
 const MoreFilledPermission = () => {
-  return (
-    permissionPrecise.value.sync() ||
-    permissionPrecise.value.generate() ||
-    permissionPrecise.value.edit() ||
-    permissionPrecise.value.export() ||
-    permissionPrecise.value.delete() ||
-    permissionPrecise.value.auth()
+  return (['sync', 'generate', 'edit', 'export', 'delete', 'auth', 'relate_map'] as const).some(
+    (key) => permissionPrecise.value[key](),
   )
 }
 
@@ -358,6 +360,7 @@ const paginationConfig = reactive({
 })
 
 const ResourceAuthorizationDrawerRef = ref()
+
 function openAuthorization(item: any) {
   ResourceAuthorizationDrawerRef.value.open(item.id)
 }
@@ -376,7 +379,9 @@ const exportZipKnowledge = (item: any) => {
 function deleteKnowledge(row: any) {
   MsgConfirm(
     `${t('views.knowledge.delete.confirmTitle')}${row.name} ?`,
-    `${t('views.knowledge.delete.confirmMessage1')} ${row.application_mapping_count} ${t('views.knowledge.delete.confirmMessage2')}`,
+    row.resource_count > 0
+      ? t('views.knowledge.delete.resourceCountMessage', row.resource_count)
+      : '',
     {
       confirmButtonText: t('common.confirm'),
       confirmButtonClass: 'danger',
@@ -392,6 +397,7 @@ function deleteKnowledge(row: any) {
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()
+
 function openGenerateDialog(row: any) {
   if (GenerateRelatedDialogRef.value) {
     GenerateRelatedDialogRef.value.open([], 'knowledge', row)
@@ -399,6 +405,7 @@ function openGenerateDialog(row: any) {
 }
 
 const SyncWebDialogRef = ref()
+
 function syncKnowledge(row: any) {
   SyncWebDialogRef.value.open(row.id)
 }
@@ -437,6 +444,7 @@ function filterWorkspaceChange(val: string) {
   getList()
   workspaceVisible.value = false
 }
+
 async function getWorkspaceList() {
   if (user.isEE()) {
     const res = await loadPermissionApi('workspace').getSystemWorkspaceList(loading)
@@ -446,6 +454,7 @@ async function getWorkspaceList() {
     }))
   }
 }
+
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
@@ -464,6 +473,10 @@ function getList() {
   })
 }
 
+const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
+const openResourceMappingDrawer = (knowledge: any) => {
+  resourceMappingDrawerRef.value?.open('KNOWLEDGE', knowledge)
+}
 onMounted(() => {
   getWorkspaceList()
   getList()

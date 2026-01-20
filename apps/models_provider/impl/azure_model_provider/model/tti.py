@@ -45,9 +45,6 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
             **optional_params,
         )
 
-    def is_cache_model(self):
-        return False
-
     def check_auth(self):
         chat = AzureOpenAI(api_key=self.api_key, azure_endpoint=self.api_base, api_version=self.api_version)
         response_list = chat.models.with_raw_response.list()
@@ -58,8 +55,12 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
         chat = AzureOpenAI(api_key=self.api_key, azure_endpoint=self.api_base, api_version=self.api_version)
         res = chat.images.generate(model=self.model, prompt=prompt, **self.params)
         file_urls = []
-        for content in res.data:
-            url = content.url
-            file_urls.append(url)
+        try:
+            for content in res.data:
+                url = content.url
+                file_urls.append(url)
+            return file_urls
+        except Exception as e:
+            raise e
 
-        return file_urls
+

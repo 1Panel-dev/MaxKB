@@ -200,21 +200,15 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         auth_target_type = self.data.get('auth_target_type')
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get('user_id')
-        wurp = QuerySet(WorkspaceUserResourcePermission).filter(auth_target_type=auth_target_type,
-                                                                workspace_id=workspace_id, user_id=user_id).first()
-        auth_type = wurp.auth_type if wurp else (
-            ResourceAuthType.RESOURCE_PERMISSION_GROUP if edition == 'CE' else ResourceAuthType.ROLE)
-        # 自动授权给创建者
+
         WorkspaceUserResourcePermission(
             target=resource_id,
             auth_target_type=auth_target_type,
             permission_list=[ResourcePermission.VIEW,
-                             ResourcePermission.MANAGE] if (
-                    auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP or is_folder) else [
-                ResourcePermissionRole.ROLE],
+                             ResourcePermission.MANAGE],
             workspace_id=workspace_id,
             user_id=user_id,
-            auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP if is_folder else auth_type
+            auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP
         ).save()
         # 刷新缓存
         version = Cache_Version.PERMISSION_LIST.get_version()
@@ -453,18 +447,33 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
         workspace_manage = is_workspace_manage(current_user_id, workspace_id)
         resource_model = self.RESOURCE_MODEL_MAP[auth_target_type]
 
+        from folders.serializers.folder import has_exact_permission_by_role
+
+        permission_id = f"{auth_target_type}:READ+AUTH"
         if workspace_manage:
-            current_user_managed_resources_ids = QuerySet(resource_model).filter(workspace_id=workspace_id,
-                                                                                 folder__in=folder_ids).annotate(
-                id_str=Cast('id', TextField())
-            ).values_list("id_str", flat=True)
+            role_type = RoleConstants.WORKSPACE_MANAGE.value.__str__()
+            has_user_role_exact_permission = has_exact_permission_by_role(current_user_id, workspace_id, permission_id,role_type)
+            if has_user_role_exact_permission:
+                current_user_managed_resources_ids = QuerySet(resource_model).filter(workspace_id=workspace_id,
+                                                                                     folder__in=folder_ids).annotate(
+                    id_str=Cast('id', TextField())
+                ).values_list("id_str", flat=True)
+            else:
+                current_user_managed_resources_ids = []
         else:
+            role_type = RoleConstants.USER.value.__str__()
+            has_user_role_exact_permission = has_exact_permission_by_role(current_user_id, workspace_id, permission_id,role_type)
+
+            permission_list = ['MANAGE']
+            if has_user_role_exact_permission:
+                permission_list = ['MANAGE','ROLE']
+
             current_user_managed_resources_ids = QuerySet(WorkspaceUserResourcePermission).filter(
                 workspace_id=workspace_id, user_id=current_user_id, auth_target_type=auth_target_type,
                 target__in=QuerySet(resource_model).filter(workspace_id=workspace_id, folder__in=folder_ids).annotate(
                     id_str=Cast('id', TextField())
                 ).values_list("id_str", flat=True),
-                permission_list__contains=['MANAGE']).values_list('target', flat=True)
+                permission_list__overlap= permission_list).values_list('target', flat=True)
 
         return current_user_managed_resources_ids
 
@@ -486,7 +495,7 @@ class ResourceUserPermissionSerializer(serializers.Serializer):
 
         if include_children:
             managed_resource_ids = list(
-                self.get_has_manage_permission_resource_under_folders(current_user_id, folder_ids)) + folder_ids
+                self.get_has_manage_permission_resource_under_folders(current_user_id, folder_ids,)) + folder_ids
 
         else:
             managed_resource_ids = [target]

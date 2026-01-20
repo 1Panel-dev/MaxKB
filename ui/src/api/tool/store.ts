@@ -32,6 +32,20 @@ const getStoreToolList: (param?: any, loading?: Ref<boolean>) => Promise<Result<
   return get('/workspace/store/tool', param, loading)
 }
 
+const getStoreKBList: (param?: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  param,
+  loading,
+) => {
+  return get('/workspace/store/knowledge_template', param, loading)
+}
+
+const getStoreAppList: (param?: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  param,
+  loading,
+) => {
+  return get('/workspace/store/application_template', param, loading)
+}
+
 /**
  * 工具商店-添加系统内置
  */
@@ -57,6 +71,8 @@ const addStoreTool: (
 export default {
   getInternalToolList,
   getStoreToolList,
+  getStoreKBList,
+  getStoreAppList,
   addInternalTool,
   addStoreTool
 }

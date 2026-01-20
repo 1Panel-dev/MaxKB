@@ -2,7 +2,7 @@
   <el-dialog width="600" :title="$t('views.chatUser.setUserGroups')" v-model="dialogVisible"
     :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true">
     <el-form label-position="top" ref="formRef" :rules="rules" :model="form" require-asterisk-position="right">
-      <el-form-item :label="$t('views.chatUser.settingMethod')" prop="user_group_ids">
+      <el-form-item :label="$t('views.chatUser.settingMethod')" prop="is_append">
         <el-radio-group v-model="form.is_append">
           <el-radio :value="true">{{ $t('views.chatUser.append') }}</el-radio>
           <el-radio :value="false">{{ $t('views.applicationOverview.SettingDisplayDialog.replace') }}</el-radio>

@@ -200,12 +200,25 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
         instance._cleanup()
         if break_outer:
             break
+        if instance.is_the_task_interrupted():
+            break
     node.context['is_interrupt_exec'] = is_interrupt_exec
     node.context['loop_node_data'] = loop_node_data
     node.context['loop_answer_data'] = loop_answer_data
     node.context["index"] = current_index
     node.context["item"] = current_index
     node.context['run_time'] = time.time() - node.context.get("start_time")
+
+
+def get_tokens(loop_node_data):
+    message_tokens = 0
+    answer_tokens = 0
+    for details in loop_node_data:
+        message_tokens += sum([row.get('message_tokens') for row in details.values() if
+                               'message_tokens' in row and row.get('message_tokens') is not None])
+        answer_tokens += sum([row.get('answer_tokens') for row in details.values() if
+                              'answer_tokens' in row and row.get('answer_tokens') is not None])
+    return {'message_tokens': message_tokens, 'answer_tokens': answer_tokens}
 
 
 def get_write_context(loop_type, array, number, loop_body):
@@ -268,7 +281,8 @@ class BaseLoopNode(ILoopNode):
                                 start_node_id=start_node_id,
                                 start_node_data=start_node_data,
                                 chat_record=chat_record,
-                                child_node=child_node
+                                child_node=child_node,
+                                is_the_task_interrupted=self.workflow_manage.is_the_task_interrupted
                                 )
 
             return workflow_manage
@@ -283,7 +297,7 @@ class BaseLoopNode(ILoopNode):
                 self.context.get(f.get('value')) is not None}
 
     def get_details(self, index: int, **kwargs):
-
+        tokens = get_tokens(self.context.get("loop_node_data"))
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -300,5 +314,8 @@ class BaseLoopNode(ILoopNode):
             'loop_context_data': self.get_loop_context_data(),
             'loop_node_data': self.context.get("loop_node_data"),
             'loop_answer_data': self.context.get("loop_answer_data"),
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
+            'message_tokens': tokens.get('message_tokens') or 0,
+            'answer_tokens': tokens.get('answer_tokens') or 0,
         }

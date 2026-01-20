@@ -31,7 +31,6 @@
     </div>
 
     <div
-      v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
       class="card-item logout"
       @click="logout"
     >

@@ -115,10 +115,6 @@ export default {
   },
   AssignmentMethod: {
     label: '赋值方式',
-
-    custom: {
-      label: '自定义',
-    },
     ref_variables: {
       popover: '变量的值必须符合',
       json_format: 'JSON 格式',

@@ -10,7 +10,13 @@
     <el-button type="primary" class="mb-16" @click="createApiKey">
       {{ $t('common.create') }}
     </el-button>
-    <el-table :data="apiKey" class="mb-16" :loading="loading" height="420">
+    <el-table
+      :data="apiKey"
+      class="mb-16"
+      :loading="loading"
+      style="min-height: 300px"
+      :max-height="500"
+    >
       <el-table-column prop="secret_key" label="API Key">
         <template #default="{ row }">
           <span class="vertical-middle lighter break-all">
@@ -121,9 +127,7 @@ async function changeState(row: any) {
   const obj = {
     is_active: !row.is_active,
   }
-  const str = obj.is_active
-    ? t('common.status.enabled')
-    : t('common.status.disabled')
+  const str = obj.is_active ? t('common.status.enabled') : t('common.status.disabled')
   await loadSharedApi({ type: 'applicationKey', systemType: apiType.value })
     .putAPIKey(id as string, row.id, obj, loading)
     .then(() => {

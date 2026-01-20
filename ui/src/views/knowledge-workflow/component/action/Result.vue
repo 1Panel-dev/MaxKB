@@ -20,13 +20,16 @@
         :closable="false"
       />
     </div>
-    <ExecutionDetailContent :detail="detail" app-type="WORK_FLOW"></ExecutionDetailContent>
+    <!-- <ExecutionDetailContent :detail="detail" app-type="WORK_FLOW"></ExecutionDetailContent> -->
+    <template v-for="(item, index) in arraySort(detail ?? [], 'index')" :key="index">
+      <ExecutionDetailCard :data="item" type="knowledge"> </ExecutionDetailCard>
+    </template>
   </div>
 </template>
 <script setup lang="ts">
 import { onUnmounted, ref, computed, watch } from 'vue'
-
-import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-source-component/ExecutionDetailContent.vue'
+import { arraySort } from '@/utils/array'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 const route = useRoute()

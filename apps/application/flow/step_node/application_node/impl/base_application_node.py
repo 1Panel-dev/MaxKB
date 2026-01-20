@@ -168,6 +168,7 @@ class BaseApplicationNode(IApplicationNode):
         self.context['question'] = details.get('question')
         self.context['type'] = details.get('type')
         self.context['reasoning_content'] = details.get('reasoning_content')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -182,7 +183,8 @@ class BaseApplicationNode(IApplicationNode):
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat,
                 chat_user_id,
                 chat_user_type,
-                app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
+                app_document_list=None, app_image_list=None, app_audio_list=None, app_video_list=None, child_node=None,
+                node_data=None,
                 **kwargs) -> NodeResult:
         from chat.serializers.chat import ChatSerializers
         if application_id == self.workflow_manage.get_body().get('application_id'):
@@ -202,6 +204,8 @@ class BaseApplicationNode(IApplicationNode):
             app_image_list = []
         if app_audio_list is None:
             app_audio_list = []
+        if app_video_list is None:
+            app_video_list = []
         runtime_node_id = None
         record_id = None
         child_node_value = None
@@ -224,6 +228,7 @@ class BaseApplicationNode(IApplicationNode):
                  'document_list': app_document_list,
                  'image_list': app_image_list,
                  'audio_list': app_audio_list,
+                 'video_list': app_video_list,
                  'runtime_node_id': runtime_node_id,
                  'chat_record_id': record_id,
                  'child_node': child_node_value,
@@ -281,5 +286,7 @@ class BaseApplicationNode(IApplicationNode):
             'document_list': self.workflow_manage.document_list,
             'image_list': self.workflow_manage.image_list,
             'audio_list': self.workflow_manage.audio_list,
-            'application_node_dict': self.context.get('application_node_dict')
+            'video_list': self.workflow_manage.video_list,
+            'application_node_dict': self.context.get('application_node_dict'),
+            'enableException': self.node.properties.get('enableException'),
         }

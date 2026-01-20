@@ -7,7 +7,7 @@
             <Back />
           </el-icon>
         </el-button>
-        <h4>详情</h4>
+        <h4>{{ $t('common.detail') }}</h4>
       </div>
     </template>
 

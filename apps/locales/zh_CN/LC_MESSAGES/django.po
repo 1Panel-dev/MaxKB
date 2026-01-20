@@ -58,7 +58,7 @@ msgstr "文件夹 ID"
 #: apps/application/serializers/application.py:368
 #| msgid "Application"
 msgid "Application Name"
-msgstr "应用名称"
+msgstr "智能体名称"
 
 #: apps/application/api/application_api.py:80
 #: apps/application/serializers/application.py:152
@@ -68,7 +68,7 @@ msgstr "应用名称"
 #: apps/application/serializers/application.py:370
 #| msgid "Application/Version"
 msgid "Application Description"
-msgstr "应用描述"
+msgstr "智能体描述"
 
 #: apps/application/api/application_api.py:87
 #: apps/application/chat_pipeline/step/chat_step/i_chat_step.py:78
@@ -250,7 +250,7 @@ msgstr "消息类型错误"
 msgid ""
 "Sorry, the AI model is not configured. Please go to the application to set "
 "up the AI model first."
-msgstr "抱歉，AI 模型未配置，请先前往应用设置 AI 模型。"
+msgstr "抱歉，AI 模型未配置，请先前往智能体设置 AI 模型。"
 
 #: apps/application/chat_pipeline/step/generate_human_message_step/i_generate_human_message_step.py:26
 #: apps/application/chat_pipeline/step/reset_problem_step/i_reset_problem_step.py:24
@@ -473,7 +473,7 @@ msgstr ""
 #: apps/xpack/api/application_setting.py:31 apps/xpack/api/platform.py:29
 #: apps/xpack/api/platform.py:70
 msgid "Application ID"
-msgstr "应用 ID"
+msgstr "智能体 ID"
 
 #: apps/application/flow/step_node/application_node/i_application_node.py:15
 msgid "API Input Fields"
@@ -788,11 +788,11 @@ msgstr "开始提示"
 
 #: apps/application/serializers/application.py:191
 msgid "application name"
-msgstr "应用名称"
+msgstr "智能体名称"
 
 #: apps/application/serializers/application.py:194
 msgid "application describe"
-msgstr "应用描述"
+msgstr "智能体描述"
 
 #: apps/application/serializers/application.py:197
 #: apps/application/serializers/application.py:372
@@ -836,11 +836,11 @@ msgstr "问题完成"
 
 #: apps/application/serializers/application.py:217
 msgid "Application Type"
-msgstr "应用类型"
+msgstr "智能体类型"
 
 #: apps/application/serializers/application.py:221
 msgid "Application type only supports SIMPLE|WORK_FLOW"
-msgstr "应用类型仅支持 SIMPLE|WORK_FLOW"
+msgstr "智能体类型仅支持 SIMPLE|WORK_FLOW"
 
 #: apps/application/serializers/application.py:226
 #: apps/application/serializers/application.py:394
@@ -888,7 +888,7 @@ msgstr ""
 
 #: apps/application/serializers/application.py:286
 msgid "Application type"
-msgstr "应用类型"
+msgstr "智能体类型"
 
 #: apps/application/serializers/application.py:287
 #: apps/xpack/serializers/resource_chat_user.py:34
@@ -1001,7 +1001,7 @@ msgid ""
 "The community version supports up to 5 applications. If you need more "
 "applications, please contact us (https://fit2cloud.com/)."
 msgstr ""
-"社区版支持最多5个应用，如需更多应用，请联系我们（https://fit2cloud.com/）。"
+"社区版支持最多5个智能体，如需更多智能体，请联系我们（https://fit2cloud.com/）。"
 
 #: apps/application/serializers/application.py:471
 #: apps/common/handle/impl/qa/zip_parse_qa_handle.py:56
@@ -1014,7 +1014,7 @@ msgstr "不支持的文件格式"
 
 #: apps/application/serializers/application.py:545
 msgid "Application id does not exist"
-msgstr "应用 ID 不存在"
+msgstr "智能体 ID 不存在"
 
 #: apps/application/serializers/application.py:591
 msgid "work_flow is a required field"
@@ -1077,7 +1077,7 @@ msgstr "跨域列表"
 #: apps/xpack/serializers/application_setting_serializer.py:77
 #: apps/xpack/serializers/dataset_lark_serializer.py:295
 msgid "application id"
-msgstr "应用 ID"
+msgstr "智能体 ID"
 
 #: apps/application/serializers/application_api_key.py:41
 #: apps/chat/serializers/chat.py:277 apps/chat/serializers/chat.py:332
@@ -1087,7 +1087,7 @@ msgstr "应用 ID"
 #: apps/xpack/serializers/platform_serializer.py:138
 #: apps/xpack/serializers/platform_serializer.py:149
 msgid "Application does not exist"
-msgstr "应用不存在"
+msgstr "智能体不存在"
 
 #: apps/application/serializers/application_api_key.py:66
 msgid "ApiKeyId"
@@ -1205,7 +1205,7 @@ msgstr "对话记录 ID"
 
 #: apps/application/serializers/application_chat_record.py:51
 msgid "Application authentication information does not exist"
-msgstr "应用认证信息不存在"
+msgstr "智能体认证信息不存在"
 
 #: apps/application/serializers/application_chat_record.py:53
 msgid "Displaying knowledge sources is not enabled"
@@ -1291,7 +1291,7 @@ msgstr "工作流版本不存在"
 #: apps/application/views/application.py:42
 #: apps/application/views/application.py:43
 msgid "Create an application"
-msgstr "创建一个应用程序"
+msgstr "创建一个智能体程序"
 
 #: apps/application/views/application.py:47
 #: apps/application/views/application.py:65
@@ -1312,101 +1312,101 @@ msgstr "创建一个应用程序"
 #: apps/xpack/views/application_setting.py:29
 #: apps/xpack/views/application_setting.py:47
 msgid "Application"
-msgstr "应用"
+msgstr "智能体"
 
 #: apps/application/views/application.py:60
 #: apps/application/views/application.py:61
 #: apps/application/views/application.py:62
 msgid "Get the application list"
-msgstr "获取应用列表"
+msgstr "获取智能体列表"
 
 #: apps/application/views/application.py:77
 #: apps/application/views/application.py:78
 #: apps/application/views/application.py:79
 msgid "Get the application list by page"
-msgstr "分页获取应用列表"
+msgstr "分页获取智能体列表"
 
 #: apps/application/views/application.py:97
 #: apps/application/views/application.py:98
 #: apps/application/views/application.py:99
 msgid "Import Application"
-msgstr "导入应用"
+msgstr "导入智能体"
 
 #: apps/application/views/application.py:117
 #: apps/application/views/application.py:118
 #: apps/application/views/application.py:119
 msgid "Export application"
-msgstr "导出应用"
+msgstr "导出智能体"
 
 #: apps/application/views/application.py:140
 #: apps/application/views/application.py:141
 #: apps/application/views/application.py:142
 msgid "Deleting application"
-msgstr "删除应用"
+msgstr "删除智能体"
 
 #: apps/application/views/application.py:160
 #: apps/application/views/application.py:161
 #: apps/application/views/application.py:162
 msgid "Modify the application"
-msgstr "修改应用"
+msgstr "修改智能体"
 
 #: apps/application/views/application.py:181
 #: apps/application/views/application.py:182
 #: apps/application/views/application.py:183
 msgid "Get application details"
-msgstr "获取应用详情"
+msgstr "获取智能体详情"
 
 #: apps/application/views/application.py:200
 #: apps/application/views/application.py:201
 #: apps/application/views/application.py:202
 msgid "Publishing an application"
-msgstr "发布应用"
+msgstr "发布智能体"
 
 #: apps/application/views/application_access_token.py:27
 #: apps/application/views/application_access_token.py:28
 #: apps/application/views/application_access_token.py:29
 msgid "Modify application access restriction information"
-msgstr "修改应用访问限制信息"
+msgstr "修改智能体访问限制信息"
 
 #: apps/application/views/application_access_token.py:43
 #: apps/application/views/application_access_token.py:44
 #: apps/application/views/application_access_token.py:45
 msgid "Get application access restriction information"
-msgstr "获取应用访问限制信息"
+msgstr "获取智能体访问限制信息"
 
 #: apps/application/views/application_api_key.py:31
 #: apps/application/views/application_api_key.py:32
 #: apps/application/views/application_api_key.py:33
 msgid "Create application ApiKey"
-msgstr "创建应用 API 密钥"
+msgstr "创建智能体 API 密钥"
 
 #: apps/application/views/application_api_key.py:37
 #: apps/application/views/application_api_key.py:57
 #: apps/application/views/application_api_key.py:77
 #: apps/application/views/application_api_key.py:99
 msgid "Application Api Key"
-msgstr "应用 API 密钥"
+msgstr "智能体 API 密钥"
 
 #: apps/application/views/application_api_key.py:52
 msgid "GET application ApiKey List"
-msgstr "获取应用的 API 密钥列表"
+msgstr "获取智能体的 API 密钥列表"
 
 #: apps/application/views/application_api_key.py:53
 #: apps/application/views/application_api_key.py:54
 msgid "Create application ApiKey List"
-msgstr "创建应用 API 密钥列表"
+msgstr "创建智能体 API 密钥列表"
 
 #: apps/application/views/application_api_key.py:71
 #: apps/application/views/application_api_key.py:72
 #: apps/application/views/application_api_key.py:73
 msgid "Modify application API_KEY"
-msgstr "修改应用 API 密钥"
+msgstr "修改智能体 API 密钥"
 
 #: apps/application/views/application_api_key.py:93
 #: apps/application/views/application_api_key.py:94
 #: apps/application/views/application_api_key.py:95
 msgid "Delete Application API_KEY"
-msgstr "删除应用 API 密钥"
+msgstr "删除智能体 API 密钥"
 
 #: apps/application/views/application_chat.py:35
 #: apps/application/views/application_chat.py:36
@@ -1425,7 +1425,7 @@ msgstr "获取对话列表"
 #: apps/application/views/application_chat_record.py:145
 #: apps/application/views/application_chat_record.py:171
 msgid "Application/Conversation Log"
-msgstr "应用/对话日志"
+msgstr "智能体/对话日志"
 
 #: apps/application/views/application_chat.py:55
 #: apps/application/views/application_chat.py:56
@@ -1443,7 +1443,7 @@ msgstr "导出对话"
 #: apps/application/views/application_chat.py:98
 #: apps/application/views/application_chat.py:99
 msgid "Get a temporary session id based on the application id"
-msgstr "获取应用的临时会话 ID"
+msgstr "获取智能体的临时会话 ID"
 
 #: apps/application/views/application_chat.py:116
 #: apps/application/views/application_chat.py:117
@@ -1498,32 +1498,32 @@ msgstr "与对话有关的统计趋势"
 #: apps/application/views/application_version.py:31
 #: apps/application/views/application_version.py:32
 msgid "Get the application version list"
-msgstr "获取应用版本列表"
+msgstr "获取智能体版本列表"
 
 #: apps/application/views/application_version.py:35
 #: apps/application/views/application_version.py:55
 #: apps/application/views/application_version.py:76
 #: apps/application/views/application_version.py:94
 msgid "Application/Version"
-msgstr "应用/ 版本"
+msgstr "智能体/ 版本"
 
 #: apps/application/views/application_version.py:50
 #: apps/application/views/application_version.py:51
 #: apps/application/views/application_version.py:52
 msgid "Get the list of application versions by page"
-msgstr "分页获取应用版本列表"
+msgstr "分页获取智能体版本列表"
 
 #: apps/application/views/application_version.py:71
 #: apps/application/views/application_version.py:72
 #: apps/application/views/application_version.py:73
 msgid "Get application version details"
-msgstr "获取应用版本详情"
+msgstr "获取智能体版本详情"
 
 #: apps/application/views/application_version.py:88
 #: apps/application/views/application_version.py:89
 #: apps/application/views/application_version.py:90
 msgid "Modify application version information"
-msgstr "修改应用版本信息"
+msgstr "修改智能体版本信息"
 
 #: apps/chat/api/chat_authentication_api.py:38
 #: apps/chat/serializers/chat_authentication.py:28
@@ -1604,7 +1604,7 @@ msgstr "下载过程被中断，请重试"
 
 #: apps/chat/serializers/chat.py:306 apps/chat/serializers/chat.py:357
 msgid "The application has not been published. Please use it after publishing."
-msgstr "应用未发布，请发布后使用。"
+msgstr "智能体未发布，请发布后使用。"
 
 #: apps/chat/serializers/chat_authentication.py:50
 #: apps/xpack/serializers/chat_auth.py:53
@@ -1622,7 +1622,7 @@ msgstr ""
 #: apps/chat/views/chat.py:37 apps/chat/views/chat.py:38
 #: apps/chat/views/chat.py:39
 msgid "Application Anonymous Certification"
-msgstr "应用匿名认证"
+msgstr "智能体匿名认证"
 
 #: apps/chat/views/chat.py:42 apps/chat/views/chat.py:64
 #: apps/chat/views/chat.py:81 apps/chat/views/chat.py:99
@@ -1634,17 +1634,17 @@ msgstr "对话"
 #: apps/chat/views/chat.py:59 apps/chat/views/chat.py:60
 #: apps/chat/views/chat.py:61
 msgid "Get application related information"
-msgstr "获取应用相关信息"
+msgstr "获取智能体相关信息"
 
 #: apps/chat/views/chat.py:76 apps/chat/views/chat.py:77
 #: apps/chat/views/chat.py:78
 msgid "Get application authentication information"
-msgstr "获取应用认证信息"
+msgstr "获取智能体认证信息"
 
 #: apps/chat/views/chat.py:115 apps/chat/views/chat.py:116
 #: apps/chat/views/chat.py:117
 msgid "Get the session id according to the application id"
-msgstr "根据应用 ID 获取会话 ID"
+msgstr "根据智能体 ID 获取会话 ID"
 
 #: apps/chat/views/chat.py:131 apps/chat/views/chat.py:132
 #: apps/chat/views/chat.py:133 apps/users/views/login.py:70
@@ -1780,7 +1780,7 @@ msgstr "工作空间"
 
 #: apps/common/constants/permission_constants.py:213
 msgid "Resource Application"
-msgstr "资源管理-应用"
+msgstr "资源管理-智能体"
 
 #: apps/common/constants/permission_constants.py:214
 msgid "Resource Knowledge"
@@ -2616,7 +2616,7 @@ msgstr "知识库选择器"
 #: apps/knowledge/serializers/knowledge.py:73
 #: apps/xpack/serializers/dataset_lark_serializer.py:296
 msgid "application id list"
-msgstr "应用 ID 列表"
+msgstr "智能体 ID 列表"
 
 #: apps/knowledge/serializers/knowledge.py:75
 msgid "file size limit"
@@ -2667,7 +2667,7 @@ msgstr "知识库名称重复！"
 #: apps/xpack/serializers/dataset_lark_serializer.py:359
 #, python-brace-format
 msgid "Unknown application id {knowledge_id}, cannot be associated"
-msgstr "未知应用 ID {knowledge_id}，无法关联"
+msgstr "未知智能体 ID {knowledge_id}，无法关联"
 
 #: apps/knowledge/serializers/knowledge.py:449
 #: apps/shared/serializers/shared_knowledge.py:62
@@ -4073,7 +4073,7 @@ msgstr ""
 msgid ""
 "Ideal for content creation, conversational AI, language understanding, R&D, "
 "and enterprise applications"
-msgstr "非常适合内容创作、对话式人工智能、语言理解、研发和企业应用"
+msgstr "非常适合内容创作、对话式人工智能、语言理解、研发和企业智能体"
 
 #: apps/models_provider/impl/aws_bedrock_model_provider/aws_bedrock_model_provider.py:115
 msgid ""
@@ -4553,7 +4553,7 @@ msgid ""
 msgstr ""
 "当前混元模型中效果最优版本，万亿级参数规模 MOE-32K 长文模型。在各种 "
 "benchmark 上达到绝对领先的水平，复杂指令和推理，具备复杂数学能力，支持 "
-"functioncall，在多语言翻译、金融法律医疗等领域应用重点优化"
+"functioncall，在多语言翻译、金融法律医疗等领域智能体重点优化"
 
 #: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py:45
 msgid ""
@@ -4746,7 +4746,7 @@ msgid ""
 "Llama-2-13b-chat is a native open source version with balanced performance "
 "and effect, suitable for conversation scenarios."
 msgstr ""
-"Llama-2-13b-chat由Meta AI研发并开源，在编码、推理及知识应用等场景表现优秀，"
+"Llama-2-13b-chat由Meta AI研发并开源，在编码、推理及知识智能体等场景表现优秀，"
 "Llama-2-13b-chat是性能与效果均衡的原生开源版本，适用于对话场景。"
 
 #: apps/models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:42
@@ -4755,7 +4755,7 @@ msgid ""
 "well in scenarios such as coding, reasoning, and knowledge application. "
 "Llama-2-70b-chat is a native open source version with high-precision effects."
 msgstr ""
-"Llama-2-70b-chat由Meta AI研发并开源，在编码、推理及知识应用等场景表现优秀，"
+"Llama-2-70b-chat由Meta AI研发并开源，在编码、推理及知识智能体等场景表现优秀，"
 "Llama-2-70b-chat是高精度效果的原生开源版本。"
 
 #: apps/models_provider/impl/wenxin_model_provider/wenxin_model_provider.py:45
@@ -6579,7 +6579,7 @@ msgstr "当前 ID"
 
 #: apps/system_manage/serializers/user_resource_permission.py:70
 msgid "Non-existent application|knowledge base id["
-msgstr "不存在的应用|知识库 ID["
+msgstr "不存在的智能体|知识库 ID["
 
 #: apps/system_manage/views/email_setting.py:50
 #: apps/system_manage/views/email_setting.py:51
@@ -7042,7 +7042,7 @@ msgstr "默认工作空间不能被删除"
 
 #: apps/workspace/serializers/workspace_serializers.py:122
 msgid "Applications Resource"
-msgstr "应用资源"
+msgstr "智能体资源"
 
 #: apps/workspace/serializers/workspace_serializers.py:124
 msgid "Knowledge Resource"
@@ -7686,7 +7686,7 @@ msgstr "请分析图片内容。"
 
 #: apps/xpack/serializers/channel/ding_talk.py:95
 msgid "DingTalk application: {user}"
-msgstr "钉钉应用: {user}"
+msgstr "钉钉智能体: {user}"
 
 #: apps/xpack/serializers/channel/ding_talk.py:106
 #: apps/xpack/serializers/channel/ding_talk.py:151
@@ -7695,7 +7695,7 @@ msgstr "AI 生成的内容"
 
 #: apps/xpack/serializers/channel/lark.py:92
 msgid "Lark application: "
-msgstr "飞书应用: "
+msgstr "飞书智能体: "
 
 #: apps/xpack/serializers/channel/slack.py:116
 msgid "The corresponding platform configuration for Slack was not found"
@@ -7715,7 +7715,7 @@ msgstr "Slack 请求无效"
 
 #: apps/xpack/serializers/channel/slack.py:347
 msgid "Slack application: {user}"
-msgstr "Slack 应用: {user}"
+msgstr "Slack 智能体: {user}"
 
 #: apps/xpack/serializers/channel/slack.py:480
 msgid "Stop"
@@ -7756,7 +7756,7 @@ msgstr "微信公众账号: {account}"
 msgid ""
 "The app does not enable the speech-to-text function or the speech-to-text "
 "function fails."
-msgstr "应用未开启语音转文字功能或语音转文字功能失败。"
+msgstr "智能体未开启语音转文字功能或语音转文字功能失败。"
 
 #: apps/xpack/serializers/channel/wechat.py:189
 msgid "Message types not supported yet"
@@ -7844,7 +7844,7 @@ msgstr "无效的访问令牌"
 
 #: apps/xpack/serializers/chat_user_serializer.py:102
 msgid "The user does not have permission to access the application"
-msgstr "用户没有访问应用的权限"
+msgstr "用户没有访问智能体的权限"
 
 #: apps/xpack/serializers/dataset_lark_serializer.py:56
 #: apps/xpack/serializers/dataset_lark_serializer.py:299
@@ -8101,13 +8101,13 @@ msgstr "项目网址"
 #: apps/xpack/views/application_setting.py:25
 #: apps/xpack/views/application_setting.py:26
 msgid "Modify Application Settings"
-msgstr "修改应用设置"
+msgstr "修改智能体设置"
 
 #: apps/xpack/views/application_setting.py:42
 #: apps/xpack/views/application_setting.py:43
 #: apps/xpack/views/application_setting.py:44
 msgid "Get Application Settings"
-msgstr "获取应用设置"
+msgstr "获取智能体设置"
 
 #: apps/xpack/views/auth.py:52 apps/xpack/views/auth.py:53
 #: apps/xpack/views/auth.py:54 apps/xpack/views/chat_user_auth.py:46
@@ -8294,7 +8294,7 @@ msgstr "对话用户/登录"
 #: apps/xpack/views/chat_user_auth.py:415
 #: apps/xpack/views/chat_user_auth.py:416
 msgid "Application Password Certification"
-msgstr "应用密码认证"
+msgstr "智能体密码认证"
 
 #: apps/xpack/views/license.py:31 apps/xpack/views/license.py:32
 #: apps/xpack/views/license.py:33
@@ -8336,7 +8336,7 @@ msgstr "获取平台配置"
 
 #: apps/xpack/views/platform.py:65 apps/xpack/views/platform.py:79
 msgid "Application/application access"
-msgstr "应用/应用访问"
+msgstr "智能体/智能体访问"
 
 #: apps/xpack/views/platform.py:73 apps/xpack/views/platform.py:74
 #: apps/xpack/views/platform.py:75
@@ -8350,7 +8350,7 @@ msgstr "获取平台状态"
 
 #: apps/xpack/views/platform.py:98 apps/xpack/views/platform.py:118
 msgid "Application/Get platform status"
-msgstr "应用/获取平台状态"
+msgstr "智能体/获取平台状态"
 
 #: apps/xpack/views/platform.py:113 apps/xpack/views/platform.py:114
 #: apps/xpack/views/platform.py:115
@@ -8361,7 +8361,7 @@ msgstr "更新平台状态"
 #: apps/xpack/views/resource_chat_user.py:28
 #: apps/xpack/views/resource_chat_user.py:29
 msgid "Get Resource chat user List"
-msgstr "获取资源聊天用户列表"
+msgstr "获取资源对话用户列表"
 
 #: apps/xpack/views/resource_chat_user.py:32
 #: apps/xpack/views/resource_chat_user.py:54
@@ -8370,19 +8370,19 @@ msgstr "获取资源聊天用户列表"
 #: apps/xpack/views/system_chat_user_group.py:45
 #: apps/xpack/views/system_chat_user_group.py:67
 msgid "Chat user"
-msgstr "聊天用户"
+msgstr "对话用户"
 
 #: apps/xpack/views/resource_chat_user.py:48
 #: apps/xpack/views/resource_chat_user.py:49
 #: apps/xpack/views/resource_chat_user.py:50
 msgid "Edit Resource chat user List"
-msgstr "编辑资源聊天用户列表"
+msgstr "编辑资源对话用户列表"
 
 #: apps/xpack/views/resource_chat_user.py:72
 #: apps/xpack/views/resource_chat_user.py:73
 #: apps/xpack/views/resource_chat_user.py:74
 msgid "Get Resource chat user page List"
-msgstr "获取资源聊天用户分页列表"
+msgstr "获取资源对话用户分页列表"
 
 #: apps/xpack/views/system_api_key.py:19 apps/xpack/views/system_api_key.py:20
 #: apps/xpack/views/system_api_key.py:21
@@ -8446,22 +8446,22 @@ msgstr "系统/用户组"
 #: apps/xpack/views/system_chat_user_group.py:20
 #: apps/xpack/views/system_chat_user_group.py:21
 msgid "Get Resource chat user group List"
-msgstr "获取资源聊天用户组列表"
+msgstr "获取资源对话用户组列表"
 
 #: apps/xpack/views/system_chat_user_group.py:39
 #: apps/xpack/views/system_chat_user_group.py:40
 #: apps/xpack/views/system_chat_user_group.py:41
 msgid "Edit Resource chat user group List"
-msgstr "编辑资源聊天用户组列表"
+msgstr "编辑资源对话用户组列表"
 
 #: apps/xpack/views/system_chat_user_group.py:62
 #: apps/xpack/views/system_chat_user_group.py:64
 msgid "Get Resource chat user group page List"
-msgstr "获取资源聊天用户组分页列表"
+msgstr "获取资源对话用户组分页列表"
 
 #: apps/xpack/views/system_chat_user_group.py:63
 msgid "Get Resource chat user page group List"
-msgstr "获取资源聊天用户分页组列表"
+msgstr "获取资源对话用户分页组列表"
 
 #: apps/xpack/views/system_params.py:22 apps/xpack/views/system_params.py:23
 #: apps/xpack/views/system_params.py:24
@@ -8474,7 +8474,7 @@ msgid "Update appearance settings"
 msgstr "更新外观设置"
 
 msgid "Application Access"
-msgstr "应用接入"
+msgstr "智能体接入"
 
 msgid "Display execution details"
 msgstr "是否显示执行详情"
@@ -8546,7 +8546,7 @@ msgid "Paragraph"
 msgstr "段落"
 
 msgid "User group"
-msgstr "用戶组"
+msgstr "用户组"
 
 msgid "Remove member from user group"
 msgstr "从用户组中移除成员"
@@ -8606,19 +8606,19 @@ msgid "Shared Knowledge/Document"
 msgstr "共享知识库/文档"
 
 msgid "System Application"
-msgstr "系统应用"
+msgstr "系统智能体"
 
 msgid "Hit-Test"
 msgstr "命中测试"
 
 msgid "Export Application"
-msgstr "导出应用"
+msgstr "导出智能体"
 
 msgid "Add ApiKey"
 msgstr "添加 API KEY"
 
 msgid "Delete application API_KEY"
-msgstr "删除应用 API KEY"
+msgstr "删除智能体 API KEY"
 
 msgid "knowledge Base"
 msgstr "知识库"
@@ -8642,7 +8642,7 @@ msgid "Generate related documents"
 msgstr "生成相关文档"
 
 msgid "Modify application access token"
-msgstr "修改应用程序访问令牌"
+msgstr "修改智能体程序访问令牌"
 
 msgid "File not exist. Only manually uploaded documents are supported"
 msgstr "文件不存在, 仅支持手动上传的文档"
@@ -8895,10 +8895,10 @@ msgid "No permission for the target folder"
 msgstr "没有目标文件夹的权限"
 
 msgid "Application token usage statistics"
-msgstr "应用令牌使用统计"
+msgstr "智能体令牌使用统计"
 
 msgid "Application top question statistics"
-msgstr "应用提问次数统计"
+msgstr "智能体提问次数统计"
 
 msgid "SAML2 Metadata"
 msgstr "SAML2 元数据"
@@ -8992,3 +8992,57 @@ msgstr "聆飞博"
 
 msgid "Super-humanoid: Lingyuyan Pro"
 msgstr "聆玉言"
+
+msgid "Login failed %s times, account will be locked, you have %s more chances !"
+msgstr "登录失败 %s 次，账号将被锁定，您还有 %s 次机会！"
+
+msgid "This account has been locked for %s minutes, please try again later"
+msgstr "该账号已被锁定 %s 分钟，请稍后再试"
+
+msgid "User does not have permission to use API Key"
+msgstr "用户没有使用 API Key 的权限"
+
+msgid "Import knowledge workflow"
+msgstr "导入知识工作流"
+
+msgid "Export knowledge workflow"
+msgstr "导出知识工作流"
+
+msgid "Role IDs cannot be empty"
+msgstr "角色 ID 不能为空"
+
+msgid "Some roles do not exist"
+msgstr "部分角色不存在"
+
+msgid "Authorized pagination list for obtaining resources"
+msgstr "获取资源的关系分页列表"
+
+msgid "Resources mapping"
+msgstr "资源映射"
+
+msgid "Batch set user roles"
+msgstr "批量设置用户角色"
+
+msgid "Role Setting cannot be empty"
+msgstr "角色设置不能为空"
+
+msgid "View related resources"
+msgstr "查看关联资源"
+
+msgid "Feedback reason"
+msgstr "反馈理由"
+
+msgid "Other reason content"
+msgstr "其他反馈理由内容"
+
+msgid "accurate"
+msgstr "内容准确"
+
+msgid "complete"
+msgstr "内容完善"
+
+msgid "inaccurate"
+msgstr "内容不准确"
+
+msgid "incomplete"
+msgstr "内容不完善"

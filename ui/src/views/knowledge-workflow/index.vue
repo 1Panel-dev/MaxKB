@@ -26,6 +26,14 @@
         </el-button>
       </div>
       <div v-else-if="!route.path.includes('share/')">
+        <el-button
+          class="ml-8"
+          v-if="permissionPrecise.create()"
+          @click="openTemplateStoreDialog()"
+        >
+          <AppIcon iconName="app-template-center" class="mr-4" />
+          {{ $t('workflow.setting.templateCenter') }}
+        </el-button>
         <el-button @click="showPopover = !showPopover">
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
@@ -52,7 +60,37 @@
                 <AppIcon iconName="app-to-import-doc" class="color-secondary"></AppIcon>
                 {{ $t('workflow.operation.toImportDoc') }}
               </el-dropdown-item>
-              <el-dropdown-item @click="openListAction" divided>
+              <el-upload
+                class="import-button"
+                ref="elUploadRef"
+                accept=".kbwf"
+                :file-list="[]"
+                action="#"
+                multiple
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                :on-change="(file: any, fileList: any) => importKnowledgeWorkflow(file)"
+                v-if="permissionPrecise.workflow_edit(id)"
+              >
+                <el-dropdown-item>
+                  <AppIcon iconName="app-import" class="color-secondary"></AppIcon>
+                  {{ $t('workflow.operation.importWorkflow') }}
+                </el-dropdown-item>
+              </el-upload>
+              <el-dropdown-item
+                @click.stop="exportKnowledgeWorkflow(detail.name, detail.id)"
+                v-if="permissionPrecise.workflow_export(id)"
+              >
+                <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                {{ $t('workflow.operation.exportWorkflow') }}
+              </el-dropdown-item>
+
+              <el-dropdown-item
+                @click="openListAction"
+                divided
+                v-if="permissionPrecise.doc_create(id)"
+              >
                 <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
                 {{ $t('workflow.ExecutionRecord') }}
               </el-dropdown-item>
@@ -137,6 +175,12 @@
       v-click-outside="clickoutsideHistory"
       @refreshVersion="refreshVersion"
     />
+    <TemplateStoreDialog
+      ref="templateStoreDialogRef"
+      :api-type="apiType"
+      source="work_flow"
+      @refresh="getDetail"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -150,7 +194,6 @@ import PublishHistory from '@/views/knowledge-workflow/component/PublishHistory.
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
-import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
 import { KnowledgeWorkFlowInstance } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
@@ -162,6 +205,7 @@ import permissionMap from '@/permission'
 import { WorkflowMode } from '@/enums/application'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { knowledgeBaseNode } from '@/workflow/common/data'
+import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Knowledge)
 provide('loopWorkflowMode', WorkflowMode.KnowledgeLoop)
@@ -362,6 +406,52 @@ const publish = () => {
             ` ${t('workflow.node')}，` +
             err_message[keys[0]]?.[0]?.message,
         )
+      }
+    })
+}
+
+const elUploadRef = ref()
+const importKnowledgeWorkflow = (file: any) => {
+  const formData = new FormData()
+  formData.append('file', file.raw)
+  const name = file.name.replace('.kbwf', '')
+  elUploadRef.value.clearFiles()
+  MsgConfirm(
+    t('common.tip'),
+    `${t('views.application.tip.confirmUse')} ${name} ${t('views.application.tip.overwrite')}?`,
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+    },
+  )
+    .then(() => {
+      loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+        .importKnowledgeWorkflow(id, formData, loading)
+        .then(() => {
+          getDetail()
+        })
+        .catch((error: any) => {
+          if (error.code === 400) {
+            MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+              cancelButtonText: t('common.confirm'),
+              confirmButtonText: t('common.professional'),
+            }).then(() => {
+              window.open('https://maxkb.cn/pricing.html', '_blank')
+            })
+          }
+        })
+    })
+    .catch(() => {})
+}
+
+function exportKnowledgeWorkflow(name: string, id: string) {
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
+    .exportKnowledgeWorkflow(id, name, loading)
+    .catch((error: any) => {
+      if (error.response.status !== 403) {
+        error.response.data.text().then((res: string) => {
+          MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+        })
       }
     })
 }
@@ -576,6 +666,11 @@ const toImportDoc = () => {
       .then(() => {})
       .catch(() => {})
   }
+}
+
+const templateStoreDialogRef = ref()
+function openTemplateStoreDialog() {
+  templateStoreDialogRef.value?.open(folderId)
 }
 
 /**

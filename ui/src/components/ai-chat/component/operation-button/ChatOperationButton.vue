@@ -19,7 +19,7 @@
             :disabled="!data?.write_ed"
             @click="audioManage?.pause(true)"
           >
-            <AppIcon iconName="app-video-pause"></AppIcon>
+            <AppIcon class="color-secondary" iconName="app-video-pause"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-else>
@@ -33,7 +33,7 @@
               }
             "
           >
-            <AppIcon iconName="app-video-play"></AppIcon>
+            <AppIcon class="color-secondary" iconName="app-video-play"></AppIcon>
           </el-button>
         </el-tooltip>
 
@@ -42,7 +42,7 @@
       <span v-if="type == 'ai-chat' || type == 'log'">
         <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
           <el-button text @click="copy(data)">
-            <AppIcon iconName="app-copy"></AppIcon>
+            <AppIcon class="color-secondary" iconName="app-copy"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
@@ -52,50 +52,111 @@
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
+
         <el-tooltip
+          v-if="buttonData?.vote_status === '-1' && mode === 'mobile'"
           effect="dark"
           :content="$t('chat.operation.like')"
           placement="top"
-          v-if="buttonData?.vote_status === '-1'"
         >
-          <el-button text @click="voteHandle('0')" :disabled="loading">
-            <AppIcon iconName="app-like"></AppIcon>
+          <el-button text :disabled="loading" @click="mobileVoteReasonHandler('0')">
+            <AppIcon class="color-secondary" iconName="app-like"></AppIcon>
           </el-button>
         </el-tooltip>
+
+        <el-popover
+          ref="likePopoverRef"
+          trigger="click"
+          placement="bottom-start"
+          :width="360"
+          popper-class="vote-popover"
+          v-if="buttonData?.vote_status === '-1' && mode !== 'mobile'"
+        >
+          <template #reference>
+            <span>
+              <el-tooltip effect="dark" :content="$t('chat.operation.like')" placement="top">
+                <el-button text :disabled="loading">
+                  <AppIcon class="color-secondary" iconName="app-like"></AppIcon>
+                </el-button>
+              </el-tooltip>
+            </span>
+          </template>
+          <VoteReasonContent
+            vote-type="0"
+            :chat-id="props.chatId"
+            :record-id="props.data.record_id"
+            @success="handleVoteSuccess"
+            @close="closePopover"
+          >
+          </VoteReasonContent>
+        </el-popover>
+
         <el-tooltip
           effect="dark"
           :content="$t('chat.operation.cancelLike')"
           placement="top"
           v-if="buttonData?.vote_status === '0'"
         >
-          <el-button text @click="voteHandle('-1')" :disabled="loading">
-            <AppIcon iconName="app-like-color"></AppIcon>
+          <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
+            <AppIcon class="color-secondary" iconName="app-like-color"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" v-if="buttonData?.vote_status === '-1'" />
         <el-tooltip
+          v-if="buttonData?.vote_status === '-1' && mode === 'mobile'"
           effect="dark"
           :content="$t('chat.operation.oppose')"
           placement="top"
-          v-if="buttonData?.vote_status === '-1'"
         >
-          <el-button text @click="voteHandle('1')" :disabled="loading">
-            <AppIcon iconName="app-oppose"></AppIcon>
+          <el-button text :disabled="loading" @click="mobileVoteReasonHandler('1')">
+            <AppIcon class="color-secondary" iconName="app-oppose"></AppIcon>
           </el-button>
         </el-tooltip>
+        <el-popover
+          ref="opposePopoverRef"
+          trigger="click"
+          placement="bottom-start"
+          :width="360"
+          popper-class="vote-popover"
+          v-if="buttonData?.vote_status === '-1' && mode !== 'mobile'"
+        >
+          <template #reference>
+            <span>
+              <el-tooltip effect="dark" :content="$t('chat.operation.oppose')" placement="top">
+                <el-button text :disabled="loading">
+                  <AppIcon class="color-secondary" iconName="app-oppose"></AppIcon>
+                </el-button>
+              </el-tooltip>
+            </span>
+          </template>
+          <VoteReasonContent
+            vote-type="1"
+            :chat-id="props.chatId"
+            :record-id="props.data.record_id"
+            @success="handleVoteSuccess"
+            @close="closePopover"
+          >
+          </VoteReasonContent>
+        </el-popover>
         <el-tooltip
           effect="dark"
           :content="$t('chat.operation.cancelOppose')"
           placement="top"
           v-if="buttonData?.vote_status === '1'"
         >
-          <el-button text @click="voteHandle('-1')" :disabled="loading">
-            <AppIcon iconName="app-oppose-color"></AppIcon>
+          <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
+            <AppIcon class="color-secondary" iconName="app-oppose-color"></AppIcon>
           </el-button>
         </el-tooltip>
       </span>
       <div ref="audioCiontainer"></div>
     </div>
+    <MobileVoteReasonDrawer
+      ref="mobileVoteReasonDrawerRef"
+      :chat-id="props.chatId"
+      :record-id="props.data.record_id"
+      @success="handleVoteSuccess"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -106,20 +167,14 @@ import applicationApi from '@/api/application/application'
 import chatAPI from '@/api/chat/chat'
 import { datetimeFormat } from '@/utils/time'
 import { MsgError } from '@/utils/message'
+import VoteReasonContent from '@/components/ai-chat/component/operation-button/VoteReasonContent.vue'
+import MobileVoteReasonDrawer from '@/components/ai-chat/component/operation-button/MobileVoteReasonDrawer.vue'
 import bus from '@/bus'
-const copy = (data: any) => {
-  try {
-    const text = data.answer_text_list
-      .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
-      .join('\n\n')
-    copyClick(removeFormRander(text))
-  } catch (e: any) {
-    copyClick(removeFormRander(data?.answer_text.trim()))
-  }
-}
+
 const route = useRoute()
 const {
   params: { id },
+  query: { mode },
 } = route as any
 
 const props = withDefaults(
@@ -141,19 +196,50 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:data', 'regeneration'])
 
+const copy = (data: any) => {
+  try {
+    const text = data.answer_text_list
+      .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
+      .join('\n\n')
+    copyClick(removeFormRander(text))
+  } catch (e: any) {
+    copyClick(removeFormRander(data?.answer_text.trim()))
+  }
+}
+
+const likePopoverRef = ref()
+const opposePopoverRef = ref()
+const closePopover = () => {
+  likePopoverRef.value.hide()
+  opposePopoverRef.value.hide()
+}
+const mobileVoteReasonDrawerRef = ref<InstanceType<typeof MobileVoteReasonDrawer> | null>(null)
+const mobileVoteReasonHandler = (voteStatus: string) => {
+  if (mobileVoteReasonDrawerRef.value) {
+    mobileVoteReasonDrawerRef.value.open(voteStatus)
+  }
+}
+
 const audioPlayer = ref<HTMLAudioElement[] | null>([])
 const audioCiontainer = ref<HTMLDivElement>()
 const buttonData = ref(props.data)
 const loading = ref(false)
-
 const audioList = ref<string[]>([])
 
 function regeneration() {
   emit('regeneration')
 }
 
-function voteHandle(val: string) {
-  chatAPI.vote(props.chatId, props.data.record_id, val, loading).then(() => {
+function handleVoteSuccess(voteStatus: string) {
+  buttonData.value['vote_status'] = voteStatus
+  emit('update:data', buttonData.value)
+  if (mode !== 'mobile') {
+    closePopover()
+  }
+}
+
+function cancelVoteHandle(val: string) {
+  chatAPI.vote(props.chatId, props.data.record_id, val, undefined, '', loading).then(() => {
     buttonData.value['vote_status'] = val
     emit('update:data', buttonData.value)
   })
@@ -178,6 +264,8 @@ function markdownToPlainText(md: string) {
       .replace(/`(.*?)`/g, '$1')
       // 移除代码块 ```code```
       .replace(/```[\s\S]*?```/g, '')
+      // 移除video标签
+      .replace(/<video>[\s\S]*?<\/video>/g, '')
       // 移除html标签
       .replace(/<[^>]+>/g, '')
       // 移除多余的换行符
@@ -561,11 +649,15 @@ onBeforeUnmount(() => {
   }
 })
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 @media only screen and (max-width: 430px) {
   .chat-operation-button {
     display: block;
     text-align: right;
   }
+}
+.vote-popover {
+  padding: 20px 24px !important;
+  color: var(--el-text-color-primary) !important;
 }
 </style>

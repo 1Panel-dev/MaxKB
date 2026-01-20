@@ -12,7 +12,8 @@ import i18n from '@/locales'
 import Components from '@/components'
 import directives from '@/directives'
 
-import { config } from 'md-editor-v3'
+import { getDefaultWhiteList } from 'xss'
+import { config, XSSPlugin } from 'md-editor-v3'
 import screenfull from 'screenfull'
 
 import katex from 'katex'
@@ -42,6 +43,50 @@ config({
     mermaid: {
       instance: mermaid,
     },
+  },
+  markdownItPlugins(plugins) {
+    return [
+      ...plugins,
+      {
+        type: 'xss',
+        plugin: XSSPlugin,
+        options: {
+          xss() {
+            return {
+              whiteList: Object.assign({}, getDefaultWhiteList(), {
+                video: ['src', 'controls', 'width', 'height', 'preload', 'playsinline'],
+                source: ['src', 'type'],
+                input: ['class', 'disabled', 'type', 'checked'],
+                iframe: [
+                  'class',
+                  'width',
+                  'height',
+                  'src',
+                  'title',
+                  'border',
+                  'frameborder',
+                  'framespacing',
+                  'allow',
+                  'allowfullscreen',
+                ],
+              }),
+              onTagAttr: (tag: string, name: any, value: any) => {
+                if (tag === 'video') {
+                  // 禁止自动播放
+                  if (name === 'autoplay') return ''
+
+                  // 限制 preload
+                  if (name === 'preload' && !['none', 'metadata'].includes(value)) {
+                    return 'preload="metadata"'
+                  }
+                }
+                return undefined
+              },
+            }
+          },
+        },
+      },
+    ]
   },
 })
 const app = createApp(App)

@@ -145,6 +145,8 @@ export default {
       currentOnly: '僅當前資源',
       includeAll: '包含所有子資源',
       effectiveResource: '生效資源',
+      defaultPermission: '預設權限',
+      defaultPermissionTip: '所選工作空間下所有資源的預設權限',
     },
   },
   resource_management: {
@@ -156,6 +158,13 @@ export default {
   loginFailed: '登入失敗',
   loginFailedMessage: '次顯示驗證碼',
   display_codeTip: '值為-1時，不顯示驗證碼',
+  failedTip: '次，鎖定帳號',
+  minute: '分鐘',
   time: '次',
   setting: '登录設置',
+  third_party_user_default_role: '第三方用戶預設角色分配',
+  resourceMapping: {
+    title: '查看關聯資源',
+    sub_title: '關聯資源',
+  },
 }

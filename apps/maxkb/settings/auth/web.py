@@ -12,7 +12,10 @@ APPLICATION_KEY_AUTH = 'common.auth.handle.impl.application_key.ApplicationKey'
 RUOYI_TOKEN_AUTH = 'common.auth.handle.impl.ruoyi_token.RuoyiToken'
 
 AUTH_HANDLES = [
-    USER_TOKEN_AUTH,
+    USER_TOKEN_AUTH
+]
+
+CHAT_AUTH_HANDLES = [
     CHAT_ANONYMOUS_USER_AURH,
     APPLICATION_KEY_AUTH,
     RUOYI_TOKEN_AUTH

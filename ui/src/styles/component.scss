@@ -4,7 +4,7 @@
   border-radius: var(--el-border-radius-base);
   .el-select__wrapper {
     box-shadow: none !important;
-    border-radius: var(--el-border-radius-base) 0 0 var(--el-border-radius-base);
+    border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;
   }
   .el-input__wrapper {
     box-shadow: none !important;
@@ -12,6 +12,10 @@
   }
   &__left {
     border-right: 1px solid var(--el-border-color);
+    .el-select__wrapper {
+      box-shadow: none !important;
+      border-radius: var(--el-border-radius-base) 0 0 var(--el-border-radius-base);
+    }
   }
 }
 

@@ -21,7 +21,8 @@
         </el-button>
       </div>
     </template>
-    <LayoutContainer class="application-manage">
+    <!-- 共享的知识库工作流中，只能查共享的工具，这里不需要展示左边的树，只需展示右边的内容   -->
+    <LayoutContainer class="application-manage" :show-left="apiType !== 'systemShare'">
       <template #left>
         <folder-tree
           :data="folderList"
@@ -152,7 +153,11 @@ function clearCheck() {
 
 const open = (checked: any) => {
   checkList.value = checked || []
-  getFolder()
+  if (apiType.value === 'systemShare') {
+    getList()
+  } else {
+    getFolder()
+  }
   dialogVisible.value = true
 }
 
@@ -195,7 +200,7 @@ function getList() {
   loadSharedApi({
     type: 'tool',
     isShared: folder_id === 'share',
-    systemType: 'workspace',
+    systemType: apiType.value,
   })
     .getToolList({
       folder_id: folder_id,

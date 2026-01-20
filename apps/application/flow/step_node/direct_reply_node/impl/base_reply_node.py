@@ -15,6 +15,7 @@ from application.flow.step_node.direct_reply_node.i_reply_node import IReplyNode
 class BaseReplyNode(IReplyNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -41,5 +42,6 @@ class BaseReplyNode(IReplyNode):
             'type': self.node.type,
             'answer': self.context.get('answer'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

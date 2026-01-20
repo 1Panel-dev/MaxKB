@@ -19,6 +19,7 @@ class ApplicationNodeSerializer(serializers.Serializer):
     image_list = serializers.ListField(required=False, label=_("picture"))
     document_list = serializers.ListField(required=False, label=_("document"))
     audio_list = serializers.ListField(required=False, label=_("Audio"))
+    video_list = serializers.ListField(required=False, label=_("Video"))
     child_node = serializers.DictField(required=False, allow_null=True,
                                        label=_("Child Nodes"))
     node_data = serializers.DictField(required=False, allow_null=True, label=_("Form Data"))
@@ -76,12 +77,24 @@ class IApplicationNode(INode):
                 if 'file_id' not in audio:
                     raise ValueError(
                         _("Parameter value error: The uploaded audio lacks file_id, and the audio upload fails."))
+        app_video_list = self.node_params_serializer.data.get('video_list', [])
+        if app_video_list and len(app_video_list) > 0:
+            app_video_list = self.workflow_manage.get_reference_field(
+                app_video_list[0],
+                app_video_list[1:]
+            )
+            for video in app_video_list:
+                if 'file_id' not in video:
+                    raise ValueError(
+                        _("Parameter value error: The uploaded video lacks file_id, and the video upload fails."))
         return self.execute(**{**self.flow_params_serializer.data, **self.node_params_serializer.data},
                             app_document_list=app_document_list, app_image_list=app_image_list,
                             app_audio_list=app_audio_list,
+                            app_video_list=app_video_list,
                             message=str(question), **kwargs)
 
     def execute(self, application_id, message, chat_id, chat_record_id, stream, re_chat, client_id, client_type,
-                app_document_list=None, app_image_list=None, app_audio_list=None, child_node=None, node_data=None,
+                app_document_list=None, app_image_list=None, app_audio_list=None, app_video_list=None, child_node=None,
+                node_data=None,
                 **kwargs) -> NodeResult:
         pass

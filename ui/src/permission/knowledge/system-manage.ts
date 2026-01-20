@@ -53,8 +53,14 @@ const systemManage = {
   doc_read: () => 
     hasPermission([
       RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ,
+      PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_READ,
+    ], 'OR'),
+  jump_read: () => 
+    hasPermission([
+      RoleConst.ADMIN,
       PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_READ
-    ],'OR'),  
+    ],'OR'),
   doc_create: () => hasPermission(
     [
       RoleConst.ADMIN,
@@ -197,6 +203,12 @@ const systemManage = {
       PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_EDIT
     ],'OR'
     ), 
+  workflow_export: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_WORKFLOW_EXPORT
+    ],'OR'
+    ), 
   chat_user_edit: () =>false,
 
   
@@ -204,6 +216,12 @@ const systemManage = {
     hasPermission([
       RoleConst.ADMIN,
       PermissionConst.RESOURCE_KNOWLEDGE_AUTH
+    ],'OR'
+    ),
+  relate_map: () => 
+    hasPermission([
+      RoleConst.ADMIN,
+      PermissionConst.RESOURCE_KNOWLEDGE_RELATE_RESOURCE_VIEW
     ],'OR'
     ),
   folderRead: () => false,

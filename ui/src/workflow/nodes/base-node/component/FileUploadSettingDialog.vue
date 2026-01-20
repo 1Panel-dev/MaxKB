@@ -11,8 +11,8 @@
     align-center
     class="scrollbar-dialog"
   >
-    <el-scrollbar max-height="550">
-      <div class="p-8">
+    <el-scrollbar>
+      <div class="p-8" style="max-height: calc(100vh - 273px)">
         <el-form
           label-position="top"
           ref="fieldFormRef"
@@ -238,6 +238,7 @@
         </el-form>
       </div>
     </el-scrollbar>
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="close"> {{ $t('common.cancel') }} </el-button>

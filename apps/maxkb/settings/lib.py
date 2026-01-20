@@ -71,9 +71,9 @@ else:
 CELERY_result_backend = CELERY_BROKER_URL
 CELERY_timezone = CONFIG.get_time_zone()
 CELERY_ENABLE_UTC = False
-CELERY_task_serializer = 'pickle'
-CELERY_result_serializer = 'pickle'
-CELERY_accept_content = ['json', 'pickle']
+CELERY_task_serializer = 'hmac_signed_serializer'
+CELERY_result_serializer = 'hmac_signed_serializer'
+CELERY_accept_content = ['json', 'hmac_signed_serializer']
 CELERY_RESULT_EXPIRES = 600
 CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime).19s %(message)s'
 CELERY_WORKER_LOG_FORMAT = '%(asctime).19s %(message)s'

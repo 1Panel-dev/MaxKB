@@ -108,6 +108,8 @@ class Application(AppModelMixin):
     mcp_source = models.CharField(verbose_name="MCP Source", max_length=20, default="referencing")
     tool_enable = models.BooleanField(verbose_name="工具是否启用", default=False)
     tool_ids = models.JSONField(verbose_name="工具ID列表", default=list)
+    application_enable = models.BooleanField(verbose_name="应用是否启用", default=False)
+    application_ids = models.JSONField(verbose_name="应用ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
 
     @staticmethod
@@ -189,6 +191,8 @@ class ApplicationVersion(AppModelMixin):
     mcp_source = models.CharField(verbose_name="MCP Source", max_length=20, default="referencing")
     tool_enable = models.BooleanField(verbose_name="工具是否启用", default=False)
     tool_ids = models.JSONField(verbose_name="工具ID列表", default=list)
+    application_enable = models.BooleanField(verbose_name="应用是否启用", default=False)
+    application_ids = models.JSONField(verbose_name="应用ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
 
     class Meta:

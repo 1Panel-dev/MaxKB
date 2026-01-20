@@ -79,7 +79,7 @@
         >
           <template #default="scope">
             <el-tag class="warning-tag" v-if="isWorkFlow(scope.row.type)">
-              {{ $t('views.application.workflow') }}
+              {{ $t('views.application.senior') }}
             </el-tag>
             <el-tag class="blue-tag" v-else>
               {{ $t('views.application.simple') }}
@@ -402,7 +402,7 @@ function mapToUrlParams(map: any[]) {
 function deleteApplication(row: any) {
   MsgConfirm(
     `${t('views.application.delete.confirmTitle')}${row.name} ?`,
-    t('views.application.delete.confirmMessage'),
+    row.resource_count > 0 ? t('views.application.delete.resourceCountMessage', row.resource_count) : '',
     {
       confirmButtonText: t('common.confirm'),
       cancelButtonText: t('common.cancel'),
@@ -439,7 +439,7 @@ const search_form = ref<any>({
 const user_options = ref<any[]>([])
 const type_options = ref<any[]>([
   {
-    label: t('views.application.workflow'),
+    label: t('views.application.senior'),
     value: 'WORK_FLOW',
   },
   {

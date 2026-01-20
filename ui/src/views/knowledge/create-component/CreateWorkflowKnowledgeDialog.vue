@@ -52,6 +52,7 @@ const dialogVisible = ref<boolean>(false)
 const currentFolder = ref<any>(null)
 
 const workflowDefault = ref(knowledgeTemplate.default)
+const workflowTemplate = ref()
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
@@ -59,8 +60,11 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (folder: string) => {
+const open = (folder: string, workflow?: any) => {
   currentFolder.value = folder
+  if (workflow) {
+    workflowTemplate.value = workflow
+  }
   dialogVisible.value = true
 }
 
@@ -69,6 +73,7 @@ const submitHandle = async () => {
     const obj = {
       folder_id: currentFolder.value?.id,
       work_flow: workflowDefault.value,
+      work_flow_template: workflowTemplate.value,
       ...BaseFormRef.value.form,
     }
     loadSharedApi({ type: 'knowledge', systemType: apiType.value })

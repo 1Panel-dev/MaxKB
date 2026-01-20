@@ -129,6 +129,15 @@ const systemManage = {
         ],
         'OR'
     ),
+    jump_read: () => 
+      hasPermission(
+        [
+          RoleConst.ADMIN,
+          PermissionConst.RESOURCE_APPLICATION_OVERVIEW_READ,
+          PermissionConst.RESOURCE_APPLICATION_READ,
+        ],
+        'OR'
+    ),  
     access_read: () => 
       hasPermission(
         [

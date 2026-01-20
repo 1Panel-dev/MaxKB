@@ -5,7 +5,7 @@ from . import views
 app_name = 'application'
 # @formatter:off
 urlpatterns = [
-
+    path('workspace/store/application_template', views.ApplicationAPI.StoreApplication.as_view()),
     path('workspace/<str:workspace_id>/application', views.ApplicationAPI.as_view(), name='application'),
     path('workspace/<str:workspace_id>/application/folder/<str:folder_id>/import', views.ApplicationAPI.Import.as_view()),
     path('workspace/<str:workspace_id>/application/<int:current_page>/<int:page_size>', views.ApplicationAPI.Page.as_view(), name='application_page'),

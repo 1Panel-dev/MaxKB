@@ -35,6 +35,7 @@
         v-model="form.embedding_model_id"
         :placeholder="$t('views.knowledge.form.EmbeddingModel.placeholder')"
         :options="modelOptions"
+        @submit-model="getSelectModel"
         :model-type="'EMBEDDING'"
         showFooter
       ></ModelSelect>

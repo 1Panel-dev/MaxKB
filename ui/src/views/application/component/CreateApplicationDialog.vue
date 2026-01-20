@@ -41,7 +41,7 @@
 
       <el-form-item
         :label="$t('views.document.upload.template')"
-        v-if="applicationForm.type === 'WORK_FLOW'"
+        v-if="applicationForm.type === 'WORK_FLOW' && !work_flow_template"
       >
         <div class="w-full">
           <el-row :gutter="16">
@@ -126,6 +126,7 @@ const applicationFormRef = ref()
 
 const loading = ref(false)
 const dialogVisible = ref<boolean>(false)
+const work_flow_template = ref()
 
 const applicationForm = ref<ApplicationFormType>({
   name: '',
@@ -158,6 +159,7 @@ const applicationForm = ref<ApplicationFormType>({
   tts_model_enable: false,
   tts_type: 'BROWSER',
   type: 'SIMPLE',
+  work_flow_template: undefined,
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -217,10 +219,11 @@ watch(dialogVisible, (bool) => {
   }
 })
 
-const open = (folder: string, type?: string) => {
+const open = (folder: string, type?: string, work_flow?: any) => {
   currentFolder.value = folder
   applicationForm.value.type = type || 'SIMPLE'
   dialogVisible.value = true
+  work_flow_template.value = work_flow
 }
 
 const submitHandle = async (formEl: FormInstance | undefined) => {
@@ -231,6 +234,9 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         workflowDefault.value.nodes[0].properties.node_data.desc = applicationForm.value.desc
         workflowDefault.value.nodes[0].properties.node_data.name = applicationForm.value.name
         applicationForm.value['work_flow'] = workflowDefault.value
+        if (work_flow_template.value) {
+          applicationForm.value['work_flow_template'] = work_flow_template.value
+        }
       }
       loading.value = true
       applicationApi

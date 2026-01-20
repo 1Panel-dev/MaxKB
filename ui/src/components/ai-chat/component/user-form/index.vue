@@ -107,7 +107,7 @@ watch(
 function handleInputFieldList() {
   dynamicsFormRefresh.value++
   const default_value: any = {}
-  props.application.work_flow?.nodes
+  props.application?.work_flow?.nodes
     ?.filter((v: any) => v.id === 'base-node')
     .map((v: any) => {
       inputFieldList.value = v.properties.user_input_field_list

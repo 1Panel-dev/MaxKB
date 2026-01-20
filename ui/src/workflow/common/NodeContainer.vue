@@ -90,9 +90,16 @@
             />
             <slot></slot>
             <template v-if="nodeFields.length > 0">
-              <h5 class="title-decoration-1 mb-8 mt-8">
-                {{ $t('common.param.outputParam') }}
-              </h5>
+              <div class="flex-between">
+                <h5 class="title-decoration-1 mb-8 mt-8">
+                  {{ $t('common.param.outputParam') }}
+                </h5>
+                <div v-if="exceptionNodeList.includes(nodeModel.type)" class="text-right">
+                  <span class="mt-8 mr-8 lighter">{{ $t('common.param.exception') }}</span>
+                  <el-switch v-model="enable_exception" size="small" />
+                </div>
+              </div>
+
               <template v-for="(item, index) in nodeFields" :key="index">
                 <div
                   class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
@@ -128,7 +135,8 @@
         :show="showAnchor"
         :inner="true"
         :id="id"
-        style="left: 100%; top: 50%; transform: translate(0, -50%)"
+        style="left: 100%; transform: translate(0, -50%)"
+        :style="dropdownMenuStyle"
         @clickNodes="clickNodes"
       />
     </el-collapse-transition>
@@ -170,7 +178,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed, onMounted, inject } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyClick } from '@/utils/clipboard'
@@ -180,6 +188,7 @@ import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 import { useRoute } from 'vue-router'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
+
 const route = useRoute()
 const {
   params: { id },
@@ -196,6 +205,13 @@ const height = ref<{
 })
 const showAnchor = ref<boolean>(false)
 const anchorData = ref<any>()
+const dropdownMenuStyle = computed(() => {
+  return {
+    top: anchorData.value
+      ? anchorData.value.y - props.nodeModel.y + props.nodeModel.height / 2 + 'px'
+      : '0px',
+  }
+})
 const titleFormRef = ref()
 const nodeNameDialogVisible = ref<boolean>(false)
 const form = ref<any>({
@@ -324,10 +340,33 @@ function clickNodes(item: any) {
 
   closeNodeMenu()
 }
+const enable_exception = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'enableException', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.enableException !== undefined) {
+      return props.nodeModel.properties.enableException
+    }
+    set(props.nodeModel.properties, 'enableException', false)
+    return false
+  },
+})
+const props = withDefaults(
+  defineProps<{
+    nodeModel: any
+    exceptionNodeList?: string[]
+  }>(),
+  {
+    exceptionNodeList: () => [
+      'ai-chat-node',
+      'video-understand-node',
+      'image-generate-node',
+      'image-understand-node',
+    ],
+  },
+)
 
-const props = defineProps<{
-  nodeModel: any
-}>()
 const nodeFields = computed(() => {
   if (props.nodeModel.properties.config.fields) {
     const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
@@ -338,9 +377,30 @@ const nodeFields = computed(() => {
         globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
       }
     })
+    if (enable_exception.value) {
+      return [
+        ...fields,
+        {
+          label: '异常信息',
+          value: 'exception_message',
+          globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
+          globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
+        },
+      ]
+    }
     return fields
   }
   return []
+})
+watch(enable_exception, () => {
+  props.nodeModel.graphModel.eventCenter.emit(
+    'delete_edge',
+    props.nodeModel.outgoing.edges
+      .filter((item: any) =>
+        [`${props.nodeModel.id}_exception_right`].includes(item.sourceAnchorId),
+      )
+      .map((item: any) => item.id),
+  )
 })
 
 function showOperate(type: string) {

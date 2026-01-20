@@ -10,7 +10,7 @@
       @touchend="onTouchEnd"
       :disabled="disabled"
     >
-      {{ disabled ? '对话中' : '按住说话' }}
+      {{ disabled ? $t('chat.inputPlaceholder.chatting') : $t('chat.inputPlaceholder.holdToTalk') }}
     </el-button>
     <!-- 使用 custom-class 自定义样式 -->
     <transition name="el-fade-in-linear">
@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { t } from '@/locales'
 const props = defineProps({
   time: {
     type: Number,
@@ -62,7 +63,7 @@ const emit = defineEmits(['TouchStart', 'TouchEnd'])
 const startY = ref(0)
 const isTouching = ref(false)
 const dialogVisible = ref(false)
-const message = ref('按住说话')
+const message = ref(t('chat.inputPlaceholder.holdToTalk'))
 
 watch(
   () => [props.time, props.start],
@@ -70,7 +71,7 @@ watch(
     if (start) {
       isTouching.value = true
       dialogVisible.value = true
-      message.value = '松开发送，上滑取消'
+      message.value = t('chat.inputPlaceholder.touchChatMessage')
       if (time === 60) {
         dialogVisible.value = false
         emit('TouchEnd', isTouching.value)
@@ -88,7 +89,7 @@ watch(
     if (val) {
       isTouching.value = true
       dialogVisible.value = true
-      message.value = '松开发送，上滑取消'
+      message.value = t('chat.inputPlaceholder.touchChatMessage')
     } else {
       dialogVisible.value = false
       isTouching.value = false
@@ -114,7 +115,7 @@ function onTouchMove(event: any) {
   // 判断是否上滑
   if (deltaY < -50) {
     // -50 是一个阈值，可以根据需要调整
-    message.value = '松开取消发送'
+    message.value = t('chat.inputPlaceholder.cancelTouchChat')
     isTouching.value = false
   }
 }

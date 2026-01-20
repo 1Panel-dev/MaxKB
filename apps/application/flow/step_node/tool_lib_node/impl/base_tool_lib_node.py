@@ -56,6 +56,8 @@ def valid_reference_value(_type, value, name):
     try:
         if _type == 'int':
             instance_type = int | float
+        elif _type == 'boolean':
+            instance_type = bool
         elif _type == 'float':
             instance_type = float | int
         elif _type == 'dict':
@@ -103,6 +105,9 @@ def convert_value(name: str, value, _type, is_required, source, node):
         value = node.workflow_manage.generate_prompt(value)
         if _type == 'int':
             return int(value)
+        if _type == 'boolean':
+            value = 0 if ['0', '[]'].__contains__(value) else value
+            return bool(value)
         if _type == 'float':
             return float(value)
         if _type == 'dict':
@@ -169,6 +174,7 @@ def bytes_to_uploaded_file(file_bytes, file_name="unknown"):
 class BaseToolLibNodeNode(IToolLibNode):
     def save_context(self, details, workflow_manage):
         self.context['result'] = details.get('result')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result'):
             self.answer_text = str(details.get('result'))
 
@@ -197,16 +203,18 @@ class BaseToolLibNodeNode(IToolLibNode):
         else:
             all_params = init_params_default_value | params
         if self.node.properties.get('kind') == 'data-source':
-            exist = function_executor.exec_code(f'{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))', {'function_name': 'get_download_file_list'})
+            exist = function_executor.exec_code(
+                f'{tool_lib.code}\ndef function_exist(function_name): return callable(globals().get(function_name))',
+                {'function_name': 'get_download_file_list'})
+            all_params = {**all_params, **self.workflow_params.get('data_source')}
             if exist:
                 download_file_list = []
                 download_list = function_executor.exec_code(tool_lib.code,
-                                                            {**all_params, **self.workflow_params.get('data_source')},
+                                                            all_params,
                                                             function_name='get_download_file_list')
                 for item in download_list:
                     result = function_executor.exec_code(tool_lib.code,
-                                                         {**all_params, **self.workflow_params.get('data_source'),
-                                                          'download_item': item},
+                                                         {**all_params, 'download_item': item},
                                                          function_name='download')
                     file_bytes = result.get('file_bytes', [])
                     chunks = []
@@ -250,5 +258,6 @@ class BaseToolLibNodeNode(IToolLibNode):
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

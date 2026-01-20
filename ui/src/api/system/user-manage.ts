@@ -66,7 +66,6 @@ const putUserManagePassword: (
 }
 
 
-
 /**
  * 获取系统默认密码
  */
@@ -90,6 +89,25 @@ const getValid: (
   return get(`/valid/${valid_type}/${valid_count}`, undefined, loading)
 }
 
+const batchDelete: (
+  ids: string[],
+  loading?: Ref<boolean>
+) => Promise<Result<any>> = (ids, loading) => {
+  return post(`/user_manage/batch_delete`, ids, {}, loading)
+}
+
+const batchSetRolePE: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`/user_manage/batch/add_role`, data, undefined, loading)
+}
+const batchSetRoleEE: (data: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  data,
+  loading,
+) => {
+  return post(`/user_manage/batch/add_role_ee`, data, undefined, loading)
+}
 
 export default {
   getUserManage,
@@ -99,5 +117,7 @@ export default {
   putUserManagePassword,
   getSystemDefaultPassword,
   getValid,
-
+  batchDelete,
+  batchSetRolePE,
+  batchSetRoleEE
 }

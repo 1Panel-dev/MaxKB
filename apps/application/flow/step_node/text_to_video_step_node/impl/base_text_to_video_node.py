@@ -14,9 +14,11 @@ from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from django.utils.translation import gettext
 
+
 class BaseTextToVideoNode(ITextToVideoNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
+        self.context['exception_message'] = details.get('err_message')
         self.context['question'] = details.get('question')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
@@ -153,4 +155,5 @@ class BaseTextToVideoNode(ITextToVideoNode):
             'image_list': self.context.get('image_list'),
             'dialogue_type': self.context.get('dialogue_type'),
             'negative_prompt': self.context.get('negative_prompt'),
+            'enableException': self.node.properties.get('enableException'),
         }

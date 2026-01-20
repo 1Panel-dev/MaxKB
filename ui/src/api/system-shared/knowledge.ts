@@ -155,7 +155,7 @@ const putKnowledgeHitTest: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return put(`${prefix}/${knowledge_id}/hit_test`, data, undefined, loading)
+  return post(`${prefix}/${knowledge_id}/hit_test`, data, undefined, loading)
 }
 
 /**
@@ -388,6 +388,39 @@ const putKnowledgeWorkflow: (
   return put(`${prefix}/${knowledge_id}/workflow`, data, undefined, loading)
 }
 
+/** * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportKnowledgeWorkflow = (
+  knowledge_id: string,
+  knowledge_name: string,
+  loading?: Ref<boolean>,
+) => {
+  return exportFile(
+    knowledge_name + '.kbwf',
+    `${prefix}/${knowledge_id}/workflow/export`,
+    undefined,
+    loading,
+  )
+}
+
+/** * 导入知识库工作流
+ * @param knowledge_id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const importKnowledgeWorkflow: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix}/${knowledge_id}/workflow/import`, data, undefined, loading)
+}
+
 const workflowUpload: (
   knowledge_id: string,
   instance: Dict<any>,
@@ -408,6 +441,15 @@ const listKnowledgeVersion: (
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (knowledge_id: string, loading) => {
   return get(`${prefix}/${knowledge_id}/knowledge_version`, {}, loading)
+}
+
+
+const getMcpTools: (
+  knowledge_id: string,
+  mcp_servers: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, mcp_servers, loading) => {
+  return post(`${prefix}/${knowledge_id}/mcp_tools`, { mcp_servers }, {}, loading)
 }
 
 export default {
@@ -443,6 +485,9 @@ export default {
   listKnowledgeVersion,
   workflowUpload,
   getWorkflowActionPage,
+  exportKnowledgeWorkflow,
+  importKnowledgeWorkflow,
+  getMcpTools
 } as {
   [key: string]: any
 }

@@ -29,7 +29,7 @@
         <el-col :span="10">
           <div class="p-24 mb-16" style="padding-bottom: 0">
             <h4 class="title-decoration-1">
-              {{ $t('views.applicationOverview.appInfo.header') }}
+              {{ $t('common.info') }}
             </h4>
           </div>
           <div class="scrollbar-height-left">
@@ -47,10 +47,7 @@
                 <el-form-item prop="name">
                   <template #label>
                     <div class="flex-between">
-                      <span
-                        >{{ $t('common.name') }}
-                        <span class="color-danger">*</span></span
-                      >
+                      <span>{{ $t('common.name') }} <span class="color-danger">*</span></span>
                     </div>
                   </template>
                   <el-input
@@ -174,7 +171,7 @@
                     style="height: 120px"
                     @submitDialog="submitNoReferencesPromptDialog"
                     :placeholder="
-                      $t('views.application.form.roleSettings.placeholder', {
+                      $t('views.application.form.prompt.placeholder', {
                         data: '{data}',
                         question: '{question}',
                       })
@@ -195,106 +192,396 @@
                     :step-strictly="true"
                   />
                 </el-form-item>
-                <el-form-item label="$t('views.application.form.relatedKnowledgeBase')">
-                  <template #label>
-                    <div class="flex-between">
-                      <span>{{ $t('views.application.form.relatedKnowledge.label') }}</span>
-                      <div>
-                        <el-button type="primary" link @click="openParamSettingDialog">
-                          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
-                          {{ $t('common.paramSetting') }}
-                        </el-button>
-                        <el-button type="primary" link @click="openKnowledgeDialog">
-                          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-                          {{ $t('common.add') }}
-                        </el-button>
+
+                <p class="mb-12 lighter">
+                  {{ $t('views.knowledge.title') }}
+                </p>
+
+                <!-- 知识库 -->
+                <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+                  <el-form-item
+                    :label="$t('views.application.form.prompt.label')"
+                    prop="model_setting.prompt"
+                    :rules="{
+                      required: applicationForm.model_id,
+                      message: $t('views.application.form.prompt.requiredMessage'),
+                      trigger: 'blur',
+                    }"
+                  >
+                    <template #label>
+                      <div
+                        class="flex align-center cursor"
+                        @click="collapseData.prompt = !collapseData.prompt"
+                      >
+                        <el-icon
+                          class="mr-8 arrow-icon"
+                          :class="collapseData.prompt ? 'rotate-90' : ''"
+                        >
+                          <CaretRight />
+                        </el-icon>
+                        <span class="mr-4">
+                          {{ $t('views.application.form.prompt.label') }}
+                          {{ $t('views.application.form.prompt.references') }}
+                        </span>
+                        <el-tooltip
+                          effect="dark"
+                          :content="$t('views.application.form.prompt.tooltip')"
+                          popper-class="max-w-350"
+                          placement="right"
+                        >
+                          <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                        </el-tooltip>
+                        <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
                       </div>
+                    </template>
+
+                    <MdEditorMagnify
+                      v-if="collapseData.prompt"
+                      :title="
+                        $t('views.application.form.prompt.label') +
+                        $t('views.application.form.prompt.references')
+                      "
+                      v-model="applicationForm.model_setting.prompt"
+                      style="height: 150px"
+                      @submitDialog="submitPromptDialog"
+                      :placeholder="
+                        $t('views.application.form.prompt.placeholder', {
+                          data: '{data}',
+                          question: '{question}',
+                        })
+                      "
+                    />
+                  </el-form-item>
+                  <div
+                    class="flex-between mb-12 cursor"
+                    @click="collapseData.knowledge_setting = !collapseData.knowledge_setting"
+                  >
+                    <div class="flex align-center">
+                      <el-icon
+                        class="mr-8 arrow-icon"
+                        :class="collapseData.knowledge_setting ? 'rotate-90' : ''"
+                      >
+                        <CaretRight />
+                      </el-icon>
+                      <span class="lighter">{{
+                        $t('views.application.form.relatedKnowledge.label')
+                      }}</span>
                     </div>
-                  </template>
-                  <div class="w-full">
+
+                    <div>
+                      <span class="mr-4">
+                        <el-button type="primary" link @click="openParamSettingDialog">
+                          <AppIcon iconName="app-setting"></AppIcon>
+                        </el-button>
+                      </span>
+
+                      <el-button type="primary" link @click="openKnowledgeDialog">
+                        <AppIcon iconName="app-add-outlined"></AppIcon>
+                      </el-button>
+                    </div>
+                  </div>
+                  <div class="w-full" v-if="collapseData.knowledge_setting">
                     <el-text type="info" v-if="applicationForm.knowledge_id_list?.length === 0"
                       >{{ $t('views.application.form.relatedKnowledge.placeholder') }}
                     </el-text>
-                    <el-row :gutter="12" v-else>
-                      <el-col
-                        :xs="24"
-                        :sm="24"
-                        :md="24"
-                        :lg="12"
-                        :xl="12"
-                        class="mb-8"
+                    <div v-else>
+                      <template
                         v-for="(item, index) in applicationForm.knowledge_id_list"
                         :key="index"
                       >
-                        <el-card class="relate-knowledge-card border-r-6" shadow="never">
-                          <div class="flex-between">
-                            <div class="flex align-center" style="width: 80%">
-                              <KnowledgeIcon
-                                :type="relatedObject(knowledgeList, item, 'id')?.type"
-                                class="mr-12"
-                              />
+                        <div
+                          class="flex-between border border-r-6 white-bg mb-4"
+                          style="padding: 5px 8px"
+                        >
+                          <div class="flex align-center" style="width: 80%">
+                            <KnowledgeIcon
+                              :type="relatedObject(knowledgeList, item, 'id')?.type"
+                              class="mr-8"
+                              :size="20"
+                            />
 
-                              <span
-                                class="ellipsis cursor"
-                                :title="relatedObject(knowledgeList, item, 'id')?.name"
-                              >
-                                {{ relatedObject(knowledgeList, item, 'id')?.name }}</span
-                              >
-                            </div>
-                            <el-button text @click="removeKnowledge(item)">
-                              <el-icon>
-                                <Close />
-                              </el-icon>
-                            </el-button>
+                            <span
+                              class="ellipsis cursor"
+                              :title="relatedObject(knowledgeList, item, 'id')?.name"
+                            >
+                              {{ relatedObject(knowledgeList, item, 'id')?.name }}</span
+                            >
                           </div>
-                        </el-card>
-                      </el-col>
-                    </el-row>
-                  </div>
-                </el-form-item>
-                <el-form-item
-                  :label="$t('views.application.form.prompt.label')"
-                  prop="model_setting.prompt"
-                  :rules="{
-                    required: applicationForm.model_id,
-                    message: $t('views.application.form.prompt.requiredMessage'),
-                    trigger: 'blur',
-                  }"
-                >
-                  <template #label>
-                    <div class="flex align-center">
-                      <span class="mr-4">
-                        {{ $t('views.application.form.prompt.label') }}
-                        {{ $t('views.application.form.prompt.references') }}
-                      </span>
-                      <el-tooltip
-                        effect="dark"
-                        :content="$t('views.application.form.prompt.tooltip')"
-                        popper-class="max-w-350"
-                        placement="right"
-                      >
-                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-                      </el-tooltip>
-                      <span class="color-danger ml-4" v-if="applicationForm.model_id">*</span>
+                          <el-button text @click="removeKnowledge(item)">
+                            <el-icon><Close /></el-icon>
+                          </el-button>
+                        </div>
+                      </template>
                     </div>
-                  </template>
+                  </div>
+                </el-card>
 
-                  <MdEditorMagnify
-                    :title="
-                      $t('views.application.form.prompt.label') +
-                      $t('views.application.form.prompt.references')
-                    "
-                    v-model="applicationForm.model_setting.prompt"
-                    style="height: 150px"
-                    @submitDialog="submitPromptDialog"
-                    :placeholder="
-                      $t('views.application.form.roleSettings.placeholder', {
-                        data: '{data}',
-                        question: '{question}',
-                      })
-                    "
-                  />
-                </el-form-item>
+                <div class="mb-8 mt-12 flex-between">
+                  <span class="mr-4 lighter">
+                    {{ $t('views.application.skill') }}
+                  </span>
+                  <div class="flex" v-if="toolPermissionPrecise.read()">
+                    <el-checkbox
+                      v-model="applicationForm.mcp_output_enable"
+                      :label="$t('views.application.form.mcp_output_enable')"
+                    />
+                  </div>
+                </div>
+                <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+                  <!-- MCP-->
+                  <div v-if="toolPermissionPrecise.read()">
+                    <div class="flex-between mb-8" @click="collapseData.MCP = !collapseData.MCP">
+                      <div class="flex align-center lighter cursor">
+                        <el-icon
+                          class="mr-8 arrow-icon"
+                          :class="collapseData.MCP ? 'rotate-90' : ''"
+                        >
+                          <CaretRight /> </el-icon
+                        >MCP
+                        <span class="ml-4" v-if="applicationForm.mcp_tool_ids?.length">
+                          ({{ applicationForm.mcp_tool_ids?.length }})</span
+                        >
+                      </div>
+                      <div class="flex">
+                        <el-button
+                          type="primary"
+                          link
+                          @click="openMcpServersDialog"
+                          @refreshForm="refreshParam"
+                        >
+                          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                        </el-button>
+                      </div>
+                    </div>
+                    <div
+                      class="w-full mb-16"
+                      v-if="
+                        applicationForm.mcp_tool_ids &&
+                        applicationForm.mcp_tool_ids.length > 0 &&
+                        toolPermissionPrecise.read() &&
+                        collapseData.MCP
+                      "
+                    >
+                      <template v-for="(item, index) in applicationForm.mcp_tool_ids" :key="index">
+                        <div
+                          class="flex-between border border-r-6 white-bg mb-4"
+                          style="padding: 5px 8px"
+                          v-if="relatedObject(mcpToolSelectOptions, item, 'id')"
+                        >
+                          <div class="flex align-center" style="line-height: 20px">
+                            <el-avatar
+                              v-if="relatedObject(mcpToolSelectOptions, item, 'id')?.icon"
+                              shape="square"
+                              :size="20"
+                              style="background: none"
+                              class="mr-8"
+                            >
+                              <img
+                                :src="
+                                  resetUrl(relatedObject(mcpToolSelectOptions, item, 'id')?.icon)
+                                "
+                                alt=""
+                              />
+                            </el-avatar>
+                            <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
+
+                            <div
+                              class="ellipsis-1"
+                              :title="relatedObject(mcpToolSelectOptions, item, 'id')?.name"
+                            >
+                              {{
+                                relatedObject(mcpToolSelectOptions, item, 'id')?.name ||
+                                $t('common.custom') + ' MCP'
+                              }}
+                            </div>
+                          </div>
+                          <el-button text @click="removeMcpTool(item)">
+                            <el-icon><Close /></el-icon>
+                          </el-button>
+                        </div>
+                      </template>
+                    </div>
+                    <div
+                      class="w-full mb-16"
+                      v-if="
+                        applicationForm.mcp_servers &&
+                        applicationForm.mcp_servers.length > 0 &&
+                        toolPermissionPrecise.read() &&
+                        collapseData.MCP
+                      "
+                    >
+                      <div
+                        class="flex-between border border-r-6 white-bg mb-4"
+                        style="padding: 5px 8px"
+                      >
+                        <div class="flex align-center" style="line-height: 20px">
+                          <ToolIcon type="MCP" class="mr-8" :size="20" />
+                          <div class="ellipsis">
+                            {{ $t('common.custom') + ' MCP' }}
+                          </div>
+                        </div>
+                        <el-button text @click="applicationForm.mcp_servers = ''">
+                          <el-icon>
+                            <Close />
+                          </el-icon>
+                        </el-button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 工具       -->
+                  <div v-if="toolPermissionPrecise.read()">
+                    <div class="flex-between mb-8" @click="collapseData.tool = !collapseData.tool">
+                      <div class="flex align-center lighter cursor">
+                        <el-icon
+                          class="mr-8 arrow-icon"
+                          :class="collapseData.tool ? 'rotate-90' : ''"
+                        >
+                          <CaretRight />
+                        </el-icon>
+                        {{ $t('views.tool.title') }}
+                        <span class="ml-4" v-if="applicationForm.tool_ids?.length">
+                          ({{ applicationForm.tool_ids?.length }})</span
+                        >
+                      </div>
+                      <div class="flex">
+                        <el-button
+                          type="primary"
+                          link
+                          @click="openToolDialog"
+                          @refreshForm="refreshParam"
+                        >
+                          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                        </el-button>
+                      </div>
+                    </div>
+                    <div
+                      class="w-full mb-16"
+                      v-if="
+                        applicationForm.tool_ids &&
+                        applicationForm.tool_ids.length > 0 &&
+                        toolPermissionPrecise.read() &&
+                        collapseData.tool
+                      "
+                    >
+                      <template v-for="(item, index) in applicationForm.tool_ids" :key="index">
+                        <div
+                          v-if="relatedObject(toolSelectOptions, item, 'id')"
+                          class="flex-between border border-r-6 white-bg mb-4"
+                          style="padding: 5px 8px"
+                        >
+                          <div class="flex align-center" style="line-height: 20px">
+                            <el-avatar
+                              v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
+                              shape="square"
+                              :size="20"
+                              style="background: none"
+                              class="mr-8"
+                            >
+                              <img
+                                :src="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.icon)"
+                                alt=""
+                              />
+                            </el-avatar>
+                            <ToolIcon v-else class="mr-8" :size="20" />
+
+                            <div
+                              class="ellipsis-1"
+                              :title="relatedObject(toolSelectOptions, item, 'id')?.name"
+                            >
+                              {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
+                            </div>
+                          </div>
+                          <el-button text @click="removeTool(item)">
+                            <el-icon><Close /></el-icon>
+                          </el-button>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+
+                  <!-- 应用       -->
+                  <div v-if="toolPermissionPrecise.read()">
+                    <div
+                      class="flex-between mb-8"
+                      @click="collapseData.agent = !collapseData.agent"
+                    >
+                      <div class="flex align-center lighter cursor">
+                        <el-icon
+                          class="mr-8 arrow-icon"
+                          :class="collapseData.agent ? 'rotate-90' : ''"
+                        >
+                          <CaretRight />
+                        </el-icon>
+                        {{ $t('views.application.title') }}
+                        <span class="ml-4" v-if="applicationForm.application_ids?.length">
+                          ({{ applicationForm.application_ids?.length }})</span
+                        >
+                      </div>
+                      <div class="flex">
+                        <el-button
+                          type="primary"
+                          link
+                          @click="openApplicationDialog"
+                          @refreshForm="refreshParam"
+                        >
+                          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                        </el-button>
+                      </div>
+                    </div>
+                    <div
+                      class="w-full mb-16"
+                      v-if="
+                        applicationForm.application_ids &&
+                        applicationForm.application_ids.length > 0 &&
+                        toolPermissionPrecise.read() &&
+                        collapseData.agent
+                      "
+                    >
+                      <template
+                        v-for="(item, index) in applicationForm.application_ids"
+                        :key="index"
+                      >
+                        <div
+                          v-if="relatedObject(applicationSelectOptions, item, 'id')"
+                          class="flex-between border border-r-6 white-bg mb-4"
+                          style="padding: 5px 8px"
+                        >
+                          <div class="flex align-center" style="line-height: 20px">
+                            <el-avatar
+                              v-if="relatedObject(applicationSelectOptions, item, 'id')?.icon"
+                              shape="square"
+                              :size="20"
+                              style="background: none"
+                              class="mr-8"
+                            >
+                              <img
+                                :src="
+                                  resetUrl(
+                                    relatedObject(applicationSelectOptions, item, 'id')?.icon,
+                                  )
+                                "
+                                alt=""
+                              />
+                            </el-avatar>
+                            <AppIcon v-else class="mr-8" :size="20" />
+
+                            <div
+                              class="ellipsis-1"
+                              :title="relatedObject(applicationSelectOptions, item, 'id')?.name"
+                            >
+                              {{ relatedObject(applicationSelectOptions, item, 'id')?.name }}
+                            </div>
+                          </div>
+                          <el-button text @click="removeApplication(item)">
+                            <el-icon><Close /></el-icon>
+                          </el-button>
+                        </div>
+                      </template>
+                    </div>
+                  </div>
+                </el-card>
+                <!-- 开场白 -->
                 <el-form-item :label="$t('views.application.form.prologue')">
                   <MdEditorMagnify
                     :title="$t('views.application.form.prologue')"
@@ -303,155 +590,7 @@
                     @submitDialog="submitPrologueDialog"
                   />
                 </el-form-item>
-                <!-- MCP-->
-                <el-form-item @click.prevent v-if="toolPermissionPrecise.read()">
-                  <template #label>
-                    <div class="flex-between">
-                      <span>MCP</span>
-                      <div class="flex">
-                        <el-button
-                          type="primary"
-                          link
-                          @click="openMcpServersDialog"
-                          @refreshForm="refreshParam"
-                          v-if="applicationForm.mcp_enable"
-                        >
-                          <AppIcon iconName="app-setting"></AppIcon>
-                        </el-button>
-                        <el-switch class="ml-8" size="small" v-model="applicationForm.mcp_enable" />
-                      </div>
-                    </div>
-                  </template>
-                </el-form-item>
-                <div
-                  class="w-full mb-16"
-                  v-if="
-                  (
-                    (applicationForm.mcp_tool_ids && applicationForm.mcp_tool_ids.length > 0) ||
-                    (applicationForm.mcp_servers && applicationForm.mcp_servers.length > 0)
-                  ) && toolPermissionPrecise.read()
-                  "
-                >
-                  <template v-for="(item, index) in applicationForm.mcp_tool_ids" :key="index">
-                    <div
-                      class="flex-between border border-r-6 white-bg mb-4"
-                      style="padding: 5px 8px"
-                      v-if="relatedObject(mcpToolSelectOptions, item, 'id')"
-                    >
-                      <div class="flex align-center" style="line-height: 20px">
-                        <el-avatar
-                          v-if="relatedObject(mcpToolSelectOptions, item, 'id')?.icon"
-                          shape="square"
-                          :size="20"
-                          style="background: none"
-                          class="mr-8"
-                        >
-                          <img
-                            :src="resetUrl(relatedObject(mcpToolSelectOptions, item, 'id')?.icon)"
-                            alt=""
-                          />
-                        </el-avatar>
-                        <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
 
-                        <div
-                          class="ellipsis"
-                          :title="relatedObject(mcpToolSelectOptions, item, 'id')?.name"
-                        >
-                          {{
-                            relatedObject(mcpToolSelectOptions, item, 'id')?.name ||
-                            $t('common.custom') + ' MCP'
-                          }}
-                        </div>
-                      </div>
-                      <el-button text @click="removeMcpTool(item)">
-                        <el-icon><Close /></el-icon>
-                      </el-button>
-                    </div>
-                  </template>
-                </div>
-                <!-- 工具       -->
-                <el-form-item @click.prevent v-if="toolPermissionPrecise.read()">
-                  <template #label>
-                    <div class="flex-between">
-                      <span class="mr-4">
-                        {{ $t('views.tool.title') }}
-                      </span>
-                      <div class="flex">
-                        <el-button
-                          type="primary"
-                          link
-                          @click="openToolDialog"
-                          @refreshForm="refreshParam"
-                          v-if="applicationForm.tool_enable"
-                        >
-                          <AppIcon iconName="app-setting"></AppIcon>
-                        </el-button>
-                        <el-switch
-                          class="ml-8"
-                          size="small"
-                          v-model="applicationForm.tool_enable"
-                        />
-                      </div>
-                    </div>
-                  </template>
-                </el-form-item>
-                <div
-                  class="w-full mb-16"
-                  v-if="applicationForm.tool_ids && applicationForm.tool_ids.length > 0 && toolPermissionPrecise.read()"
-                >
-                  <template v-for="(item, index) in applicationForm.tool_ids" :key="index">
-                    <div
-                      v-if="relatedObject(toolSelectOptions, item, 'id')"
-                      class="flex-between border border-r-6 white-bg mb-4"
-                      style="padding: 5px 8px"
-                    >
-                      <div class="flex align-center" style="line-height: 20px">
-                        <el-avatar
-                          v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
-                          shape="square"
-                          :size="20"
-                          style="background: none"
-                          class="mr-8"
-                        >
-                          <img
-                            :src="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.icon)"
-                            alt=""
-                          />
-                        </el-avatar>
-                        <ToolIcon v-else class="mr-8" :size="20" />
-
-                        <div
-                          class="ellipsis"
-                          :title="relatedObject(toolSelectOptions, item, 'id')?.name"
-                        >
-                          {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
-                        </div>
-                      </div>
-                      <el-button text @click="removeTool(item)">
-                        <el-icon><Close /></el-icon>
-                      </el-button>
-                    </div>
-                  </template>
-                </div>
-                <el-form-item
-                  @click.prevent
-                  v-if="(applicationForm.mcp_enable || applicationForm.tool_enable) && toolPermissionPrecise.read()"
-                >
-                  <template #label>
-                    <div class="flex-between">
-                      <span class="mr-4">
-                        {{ $t('views.application.form.mcp_output_enable') }}
-                      </span>
-                      <div class="flex">
-                        <el-switch
-                          class="ml-8"
-                          size="small"
-                          v-model="applicationForm.mcp_output_enable"
-                        />
-                      </div>
-                    </div>
-                  </template>
-                </el-form-item>
                 <el-form-item @click.prevent>
                   <template #label>
                     <div class="flex-between">
@@ -633,6 +772,7 @@
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
     <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" />
+    <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
   </div>
 </template>
 <script setup lang="ts">
@@ -658,11 +798,14 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl } from '@/utils/common.ts'
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
+import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
+import useStore from '@/stores'
 const route = useRoute()
 const router = useRouter()
 const {
   params: { id },
 } = route as any
+const { user, folder } = useStore()
 
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
@@ -691,6 +834,13 @@ const optimizationPrompt =
   '<data></data>' +
   t('views.application.dialog.defaultPrompt2')
 
+const collapseData = reactive({
+  prompt: true,
+  knowledge_setting: true,
+  MCP: true,
+  tool: true,
+  agent: true,
+})
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
 const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
@@ -736,13 +886,15 @@ const applicationForm = ref<ApplicationFormType>({
   tts_model_enable: false,
   tts_type: 'BROWSER',
   type: 'SIMPLE',
-  mcp_enable: false,
+  application_enable: true,
+  application_ids: [],
+  mcp_enable: true,
   mcp_tool_ids: [],
   mcp_servers: '',
   mcp_source: 'referencing',
-  tool_enable: false,
+  tool_enable: true,
   tool_ids: [],
-  mcp_output_enable: true,
+  mcp_output_enable: false,
 })
 const themeDetail = ref({})
 
@@ -877,6 +1029,14 @@ function removeMcpTool(id: any) {
   }
 }
 
+function removeApplication(id: any) {
+  if (applicationForm.value.application_ids) {
+    applicationForm.value.application_ids = applicationForm.value.application_ids.filter(
+      (v: any) => v !== id,
+    )
+  }
+}
+
 const mcpServersDialogRef = ref()
 function openMcpServersDialog() {
   const config = {
@@ -891,6 +1051,7 @@ function submitMcpServersDialog(config: any) {
   applicationForm.value.mcp_servers = config.mcp_servers
   applicationForm.value.mcp_tool_ids = config.mcp_tool_ids
   applicationForm.value.mcp_source = config.mcp_source
+  collapseData.MCP = true
 }
 
 const toolDialogRef = ref()
@@ -900,6 +1061,26 @@ function openToolDialog() {
 
 function submitToolDialog(config: any) {
   applicationForm.value.tool_ids = config.tool_ids
+  collapseData.tool = true
+}
+
+const applicationDialogRef = ref()
+function openApplicationDialog() {
+  applicationDialogRef.value.open(applicationForm.value.application_ids)
+}
+
+function submitApplicationDialog(config: any) {
+  applicationForm.value.application_ids = config.application_ids
+  collapseData.agent = true
+}
+
+const applicationSelectOptions = ref<any[]>([])
+function getApplicationSelectOptions() {
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .getAllApplication({ folder_id: folder.currentFolder?.id || user.getWorkspaceId() })
+    .then((res: any) => {
+      applicationSelectOptions.value = res.data.filter((item: any) => item.is_publish)
+    })
 }
 
 const toolSelectOptions = ref<any[]>([])
@@ -1116,8 +1297,9 @@ onMounted(() => {
   getSTTModel()
   getTTSModel()
   if (toolPermissionPrecise.value.read()) {
-    getToolSelectOptions();
+    getToolSelectOptions()
     getMcpToolSelectOptions()
+    getApplicationSelectOptions()
   }
 })
 </script>
@@ -1148,7 +1330,4 @@ onMounted(() => {
   height: 150px;
 }
 
-:deep(.el-form-item__label) {
-  display: block;
-}
 </style>

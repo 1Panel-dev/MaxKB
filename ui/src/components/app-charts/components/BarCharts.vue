@@ -128,7 +128,6 @@ watch(
 )
 
 onMounted(() => {
-  console.log(props.option.dataZoom)
   nextTick(() => {
     initChart()
     window.addEventListener('resize', changeChartSize)

@@ -36,7 +36,7 @@ const workspace = {
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.KNOWLEDGE_FOLDER_READ.getKnowledgeWorkspaceResourcePermission(folder_id),
-        PermissionConst.KNOWLEDGE_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_FOLDER_READ.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -51,8 +51,8 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_FOLDER_EDIT.getKnowledgeWorkspaceResourcePermission(folder_id),
-        PermissionConst.KNOWLEDGE_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_FOLDER_AUTH.getKnowledgeWorkspaceResourcePermission(folder_id),
+        PermissionConst.KNOWLEDGE_FOLDER_AUTH.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -66,8 +66,8 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_FOLDER_EDIT.getKnowledgeWorkspaceResourcePermission(folder_id),
-        PermissionConst.KNOWLEDGE_CREATE.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_FOLDER_CREATE.getKnowledgeWorkspaceResourcePermission(folder_id),
+        PermissionConst.KNOWLEDGE_FOLDER_CREATE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -81,8 +81,8 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_FOLDER_EDIT.getKnowledgeWorkspaceResourcePermission(folder_id),
-        PermissionConst.KNOWLEDGE_DELETE.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_FOLDER_DELETE.getKnowledgeWorkspaceResourcePermission(folder_id),
+        PermissionConst.KNOWLEDGE_FOLDER_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -97,7 +97,7 @@ const workspace = {
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.KNOWLEDGE_FOLDER_EDIT.getKnowledgeWorkspaceResourcePermission(folder_id),
-        PermissionConst.KNOWLEDGE_EDIT.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_FOLDER_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -178,6 +178,23 @@ const workspace = {
       ],
       'OR',
     ),
+    relate_map: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_RELATE_RESOURCE_VIEW.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   export: (source_id: string) =>
     hasPermission(
       [
@@ -209,6 +226,27 @@ const workspace = {
       'OR',
     ),
   doc_read: () => false,
+  jump_read: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
+        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   doc_create: (source_id: string) =>
     hasPermission(
       [
@@ -584,6 +622,21 @@ const workspace = {
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.KNOWLEDGE_WORKFLOW_EDIT.getKnowledgeWorkspaceResourcePermission(source_id),
         PermissionConst.KNOWLEDGE_WORKFLOW_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  workflow_export: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),

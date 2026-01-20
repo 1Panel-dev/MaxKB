@@ -6,7 +6,7 @@ export default {
   delete: {
     confirmTitle: '是否刪除工作空間：',
     confirmContent: '刪除後，該空間下的成員都會被移除，請謹慎操作。',
-    confirmContentNotDelete: '該工作空間下存在知識庫資源、應用資源，無法刪除。',
+    confirmContentNotDelete: '該工作空間下存在知識庫資源、智能體資源，無法刪除。',
   },
   member: {
     delete: {

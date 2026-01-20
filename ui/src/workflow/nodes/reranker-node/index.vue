@@ -15,9 +15,7 @@
           prop="reranker_reference_list"
           :rules="{
             type: 'array',
-            message: $t(
-              'workflow.nodes.rerankerNode.rerankerContent.requiredMessage',
-            ),
+            message: $t('workflow.nodes.rerankerNode.rerankerContent.requiredMessage'),
             trigger: 'change',
             required: true,
           }"
@@ -54,11 +52,7 @@
                   :key="index"
                   :nodeModel="nodeModel"
                   class="w-full"
-                  :placeholder="
-                    $t(
-                      'workflow.nodes.rerankerNode.rerankerContent.requiredMessage',
-                    )
-                  "
+                  :placeholder="$t('workflow.nodes.rerankerNode.rerankerContent.requiredMessage')"
                   v-model="form_data.reranker_reference_list[index]"
                 />
               </el-form-item>
@@ -70,14 +64,10 @@
             </el-col>
           </el-row>
         </el-form-item>
-        <el-form-item
-          :label="$t('workflow.nodes.searchKnowledgeNode.searchParam')"
-        >
+        <el-form-item :label="$t('workflow.nodes.searchKnowledgeNode.searchParam')">
           <template #label>
             <div class="flex-between">
-              <span>{{
-                $t('workflow.nodes.searchKnowledgeNode.searchParam')
-              }}</span>
+              <span>{{ $t('workflow.nodes.searchKnowledgeNode.searchParam') }}</span>
               <el-button type="primary" link @click="openParamSettingDialog">
                 <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
@@ -97,9 +87,7 @@
               >
               <el-col :span="12" class="lighter"> {{ form_data.reranker_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">
-                {{
-                  $t('workflow.nodes.rerankerNode.max_paragraph_char_number')
-                }}</el-col
+                {{ $t('workflow.nodes.rerankerNode.max_paragraph_char_number') }}</el-col
               >
               <el-col :span="12" class="lighter">
                 {{ form_data.reranker_setting.max_paragraph_char_number }}</el-col
@@ -111,9 +99,7 @@
           :label="$t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')"
           prop="question_reference_address"
           :rules="{
-            message: $t(
-              'workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
-            ),
+            message: $t('workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage'),
             trigger: 'blur',
             required: true,
           }"
@@ -130,9 +116,7 @@
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="
-              $t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')
-            "
+            :placeholder="$t('workflow.nodes.searchKnowledgeNode.searchQuestion.label')"
             v-model="form_data.question_reference_address"
           />
         </el-form-item>
@@ -157,9 +141,7 @@
             @wheel="wheel"
             :teleported="false"
             v-model="form_data.reranker_model_id"
-            :placeholder="
-              $t('workflow.nodes.rerankerNode.reranker_model.placeholder')
-            "
+            :placeholder="$t('workflow.nodes.rerankerNode.reranker_model.placeholder')"
             :options="modelOptions"
             @submitModel="getSelectModel"
             showFooter
@@ -197,6 +179,8 @@ const {
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
   } else {
     return 'workspace'
   }

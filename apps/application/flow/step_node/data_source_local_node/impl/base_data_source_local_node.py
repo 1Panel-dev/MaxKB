@@ -18,7 +18,7 @@ class BaseDataSourceLocalNodeForm(BaseForm):
 
 class BaseDataSourceLocalNode(IDataSourceLocalNode):
     def save_context(self, details, workflow_manage):
-        pass
+        self.context['exception_message'] = details.get('err_message')
 
     @staticmethod
     def get_form_list(node):
@@ -47,5 +47,6 @@ class BaseDataSourceLocalNode(IDataSourceLocalNode):
             'file_list': self.context.get('file_list'),
             'knowledge_base': self.workflow_params.get('knowledge_base'),
             'status': self.status,
-            'err_message': self.err_message
+            'err_message': self.err_message,
+            'enableException': self.node.properties.get('enableException'),
         }

@@ -30,11 +30,16 @@
   .el-card__body {
     overflow: inherit;
   }
+  &.el-card.is-hover-shadow:hover {
+    box-shadow: var(--el-box-shadow-light) !important;
+  }
 }
 
 // tree
 .el-tree {
   background: none;
+  color: var(--el-text-color-primary);
+  font-weight: 400;
 }
 .el-tree-node__content {
   border-radius: var(--el-border-radius-base);
@@ -46,6 +51,7 @@
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
   background: var(--el-color-primary-light-9);
   color: var(--el-color-primary);
+  font-weight: 500;
 }
 .el-tree-node__expand-icon {
   color: var(--app-text-color-secondary);
@@ -76,6 +82,9 @@
   &.is-link:focus {
     background: none;
     border: none;
+  }
+  &.is-link:not(.is-disabled):hover {
+    color: var(--el-color-primary);
   }
 }
 .el-button--text {
@@ -252,6 +261,7 @@
   }
 }
 .el-form-item__label {
+  display: block;
   font-weight: 400;
   width: 100% !important;
   color: var(--el-text-color-primary);
@@ -302,6 +312,17 @@
   color: var(--app-text-color-secondary);
   font-weight: 500;
   border-color: var(--app-text-color-light-1);
+}
+
+.el-check-tag {
+  font-weight: 400;
+  padding: 7px 8px;
+  color: var(--el-text-color-primary);
+  background-color: var(--app-text-color-light-1);
+}
+.el-check-tag.el-check-tag--primary.is-checked {
+  background: var(--el-color-primary-light-8);
+  color: var(--el-color-primary);
 }
 
 // el-select

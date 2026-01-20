@@ -42,6 +42,7 @@ def get_user_operation_object(user_id):
     return {}
 
 
+
 def get_re_password_details(request):
     path = request.path
     body = request.data
@@ -125,6 +126,8 @@ class UserList(APIView):
                    operation_id=_("Get all user"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
                    responses=UserListApi.get_response())
+    @has_permissions(RoleConstants.WORKSPACE_MANAGE, RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN,
+                     RoleConstants.EXTENDS_WORKSPACE_MANAGE)
     def get(self, request: Request):
         return result.success(UserManageSerializer().get_all_user_list())
 
@@ -243,9 +246,9 @@ class UserManage(APIView):
                        responses=DefaultModelResponse.get_response())
         @has_permissions(PermissionConstants.USER_DELETE, RoleConstants.ADMIN)
         @log(menu='User management', operate='Batch delete user',
-             get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id')))
+             get_operation_object=lambda r, k: get_user_operation_object(r.data.get('ids', [])))
         def post(self, request: Request):
-            return result.success(UserManageSerializer.BatchDelete(data=request.data).batch_delete(with_valid=True))
+            return result.success(UserManageSerializer.BatchDelete({'ids': request.data}).batch_delete(with_valid=True))
 
     class RePassword(APIView):
         authentication_classes = [TokenAuth]

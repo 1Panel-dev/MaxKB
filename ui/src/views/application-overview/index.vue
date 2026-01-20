@@ -5,7 +5,7 @@
       <div class="main-calc-height">
         <el-card style="--el-card-padding: 24px">
           <h4 class="title-decoration-1 mb-16">
-            {{ $t('views.applicationOverview.appInfo.header') }}
+            {{ $t('common.info') }}
           </h4>
           <el-card shadow="never" class="overview-card" v-loading="loading">
             <div class="title flex align-center">
@@ -163,9 +163,9 @@
           <div class="mb-16">
             <el-select
               v-model="history_day"
-              class="mr-12"
+              class="mr-12 w-180"
               @change="changeDayHandle"
-              style="width: 180px"
+
             >
               <el-option
                 v-for="item in dayOptions"

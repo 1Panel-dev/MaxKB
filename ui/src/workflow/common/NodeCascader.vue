@@ -7,6 +7,7 @@
     v-bind="$attrs"
     v-model="data"
     separator=" > "
+    clearable
   >
     <template #default="{ node, data }">
       <span class="flex align-center" @wheel="wheel">

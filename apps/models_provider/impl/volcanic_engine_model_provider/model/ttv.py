@@ -115,5 +115,6 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 maxkb_logger.info(f"[ArkVideo] Deleted task {task_id}")
         except Exception as e:
             maxkb_logger.error(f"[ArkVideo] Failed to delete task {task_id}: {e}")
+            raise e
         maxkb_logger.info("视频地址", result.content.video_url)
         return result.content.video_url

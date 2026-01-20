@@ -11,8 +11,7 @@
           >
         </div>
         <el-text type="info" class="ml-16 color-secondary" v-else-if="saveTime"
-          >{{ $t('workflow.info.saveTime')
-          }}{{ datetimeFormat(saveTime) }}</el-text
+          >{{ $t('workflow.info.saveTime') }}{{ datetimeFormat(saveTime) }}</el-text
         >
       </div>
       <div v-if="showHistory && disablePublic">
@@ -27,6 +26,14 @@
         </el-button>
       </div>
       <div v-else>
+        <el-button
+          class="ml-8"
+          v-if="permissionPrecise.edit(id)"
+          @click="openTemplateStoreDialog()"
+        >
+          <AppIcon iconName="app-template-center" class="mr-4" />
+          {{ $t('workflow.setting.templateCenter') }}
+        </el-button>
         <el-button @click="showPopover = !showPopover">
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
@@ -138,6 +145,12 @@
       v-click-outside="clickoutsideHistory"
       @refreshVersion="refreshVersion"
     />
+     <TemplateStoreDialog
+      ref="templateStoreDialogRef"
+      :api-type="apiType"
+      source="work_flow"
+      @refresh="getDetail"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -160,6 +173,7 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { WorkflowMode } from '@/enums/application'
+import TemplateStoreDialog from "@/views/application/template-store/TemplateStoreDialog.vue";
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Application)
 provide('loopWorkflowMode', WorkflowMode.ApplicationLoop)
@@ -207,7 +221,10 @@ const urlParams = computed(() =>
   mapToUrlParams(apiInputParams.value) ? '?' + mapToUrlParams(apiInputParams.value) : '',
 )
 const shareUrl = computed(
-  () => `${window.location.origin}/chat/` + detail.value?.access_token + urlParams.value,
+  () =>
+    `${window.location.origin}${window.MaxKB.chatPrefix}/` +
+    detail.value?.access_token +
+    urlParams.value,
 )
 
 function back() {
@@ -368,9 +385,7 @@ const publish = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(
-          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
-        )
+        MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
         MsgError(
@@ -406,9 +421,7 @@ const clickShowDebug = () => {
       const node = res.node
       const err_message = res.errMessage
       if (typeof err_message == 'string') {
-        MsgError(
-          res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message,
-        )
+        MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {
         const keys = Object.keys(err_message)
         MsgError(
@@ -635,6 +648,11 @@ const closeInterval = () => {
   if (interval) {
     clearInterval(interval)
   }
+}
+
+const templateStoreDialogRef = ref()
+function openTemplateStoreDialog() {
+  templateStoreDialogRef.value?.open()
 }
 
 onMounted(() => {

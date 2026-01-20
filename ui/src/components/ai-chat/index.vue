@@ -36,9 +36,12 @@
           <template v-for="(item, index) in chatList" :key="index">
             <!-- 问题 -->
             <QuestionContent
+              :chat-management="ChatManagement"
               :type="type"
               :application="applicationDetails"
+              :send-message="sendMessage"
               :chat-record="item"
+              :is-last="index >= chatList.length - 1"
             ></QuestionContent>
             <!-- 回答 -->
             <AnswerContent
@@ -194,7 +197,7 @@ const initialApiFormData = ref({})
 
 const isUserInput = computed(
   () =>
-    props.applicationDetails.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
+    props.applicationDetails?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
       ?.properties.user_input_field_list.length > 0,
 )
 
@@ -695,7 +698,7 @@ onMounted(() => {
     // 2. 解析当前变换状态
     const currentTransform = target.style.transform
     const transformValues = parseTransform(currentTransform)
-    let { scale, translateX, translateY } = transformValues
+    const { scale, translateX, translateY } = transformValues
     // 确保scale是数值类型
     const currentScale = Array.isArray(scale) ? scale[0] : scale
 

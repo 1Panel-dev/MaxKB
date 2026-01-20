@@ -2,13 +2,13 @@
   <div v-infinite-scroll="loadData" :infinite-scroll-disabled="disabledScroll">
     <slot />
   </div>
-  <div style="padding: 0 10px 16px">
-    <el-divider v-if="size > 0 && loading" style="background: none">
-      <el-text type="info"> {{ $t('components.loading') }}...</el-text>
-    </el-divider>
-    <el-divider v-if="noMore" style="background: none !important">
-      <el-text type="info"> {{ $t('components.noMore') }}</el-text>
-    </el-divider>
+  <div style="padding: 0 10px 16px" class="text-center lighter color-secondary">
+    <el-text class="text-with-lines" type="info" v-if="size > 0 && loading">
+      {{ $t('components.loading') }}...</el-text
+    >
+    <el-text class="text-with-lines" v-if="noMore" type="info">
+      {{ $t('components.noMore') }}</el-text
+    >
   </div>
 </template>
 <script setup lang="ts">
@@ -61,7 +61,6 @@ const noMore = computed(
     props.size > 0 && props.size === props.total && props.total > props.page_size && !props.loading,
 )
 const disabledScroll = computed(() => props.size > 0 && (props.loading || noMore.value))
-
 function loadData() {
   if (props.total > props.page_size) {
     current.value += 1
@@ -70,4 +69,26 @@ function loadData() {
   }
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.text-with-lines {
+  position: relative;
+  display: inline-block;
+}
+
+.text-with-lines::before,
+.text-with-lines::after {
+  content: '';
+  position: absolute;
+  width: 80px;
+  border-bottom: 1px solid var(--el-border-color);
+  top: 10px;
+}
+
+.text-with-lines::before {
+  left: -88px; /* 左侧线条位置 */
+}
+
+.text-with-lines::after {
+  right: -82px; /* 右侧线条位置 */
+}
+</style>

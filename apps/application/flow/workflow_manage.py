@@ -97,7 +97,7 @@ class WorkflowManage:
                  video_list=None,
                  other_list=None,
                  start_node_id=None,
-                 start_node_data=None, chat_record=None, child_node=None):
+                 start_node_data=None, chat_record=None, child_node=None, is_the_task_interrupted=lambda: False):
         if form_data is None:
             form_data = {}
         if image_list is None:
@@ -138,6 +138,7 @@ class WorkflowManage:
         self.global_field_list = []
         self.chat_field_list = []
         self.init_fields()
+        self.is_the_task_interrupted = is_the_task_interrupted
         if start_node_id is not None:
             self.load_node(chat_record, start_node_id, start_node_data)
         else:
@@ -152,6 +153,8 @@ class WorkflowManage:
             node_name = properties.get('stepName')
             node_id = node.id
             node_config = properties.get('config')
+            field_list.append(
+                {'label': '异常信息', 'value': 'exception_message', 'node_id': node_id, 'node_name': node_name})
             if node_config is not None:
                 fields = node_config.get('fields')
                 if fields is not None:
@@ -471,27 +474,49 @@ class WorkflowManage:
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
+            if current_node.status == 500:
+                enableException = current_node.node.properties.get('enableException')
+                if not enableException:
+                    return None
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                r = NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                               _is_interrupt=lambda node, step_variable, global_variable: False)
+                r.write_context(current_node, self)
+                return r
+            if self.is_the_task_interrupted():
+                current_node.status = 201
+                return None
             return current_result
         except Exception as e:
             # 添加节点
-
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
-            chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
-                                                                   self.params.get('chat_id'),
-                                                                   current_node.id,
-                                                                   current_node.up_node_id_list,
-                                                                   'Exception:' + str(e), False, 0, 0,
-                                                                   {'node_is_end': True,
-                                                                    'runtime_node_id': current_node.runtime_node_id,
-                                                                    'node_type': current_node.type,
-                                                                    'view_type': current_node.view_type,
-                                                                    'child_node': {},
-                                                                    'real_node_id': real_node_id,
-                                                                    'node_status': 'ERROR'})
-            current_node.node_chunk.add_chunk(chunk)
+            enableException = current_node.node.properties.get('enableException')
             current_node.get_write_error_context(e)
             self.status = 500
-            return None
+            if self.is_the_task_interrupted():
+                current_node.status = 201
+                return None
+            if not enableException:
+                chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                       self.params.get('chat_id'),
+                                                                       current_node.id,
+                                                                       current_node.up_node_id_list,
+                                                                       'Exception:' + str(e), False, 0, 0,
+                                                                       {'node_is_end': True,
+                                                                        'runtime_node_id': current_node.runtime_node_id,
+                                                                        'node_type': current_node.type,
+                                                                        'view_type': current_node.view_type,
+                                                                        'child_node': {},
+                                                                        'real_node_id': real_node_id,
+                                                                        'node_status': 'ERROR'})
+                current_node.node_chunk.add_chunk(chunk)
+                return None
+            else:
+                current_node.context['exception_message'] = current_node.err_message
+                current_node.context['branch_id'] = 'exception'
+                return NodeResult({'branch_id': 'exception', 'exception': current_node.err_message}, {},
+                                  _is_interrupt=lambda node, step_variable, global_variable: False)
         finally:
             current_node.node_chunk.end()
             # 归还链接到连接池
@@ -549,7 +574,7 @@ class WorkflowManage:
         details_result = {}
         for index in range(len(self.node_context)):
             node = self.node_context[index]
-            if self.chat_record is not None and self.chat_record.details is not None:
+            if self.chat_record is not None and self.chat_record.details is not None and self.start_node:
                 details = self.chat_record.details.get(node.runtime_node_id)
                 if details is not None and self.start_node.runtime_node_id != node.runtime_node_id:
                     details_result[node.runtime_node_id] = details
@@ -649,16 +674,17 @@ class WorkflowManage:
         else:
             for edge_node in next_edge_node_list:
                 edge = edge_node.edge
-                next_node = edge_node.node
-                if next_node.properties.get('condition', "AND") == 'AND':
-                    if self.dependent_node_been_executed(edge.targetNodeId):
+                if edge.sourceNodeId + '_right' == edge.sourceAnchorId:
+                    next_node = edge_node.node
+                    if next_node.properties.get('condition', "AND") == 'AND':
+                        if self.dependent_node_been_executed(edge.targetNodeId):
+                            node_list.append(
+                                self.get_node_cls_by_id(edge.targetNodeId,
+                                                        [*current_node.up_node_id_list, current_node.node.id]))
+                    else:
                         node_list.append(
                             self.get_node_cls_by_id(edge.targetNodeId,
                                                     [*current_node.up_node_id_list, current_node.node.id]))
-                else:
-                    node_list.append(
-                        self.get_node_cls_by_id(edge.targetNodeId,
-                                                [*current_node.up_node_id_list, current_node.node.id]))
 
         return node_list
 

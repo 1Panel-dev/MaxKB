@@ -10,7 +10,7 @@
       ref="baseNodeFormRef"
     >
       <el-form-item
-        :label="$t('workflow.nodes.baseNode.appName.label')"
+        :label="$t('common.name')"
         prop="name"
         :rules="{
           message: t('views.application.form.appName.requiredMessage'),
@@ -26,7 +26,7 @@
           @blur="form_data.name = form_data.name?.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('workflow.nodes.baseNode.appDescription.label')">
+      <el-form-item :label="$t('common.desc')">
         <el-input
           v-model="form_data.desc"
           :placeholder="$t('views.application.form.appDescription.placeholder')"
@@ -368,7 +368,4 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
-:deep(.el-form-item__label) {
-  display: block;
-}
 </style>

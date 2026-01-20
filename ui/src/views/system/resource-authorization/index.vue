@@ -46,13 +46,15 @@
                     <div class="flex-between">
                       <div class="flex">
                         <span class="mr-8 ellipsis-1" :title="row.nick_name">{{
-                          row.nick_name
+                          i18n_name(row.nick_name)
                         }}</span>
                         <el-text
                           class="color-input-placeholder ellipsis-1"
                           :title="row.roles.join('，')"
                           v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
-                          >({{ row.roles?.join('，') }})</el-text
+                          >({{
+                            row.roles.map((item: any) => i18n_name(item))?.join('，')
+                          }})</el-text
                         >
                       </div>
                     </div>
@@ -88,6 +90,7 @@ import type { WorkspaceItem } from '@/api/type/workspace'
 import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
 
 import useStore from '@/stores'
+import { i18n_name } from '@/utils/common'
 
 const route = useRoute()
 const { user } = useStore()
@@ -168,11 +171,13 @@ const getPermissionList = () => {
     if (resourceType === 'MODEL') {
       permissionData.value = res.data || []
     } else {
-      permissionData.value = res.data.map((item: any) => {
-      if (!item.folder_id && item.permission === 'NOT_AUTH') {
-        return {...item, permission: 'VIEW'}
-      }
-      return item}) || []
+      permissionData.value =
+        res.data.map((item: any) => {
+          if (!item.folder_id && item.permission === 'NOT_AUTH') {
+            return { ...item, permission: 'VIEW' }
+          }
+          return item
+        }) || []
     }
   })
 }
@@ -188,7 +193,7 @@ const toTree = (nodeList: any, pField: any) => {
   const nodeMap = Object.fromEntries(list.map((item: any) => [item.id, item]))
 
   for (let index = 0; index < nodeList.length; index++) {
-    const element = list[index];
+    const element = list[index]
     if (!element.children) {
       element.children = []
     }
@@ -196,7 +201,7 @@ const toTree = (nodeList: any, pField: any) => {
       const pNode = nodeMap[element[pField]]
       if (pNode) {
         if (!pNode.children) {
-           pNode.children = []
+          pNode.children = []
         }
         pNode.children.push(element)
       }

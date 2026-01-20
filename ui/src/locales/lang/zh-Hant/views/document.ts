@@ -123,7 +123,6 @@ export default {
     PENDING: '排隊中',
     GENERATE: '生成中',
     SYNC: '同步中',
-    REVOKE: '取消中',
     finish: '完圓',
   },
   enableStatus: {

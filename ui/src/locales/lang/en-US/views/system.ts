@@ -144,6 +144,8 @@ export default {
       currentOnly: 'Current resource only',
       includeAll: 'Include all sub-resources',
       effectiveResource: 'Effective Resource',
+      defaultPermission: 'Default Permission',
+      defaultPermissionTip: 'Default permissions for all resources under the selected workspace',
     },
   },
   resource_management: {
@@ -157,4 +159,11 @@ export default {
   display_codeTip: 'When the value is -1, the verification code is not displayed',
   time: 'Times',
   setting: 'Login Setting',
+  failedTip: 'Next, lock the account',
+  minute: 'Minutes',
+  third_party_user_default_role: 'Default Role Assignment for Third-party Users',
+  resourceMapping: {
+    title: 'View Associated Resources',
+    sub_title: 'Associated Resources',
+  },
 }

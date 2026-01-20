@@ -52,54 +52,63 @@
       </div>
       <div v-show="!isPcCollapse" class="left-height" v-if="showHistory">
         <el-scrollbar>
-          <div class="p-16 pt-0">
-            <common-list
-              :data="chatLogData"
-              class="mt-8"
-              v-loading="leftLoading"
-              :defaultActive="currentChatId"
-              @click="handleClickList"
-              @mouseenter="mouseenter"
-              @mouseleave="mouseId = ''"
-            >
-              <template #default="{ row }">
-                <div class="flex-between">
-                  <span :title="row.abstract" class="ellipsis" style="max-width: 180px">
-                    {{ row.abstract }}
-                  </span>
-                  <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
-                    <el-dropdown trigger="click" :teleported="false">
-                      <el-button text>
-                        <AppIcon iconName="app-more"></AppIcon>
-                      </el-button>
+          <InfiniteScroll
+            :size="chatLogData.length"
+            :total="_chatLogPagination?.total || 0"
+            :page_size="_chatLogPagination?.page_size || 20"
+            v-model:current_page="_chatLogPagination.current_page"
+            @load="scrollData"
+            :loading="leftLoading"
+          >
+            <div class="p-16 pt-0">
+              <common-list
+                :data="chatLogData"
+                class="mt-8"
+                v-loading="leftLoading"
+                :defaultActive="currentChatId"
+                @click="handleClickList"
+                @mouseenter="mouseenter"
+                @mouseleave="mouseId = ''"
+              >
+                <template #default="{ row }">
+                  <div class="flex-between">
+                    <span :title="row.abstract" class="ellipsis" style="max-width: 180px">
+                      {{ row.abstract }}
+                    </span>
+                    <div @click.stop v-show="mouseId === row.id && row.id !== 'new'">
+                      <el-dropdown trigger="click" :teleported="false">
+                        <el-button text>
+                          <AppIcon iconName="app-more"></AppIcon>
+                        </el-button>
 
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item @click.stop="editLogTitle(row)">
-                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item @click.stop="deleteChatLog(row)">
-                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item @click.stop="editLogTitle(row)">
+                              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="deleteChatLog(row)">
+                              <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                              {{ $t('common.delete') }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
                   </div>
-                </div>
-              </template>
+                </template>
 
-              <template #empty>
-                <div class="text-center">
-                  <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
-                </div>
-              </template>
-            </common-list>
-          </div>
-          <div v-if="chatLogData?.length" class="text-center lighter color-secondary">
+                <template #empty>
+                  <div class="text-center">
+                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+                  </div>
+                </template>
+              </common-list>
+            </div>
+          </InfiniteScroll>
+          <!-- <div v-if="chatLogData?.length" class="text-center lighter color-secondary">
             <span>{{ $t('chat.only20history') }}</span>
-          </div>
+          </div> -->
         </el-scrollbar>
       </div>
       <el-menu-item index="1" v-show="isPcCollapse" @click="newChat">
@@ -107,53 +116,80 @@
         <template #title>{{ $t('chat.createChat') }}</template>
       </el-menu-item>
 
-      <el-sub-menu v-show="isPcCollapse" index="2" v-if="showHistory">
+      <el-sub-menu v-show="isPcCollapse" index="2" v-if="showHistory" :teleported="false">
         <template #title>
           <AppIcon iconName="app-history-outlined" />
         </template>
-        <el-menu-item-group v-loading="leftLoading">
-          <template #title>
-            <div class="flex-between w-full">
-              <span>{{ $t('chat.history') }}</span>
-              <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
-                <el-button text @click.stop="clearChat">
-                  <AppIcon iconName="app-delete"></AppIcon>
-                </el-button>
-              </el-tooltip>
-            </div>
-          </template>
-          <el-menu-item
-            v-for="row in chatLogData"
-            :index="row.id"
-            :key="row.id"
-            @click="handleClickList(row)"
-            @mouseenter="mouseenter(row)"
-            @mouseleave="mouseId = ''"
-          >
-            <div class="flex-between w-full lighter">
-              <span :title="row.abstract" class="ellipsis">
-                {{ row.abstract }}
-              </span>
-              <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
-                <el-dropdown trigger="click" :teleported="false">
-                  <AppIcon iconName="app-more" class="mt-4 lighter"></AppIcon>
-                  <template #dropdown>
-                    <el-dropdown-menu>
-                      <el-dropdown-item @click.stop="editLogTitle(row)">
-                        <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                        {{ $t('common.edit') }}
-                      </el-dropdown-item>
-                      <el-dropdown-item @click.stop="deleteChatLog(row)">
-                        <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
-                        {{ $t('common.delete') }}
-                      </el-dropdown-item>
-                    </el-dropdown-menu>
-                  </template>
-                </el-dropdown>
+        <div class="flex-between p-8 ml-8">
+          <span>{{ $t('chat.history') }}</span>
+          <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
+            <el-button text @click.stop="clearChat">
+              <AppIcon
+                iconName="app-delete"
+                class="color-secondary"
+                style="font-size: 16px"
+              ></AppIcon>
+            </el-button>
+          </el-tooltip>
+        </div>
+
+        <div class="left-height">
+          <el-scrollbar>
+            <InfiniteScroll
+              :size="chatLogData.length"
+              :total="_chatLogPagination?.total || 0"
+              :page_size="_chatLogPagination?.page_size || 20"
+              v-model:current_page="_chatLogPagination.current_page"
+              @load="scrollData"
+              :loading="leftLoading"
+            >
+              <div v-loading="leftLoading">
+                <el-menu-item
+                  v-for="row in chatLogData"
+                  :index="row.id"
+                  :key="row.id"
+                  @click="handleClickList(row)"
+                  @mouseenter="mouseenter(row)"
+                  @mouseleave="mouseId = ''"
+                >
+                  <div class="flex-between w-full lighter">
+                    <span :title="row.abstract" class="ellipsis">
+                      {{ row.abstract }}
+                    </span>
+                    <div @click.stop class="flex" v-show="mouseId === row.id && row.id !== 'new'">
+                      <el-dropdown trigger="click" :teleported="false">
+                        <el-button text class="lighter" style="padding: 1px !important">
+                          <AppIcon iconName="app-more" style="margin-right: 0"></AppIcon>
+                        </el-button>
+
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item @click.stop="editLogTitle(row)">
+                              <AppIcon
+                                iconName="app-edit"
+                                style="color: var(--app-text-color-secondary)"
+                                class="mr-4"
+                              ></AppIcon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item @click.stop="deleteChatLog(row)">
+                              <AppIcon
+                                iconName="app-delete"
+                                style="color: var(--app-text-color-secondary)"
+                                class="mr-4"
+                              ></AppIcon>
+                              {{ $t('common.delete') }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </div>
+                </el-menu-item>
               </div>
-            </div>
-          </el-menu-item>
-        </el-menu-item-group>
+            </InfiniteScroll>
+          </el-scrollbar>
+        </div>
         <div v-if="!chatLogData?.length" class="text-center">
           <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
         </div>
@@ -164,12 +200,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, inject, type Ref } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import EditTitleDialog from './EditTitleDialog.vue'
-import useStore from '@/stores'
 
-const { user } = useStore()
+const scrollData = inject('scrollData') as any
+// 子组件
+const chatLogPagination = inject('chatLogPagination') as any
+const _chatLogPagination = chatLogPagination()
+
 const props = defineProps<{
   applicationDetail: any
   chatLogData: any[]
@@ -180,11 +219,17 @@ const props = defineProps<{
 const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
 
 const showHistory = computed(() => {
-  console.log(props.applicationDetail?.show_history)
   return props.applicationDetail?.show_history != null || undefined
     ? props.applicationDetail?.show_history
     : true
 })
+
+// 更新页码的方法
+const updateCurrentPage = (page: number) => {
+  if (chatLogPagination) {
+    chatLogPagination.current_page = page
+  }
+}
 
 const EditTitleDialogRef = ref()
 
@@ -193,6 +238,7 @@ const mouseId = ref('')
 function mouseenter(row: any) {
   mouseId.value = row.id
 }
+
 const newChat = () => {
   emit('newChat')
 }
@@ -261,7 +307,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 </style>
 <style lang="scss">
 .chat-pc-popper {
-  background: #ffffff !important;
+  background: #eef1f4;
   .el-menu {
     background: var(--el-color-primary-light-06) !important;
   }

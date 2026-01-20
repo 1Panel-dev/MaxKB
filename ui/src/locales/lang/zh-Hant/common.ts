@@ -48,6 +48,7 @@ export default {
   reason: '理由',
   removeSuccess: '移除成功',
   publish: '發佈',
+  noTargetPermission: '無目標資源權限',
   searchBar: {
     placeholder: '按名稱搜尋',
   },
@@ -75,7 +76,9 @@ export default {
     success: '成功',
     fail: '失敗',
     all: '全部',
-    padding: '執行中',
+    STARTED: '執行中',
+    REVOKED: '已取消',
+    REVOKE: '取消中',
   },
   param: {
     outputParam: '輸出參數',
@@ -83,6 +86,7 @@ export default {
     initParam: '啟動參數',
     editParam: '編輯參數',
     addParam: '新增參數',
+    exception: '异常捕獲',
   },
   aggregationStrategy: '聚合策略',
   inputPlaceholder: '請輸入',
@@ -95,7 +99,6 @@ export default {
   rename: '重命名',
   renameSuccess: '重命名成功',
   EditAvatarDialog: {
-    title: '應用頭像',
     customizeUpload: '自訂上傳',
     upload: '上傳',
     default: '預設 logo',
@@ -138,4 +141,5 @@ export default {
     prev: '上一步',
     next: '下一步',
   },
+  use: '使用',
 }

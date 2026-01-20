@@ -1,11 +1,13 @@
 from django.urls import path
 
+from chat.views.mcp import mcp_view
 from . import views
 
 app_name = 'chat'
 # @formatter:off
 urlpatterns = [
     path('embed', views.ChatEmbedView.as_view()),
+    path('mcp', mcp_view),
     path('auth/anonymous', views.AnonymousAuthentication.as_view()),
     path('profile', views.AuthProfile.as_view()),
     path('resource_proxy',views.ResourceProxy.as_view()),
@@ -15,8 +17,7 @@ urlpatterns = [
     path('text_to_speech', views.TextToSpeech.as_view()),
     path('speech_to_text', views.SpeechToText.as_view()),
     path('captcha', views.CaptchaView.as_view(), name='captcha'),
-    path('<str:application_id>/chat/completions', views.OpenAIView.as_view(),
-         name='application/chat_completions'),
+    path('<str:application_id>/chat/completions', views.OpenAIView.as_view(), name='application/chat_completions'),
     path('vote/chat/<str:chat_id>/chat_record/<str:chat_record_id>', views.VoteView.as_view(), name='vote'),
     path('historical_conversation', views.HistoricalConversationView.as_view(), name='historical_conversation'),
     path('historical_conversation/<str:chat_id>/record/<str:chat_record_id>',views.ChatRecordView.as_view(),name='conversation_details'),

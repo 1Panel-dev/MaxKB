@@ -7,12 +7,11 @@
     @desc: 对话step Base实现
 """
 import json
-import os
 import time
 import traceback
-import uuid_utils.compat as uuid
 from typing import List
 
+import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
 from django.utils.translation import gettext as _
@@ -26,11 +25,12 @@ from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineMode
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
 from application.flow.tools import Reasoning, mcp_response_generator
-from application.models import ApplicationChatUserStats, ChatUserType
+from application.models import ApplicationChatUserStats, ChatUserType, Application, ApplicationApiKey, \
+    ApplicationAccessToken
+from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
-from maxkb.const import CONFIG
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from tools.models import Tool
 
@@ -57,7 +57,6 @@ def write_context(step, manage, request_token, response_token, all_text):
     manage.context['run_time'] = current_time - manage.context['start_time']
     manage.context['message_tokens'] = manage.context['message_tokens'] + request_token
     manage.context['answer_tokens'] = manage.context['answer_tokens'] + response_token
-
 
 
 def event_content(response,
@@ -176,12 +175,11 @@ class BaseChatStep(IChatStep):
                 no_references_setting=None,
                 model_params_setting=None,
                 model_setting=None,
-                mcp_enable=False,
                 mcp_tool_ids=None,
                 mcp_servers='',
                 mcp_source="referencing",
-                tool_enable=False,
                 tool_ids=None,
+                application_ids=None,
                 mcp_output_enable=True,
                 **kwargs):
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
@@ -192,14 +190,16 @@ class BaseChatStep(IChatStep):
                                        manage, padding_problem_text, chat_user_id, chat_user_type,
                                        no_references_setting,
                                        model_setting,
-                                       mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids,
+                                       mcp_tool_ids, mcp_servers, mcp_source, tool_ids,
+                                       application_ids,
                                        mcp_output_enable)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
                                       paragraph_list,
                                       manage, padding_problem_text, chat_user_id, chat_user_type, no_references_setting,
                                       model_setting,
-                                      mcp_enable, mcp_tool_ids, mcp_servers, mcp_source, tool_enable, tool_ids,
+                                      mcp_tool_ids, mcp_servers, mcp_source, tool_ids,
+                                      application_ids,
                                       mcp_output_enable)
 
     def get_details(self, manage, **kwargs):
@@ -224,43 +224,65 @@ class BaseChatStep(IChatStep):
         result.append({'role': 'ai', 'content': answer_text})
         return result
 
-    def _handle_mcp_request(self, mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
-                            mcp_output_enable, chat_model, message_list):
-        if not mcp_enable and not tool_enable:
-            return None
+    def _handle_mcp_request(self, mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
+                            application_ids, mcp_output_enable, chat_model, message_list):
 
         mcp_servers_config = {}
 
         # 迁移过来mcp_source是None
         if mcp_source is None:
             mcp_source = 'custom'
-        if mcp_enable:
-            # 兼容老数据
-            if not mcp_tool_ids:
-                mcp_tool_ids = []
-            if mcp_source == 'custom' and mcp_servers is not None and '"stdio"' not in mcp_servers:
-                mcp_servers_config = json.loads(mcp_servers)
-            elif mcp_tool_ids:
-                mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
-                for mcp_tool in mcp_tools:
-                    if mcp_tool and mcp_tool['is_active']:
-                        mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
+        # 兼容老数据
+        if not mcp_tool_ids:
+            mcp_tool_ids = []
+        if mcp_source == 'custom' and mcp_servers and '"stdio"' not in mcp_servers:
+            mcp_servers_config = json.loads(mcp_servers)
+        elif mcp_tool_ids:
+            mcp_tools = QuerySet(Tool).filter(id__in=mcp_tool_ids).values()
+            for mcp_tool in mcp_tools:
+                if mcp_tool and mcp_tool['is_active']:
+                    mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
 
-        if tool_enable:
-            if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
-                self.context['tool_ids'] = tool_ids
-                for tool_id in tool_ids:
-                    tool = QuerySet(Tool).filter(id=tool_id).first()
-                    if tool is None or tool.is_active is False:
-                        continue
-                    executor = ToolExecutor()
-                    if tool.init_params is not None:
-                        params = json.loads(rsa_long_decrypt(tool.init_params))
-                    else:
-                        params = {}
-                    tool_config = executor.get_tool_mcp_config(tool.code, params)
+        if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
+            self.context['tool_ids'] = tool_ids
+            for tool_id in tool_ids:
+                tool = QuerySet(Tool).filter(id=tool_id).first()
+                if tool is None or tool.is_active is False:
+                    continue
+                executor = ToolExecutor()
+                if tool.init_params is not None:
+                    params = json.loads(rsa_long_decrypt(tool.init_params))
+                else:
+                    params = {}
+                tool_config = executor.get_tool_mcp_config(tool.code, params, tool.name, tool.desc)
 
-                    mcp_servers_config[str(tool.id)] = tool_config
+                mcp_servers_config[str(tool.id)] = tool_config
+
+        if application_ids and len(application_ids) > 0:
+            self.context['application_ids'] = application_ids
+            for application_id in application_ids:
+                app = QuerySet(Application).filter(id=application_id, is_publish=True).first()
+                if app is None:
+                    continue
+                app_key = QuerySet(ApplicationApiKey).filter(application_id=application_id, is_active=True).first()
+                if app_key is not None:
+                    api_key = app_key.secret_key
+                    application_access_token = QuerySet(ApplicationAccessToken).filter(
+                        application_id=app_key.application_id
+                    ).first()
+                    if application_access_token is not None and application_access_token.authentication:
+                        raise AppApiException(
+                            500,
+                            _('Agent 【{name}】 access token authentication is not supported for agent tool').format(name=app.name)
+                        )
+                else:
+                    raise AppApiException(
+                        500,
+                        _('Agent Key is required for agent tool 【{name}】').format(name=app.name)
+                    )
+                executor = ToolExecutor()
+                app_config = executor.get_app_mcp_config(api_key)
+                mcp_servers_config[app.name] = app_config
 
         if len(mcp_servers_config) > 0:
             return mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable)
@@ -272,12 +294,11 @@ class BaseChatStep(IChatStep):
                           paragraph_list=None,
                           no_references_setting=None,
                           problem_text=None,
-                          mcp_enable=False,
                           mcp_tool_ids=None,
                           mcp_servers='',
                           mcp_source="referencing",
-                          tool_enable=False,
                           tool_ids=None,
+                          application_ids=None,
                           mcp_output_enable=True):
         if paragraph_list is None:
             paragraph_list = []
@@ -296,7 +317,8 @@ class BaseChatStep(IChatStep):
         else:
             # 处理 MCP 请求
             mcp_result = self._handle_mcp_request(
-                mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_ids, tool_ids, mcp_output_enable, chat_model,
+                mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
+                application_ids, mcp_output_enable, chat_model,
                 message_list,
             )
             if mcp_result:
@@ -314,18 +336,20 @@ class BaseChatStep(IChatStep):
                        chat_user_id=None, chat_user_type=None,
                        no_references_setting=None,
                        model_setting=None,
-                       mcp_enable=False,
                        mcp_tool_ids=None,
                        mcp_servers='',
                        mcp_source="referencing",
-                       tool_enable=False,
                        tool_ids=None,
+                       application_ids=None,
                        mcp_output_enable=True):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
-                                                         no_references_setting, problem_text, mcp_enable, mcp_tool_ids,
-                                                         mcp_servers, mcp_source, tool_enable, tool_ids,
+                                                         no_references_setting, problem_text, mcp_tool_ids,
+                                                         mcp_servers, mcp_source, tool_ids,
+                                                         application_ids,
                                                          mcp_output_enable)
-        chat_record_id = uuid.uuid7()
+        chat_record_id = self.context.get('step_args', {}).get('chat_record_id') if self.context.get('step_args',
+                                                                                                     {}).get(
+            'chat_record_id') else uuid.uuid7()
         r = StreamingHttpResponse(
             streaming_content=event_content(chat_result, chat_id, chat_record_id, paragraph_list,
                                             post_response_handler, manage, self, chat_model, message_list, problem_text,
@@ -341,12 +365,11 @@ class BaseChatStep(IChatStep):
                          paragraph_list=None,
                          no_references_setting=None,
                          problem_text=None,
-                         mcp_enable=False,
                          mcp_tool_ids=None,
                          mcp_servers='',
                          mcp_source="referencing",
-                         tool_enable=False,
                          tool_ids=None,
+                         application_ids=None,
                          mcp_output_enable=True
                          ):
         if paragraph_list is None:
@@ -365,7 +388,8 @@ class BaseChatStep(IChatStep):
         else:
             # 处理 MCP 请求
             mcp_result = self._handle_mcp_request(
-                mcp_enable, tool_enable, mcp_source, mcp_servers, mcp_tool_ids, tool_ids, mcp_output_enable,
+                mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
+                application_ids, mcp_output_enable,
                 chat_model, message_list,
             )
             if mcp_result:
@@ -382,12 +406,11 @@ class BaseChatStep(IChatStep):
                       padding_problem_text: str = None,
                       chat_user_id=None, chat_user_type=None, no_references_setting=None,
                       model_setting=None,
-                      mcp_enable=False,
                       mcp_tool_ids=None,
                       mcp_servers='',
                       mcp_source="referencing",
-                      tool_enable=False,
                       tool_ids=None,
+                      application_ids=None,
                       mcp_output_enable=True):
         reasoning_content_enable = model_setting.get('reasoning_content_enable', False)
         reasoning_content_start = model_setting.get('reasoning_content_start', '<think>')
@@ -398,9 +421,10 @@ class BaseChatStep(IChatStep):
         # 调用模型
         try:
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
-                                                            no_references_setting, problem_text, mcp_enable,
-                                                            mcp_tool_ids, mcp_servers, mcp_source, tool_enable,
-                                                            tool_ids, mcp_output_enable)
+                                                            no_references_setting, problem_text,
+                                                            mcp_tool_ids, mcp_servers, mcp_source,
+                                                            tool_ids, application_ids,
+                                                            mcp_output_enable)
             if is_ai_chat:
                 request_token = chat_model.get_num_tokens_from_messages(message_list)
                 response_token = chat_model.get_num_tokens(chat_result.content)

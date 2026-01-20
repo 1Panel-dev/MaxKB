@@ -6,16 +6,22 @@
       v-hasPermission="
         new ComplexPermission(
           [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-          [PermissionConst.WORKSPACE_ADD_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_ADD_MEMBER.getWorkspacePermissionWorkspaceManageRole],
+          [
+            PermissionConst.WORKSPACE_ADD_MEMBER,
+            PermissionConst.WORKSPACE_WORKSPACE_ADD_MEMBER
+              .getWorkspacePermissionWorkspaceManageRole,
+          ],
           [],
-            'OR',)"
+          'OR',
+        )
+      "
     >
       {{ $t('views.role.member.add') }}
     </el-button>
     <div class="flex complex-search">
       <el-select class="complex-search__left" v-model="searchType" style="width: 120px">
-        <el-option :label="$t('views.login.loginForm.username.label')" value="username"/>
-        <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name"/>
+        <el-option :label="$t('views.login.loginForm.username.label')" value="username" />
+        <el-option :label="$t('views.userManage.userForm.nick_name.label')" value="nick_name" />
       </el-select>
       <el-input
         v-if="searchType === 'username'"
@@ -31,7 +37,8 @@
         @change="getList"
         :placeholder="$t('common.inputPlaceholder')"
         style="width: 220px"
-        clearable/>
+        clearable
+      />
     </div>
   </div>
   <app-table
@@ -44,9 +51,9 @@
     :span-method="objectSpanMethod"
     :maxTableHeight="320"
   >
-    <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')"/>
-    <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')"/>
-    <el-table-column prop="role_name" :label="$t('views.role.member.role')"/>
+    <el-table-column prop="nick_name" :label="$t('views.userManage.userForm.nick_name.label')" />
+    <el-table-column prop="username" :label="$t('views.login.loginForm.username.label')" />
+    <el-table-column prop="role_name" :label="$t('views.role.member.role')" />
     <el-table-column :label="$t('common.operation')" width="100" fixed="right">
       <template #default="{ row }">
         <el-tooltip
@@ -60,10 +67,16 @@
             @click.stop="handleDelete(row)"
             v-hasPermission="
               new ComplexPermission(
-              [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-              [PermissionConst.WORKSPACE_REMOVE_MEMBER, PermissionConst.WORKSPACE_WORKSPACE_REMOVE_MEMBER.getWorkspacePermissionWorkspaceManageRole],
-              [],
-                'OR',)"
+                [RoleConst.ADMIN, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+                [
+                  PermissionConst.WORKSPACE_REMOVE_MEMBER,
+                  PermissionConst.WORKSPACE_WORKSPACE_REMOVE_MEMBER
+                    .getWorkspacePermissionWorkspaceManageRole,
+                ],
+                [],
+                'OR',
+              )
+            "
           >
             <AppIcon iconName="app-delete-users"></AppIcon>
           </el-button>
@@ -79,15 +92,15 @@
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref, reactive, watch} from 'vue'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {t} from '@/locales'
+import { onMounted, ref, reactive, watch } from 'vue'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
 import AddMemberDrawer from './AddMemberDrawer.vue'
-import type {WorkspaceMemberItem, WorkspaceItem} from '@/api/type/workspace'
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
-import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
-
+import type { WorkspaceMemberItem, WorkspaceItem } from '@/api/type/workspace'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
+import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
+import { i18n_name } from '@/utils/common'
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem
@@ -120,7 +133,11 @@ async function getList() {
       params,
       loading,
     )
-    tableData.value = res.data.records
+    tableData.value = res.data.records.map((item: any) => ({
+      ...item,
+      nick_name: i18n_name(item.nick_name),
+      role_name: i18n_name(item.role_name),
+    }))
     paginationConfig.total = res.data.total
   } catch (error) {
     console.error(error)
@@ -143,22 +160,22 @@ watch(
   },
 )
 
-const objectSpanMethod = ({row, column, rowIndex, columnIndex}: any) => {
+const objectSpanMethod = ({ row, column, rowIndex, columnIndex }: any) => {
   if (column.property === 'nick_name' || column.property === 'username') {
-    const sameUserRows = tableData.value.filter(item => item.user_id === row.user_id);
-    if (rowIndex === tableData.value.findIndex(item => item.user_id === row.user_id)) {
+    const sameUserRows = tableData.value.filter((item) => item.user_id === row.user_id)
+    if (rowIndex === tableData.value.findIndex((item) => item.user_id === row.user_id)) {
       return {
         rowspan: sameUserRows.length,
-        colspan: 1
-      };
+        colspan: 1,
+      }
     } else {
       return {
         rowspan: 0,
-        colspan: 0
-      };
+        colspan: 0,
+      }
     }
   }
-};
+}
 
 const addMemberDrawerRef = ref<InstanceType<typeof AddMemberDrawer>>()
 
@@ -173,17 +190,14 @@ function handleDelete(row: WorkspaceMemberItem) {
   })
     .then(() => {
       loading.value = true
-      loadPermissionApi('workspace').deleteWorkspaceMember(
-        props.currentWorkspace?.id as string,
-        row.user_relation_id,
-        loading,
-      ).then(() => {
-        MsgSuccess(t('common.deleteSuccess'))
-        getList()
-      })
+      loadPermissionApi('workspace')
+        .deleteWorkspaceMember(props.currentWorkspace?.id as string, row.user_relation_id, loading)
+        .then(() => {
+          MsgSuccess(t('common.deleteSuccess'))
+          getList()
+        })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 </script>
 
@@ -192,4 +206,3 @@ function handleDelete(row: WorkspaceMemberItem) {
   border-right: 1px solid var(--el-table-border-color);
 }
 </style>
-

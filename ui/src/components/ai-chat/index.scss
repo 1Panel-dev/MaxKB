@@ -12,6 +12,7 @@
     position: absolute;
     right: 14px;
     top: -30px;
+    z-index: 22;
   }
   &__content {
     padding-top: 0;
@@ -42,7 +43,7 @@
 
 @media only screen and (max-width: 768px) {
   .ai-chat {
-    height: calc(100% - 106px) !important;
+    height: calc(100% - 116px) !important;
   }
 }
 .chat-mobile {

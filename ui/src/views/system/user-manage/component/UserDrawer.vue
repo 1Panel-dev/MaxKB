@@ -69,12 +69,51 @@
       :deleteButtonDisabled="deleteButtonDisabled"
     />
     <template #footer>
-      <el-button @click.prevent="visible = false"> {{ $t('common.cancel') }}</el-button>
-      <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
-        {{ $t('common.save') }}
-      </el-button>
+      <div style="display: flex; width: 100%;">
+        <el-button @click="openDialog" v-if="!isEdit && showPermission">
+          {{ $t('views.system.resourceAuthorization.setting.defaultPermission') }}
+        </el-button>
+        <div style="margin-left: auto;">
+          <el-button @click.prevent="visible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
+            {{ $t('common.save') }}
+          </el-button>
+        </div>
+      </div>
+
     </template>
   </el-drawer>
+  <el-dialog
+    v-model="dialogVisible"
+    :title="$t('views.system.resourceAuthorization.setting.defaultPermission')"
+    destroy-on-close
+    @close="closeDialog"
+  >
+    <template #header="{ titleId, titleClass }" v-if="user.isEE()">
+      <div class="dialog-header">
+        <h4 :id="titleId" :class="titleClass" style="margin: 0;">
+          {{ $t('views.system.resourceAuthorization.setting.defaultPermission') }}
+          <span class="dialog-subtitle">
+          {{ $t('views.system.resourceAuthorization.setting.defaultPermissionTip') }}
+        </span>
+        </h4>
+      </div>
+    </template>
+    <el-radio-group v-model="radioPermission" class="radio-block">
+      <template v-for="(item, index) in permissionOptions" :key="index">
+        <el-radio :value="item.value" class="mr-16">
+          <p class="color-text-primary lighter">{{ item.label }}</p>
+          <el-text class="color-secondary lighter">{{ item.desc }}</el-text>
+        </el-radio>
+      </template>
+    </el-radio-group>
+    <template #footer>
+      <div class="dialog-footer mt-24">
+        <el-button @click="closeDialog"> {{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="submitDialog"> {{ $t('common.confirm') }}</el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 <script setup lang="ts">
 import {ref, reactive, watch, onBeforeMount, computed} from 'vue'
@@ -85,8 +124,10 @@ import {t} from '@/locales'
 import type {FormItemModel} from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import {RoleTypeEnum} from '@/enums/system'
+import {AuthorizationEnum, RoleTypeEnum} from '@/enums/system'
 import useStore from '@/stores'
+import {hasPermission} from "@/utils/permission";
+import {EditionConst} from "@/utils/permission/data.ts";
 
 const {user} = useStore()
 const props = defineProps({
@@ -109,15 +150,56 @@ const memberFormContentLoading = ref(false)
 const formItemModel = ref<FormItemModel[]>([])
 const roleFormItem = ref<FormItemModel[]>([])
 const adminRoleList = ref<any[]>([])
+const userRoleList = ref<any[]>([])
 const workspaceFormItem = ref<FormItemModel[]>([])
 
 const isAdmin = computed(() => userForm.value['id'] === 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab')
+const dialogVisible = ref(false)
+const radioPermission = ref('NOT_AUTH')
+const defaultPermission = ref('NOT_AUTH')
+const permissionOptions = computed(() => {
+  const baseOptions = [
+    {
+      label: t('views.system.resourceAuthorization.setting.check'),
+      value: AuthorizationEnum.VIEW,
+      desc: t('views.system.resourceAuthorization.setting.checkDesc'),
+    },
+    {
+      label: t('views.system.resourceAuthorization.setting.management'),
+      value: AuthorizationEnum.MANAGE,
+      desc: t('views.system.resourceAuthorization.setting.managementDesc'),
+    },
+    {
+      label: t('views.system.resourceAuthorization.setting.notAuthorized'),
+      value: AuthorizationEnum.NOT_AUTH,
+      desc: '',
+    }
+  ];
 
-function deleteButtonDisabled(element: any) {
-  if (isAdmin.value && ['ADMIN', 'WORKSPACE_MANAGE', 'USER'].includes(element.role_id)) {
+  if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
+    baseOptions.splice(2, 0, {
+      label: t('views.system.resourceAuthorization.setting.role'),
+      value: AuthorizationEnum.ROLE,
+      desc: t('views.system.resourceAuthorization.setting.roleDesc'),
+    });
+  }
+
+  return baseOptions;
+});
+
+const showPermission = computed(() => {
+  //社区版本的可以显示 别的版本 过期了 也可以显示
+  if (user.isCE() || user.isExpire()) {
     return true
   }
-  return false
+  const hasUserRole = list.value.some((item) => userRoleList.value.includes(item.role_id));
+  return (user.isEE() || user.isPE()) && hasUserRole
+})
+
+
+function deleteButtonDisabled(element: any) {
+  return isAdmin.value && ['ADMIN', 'WORKSPACE_MANAGE', 'USER'].includes(element.role_id);
+
 }
 
 async function getRoleFormItem() {
@@ -145,6 +227,10 @@ async function getRoleFormItem() {
       },
     ]
     adminRoleList.value = res.data.filter((item) => item.type === RoleTypeEnum.ADMIN)
+    userRoleList.value = res.data
+      .filter((item) => item.type === RoleTypeEnum.USER)
+      .map((item) => item.id)
+
   } catch (e) {
     console.error(e)
   }
@@ -352,6 +438,7 @@ const submit = async (formEl: FormInstance | undefined) => {
             visible.value = false
           })
       } else {
+        params.defaultPermission = defaultPermission.value
         userManageApi
           .postUserManage(params, loading)
           .then((res) => {
@@ -369,6 +456,35 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
+const openDialog = () => {
+  dialogVisible.value = true
+}
+
+const closeDialog = () => {
+  dialogVisible.value = false
+}
+
+const submitDialog = () => {
+  defaultPermission.value = radioPermission.value
+  closeDialog()
+}
+
+
 defineExpose({open})
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.dialog-header {
+  h4 {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin: 0;
+  }
+
+  .dialog-subtitle {
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+  }
+}
+
+</style>

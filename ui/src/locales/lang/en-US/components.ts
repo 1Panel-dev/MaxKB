@@ -17,5 +17,10 @@ export default {
     folderNamePlaceholder: 'Please enter a name',
     requiredMessage: 'Please select a folder',
     deleteConfirmMessage: 'Folders with resources will be deleted, please be cautious.',
+    ascTime: 'Sort by creation time ascending',
+    descTime: 'Sort by creation time descending',
+    ascName: 'Sort by name ascending',
+    descName: 'Sort by name descending',
+    custom: 'Sort by user drag-and-drop',
   },
 }

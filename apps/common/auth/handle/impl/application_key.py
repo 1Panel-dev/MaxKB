@@ -39,4 +39,4 @@ class ApplicationKey(AuthBaseHandle):
             chat_user_type=ChatUserType.ANONYMOUS_USER.value)
 
     def support(self, request, token: str, get_token_details):
-        return str(token).startswith("application-")
+        return str(token).startswith("application-") or str(token).startswith('agent-')

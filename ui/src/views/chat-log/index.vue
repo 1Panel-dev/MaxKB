@@ -25,9 +25,8 @@
           </div>
           <el-select
             v-model="history_day"
-            class="ml-12"
+            class="ml-12 w-180"
             @change="changeDayHandle"
-            style="width: 180px"
           >
             <el-option
               v-for="item in dayOptions"

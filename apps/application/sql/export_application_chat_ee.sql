@@ -11,6 +11,8 @@ SELECT
     application_chat_record_temp."index" as "index",
     application_chat_record_temp.improve_paragraph_list  as improve_paragraph_list,
     application_chat_record_temp.vote_status as vote_status,
+    application_chat_record_temp.vote_reason as vote_reason,
+    application_chat_record_temp.vote_other_content as vote_other_content,
     application_chat_record_temp.create_time as create_time,
     (CASE WHEN "chat_user".id is NULL THEN application_chat.asker ELSE jsonb_build_object('id',chat_user.id,'username',chat_user.username)  END)::json AS asker
 FROM

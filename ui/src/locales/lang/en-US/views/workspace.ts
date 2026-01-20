@@ -8,7 +8,7 @@ export default {
     confirmContent:
       'After deletion, all members in this space will be removed. Please proceed with caution.',
     confirmContentNotDelete:
-      'This workspace contains knowledge base resources and application resources, and cannot be deleted.',
+      'This workspace contains knowledge base resources and agent resources, and cannot be deleted.',
   },
   member: {
     delete: {

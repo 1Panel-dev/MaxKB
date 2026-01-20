@@ -28,7 +28,7 @@ from application.flow.common import Answer, Workflow
 from application.flow.i_step_node import WorkFlowPostHandler
 from application.flow.tools import to_stream_response_simple
 from application.flow.workflow_manage import WorkflowManage
-from application.models import Application, ApplicationTypeChoices, ApplicationKnowledgeMapping, \
+from application.models import Application, ApplicationTypeChoices, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
@@ -42,6 +42,7 @@ from knowledge.models import Document, Paragraph
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_instance_by_model_workspace_id
+from system_manage.models.resource_mapping import ResourceMapping
 
 
 class ChatMessagesSerializers(serializers.Serializer):
@@ -327,6 +328,7 @@ class ChatSerializers(serializers.Serializer):
         chat_user_id = self.data.get('chat_user_id')
         chat_user_type = self.data.get('chat_user_type')
         form_data = instance.get("form_data")
+        chat_record_id = instance.get('chat_record_id')
         pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
@@ -350,6 +352,8 @@ class ChatSerializers(serializers.Serializer):
         # 构建运行参数
         params = chat_info.to_pipeline_manage_params(message, get_post_handler(chat_info), exclude_paragraph_id_list,
                                                      chat_user_id, chat_user_type, stream, form_data)
+        if chat_record_id:
+            params['chat_record_id'] = chat_record_id
         chat_info.set_chat(message)
         # 运行流水线作业
         pipeline_message.run(params)
@@ -392,7 +396,7 @@ class ChatSerializers(serializers.Serializer):
         work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
-                                              uuid.uuid7()) if chat_record is None else chat_record.id,
+                                              uuid.uuid7()) if chat_record is None else str(chat_record.id),
                                            'stream': stream,
                                            're_chat': re_chat,
                                            'chat_user_id': chat_user_id,
@@ -400,6 +404,7 @@ class ChatSerializers(serializers.Serializer):
                                            'workspace_id': workspace_id,
                                            'debug': debug,
                                            'chat_user': chat_info.get_chat_user(),
+                                           'chat_user_group': chat_info.get_chat_user_group(),
                                            'application_id': str(chat_info.application_id)},
                                           WorkFlowPostHandler(chat_info),
                                           base_to_response, form_data, image_list, document_list, audio_list,
@@ -466,9 +471,10 @@ class ChatSerializers(serializers.Serializer):
 
     def re_open_chat_simple(self, chat_id, application):
         # 数据集id列表
-        knowledge_id_list = [str(row.knowledge_id) for row in
-                             QuerySet(ApplicationKnowledgeMapping).filter(
-                                 application_id=application.id)]
+        knowledge_id_list = [str(row.target_id) for row in
+                             QuerySet(ResourceMapping).filter(source_id=str(application.id),
+                                                              source_type='APPLICATION',
+                                                              target_type='KNOWLEDGE')]
 
         # 需要排除的文档
         exclude_document_id_list = [str(document.id) for document in
@@ -543,9 +549,11 @@ class OpenChatSerializers(serializers.Serializer):
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get("chat_user_type")
         debug = self.data.get("debug")
-        knowledge_id_list = [str(row.knowledge_id) for row in
-                             QuerySet(ApplicationKnowledgeMapping).filter(
-                                 application_id=application_id)]
+        knowledge_id_list = [str(row.target_id) for row in
+                             QuerySet(ResourceMapping).filter(source_id=str(application_id),
+                                                              source_type='APPLICATION',
+                                                              target_type='KNOWLEDGE')]
+
         chat_id = str(uuid.uuid7())
         ChatInfo(chat_id, chat_user_id, chat_user_type, knowledge_id_list,
                  [str(document.id) for document in

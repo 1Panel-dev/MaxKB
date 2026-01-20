@@ -41,8 +41,8 @@ template
       <span class="dialog-footer">
         <el-button @click="handleClose">{{ $t('common.cancel') }}</el-button>
         <el-button @click="validateConnection">{{
-          $t('views.system.authentication.scanTheQRCode.validate')
-        }}</el-button>
+            $t('views.system.authentication.scanTheQRCode.validate')
+          }}</el-button>
         <el-button type="primary" @click="validateForm">{{ $t('common.save') }}</el-button>
       </span>
     </template>
@@ -50,11 +50,11 @@ template
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
-import { ElForm } from 'element-plus'
+import {reactive, ref} from 'vue'
+import {ElForm} from 'element-plus'
 import platformApi from '@/api/system-settings/platform-source'
-import { MsgError, MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {MsgError, MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
 
 const visible = ref(false)
 const loading = ref(false)
@@ -184,7 +184,7 @@ const open = async (platform: Platform) => {
   }
   formRef.value?.clearValidate()
 }
-defineExpose({ open })
+defineExpose({open})
 
 const validateForm = () => {
   formRef.value?.validate((valid) => {

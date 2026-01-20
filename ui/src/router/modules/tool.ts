@@ -11,6 +11,8 @@ const ModelRouter = {
       PermissionConst.TOOL_READ.getWorkspacePermission,
       PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
+    icon: 'app-tool',
+    iconActive: 'app-tool-active',
     group: 'workspace',
     order: 3,
   },

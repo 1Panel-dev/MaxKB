@@ -113,6 +113,9 @@
             <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'"
               >{{ $t('dynamicsForm.input_type_list.DatePicker') }}
             </el-tag>
+            <el-tag type="info" class="info-tag" v-if="row.input_type === 'JsonInput'"
+              >{{ $t('dynamicsForm.input_type_list.JsonInput') }}
+            </el-tag>
           </template>
         </el-table-column>
         <el-table-column :label="$t('common.required')">

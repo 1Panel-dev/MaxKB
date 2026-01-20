@@ -5,6 +5,7 @@
     width="800"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
+    align-center
   >
     <el-card shadow="never" class="layout-bg mb-16">
       <el-text type="info" class="color-secondary">{{ $t('layout.apiServiceAddress') }}</el-text>
@@ -21,7 +22,12 @@
     <el-button type="primary" class="mb-16" @click="createApiKey">
       {{ $t('common.create') }}
     </el-button>
-    <el-table :data="apiKey" class="mb-16" :loading="loading">
+    <el-table
+      :data="apiKey"
+      :loading="loading"
+      style="min-height: 300px"
+      :max-height="420"
+    >
       <el-table-column prop="secret_key" label="API Key">
         <template #default="{ row }">
           <span class="vertical-middle lighter break-all">

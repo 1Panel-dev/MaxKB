@@ -4,9 +4,9 @@ export default {
   syncUsersTip: 'Only import newly added users',
   setUserGroups: 'Configure User Groups',
   knowledgeTitleTip:
-    'This configuration will only take effect after enabling chat user login authentication in the associated application',
+    'This configuration will only take effect after enabling chat user login authentication in the associated agent',
   applicationTitleTip:
-    'This configuration requires login authentication to be enabled in the application',
+    'This configuration requires login authentication to be enabled in the agent',
   autoAuthorization: 'Auto Authorization',
   authorization: 'Authorization',
   batchDeleteUser: 'Delete selected {count} users?',

@@ -87,12 +87,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, reactive, nextTick, computed } from 'vue'
+import { ref, onMounted, reactive, nextTick, computed, provide } from 'vue'
 import { isAppIcon } from '@/utils/common'
 import { hexToRgba } from '@/utils/theme'
 import { t } from '@/locales'
 import ChatHistoryDrawer from './component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
+
+provide('scrollData', loadInfiniteScroll)
+provide('chatLogPagination', () => chatLogPagination)
 
 const AiChatRef = ref()
 const loading = ref(false)
@@ -176,21 +179,28 @@ function newChat() {
   show.value = false
 }
 
+const chatLogPagination = ref({
+  total: 0,
+  page_size: 20,
+  current_page: 1,
+})
 function getChatLog(refresh?: boolean) {
-  const page = {
-    current_page: 1,
-    page_size: 20,
-  }
+  chatAPI
+    .pageChat(chatLogPagination.value.current_page, chatLogPagination.value.page_size, left_loading)
+    .then((res: any) => {
+      chatLogPagination.value.total = res.data.total
+      chatLogData.value = [...chatLogData.value, ...res.data.records]
+      if (!refresh) {
+        paginationConfig.current_page = 1
+        paginationConfig.total = 0
+        currentRecordList.value = []
+        currentChatId.value = 'new'
+      }
+    })
+}
 
-  chatAPI.pageChat(page.current_page, page.page_size, left_loading).then((res: any) => {
-    chatLogData.value = res.data.records
-    if (!refresh) {
-      paginationConfig.current_page = 1
-      paginationConfig.total = 0
-      currentRecordList.value = []
-      currentChatId.value = 'new'
-    }
-  })
+function loadInfiniteScroll() {
+  getChatLog(true)
 }
 
 function getChatRecord() {
@@ -241,6 +251,8 @@ function refreshFieldTitle(chatId: string, abstract: string) {
 
 function refresh(id: string) {
   currentChatId.value = id
+  chatLogPagination.value.current_page = 1
+  chatLogData.value = []
   getChatLog(true)
 }
 /**
@@ -300,7 +312,5 @@ onMounted(() => {
 }
 </style>
 <style lang="scss" scoped>
-:deep(.el-overlay) {
-  background-color: transparent;
-}
+
 </style>

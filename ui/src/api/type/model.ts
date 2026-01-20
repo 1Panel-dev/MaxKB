@@ -81,6 +81,7 @@ interface Model {
    * 模型参数配置
    */
   model_params_form: Dict<any>[]
+  resource_count: number
 }
 interface CreateModelRequest {
   /**

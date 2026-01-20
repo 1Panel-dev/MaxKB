@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { set,cloneDeep } from 'lodash'
+import { set, cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
@@ -225,7 +225,7 @@ onMounted(() => {
   inputFieldList.value.forEach((item, index) => {
     item.label = item.label || item.name
     item.field = item.field || item.variable
-    item.required = item.required || item.is_required
+    item.required = item.required == undefined ? item.is_required : item.required
     switch (item.type) {
       case 'input':
         item.input_type = 'TextInput'

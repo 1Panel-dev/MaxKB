@@ -67,7 +67,6 @@
                   {{ $t('views.login.resetPassword') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="chatUser.chatUserProfile?.source === 'LOCAL'"
                   class="border-t"
                   style="padding-top: 8px; padding-bottom: 8px"
                   @click="logout"

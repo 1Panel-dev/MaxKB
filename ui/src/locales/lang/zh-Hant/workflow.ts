@@ -11,6 +11,8 @@ export default {
   },
   operation: {
     toImportDoc: '去導入文檔',
+    importWorkflow: '導入工作流',
+    exportWorkflow: '導出工作流',
   },
   setting: {
     restoreVersion: '恢復版本',
@@ -22,6 +24,7 @@ export default {
     copyParam: '複製參數',
     exit: '直接退出',
     exitSave: '保存並退出',
+    templateCenter: '模板中心',
   },
   tip: {
     noData: '沒有找到相關結果',
@@ -29,7 +32,7 @@ export default {
     onlyRight: '只允許從右邊的錨點連出',
     notRecyclable: '不可循環連線',
     onlyLeft: '只允許連接左邊的錨點',
-    applicationNodeError: '該應用不可用',
+    applicationNodeError: '該智能體不可用',
     toolNodeError: '該函數不可用',
     repeatedNodeError: '節點名稱已存在！',
     cannotCopy: '不能被複製',
@@ -116,13 +119,6 @@ export default {
       currentTime: '當前時間',
     },
     baseNode: {
-      label: '基本信息',
-      appName: {
-        label: '應用名稱',
-      },
-      appDescription: {
-        label: '應用描述',
-      },
       fileUpload: {
         label: '文件上傳',
         tooltip: '開啟後，問答頁面會顯示上傳文件的按鈕。',
@@ -295,7 +291,7 @@ export default {
         label: '视觉模型',
         requiredMessage: '请选择视觉模型',
       },
-      image: {
+      video: {
         label: '选择视频',
         requiredMessage: '请选择视频',
       },
@@ -443,7 +439,7 @@ export default {
       },
     },
     applicationNode: {
-      label: '應用節點',
+      label: '智能體節點',
     },
     loopNode: {
       label: '循環節點',

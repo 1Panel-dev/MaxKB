@@ -115,9 +115,6 @@ export default {
   },
   AssignmentMethod: {
     label: 'Assignment Method',
-    custom: {
-      label: 'Custom',
-    },
     ref_variables: {
       label: 'Reference Variables',
       popover: 'Variable values must comply with',

@@ -242,11 +242,4 @@ onMounted(() => {
     top: -35px;
   }
 }
-:deep(.el-form-item__label) {
-  display: block;
-}
-
-:deep(.el-select-dropdown) {
-  max-width: 400px;
-}
 </style>

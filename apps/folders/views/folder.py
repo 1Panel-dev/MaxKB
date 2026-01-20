@@ -38,9 +38,9 @@ class FolderView(APIView):
         tags=[_('Folder')]  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
+        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.CREATE,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{r.data.get('parent_id')}"),
-        lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.CREATE,
+        lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.CREATE,
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
                                      ),
         lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
@@ -99,7 +99,7 @@ class FolderView(APIView):
             tags=[_('Folder')]  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.EDIT,
+            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
                                          ),
             lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
@@ -151,15 +151,15 @@ class FolderView(APIView):
             tags=[_('Folder')]  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: Permission(group=Group(kwargs.get('source')), operate=Operate.DELETE,
+            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.DELETE,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
                                          ),
-            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.EDIT,
+            lambda r, kwargs: Permission(group=Group(f"{kwargs.get('source')}_FOLDER"), operate=Operate.DELETE,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                          ),
             lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
                                              [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
-                                                         operate=Operate.EDIT,
+                                                         operate=Operate.DELETE,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                                          )], CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()

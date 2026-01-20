@@ -1,7 +1,6 @@
 export default {
   title: '概覽',
   appInfo: {
-    header: '應用資訊',
     publicAccessLink: '公開訪問連結',
     openText: '開',
     closeText: '關',
@@ -43,7 +42,7 @@ export default {
       displayCodeRequired: '請輸入失敗次數',
       toSettingChatUser: '去配置對話用戶',
       authenticationTooltip:
-        '開啟登陸認證後，應用和關聯的知識庫均需要對話用戶授權配置，否則用戶無權限登陸和知識庫檢索',
+        '開啟登陸認證後，智能體和關聯的知識庫均需要對話用戶授權配置，否則用戶無權限登陸和知識庫檢索',
     },
     SettingAPIKeyDialog: {
       dialogTitle: '設定',

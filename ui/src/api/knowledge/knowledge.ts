@@ -163,7 +163,7 @@ const putKnowledgeHitTest: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<Array<any>>> = (knowledge_id, data, loading) => {
-  return put(`${prefix.value}/${knowledge_id}/hit_test`, data, undefined, loading)
+  return post(`${prefix.value}/${knowledge_id}/hit_test`, data, undefined, loading)
 }
 
 /**
@@ -395,6 +395,36 @@ const putKnowledgeWorkflow: (
   return put(`${prefix.value}/${knowledge_id}/workflow`, data, undefined, loading)
 }
 
+/**
+ * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportKnowledgeWorkflow = (
+  knowledge_id: string,
+  knowledge_name: string,
+  loading?: Ref<boolean>,
+) => {
+  return exportFile(
+    knowledge_name + '.kbwf',
+    `${prefix.value}/${knowledge_id}/workflow/export`,
+    undefined,
+    loading,
+  )
+}
+/**
+ * 导入知识库工作流
+ */
+const importKnowledgeWorkflow: (
+  knowledge_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, data, loading) => {
+  return post(`${prefix.value}/${knowledge_id}/workflow/import`, data, undefined, loading)
+}
+
 const listKnowledgeVersion: (
   knowledge_id: string,
   loading?: Ref<boolean>,
@@ -433,7 +463,18 @@ const getWorkflowAction: (
 ) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
   return get(`${prefix.value}/${knowledge_id}/action/${knowledge_action_id}`, {}, loading)
 }
-
+const cancelWorkflowAction: (
+  knowledge_id: string,
+  knowledge_action_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id: string, knowledge_action_id, loading) => {
+  return post(
+    `${prefix.value}/${knowledge_id}/action/${knowledge_action_id}/cancel`,
+    {},
+    undefined,
+    loading,
+  )
+}
 /**
  * mcp 节点
  */
@@ -480,4 +521,7 @@ export default {
   putKnowledgeWorkflow,
   workflowUpload,
   getWorkflowActionPage,
+  cancelWorkflowAction,
+  exportKnowledgeWorkflow,
+  importKnowledgeWorkflow,
 }

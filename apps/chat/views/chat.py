@@ -21,7 +21,7 @@ from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechTo
     TextToSpeechSerializers, OpenAIChatSerializer
 from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
     AuthProfileSerializer
-from common.auth import TokenAuth
+from common.auth import ChatTokenAuth
 from common.constants.permission_constants import ChatAuth
 from common.exception.app_exception import AppAuthenticationFailed
 from common.result import result
@@ -65,7 +65,7 @@ class ResourceProxy(APIView):
 
 
 class OpenAIView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -108,7 +108,7 @@ class AnonymousAuthentication(APIView):
 
 
 class ApplicationProfile(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['GET'],
@@ -142,7 +142,7 @@ class AuthProfile(APIView):
 
 
 class ChatView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -164,7 +164,7 @@ class ChatView(APIView):
 
 
 class OpenView(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['GET'],
@@ -196,7 +196,7 @@ class CaptchaView(APIView):
 
 
 class SpeechToText(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -215,7 +215,7 @@ class SpeechToText(APIView):
 
 
 class TextToSpeech(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
         methods=['POST'],
@@ -234,7 +234,7 @@ class TextToSpeech(APIView):
 
 
 class UploadFile(APIView):
-    authentication_classes = [TokenAuth]
+    authentication_classes = [ChatTokenAuth]
     parser_classes = [MultiPartParser]
 
     @extend_schema(

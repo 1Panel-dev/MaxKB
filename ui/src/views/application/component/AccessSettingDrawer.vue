@@ -373,12 +373,12 @@ const drawerTitle = computed(
 const infoTitle = computed(
   () =>
     ({
-      wechat: t('views.applicationOverview.appInfo.header'),
-      dingtalk: t('views.applicationOverview.appInfo.header'),
-      wecom: t('views.applicationOverview.appInfo.header'),
-      lark: t('views.applicationOverview.appInfo.header'),
-      slack: t('views.applicationOverview.appInfo.header'),
-      wecomBot: t('views.applicationOverview.appInfo.header'),
+      wechat: t('common.info'),
+      dingtalk: t('common.info'),
+      wecom: t('common.info'),
+      lark: t('common.info'),
+      slack: t('common.info'),
+      wecomBot: t('common.info'),
     })[configType.value],
 )
 

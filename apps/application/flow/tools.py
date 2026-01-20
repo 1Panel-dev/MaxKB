@@ -11,8 +11,9 @@ import json
 import queue
 import re
 import threading
+from functools import reduce
 from typing import Iterator
-
+from maxkb.const import CONFIG
 from django.http import StreamingHttpResponse
 from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -253,7 +254,11 @@ def generate_tool_message_complete(name, input_content, output_content):
 
     # 格式化输出
     if '```' not in output_content:
-        output_formatted = tool_message_json_template % output_content
+        try:
+            json.loads(output_content)
+            output_formatted = tool_message_json_template % output_content
+        except:
+            output_formatted = output_content
     else:
         output_formatted = output_content
 
@@ -314,7 +319,9 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         client = MultiServerMCPClient(json.loads(mcp_servers))
         tools = await client.get_tools()
         agent = create_react_agent(chat_model, tools)
-        response = agent.astream({"messages": message_list}, stream_mode='messages')
+        recursion_limit = int(CONFIG.get("LANGCHAIN_GRAPH_RECURSION_LIMIT", '25'))
+        response = agent.astream({"messages": message_list}, config={"recursion_limit": recursion_limit},
+                                 stream_mode='messages')
 
         # 用于存储工具调用信息（按 tool_id）以及按 index 聚合分片
         tool_calls_info = {}
@@ -426,3 +433,122 @@ def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_ena
 
 async def anext_async(agen):
     return await agen.__anext__()
+
+
+target_source_node_mapping = {
+    'TOOL': {'tool-lib-node': lambda n: [n.get('properties').get('node_data').get('tool_lib_id')],
+             'ai-chat-node': lambda n: [*(n.get('properties').get('node_data').get('mcp_tool_ids') or []),
+                                        *(n.get('properties').get('node_data').get('tool_ids') or [])],
+             'mcp-node': lambda n: [n.get('properties').get('node_data').get('mcp_tool_id')]
+             },
+    'MODEL': {'ai-chat-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'question-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'speech-to-text-node': lambda n: [n.get('properties').get('node_data').get('stt_model_id')],
+              'text-to-speech-node': lambda n: [n.get('properties').get('node_data').get('tts_model_id')],
+              'image-to-video-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'image-generate-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'intent-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'image-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'parameter-extraction-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'video-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              },
+    'KNOWLEDGE': {'search-knowledge-node': lambda n: n.get('properties').get('node_data').get('knowledge_id_list')},
+    'APPLICATION': {
+        'application-node': lambda n: [n.get('properties').get('node_data').get('application_id')]
+    }
+}
+
+
+def get_node_handle_callback(source_type, source_id):
+    def node_handle_callback(node):
+        from system_manage.models.resource_mapping import ResourceMapping
+        response = []
+        for key, value in target_source_node_mapping.items():
+            if node.get('type') in value:
+                call = value.get(node.get('type'))
+                target_source_id_list = call(node)
+                for target_source_id in target_source_id_list:
+                    if target_source_id:
+                        response.append(ResourceMapping(source_type=source_type, target_type=key, source_id=source_id,
+                                                        target_id=target_source_id))
+        return response
+
+    return node_handle_callback
+
+
+def get_workflow_resource(workflow, node_handle):
+    response = []
+    if 'nodes' in workflow:
+        for node in workflow.get('nodes'):
+            rs = node_handle(node)
+            if rs:
+                for r in rs:
+                    response.append(r)
+            if node.get('type') == 'loop-node':
+                r = get_workflow_resource(node.get('properties', {}).get('node_data', {}).get('loop_body'), node_handle)
+                for rn in r:
+                    response.append(rn)
+        return list({(str(item.target_type) + str(item.target_id)): item for item in response}.values())
+    return []
+
+
+application_instance_field_call_dict = {
+    'TOOL': [lambda instance: instance.mcp_tool_ids or [], lambda instance: instance.tool_ids or []],
+    'MODEL': [lambda instance: [instance.model_id] if instance.model_id else [],
+              lambda instance: [instance.tts_model_id] if instance.tts_model_id else [],
+              lambda instance: [instance.stt_model_id] if instance.stt_model_id else []]
+}
+knowledge_instance_field_call_dict = {
+    'MODEL': [lambda instance: [instance.embedding_model_id] if instance.embedding_model_id else []],
+}
+
+
+def get_instance_resource(instance, source_type, source_id, instance_field_call_dict):
+    response = []
+    from system_manage.models.resource_mapping import ResourceMapping
+    for target_type, call_list in instance_field_call_dict.items():
+        target_id_list = reduce(lambda x, y: [*x, *y], [call(instance) for call in call_list], [])
+        if target_id_list:
+            for target_id in target_id_list:
+                response.append(ResourceMapping(source_type=source_type, target_type=target_type, source_id=source_id,
+                                                target_id=target_id))
+    return response
+
+
+def save_workflow_mapping(workflow, source_type, source_id, other_resource_mapping=None):
+    if not other_resource_mapping:
+        other_resource_mapping = []
+    from system_manage.models.resource_mapping import ResourceMapping
+    from django.db.models import QuerySet
+    QuerySet(ResourceMapping).filter(source_type=source_type, source_id=source_id).delete()
+    resource_mapping_list = get_workflow_resource(workflow,
+                                                  get_node_handle_callback(source_type,
+                                                                           source_id))
+    resource_mapping_list += other_resource_mapping
+    if resource_mapping_list:
+        QuerySet(ResourceMapping).bulk_create(
+            {(str(item.target_type) + str(item.target_id)): item for item in resource_mapping_list}.values())
+
+
+def get_tool_id_list(workflow):
+    _result = []
+    for node in workflow.get('nodes', []):
+        if node.get('type') == 'tool-lib-node':
+            tool_id = node.get('properties', {}).get('node_data', {}).get('tool_lib_id')
+            if tool_id:
+                _result.append(tool_id)
+        elif node.get('type') == 'loop-node':
+            r = get_tool_id_list(node.get('properties', {}).get('node_data', {}).get('loop_body', {}))
+            for item in r:
+                _result.append(item)
+        elif node.get('type') == 'ai-chat-node':
+            node_data = node.get('properties', {}).get('node_data', {})
+            mcp_tool_ids = node_data.get('mcp_tool_ids') or []
+            tool_ids = node_data.get('tool_ids') or []
+            for _id in mcp_tool_ids + tool_ids:
+                _result.append(_id)
+        elif node.get('type') == 'mcp-node':
+            mcp_tool_id = node.get('properties', {}).get('node_data', {}).get('mcp_tool_id')
+            if mcp_tool_id:
+                _result.append(mcp_tool_id)
+    return _result

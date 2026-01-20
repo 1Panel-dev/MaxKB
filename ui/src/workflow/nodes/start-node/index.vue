@@ -69,6 +69,10 @@ const globalFields = [
     value: 'chat_user_type',
   },
   {
+    label: t('chat.chatUserGroup'),
+    value: 'chat_user_group',
+  },
+  {
     label: t('views.chatUser.title'),
     value: 'chat_user',
   },
@@ -100,7 +104,7 @@ const refreshFieldList = () => {
 const refreshChatFieldList = () => {
   const chatFieldList = props.nodeModel.graphModel.nodes
     .filter((v: any) => v.id === 'base-node')
-    .map((v: any) => cloneDeep(v.properties.chat_input_field_list))
+    .map((v: any) => cloneDeep(v.properties.chat_input_field_list || []))
     .reduce((x: any, y: any) => [...x, ...y], [])
     .map((i: any) => ({ label: i.label, value: i.field }))
 

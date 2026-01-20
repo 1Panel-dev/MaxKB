@@ -6,9 +6,8 @@
       popper-class="sidebar-container-popper"
     >
       <template #title>
-        <el-icon>
-          <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
-        </el-icon>
+        <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
+
         <span>{{ $t(menu.meta?.title as string) }}</span>
       </template>
       <sidebar-item

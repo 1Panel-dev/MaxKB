@@ -18,6 +18,7 @@ class BaseImageGenerateNode(IImageGenerateNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -154,4 +155,5 @@ class BaseImageGenerateNode(IImageGenerateNode):
             'image_list': self.context.get('image_list'),
             'dialogue_type': self.context.get('dialogue_type'),
             'negative_prompt': self.context.get('negative_prompt'),
+            'enableException': self.node.properties.get('enableException'),
         }

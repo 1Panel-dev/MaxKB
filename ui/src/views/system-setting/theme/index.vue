@@ -17,7 +17,7 @@
           <template v-for="(item, index) in themeList" :key="index">
             <el-radio-button :label="item.label" :value="item.value" />
           </template>
-          <el-radio-button :label="$t('theme.custom')" value="custom" />
+          <el-radio-button :label="$t('common.custom')" value="custom" />
         </el-radio-group>
         <div v-if="themeRadio === 'custom'">
           <h5 class="mt-16 mb-8">{{ $t('theme.customTheme') }}</h5>

@@ -34,7 +34,10 @@ interface ApplicationFormType {
   mcp_source?: string
   tool_enable?: boolean
   tool_ids?: string[]
+  application_enable?: boolean
+  application_ids?: string[]
   mcp_output_enable?: boolean
+  work_flow_template?: any
 }
 
 interface Chunk {

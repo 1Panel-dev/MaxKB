@@ -114,7 +114,9 @@
             :placeholder="`${t('workflow.UserPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
           />
         </el-form-item>
-        <el-form-item>
+        <el-form-item
+          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+        >
           <template #label>
             <div class="flex-between">
               <div>{{ $t('views.application.form.historyRecord.label') }}</div>
@@ -140,23 +142,22 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('workflow.nodes.videoUnderstandNode.image.label')"
           :rules="{
             type: 'array',
             required: true,
-            message: $t('workflow.nodes.videoUnderstandNode.image.requiredMessage'),
+            message: $t('workflow.nodes.videoUnderstandNode.video.requiredMessage'),
             trigger: 'change',
           }"
         >
           <template #label
-            >{{ $t('workflow.nodes.videoUnderstandNode.image.label')
+            >{{ $t('workflow.nodes.videoUnderstandNode.video.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
-            :placeholder="$t('workflow.nodes.videoUnderstandNode.image.requiredMessage')"
+            :placeholder="$t('workflow.nodes.videoUnderstandNode.video.requiredMessage')"
             v-model="form_data.video_list"
           />
         </el-form-item>
@@ -210,6 +211,8 @@ const {
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
   } else {
     return 'workspace'
   }

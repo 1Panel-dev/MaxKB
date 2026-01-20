@@ -37,11 +37,12 @@ export default {
   },
   delete: {
     confirmTitle: '是否刪除工具',
-    confirmMessage: '刪除後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
+    confirmMessage: '刪除後，引用該工具的智能體在查詢時會報錯，請謹慎操作。',
+    resourceCountMessage: '此工具關聯 {count} 個資源，刪除後無法使用，請謹慎操作。',
   },
   disabled: {
     confirmTitle: '是否停用工具：',
-    confirmMessage: '停用後，引用該工具的應用在查詢時會報錯，請謹慎操作。',
+    confirmMessage: '停用後，引用該工具的智能體在查詢時會報錯，請謹慎操作。',
   },
   form: {
     toolName: {

@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; height: 100%">
+  <div style="width: 100%; height: calc(100vh - 57px)">
     <embed v-if="is_pdf" style="width: 100%; height: 100%" :src="pdfSrc" />
   </div>
 </template>

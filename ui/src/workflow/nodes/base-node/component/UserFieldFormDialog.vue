@@ -1,10 +1,6 @@
 <template>
   <el-dialog
-    :title="
-      isEdit
-        ? $t('common.param.editParam')
-        : $t('common.param.addParam')
-    "
+    :title="isEdit ? $t('common.param.editParam') : $t('common.param.addParam')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -59,13 +55,13 @@ const currentRow = computed(() => {
           input_type: 'TextInput',
           label: row.label || row.name,
           default_value: row.default_value,
-          required: row.required != undefined ? row.required : row.is_required
+          required: row.required != undefined ? row.required : row.is_required,
         }
       case 'select':
         if (
           check_field(
             ['field', 'input_type', 'label', 'required', 'option_list'],
-            currentItem.value
+            currentItem.value,
           )
         ) {
           return currentItem.value
@@ -81,7 +77,7 @@ const currentRow = computed(() => {
             ? row.option_list
             : row.optionList.map((o: any) => {
                 return { key: o, value: o }
-              })
+              }),
         }
 
       case 'date':
@@ -94,9 +90,9 @@ const currentRow = computed(() => {
               'required',
               'attrs.format',
               'attrs.value-format',
-              'attrs.type'
+              'attrs.type',
             ],
-            currentItem.value
+            currentItem.value,
           )
         ) {
           return currentItem.value
@@ -110,14 +106,19 @@ const currentRow = computed(() => {
           attrs: {
             format: 'YYYY-MM-DD HH:mm:ss',
             'value-format': 'YYYY-MM-DD HH:mm:ss',
-            type: 'datetime'
-          }
+            type: 'datetime',
+          },
         }
       default:
         return currentItem.value
     }
   } else {
-    return { input_type: 'TextInput', required: false, attrs: { maxlength: 200, minlength: 0 }, show_default_value: true }
+    return {
+      input_type: 'TextInput',
+      required: false,
+      attrs: { maxlength: 200, minlength: 0 },
+      show_default_value: true,
+    }
   }
 })
 const currentIndex = ref(null)
@@ -129,6 +130,9 @@ const inputTypeList = ref([
   { label: t('dynamicsForm.input_type_list.RadioCard'), value: 'RadioCardConstructor' },
   { label: t('dynamicsForm.input_type_list.DatePicker'), value: 'DatePickerConstructor' },
   { label: t('dynamicsForm.input_type_list.SwitchInput'), value: 'SwitchInputConstructor' },
+  { label: t('dynamicsForm.input_type_list.RadioRow'), value: 'RadioRowConstructor' },
+  { label: t('dynamicsForm.input_type_list.TextareaInput'), value: 'TextareaInputConstructor' },
+  { label: t('dynamicsForm.input_type_list.MultiRow'), value: 'MultiRowConstructor' },
 ])
 
 const dialogVisible = ref<boolean>(false)

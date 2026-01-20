@@ -32,16 +32,16 @@ class ChatNodeSerializer(serializers.Serializer):
                                           label='Model settings')
     dialogue_type = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                           label=_("Context Type"))
-    mcp_enable = serializers.BooleanField(required=False, label=_("Whether to enable MCP"))
     mcp_servers = serializers.JSONField(required=False, label=_("MCP Server"))
     mcp_tool_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Tool ID"))
     mcp_tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
                                          label=_("MCP Tool IDs"), )
     mcp_source = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("MCP Source"))
 
-    tool_enable = serializers.BooleanField(required=False, default=False, label=_("Whether to enable tools"))
     tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
                                      label=_("Tool IDs"), )
+    application_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
+                                     label=_("App IDs"), )
     mcp_output_enable = serializers.BooleanField(required=False, default=True, label=_("Whether to enable MCP output"))
 
 
@@ -66,13 +66,12 @@ class IChatNode(INode):
                 model_params_setting=None,
                 dialogue_type=None,
                 model_setting=None,
-                mcp_enable=False,
                 mcp_servers=None,
                 mcp_tool_id=None,
                 mcp_tool_ids=None,
                 mcp_source=None,
-                tool_enable=False,
                 tool_ids=None,
+                application_ids=None,
                 mcp_output_enable=True,
                 **kwargs) -> NodeResult:
         pass

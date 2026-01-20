@@ -12,6 +12,8 @@ const share = {
   delete: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DELETE], 'OR'),
 
   doc_read: () => false,
+  jump_read: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
   doc_create: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE], 'OR'),
   doc_vector: () =>
@@ -60,10 +62,12 @@ const share = {
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
   workflow_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EDIT], 'OR'),
-  
+  workflow_export: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EXPORT], 'OR'),  
   chat_user_edit: () => false,
 
   auth: () => false,
+  relate_map: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

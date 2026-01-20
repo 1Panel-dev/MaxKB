@@ -3,13 +3,15 @@
 import os
 
 from celery import Celery
-from celery.schedules import crontab
 from kombu import Exchange, Queue
 from maxkb import settings
 from .heartbeat import *
+from .hmac_signed_serializer import register_hmac_signed_serializer
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maxkb.settings')
+
+register_hmac_signed_serializer()
 
 app = Celery('MaxKB')
 

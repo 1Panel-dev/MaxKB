@@ -1,7 +1,7 @@
 export default {
   title: '知识库',
   document_count: '文档数',
-  relatedApp_count: '关联应用',
+  relatedApp_count: '关联智能体',
   setting: {
     vectorization: '向量化',
     sync: '同步',
@@ -15,7 +15,8 @@ export default {
   delete: {
     confirmTitle: '是否删除知识库：',
     confirmMessage1: '此知识库关联',
-    confirmMessage2: '个应用，删除后无法恢复，请谨慎操作。',
+    confirmMessage2: '个智能体，删除后无法恢复，请谨慎操作。',
+    resourceCountMessage: '此知识库关联 {count} 个资源，删除后无法使用，请谨慎操作。',
   },
   knowledgeType: {
     label: '知识库类型',

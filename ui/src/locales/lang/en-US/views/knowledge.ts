@@ -1,8 +1,8 @@
 export default {
   title: 'Knowledge',
-  relatedApplications: 'Linked App',
+  relatedApplications: 'Linked Agent',
   document_count: 'docs',
-  relatedApp_count: 'linked apps',
+  relatedApp_count: 'linked agents',
   setting: {
     vectorization: 'Vectorization',
     sync: 'Sync',
@@ -17,7 +17,8 @@ export default {
   delete: {
     confirmTitle: 'Confirm deletion of knowledge:',
     confirmMessage1: 'This knowledge is related with',
-    confirmMessage2: 'APP. Deleting it will be irreversible, please proceed with caution.',
+    confirmMessage2: 'agent. Deleting it will be irreversible, please proceed with caution.',
+    resourceCountMessage: 'This knowledge is associated with {count} resources, and will be unavailable after deletion. Please proceed with caution.',
   },
   knowledgeType: {
     label: 'Type',

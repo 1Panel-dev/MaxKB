@@ -25,8 +25,8 @@ class ApiUserProfileResponse(ResultSerializer):
 class RoleSettingRequestSerializer(serializers.Serializer):
     role_id = serializers.CharField(required=True, label=_('Role ID'))
     workspace_ids = serializers.ListField(
-        child=serializers.CharField(required=True),
-        required=True,
+        child=serializers.CharField(required=False),
+        required=False,
         label=_('Workspace IDs')
     )
 

@@ -16,6 +16,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.flow.tools import save_workflow_mapping, get_instance_resource, knowledge_instance_field_call_dict
 from common.config.embedding_config import ModelManage
 from common.db.search import native_search
 from common.db.sql_execute import sql_execute, update_execute
@@ -23,10 +24,11 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from knowledge.models import Document
+from knowledge.models import Document, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model, get_model_default_params
+from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 
 
 class MetaSerializer(serializers.Serializer):
@@ -275,3 +277,20 @@ def drop_knowledge_index(knowledge_id=None, document_id=None):
         sql = f'DROP INDEX "embedding_hnsw_idx_{k_id}"'
         update_execute(sql, [])
         maxkb_logger.info(f'Dropped index for knowledge ID: {k_id}')
+
+
+def update_resource_mapping_by_knowledge(knowledge_id: str):
+    knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+    instance_mapping = get_instance_resource(knowledge, ResourceType.KNOWLEDGE, str(knowledge.id),
+                                             knowledge_instance_field_call_dict)
+    if knowledge.type == KnowledgeType.WORKFLOW:
+        knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(
+            knowledge_id=knowledge_id).order_by(
+            '-create_time')[0:1].first()
+        if knowledge_workflow:
+            save_workflow_mapping(knowledge_workflow.work_flow, ResourceType.KNOWLEDGE,
+                                  str(knowledge_id), instance_mapping)
+            return
+    else:
+        save_workflow_mapping({}, ResourceType.KNOWLEDGE,
+                              str(knowledge_id), instance_mapping)

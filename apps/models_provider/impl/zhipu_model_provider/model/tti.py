@@ -66,8 +66,11 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
             **self.params  # 填写额外参数
         )
         file_urls = []
-        for content in response.data:
-            url = content.url
-            file_urls.append(url)
+        try:
+            for content in response.data:
+                url = content.url
+                file_urls.append(url)
 
-        return file_urls
+            return file_urls
+        except Exception as e:
+            raise e

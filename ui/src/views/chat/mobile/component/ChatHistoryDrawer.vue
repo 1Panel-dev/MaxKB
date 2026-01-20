@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, defineModel } from 'vue'
+import { ref, computed } from 'vue'
 import useStore from '@/stores'
 import UserCenterDrawer from './UserCenterDrawer.vue'
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'

@@ -71,4 +71,4 @@ class AliyunBaiLianAsrSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
         except Exception as err:
             maxkb_logger.error(f":Error: {str(err)}: {traceback.format_exc()}")
-            raise
+            raise err

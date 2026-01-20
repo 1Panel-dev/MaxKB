@@ -26,6 +26,8 @@ from models_provider.constants.model_provider_constants import ModelProvideConst
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_credential
 from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from system_manage.models.resource_mapping import ResourceMapping
+from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage
 
@@ -190,6 +192,7 @@ class ModelSerializer(serializers.Serializer):
             #     if dataset_count > 0:
             #         raise AppApiException(500, f"该模型关联了{dataset_count} 个应用，无法删除该模型。")
             model.delete()
+            ResourceMapping.objects.filter(target_id=model_id).delete()
             return True
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):
@@ -366,23 +369,25 @@ class ModelSerializer(serializers.Serializer):
             workspace_manage = is_workspace_manage(user_id, workspace_id)
             query_params = self._build_query_params(workspace_id, workspace_manage, user_id)
             is_x_pack_ee = self.is_x_pack_ee()
-            return native_search(query_params,
-                                 select_string=get_file_content(
-                                     os.path.join(PROJECT_DIR, "apps", "models_provider", 'sql',
-                                                  'list_model.sql' if workspace_manage else (
-                                                      'list_model_user_ee.sql' if is_x_pack_ee else 'list_model_user.sql')
-                                                  )))
+            result = native_search(query_params,
+                                   select_string=get_file_content(
+                                       os.path.join(PROJECT_DIR, "apps", "models_provider", 'sql',
+                                                    'list_model.sql' if workspace_manage else (
+                                                        'list_model_user_ee.sql' if is_x_pack_ee else 'list_model_user.sql')
+                                                    )))
+            return ResourceMappingSerializer().get_resource_count(result)
 
         def share_list(self, workspace_id, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             query_params = self._build_query_params(workspace_id, False, user_id)
-            return [
+            result = [
                 self._build_model_data(
                     model
                 ) for model in query_params.get('model_query_set')
             ]
+            return ResourceMappingSerializer().get_resource_count(result)
 
         def model_list(self, workspace_id, with_valid=True):
             if with_valid:

@@ -17,5 +17,10 @@ export default {
     folderNamePlaceholder: '請輸入名稱',
     requiredMessage: '請選擇文件夾',
     deleteConfirmMessage: '文件夹下的資源會被刪除，請謹慎操作。',
+    ascTime: '按創建時間升序',
+    descTime: '按創建時間降序',
+    ascName: '按名稱升序',
+    descName: '按名稱降序',
+    custom: '按用戶拖拽排序',
   },
 }

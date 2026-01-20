@@ -42,7 +42,7 @@ export const baseNode = {
   text: '',
   properties: {
     height: 728.375,
-    stepName: t('workflow.nodes.baseNode.label'),
+    stepName: t('common.info'),
     input_field_list: [],
     node_data: {
       name: '',
@@ -64,7 +64,7 @@ export const knowledgeBaseNode = {
   text: '',
   properties: {
     height: 728.375,
-    stepName: t('workflow.nodes.baseNode.label'),
+    stepName: t('common.info'),
     input_field_list: [],
     node_data: {
       name: '',
@@ -781,14 +781,7 @@ export const menuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [
-      searchKnowledgeNode,
-      searchDocumentNode,
-      rerankerNode,
-      documentExtractNode,
-      documentSplitNode,
-      knowledgeWriteNode,
-    ],
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
@@ -852,6 +845,10 @@ export const knowledgeLoopMenuNodes = [
     list: [dataSourceLocalNode, dataSourceWebNode],
   },
   {
+    label: t('views.knowledge.title'),
+    list: [documentSplitNode, knowledgeWriteNode, documentExtractNode],
+  },
+  {
     label: t('workflow.nodes.classify.aiCapability'),
     list: [
       aiChatNode,
@@ -865,10 +862,6 @@ export const knowledgeLoopMenuNodes = [
       videoUnderstandNode,
       questionNode,
     ],
-  },
-  {
-    label: t('views.knowledge.title'),
-    list: [documentSplitNode, knowledgeWriteNode, documentExtractNode],
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),

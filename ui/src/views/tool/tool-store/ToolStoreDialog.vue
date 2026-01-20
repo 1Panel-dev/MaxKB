@@ -75,7 +75,7 @@
             {{ t('views.tool.toolStore.searchResult', { count: filterList.length }) }}
           </h4>
           <el-row :gutter="16" v-if="filterList.length">
-            <el-col v-for="tool in filterList" :key="tool.id" :span="12" class="mb-16">
+            <el-col v-for="tool in filterList" :key="tool.id" :span="8" class="mb-16">
               <ToolCard
                 :tool="tool"
                 :addLoading="addLoading"
@@ -164,7 +164,7 @@ async function getList() {
     return acc
   }, [] as ToolCategory[])
 
-  categories.value = merged
+  categories.value = merged.filter((item: any) => item.tools.length > 0)
 }
 
 async function getInternalToolList() {

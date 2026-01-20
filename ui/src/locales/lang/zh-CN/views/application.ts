@@ -1,32 +1,36 @@
-import tool from '@/api/tool/tool'
-
 export default {
-  title: '应用',
-  createApplication: '创建简易应用',
-  createWorkFlowApplication: '创建高级编排应用',
-  importApplication: '导入应用',
-  copyApplication: '复制应用',
-  workflow: '高级编排',
-  simple: '简易应用',
-  simplePlaceholder: '适用于初级用户使用表单设置构建AI对话助手',
-  workflowPlaceholder: '适用于高级用户使用低代码拖拉拽方式构建复杂逻辑的AI对话助手',
+  title: '智能体',
+  createApplication: '创建简易智能体',
+  createWorkFlowApplication: '创建高级智能体',
+  importApplication: '导入智能体',
+  copyApplication: '复制智能体',
+  simple: '简易',
+  senior: '高级',
+  simpleAgent: '简易智能体',
+  AdvancedAgent: '高级智能体',
+  simplePlaceholder: '通过表单设置方式，快速搭建基础功能的智能体',
+  advancedPlaceholder: '使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体',
   appTest: '调试预览',
+  skill: '技能',
 
   operation: {
     addModel: '添加模型',
     toChat: '去对话',
   },
   delete: {
-    confirmTitle: '是否删除应用：',
-    confirmMessage: '删除后该应用将不再提供服务，请谨慎操作。',
+    confirmTitle: '是否删除智能体：',
+    confirmMessage: '删除后该智能体将不再提供服务，请谨慎操作。',
+    resourceCountMessage: '此智能体关联 {count} 个资源，删除后无法使用，请谨慎操作。',
   },
   tip: {
     publishSuccess: '发布成功',
     ExportError: '导出失败',
-    professionalMessage: '社区版最多支持 5 个应用，如需拥有更多应用，请升级为专业版。',
+    professionalMessage: '社区版最多支持 5 个智能体，如需拥有更多智能体，请升级为专业版。',
     saveErrorMessage: '保存失败，请检查输入或稍后再试',
     loadingErrorMessage: '加载配置失败，请检查输入或稍后再试',
     noDocPermission: '无文档创建权限',
+    confirmUse: '确定使用',
+    overwrite: '覆盖当前工作流',
   },
   editIcon: '编辑图标',
   iconType: '图标类型',
@@ -56,11 +60,11 @@ export default {
   chatPageConfig: '对话页面配置',
   form: {
     appName: {
-      placeholder: '请输入应用名称',
-      requiredMessage: '请输入应用名称',
+      placeholder: '请输入智能体名称',
+      requiredMessage: '请输入智能体名称',
     },
     appDescription: {
-      placeholder: '描述该应用的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题',
+      placeholder: '描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题',
     },
     appType: {
       simplePlaceholder: '适合新手创建小助手',
@@ -93,8 +97,7 @@ export default {
       placeholder:
         '用户提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。',
       requiredMessage: '请输入用户提示词',
-      tooltip:
-        '用户向模型提出的问题或输入的指令',
+      tooltip: '用户向模型提出的问题或输入的指令',
       noReferencesTooltip:
         '通过调整提示词内容，可以引导大模型聊天方向，该提示词会被固定在上下文的开头。可以使用变量：{question} 是用户提出问题的占位符。',
       referencesTooltip:
@@ -142,7 +145,7 @@ export default {
       start: '开始',
       end: '结束',
     },
-    mcp_output_enable: '输出 MCP/ 工具执行过程',
+    mcp_output_enable: '输出执行过程',
   },
   generateDialog: {
     label: '生成',
@@ -181,19 +184,19 @@ export default {
     defaultPrompt2: '标签中',
   },
   applicationAccess: {
-    title: '应用接入',
+    title: '接入第三方',
     wecom: '企业微信应用',
-    wecomTip: '打造企业微信智能应用',
+    wecomTip: '打造企业微信智能体',
     wecomBot: '企业微信智能机器人',
     wecomBotTip: '打造企业微信智能机器人',
     dingtalk: '钉钉应用',
-    dingtalkTip: '打造钉钉智能应用',
+    dingtalkTip: '打造钉钉智能体',
     wechat: '公众号',
-    wechatTip: '打造公众号智能应用',
+    wechatTip: '打造公众号智能体',
     lark: '飞书应用',
-    larkTip: '打造飞书智能应用',
+    larkTip: '打造飞书智能体',
     slack: 'Slack',
-    slackTip: '打造 Slack 智能应用',
+    slackTip: '打造 Slack 智能体',
     setting: '配置',
     callback: '回调地址',
     callbackTip: '请输入回调地址',

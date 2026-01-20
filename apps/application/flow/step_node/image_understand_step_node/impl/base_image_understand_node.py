@@ -68,6 +68,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
         self.context['question'] = details.get('question')
+        self.context['exception_message'] = details.get('err_message')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
 
@@ -253,5 +254,6 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             'status': self.status,
             'err_message': self.err_message,
             'image_list': self.context.get('image_list'),
-            'dialogue_type': self.context.get('dialogue_type')
+            'dialogue_type': self.context.get('dialogue_type'),
+            'enableException': self.node.properties.get('enableException'),
         }

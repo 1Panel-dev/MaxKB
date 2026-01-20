@@ -57,7 +57,7 @@
       </div>
     </el-scrollbar>
     <!-- 添加按钮 -->
-    <el-button type="primary" text class="mt-2" @click="handleAdd">
+    <el-button type="primary" text class="mt-2" @click="handleAdd" v-if="needAddButton">
       <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
       {{ props.addText ?? $t('views.role.member.add') }}
     </el-button>
@@ -65,15 +65,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
-import type { FormItemModel } from '@/api/type/role'
+import {ref, watch, computed} from 'vue'
+import type {FormItemModel} from '@/api/type/role'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   models: FormItemModel[]
   addText?: string
-  keepOneLine?: boolean // 至少保留一行
+  keepOneLine?: boolean
   deleteButtonDisabled?: (model: any) => boolean
-}>()
+  needAddButton?: boolean
+}>(), {
+  needAddButton: true
+})
+
 
 const formRef = ref()
 const formItem: Record<string, any> = {}
@@ -86,7 +90,7 @@ const selectedRoles = computed(() => {
 })
 
 function handleAdd() {
-  form.value.push({ ...formItem })
+  form.value.push({...formItem})
 }
 
 watch(
@@ -96,7 +100,7 @@ watch(
       formItem[e.path] = []
     })
   },
-  { immediate: true },
+  {immediate: true},
 )
 
 function handleDelete(index: number) {
@@ -115,5 +119,5 @@ const resetValidation = () => {
     formRef.value.clearValidate()
   }
 }
-defineExpose({ validate, resetValidation })
+defineExpose({validate, resetValidation})
 </script>

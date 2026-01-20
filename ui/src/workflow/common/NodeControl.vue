@@ -113,7 +113,6 @@ function fitView() {
 }
 const layout = () => {
   props.lf?.extension.dagre.layout()
-  console.log(props.lf)
   props.lf?.graphModel.nodes.forEach((node: any) => {
     if (node.type === 'loop-body-node') {
       node?.loopLayout?.()

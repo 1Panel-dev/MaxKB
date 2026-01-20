@@ -1,14 +1,15 @@
 <template>
-  <iframe :src="iframeUrl" width="100%" height="380px" frameborder="0"
-          style="margin-top: -30px"></iframe>
+  <div id="wecom-qr" class="wecom-qr flex"></div>
 </template>
 
 <script lang="ts" setup>
-import {ref, nextTick, defineProps} from 'vue'
-import {getBrowserLang} from '@/locales'
-import {useRoute} from "vue-router";
+import { nextTick, defineProps, onBeforeUnmount } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { getBrowserLang } from '@/locales'
+import useStore from '@/stores'
 
-const route = useRoute()
+const WE_COM_ORIGIN = 'https://login.work.weixin.qq.com'
+const LOGIN_STATE = 'fit2cloud-wecom-qr'
 const props = defineProps<{
   config: {
     app_secret: string
@@ -19,29 +20,80 @@ const props = defineProps<{
   }
 }>()
 
+const router = useRouter()
+const route = useRoute()
+const { chatUser } = useStore()
+
 const {
-  params: {accessToken},
+  params: { accessToken },
 } = route as any
 
-const iframeUrl = ref('')
-const init = async () => {
-  await nextTick() // 确保DOM已更新
-  const data = {
-    corpId: props.config.corp_id,
-    agentId: props.config.agent_id,
-    redirectUri: props.config.callback_url,
-  }
-  let lang = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-  if (lang === 'en-US') {
-    lang = 'en'
-  } else {
-    lang = 'zh'
-  }
-  const redirectUri = encodeURIComponent(data.redirectUri)
-  console.log('redirectUri', data.redirectUri)
-  // 手动构建生成二维码的url
-  iframeUrl.value = `https://login.work.weixin.qq.com/wwlogin/sso/login?login_type=CorpApp&appid=${data.corpId}&agentid=${data.agentId}&redirect_uri=${redirectUri}&state=${accessToken}&lang=${lang}&lang=${lang}&panel_size=small`
+let iframe: HTMLIFrameElement | null = null
+
+function createTransparentIFrame(el: string) {
+  const container = document.querySelector(el)
+  if (!container) return null
+
+  const iframeEl = document.createElement('iframe')
+  iframeEl.style.cssText = `
+    display: block;
+    border: none;
+    background: transparent;
+  `
+  iframeEl.referrerPolicy = 'origin'
+  iframeEl.setAttribute('frameborder', '0')
+  iframeEl.setAttribute('allowtransparency', 'true')
+  iframeEl.setAttribute('allow', 'local-network-access')
+  container.appendChild(iframeEl)
+  return iframeEl
 }
+
+function getLang() {
+  const lang = localStorage.getItem('MaxKB-locale') || getBrowserLang()
+  return lang === 'en-US' ? 'en' : 'zh'
+}
+
+function cleanup() {
+  iframe?.remove()
+  iframe = null
+}
+
+const init = async () => {
+  await nextTick()
+
+  iframe = createTransparentIFrame('#wecom-qr')
+  if (!iframe) return
+
+  const redirectUri = encodeURIComponent(props.config.callback_url)
+
+  iframe.src =
+    `${WE_COM_ORIGIN}/wwlogin/sso/login` +
+    `?login_type=CorpApp` +
+    `&appid=${props.config.corp_id}` +
+    `&agentid=${props.config.agent_id}` +
+    `&redirect_uri=${redirectUri}` +
+    `&state=${accessToken}` +
+    `&lang=${getLang()}` +
+    `&panel_size=small` +
+    `&redirect_type=self`
+  iframe.addEventListener('load', (e) => {
+    if (iframe?.contentWindow) {
+      iframe.contentWindow.postMessage('getToken', '*')
+    }
+  })
+  window.addEventListener('message', (event) => {
+    if (event.data.type === 'token') {
+      chatUser.setToken(event.data.value)
+      router.push({
+        name: 'chat',
+        params: { accessToken },
+        query: route.query,
+      })
+    }
+  })
+}
+
+onBeforeUnmount(cleanup)
 
 init()
 </script>
@@ -49,8 +101,7 @@ init()
 <style scoped lang="scss">
 #wecom-qr {
   margin-top: -20px;
-  height: 331px;
+  height: 360px;
   justify-content: center;
-
 }
 </style>

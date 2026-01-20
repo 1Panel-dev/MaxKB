@@ -28,7 +28,7 @@ dependencies = [
     "langchain-mcp-adapters==0.1.13",
     "langchain-huggingface==0.3.1",
     "langchain-ollama==0.3.10",
-    "langchain_core==0.3.80",
+    "langchain_core==0.3.81",
     "langchain-aws==0.2.28",
     "langgraph==0.5.3",
     "torch==2.8.0",

@@ -42,9 +42,6 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
             **optional_params,
         )
 
-    def is_cache_model(self):
-        return False
-
     def check_auth(self):
         chat = OpenAI(api_key=self.api_key, base_url=self.api_base)
         response_list = chat.models.with_raw_response.list()
@@ -55,8 +52,10 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
         chat = OpenAI(api_key=self.api_key, base_url=self.api_base)
         res = chat.images.generate(model=self.model, prompt=prompt, **self.params)
         file_urls = []
-        for content in res.data:
-            url = content.url
-            file_urls.append(url)
-
-        return file_urls
+        try:
+            for content in res.data:
+                url = content.url
+                file_urls.append(url)
+            return file_urls
+        except Exception as e:
+            raise f"OpenAI generate image error: {e}"

@@ -11,7 +11,6 @@ export default {
   green: '松石綠',
   purple: '神秘紫',
   red: '胭脂紅',
-  custom: '自定義',
   loginBackground: '登錄背景圖',
   loginLogo: '登錄 Logo',
   websiteLogo: '網站 Logo',

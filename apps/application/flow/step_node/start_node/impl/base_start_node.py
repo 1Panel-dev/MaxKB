@@ -34,7 +34,9 @@ def get_global_variable(node):
             'history_context': history_context, 'chat_id': str(chat_id), **node.workflow_manage.form_data,
             'chat_user_id': body.get('chat_user_id'),
             'chat_user_type': body.get('chat_user_type'),
-            'chat_user': body.get('chat_user')}
+            'chat_user': body.get('chat_user'),
+            'chat_user_group': body.get('chat_user_group')
+            }
 
 
 class BaseStartStepNode(IStarNode):
@@ -50,6 +52,7 @@ class BaseStartStepNode(IStarNode):
         self.context['audio'] = details.get('audio_list')
         self.context['video'] = details.get('video_list')
         self.context['other'] = details.get('other_list')
+        self.context['exception_message'] = details.get('err_message')
         self.status = details.get('status')
         self.err_message = details.get('err_message')
         for key, value in workflow_variable.items():
@@ -103,5 +106,6 @@ class BaseStartStepNode(IStarNode):
             'document_list': self.context.get('document'),
             'audio_list': self.context.get('audio'),
             'other_list': self.context.get('other'),
-            'global_fields': global_fields
+            'global_fields': global_fields,
+            'enableException': self.node.properties.get('enableException'),
         }
