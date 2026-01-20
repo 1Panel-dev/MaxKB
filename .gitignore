@@ -191,3 +191,4 @@ tmp/
 config.yml
 .SANDBOX_BANNED_HOSTS
 /java-sdk
+/xiaohongshu-mcp
