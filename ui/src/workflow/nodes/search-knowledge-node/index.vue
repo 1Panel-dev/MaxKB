@@ -217,10 +217,10 @@ const nodeCascaderRef = ref()
 const form = {
   knowledge_id_list: [],
   knowledge_setting: {
-    top_n: 3,
-    similarity: 0.6,
+    top_n: 5,
+    similarity: 0.7,
     max_paragraph_char_number: 5000,
-    search_mode: 'embedding',
+    search_mode: 'blend',
   },
   question_reference_address: [],
   show_knowledge: false,

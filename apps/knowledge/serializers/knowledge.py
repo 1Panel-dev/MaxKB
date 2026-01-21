@@ -108,8 +108,8 @@ class HitTestSerializer(serializers.Serializer):
     top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_('similarity'))
     search_mode = serializers.CharField(required=True, label=_('search mode'), validators=[
-        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                  message=_('The type only supports embedding|keywords|blend'), code=500)
+        validators.RegexValidator(regex=re.compile("^embedding|keywords|blend|page_index$"),
+                                  message=_('The type only supports embedding|keywords|blend|page_index'), code=500)
     ])
 
 
@@ -561,6 +561,18 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
             # 批量插入段落
             QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+
+            # 【PageIndex】段落创建完成后自动触发PageIndex构建（用户无感知）
+            if len(document_model_list) > 0:
+                try:
+                    from knowledge.serializers.common import _build_page_index_after_paragraph_creation
+                    document_ids = [str(doc.id) for doc in document_model_list]
+                    _build_page_index_after_paragraph_creation(document_ids)
+                except Exception as e:
+                    # PageIndex构建失败不影响主流程
+                    from common.utils.logger import maxkb_logger
+                    maxkb_logger.warning(f'[PageIndex] Auto build failed: {str(e)}')
+
             # 批量插入问题
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 批量插入关联问题
@@ -710,9 +722,10 @@ class KnowledgeSerializer(serializers.Serializer):
         top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
         similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_('similarity'))
         search_mode = serializers.CharField(required=True, label=_('search mode'), validators=[
-            validators.RegexValidator(regex=re.compile("^embedding|keywords|blend$"),
-                                      message=_('The type only supports embedding|keywords|blend'), code=500)
+            validators.RegexValidator(regex=re.compile("^embedding|keywords|blend|page_index$"),
+                                      message=_('The type only supports embedding|keywords|blend|page_index'), code=500)
         ])
+
 
         def is_valid(self, *, raise_exception=True):
             super().is_valid(raise_exception=True)

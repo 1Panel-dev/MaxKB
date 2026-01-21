@@ -59,6 +59,9 @@ def handle_sheet(file_name, sheet, image_dict, limit: int):
                 result_item_content += next_md_content
             else:
                 paragraphs.append({'content': result_item_content, 'title': ''})
+                # 对于表格，保持表头在每个新块的开始是很重要的
+                # 但简单的拼接可能会导致上下文丢失
+                # 这里我们简单地重置为表头+当前行
                 result_item_content = title_md_content + next_md_content
     if len(result_item_content) > 0:
         paragraphs.append({'content': result_item_content, 'title': ''})
@@ -105,6 +108,10 @@ class XlsxSplitHandle(BaseSplitHandle):
         try:
             if type(limit) is str:
                 limit = int(limit)
+            # 确保limit足够大，或者使用默认的chunk_size
+            if limit < 800:
+                limit = 800
+
             workbook = openpyxl.load_workbook(io.BytesIO(buffer))
             try:
                 image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))

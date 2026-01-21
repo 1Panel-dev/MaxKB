@@ -79,8 +79,18 @@ def dev():
 
 
 if __name__ == '__main__':
-    os.environ['HF_HOME'] = '/opt/maxkb-app/model/base'
-    os.environ['TMPDIR'] = '/opt/maxkb-app/tmp'
+    # 设置环境变量，兼容Windows和Linux
+    if not os.environ.get('HF_HOME'):
+        # 优先使用环境变量，否则使用项目目录
+        default_hf_home = os.path.join(BASE_DIR, 'data', 'model', 'base')
+        os.environ['HF_HOME'] = os.environ.get('HF_HOME', default_hf_home)
+
+    if not os.environ.get('TMPDIR'):
+        # 优先使用环境变量，否则使用项目目录
+        default_tmp_dir = os.path.join(BASE_DIR, 'tmp')
+        os.makedirs(default_tmp_dir, mode=0o700, exist_ok=True)
+        os.environ['TMPDIR'] = default_tmp_dir
+
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;

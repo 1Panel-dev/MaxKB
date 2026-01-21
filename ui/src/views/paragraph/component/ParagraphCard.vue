@@ -120,6 +120,13 @@
         </el-dropdown>
       </el-card>
     </div>
+    <!-- 章节路径显示 -->
+    <div v-if="data.section_path" class="section-path-row mb-8">
+      <el-tag type="info" size="small" effect="plain" class="section-path-tag">
+        <el-icon class="mr-4"><FolderOpened /></el-icon>
+        <span class="ellipsis-1" :title="data.section_path">{{ data.section_path }}</span>
+      </el-tag>
+    </div>
     <h2 class="mb-16">{{ data.title || '-' }}</h2>
     <MdPreview
       ref="editorRef"
@@ -154,6 +161,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import { t } from '@/locales'
+import { FolderOpened } from '@element-plus/icons-vue'
 const props = defineProps<{
   data: any
   disabled?: boolean
@@ -336,6 +344,21 @@ watch(dialogVisible, (val: boolean) => {
     top: 0;
     overflow: inherit;
     z-index: 10;
+  }
+
+  .section-path-row {
+    .section-path-tag {
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+
+      .ellipsis-1 {
+        max-width: 300px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
   }
 }
 </style>

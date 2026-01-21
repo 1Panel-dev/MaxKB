@@ -25,7 +25,7 @@ from common.utils.common import get_file_content
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from knowledge.models import Document, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
-from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
+from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File, PageIndexNode, Embedding, SourceType
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model, get_model_default_params
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
@@ -44,6 +44,17 @@ class MetaSerializer(serializers.Serializer):
                 raise AppApiException(500, _('URL error, cannot parse [{source_url}]').format(source_url=source_url))
 
     class BaseMeta(serializers.Serializer):
+        # PageIndex检索模式配置
+        search_mode = serializers.ChoiceField(
+            required=False,
+            choices=['traditional', 'page_index'],
+            default='traditional',
+            label=_('检索模式')
+        )
+        use_tree_filter = serializers.BooleanField(required=False, default=True, label=_('树过滤'))
+        top_n = serializers.IntegerField(required=False, min_value=1, max_value=50, default=5, label=_('返回数量'))
+        similarity_threshold = serializers.FloatField(required=False, min_value=0, max_value=1, default=0.6, label=_('相似度阈值'))
+
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
 
@@ -263,7 +274,187 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
             maxkb_logger.info(f'Created index for knowledge ID: {k_id}')
 
 
+
+
+
+def _build_page_index_after_paragraph_creation(document_ids: List[str]):
+    """
+    在段落创建后自动构建PageIndex（不依赖向量化状态）
+    这是PageIndex的正确触发时机：段落创建完成后立即构建，不等待向量化。
+
+    Args:
+        document_ids: 文档ID列表
+    """
+    from knowledge.models import Document, PageIndexNode, Paragraph, Embedding, SourceType
+
+    for doc_id in document_ids:
+        document = QuerySet(Document).filter(id=doc_id).first()
+        if not document:
+            continue
+
+        knowledge = document.knowledge
+
+        # 检查PageIndex是否启用
+        try:
+            from config.page_index_config import PageIndexConfig
+            if not PageIndexConfig.is_enabled(str(knowledge.id)):
+                continue
+        except ImportError:
+            continue
+
+        # 检查是否已有段落
+        paragraph_count = QuerySet(Paragraph).filter(document=document).count()
+        if paragraph_count == 0:
+            continue
+
+        # 构建PageIndex（不等待向量化）
+        try:
+            maxkb_logger.info(f'[PageIndex] Auto building for document: {document.name} (ID: {doc_id})')
+
+            # 导入PageIndex构建器
+            from knowledge.page_index import PageIndex
+
+            # 清理当前文档旧PageIndex节点
+            QuerySet(PageIndexNode).filter(document=document).delete()
+
+            # 构建PageIndex树
+            page_index = PageIndex.from_documents(
+                documents=[document],
+                knowledge=knowledge,
+                chunk_size=1000,
+                chunk_overlap=200
+            )
+
+            # 同步段落向量与PageIndex节点关系
+            _sync_page_index_embeddings_for_document(document)
+
+            stats = page_index.get_statistics()
+            maxkb_logger.info(
+                f'[PageIndex] Built successfully for document {doc_id}: '
+                f'{stats["total_nodes"]} nodes, max depth {stats["max_depth"]}'
+            )
+
+        except Exception as e:
+            maxkb_logger.error(f'[PageIndex] Build error for document {doc_id}: {str(e)}', exc_info=True)
+
+
+def _build_page_index_for_document_if_needed(document: Document):
+    """
+    在向量化之前构建PageIndex（如果需要且尚未构建）
+    这确保了在生成embedding时，page_index_node表已经有数据
+    """
+    knowledge = document.knowledge
+
+    # 检查PageIndex是否启用
+    try:
+        from config.page_index_config import PageIndexConfig
+        if not PageIndexConfig.is_enabled(str(knowledge.id)):
+            return
+    except ImportError:
+        return
+
+    # 检查是否已有段落
+    paragraph_count = QuerySet(Paragraph).filter(document=document).count()
+    if paragraph_count == 0:
+        return
+
+    # 检查是否已经构建过PageIndex
+    existing_nodes = QuerySet(PageIndexNode).filter(document=document).count()
+    if existing_nodes > 0:
+        maxkb_logger.info(f'[PageIndex] Already built for document {document.id}, skipping')
+        return
+
+    # 构建PageIndex
+    try:
+        maxkb_logger.info(f'[PageIndex] Building for document: {document.name} (ID: {document.id})')
+
+        from knowledge.page_index import PageIndex
+
+        page_index = PageIndex.from_documents(
+            documents=[document],
+            knowledge=knowledge,
+            chunk_size=1000,
+            chunk_overlap=200
+        )
+
+        stats = page_index.get_statistics()
+        maxkb_logger.info(
+            f'[PageIndex] Built successfully for document {document.id}: '
+            f'{stats["total_nodes"]} nodes, max depth {stats["max_depth"]}'
+        )
+    except Exception as e:
+        maxkb_logger.error(f'[PageIndex] Build error for document {document.id}: {str(e)}', exc_info=True)
+
+
+def _sync_page_index_embeddings_for_document(document: Document):
+    """
+    将段落向量与PageIndex节点进行绑定，补齐page_index_node/tree_path等字段
+    """
+    nodes = list(QuerySet(PageIndexNode).filter(document=document).values(
+        'id', 'title', 'level', 'path', 'order'
+    ))
+    if not nodes:
+        return None
+
+    root_node = None
+    node_by_title = {}
+    for node in nodes:
+        if root_node is None and node.get('level') == 0:
+            root_node = node
+        title = (node.get('title') or '').strip()
+        if title and title not in node_by_title:
+            node_by_title[title] = node
+
+    updated_count = 0
+    paragraph_list = list(QuerySet(Paragraph).filter(document=document).values('id', 'title'))
+    for paragraph in paragraph_list:
+        title = (paragraph.get('title') or '').strip()
+        node = node_by_title.get(title) if title else None
+        if node is None:
+            node = root_node
+        if not node:
+            continue
+
+        updated_count += QuerySet(Embedding).filter(
+            paragraph_id=paragraph.get('id'),
+            source_type=SourceType.PARAGRAPH
+        ).update(
+            page_index_node_id=node.get('id'),
+            tree_level=node.get('level', 0),
+            tree_path=node.get('path', []),
+            sibling_index=node.get('order', 0)
+        )
+
+    fallback_updated = 0
+    if updated_count == 0 and root_node:
+        fallback_updated = QuerySet(Embedding).filter(
+            document_id=document.id,
+            source_type=SourceType.PARAGRAPH,
+            page_index_node_id__isnull=True
+        ).update(
+            page_index_node_id=root_node.get('id'),
+            tree_level=root_node.get('level', 0),
+            tree_path=root_node.get('path', []),
+            sibling_index=root_node.get('order', 0)
+        )
+
+    result = {
+        'document_id': str(document.id),
+        'paragraphs': len(paragraph_list),
+        'updated': updated_count,
+        'fallback_updated': fallback_updated,
+        'root_node_id': root_node.get('id') if root_node else None
+    }
+    maxkb_logger.info(
+        f"[PageIndex] 同步段落向量与节点关系完成 document={document.id} "
+        f"paragraphs={result['paragraphs']} updated={result['updated']} "
+        f"fallback_updated={result['fallback_updated']} root_node={result['root_node_id']}"
+    )
+    return result
+
+
 def drop_knowledge_index(knowledge_id=None, document_id=None):
+
     if knowledge_id is None and document_id is None:
         raise AppApiException(500, _('Knowledge ID or Document ID must be provided'))
 

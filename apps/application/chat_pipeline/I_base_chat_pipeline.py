@@ -20,7 +20,9 @@ class ParagraphPipelineModel:
     def __init__(self, _id: str, document_id: str, knowledge_id: str, content: str, title: str, status: str,
                  is_active: bool, comprehensive_score: float, similarity: float, knowledge_name: str,
                  document_name: str,
-                 hit_handling_method: str, directly_return_similarity: float, knowledge_type, meta: dict = None):
+                 hit_handling_method: str, directly_return_similarity: float, knowledge_type, meta: dict = None,
+                 section_title: str = None, section_path: str = None, tree_level: int = 0,
+                 tree_path: list = None, page_index_node_id: str = None):
         self.id = _id
         self.document_id = document_id
         self.knowledge_id = knowledge_id
@@ -36,6 +38,12 @@ class ParagraphPipelineModel:
         self.directly_return_similarity = directly_return_similarity
         self.meta = meta
         self.knowledge_type = knowledge_type
+        # PageIndex 章节信息
+        self.section_title = section_title or ''
+        self.section_path = section_path or ''
+        self.tree_level = tree_level
+        self.tree_path = tree_path or []
+        self.page_index_node_id = page_index_node_id
 
     def to_dict(self):
         return {
@@ -52,7 +60,26 @@ class ParagraphPipelineModel:
             'document_name': self.document_name,
             'knowledge_type': self.knowledge_type,
             'meta': self.meta,
+            # PageIndex 章节信息
+            'section_title': self.section_title,
+            'section_path': self.section_path,
+            'tree_level': self.tree_level,
+            'tree_path': self.tree_path,
+            'page_index_node_id': self.page_index_node_id,
         }
+
+    def get_formatted_content(self) -> str:
+        """
+        获取带章节路径的格式化内容
+        """
+        parts = []
+        if self.section_path:
+            parts.append(f"## {self.section_path}")
+        if self.title and self.title.strip():
+            parts.append(f"#### {self.title}")
+        if self.content:
+            parts.append(self.content)
+        return '\n'.join(parts)
 
     class builder:
         def __init__(self):
@@ -65,6 +92,12 @@ class ParagraphPipelineModel:
             self.hit_handling_method = None
             self.directly_return_similarity = 0.9
             self.meta = {}
+            # PageIndex 章节信息
+            self.section_title = ''
+            self.section_path = ''
+            self.tree_level = 0
+            self.tree_path = []
+            self.page_index_node_id = None
 
         def add_paragraph(self, paragraph):
             if isinstance(paragraph, Paragraph):
@@ -78,6 +111,12 @@ class ParagraphPipelineModel:
                                   }
             else:
                 self.paragraph = paragraph
+                # 从 paragraph dict 中提取 PageIndex 信息
+                self.section_title = paragraph.get('section_title', '')
+                self.section_path = paragraph.get('section_path', '')
+                self.tree_level = paragraph.get('tree_level', 0)
+                self.tree_path = paragraph.get('tree_path', [])
+                self.page_index_node_id = paragraph.get('page_index_node_id')
             return self
 
         def add_knowledge_name(self, knowledge_name):
@@ -112,16 +151,40 @@ class ParagraphPipelineModel:
             self.meta = meta
             return self
 
+        def add_section_info(self, section_title: str = '', section_path: str = '',
+                            tree_level: int = 0, tree_path: list = None, page_index_node_id: str = None):
+            """添加 PageIndex 章节信息"""
+            self.section_title = section_title or ''
+            self.section_path = section_path or ''
+            self.tree_level = tree_level
+            self.tree_path = tree_path or []
+            self.page_index_node_id = page_index_node_id
+            return self
+
         def build(self):
-            return ParagraphPipelineModel(str(self.paragraph.get('id')), str(self.paragraph.get('document_id')),
-                                          str(self.paragraph.get('knowledge_id')),
-                                          self.paragraph.get('content'), self.paragraph.get('title'),
-                                          self.paragraph.get('status'),
-                                          self.paragraph.get('is_active'),
-                                          self.comprehensive_score, self.similarity, self.knowledge_name,
-                                          self.document_name, self.hit_handling_method, self.directly_return_similarity,
-                                          self.knowledge_type,
-                                          self.meta)
+            return ParagraphPipelineModel(
+                str(self.paragraph.get('id')),
+                str(self.paragraph.get('document_id')),
+                str(self.paragraph.get('knowledge_id')),
+                self.paragraph.get('content'),
+                self.paragraph.get('title'),
+                self.paragraph.get('status'),
+                self.paragraph.get('is_active'),
+                self.comprehensive_score,
+                self.similarity,
+                self.knowledge_name,
+                self.document_name,
+                self.hit_handling_method,
+                self.directly_return_similarity,
+                self.knowledge_type,
+                self.meta,
+                # PageIndex 章节信息
+                self.section_title,
+                self.section_path,
+                self.tree_level,
+                self.tree_path,
+                self.page_index_node_id
+            )
 
 
 class IBaseChatPipelineStep:

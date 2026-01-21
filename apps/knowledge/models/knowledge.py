@@ -282,6 +282,8 @@ class SearchMode(models.TextChoices):
     embedding = 'embedding'
     keywords = 'keywords'
     blend = 'blend'
+    page_index = 'page_index'
+
 
 
 class FileSourceType(models.TextChoices):
@@ -309,6 +311,60 @@ class VectorField(models.Field):
         return 'vector'
 
 
+class PageIndexNode(models.Model):
+    """PageIndex树节点表"""
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name='page_nodes')
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.CASCADE, related_name='page_nodes')
+    
+    # 树结构字段
+    level = models.IntegerField(default=0, verbose_name="层级深度", db_index=True)
+    title = models.CharField(max_length=255, verbose_name="节点标题", db_index=True)
+    path = models.JSONField(default=list, verbose_name="完整路径")
+    parent = models.ForeignKey('self', null=True, blank=True, 
+                              on_delete=models.CASCADE, related_name='children')
+    order = models.IntegerField(default=0, verbose_name="同级排序", db_index=True)
+    
+    # 内容字段
+    content = models.TextField(verbose_name="节点内容")
+    char_count = models.IntegerField(default=0, verbose_name="字符数")
+
+    # 向量字段
+    embedding = VectorField(null=True, verbose_name="节点向量")
+    embedding_status = models.CharField(
+        max_length=20,
+        choices=[(state.value, state.name) for state in State],
+        default=State.PENDING.value,
+        verbose_name="嵌入状态"
+    )
+
+    # 元数据
+    meta = models.JSONField(default=dict, verbose_name="元数据")
+
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = "page_index_node"
+        indexes = [
+            models.Index(fields=['document', 'level']),
+            models.Index(fields=['knowledge', 'level']),
+            models.Index(fields=['parent']),
+        ]
+    
+    def get_full_path(self) -> str:
+        """获取完整路径字符串"""
+        return " > ".join([str(p) for p in self.path])
+    
+    def get_all_content(self) -> str:
+        """获取节点及其子节点的所有内容"""
+        contents = [self.content]
+        for child in self.children.all().order_by('order'):
+            contents.append(child.get_all_content())
+        return "\n\n".join(contents)
+
+
 class Embedding(models.Model):
     id = models.CharField(max_length=128, primary_key=True, verbose_name="主键id")
     source_id = models.CharField(max_length=128, verbose_name="资源id", db_index=True)
@@ -321,6 +377,21 @@ class Embedding(models.Model):
     embedding = VectorField(verbose_name="向量")
     search_vector = SearchVectorField(verbose_name="分词", default="")
     meta = models.JSONField(verbose_name="元数据", default=dict)
+    
+    # 新增：PageIndex关联
+    page_index_node = models.ForeignKey(
+        PageIndexNode,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='embeddings',
+        verbose_name="所属树节点"
+    )
+    
+    # 新增：树结构元数据
+    tree_level = models.IntegerField(default=0, verbose_name="所属层级")
+    tree_path = models.JSONField(default=list, verbose_name="所属路径")
+    sibling_index = models.IntegerField(default=0, verbose_name="兄弟节点索引")
 
     class Meta:
         db_table = "embedding"

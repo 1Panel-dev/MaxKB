@@ -20,7 +20,8 @@ class CeleryDefaultService(CeleryBaseService):
         env['ANSIBLE_FORCE_COLOR'] = 'True'
         env['PYTHONPATH'] = settings.APPS_DIR
         env['SERVER_NAME'] = 'celery'
-        if os.getuid() == 0:
+        # os.getuid() 仅在 Unix/Linux 系统上可用
+        if hasattr(os, 'getuid') and os.getuid() == 0:
             env.setdefault('C_FORCE_ROOT', '1')
         kwargs = {
             'cwd': self.cwd,

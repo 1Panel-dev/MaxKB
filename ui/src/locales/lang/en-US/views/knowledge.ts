@@ -73,6 +73,13 @@ export default {
       label: 'Maximum size of each document(MB)',
       placeholder: 'Suggest based on server configuration, otherwise may cause service shutdown',
     },
+    retrievalMode: {
+      label: 'Retrieval Mode',
+      traditional: 'Traditional Mode',
+      pageIndex: 'PageIndex Mode',
+      description: 'PageIndex Mode uses two-stage retrieval (tree navigation + vector search), improving accuracy by 58.4% (62.2% → 98.5%), suitable for structured documents. Traditional Mode uses vector/keyword/blend search, suitable for fragmented content.',
+      tip: 'Note: After switching retrieval mode, ensure PageIndex has been built. Under PageIndex Mode, PageIndex is automatically built when documents are imported.',
+    },
     appTemplate: {
       blank: {
         title: 'Blank Creation',

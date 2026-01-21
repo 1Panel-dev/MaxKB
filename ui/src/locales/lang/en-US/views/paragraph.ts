@@ -6,6 +6,7 @@ export default {
   prevAddParagraph: 'Insert Segment Above',
   paragraphDetail: 'Segment Details',
   character_count: 'characters',
+  sectionPath: 'Section Path',
   setting: {
     batchSelected: 'Batch Select',
     cancelSelected: 'Cancel Selection',

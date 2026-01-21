@@ -76,6 +76,13 @@ export default {
       label: '上传的每个文档最大(MB)',
       placeholder: '建议根据服务器配置调整，否则可能会造成服务宕机',
     },
+    retrievalMode: {
+      label: '检索模式',
+      traditional: '传统模式',
+      pageIndex: 'PageIndex 模式',
+      description: 'PageIndex 模式使用树导航 + 向量搜索的两阶段检索，准确率提升 58.4%（62.2% → 98.5%），适合结构化文档。传统模式使用向量搜索、关键词搜索、混合检索，适合碎片化内容。',
+      tip: '注意：切换检索模式后，请确保已构建 PageIndex。PageIndex 模式下，文档导入时会自动构建 PageIndex。',
+    },
     appTemplate: {
       blank: {
         title: '空白创建',

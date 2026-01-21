@@ -52,6 +52,35 @@ def reset_meta(meta):
     return meta
 
 
+def format_paragraph_with_section(paragraph: Dict) -> str:
+    """
+    格式化段落内容，包含章节路径信息
+
+    输出格式：
+    ## 章节路径（如果有）
+    #### 段落标题（如果有）
+    段落内容
+    """
+    parts = []
+
+    # 添加章节路径
+    section_path = paragraph.get('section_path', '')
+    if section_path:
+        parts.append(f"## {section_path}")
+
+    # 添加段落标题
+    title = paragraph.get('title', '')
+    if title and title.strip():
+        parts.append(f"#### {title}")
+
+    # 添加段落内容
+    content = paragraph.get('content', '')
+    if content:
+        parts.append(content)
+
+    return '\n'.join(parts)
+
+
 class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
     def save_context(self, details, workflow_manage):
         result = details.get('paragraph_list', [])
@@ -63,9 +92,10 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         self.context['question'] = details.get('question')
         self.context['run_time'] = details.get('run_time')
         self.context['is_hit_handling_method_list'] = [row for row in result if row.get('is_hit_handling_method')]
-        self.context['data'] = '\n'.join(
-            [f"{paragraph.get('title', '')}:{paragraph.get('content')}" for paragraph in
-             result])[0:knowledge_setting.get('max_paragraph_char_number', 5000)]
+        # 使用带章节路径的格式化
+        self.context['data'] = '\n\n'.join(
+            [format_paragraph_with_section(paragraph) for paragraph in result]
+        )[0:knowledge_setting.get('max_paragraph_char_number', 5000)]
         self.context['directly_return'] = directly_return
         self.context['exception_message'] = details.get('err_message')
 
@@ -120,11 +150,15 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
         result = sorted(result, key=lambda p: p.get('similarity'), reverse=True)
+
+        # 使用带章节路径的格式化输出
+        formatted_data = '\n\n'.join(
+            [format_paragraph_with_section(paragraph) for paragraph in result]
+        )[0:knowledge_setting.get('max_paragraph_char_number', 5000)]
+
         return NodeResult({'paragraph_list': result,
                            'is_hit_handling_method_list': [row for row in result if row.get('is_hit_handling_method')],
-                           'data': '\n'.join(
-                               [f"{reset_title(paragraph.get('title', ''))}{paragraph.get('content')}" for paragraph in
-                                result])[0:knowledge_setting.get('max_paragraph_char_number', 5000)],
+                           'data': formatted_data,
                            'directly_return': '\n'.join(
                                [paragraph.get('content') for paragraph in
                                 result if
@@ -139,6 +173,18 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
                                  str(embedding.get('paragraph_id')) == str(paragraph.get('id'))]
         if filter_embedding_list is not None and len(filter_embedding_list) > 0:
             find_embedding = filter_embedding_list[-1]
+
+            # 构建章节路径字符串
+            section_title = paragraph.get('section_title', '')
+            tree_path = paragraph.get('tree_path', [])
+            section_path = ''
+
+            # 如果有 section_path 从 embedding 结果中获取（PageIndex 检索模式）
+            if find_embedding.get('section_path'):
+                section_path = find_embedding.get('section_path')
+            elif section_title:
+                section_path = section_title
+
             return {
                 **paragraph,
                 'similarity': find_embedding.get('similarity'),
@@ -149,7 +195,13 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
                 'id': str(paragraph.get('id')),
                 'knowledge_id': str(paragraph.get('knowledge_id')),
                 'document_id': str(paragraph.get('document_id')),
-                'meta': reset_meta(paragraph.get('meta'))
+                'meta': reset_meta(paragraph.get('meta')),
+                # PageIndex 章节信息
+                'section_title': section_title,
+                'section_path': section_path or find_embedding.get('section_path', ''),
+                'tree_level': paragraph.get('tree_level') or find_embedding.get('tree_level', 0),
+                'tree_path': tree_path or find_embedding.get('tree_path', []),
+                'page_index_node_id': str(paragraph.get('page_index_node_id')) if paragraph.get('page_index_node_id') else find_embedding.get('page_index_node_id')
             }
 
     @staticmethod

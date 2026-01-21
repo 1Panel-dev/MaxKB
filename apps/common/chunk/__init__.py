@@ -7,11 +7,12 @@
     @desc:
 """
 from common.chunk.impl.mark_chunk_handle import MarkChunkHandle
+from common.chunk.impl.overlap_chunk_handle import OverlapChunkHandle
 
-handles = [MarkChunkHandle()]
+handles = [OverlapChunkHandle(), MarkChunkHandle()]
 
 
-def text_to_chunk(text: str, chunk_size: int = 256):
+def text_to_chunk(text: str, chunk_size: int = 800):
     chunk_list = [text]
     for handle in handles:
         chunk_list = handle.handle(chunk_list, chunk_size)

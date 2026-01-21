@@ -5,8 +5,8 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		( "paragraph_id" ) ( 1 - distance + ts_similarity ) as similarity, *,
-		(1 - distance + ts_similarity) AS comprehensive_score
+		( "paragraph_id" ) (%s * (1 - distance) + %s * ts_similarity) as similarity, *,
+		(%s * (1 - distance) + %s * ts_similarity) AS comprehensive_score
 	FROM
 		(
 		SELECT

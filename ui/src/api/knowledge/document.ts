@@ -259,6 +259,24 @@ const putDocumentRefresh: (
 }
 
 /**
+ * 触发PageIndex节点向量化
+ * @param 参数
+ * knowledge_id, document_id
+ */
+const putPageIndexEmbedding: (
+  knowledge_id: string,
+  document_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, loading) => {
+  return put(
+    `${prefix.value}/${knowledge_id}/document/${document_id}/page_index_embedding`,
+    undefined,
+    undefined,
+    loading,
+  )
+}
+
+/**
  * 同步web站点类型
  * @param 参数
  * knowledge_id, document_id,
@@ -661,6 +679,7 @@ export default {
   exportMulDocument,
   exportMulDocumentZip,
   putDocumentRefresh,
+  putPageIndexEmbedding,
   putDocumentSync,
   putMulDocument,
   delMulDocument,

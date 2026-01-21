@@ -250,7 +250,14 @@ class RefreshAPI(DocumentReadAPI):
         return DocumentRefreshSerializer
 
 
+class PageIndexEmbeddingAPI(DocumentReadAPI):
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
 class BatchEditHitHandlingAPI(APIMixin):
+
     @staticmethod
     def get_parameters():
         return [

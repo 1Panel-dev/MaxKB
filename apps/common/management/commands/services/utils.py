@@ -1,11 +1,18 @@
 import threading
 import signal
 import time
-import daemon
-from daemon import pidfile
+import sys
 from .hands import *
 from .hands import __version__
 from .services.base import BaseService
+
+# daemon 模块仅在 Unix/Linux 系统上可用
+if sys.platform != 'win32':
+    import daemon
+    from daemon import pidfile
+else:
+    daemon = None
+    pidfile = None
 
 
 class ServicesUtil(object):
@@ -124,6 +131,11 @@ class ServicesUtil(object):
 
     @property
     def daemon_context(self):
+        if sys.platform == 'win32':
+            raise RuntimeError(
+                "Daemon mode is not supported on Windows. "
+                "Please use 'python main.py dev web' instead of 'python main.py start web'."
+            )
         daemon_log_file = open(self.daemon_log_filepath, 'a')
         context = daemon.DaemonContext(
             pidfile=pidfile.TimeoutPIDLockFile(self.daemon_pid_filepath),

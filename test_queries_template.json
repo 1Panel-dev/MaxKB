@@ -1,0 +1,27 @@
+[
+  {
+    "query": "如何提升RAG系统的召回率？",
+    "relevant_paragraph_ids": [
+      "paragraph_id_1",
+      "paragraph_id_2",
+      "paragraph_id_3"
+    ],
+    "description": "测试关于召回率优化的检索效果"
+  },
+  {
+    "query": "什么是混合检索？",
+    "relevant_paragraph_ids": [
+      "paragraph_id_4",
+      "paragraph_id_5"
+    ],
+    "description": "测试关于混合检索概念的检索效果"
+  },
+  {
+    "query": "Reranker的作用是什么？",
+    "relevant_paragraph_ids": [
+      "paragraph_id_6"
+    ],
+    "description": "测试关于Reranker的检索效果"
+  }
+]
+

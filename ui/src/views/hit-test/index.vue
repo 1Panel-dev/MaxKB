@@ -62,6 +62,13 @@
                   <div class="primary">{{ item.similarity?.toFixed(3) }}</div>
                 </template>
                 <template #footer>
+                  <!-- 章节路径显示 -->
+                  <div v-if="item.section_path" class="section-path-row mb-8">
+                    <el-tag type="info" size="small" effect="plain" class="section-path-tag">
+                      <el-icon class="mr-4"><FolderOpened /></el-icon>
+                      <span class="ellipsis-1" :title="item.section_path">{{ item.section_path }}</span>
+                    </el-tag>
+                  </div>
                   <div class="footer-content flex-between">
                     <el-text>
                       <el-icon>
@@ -157,6 +164,20 @@
                 }}</el-text>
               </el-radio>
             </el-card>
+            <el-card
+              shadow="never"
+              class="mb-16"
+              :class="cloneForm.search_mode === 'page_index' ? 'active' : ''"
+            >
+              <el-radio value="page_index" size="large">
+                <p class="mb-4">
+                  {{ $t('views.application.dialog.pageIndexSearch') }}
+                </p>
+                <el-text type="info">{{
+                  $t('views.application.dialog.pageIndexSearchTooltip')
+                }}</el-text>
+              </el-radio>
+            </el-card>
           </el-radio-group>
         </div>
         <el-row :gutter="20">
@@ -238,6 +259,7 @@ import { arraySort } from '@/utils/array'
 import emptyImg from '@/assets/hit-test-empty.png'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { FolderOpened } from '@element-plus/icons-vue'
 const route = useRoute()
 const {
   params: { id },
@@ -277,6 +299,9 @@ const isDisabledChart = computed(() => !inputValue.value)
 function changeHandle(val: string) {
   if (val === 'keywords') {
     cloneForm.value.similarity = 0
+  } else if (val === 'page_index') {
+    cloneForm.value.similarity = 0.6
+    cloneForm.value.top_number = 5
   } else {
     cloneForm.value.similarity = 0.6
   }
@@ -430,6 +455,21 @@ onMounted(() => {})
     :deep(.description) {
       -webkit-line-clamp: 5 !important;
       height: 110px;
+    }
+  }
+
+  .section-path-row {
+    .section-path-tag {
+      max-width: 100%;
+      display: inline-flex;
+      align-items: center;
+
+      .ellipsis-1 {
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 }

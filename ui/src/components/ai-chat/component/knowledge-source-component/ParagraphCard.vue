@@ -3,7 +3,7 @@
     shadow="never"
     :title="index + 1 + '.' + data.title || '-'"
     class="paragraph-source-card cursor mb-8 paragraph-source-card-height"
-    :style="{ height: data?.document_name?.trim() ? '300px' : '260px' }"
+    :style="{ height: cardHeight }"
     :class="data.is_active ? '' : 'disabled'"
     :showIcon="false"
   >
@@ -13,7 +13,15 @@
       </div>
     </template>
 
-    <el-scrollbar height="150">
+    <!-- 章节路径显示 -->
+    <div v-if="data?.section_path" class="section-path mb-8">
+      <el-tag type="info" size="small" effect="plain" class="section-path-tag">
+        <el-icon class="mr-4"><FolderOpened /></el-icon>
+        <span class="ellipsis-1" :title="data.section_path">{{ data.section_path }}</span>
+      </el-tag>
+    </div>
+
+    <el-scrollbar :height="scrollHeight">
       <MdPreview ref="editorRef" editorId="preview-only" :modelValue="content" noImgZoomIn />
     </el-scrollbar>
 
@@ -61,6 +69,8 @@ import { getImgUrl, getFileUrl } from '@/utils/common'
 import { computed } from 'vue'
 import { MsgInfo } from '@/utils/message'
 import { t } from '@/locales'
+import { FolderOpened } from '@element-plus/icons-vue'
+
 const props = defineProps({
   data: {
     type: Object,
@@ -79,6 +89,21 @@ const props = defineProps({
     default: null,
   },
 })
+
+// 根据是否有章节路径调整高度
+const hasSectionPath = computed(() => !!props.data?.section_path)
+const cardHeight = computed(() => {
+  let baseHeight = props.data?.document_name?.trim() ? 300 : 260
+  if (hasSectionPath.value) {
+    baseHeight += 32 // 章节路径标签高度
+  }
+  return `${baseHeight}px`
+})
+
+const scrollHeight = computed(() => {
+  return hasSectionPath.value ? 120 : 150
+})
+
 const isMetaObject = computed(() => typeof props.data.meta === 'object')
 const parsedMeta = computed(() => {
   try {
@@ -89,6 +114,7 @@ const parsedMeta = computed(() => {
 })
 
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
+
 function infoMessage(data: any) {
   if (data?.meta?.allow_download === false) {
     MsgInfo(t('chat.noPermissionDownload'))
@@ -97,4 +123,19 @@ function infoMessage(data: any) {
   }
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.section-path {
+  .section-path-tag {
+    max-width: 100%;
+    display: inline-flex;
+    align-items: center;
+
+    .ellipsis-1 {
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}
+</style>

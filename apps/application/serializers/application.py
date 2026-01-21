@@ -132,6 +132,25 @@ class KnowledgeSettingSerializer(serializers.Serializer):
     no_references_setting = NoReferencesSetting(required=True,
                                                 label=_("Segment settings not referenced"))
 
+    enable_reranker = serializers.BooleanField(
+        required=False,
+        default=False,
+        label=_("Enable Reranker")
+    )
+    reranker_model_id = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        label=_("Reranker Model ID")
+    )
+    reranker_top_n = serializers.IntegerField(
+        required=False,
+        default=3,
+        min_value=1,
+        max_value=100,
+        label=_("Reranker Top N")
+    )
+
 
 class ModelKnowledgeAssociation(serializers.Serializer):
     user_id = serializers.UUIDField(required=True, label=_("User ID"))

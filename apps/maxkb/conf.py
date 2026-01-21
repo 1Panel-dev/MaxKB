@@ -20,8 +20,8 @@ logger = logging.getLogger('maxkb.conf')
 class Config(dict):
     defaults = {
         # 数据库相关配置
-        "DB_HOST": "127.0.0.1",
-        "DB_PORT": 5432,
+        "DB_HOST": "10.80.17.190",
+        "DB_PORT": 5433,
         "DB_USER": "root",
         "DB_PASSWORD": "Password123@postgres",
         "DB_ENGINE": "dj_db_conn_pool.backends.postgresql",
@@ -34,9 +34,9 @@ class Config(dict):
         'LANGUAGE_CODE': 'zh-CN',
         "DEBUG": False,
         # redis host
-        'REDIS_HOST': '127.0.0.1',
+        'REDIS_HOST': '10.80.17.190',
         # 端口
-        'REDIS_PORT': 6379,
+        'REDIS_PORT': 6389,
         # 密码
         'REDIS_PASSWORD': 'Password123@redis',
         # 库

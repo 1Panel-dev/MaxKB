@@ -11,9 +11,11 @@ from common.log.log import log
 from common.result import result
 from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentBatchCreateAPI, DocumentCreateAPI, \
     DocumentReadAPI, DocumentEditAPI, DocumentDeleteAPI, TableDocumentCreateAPI, QaDocumentCreateAPI, \
-    WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
-    DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
-    DocumentExportAPI, DocumentMigrateAPI, DocumentDownloadSourceAPI, DocumentTagsAPI
+    WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, PageIndexEmbeddingAPI, \
+    BatchEditHitHandlingAPI, DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, \
+    BatchGenerateRelatedAPI, TemplateExportAPI, DocumentExportAPI, DocumentMigrateAPI, \
+    DocumentDownloadSourceAPI, DocumentTagsAPI
+
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.views.common import get_knowledge_document_operation_object, get_document_operation_object_batch, \
@@ -308,7 +310,39 @@ class DocumentView(APIView):
                 data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
             ).refresh(request.data.get('state_list')))
 
+    class PageIndexEmbedding(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            summary=_('PageIndex embedding'),
+            description=_('Trigger PageIndex node embedding'),
+            operation_id=_('Trigger PageIndex node embedding'),  # type: ignore
+            parameters=PageIndexEmbeddingAPI.get_parameters(),
+            responses=PageIndexEmbeddingAPI.get_response(),
+            tags=[_('Knowledge Base/Documentation')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        @log(
+            menu='document', operate="Trigger PageIndex embedding",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get('knowledge_id')),
+                get_document_operation_object(keywords.get('document_id'))
+            ),
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(DocumentSerializers.Operate(
+                data={'document_id': document_id, 'knowledge_id': knowledge_id, 'workspace_id': workspace_id}
+            ).page_index_embedding())
+
     class CancelTask(APIView):
+
         authentication_classes = [TokenAuth]
 
         @extend_schema(

@@ -20,7 +20,8 @@ class CeleryBaseService(BaseService):
         os.environ.setdefault('ANSIBLE_FORCE_COLOR', 'True')
         os.environ.setdefault('PYTHONPATH', settings.APPS_DIR)
 
-        if os.getuid() == 0:
+        # os.getuid() 仅在 Unix/Linux 系统上可用
+        if hasattr(os, 'getuid') and os.getuid() == 0:
             os.environ.setdefault('C_FORCE_ROOT', '1')
         server_hostname = os.environ.get("SERVER_HOSTNAME")
         if not server_hostname:

@@ -492,3 +492,106 @@ class KnowledgeWebView(APIView):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
         ).save_web(request.data))
+
+
+class PageIndexTreeView(APIView):
+    """PageIndex 章节树 API"""
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_('Get PageIndex section tree for knowledge'),
+        summary=_('Get PageIndex section tree'),
+        operation_id=_('Get PageIndex section tree'),
+        tags=[_('Knowledge Base')]
+    )
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_READ.get_workspace_permission(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+    )
+    def get(self, request: Request, workspace_id: str, knowledge_id: str):
+        """
+        获取知识库的章节树结构
+
+        返回格式：
+        {
+            "tree": [
+                {
+                    "id": "node-id",
+                    "title": "第一章",
+                    "level": 1,
+                    "document_id": "doc-id",
+                    "document_name": "文档名称",
+                    "children": [...]
+                }
+            ],
+            "flat_list": [
+                {"id": "node-id", "title": "第一章", "path": "文档 > 第一章", ...}
+            ]
+        }
+        """
+        from knowledge.models import PageIndexNode, Document
+        from django.db.models import QuerySet
+
+        # 获取所有节点
+        nodes = list(PageIndexNode.objects.filter(
+            knowledge_id=knowledge_id
+        ).order_by('document_id', 'level', 'order').values(
+            'id', 'title', 'level', 'order', 'path', 'parent_id', 'document_id', 'char_count'
+        ))
+
+        if not nodes:
+            return result.success({'tree': [], 'flat_list': []})
+
+        # 获取文档名称映射
+        doc_ids = list(set(n['document_id'] for n in nodes))
+        docs = {str(d.id): d.name for d in QuerySet(Document).filter(id__in=doc_ids)}
+
+        # 构建节点映射
+        node_map = {str(n['id']): {**n, 'id': str(n['id']), 'children': []} for n in nodes}
+
+        # 构建树结构
+        root_nodes = []
+        for node in nodes:
+            node_id = str(node['id'])
+            parent_id = str(node['parent_id']) if node['parent_id'] else None
+            node_data = node_map[node_id]
+            node_data['document_name'] = docs.get(str(node['document_id']), '')
+
+            if parent_id and parent_id in node_map:
+                node_map[parent_id]['children'].append(node_data)
+            elif node['level'] == 0:
+                root_nodes.append(node_data)
+
+        # 构建扁平列表（带路径字符串）
+        flat_list = []
+        for node in nodes:
+            node_id = str(node['id'])
+            path_titles = []
+
+            # 构建路径
+            for pid in (node['path'] or []):
+                pid_str = str(pid)
+                if pid_str in node_map:
+                    title = node_map[pid_str].get('title', '')
+                    if title:
+                        path_titles.append(title)
+
+            current_title = node['title'] or ''
+            if current_title:
+                path_titles.append(current_title)
+
+            flat_list.append({
+                'id': node_id,
+                'title': node['title'] or '',
+                'level': node['level'],
+                'path': ' > '.join(path_titles),
+                'document_id': str(node['document_id']),
+                'document_name': docs.get(str(node['document_id']), ''),
+                'char_count': node['char_count']
+            })
+
+        return result.success({
+            'tree': root_nodes,
+            'flat_list': flat_list
+        })

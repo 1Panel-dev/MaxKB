@@ -62,6 +62,10 @@ class XlsSplitHandle(BaseSplitHandle):
         try:
             if type(limit) is str:
                 limit = int(limit)
+            # 确保limit足够大，或者使用默认的chunk_size
+            if limit < 800:
+                limit = 800
+
             workbook = xlrd.open_workbook(file_contents=buffer)
             worksheets = workbook.sheets()
             worksheets_size = len(worksheets)

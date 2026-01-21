@@ -79,10 +79,34 @@ def get_key_by_word_dict(key, word_dict):
 def to_ts_vector(text: str):
     # 分词
     result = jieba.lcut(text, cut_all=True)
-    return " ".join(result)
+    # 转换为小写，确保英文词能被正确索引
+    result_lower = [token.lower() for token in result]
+    return " ".join(result_lower)
 
 
 def to_query(text: str):
+    # 中文停用词列表
+    stopwords = {'的', '了', '在', '是', '我', '有', '和', '就', '不', '人', '都', '一', '一个',
+                 '上', '也', '很', '到', '说', '要', '去', '你', '会', '着', '没有', '看', '好',
+                 '自己', '这', '？', '！', '，', '。', '、', '；', '：', '"', '"', ''', ''',
+                 '吗', '呢', '啊', '哦', '嗯', '吧', '呀', '什么', '怎么', '为什么', '哪里',
+                 '谁', '哪个', '多少', '几', '怎样', '如何'}
+
     extract_tags = jieba.lcut(text, cut_all=True)
-    result = " ".join(extract_tags)
+
+    # 过滤停用词和单字符（保留英文、数字）
+    filtered_tags = []
+    for tag in extract_tags:
+        tag_stripped = tag.strip()
+        # 保留：长度>1的词，或者是英文/数字
+        if tag_stripped and (len(tag_stripped) > 1 or tag_stripped.isalnum()):
+            if tag_stripped not in stopwords:
+                # 转换为小写，确保与search_vector匹配
+                filtered_tags.append(tag_stripped.lower())
+
+    # 如果过滤后为空，使用原始分词（避免查询为空）
+    if not filtered_tags:
+        filtered_tags = [tag.strip().lower() for tag in extract_tags if tag.strip()]
+
+    result = " ".join(filtered_tags)
     return result

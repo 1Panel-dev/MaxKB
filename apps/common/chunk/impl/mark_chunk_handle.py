@@ -12,7 +12,7 @@ from typing import List
 from common.chunk.i_chunk_handle import IChunkHandle
 
 class MarkChunkHandle(IChunkHandle):
-    def handle(self, chunk_list: List[str], chunk_size: int = 256):
+    def handle(self, chunk_list: List[str], chunk_size: int = 800):
         split_chunk_pattern = r'.{1,%d}[。| |\\.|！|;|；|!|\n]' % chunk_size
         max_chunk_pattern = r'.{1,%d}' % chunk_size
 

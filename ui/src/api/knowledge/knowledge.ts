@@ -486,6 +486,19 @@ const getMcpTools: (
   return post(`${prefix.value}/${knowledge_id}/mcp_tools`, { mcp_servers }, {}, loading)
 }
 
+/**
+ * 获取知识库的 PageIndex 章节树
+ * @param knowledge_id 知识库id
+ * @param loading
+ * @returns { tree: [], flat_list: [] }
+ */
+const getPageIndexTree: (
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, loading) => {
+  return get(`${prefix.value}/${knowledge_id}/page_index_tree`, {}, loading)
+}
+
 const postTransformWorkflow: (
   knowledge_id: string,
   data: any,
@@ -533,5 +546,6 @@ export default {
   cancelWorkflowAction,
   exportKnowledgeWorkflow,
   importKnowledgeWorkflow,
+  getPageIndexTree,
   postTransformWorkflow,
 }

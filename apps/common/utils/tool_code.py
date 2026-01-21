@@ -5,9 +5,7 @@ import getpass
 import gzip
 import json
 import os
-import pwd
 import random
-import resource
 import socket
 import subprocess
 import sys
@@ -16,6 +14,17 @@ import time
 from contextlib import contextmanager
 from contextlib import suppress
 from textwrap import dedent
+
+# Windows兼容性：pwd和resource模块仅在Unix/Linux系统上可用
+try:
+    import pwd
+except ImportError:
+    pwd = None  # Windows系统上pwd模块不可用
+
+try:
+    import resource
+except ImportError:
+    resource = None  # Windows系统上resource模块不可用
 
 import uuid_utils.compat as uuid
 from django.utils.translation import gettext_lazy as _
@@ -92,7 +101,10 @@ class ToolExecutor:
     def exec_code(self, code_str, keywords, function_name=None):
         _id = str(uuid.uuid7())
         action_function = f'({function_name !a}, locals_v.get({function_name !a}))' if function_name else 'locals_v.popitem()'
-        set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
+        # Windows兼容性：仅在Linux系统且启用sandbox时设置用户权限
+        set_run_user = ''
+        if _enable_sandbox and pwd is not None and sys.platform.startswith("linux"):
+            set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});'
         _exec_code = f"""
 try:
     import os, sys, json
@@ -197,7 +209,10 @@ sys.stdout.flush()
 
     def generate_mcp_server_code(self, code_str, params, name, description):
         code = self._generate_mcp_server_code(code_str, params, name, description)
-        set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
+        # Windows兼容性：仅在Linux系统且启用sandbox时设置用户权限
+        set_run_user = ''
+        if _enable_sandbox and pwd is not None and sys.platform.startswith("linux"):
+            set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});'
         return f"""
 import os, sys, logging
 logging.basicConfig(level=logging.WARNING)
@@ -245,7 +260,9 @@ exec({dedent(code)!a})
         }}
         def _set_resource_limit():
             if not _enable_sandbox or not sys.platform.startswith("linux"): return
-            with suppress(Exception): resource.setrlimit(resource.RLIMIT_AS, (_process_limit_mem_mb * 1024 * 1024,) * 2)
+            # Windows兼容性：resource模块仅在Unix/Linux系统上可用
+            if resource is not None:
+                with suppress(Exception): resource.setrlimit(resource.RLIMIT_AS, (_process_limit_mem_mb * 1024 * 1024,) * 2)
             with suppress(Exception): os.sched_setaffinity(0, set(random.sample(list(os.sched_getaffinity(0)), _process_limit_cpu_cores)))
         try:
             subprocess_result = subprocess.run(

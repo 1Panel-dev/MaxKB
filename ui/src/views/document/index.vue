@@ -511,6 +511,13 @@
                             {{ $t('views.document.generateQuestion.title') }}
                           </el-dropdown-item>
                           <el-dropdown-item
+                            @click="triggerPageIndexEmbedding(row)"
+                            v-if="permissionPrecise.doc_vector(id)"
+                          >
+                            <AppIcon iconName="app-document-refresh" class="color-secondary" />
+                            {{ $t('views.document.setting.pageIndexEmbedding') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
                             @click="openTagSettingDrawer(row)"
                             v-if="permissionPrecise.doc_tag(id)"
                           >
@@ -631,6 +638,13 @@
                             <AppIcon iconName="app-sync" class="color-secondary"></AppIcon>
                             {{ $t('views.knowledge.setting.sync') }}</el-dropdown-item
                           >
+                          <el-dropdown-item
+                            @click="triggerPageIndexEmbedding(row)"
+                            v-if="permissionPrecise.doc_vector(id)"
+                          >
+                            <AppIcon iconName="app-document-refresh" class="color-secondary" />
+                            {{ $t('views.document.setting.pageIndexEmbedding') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             @click="openTagSettingDrawer(row)"
                             v-if="permissionPrecise.doc_tag(id)"
@@ -1071,6 +1085,15 @@ function refreshDocument(row: any) {
       })
   }
   embeddingContentDialogRef.value?.open(embeddingDocument)
+}
+
+function triggerPageIndexEmbedding(row: any) {
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .putPageIndexEmbedding(row.knowledge_id, row.id, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.tip.pageIndexEmbeddingSuccess'))
+      getList()
+    })
 }
 
 function rowClickHandle(row: any, column: any) {

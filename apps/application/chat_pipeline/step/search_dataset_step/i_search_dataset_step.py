@@ -46,6 +46,11 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         ], label=_("Retrieval Mode"))
         workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
 
+        # Reranker settings
+        enable_reranker = serializers.BooleanField(required=False, default=False, label=_("Enable Reranker"))
+        reranker_model_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Reranker Model ID"))
+        reranker_top_n = serializers.IntegerField(required=False, default=3, min_value=1, max_value=100, label=_("Reranker Top N"))
+
     def get_step_serializer(self, manage: PipelineManage) -> Type[InstanceSerializer]:
         return self.InstanceSerializer
 
@@ -60,6 +65,9 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
                 search_mode: str = None,
                 workspace_id=None,
                 manage: PipelineManage = None,
+                enable_reranker: bool = False,
+                reranker_model_id: str = None,
+                reranker_top_n: int = 3,
                 **kwargs) -> List[ParagraphPipelineModel]:
         """
         关于 用户和补全问题 说明: 补全问题如果有就使用补全问题去查询 反之就用用户原始问题查询
@@ -71,6 +79,9 @@ class ISearchDatasetStep(IBaseChatPipelineStep):
         :param exclude_paragraph_id_list:          需要排除段落id
         :param padding_problem_text                补全问题
         :param search_mode                         检索模式
+        :param enable_reranker                     是否启用重排序
+        :param reranker_model_id                   重排序模型ID
+        :param reranker_top_n                      重排序返回数量
         :param workspace_id                        工作空间id
         :return: 段落列表
         """

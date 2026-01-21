@@ -50,6 +50,9 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                 search_mode: str = None,
                 workspace_id=None,
                 manage=None,
+                enable_reranker: bool = False,
+                reranker_model_id: str = None,
+                reranker_top_n: int = 3,
                 **kwargs) -> List[ParagraphPipelineModel]:
         get_knowledge_list_of_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
         chat_user_type = manage.context.get('chat_user_type')
@@ -72,8 +75,45 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
                                       exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []
+
+        # Reranker processing
+        if enable_reranker and reranker_model_id:
+            try:
+                from langchain_core.documents import Document
+                from models_provider.tools import get_model_instance_by_model_workspace_id
+
+                # Convert embedding_list to Document format
+                documents = [
+                    Document(
+                        page_content=str(item.get('content', '')),
+                        metadata={'paragraph_id': item.get('paragraph_id'), 'similarity': item.get('similarity')}
+                    ) for item in embedding_list if item.get('content')
+                ]
+
+                if documents:
+                    # Execute reranking
+                    reranker_model = get_model_instance_by_model_workspace_id(
+                        reranker_model_id,
+                        workspace_id,
+                        top_n=reranker_top_n
+                    )
+                    reranked_docs = reranker_model.compress_documents(documents, exec_problem_text)
+
+                    # Reorder embedding_list based on reranked results
+                    reranked_ids = [doc.metadata.get('paragraph_id') for doc in reranked_docs]
+                    id_to_item = {item.get('paragraph_id'): item for item in embedding_list}
+                    embedding_list = [id_to_item[pid] for pid in reranked_ids if pid in id_to_item]
+            except Exception as e:
+                # If reranker fails, continue with original results
+                maxkb_logger.error(f"Reranker failed: {str(e)}, using original search results")
+
         paragraph_list = self.list_paragraph(embedding_list, vector)
         result = [self.reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
+
+        # Limit results based on reranker_top_n if reranker is enabled
+        if enable_reranker and reranker_model_id:
+            result = result[:reranker_top_n]
+
         return result
 
     @staticmethod

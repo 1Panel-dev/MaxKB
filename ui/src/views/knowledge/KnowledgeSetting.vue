@@ -154,6 +154,54 @@
                 <h4 class="title-decoration-1 mb-16">
                   {{ $t('common.otherSetting') }}
                 </h4>
+
+                <!-- 【新增】检索模式选择 -->
+                <el-form-item :label="$t('views.knowledge.form.retrievalMode.label')">
+                  <el-radio-group v-model="form.search_mode">
+                    <el-radio label="traditional">
+                      {{ $t('views.knowledge.form.retrievalMode.traditional') }}
+                    </el-radio>
+                    <el-radio label="page_index">
+                      {{ $t('views.knowledge.form.retrievalMode.pageIndex') }}
+                    </el-radio>
+                  </el-radio-group>
+                  <el-text type="info" class="mt-8 block">
+                    {{ $t('views.knowledge.form.retrievalMode.description') }}
+                  </el-text>
+                  <el-text type="warning" class="mt-8 block" v-if="form.search_mode === 'page_index'">
+                    {{ $t('views.knowledge.form.retrievalMode.tip') }}
+                  </el-text>
+                </el-form-item>
+
+                <!-- 【新增】PageIndex 配置（仅在启用PageIndex时显示） -->
+                <template v-if="form.search_mode === 'page_index'">
+                  <el-form-item label="树过滤">
+                    <el-switch v-model="form.use_tree_filter" />
+                    <el-text type="info" class="ml-8">启用树结构过滤</el-text>
+                  </el-form-item>
+                  <el-form-item label="返回数量 (Top-N)">
+                    <el-slider
+                      v-model="form.top_n"
+                      :min="1"
+                      :max="20"
+                      show-input
+                      :show-input-controls="false"
+                      class="custom-slider"
+                    />
+                  </el-form-item>
+                  <el-form-item label="相似度阈值">
+                    <el-slider
+                      v-model="form.similarity_threshold"
+                      :min="0"
+                      :max="1"
+                      :step="0.05"
+                      show-input
+                      :show-input-controls="false"
+                      class="custom-slider"
+                    />
+                  </el-form-item>
+                </template>
+
                 <el-form-item :label="$t('views.knowledge.form.file_count_limit.label')">
                   <el-slider
                     v-model="form.file_count_limit"
@@ -252,6 +300,11 @@ const form = ref<any>({
   folder_token: '',
   file_count_limit: 50,
   file_size_limit: 100,
+  // 【新增】检索模式配置
+  search_mode: 'traditional',
+  use_tree_filter: true,
+  top_n: 5,
+  similarity_threshold: 0.6,
 })
 
 const rules = reactive({
@@ -289,6 +342,16 @@ async function submit() {
   if (await BaseFormRef.value?.validate()) {
     await webFormRef.value.validate((valid: any) => {
       if (valid) {
+        // 【新增】构建 meta 对象，包含检索模式配置
+        const metaObj = {
+          ...form.value,
+          // 只保留PageIndex相关配置
+          search_mode: form.value.search_mode,
+          use_tree_filter: form.value.use_tree_filter,
+          top_n: form.value.top_n,
+          similarity_threshold: form.value.similarity_threshold,
+        }
+
         const obj =
           detail.value.type === 1 || detail.value.type === 2
             ? {
@@ -298,6 +361,8 @@ async function submit() {
                 ...BaseFormRef.value.form,
               }
             : {
+                // 【新增】通用知识库也将meta保存到meta字段
+                meta: metaObj,
                 file_count_limit: form.value.file_count_limit,
                 file_size_limit: form.value.file_size_limit,
                 ...BaseFormRef.value.form,
@@ -360,6 +425,13 @@ function getDetail() {
       if (detail.value?.type === 0) {
         form.value.file_count_limit = res.data.file_count_limit
         form.value.file_size_limit = res.data.file_size_limit
+
+        // 【新增】加载检索模式配置
+        const meta = res.data.meta || {}
+        form.value.search_mode = meta.search_mode || 'traditional'
+        form.value.use_tree_filter = meta.use_tree_filter !== undefined ? meta.use_tree_filter : true
+        form.value.top_n = meta.top_n || 5
+        form.value.similarity_threshold = meta.similarity_threshold !== undefined ? meta.similarity_threshold : 0.6
       }
       if (detail.value?.type === 1 || detail.value?.type === 2) {
         form.value = res.data.meta

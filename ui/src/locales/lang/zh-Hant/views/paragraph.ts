@@ -6,6 +6,7 @@ export default {
   prevAddParagraph: '上方插入分段',
   paragraphDetail: '分段詳情',
   character_count: '個字符',
+  sectionPath: '章節路徑',
   setting: {
     batchSelected: '批量選擇',
     cancelSelected: '取消選擇',

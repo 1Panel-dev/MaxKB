@@ -77,9 +77,29 @@ def embedding_by_document(document_id, model_id, state_list=None):
                 traceback=traceback.format_exc()
             ))
 
+    # 【关键修改】在向量化之前先构建PageIndex，确保page_index_node表有数据
+    try:
+        from knowledge.serializers.common import _build_page_index_for_document_if_needed
+        document = QuerySet(Document).filter(id=document_id).first()
+        if document:
+            _build_page_index_for_document_if_needed(document)
+            maxkb_logger.info(f'[PageIndex] Pre-build completed for document {document_id} before embedding')
+    except Exception as e:
+        maxkb_logger.warning(f'[PageIndex] Pre-build failed for document {document_id}: {e}')
+
     embedding_model = get_embedding_model(model_id, exception_handler)
     #
     ListenerManagement.embedding_by_document(document_id, embedding_model, state_list)
+
+    # 【保留】向量化后再次同步，确保关联关系正确
+    try:
+        from knowledge.serializers.common import _sync_page_index_embeddings_for_document
+        document = QuerySet(Document).filter(id=document_id).first()
+        if document:
+            _sync_page_index_embeddings_for_document(document)
+    except Exception as e:
+        maxkb_logger.warning(f'[PageIndex] Auto sync paragraph embeddings failed: {e}')
+
 
 
 @celery_app.task(name='celery:embedding_by_document_list')

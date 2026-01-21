@@ -50,7 +50,8 @@ from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model, flat_map
 from knowledge.models import Knowledge, Paragraph, Problem, Document, KnowledgeType, ProblemParagraphMapping, State, \
-    TaskType, File, FileSourceType, Tag, DocumentTag
+    TaskType, File, FileSourceType, Tag, DocumentTag, PageIndexNode
+
 from knowledge.serializers.common import ProblemParagraphManage, BatchSerializer, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, write_image, zip_dir
 from knowledge.serializers.paragraph import ParagraphSerializers, ParagraphInstanceSerializer, \
@@ -513,7 +514,15 @@ class DocumentSerializers(serializers.Serializer):
                         for i, paragraph in enumerate(paragraph_model_list):
                             paragraph.position = max_position + i + 1
                         QuerySet(Paragraph).bulk_create(paragraph_model_list)
+
+                        # 【PageIndex】段落创建完成后自动触发构建
+                        try:
+                            from knowledge.serializers.common import _build_page_index_after_paragraph_creation
+                            _build_page_index_after_paragraph_creation([document_id])
+                        except Exception as e:
+                            maxkb_logger.warning(f'[PageIndex] Auto build failed for document {document_id}: {str(e)}')
                     # 批量插入问题
+
                     QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
                     # 插入关联问题
                     QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
@@ -728,6 +737,43 @@ class DocumentSerializers(serializers.Serializer):
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it repeatedly.'))
 
+        def page_index_embedding(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+
+            document_id = self.data.get("document_id")
+            document = QuerySet(Document).filter(id=document_id).first()
+            if not document:
+                raise AppApiException(500, _('Document not found'))
+
+            node_count = QuerySet(PageIndexNode).filter(document_id=document_id).count()
+            if node_count == 0:
+                raise AppApiException(500, _('PageIndex nodes not found, please build PageIndex first.'))
+
+            sync_result = None
+            try:
+                from knowledge.serializers.common import _sync_page_index_embeddings_for_document
+                sync_result = _sync_page_index_embeddings_for_document(document)
+            except Exception as e:
+                maxkb_logger.warning(f'[PageIndex] Sync paragraph embedding failed: {e}')
+
+            try:
+                from knowledge.tasks import generate_page_index_embeddings
+                generate_page_index_embeddings.delay(document_id)
+                maxkb_logger.info(
+                    f'[PageIndex] Manual embedding task scheduled for document {document_id}, nodes: {node_count}'
+                )
+            except Exception as e:
+                raise AppApiException(500, str(e))
+
+            return {
+                'scheduled': True,
+                'node_count': node_count,
+                'sync_result': sync_result
+            }
+
+
+
         @staticmethod
         def get_workbook(data_dict, document_dict):
             # 创建工作簿对象
@@ -840,7 +886,15 @@ class DocumentSerializers(serializers.Serializer):
                 for i, paragraph in enumerate(paragraph_model_list):
                     paragraph.position = max_position + i + 1
                 QuerySet(Paragraph).bulk_create(paragraph_model_list)
+
+                # 【PageIndex】段落创建完成后自动触发构建
+                try:
+                    from knowledge.serializers.common import _build_page_index_after_paragraph_creation
+                    _build_page_index_after_paragraph_creation([str(document_model.id)])
+                except Exception as e:
+                    maxkb_logger.warning(f'[PageIndex] Auto build failed for document {document_model.id}: {str(e)}')
             # 批量插入问题
+
             QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
             # 批量插入关联问题
             QuerySet(ProblemParagraphMapping).bulk_create(
@@ -1173,7 +1227,16 @@ class DocumentSerializers(serializers.Serializer):
                     for i, paragraph in enumerate(sub_list):
                         paragraph.position = max_position + i + 1
                     QuerySet(Paragraph).bulk_create(sub_list if len(sub_list) > 0 else [])
+
+                # 【PageIndex】段落创建完成后自动触发构建
+                try:
+                    from knowledge.serializers.common import _build_page_index_after_paragraph_creation
+                    document_ids = [str(doc.id) for doc in document_model_list]
+                    _build_page_index_after_paragraph_creation(document_ids)
+                except Exception as e:
+                    maxkb_logger.warning(f'[PageIndex] Auto build failed for batch documents: {str(e)}')
             # 批量插入问题
+
             bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
             # 批量插入关联问题
             bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
