@@ -49,9 +49,14 @@ class TriggerView(APIView):
         tags=[_('Trigger')]  # type: ignore
     )
     def get(self, request: Request, workspace_id: str):
-        return result.success(TriggerQuerySerializer(data={'workspace_id': workspace_id,
-                                                           'name': request.query_params.get('name'),
-                                                           'type': request.query_params.get('type')}).list())
+        return result.success(TriggerQuerySerializer(data={
+            'workspace_id': workspace_id,
+            'name': request.query_params.get('name'),
+            'type': request.query_params.get('type'),
+            'task': request.query_params.get('task'),
+            'is_active': request.query_params.get('is_active'),
+            'create_user': request.query_params.get('create_user'),
+        }).list())
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -152,5 +157,8 @@ class TriggerView(APIView):
             return result.success(TriggerQuerySerializer(data={
                 'workspace_id': workspace_id,
                 'name': request.query_params.get('name'),
-                'type': request.query_params.get('type')
+                'task': request.query_params.get('task'),
+                'type': request.query_params.get('type'),
+                'is_active': request.query_params.get('is_active'),
+                'create_user': request.query_params.get('create_user'),
             }).page(current_page, page_size))
