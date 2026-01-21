@@ -332,7 +332,7 @@ class TriggerSerializer(serializers.Serializer):
             id=trigger_id,
             name=instance.get('name'),
             workspace_id=self.data.get('workspace_id'),
-            desc=instance.get('desc'),
+            desc=instance.get('desc') or '',
             trigger_type=instance.get('trigger_type'),
             trigger_setting=instance.get('trigger_setting'),
             meta=instance.get('meta', {}),
@@ -497,7 +497,7 @@ class TriggerQuerySerializer(serializers.Serializer):
         if self.data.get("name"):
             trigger_query_set = trigger_query_set.filter(name__contains=self.data.get("name"))
         if self.data.get("type"):
-            trigger_query_set = trigger_query_set.filter(type=self.data.get("type"))
+            trigger_query_set = trigger_query_set.filter(trigger_type=self.data.get("type"))
         if self.data.get("is_active") is not None:
             trigger_query_set = trigger_query_set.filter(is_active=self.data.get("is_active"))
         if self.data.get("task"):

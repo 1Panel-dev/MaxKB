@@ -1,4 +1,4 @@
-interface triggerData {
+interface TriggerData {
   id?: string
   name?: string
   desc?: string
@@ -8,4 +8,4 @@ interface triggerData {
   is_active?: boolean
 }
 
-export type { triggerData }
+export type { TriggerData }

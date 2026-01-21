@@ -4,7 +4,7 @@ import type { User, ResetPasswordRequest, CheckCodeRequest } from '@/api/type/us
 import type { Ref } from 'vue'
 import type { KeyValue, pageRequest } from '@/api/type/common'
 import useStore from '@/stores'
-import type { triggerData } from '../type/trigger'
+import type { TriggerData } from '../type/trigger'
 const prefix: any = { _value: '/workspace/' }
 Object.defineProperty(prefix, 'value', {
   get: function () {
@@ -46,7 +46,7 @@ const getTriggerDetail: (
  * @param loading 
  * @returns 
  */
-const postTrigger: (data: triggerData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const postTrigger: (data: TriggerData, loading?: Ref<boolean>) => Promise<Result<any>> = (
   data, loading
 ) => {
   return post(`${prefix.value}`, data, undefined,loading)
@@ -59,10 +59,10 @@ const postTrigger: (data: triggerData, loading?: Ref<boolean>) => Promise<Result
  * @param loading 
  * @returns 
  */
-const putTrigger: (trigger_id: string, data: triggerData, loading?: Ref<boolean>) => Promise<Result<any>> = (
+const putTrigger: (trigger_id: string, data: TriggerData, loading?: Ref<boolean>) => Promise<Result<any>> = (
   trigger_id,data,loading
 ) => {
-  return post(`${prefix.value}/${trigger_id}`, data, undefined,loading)
+  return put(`${prefix.value}/${trigger_id}`, data, undefined,loading)
 }
 
 /**
@@ -74,7 +74,7 @@ const putTrigger: (trigger_id: string, data: triggerData, loading?: Ref<boolean>
 const deleteTrigger: (trigger_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
   trigger_id,loading
 ) => {
-  return post(`${prefix.value}/${trigger_id}`, undefined, {},loading)
+  return del(`${prefix.value}/${trigger_id}`, undefined, {},loading)
 }
 
 /**
