@@ -353,7 +353,7 @@ const times = Array.from({ length: 24 }, (_, i) => {
 })
 const days = Array.from({ length: 31 }, (_, i) => {
   const t = i.toString() + '日'
-  return { label: t, value: i, children: times }
+  return { label: t, value: i.toString(), children: times }
 })
 const hours = Array.from({ length: 24 }, (_, i) => {
   const t = i.toString().padStart(2, '0')
