@@ -6,14 +6,7 @@
         <div class="p-24">
           <div class="flex-between">
             <div>
-              <el-button
-                type="primary"
-                @click="
-                  router.push({
-                    path: `/knowledge/document/upload/${folderId}/${type}`,
-                    query: { id: id },
-                  })
-                "
+              <el-button type="primary" @click="openCreateTriggerDrawer"
                 >{{ $t('common.create') }}
               </el-button>
               <el-button @click="batchChangeState(true)" :disabled="multipleSelection.length === 0"
@@ -143,7 +136,7 @@
                 <el-divider direction="vertical" />
                 <el-tooltip effect="dark" :content="$t('common.edit')" placement="top">
                   <span class="mr-4">
-                    <el-button type="primary" text>
+                    <el-button type="primary" text @click="openEditTriggerDrawer(row)">
                       <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                     </el-button>
                   </span>
@@ -161,6 +154,7 @@
         </div>
       </div>
     </el-card>
+    <TriggerDrawer ref="triggerDrawerRef"></TriggerDrawer>
   </div>
 </template>
 <script setup lang="ts">
@@ -178,6 +172,16 @@ import WorkspaceApi from '@/api/workspace/workspace'
 
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import type { TriggerData } from '@/api/type/trigger'
+
+import TriggerDrawer from '@/views/trigger/component/TriggerDrawer.vue'
+
+const triggerDrawerRef = ref<InstanceType<typeof TriggerDrawer>>()
+const openCreateTriggerDrawer = () => {
+  triggerDrawerRef.value?.open()
+}
+const openEditTriggerDrawer = (trigger: any) => {
+  triggerDrawerRef.value?.open(trigger.id)
+}
 const route = useRoute()
 const router = useRouter()
 const {
