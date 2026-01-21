@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="drawer" title="创建触发器">
+  <el-drawer v-model="drawer" :title="is_edit ? '修改触发器' : '创建触发器'">
     <el-form
       :model="form"
       label-width="auto"
@@ -237,7 +237,7 @@
     <ToolDialog @refresh="toolRefresh" ref="toolDialogRef"></ToolDialog>
     <template #footer>
       <el-form-item>
-        <el-button type="primary" @click="submit">创建</el-button>
+        <el-button type="primary" @click="submit">{{ is_edit ? '修改' : '创建' }}</el-button>
         <el-button @click="close">取消</el-button>
       </el-form-item>
     </template>
@@ -465,9 +465,10 @@ const init = (trigger_id: string) => {
       .reduce((x: any, y: any) => ({ ...x, ...y }), {})
   })
 }
-
+const current_trigger_id = ref<string>()
 const open = (trigger_id?: string) => {
   is_edit.value = trigger_id ? true : false
+  current_trigger_id.value = trigger_id
   drawer.value = true
   if (trigger_id) {
     init(trigger_id)
@@ -486,10 +487,19 @@ const submit = () => {
       : []),
     triggerFormRef.value?.validate(),
   ]).then((ok) => {
-    triggerAPI.postTrigger(form.value).then((ok) => {
-      close()
-      emit('refresh')
-    })
+    if (is_edit.value) {
+      if (current_trigger_id.value) {
+        triggerAPI.putTrigger(current_trigger_id.value, form.value).then((ok) => {
+          close()
+          emit('refresh')
+        })
+      }
+    } else {
+      triggerAPI.postTrigger(form.value).then((ok) => {
+        close()
+        emit('refresh')
+      })
+    }
   })
 }
 onMounted(() => {})

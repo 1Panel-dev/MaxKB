@@ -154,7 +154,7 @@
         </div>
       </div>
     </el-card>
-    <TriggerDrawer ref="triggerDrawerRef"></TriggerDrawer>
+    <TriggerDrawer @refresh="getList()" ref="triggerDrawerRef"></TriggerDrawer>
   </div>
 </template>
 <script setup lang="ts">
