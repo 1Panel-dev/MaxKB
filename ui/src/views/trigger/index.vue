@@ -29,7 +29,7 @@
                 <el-option :label="$t('common.name', '名称')" value="name" />
                 <el-option :label="$t('view.trigger.type', '类型')" value="type" />
                 <el-option :label="$t('view.trigger.task', '任务')" value="task" />
-                <el-option :label="$t('view.trigger.status', '状态')" value="status" />
+                <el-option :label="$t('view.trigger.status', '状态')" value="is_active" />
                 <el-option :label="$t('view.trigger.createUser', '创建者')" value="create_user" />
               </el-select>
               <el-input
@@ -48,8 +48,19 @@
                 clearable
                 style="width: 220px"
               >
-                <el-option :label="$t('view.trigger.scheduled')" value="SCHEDULED" />
-                <el-option :label="$t('view.trigger.event')" value="unpublished" />
+                <el-option :label="$t('view.trigger.scheduled', '定时触发')" value="SCHEDULED" />
+                <el-option :label="$t('view.trigger.event', '事件触发')" value="EVENT" />
+              </el-select>
+              <el-select
+                v-else-if="search_type === 'is_active'"
+                v-model="search_form.is_active"
+                @change="searchHandle"
+                filterable
+                clearable
+                style="width: 220px"
+              >
+                <el-option :label="$t('view.trigger.active', '启用')" value="true" />
+                <el-option :label="$t('view.trigger.ban', '禁用')" value="false" />
               </el-select>
               <el-select
                 v-else-if="search_type === 'create_user'"
@@ -121,6 +132,28 @@
             >
               <template #default="{ row }">
                 {{ datetimeFormat(row.update_time) }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="trigger_task"
+              :label="$t('views.trigger.table.task', '任务')"
+              width="180"
+            >
+              <template #default="{ row }">
+                <div class="flex">
+                  <el-check-tag type="info" class="mr-8"
+                    >智能体
+                    {{
+                      row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
+                    }}</el-check-tag
+                  >
+                  <el-check-tag type="info"
+                    >工具
+                    {{
+                      row.trigger_task.filter((item: any) => item.type === 'TOOL').length
+                    }}</el-check-tag
+                  >
+                </div>
               </template>
             </el-table-column>
             <el-table-column align="left" width="160" fixed="right" :label="$t('common.operation')">
@@ -292,8 +325,10 @@ function updateData(triggerId: string, data: TriggerData, msg: string) {
   triggerAPI
     .putTrigger(triggerId, data, loading)
     .then((res: any) => {
-      const index = triggerData.value.findIndex((v) => v.id === triggerId)
-      triggerData.value.splice(index, 1, res.data)
+      const trigger: TriggerData = triggerData.value.find((v) => v.id === triggerId)
+      if (trigger) {
+        trigger.is_active = res.data.is_active
+      }
       MsgSuccess(msg)
       return true
     })
@@ -314,7 +349,10 @@ function handleSizeChange() {
 }
 
 function getList(bool?: boolean) {
-  const param = {}
+  const param: any = {}
+  if (search_form.value[search_type.value]) {
+    param[search_type.value] = search_form.value[search_type.value]
+  }
   triggerAPI
     .pageTrigger(paginationConfig.value, param, bool ? undefined : loading)
     .then((res: any) => {

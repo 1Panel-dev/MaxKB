@@ -43,6 +43,7 @@ class BatchActiveSerializer(serializers.Serializer):
                 raise AppApiException(500, _('The following id does not exist: {error_id_list}').format(
                     error_id_list=error_id_list))
 
+
 class InputField(serializers.Serializer):
     source = serializers.CharField(required=True, label=_("source"), validators=[
         validators.RegexValidator(regex=re.compile("^custom|reference$"),
@@ -121,6 +122,7 @@ class TriggerTaskCreateRequest(serializers.Serializer):
 
         return attrs
 
+
 class TriggerTaskEditRequest(serializers.Serializer):
     source_type = serializers.ChoiceField(required=False, choices=TriggerTaskTypeChoices)
     source_id = serializers.CharField(required=False, label=_('source_id'))
@@ -141,6 +143,7 @@ class TriggerTaskEditRequest(serializers.Serializer):
             attrs['parameter'] = serializer.validated_data
 
         return attrs
+
 
 class TriggerEditRequest(serializers.Serializer):
     name = serializers.CharField(required=False, label=_('trigger name'))
@@ -392,8 +395,10 @@ class TriggerSerializer(serializers.Serializer):
             workspace_id = self.data.get("workspace_id")
             trigger_id_list = instance.get("id_list")
             is_active = instance.get("is_active")
-            Trigger.objects.filter(workspace_id=workspace_id, id__in=trigger_id_list, is_active= not is_active).update(is_active=is_active)
+            Trigger.objects.filter(workspace_id=workspace_id, id__in=trigger_id_list, is_active=not is_active).update(
+                is_active=is_active)
             return True
+
 
 class TriggerOperateSerializer(serializers.Serializer):
     trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
@@ -426,9 +431,9 @@ class TriggerOperateSerializer(serializers.Serializer):
                 trigger.__setattr__(field, instance.get(field))
         trigger.save()
         # 处理trigger task
-        TriggerTask.objects.filter(trigger_id=trigger_id).delete()
         trigger_tasks = instance.get('trigger_task')
         if trigger_tasks:
+            TriggerTask.objects.filter(trigger_id=trigger_id).delete()
             trigger_task_model_list = [TriggerTask(
                 id=uuid.uuid7(),
                 trigger_id=trigger_id,
@@ -453,18 +458,20 @@ class TriggerOperateSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid()
         trigger_id = self.data.get('trigger_id')
-        trigger = QuerySet(Trigger).filter(id=trigger_id).first()
+        workspace_id = self.data.get('workspace_id')
+        trigger = QuerySet(Trigger).filter(workspace_id=workspace_id, id=trigger_id).first()
 
         trigger_tasks = QuerySet(TriggerTask).filter(trigger_id=trigger_id)
         application_ids = [str(task.source_id) for task in trigger_tasks if
                            task.source_type == TriggerTaskTypeChoices.APPLICATION]
         tool_ids = [str(task.source_id) for task in trigger_tasks if task.source_type == TriggerTaskTypeChoices.TOOL]
 
-        trigger_task_list  = [TriggerTaskModelSerializer(task).data for task in trigger_tasks]
+        trigger_task_list = [TriggerTaskModelSerializer(task).data for task in trigger_tasks]
         application_task_list = [ApplicationTriggerTaskSerializer(application).data for application in
-                                 QuerySet(Application).filter(id__in=application_ids)]
+                                 QuerySet(Application).filter(workspace_id=workspace_id, id__in=application_ids)]
 
-        tool_task_list = [ToolTriggerTaskSerializer(tool).data for tool in QuerySet(Tool).filter(id__in=tool_ids)]
+        tool_task_list = [ToolTriggerTaskSerializer(tool).data for tool in
+                          QuerySet(Tool).filter(workspace_id=workspace_id, id__in=tool_ids)]
 
         return {
             **TriggerModelSerializer(trigger).data,
@@ -477,7 +484,7 @@ class TriggerOperateSerializer(serializers.Serializer):
 class TriggerQuerySerializer(serializers.Serializer):
     name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Trigger name'))
     type = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger type'))
-    is_active = serializers.BooleanField(required=False,allow_null=True, label=_('Is active'))
+    is_active = serializers.BooleanField(required=False, allow_null=True, label=_('Is active'))
     task = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger task'))
     create_user = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Create user'))
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
@@ -488,34 +495,35 @@ class TriggerQuerySerializer(serializers.Serializer):
                 'name': models.CharField(),
                 'trigger_type': models.CharField(),
                 't.workspace_id': models.CharField(),
-                'is_active': models.BooleanField(),
-                'task_str': models.CharField(),
-                'create_user': models.CharField(),
+                't.is_active': models.BooleanField(),
+                't.user_id': models.CharField(),
             }))
-        trigger_query_set = trigger_query_set.filter(**{'t.workspace_id':self.data.get("workspace_id")})
-        user_query_set = QuerySet(model=get_dynamics_model({'nick_name': models.CharField()}))
+        task_query_set = QuerySet(model=get_dynamics_model({
+            'trigger_task_str': models.CharField(),
+        }))
+        trigger_query_set = trigger_query_set.filter(**{'t.workspace_id': self.data.get("workspace_id")})
         if self.data.get("name"):
             trigger_query_set = trigger_query_set.filter(name__contains=self.data.get("name"))
         if self.data.get("type"):
             trigger_query_set = trigger_query_set.filter(trigger_type=self.data.get("type"))
         if self.data.get("is_active") is not None:
-            trigger_query_set = trigger_query_set.filter(is_active=self.data.get("is_active"))
+            trigger_query_set = trigger_query_set.filter(**{"t.is_active": self.data.get("is_active")})
         if self.data.get("task"):
-            trigger_query_set = trigger_query_set.filter(task_str__icontains=self.data.get("task"))
+            task_query_set = task_query_set.filter(trigger_task_str__icontains=self.data.get("task"))
         if self.data.get("create_user"):
-            user_query_set = user_query_set.filter(create_user__icontains=self.data.get("create_user"))
+            trigger_query_set = trigger_query_set.filter(**{"t.user_id": self.data.get("create_user")})
 
-        return {"trigger_query_set": trigger_query_set, "user_query_set": user_query_set}
+        return {"trigger_query_set": trigger_query_set, "task_query_set": task_query_set}
 
     def page(self, current_page: int, page_size: int, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        return native_page_search(current_page, page_size, self.get_query_set(),get_file_content(
-            os.path.join(PROJECT_DIR, "apps","trigger","sql","get_trigger_page_list.sql")
+        return native_page_search(current_page, page_size, self.get_query_set(), get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "trigger", "sql", "get_trigger_page_list.sql")
         ))
 
     def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        return native_search(self.get_query_set(),select_string=get_file_content(
-            os.path.join(PROJECT_DIR, "apps","trigger","sql","get_trigger_page_list.sql")))
+        return native_search(self.get_query_set(), select_string=get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "trigger", "sql", "get_trigger_page_list.sql")))

@@ -168,7 +168,7 @@ const options = computed(() => {
 })
 
 const base_node = computed(() => {
-  return props.application?.work_flow.nodes.find((n: any) => n.type === 'base-node')
+  return (props.application?.work_flow?.nodes || []).find((n: any) => n.type === 'base-node')
 })
 const api_input_field_list = computed(() => {
   const result: Array<any> = []
