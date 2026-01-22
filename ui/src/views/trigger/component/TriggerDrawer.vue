@@ -401,7 +401,7 @@ const scheduled = computed({
       if (schedule_type === 'interval') {
         const interval_value = form.value.trigger_setting.interval_value
         const interval_unit = form.value.trigger_setting.interval_unit
-        return [schedule_type, interval_value, interval_unit].filter((item) => item !== undefined)
+        return [schedule_type, interval_unit, interval_value].filter((item) => item !== undefined)
       } else {
         const days = form.value.trigger_setting.days
           ? form.value.trigger_setting.days[0]
@@ -421,8 +421,8 @@ const scheduled = computed({
     const schedule_type = value[0]
     form.value.trigger_setting.schedule_type = schedule_type
     if (schedule_type == 'interval') {
-      form.value.trigger_setting.interval_value = value[1]
-      form.value.trigger_setting.interval_unit = value[2]
+      form.value.trigger_setting.interval_unit = value[1]
+      form.value.trigger_setting.interval_value = value[2]
     } else {
       if (schedule_type == 'daily') {
         form.value.trigger_setting.time = [value[1]]
