@@ -256,7 +256,7 @@ import triggerAPI from '@/api/trigger/trigger'
 import toolAPI from '@/api/tool/tool'
 import ToolParameter from './ToolParameter.vue'
 import ApplicationParameter from './ApplicationParameter.vue'
-import { FormInstance } from 'element-plus'
+import { type FormInstance } from 'element-plus'
 const emit = defineEmits(['refresh'])
 const triggerFormRef = ref<FormInstance>()
 const copy = () => {

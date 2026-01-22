@@ -56,7 +56,7 @@
 </template>
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { FormInstance } from 'element-plus'
+import { type FormInstance } from 'element-plus'
 const toolParameterFormRef = ref<FormInstance>()
 const props = defineProps<{ tool?: any; modelValue: any; trigger: any }>()
 const emit = defineEmits(['update:modelValue'])
