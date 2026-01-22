@@ -143,20 +143,64 @@
                 <el-popover>
                   <template #reference>
                     <div class="flex">
-                      <el-check-tag type="info" class="mr-8"
-                        >智能体
+                      <el-check-tag type="info" class="mr-8">
+                        智能体
                         {{
                           row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
-                        }}</el-check-tag
-                      >
-                      <el-check-tag type="info"
-                        >工具
-                        {{
-                          row.trigger_task.filter((item: any) => item.type === 'TOOL').length
-                        }}</el-check-tag
-                      >
+                        }}
+                      </el-check-tag>
+                      <el-check-tag type="info">
+                        工具
+                        {{ row.trigger_task.filter((item: any) => item.type === 'TOOL').length }}
+                      </el-check-tag>
                     </div>
                   </template>
+
+                  <div>
+                    <!-- 智能体部分 -->
+                    <div class="color-secondary mb-8">
+                      智能体
+                      {{
+                        row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
+                      }}
+                    </div>
+                    <div
+                      v-for="item in row.trigger_task.filter(
+                        (item: any) => item.type === 'APPLICATION',
+                      )"
+                      :key="item.id"
+                      class="flex align-center mb-8"
+                    >
+                      <el-avatar shape="square" :size="20" style="background: none" class="mr-8">
+                        <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                      </el-avatar>
+                      <span>{{ item.name }}</span>
+                    </div>
+
+                    <el-divider class="mt-8 mb-8" />
+
+                    <!-- 工具部分 -->
+                    <div class="color-secondary mb-8">
+                      工具 {{ row.trigger_task.filter((item: any) => item.type === 'TOOL').length }}
+                    </div>
+                    <div
+                      v-for="item in row.trigger_task.filter((item: any) => item.type === 'TOOL')"
+                      :key="item.id"
+                      class="flex align-center mb-8"
+                    >
+                      <el-avatar
+                        v-if="item?.icon"
+                        shape="square"
+                        :size="20"
+                        style="background: none"
+                        class="mr-8"
+                      >
+                        <img :src="resetUrl(item?.icon)" alt="" />
+                      </el-avatar>
+                      <ToolIcon v-else :size="20" :type="item?.tool_type" class="mr-8" />
+                      <span>{{ item.name }}</span>
+                    </div>
+                  </div>
                 </el-popover>
               </template>
             </el-table-column>
@@ -206,6 +250,7 @@ import { t } from '@/locales'
 import permissionMap from '@/permission'
 import { datetimeFormat } from '@/utils/time'
 import WorkspaceApi from '@/api/workspace/workspace'
+import { resetUrl } from '@/utils/common'
 
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import type { TriggerData } from '@/api/type/trigger'
