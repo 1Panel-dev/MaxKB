@@ -140,20 +140,24 @@
               width="180"
             >
               <template #default="{ row }">
-                <div class="flex">
-                  <el-check-tag type="info" class="mr-8"
-                    >智能体
-                    {{
-                      row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
-                    }}</el-check-tag
-                  >
-                  <el-check-tag type="info"
-                    >工具
-                    {{
-                      row.trigger_task.filter((item: any) => item.type === 'TOOL').length
-                    }}</el-check-tag
-                  >
-                </div>
+                <el-popover>
+                  <template #reference>
+                    <div class="flex">
+                      <el-check-tag type="info" class="mr-8"
+                        >智能体
+                        {{
+                          row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
+                        }}</el-check-tag
+                      >
+                      <el-check-tag type="info"
+                        >工具
+                        {{
+                          row.trigger_task.filter((item: any) => item.type === 'TOOL').length
+                        }}</el-check-tag
+                      >
+                    </div>
+                  </template>
+                </el-popover>
               </template>
             </el-table-column>
             <el-table-column align="left" width="160" fixed="right" :label="$t('common.operation')">
