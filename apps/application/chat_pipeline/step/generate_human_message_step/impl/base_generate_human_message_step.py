@@ -71,3 +71,10 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                 data_list.append(f"<data>{content}</data>")
         data = "\n".join(data_list)
         return HumanMessage(content=prompt.replace('{data}', data).replace('{question}', problem))
+
+    def get_details(self, manage, **kwargs):
+        return {
+            'status': self.status,
+            'err_message': self.err_message,
+            'step_type': 'generate_human_message',
+        }

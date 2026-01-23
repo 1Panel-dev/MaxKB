@@ -21,6 +21,7 @@ class PipelineManage:
                  debug=False):
         # 步骤执行器
         self.step_list = [step() for step in step_list]
+        self.run_step_list = []
         # 上下文
         self.context = {'message_tokens': 0, 'answer_tokens': 0}
         self.base_to_response = base_to_response
@@ -32,12 +33,13 @@ class PipelineManage:
             for key, value in context.items():
                 self.context[key] = value
         for step in self.step_list:
+            self.run_step_list.append(step)
             step.run(self)
 
     def get_details(self):
         return reduce(lambda x, y: {**x, **y}, [{item.get('step_type'): item} for item in
                                                 filter(lambda r: r is not None,
-                                                       [row.get_details(self) for row in self.step_list])], {})
+                                                       [row.get_details(self) for row in self.run_step_list])], {})
 
     def get_base_to_response(self):
         return self.base_to_response

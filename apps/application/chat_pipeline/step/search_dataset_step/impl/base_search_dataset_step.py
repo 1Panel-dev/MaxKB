@@ -68,7 +68,8 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model, **{**default_params}))
         embedding_value = embedding_model.embed_query(exec_problem_text)
         vector = VectorStore.get_embedding_vector()
-        embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, None, exclude_document_id_list,
+        embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, None,
+                                      exclude_document_id_list,
                                       exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))
         if embedding_list is None:
             return []
@@ -132,12 +133,14 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         return paragraph_list
 
     def get_details(self, manage, **kwargs):
-        step_args = self.context['step_args']
+        step_args = self.context.get('step_args') or {}
 
         return {
+            'status': self.status,
+            'err_message': self.err_message,
             'step_type': 'search_step',
-            'paragraph_list': [row.to_dict() for row in self.context['paragraph_list']],
-            'run_time': self.context['run_time'],
+            'paragraph_list': [row.to_dict() for row in (self.context.get('paragraph_list') or [])],
+            'run_time': self.context.get('run_time') or 0,
             'problem_text': step_args.get(
                 'padding_problem_text') if 'padding_problem_text' in step_args else step_args.get('problem_text'),
             'model_name': self.context.get('model_name'),

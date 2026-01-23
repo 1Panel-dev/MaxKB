@@ -9,7 +9,7 @@
 import time
 from abc import abstractmethod
 from typing import Type
-
+import uuid_utils.compat as uuid
 from rest_framework import serializers
 
 from knowledge.models import Paragraph
@@ -128,6 +128,8 @@ class IBaseChatPipelineStep:
     def __init__(self):
         # 当前步骤上下文,用于存储当前步骤信息
         self.context = {}
+        self.status = 200
+        self.err_message = ''
 
     @abstractmethod
     def get_step_serializer(self, manage) -> Type[serializers.Serializer]:
@@ -145,12 +147,29 @@ class IBaseChatPipelineStep:
         :param manage:      步骤管理器
         :return: 执行结果
         """
-        start_time = time.time()
-        self.context['start_time'] = start_time
-        # 校验参数,
-        self.valid_args(manage)
-        self._run(manage)
-        self.context['run_time'] = time.time() - start_time
+        try:
+            start_time = time.time()
+            self.context['start_time'] = start_time
+            # 校验参数,
+            self.valid_args(manage)
+            self._run(manage)
+            self.context['run_time'] = time.time() - start_time
+        except Exception as e:
+            self.err_message = str(e)
+            self.status = 500
+            chat_record_id = manage.context.get('chat_record_id') or str(uuid.uuid7())
+            manage.context['message_tokens'] = 0
+            manage.context['answer_tokens'] = 0
+            end_time = time.time()
+            manage.context['run_time'] = end_time - (manage.context.get('start_time') or end_time)
+            post_response_handler = manage.context.get('post_response_handler')
+            post_response_handler.handler(manage.context.get('chat_id'), chat_record_id,
+                                          manage.context.get('paragraph_list') or [],
+                                          manage.context.get('problem_text'),
+                                          str(e), manage, self, manage.context.get('padding_problem_text'),
+                                          reasoning_content='')
+
+            raise e
 
     def _run(self, manage):
         pass

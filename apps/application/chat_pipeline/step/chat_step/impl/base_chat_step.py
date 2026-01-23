@@ -204,8 +204,10 @@ class BaseChatStep(IChatStep):
 
     def get_details(self, manage, **kwargs):
         return {
+            'status': self.status,
+            'err_message': self.err_message,
             'step_type': 'chat_step',
-            'run_time': self.context['run_time'],
+            'run_time': self.context.get('run_time') or 0,
             'model_id': str(manage.context['model_id']),
             'message_list': self.reset_message_list(self.context['step_args'].get('message_list'),
                                                     self.context['answer_text']),
@@ -273,7 +275,8 @@ class BaseChatStep(IChatStep):
                     if application_access_token is not None and application_access_token.authentication:
                         raise AppApiException(
                             500,
-                            _('Agent 【{name}】 access token authentication is not supported for agent tool').format(name=app.name)
+                            _('Agent 【{name}】 access token authentication is not supported for agent tool').format(
+                                name=app.name)
                         )
                 else:
                     raise AppApiException(

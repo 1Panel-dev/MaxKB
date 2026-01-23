@@ -36,7 +36,7 @@ from common.exception.app_exception import AppApiException, AppChatNumOutOfBound
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
-from common.utils.common import flat_map, get_file_content
+from common.utils.common import flat_map, get_file_content, is_valid_uuid
 from knowledge.models import Document, Paragraph
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model, Status
@@ -381,7 +381,8 @@ class ChatSerializers(serializers.Serializer):
                 return chat_record_list[-1]
         chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_info.chat_id).first()
         if chat_record is None:
-            raise ChatException(500, _("Conversation record does not exist"))
+            if not is_valid_uuid(chat_record_id):
+                raise ChatException(500, _("Conversation record does not exist"))
         chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
         return chat_record
 
@@ -406,12 +407,13 @@ class ChatSerializers(serializers.Serializer):
         history_chat_record = chat_info.chat_record_list
         if chat_record_id is not None:
             chat_record = self.get_chat_record(chat_info, chat_record_id)
-            history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
+            if chat_record:
+                history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
         work_flow = chat_info.application.work_flow
         work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
                                           {'history_chat_record': history_chat_record, 'question': message,
                                            'chat_id': chat_info.chat_id, 'chat_record_id': str(
-                                              uuid.uuid7()) if chat_record is None else str(chat_record.id),
+                                              uuid.uuid7()) if chat_record_id is None else str(chat_record_id),
                                            'stream': stream,
                                            're_chat': re_chat,
                                            'chat_user_id': chat_user_id,
