@@ -14,10 +14,12 @@ from rest_framework.views import APIView
 from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
+from trigger.serializers.task_source_trigger import TaskSourceTriggerListSerializer, TaskSourceTriggerOperateSerializer, \
+    TaskSourceTriggerSerializer
 from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSerializer
 
 from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI, TriggerBatchDeleteAPI, \
-    TriggerBatchActiveAPI
+    TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI
 from trigger.serializers.trigger import TriggerSerializer
 
 
@@ -162,3 +164,86 @@ class TriggerView(APIView):
                 'is_active': request.query_params.get('is_active'),
                 'create_user': request.query_params.get('create_user'),
             }).page(current_page, page_size))
+
+
+class TaskSourceTriggerView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_('Create trigger of source'),
+        summary=_('Create trigger of source'),
+        operation_id=_('Create trigger of source'),  # type: ignore
+        parameters=TaskSourceTriggerAPI.get_parameters(),
+        request=TaskSourceTriggerAPI.get_request(),
+        responses=TaskSourceTriggerAPI.get_response(),
+        tags=[_('Trigger')]  # type: ignore
+    )
+    def post(self, request: Request, workspace_id: str, source_type: str, source_id: str):
+        return result.success(TaskSourceTriggerSerializer(data={
+            'workspace_id': workspace_id,
+            'user_id': request.user.id
+        }).insert({**request.data, 'source_id': source_id,
+                   'source_type': source_type}))
+
+    @extend_schema(
+        methods=['GET'],
+        description=_('Get the trigger list of source'),
+        summary=_('Get the trigger list of source'),
+        operation_id=_('Get the trigger list of source'),  # type: ignore
+        parameters=TaskSourceTriggerAPI.get_parameters(),
+        responses=result.DefaultResultSerializer,
+        tags=[_('Trigger')]  # type: ignore
+    )
+    def get(self, request: Request, workspace_id: str, source_type: str, source_id: str):
+        return result.success(TaskSourceTriggerListSerializer(data={
+            'workspace_id': workspace_id,
+            'source_id': source_id,
+            'source_type': source_type,
+        }).list())
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['GET'],
+            description=_('Get Task source trigger details'),
+            summary=_('Get Task source trigger details'),
+            operation_id=_('Get Task source trigger details'),  # type: ignore
+            parameters=TaskSourceTriggerOperateAPI.get_parameters(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def get(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
+            return result.success(TaskSourceTriggerOperateSerializer(
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id,
+                      'source_id': source_id, 'source_type': source_type}
+            ).one())
+
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_('Modify the task source trigger'),
+            summary=_('Modify the task source trigger'),
+            operation_id=_('Modify the task source trigger'),  # type: ignore
+            parameters=TaskSourceTriggerOperateAPI.get_parameters(),
+            request=TaskSourceTriggerOperateAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def get(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
+            return result.success(TaskSourceTriggerOperateSerializer(
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id,
+                      'source_id': source_id, 'source_type': source_type}
+            ).edit(request.data))
+
+
+
+
+
+
+
+
+
+
+

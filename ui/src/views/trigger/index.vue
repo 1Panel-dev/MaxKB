@@ -143,13 +143,25 @@
                 <el-popover>
                   <template #reference>
                     <div class="flex">
-                      <el-check-tag type="info" class="mr-8">
+                      <el-check-tag
+                        type="info"
+                        class="mr-8"
+                        v-if="
+                          row.trigger_task.filter((item: any) => item.type === 'APPLICATION')
+                            .length !== 0
+                        "
+                      >
                         智能体
                         {{
                           row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
                         }}
                       </el-check-tag>
-                      <el-check-tag type="info">
+                      <el-check-tag
+                        type="info"
+                        v-if="
+                          row.trigger_task.filter((item: any) => item.type === 'TOOL').length !== 0
+                        "
+                      >
                         工具
                         {{ row.trigger_task.filter((item: any) => item.type === 'TOOL').length }}
                       </el-check-tag>
@@ -158,7 +170,13 @@
 
                   <div>
                     <!-- 智能体部分 -->
-                    <div class="color-secondary mb-8">
+                    <div
+                      class="color-secondary mb-8"
+                      v-if="
+                        row.trigger_task.filter((item: any) => item.type === 'APPLICATION')
+                          .length !== 0
+                      "
+                    >
                       智能体
                       {{
                         row.trigger_task.filter((item: any) => item.type === 'APPLICATION').length
@@ -176,11 +194,20 @@
                       </el-avatar>
                       <span>{{ item.name }}</span>
                     </div>
-
-                    <el-divider class="mt-8 mb-8" />
-
+                    <el-divider
+                      class="mt-8 mb-8"
+                      v-if="
+                        row.trigger_task.some((item: any) => item.type === 'APPLICATION') &&
+                        row.trigger_task.some((item: any) => item.type === 'TOOL')
+                      "
+                    />
                     <!-- 工具部分 -->
-                    <div class="color-secondary mb-8">
+                    <div
+                      class="color-secondary mb-8"
+                      v-if="
+                        row.trigger_task.filter((item: any) => item.type === 'TOOL').length !== 0
+                      "
+                    >
                       工具 {{ row.trigger_task.filter((item: any) => item.type === 'TOOL').length }}
                     </div>
                     <div

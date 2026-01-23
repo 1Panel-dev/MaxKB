@@ -461,17 +461,26 @@ class TriggerOperateSerializer(serializers.Serializer):
         workspace_id = self.data.get('workspace_id')
         trigger = QuerySet(Trigger).filter(workspace_id=workspace_id, id=trigger_id).first()
 
-        trigger_tasks = QuerySet(TriggerTask).filter(trigger_id=trigger_id)
-        application_ids = [str(task.source_id) for task in trigger_tasks if
-                           task.source_type == TriggerTaskTypeChoices.APPLICATION]
-        tool_ids = [str(task.source_id) for task in trigger_tasks if task.source_type == TriggerTaskTypeChoices.TOOL]
+        trigger_tasks = list(QuerySet(TriggerTask).filter(trigger_id=trigger_id))
 
-        trigger_task_list = [TriggerTaskModelSerializer(task).data for task in trigger_tasks]
-        application_task_list = [ApplicationTriggerTaskSerializer(application).data for application in
-                                 QuerySet(Application).filter(workspace_id=workspace_id, id__in=application_ids)]
+        application_ids = []
+        tool_ids = []
+        for task in trigger_tasks:
+            if task.source_type == TriggerTaskTypeChoices.APPLICATION:
+                application_ids.append(task.source_id)
+            elif task.source_type == TriggerTaskTypeChoices.TOOL:
+                tool_ids.append(task.source_id)
 
-        tool_task_list = [ToolTriggerTaskSerializer(tool).data for tool in
-                          QuerySet(Tool).filter(workspace_id=workspace_id, id__in=tool_ids)]
+        trigger_task_list = TriggerTaskModelSerializer(trigger_tasks, many=True).data
+
+        application_task_list = []
+        if application_ids:
+            applications =Application.objects.filter(workspace_id=workspace_id, id__in=application_ids)
+            application_task_list = ApplicationTriggerTaskSerializer(applications, many=True).data
+        tool_task_list = []
+        if tool_ids:
+            tools = Tool.objects.filter(workspace_id=workspace_id, id__in=tool_ids)
+            tool_task_list = ToolTriggerTaskSerializer(tools, many=True).data
 
         return {
             **TriggerModelSerializer(trigger).data,
