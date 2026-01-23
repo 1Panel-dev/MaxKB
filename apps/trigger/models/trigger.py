@@ -52,3 +52,4 @@ class TriggerTask(AppModelMixin):
 
     class Meta:
         db_table = "event_trigger_task"
+        unique_together = [('trigger', 'source_id', 'source_type')]

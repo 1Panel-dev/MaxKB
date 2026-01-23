@@ -30,6 +30,20 @@ from trigger.serializers.trigger import TriggerModelSerializer, TriggerSerialize
     ToolTriggerTaskSerializer, TriggerTaskModelSerializer
 
 
+class TaskSourceTriggerTaskEditRequest(serializers.Serializer):
+    meta = serializers.DictField(default=dict, required=False)
+    parameter = serializers.DictField(default=dict, required=False)
+
+
+class TaskSourceTriggerEditRequest(serializers.Serializer):
+    name = serializers.CharField(required=False, label=_('trigger name'))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('trigger description'))
+    trigger_type = serializers.ChoiceField(required=False, choices=TriggerTypeChoices)
+    trigger_setting = serializers.DictField(required=False, label=_("trigger setting"))
+    meta = serializers.DictField(default=dict, required=False)
+    trigger_task = TaskSourceTriggerTaskEditRequest(many=True, required=False)
+
+
 class TaskSourceTriggerSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     user_id = serializers.UUIDField(required=True, label=_("User ID"))
@@ -42,7 +56,6 @@ class TaskSourceTriggerSerializer(serializers.Serializer):
 
 class TaskSourceTriggerOperateSerializer(serializers.Serializer):
     trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
-    user_id = serializers.UUIDField(required=True, label=_("User ID"))
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
     source_type = serializers.CharField(required=True, label=_('source type'))
     source_id = serializers.CharField(required=True, label=_('source id'))
@@ -85,14 +98,49 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
                 'application_task': tool_task,
             }
 
-    def edit(self, instance: Dict, with_valid = True):
+    @transaction.atomic
+    def edit(self, instance: Dict, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
+        serializer = TaskSourceTriggerEditRequest(data=instance)
+        serializer.is_valid(raise_exception=True)
+        valid_data = serializer.validated_data
+        trigger_id = self.data.get('trigger_id')
+        workspace_id = self.data.get('workspace_id')
 
+        trigger = Trigger.objects.filter(workspace_id=workspace_id, id=trigger_id).first()
+        if not trigger:
+            raise serializers.ValidationError(_('Trigger not found'))
+        task_source_trigger_edit_field_list = ['name', 'desc', 'trigger_type', 'trigger_setting', 'meta']
 
+        for field in task_source_trigger_edit_field_list:
+            if field in valid_data:
+                setattr(trigger, field, valid_data.get(field))
+        trigger.save()
 
+        return self.one()
 
+    # 删除的是当前trigger_id+source_id+source_type对应的task
+    @transaction.atomic
+    def delete(self):
+        self.is_valid(raise_exception=True)
+        trigger_id = self.data.get('trigger_id')
+        workspace_id = self.data.get('workspace_id')
+        source_id = self.data.get('source_id')
+        source_type = self.data.get('source_type')
 
+        trigger = Trigger.objects.filter(workspace_id=workspace_id,id=trigger_id).first()
+        if not trigger:
+            raise AppApiException(404, _('Trigger not found'))
+        delete_count = TriggerTask.objects.filter(trigger_id=trigger_id, source_id=source_id,
+                                                     source_type=source_type).delete()[0]
+        if delete_count == 0:
+            raise AppApiException(404, _('Task not found'))
+        has_other_tasks = TriggerTask.objects.filter(trigger_id=trigger_id).exists()
+
+        if not has_other_tasks:
+            trigger.delete()
+        return True
 
 class TaskSourceTriggerListSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))

@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Application
-from common.db.search import page_search, get_dynamics_model, native_page_search, native_search
+from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.exception.app_exception import AppApiException
 from common.field.common import ObjectField
 from common.utils.common import get_file_content
@@ -327,24 +327,26 @@ class TriggerSerializer(serializers.Serializer):
     def insert(self, instance, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-            TriggerCreateRequest(data=instance).is_valid(raise_exception=True)
+        serializer = TriggerCreateRequest(data=instance)
+        serializer.is_valid(raise_exception=True)
+        valid_data = serializer.validated_data
 
-        trigger_id = instance.get('id') if instance.get('id') else uuid.uuid7()
+        trigger_id = valid_data.get('id') if valid_data.get('id') else uuid.uuid7()
 
         trigger_model = Trigger(
             id=trigger_id,
-            name=instance.get('name'),
+            name=valid_data.get('name'),
             workspace_id=self.data.get('workspace_id'),
-            desc=instance.get('desc') or '',
-            trigger_type=instance.get('trigger_type'),
-            trigger_setting=instance.get('trigger_setting'),
-            meta=instance.get('meta', {}),
+            desc=valid_data.get('desc') or '',
+            trigger_type=valid_data.get('trigger_type'),
+            trigger_setting=valid_data.get('trigger_setting'),
+            meta=valid_data.get('meta', {}),
             is_active=False,
             user_id=self.data.get('user_id'),
         )
         trigger_model.save()
 
-        trigger_tasks = instance.get('trigger_task')
+        trigger_tasks = valid_data.get('trigger_task')
         if trigger_tasks:
             trigger_task_models = [
                 self.to_trigger_task_model(trigger_id, task) for task in
@@ -420,7 +422,7 @@ class TriggerOperateSerializer(serializers.Serializer):
             self.is_valid()
             TriggerEditRequest(data=instance).is_valid(raise_exception=True)
         trigger_id = self.data.get('trigger_id')
-        trigger = Trigger.objects.filter(id=trigger_id).first()
+        trigger = Trigger.objects.filter(workspace_id=self.data.get('workspace_id') ,id=trigger_id).first()
         if not trigger:
             raise serializers.ValidationError(_('Trigger not found'))
 

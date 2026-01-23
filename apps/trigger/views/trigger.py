@@ -216,7 +216,7 @@ class TaskSourceTriggerView(APIView):
         )
         def get(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
-                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id,
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
                       'source_id': source_id, 'source_type': source_type}
             ).one())
 
@@ -231,11 +231,26 @@ class TaskSourceTriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
-        def get(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
+        def put(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
-                data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id,
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
                       'source_id': source_id, 'source_type': source_type}
             ).edit(request.data))
+
+        @extend_schema(
+            methods=['DELETE'],
+            description=_('Delete the task source trigger'),
+            summary=_('Delete the task source trigger'),
+            operation_id=_('Delete the task source trigger'),  # type: ignore
+            parameters=TaskSourceTriggerOperateAPI.get_parameters(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Trigger')]  # type: ignore
+        )
+        def delete(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
+            return result.success(TaskSourceTriggerOperateSerializer(
+                data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
+                      'source_id': source_id, 'source_type': source_type}
+            ).delete())
 
 
 
