@@ -151,7 +151,6 @@ class TriggerEditRequest(serializers.Serializer):
     trigger_type = serializers.ChoiceField(required=False, choices=TriggerTypeChoices)
     trigger_setting = serializers.DictField(required=False, label=_("trigger setting"))
     meta = serializers.DictField(default=dict, required=False)
-    is_active = serializers.BooleanField(required=False, label=_('Is active'))
     trigger_task = TriggerTaskEditRequest(many=True, required=False)
 
 
@@ -341,7 +340,7 @@ class TriggerSerializer(serializers.Serializer):
             trigger_type=valid_data.get('trigger_type'),
             trigger_setting=valid_data.get('trigger_setting'),
             meta=valid_data.get('meta', {}),
-            is_active=False,
+            is_active=valid_data.get('is_active') or False ,
             user_id=self.data.get('user_id'),
         )
         trigger_model.save()
@@ -358,17 +357,36 @@ class TriggerSerializer(serializers.Serializer):
 
         return TriggerResponse(trigger_model).data
 
-    @staticmethod
-    def to_trigger_task_model(trigger_id: str, task_data: dict):
+    def to_trigger_task_model(self, trigger_id: str, task_data: dict):
+        source_type = task_data.get('source_type')
+        source_id = task_data.get('source_id')
+        is_active = self.is_active_source(source_type,source_id)
         return TriggerTask(
             id=uuid.uuid7(),
             trigger_id=trigger_id,
-            source_type=task_data.get('source_type'),
-            source_id=task_data.get('source_id'),
-            is_active=task_data.get('is_active', False),
+            source_type=source_type,
+            source_id=source_id,
+            is_active=is_active,
             parameter=task_data.get('parameter', {}),
             meta=task_data.get('meta', {})
         )
+
+    @staticmethod
+    def is_active_source(source_type: str, source_id: str):
+
+        config = {
+            TriggerTaskTypeChoices.APPLICATION: (Application, 'is_publish'),
+            TriggerTaskTypeChoices.TOOL: (Tool, 'is_active'),
+        }
+        if source_type not in config:
+            raise AppApiException(500, _('Error source type'))
+        source_model,field= config.get(TriggerTaskTypeChoices(source_type))
+        source = QuerySet(source_model).filter(id=source_id).first()
+        if not source:
+            raise AppApiException(500, _(f'{source_type} id does not exist'))
+
+        return getattr(source,field)
+
 
     class Batch(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
