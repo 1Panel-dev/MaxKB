@@ -48,7 +48,7 @@ class TriggerTask(AppModelMixin):
     source_type = models.CharField(verbose_name="触发器任务类型", choices=TriggerTaskTypeChoices.choices,
                                    default=TriggerTaskTypeChoices.APPLICATION, max_length=256
                                    )
-    source_id = models.UUIDField(verbose_name="资源id", blank=True, null=True)
+    source_id = models.UUIDField(verbose_name="资源id")
     is_active = models.BooleanField(default=True, db_index=True)
     parameter = models.JSONField(default=list)
     meta = models.JSONField(default=dict)
@@ -60,10 +60,15 @@ class TriggerTask(AppModelMixin):
 
 class TaskRecord(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+
+    trigger = models.ForeignKey(Trigger, on_delete=models.CASCADE)
+
+    trigger_task = models.ForeignKey(TriggerTask, on_delete=models.CASCADE)
+
     source_type = models.CharField(verbose_name="触发器任务类型", choices=TriggerTaskTypeChoices.choices,
                                    default=TriggerTaskTypeChoices.APPLICATION, max_length=256)
-    source_id = models.UUIDField(verbose_name="资源id", blank=True, null=True)
-    task_record_id = models.UUIDField(verbose_name="任务记录id", blank=True, null=True)
+    source_id = models.UUIDField(verbose_name="资源id")
+    task_record_id = models.UUIDField(verbose_name="任务记录id")
     meta = models.JSONField(default=dict, encoder=SystemEncoder)
     state = models.CharField(verbose_name='状态', max_length=20,
                              choices=State.choices,

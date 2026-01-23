@@ -259,6 +259,7 @@
                     </el-button>
                   </span>
                 </el-tooltip>
+
                 <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
                   <span class="mr-4">
                     <el-button type="primary" text @click="deleteTrigger(row)">
@@ -273,10 +274,11 @@
       </div>
     </el-card>
     <TriggerDrawer @refresh="getList()" ref="triggerDrawerRef"></TriggerDrawer>
+    <TriggerTaskRecordDrawer ref="triggerTaskRecordDrawerRef"></TriggerTaskRecordDrawer>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted,  computed } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { ElTable } from 'element-plus'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -284,6 +286,7 @@ import useStore from '@/stores'
 import triggerAPI from '@/api/trigger/trigger'
 import { TriggerType } from '@/enums/trigger'
 import { t } from '@/locales'
+import TriggerTaskRecordDrawer from './component/TriggerTaskRecordDrawer.vue'
 import permissionMap from '@/permission'
 import { datetimeFormat } from '@/utils/time'
 import WorkspaceApi from '@/api/workspace/workspace'
@@ -293,6 +296,9 @@ import type { TriggerData } from '@/api/type/trigger'
 import TriggerDrawer from '@/views/trigger/component/TriggerDrawer.vue'
 
 const { user } = useStore()
+
+const triggerTaskRecordDrawerRef = ref<InstanceType<typeof TriggerTaskRecordDrawer>>()
+
 const triggerDrawerRef = ref<InstanceType<typeof TriggerDrawer>>()
 const openCreateTriggerDrawer = () => {
   triggerDrawerRef.value?.open()
@@ -302,7 +308,7 @@ const openEditTriggerDrawer = (trigger: any) => {
 }
 
 const openExecutionRecordDrawer = (trigger: any) => {
-
+  triggerTaskRecordDrawerRef.value?.open(trigger.id)
 }
 
 const loading = ref(false)
