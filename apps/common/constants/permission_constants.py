@@ -576,7 +576,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_CREATE = Permission(
         group=Group.TOOL_FOLDER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     TOOL_FOLDER_EDIT = Permission(
         group=Group.TOOL_FOLDER, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -650,7 +650,7 @@ class PermissionConstants(Enum):
     )
     KNOWLEDGE_FOLDER_CREATE = Permission(
         group=Group.KNOWLEDGE_FOLDER, operate=Operate.CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_FOLDER_EDIT = Permission(
