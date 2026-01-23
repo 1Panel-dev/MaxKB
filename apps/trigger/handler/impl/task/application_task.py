@@ -6,11 +6,15 @@
     @date：2026/1/14 19:14
     @desc:
 """
-import uuid
 
-from application.models import ChatUserType, Chat
+import uuid_utils.compat as uuid
+from django.db.models import QuerySet
+
+from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices
 from chat.serializers.chat import ChatSerializers
+from knowledge.models import State
 from trigger.handler.base_task import BaseTriggerTask
+from trigger.models import TaskRecord
 
 
 def get_reference(fields, obj):
@@ -43,13 +47,32 @@ def get_application_execute_parameters(parameter_setting, kwargs):
             parameters[field] = get_field_value(field_setting, kwargs)
     api_input_field_list = parameter_setting.get('api_input_field_list')
     if api_input_field_list:
-        for key, value in api_input_field_list.item():
+        for key, value in api_input_field_list.items():
             parameters['form_data'][key] = get_field_value(value, kwargs)
     user_input_field_list = parameter_setting.get('user_input_field_list')
     if user_input_field_list:
-        for key, value in user_input_field_list.item():
+        for key, value in user_input_field_list.items():
             parameters['form_data'][key] = get_field_value(value, kwargs)
     return parameters
+
+
+def get_loop_workflow_node(node_list):
+    result = []
+    for item in node_list:
+        if item.get('type') == 'loop-node':
+            for loop_item in item.get('loop_node_data') or []:
+                for inner_item in loop_item.values():
+                    result.append(inner_item)
+    return result
+
+
+def get_workflow_state(details):
+    node_list = details.values()
+    all_node = [*node_list, *get_loop_workflow_node(node_list)]
+    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
+    if err:
+        return State.FAILURE
+    return State.SUCCESS
 
 
 class ApplicationTask(BaseTriggerTask):
@@ -61,8 +84,10 @@ class ApplicationTask(BaseTriggerTask):
         parameters = get_application_execute_parameters(parameter_setting, kwargs)
         parameters['re_chat'] = False
         parameters['stream'] = True
-        chat_id = uuid.uuid1()
-        chat_user_id = str(uuid.uuid1())
+        chat_id = uuid.uuid7()
+        chat_user_id = str(uuid.uuid7())
+        chat_record_id = str(uuid.uuid7())
+        parameters['chat_record_id'] = chat_record_id
         application_id = trigger_task.get('source_id')
         message = parameters.get('message')
         Chat.objects.get_or_create(id=chat_id, defaults={
@@ -70,13 +95,28 @@ class ApplicationTask(BaseTriggerTask):
             'abstract': message,
             'chat_user_id': chat_user_id,
             'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
-            'asker': {'username': "游客"}
+            'asker': {'username': "游客"},
+            'source': {
+                'type': ChatSourceChoices.TRIGGER.value
+            },
         })
-
-        list(ChatSerializers(data={
-            "chat_id": chat_id,
-            "chat_user_id": chat_user_id,
-            'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
-            'application_id': application_id,
-            'debug': False
-        }).chat(instance=parameters))
+        task_record_id = uuid.uuid7()
+        TaskRecord(id=task_record_id, source_type="APPLICATION", source_id=application_id,
+                   task_record_id=chat_record_id,
+                   meta={'chat_id': chat_id},
+                   state=State.STARTED).save()
+        try:
+            list(ChatSerializers(data={
+                "chat_id": chat_id,
+                "chat_user_id": chat_user_id,
+                'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
+                'application_id': application_id,
+                'source': {
+                    'type': ChatSourceChoices.TRIGGER.value
+                },
+                'debug': False
+            }).chat(instance=parameters))
+        finally:
+            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
+            state = get_workflow_state(chat_record.details)
+            QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=chat_record.run_time)

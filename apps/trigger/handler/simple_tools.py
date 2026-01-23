@@ -6,6 +6,8 @@
     @date：2026/1/14 19:18
     @desc:
 """
+from threading import Thread
+
 from trigger.handler.impl.task.application_task import ApplicationTask
 from trigger.handler.impl.trigger.scheduled_trigger import ScheduledTrigger
 
@@ -23,7 +25,8 @@ def execute(trigger_task, **kwargs):
     """
     for simple_task_handler in simple_task_handlers:
         if simple_task_handler.support(trigger_task, **kwargs):
-            return simple_task_handler.execute(trigger_task, **kwargs)
+            Thread(target=simple_task_handler.execute, args=(trigger_task,), kwargs=kwargs).start()
+            return
     raise Exception("不支持的处理器类型")
 
 
