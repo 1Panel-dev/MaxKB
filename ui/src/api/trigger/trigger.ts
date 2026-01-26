@@ -184,6 +184,69 @@ const postResourceTrigger: (
     loading,
   )
 }
+
+/**
+ * 资源端触发器列表
+ * @param source_type 
+ * @param source_id 
+ * @param loading 
+ * @returns 
+ */
+const getResourceTriggerList: (
+  source_type: string,
+  resource_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (source_type, source_id, loading) => {
+  return get(
+    `${prefixWorkspace.value}/${source_type}/${source_id}/trigger`,
+    undefined,
+    loading
+  )
+}
+
+/**
+ * 资源端触发器详情
+ * @param source_type 
+ * @param source_id 
+ * @param trigger_id 
+ * @param loading 
+ * @returns 
+ */
+const getResourceTriggerDetail: (
+    source_type: string,
+  resource_id: string,
+  trigger_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (source_type, source_id, trigger_id, loading) => {
+  return get(
+    `${prefixWorkspace.value}/${source_type}/${source_id}/trigger/${trigger_id}`,
+    undefined,
+    loading
+  )
+}
+
+/**
+ * 资源端删除触发器
+ * @param source_type 
+ * @param source_id 
+ * @param trigger_id 
+ * @param loading 
+ * @returns 
+ */
+const deleteResourceTrigger: (
+    source_type: string,
+  resource_id: string,
+  trigger_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (source_type, source_id, trigger_id, loading) => {
+  return del(
+    `${prefixWorkspace.value}/${source_type}/${source_id}/trigger/${trigger_id}`,
+    undefined,
+    {},
+    loading
+  )
+}
+
 /**
  * 资源端修改触发器
  * @param source_type 资源类型
@@ -221,4 +284,7 @@ export default {
   getTriggerTaskRecordDetails,
   postResourceTrigger,
   putResourceTrigger,
+  getResourceTriggerList,
+  getResourceTriggerDetail,
+  deleteResourceTrigger
 }
