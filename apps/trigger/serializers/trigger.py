@@ -25,7 +25,7 @@ from common.utils.common import get_file_content
 from knowledge.serializers.common import BatchSerializer
 from maxkb.conf import PROJECT_DIR
 from tools.models import Tool
-from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
+from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask, TaskRecord
 
 
 class BatchActiveSerializer(serializers.Serializer):
@@ -401,7 +401,7 @@ class TriggerSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             trigger_id_list = instance.get("id_list")
-
+            TaskRecord.objects.filter(trigger_id__in=trigger_id_list).delete()
             TriggerTask.objects.filter(trigger_id__in=trigger_id_list).delete()
             Trigger.objects.filter(workspace_id=workspace_id, id__in=trigger_id_list).delete()
 
@@ -469,6 +469,7 @@ class TriggerOperateSerializer(serializers.Serializer):
     def delete(self):
         self.is_valid(raise_exception=True)
         trigger_id = self.data.get('trigger_id')
+        TaskRecord.objects.filter(trigger_id=trigger_id).delete()
         TriggerTask.objects.filter(trigger_id=trigger_id).delete()
         Trigger.objects.filter(id=trigger_id).delete()
         return True
