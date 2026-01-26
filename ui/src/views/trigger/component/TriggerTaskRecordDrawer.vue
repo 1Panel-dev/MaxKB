@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="drawer" title="执行记录" direction="rtl" :before-close="close">
+  <el-drawer v-model="drawer" title="执行记录" direction="rtl" size="800px" :before-close="close">
     <div class="lighter mb-12">
       {{ $t('views.system.resourceMapping.sub_title') }}
     </div>
@@ -54,7 +54,6 @@
         <template #default="{ row }">
           <el-button link>
             <div class="flex align-center">
-              <KnowledgeIcon class="mr-8" :size="22" :type="row.icon" />
               <el-avatar shape="square" :size="22" style="background: none" class="mr-8">
                 <img
                   v-if="row.source_type === 'TOOL'"
@@ -68,17 +67,12 @@
                 />
               </el-avatar>
 
-              <span>{{ row.name }}</span>
+              <span>{{ row.source_name }}</span>
             </div>
           </el-button>
         </template>
       </el-table-column>
-      <el-table-column
-        prop="desc"
-        min-width="120"
-        show-overflow-tooltip
-        :label="$t('common.desc')"
-      />
+
       <el-table-column
         prop="source_type"
         min-width="120"
@@ -94,12 +88,56 @@
         </template>
       </el-table-column>
 
+      <el-table-column prop="state" :label="$t('common.status.label')" width="180">
+        <template #default="{ row }">
+          <el-text class="color-text-primary" v-if="row.state === 'SUCCESS'">
+            <el-icon class="color-success"><SuccessFilled /></el-icon>
+            {{ $t('common.status.success') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'FAILURE'">
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+            {{ $t('common.status.fail') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKED'">
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+            {{ $t('common.status.REVOKED') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKE'">
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
+            {{ $t('common.status.REVOKE') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else>
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
+            {{ $t('common.status.STARTED') }}
+          </el-text>
+        </template>
+      </el-table-column>
+      <el-table-column prop="run_time" :label="$t('chat.KnowledgeSource.consumeTime')">
+        <template #default="{ row }">
+          {{ row.run_time != undefined ? row.run_time?.toFixed(2) + 's' : '-' }}
+        </template>
+      </el-table-column>
       <el-table-column
-        prop="username"
-        min-width="120"
-        show-overflow-tooltip
-        :label="$t('common.creator')"
-      />
+        prop="create_time"
+        :label="$t('chat.executionDetails.createTime')"
+        width="180"
+      >
+        <template #default="{ row }">
+          {{ datetimeFormat(row.create_time) }}
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="$t('common.operation')" width="90">
+        <template #default="{ row }">
+          <div class="flex">
+            <el-tooltip effect="dark" :content="$t('chat.executionDetails.title')" placement="top">
+              <el-button type="primary" text @click.stop="toDetails(row)">
+                <AppIcon iconName="app-operate-log"></AppIcon>
+              </el-button>
+            </el-tooltip>
+          </div>
+        </template>
+      </el-table-column>
     </app-table>
   </el-drawer>
 </template>
@@ -107,6 +145,8 @@
 import { ref, reactive } from 'vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import triggerAPI from '@/api/trigger/trigger'
+import { datetimeFormat } from '@/utils/time'
+const toDetails = (row: any) => {}
 const searchType = ref<string>('name')
 const drawer = ref<boolean>(false)
 const paginationConfig = reactive({

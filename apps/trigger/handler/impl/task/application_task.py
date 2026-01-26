@@ -12,7 +12,8 @@ from django.db.models import QuerySet
 
 from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices
 from chat.serializers.chat import ChatSerializers
-from knowledge.models import State
+from knowledge.models.knowledge_action import State
+
 from trigger.handler.base_task import BaseTriggerTask
 from trigger.models import TaskRecord
 
@@ -101,7 +102,9 @@ class ApplicationTask(BaseTriggerTask):
             },
         })
         task_record_id = uuid.uuid7()
-        TaskRecord(id=task_record_id, source_type="APPLICATION", source_id=application_id,
+        TaskRecord(id=task_record_id, trigger_id=trigger_task.get('trigger'), trigger_task_id=trigger_task.get('id'),
+                   source_type="APPLICATION",
+                   source_id=application_id,
                    task_record_id=chat_record_id,
                    meta={'chat_id': chat_id},
                    state=State.STARTED).save()
@@ -116,7 +119,9 @@ class ApplicationTask(BaseTriggerTask):
                 },
                 'debug': False
             }).chat(instance=parameters))
-        finally:
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
             state = get_workflow_state(chat_record.details)
             QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=chat_record.run_time)
+        except Exception as e:
+            state = State.FAILURE
+            QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=0)
