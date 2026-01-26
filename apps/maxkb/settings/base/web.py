@@ -66,7 +66,10 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': ['common.auth.authenticate.AnonymousAuthentication']
 }
-STATICFILES_DIRS = [(os.path.join(PROJECT_DIR, 'ui', 'dist', 'admin'))]
+STATICFILES_DIRS = [
+    ('admin', os.path.join(PROJECT_DIR, 'ui', 'dist', 'admin')),
+    ('chat', os.path.join(PROJECT_DIR, 'ui', 'dist', 'chat')),
+]
 STATIC_ROOT = os.path.join(BASE_DIR.parent, 'static')
 ROOT_URLCONF = 'maxkb.urls'
 APPS_DIR = os.path.join(PROJECT_DIR, 'apps')

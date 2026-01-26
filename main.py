@@ -80,7 +80,9 @@ def dev():
 
 if __name__ == '__main__':
     os.environ['HF_HOME'] = '/opt/maxkb-app/model/base'
-    os.environ['TMPDIR'] = '/opt/maxkb-app/tmp'
+    tmpdir = os.environ.get('TMPDIR') or os.path.join(BASE_DIR, 'tmp')
+    os.environ['TMPDIR'] = tmpdir
+    os.makedirs(tmpdir, exist_ok=True)
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;
