@@ -9,11 +9,12 @@
 from threading import Thread
 
 from trigger.handler.impl.task.application_task import ApplicationTask
+from trigger.handler.impl.trigger.event_trigger import EventTrigger
 from trigger.handler.impl.trigger.scheduled_trigger import ScheduledTrigger
 
 simple_task_handlers = [ApplicationTask()]
 
-simple_trigger_handlers = [ScheduledTrigger()]
+simple_trigger_handlers = [ScheduledTrigger(), EventTrigger()]
 
 
 def execute(trigger_task, **kwargs):
