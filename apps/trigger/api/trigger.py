@@ -12,6 +12,7 @@ from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from knowledge.serializers.common import BatchSerializer
+from trigger.serializers.task_source_trigger import TaskSourceTriggerEditRequest
 from trigger.serializers.trigger import TriggerCreateRequest, TriggerResponse, BatchActiveSerializer
 
 
@@ -197,3 +198,7 @@ class TaskSourceTriggerOperateAPI(APIMixin):
                 required=True,
             ),
         ]
+
+    @staticmethod
+    def get_request():
+        return TaskSourceTriggerEditRequest
