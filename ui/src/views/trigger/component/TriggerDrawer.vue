@@ -258,7 +258,7 @@
                     </span>
                     <span class="mr-4">
                       <el-button text>
-                        <el-icon><Close /></el-icon>
+                        <el-icon><Close @click="deleteTask(item)" /></el-icon>
                       </el-button>
                     </span>
                   </div>
@@ -290,7 +290,7 @@
             </div>
           </div>
           <div class="w-full" v-if="collapseData.tool">
-            <template v-for="(item, index) in toolDetailsDict" :key="index">
+            <template v-for="(item, index) in toolTask" :key="index">
               <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px 5px">
                 <div class="flex-between">
                   <div class="flex align-center" style="line-height: 20px">
@@ -325,7 +325,7 @@
                     </span>
                     <span class="mr-4">
                       <el-button text>
-                        <el-icon><Close /></el-icon>
+                        <el-icon><Close @click="deleteTask(item)" /></el-icon>
                       </el-button>
                     </span>
                   </div>
@@ -422,6 +422,11 @@ const applicationTask = computed(() => {
 const toolTask = computed(() => {
   return form.value.trigger_task.filter((task: any) => task.source_type === 'TOOL')
 })
+const deleteTask = (task: any) => {
+  form.value.trigger_task = form.value.trigger_task.filter(
+    (t: any) => !(t.source_type === task.source_type && t.source_id === task.source_id),
+  )
+}
 const applicationParameterRef = ref<Array<InstanceType<typeof ApplicationParameter>>>()
 const toolParameterRef = ref<Array<InstanceType<typeof ToolParameter>>>()
 const toolRefresh = (tool_selected: any) => {
