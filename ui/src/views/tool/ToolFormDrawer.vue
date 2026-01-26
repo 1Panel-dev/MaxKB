@@ -307,11 +307,13 @@ const createTrigger = (trigger: any) => {
   if (form.value?.id) {
     return triggerAPI.postResourceTrigger('TOOL', form.value?.id, trigger)
   }
+  return Promise.resolve<any>({})
 }
 const editTrigger = (trigger_id: string, trigger: any) => {
   if (form.value?.id) {
     return triggerAPI.putResourceTrigger('TOOL', form.value?.id, trigger_id, trigger)
   }
+  return Promise.resolve<any>({})
 }
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
