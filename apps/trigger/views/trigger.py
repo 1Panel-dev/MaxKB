@@ -14,12 +14,13 @@ from rest_framework.views import APIView
 from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
+from common.result import DefaultResultSerializer
 from trigger.serializers.task_source_trigger import TaskSourceTriggerListSerializer, TaskSourceTriggerOperateSerializer, \
     TaskSourceTriggerSerializer
 from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSerializer
 
 from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI, TriggerBatchDeleteAPI, \
-    TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI
+    TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI, TaskSourceTriggerCreateAPI
 from trigger.serializers.trigger import TriggerSerializer
 
 
@@ -171,12 +172,12 @@ class TaskSourceTriggerView(APIView):
 
     @extend_schema(
         methods=['POST'],
-        description=_('Create trigger of source'),
-        summary=_('Create trigger of source'),
-        operation_id=_('Create trigger of source'),  # type: ignore
-        parameters=TaskSourceTriggerAPI.get_parameters(),
-        request=TaskSourceTriggerAPI.get_request(),
-        responses=TaskSourceTriggerAPI.get_response(),
+        description=_('Create trigger in source'),
+        summary=_('Create trigger in source'),
+        operation_id=_('Create trigger in source'),  # type: ignore
+        parameters=TaskSourceTriggerCreateAPI.get_parameters(),
+        request=TaskSourceTriggerCreateAPI.get_request(),
+        responses=TaskSourceTriggerCreateAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     def post(self, request: Request, workspace_id: str, source_type: str, source_id: str):
@@ -184,6 +185,7 @@ class TaskSourceTriggerView(APIView):
             'workspace_id': workspace_id,
             'user_id': request.user.id
         }).insert({**request.data, 'source_id': source_id,
+                   'workspace_id': workspace_id,
                    'source_type': source_type}))
 
     @extend_schema(
@@ -192,7 +194,7 @@ class TaskSourceTriggerView(APIView):
         summary=_('Get the trigger list of source'),
         operation_id=_('Get the trigger list of source'),  # type: ignore
         parameters=TaskSourceTriggerAPI.get_parameters(),
-        responses=result.DefaultResultSerializer,
+        responses=DefaultResultSerializer,
         tags=[_('Trigger')]  # type: ignore
     )
     def get(self, request: Request, workspace_id: str, source_type: str, source_id: str):

@@ -25,7 +25,7 @@ class TriggerCreateAPI(APIMixin):
                 type=OpenApiTypes.STR,
                 location='path',
                 required=True,
-            )
+            ),
         ]
 
     @staticmethod
@@ -35,6 +35,44 @@ class TriggerCreateAPI(APIMixin):
     @staticmethod
     def get_response():
         return TriggerResponse
+
+class TaskSourceTriggerCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="source_id",
+                description="资源id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+            OpenApiParameter(
+                name="source_type",
+                description="资源类型",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return TriggerCreateRequest
+
+    @staticmethod
+    def get_response():
+        return TriggerResponse
+
+
+
 
 class TriggerBatchDeleteAPI(APIMixin):
     @staticmethod

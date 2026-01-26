@@ -51,12 +51,18 @@ class TaskSourceTriggerSerializer(serializers.Serializer):
     def insert(self, instance, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        return TriggerSerializer().insert(instance, with_valid=True)
+        if not len(instance.get("trigger_task")) == 1:
+            raise AppApiException(500, _('Trigger task number must be one'))
+
+        return TriggerSerializer(data={
+            'workspace_id': self.data.get('workspace_id'),
+            'user_id': self.data.get('user_id')
+        }).insert(instance, with_valid=True)
 
 
 class TaskSourceTriggerOperateSerializer(serializers.Serializer):
     trigger_id = serializers.UUIDField(required=True, label=_('trigger id'))
-    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    workspace_id = serializers.CharField(required=False, label=_('workspace id'))
     source_type = serializers.CharField(required=True, label=_('source type'))
     source_id = serializers.CharField(required=True, label=_('source id'))
 
