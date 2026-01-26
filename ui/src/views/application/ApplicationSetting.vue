@@ -958,7 +958,7 @@ const ttsModelOptions = ref<any>(null)
 const triggerDrawerRef = ref<InstanceType<typeof TriggerDrawer>>()
 
 const openCreateTriggerDrawer = () => {
-  triggerDrawerRef.value?.open()
+  triggerDrawerRef.value?.open(undefined, 'APPLICATION', id)
 }
 const openEditTriggerDrawer = (trigger: any) => {
   triggerDrawerRef.value?.open(trigger.id)

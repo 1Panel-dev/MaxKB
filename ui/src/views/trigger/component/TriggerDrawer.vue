@@ -601,12 +601,20 @@ const init = (trigger_id: string) => {
   })
 }
 const current_trigger_id = ref<string>()
-const open = (trigger_id?: string) => {
+const open = (trigger_id?: string, source_type?: string, source_id?: string) => {
   is_edit.value = trigger_id ? true : false
   current_trigger_id.value = trigger_id
   drawer.value = true
   if (trigger_id) {
     init(trigger_id)
+  }
+  if (source_type && source_id) {
+    if (source_type == 'APPLICATION') {
+      applicationRefresh({ application_ids: [source_id] })
+    }
+    if (source_type == 'TOOL') {
+      toolRefresh({ tool_ids: [source_id] })
+    }
   }
 }
 
