@@ -803,7 +803,12 @@
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
     <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
-    <TriggerDrawer @refresh="refreshTrigger" ref="triggerDrawerRef"></TriggerDrawer>
+    <TriggerDrawer
+      @refresh="refreshTrigger"
+      ref="triggerDrawerRef"
+      :create-trigger="createTrigger"
+      :edit-trigger="editTrigger"
+    ></TriggerDrawer>
   </div>
 </template>
 <script setup lang="ts">
@@ -826,7 +831,8 @@ import permissionMap from '@/permission'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import { resetUrl } from '@/utils/common.ts'
+import { resetUrl } from '@/utils/common'
+import triggerAPI from '@/api/trigger/trigger'
 import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
@@ -849,7 +855,12 @@ const apiType = computed(() => {
 const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
-
+const createTrigger = (trigger: any) => {
+  return triggerAPI.postResourceTrigger('APPLICATION', id, trigger)
+}
+const editTrigger = (trigger_id: string, trigger: any) => {
+  return triggerAPI.putResourceTrigger('APPLICATION', id, trigger_id, trigger)
+}
 const toolPermissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })

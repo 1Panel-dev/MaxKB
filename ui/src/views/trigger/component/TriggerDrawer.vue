@@ -357,7 +357,6 @@
 <script setup lang="ts">
 import { v4 as uuidv4 } from 'uuid'
 import { ref, computed, onMounted, reactive } from 'vue'
-import { useRouter } from 'vue-router'
 import { copyClick } from '@/utils/clipboard'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
@@ -366,9 +365,21 @@ import triggerAPI from '@/api/trigger/trigger'
 import toolAPI from '@/api/tool/tool'
 import ToolParameter from './ToolParameter.vue'
 import ApplicationParameter from './ApplicationParameter.vue'
-import { resetUrl } from '@/utils/common.ts'
+import { resetUrl } from '@/utils/common'
 import { type FormInstance } from 'element-plus'
+import Result from '@/request/Result'
+
 const emit = defineEmits(['refresh'])
+const props = withDefaults(
+  defineProps<{
+    createTrigger?: (trigger: any) => Promise<Result<any>>
+    editTrigger?: (trigger_id: string, trigger: any) => Promise<Result<any>>
+  }>(),
+  {
+    createTrigger: triggerAPI.postTrigger,
+    editTrigger: triggerAPI.putTrigger,
+  },
+)
 
 const collapseData = reactive({
   tool: true,
@@ -612,13 +623,13 @@ const submit = () => {
   ]).then((ok) => {
     if (is_edit.value) {
       if (current_trigger_id.value) {
-        triggerAPI.putTrigger(current_trigger_id.value, form.value).then((ok) => {
+        props.editTrigger(current_trigger_id.value, form.value).then((ok) => {
           close()
           emit('refresh')
         })
       }
     } else {
-      triggerAPI.postTrigger(form.value).then((ok) => {
+      props.createTrigger(form.value).then((ok) => {
         close()
         emit('refresh')
       })

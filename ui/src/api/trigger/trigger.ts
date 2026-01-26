@@ -13,6 +13,14 @@ Object.defineProperty(prefix, 'value', {
   },
 })
 
+const prefixWorkspace: any = { _value: '/workspace/' }
+Object.defineProperty(prefixWorkspace, 'value', {
+  get: function () {
+    const { user } = useStore()
+    return this._value + user.getWorkspaceId()
+  },
+})
+
 /**
  * 触发器列表
  * @param data
@@ -154,6 +162,52 @@ const getTriggerTaskRecordDetails = (
     loading,
   )
 }
+
+/**
+ * 资源端创建触发器
+ * @param source_type  资源类型
+ * @param source_id    资源id
+ * @param data         数据
+ * @param loading      加载器
+ * @returns
+ */
+const postResourceTrigger: (
+  source_type: string,
+  resource_id: string,
+  data: TriggerData,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (source_type, source_id, data, loading) => {
+  return post(
+    `${prefixWorkspace.value}/${source_type}/${source_id}/trigger`,
+    data,
+    undefined,
+    loading,
+  )
+}
+/**
+ * 资源端修改触发器
+ * @param source_type 资源类型
+ * @param source_id   资源id
+ * @param trigger_id  触发器id
+ * @param data        触发器数据
+ * @param loading     加载器
+ * @returns
+ */
+const putResourceTrigger: (
+  source_type: string,
+  resource_id: string,
+  trigger_id: string,
+  data: TriggerData,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (source_type, source_id, trigger_id, data, loading) => {
+  return post(
+    `${prefixWorkspace.value}/${source_type}/${source_id}/trigger/${trigger_id}`,
+    data,
+    undefined,
+    loading,
+  )
+}
+
 export default {
   pageTrigger,
   getTriggerList,
@@ -165,4 +219,6 @@ export default {
   activateMulTrigger,
   pageTriggerTaskRecord,
   getTriggerTaskRecordDetails,
+  postResourceTrigger,
+  putResourceTrigger,
 }

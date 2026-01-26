@@ -260,6 +260,12 @@
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
     <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
+    <TriggerDrawer
+      @refresh="refreshTrigger"
+      ref="triggerDrawerRef"
+      :create-trigger="createTrigger"
+      :edit-trigger="editTrigger"
+    ></TriggerDrawer>
   </el-drawer>
 </template>
 
@@ -280,7 +286,7 @@ import useStore from '@/stores'
 import permissionMap from '@/permission'
 import TriggerDrawer from '@/views/trigger/component/TriggerDrawer.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-
+import triggerAPI from '@/api/trigger/trigger'
 const route = useRoute()
 
 const props = defineProps({
@@ -297,6 +303,16 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+const createTrigger = (trigger: any) => {
+  if (form.value?.id) {
+    return triggerAPI.postResourceTrigger('TOOL', form.value?.id, trigger)
+  }
+}
+const editTrigger = (trigger_id: string, trigger: any) => {
+  if (form.value?.id) {
+    return triggerAPI.putResourceTrigger('TOOL', form.value?.id, trigger_id, trigger)
+  }
+}
 const permissionPrecise = computed(() => {
   return permissionMap['tool'][apiType.value]
 })
@@ -353,7 +369,6 @@ const rules = reactive({
     },
   ],
 })
-
 
 const triggerDrawerRef = ref<InstanceType<typeof TriggerDrawer>>()
 
