@@ -63,7 +63,7 @@ class TaskRecord(AppModelMixin):
 
     trigger = models.ForeignKey(Trigger, on_delete=models.CASCADE)
 
-    trigger_task = models.ForeignKey(TriggerTask, on_delete=models.CASCADE)
+    trigger_task_id = models.UUIDField(max_length=128, default=uuid.uuid7, editable=False, verbose_name="触发器任务id")
 
     source_type = models.CharField(verbose_name="触发器任务类型", choices=TriggerTaskTypeChoices.choices,
                                    default=TriggerTaskTypeChoices.APPLICATION, max_length=256)
