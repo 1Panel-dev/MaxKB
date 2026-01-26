@@ -53,6 +53,11 @@ class TaskSourceTriggerSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         if not len(instance.get("trigger_task")) == 1:
             raise AppApiException(500, _('Trigger task number must be one'))
+        source_id = instance.get('source_id')
+        source_type = instance.get('source_type')
+        source_trigger_task = instance.get('trigger_task')[0]
+        if not (instance.get('source_id') == source_id and source_trigger_task.get('source_type') == source_type):
+            raise AppApiException(500, _('Incorrect trigger task'))
 
         return TriggerSerializer(data={
             'workspace_id': self.data.get('workspace_id'),
@@ -135,11 +140,11 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
         source_id = self.data.get('source_id')
         source_type = self.data.get('source_type')
 
-        trigger = Trigger.objects.filter(workspace_id=workspace_id,id=trigger_id).first()
+        trigger = Trigger.objects.filter(workspace_id=workspace_id, id=trigger_id).first()
         if not trigger:
             raise AppApiException(404, _('Trigger not found'))
         delete_count = TriggerTask.objects.filter(trigger_id=trigger_id, source_id=source_id,
-                                                     source_type=source_type).delete()[0]
+                                                  source_type=source_type).delete()[0]
         if delete_count == 0:
             raise AppApiException(404, _('Task not found'))
         has_other_tasks = TriggerTask.objects.filter(trigger_id=trigger_id).exists()
@@ -147,6 +152,7 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
         if not has_other_tasks:
             trigger.delete()
         return True
+
 
 class TaskSourceTriggerListSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
