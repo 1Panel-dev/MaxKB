@@ -208,8 +208,8 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                         text_data = json.loads(base64.b64decode(text).decode('utf-8'))
                         for ws_item in text_data.get('ws', []):
                             for cw in ws_item.get('cw', []):
-                                for sw in cw.get('sw', []):
-                                    result_text += sw['w']
+                                for sw in cw.get('w', []):
+                                    result_text += sw
 
                 if data['header'].get('status') == 2:
                     break
