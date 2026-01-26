@@ -141,6 +141,19 @@ const pageTriggerTaskRecord = (
     loading,
   )
 }
+
+const getTriggerTaskRecordDetails = (
+  trigger_id: string,
+  trigger_task_id: string,
+  trigger_task_record_id: string,
+  loading?: Ref<boolean>,
+) => {
+  return get(
+    `${prefix.value}/${trigger_id}/trigger_task/${trigger_task_id}/trigger_task_record/${trigger_task_record_id}`,
+    {},
+    loading,
+  )
+}
 export default {
   pageTrigger,
   getTriggerList,
@@ -151,4 +164,5 @@ export default {
   delMulTrigger,
   activateMulTrigger,
   pageTriggerTaskRecord,
+  getTriggerTaskRecordDetails,
 }

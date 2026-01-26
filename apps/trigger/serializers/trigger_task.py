@@ -13,10 +13,21 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
+from application.models import ChatRecord
 from common.db.search import native_page_search, get_dynamics_model
+from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from maxkb.conf import PROJECT_DIR
 from trigger.models import TriggerTask, TaskRecord
+
+
+class ChatRecordSerializerModel(serializers.ModelSerializer):
+    class Meta:
+        model = ChatRecord
+        fields = ['id', 'chat_id', 'vote_status', 'vote_reason', 'vote_other_content', 'problem_text', 'answer_text',
+                  'message_tokens', 'answer_tokens', 'const', 'improve_paragraph_id_list', 'run_time', 'index',
+                  'answer_text_list', 'details',
+                  'create_time', 'update_time']
 
 
 class TriggerTaskResponse(serializers.ModelSerializer):
@@ -38,6 +49,28 @@ class TriggerTaskQuerySerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         return [TriggerTaskResponse(row).data for row in self.get_query_set()]
+
+
+class TriggerTaskRecordOperateSerializer(serializers.Serializer):
+    trigger_id = serializers.CharField(required=True, label=_("Trigger ID"))
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    trigger_task_id = serializers.CharField(required=True, label=_("Trigger task ID"))
+    trigger_task_record_id = serializers.CharField(required=True, label=_("Trigger task record ID"))
+
+    def get_execution_details(self, is_valid=True):
+        if is_valid:
+            self.is_valid(raise_exception=True)
+        task_record = QuerySet(TaskRecord).filter(trigger_id=self.data.get("trigger_id"),
+                                                  trigger_task_id=self.data.get("trigger_task_id"),
+                                                  id=self.data.get('trigger_task_record_id')).first()
+        if not task_record:
+            raise AppApiException(500, _('Trigger task record id does not exist'))
+        if task_record.source_type == 'APPLICATION':
+            chat_record = QuerySet(ChatRecord).filter(id=task_record.task_record_id).first()
+            return ChatRecordSerializerModel(chat_record).data
+        if task_record.source_type == 'TOOL':
+            pass
+        return None
 
 
 class TriggerTaskRecordQuerySerializer(serializers.Serializer):

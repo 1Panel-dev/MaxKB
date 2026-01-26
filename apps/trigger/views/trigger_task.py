@@ -13,7 +13,8 @@ from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI
 from common import result
-from trigger.serializers.trigger_task import TriggerTaskQuerySerializer, TriggerTaskRecordQuerySerializer
+from trigger.serializers.trigger_task import TriggerTaskQuerySerializer, TriggerTaskRecordQuerySerializer, \
+    TriggerTaskRecordOperateSerializer
 
 
 class TriggerTaskView(APIView):
@@ -34,6 +35,26 @@ class TriggerTaskView(APIView):
 
 class TriggerTaskRecordView(APIView):
     pass
+
+
+class TriggerTaskRecordExecutionDetailsView(APIView):
+    @extend_schema(
+        methods=['GET'],
+        description=_('Retrieve detailed records of tasks executed by the trigger.'),
+        summary=_('Retrieve detailed records of tasks executed by the trigger.'),
+        operation_id=_('Retrieve detailed records of tasks executed by the trigger.'),  # type: ignore
+        parameters=ApplicationCreateAPI.get_parameters(),
+        request=ApplicationCreateAPI.get_request(),
+        responses=ApplicationCreateAPI.get_response(),
+        tags=[_('Trigger')]  # type: ignore
+    )
+    def get(self, request: Request, workspace_id: str, trigger_id: str, trigger_task_id: str,
+            trigger_task_record_id: str):
+        return result.success(
+            TriggerTaskRecordOperateSerializer(
+                data={'workspace_id': workspace_id, 'trigger_id': trigger_id, 'trigger_task_id': trigger_task_id,
+                      'trigger_task_record_id': trigger_task_record_id})
+            .get_execution_details())
 
 
 class TriggerTaskRecordPageView(APIView):

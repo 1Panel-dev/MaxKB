@@ -146,7 +146,11 @@ import { ref, reactive } from 'vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import triggerAPI from '@/api/trigger/trigger'
 import { datetimeFormat } from '@/utils/time'
-const toDetails = (row: any) => {}
+const toDetails = (row: any) => {
+  triggerAPI.getTriggerTaskRecordDetails(row.trigger_id, row.trigger_task_id, row.id).then((ok) => {
+    console.log(ok)
+  })
+}
 const searchType = ref<string>('name')
 const drawer = ref<boolean>(false)
 const paginationConfig = reactive({
