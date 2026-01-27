@@ -171,6 +171,8 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
                 'child_node': child_node}
             content_chunk = (chunk.get('content', '') or '')
             reasoning_content_chunk = (chunk.get('reasoning_content', '') or '')
+            if chunk.get('real_node_id'):
+                chunk['real_node_id'] = chunk['real_node_id'] + '__' + str(index)
             reasoning_content += reasoning_content_chunk
             answer += content_chunk
             yield chunk
