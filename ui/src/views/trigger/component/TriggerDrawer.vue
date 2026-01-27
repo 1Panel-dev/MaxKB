@@ -205,102 +205,104 @@
         </el-card>
       </el-form-item>
       <el-form-item :label="$t('views.trigger.taskExecution')">
-        <!-- 资源端智能体 -->
-        <div class="w-full" v-if="resourceType === 'APPLICATION'">
-          <template v-for="(item, index) in applicationTask" :key="index">
-            <div class="border border-r-6 white-bg" style="padding: 2px 8px">
-              <div class="flex-between">
-                <div class="flex align-center" style="line-height: 20px">
-                  <el-avatar
-                    v-if="applicationDetailsDict[item.source_id]?.icon"
-                    shape="square"
-                    :size="20"
-                    style="background: none"
-                    class="mr-8"
-                  >
-                    <img :src="resetUrl(applicationDetailsDict[item.source_id]?.icon)" alt="" />
-                  </el-avatar>
-                  <AppIcon v-else class="mr-8" :size="20" />
+        <template v-if="['APPLICATION', 'TOOL'].includes(resourceType)">
+          <!-- 资源端智能体 -->
+          <div class="w-full" v-if="resourceType === 'APPLICATION'">
+            <template v-for="(item, index) in applicationTask" :key="index">
+              <div class="border border-r-6 white-bg" style="padding: 2px 8px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="applicationDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="resetUrl(applicationDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <AppIcon v-else class="mr-8" :size="20" />
 
-                  <div class="ellipsis-1" :title="applicationDetailsDict[item.source_id]?.name">
-                    {{ applicationDetailsDict[item.source_id]?.name }}
+                    <div class="ellipsis-1" :title="applicationDetailsDict[item.source_id]?.name">
+                      {{ applicationDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'agent' + index ? '' : 'agent' + index"
+                      >
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'agent' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
                   </div>
                 </div>
-                <div style="margin-top: -2px">
-                  <span class="mr-4">
-                    <el-button
-                      text
-                      @click="showTast = showTast === 'agent' + index ? '' : 'agent' + index"
+                <ApplicationParameter
+                  class="mt-8 mb-8"
+                  ref="applicationParameterRef"
+                  v-if="showTast === 'agent' + index && applicationDetailsDict[item.source_id]"
+                  :application="applicationDetailsDict[item.source_id]"
+                  :trigger="form"
+                  v-model="item.parameter"
+                ></ApplicationParameter>
+              </div>
+            </template>
+          </div>
+          <!-- 资源端工具 -->
+          <div class="w-full" v-if="resourceType === 'TOOL'">
+            <template v-for="(item, index) in toolTask" :key="index">
+              <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px 5px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="toolDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
                     >
-                      <el-icon
-                        class="arrow-icon"
-                        :class="showTast === 'agent' + index ? 'rotate-180' : ''"
+                      <img :src="resetUrl(toolDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <ToolIcon v-else class="mr-8" :size="20" />
+
+                    <div class="ellipsis-1" :title="toolDetailsDict[item.source_id]?.name">
+                      {{ toolDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'tool' + index ? '' : 'tool' + index"
                       >
-                        <ArrowDown />
-                      </el-icon>
-                    </el-button>
-                  </span>
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'tool' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
+                  </div>
                 </div>
               </div>
-              <ApplicationParameter
+              <ToolParameter
                 class="mt-8 mb-8"
-                ref="applicationParameterRef"
-                v-if="showTast === 'agent' + index && applicationDetailsDict[item.source_id]"
-                :application="applicationDetailsDict[item.source_id]"
+                ref="toolParameterRef"
+                v-if="showTast === 'tool' + index && toolDetailsDict[item.source_id]"
+                :tool="toolDetailsDict[item.source_id]"
                 :trigger="form"
                 v-model="item.parameter"
-              ></ApplicationParameter>
-            </div>
-          </template>
-        </div>
-        <!-- 资源端工具 -->
-        <div class="w-full" v-if="resourceType === 'TOOL'">
-          <template v-for="(item, index) in toolTask" :key="index">
-            <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px 5px">
-              <div class="flex-between">
-                <div class="flex align-center" style="line-height: 20px">
-                  <el-avatar
-                    v-if="toolDetailsDict[item.source_id]?.icon"
-                    shape="square"
-                    :size="20"
-                    style="background: none"
-                    class="mr-8"
-                  >
-                    <img :src="resetUrl(toolDetailsDict[item.source_id]?.icon)" alt="" />
-                  </el-avatar>
-                  <ToolIcon v-else class="mr-8" :size="20" />
-
-                  <div class="ellipsis-1" :title="toolDetailsDict[item.source_id]?.name">
-                    {{ toolDetailsDict[item.source_id]?.name }}
-                  </div>
-                </div>
-                <div style="margin-top: -2px">
-                  <span class="mr-4">
-                    <el-button
-                      text
-                      @click="showTast = showTast === 'tool' + index ? '' : 'tool' + index"
-                    >
-                      <el-icon
-                        class="arrow-icon"
-                        :class="showTast === 'tool' + index ? 'rotate-180' : ''"
-                      >
-                        <ArrowDown />
-                      </el-icon>
-                    </el-button>
-                  </span>
-                </div>
-              </div>
-            </div>
-            <ToolParameter
-              class="mt-8 mb-8"
-              ref="toolParameterRef"
-              v-if="showTast === 'tool' + index && toolDetailsDict[item.source_id]"
-              :tool="toolDetailsDict[item.source_id]"
-              :trigger="form"
-              v-model="item.parameter"
-            ></ToolParameter>
-          </template>
-        </div>
+              ></ToolParameter>
+            </template>
+          </div>
+        </template>
         <!-- 触发器 -->
         <el-card
           shadow="never"
