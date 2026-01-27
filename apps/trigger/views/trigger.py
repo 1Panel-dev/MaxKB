@@ -186,6 +186,7 @@ class TaskSourceTriggerView(APIView):
             'user_id': request.user.id
         }).insert({**request.data, 'source_id': source_id,
                    'workspace_id': workspace_id,
+                   'is_active': True,
                    'source_type': source_type}))
 
     @extend_schema(
