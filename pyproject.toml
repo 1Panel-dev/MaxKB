@@ -51,7 +51,7 @@ dependencies = [
     "xlrd==2.0.2",
     "xlwt==1.3.0",
     "pymupdf==1.26.3",
-    "pypdf==6.6.0",
+    "pypdf==6.6.2",
     "pydub==0.25.1",
     "pysilk==0.0.1",
     "gunicorn==23.0.0",
