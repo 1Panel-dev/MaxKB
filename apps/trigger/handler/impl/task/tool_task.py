@@ -35,24 +35,10 @@ def get_field_value(value, kwargs):
         return get_reference(value.get('value'), kwargs)
 
 
-def get_application_execute_parameters(parameter_setting, kwargs):
-    parameters = {'form_data': {}}
-    question_setting = parameter_setting.get('question')
-    if question_setting:
-        parameters['message'] = get_field_value(question_setting, kwargs)
-    filed_list = ['image_list', 'document_list', 'audio_list', 'video_list', 'other_list']
-    for field in filed_list:
-        field_setting = parameter_setting.get(field)
-        if field_setting:
-            parameters[field] = get_field_value(field_setting, kwargs)
-    api_input_field_list = parameter_setting.get('api_input_field_list')
-    if api_input_field_list:
-        for key, value in api_input_field_list.items():
-            parameters['form_data'][key] = get_field_value(value, kwargs)
-    user_input_field_list = parameter_setting.get('user_input_field_list')
-    if user_input_field_list:
-        for key, value in user_input_field_list.items():
-            parameters['form_data'][key] = get_field_value(value, kwargs)
+def get_tool_execute_parameters(parameter_setting, kwargs):
+    parameters = {}
+    for key, value in parameter_setting.items():
+        parameters[key] = get_field_value(value, kwargs)
     return parameters
 
 
@@ -81,7 +67,7 @@ class ToolTask(BaseTriggerTask):
 
     def execute(self, trigger_task, **kwargs):
         parameter_setting = trigger_task.get('parameter')
-        parameters = get_application_execute_parameters(parameter_setting, kwargs)
+        parameters = get_tool_execute_parameters(parameter_setting, kwargs)
         tool_id = trigger_task.get('source_id')
         task_record_id = uuid.uuid7()
 
