@@ -20,8 +20,6 @@ from common.exception.app_exception import AppApiException, AppAuthenticationFai
 from common.result import Result
 from trigger.handler.base_trigger import BaseTrigger
 from trigger.models import TriggerTask, Trigger
-from trigger.serializers.trigger import TriggerResponse
-from trigger.serializers.trigger_task import TriggerTaskResponse
 
 
 def valid_parameter_type(value, _type, desc):
@@ -96,6 +94,7 @@ class EventTriggerView(APIView):
 
     )
     def post(self, request: Request, trigger_id: str):
+        from trigger.serializers.trigger import TriggerResponse
         trigger = QuerySet(Trigger).filter(id=trigger_id).first()
         if trigger:
             return EventTrigger.execute(TriggerResponse(trigger).data, request)
@@ -109,6 +108,7 @@ class EventTrigger(BaseTrigger):
 
     @staticmethod
     def execute(trigger, request=None, **kwargs):
+        from trigger.serializers.trigger_task import TriggerTaskResponse
         trigger_setting = trigger.get('trigger_setting')
         if trigger_setting.get('token'):
             token = request.META.get('HTTP_AUTHORIZATION')
