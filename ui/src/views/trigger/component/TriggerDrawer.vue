@@ -594,15 +594,18 @@ const times = Array.from({ length: 24 }, (_, i) => {
   return { label: time, value: time }
 })
 const days = Array.from({ length: 31 }, (_, i) => {
-  const day = (i + 1).toString() + t('views.trigger.triggerCycle.days')
+  i = i + 1
+  const day = i.toString() + t('views.trigger.triggerCycle.days')
   return { label: day, value: i.toString(), children: times }
 })
 const hours = Array.from({ length: 24 }, (_, i) => {
-  const time = (i + 1).toString().padStart(2, '0')
+  i = i + 1
+  const time = i.toString().padStart(2, '0')
   return { label: time, value: i }
 })
 const minutes = Array.from({ length: 60 }, (_, i) => {
-  const time = (i + 1).toString().padStart(2, '0')
+  i = i + 1
+  const time = i.toString().padStart(2, '0')
   return { label: time, value: i }
 })
 
