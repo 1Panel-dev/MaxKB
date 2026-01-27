@@ -54,6 +54,7 @@ from system_manage.serializers.resource_mapping_serializers import ResourceMappi
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope
 from tools.serializers.tool import ToolExportModelSerializer
+from trigger.models import TriggerTask
 from users.models import User
 from users.serializers.user import is_workspace_manage
 
@@ -893,6 +894,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         else:
             access_token = application_access_token.access_token
         del_application_access_token(access_token)
+        QuerySet(TriggerTask).filter(source_type="APPLICATION", source_id=self.data.get("application_id")).update(
+            is_active=True)
         return self.one(with_valid=False)
 
     @staticmethod

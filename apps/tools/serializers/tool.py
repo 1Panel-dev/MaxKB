@@ -38,6 +38,7 @@ from maxkb.const import CONFIG, PROJECT_DIR
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolFolder, ToolType
+from trigger.models import TriggerTask
 from users.serializers.user import is_workspace_manage
 
 tool_executor = ToolExecutor()
@@ -518,7 +519,9 @@ class ToolSerializer(serializers.Serializer):
 
             edit_dict['update_time'] = timezone.now()
             QuerySet(Tool).filter(id=self.data.get('id')).update(**edit_dict)
-
+            if 'is_active' in instance:
+                QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get('id')).update(
+                    is_active=instance.get('is_active'))
             return self.one()
 
         def delete(self):
