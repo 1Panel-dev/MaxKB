@@ -373,7 +373,6 @@ class TriggerSerializer(serializers.Serializer):
             raise AppApiException(500, _('Trigger task can not be empty'))
 
         if trigger_model.is_active:
-
             deploy(TriggerModelSerializer(trigger_model).data, **{})
         return TriggerResponse(trigger_model).data
 
@@ -516,6 +515,10 @@ class TriggerOperateSerializer(serializers.Serializer):
         trigger_tasks = instance.get('trigger_task')
 
         if trigger_tasks is not None:
+            # 检查是否为空列表
+            if not trigger_tasks:
+                raise serializers.ValidationError(_('Trigger must have at least one task'))
+
             is_active_map = TriggerSerializer.batch_get_source_active_status(trigger_tasks)
 
             trigger_task_model_list = [TriggerTask(
@@ -531,6 +534,10 @@ class TriggerOperateSerializer(serializers.Serializer):
             TriggerTask.objects.filter(trigger_id=trigger_id).delete()
 
             TriggerTask.objects.bulk_create(trigger_task_model_list)
+        else:
+            # 用户没提交 trigger_task 字段，确保数据库中有 task
+            if not TriggerTask.objects.filter(trigger_id=trigger_id).exists():
+                raise serializers.ValidationError(_('Trigger must have at least one task'))
 
         # 重新部署触发器任务
         if need_redeploy:
