@@ -6,16 +6,28 @@
         <div class="p-24">
           <div class="flex-between">
             <div>
-              <el-button type="primary" @click="openCreateTriggerDrawer"
+              <el-button
+                v-if="triggerPermissionMap.create()"
+                type="primary"
+                @click="openCreateTriggerDrawer"
                 >{{ $t('common.create') }}
               </el-button>
-              <el-button @click="batchChangeState(true)" :disabled="multipleSelection.length === 0"
+              <el-button
+                v-if="triggerPermissionMap.edit()"
+                @click="batchChangeState(true)"
+                :disabled="multipleSelection.length === 0"
                 >{{ $t('common.status.enable') }}
               </el-button>
-              <el-button @click="batchChangeState(false)" :disabled="multipleSelection.length === 0"
+              <el-button
+                v-if="triggerPermissionMap.edit()"
+                @click="batchChangeState(false)"
+                :disabled="multipleSelection.length === 0"
                 >{{ $t('common.status.disable') }}
               </el-button>
-              <el-button @click="batchDelete" :disabled="multipleSelection.length === 0"
+              <el-button
+                v-if="triggerPermissionMap.delete()"
+                @click="batchDelete"
+                :disabled="multipleSelection.length === 0"
                 >{{ $t('common.delete') }}
               </el-button>
             </div>
@@ -243,7 +255,7 @@
             </el-table-column>
             <el-table-column align="left" width="160" fixed="right" :label="$t('common.operation')">
               <template #default="{ row }">
-                <span @click.stop>
+                <span v-if="triggerPermissionMap.edit()" @click.stop>
                   <el-switch
                     :before-change="() => changeState(row)"
                     :loading="loading"
@@ -259,7 +271,12 @@
                     </el-button>
                   </span>
                 </el-tooltip>
-                <el-tooltip effect="dark" :content="$t('workflow.ExecutionRecord')" placement="top">
+                <el-tooltip
+                  v-if="triggerPermissionMap.record()"
+                  effect="dark"
+                  :content="$t('workflow.ExecutionRecord')"
+                  placement="top"
+                >
                   <span class="mr-4">
                     <el-button type="primary" text @click="openExecutionRecordDrawer(row)">
                       <AppIcon iconName="app-schedule-report"></AppIcon>
@@ -267,7 +284,12 @@
                   </span>
                 </el-tooltip>
 
-                <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
+                <el-tooltip
+                  v-if="triggerPermissionMap.delete()"
+                  effect="dark"
+                  :content="$t('common.delete')"
+                  placement="top"
+                >
                   <span class="mr-4">
                     <el-button type="primary" text @click="deleteTrigger(row)">
                       <AppIcon iconName="app-delete"></AppIcon>
@@ -301,6 +323,8 @@ import { resetUrl } from '@/utils/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import type { TriggerData } from '@/api/type/trigger'
 import TriggerDrawer from '@/views/trigger/component/TriggerDrawer.vue'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const { user } = useStore()
 
@@ -405,6 +429,41 @@ function batchDelete() {
       getList()
     })
   })
+}
+
+const triggerPermissionMap = {
+  edit: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  create: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  delete: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  record: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_RECORD.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
 }
 
 async function changeState(row: any) {

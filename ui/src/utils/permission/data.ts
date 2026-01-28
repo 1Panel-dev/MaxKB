@@ -116,6 +116,7 @@ const PermissionConst = {
   TRIGGER_CREATE: new Permission('TRIGGER:READ+CREATE'),
   TRIGGER_EDIT: new Permission('TRIGGER:READ+EDIT'),
   TRIGGER_DELETE: new Permission('TRIGGER:READ+DELETE'),
+  TRIGGER_RECORD: new Permission('TRIGGER:READ+RECORD'),
 
   KNOWLEDGE_READ: new Permission('KNOWLEDGE:READ'),
   KNOWLEDGE_CREATE: new Permission('KNOWLEDGE:READ+CREATE'),

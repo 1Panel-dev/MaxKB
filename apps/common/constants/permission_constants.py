@@ -375,6 +375,7 @@ Permission_Label = {
     Operate.TRIGGER_CREATE.value: _('Create Trigger'),
     Operate.TRIGGER_EDIT.value: _('Edit Trigger'),
     Operate.TRIGGER_DELETE.value: _('Delete Trigger'),
+    Operate.RECORD.value: _('Execute record'),
 
     Group.APPLICATION_OVERVIEW.value: _('Overview'),
     Group.APPLICATION_ACCESS.value: _('Application Access'),

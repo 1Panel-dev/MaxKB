@@ -459,7 +459,7 @@
     <ToolDialog @refresh="toolRefresh" ref="toolDialogRef"></ToolDialog>
     <template #footer>
       <el-button @click="close">{{ $t('common.cancel') }}</el-button>
-      <el-button type="primary" @click="submit">{{
+      <el-button v-if="submitPermission" type="primary" @click="submit">{{
         is_edit ? $t('common.save') : $t('common.create')
       }}</el-button>
     </template>
@@ -480,6 +480,8 @@ import { resetUrl } from '@/utils/common.ts'
 import { t } from '@/locales'
 import { type FormInstance } from 'element-plus'
 import Result from '@/request/Result'
+import { hasPermission } from '@/utils/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const emit = defineEmits(['refresh'])
 const props = withDefaults(
@@ -500,6 +502,29 @@ const collapseData = reactive({
   agent: true,
 })
 const showTast = ref<string>('')
+
+const submitPermission = computed(() => {
+  return is_edit.value ? triggerPermissionMap.edit() : triggerPermissionMap.create()
+})
+
+const triggerPermissionMap = {
+  edit: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  create: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+}
 
 const triggerFormRef = ref<FormInstance>()
 const copy = () => {
