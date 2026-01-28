@@ -126,16 +126,20 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
         if not trigger:
             raise serializers.ValidationError(_('Trigger not found'))
         task_source_trigger_edit_field_list = ['name', 'desc', 'trigger_type', 'trigger_setting', 'meta']
+        trigger_deploy_edit_field_list = ['trigger_type', 'trigger_setting']
+
+        need_redeploy = any(field in instance for field in trigger_deploy_edit_field_list)
 
         for field in task_source_trigger_edit_field_list:
             if field in valid_data:
                 setattr(trigger, field, valid_data.get(field))
         trigger.save()
 
-        if trigger.is_active:
-            deploy(ToolModelSerializer(trigger).data, **{})
-        else:
-            undeploy(TriggerModelSerializer(trigger).data, **{})
+        if need_redeploy:
+            if trigger.is_active:
+                deploy(ToolModelSerializer(trigger).data, **{})
+            else:
+                undeploy(TriggerModelSerializer(trigger).data, **{})
 
         return self.one()
 
