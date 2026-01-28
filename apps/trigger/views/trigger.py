@@ -6,6 +6,7 @@
     @date：2026/1/14 11:44
     @desc:
 """
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
@@ -14,7 +15,12 @@ from rest_framework.views import APIView
 from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants, \
+    Permission, Group, Operate
+from common.log.log import log
 from common.result import DefaultResultSerializer
+from trigger.models import Trigger
 from trigger.serializers.task_source_trigger import TaskSourceTriggerListSerializer, TaskSourceTriggerOperateSerializer, \
     TaskSourceTriggerSerializer
 from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSerializer
@@ -22,6 +28,24 @@ from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSe
 from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI, TriggerBatchDeleteAPI, \
     TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI, TaskSourceTriggerCreateAPI
 from trigger.serializers.trigger import TriggerSerializer
+
+
+def get_trigger_operation_object(trigger_id):
+    trigger_model = QuerySet(model=Trigger).filter(id=trigger_id).first()
+    if trigger_model is not None:
+        return {
+            "name": trigger_model.name
+        }
+
+
+def get_trigger_operation_object_batch(trigger_id_list):
+    trigger_model_list = QuerySet(model=Trigger).filter(id__in=trigger_id_list)
+    if trigger_model_list is not None:
+        return {
+            "name": f'[{",".join([trigger_model.name for trigger_model in trigger_model_list])}]',
+            "trigger_list": [{'name': trigger_model.name, 'type': trigger_model.type} for trigger_model in
+                             trigger_model_list]
+        }
 
 
 class TriggerView(APIView):
@@ -37,6 +61,14 @@ class TriggerView(APIView):
         responses=TriggerCreateAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
+    @has_permissions(
+        PermissionConstants.TRIGGER_CREATE.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+    )
+    @log(
+        menu="Trigger", operate="Create trigger",
+        get_operation_object=lambda r, k: r.data.get('name'),
+    )
     def post(self, request: Request, workspace_id: str):
         return result.success(TriggerSerializer(
             data={'workspace_id': workspace_id, 'user_id': request.user.id}).insert(request.data))
@@ -50,6 +82,10 @@ class TriggerView(APIView):
         request=ApplicationCreateAPI.get_request(),
         responses=ApplicationCreateAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str):
         return result.success(TriggerQuerySerializer(data={
@@ -73,6 +109,14 @@ class TriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Trigger", operate="Get trigger details",
+            get_operation_object=lambda r, k: get_trigger_operation_object(k.get('trigger_id')),
+        )
         def get(self, request: Request, workspace_id: str, trigger_id: str):
             return result.success(TriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -88,6 +132,14 @@ class TriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            PermissionConstants.TRIGGER_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Trigger", operate="Modify the trigger",
+            get_operation_object=lambda r, k: get_trigger_operation_object(k.get('trigger_id')),
+        )
         def put(self, request: Request, workspace_id: str, trigger_id: str):
             return result.success(TriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -101,6 +153,14 @@ class TriggerView(APIView):
             parameters=TriggerOperateAPI.get_parameters(),
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TRIGGER_DELETE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Trigger", operate="Delete the trigger",
+            get_operation_object=lambda r, k: get_trigger_operation_object(k.get('trigger_id')),
         )
         def delete(self, request: Request, workspace_id: str, trigger_id: str):
             return result.success(TriggerOperateSerializer(
@@ -120,6 +180,14 @@ class TriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            PermissionConstants.TRIGGER_DELETE.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Trigger", operate="Delete the trigger",
+            get_operation_object=lambda r, k: get_trigger_operation_object_batch(r.data.get('id_list')),
+        )
         def put(self, request: Request, workspace_id: str):
             return result.success(TriggerSerializer.Batch(
                 data={'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -138,6 +206,14 @@ class TriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            PermissionConstants.TRIGGER_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
+        @log(
+            menu="Trigger", operate="Activate trigger in batches",
+            get_operation_object=lambda r, k: get_trigger_operation_object_batch(r.data.get('id_list')),
+        )
         def put(self, request: Request, workspace_id: str):
             return result.success(TriggerSerializer.Batch(
                 data={'workspace_id': workspace_id, 'user_id': request.user.id}
@@ -155,6 +231,10 @@ class TriggerView(APIView):
             request=ApplicationCreateAPI.get_request(),
             responses=ApplicationCreateAPI.get_response(),
             tags=[_('Trigger')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(TriggerQuerySerializer(data={
@@ -180,6 +260,19 @@ class TaskSourceTriggerView(APIView):
         responses=TaskSourceTriggerCreateAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_CREATE,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                     ),
+        lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_CREATE,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}"
+                                     ),
+        ViewPermission([RoleConstants.USER.get_workspace_role()],
+                       [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
+                                                     operate=Operate.SELF,
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
+                       CompareConstants.AND),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def post(self, request: Request, workspace_id: str, source_type: str, source_id: str):
         return result.success(TaskSourceTriggerSerializer(data={
             'workspace_id': workspace_id,
@@ -198,6 +291,15 @@ class TaskSourceTriggerView(APIView):
         responses=DefaultResultSerializer,
         tags=[_('Trigger')]  # type: ignore
     )
+    @has_permissions(
+        lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_READ,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                     ),
+        lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_READ,
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}"
+                                     ),
+        RoleConstants.USER.get_workspace_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, source_type: str, source_id: str):
         return result.success(TaskSourceTriggerListSerializer(data={
             'workspace_id': workspace_id,
@@ -217,12 +319,20 @@ class TaskSourceTriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_READ,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                         ),
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_READ,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}"
+                                         ),
+            RoleConstants.USER.get_workspace_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
                       'source_id': source_id, 'source_type': source_type}
             ).one())
-
 
         @extend_schema(
             methods=['PUT'],
@@ -234,6 +344,20 @@ class TaskSourceTriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_EDIT,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                         ),
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_EDIT,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}"
+                                         ),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
+                                                         operate=Operate.SELF,
+                                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
+                           CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def put(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
@@ -249,19 +373,21 @@ class TaskSourceTriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
+        @has_permissions(
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_DELETE,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
+                                         ),
+            lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_DELETE,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}"
+                                         ),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
+                                                         operate=Operate.SELF,
+                                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
+                           CompareConstants.AND),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def delete(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
                       'source_id': source_id, 'source_type': source_type}
             ).delete())
-
-
-
-
-
-
-
-
-
-
-
