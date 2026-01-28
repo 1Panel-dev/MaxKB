@@ -26,7 +26,8 @@ from trigger.serializers.task_source_trigger import TaskSourceTriggerListSeriali
 from trigger.serializers.trigger import TriggerQuerySerializer, TriggerOperateSerializer
 
 from trigger.api.trigger import TriggerCreateAPI, TriggerOperateAPI, TriggerEditAPI, TriggerBatchDeleteAPI, \
-    TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI, TaskSourceTriggerCreateAPI
+    TriggerBatchActiveAPI, TaskSourceTriggerOperateAPI, TaskSourceTriggerAPI, TaskSourceTriggerCreateAPI, \
+    TriggerQueryAPI, TriggerQueryPageAPI
 from trigger.serializers.trigger import TriggerSerializer
 
 
@@ -78,9 +79,8 @@ class TriggerView(APIView):
         description=_('Get the trigger list'),
         summary=_('Get the trigger list'),
         operation_id=_('Get the trigger list'),  # type: ignore
-        parameters=ApplicationCreateAPI.get_parameters(),
-        request=ApplicationCreateAPI.get_request(),
-        responses=ApplicationCreateAPI.get_response(),
+        parameters=TriggerQueryAPI.get_parameters(),
+        responses=TriggerQueryAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     @has_permissions(
@@ -227,9 +227,8 @@ class TriggerView(APIView):
             description=_('Get the trigger list by page'),
             summary=_('Get the trigger list by page'),
             operation_id=_('Get the trigger list by page'),  # type: ignore
-            parameters=ApplicationCreateAPI.get_parameters(),
-            request=ApplicationCreateAPI.get_request(),
-            responses=ApplicationCreateAPI.get_response(),
+            parameters=TriggerQueryPageAPI.get_parameters(),
+            responses=TriggerQueryPageAPI.get_response(),
             tags=[_('Trigger')]  # type: ignore
         )
         @has_permissions(
@@ -344,7 +343,6 @@ class TaskSourceTriggerView(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Trigger')]  # type: ignore
         )
-
         @has_permissions(
             lambda r, kwargs: Permission(group=Group(kwargs.get("source_type")), operate=Operate.TRIGGER_EDIT,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"

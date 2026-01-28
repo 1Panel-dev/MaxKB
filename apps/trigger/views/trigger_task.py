@@ -11,8 +11,8 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
-from application.api.application_api import ApplicationCreateAPI
 from common import result
+from trigger.api.trigger_task import TriggerTaskRecordExecutionDetailsAPI, TriggerTaskRecordPageAPI, TriggerTaskAPI
 from trigger.serializers.trigger_task import TriggerTaskQuerySerializer, TriggerTaskRecordQuerySerializer, \
     TriggerTaskRecordOperateSerializer
 
@@ -23,9 +23,8 @@ class TriggerTaskView(APIView):
         description=_('Get the task list of triggers'),
         summary=_('Get the task list of triggers'),
         operation_id=_('Get the task list of triggers'),  # type: ignore
-        parameters=ApplicationCreateAPI.get_parameters(),
-        request=ApplicationCreateAPI.get_request(),
-        responses=ApplicationCreateAPI.get_response(),
+        parameters=TriggerTaskAPI.get_parameters(),
+        responses=TriggerTaskAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     def get(self, request: Request, workspace_id: str, trigger_id: str):
@@ -43,9 +42,8 @@ class TriggerTaskRecordExecutionDetailsView(APIView):
         description=_('Retrieve detailed records of tasks executed by the trigger.'),
         summary=_('Retrieve detailed records of tasks executed by the trigger.'),
         operation_id=_('Retrieve detailed records of tasks executed by the trigger.'),  # type: ignore
-        parameters=ApplicationCreateAPI.get_parameters(),
-        request=ApplicationCreateAPI.get_request(),
-        responses=ApplicationCreateAPI.get_response(),
+        parameters=TriggerTaskRecordExecutionDetailsAPI.get_parameters(),
+        responses=TriggerTaskRecordExecutionDetailsAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     def get(self, request: Request, workspace_id: str, trigger_id: str, trigger_task_id: str,
@@ -63,9 +61,8 @@ class TriggerTaskRecordPageView(APIView):
         description=_('Get a paginated list of execution records for trigger tasks.'),
         summary=_('Get a paginated list of execution records for trigger tasks.'),
         operation_id=_('Get a paginated list of execution records for trigger tasks.'),  # type: ignore
-        parameters=ApplicationCreateAPI.get_parameters(),
-        request=ApplicationCreateAPI.get_request(),
-        responses=ApplicationCreateAPI.get_response(),
+        parameters=TriggerTaskRecordPageAPI.get_parameters(),
+        responses=TriggerTaskRecordPageAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
     def get(self, request: Request, workspace_id: str, trigger_id: str, current_page: int, page_size: int):
