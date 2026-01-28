@@ -18,7 +18,7 @@ from application.flow.i_step_node import NodeResult
 
 class ConditionSerializer(serializers.Serializer):
     compare = serializers.CharField(required=True, label=_("Comparator"))
-    value = serializers.CharField(required=True, label=_("value"))
+    value = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("value"))
     field = serializers.ListField(required=True, label=_("Fields"))
 
 
