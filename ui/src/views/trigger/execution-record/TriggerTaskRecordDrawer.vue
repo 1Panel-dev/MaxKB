@@ -19,7 +19,7 @@
         </el-select>
         <el-input
           v-if="searchType === 'name'"
-          v-model="query.resource_name"
+          v-model="query.name"
           :placeholder="$t('common.search')"
           style="width: 220px"
           clearable
@@ -27,7 +27,7 @@
         />
         <el-select
           v-else-if="searchType === 'state'"
-          v-model="query.source_type"
+          v-model="query.state"
           @change="getList(true)"
           filterable
           clearable
@@ -51,6 +51,8 @@
       :pagination-config="paginationConfig"
       @sizeChange="changeSize"
       @changePage="getList(true)"
+      :default-sort="{ prop: 'create_time', order: 'descending' }"
+      @sort-change="handleSortChange"
       :maxTableHeight="200"
       :row-key="(row: any) => row.id"
       v-loading="loading"
@@ -129,6 +131,7 @@
         </template>
       </el-table-column>
       <el-table-column
+        sortable
         prop="create_time"
         :label="$t('chat.executionDetails.createTime')"
         width="180"
@@ -181,6 +184,7 @@ const tableData = ref<Array<any>>([])
 const query = ref<any>({
   state: '',
   name: '',
+  order: '',
 })
 const loading = ref<boolean>(false)
 const current_trigger_id = ref<string>()
@@ -210,7 +214,10 @@ const changeSize = () => {
   paginationConfig.current_page = 1
   getList()
 }
-
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
+  query.value.order = order === 'ascending' ? `ett.${prop}` : `-ett.${prop}`
+  getList()
+}
 const getList = (isLoading?: boolean) => {
   if (current_trigger_id.value) {
     return triggerAPI

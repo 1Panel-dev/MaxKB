@@ -76,12 +76,14 @@ class TriggerTaskRecordOperateSerializer(serializers.Serializer):
 class TriggerTaskRecordQuerySerializer(serializers.Serializer):
     trigger_id = serializers.CharField(required=True, label=_("Trigger ID"))
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-    state = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger task'))
-    name = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger task'))
+    state = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger state'))
+    name = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger name'))
+    order = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Order field'))
 
     def get_query_set(self):
         trigger_query_set = QuerySet(
             model=get_dynamics_model({
+                'ett.create_time': models.DateTimeField(),
                 'ett.state': models.CharField(),
                 'sdc.name': models.CharField(),
                 'ett.workspace_id': models.CharField(),
@@ -89,6 +91,10 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
             }))
         trigger_query_set = trigger_query_set.filter(
             **{'ett.trigger_id': self.data.get("trigger_id")})
+        if self.data.get("order"):
+            trigger_query_set = trigger_query_set.order_by(self.data.get("order"))
+        else:
+            trigger_query_set = trigger_query_set.order_by("-ett.create_time")
         if self.data.get('state'):
             trigger_query_set = trigger_query_set.filter(**{'ett.state': self.data.get('state')})
         if self.data.get("name"):
