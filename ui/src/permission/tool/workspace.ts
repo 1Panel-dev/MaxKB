@@ -105,10 +105,10 @@ const workspace = {
   trigger_read: (source_id:string) => 
         hasPermission(
             [
-              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
-              PermissionConst.TOOL_TRIGGER_READ.getApplicationWorkspaceResourcePermission(source_id)  
+              PermissionConst.TOOL_TRIGGER_READ.getToolWorkspaceResourcePermission(source_id)  
             ],
             'OR'
     ),
