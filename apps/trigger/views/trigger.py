@@ -272,6 +272,10 @@ class TaskSourceTriggerView(APIView):
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
                        CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    @log(
+        menu="Trigger", operate="Create trigger in source",
+        get_operation_object=lambda r, k: r.data.get('name'),
+    )
     def post(self, request: Request, workspace_id: str, source_type: str, source_id: str):
         return result.success(TaskSourceTriggerSerializer(data={
             'workspace_id': workspace_id,
@@ -356,6 +360,10 @@ class TaskSourceTriggerView(APIView):
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
                            CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        @log(
+            menu="Trigger", operate="Modify the source point trigger",
+            get_operation_object=lambda r, k: get_trigger_operation_object(k.get('trigger_id')),
+        )
         def put(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
@@ -384,6 +392,10 @@ class TaskSourceTriggerView(APIView):
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
                            CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+        @log(
+            menu="Trigger", operate="Delete the source point trigger",
+            get_operation_object=lambda r, k: get_trigger_operation_object(k.get('trigger_id')),
+        )
         def delete(self, request: Request, workspace_id: str, source_type: str, source_id: str, trigger_id: str):
             return result.success(TaskSourceTriggerOperateSerializer(
                 data={'trigger_id': trigger_id, 'workspace_id': workspace_id,
