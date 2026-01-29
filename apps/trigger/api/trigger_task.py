@@ -46,6 +46,11 @@ class TriggerTaskResultSerializer(ResultSerializer):
 
 class TriggerTaskAPI(APIMixin):
     @staticmethod
+    def get_system_parameters():
+        return [parameter for parameter in TriggerTaskRecordExecutionDetailsAPI.get_parameters() if
+                not parameter.name == 'workspace_id']
+
+    @staticmethod
     def get_parameters():
         return [
             OpenApiParameter(
@@ -70,6 +75,11 @@ class TriggerTaskAPI(APIMixin):
 
 
 class TriggerTaskRecordPageAPI(APIMixin):
+    @staticmethod
+    def get_system_parameters():
+        return [parameter for parameter in TriggerTaskRecordExecutionDetailsAPI.get_parameters() if
+                not parameter.name == 'workspace_id']
+
     @staticmethod
     def get_parameters():
         return [
@@ -130,6 +140,11 @@ class TriggerTaskRecordPageAPI(APIMixin):
 
 
 class TriggerTaskRecordExecutionDetailsAPI(APIMixin):
+    @staticmethod
+    def get_system_parameters():
+        return [parameter for parameter in TriggerTaskRecordExecutionDetailsAPI.get_parameters() if
+                not parameter.name == 'workspace_id']
+
     @staticmethod
     def get_parameters():
         return [
