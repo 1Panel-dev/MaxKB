@@ -460,7 +460,7 @@
     <ToolDialog @refresh="toolRefresh" ref="toolDialogRef"></ToolDialog>
     <template #footer>
       <el-button @click="close">{{ $t('common.cancel') }}</el-button>
-      <el-button v-if="editPermission" type="primary" @click="submit">{{
+      <el-button v-if="!is_edit || editPermission" type="primary" @click="submit">{{
         is_edit ? $t('common.save') : $t('common.create')
       }}</el-button>
     </template>
