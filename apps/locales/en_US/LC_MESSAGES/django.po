@@ -8962,3 +8962,171 @@ msgstr "Slack App"
 
 msgid "Root Directory"
 msgstr ""
+
+msgid "Create trigger"
+msgstr ""
+
+msgid "Get the trigger list"
+msgstr ""
+
+msgid "Get trigger details"
+msgstr ""
+
+msgid "Modify the trigger"
+msgstr ""
+
+msgid "Delete the trigger"
+msgstr ""
+
+msgid "Delete trigger in batches"
+msgstr ""
+
+msgid "Activate trigger in batches"
+msgstr ""
+
+msgid "Get the trigger list by page"
+msgstr ""
+
+msgid "Create trigger in source"
+msgstr ""
+
+msgid "Get the trigger list of source"
+msgstr ""
+
+msgid "Modify the task source trigger"
+msgstr ""
+
+msgid "Get Task source trigger details"
+msgstr ""
+
+msgid "Delete the task source trigger"
+msgstr ""
+
+msgid "Get the task list of triggers"
+msgstr ""
+
+msgid "Retrieve detailed records of tasks executed by the trigger."
+msgstr ""
+
+msgid "Get a paginated list of execution records for trigger tasks."
+msgstr ""
+
+msgid "%s must be an array"
+msgstr ""
+
+msgid "%s must not be empty"
+msgstr ""
+
+msgid "%s values must be between %s and %s"
+msgstr ""
+
+msgid "Invalid time format: %s, must be HH:MM (e.g., 09:00)"
+msgstr ""
+
+msgid "schedule_type must be one of %s"
+msgstr ""
+
+msgid "interval_value must be an integer greater than or equal to 1"
+msgstr ""
+
+msgid "interval_unit must be one of %s"
+msgstr ""
+
+msgid "body must be an array"
+msgstr ""
+
+msgid "Error trigger type"
+msgstr ""
+
+msgid "The following id does not exist: %s"
+msgstr ""
+
+msgid "%s must be a dict"
+msgstr ""
+
+msgid "input_field_list must be a dict"
+msgstr ""
+
+msgid "%s type requires %s field"
+msgstr ""
+
+msgid "trigger name"
+msgstr ""
+
+msgid "trigger description"
+msgstr ""
+
+msgid "trigger setting"
+msgstr ""
+
+msgid "Trigger ID"
+msgstr ""
+
+msgid "Trigger task can not be empty"
+msgstr ""
+
+msgid "%s id does not exist"
+msgstr ""
+
+msgid "Trigger id does not exist"
+msgstr ""
+
+msgid "Trigger not found"
+msgstr ""
+
+msgid "Trigger must have at least one task"
+msgstr ""
+
+msgid "Trigger task number must be one"
+msgstr ""
+
+msgid "Incorrect trigger task"
+msgstr ""
+
+msgid "Trigger task ID"
+msgstr ""
+
+msgid "Trigger task record ID"
+msgstr ""
+
+msgid "Trigger task record id does not exist"
+msgstr ""
+
+msgid "Order field"
+msgstr ""
+
+msgid "System Trigger"
+msgstr ""
+
+msgid "Get the System trigger list of source"
+msgstr ""
+
+msgid "Get System Task source trigger details"
+msgstr ""
+
+msgid "Modify the System task source trigger"
+msgstr ""
+
+msgid "Delete the System task source trigger"
+msgstr ""
+
+msgid "Invalid source type"
+msgstr ""
+
+msgid "Shared tool is not supported"
+msgstr ""
+
+msgid "Read Trigger"
+msgstr ""
+
+msgid "Create Trigger"
+msgstr ""
+
+msgid "Edit Trigger"
+msgstr ""
+
+msgid "Delete Trigger"
+msgstr ""
+
+msgid "Execute record"
+msgstr ""

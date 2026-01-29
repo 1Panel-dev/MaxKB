@@ -40,8 +40,7 @@ class BatchActiveSerializer(serializers.Serializer):
             if len(model_list) != len(id_list):
                 model_id_list = [str(m.id) for m in model_list]
                 error_id_list = list(filter(lambda row_id: not model_id_list.__contains__(row_id), id_list))
-                raise AppApiException(500, _('The following id does not exist: {error_id_list}').format(
-                    error_id_list=error_id_list))
+                raise AppApiException(500, _('The following id does not exist: %s') % ','.join(map(str, error_id_list)))
 
 
 class InputField(serializers.Serializer):
@@ -67,7 +66,7 @@ class ApplicationTaskParameterSerializer(serializers.Serializer):
         if not value:
             return value
         if not isinstance(value, dict):
-            raise serializers.ValidationError(f"{field_name} must be a dict")
+            raise serializers.ValidationError(_("%s must be a dict") % field_name)
 
         for key, val in value.items():
             serializer = InputField(data=val)
@@ -89,7 +88,7 @@ class ToolTaskParameterSerializer(serializers.Serializer):
         if not value:
             return value
         if not isinstance(value, dict):
-            raise serializers.ValidationError("input_field_list must be a dict")
+            raise serializers.ValidationError(_("input_field_list must be a dict"))
 
         for key, val in value.items():
             serializer = InputField(data=val)
@@ -122,19 +121,17 @@ class TriggerValidationMixin:
     def _validate_required_field(setting, field_name, trigger_type):
         if field_name not in setting:
             raise serializers.ValidationError({
-                'trigger_setting': f'{trigger_type} type requires {field_name} field'
+                'trigger_setting': _('%s type requires %s field') % (trigger_type, field_name)
             })
 
     @staticmethod
     def _validate_non_empty_array(value, field_name):
         if not isinstance(value, list):
             raise serializers.ValidationError({
-                'trigger_setting': f'{field_name} must be an array'
-            })
+                'trigger_setting': _('%s must be an array') % field_name            })
         if len(value) == 0:
             raise serializers.ValidationError({
-                'trigger_setting': f'{field_name} must not be empty'
-            })
+                'trigger_setting': _('%s must not be empty') % field_name            })
 
     @staticmethod
     def _validate_number_range(values, field_name, min_val, max_val):
@@ -145,7 +142,7 @@ class TriggerValidationMixin:
                     raise ValueError
             except (ValueError, TypeError):
                 raise serializers.ValidationError({
-                    'trigger_setting': f'{field_name} values must be between "{min_val}" and "{max_val}"'
+                    'trigger_setting': _('%s values must be between %s and %s') % (field_name, min_val, max_val)
                 })
 
     def _validate_time_array(self, time_list):
@@ -161,7 +158,7 @@ class TriggerValidationMixin:
         pattern = r'^([01]\d|2[0-3]):([0-5]\d)$'
         if not re.match(pattern, str(time_str)):
             raise serializers.ValidationError({
-                'trigger_setting': f'Invalid time format: {time_str}, must be HH:MM (e.g., 09:00)'
+                'trigger_setting': _('Invalid time format: %s, must be HH:MM (e.g., 09:00)') % time_str
             })
 
     def _validate_scheduled_setting(self, setting):
@@ -169,7 +166,8 @@ class TriggerValidationMixin:
 
         valid_types = ['daily', 'weekly', 'monthly', 'interval']
         if schedule_type not in valid_types:
-            raise serializers.ValidationError({'trigger_setting': f'schedule_type must be one of {valid_types}'})
+            raise serializers.ValidationError({    'trigger_setting': _('schedule_type must be one of %s') % ', '.join(valid_types)
+})
         if schedule_type == 'daily':
             self._validate_daily(setting)
         elif schedule_type == 'weekly':
@@ -210,12 +208,12 @@ class TriggerValidationMixin:
                 raise ValueError
         except (ValueError, TypeError):
             raise serializers.ValidationError({
-                'trigger_setting': 'interval_value must be an integer greater than or equal to 1'
+                'trigger_setting': _('interval_value must be an integer greater than or equal to 1')
             })
         valid_units = ['minutes', 'hours']
         if interval_unit not in valid_units:
             raise serializers.ValidationError({
-                'trigger_setting': f'interval_unit must be one of {valid_units}'
+                'trigger_setting': _('interval_unit must be one of %s') % ', '.join(valid_units)
             })
 
     @staticmethod
@@ -223,7 +221,7 @@ class TriggerValidationMixin:
         body = setting.get('body')
         if body is not None and not isinstance(body, list):
             raise serializers.ValidationError({
-                'trigger_setting': 'body must be an array'
+                'trigger_setting': _('body must be an array')
             })
 
 
@@ -421,7 +419,7 @@ class TriggerSerializer(serializers.Serializer):
         source_model, field = config.get(TriggerTaskTypeChoices(source_type))
         source = QuerySet(source_model).filter(id=source_id).first()
         if not source:
-            raise AppApiException(500, _(f'{source_type} id does not exist'))
+            raise AppApiException(500, _('%s id does not exist') % source_type)
 
         return getattr(source, field)
 

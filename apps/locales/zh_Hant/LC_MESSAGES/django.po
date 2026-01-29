@@ -9082,3 +9082,171 @@ msgstr "Slack 應用"
 
 msgid "Root Directory"
 msgstr "根目錄"
+
+msgid "Create trigger"
+msgstr "建立觸發器"
+
+msgid "Get the trigger list"
+msgstr "取得觸發器清單"
+
+msgid "Get trigger details"
+msgstr "取得觸發器詳情"
+
+msgid "Modify the trigger"
+msgstr "修改觸發器"
+
+msgid "Delete the trigger"
+msgstr "刪除觸發器"
+
+msgid "Delete trigger in batches"
+msgstr "批次刪除觸發器"
+
+msgid "Activate trigger in batches"
+msgstr "批次啟用/停用觸發器"
+
+msgid "Get the trigger list by page"
+msgstr "分頁取得觸發器清單"
+
+msgid "Create trigger in source"
+msgstr "資源端建立觸發器"
+
+msgid "Get the trigger list of source"
+msgstr "取得資源端觸發器清單"
+
+msgid "Get Task source trigger details"
+msgstr "取得資源端觸發器詳情"
+
+msgid "Delete the task source trigger"
+msgstr "刪除資源端觸發器"
+
+msgid "Get the task list of triggers"
+msgstr "取得觸發器任務清單"
+
+msgid "Retrieve detailed records of tasks executed by the trigger."
+msgstr "取得由該觸發器執行的任務詳細記錄。"
+
+msgid "Get a paginated list of execution records for trigger tasks."
+msgstr "取得觸發器任務執行記錄的分頁清單。"
+
+msgid "%s must be an array"
+msgstr "%s 必須是陣列類型"
+
+msgid "%s must not be empty"
+msgstr "%s 不能為空"
+
+msgid "%s values must be between %s and %s"
+msgstr "%s 的值必須在 %s 到 %s 之間"
+
+msgid "Invalid time format: %s, must be HH:MM (e.g., 09:00)"
+msgstr "時間格式無效: %s，必須是 HH:MM 格式 (例如: 09:00)"
+
+msgid "schedule_type must be one of %s"
+msgstr "schedule_type 必須是以下值之一: %s"
+
+msgid "interval_value must be an integer greater than or equal to 1"
+msgstr "interval_value 必須是大於或等於 1 的整數"
+
+msgid "interval_unit must be one of %s"
+msgstr "interval_unit 必須是以下值之一: %s"
+
+msgid "body must be an array"
+msgstr "body 必須是陣列類型"
+
+msgid "Error trigger type"
+msgstr "觸發器類型錯誤"
+
+msgid "The following id does not exist: %s"
+msgstr "以下 id 不存在: %s"
+
+msgid "%s must be a dict"
+msgstr "%s 必須是字典類型"
+
+msgid "input_field_list must be a dict"
+msgstr "input_field_list 必須是字典類型"
+
+msgid "%s type requires %s field"
+msgstr "%s 類型需要 %s 欄位"
+
+msgid "trigger name"
+msgstr "觸發器名稱"
+
+msgid "trigger description"
+msgstr "觸發器描述"
+
+msgid "trigger setting"
+msgstr "觸發器設定"
+
+msgid "Trigger ID"
+msgstr "觸發器ID"
+
+msgid "Trigger task can not be empty"
+msgstr "觸發器任務不能為空"
+
+msgid "%s id does not exist"
+msgstr "%s id 不存在"
+
+msgid "Trigger id does not exist"
+msgstr "觸發器 id 不存在"
+
+msgid "Trigger not found"
+msgstr "未找到觸發器"
+
+msgid "Trigger must have at least one task"
+msgstr "觸發器必須至少有一個任務"
+
+msgid "Trigger task number must be one"
+msgstr "觸發器任務數量必須為一個"
+
+msgid "Incorrect trigger task"
+msgstr "觸發器任務不正確"
+
+msgid "Trigger task ID"
+msgstr "觸發器任務ID"
+
+msgid "Trigger task record ID"
+msgstr "觸發器任務記錄ID"
+
+msgid "Trigger task record id does not exist"
+msgstr "觸發器任務記錄 id 不存在"
+
+msgid "Order field"
+msgstr "排序欄位"
+
+msgid "System Trigger"
+msgstr "系統觸發器"
+
+msgid "Get the System trigger list of source"
+msgstr "取得來源的系統觸發器清單"
+
+msgid "Get System Task source trigger details"
+msgstr "取得系統任務來源觸發器詳情"
+
+msgid "Modify the System task source trigger"
+msgstr "修改系統任務來源觸發器"
+
+msgid "Modify the task source trigger"
+msgstr "修改任務來源觸發器"
+
+msgid "Delete the System task source trigger"
+msgstr "刪除系統任務來源觸發器"
+
+msgid "Invalid source type"
+msgstr "無效的來源類型"
+
+msgid "Shared tool is not supported"
+msgstr "不支援共享工具"
+
+msgid "Read Trigger"
+msgstr "檢視觸發器"
+
+msgid "Create Trigger"
+msgstr "建立觸發器"
+
+msgid "Edit Trigger"
+msgstr "編輯觸發器"
+
+msgid "Delete Trigger"
+msgstr "刪除觸發器"
+
+msgid "Execute record"
+msgstr "執行記錄"

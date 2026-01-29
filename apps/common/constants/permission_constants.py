@@ -560,47 +560,6 @@ class PermissionConstants(Enum):
         group=Group.TRIGGER, operate=Operate.RECORD, role_list=[RoleConstants.ADMIN],
         parent_group=[WorkspaceGroup.TRIGGER],
     )
-    # source point trigger
-    TOOL_TRIGGER_READ = Permission(
-        group=Group.TOOL, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
-    )
-    TOOL_TRIGGER_CREATE = Permission(
-        group=Group.TOOL, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
-    )
-    TOOL_TRIGGER_EDIT = Permission(
-        group=Group.TOOL, operate=Operate.TRIGGER_EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
-    )
-    TOOL_TRIGGER_DELETE = Permission(
-        group=Group.TOOL, operate=Operate.TRIGGER_DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
-    )
-    APPLICATION_TRIGGER_READ = Permission(
-        group=Group.APPLICATION, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]
-    )
-    APPLICATION_TRIGGER_CREATE = Permission(
-        group=Group.APPLICATION, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
-    )
-    APPLICATION_TRIGGER_EDIT = Permission(
-        group=Group.APPLICATION, operate=Operate.TRIGGER_EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
-    )
-    APPLICATION_TRIGGER_DELETE = Permission(
-        group=Group.APPLICATION, operate=Operate.TRIGGER_DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
-    )
     TOOL_READ = Permission(
         group=Group.TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
@@ -643,6 +602,27 @@ class PermissionConstants(Enum):
         group=Group.TOOL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
+    # source point trigger
+    TOOL_TRIGGER_READ = Permission(
+        group=Group.TOOL, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+    )
+    TOOL_TRIGGER_CREATE = Permission(
+        group=Group.TOOL, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+    )
+    TOOL_TRIGGER_EDIT = Permission(
+        group=Group.TOOL, operate=Operate.TRIGGER_EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+    )
+    TOOL_TRIGGER_DELETE = Permission(
+        group=Group.TOOL, operate=Operate.TRIGGER_DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
     )
     TOOL_FOLDER_READ = Permission(
         group=Group.TOOL_FOLDER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1052,6 +1032,26 @@ class PermissionConstants(Enum):
                                                     resource_permission_group_list=[
                                                         ResourcePermissionConst.APPLICATION_MANGE],
                                                     )
+    APPLICATION_TRIGGER_READ = Permission(
+        group=Group.APPLICATION, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]
+    )
+    APPLICATION_TRIGGER_CREATE = Permission(
+        group=Group.APPLICATION, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
+    )
+    APPLICATION_TRIGGER_EDIT = Permission(
+        group=Group.APPLICATION, operate=Operate.TRIGGER_EDIT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
+    )
+    APPLICATION_TRIGGER_DELETE = Permission(
+        group=Group.APPLICATION, operate=Operate.TRIGGER_DELETE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
+    )
     APPLICATION_FOLDER_READ = Permission(group=Group.APPLICATION_FOLDER, operate=Operate.READ,
                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                          parent_group=[UserGroup.APPLICATION],
