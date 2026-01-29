@@ -105,7 +105,7 @@ const workspace = {
   trigger_read: (source_id:string) => 
         hasPermission(
             [
-              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
               PermissionConst.TOOL_TRIGGER_READ.getApplicationWorkspaceResourcePermission(source_id)  
@@ -115,30 +115,30 @@ const workspace = {
   trigger_create: (source_id:string) => 
     hasPermission(
             [
-              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
-              PermissionConst.TOOL_TRIGGER_CREATE.getApplicationWorkspaceResourcePermission(source_id)  
+              PermissionConst.TOOL_TRIGGER_CREATE.getToolWorkspaceResourcePermission(source_id)  
             ],
             'OR'
     ),
   trigger_edit: (source_id: string) => 
     hasPermission(
             [
-              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
-              PermissionConst.TOOL_TRIGGER_EDIT.getApplicationWorkspaceResourcePermission(source_id)  
+              PermissionConst.TOOL_TRIGGER_EDIT.getToolWorkspaceResourcePermission(source_id)  
             ],
             'OR'
     ),
   trigger_delete: (source_id:string) => 
     hasPermission(
             [
-              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
               RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
               PermissionConst.TOOL_TRIGGER_DELETE.getWorkspacePermissionWorkspaceManageRole,
-              PermissionConst.TOOL_TRIGGER_DELETE.getApplicationWorkspaceResourcePermission(source_id)  
+              PermissionConst.TOOL_TRIGGER_DELETE.getToolWorkspaceResourcePermission(source_id)  
             ],
             'OR'
     ),

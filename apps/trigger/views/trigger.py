@@ -185,7 +185,7 @@ class TriggerView(APIView):
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         @log(
-            menu="Trigger", operate="Delete the trigger",
+            menu="Trigger", operate="Delete trigger in batches",
             get_operation_object=lambda r, k: get_trigger_operation_object_batch(r.data.get('id_list')),
         )
         def put(self, request: Request, workspace_id: str):
