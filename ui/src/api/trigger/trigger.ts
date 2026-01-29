@@ -263,7 +263,7 @@ const putResourceTrigger: (
   data: TriggerData,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (source_type, source_id, trigger_id, data, loading) => {
-  return post(
+  return put(
     `${prefixWorkspace.value}/${source_type}/${source_id}/trigger/${trigger_id}`,
     data,
     undefined,

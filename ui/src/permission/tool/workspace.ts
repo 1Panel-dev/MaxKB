@@ -102,6 +102,46 @@ const workspace = {
       ],
       'OR',
     ),
+  trigger_read: (source_id:string) => 
+        hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.TOOL_TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.TOOL_TRIGGER_READ.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+  trigger_create: (source_id:string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.TOOL_TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.TOOL_TRIGGER_CREATE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+  trigger_edit: (source_id: string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.TOOL_TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.TOOL_TRIGGER_EDIT.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+  trigger_delete: (source_id:string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.TOOL_TRIGGER_DELETE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.TOOL_TRIGGER_DELETE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
   switch: (source_id:string) =>
     hasPermission(
       [

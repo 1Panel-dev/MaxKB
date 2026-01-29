@@ -5,10 +5,8 @@ const ModelRouter = {
   meta: {
     title: 'views.trigger.title',
     permission: [
-      RoleConst.USER.getWorkspaceRole,
       RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-      PermissionConst.TOOL_READ.getWorkspacePermission,
-      PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,
+      PermissionConst.TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
     ],
     group: 'workspace',
     order: 5,

@@ -32,6 +32,38 @@ const systemManage = {
             ],
             'OR'
     ),
+    trigger_read: () =>
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_TRIGGER_READ
+            ],
+            'OR'
+    ),
+    trigger_create: () =>
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_TRIGGER_CREATE
+            ],
+            'OR'
+    ),
+    trigger_edit: () =>
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_TRIGGER_EDIT
+            ],
+            'OR'
+    ),
+    trigger_delete: () =>
+        hasPermission(
+            [
+              RoleConst.ADMIN,
+              PermissionConst.RESOURCE_APPLICATION_TRIGGER_DELETE
+            ],
+            'OR'
+    ),
     debug: () =>
         hasPermission(
             [

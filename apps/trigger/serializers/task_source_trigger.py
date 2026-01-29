@@ -107,7 +107,7 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
             return {
                 **TriggerModelSerializer(trigger).data,
                 'trigger_task': trigger_task,
-                'application_task': tool_task,
+                'tool_task': tool_task,
             }
 
     @transaction.atomic
@@ -137,7 +137,7 @@ class TaskSourceTriggerOperateSerializer(serializers.Serializer):
 
         if need_redeploy:
             if trigger.is_active:
-                deploy(ToolModelSerializer(trigger).data, **{})
+                deploy(TriggerModelSerializer(trigger).data, **{})
             else:
                 undeploy(TriggerModelSerializer(trigger).data, **{})
 

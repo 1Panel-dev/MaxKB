@@ -460,7 +460,7 @@
     <ToolDialog @refresh="toolRefresh" ref="toolDialogRef"></ToolDialog>
     <template #footer>
       <el-button @click="close">{{ $t('common.cancel') }}</el-button>
-      <el-button v-if="submitPermission" type="primary" @click="submit">{{
+      <el-button v-if="editPermission" type="primary" @click="submit">{{
         is_edit ? $t('common.save') : $t('common.create')
       }}</el-button>
     </template>
@@ -474,6 +474,7 @@ import ApplicationDialog from '@/views/application/component/ApplicationDialog.v
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import applicationAPI from '@/api/application/application'
 import triggerAPI from '@/api/trigger/trigger'
+import systemManageTriggerAPI from '@/api/system-resource-management/trigger'
 import toolAPI from '@/api/tool/tool'
 import ToolParameter from '@/views/trigger/component/ToolParameter.vue'
 import ApplicationParameter from '@/views/trigger/component/ApplicationParameter.vue'
@@ -481,8 +482,10 @@ import { resetUrl } from '@/utils/common.ts'
 import { triggerCycleOptions } from '@/utils/trigger.ts'
 import { t } from '@/locales'
 import { type FormInstance } from 'element-plus'
+import { useRoute } from 'vue-router'
 import Result from '@/request/Result'
 import { hasPermission } from '@/utils/permission'
+import permissionMap from '@/permission'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const emit = defineEmits(['refresh'])
@@ -505,28 +508,34 @@ const collapseData = reactive({
 })
 const showTast = ref<string>('')
 
-const submitPermission = computed(() => {
-  return is_edit.value ? triggerPermissionMap.edit() : triggerPermissionMap.create()
+const route = useRoute()
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
 })
 
-const triggerPermissionMap = {
-  edit: () =>
-    hasPermission(
+const permissionPrecise = computed(() => {
+  return permissionMap[current_source_type.value?.toLocaleLowerCase() as 'application' | 'tool'][
+    apiType.value as 'workspace' | 'systemManage'
+  ]
+})
+
+const editPermission = computed(() => {
+  if (current_source_id.value && current_source_type.value) {
+    return permissionPrecise.value.trigger_edit(current_source_id.value)
+  } else {
+    return hasPermission(
       [
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
-    ),
-  create: () =>
-    hasPermission(
-      [
-        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
-      ],
-      'OR',
-    ),
-}
+    )
+  }
+})
 
 const triggerFormRef = ref<FormInstance>()
 const copy = () => {
@@ -685,26 +694,49 @@ const event_url = computed(() => {
 })
 
 const init = (trigger_id: string) => {
-  triggerAPI.getTriggerDetail(trigger_id).then((ok) => {
-    form.value = ok.data
-
-    applicationDetailsDict.value = ok.data.application_task_list
-      .map((item: any) => ({ [item.id]: item }))
-      .reduce((x: any, y: any) => ({ ...x, ...y }), {})
-    toolDetailsDict.value = ok.data.tool_task_list
-      .map((item: any) => ({ [item.id]: item }))
-      .reduce((x: any, y: any) => ({ ...x, ...y }), {})
-  })
+  if (current_source_id.value && current_source_type.value) {
+    let api
+    if (apiType.value === 'workspace') {
+      api = triggerAPI.getResourceTriggerDetail(
+        current_source_type.value,
+        current_source_id.value,
+        trigger_id,
+      )
+    } else {
+      api = systemManageTriggerAPI.getResourceTriggerDetail(
+        current_source_type.value,
+        current_source_id.value,
+        trigger_id,
+      )
+    }
+    api.then((ok) => {
+      form.value = { ...ok.data, trigger_task: [ok.data.trigger_task] }
+      applicationDetailsDict.value = { [ok.data.application_task.id]: ok.data.application_task }
+      toolDetailsDict.value = { [ok.data.tool_task.id]: ok.data.tool_task }
+    })
+  } else {
+    triggerAPI.getTriggerDetail(trigger_id).then((ok) => {
+      form.value = ok.data
+      applicationDetailsDict.value = (ok.data.application_task_list || [])
+        .map((item: any) => ({ [item.id]: item }))
+        .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+      toolDetailsDict.value = (ok.data.tool_task_list || [])
+        .map((item: any) => ({ [item.id]: item }))
+        .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+    })
+  }
 }
 const current_trigger_id = ref<string>()
+const current_source_id = ref<string>()
+const current_source_type = ref<string>()
+
 const open = (trigger_id?: string, source_type?: string, source_id?: string) => {
   is_edit.value = trigger_id ? true : false
   current_trigger_id.value = trigger_id
   drawer.value = true
-  if (trigger_id) {
-    init(trigger_id)
-  }
   if (source_type && source_id) {
+    current_source_type.value = source_type
+    current_source_id.value = source_id
     if (source_type == 'APPLICATION') {
       applicationRefresh({ application_ids: [source_id] })
     }
@@ -712,9 +744,14 @@ const open = (trigger_id?: string, source_type?: string, source_id?: string) => 
       toolRefresh({ tool_ids: [source_id] })
     }
   }
+  if (trigger_id) {
+    init(trigger_id)
+  }
 }
 
 const close = () => {
+  current_source_id.value = undefined
+  current_source_type.value = undefined
   drawer.value = false
   form.value = getDefaultValue()
 }

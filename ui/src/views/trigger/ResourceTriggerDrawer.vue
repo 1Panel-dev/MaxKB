@@ -7,7 +7,12 @@
       <h4 class="title-decoration-1 mb-16 mt-16">
         {{ $t('views.trigger.title') }}
       </h4>
-      <el-button link type="primary" @click="openCreateTriggerDrawer()">
+      <el-button
+        v-if="permissionPrecise.trigger_create(toolId)"
+        link
+        type="primary"
+        @click="openCreateTriggerDrawer()"
+      >
         <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
         {{ $t('common.add') }}
       </el-button>
@@ -30,7 +35,11 @@
               </el-button>
             </span>
 
-            <el-button text @click="removeTrigger(item)">
+            <el-button
+              v-if="permissionPrecise.trigger_delete(toolId)"
+              text
+              @click="removeTrigger(item)"
+            >
               <el-icon><Close /></el-icon>
             </el-button>
           </div>
@@ -54,21 +63,27 @@ import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import TriggerDrawer from '@/views/trigger/TriggerDrawer.vue'
+import permissionMap from '@/permission'
 import triggerAPI from '@/api/trigger/trigger'
 import { getTriggerCycleLabel } from '@/utils/trigger'
-const route = useRoute()
 
 const props = defineProps<{
   source: string
 }>()
+
+const route = useRoute()
 const apiType = computed(() => {
-  if (route.path.includes('shared')) {
-    return 'systemShare'
-  } else if (route.path.includes('resource-management')) {
+  if (route.path.includes('resource-management')) {
     return 'systemManage'
   } else {
     return 'workspace'
   }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap[props.source.toLowerCase() as 'application' | 'tool'][
+    apiType.value as 'workspace' | 'systemManage'
+  ]
 })
 
 const toolId = ref<string>('')
@@ -97,7 +112,7 @@ const openCreateTriggerDrawer = () => {
   triggerDrawerRef.value?.open(undefined, props.source, toolId.value)
 }
 const openEditTriggerDrawer = (trigger: any) => {
-  triggerDrawerRef.value?.open(trigger.id)
+  triggerDrawerRef.value?.open(trigger.id, props.source, toolId.value)
 }
 
 function getTriggerList() {

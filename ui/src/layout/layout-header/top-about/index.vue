@@ -9,7 +9,20 @@
       <AppIcon iconName="app-pricing" class="mr-8"></AppIcon>
       {{ $t('common.upgrade') }}
     </el-button>
-    <el-tooltip effect="dark" :content="$t('views.trigger.title')" placement="top">
+    <el-tooltip
+      v-if="
+        hasPermission(
+          [
+            RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            PermissionConst.TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
+          ],
+          'OR',
+        )
+      "
+      effect="dark"
+      :content="$t('views.trigger.title')"
+      placement="top"
+    >
       <el-button
         text
         @click="router.push({ name: 'trigger' })"
@@ -68,7 +81,8 @@
 </template>
 <script setup lang="ts">
 import useStore from '@/stores'
-import { EditionConst, RoleConst } from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import { useRoute, useRouter } from 'vue-router'
 const route = useRoute()
 const router = useRouter()

@@ -93,6 +93,46 @@ const workspace = {
             ],
             'OR'
     ),
+    trigger_read: (source_id:string) => 
+        hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_TRIGGER_READ.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+        trigger_create: (source_id:string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_TRIGGER_CREATE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+            trigger_edit: (source_id:string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_TRIGGER_EDIT.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
+                trigger_delete: (source_id:string) => 
+    hasPermission(
+            [
+              new ComplexPermission([RoleConst.USER],[PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],[],'AND'),
+              RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+              PermissionConst.APPLICATION_TRIGGER_DELETE.getWorkspacePermissionWorkspaceManageRole,
+              PermissionConst.APPLICATION_TRIGGER_DELETE.getApplicationWorkspaceResourcePermission(source_id)  
+            ],
+            'OR'
+    ),
     auth: (source_id:string) => 
         hasPermission(
             [
