@@ -267,29 +267,36 @@ const base_field_list = computed<Array<any>>(() => {
   return result
 })
 const init_parameters = () => {
-  const parameter: any = {}
+  const parameter: any = { ...props.modelValue }
   base_field_list.value.forEach((f) => {
-    parameter[f.field] = { source: 'custom', value: f.default_value }
+    if (!parameter[f.field]) {
+      parameter[f.field] = { source: 'custom', value: f.default_value }
+    }
   })
   api_input_field_list.value.forEach((f) => {
     if (!parameter.api_input_field_list) {
       parameter['api_input_field_list'] = {}
     }
-    parameter['api_input_field_list'][f.field] = {
-      source: 'custom',
-      value: f.default_value ? f.default_value : '',
+    if (!parameter['api_input_field_list'][f.field]) {
+      parameter['api_input_field_list'][f.field] = {
+        source: 'custom',
+        value: f.default_value ? f.default_value : '',
+      }
     }
   })
   user_input_field_list.value.forEach((f) => {
     if (!parameter['user_input_field_list']) {
       parameter['user_input_field_list'] = {}
     }
-    parameter['user_input_field_list'][f.field] = {
-      source: 'custom',
-      value: f.default_value ? f.default_value : '',
+    if (!parameter['user_input_field_list'][f.field]) {
+      parameter['user_input_field_list'][f.field] = {
+        source: 'custom',
+        value: f.default_value ? f.default_value : '',
+      }
     }
   })
-  emit('update:modelValue', { ...parameter, ...props.modelValue })
+
+  emit('update:modelValue', { ...parameter })
 }
 
 init_parameters()

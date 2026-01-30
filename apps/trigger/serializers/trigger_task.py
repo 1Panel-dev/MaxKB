@@ -17,7 +17,9 @@ from application.models import ChatRecord
 from common.db.search import native_page_search, get_dynamics_model
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
+from knowledge.models.knowledge_action import State
 from maxkb.conf import PROJECT_DIR
+from tools.models import ToolRecord
 from trigger.models import TriggerTask, TaskRecord, Trigger
 
 
@@ -85,10 +87,39 @@ class TriggerTaskRecordOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _('Trigger task record id does not exist'))
         if task_record.source_type == 'APPLICATION':
             chat_record = QuerySet(ChatRecord).filter(id=task_record.task_record_id).first()
-            return ChatRecordSerializerModel(chat_record).data
+            if chat_record:
+                return ChatRecordSerializerModel(chat_record).data
+            return {
+                'state': 'TRIGGER_ERROR',
+                'meta': task_record.meta
+            }
         if task_record.source_type == 'TOOL':
-            pass
-        return None
+            tool_record = QuerySet(ToolRecord).filter(id=task_record.task_record_id).first()
+            if tool_record:
+                return {
+                    'id': tool_record.id,
+                    'tool_id': tool_record.tool_id,
+                    'workspace_id': tool_record.workspace_id,
+                    'source_type': tool_record.source_type,
+                    'source_id': tool_record.source_id,
+                    'meta': tool_record.meta,
+                    'state': tool_record.state,
+                    'run_time': tool_record.run_time,
+                    'details': {
+                        'tool_call': {
+                            'index': 0,
+                            'result': tool_record.meta.get('output'),
+                            'params': tool_record.meta.get('input'),
+                            'status': 500 if tool_record.state == State.FAILURE else 200 if tool_record.state == State.SUCCESS else 201,
+                            'type': 'tool-node',
+                            'err_message': tool_record.meta.get('err_message')
+                        }
+                    }
+                }
+            return {
+                'state': 'TRIGGER_ERROR',
+                'meta': task_record.meta
+            }
 
 
 class TriggerTaskRecordQuerySerializer(serializers.Serializer):

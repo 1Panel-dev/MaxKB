@@ -184,11 +184,10 @@ class ToolTask(BaseTriggerTask):
             QuerySet(TaskRecord).filter(id=task_record_id).update(
                 state=State.FAILURE,
                 run_time=time.time() - start_time,
-                meta={'input': parameter_setting, 'output': 'Error: ' + str(e)}
+                meta={'input': parameter_setting, 'output': 'Error: ' + str(e), 'err_message': 'Error: ' + str(e)}
             )
             QuerySet(ToolRecord).filter(id=task_record_id).update(
                 state=State.FAILURE,
                 run_time=time.time() - start_time,
-                meta={'input': parameter_setting, 'output': 'Error: ' + str(e)}
+                meta={'input': parameter_setting, 'output': 'Error: ' + str(e), 'err_message': 'Error: ' + str(e)}
             )
-

@@ -7,13 +7,15 @@
     @desc:
 """
 import json
-from functools import reduce
+import time
+import traceback
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
 from application.models import ChatUserType, Chat, ChatRecord, ChatSourceChoices, Application
 from chat.serializers.chat import ChatSerializers
+from common.utils.logger import maxkb_logger
 from knowledge.models.knowledge_action import State
 from trigger.handler.base_task import BaseTriggerTask
 from trigger.models import TaskRecord, TriggerTask
@@ -30,9 +32,7 @@ def get_reference(fields, obj):
 
 
 def conversion_custom_value(value, _type):
-    if ['array', 'dict', 'float', 'int', 'boolean'].__contains__(_type):
-        return json.loads(value)
-    if _type == 'any':
+    if ['array', 'dict', 'float', 'int', 'boolean', 'any'].__contains__(_type):
         try:
             return json.loads(value)
         except Exception as e:
@@ -86,7 +86,7 @@ def get_application_execute_parameters(parameter_setting, application_parameters
                     _setting = setting.get(ck)
                     if _setting:
                         _value = get_field_value(_setting, kwargs, cv.get('type'), cv.get('required'),
-                                                 cv.get('default_value'), cv.get('field'))
+                                                 cv.get('default_value'), ck)
                         parameters['form_data'][ck] = _value
                     else:
                         if cv.get('default_value'):
@@ -96,7 +96,7 @@ def get_application_execute_parameters(parameter_setting, application_parameters
                                 raise Exception(f'{ck} is required')
             else:
                 value = get_field_value(setting, kwargs, value.get('type'), value.get('required'),
-                                        value.get('default_value'), value.get('field'))
+                                        value.get('default_value'), key)
                 parameters['message' if key == 'question' else key] = value
         else:
             if value.get('default_value'):
@@ -145,7 +145,7 @@ def get_application_parameters_setting(application):
     else:
         base_node_list = [n for n in application.work_flow.get('nodes') if n.get('type') == "base-node"]
         if len(base_node_list) == 0:
-            raise Exception('错误的应用工作流信息')
+            raise Exception('Incorrect application workflow information')
         base_node = base_node_list[0]
         api_input_field_list = base_node.get('properties').get('api_input_field_list') or []
         api_input_field_list = {user_field.get('variable'): {
@@ -178,39 +178,43 @@ class ApplicationTask(BaseTriggerTask):
 
     def execute(self, trigger_task, **kwargs):
         parameter_setting = trigger_task.get('parameter')
-        application = QuerySet(Application).filter(id=trigger_task.get('source_id')).only('type', 'work_flow').first()
-        if application is None:
-            QuerySet(TriggerTask).filter(id=trigger_task.get('id')).delete()
-            return
-        application_parameters_setting = get_application_parameters_setting(application)
-        parameters = get_application_execute_parameters(parameter_setting, application_parameters_setting, kwargs)
-        parameters['re_chat'] = False
-        parameters['stream'] = True
-        chat_id = uuid.uuid7()
-        chat_user_id = str(uuid.uuid7())
-        chat_record_id = str(uuid.uuid7())
-        parameters['chat_record_id'] = chat_record_id
-        application_id = trigger_task.get('source_id')
-        message = parameters.get('message')
-        Chat.objects.get_or_create(id=chat_id, defaults={
-            'application_id': application_id,
-            'abstract': message,
-            'chat_user_id': chat_user_id,
-            'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
-            'asker': {'username': "游客"},
-            'ip_address': kwargs.get('body')['ip_address'],
-            'source': {
-                'type': ChatSourceChoices.TRIGGER.value
-            },
-        })
         task_record_id = uuid.uuid7()
-        TaskRecord(id=task_record_id, trigger_id=trigger_task.get('trigger'), trigger_task_id=trigger_task.get('id'),
-                   source_type="APPLICATION",
-                   source_id=application_id,
-                   task_record_id=chat_record_id,
-                   meta={'chat_id': chat_id},
-                   state=State.STARTED).save()
+        start_time = time.time()
         try:
+            application = QuerySet(Application).filter(id=trigger_task.get('source_id')).only('type',
+                                                                                              'work_flow').first()
+            if application is None:
+                QuerySet(TriggerTask).filter(id=trigger_task.get('id')).delete()
+                return
+            application_id = trigger_task.get('source_id')
+            chat_id = uuid.uuid7()
+            chat_user_id = str(uuid.uuid7())
+            chat_record_id = str(uuid.uuid7())
+            TaskRecord(id=task_record_id, trigger_id=trigger_task.get('trigger'),
+                       trigger_task_id=trigger_task.get('id'),
+                       source_type="APPLICATION",
+                       source_id=application_id,
+                       task_record_id=chat_record_id,
+                       meta={'chat_id': chat_id},
+                       state=State.STARTED).save()
+            application_parameters_setting = get_application_parameters_setting(application)
+            parameters = get_application_execute_parameters(parameter_setting, application_parameters_setting, kwargs)
+            parameters['re_chat'] = False
+            parameters['stream'] = True
+            parameters['chat_record_id'] = chat_record_id
+            message = parameters.get('message')
+            Chat.objects.get_or_create(id=chat_id, defaults={
+                'application_id': application_id,
+                'abstract': message,
+                'chat_user_id': chat_user_id,
+                'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
+                'asker': {'username': "游客"},
+                'ip_address': kwargs.get('body')['ip_address'],
+                'source': {
+                    'type': ChatSourceChoices.TRIGGER.value
+                },
+            })
+
             list(ChatSerializers(data={
                 "chat_id": chat_id,
                 "chat_user_id": chat_user_id,
@@ -223,8 +227,22 @@ class ApplicationTask(BaseTriggerTask):
                 'debug': False
             }).chat(instance=parameters))
             chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
-            state = get_workflow_state(chat_record.details)
-            QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=chat_record.run_time)
+            if chat_record:
+                state = get_workflow_state(chat_record.details)
+                QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=chat_record.run_time,
+                                                                      meta={'parameter_setting': parameter_setting,
+                                                                            'input': parameters, 'output': None})
+            else:
+                QuerySet(TaskRecord).filter(id=task_record_id).update(state=State.FAILURE,
+                                                                      run_time=time.time() - start_time,
+                                                                      meta={'parameter_setting': parameter_setting,
+                                                                            'input': parameters, 'output': None,
+                                                                            'err_message': 'Error: An unknown error occurred during the execution of the conversation'})
         except Exception as e:
-            state = State.FAILURE
-            QuerySet(TaskRecord).filter(id=task_record_id).update(state=state, run_time=0)
+            maxkb_logger.error(f"Application execution error: {traceback.format_exc()}")
+            QuerySet(TaskRecord).filter(id=task_record_id).update(
+                state=State.FAILURE,
+                run_time=time.time() - start_time,
+                meta={'input': {'parameter_setting': parameter_setting, **kwargs}, 'output': None,
+                      'err_message': 'Error: ' + str(e)}
+            )
