@@ -54,7 +54,7 @@ from system_manage.serializers.resource_mapping_serializers import ResourceMappi
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope
 from tools.serializers.tool import ToolExportModelSerializer
-from trigger.models import TriggerTask
+from trigger.models import TriggerTask, Trigger
 from users.models import User
 from users.serializers.user import is_workspace_manage
 
@@ -790,6 +790,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         return tools
 
     def delete(self, with_valid=True):
+        from trigger.handler.simple_tools import deploy
+        from trigger.serializers.trigger import TriggerModelSerializer
         if with_valid:
             self.is_valid()
         application_id = self.data.get('application_id')
@@ -798,6 +800,16 @@ class ApplicationOperateSerializer(serializers.Serializer):
             Q(target_id=application_id) | Q(source_id=application_id)
         ).delete()
         QuerySet(Application).filter(id=application_id).delete()
+        trigger_ids = list(
+            QuerySet(TriggerTask).filter(
+                source_type="APPLICATION", source_id=self.data.get('id')
+            ).values('trigger_id').distinct()
+        )
+        QuerySet(TriggerTask).filter(source_type="APPLICATION", source_id=self.data.get('id')).delete()
+        for trigger_id in trigger_ids:
+            trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
+            if trigger and trigger.is_active:
+                deploy(TriggerModelSerializer(trigger).data, **{})
         return True
 
     def export(self, with_valid=True):
