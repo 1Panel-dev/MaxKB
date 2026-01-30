@@ -142,7 +142,7 @@
 
         <el-cascader
           v-if="modelValue['api_input_field_list'][f.field].source === 'reference'"
-          v-model="modelValue[f.field].value"
+          v-model="modelValue['api_input_field_list'][f.field].value"
           :options="options"
           :placeholder="$t('common.selectPlaceholder')"
           :props="props"
