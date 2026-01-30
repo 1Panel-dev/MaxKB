@@ -128,10 +128,10 @@ class TriggerValidationMixin:
     def _validate_non_empty_array(value, field_name):
         if not isinstance(value, list):
             raise serializers.ValidationError({
-                'trigger_setting': _('%s must be an array') % field_name            })
+                'trigger_setting': _('%s must be an array') % field_name})
         if len(value) == 0:
             raise serializers.ValidationError({
-                'trigger_setting': _('%s must not be empty') % field_name            })
+                'trigger_setting': _('%s must not be empty') % field_name})
 
     @staticmethod
     def _validate_number_range(values, field_name, min_val, max_val):
@@ -166,8 +166,9 @@ class TriggerValidationMixin:
 
         valid_types = ['daily', 'weekly', 'monthly', 'interval']
         if schedule_type not in valid_types:
-            raise serializers.ValidationError({    'trigger_setting': _('schedule_type must be one of %s') % ', '.join(valid_types)
-})
+            raise serializers.ValidationError(
+                {'trigger_setting': _('schedule_type must be one of %s') % ', '.join(valid_types)
+                 })
         if schedule_type == 'daily':
             self._validate_daily(setting)
         elif schedule_type == 'weekly':
