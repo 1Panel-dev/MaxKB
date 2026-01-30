@@ -274,7 +274,7 @@
                 <el-tooltip
                   v-if="triggerPermissionMap.record()"
                   effect="dark"
-                  :content="$t('workflow.ExecutionRecord')"
+                  :content="$t('common.ExecutionRecord.title')"
                   placement="top"
                 >
                   <span class="mr-4">

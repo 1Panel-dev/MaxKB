@@ -4,6 +4,7 @@ export default {
   task: '任务',
   triggerTask: '触发任务',
   taskExecution: '任务执行',
+  triggerSource: '触发来源',
   delete: {
     confirmTitle: '是否删除触发器：',
     confirmTitle2: '个触发器？',
@@ -44,5 +45,4 @@ export default {
     },
   },
   requestParameter: '请求参数',
-  xecutionRecord: '执行记录',
 }

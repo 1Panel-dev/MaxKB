@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="drawer"
-    :title="$t('workflow.ExecutionRecord')"
+    :title="$t('common.ExecutionRecord.title')"
     direction="rtl"
     size="800px"
     :before-close="close"
@@ -14,9 +14,9 @@
           @change="changeFilterHandle"
           style="width: 100px"
         >
-          <el-option :label="$t('触发来源')" value="source_name"/>
-          <el-option :label="$t('类型')" value="source_type"/>
-          <el-option :label="$t('common.status.label')" value="state"/>
+          <el-option :label="$t('views.trigger.triggerSource')" value="source_name" />
+          <el-option :label="$t('common.type')" value="source_type" />
+          <el-option :label="$t('common.status.label')" value="state" />
         </el-select>
         <el-input
           v-if="searchType === 'source_name'"
@@ -38,9 +38,9 @@
           style="width: 220px"
           :placeholder="$t('common.search')"
         >
-          <el-option :label="$t('common.status.success')" value="SUCCESS"/>
-          <el-option :label="$t('common.status.STARTED')" value="STARTED"/>
-          <el-option :label="$t('common.status.fail')" value="FAILURE"/>
+          <el-option :label="$t('common.status.success')" value="SUCCESS" />
+          <el-option :label="$t('common.status.STARTED')" value="STARTED" />
+          <el-option :label="$t('common.status.fail')" value="FAILURE" />
         </el-select>
         <el-select
           v-else
@@ -54,9 +54,9 @@
           style="width: 220px"
           :placeholder="$t('common.search')"
         >
-          <el-option :label="$t('views.application.title')" value="APPLICATION"/>
-          <el-option :label="$t('views.knowledge.title')" value="KNOWLEDGE"/>
-          <el-option :label="$t('views.trigger.title')" value="TRIGGER"/>
+          <el-option :label="$t('views.application.title')" value="APPLICATION" />
+          <el-option :label="$t('views.knowledge.title')" value="KNOWLEDGE" />
+          <el-option :label="$t('views.trigger.title')" value="TRIGGER" />
         </el-select>
       </div>
     </div>
@@ -79,7 +79,7 @@
     >
       <el-table-column
         prop="name"
-        :label="$t('触发来源')"
+        :label="$t('views.trigger.triggerSource')"
         min-width="130"
         show-overflow-tooltip
       >
@@ -102,7 +102,6 @@
           </div>
         </template>
       </el-table-column>
-
       <el-table-column
         prop="source_type"
         min-width="120"
@@ -119,33 +118,23 @@
       <el-table-column prop="state" :label="$t('common.status.label')" width="180">
         <template #default="{ row }">
           <el-text class="color-text-primary" v-if="row.state === 'SUCCESS'">
-            <el-icon class="color-success">
-              <SuccessFilled/>
-            </el-icon>
+            <el-icon class="color-success"><SuccessFilled /></el-icon>
             {{ $t('common.status.success') }}
           </el-text>
           <el-text class="color-text-primary" v-else-if="row.state === 'FAILURE'">
-            <el-icon class="color-danger">
-              <CircleCloseFilled/>
-            </el-icon>
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             {{ $t('common.status.fail') }}
           </el-text>
           <el-text class="color-text-primary" v-else-if="row.state === 'REVOKED'">
-            <el-icon class="color-danger">
-              <CircleCloseFilled/>
-            </el-icon>
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
             {{ $t('common.status.REVOKED') }}
           </el-text>
           <el-text class="color-text-primary" v-else-if="row.state === 'REVOKE'">
-            <el-icon class="is-loading color-primary">
-              <Loading/>
-            </el-icon>
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
             {{ $t('common.status.REVOKE') }}
           </el-text>
           <el-text class="color-text-primary" v-else>
-            <el-icon class="is-loading color-primary">
-              <Loading/>
-            </el-icon>
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
             {{ $t('common.status.STARTED') }}
           </el-text>
         </template>
@@ -191,14 +180,13 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
-import { resetUrl } from '@/utils/common'
+import { ref, reactive, computed } from 'vue'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import type { Dict } from '@/api/type/common'
 import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
-import { loadSharedApi } from "@/utils/dynamics-api/shared-api.ts";
-import { useRoute } from "vue-router";
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { useRoute } from 'vue-router'
 const route = useRoute()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
@@ -219,8 +207,8 @@ const paginationConfig = reactive({
 const tableData = ref<Array<any>>([])
 const query = ref<any>({
   state: '',
-  source_name: '',
-  source_type: '',
+  name: '',
+  order: '',
 })
 const loading = ref<boolean>(false)
 const current_trigger_id = ref<string>()
@@ -230,7 +218,7 @@ const tableIndexMap = computed<Dict<number>>(() => {
     .map((row, index) => ({
       [row.id]: index,
     }))
-    .reduce((pre, next) => ({...pre, ...next}), {})
+    .reduce((pre, next) => ({ ...pre, ...next }), {})
 })
 const ExecutionDetailDrawerRef = ref<any>()
 
@@ -244,38 +232,31 @@ const toDetails = (row: any) => {
 }
 
 const changeFilterHandle = () => {
-  query.value = {source_name: '', state: ''}
+  query.value = { name: '', statu: '' }
 }
 const changeSize = () => {
   paginationConfig.current_page = 1
   getList()
 }
-
-function handleSortChange({prop, order}: { prop: string; order: string }) {
+function handleSortChange({ prop, order }: { prop: string; order: string }) {
   query.value.order = order === 'ascending' ? `ett.${prop}` : `-ett.${prop}`
   getList()
 }
 
 const getList = (isLoading?: boolean) => {
   if (current_trigger_id.value) {
-    return loadSharedApi({type: 'tool', systemType: apiType.value})
-      .pageToolRecord(current_trigger_id.value, paginationConfig, {...query.value}, loading)
+    return loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .pageToolRecord(
+        current_trigger_id.value,
+        paginationConfig,
+        { ...query.value },
+        isLoading ? loading : undefined,
+      )
       .then((ok: any) => {
         tableData.value = ok.data.records
         paginationConfig.total = ok.data.total
       })
 
-    // return triggerAPI
-    //   .pageTriggerTaskRecord(
-    //     current_trigger_id.value,
-    //     paginationConfig,
-    //     { ...query.value },
-    //     isLoading ? loading : undefined,
-    //   )
-    //   .then((ok) => {
-    //     tableData.value = ok.data.records
-    //     paginationConfig.total = ok.data.total
-    //   })
   } else return Promise.resolve()
 }
 
@@ -331,6 +312,6 @@ const close = () => {
   drawer.value = false
 }
 
-defineExpose({open, close})
+defineExpose({ open, close })
 </script>
 <style lang="scss" scoped></style>

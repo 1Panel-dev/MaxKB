@@ -144,4 +144,8 @@ export default {
     next: 'Next',
   },
   use: 'Use',
+  ExecutionRecord: {
+    title: 'Execution Record',
+    subTitle: 'View Execution Record',
+  },
 }

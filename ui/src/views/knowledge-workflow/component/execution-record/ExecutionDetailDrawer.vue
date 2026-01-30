@@ -22,7 +22,7 @@
     <div>
       <el-scrollbar>
         <h4 class="title-decoration-1 mb-16 mt-4">
-          {{ $t('workflow.ExecutionRecord') }}
+          {{ $t('common.ExecutionRecord.title') }}
         </h4>
         <el-card class="mb-24" shadow="never" style="--el-card-padding: 12px 16px">
           <el-row :gutter="16" class="lighter">

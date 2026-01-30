@@ -4,6 +4,7 @@ export default {
   task: 'Task',
   triggerTask: 'Trigger Task',
   taskExecution: 'Task Execution',
+  triggerSource: 'Trigger Source',
   delete: {
     confirmTitle: 'Confirm deleting trigger:',
     confirmTitle2: 'triggers?',

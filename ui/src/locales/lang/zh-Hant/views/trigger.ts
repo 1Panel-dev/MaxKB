@@ -4,6 +4,7 @@ export default {
   task: '任務',
   triggerTask: '觸發任務',
   taskExecution: '任務執行',
+  triggerSource: '觸發來源',
   delete: {
     confirmTitle: '是否刪除觸發器：',
     confirmTitle2: '個觸發器？',

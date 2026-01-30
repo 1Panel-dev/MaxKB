@@ -57,6 +57,8 @@ class MCPToolHandler:
             'application_id': self.application.id,
             'chat_user_id': str(uuid.uuid7()),
             'chat_user_type': ChatUserType.ANONYMOUS_USER,
+            'ip_address': '-',
+            'source': {"type": ChatSourceChoices.ONLINE.value},
             'debug': False
         }).open()
 

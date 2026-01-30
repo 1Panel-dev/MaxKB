@@ -13,7 +13,7 @@
       <div class="flex align-center" style="margin-left: -8px">
         <el-button class="cursor mr-4" link @click.prevent="visible = false">
           <el-icon :size="20">
-            <Back/>
+            <Back />
           </el-icon>
         </el-button>
         <h4>{{ $t('chat.executionDetails.title') }}</h4>
@@ -22,12 +22,12 @@
     <div>
       <el-scrollbar>
         <h4 class="title-decoration-1 mb-16 mt-4">
-          {{ $t('workflow.ExecutionRecord') }}
+          {{ $t('common.ExecutionRecord.title') }}
         </h4>
         <el-card class="mb-24" shadow="never" style="--el-card-padding: 12px 16px">
           <el-row :gutter="16" class="lighter">
             <el-col :span="6">
-              <p class="color-secondary mb-4">{{ $t('views.trigger.triggerTask') }}</p>
+              <p class="color-secondary mb-4">{{ $t('views.trigger.triggerSource') }}</p>
               <p class="flex align-center">
                 <el-avatar shape="square" :size="22" style="background: none" class="mr-8">
                   <img
@@ -43,8 +43,8 @@
                 </el-avatar>
 
                 <span class="ellipsis-1" :title="props.currentContent?.source_name">{{
-                    props.currentContent?.source_name || '-'
-                  }}</span>
+                  props.currentContent?.source_name || '-'
+                }}</span>
               </p>
             </el-col>
             <el-col :span="6">
@@ -54,42 +54,32 @@
                   class="color-text-primary"
                   v-if="props.currentContent?.state === 'SUCCESS'"
                 >
-                  <el-icon class="color-success">
-                    <SuccessFilled/>
-                  </el-icon>
+                  <el-icon class="color-success"><SuccessFilled /></el-icon>
                   {{ $t('common.status.success') }}
                 </el-text>
                 <el-text
                   class="color-text-primary"
                   v-else-if="props.currentContent?.state === 'FAILURE'"
                 >
-                  <el-icon class="color-danger">
-                    <CircleCloseFilled/>
-                  </el-icon>
+                  <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
                   {{ $t('common.status.fail') }}
                 </el-text>
                 <el-text
                   class="color-text-primary"
                   v-else-if="props.currentContent?.state === 'REVOKED'"
                 >
-                  <el-icon class="color-danger">
-                    <CircleCloseFilled/>
-                  </el-icon>
+                  <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
                   {{ $t('common.status.REVOKED') }}
                 </el-text>
                 <el-text
                   class="color-text-primary"
                   v-else-if="props.currentContent?.state === 'REVOKE'"
                 >
-                  <el-icon class="is-loading color-primary">
-                    <Loading/>
-                  </el-icon>
+                  <el-icon class="is-loading color-primary"><Loading /></el-icon>
                   {{ $t('common.status.REVOKE') }}
                 </el-text>
                 <el-text class="color-text-primary" v-else>
-                  <el-icon class="is-loading color-primary">
-                    <Loading/>
-                  </el-icon>
+                  <el-icon class="is-loading color-primary"><Loading /></el-icon>
                   {{ $t('common.status.STARTED') }}
                 </el-text>
               </p>
@@ -113,35 +103,78 @@
         <h4 class="title-decoration-1 mb-16 mt-4">
           {{ $t('chat.executionDetails.title') }}
         </h4>
-        <template v-for="(item, index) in arraySort(detail ?? [], 'index')" :key="index">
-          <ExecutionDetailCard :data="item"></ExecutionDetailCard>
-        </template>
+        <el-card class="mb-8" shadow="never" style="--el-card-padding: 12px 16px">
+          <div class="flex-between cursor" @click="showDetail = !showDetail">
+            <div class="flex align-center">
+              <el-icon class="mr-8 arrow-icon" :class="showDetail ? 'rotate-90' : ''">
+                <CaretRight />
+              </el-icon>
+              <el-avatar
+                v-if="detail?.tool_icon"
+                shape="square"
+                :size="24"
+                style="background: none"
+                class="mr-8"
+              >
+                <img :src="resetUrl(detail?.tool_icon)" alt="" />
+              </el-avatar>
+              <ToolIcon v-else :size="24" :type="detail?.tool_type" />
+              <h4>{{ detail?.tool_name }}</h4>
+            </div>
+            <div class="flex align-center">
+              <span class="mr-16 color-secondary" v-if="detail?.state !== 'STARTED'"
+                >{{ detail?.run_time?.toFixed(2) || 0.0 }} s</span
+              >
+              <el-icon class="color-success" :size="16" v-if="detail?.state === 'SUCCESS'">
+                <CircleCheck />
+              </el-icon>
+              <el-icon class="is-loading" :size="16" v-else-if="detail?.state === 'STARTED'">
+                <Loading />
+              </el-icon>
+              <el-icon class="color-danger" :size="16" v-else>
+                <CircleClose />
+              </el-icon>
+            </div>
+          </div>
+          <el-collapse-transition>
+            <div class="mt-12" v-if="showDetail">
+              <!-- 工具库 -->
+              <div class="card-never border-r-6 mt-8">
+                <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
+                <div class="p-8-12 border-t-dashed lighter break-all">
+                  {{ detail?.meta.input || '-' }}
+                </div>
+              </div>
+              <div class="card-never border-r-6 mt-8">
+                <h5 class="p-8-12">{{ $t('chat.executionDetails.output') }}</h5>
+                <div class="p-8-12 border-t-dashed lighter break-all">
+                  {{ detail?.meta.output || '-' }}
+                </div>
+              </div>
+            </div>
+          </el-collapse-transition>
+        </el-card>
       </el-scrollbar>
     </div>
     <template #footer>
       <div>
         <el-button @click="pre" :disabled="pre_disable || loading">{{
-            $t('common.pages.prev')
-          }}
-        </el-button>
+          $t('common.pages.prev')
+        }}</el-button>
         <el-button @click="next" :disabled="next_disable || loading">{{
-            $t('common.pages.next')
-          }}
-        </el-button>
+          $t('common.pages.next')
+        }}</el-button>
       </div>
     </template>
   </el-drawer>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { arraySort } from '@/utils/array'
-import { resetUrl } from '@/utils/common'
-import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import { isAppIcon, resetUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
-import { loadSharedApi } from "@/utils/dynamics-api/shared-api.ts";
-
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 const props = withDefaults(
   defineProps<{
     /**
@@ -180,17 +213,19 @@ const apiType = computed(() => {
 })
 
 const detail = ref<any>(null)
+const showDetail = ref<boolean>(true)
 
 const loading = ref(false)
 const visible = ref(false)
 
-function closeHandle() {
-}
+function closeHandle() {}
 
 watch(
   () => props.currentId,
   () => {
-    getDetail()
+    if (props.currentId) {
+      getDetail()
+    }
   },
 )
 
@@ -202,22 +237,13 @@ watch(visible, (bool) => {
 })
 
 function getDetail() {
-  // triggerAPI
-  //   .getTriggerTaskRecordDetails(
-  //     props.currentContent?.trigger_id,
-  //     props.currentContent?.trigger_task_id,
-  //     props.currentContent?.id,
-  //   )
-  //   .then((ok) => {
-  //     detail.value = Object.values(ok.data.details)
-  //   })
   if (!props.currentContent) {
     return
   }
-  loadSharedApi({type: 'tool', systemType: apiType.value})
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getToolRecordDetail(props.currentContent?.tool_id, props.currentContent?.id, loading)
     .then((ok: any) => {
-      detail.value = [ok.data]
+      detail.value = ok.data
     })
 }
 

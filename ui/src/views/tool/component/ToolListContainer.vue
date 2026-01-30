@@ -320,7 +320,7 @@
                               iconName="app-schedule-report"
                               class="color-secondary"
                             ></AppIcon>
-                            {{ $t('查看执行记录') }}
+                            {{ $t('common.ExecutionRecord.subTitle') }}
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="openMoveToDialog(item)"
@@ -429,7 +429,7 @@ import ToolStoreDescDrawer from '@/views/tool/component/ToolStoreDescDrawer.vue'
 
 import bus from '@/bus'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
-import ToolRecordDrawer from "@/views/tool/component/ToolRecordDrawer.vue";
+import ToolRecordDrawer from "@/views/tool/execution-record/TriggerRecordDrawer.vue";
 
 const route = useRoute()
 

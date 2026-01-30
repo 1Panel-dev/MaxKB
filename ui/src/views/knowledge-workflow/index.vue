@@ -92,7 +92,7 @@
                 v-if="permissionPrecise.doc_create(id)"
               >
                 <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
-                {{ $t('workflow.ExecutionRecord') }}
+                {{ $t('common.ExecutionRecord.title') }}
               </el-dropdown-item>
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>

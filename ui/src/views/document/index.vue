@@ -155,7 +155,7 @@
 
               <el-tooltip
                 effect="dark"
-                :content="$t('workflow.ExecutionRecord')"
+                :content="$t('common.ExecutionRecord.title')"
                 placement="top"
                 v-if="knowledgeDetail?.type === 4 && permissionPrecise.doc_create(id)"
               >

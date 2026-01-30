@@ -5,6 +5,99 @@ import django.db.models.deletion
 import uuid_utils.compat
 from django.db import migrations, models
 
+old = [
+    "https://apps-assets.fit2cloud.com/stable/maxkb/md2docx/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/mcp_output/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/feishubot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/mongo/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/OFD_Parse/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/html_to_pdf/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/feishu_datasource/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/quotation_generation_agent/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/html2pdf/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/sqlbot_ai/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/metaso/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/registry/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/smtp_email/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/wecomrobot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/paperx/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/case_inquire/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/data_analysis_assistant/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/crm_intelligent_search/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/case_collection/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/knowledge_self_assessment/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/minerU_util/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/invoice_recognition/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/fragment/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/contract_review/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/echart_to_svg/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/extract/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/big_order/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/crm_intelligent_recording/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/dingrobot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/timestamp/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/knowledge_workflow/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/household_registration_policy_qa_assistant/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/httputils/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/html_compression/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/crm_customer_entry_ai_agent/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/anspire/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/application_template/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/baidu-translate/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/website_translation/logo.png",
+]
+new = [
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_md2docx/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_mcp_output/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_feishubot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_mongo/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_OFD_Parse/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_html_to_pdf/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/db_feishu_datasource/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_quotation_generation_agent/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_html2pdf/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_sqlbot_ai/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_metaso/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_registry/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_smtp_email/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_wecomrobot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_paperx/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_case_inquire/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_data_analysis_assistant/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_crm_intelligent_search/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_case_collection/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_knowledge_self_assessment/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_minerU_util/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_invoice_recognition/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_fragment/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_contract_review/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_echart_to_svg/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_extract/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_big_order/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_crm_intelligent_recording/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_dingrobot/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_timestamp/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/kbwf_knowledge_workflow/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_household_registration_policy_qa_assistant/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_httputils/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_html_compression/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_crm_customer_entry_ai_agent/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_anspire/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_application_template/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/tool_baidu-translate/logo.png",
+    "https://apps-assets.fit2cloud.com/stable/maxkb/app_website_translation/logo.png",
+]
+
+def _replace_tool_icons(apps, schema_editor):
+    if len(old) != len(new):
+        raise ValueError("`old` 与 `new` 长度不一致，无法一一替换")
+
+    Tool = apps.get_model("tools", "Tool")
+    mapping = dict(zip(old, new))
+
+    # 逐个 update，避免依赖数据库对 CASE/WHEN 的兼容差异
+    for old_icon, new_icon in mapping.items():
+        Tool.objects.filter(icon=old_icon).update(icon=new_icon)
 
 class Migration(migrations.Migration):
 
@@ -31,4 +124,5 @@ class Migration(migrations.Migration):
                 'db_table': 'tool_record',
             },
         ),
+        migrations.RunPython(_replace_tool_icons, reverse_code=migrations.RunPython.noop),
     ]

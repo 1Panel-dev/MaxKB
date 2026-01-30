@@ -143,4 +143,8 @@ export default {
     next: '下一步',
   },
   use: '使用',
+  ExecutionRecord: {
+    title: '執行記錄',
+    subTitle: '查看執行記錄',
+  },
 }

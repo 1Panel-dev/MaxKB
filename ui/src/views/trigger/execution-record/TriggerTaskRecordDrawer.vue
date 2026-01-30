@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="drawer"
-    :title="$t('workflow.ExecutionRecord')"
+    :title="$t('common.ExecutionRecord.title')"
     direction="rtl"
     size="800px"
     :before-close="close"
