@@ -125,6 +125,7 @@ export default {
     paragraphRules: '分段規則',
     writeContent: '寫入內容',
     cancel: '取消執行',
+    errLog: '錯誤日誌',
     cancelExecutionTip: '確定取消所選的任務？',
   },
   KnowledgeSource: {

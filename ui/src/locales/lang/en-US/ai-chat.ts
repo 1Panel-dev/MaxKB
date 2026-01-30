@@ -127,6 +127,7 @@ export default {
     paragraphRules: 'Segmentation Rules',
     writeContent: 'Content Written',
     cancel: 'Cancel Execution',
+    errLog: 'Error Log',
     cancelExecutionTip: 'Are you sure you want to cancel the selected task? ',
   },
   KnowledgeSource: {
