@@ -56,8 +56,12 @@ def get_parameters(body_setting, request: Request):
     parameters = {}
     for body in body_setting:
         value = request.data.get(body.get('field'))
-        if value is None and body.get('required'):
+        required = body.get('required')
+        if value is None and required:
             raise AppApiException(500, f'{body.get("desc")} is required')
+        if value is None and not required:
+            parameters[body.get('field')] = None
+            continue
         _type = body.get('type')
         valid_parameter_type(value, _type, body.get("desc"))
         parameters[body.get('field')] = value
