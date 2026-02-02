@@ -295,7 +295,11 @@
 
                           <el-dropdown-item
                             @click.stop="openTriggerDrawer(item)"
-                            v-if="apiType === 'workspace' && item.tool_type === 'CUSTOM'"
+                            v-if="
+                              ['workspace', 'systemManage'].includes(apiType) &&
+                              item.tool_type === 'CUSTOM' &&
+                              permissionPrecise.trigger_read(item.id)
+                            "
                           >
                             <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
                             {{ $t('views.trigger.title') }}
@@ -314,7 +318,7 @@
                           <el-dropdown-item
                             text
                             @click.stop="openToolRecordDrawer(item)"
-                            v-if="item.tool_type === 'CUSTOM'"
+                            v-if="item.tool_type === 'CUSTOM' && permissionPrecise.record(item.id)"
                           >
                             <AppIcon
                               iconName="app-schedule-report"
@@ -397,7 +401,7 @@
     ref="resourceTriggerDrawerRef"
     :source="SourceTypeEnum.TOOL"
   ></ResourceTriggerDrawer>
-  <ToolRecordDrawer ref="toolRecordDrawerRef"/>
+  <ToolRecordDrawer ref="toolRecordDrawerRef" />
 </template>
 
 <script lang="ts" setup>
@@ -429,7 +433,7 @@ import ToolStoreDescDrawer from '@/views/tool/component/ToolStoreDescDrawer.vue'
 
 import bus from '@/bus'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
-import ToolRecordDrawer from "@/views/tool/execution-record/TriggerRecordDrawer.vue";
+import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
 
 const route = useRoute()
 
@@ -467,6 +471,8 @@ const MoreFieldPermission = (id: any) => {
     permissionPrecise.value.delete(id) ||
     permissionPrecise.value.auth(id) ||
     permissionPrecise.value.relate_map(id) ||
+    permissionPrecise.value.trigger_read(id) ||
+    permissionPrecise.value.record(id) ||
     isSystemShare.value
   )
 }

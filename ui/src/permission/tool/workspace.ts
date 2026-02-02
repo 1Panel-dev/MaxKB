@@ -102,6 +102,16 @@ const workspace = {
       ],
       'OR',
     ),
+    record: (source_id:string) =>
+    hasPermission(
+      [
+        new ComplexPermission([RoleConst.USER],[PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],[],'AND'),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EXECUTE_RECORD.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EXECUTE_RECORD.getWorkspacePermissionWorkspaceManageRole
+      ],
+      'OR',
+    ),
   trigger_read: (source_id:string) => 
         hasPermission(
             [

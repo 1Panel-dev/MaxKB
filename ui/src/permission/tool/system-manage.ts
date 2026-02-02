@@ -114,7 +114,14 @@ const systemManage = {
       ],
       'OR'
     ),
-  
+  record: () =>
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.RESOURCE_TOOL_EXECUTE_RECORD
+      ],
+      'OR'
+    ),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

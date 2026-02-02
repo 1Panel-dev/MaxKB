@@ -527,8 +527,8 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
-            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
                            [PermissionConstants.TOOL.get_workspace_tool_permission()],
@@ -556,8 +556,8 @@ class ToolView(APIView):
             tags=[_("Tool")]  # type: ignore
         )
         @has_permissions(
-            PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
-            PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
+            PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
                            [PermissionConstants.TOOL.get_workspace_tool_permission()],

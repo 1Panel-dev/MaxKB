@@ -603,11 +603,16 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
+    TOOL_EXECUTE_RECORD = Permission(
+        group=Group.TOOL, operate=Operate.RECORD, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
     # source point trigger
     TOOL_TRIGGER_READ = Permission(
         group=Group.TOOL, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
-        resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW]
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
     TOOL_TRIGGER_CREATE = Permission(
         group=Group.TOOL, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1035,7 +1040,7 @@ class PermissionConstants(Enum):
     APPLICATION_TRIGGER_READ = Permission(
         group=Group.APPLICATION, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
     )
     APPLICATION_TRIGGER_CREATE = Permission(
         group=Group.APPLICATION, operate=Operate.TRIGGER_CREATE, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1347,6 +1352,10 @@ class PermissionConstants(Enum):
     )
     SHARED_TOOL_RELATE_RESOURCE_VIEW = Permission(
         group=Group.SYSTEM_TOOL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
+    )
+    SHARED_TOOL_EXECUTE_RECORD = Permission(
+        group=Group.SYSTEM_TOOL, operate=Operate.RECORD, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
     )
     SHARED_KNOWLEDGE_READ = Permission(
@@ -1779,6 +1788,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_TOOL_RELATE_RESOURCE_VIEW = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_TOOL], is_ee=settings.edition == "EE"
+    )
+    RESOURCE_TOOL_EXECUTE_RECORD = Permission(
+        group=Group.SYSTEM_RES_TOOL, operate=Operate.RECORD, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL], is_ee=settings.edition == "EE"
     )
     RESOURCE_TOOL_TRIGGER_READ = Permission(
