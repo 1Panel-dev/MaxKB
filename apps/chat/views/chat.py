@@ -82,7 +82,8 @@ class OpenAIView(APIView):
         ip_address = _get_ip_address(request)
         return OpenAIChatSerializer(data={'application_id': application_id, 'chat_user_id': request.auth.chat_user_id,
                                           'chat_user_type': request.auth.chat_user_type,
-                                          'ip_address': ip_address, }).chat(request.data)
+                                          'ip_address': ip_address,
+                                          'source': {"type": ChatSourceChoices.API_CALL.value}}).chat(request.data)
 
 
 class AnonymousAuthentication(APIView):
