@@ -10,11 +10,13 @@ from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
+from common.auth.authentication import has_permissions
 from common import result
 from trigger.api.trigger_task import TriggerTaskRecordExecutionDetailsAPI, TriggerTaskRecordPageAPI, TriggerTaskAPI
 from trigger.serializers.trigger_task import TriggerTaskQuerySerializer, TriggerTaskRecordQuerySerializer, \
     TriggerTaskRecordOperateSerializer
+from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants, \
+    Permission, Group, Operate
 
 
 class TriggerTaskView(APIView):
@@ -26,6 +28,10 @@ class TriggerTaskView(APIView):
         parameters=TriggerTaskAPI.get_parameters(),
         responses=TriggerTaskAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, trigger_id: str):
         return result.success(
@@ -46,6 +52,10 @@ class TriggerTaskRecordExecutionDetailsView(APIView):
         responses=TriggerTaskRecordExecutionDetailsAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
     )
+    @has_permissions(
+        PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+    )
     def get(self, request: Request, workspace_id: str, trigger_id: str, trigger_task_id: str,
             trigger_task_record_id: str):
         return result.success(
@@ -64,6 +74,10 @@ class TriggerTaskRecordPageView(APIView):
         parameters=TriggerTaskRecordPageAPI.get_parameters(),
         responses=TriggerTaskRecordPageAPI.get_response(),
         tags=[_('Trigger')]  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.TRIGGER_READ.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str, trigger_id: str, current_page: int, page_size: int):
         return result.success(
