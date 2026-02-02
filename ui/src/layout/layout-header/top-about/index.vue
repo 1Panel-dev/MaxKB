@@ -17,7 +17,7 @@
             PermissionConst.TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
           ],
           'OR',
-        )
+        ) && type === 'workspace'
       "
       effect="dark"
       :content="$t('views.trigger.title')"
@@ -88,6 +88,9 @@ const route = useRoute()
 const router = useRouter()
 const { theme, user } = useStore()
 
+withDefaults(defineProps<{ type?: 'workspace' | 'system' }>(), {
+  type: 'workspace',
+})
 function toUrl(url: string) {
   window.open(url, '_blank')
 }
