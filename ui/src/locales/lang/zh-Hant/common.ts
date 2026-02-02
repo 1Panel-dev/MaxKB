@@ -147,4 +147,5 @@ export default {
     title: '執行記錄',
     subTitle: '查看執行記錄',
   },
+  sourceType: '資源類型',
 }

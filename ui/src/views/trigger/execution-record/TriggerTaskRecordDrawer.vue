@@ -16,6 +16,7 @@
         >
           <el-option :label="$t('common.name')" value="name" />
           <el-option :label="$t('common.status.label')" value="state" />
+          <el-option :label="$t('common.sourceType')" value="source_type" />
         </el-select>
         <el-input
           v-if="searchType === 'name'"
@@ -25,6 +26,21 @@
           clearable
           @change="getList(true)"
         />
+        <el-select
+          v-else-if="searchType === 'source_type'"
+          v-model="query.source_type"
+          @change="getList(true)"
+          filterable
+          clearable
+          :reserve-keyword="false"
+          collapse-tags
+          collapse-tags-tooltip
+          style="width: 220px"
+          :placeholder="$t('common.search')"
+        >
+          <el-option :label="$t('views.application.title')" value="APPLICATION" />
+          <el-option :label="$t('views.tool.title')" value="TOOL" />
+        </el-select>
         <el-select
           v-else-if="searchType === 'state'"
           v-model="query.state"
@@ -172,6 +188,7 @@ const tableData = ref<Array<any>>([])
 const query = ref<any>({
   state: '',
   name: '',
+  source_type: '',
   order: '',
 })
 const loading = ref<boolean>(false)
@@ -221,7 +238,6 @@ const getList = (isLoading?: boolean) => {
       })
   } else return Promise.resolve()
 }
-
 
 const pre_disable = computed(() => {
   const index = tableData.value.findIndex((item) => item.id === currentId.value)

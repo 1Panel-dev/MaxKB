@@ -10,6 +10,8 @@ from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
+
+from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common import result
 from trigger.api.trigger_task import TriggerTaskRecordExecutionDetailsAPI, TriggerTaskRecordPageAPI, TriggerTaskAPI
@@ -20,6 +22,8 @@ from common.constants.permission_constants import PermissionConstants, RoleConst
 
 
 class TriggerTaskView(APIView):
+    authentication_classes = [TokenAuth]
+
     @extend_schema(
         methods=['GET'],
         description=_('Get the task list of triggers'),
@@ -43,6 +47,8 @@ class TriggerTaskRecordView(APIView):
 
 
 class TriggerTaskRecordExecutionDetailsView(APIView):
+    authentication_classes = [TokenAuth]
+
     @extend_schema(
         methods=['GET'],
         description=_('Retrieve detailed records of tasks executed by the trigger.'),
@@ -66,6 +72,8 @@ class TriggerTaskRecordExecutionDetailsView(APIView):
 
 
 class TriggerTaskRecordPageView(APIView):
+    authentication_classes = [TokenAuth]
+
     @extend_schema(
         methods=['GET'],
         description=_('Get a paginated list of execution records for trigger tasks.'),
@@ -83,6 +91,7 @@ class TriggerTaskRecordPageView(APIView):
         return result.success(
             TriggerTaskRecordQuerySerializer(
                 data={'workspace_id': workspace_id, 'trigger_id': trigger_id,
+                      'source_type': request.query_params.get('source_type'),
                       'state': request.query_params.get('state'),
                       'name': request.query_params.get('name')})
             .page(current_page, page_size))

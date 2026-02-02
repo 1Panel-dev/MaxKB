@@ -148,4 +148,5 @@ export default {
     title: 'Execution Record',
     subTitle: 'View Execution Record',
   },
+  sourceType: 'Source type',
 }

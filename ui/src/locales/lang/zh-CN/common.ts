@@ -147,5 +147,6 @@ export default {
   ExecutionRecord: {
     title: '执行记录',
     subTitle: '查看执行记录',
-  }
+  },
+  sourceType: '资源类型',
 }

@@ -127,6 +127,7 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     state = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger state'))
     name = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Trigger name'))
+    source_type = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('Source type'))
     order = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Order field'))
 
     def is_valid(self, *, raise_exception=False):
@@ -146,6 +147,7 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
                 'sdc.name': models.CharField(),
                 'ett.workspace_id': models.CharField(),
                 'ett.trigger_id': models.UUIDField(),
+                'sdc.source_type': models.CharField()
             }))
         trigger_query_set = trigger_query_set.filter(
             **{'ett.trigger_id': self.data.get("trigger_id")})
@@ -157,6 +159,8 @@ class TriggerTaskRecordQuerySerializer(serializers.Serializer):
             trigger_query_set = trigger_query_set.filter(**{'ett.state': self.data.get('state')})
         if self.data.get("name"):
             trigger_query_set = trigger_query_set.filter(**{'sdc.name__contains': self.data.get('name')})
+        if self.data.get('source_type'):
+            trigger_query_set = trigger_query_set.filter(**{'sdc.source_type': self.data.get('source_type')})
         return trigger_query_set
 
     def list(self, with_valid=True):
