@@ -2,7 +2,7 @@ WITH scheduler AS (SELECT SPLIT_PART(id, ':', 2) as trigger_id,
                           id,
                           next_run_time
                    FROM django_apscheduler_djangojob
-                   WHERE id LIKE 'trigger:%')
+                   WHERE id LIKE 'trigger:%%')
 SELECT *
 FROM (SELECT t.id,
              t.workspace_id,

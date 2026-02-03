@@ -82,23 +82,19 @@ class ApplicationTaskParameterSerializer(serializers.Serializer):
 
 
 class ToolTaskParameterSerializer(serializers.Serializer):
-    input_field_list = serializers.JSONField(required=False)
 
-    def validate_input_field_list(self, value):
-        if not value:
-            return value
-        if not isinstance(value, dict):
-            raise serializers.ValidationError(_("input_field_list must be a dict"))
+    def to_internal_value(self, data):
+        if not isinstance(data, dict):
+            raise serializers.ValidationError("must be a dict")
 
-        for key, val in value.items():
+        validated = {}
+        for key, val in data.items():
             serializer = InputField(data=val)
             if not serializer.is_valid():
-                raise serializers.ValidationError({
-                    key: serializer.errors
-                })
+                raise serializers.ValidationError({key: serializer.errors})
+            validated[key] = serializer.validated_data
 
-        return value
-
+        return validated
 
 class TriggerValidationMixin:
 
@@ -607,7 +603,7 @@ class TriggerQuerySerializer(serializers.Serializer):
     def get_query_set(self):
         trigger_query_set = QuerySet(
             model=get_dynamics_model({
-                'name': models.CharField(),
+                't.name': models.CharField(),
                 'trigger_type': models.CharField(),
                 't.workspace_id': models.CharField(),
                 't.is_active': models.BooleanField(),
@@ -618,7 +614,7 @@ class TriggerQuerySerializer(serializers.Serializer):
         }))
         trigger_query_set = trigger_query_set.filter(**{'t.workspace_id': self.data.get("workspace_id")})
         if self.data.get("name"):
-            trigger_query_set = trigger_query_set.filter(name__contains=self.data.get("name"))
+            trigger_query_set = trigger_query_set.filter(**{'t.name__icontains': self.data.get("name")})
         if self.data.get("type"):
             trigger_query_set = trigger_query_set.filter(trigger_type=self.data.get("type"))
         if self.data.get("is_active") is not None:
