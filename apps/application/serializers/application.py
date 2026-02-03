@@ -802,10 +802,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
         QuerySet(Application).filter(id=application_id).delete()
         trigger_ids = list(
             QuerySet(TriggerTask).filter(
-                source_type="APPLICATION", source_id=self.data.get('id')
+                source_type="APPLICATION", source_id=application_id
             ).values('trigger_id').distinct()
         )
-        QuerySet(TriggerTask).filter(source_type="APPLICATION", source_id=self.data.get('id')).delete()
+        QuerySet(TriggerTask).filter(source_type="APPLICATION", source_id=application_id).delete()
         for trigger_id in trigger_ids:
             trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
             if trigger and trigger.is_active:
