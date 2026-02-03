@@ -9125,7 +9125,7 @@ msgstr ""
 msgid "Delete Trigger"
 msgstr ""
 
-msgid "Execute record"
+msgid "Read execute record"
 msgstr ""
 
 msgid "ADMIN"

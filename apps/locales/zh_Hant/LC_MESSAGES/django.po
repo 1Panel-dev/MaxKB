@@ -9245,8 +9245,8 @@ msgstr "編輯觸發器"
 msgid "Delete Trigger"
 msgstr "刪除觸發器"
 
-msgid "Execute record"
-msgstr "執行記錄"
+msgid "Read execute record"
+msgstr "檢視執行記錄"
 
 msgid "ADMIN"
 msgstr "系統管理員"

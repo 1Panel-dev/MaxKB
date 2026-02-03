@@ -9248,8 +9248,8 @@ msgstr "编辑触发器"
 msgid "Delete Trigger"
 msgstr "删除触发器"
 
-msgid "Execute record"
-msgstr "执行记录"
+msgid "Read execute record"
+msgstr "查看执行记录"
 
 msgid "ADMIN"
 msgstr "系统管理员"

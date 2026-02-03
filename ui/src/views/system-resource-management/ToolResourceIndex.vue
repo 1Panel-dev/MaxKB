@@ -332,7 +332,11 @@
 
                   <el-dropdown-item
                     @click.stop="openTriggerDrawer(row)"
-                    v-if="row.tool_type === 'CUSTOM' && permissionPrecise.trigger_read()"
+                    v-if="
+                      row.tool_type === 'CUSTOM' &&
+                      permissionPrecise.trigger_read() &&
+                      row.is_active
+                    "
                   >
                     <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
                     {{ $t('views.trigger.title') }}
@@ -348,7 +352,7 @@
                   <el-dropdown-item
                     text
                     @click.stop="openToolRecordDrawer(row)"
-                    v-if="permissionPrecise.relate_map()"
+                    v-if="permissionPrecise.record()"
                   >
                     <AppIcon iconName="app-schedule-report" class="color-secondary" />
                     {{ $t('common.ExecutionRecord.subTitle') }}
