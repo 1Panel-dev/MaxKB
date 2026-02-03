@@ -340,7 +340,7 @@
                   <el-dropdown-item
                     text
                     @click.stop="openToolRecordDrawer(row)"
-                    v-if="permissionPrecise.relate_map()"
+                    v-if="permissionPrecise.record()"
                   >
                     <AppIcon iconName="app-schedule-report" class="color-secondary" />
                     {{ $t('common.ExecutionRecord.subTitle') }}
@@ -373,7 +373,7 @@
     <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
     <ResourceAuthorizationDrawer :type="SourceTypeEnum.TOOL" ref="ResourceAuthorizationDrawerRef" />
     <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
-    <ToolRecordDrawer ref="toolRecordDrawerRef"/>
+    <ToolRecordDrawer ref="toolRecordDrawerRef" />
   </div>
 </template>
 
@@ -398,8 +398,8 @@ import UserApi from '@/api/user/user.ts'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import permissionMap from '@/permission'
 import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
-import ResourceMappingDrawer from "@/components/resource_mapping/index.vue";
-import ToolRecordDrawer from "@/views/tool/execution-record/TriggerRecordDrawer.vue";
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
 
 const { user } = useStore()
 
@@ -712,7 +712,6 @@ const toolRecordDrawerRef = ref<InstanceType<typeof ToolRecordDrawer>>()
 const openToolRecordDrawer = (data: any) => {
   toolRecordDrawerRef.value?.open(data)
 }
-
 
 onMounted(() => {
   getWorkspaceList()
