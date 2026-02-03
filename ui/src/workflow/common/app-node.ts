@@ -79,10 +79,10 @@ class AppNode extends HtmlResize.view {
     }
     if (this.props.model.type === 'knowledge-base-node') {
       let globalFields = []
-      if (this.props.model.properties.user_input_field_list) {
-        globalFields = this.props.model.properties.user_input_field_list.map((item: any) => ({
+      if (this.props.model.properties.config?.globalFields) {
+        globalFields = this.props.model.properties.config.globalFields.map((item: any) => ({
           label: typeof item.label == 'string' ? item.label : item.label.label,
-          value: item.field,
+          value: item.value,
         }))
       }
 

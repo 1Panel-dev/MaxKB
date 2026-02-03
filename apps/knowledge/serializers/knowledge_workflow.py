@@ -142,6 +142,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                         knowledge_id=self.data.get("knowledge_id"),
                         state=State.STARTED,
                         meta=meta).save()
+        knowledge = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id')).first()
+        instance['knowledge_base'] = {**(instance.get('knowledge_base') or {}),
+                                      'knowledge': {'id': str(knowledge.id), 'name': knowledge.name,
+                                                    'desc': knowledge.desc,
+                                                    'workspace_id': knowledge.workspace_id}}
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
@@ -169,6 +174,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 'user_name': user.username}
         KnowledgeAction(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED,
                         meta=meta).save()
+        knowledge = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id')).first()
+        instance['knowledge_base'] = {**(instance.get('knowledge_base') or {}),
+                                      'knowledge': {'id': str(knowledge.id), 'name': knowledge.name,
+                                                    'desc': knowledge.desc,
+                                                    'workspace_id': knowledge.workspace_id}}
         work_flow_manage = KnowledgeWorkflowManage(
             Workflow.new_instance(knowledge_workflow_version.work_flow, WorkflowMode.KNOWLEDGE),
             {'knowledge_id': self.data.get("knowledge_id"), 'knowledge_action_id': knowledge_action_id, 'stream': True,
