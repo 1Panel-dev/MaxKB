@@ -223,7 +223,7 @@ class ApplicationTask(BaseTriggerTask):
                 "chat_user_id": chat_user_id,
                 'chat_user_type': ChatUserType.ANONYMOUS_USER.value,
                 'application_id': application_id,
-                'ip_address': kwargs.get('body')['ip_address'],
+                'ip_address': ip_address,
                 'source': {
                     'type': ChatSourceChoices.TRIGGER.value
                 },
