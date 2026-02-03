@@ -150,6 +150,15 @@
                 </div>
               </template>
             </el-table-column>
+            <el-table-column
+              prop="next_run_time"
+              :label="$t('views.trigger.next', '下次执行时间')"
+              show-overflow-tooltip
+            >
+              <template #default="{ row }">
+                {{ datetimeFormat(row.next_run_time) }}
+              </template>
+            </el-table-column>
             <el-table-column prop="desc" :label="$t('common.desc')" show-overflow-tooltip>
             </el-table-column>
 

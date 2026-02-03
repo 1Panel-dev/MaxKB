@@ -2,6 +2,7 @@ export default {
   title: '触发器',
   tip: '触发时系统将会根据入参设置自动调用任务执行',
   task: '任务',
+  next: '下次执行时间',
   triggerTask: '触发任务',
   taskExecution: '任务执行',
   triggerSource: '触发来源',
