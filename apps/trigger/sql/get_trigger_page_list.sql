@@ -11,6 +11,7 @@ FROM (SELECT t.id,
              t.create_time,
              t.update_time,
              t.user_id,
+             (SELECT nick_name FROM "user" WHERE id = t.user_id) AS create_user,
              COALESCE(
                      JSON_AGG(
                              JSON_BUILD_OBJECT(

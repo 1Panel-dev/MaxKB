@@ -245,6 +245,8 @@
                 </el-popover>
               </template>
             </el-table-column>
+            <el-table-column prop="create_user" :label="$t('common.creator')" width="150">
+            </el-table-column>
             <el-table-column
               prop="create_time"
               :label="$t('common.createTime')"

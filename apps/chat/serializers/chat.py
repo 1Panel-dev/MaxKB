@@ -289,7 +289,7 @@ class ChatSerializers(serializers.Serializer):
     application_id = serializers.UUIDField(required=True, allow_null=True,
                                            label=_("Application ID"))
     debug = serializers.BooleanField(required=False, label=_("Debug"))
-    ip_address = serializers.CharField(required=False, label=_("IP Address"))
+    ip_address = serializers.CharField(required=False, label=_("IP Address"), allow_null=True, allow_blank=True)
     source = serializers.JSONField(required=False, label=_("Source"))
 
     def is_valid_application_workflow(self, *, raise_exception=False):
