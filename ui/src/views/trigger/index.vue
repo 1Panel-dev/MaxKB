@@ -152,7 +152,7 @@
             </el-table-column>
             <el-table-column
               prop="next_run_time"
-              :label="$t('views.trigger.next', '下次执行时间')"
+              :label="$t('views.trigger.next')"
               show-overflow-tooltip
             >
               <template #default="{ row }">
