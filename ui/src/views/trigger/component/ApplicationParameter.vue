@@ -223,7 +223,7 @@ const base_field_list = computed<Array<any>>(() => {
     if (base_node.value.properties.node_data.file_upload_enable) {
       if (base_node.value.properties.node_data.file_upload_setting.document) {
         result.push({
-          field: 'document',
+          field: 'document_list',
           required: true,
           default_value: '[]',
           label: { value: t('common.fileUpload.document') },
@@ -231,7 +231,7 @@ const base_field_list = computed<Array<any>>(() => {
       }
       if (base_node.value.properties.node_data.file_upload_setting.image) {
         result.push({
-          field: 'image',
+          field: 'image_list',
           required: true,
           default_value: '[]',
           label: { value: t('common.fileUpload.image') },
@@ -239,7 +239,7 @@ const base_field_list = computed<Array<any>>(() => {
       }
       if (base_node.value.properties.node_data.file_upload_setting.audio) {
         result.push({
-          field: 'audio',
+          field: 'audio_list',
           required: true,
           default_value: '[]',
           label: { value: t('common.fileUpload.audio') },
@@ -247,7 +247,7 @@ const base_field_list = computed<Array<any>>(() => {
       }
       if (base_node.value.properties.node_data.file_upload_setting.video) {
         result.push({
-          field: 'video',
+          field: 'video_list',
           required: true,
           default_value: '[]',
           label: { value: t('common.fileUpload.video') },
@@ -256,7 +256,7 @@ const base_field_list = computed<Array<any>>(() => {
 
       if (base_node.value.properties.node_data.file_upload_setting.other) {
         result.push({
-          field: 'other',
+          field: 'other_list',
           required: true,
           default_value: '[]',
           label: { value: t('common.fileUpload.other') },

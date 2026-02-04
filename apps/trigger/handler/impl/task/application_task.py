@@ -168,7 +168,8 @@ def get_application_parameters_setting(application):
             for field in ['audio', 'document', 'image', 'other', 'video']:
                 v = file_upload_setting.get(field)
                 if v:
-                    application_parameter_setting[field] = {'required': False, 'default_value': [], 'type': 'array'}
+                    application_parameter_setting[field + '_list'] = {'required': False, 'default_value': [],
+                                                                     'type': 'array'}
         return application_parameter_setting
 
 
