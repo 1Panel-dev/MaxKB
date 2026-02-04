@@ -1,0 +1,44 @@
+# MaxKB 配置文件
+# 数据库相关配置
+DB_NAME: maxkb
+DB_HOST: 127.0.0.1
+DB_PORT: 5432
+DB_USER: postgres
+DB_PASSWORD: 199628
+DB_ENGINE: dj_db_conn_pool.backends.postgresql
+DB_MAX_OVERFLOW: 80
+
+# 本地模型配置
+LOCAL_MODEL_HOST: 127.0.0.1
+LOCAL_MODEL_PORT: 11636
+LOCAL_MODEL_PROTOCOL: http
+LOCAL_MODEL_HOST_WORKER: 1
+
+# 嵌入模型配置
+EMBEDDING_MODEL_PATH: /opt/maxkb-app/model/base
+EMBEDDING_MODEL_NAME: text2vec-base-chinese
+
+# 语言配置
+LANGUAGE_CODE: zh-CN
+TIME_ZONE: Asia/Shanghai
+DEBUG: false
+
+# Redis 配置
+REDIS_HOST: 127.0.0.1
+REDIS_PORT: 6379
+REDIS_PASSWORD: 199628@tlw
+REDIS_DB: 0
+REDIS_MAX_CONNECTIONS: 100
+
+# 日志级别
+LOG_LEVEL: INFO
+
+# 管理后台和聊天界面路径配置
+ADMIN_PATH: /admin
+CHAT_PATH: /chat
+
+# 会话超时时间（秒）
+SESSION_TIMEOUT: 28800
+
+# 沙盒Python包路径
+SANDBOX_PYTHON_PACKAGE_PATHS: /opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages
