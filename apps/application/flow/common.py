@@ -242,7 +242,8 @@ class Workflow:
             raise AppApiException(500, _('There can only be one starting node'))
 
     def is_valid_model_params(self):
-        node_list = [node for node in self.nodes if (node.type == 'ai-chat-node' or node.type == 'question-node')]
+        node_list = [node for node in self.nodes if (
+                    node.type == 'ai-chat-node' or node.type == 'question-node' or node.type == 'parameter-extraction-node')]
         for node in node_list:
             model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
             if model is None:
