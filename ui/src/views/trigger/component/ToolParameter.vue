@@ -60,12 +60,34 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { type FormInstance } from 'element-plus'
 const toolParameterFormRef = ref<FormInstance>()
 const props = defineProps<{ tool?: any; modelValue: any; trigger: any }>()
 const emit = defineEmits(['update:modelValue'])
+const showSource = computed(() => {
+  return props.trigger.trigger_type === 'EVENT' && props.trigger.trigger_setting.body.length > 0
+})
 
+watch(
+  () => showSource.value,
+  () => {
+    if (!showSource.value) {
+      const parameter: any = {}
+      input_field_list.value.forEach((f) => {
+        if (props.modelValue[f.field]) {
+          parameter[f.field] = {
+            ...props.modelValue[f.field],
+            source: 'custom',
+          }
+        } else {
+          parameter[f.field] = { source: 'custom', value: f.default_value }
+        }
+      })
+      emit('update:modelValue', { ...parameter })
+    }
+  },
+)
 const options = computed(() => {
   if (props.trigger.trigger_type === 'EVENT') {
     const body = props.trigger.trigger_setting.body
