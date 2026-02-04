@@ -17,18 +17,18 @@ from .logger import CeleryThreadTaskFileHandler
 logger = logging.getLogger(__file__)
 safe_str = lambda x: x
 
+
 def init_scheduler():
     from common import job
-
+    from common.init import init_template
     job.run()
-
+    init_template.run()
     try:
         from xpack import job as xpack_job
 
         xpack_job.run()
     except ImportError:
-        pass 
-
+        pass
 
 
 @worker_ready.connect
