@@ -125,11 +125,7 @@
             </div>
             <el-select
               :teleported="false"
-              v-if="
-                modelValue['api_input_field_list'][f.field] &&
-                trigger.trigger_type === 'EVENT' &&
-                trigger.trigger_setting.body.length
-              "
+              v-if="modelValue['api_input_field_list'][f.field] && showSource"
               v-model="modelValue['api_input_field_list'][f.field].source"
               size="small"
               style="width: 85px"
@@ -158,13 +154,63 @@
   </el-form>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { type FormInstance } from 'element-plus'
 import { t } from '@/locales'
 const applicationParameterFormRef = ref<FormInstance>()
 const props = defineProps<{ application?: any; modelValue: any; trigger: any }>()
 const emit = defineEmits(['update:modelValue'])
-
+const showSource = computed(() => {
+  return props.trigger.trigger_type === 'EVENT' && props.trigger.trigger_setting.body.length > 0
+})
+watch(
+  () => showSource.value,
+  () => {
+    if (!showSource.value) {
+      const parameter: any = { ...props.modelValue }
+      base_field_list.value.forEach((f) => {
+        if (!parameter[f.field]) {
+          parameter[f.field] = { source: 'custom', value: f.default_value }
+        } else {
+          parameter[f.field] = { ...parameter[f.field], source: 'custom' }
+        }
+      })
+      api_input_field_list.value.forEach((f) => {
+        if (!parameter.api_input_field_list) {
+          parameter['api_input_field_list'] = {}
+        }
+        if (!parameter['api_input_field_list'][f.field]) {
+          parameter['api_input_field_list'][f.field] = {
+            source: 'custom',
+            value: f.default_value ? f.default_value : '',
+          }
+        } else {
+          parameter['api_input_field_list'][f.field] = {
+            ...parameter['api_input_field_list'][f.field],
+            source: 'custom',
+          }
+        }
+      })
+      user_input_field_list.value.forEach((f) => {
+        if (!parameter['user_input_field_list']) {
+          parameter['user_input_field_list'] = {}
+        }
+        if (!parameter['user_input_field_list'][f.field]) {
+          parameter['user_input_field_list'][f.field] = {
+            source: 'custom',
+            value: f.default_value ? f.default_value : '',
+          }
+        } else {
+          parameter['user_input_field_list'][f.field] = {
+            ...parameter['user_input_field_list'][f.field],
+            source: 'custom',
+          }
+        }
+      })
+      emit('update:modelValue', { ...parameter })
+    }
+  },
+)
 const options = computed(() => {
   if (props.trigger.trigger_type === 'EVENT') {
     const body = props.trigger.trigger_setting.body
