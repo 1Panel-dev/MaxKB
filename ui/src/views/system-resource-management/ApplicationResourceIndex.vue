@@ -286,7 +286,7 @@
                   </el-dropdown-item>
                   <el-dropdown-item
                     @click.stop="openTriggerDrawer(row)"
-                    v-if="row.is_publish && permissionPrecise.trigger_read()"
+                    v-if="permissionPrecise.trigger_read()"
                   >
                     <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
                     {{ $t('views.trigger.title') }}
@@ -355,7 +355,8 @@ const MoreFilledPermission = () => {
   return (
     permissionPrecise.value.export() ||
     permissionPrecise.value.delete() ||
-    permissionPrecise.value.auth()
+    permissionPrecise.value.auth() ||
+    permissionPrecise.value.trigger_read()
   )
 }
 

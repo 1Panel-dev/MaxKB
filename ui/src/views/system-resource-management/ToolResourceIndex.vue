@@ -332,11 +332,7 @@
 
                   <el-dropdown-item
                     @click.stop="openTriggerDrawer(row)"
-                    v-if="
-                      row.tool_type === 'CUSTOM' &&
-                      permissionPrecise.trigger_read() &&
-                      row.is_active
-                    "
+                    v-if="row.tool_type === 'CUSTOM' && permissionPrecise.trigger_read()"
                   >
                     <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
                     {{ $t('views.trigger.title') }}
@@ -474,6 +470,7 @@ const MoreFilledPermission = (row: any) => {
     permissionPrecise.value.delete() ||
     permissionPrecise.value.auth() ||
     permissionPrecise.value.relate_map() ||
+    permissionPrecise.value.trigger_read() ||
     (row.init_field_list?.length > 0 && permissionPrecise.value.edit())
   )
 }

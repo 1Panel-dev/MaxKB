@@ -504,6 +504,7 @@ import Result from '@/request/Result'
 import { hasPermission } from '@/utils/permission'
 import permissionMap from '@/permission'
 import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 const emit = defineEmits(['refresh'])
 const props = withDefaults(
@@ -573,9 +574,11 @@ const applicationRefresh = (application_selected: any) => {
   application_list
     .filter((id) => !existApplicationIds.includes(id))
     .map((id) => {
-      return applicationAPI.getApplicationDetail(id).then((ok) => {
-        applicationDetailsDict.value[ok.data.id] = ok.data
-      })
+      return loadSharedApi({ type: 'application', systemType: apiType.value })
+        .getApplicationDetail(id)
+        .then((ok: any) => {
+          applicationDetailsDict.value[ok.data.id] = ok.data
+        })
     })
   const task_source_id_list = form.value.trigger_task
     .filter((task: any) => task.source_type === 'APPLICATION')
@@ -613,9 +616,11 @@ const toolRefresh = (tool_selected: any) => {
   tool_ids
     .filter((id) => !existToolIds.includes(id))
     .map((id) => {
-      toolAPI.getToolById(id).then((ok) => {
-        toolDetailsDict.value[ok.data.id] = ok.data
-      })
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
+        .getToolById(id)
+        .then((ok: any) => {
+          toolDetailsDict.value[ok.data.id] = ok.data
+        })
     })
   const task_source_id_list = form.value.trigger_task
     .filter((task: any) => task.source_type === 'TOOL')

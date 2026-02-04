@@ -97,13 +97,20 @@ const emit = defineEmits(['refresh'])
 
 const createTrigger = (trigger: any) => {
   if (toolId.value) {
-    return triggerAPI.postResourceTrigger(props.source, toolId.value, trigger)
+    return loadSharedApi({ type: 'trigger', systemType: apiType.value }).postResourceTrigger(
+      props.source,
+      toolId.value,
+      trigger,
+    )
   }
   return Promise.resolve<any>({})
 }
 const editTrigger = (trigger_id: string, trigger: any) => {
   if (toolId.value) {
-    return triggerAPI.putResourceTrigger(props.source, toolId.value, trigger_id, trigger)
+    return loadSharedApi({
+      type: 'trigger',
+      systemType: apiType.value,
+    }).putResourceTrigger(props.source, toolId.value, trigger_id, trigger)
   }
   return Promise.resolve<any>({})
 }
