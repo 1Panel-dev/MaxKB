@@ -145,10 +145,12 @@ class ToolTask(BaseTriggerTask):
 
             parameters = get_tool_execute_parameters(tool.input_field_list, parameter_setting, kwargs)
             init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
-
+            parameters = init_params_default_value | parameters
             if tool.init_params is not None:
-                parameters = json.loads(rsa_long_decrypt(tool.init_params)) | parameters
-            all_params = init_params_default_value | parameters
+                all_params = json.loads(rsa_long_decrypt(tool.init_params)) | parameters
+            else:
+                all_params = parameters
+
             result = executor.exec_code(tool.code, all_params)
 
             result_dict = _get_result_detail(result)
