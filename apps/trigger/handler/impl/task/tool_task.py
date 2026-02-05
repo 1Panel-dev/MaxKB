@@ -165,7 +165,7 @@ class ToolTask(BaseTriggerTask):
             QuerySet(ToolRecord).filter(id=task_record_id).update(
                 state=State.SUCCESS,
                 run_time=time.time() - start_time,
-                meta={'input': init_params_default_value | parameters, 'output': result_dict}
+                meta={'input': parameters, 'output': result_dict}
             )
         except Exception as e:
             maxkb_logger.error(f"Tool execution error: {traceback.format_exc()}")
