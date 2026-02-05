@@ -145,11 +145,11 @@ class ToolTask(BaseTriggerTask):
 
             parameters = get_tool_execute_parameters(tool.input_field_list, parameter_setting, kwargs)
             init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
-            parameters = init_params_default_value | parameters
+
             if tool.init_params is not None:
-                all_params = json.loads(rsa_long_decrypt(tool.init_params)) | parameters
+                all_params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params)) | parameters
             else:
-                all_params = parameters
+                all_params = init_params_default_value | parameters
 
             result = executor.exec_code(tool.code, all_params)
 
@@ -165,7 +165,7 @@ class ToolTask(BaseTriggerTask):
             QuerySet(ToolRecord).filter(id=task_record_id).update(
                 state=State.SUCCESS,
                 run_time=time.time() - start_time,
-                meta={'input': parameters, 'output': result_dict}
+                meta={'input': init_params_default_value | parameters, 'output': result_dict}
             )
         except Exception as e:
             maxkb_logger.error(f"Tool execution error: {traceback.format_exc()}")
