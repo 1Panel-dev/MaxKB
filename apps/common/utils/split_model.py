@@ -167,9 +167,8 @@ def parse_level(text, pattern: str):
     level_content_list = list(map(to_tree_obj, [r[0:255] for r in re_findall(pattern, text) if r is not None]))
     # 过滤掉空标题或只包含#和空白字符的标题
     filtered_list = [item for item in level_content_list
-                     if item['content'].strip() and item['content'].replace('#', '').strip()]
+                     if item['content'].strip(' ') and item['content'].replace('#', '').strip(' ')]
     return list(map(filter_special_symbol, filtered_list))
-
 
 
 def re_findall(pattern, text):
@@ -305,8 +304,8 @@ def smart_split_paragraph(content: str, limit: int):
         # 优先级:句号 > 感叹号/问号 > 回车
         split_chars = [
             ('。', 0), ('.', 0),  # 中英文句号
-            ('!', 0), ('!', 0),   # 中英文感叹号
-            ('?', 0), ('?', 0),   # 中英文问号
+            ('!', 0), ('!', 0),  # 中英文感叹号
+            ('?', 0), ('?', 0),  # 中英文问号
         ]
 
         # 从后往前找分割点
