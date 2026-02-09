@@ -439,7 +439,6 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
 
         tempResult += str
         const split = tempResult.match(/data:.*?}\n\n/g)
-
         if (split) {
           str = split.join('')
           tempResult = tempResult.replace(str, '')
@@ -584,7 +583,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
             reader,
             response.headers.get('Content-Type') !== 'application/json',
           )
-          return reader.read().then(write)
+          return write()
         }
       })
       .then(() => {
