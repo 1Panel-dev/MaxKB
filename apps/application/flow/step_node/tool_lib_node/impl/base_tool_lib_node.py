@@ -252,7 +252,7 @@ class BaseToolLibNodeNode(IToolLibNode):
         start_time = time.time()
         try:
             # 过滤掉 tool_init_params 中的参数
-            tool_init_params = json.loads(rsa_long_decrypt(tool_lib.init_params))
+            tool_init_params = json.loads(rsa_long_decrypt(tool_lib.init_params)) if tool_lib.init_params else {}
             if tool_init_params:
                 filtered_args = {
                     k: v for k, v in all_params.items()
