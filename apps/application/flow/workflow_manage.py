@@ -664,9 +664,16 @@ class WorkflowManage:
                         f"{edge.sourceNodeId}_{current_node_result.node_variable.get('branch_id')}_right" == edge.sourceAnchorId):
                     if next_node.properties.get('condition', "AND") == 'AND':
                         if self.dependent_node_been_executed(edge.targetNodeId):
+                            up_nodes = self.flow.get_up_nodes(edge.targetNodeId)
+                            up_node_id_list = current_node.up_node_id_list
+                            if up_nodes and len(up_nodes) > 1:
+                                up_nodes.sort(key=lambda node: node.id)
+                                first = up_nodes[0]
+                                up_node_id_list = [n_c for n_c in self.node_context if n_c.node.id == first.id][
+                                    0].up_node_id_list
                             node_list.append(
                                 self.get_node_cls_by_id(edge.targetNodeId,
-                                                        [*current_node.up_node_id_list, current_node.node.id]))
+                                                        [*up_node_id_list, current_node.node.id]))
                     else:
                         node_list.append(
                             self.get_node_cls_by_id(edge.targetNodeId,
@@ -678,9 +685,16 @@ class WorkflowManage:
                     next_node = edge_node.node
                     if next_node.properties.get('condition', "AND") == 'AND':
                         if self.dependent_node_been_executed(edge.targetNodeId):
+                            up_nodes = self.flow.get_up_nodes(edge.targetNodeId)
+                            up_node_id_list = current_node.up_node_id_list
+                            if up_nodes and len(up_nodes) > 1:
+                                up_nodes.sort(key=lambda node: node.id)
+                                first = up_nodes[0]
+                                up_node_id_list = [n_c for n_c in self.node_context if n_c.node.id == first.id][
+                                    0].up_node_id_list
                             node_list.append(
                                 self.get_node_cls_by_id(edge.targetNodeId,
-                                                        [*current_node.up_node_id_list, current_node.node.id]))
+                                                        [*up_node_id_list, current_node.node.id]))
                     else:
                         node_list.append(
                             self.get_node_cls_by_id(edge.targetNodeId,
