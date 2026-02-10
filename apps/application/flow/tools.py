@@ -404,7 +404,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
                         tool_lib_id = tool_result.pop('tool_id') if 'tool_id' in tool_result else None
                         if tool_lib_id:
                             await save_tool_record(tool_lib_id, tool_info, tool_result, source_id, source_type)
-                        tool_result = json.dumps(tool_result)
+                        tool_result = json.dumps(tool_result, ensure_ascii=False)
                     except Exception as e:
                         tool_result = chunk[0].content
                     content = generate_tool_message_complete(
