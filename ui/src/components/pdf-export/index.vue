@@ -44,54 +44,55 @@ import * as htmlToImage from 'html-to-image'
 import { ref, nextTick } from 'vue'
 import html2Canvas from 'html2canvas'
 import { jsPDF } from 'jspdf'
+
 const loading = ref<boolean>(false)
 const svgContainerRef = ref()
 const cloneContainerRef = ref()
 const dialogVisible = ref<boolean>(false)
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+
 const open = (element: HTMLElement | null) => {
   dialogVisible.value = true
   loading.value = true
   if (!element) {
+    loading.value = false
     return
   }
   const cElement = element.cloneNode(true) as HTMLElement
-  const images = cElement.querySelectorAll('img')
-  const loadPromises = Array.from(images).map((img) => {
-    if (!img.src.startsWith(window.origin) && img.src.startsWith('http')) {
-      img.src = `${window.MaxKB.prefix}/api/resource_proxy?url=${encodeURIComponent(img.src)}`
-    }
-    img.setAttribute('onerror', '')
-    return new Promise((resolve) => {
-      // 已加载完成的图片直接 resolve
-      if (img.complete) {
-        resolve({ img, success: img.naturalWidth > 0 })
-        return
-      }
-
-      // 未加载完成的图片监听事件
-      img.onload = () => resolve({ img, success: true })
-      img.onerror = () => resolve({ img, success: false })
-    })
-  })
-  Promise.all(loadPromises).finally(() => {
-    setTimeout(() => {
-      nextTick(() => {
-        cloneContainerRef.value.appendChild(cElement)
-        htmlToImage
-          .toSvg(cElement, {
-            pixelRatio: 1,
-            quality: 1,
-            onImageErrorHandler: (
-              event: Event | string,
-              source?: string,
-              lineno?: number,
-              colno?: number,
-              error?: Error,
-            ) => {
-              console.log(event, source, lineno, colno, error)
-            },
-          })
-          .then((dataUrl) => {
+  setTimeout(() => {
+    nextTick(() => {
+      cloneContainerRef.value.appendChild(cElement)
+      htmlToImage
+        .toSvg(cElement, {
+          pixelRatio: 1,
+          quality: 1,
+          onImageErrorHandler: (
+            event: Event | string,
+            source?: string,
+            lineno?: number,
+            colno?: number,
+            error?: Error,
+          ) => {
+            console.log(event, source, lineno, colno, error)
+          },
+        })
+        .then((dataUrl) => {
+          if (isSafari) {
+            // Safari: 跳过 SVG data URI，直接用 toCanvas
+            return htmlToImage
+              .toCanvas(cElement, {
+                pixelRatio: 1,
+                quality: 1,
+              })
+              .then((canvas) => {
+                cloneContainerRef.value.style.display = 'none'
+                canvas.style.width = '100%'
+                canvas.style.height = 'auto'
+                svgContainerRef.value.appendChild(canvas)
+                svgContainerRef.value.style.height = canvas.height + 'px'
+              })
+          } else {
+            // Chrome 等：保持原逻辑
             return fetch(dataUrl)
               .then((response) => {
                 return response.text()
@@ -104,93 +105,128 @@ const open = (element: HTMLElement | null) => {
                 svgContainerRef.value.appendChild(svgElement)
                 svgContainerRef.value.style.height = svgElement.scrollHeight + 'px'
               })
-          })
-          .finally(() => {
-            loading.value = false
-          })
-          .catch((e) => {
-            loading.value = false
-          })
-      })
-    }, 1)
-  })
+          }
+        })
+        .finally(() => {
+          loading.value = false
+        })
+        .catch((e) => {
+          console.error(e)
+          loading.value = false
+        })
+    })
+  }, 1)
 }
 
 const exportPDF = () => {
   loading.value = true
   setTimeout(() => {
     nextTick(() => {
-      html2Canvas(svgContainerRef.value, {
-        logging: false,
-        allowTaint: true,
-        useCORS: true,
-      })
-        .then((canvas) => {
-          const doc = new jsPDF('p', 'mm', 'a4')
-          // 将canvas转换为图片
-          const imgData = canvas.toDataURL(`image/jpeg`, 1)
-          // 获取PDF页面尺寸
-          const pageWidth = doc.internal.pageSize.getWidth()
-          const pageHeight = doc.internal.pageSize.getHeight()
-          // 计算图像在PDF中的尺寸
-          const imgWidth = pageWidth
-          const imgHeight = (canvas.height * imgWidth) / canvas.width
-          // 添加图像到PDF
-          doc.addImage(imgData, 'jpeg', 0, 0, imgWidth, imgHeight)
-
-          // 如果内容超过一页，自动添加新页面
-          let heightLeft = imgHeight
-          let position = 0
-
-          // 第一页已经添加
-          heightLeft -= pageHeight
-
-          // 当内容超过一页时
-          while (heightLeft >= 0) {
-            position = heightLeft - imgHeight
-            doc.addPage()
-            doc.addImage(imgData, 'jpeg', 0, position, imgWidth, imgHeight)
-            heightLeft -= pageHeight
-          }
-
-          // 保存PDF
-          doc.save('导出文档.pdf')
-          return 'ok'
+      if (isSafari) {
+        // Safari: 直接取已有的 canvas
+        const canvas = svgContainerRef.value.querySelector('canvas')
+        if (canvas) {
+          generatePDF(canvas)
+        }
+        loading.value = false
+      } else {
+        html2Canvas(svgContainerRef.value, {
+          logging: false,
+          allowTaint: true,
+          useCORS: true,
         })
-        .finally(() => {
-          loading.value = false
-        })
+          .then((canvas) => {
+            generatePDF(canvas)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
     })
   })
 }
+
+const generatePDF = (canvas: HTMLCanvasElement) => {
+  const newCanvas = document.createElement('canvas')
+  newCanvas.width = canvas.width
+  newCanvas.height = canvas.height
+  const ctx = newCanvas.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
+  ctx.drawImage(canvas, 0, 0)
+
+  const doc = new jsPDF('p', 'mm', 'a4')
+  const imgData = newCanvas.toDataURL('image/jpeg', 1)
+  const pageWidth = doc.internal.pageSize.getWidth()
+  const pageHeight = doc.internal.pageSize.getHeight()
+  const imgWidth = pageWidth
+  const imgHeight = (newCanvas.height * imgWidth) / newCanvas.width
+
+  doc.addImage(imgData, 'jpeg', 0, 0, imgWidth, imgHeight)
+
+  let heightLeft = imgHeight - pageHeight
+
+  while (heightLeft > 0) {
+    const position = -(imgHeight - heightLeft)
+    doc.addPage()
+    doc.addImage(imgData, 'jpeg', 0, position, imgWidth, imgHeight)
+    heightLeft -= pageHeight
+  }
+
+  doc.save('导出文档.pdf')
+}
+
 const exportJepg = () => {
   loading.value = true
   setTimeout(() => {
     nextTick(() => {
-      html2Canvas(svgContainerRef.value, {
-        logging: false,
-        allowTaint: true,
-        useCORS: true,
-      })
-        .then((canvas) => {
-          // 将canvas转换为图片
-          const imgData = canvas.toDataURL(`image/jpeg`, 1)
-          const link = document.createElement('a')
-          link.download = `webpage-screenshot.jpeg`
-          link.href = imgData
-          document.body.appendChild(link)
-          link.click()
-          return 'ok'
+      if (isSafari) {
+        // Safari: 直接取已有的 canvas
+        const canvas = svgContainerRef.value.querySelector('canvas')
+        if (canvas) {
+          downloadJpeg(canvas)
+        }
+        loading.value = false
+      } else {
+        html2Canvas(svgContainerRef.value, {
+          logging: false,
+          allowTaint: true,
+          useCORS: true,
         })
-        .finally(() => {
-          loading.value = false
-        })
+          .then((canvas) => {
+            downloadJpeg(canvas)
+          })
+          .finally(() => {
+            loading.value = false
+          })
+      }
     })
   }, 1)
 }
+
+const downloadJpeg = (canvas: HTMLCanvasElement) => {
+  // 创建新 canvas，先填充白色背景
+  const newCanvas = document.createElement('canvas')
+  newCanvas.width = canvas.width
+  newCanvas.height = canvas.height
+  const ctx = newCanvas.getContext('2d')!
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, newCanvas.width, newCanvas.height)
+  ctx.drawImage(canvas, 0, 0)
+
+  const imgData = newCanvas.toDataURL('image/jpeg', 1)
+  const link = document.createElement('a')
+  link.download = 'webpage-screenshot.jpeg'
+  link.href = imgData
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 const close = () => {
   dialogVisible.value = false
 }
+
 defineExpose({ open, close })
 </script>
 <style lang="scss" scoped></style>
