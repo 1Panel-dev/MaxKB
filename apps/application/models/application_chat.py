@@ -15,6 +15,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from application.models import Application
 from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
+from users.models import User
 
 
 class ChatUserType(models.TextChoices):
@@ -64,6 +65,9 @@ class VoteReasonChoices(models.TextChoices):
     INCOMPLETE = 'incomplete', '内容不完善'
     OTHER = 'other', '其他'
 
+class ShareLinkType(models.TextChoices):
+    PUBLIC = "PUBLIC", 'public'
+    PRIVATE = "PRIVATE", 'private'
 
 class ChatSourceChoices(models.TextChoices):
     ONLINE = "ONLINE", "线上使用"
@@ -138,3 +142,14 @@ class ApplicationChatUserStats(AppModelMixin):
         indexes = [
             models.Index(fields=['application_id', 'chat_user_id']),
         ]
+
+class ChatShareLink(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
+    application = models.ForeignKey(Application,on_delete=models.CASCADE)
+    share_type = models.CharField(max_length=20, choices=ShareLinkType.choices, default=ShareLinkType.PUBLIC)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
+    chat_record_ids = ArrayField(base_field=models.UUIDField(max_length=128))
+
+    class Meta:
+        db_table = "application_chat_share_link"

@@ -9259,3 +9259,21 @@ msgstr "空间管理员"
 
 msgid "USER"
 msgstr "普通用户"
+
+msgid "Generate share link"
+msgstr "生成分享链接"
+
+msgid "Chat record link"
+msgstr "聊天记录链接"
+
+msgid "Get chat record by share link"
+msgstr "通过分享链接获取聊天记录"
+
+msgid "Invalid chat record ids"
+msgstr "无效的聊天记录ID"
+
+msgid "Share link does not exist"
+msgstr "分享链接不存在"
+
+msgid "Chat has been deleted"
+msgstr "聊天记录已被删除"

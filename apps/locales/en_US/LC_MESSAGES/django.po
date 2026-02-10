@@ -9136,3 +9136,21 @@ msgstr "Workspace Manager"
 
 msgid "USER"
 msgstr "Regular User"
+
+msgid "Generate share link"
+msgstr "Generate share link"
+
+msgid "Chat record link"
+msgstr "Chat record link"
+
+msgid "Get chat record by share link"
+msgstr "Get chat record by share link"
+
+msgid "Invalid chat record ids"
+msgstr "Invalid chat record ids"
+
+msgid "Share link does not exist"
+msgstr "Share link does not exist"
+
+msgid "Chat has been deleted"
+msgstr "Chat has been deleted"

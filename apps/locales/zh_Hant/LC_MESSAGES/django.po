@@ -9256,3 +9256,21 @@ msgstr "空間管理員"
 
 msgid "USER"
 msgstr "普通用戶"
+
+msgid "Generate share link"
+msgstr "產生分享連結"
+
+msgid "Chat record link"
+msgstr "聊天記錄連結"
+
+msgid "Get chat record by share link"
+msgstr "透過分享連結取得聊天記錄"
+
+msgid "Invalid chat record ids"
+msgstr "無效的聊天記錄ID"
+
+msgid "Share link does not exist"
+msgstr "分享連結不存在"
+
+msgid "Chat has been deleted"
+msgstr "聊天記錄已被刪除"

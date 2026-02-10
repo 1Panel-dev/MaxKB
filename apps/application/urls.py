@@ -24,6 +24,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat', views.ApplicationChat.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/export', views.ApplicationChat.Export.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<int:current_page>/<int:page_size>', views.ApplicationChat.Page.as_view()),
+    path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/share_chat', views.ChatRecordLinkView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record', views.ApplicationChatRecord.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<str:chat_record_id>', views.ApplicationChatRecordOperateAPI.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/chat/<str:chat_id>/chat_record/<int:current_page>/<int:page_size>', views.ApplicationChatRecord.Page.as_view()),
@@ -39,5 +40,5 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/mcp_tools', views.McpServers.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/model/<str:model_id>/prompt_generate', views.PromptGenerateView.as_view()),
     path('chat_message/<str:chat_id>', views.ChatView.as_view()),
-
+    path('chat/share/<str:link>', views.ChatRecordDetailView.as_view()),
 ]
