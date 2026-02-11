@@ -1,5 +1,5 @@
-import {type Dict} from '@/api/type/common'
-import {type Ref} from 'vue'
+import { type Dict } from '@/api/type/common'
+import { type Ref } from 'vue'
 import bus from '@/bus'
 
 interface ApplicationFormType {
@@ -168,7 +168,7 @@ export class ChatRecordManage {
       }
     }
     this.chat.answer_text = this.chat.answer_text + chunk_answer
-    bus.emit('change:answer', {record_id: this.chat.record_id, is_end: false})
+    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: false })
   }
 
   get_current_up_node(run_node: any) {
@@ -259,7 +259,7 @@ export class ChatRecordManage {
     if (this.loading) {
       this.loading.value = false
     }
-    bus.emit('change:answer', {record_id: this.chat.record_id, is_end: true})
+    bus.emit('change:answer', { record_id: this.chat.record_id, is_end: true })
     if (this.id) {
       clearInterval(this.id)
     }
@@ -293,21 +293,21 @@ export class ChatRecordManage {
         }
         return
       }
-      const {current_node, answer_text_list_index} = node_info
+      const { current_node, answer_text_list_index } = node_info
 
       if (current_node.buffer.length > 20) {
         const context = current_node.is_end
           ? current_node.buffer.splice(0)
           : current_node.buffer.splice(
-            0,
-            current_node.is_end ? undefined : current_node.buffer.length - 20,
-          )
+              0,
+              current_node.is_end ? undefined : current_node.buffer.length - 20,
+            )
         const reasoning_content = current_node.is_end
           ? current_node.reasoning_content_buffer.splice(0)
           : current_node.reasoning_content_buffer.splice(
-            0,
-            current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20,
-          )
+              0,
+              current_node.is_end ? undefined : current_node.reasoning_content_buffer.length - 20,
+            )
         this.append_answer(
           context.join(''),
           reasoning_content.join(''),
@@ -392,10 +392,16 @@ export class ChatRecordManage {
   appendChunk(chunk: Chunk) {
     let n = this.node_list.find((item) => item.real_node_id == chunk.real_node_id)
     if (n) {
-      n.buffer.push(...chunk.content)
+      for (const ch of chunk.content) {
+        n.buffer.push(ch)
+      }
+      // n.buffer.push(...chunk.content)
       n.content += chunk.content
       if (chunk.reasoning_content) {
-        n.reasoning_content_buffer.push(...chunk.reasoning_content)
+        for (const ch of chunk.reasoning_content) {
+          n.reasoning_content_buffer.push(ch)
+        }
+        // n.reasoning_content_buffer.push(...chunk.reasoning_content)
         n.reasoning_content += chunk.reasoning_content
       }
     } else {
@@ -542,4 +548,4 @@ export class ChatManagement {
   }
 }
 
-export type {ApplicationFormType, chatType}
+export type { ApplicationFormType, chatType }
