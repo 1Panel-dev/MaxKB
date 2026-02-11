@@ -86,6 +86,13 @@
 
                         <template #dropdown>
                           <el-dropdown-menu>
+                            <el-dropdown-item
+                              @click.stop="shareHandle()"
+                              :disabled="currentChatId !== row.id"
+                            >
+                              <AppIcon iconName="app-share" class="color-secondary"></AppIcon>
+                              {{ $t('chat.share') }}
+                            </el-dropdown-item>
                             <el-dropdown-item @click.stop="editLogTitle(row)">
                               <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
                               {{ $t('common.edit') }}
@@ -219,7 +226,14 @@ const props = defineProps<{
   currentChatId: string
   isPcCollapse?: boolean
 }>()
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
+const emit = defineEmits([
+  'newChat',
+  'clickLog',
+  'deleteLog',
+  'refreshFieldTitle',
+  'clearChat',
+  'clickShare',
+])
 
 const showHistory = computed(() => {
   return props.applicationDetail?.show_history != null || undefined
@@ -242,6 +256,9 @@ function mouseenter(row: any) {
   mouseId.value = row.id
 }
 
+const shareHandle = () => {
+  emit('clickShare')
+}
 const newChat = () => {
   emit('newChat')
 }

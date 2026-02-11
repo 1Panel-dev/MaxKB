@@ -4,8 +4,6 @@ export default {
     publicAccessLink: 'Public URL',
     openText: 'On',
     closeText: 'Off',
-    copyLinkText: 'Copy Link',
-    refreshLinkText: 'Refresh Link',
     demo: 'Preview',
     embedInWebsite: 'Get Embed Code',
     accessControl: 'Access Control',

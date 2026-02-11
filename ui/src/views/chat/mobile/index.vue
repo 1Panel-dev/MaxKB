@@ -1,7 +1,6 @@
 <template>
   <div
     class="chat-mobile layout-bg chat-background"
-    :class="classObj"
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(
@@ -66,7 +65,7 @@
           type="ai-chat"
           @refresh="refresh"
           @scroll="handleScroll"
-          class="AiChat-embed"
+          v-model:selection="showSelection"
         >
         </AiChat>
       </div>
@@ -82,6 +81,7 @@
       @delete-log="deleteLog"
       @refreshFieldTitle="refreshFieldTitle"
       @clear-chat="clearChat"
+      @clickShare="clickShareHandle"
     />
   </div>
 </template>
@@ -130,11 +130,11 @@ const customStyle = computed(() => {
   }
 })
 
-const classObj = computed(() => {
-  return {
-    mobile: common.isMobile(),
-  }
-})
+const showSelection = ref(false)
+const clickShareHandle = () => {
+  showSelection.value = true
+  show.value = false
+}
 
 function clearChat() {
   chatAPI.clearChat(left_loading).then(() => {

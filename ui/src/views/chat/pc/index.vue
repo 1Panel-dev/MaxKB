@@ -31,6 +31,7 @@
           @delete-log="deleteLog"
           @clear-chat="clearChat"
           @refreshFieldTitle="refreshFieldTitle"
+          @clickShare="clickShareHandle"
           :isPcCollapse="isPcCollapse"
         >
           <div class="user-info p-16 cursor">
@@ -124,12 +125,14 @@
               <span v-if="paginationConfig.total" class="lighter">
                 {{ paginationConfig.total }} {{ $t('chat.question_count') }}
               </span>
+              <el-button text class="ml-12" @click="clickShareHandle">
+                <AppIcon iconName="app-share"></AppIcon>
+              </el-button>
+
               <el-dropdown class="ml-8">
-                <AppIcon
-                  iconName="app-export"
-                  class="cursor"
-                  :title="$t('chat.exportRecords')"
-                ></AppIcon>
+                <el-button text>
+                  <AppIcon iconName="app-export" :title="$t('chat.exportRecords')"></AppIcon>
+                </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
                     <el-dropdown-item @click="exportMarkdown"
@@ -161,6 +164,7 @@
               @open-execution-detail="openExecutionDetail"
               @openParagraph="openKnowledgeSource"
               @openParagraphDocument="openParagraphDocument"
+              v-model:selection="showSelection"
             >
             </AiChat>
           </div>
@@ -256,16 +260,15 @@ const openPDFExport = () => {
   pdfExportRef.value?.open(document.getElementById('chatListId'))
 }
 const route = useRoute()
-const isCollapse = ref(false)
 const isPcCollapse = ref(false)
-watch(
-  () => common.device,
-  () => {
-    if (common.isMobile()) {
-      isPcCollapse.value = false
-    }
-  },
-)
+// watch(
+//   () => common.device,
+//   () => {
+//     if (common.isMobile()) {
+//       isPcCollapse.value = false
+//     }
+//   },
+// )
 
 const logout = () => {
   chatUser.logout().then(() => {
@@ -274,6 +277,10 @@ const logout = () => {
       query: route.query,
     })
   })
+}
+const showSelection = ref(false)
+const clickShareHandle = () => {
+  showSelection.value = true
 }
 
 const resetPasswordRef = ref<InstanceType<typeof ResetPassword>>()
@@ -289,9 +296,8 @@ const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
 
 const classObj = computed(() => {
   return {
-    mobile: common.isMobile(),
-    hideLeft: !isCollapse.value,
-    openLeft: isCollapse.value,
+    hideLeft: isPcCollapse.value,
+    openLeft: !isPcCollapse.value,
   }
 })
 
@@ -387,9 +393,6 @@ function newChat() {
   closeExecutionDetail()
   currentChatId.value = 'new'
   currentChatName.value = t('chat.createChat')
-  if (common.isMobile()) {
-    isCollapse.value = false
-  }
 }
 
 const chatLogPagination = ref({
@@ -465,9 +468,6 @@ const clickListHandle = (item: any) => {
         })
       }
     }
-  }
-  if (common.isMobile()) {
-    isCollapse.value = false
   }
 }
 
@@ -619,24 +619,12 @@ function closeExecutionDetail() {
   }
 }
 
-.chat-width {
-  max-width: 80%;
-  margin: 0 auto;
-}
-
 .chat-pc__right {
   width: calc(100vw - 280px);
   --execution-detail-panel-width: 400px;
 
   .execution-detail-panel {
     width: var(--execution-detail-panel-width, 400px);
-  }
-}
-
-@media only screen and (max-width: 1000px) {
-  .chat-width {
-    max-width: 100% !important;
-    margin: 0 auto;
   }
 }
 </style>

@@ -79,12 +79,12 @@
                 <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
                   <div class="download-button flex align-center" @click="downloadFile(item)">
                     <el-icon class="mr-4">
-                      <Download/>
+                      <Download />
                     </el-icon>
                     {{ $t('chat.download') }}
                   </div>
                   <div class="show flex align-center">
-                    <img :src="getImgUrl(item && item?.name)" alt="" width="24"/>
+                    <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
                     <div class="ml-4 ellipsis-1" :title="item && item?.name">
                       {{ item && item?.name }}
                     </div>
@@ -164,7 +164,7 @@
         </el-avatar>
       </div>
     </div>
-    <div class="question-edit-button text-right mt-4">
+    <div class="question-edit-button text-right mt-4" v-if="!selection">
       <div v-if="!isReQuestion && showIcon">
         <el-tooltip
           effect="dark"
@@ -190,7 +190,7 @@ import { type chatType } from '@/api/type/application'
 import { getImgUrl, downloadByURL } from '@/utils/common'
 import { useRoute, useRouter } from 'vue-router'
 import { onMounted, computed, ref, nextTick } from 'vue'
-import {getAttrsArray} from '@/utils/array'
+import { getAttrsArray } from '@/utils/array'
 import { copyClick } from '@/utils/clipboard'
 const route = useRoute()
 const {
@@ -203,6 +203,7 @@ const props = defineProps<{
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
   type: 'log' | 'ai-chat' | 'debug-ai-chat'
   isLast: boolean
+  selection?: boolean
 }>()
 
 const showIcon = ref<boolean>(false)

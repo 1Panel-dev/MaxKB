@@ -25,40 +25,61 @@
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
-        <div ref="dialogScrollbar" class="ai-chat__content p-16" id="chatListId">
+        <div
+          ref="dialogScrollbar"
+          class="ai-chat__content p-16"
+          id="chatListId"
+          :style="{ marginBottom: selection ? '65px' : '' }"
+        >
           <PrologueContent
             :type="type"
             :application="applicationDetails"
             :available="available"
             :send-message="sendMessage"
           ></PrologueContent>
-
-          <template v-for="(item, index) in chatList" :key="index">
-            <!-- 问题 -->
-            <QuestionContent
-              :chat-management="ChatManagement"
-              :type="type"
-              :application="applicationDetails"
-              :send-message="sendMessage"
-              :chat-record="item"
-              :is-last="index >= chatList.length - 1"
-            ></QuestionContent>
-            <!-- 回答 -->
-            <AnswerContent
-              :application="applicationDetails"
-              :loading="loading"
-              v-model:chat-record="chatList[index]"
-              :type="type"
-              :send-message="sendMessage"
-              :chat-management="ChatManagement"
-              :executionIsRightPanel="props.executionIsRightPanel"
-              @open-execution-detail="emit('openExecutionDetail', chatList[index])"
-              @openParagraph="emit('openParagraph', chatList[index])"
-              @openParagraphDocument="
-                (val: any) => emit('openParagraphDocument', chatList[index], val)
-              "
-            ></AnswerContent>
-          </template>
+          <el-checkbox-group v-model="multipleSelectionChat" @change="handleCheckedChatChange">
+            <template v-for="(item, index) in chatList" :key="index">
+              <div class="flex-between w-full">
+                <el-checkbox :value="item.id" v-if="selection" />
+                <div
+                  class="w-full border-r-8"
+                  :class="selection ? 'is-selected p-12 mt-8 mb-8' : 'mt-24'"
+                >
+                  <!-- 问题 -->
+                  <QuestionContent
+                    :chat-management="ChatManagement"
+                    :type="type"
+                    :application="applicationDetails"
+                    :send-message="sendMessage"
+                    :chat-record="item"
+                    :is-last="index >= chatList.length - 1"
+                    :selection="selection"
+                  ></QuestionContent>
+                </div>
+              </div>
+              <div class="flex align-center w-full">
+                <el-checkbox :value="item.id" v-if="selection" />
+                <div class="w-full border-r-8" :class="selection ? 'is-selected p-12' : ''">
+                  <!-- 回答 -->
+                  <AnswerContent
+                    :application="applicationDetails"
+                    :loading="loading"
+                    v-model:chat-record="chatList[index]"
+                    :type="type"
+                    :send-message="sendMessage"
+                    :chat-management="ChatManagement"
+                    :executionIsRightPanel="props.executionIsRightPanel"
+                    @open-execution-detail="emit('openExecutionDetail', chatList[index])"
+                    @openParagraph="emit('openParagraph', chatList[index])"
+                    @openParagraphDocument="
+                      (val: any) => emit('openParagraphDocument', chatList[index], val)
+                    "
+                    :selection="selection"
+                  ></AnswerContent>
+                </div>
+              </div>
+            </template>
+          </el-checkbox-group>
           <TransitionContent
             v-if="transcribing"
             :text="t('chat.inputPlaceholder.recorderLoading')"
@@ -73,6 +94,21 @@
         <el-button v-if="isBottom" circle class="back-bottom-button" @click="setScrollBottom">
           <el-icon><ArrowDownBold /></el-icon>
         </el-button>
+        <div class="mul-operation border-t w-full" v-if="selection === true">
+          <div class="flex-between chat-width">
+            <el-checkbox v-model="checkAll" @change="handleCheckAllChange">
+              {{ $t('common.allCheck') }}</el-checkbox
+            >
+            <div>
+              <el-button @click="cancelCheckHandle">
+                {{ $t('common.cancel') }}
+              </el-button>
+              <el-button type="primary">
+                {{ $t('chat.copyLinkText') }}
+              </el-button>
+            </div>
+          </div>
+        </div>
         <ChatInputOperate
           :app-id="appId"
           :application-details="applicationDetails"
@@ -85,7 +121,7 @@
           v-model:chat-id="chartOpenId"
           v-model:loading="loading"
           v-model:show-user-input="showUserInput"
-          v-if="type !== 'log'"
+          v-else-if="type !== 'log'"
         >
           <template #userInput>
             <el-button
@@ -135,6 +171,7 @@ import ChatInputOperate from '@/components/ai-chat/component/chat-input-operate/
 import PrologueContent from '@/components/ai-chat/component/prologue-content/index.vue'
 import UserForm from '@/components/ai-chat/component/user-form/index.vue'
 import Control from '@/components/ai-chat/component/control/index.vue'
+import type { CheckboxValueType } from 'element-plus'
 import { t } from '@/locales'
 import bus from '@/bus'
 import { throttle } from 'lodash-es'
@@ -159,6 +196,8 @@ const props = withDefaults(
     available?: boolean
     chatId?: string
     executionIsRightPanel?: boolean
+    chatRecord: chatType
+    selection?: boolean
   }>(),
   {
     applicationDetails: () => ({}),
@@ -172,6 +211,7 @@ const emit = defineEmits([
   'openExecutionDetail',
   'openParagraph',
   'openParagraphDocument',
+  'update:selection',
 ])
 const { application, common, chatUser } = useStore()
 const isMobile = computed(() => {
@@ -253,6 +293,23 @@ watch(
     immediate: true,
   },
 )
+
+// 选择对话分享
+const checkAll = ref(false)
+const multipleSelectionChat = ref<any[]>([])
+
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  multipleSelectionChat.value = val ? chatList.value.map((v) => v.id) : []
+}
+const handleCheckedChatChange = (value: CheckboxValueType[]) => {
+  const checkedCount = value.length
+  checkAll.value = checkedCount === chatList.value.length
+}
+function cancelCheckHandle() {
+  checkAll.value = false
+  multipleSelectionChat.value = []
+  emit('update:selection', false)
+}
 
 const toggleUserInput = () => {
   showUserInput.value = !showUserInput.value
@@ -798,14 +855,6 @@ defineExpose({
   bottom: 50px;
   width: calc(100% - 50px);
   max-width: 400px;
-}
-
-.video-stop-button {
-  box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
-
-  &:hover {
-    background: #ffffff;
-  }
 }
 
 @media only screen and (max-width: 768px) {

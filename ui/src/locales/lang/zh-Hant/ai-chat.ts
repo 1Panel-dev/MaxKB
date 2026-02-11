@@ -142,4 +142,6 @@ export default {
     questionPadded: '優化後問題',
   },
   editTitle: '編輯標題',
+  share: '分享',
+  copyLinkText: '複製連結',
 }

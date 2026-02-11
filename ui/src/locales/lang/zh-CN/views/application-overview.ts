@@ -4,8 +4,6 @@ export default {
     publicAccessLink: '公开访问链接',
     openText: '开',
     closeText: '关',
-    copyLinkText: '复制链接',
-    refreshLinkText: '刷新链接',
     demo: '演示',
     embedInWebsite: '嵌入第三方',
     accessControl: '访问限制',

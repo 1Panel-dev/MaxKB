@@ -28,6 +28,30 @@
       }
     }
   }
+  .video-stop-button {
+    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+
+    &:hover {
+      background: #ffffff;
+    }
+  }
+  .el-checkbox-group {
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .is-selected {
+    background: rgba(31, 35, 41, 0.08);
+  }
+  .mul-operation {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    padding: 16px 24px;
+    box-sizing: border-box;
+    background: #ffffff;
+    z-index: 22;
+    box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+  }
 }
 
 .chat-width {
@@ -49,5 +73,19 @@
 .chat-mobile {
   .el-button.is-text:not(.is-disabled):hover {
     background: none;
+  }
+}
+.chat-pc {
+  &.openLeft {
+    .mul-operation {
+      margin-left: 281px;
+      width: calc(100% - 281px);
+    }
+  }
+  &.hideLeft {
+    .mul-operation {
+      margin-left: 65px;
+      width: calc(100% - 65px);
+    }
   }
 }

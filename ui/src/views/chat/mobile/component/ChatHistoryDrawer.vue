@@ -18,6 +18,7 @@
         @delete-log="deleteChatLog"
         @refreshFieldTitle="refreshFieldTitle"
         @clear-chat="clearChat"
+        @clickShare="clickShareHandle"
       >
         <div class="flex align-center user-info p-16" @click="toUserCenter">
           <el-avatar
@@ -52,9 +53,20 @@ const props = defineProps<{
   currentChatId: string
 }>()
 
-const emit = defineEmits(['newChat', 'clickLog', 'deleteLog', 'refreshFieldTitle', 'clearChat'])
+const emit = defineEmits([
+  'newChat',
+  'clickLog',
+  'deleteLog',
+  'refreshFieldTitle',
+  'clearChat',
+  'clickShare',
+])
 
 const { chatUser } = useStore()
+
+const clickShareHandle = () => {
+  emit('clickShare')
+}
 
 const clearChat = () => {
   emit('clearChat')

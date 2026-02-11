@@ -141,4 +141,6 @@ export default {
     questionPadded: '优化后问题',
   },
   editTitle: '编辑标题',
+  share: '分享',
+  copyLinkText: '复制链接',
 }

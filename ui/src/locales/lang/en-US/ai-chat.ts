@@ -144,4 +144,6 @@ export default {
     questionPadded: 'Padded Question',
   },
   editTitle: 'Edit Title',
+  share: 'Share',
+  copyLinkText: 'Copy Link',
 }
