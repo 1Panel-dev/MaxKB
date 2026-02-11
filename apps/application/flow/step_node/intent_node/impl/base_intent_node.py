@@ -6,7 +6,7 @@ from typing import List, Dict, Any
 from functools import reduce
 
 from django.db.models import QuerySet
-from langchain.schema import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from application.flow.i_step_node import INode, NodeResult
 from application.flow.step_node.intent_node.i_intent_node import IIntentNode

@@ -14,8 +14,7 @@ from typing import List, Dict
 
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
-from langchain.schema import HumanMessage, SystemMessage
-from langchain_core.messages import BaseMessage, AIMessage
+from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
 
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode

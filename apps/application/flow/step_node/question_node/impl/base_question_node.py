@@ -12,8 +12,7 @@ from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
-from langchain.schema import HumanMessage, SystemMessage
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.question_node.i_question_node import IQuestionNode

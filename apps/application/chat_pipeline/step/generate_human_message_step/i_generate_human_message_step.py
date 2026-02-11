@@ -10,7 +10,7 @@ from abc import abstractmethod
 from typing import Type, List
 
 from django.utils.translation import gettext_lazy as _
-from langchain.schema import BaseMessage
+from langchain_core.messages import BaseMessage
 from rest_framework import serializers
 
 from application.chat_pipeline.I_base_chat_pipeline import IBaseChatPipelineStep, ParagraphPipelineModel

@@ -9,7 +9,7 @@
 from typing import List
 
 from django.utils.translation import gettext as _
-from langchain.schema import HumanMessage
+from langchain_core.messages import HumanMessage
 
 from application.chat_pipeline.step.reset_problem_step.i_reset_problem_step import IResetProblemStep
 from application.models import ChatRecord

@@ -16,9 +16,7 @@ from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
 from django.utils.translation import gettext as _
 from langchain.chat_models.base import BaseChatModel
-from langchain.schema import BaseMessage
-from langchain.schema.messages import HumanMessage, AIMessage
-from langchain_core.messages import AIMessageChunk, SystemMessage
+from langchain_core.messages import AIMessageChunk, SystemMessage, BaseMessage, HumanMessage, AIMessage
 from rest_framework import status
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
