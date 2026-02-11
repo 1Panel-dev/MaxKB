@@ -8,8 +8,7 @@
 """
 from typing import List, Dict
 
-from langchain.schema import BaseMessage, HumanMessage
-from langchain_core.messages import SystemMessage
+from langchain_core.messages import SystemMessage, BaseMessage, HumanMessage
 
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.generate_human_message_step.i_generate_human_message_step import \
