@@ -6,7 +6,7 @@ authors = [{ name = "shaohuzhang1", email = "shaohu.zhang@fit2cloud.com" }]
 requires-python = "~=3.11.0"
 readme = "README.md"
 dependencies = [
-    "django==5.2.9",
+    "django==5.2.11",
     "drf-spectacular[sidecar]==0.28.0",
     "django-redis==6.0.0",
     "django-db-connection-pool==1.2.6",
