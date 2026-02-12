@@ -36,7 +36,7 @@ class GunicornLocalModelService(BaseService):
             '-w', str(worker),
             '--max-requests', str(max_requests),
             '--max-requests-jitter', '2048',
-            '--timeout', '0',
+            '--timeout', '30',
             '--graceful-timeout', '300',
             '--access-logformat', log_format,
             '--access-logfile', '/dev/null',
