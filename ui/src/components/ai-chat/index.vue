@@ -103,7 +103,11 @@
               <el-button @click="cancelCheckHandle">
                 {{ $t('common.cancel') }}
               </el-button>
-              <el-button type="primary">
+              <el-button
+                type="primary"
+                @click="shareChatHandle"
+                :disabled="shareLoading || multipleSelectionChat.length === 0"
+              >
                 {{ $t('chat.copyLinkText') }}
               </el-button>
             </div>
@@ -297,9 +301,21 @@ watch(
 // 选择对话分享
 const checkAll = ref(false)
 const multipleSelectionChat = ref<any[]>([])
+const shareLoading = ref(false)
+function shareChatHandle() {
+  const obj = {
+    chat_record_ids: multipleSelectionChat.value,
+    is_current_all: checkAll.value,
+  }
+  chatAPI.postShareChat(id || props.appId, chartOpenId.value, obj, shareLoading).then((res) => {
+    console.log(res)
+
+  })
+}
 
 const handleCheckAllChange = (val: CheckboxValueType) => {
   multipleSelectionChat.value = val ? chatList.value.map((v) => v.id) : []
+  checkAll.value = val as boolean
 }
 const handleCheckedChatChange = (value: CheckboxValueType[]) => {
   const checkedCount = value.length
