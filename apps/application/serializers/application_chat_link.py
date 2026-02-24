@@ -35,7 +35,6 @@ class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
 
 class ChatRecordShareLinkSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
-    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     user_id = serializers.UUIDField(required=False, label=_("User ID"))
 

@@ -30,9 +30,8 @@ class ChatRecordLinkView(APIView):
         tags=[_("Chat record link")]  # type: ignore
     )
 
-    def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
+    def post(self, request: Request, application_id: str, chat_id: str):
         return result.success(ChatRecordShareLinkSerializer(data={
-            "workspace_id": workspace_id,
             "application_id": application_id,
             "chat_id": chat_id,
             "user_id": request.auth.chat_user_id
