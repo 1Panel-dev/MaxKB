@@ -165,13 +165,8 @@
       </div>
     </div>
     <div class="question-edit-button text-right mt-4" v-if="!selection">
-      <div v-if="!isReQuestion && showIcon">
-        <el-tooltip
-          effect="dark"
-          :content="$t('common.edit')"
-          placement="top"
-          v-if="props.isLast && props.type !== 'log'"
-        >
+      <div v-if="!isReQuestion && showIcon && props.type === 'ai-chat'">
+        <el-tooltip effect="dark" :content="$t('common.edit')" placement="top" v-if="props.isLast">
           <el-button text @click.stop="handleEdit(chatRecord)">
             <AppIcon class="color-secondary" iconName="app-edit"></AppIcon>
           </el-button>
@@ -201,7 +196,7 @@ const props = defineProps<{
   chatRecord: chatType
   chatManagement: any
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
-  type: 'log' | 'ai-chat' | 'debug-ai-chat'
+  type: 'log' | 'ai-chat' | 'debug-ai-chat' | 'share'
   isLast: boolean
   selection?: boolean
 }>()

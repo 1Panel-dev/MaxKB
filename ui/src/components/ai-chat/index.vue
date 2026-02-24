@@ -125,7 +125,7 @@
           v-model:chat-id="chartOpenId"
           v-model:loading="loading"
           v-model:show-user-input="showUserInput"
-          v-else-if="type !== 'log'"
+          v-else-if="type !== 'log' && type !== 'share'"
         >
           <template #userInput>
             <el-button
@@ -179,6 +179,7 @@ import type { CheckboxValueType } from 'element-plus'
 import { t } from '@/locales'
 import bus from '@/bus'
 import { throttle } from 'lodash-es'
+import { copyClick } from '@/utils/clipboard'
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return props.type === 'debug-ai-chat'
     ? applicationApi.postUploadFile(file, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE', loading)
@@ -194,7 +195,7 @@ const {
 const props = withDefaults(
   defineProps<{
     applicationDetails: any
-    type?: 'log' | 'ai-chat' | 'debug-ai-chat'
+    type?: 'log' | 'ai-chat' | 'debug-ai-chat' | 'share'
     appId?: string
     record?: Array<chatType>
     available?: boolean
@@ -308,8 +309,9 @@ function shareChatHandle() {
     is_current_all: checkAll.value,
   }
   chatAPI.postShareChat(id || props.appId, chartOpenId.value, obj, shareLoading).then((res) => {
-    console.log(res)
-
+    if (res.data?.link) {
+      copyClick(window.location.origin + '/chat/share/' + res.data.link)
+    }
   })
 }
 

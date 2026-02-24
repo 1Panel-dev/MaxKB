@@ -361,12 +361,11 @@ const postShareChat: (
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<any> = (application_id, chat_id, data, loading) => {
-  return post(
-    `${prefix.value}/${application_id}/chat/${chat_id}/share_chat`,
-    data,
-    undefined,
-    loading,
-  )
+  return post(`/${application_id}/chat/${chat_id}/share_chat`, data, undefined, loading)
+}
+
+const getShareLink: (link: string) => Promise<Result<any>> = (link) => {
+  return get(`/share/${link}`, undefined)
 }
 
 export default {
@@ -401,4 +400,5 @@ export default {
   postUploadFile,
   getFile,
   postShareChat,
+  getShareLink,
 }

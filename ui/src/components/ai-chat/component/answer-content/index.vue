@@ -89,7 +89,7 @@ const props = defineProps<{
   loading: boolean
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => Promise<boolean>
   chatManagement: any
-  type: 'log' | 'ai-chat' | 'debug-ai-chat'
+  type: 'log' | 'ai-chat' | 'debug-ai-chat' | 'share'
   executionIsRightPanel?: boolean
   selection?: boolean
 }>()

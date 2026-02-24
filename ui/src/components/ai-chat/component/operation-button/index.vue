@@ -1,9 +1,9 @@
 <template>
-
   <div class="operation-button-container">
+    <ShareOperationButton v-if="type === 'share'" v-bind:data="chatRecord" />
 
     <LogOperationButton
-      v-if="type === 'log'"
+      v-else-if="type === 'log'"
       v-bind:data="chatRecord"
       @update:data="(event: any) => emit('update:chatRecord', event)"
       :applicationId="application.id"
@@ -42,9 +42,10 @@
 <script setup lang="ts">
 import ChatOperationButton from '@/components/ai-chat/component/operation-button/ChatOperationButton.vue'
 import LogOperationButton from '@/components/ai-chat/component/operation-button/LogOperationButton.vue'
+import ShareOperationButton from '@/components/ai-chat/component/operation-button/ShareOperationButton.vue'
 import { type chatType } from '@/api/type/application'
 defineProps<{
-  type: 'log' | 'ai-chat' | 'debug-ai-chat'
+  type: 'log' | 'ai-chat' | 'debug-ai-chat' | 'share'
   chatRecord: chatType
   application: any
   loading: boolean

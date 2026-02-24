@@ -20,7 +20,7 @@ const router = createRouter({
 router.beforeEach(
   async (to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) => {
     NProgress.start()
-    if (to.path === '/404') {
+    if (to.path === '/404' || to.name === 'Share') {
       next()
       return
     }

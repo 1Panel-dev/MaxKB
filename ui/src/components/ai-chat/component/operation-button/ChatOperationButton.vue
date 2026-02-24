@@ -180,7 +180,7 @@ const {
 const props = withDefaults(
   defineProps<{
     data: any
-    type: 'log' | 'ai-chat' | 'debug-ai-chat'
+    type: 'log' | 'ai-chat' | 'debug-ai-chat' | 'share'
     chatId: string
     chat_loading: boolean
     applicationId: string

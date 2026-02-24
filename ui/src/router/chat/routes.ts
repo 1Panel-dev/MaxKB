@@ -24,4 +24,10 @@ export const routes: Array<RouteRecordRaw> = [
     name: 'NoService',
     component: () => import('@/views/error/NoService.vue'),
   },
+  // 对话
+  {
+    path: '/share/:link',
+    name: 'Share',
+    component: () => import('@/views/chat/Share.vue'),
+  },
 ]

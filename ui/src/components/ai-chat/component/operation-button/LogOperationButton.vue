@@ -16,19 +16,19 @@
             v-if="!audioPlayerStatus"
           >
             <el-button text @click="playAnswerText(data?.answer_text)">
-              <AppIcon iconName="app-video-play"></AppIcon>
+              <AppIcon iconName="app-video-play" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
           <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
             <el-button type="primary" text @click="pausePlayAnswerText()">
-              <AppIcon iconName="app-video-pause"></AppIcon>
+              <AppIcon iconName="app-video-pause" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
           <el-divider direction="vertical" />
         </span>
         <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
           <el-button text @click="copyClick(data?.answer_text)">
-            <AppIcon iconName="app-copy"></AppIcon>
+            <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
           </el-button>
         </el-tooltip>
         <el-divider direction="vertical" />
@@ -40,7 +40,7 @@
             placement="top"
           >
             <el-button text @click="editContent(data)">
-              <AppIcon iconName="app-edit"></AppIcon>
+              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
 
