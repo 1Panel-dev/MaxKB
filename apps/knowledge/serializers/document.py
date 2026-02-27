@@ -392,16 +392,34 @@ class DocumentSerializers(serializers.Serializer):
         status = serializers.CharField(required=False, label=_('status'), allow_null=True, allow_blank=True)
         order_by = serializers.CharField(required=False, label=_('order by'), allow_null=True, allow_blank=True)
         tag = serializers.CharField(required=False, label=_('tag'), allow_null=True, allow_blank=True)
+        tag_ids = serializers.ListField(child=serializers.UUIDField(),allow_null=True,required=False,allow_empty=True)
+        no_tag = serializers.BooleanField(required=False,default=False, allow_null=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
             query_set = query_set.filter(**{'knowledge_id': self.data.get("knowledge_id")})
+
+            tag_ids = self.data.get('tag_ids')
+            no_tag = self.data.get('no_tag')
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
             if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') not in [None, '']:
                 query_set = query_set.filter(**{'hit_handling_method': self.data.get('hit_handling_method')})
             if 'is_active' in self.data and self.data.get('is_active') is not None:
                 query_set = query_set.filter(**{'is_active': self.data.get('is_active')})
+            if no_tag and tag_ids:
+                matched_doc_ids = QuerySet(DocumentTag).filter(tag_id__in=tag_ids).values_list('document_id', flat=True)
+                tagged_doc_ids = QuerySet(DocumentTag).values_list('document_id', flat=True)
+                query_set = query_set.filter(
+                    Q(id__in=matched_doc_ids) | ~Q(id__in=tagged_doc_ids)
+                )
+            elif no_tag:
+                tagged_doc_ids = QuerySet(DocumentTag).values_list('document_id', flat=True)
+                query_set = query_set.exclude(id__in=tagged_doc_ids)
+            elif tag_ids:
+                matched_doc_ids = QuerySet(DocumentTag).filter(tag_id__in=tag_ids).values_list('document_id', flat=True)
+                query_set = query_set.filter(id__in=matched_doc_ids)
+
             if 'status' in self.data and self.data.get('status') is not None:
                 task_type = self.data.get('task_type')
                 status = self.data.get('status')

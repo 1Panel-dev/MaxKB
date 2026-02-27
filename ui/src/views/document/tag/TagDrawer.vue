@@ -126,8 +126,8 @@
       />
     </div>
   </el-drawer>
-  <CreateTagDialog ref="createTagDialogRef" @refresh="getList" />
-  <EditTagDialog ref="editTagDialogRef" @refresh="getList" />
+  <CreateTagDialog ref="createTagDialogRef" @refresh="handleDialogRefresh" />
+  <EditTagDialog ref="editTagDialogRef" @refresh="handleDialogRefresh" />
 </template>
 
 <script setup lang="ts">
@@ -140,7 +140,16 @@ import { t } from '@/locales'
 import EditTagDialog from '@/views/document/tag/EditTagDialog.vue'
 import permissionMap from '@/permission'
 
-const emit = defineEmits(['refresh'])
+const emit = defineEmits(['refresh', 'tag-changed'])
+
+function notifyTagChanged() {
+  emit('tag-changed')
+}
+
+function handleDialogRefresh() {
+  getList()
+  notifyTagChanged()
+}
 
 const route = useRoute()
 const {
@@ -270,7 +279,9 @@ const handleSelectionChange = async (val: any[]) => {
   // 以表格最终状态为准更新缓存（这里直接用传入 val 可能已过期）
   // 简化：重新从表格取 selection（Element Plus 有 store，没暴露就用 val\+补丁）
   multipleSelection.value = pagedTableData.value.filter((r) =>
-    tableRef.value?.getSelectionRows ? tableRef.value.getSelectionRows().some((s: any) => s.id === r.id) : selectedIds.has(r.id)
+    tableRef.value?.getSelectionRows
+      ? tableRef.value.getSelectionRows().some((s: any) => s.id === r.id)
+      : selectedIds.has(r.id),
   )
 }
 
@@ -291,6 +302,7 @@ function batchDelete() {
         .delMulTag(id, tagsToDelete)
         .then(() => {
           getList()
+          notifyTagChanged()
         })
     })
     .catch(() => {})
@@ -312,6 +324,7 @@ function delTag(row: any) {
         .delTag(id, row.id, 'key')
         .then(() => {
           getList()
+          notifyTagChanged()
         })
     })
     .catch(() => {})
@@ -331,6 +344,7 @@ function delTagValue(row: any) {
         .delTag(id, row.id, 'one')
         .then(() => {
           getList()
+          notifyTagChanged()
         })
     })
     .catch(() => {})

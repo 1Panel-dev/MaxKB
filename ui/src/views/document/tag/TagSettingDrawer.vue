@@ -143,6 +143,7 @@ function batchDelete() {
     .delMulDocumentTag(id, document_id.value, tagsToDelete, loading)
     .then(() => {
       getList()
+      emit('refresh')
     })
 }
 
@@ -151,6 +152,7 @@ function delTagValue(row: any) {
     .delMulDocumentTag(id, document_id.value, [row.id], loading)
     .then(() => {
       getList()
+      emit('refresh')
     })
 }
 
@@ -177,6 +179,7 @@ function addTags(tags: any) {
     .then(() => {
       addTagDialogRef.value?.close()
       getList()
+      emit('refresh')
     })
 }
 

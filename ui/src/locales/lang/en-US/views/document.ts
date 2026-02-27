@@ -103,6 +103,7 @@ export default {
     key: 'Tag',
     value: 'Value',
     addTag: 'Add Tag',
+    noTag: 'No Tag',
     setting: 'Tag Settings',
     create: 'Create Tag',
     createValue: 'Create Tag Value',

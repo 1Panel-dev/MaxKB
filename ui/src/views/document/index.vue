@@ -210,74 +210,6 @@
               :label="$t('views.document.fileStatus.label')"
               width="130"
             >
-              <template #header>
-                <div>
-                  <span>{{ $t('views.document.fileStatus.label') }}</span>
-                  <el-dropdown trigger="click" @command="dropdownHandle">
-                    <el-button
-                      style="margin-top: 1px"
-                      link
-                      :type="filterMethod['status'] ? 'primary' : ''"
-                    >
-                      <el-icon>
-                        <Filter />
-                      </el-icon>
-                    </el-button>
-                    <template #dropdown>
-                      <el-dropdown-menu style="width: 100px">
-                        <el-dropdown-item
-                          :class="filterMethod['status'] ? '' : 'is-active'"
-                          :command="beforeCommand('status', '')"
-                          class="justify-center"
-                          >{{ $t('common.status.all') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item
-                          :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
-                          class="justify-center"
-                          :command="beforeCommand('status', State.SUCCESS)"
-                          >{{ $t('common.status.success') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item
-                          :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
-                          class="justify-center"
-                          :command="beforeCommand('status', State.FAILURE)"
-                          >{{ $t('common.status.fail') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item
-                          :class="
-                            filterMethod['status'] === State.STARTED &&
-                            filterMethod['task_type'] == TaskType.EMBEDDING
-                              ? 'is-active'
-                              : ''
-                          "
-                          class="justify-center"
-                          :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
-                          >{{ $t('views.document.fileStatus.EMBEDDING') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item
-                          :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
-                          class="justify-center"
-                          :command="beforeCommand('status', State.PENDING)"
-                          >{{ $t('views.document.fileStatus.PENDING') }}
-                        </el-dropdown-item>
-                        <el-dropdown-item
-                          :class="
-                            filterMethod['status'] === State.STARTED &&
-                            filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
-                              ? 'is-active'
-                              : ''
-                          "
-                          class="justify-center"
-                          :command="
-                            beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)
-                          "
-                          >{{ $t('views.document.fileStatus.GENERATE') }}
-                        </el-dropdown-item>
-                      </el-dropdown-menu>
-                    </template>
-                  </el-dropdown>
-                </div>
-              </template>
               <template #default="{ row }">
                 <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
               </template>
@@ -355,6 +287,76 @@
                     {{ $t('common.status.disabled') }}
                   </span>
                 </div>
+              </template>
+            </el-table-column>
+            <el-table-column width="160">
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.tag.label') }}</span>
+                  <el-dropdown trigger="click" @visible-change="handleTagVisibleChange">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['tags']?.length > 0 ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <div>
+                        <el-cascader-panel
+                          v-model="tagFilterValue"
+                          :options="tagFilterOptions"
+                          :props="{
+                            multiple: true,
+                            checkStrictly: true,
+                            emitPath: false,
+                            showPrefix: false,
+                          }"
+                          @change="(val: any) => dropdownHandle({ attr: 'tags', command: val })"
+                        />
+                      </div>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
+              <template #default="{ row }">
+                <el-popover
+                  trigger="hover"
+                  placement="bottom"
+                  :disabled="!row.tag_count"
+                  :width="160"
+                >
+                  <div v-for="tag in row.tags" :key="tag.id" flex class="pt-4">
+                    <span class="mr-8 color-input-placeholder">{{ tag.key }}</span
+                    >{{ tag.value }}
+                  </div>
+
+                  <template #reference>
+                    <el-space :size="4">
+                      <el-button
+                        size="small"
+                        style="padding: 1px 6px"
+                        @click.stop="openTagSettingDrawer(row)"
+                        :disabled="!permissionPrecise.doc_tag(id)"
+                      >
+                        <AppIcon iconName="app-tag"></AppIcon>
+                        <span>{{ row.tag_count || 0 }}</span>
+                      </el-button>
+                      <el-button
+                        size="small"
+                        plain
+                        style="padding: 1px 6px; border-style: dashed"
+                        :disabled="!permissionPrecise.doc_tag(id)"
+                        @click.stop="openAddTagDialog(row.id)"
+                      >
+                        <el-icon class="color-secondary"><Plus /></el-icon>
+                        <span class="color-secondary">{{ $t('views.document.tag.key') }}</span>
+                      </el-button>
+                    </el-space>
+                  </template>
+                </el-popover>
               </template>
             </el-table-column>
             <el-table-column width="170">
@@ -734,15 +736,23 @@
       :workspaceId="knowledgeDetail?.workspace_id"
     />
     <GenerateRelatedDialog ref="GenerateRelatedDialogRef" @refresh="getList" :apiType="apiType" />
-    <TagDrawer ref="tagDrawerRef" />
-    <TagSettingDrawer ref="tagSettingDrawerRef" />
+    <TagDrawer ref="tagDrawerRef" @tag-changed="onTagChanged" />
+    <TagSettingDrawer
+      ref="tagSettingDrawerRef"
+      @refresh="
+        () => {
+          onTagChanged()
+          getList()
+        }
+      "
+    />
     <AddTagDialog ref="addTagDialogRef" @addTags="addTags" :apiType="apiType" />
     <!-- 执行详情 -->
     <ExecutionRecord ref="ListActionRef"></ExecutionRecord>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, reactive } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
 import type { ElTable } from 'element-plus'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
@@ -1359,6 +1369,61 @@ function openGenerateDialog(row?: any) {
   GenerateRelatedDialogRef.value.open(arr, 'document')
 }
 
+const tagFilterValue = ref<string[]>([])
+const tagFilterDirty = ref(false)
+const tagFilterOptions = ref<any[]>([])
+const tagFilterLoaded = ref(false)
+const tagFilterLoading = ref(false)
+
+function buildTagCascaderOptions(tags: any[]) {
+  const options = tags.map((group: any) => ({
+    label: group.key,
+    value: group.key,
+    children: (group.values || []).map((item: any) => ({
+      label: item.value,
+      value: item.id, // 叶子节点 tag.id
+    })),
+  }))
+
+  options.push({
+    label: t('views.document.tag.noTag'),
+    value: 'NO_TAG',
+    children: [],
+  })
+
+  return options
+}
+
+async function ensureTagFilterOptions(needRefresh = false) {
+  // 非刷新 && 已加载 && 非脏数据
+  if (!needRefresh && tagFilterLoaded.value && !tagFilterDirty.value) return
+
+  try {
+    tagFilterLoading.value = true
+    const params = {}
+    const res: any = await loadSharedApi({
+      type: 'knowledge',
+      systemType: apiType.value,
+      isShared: isShared.value,
+    }).getTags(id, params, tagFilterLoading)
+
+    tagFilterOptions.value = buildTagCascaderOptions(res?.data || [])
+    tagFilterLoaded.value = true
+    tagFilterDirty.value = false
+  } finally {
+    tagFilterLoading.value = false
+  }
+}
+
+async function handleTagVisibleChange(visible: boolean) {
+  if (!visible) return
+  await ensureTagFilterOptions()
+}
+
+function onTagChanged() {
+  tagFilterDirty.value = true
+}
+
 const tagDrawerRef = ref()
 function openTagDrawer() {
   tagDrawerRef.value.open()
@@ -1371,13 +1436,14 @@ function openTagSettingDrawer(doc: any) {
 
 const addTagDialogRef = ref()
 
-function openAddTagDialog() {
-  addTagDialogRef.value?.open()
+function openAddTagDialog(rowId?: string) {
+  addTagDialogRef.value?.open(rowId)
 }
 
-function addTags(tags: any) {
-  const arr: string[] = multipleSelection.value.map((v) => v.id)
-
+function addTags(tags: any, rowId?: string) {
+  const arr: string[] = multipleSelection.value.length
+    ? multipleSelection.value.map((v) => v.id)
+    : [rowId]
   loadSharedApi({ type: 'document', systemType: apiType.value })
     .postMulDocumentTags(id, { tag_ids: tags, document_ids: arr }, loading)
     .then(() => {
@@ -1399,7 +1465,7 @@ onMounted(() => {
   }
   getList()
   // 初始化定时任务
-  initInterval()
+  // initInterval()
 })
 
 onBeforeUnmount(() => {

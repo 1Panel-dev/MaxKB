@@ -168,6 +168,7 @@ const submit = () => {
     emit(
       'addTags',
       tagList.value.map((tag) => tag.value),
+      currentDocId.value,
     )
   })
 }
@@ -182,7 +183,9 @@ function getTags(Key?: string) {
 }
 
 function filterMethod(val: string) {
-  keyOptions.value = allKeyOptions.value.filter((item: any) => item.key.indexOf(val) > -1).slice(0, 100)
+  keyOptions.value = allKeyOptions.value
+    .filter((item: any) => item.key.indexOf(val) > -1)
+    .slice(0, 100)
 }
 
 const createTagDialogRef = ref()
@@ -191,8 +194,10 @@ function openCreateTagDialog(row?: any) {
   createTagDialogRef.value?.open(row)
 }
 
-const open = () => {
+const currentDocId = ref<string | undefined>()
+const open = (rowId?: string) => {
   getTags()
+  currentDocId.value = rowId
   dialogVisible.value = true
   tagList.value = [{}]
 }

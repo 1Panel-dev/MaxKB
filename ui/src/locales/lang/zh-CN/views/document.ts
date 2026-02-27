@@ -98,6 +98,7 @@ export default {
     key: '标签',
     value: '标签值',
     addTag: '添加标签',
+    noTag: '无标签',
     addValue: '添加标签值',
     setting: '标签设置',
     create: '创建标签',

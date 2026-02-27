@@ -99,6 +99,7 @@ export default {
     label: '標籤管理',
     key: '標籤',
     value: '標籤值',
+    noTag: '無標籤',
     addTag: '添加標籤',
     setting: '標籤設置',
     create: '創建標籤',
