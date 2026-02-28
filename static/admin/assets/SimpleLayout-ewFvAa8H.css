@@ -1,0 +1,1 @@
+.app-layout{background-color:var(--app-layout-bg-color);height:100%}.app-header{background:var(--app-header-bg-color);position:fixed;width:100%;left:0;top:0;z-index:100}.app-main{position:relative;height:100%;padding:var(--app-header-height) 0 0!important;box-sizing:border-box;overflow:auto}.app-main.isExpire{padding-top:calc(var(--app-header-height) + 40px)!important}
