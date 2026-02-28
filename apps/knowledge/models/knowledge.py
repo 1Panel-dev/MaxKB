@@ -346,7 +346,7 @@ class File(AppModelMixin):
             raise ValueError("bytea参数不能为空")
 
         sha256_hash = get_sha256_hash(bytea)
-
+        self.sha256_hash = sha256_hash
         existing_file = QuerySet(File).filter(sha256_hash=sha256_hash).first()
         if existing_file:
             self.loid = existing_file.loid
