@@ -1465,7 +1465,7 @@ onMounted(() => {
   }
   getList()
   // 初始化定时任务
-  // initInterval()
+  initInterval()
 })
 
 onBeforeUnmount(() => {
