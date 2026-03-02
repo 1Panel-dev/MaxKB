@@ -5,7 +5,7 @@
         <div class="flex" style="flex-wrap: nowrap; align-items: center">
           <el-avatar class="avatar-gradient mr-8" style="height: 20px; width: 20px" shape="square">
             <img :src="toolCallsContent.icon || defaultIcon" /> </el-avatar
-          >{{ toolCallsContent.title || '工具执行' }}工具执行
+          >{{ toolCallsContent.title || '工具执行' }}
         </div>
       </template>
       <Content :content="toolCallsContent"></Content>
