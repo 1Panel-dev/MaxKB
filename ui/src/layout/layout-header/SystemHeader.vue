@@ -1,4 +1,3 @@
-·
 <template>
   <div class="app-top-bar-container border-b flex-center">
     <div class="logo mt-4">
