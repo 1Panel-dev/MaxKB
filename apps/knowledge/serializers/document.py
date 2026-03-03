@@ -395,8 +395,6 @@ class DocumentSerializers(serializers.Serializer):
         tag_ids = serializers.ListField(child=serializers.UUIDField(), allow_null=True, required=False,
                                         allow_empty=True)
         no_tag = serializers.BooleanField(required=False, default=False, allow_null=True)
-        tag_ids = serializers.ListField(child=serializers.UUIDField(),allow_null=True,required=False,allow_empty=True)
-        no_tag = serializers.BooleanField(required=False,default=False, allow_null=True)
         tag_exclude = serializers.BooleanField(required=False,default=False, allow_null=True)
 
         def get_query_set(self):
