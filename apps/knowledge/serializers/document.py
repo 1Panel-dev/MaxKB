@@ -395,6 +395,9 @@ class DocumentSerializers(serializers.Serializer):
         tag_ids = serializers.ListField(child=serializers.UUIDField(), allow_null=True, required=False,
                                         allow_empty=True)
         no_tag = serializers.BooleanField(required=False, default=False, allow_null=True)
+        tag_ids = serializers.ListField(child=serializers.UUIDField(),allow_null=True,required=False,allow_empty=True)
+        no_tag = serializers.BooleanField(required=False,default=False, allow_null=True)
+        tag_exclude = serializers.BooleanField(required=False,default=False, allow_null=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -402,6 +405,7 @@ class DocumentSerializers(serializers.Serializer):
 
             tag_ids = self.data.get('tag_ids')
             no_tag = self.data.get('no_tag')
+            tag_exclude = self.data.get('tag_exclude')
             if 'name' in self.data and self.data.get('name') is not None:
                 query_set = query_set.filter(**{'name__icontains': self.data.get('name')})
             if 'hit_handling_method' in self.data and self.data.get('hit_handling_method') not in [None, '']:
@@ -419,7 +423,10 @@ class DocumentSerializers(serializers.Serializer):
                 query_set = query_set.exclude(id__in=tagged_doc_ids)
             elif tag_ids:
                 matched_doc_ids = QuerySet(DocumentTag).filter(tag_id__in=tag_ids).values_list('document_id', flat=True)
-                query_set = query_set.filter(id__in=matched_doc_ids)
+                if tag_exclude:
+                    query_set = query_set.exclude(id__in=matched_doc_ids)
+                else:
+                    query_set = query_set.filter(id__in=matched_doc_ids)
 
             if 'status' in self.data and self.data.get('status') is not None:
                 task_type = self.data.get('task_type')
@@ -1605,6 +1612,40 @@ class DocumentSerializers(serializers.Serializer):
                 tag_id__in=tag_ids
             ).delete()
 
+    class DeleteDocsTag(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
+        tag_id = serializers.UUIDField(required=True, label=_('tag id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Knowledge).filter(id=self.data.get('knowledge_id'))
+            if workspace_id and workspace_id != 'None':
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Knowledge id does not exist'))
+            if not QuerySet(Tag).filter(
+                    id=self.data.get('tag_id'),
+                    knowledge_id=self.data.get('knowledge_id')
+            ).exists():
+                raise AppApiException(500, _('Tag id does not exist'))
+
+        def batch_delete_docs_tag(self, instance,with_valid=True):
+            if with_valid:
+                BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get('knowledge_id')
+            tag_id=self.data.get('tag_id')
+            doc_id_list = instance.get("id_list")
+
+            valid_doc_count = Document.objects.filter(id__in=doc_id_list, knowledge_id=knowledge_id).count()
+            if valid_doc_count != len(doc_id_list):
+                raise AppApiException(500, _('Document id does not belong to current knowledge'))
+
+            DocumentTag.objects.filter(document_id__in=doc_id_list,tag_id=tag_id).delete()
+
+            return True
     class ReplaceSourceFile(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))

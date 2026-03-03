@@ -89,6 +89,13 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('views.document.tag.relatedDoc')" align="right">
+        <template #default="{ row }">
+          <el-link type="primary" underline @click="openTagLinkedDocumentDialog(row)">
+            {{ row.doc_count }}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('common.operation')" align="left" width="100" fixed="right">
         <template #default="{ row }">
           <span class="mr-4">
@@ -128,6 +135,7 @@
   </el-drawer>
   <CreateTagDialog ref="createTagDialogRef" @refresh="handleDialogRefresh" />
   <EditTagDialog ref="editTagDialogRef" @refresh="handleDialogRefresh" />
+  <TaglinkedDocumentDialog ref="taglinkedDocumentDialogRef" @refresh="handleDialogRefresh" />
 </template>
 
 <script setup lang="ts">
@@ -135,6 +143,7 @@ import { computed, ref, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import CreateTagDialog from './CreateTagDialog.vue'
+import TaglinkedDocumentDialog from './TaglinkedDocumentDialog.vue'
 import { MsgConfirm } from '@/utils/message.ts'
 import { t } from '@/locales'
 import EditTagDialog from '@/views/document/tag/EditTagDialog.vue'
@@ -201,6 +210,7 @@ const tableData = computed(() => {
           id: value.id,
           key: tag.key,
           value: value.value,
+          doc_count: value.doc_count,
           keyIndex: index, // 同一个 key 下第几行
         })
       })
@@ -328,6 +338,12 @@ function delTag(row: any) {
         })
     })
     .catch(() => {})
+}
+
+const taglinkedDocumentDialogRef = ref()
+
+const openTagLinkedDocumentDialog = (row: any) => {
+  taglinkedDocumentDialogRef.value?.open(row)
 }
 
 function editTagValue(row: any) {

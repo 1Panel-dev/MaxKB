@@ -57,6 +57,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/replace_source_file', views.DocumentView.ReplaceSourceFile.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/tags', views.DocumentView.Tags.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/tags/batch_delete', views.DocumentView.Tags.BatchDelete.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/tag/<str:tag_id>/docs_delete', views.DocumentView.Tags.BatchDeleteDocsTag.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph', views.ParagraphView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/batch_delete', views.ParagraphView.BatchDelete.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/paragraph/batch_generate_related', views.ParagraphView.BatchGenerateRelated.as_view()),

@@ -607,6 +607,16 @@ const delMulDocumentTag: (
   return put(`${prefix}/${knowledge_id}/document/${document_id}/tags/batch_delete`, tags, null, loading)
 }
 
+const delDocsTag: (
+  knowledge_id: string,
+  tag_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, tag_id, data, loading) => {
+  return put(`${prefix}/${knowledge_id}/tag/${tag_id}/docs_delete`, {id_list: data}, null, loading)
+}
+
+
 export default {
   getDocumentList,
   getDocumentPage,
@@ -644,5 +654,6 @@ export default {
   getDocumentTags,
   postDocumentTags,
   postMulDocumentTags,
-  delMulDocumentTag
+  delMulDocumentTag,
+  delDocsTag
 }

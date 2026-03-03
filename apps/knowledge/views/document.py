@@ -14,6 +14,7 @@ from knowledge.api.document import DocumentSplitAPI, DocumentBatchAPI, DocumentB
     WebDocumentCreateAPI, CancelTaskAPI, BatchCancelTaskAPI, SyncWebAPI, RefreshAPI, BatchEditHitHandlingAPI, \
     DocumentTreeReadAPI, DocumentSplitPatternAPI, BatchRefreshAPI, BatchGenerateRelatedAPI, TemplateExportAPI, \
     DocumentExportAPI, DocumentMigrateAPI, DocumentDownloadSourceAPI, DocumentTagsAPI
+from knowledge.api.tag import DocsTagDeleteAPI
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.views.common import get_knowledge_document_operation_object, get_document_operation_object_batch, \
@@ -648,6 +649,7 @@ class DocumentView(APIView):
                     'folder_id': request.query_params.get('folder_id'),
                     'name': request.query_params.get('name'),
                     'tag': request.query_params.get('tag'),
+                    'tag_exclude': request.query_params.get('tag_exclude'),
                     'tag_ids': [tag for tag in raw_tags if tag != 'NO_TAG'],
                     'no_tag': 'NO_TAG' in raw_tags,
                     'desc': request.query_params.get("desc"),
@@ -843,6 +845,38 @@ class DocumentView(APIView):
                     'document_id': document_id,
                     'tag_ids': request.data
                 }).delete_tags())
+
+        class BatchDeleteDocsTag(APIView):
+            authentication_classes = [TokenAuth]
+
+            @extend_schema(
+                summary=_("Batch Delete Documents Tag"),
+                description=_("Batch Delete Documents Tag"),
+                parameters=DocsTagDeleteAPI.get_parameters(),
+                request=DocsTagDeleteAPI.get_request(),
+                responses=DocsTagDeleteAPI.get_response(),
+                tags=[_('Knowledge Base/Tag')]  # type: ignore
+            )
+            @has_permissions(
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_knowledge_permission(),
+                PermissionConstants.KNOWLEDGE_DOCUMENT_TAG.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ViewPermission([RoleConstants.USER.get_workspace_role()],
+                               [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                               CompareConstants.AND),
+            )
+            @log(
+                menu='tag', operate="Batch Delete Documents Tag",
+                get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                    get_knowledge_operation_object(keywords.get('knowledge_id')),
+                    get_document_operation_object_batch(r.data.get('id_list'))),
+            )
+            def put(self, request: Request, workspace_id: str, knowledge_id: str, tag_id: str):
+                return result.success(DocumentSerializers.DeleteDocsTag(data={
+                    'workspace_id': workspace_id,
+                    'knowledge_id': knowledge_id,
+                    'tag_id': tag_id,
+                }).batch_delete_docs_tag(request.data))
 
     class Migrate(APIView):
         authentication_classes = [TokenAuth]
