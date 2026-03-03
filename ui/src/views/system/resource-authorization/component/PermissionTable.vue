@@ -383,7 +383,39 @@ function closeDialog() {
   multipleSelection.value = []
   multipleTableRef.value?.clearSelection()
 }
+function getResourcesByFolderId(treeData: any[], folderId: string): any[] {
+  const result: any[] = []
+  let target: any = null
 
+  function dfs(nodes: any[]) {
+    for (const node of nodes) {
+      if (node.id === folderId) {
+        target = node
+        return
+      }
+      if (node.children?.length) {
+        dfs(node.children)
+        if (target) return
+      }
+    }
+  }
+
+  function collect(node: any) {
+    if (!node?.children) return
+    for (const child of node.children) {
+      result.push(child)
+      collect(child)
+    }
+  }
+
+  dfs(treeData)
+
+  if (target) {
+    collect(target)
+  }
+
+  return result
+}
 function submitPermissions(value: string, row: any) {
   const obj = [
     {
@@ -409,8 +441,14 @@ function submitPermissions(value: string, row: any) {
     }
     return result
   }
+
   if (['VIEW', 'MANAGE', 'ROLE'].includes(value)) {
     emitSubmitPermissions(props.data, [row.folder_id], obj)
+  }
+  if (['NOT_AUTH'].includes(value) && 'folder' == row.resource_type) {
+    getResourcesByFolderId(props.data, row.id).forEach((n) => {
+      obj.push({ target_id: n.id, permission: 'NOT_AUTH' })
+    })
   }
   emit('submitPermissions', obj)
 }
