@@ -73,7 +73,7 @@ const putKnowledge: (
  * 删除知识库
  * @param 参数 knowledge_id
  */
-const delKnowledge: (knowledge_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const delKnowledge: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   knowledge_id,
   loading,
 ) => {

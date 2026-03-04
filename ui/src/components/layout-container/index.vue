@@ -42,7 +42,7 @@ const props = defineProps({
   resizable: Boolean,
   minLeftWidth: {
     type: Number,
-    default: 240,
+    default: 260,
   },
   maxLeftWidth: {
     type: Number,
