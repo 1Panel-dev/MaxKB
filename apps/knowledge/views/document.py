@@ -68,12 +68,17 @@ class DocumentView(APIView):
                        [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
+        raw_tags = request.query_params.getlist("tags[]")
         return result.success(DocumentSerializers.Query(
             data={
                 'workspace_id': workspace_id,
                 'knowledge_id': knowledge_id,
                 'folder_id': request.query_params.get('folder_id'),
                 'name': request.query_params.get('name'),
+                'tag': request.query_params.get('tag'),
+                'tag_exclude': request.query_params.get('tag_exclude'),
+                'tag_ids': [tag for tag in raw_tags if tag != 'NO_TAG'],
+                'no_tag': 'NO_TAG' in raw_tags,
                 'desc': request.query_params.get("desc"),
                 'user_id': request.query_params.get('user_id')
             }
