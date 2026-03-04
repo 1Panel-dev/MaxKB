@@ -4,13 +4,16 @@
     <div style="padding: 16px;">
       <h1 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG</h1>
     </div>
-    
+
     <!-- 业务菜单或系统管理菜单 -->
     <div style="padding: 0 16px;">
       <!-- 业务菜单 -->
       <div v-if="!isSystemManagement" style="display: flex; flex-direction: column; gap: 8px;">
         <router-link to="/application" style="display: block; padding: 10px 16px; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;" :style="activeMainMenu === '/application' ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}">
           应用
+        </router-link>
+        <router-link to="/mindmap" style="display: block; padding: 10px 16px; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;" :style="activeMainMenu === '/mindmap' ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}">
+          思维导图
         </router-link>
         <router-link to="/knowledge" style="display: block; padding: 10px 16px; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;" :style="activeMainMenu === '/knowledge' ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}">
           知识库
@@ -22,13 +25,13 @@
           模型
         </router-link>
       </div>
-      
+
       <!-- 系统管理菜单 -->
       <div v-else style="display: flex; flex-direction: column; gap: 8px;">
         <router-link to="/system/user" style="display: block; padding: 10px 16px; border-radius: 8px; text-decoration: none; color: #333; font-size: 14px;" :style="activeSystemMenu === '/system/user' ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}">
           用户管理
         </router-link>
-        
+
         <!-- 资源授权（下拉展开） -->
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-radius: 8px; cursor: pointer;" :style="activeSystemMenu.startsWith('/system/authorization') ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}" @click="toggleResourceAuth">
@@ -50,7 +53,7 @@
             </router-link>
           </div>
         </div>
-        
+
         <!-- 系统设置（下拉展开） -->
         <div>
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 16px; border-radius: 8px; cursor: pointer;" :style="activeSystemMenu.startsWith('/system/email') ? { backgroundColor: '#e6f0ff', color: '#1890ff' } : {}" @click="toggleSystemSettings">
@@ -65,7 +68,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- 底部用户信息区 -->
     <div style="margin-top: auto; padding: 16px; border-top: 1px solid #e5e7eb;">
       <UserAvatar />
@@ -90,6 +93,7 @@ const isSystemManagement = computed(() => {
 const activeMainMenu = computed(() => {
   const path = route.path
   if (path.startsWith('/application')) return '/application'
+  if (path.startsWith('/mindmap')) return '/mindmap'
   if (path.startsWith('/knowledge')) return '/knowledge'
   if (path.startsWith('/tool')) return '/tool'
   if (path.startsWith('/model')) return '/model'
