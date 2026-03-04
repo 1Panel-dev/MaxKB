@@ -7,14 +7,14 @@ import type {KeyValue} from '../type/common'
 
 const prefix_provider = '/provider'
 /**
- * 获得供应商列表
+ * 获得模型列表
  */
 const getProvider: (loading?: Ref<boolean>) => Promise<Result<Array<Provider>>> = (loading) => {
   return get(`${prefix_provider}`, {}, loading)
 }
 
 /**
- * 获得供应商列表
+ * 获得模型列表
  */
 const getProviderByModelType: (
   model_type: string,
@@ -42,7 +42,7 @@ const getModelCreateForm: (
 
 /**
  * 获取模型类型列表
- * @param provider 供应商
+ * @param provider 模型
  * @param loading  加载器
  * @returns 模型类型列表
  */

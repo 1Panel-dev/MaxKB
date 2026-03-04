@@ -46,7 +46,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(choices=[('SUCCESS', '成功'), ('ERROR', '失败'), ('DOWNLOAD', '下载中'), ('PAUSE_DOWNLOAD', '暂停下载')], db_index=True, default='SUCCESS', max_length=20, verbose_name='设置类型')),
                 ('model_type', models.CharField(db_index=True, max_length=128, verbose_name='模型类型')),
                 ('model_name', models.CharField(db_index=True, max_length=128, verbose_name='模型名称')),
-                ('provider', models.CharField(db_index=True, max_length=128, verbose_name='供应商')),
+                ('provider', models.CharField(db_index=True, max_length=128, verbose_name='模型')),
                 ('credential', models.CharField(max_length=102400, verbose_name='模型认证信息')),
                 ('meta', models.JSONField(default=dict, verbose_name='模型元数据,用于存储下载,或者错误信息')),
                 ('model_params_form', models.JSONField(default=list, verbose_name='模型参数配置')),

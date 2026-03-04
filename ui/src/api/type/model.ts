@@ -7,15 +7,15 @@ interface modelRequest {
 
 interface Provider {
   /**
-   * 供应商代号
+   * 模型代号
    */
   provider: string
   /**
-   * 供应商名称
+   * 模型名称
    */
   name: string
   /**
-   * 供应商icon
+   * 模型icon
    */
   icon: string
 }
@@ -34,7 +34,7 @@ interface ListModelRequest {
    */
   model_name?: string
   /**
-   * 供应商
+   * 模型
    */
   provider?: string
 
@@ -66,7 +66,7 @@ interface Model {
    */
   credential: any
   /**
-   * 供应商
+   * 模型
    */
   provider: string
   /**
@@ -100,7 +100,7 @@ interface CreateModelRequest {
    */
   credential: any
   /**
-   * 供应商
+   * 模型
    */
   provider: string
 }

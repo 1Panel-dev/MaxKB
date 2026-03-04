@@ -163,7 +163,7 @@ interface FormField {
    */
   option_list?: Array<any>
   /**
-   * 供应商
+   * 模型
    */
   provider?: string
   /**

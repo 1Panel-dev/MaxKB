@@ -35,7 +35,7 @@ class Model(AppModelMixin):
 
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
 
-    provider = models.CharField(max_length=128, verbose_name='供应商', db_index=True)
+    provider = models.CharField(max_length=128, verbose_name='模型', db_index=True)
 
     credential = models.CharField(max_length=102400, verbose_name="模型认证信息")
 

@@ -1,7 +1,7 @@
 export default {
   title: '模型',
-  provider: '供应商',
-  providerPlaceholder: '选择供应商',
+  provider: '模型',
+  providerPlaceholder: '选择模型',
   addModel: '添加模型',
   delete: {
     confirmTitle: '是否删除：',

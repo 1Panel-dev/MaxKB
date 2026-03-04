@@ -24,12 +24,12 @@ from models_provider.constants.model_provider_constants import ModelProvideConst
 def get_model_(provider, model_type, model_name, credential, model_id, use_local=False, **kwargs):
     """
     获取模型实例
-    @param provider:   供应商
+    @param provider:   模型
     @param model_type: 模型类型
     @param model_name: 模型名称
     @param credential: 认证信息
     @param model_id:   模型id
-    @param use_local:  是否调用本地模型 只适用于本地供应商
+    @param use_local:  是否调用本地模型 只适用于本地模型
     @return: 模型实例
     """
     model = get_provider(provider).get_model(model_type, model_name,
@@ -52,9 +52,9 @@ def get_model(model, **kwargs):
 
 def get_provider(provider):
     """
-    获取供应商实例
-    @param provider: 供应商字符串
-    @return: 供应商实例
+    获取模型实例
+    @param provider: 模型字符串
+    @return: 模型实例
     """
     return ModelProvideConstants[provider].value
 
@@ -62,7 +62,7 @@ def get_provider(provider):
 def get_model_list(provider, model_type):
     """
     获取模型列表
-    @param provider:   供应商字符串
+    @param provider:   模型字符串
     @param model_type: 模型类型
     @return:  模型列表
     """
@@ -72,7 +72,7 @@ def get_model_list(provider, model_type):
 def get_model_credential(provider, model_type, model_name):
     """
     获取模型认证实例
-    @param provider:   供应商字符串
+    @param provider:   模型字符串
     @param model_type: 模型类型
     @param model_name: 模型名称
     @return:  认证实例对象
@@ -83,7 +83,7 @@ def get_model_credential(provider, model_type, model_name):
 def get_model_type_list(provider):
     """
     获取模型类型列表
-    @param provider:  供应商字符串
+    @param provider:  模型字符串
     @return:  模型类型列表
     """
     return get_provider(provider).get_model_type_list()
@@ -93,7 +93,7 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
                         raise_exception=False):
     """
     校验模型认证参数
-    @param provider:         供应商字符串
+    @param provider:         模型字符串
     @param model_type:       模型类型
     @param model_name:       模型名称
     @param model_credential: 模型认证数据

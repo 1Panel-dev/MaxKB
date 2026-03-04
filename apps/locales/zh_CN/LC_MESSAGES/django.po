@@ -3272,7 +3272,7 @@ msgstr "基础模型"
 #: apps/shared/api/shared_model.py:39
 #: apps/shared/serializers/shared_model.py:114
 msgid "provider"
-msgstr "供应商"
+msgstr "模型"
 
 #: apps/models_provider/api/model.py:65
 #: apps/models_provider/serializers/model_serializer.py:322
@@ -5115,7 +5115,7 @@ msgstr "重新排序文档"
 #: apps/models_provider/views/provide.py:22
 #: apps/models_provider/views/provide.py:23
 msgid "Get a list of model suppliers"
-msgstr "获取模型供应商列表"
+msgstr "获取模型模型列表"
 
 #: apps/models_provider/views/provide.py:43
 #: apps/models_provider/views/provide.py:44

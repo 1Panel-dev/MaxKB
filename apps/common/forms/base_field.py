@@ -134,8 +134,8 @@ class BaseExecField(BaseField):
         :param label:  提示
         :param text_field:  文本字段
         :param value_field: 值字段
-        :param provider:    指定供应商
-        :param method:      执行供应商函数 method
+        :param provider:    指定模型
+        :param method:      执行模型函数 method
         :param required:    是否必填
         :param default_value: 默认值
         :param relation_show_field_dict:        {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才显示
