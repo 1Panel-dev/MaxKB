@@ -11,13 +11,15 @@
       />
       <SystemHeader />
     </div>
-    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''">
-      <layout-container>
-        <template #left>
-          <Sidebar />
-        </template>
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''" style="display: flex;">
+      <!-- 最左侧侧边栏 -->
+      <div style="width: 240px; border-right: 1px solid #e5e7eb;">
+        <Sidebar />
+      </div>
+      <!-- 主内容区 -->
+      <div style="flex: 1; overflow: hidden;">
         <AppMain />
-      </layout-container>
+      </div>
     </div>
   </div>
 </template>

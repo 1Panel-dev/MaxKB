@@ -48,28 +48,27 @@ const currentSystemPage = computed(() => {
 
 <template>
   <div class="app-layout">
-    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''">
-      <LayoutContainer>
-        <template #left>
-          <Sidebar />
-        </template>
-        <div>
-          <!-- 顶部功能区（仅系统管理模式显示） -->
-          <div v-if="isSystemManagement" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #e5e7eb;">
-            <div style="display: flex; align-items: center;">
-              <h2 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG | 系统管理</h2>
-            </div>
-            <div style="display: flex; align-items: center;">
-              <router-link to="/application" style="display: flex; align-items: center; padding: 6px 12px; border-radius: 6px; text-decoration: none; color: #1890ff; border: 1px solid #1890ff;">
-                <span style="margin-right: 4px;">←</span>
-                返回工作空间
-              </router-link>
-            </div>
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''" style="display: flex;">
+      <!-- 最左侧侧边栏 -->
+      <div style="width: 240px; border-right: 1px solid #e5e7eb;">
+        <Sidebar />
+      </div>
+      <!-- 主内容区 -->
+      <div style="flex: 1; overflow: hidden;">
+        <!-- 顶部功能区（仅系统管理模式显示） -->
+        <div v-if="isSystemManagement" style="display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid #e5e7eb;">
+          <div style="display: flex; align-items: center;">
+            <h2 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG | 系统管理</h2>
           </div>
-          
-          <AppMain />
+          <div style="display: flex; align-items: center;">
+            <router-link to="/application" style="display: flex; align-items: center; padding: 6px 12px; border-radius: 6px; text-decoration: none; color: #1890ff; border: 1px solid #1890ff;">
+              <span style="margin-right: 4px;">←</span>
+              返回工作空间
+            </router-link>
+          </div>
         </div>
-      </LayoutContainer>
+        <AppMain />
+      </div>
     </div>
   </div>
 </template>
