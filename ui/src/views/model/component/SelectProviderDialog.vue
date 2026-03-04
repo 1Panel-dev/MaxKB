@@ -78,7 +78,16 @@ const checkModelType = (model_type: string) => {
   selectModelType.value = model_type
   currentModelType.value = modelTypeOptions.filter((item) => item.value === model_type)[0].text
   ProviderApi.getProviderByModelType(model_type, loading).then((ok) => {
-    list_provider.value = ok.data
+    // 排除指定的模型提供商
+    const excludedProviders = [
+      'Anthropic',
+      'Amazon Bedrock',
+      'Gemini',
+      'SILICONFLOW',
+      'Xorbits Inference',
+      'Regolo'
+    ]
+    list_provider.value = ok.data.filter(provider => !excludedProviders.includes(provider.name))
     list_provider.value.sort((a, b) => a.provider.localeCompare(b.provider))
   })
 }

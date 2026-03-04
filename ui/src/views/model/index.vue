@@ -219,8 +219,18 @@ const search_type_change = () => {
 
 onMounted(() => {
   model.asyncGetProvider(loading).then((ok: any) => {
+    // 排除指定的模型提供商
+    const excludedProviders = [
+      'Anthropic',
+      'Amazon Bedrock',
+      'Gemini',
+      'SILICONFLOW',
+      'Xorbits Inference',
+      'Regolo'
+    ]
+    const filteredProviders = ok.data.filter((provider: any) => !excludedProviders.includes(provider.name))
     active_provider.value = allObj
-    provider_list.value = [allObj, ...ok.data]
+    provider_list.value = [allObj, ...filteredProviders]
     list_model()
   })
 })
