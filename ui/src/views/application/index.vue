@@ -187,7 +187,7 @@
                   :title="item.name"
                   :description="item.desc"
                   class="cursor"
-                  @click="goApp(item)"
+                  @click="toChat(item)"
                 >
                   <template #icon>
                     <el-avatar shape="square" :size="32" style="background: none">

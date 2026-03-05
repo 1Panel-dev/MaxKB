@@ -1,6 +1,6 @@
 <template>
-  <div class="app-layout">
-    <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''">
+  <div class="app-layout" style="display: flex; flex-direction: column; height: 100vh;">
+    <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''" style="position: static;">
       <el-alert
         v-if="user.isExpire()"
         :title="$t('layout.isExpire')"
@@ -11,13 +11,13 @@
       />
       <SystemHeader />
     </div>
-    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''" style="display: flex;">
+    <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''" style="display: flex; flex: 1; overflow: hidden;">
       <!-- 最左侧侧边栏 -->
       <div style="width: 240px; border-right: 1px solid #e5e7eb;">
         <Sidebar />
       </div>
       <!-- 主内容区 -->
-      <div style="flex: 1; overflow: hidden;">
+      <div style="flex: 1; overflow: auto;">
         <AppMain />
       </div>
     </div>

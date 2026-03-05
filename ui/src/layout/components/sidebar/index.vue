@@ -1,8 +1,7 @@
 <template>
-  <div class="sidebar" style="display: flex; flex-direction: column; height: 100vh; background-color: #F9FAFB; width: 240px;">
+  <div class="sidebar" style="display: flex; flex-direction: column; height: 100%; background-color: #F9FAFB; width: 240px;">
     <!-- 顶部 Logo 区 -->
     <div style="padding: 16px;">
-      <h1 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG</h1>
     </div>
 
     <!-- 业务菜单或系统管理菜单 -->
