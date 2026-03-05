@@ -160,7 +160,7 @@ class TriggerValidationMixin:
     def _validate_scheduled_setting(self, setting):
         schedule_type = setting.get('schedule_type')
 
-        valid_types = ['daily', 'weekly', 'monthly', 'interval']
+        valid_types = ['daily', 'weekly', 'monthly', 'interval','cron']
         if schedule_type not in valid_types:
             raise serializers.ValidationError(
                 {'trigger_setting': _('schedule_type must be one of %s') % ', '.join(valid_types)
@@ -173,7 +173,8 @@ class TriggerValidationMixin:
             self._validate_monthly(setting)
         elif schedule_type == 'interval':
             self._validate_interval(setting)
-
+        elif schedule_type == 'cron':
+            self._validate_cron(setting)
     def _validate_daily(self, setting):
         self._validate_required_field(setting, 'time', 'daily')
         self._validate_time_array(setting['time'])
@@ -211,6 +212,21 @@ class TriggerValidationMixin:
         if interval_unit not in valid_units:
             raise serializers.ValidationError({
                 'trigger_setting': _('interval_unit must be one of %s') % ', '.join(valid_units)
+            })
+    @staticmethod
+    def _validate_cron(setting):
+        from apscheduler.triggers.cron import CronTrigger
+
+        cron_expression: str = setting.get('cron_expression')
+        if not cron_expression:
+            raise serializers.ValidationError({
+                'trigger_setting': _('cron type requires cron_expression field')
+            })
+        try:
+            CronTrigger.from_crontab(cron_expression.strip())
+        except ValueError:
+            raise serializers.ValidationError({
+                'trigger_setting': _('Invalid cron expression: %s') % cron_expression
             })
 
     @staticmethod

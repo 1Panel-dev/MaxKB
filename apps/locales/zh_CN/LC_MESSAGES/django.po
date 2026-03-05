@@ -9277,3 +9277,15 @@ msgstr "分享链接不存在"
 
 msgid "Chat has been deleted"
 msgstr "聊天记录已被删除"
+
+msgid "cron type requires cron_expression field"
+msgstr "cron 类型需要 cron_expression 字段"
+
+msgid "Invalid cron expression: %s"
+msgstr "Cron 表达式不合法：%s"
+
+msgid "Batch Remove Documents from Tag"
+msgstr "批量删除标签下的文档"
+
+msgid "Document does not belong to current knowledge"
+msgstr "文档不属于当前知识库"
