@@ -10,23 +10,27 @@
       <div class="workflow-search-container flex-between">
         <el-input
           ref="searchInputRef"
-          v-model="searchText"
+          v-bind:modelValue="searchText"
+          @update:modelValue="handleSearch"
           :placeholder="$t('workflow.tip.searchPlaceholder')"
           clearable
-          @keyup.enter="handleSearch"
+          @keyup.enter="next"
           @keyup.esc="closeSearch"
         >
         </el-input>
         <span>
           <el-space :size="4">
-            <span class="lighter"> 2/3 </span>
+            <span class="lighter" v-if="selectedCount && selectedCount > 0">
+              {{ currentIndex + 1 }}/{{ selectedCount }}
+            </span>
+            <span class="lighter" v-else-if="searchText.length > 0"> 无结果 </span>
             <el-divider direction="vertical" />
 
             <el-button text>
-              <el-icon><ArrowUp /></el-icon>
+              <el-icon @click="up"><ArrowUp /></el-icon>
             </el-button>
             <el-button text>
-              <el-icon><ArrowDown /></el-icon>
+              <el-icon @click="next"><ArrowDown /></el-icon>
             </el-button>
             <el-button text @click="closeSearch()">
               <el-icon><Close /></el-icon>
@@ -43,15 +47,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+import { MsgSuccess, MsgWarning } from '@/utils/message'
 // Props定义
 interface Props {
-  onSearch?: (keyword: string) => void // 搜索回调
+  lf?: any
 }
-const props = withDefaults(defineProps<Props>(), {
-  onSearch: undefined,
-})
+const props = withDefaults(defineProps<Props>(), {})
 
 // 状态
 const showSearch = ref(false)
@@ -72,6 +74,99 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
+const focusOn = (node: any) => {
+  console.log(node)
+  props.lf?.graphModel.transformModel.focusOn(
+    node.x,
+    node.y,
+    props.lf?.container.clientWidth,
+    props.lf?.container.clientHeight,
+  )
+}
+const selectedNodes = ref<Array<any>>()
+const currentIndex = ref<number>(0)
+const selectedCount = computed(() => {
+  return selectedNodes.value?.length
+})
+
+const getSelectNodes = (kw: string) => {
+  const result: Array<any> = []
+  const graph_data = props.lf?.getGraphData()
+  graph_data.nodes.filter((node: any) => {
+    if (node.properties.stepName.includes(kw)) {
+      result.push({
+        ...node,
+        order: 1,
+        focusOn: () => {
+          focusOn(node)
+          props.lf?.graphModel.getNodeModelById(node.id).focusOn(searchText.value)
+        },
+        selectOn: () => {
+          props.lf?.graphModel.getNodeModelById(node.id).selectOn(searchText.value)
+        },
+        clearSelectOn: () => {
+          props.lf?.graphModel.getNodeModelById(node.id).clearSelectOn(searchText.value)
+        },
+      })
+    }
+    if (node.type == 'loop-body-node') {
+      const nodeModel = props.lf?.graphModel
+      const childNodeModel = nodeModel.getNodeModelById(node.id)
+      childNodeModel.getSelectNodes(searchText.value).map((childNode: any) => {
+        result.push({
+          ...childNode,
+          order: 2,
+          focusOn: () => {
+            focusOn(node)
+            childNodeModel.focusOn({ node: childNode, kw: searchText.value })
+          },
+          selectOn: () => {
+            childNodeModel.selectOn({ node: childNode, kw: searchText.value })
+          },
+          clearSelectOn: () => {
+            childNodeModel.clearSelectOn({ node: childNode, kw: searchText.value })
+          },
+        })
+      })
+    }
+  })
+  result.sort((a, b) => a.order - b.order || a.y - b.y || a.x - b.x)
+  return result
+}
+const selectNodes = (nodes: Array<any>) => {
+  nodes.forEach((node) => node.selectOn())
+}
+const next = () => {
+  if (selectedNodes.value && selectedNodes.value.length > 0) {
+    if (selectedNodes.value.length - 1 >= currentIndex.value + 1) {
+      currentIndex.value++
+    } else {
+      currentIndex.value = 0
+    }
+    selectedNodes.value[currentIndex.value].focusOn()
+  }
+}
+const up = () => {
+  if (selectedNodes.value && selectedNodes.value.length > 0) {
+    if (currentIndex.value - 1 <= 0) {
+      currentIndex.value = selectedNodes.value.length - 1
+    } else {
+      currentIndex.value--
+    }
+    selectedNodes.value[currentIndex.value].focusOn()
+  }
+}
+
+const onSearch = (kw: string) => {
+  if (selectedNodes.value === undefined) {
+    const selected = getSelectNodes(kw)
+    if (selected && selected.length > 0) {
+      selectedNodes.value = selected
+      selectNodes(selected)
+      selected[currentIndex.value].focusOn()
+    }
+  }
+}
 // 打开搜索
 const openSearch = () => {
   showSearch.value = true
@@ -84,14 +179,31 @@ const openSearch = () => {
 
 // 关闭搜索
 const closeSearch = () => {
+  clearSelect()
   showSearch.value = false
   searchText.value = ''
 }
-
+const clearSelect = () => {
+  if (selectedNodes.value) {
+    selectedNodes.value[currentIndex.value].clearSelectOn()
+  }
+  selectedNodes.value = undefined
+  currentIndex.value = 0
+  props.lf?.graphModel.clearSelectElements()
+  const graph_data = props.lf?.getGraphData()
+  graph_data.nodes.forEach((node: any) => {
+    if (node.type == 'loop-body-node') {
+      props.lf?.graphModel.getNodeModelById(node.id).clearSelectElements()
+    }
+  })
+}
 // 执行搜索
-const handleSearch = () => {
+const handleSearch = (kw: string) => {
+  searchText.value = kw
+  clearSelect()
+
   if (searchText.value.trim()) {
-    props.onSearch?.(searchText.value)
+    onSearch?.(searchText.value)
   }
 }
 
@@ -123,7 +235,7 @@ onUnmounted(() => {
   width: 360px;
   :deep(.el-input__wrapper) {
     box-shadow: none;
-    padding: 0 8px 0 1px!important;
+    padding: 0 8px 0 1px !important;
   }
 }
 </style>

@@ -3,7 +3,7 @@
   <!-- 辅助工具栏 -->
   <Control class="workflow-control" v-if="lf" :lf="lf"></Control>
   <TeleportContainer :flow-id="flowId" />
-  <NodeSearch class="workflow-search" :on-search="onSearch"></NodeSearch>
+  <NodeSearch class="workflow-search" :lf="lf"></NodeSearch>
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
@@ -18,7 +18,7 @@ import { initDefaultShortcut } from '@/workflow/common/shortcut'
 import Dagre from '@/workflow/plugins/dagre'
 import { disconnectAll, getTeleport } from '@/workflow/common/teleport'
 import { WorkflowMode } from '@/enums/application'
-import { MsgSuccess, MsgWarning } from '@/utils/message'
+
 import NodeSearch from '@/workflow/common/NodeSearch.vue'
 const nodes: any = import.meta.glob('./nodes/**/index.ts', { eager: true })
 const workflow_mode = inject('workflowMode') || WorkflowMode.Application
@@ -51,43 +51,6 @@ onUnmounted(() => {
 })
 const render = (data: any) => {
   lf.value.render(data)
-}
-const searchQueue: Array<string> = []
-const selectNode = (node: any) => {
-  lf.value.graphModel.selectNodeById(node.id)
-  lf.value.graphModel.transformModel.focusOn(
-    node.x,
-    node.y,
-    lf.value.container.clientWidth,
-    lf.value.container.clientHeight,
-  )
-  searchQueue.push(node.id)
-}
-const onSearch = (kw: string) => {
-  const graph_data = lf.value.getGraphData()
-  for (let index = 0; index < graph_data.nodes.length; index++) {
-    const node = graph_data.nodes[index]
-    let firstNode = null
-    if (node.properties.stepName.includes(kw)) {
-      if (!firstNode) {
-        firstNode = node
-      }
-
-      if (!searchQueue.includes(node.id)) {
-        selectNode(node)
-        break
-      }
-    }
-    if (index === graph_data.nodes.length - 1) {
-      searchQueue.length = 0
-      if (firstNode) {
-        selectNode(firstNode)
-      } else {
-        lf.value.graphModel.clearSelectElements()
-        MsgWarning('不存在的节点')
-      }
-    }
-  }
 }
 
 const renderGraphData = (data?: any) => {

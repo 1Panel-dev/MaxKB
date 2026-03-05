@@ -432,10 +432,34 @@ const closeNodeMenu = () => {
   showAnchor.value = false
   anchorData.value = undefined
 }
+/**
+ * 检索选中时候触发
+ * @param kw
+ */
+const selectOn = (kw: string) => {
+  props.nodeModel.setSelected(true)
+  console.log('selectOn', kw)
+}
+/**
+ * 定位时触发
+ * @param kw
+ */
+const focusOn = (kw: string) => {
+  console.log('focusOn', kw)
+}
+/**
+ * 清除时触发
+ */
+const clearSelectOn = () => {
+  console.log('onClearSearchSelect')
+}
 onMounted(() => {
   set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
     showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
   })
+  set(props.nodeModel, 'selectOn', selectOn)
+  set(props.nodeModel, 'focusOn', focusOn)
+  set(props.nodeModel, 'clearSelectOn', clearSelectOn)
 })
 </script>
 <style lang="scss" scoped>
@@ -455,5 +479,4 @@ onMounted(() => {
     }
   }
 }
-
 </style>
