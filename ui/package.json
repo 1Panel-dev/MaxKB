@@ -25,6 +25,7 @@
     "@vavt/cm-extension": "^1.9.1",
     "@vueuse/core": "^13.3.0",
     "axios": "^1.8.4",
+    "cron-validator": "^1.4.0",
     "cropperjs": "^1.6.2",
     "dingtalk-jsapi": "^3.1.0",
     "echarts": "^5.6.0",

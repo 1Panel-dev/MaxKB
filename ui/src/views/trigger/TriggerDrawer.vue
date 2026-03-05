@@ -76,14 +76,45 @@
             shadow="never"
             class="card-never mt-16 w-full"
           >
-            <p style="margin-top: -8px">{{ $t('views.trigger.triggerCycle.title') }}</p>
+            <div class="flex-between">
+              <p style="margin-top: -8px">
+                {{
+                  form.trigger_setting.schedule_type === 'cron'
+                    ? 'Cron表达式'
+                    : $t('views.trigger.triggerCycle.title')
+                }}
+              </p>
+              <el-tooltip
+                :content="
+                  form.trigger_setting.schedule_type === 'cron'
+                    ? '切换为触发周期'
+                    : '切换为Cron表达式'
+                "
+                placement="top"
+                effect="light"
+              >
+                <el-button text @click.stop="switchScheduleType">
+                  <el-icon><Switch /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
 
             <el-cascader
+              v-if="form.trigger_setting.schedule_type !== 'cron'"
               v-model="scheduled"
               :options="triggerCycleOptions"
               @change="handleChangeScheduled"
               style="width: 100%"
             />
+            <el-input
+              v-else
+              v-model="form.trigger_setting.cron_expression"
+              placeholder="请输入Cron表达式（如：0 0 1 * *）"
+              clearable
+              @blur="validateCron"
+              @input="validateCron"
+            />
+            <div v-if="cronError" class="el-form-item__error">{{ cronError }}</div>
           </el-card>
         </el-card>
         <el-card
@@ -500,6 +531,8 @@ import { triggerCycleOptions } from '@/utils/trigger.ts'
 import { t } from '@/locales'
 import { type FormInstance } from 'element-plus'
 import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
+import { isValidCron } from 'cron-validator'
 import Result from '@/request/Result'
 import { hasPermission } from '@/utils/permission'
 import permissionMap from '@/permission'
@@ -576,6 +609,52 @@ const is_edit = ref<boolean>(false)
 const event_url = computed(() => {
   return `${window.origin}${window.MaxKB.prefix}/api/trigger/v1/webhook/${form.value.id}`
 })
+
+const lastPresetSetting = ref<any>(null)
+const cronError = ref('')
+
+const validateCron = () => {
+  const cron = form.value.trigger_setting.cron_expression?.trim()
+  if (!cron) {
+    cronError.value = ''
+    return
+  }
+  const fields = cron.split(/\s+/)
+  if (fields.length !== 5 || !isValidCron(cron)) {
+    cronError.value = 'Cron表达式不合法'
+  } else {
+    cronError.value = ''
+  }
+}
+
+function switchScheduleType() {
+  const currentType = form.value.trigger_setting.schedule_type || 'daily'
+  const isCron = currentType === 'cron'
+
+  if (!isCron) {
+    lastPresetSetting.value = cloneDeep({
+      schedule_type: form.value.trigger_setting.schedule_type,
+      interval_unit: form.value.trigger_setting.interval_unit,
+      interval_value: form.value.trigger_setting.interval_value,
+      days: form.value.trigger_setting.days,
+      time: form.value.trigger_setting.time,
+    })
+
+    form.value.trigger_setting.schedule_type = 'cron'
+    form.value.trigger_setting.interval_unit = undefined
+    form.value.trigger_setting.interval_value = undefined
+    form.value.trigger_setting.days = undefined
+    form.value.trigger_setting.time = undefined
+    return
+  }
+  cronError.value = ''
+  const backup = lastPresetSetting.value
+  form.value.trigger_setting.schedule_type = backup?.schedule_type || 'daily'
+  form.value.trigger_setting.interval_unit = backup?.interval_unit
+  form.value.trigger_setting.interval_value = backup?.interval_value
+  form.value.trigger_setting.days = backup?.days
+  form.value.trigger_setting.time = backup?.time
+}
 
 const addParameter = () => {
   form.value.trigger_setting.body.push({ field: '', type: '' })
@@ -779,12 +858,21 @@ const open = (trigger_id?: string, source_type?: string, source_id?: string) => 
 }
 
 const close = () => {
+  cronError.value = ''
   current_source_id.value = undefined
   current_source_type.value = undefined
   drawer.value = false
   form.value = getDefaultValue()
 }
 const submit = () => {
+  if (
+    form.value.trigger_type === 'SCHEDULED' &&
+    form.value.trigger_setting.schedule_type === 'cron'
+  ) {
+    validateCron()
+    if (cronError.value) return
+  }
+
   Promise.all([
     ...(toolParameterRef.value ? toolParameterRef.value.map((item) => item.validate()) : []),
     ...(applicationParameterRef.value
