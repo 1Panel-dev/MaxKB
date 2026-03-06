@@ -34,7 +34,7 @@ from application.serializers.application_serializers import ModelDatasetAssociat
     ModelSettingSerializer
 from application.serializers.chat_message_serializers import ChatInfo
 from common.constants.permission_constants import RoleConstants
-from common.db.search import native_search, native_page_search, page_search, get_dynamics_model
+from common.db.search import native_search, native_page_search, page_search, get_dynamics_model, native_page_handler
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.util.common import post
 from common.util.field_message import ErrMessage
@@ -145,7 +145,8 @@ class ChatSerializers(serializers.Serializer):
                  'trample_num': models.IntegerField(),
                  'comparer': models.CharField(),
                  'application_chat.update_time': models.DateTimeField(),
-                 'application_chat.id': models.UUIDField(), }))
+                 'application_chat.id': models.UUIDField(),
+                 'application_chat_record_temp.id': models.UUIDField()}))
 
             base_query_dict = {'application_chat.application_id': self.data.get("application_id"),
                                'application_chat.update_time__gte': start_time,
@@ -234,55 +235,90 @@ class ChatSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
 
-            data_list = native_search(self.get_query_set(data.get('select_ids')),
-                                      select_string=get_file_content(
-                                          os.path.join(PROJECT_DIR, "apps", "application", 'sql',
-                                                       'export_application_chat.sql')),
-                                      with_table_name=False)
+            batch_size = 2000
 
-            batch_size = 500
+            select_sql = get_file_content(
+                os.path.join(
+                    PROJECT_DIR,
+                    "apps",
+                    "application",
+                    "sql",
+                    "export_application_chat.sql"
+                )
+            )
 
             def stream_response():
-                workbook = openpyxl.Workbook()
-                worksheet = workbook.active
-                worksheet.title = 'Sheet1'
+                import tempfile
 
-                headers = [gettext('Conversation ID'), gettext('summary'), gettext('User Questions'),
-                           gettext('Problem after optimization'),
-                           gettext('answer'), gettext('User feedback'),
-                           gettext('Reference segment number'),
-                           gettext('Section title + content'),
-                           gettext('Annotation'), gettext('USER'), gettext('Consuming tokens'),
-                           gettext('Time consumed (s)'),
-                           gettext('Question Time')]
-                for col_idx, header in enumerate(headers, 1):
-                    cell = worksheet.cell(row=1, column=col_idx)
-                    cell.value = header
+                headers = [
+                    gettext('Conversation ID'),
+                    gettext('summary'),
+                    gettext('User Questions'),
+                    gettext('Problem after optimization'),
+                    gettext('answer'),
+                    gettext('User feedback'),
+                    gettext('Reference segment number'),
+                    gettext('Section title + content'),
+                    gettext('Annotation'),
+                    gettext('USER'),
+                    gettext('Consuming tokens'),
+                    gettext('Time consumed (s)'),
+                    gettext('Question Time')
+                ]
 
-                for i in range(0, len(data_list), batch_size):
-                    batch_data = data_list[i:i + batch_size]
+                with tempfile.NamedTemporaryFile(suffix=".xlsx") as tmp:
 
-                    for row_idx, row in enumerate(batch_data, start=i + 2):
-                        for col_idx, value in enumerate(self.to_row(row), 1):
-                            cell = worksheet.cell(row=row_idx, column=col_idx)
-                            if isinstance(value, str):
-                                value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
-                            if isinstance(value, datetime.datetime):
-                                eastern = pytz.timezone(TIME_ZONE)
-                                c = datetime.timezone(eastern._utcoffset)
-                                value = value.astimezone(c)
-                            cell.value = value
+                    workbook = openpyxl.Workbook(write_only=True)
+                    worksheet = workbook.create_sheet(title="Sheet1")
 
-                output = BytesIO()
-                workbook.save(output)
-                output.seek(0)
-                yield output.getvalue()
-                output.close()
-                workbook.close()
+                    # 写表头
+                    worksheet.append(headers)
 
-            response = StreamingHttpResponse(stream_response(),
-                                             content_type='application/vnd.open.xmlformats-officedocument.spreadsheetml.sheet')
+                    for data_list in native_page_handler(
+                            batch_size,
+                            self.get_query_set(data.get('select_ids')),
+                            primary_key='application_chat_record_temp.id',
+                            primary_queryset='default_queryset',
+                            get_primary_value=lambda item: item.get('id'),
+                            select_string=select_sql,
+                            with_table_name=False
+                    ):
+
+                        for row in data_list:
+
+                            row_values = []
+                            for value in self.to_row(row):
+
+                                if isinstance(value, str):
+                                    value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
+
+                                elif isinstance(value, datetime.datetime):
+                                    eastern = pytz.timezone(TIME_ZONE)
+                                    c = datetime.timezone(eastern._utcoffset)
+                                    value = value.astimezone(c)
+
+                                row_values.append(value)
+
+                            worksheet.append(row_values)
+
+                    workbook.save(tmp.name)
+                    workbook.close()
+
+                    # 分块返回文件
+                    with open(tmp.name, "rb") as f:
+                        while True:
+                            chunk = f.read(8192)
+                            if not chunk:
+                                break
+                            yield chunk
+
+            response = StreamingHttpResponse(
+                stream_response(),
+                content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
             response['Content-Disposition'] = 'attachment; filename="data.xlsx"'
+
             return response
 
         def page(self, current_page: int, page_size: int, with_valid=True):
