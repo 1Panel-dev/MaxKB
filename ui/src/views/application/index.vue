@@ -238,9 +238,13 @@
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
-                            <el-dropdown-item @click.stop="toChat(item)">
+                            <!-- <el-dropdown-item @click.stop="goApp(item)">
                               <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
-                              {{ $t('views.application.operation.toChat') }}
+                              {{ $t('views.application.operation.goApp') }}
+                            </el-dropdown-item> -->
+                            <el-dropdown-item @click.stop="goApp(item)">
+                              <AppIcon iconName="app-application" class="color-secondary"></AppIcon>
+                              应用
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="settingApplication(item)"

@@ -1,7 +1,16 @@
 <template>
   <div class="app-layout" style="display: flex; flex-direction: column; height: 100vh;">
-    <!-- 顶部 header -->
-    <SystemHeader />
+    <div class="app-header" :class="!isDefaultTheme ? 'custom-header' : ''" style="position: static;">
+      <el-alert
+        v-if="user.isExpire()"
+        :title="$t('layout.isExpire')"
+        type="warning"
+        class="border-b"
+        show-icon
+        :closable="false"
+      />
+      <SystemHeader />
+    </div>
     <!-- 主内容区 -->
     <div class="app-main" :class="user.isExpire() ? 'isExpire' : ''" style="display: flex; flex: 1; overflow: hidden;">
       <!-- 最左侧侧边栏 -->
@@ -35,7 +44,10 @@ const isShared = computed(() => {
     route.path.includes('resource-management')
   )
 })
-const { user } = useStore()
+const { user, theme } = useStore()
+const isDefaultTheme = computed(() => {
+  return theme.isDefaultTheme()
+})
 </script>
 <style lang="scss" scoped>
 @use './index.scss';

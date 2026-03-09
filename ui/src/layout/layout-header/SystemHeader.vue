@@ -2,6 +2,7 @@
   <div class="app-top-bar-container border-b flex-center">
     <div class="flex-between w-full align-center" style="padding: 0 16px;">
       <div style="display: flex; align-items: center;">
+        <ChinaMobileIcon />
         <h1 style="font-size: 18px; font-weight: 600; margin: 0;">{{ isSystemManagement ? 'AI-RAG | 系统管理' : 'AI-RAG' }}</h1>
       </div>
       <div style="display: flex; align-items: center;">
@@ -16,6 +17,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import ChinaMobileIcon from '@/components/china-mobile-icon/index.vue'
 
 const route = useRoute()
 

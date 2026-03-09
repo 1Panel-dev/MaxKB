@@ -6,6 +6,7 @@
 
     <div class="flex-between w-full">
       <div class="ml-24 flex align-center w-120">
+        <ChinaMobileIcon />
         <!-- 企业版: 工作空间下拉框-->
         <el-divider
           class="mr-8"
@@ -31,6 +32,7 @@ import { useRoute, useRouter } from 'vue-router'
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
 import TopAbout from './top-about/index.vue'
+import ChinaMobileIcon from '@/components/china-mobile-icon/index.vue'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import type { WorkspaceItem } from '@/api/type/workspace'
