@@ -19,8 +19,17 @@
       ),
     }"
   >
-    <div class="flex h-full w-full">
-      <div class="chat-pc__left">
+    <div class="app-top-bar-container border-b flex-center">
+      <div class="flex-between w-full align-center" style="padding: 0 16px;">
+        <div style="display: flex; align-items: center;">
+          <ChinaMobileIcon />
+          <h1 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG</h1>
+        </div>
+      </div>
+    </div>
+    <LayoutContainer showCollapse resizable class="application-manage">
+      <template #left>
+        <h4 class="p-12-16 pb-0 mt-12">{{ $t('chat.title') }}</h4>
         <HistoryPanel
           :application-detail="applicationDetail"
           :chat-log-data="chatLogData"
@@ -91,26 +100,10 @@
             </el-dropdown>
           </div>
         </HistoryPanel>
-        <el-button
-          v-if="!common.isMobile()"
-          class="pc-collapse cursor"
-          circle
-          @click="isPcCollapse = !isPcCollapse"
-        >
-          <el-icon>
-            <component :is="isPcCollapse ? 'ArrowRightBold' : 'ArrowLeftBold'" />
-          </el-icon>
-        </el-button>
-      </div>
-      <div
-        class="chat-pc__right chat-background"
-        :style="{
-          backgroundImage: `url(${applicationDetail?.chat_background})`,
-          '--execution-detail-panel-width': rightPanelSize + 'px',
-        }"
-      >
-        <div style="flex: 1; width: calc(100% - var(--execution-detail-panel-width))">
-          <div class="p-16-24 flex-between">
+      </template>
+      <ContentContainer>
+        <template #header>
+          <div class="flex-between w-full">
             <h4 class="ellipsis-1" style="width: 66%">
               {{ currentChatName }}
             </h4>
@@ -147,70 +140,78 @@
               </el-dropdown>
             </span>
           </div>
-          <div class="right-height chat-width">
-            <AiChat
-              ref="AiChatRef"
-              v-model:applicationDetails="applicationDetail"
-              :available="applicationAvailable"
-              type="ai-chat"
-              :appId="applicationDetail?.id"
-              :record="currentRecordList"
-              :chatId="currentChatId"
-              executionIsRightPanel
-              @refresh="refresh"
-              @scroll="handleScroll"
-              @open-execution-detail="openExecutionDetail"
-              @openParagraph="openKnowledgeSource"
-              @openParagraphDocument="openParagraphDocument"
-            >
-            </AiChat>
-          </div>
-        </div>
-        <div class="execution-detail-panel" :resizable="false" collapsible>
-          <div class="p-16 flex-between border-b">
-            <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
-
-            <div class="flex align-center">
-              <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
-                <a
-                  :href="
-                    getFileUrl(rightPanelDetail?.meta?.source_file_id) ||
-                    rightPanelDetail?.meta?.source_url
-                  "
-                  target="_blank"
-                  class="ellipsis-1"
-                  :title="rightPanelDetail?.document_name?.trim()"
-                >
-                  <el-button text>
-                    <AppIcon iconName="app-pdf-export" class="cursor"></AppIcon>
-                  </el-button>
-                </a>
-              </span>
-              <!-- <span v-if="rightPanelType === 'paragraphDocument'">
-                <el-button text> <app-icon iconName="app-export" size="20" /></el-button>
-              </span> -->
-              <span>
-                <el-button text @click="closeExecutionDetail">
-                  <el-icon size="20"><Close /></el-icon
-                ></el-button>
-              </span>
+        </template>
+        <div
+          class="chat-background"
+          :style="{
+            backgroundImage: `url(${applicationDetail?.chat_background})`,
+            '--execution-detail-panel-width': rightPanelSize + 'px',
+          }"
+          style="display: flex; height: 100%;"
+        >
+          <div style="flex: 1; width: calc(100% - var(--execution-detail-panel-width))">
+            <div class="right-height chat-width">
+              <AiChat
+                ref="AiChatRef"
+                v-model:applicationDetails="applicationDetail"
+                :available="applicationAvailable"
+                type="ai-chat"
+                :appId="applicationDetail?.id"
+                :record="currentRecordList"
+                :chatId="currentChatId"
+                executionIsRightPanel
+                @refresh="refresh"
+                @scroll="handleScroll"
+                @open-execution-detail="openExecutionDetail"
+                @openParagraph="openKnowledgeSource"
+                @openParagraphDocument="openParagraphDocument"
+              >
+              </AiChat>
             </div>
           </div>
-          <div class="execution-detail-content" v-loading="rightPanelLoading">
-            <ParagraphSourceContent
-              v-if="rightPanelType === 'knowledgeSource'"
-              :detail="rightPanelDetail"
-            />
-            <ExecutionDetailContent
-              v-if="rightPanelType === 'executionDetail'"
-              :detail="executionDetail"
-              :appType="applicationDetail?.type"
-            />
-            <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+          <div class="execution-detail-panel" :resizable="false" collapsible>
+            <div class="p-16 flex-between border-b">
+              <h4 class="medium ellipsis" :title="rightPanelTitle">{{ rightPanelTitle }}</h4>
+
+              <div class="flex align-center">
+                <span v-if="rightPanelType === 'paragraphDocument'" class="mr-4">
+                  <a
+                    :href="
+                      getFileUrl(rightPanelDetail?.meta?.source_file_id) ||
+                      rightPanelDetail?.meta?.source_url
+                    "
+                    target="_blank"
+                    class="ellipsis-1"
+                    :title="rightPanelDetail?.document_name?.trim()"
+                  >
+                    <el-button text>
+                      <AppIcon iconName="app-pdf-export" class="cursor"></AppIcon>
+                    </el-button>
+                  </a>
+                </span>
+                <span>
+                  <el-button text @click="closeExecutionDetail">
+                    <el-icon size="20"><Close /></el-icon>
+                  </el-button>
+                </span>
+              </div>
+            </div>
+            <div class="execution-detail-content" v-loading="rightPanelLoading">
+              <ParagraphSourceContent
+                v-if="rightPanelType === 'knowledgeSource'"
+                :detail="rightPanelDetail"
+              />
+              <ExecutionDetailContent
+                v-if="rightPanelType === 'executionDetail'"
+                :detail="executionDetail"
+                :appType="applicationDetail?.type"
+              />
+              <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </ContentContainer>
+    </LayoutContainer>
 
     <ResetPassword
       ref="resetPasswordRef"
@@ -240,6 +241,9 @@ import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
 import { cloneDeep } from 'lodash'
 import { getFileUrl } from '@/utils/common'
 import PdfExport from '@/components/pdf-export/index.vue'
+import ChinaMobileIcon from '@/components/china-mobile-icon/index.vue'
+import LayoutContainer from '@/components/layout-container/index.vue'
+import ContentContainer from '@/components/layout-container/ContentContainer.vue'
 
 useResize()
 const pdfExportRef = ref<InstanceType<typeof PdfExport>>()
@@ -534,30 +538,12 @@ function closeExecutionDetail() {
   overflow: hidden;
   background: #eef1f4;
 
-  &__left {
-    position: relative;
-    z-index: 1;
-
-    .pc-collapse {
-      position: absolute;
-      top: 20px;
-      right: -13px;
-      box-shadow: 0px 5px 10px 0px var(--app-text-color-light-1);
-      z-index: 1;
-      width: 24px;
-      height: 24px;
-    }
-  }
-
-  &__right {
-    flex: 1;
-    overflow: hidden;
+  .chat-background {
     position: relative;
     box-sizing: border-box;
-    display: flex;
 
     .right-height {
-      height: calc(100vh - 60px);
+      height: calc(100vh - var(--app-header-height) - 120px);
     }
 
     :deep(.execution-detail-panel) {
@@ -584,13 +570,8 @@ function closeExecutionDetail() {
   margin: 0 auto;
 }
 
-.chat-pc__right {
-  width: calc(100vw - 280px);
-  --execution-detail-panel-width: 400px;
-
-  .execution-detail-panel {
-    width: var(--execution-detail-panel-width, 400px);
-  }
+.execution-detail-panel {
+  width: var(--execution-detail-panel-width, 400px);
 }
 
 @media only screen and (max-width: 1000px) {
