@@ -23,7 +23,13 @@
             <span class="lighter" v-if="selectedCount && selectedCount > 0">
               {{ currentIndex + 1 }}/{{ selectedCount }}
             </span>
-            <span class="lighter color-secondary" style="width: 42px;" v-else-if="searchText.length > 0"> 无结果 </span>
+            <span
+              class="lighter color-secondary"
+              style="width: 42px"
+              v-else-if="searchText.length > 0"
+            >
+              无结果
+            </span>
             <el-divider direction="vertical" />
 
             <el-button text>
@@ -136,22 +142,24 @@ const selectNodes = (nodes: Array<any>) => {
 }
 const next = () => {
   if (selectedNodes.value && selectedNodes.value.length > 0) {
+    selectedNodes.value[currentIndex.value]?.selectOn()
     if (selectedNodes.value.length - 1 >= currentIndex.value + 1) {
       currentIndex.value++
     } else {
       currentIndex.value = 0
     }
-    selectedNodes.value[currentIndex.value].focusOn()
+    selectedNodes.value[currentIndex.value]?.focusOn()
   }
 }
 const up = () => {
   if (selectedNodes.value && selectedNodes.value.length > 0) {
+    selectedNodes.value[currentIndex.value]?.selectOn()
     if (currentIndex.value - 1 <= 0) {
       currentIndex.value = selectedNodes.value.length - 1
     } else {
       currentIndex.value--
     }
-    selectedNodes.value[currentIndex.value].focusOn()
+    selectedNodes.value[currentIndex.value]?.focusOn()
   }
 }
 
@@ -183,7 +191,9 @@ const closeSearch = () => {
 }
 const clearSelect = () => {
   if (selectedNodes.value) {
-    selectedNodes.value[currentIndex.value].clearSelectOn()
+    selectedNodes.value.forEach((node) => {
+      node.clearSelectOn()
+    })
   }
   selectedNodes.value = undefined
   currentIndex.value = 0
