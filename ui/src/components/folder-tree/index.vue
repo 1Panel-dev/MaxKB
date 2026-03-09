@@ -460,7 +460,7 @@ const handleDrop = (draggingNode: any, dropNode: any, dropType: string, ev: Drag
     folderApi
       .putFolder(dragData.id, props.source, obj, loading)
       .then(() => {
-        sortAfterDrop(dragData, dropData, dropType, newParentId)
+        emit('refreshTree')
 
         MsgSuccess(t('common.saveSuccess'))
       })
