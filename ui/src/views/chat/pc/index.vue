@@ -387,6 +387,7 @@ function handleScroll(event: any) {
 }
 
 function newChat() {
+  showSelection.value = false
   if (!chatLogData.value.some((v) => v.id === 'new')) {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
@@ -458,6 +459,7 @@ function getChatRecord() {
 
 const clickListHandle = (item: any) => {
   if (item.id !== currentChatId.value) {
+    showSelection.value = false
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []

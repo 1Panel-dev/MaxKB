@@ -40,11 +40,11 @@
           <el-checkbox-group v-model="multipleSelectionChat" @change="handleCheckedChatChange">
             <template v-for="(item, index) in chatList" :key="index">
               <div class="flex-between w-full">
-                <el-checkbox :value="item.id" v-if="selection" />
+                <el-checkbox :value="item.record_id" v-if="selection" />
                 <div
                   class="w-full border-r-8"
                   :class="selection ? 'is-selected p-12 mt-8 mb-8 cursor' : 'mt-24'"
-                  @click="toggleSelect(item.id)"
+                  @click="toggleSelect(item.record_id)"
                 >
                   <!-- 问题 -->
                   <QuestionContent
@@ -59,11 +59,11 @@
                 </div>
               </div>
               <div class="flex align-center w-full">
-                <el-checkbox :value="item.id" v-if="selection" />
+                <el-checkbox :value="item.record_id" v-if="selection" />
                 <div
                   class="w-full border-r-8"
                   :class="selection ? 'is-selected p-12 cursor' : ''"
-                  @click="toggleSelect(item.id)"
+                  @click="toggleSelect(item.record_id)"
                 >
                   <!-- 回答 -->
                   <AnswerContent
@@ -304,14 +304,22 @@ watch(
   },
 )
 
+// 选择对话分享
+const checkAll = ref(false)
+const multipleSelectionChat = ref<any[]>([])
+const shareLoading = ref(false)
+
 watch(
   () => props.selection,
   (value) => {
     if (value) {
       if (value && multipleSelectionChat.value.length === 0) {
-        multipleSelectionChat.value = chatList.value.map((v) => v.id)
+        multipleSelectionChat.value = chatList.value.map((v) => v.record_id)
         checkAll.value = true
       }
+    } else {
+      checkAll.value = false
+      multipleSelectionChat.value = []
     }
   },
   {
@@ -319,13 +327,12 @@ watch(
   },
 )
 
-// 选择对话分享
-const checkAll = ref(false)
-const multipleSelectionChat = ref<any[]>([])
-const shareLoading = ref(false)
 function shareChatHandle() {
+  const validIds = new Set(chatList.value.map((v) => v.record_id))
+  const selectedIds = multipleSelectionChat.value.filter((id) => validIds.has(id))
+
   const obj = {
-    chat_record_ids: multipleSelectionChat.value,
+    chat_record_ids: selectedIds,
     is_current_all: checkAll.value,
   }
   chatAPI.postShareChat(id || props.appId, chartOpenId.value, obj, shareLoading).then((res) => {
@@ -336,7 +343,7 @@ function shareChatHandle() {
 }
 
 const handleCheckAllChange = (val: CheckboxValueType) => {
-  multipleSelectionChat.value = val ? chatList.value.map((v) => v.id) : []
+  multipleSelectionChat.value = val ? chatList.value.map((v) => v.record_id) : []
   checkAll.value = val as boolean
 }
 const handleCheckedChatChange = (value: CheckboxValueType[]) => {
