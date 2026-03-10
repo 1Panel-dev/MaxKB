@@ -1,4 +1,4 @@
-# MaxKB API接口参数文档
+# AI-RAG API接口参数文档
 
 ## 1. 概述
 

@@ -1,6 +1,12 @@
 <template>
   <login-layout v-if="!loading" v-loading="loading">
     <LoginContainer :subTitle="newDefaultSlogan">
+      <template #logo>
+        <div style="display: flex; align-items: center; justify-content: center;">
+          <ChinaMobileIcon />
+          <h1 style="font-size: 18px; font-weight: 600; margin: 0; background: linear-gradient(90deg, #6B47E5, #1E71C7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AI-RAG</h1>
+        </div>
+      </template>
       <h2 class="mb-24" v-if="!showQrCodeTab">{{ loginMode || $t('views.login.title') }}</h2>
       <div v-if="!showQrCodeTab">
         <el-form
@@ -142,6 +148,7 @@ import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
 import {loadScript} from '@/utils/common'
 import forge from 'node-forge';
+import ChinaMobileIcon from '@/components/china-mobile-icon/index.vue';
 
 const router = useRouter()
 const {login, user, theme} = useStore()
