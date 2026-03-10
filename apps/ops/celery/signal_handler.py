@@ -2,7 +2,7 @@
 #
 import logging
 import os
-
+from common.init import init_template
 from celery import subtask
 from celery.signals import (
     worker_ready, worker_shutdown, after_setup_logger, task_revoked, task_prerun
@@ -31,6 +31,7 @@ def on_app_ready(sender=None, headers=None, **kwargs):
             logger.debug("Periodic task [{}] is disabled!".format(task))
             continue
         subtask(task).delay()
+    init_template.run()
 
 
 def delete_files(directory):

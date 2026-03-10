@@ -23,10 +23,9 @@ from rest_framework import status
 
 from application.urls import urlpatterns as application_urlpatterns
 from common.cache_data.static_resource_cache import get_index_html
-from common.constants.cache_code_constants import CacheCodeConstants
+from common.init import init_template
 from common.init.init_doc import init_doc
 from common.response.result import Result
-from common.util.cache_util import get_cache
 from smartdoc import settings
 from smartdoc.conf import PROJECT_DIR
 
@@ -72,3 +71,4 @@ def page_not_found(request, exception):
 
 handler404 = page_not_found
 init_doc(urlpatterns, application_urlpatterns)
+init_template.run()
