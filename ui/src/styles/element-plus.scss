@@ -145,6 +145,10 @@
 .el-card {
   --el-card-padding: calc(var(--app-base-px) * 2);
   color: var(--el-text-color-regular);
+  overflow: visible;
+  .el-card__body {
+    overflow: inherit;
+  }
 }
 .el-dropdown {
   color: var(--app-text-color);

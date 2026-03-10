@@ -121,7 +121,7 @@ const props = defineProps({
   },
   id: String,
   type: String,
-  tableHeight: Number,
+  tableHeight: [String, Number],
   manage: Boolean
 })
 

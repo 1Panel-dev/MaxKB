@@ -532,7 +532,7 @@ onBeforeRouteLeave((to: any) => {
 const beforePagination = computed(() => common.paginationConfig[storeKey])
 const beforeSearch = computed(() => common.search[storeKey])
 const embeddingContentDialogRef = ref<InstanceType<typeof EmbeddingContentDialog>>()
-const SyncWebDialogRef = ref()
+
 const loading = ref(false)
 let interval: any
 const filterText = ref('')

@@ -103,7 +103,7 @@ const currentType = ref<String>('')
 const filterText = ref('')
 
 const activeName = ref(TeamEnum.DATASET)
-const tableHeight = ref(0)
+const tableHeight = ref('')
 
 const settingTags = reactive([
   {

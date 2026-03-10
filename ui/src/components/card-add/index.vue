@@ -1,6 +1,6 @@
 <template>
   <el-card shadow="never" class="card-add">
-    <div class="flex-center">
+    <div class="flex-center" style="height: 133px;">
       <AppIcon iconName="Plus" class="add-icon p-8 border-r-4 layout-bg" />
       <span>{{ title }}</span>
     </div>

@@ -16,7 +16,7 @@
         </span>
       </div>
 
-      <el-scrollbar :max-height="first ? 0 : 450">
+      <el-scrollbar :max-height="first ? '' : 450">
         <el-collapse-transition>
           <div
             v-show="showUserInput"
