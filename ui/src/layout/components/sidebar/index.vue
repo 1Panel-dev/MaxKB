@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import UserAvatar from '@/layout/layout-header/avatar/index.vue'
 
@@ -130,6 +130,12 @@ const toggleSystemSettings = () => {
 const activeSubMenu = computed(() => {
   const path = route.path
   return path
+})
+
+// 确保组件挂载时下拉菜单保持折叠状态
+onMounted(() => {
+  resourceAuthExpanded.value = false
+  systemSettingsExpanded.value = false
 })
 </script>
 

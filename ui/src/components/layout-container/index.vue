@@ -50,7 +50,7 @@ const props = defineProps({
   },
 })
 
-const isCollapse = ref(false)
+const isCollapse = ref(true)
 const leftWidth = ref(props.minLeftWidth)
 const isResizing = ref(false)
 

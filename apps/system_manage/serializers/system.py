@@ -16,6 +16,7 @@ from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.rsa_util import get_key_pair_by_sql
 from maxkb import settings
+from maxkb.const import CONFIG
 from system_manage.models import SystemSetting
 
 
@@ -48,5 +49,5 @@ class SystemConfigSerializer(serializers.Serializer):
     @staticmethod
     def get_config():
         return {
-            'mindmap_url': settings.config.get('MINDMAP_URL', '')
+            'mindmap_url': CONFIG.get('MINDMAP_URL', '')
         }

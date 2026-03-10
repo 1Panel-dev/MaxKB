@@ -15,9 +15,6 @@ VERSION = '2.0.0'
 
 # load environment variables from .env file
 load_dotenv()
-# print(os.getenv('MAXKB_CONFIG'))
-if os.getenv('MAXKB_CONFIG') is not None:
-    CONFIG = ConfigManager.load_user_config(root_path=PROJECT_DIR)
-else:
-    CONFIG = ConfigManager.load_user_config(root_path=os.path.abspath('/opt/maxkb/conf'))
+# 直接从 /opt/maxkb/conf 目录加载配置
+CONFIG = ConfigManager.load_user_config(root_path=os.path.abspath('/opt/maxkb/conf'))
 
