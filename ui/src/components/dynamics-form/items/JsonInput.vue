@@ -1,7 +1,7 @@
 <template>
   <div style="width: 100%" class="function-CodemirrorEditor">
     <Codemirror
-      v-bind="$attrs"
+      v-bind="editorAttrs"
       ref="cmRef"
       v-model="model_value"
       :extensions="extensions"
@@ -51,7 +51,7 @@ import { json, jsonParseLinter } from '@codemirror/lang-json'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { Codemirror } from 'vue-codemirror'
 import { linter } from '@codemirror/lint'
-import { computed, ref } from 'vue'
+import { computed, ref, useAttrs } from 'vue'
 import { t } from '@/locales'
 const props = withDefaults(defineProps<{ modelValue?: any }>(), { modelValue: () => {} })
 const emit = defineEmits(['update:modelValue'])
@@ -123,6 +123,8 @@ const validate_rules = (rule: any, value: any, callback: any) => {
   }
   return true
 }
+
+const editorAttrs = useAttrs() as any
 
 defineExpose({ validate_rules: validate_rules })
 </script>

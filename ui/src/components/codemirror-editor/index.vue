@@ -7,7 +7,7 @@
       :style="codemirrorStyle"
       :tab-size="4"
       :autofocus="true"
-      v-bind="$attrs"
+      v-bind="editorAttrs"
     />
 
     <div class="codemirror-editor__footer">
@@ -39,7 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, useAttrs } from 'vue'
 import { Codemirror } from 'vue-codemirror'
 import { python } from '@codemirror/lang-python'
 import { oneDark } from '@codemirror/theme-one-dark'
@@ -47,6 +47,7 @@ import { linter, type Diagnostic } from '@codemirror/lint'
 import FunctionApi from '@/api/function-lib'
 
 defineOptions({ name: 'CodemirrorEditor' })
+const editorAttrs = useAttrs() as any
 
 const props = defineProps<{
   title: String
