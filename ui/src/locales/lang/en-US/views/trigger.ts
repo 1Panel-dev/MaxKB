@@ -26,6 +26,11 @@ export default {
     sunday: 'Sunday',
     hours: 'Hours',
     minutes: 'Minutes',
+    cronExpression: 'Cron expression',
+    switchCycle: 'Switch to Trigger Cycle',
+    switchCron: 'Switch to Cron expression',
+    placeholder: 'Please enter a Cron expression (e.g. 0 0 1 * *)'
+
   },
   type: {
     scheduled: 'Scheduled Trigger',

@@ -26,6 +26,10 @@ export default {
     sunday: '周日',
     hours: '小时',
     minutes: '分钟',
+    cronExpression: 'Cron 表达式',
+    switchCycle: '切换为触发周期',
+    switchCron: '切换为时间表达式',
+    placeholder: '请输入Cron表达式（如：0 0 1 * *）'
   },
   type: {
     scheduled: '定时触发',

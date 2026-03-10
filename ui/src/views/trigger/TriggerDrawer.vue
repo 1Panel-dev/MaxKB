@@ -80,15 +80,15 @@
               <p style="margin-top: -8px">
                 {{
                   form.trigger_setting.schedule_type === 'cron'
-                    ? 'Cron表达式'
+                    ? $t('views.trigger.triggerCycle.cronExpression')
                     : $t('views.trigger.triggerCycle.title')
                 }}
               </p>
               <el-tooltip
                 :content="
                   form.trigger_setting.schedule_type === 'cron'
-                    ? '切换为触发周期'
-                    : '切换为Cron表达式'
+                    ? $t('views.trigger.triggerCycle.switchCycle')
+                    : $t('views.trigger.triggerCycle.switchCron')
                 "
                 placement="top"
                 effect="light"
@@ -109,7 +109,7 @@
             <el-input
               v-else
               v-model="form.trigger_setting.cron_expression"
-              placeholder="请输入Cron表达式（如：0 0 1 * *）"
+              :placeholder="t('views.trigger.triggerCycle.placeholder')"
               clearable
               @blur="validateCron"
               @input="validateCron"
