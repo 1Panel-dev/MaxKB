@@ -1,5 +1,5 @@
 <template>
-  <MdEditor :language="language" noIconfont noPrettier v-bind="$attrs">
+  <MdEditor :language="language" noIconfont noPrettier v-bind="editorAttrs">
     <template #defFooters>
       <slot name="defFooters"> </slot>
     </template>
@@ -7,7 +7,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useAttrs } from 'vue'
 import { MdEditor, config } from 'md-editor-v3'
 import { getBrowserLang } from '@/locales/index'
 import './assets/markdown-iconfont.js'
@@ -15,6 +15,7 @@ import './assets/markdown-iconfont.js'
 import ZH_TW from '@vavt/cm-extension/dist/locale/zh-TW'
 
 defineOptions({ name: 'MdEditor' })
+const editorAttrs = useAttrs() as any
 const language = computed(() => localStorage.getItem('MaxKB-locale') || getBrowserLang() || '')
 config({
   editorConfig: {
