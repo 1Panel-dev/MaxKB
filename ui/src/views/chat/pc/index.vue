@@ -25,11 +25,12 @@
           <ChinaMobileIcon />
           <h1 style="font-size: 18px; font-weight: 600; margin: 0;">AI-RAG</h1>
         </div>
+        <div style="display: flex; align-items: center;">
+        </div>
       </div>
     </div>
-    <LayoutContainer showCollapse resizable class="application-manage">
+    <LayoutContainer class="application-manage" :show-collapse="false">
       <template #left>
-        <h4 class="p-12-16 pb-0 mt-12">{{ $t('chat.title') }}</h4>
         <HistoryPanel
           :application-detail="applicationDetail"
           :chat-log-data="chatLogData"
@@ -533,6 +534,13 @@ function closeExecutionDetail() {
 }
 </script>
 <style lang="scss" scoped>
+.app-top-bar-container {
+  height: var(--app-header-height);
+  box-sizing: border-box;
+  padding: var(--app-header-padding);
+  background: var(--app-header-bg-color);
+}
+
 .chat-pc {
   height: 100%;
   overflow: hidden;

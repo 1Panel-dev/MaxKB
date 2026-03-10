@@ -42,3 +42,11 @@ class SystemProfileSerializer(serializers.Serializer):
         return {'version': version, 'edition': settings.edition,
                 'license_is_valid': license_is_valid() if license_is_valid() is not None else False,
                 'ras': get_key_pair_by_sql().get('key')}
+
+
+class SystemConfigSerializer(serializers.Serializer):
+    @staticmethod
+    def get_config():
+        return {
+            'mindmap_url': settings.config.get('MINDMAP_URL', '')
+        }

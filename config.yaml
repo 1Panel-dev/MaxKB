@@ -42,3 +42,6 @@ SESSION_TIMEOUT: 28800
 
 # 沙盒Python包路径
 SANDBOX_PYTHON_PACKAGE_PATHS: /opt/py3/lib/python3.11/site-packages,/opt/maxkb-app/sandbox/python-packages,/opt/maxkb/python-packages
+
+# 思维导图服务配置
+MINDMAP_URL: http://10.100.52.76:3000/
