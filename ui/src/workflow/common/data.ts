@@ -78,6 +78,41 @@ export const knowledgeBaseNode = {
     user_input_field_list: [],
   },
 }
+export const toolBaseNode = {
+  id: WorkflowType.ToolBaseNode,
+  type: WorkflowType.ToolBaseNode,
+  x: 360,
+  y: 2761.3875,
+  text: '',
+  properties: {
+    width: 500,
+    height: 728.375,
+    stepName: t('common.info'),
+    input_field_list: [],
+    node_data: {},
+    config: {},
+    showNode: true,
+    user_input_config: { title: t('chat.userInput') },
+    user_input_field_list: [],
+  },
+}
+export const toolStartNode = {
+  id: WorkflowType.ToolStartNode,
+  type: WorkflowType.ToolStartNode,
+  x: 360,
+  y: 2761.3875,
+  text: '',
+  properties: {
+    height: 728.375,
+    stepName: t('workflow.nodes.startNode.label'),
+    input_field_list: [],
+    node_data: {},
+    config: {},
+    showNode: true,
+    user_input_config: { title: t('chat.userInput') },
+    user_input_field_list: [],
+  },
+}
 export const dataSourceLocalNode = {
   type: WorkflowType.DataSourceLocalNode,
   x: 360,
@@ -881,8 +916,88 @@ export const knowledgeLoopMenuNodes = [
     list: [mcpNode, toolNode],
   },
 ]
-
+export const toolLoopMenuNodes = [
+  {
+    label: t('views.tool.dataSource.title'),
+    list: [dataSourceLocalNode, dataSourceWebNode],
+  },
+  {
+    label: t('views.knowledge.title'),
+    list: [documentSplitNode, knowledgeWriteNode, documentExtractNode],
+  },
+  {
+    label: t('workflow.nodes.classify.aiCapability'),
+    list: [
+      aiChatNode,
+      intentNode,
+      textToSpeechNode,
+      speechToTextNode,
+      imageGenerateNode,
+      imageUnderstandNode,
+      textToVideoNode,
+      imageToVideoNode,
+      videoUnderstandNode,
+      questionNode,
+    ],
+  },
+  {
+    label: t('workflow.nodes.classify.businessLogic'),
+    list: [conditionNode, replyNode, loopContinueNode, loopBreakNode],
+  },
+  {
+    label: t('workflow.nodes.classify.dataProcessing'),
+    list: [
+      variableAssignNode,
+      variableAggregationNode,
+      variableSplittingNode,
+      parameterExtractionNode,
+    ],
+  },
+  {
+    label: t('workflow.nodes.classify.other'),
+    list: [mcpNode, toolNode],
+  },
+]
+const toolMenuNodes = [
+  {
+    label: t('workflow.nodes.classify.aiCapability'),
+    list: [
+      aiChatNode,
+      intentNode,
+      textToSpeechNode,
+      speechToTextNode,
+      imageGenerateNode,
+      imageUnderstandNode,
+      textToVideoNode,
+      imageToVideoNode,
+      videoUnderstandNode,
+      questionNode,
+    ],
+  },
+  {
+    label: t('views.knowledge.title'),
+    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
+  },
+  {
+    label: t('workflow.nodes.classify.businessLogic'),
+    list: [conditionNode, formNode, replyNode, loopNode],
+  },
+  {
+    label: t('workflow.nodes.classify.dataProcessing'),
+    list: [
+      variableAssignNode,
+      variableAggregationNode,
+      variableSplittingNode,
+      parameterExtractionNode,
+    ],
+  },
+  {
+    label: t('workflow.nodes.classify.other'),
+    list: [mcpNode, toolNode],
+  },
+]
 export const getMenuNodes = (workflowMode: WorkflowMode) => {
+  console.log(workflowMode)
   if (workflowMode == WorkflowMode.Application) {
     return menuNodes
   }
@@ -894,6 +1009,12 @@ export const getMenuNodes = (workflowMode: WorkflowMode) => {
   }
   if (workflowMode == WorkflowMode.KnowledgeLoop) {
     return knowledgeLoopMenuNodes
+  }
+  if (workflowMode == WorkflowMode.Tool) {
+    return toolMenuNodes
+  }
+  if (workflowMode == WorkflowMode.ToolLoop) {
+    return toolLoopMenuNodes
   }
 }
 
@@ -994,6 +1115,8 @@ export const nodeDict: any = {
   [WorkflowType.DataSourceLocalNode]: dataSourceLocalNode,
   [WorkflowType.DataSourceWebNode]: dataSourceWebNode,
   [WorkflowType.KnowledgeWriteNode]: knowledgeWriteNode,
+  [WorkflowType.ToolBaseNode]: toolBaseNode,
+  [WorkflowType.ToolStartNode]: toolStartNode,
 }
 
 export function isWorkFlow(type: string | undefined) {

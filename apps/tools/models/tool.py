@@ -36,6 +36,7 @@ class ToolType(models.TextChoices):
     SKILL = "SKILL", "技能"
     MCP = "MCP", "MCP工具"
     DATA_SOURCE = "DATA_SOURCE", "数据源"
+    WORKFLOW = "WORKFLOW"
 
 
 class ToolTaskTypeChoices(models.TextChoices):
@@ -67,7 +68,6 @@ class Tool(AppModelMixin):
 
     class Meta:
         db_table = "tool"
-
 
 
 class ToolRecord(AppModelMixin):

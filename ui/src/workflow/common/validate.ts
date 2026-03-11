@@ -46,6 +46,8 @@ const end_nodes_dict = {
   [WorkflowMode.Knowledge]: [WorkflowType.KnowledgeWriteNode],
   [WorkflowMode.ApplicationLoop]: loop_end_nodes,
   [WorkflowMode.KnowledgeLoop]: [...loop_end_nodes, WorkflowType.KnowledgeWriteNode],
+  [WorkflowMode.Tool]: end_nodes,
+  [WorkflowMode.ToolLoop]: loop_end_nodes,
 }
 
 export class WorkFlowInstance {
@@ -109,7 +111,9 @@ export class WorkFlowInstance {
    */
   get_start_node() {
     const start_node_list = this.nodes.filter((item) =>
-      [WorkflowType.Start, WorkflowType.LoopStartNode].includes(item.id),
+      [WorkflowType.Start, WorkflowType.LoopStartNode, WorkflowType.ToolStartNode].includes(
+        item.id,
+      ),
     )
     return start_node_list[0]
   }
@@ -147,7 +151,13 @@ export class WorkFlowInstance {
     this.workFlowNodes = []
     this._is_valid_work_flow()
     const notInWorkFlowNodes = this.nodes
-      .filter((node: any) => node.id !== WorkflowType.Start && node.id !== WorkflowType.Base)
+      .filter(
+        (node: any) =>
+          node.id !== WorkflowType.Start &&
+          node.id !== WorkflowType.Base &&
+          node.type !== WorkflowType.ToolBaseNode &&
+          node.type !== WorkflowType.ToolStartNode,
+      )
       .filter((node) => !this.workFlowNodes.includes(node))
     if (notInWorkFlowNodes.length > 0) {
       throw `${t('workflow.validate.notInWorkFlowNode')}:${notInWorkFlowNodes.map((node) => node.properties.stepName).join('，')}`
@@ -177,7 +187,9 @@ export class WorkFlowInstance {
       if (
         node.type !== WorkflowType.Base &&
         node.type !== WorkflowType.Start &&
-        node.type !== WorkflowType.LoopStartNode
+        node.type !== WorkflowType.LoopStartNode &&
+        node.type !== WorkflowType.ToolBaseNode &&
+        node.type !== WorkflowType.ToolStartNode
       ) {
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `${t('workflow.validate.notInWorkFlowNode')}:${node.properties.stepName}`
@@ -215,7 +227,33 @@ export class WorkFlowInstance {
     }
   }
 }
+export class ToolWorkFlowInstance extends WorkFlowInstance {
+  is_valid_start_node() {
+    const start_node_list = this.nodes.filter((item) => item.type === WorkflowType.ToolStartNode)
 
+    if (start_node_list.length == 0) {
+      throw t('workflow.validate.startNodeRequired')
+    }
+  }
+  /**
+   * 校验基本信息节点
+   */
+  is_valid_base_node() {
+    const base_node_list = this.nodes.filter((item) => item.id === WorkflowType.ToolBaseNode)
+    if (base_node_list.length == 0) {
+      throw t('workflow.validate.baseNodeRequired')
+    } else if (base_node_list.length > 1) {
+      throw t('workflow.validate.baseNodeOnly')
+    }
+  }
+  get_start_nodes() {
+    return this.nodes.filter((item) => item.type === WorkflowType.ToolStartNode)
+  }
+  get_base_node() {
+    const base_node_list = this.nodes.filter((item) => item.id === WorkflowType.ToolBaseNode)
+    return base_node_list[0]
+  }
+}
 export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
   is_valid_start_node() {
     const start_node_list =
@@ -255,7 +293,6 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
       )
       .filter((node) => !this.workFlowNodes.includes(node))
     if (notInWorkFlowNodes.length > 0) {
-      console.log('ss')
       throw `${t('workflow.validate.notInWorkFlowNode')}:${notInWorkFlowNodes.map((node) => node.properties.stepName).join('，')}`
     }
     this.workFlowNodes = []

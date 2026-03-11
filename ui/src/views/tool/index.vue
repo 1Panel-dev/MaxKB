@@ -30,6 +30,7 @@
             <el-radio-button value="DATA_SOURCE">{{
               $t('views.tool.dataSource.title')
             }}</el-radio-button>
+            <el-radio-button value="WORKFLOW">工作流</el-radio-button>
           </el-radio-group>
         </el-space>
       </template>

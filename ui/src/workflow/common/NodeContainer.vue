@@ -417,6 +417,8 @@ function showConditionOperate(type: string) {
     ![
       WorkflowType.Start,
       WorkflowType.Base,
+      WorkflowType.ToolBaseNode,
+      WorkflowType.ToolStartNode,
       WorkflowType.KnowledgeBase,
       WorkflowType.LoopStartNode.toString(),
       WorkflowType.DataSourceLocalNode,
@@ -453,7 +455,6 @@ onMounted(() => {
       border: 1px solid #f54a45 !important;
     }
   }
-
 }
 :deep(.el-card) {
   overflow: visible;

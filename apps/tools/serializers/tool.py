@@ -40,6 +40,7 @@ from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolFolder, ToolType, ToolRecord
+from tools.models.tool_workflow import ToolWorkflow
 from trigger.models import TriggerTask, Trigger
 from users.serializers.user import is_workspace_manage
 
@@ -391,7 +392,8 @@ class ToolSerializer(serializers.Serializer):
                 'user_id': self.data.get('user_id'),
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource(str(tool_id))
-
+            if instance.get('tool_type') == ToolType.WORKFLOW:
+                ToolWorkflow(id=uuid.uuid7(), tool_id=tool_id, work_flow=instance.get('work_flow', {})).save()
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get('tool_type') == ToolType.SKILL:
                 file_id = instance.get('code')
@@ -609,11 +611,18 @@ class ToolSerializer(serializers.Serializer):
                     'name': skill_file.file_name,
                     'size': skill_file.file_size,
                 } if skill_file else None
+            work_flow = {}
+            if tool.tool_type == 'WORKFLOW':
+                tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=tool.id).first()
+                if tool_workflow:
+                    work_flow = tool_workflow.work_flow
+
             return {
                 **ToolModelSerializer(tool).data,
                 'init_params': tool.init_params if tool.init_params else {},
                 'nick_name': nick_name,
-                'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else []
+                'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else [],
+                'work_flow': work_flow
             }
 
         def export(self):
