@@ -98,20 +98,22 @@ const getSelectNodes = (kw: string) => {
   const graph_data = props.lf?.getGraphData()
   graph_data.nodes.filter((node: any) => {
     if (node.properties.stepName.includes(kw)) {
-      result.push({
-        ...node,
-        order: 1,
-        focusOn: () => {
-          focusOn(node)
-          props.lf?.graphModel.getNodeModelById(node.id).focusOn(searchText.value)
-        },
-        selectOn: () => {
-          props.lf?.graphModel.getNodeModelById(node.id).selectOn(searchText.value)
-        },
-        clearSelectOn: () => {
-          props.lf?.graphModel.getNodeModelById(node.id).clearSelectOn(searchText.value)
-        },
-      })
+      if (node.type !== 'loop-body-node') {
+        result.push({
+          ...node,
+          order: 1,
+          focusOn: () => {
+            focusOn(node)
+            props.lf?.graphModel.getNodeModelById(node.id)?.focusOn(searchText.value)
+          },
+          selectOn: () => {
+            props.lf?.graphModel.getNodeModelById(node.id)?.selectOn(searchText.value)
+          },
+          clearSelectOn: () => {
+            props.lf?.graphModel.getNodeModelById(node.id)?.clearSelectOn(searchText.value)
+          },
+        })
+      }
     }
     if (node.type == 'loop-body-node') {
       const nodeModel = props.lf?.graphModel
@@ -154,7 +156,7 @@ const next = () => {
 const up = () => {
   if (selectedNodes.value && selectedNodes.value.length > 0) {
     selectedNodes.value[currentIndex.value]?.selectOn()
-    if (currentIndex.value - 1 <= 0) {
+    if (currentIndex.value - 1 < 0) {
       currentIndex.value = selectedNodes.value.length - 1
     } else {
       currentIndex.value--
@@ -214,7 +216,10 @@ const handleSearch = (kw: string) => {
     onSearch?.(searchText.value)
   }
 }
-
+const reSearch = () => {
+  console.log('ss')
+  handleSearch(searchText.value)
+}
 // 生命周期
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
@@ -223,6 +228,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
+defineExpose({ reSearch })
 </script>
 
 <style scoped>
