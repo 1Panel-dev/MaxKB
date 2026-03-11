@@ -443,18 +443,17 @@ const closeNodeMenu = () => {
 const keyWord = ref('')
 const currentKeyWord = ref(false)
 const selectOn = (kw: string) => {
-  props.nodeModel.setSelected(true)
   keyWord.value = kw
+  props.nodeModel.isSelected = false
   currentKeyWord.value = false
-  console.log('selectOn', kw)
 }
 /**
  * 定位时触发
  * @param kw
  */
 const focusOn = (kw: string) => {
+  props.nodeModel.setSelected(true)
   currentKeyWord.value = true
-  console.log('focusOn', kw)
 }
 /**
  * 清除时触发
@@ -462,7 +461,6 @@ const focusOn = (kw: string) => {
 const clearSelectOn = () => {
   keyWord.value = ''
   currentKeyWord.value = false
-  console.log('onClearSearchSelect')
 }
 
 // 高亮选中关键字
