@@ -229,7 +229,7 @@ const condition = computed({
     if (props.nodeModel.properties.condition) {
       return props.nodeModel.properties.condition
     }
-    set(props.nodeModel.properties, 'condition', 'AND')
+    set(props.nodeModel.properties, 'condition', 'OR')
     return true
   },
 })
