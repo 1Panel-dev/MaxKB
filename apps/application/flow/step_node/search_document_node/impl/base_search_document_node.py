@@ -9,6 +9,7 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_document_node.i_search_document_node import ISearchDocumentStepNode
 from common.constants.permission_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, DocumentTag, Knowledge
 
 
@@ -29,8 +30,10 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
                 search_scope_reference: List, question_reference: List, search_condition_type: str,
                 search_condition_list: List,
                 **kwargs) -> NodeResult:
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
 
         if search_scope_type == 'custom':  # 手动选择知识库
+            knowledge_id_list = filter_authorized_ids('knowledge', knowledge_id_list, workspace_id)
             document_id_list = QuerySet(Document).filter(
                 knowledge_id__in=knowledge_id_list
             ).values_list('id', flat=True)
@@ -38,8 +41,11 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
             if search_scope_source == 'document':  # 文档
                 document_id_list = self.get_reference_content(search_scope_reference)
             else:  # 知识库
+                ref_knowledge_ids = filter_authorized_ids('knowledge',
+                                                          self.get_reference_content(search_scope_reference),
+                                                          workspace_id)
                 document_id_list = QuerySet(Document).filter(
-                    knowledge_id__in=self.get_reference_content(search_scope_reference)
+                    knowledge_id__in=ref_knowledge_ids
                 ).values_list('id', flat=True)
 
         # 权限过滤
@@ -47,13 +53,14 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
         chat_user_type = self.workflow_manage.get_body().get('chat_user_type')
 
         if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
-            # 获取授权的知识库ID列表
+            actual_knowledge_ids = list(
+                QuerySet(Document).filter(id__in=document_id_list)
+                .values_list('knowledge_id', flat=True).distinct()
+            )
             authorized_knowledge_ids = get_knowledge_list_of_authorized(
                 self.workflow_manage.get_body().get('chat_user_id'),
-                knowledge_id_list
+                actual_knowledge_ids
             )
-
-            # 过滤出授权知识库下的文档
             document_id_list = QuerySet(Document).filter(
                 id__in=document_id_list,
                 knowledge_id__in=authorized_knowledge_ids

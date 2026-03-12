@@ -28,6 +28,7 @@ from application.models import ApplicationChatUserStats, ChatUserType, Applicati
 from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
+from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from tools.models import Tool
@@ -192,6 +193,7 @@ class BaseChatStep(IChatStep):
                                        mcp_tool_ids, mcp_servers, mcp_source, tool_ids,
                                        application_ids,
                                        skill_tool_ids,
+                                       workspace_id,
                                        mcp_output_enable)
         else:
             return self.execute_block(message_list, chat_id, problem_text, post_response_handler, chat_model,
@@ -201,6 +203,7 @@ class BaseChatStep(IChatStep):
                                       mcp_tool_ids, mcp_servers, mcp_source, tool_ids,
                                       application_ids,
                                       skill_tool_ids,
+                                      workspace_id,
                                       mcp_output_enable)
 
     def get_details(self, manage, **kwargs):
@@ -333,6 +336,7 @@ class BaseChatStep(IChatStep):
                           tool_ids=None,
                           application_ids=None,
                           skill_tool_ids=None,
+                          workspace_id=None,
                           mcp_output_enable=True,
                           agent_id=None,
                           chat_id=None
@@ -352,6 +356,17 @@ class BaseChatStep(IChatStep):
             return iter([AIMessageChunk(
                 _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.'))]), False
         else:
+            # 过滤tool_id
+            all_tool_ids = list(set(
+                (mcp_tool_ids or []) +
+                (tool_ids or []) +
+                (skill_tool_ids or [])
+            ))
+            authorized_set = set(filter_authorized_ids('tool', all_tool_ids, workspace_id))
+
+            mcp_tool_ids = [i for i in (mcp_tool_ids or []) if i in authorized_set]
+            tool_ids = [i for i in (tool_ids or []) if i in authorized_set]
+            skill_tool_ids = [i for i in (skill_tool_ids or []) if i in authorized_set]
             # 处理 MCP 请求
             mcp_result = self._handle_mcp_request(
                 mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
@@ -379,11 +394,12 @@ class BaseChatStep(IChatStep):
                        tool_ids=None,
                        application_ids=None,
                        skill_tool_ids=None,
+                       workspace_id=None,
                        mcp_output_enable=True):
         chat_result, is_ai_chat = self.get_stream_result(message_list, chat_model, paragraph_list,
                                                          no_references_setting, problem_text, mcp_tool_ids,
                                                          mcp_servers, mcp_source, tool_ids,
-                                                         application_ids, skill_tool_ids,
+                                                         application_ids, skill_tool_ids, workspace_id,
                                                          mcp_output_enable, manage.context.get('application_id'),
                                                          chat_id)
         chat_record_id = self.context.get('step_args', {}).get('chat_record_id') if self.context.get('step_args',
@@ -410,6 +426,7 @@ class BaseChatStep(IChatStep):
                          tool_ids=None,
                          application_ids=None,
                          skill_tool_ids=None,
+                         workspace_id=None,
                          mcp_output_enable=True,
                          application_id=None,
                          chat_id=None
@@ -428,6 +445,17 @@ class BaseChatStep(IChatStep):
             return AIMessage(
                 _('Sorry, the AI model is not configured. Please go to the application to set up the AI model first.')), False
         else:
+            # 过滤tool_id
+            all_tool_ids = list(set(
+                (mcp_tool_ids or []) +
+                (tool_ids or []) +
+                (skill_tool_ids or [])
+            ))
+            authorized_set = set(filter_authorized_ids('tool', all_tool_ids, workspace_id))
+
+            mcp_tool_ids = [i for i in (mcp_tool_ids or []) if i in authorized_set]
+            tool_ids = [i for i in (tool_ids or []) if i in authorized_set]
+            skill_tool_ids = [i for i in (skill_tool_ids or []) if i in authorized_set]
             # 处理 MCP 请求
             mcp_result = self._handle_mcp_request(
                 mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
@@ -454,6 +482,7 @@ class BaseChatStep(IChatStep):
                       tool_ids=None,
                       application_ids=None,
                       skill_tool_ids=None,
+                      workspace_id=None,
                       mcp_output_enable=True):
         reasoning_content_enable = model_setting.get('reasoning_content_enable', False)
         reasoning_content_start = model_setting.get('reasoning_content_start', '<think>')
@@ -466,7 +495,7 @@ class BaseChatStep(IChatStep):
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
                                                             no_references_setting, problem_text,
                                                             mcp_tool_ids, mcp_servers, mcp_source,
-                                                            tool_ids, application_ids, skill_tool_ids,
+                                                            tool_ids, application_ids, skill_tool_ids,workspace_id,
                                                             mcp_output_enable, manage.context.get('application_id'),
                                                             chat_id)
             if is_ai_chat:
