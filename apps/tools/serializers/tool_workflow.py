@@ -20,6 +20,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
+from application.flow.tool_workflow_manage import ToolWorkflowManage
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.result import result
@@ -212,6 +213,11 @@ class ToolWorkflowSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         tool_id = serializers.UUIDField(required=True, label=_('tool id'))
+
+        def debug(self, instance: Dict, user, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            ToolWorkflowManage()
 
         def publish(self, with_valid=True):
             if with_valid:

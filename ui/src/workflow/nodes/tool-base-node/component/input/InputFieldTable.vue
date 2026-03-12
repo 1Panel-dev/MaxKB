@@ -128,11 +128,13 @@ function onDragHandle() {
 }
 
 onMounted(() => {
-  set(props.nodeModel.properties, 'user_input_field_list', inputFieldList)
   if (props.nodeModel.properties.user_input_config) {
     inputFieldConfig.value = props.nodeModel.properties.user_input_config
   }
-  set(props.nodeModel.properties, 'user_input_config', inputFieldConfig)
+  if (props.nodeModel.properties.user_input_field_list) {
+    inputFieldList.value = props.nodeModel.properties.user_input_field_list
+  }
+  props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
   onDragHandle()
 })
 </script>

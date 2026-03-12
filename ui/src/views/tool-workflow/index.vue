@@ -150,6 +150,7 @@
       source="work_flow"
       @refresh="getDetail"
     />
+    <DebugDrawer ref="debugDrawerRef"></DebugDrawer>
   </div>
 </template>
 <script setup lang="ts">
@@ -174,6 +175,7 @@ import { WorkflowMode } from '@/enums/application'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { toolBaseNode, toolStartNode } from '@/workflow/common/data'
 import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
+import DebugDrawer from './component/debug-drawer/index.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
 provide('loopWorkflowMode', WorkflowMode.ToolLoop)
@@ -207,6 +209,7 @@ const isDefaultTheme = computed(() => {
 })
 
 const workflowRef = ref()
+const debugDrawerRef = ref<InstanceType<typeof DebugDrawer>>()
 const loading = ref(false)
 const detail = ref<any>(null)
 
@@ -434,7 +437,7 @@ const clickShowDebug = () => {
           ...workflow.get_base_node()?.properties.node_data,
           work_flow: getGraphData(),
         }
-        // DebugRef.value?.open(graphData)
+        debugDrawerRef.value?.open(id)
       } catch (e: any) {
         MsgError(e.toString())
       }

@@ -22,6 +22,7 @@ from application.models import ApplicationChatUserStats
 from application.models import ChatRecord, ChatUserType
 from common.field.common import InstanceField
 from knowledge.models.knowledge_action import KnowledgeAction, State
+from tools.models import ToolRecord
 
 chat_cache = cache
 
@@ -113,6 +114,16 @@ class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
             state=state,
             run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
                 'start_time') is not None else 0)
+
+
+class ToolWorkflowPostHandler(WorkFlowPostHandler):
+    def __init__(self, chat_info, tool_id):
+        super().__init__(chat_info)
+        self.tool_id = tool_id
+
+    def handler(self, workflow):
+        state = get_workflow_state(workflow)
+        ToolRecord(tool_id=self.tool_id)
 
 
 def get_loop_workflow_node(node_list):

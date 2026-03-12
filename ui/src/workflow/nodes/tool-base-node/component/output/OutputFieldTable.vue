@@ -116,10 +116,13 @@ function onDragHandle() {
 }
 
 onMounted(() => {
-  set(props.nodeModel.properties, 'user_output_field_list', inputFieldList)
   if (props.nodeModel.properties.user_output_config) {
     outputFieldConfig.value = props.nodeModel.properties.user_output_config
   }
+  if (props.nodeModel.properties.user_output_field_list) {
+    inputFieldList.value = props.nodeModel.properties.user_output_field_list
+  }
+  set(props.nodeModel.properties, 'user_output_field_list', inputFieldList.value)
   set(props.nodeModel.properties, 'user_output_config', outputFieldConfig)
   onDragHandle()
 })

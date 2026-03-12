@@ -198,3 +198,33 @@ class KnowledgeWorkflowVersionView(APIView):
         return result.success(KnowledgeWorkflowSerializer.Operate(
             data={'user_id': request.user.id, 'workspace_id': workspace_id, 'tool_id': tool_id}
         ).one())
+
+
+class KnowledgeWorkflowActionView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_('tool workflow debug'),
+        summary=_('tool workflow debug'),
+        operation_id=_('tool workflow debug'),  # type: ignore
+        parameters=ToolWorkflowApi.get_parameters(),
+        responses=ToolWorkflowApi.get_response(),
+        tags=[_('Tool')]  # type: ignore
+    )
+    @has_permissions(
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        ViewPermission(
+            [RoleConstants.USER.get_workspace_role()],
+            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            CompareConstants.AND
+        ),
+    )
+    def post(self, request: Request, workspace_id: str, tool_id: str):
+        return result.success(
+            ToolWorkflowSerializer.Operate(data={'workspace_id': workspace_id, 'tool_id': tool_id})
+            .debug(request.data,
+                   request.user,
+                   True))
