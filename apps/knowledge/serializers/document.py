@@ -395,7 +395,7 @@ class DocumentSerializers(serializers.Serializer):
         tag_ids = serializers.ListField(child=serializers.UUIDField(), allow_null=True, required=False,
                                         allow_empty=True)
         no_tag = serializers.BooleanField(required=False, default=False, allow_null=True)
-        tag_exclude = serializers.BooleanField(required=False,default=False, allow_null=True)
+        tag_exclude = serializers.BooleanField(required=False, default=False, allow_null=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -1350,17 +1350,19 @@ class DocumentSerializers(serializers.Serializer):
                 ).values_list('document_id', 'tag_id')
             }
 
-            # 批量创建不存在的关联关系
-            new_relations = [
-                DocumentTag(
-                    id=uuid.uuid7(),
-                    document_id=document_id,
-                    tag_id=tag_id,
-                )
-                for document_id in document_id_list
-                for tag_id in tag_id_list
-                if (document_id, tag_id) not in existing_relations
-            ]
+            new_relations = []
+            for doc_id in document_id_list:
+                for tag_id in tag_id_list:
+                    relation_key = (str(doc_id), str(tag_id))
+
+                    # 既检查数据库中已存在的，也检查本次即将创建的
+                    if relation_key not in existing_relations:
+                        new_relations.append(DocumentTag(
+                            id=uuid.uuid7(),
+                            document_id=doc_id,
+                            tag_id=tag_id,
+                        ))
+                        existing_relations.add(relation_key)
 
             if new_relations:
                 QuerySet(DocumentTag).bulk_create(new_relations)
@@ -1629,21 +1631,22 @@ class DocumentSerializers(serializers.Serializer):
             ).exists():
                 raise AppApiException(500, _('Tag id does not exist'))
 
-        def batch_delete_docs_tag(self, instance,with_valid=True):
+        def batch_delete_docs_tag(self, instance, with_valid=True):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get('knowledge_id')
-            tag_id=self.data.get('tag_id')
+            tag_id = self.data.get('tag_id')
             doc_id_list = instance.get("id_list")
 
             valid_doc_count = Document.objects.filter(id__in=doc_id_list, knowledge_id=knowledge_id).count()
             if valid_doc_count != len(doc_id_list):
                 raise AppApiException(500, _('Document id does not belong to current knowledge'))
 
-            DocumentTag.objects.filter(document_id__in=doc_id_list,tag_id=tag_id).delete()
+            DocumentTag.objects.filter(document_id__in=doc_id_list, tag_id=tag_id).delete()
 
             return True
+
     class ReplaceSourceFile(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('workspace id'))
         knowledge_id = serializers.UUIDField(required=True, label=_('knowledge id'))
