@@ -80,10 +80,13 @@ class OpenAIView(APIView):
     )
     def post(self, request: Request, application_id: str):
         ip_address = _get_ip_address(request)
-        return OpenAIChatSerializer(data={'application_id': application_id, 'chat_user_id': request.auth.chat_user_id,
-                                          'chat_user_type': request.auth.chat_user_type,
-                                          'ip_address': ip_address,
-                                          'source': {"type": ChatSourceChoices.API_CALL.value}}).chat(request.data)
+        if application_id != str(request.auth.application_id):
+            raise AppAuthenticationFailed(500, _('Secret key is invalid'))
+        return OpenAIChatSerializer(
+            data={'application_id': application_id, 'chat_user_id': request.auth.chat_user_id,
+                  'chat_user_type': request.auth.chat_user_type,
+                  'ip_address': ip_address,
+                  'source': {"type": ChatSourceChoices.API_CALL.value}}).chat(request.data)
 
 
 class AnonymousAuthentication(APIView):
