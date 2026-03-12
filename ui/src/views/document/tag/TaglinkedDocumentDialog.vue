@@ -8,7 +8,7 @@
     destroy-on-close
   >
     <template #header>
-      <h4>{{ $t('views.document.tag.key') }}: {{ $t('views.document.tag.value') }}</h4>
+      <h4>{{ currentTag.key }}: {{ currentTag.value }}</h4>
     </template>
     <div>
       <el-tabs v-model="activeTab" @tab-change="handleTabChange">
