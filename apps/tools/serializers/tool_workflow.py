@@ -182,10 +182,10 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 if with_valid:
                     self.is_valid()
                 tool_id = self.data.get('tool_id')
-                tool_workflow = QuerySet(ToolWorkflow).filter(knowledge_id=tool_id).first()
+                tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=tool_id).first()
                 tool = QuerySet(Tool).filter(id=tool_id).first()
                 from application.flow.tools import get_tool_id_list
-                tool_id_list = get_tool_id_list(tool.work_flow)
+                tool_id_list = get_tool_id_list(tool_workflow.work_flow)
                 tool_list = []
                 if len(tool_id_list) > 0:
                     tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)

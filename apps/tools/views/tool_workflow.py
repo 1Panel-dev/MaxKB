@@ -75,7 +75,7 @@ class ToolWorkflowView(APIView):
              get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
              )
         def get(self, request: Request, workspace_id: str, tool_id: str):
-            return KnowledgeWorkflowSerializer.Export(
+            return ToolWorkflowSerializer.Export(
                 data={'tool_id': tool_id, 'user_id': request.user.id, 'workspace_id': workspace_id}
             ).export()
 

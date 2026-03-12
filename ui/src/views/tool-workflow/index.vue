@@ -56,44 +56,14 @@
           </el-button>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="toImportDoc">
-                <AppIcon iconName="app-to-import-doc" class="color-secondary"></AppIcon>
-                {{ $t('workflow.operation.toImportDoc') }}
-              </el-dropdown-item>
-              <el-upload
-                class="import-button"
-                ref="elUploadRef"
-                accept=".kbwf"
-                :file-list="[]"
-                action="#"
-                multiple
-                :auto-upload="false"
-                :show-file-list="false"
-                :limit="1"
-                :on-change="(file: any, fileList: any) => importKnowledgeWorkflow(file)"
-                v-if="permissionPrecise.workflow_edit(id)"
-              >
-                <el-dropdown-item>
-                  <AppIcon iconName="app-import" class="color-secondary"></AppIcon>
-                  {{ $t('workflow.operation.importWorkflow') }}
-                </el-dropdown-item>
-              </el-upload>
               <el-dropdown-item
-                @click.stop="exportKnowledgeWorkflow(detail.name, detail.id)"
+                @click.stop="exportToolWorkflow(detail.name, detail.id)"
                 v-if="permissionPrecise.workflow_export(id)"
               >
                 <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                 {{ $t('workflow.operation.exportWorkflow') }}
               </el-dropdown-item>
 
-              <el-dropdown-item
-                @click="openListAction"
-                divided
-                v-if="permissionPrecise.doc_create(id)"
-              >
-                <AppIcon iconName="app-execution-record" class="color-secondary"></AppIcon>
-                {{ $t('common.ExecutionRecord.title') }}
-              </el-dropdown-item>
               <el-dropdown-item @click="openHistory">
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
                 {{ $t('workflow.setting.releaseHistory') }}
@@ -166,7 +136,7 @@
         </div>
       </div>
     </el-collapse-transition>
-    <ExecutionRecord ref="ListActionRef"></ExecutionRecord>
+
     <!-- 发布历史 -->
     <PublishHistory
       v-if="showHistory"
@@ -188,8 +158,8 @@ import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
-import ExecutionRecord from '@/views/knowledge-workflow/component/execution-record/ExecutionRecordDrawer.vue'
-import PublishHistory from '@/views/knowledge-workflow/component/PublishHistory.vue'
+
+import PublishHistory from '@/views/tool-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
@@ -438,9 +408,9 @@ const importKnowledgeWorkflow = (file: any) => {
     .catch(() => {})
 }
 
-function exportKnowledgeWorkflow(name: string, id: string) {
-  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
-    .exportKnowledgeWorkflow(id, name, loading)
+function exportToolWorkflow(name: string, id: string) {
+  loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
+    .exportToolWorkflow(id, name, loading)
     .catch((error: any) => {
       if (error.response.status !== 403) {
         error.response.data.text().then((res: string) => {

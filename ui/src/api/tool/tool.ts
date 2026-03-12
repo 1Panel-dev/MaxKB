@@ -230,6 +230,21 @@ const exportKnowledgeWorkflow = (
   )
 }
 /**
+ * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportToolWorkflow = (tool_id: string, tool_name: string, loading?: Ref<boolean>) => {
+  return exportFile(
+    tool_name + '.tool',
+    `${prefix.value}/${tool_id}/workflow/export`,
+    undefined,
+    loading,
+  )
+}
+/**
  * 导入工具工作流
  */
 const importToolWorkflow: (
@@ -298,4 +313,5 @@ export default {
   listToolWorkflowVersion,
   updateToolWorkflowVersion,
   publish,
+  exportToolWorkflow,
 }
