@@ -81,6 +81,7 @@ function refreshFieldList(data: any) {
     }
     inputFieldList.value?.push(data)
   }
+  set(props.nodeModel.properties, 'user_output_field_list', cloneDeep(inputFieldList.value))
   inputFieldFormDialogRef.value?.close()
   props.nodeModel.graphModel.getNodeModelById('tool-start-node').clear_next_node_field(true)
   currentIndex.value = null
