@@ -1,18 +1,30 @@
 <template>
-  <el-drawer v-model="drawer" title="调试" direction="rtl" :before-close="close">
-    <Parameters ref="paramtersRef" :workflow="toolDetail?.work_flow"></Parameters>
+  <el-drawer
+    v-model="drawer"
+    title="调试"
+    direction="rtl"
+    :before-close="close"
+    :destroy-on-close="true"
+  >
+    <Parameters
+      v-if="active == 'parameters'"
+      ref="paramtersRef"
+      :workflow="toolDetail?.work_flow"
+    ></Parameters>
+    <Result v-else ref="resultRef" :isShared="isShared" :apiType="apiType"></Result>
     <template #footer>
-      <el-button>取消</el-button>
+      <el-button @click="close">取消</el-button>
       <el-button type="primary" @click="run">运行</el-button>
     </template>
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import Parameters from '../debug/parameters/index.vue'
-const router = useRouter()
+import Result from '../debug/result/index.vue'
+
 const route = useRoute()
 const {
   params: { folderId },
@@ -34,6 +46,7 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+const active = ref<string>('parameters')
 const toolDetail = ref<any>()
 function getDetail(toolId: string) {
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
@@ -49,11 +62,17 @@ const open = (toolId: any) => {
 }
 const close = () => {
   drawer.value = false
+  active.value = 'parameters'
 }
 const paramtersRef = ref<InstanceType<typeof Parameters>>()
+const resultRef = ref<InstanceType<typeof Result>>()
 const run = () => {
   paramtersRef.value?.validate()?.then(() => {
-    console.log(paramtersRef.value?.getData())
+    const parameters = paramtersRef.value?.getData()
+    active.value = 'result'
+    nextTick(() => {
+      resultRef.value?.execute(toolDetail.value.id, parameters)
+    })
   })
 }
 defineExpose({ open, close })

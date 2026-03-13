@@ -20,6 +20,8 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers, status
 
+from application.flow.common import Workflow, WorkflowMode
+from application.flow.i_step_node import ToolWorkflowPostHandler
 from application.flow.tool_workflow_manage import ToolWorkflowManage
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
@@ -217,7 +219,19 @@ class ToolWorkflowSerializer(serializers.Serializer):
         def debug(self, instance: Dict, user, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            ToolWorkflowManage()
+            tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            work_flow_manage = ToolWorkflowManage(
+                Workflow.new_instance(tool_workflow.work_flow, WorkflowMode.TOOL),
+                {
+                    'tool_id': self.data.get("tool_id"),
+                    'stream': True,
+                    'workspace_id': self.data.get("workspace_id"),
+                    **instance},
+                ToolWorkflowPostHandler(None, self.data.get("tool_id")),
+                is_the_task_interrupted=lambda: False)
+
+            r = work_flow_manage.run()
+            return r
 
         def publish(self, with_valid=True):
             if with_valid:

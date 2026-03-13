@@ -997,7 +997,6 @@ const toolMenuNodes = [
   },
 ]
 export const getMenuNodes = (workflowMode: WorkflowMode) => {
-  console.log(workflowMode)
   if (workflowMode == WorkflowMode.Application) {
     return menuNodes
   }

@@ -113,9 +113,7 @@ const workflowModel = inject('workflowMode') as WorkflowMode
 const route = useRoute()
 const { user, folder } = useStore()
 
-const menuNodes = getMenuNodes(workflowModel || WorkflowMode.Application)?.filter(
-  (item, index) => index > 0,
-)
+const menuNodes = getMenuNodes(workflowModel || WorkflowMode.Application)
 const search_text = ref<string>('')
 const props = defineProps({
   show: {

@@ -215,6 +215,11 @@ class KnowledgeFlowParamsSerializer(serializers.Serializer):
     knowledge_base = serializers.DictField(required=False, label="知识库设置")
 
 
+class ToolFlowParamsSerializer(serializers.Serializer):
+    tool_id = serializers.UUIDField(required=True, label="工具id")
+    workspace_id = serializers.CharField(required=True, label="工作空间id")
+
+
 class INode:
     view_type = 'many_view'
 

@@ -67,9 +67,8 @@ function openChangeTitleDialog() {
 }
 
 function deleteField(index: any) {
-  inputFieldList.value.splice(index, 1)
-  props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
-  onDragHandle()
+  inputFieldList.value = inputFieldList.value.filter((item, i) => i !== index)
+  set(props.nodeModel.properties, 'user_output_field_list', inputFieldList.value)
 }
 const currentIndex = ref<number | null>(null)
 function refreshFieldList(data: any) {
@@ -117,13 +116,11 @@ function onDragHandle() {
 
 onMounted(() => {
   if (props.nodeModel.properties.user_output_config) {
-    outputFieldConfig.value = props.nodeModel.properties.user_output_config
+    outputFieldConfig.value = cloneDeep(props.nodeModel.properties.user_output_config)
   }
   if (props.nodeModel.properties.user_output_field_list) {
-    inputFieldList.value = props.nodeModel.properties.user_output_field_list
+    inputFieldList.value = cloneDeep(props.nodeModel.properties.user_output_field_list)
   }
-  set(props.nodeModel.properties, 'user_output_field_list', inputFieldList.value)
-  set(props.nodeModel.properties, 'user_output_config', outputFieldConfig)
   onDragHandle()
 })
 </script>

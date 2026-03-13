@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile } from '@/request/index'
+import { get, post, del, put, exportFile, postStream } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { AddInternalToolParam, toolData } from '@/api/type/tool'
@@ -288,6 +288,17 @@ const publish: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>>
 ) => {
   return put(`${prefix.value}/${tool_id}/publish`, {}, {}, loading)
 }
+
+/**
+ * 调试工作流
+ * @param 参数
+ * chat_id: string
+ * data
+ */
+const debugToolWorkflow: (tool_id: string, data: any) => Promise<any> = (tool_id, data) => {
+  const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${p}${prefix.value}/${tool_id}/debug`, data)
+}
 export default {
   getToolList,
   getAllToolList,
@@ -314,4 +325,5 @@ export default {
   updateToolWorkflowVersion,
   publish,
   exportToolWorkflow,
+  debugToolWorkflow,
 }

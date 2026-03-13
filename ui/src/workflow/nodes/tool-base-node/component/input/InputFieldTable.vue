@@ -129,10 +129,10 @@ function onDragHandle() {
 
 onMounted(() => {
   if (props.nodeModel.properties.user_input_config) {
-    inputFieldConfig.value = props.nodeModel.properties.user_input_config
+    inputFieldConfig.value = cloneDeep(props.nodeModel.properties.user_input_config)
   }
   if (props.nodeModel.properties.user_input_field_list) {
-    inputFieldList.value = props.nodeModel.properties.user_input_field_list
+    inputFieldList.value = cloneDeep(props.nodeModel.properties.user_input_field_list)
   }
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
   onDragHandle()

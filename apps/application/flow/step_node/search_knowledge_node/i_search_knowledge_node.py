@@ -68,7 +68,7 @@ def get_paragraph_list(chat_record, node_id):
 
 class ISearchKnowledgeStepNode(INode):
     type = 'search-knowledge-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return SearchDatasetStepNodeSerializer

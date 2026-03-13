@@ -11,7 +11,6 @@ from common.constants.permission_constants import PermissionConstants, RoleConst
 from common.log.log import log
 from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
-from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
 from tools.api.tool_workflow import ToolWorkflowApi, ToolWorkflowExportApi, ToolWorkflowImportApi
 from tools.serializers.tool_workflow import ToolWorkflowSerializer
@@ -200,7 +199,7 @@ class KnowledgeWorkflowVersionView(APIView):
         ).one())
 
 
-class KnowledgeWorkflowActionView(APIView):
+class ToolWorkflowDebugView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
@@ -213,18 +212,18 @@ class KnowledgeWorkflowActionView(APIView):
         tags=[_('Tool')]  # type: ignore
     )
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+        PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+            [PermissionConstants.TOOL.get_workspace_tool_permission()],
             CompareConstants.AND
         ),
     )
     def post(self, request: Request, workspace_id: str, tool_id: str):
-        return result.success(
-            ToolWorkflowSerializer.Operate(data={'workspace_id': workspace_id, 'tool_id': tool_id})
-            .debug(request.data,
-                   request.user,
-                   True))
+        return ToolWorkflowSerializer.Operate(
+            data={'workspace_id': workspace_id, 'tool_id': tool_id, 'user_id': request.user.id}).debug(
+            request.data,
+            request.user,
+            True)
