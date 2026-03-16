@@ -125,7 +125,7 @@ class BaseQuestionNode(IQuestionNode):
         return HumanMessage(self.workflow_manage.generate_prompt(prompt))
 
     def generate_message_list(self, system: str, prompt: str, history_message):
-        if system is None or len(system) == 0:
+        if system is not None and len(system) > 0:
             return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
                     HumanMessage(self.workflow_manage.generate_prompt(prompt))]
         else:
