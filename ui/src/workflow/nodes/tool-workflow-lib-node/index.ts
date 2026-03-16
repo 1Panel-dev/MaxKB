@@ -4,6 +4,9 @@ class ToolWorkflowLibNode extends AppNode {
   constructor(props: any) {
     super(props, ToolWorkflowLibNodeVue)
   }
+  getConfig(props: any) {
+    return props.model.properties.config
+  }
 }
 export default {
   type: 'tool-workflow-lib-node',
