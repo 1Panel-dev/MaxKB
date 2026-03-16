@@ -1066,6 +1066,7 @@ class ToolTreeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
         tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
+        tool_type_list = serializers.ListField(child=serializers.CharField(),required=False, label=_('tool type list'), allow_null=True, allow_empty=True)
         create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
@@ -1127,7 +1128,11 @@ class ToolTreeSerializer(serializers.Serializer):
 
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
-            if tool_type:
+
+            tool_type_list = self.data.get('tool_type_list')
+            if tool_type_list:
+                tool_query_set = tool_query_set.filter(tool_type__in=tool_type_list)
+            elif tool_type:
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {

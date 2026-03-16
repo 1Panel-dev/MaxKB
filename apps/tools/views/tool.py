@@ -74,6 +74,7 @@ class ToolView(APIView):
                 'name': request.query_params.get('name'),
                 'scope': request.query_params.get('scope', ToolScope.WORKSPACE),
                 'tool_type': request.query_params.get('tool_type'),
+                'tool_type_list': request.query_params.getlist('tool_type_list[]'),
                 'user_id': request.user.id,
                 'create_user': request.query_params.get('create_user'),
             }

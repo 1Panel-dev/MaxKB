@@ -15,6 +15,7 @@ export enum WorkflowType {
   Condition = 'condition-node',
   Reply = 'reply-node',
   ToolLib = 'tool-lib-node',
+  ToolWorkflowLib = 'tool-workflow-lib-node',
   ToolLibCustom = 'tool-node',
   RerankerNode = 'reranker-node',
   Application = 'application-node',
