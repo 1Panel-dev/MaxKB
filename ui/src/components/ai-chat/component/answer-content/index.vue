@@ -16,7 +16,11 @@
           <MdRenderer
             v-if="
               (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
-              answer_text.length == 0
+              answer_text.length == 0 &&
+              answer_text
+                .map((item) => item.content)
+                .join('')
+                .trim().length == 0
             "
             :source="$t('chat.tip.answerMessage')"
           ></MdRenderer>
