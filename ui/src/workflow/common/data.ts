@@ -1038,6 +1038,27 @@ export const toolLibNode = {
   },
 }
 
+/**
+ * 工作流工具配置数据
+ */
+export const toolWorkflowLibNode = {
+  type: WorkflowType.ToolWorkflowLib,
+  text: t('workflow.nodes.toolWorlflowNode.text','工作流工具'),
+  label: t('workflow.nodes.toolWorlflowNode.label','工作流工具'),
+  height: 170,
+  properties: {
+    stepName: t('workflow.nodes.toolWorlflowNode.label','工作流工具'),
+    config: {
+      fields: [
+        {
+          label: t('common.result'),
+          value: 'result',
+        },
+      ],
+    },
+  },
+}
+
 export const applicationNode = {
   type: WorkflowType.Application,
   text: t('workflow.nodes.applicationNode.label'),
@@ -1086,6 +1107,7 @@ export const nodeDict: any = {
   [WorkflowType.Start]: startNode,
   [WorkflowType.Reply]: replyNode,
   [WorkflowType.ToolLib]: toolNode,
+  [WorkflowType.ToolWorkflowLib]: toolWorkflowLibNode,
   [WorkflowType.ToolLibCustom]: toolNode,
   [WorkflowType.RerankerNode]: rerankerNode,
   [WorkflowType.FormNode]: formNode,

@@ -92,7 +92,7 @@
             <template v-if="nodeFields.length > 0">
               <div class="flex-between">
                 <h5 class="title-decoration-1 mb-8 mt-8">
-                  {{ $t('common.param.outputParam') }}
+                  {{ output_title }}
                 </h5>
                 <div v-if="exceptionNodeList.includes(nodeModel.type)" class="text-right">
                   <span class="mt-8 mr-8 lighter">{{ $t('common.param.exception') }}</span>
@@ -392,6 +392,11 @@ const nodeFields = computed(() => {
   }
   return []
 })
+
+const output_title = computed(() => {
+  return props.nodeModel.properties.config.output_title ?? t('common.param.outputParam')
+})
+
 watch(enable_exception, () => {
   props.nodeModel.graphModel.eventCenter.emit(
     'delete_edge',
