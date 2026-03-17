@@ -29,5 +29,5 @@ from .start_with import StartWithCompare
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
                        LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
                        IsNullCompare(),
-                       IsNotNullCompare(), NotContainCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
+                       IsNotNullCompare(), NotContainCompare(), NotEqualCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
                        EndWithCompare()]

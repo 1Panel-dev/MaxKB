@@ -509,6 +509,7 @@ export default {
     contain: '包含',
     not_contain: '不包含',
     eq: '等於',
+    not_eq: '不等於',
     ge: '大於等於',
     gt: '大於',
     le: '小於等於',

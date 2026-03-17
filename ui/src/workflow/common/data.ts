@@ -942,6 +942,7 @@ export const compareList = [
   { value: 'contain', label: t('workflow.compare.contain') },
   { value: 'not_contain', label: t('workflow.compare.not_contain') },
   { value: 'eq', label: t('workflow.compare.eq') },
+  { value: 'not_eq', label: t('workflow.compare.not_eq') },
   { value: 'ge', label: t('workflow.compare.ge') },
   { value: 'gt', label: t('workflow.compare.gt') },
   { value: 'le', label: t('workflow.compare.le') },
