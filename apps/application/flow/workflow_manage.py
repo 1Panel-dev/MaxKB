@@ -192,9 +192,7 @@ class WorkflowManage:
             if node_details.get('runtime_node_id') == start_node_id:
                 def get_node_params(n):
                     is_result = False
-                    if n.type == 'application-node':
-                        is_result = True
-                    if n.type == 'loop-node':
+                    if ['application-node', 'loop-node', 'tool-workflow-lib-node'].__contains__(n.type):
                         is_result = True
                     return {**n.properties.get('node_data'), 'form_data': start_node_data, 'node_data': start_node_data,
                             'child_node': self.child_node, 'is_result': is_result}
@@ -798,3 +796,9 @@ class WorkflowManage:
 
     def get_params_serializer_class(self):
         return FlowParamsSerializer
+
+    def get_source_type(self):
+        return "APPLICATION"
+
+    def get_source_id(self):
+        return self.params.get('application_id')

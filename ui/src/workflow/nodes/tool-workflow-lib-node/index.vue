@@ -150,8 +150,6 @@ const update_field = () => {
   loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getToolById(props.nodeModel.properties.node_data.tool_lib_id)
     .then((ok: any) => {
-      console.log('ssss', ok.data)
-
       const workflowNodes = ok.data?.work_flow?.nodes || []
       const baseNode = workflowNodes.find((n: any) => n.type === 'tool-base-node')
 
@@ -159,17 +157,14 @@ const update_field = () => {
         const new_input_list = baseNode.properties.user_input_field_list || []
         const new_output_list = baseNode.properties.user_output_field_list || []
 
-        let config_field_list: any[] = []
-        if (new_output_list.length > 0) {
-          config_field_list = new_output_list.map((item: any) => ({
-            label: item.label,
-            value: item.field,
-          }))
-        }
+        const old_config_fields = props.nodeModel.properties.config?.fields || []
+        const config_field_list = new_output_list.map((item: any) => {
+          const old = old_config_fields.find((o: any) => o.value === item.field)
+          return old ?? { label: item.label, value: item.field }
+        })
 
         const input_title = baseNode.properties.user_input_config?.title
         const output_title = baseNode.properties.user_output_config?.title
-
         const old_input_list = props.nodeModel.properties.node_data.input_field_list || []
         const merged_input_list = new_input_list.map((item: any) => {
           const find_field = old_input_list.find((old_item: any) => old_item.field === item.field)
@@ -197,6 +192,9 @@ const update_field = () => {
 }
 
 onMounted(() => {
+  if (props.nodeModel.properties.config?.fields?.length) {
+    set(props.nodeModel.properties.config, 'fields', props.nodeModel.properties.config.fields)
+  }
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)

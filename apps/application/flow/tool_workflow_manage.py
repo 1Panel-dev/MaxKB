@@ -8,6 +8,9 @@
 """
 from concurrent.futures import ThreadPoolExecutor
 
+from django.db import close_old_connections
+from django.utils.translation import get_language
+
 from application.flow.common import Workflow
 from application.flow.i_step_node import WorkFlowPostHandler, ToolFlowParamsSerializer
 from application.flow.workflow_manage import WorkflowManage
@@ -29,6 +32,12 @@ class ToolWorkflowManage(WorkflowManage):
     def get_params_serializer_class(self):
         return ToolFlowParamsSerializer
 
+    def stream(self):
+        close_old_connections()
+        language = get_language()
+        self.run_chain_async(self.start_node, None, language)
+        return self.await_result(is_cleanup=False)
+
     def get_start_node(self):
         return self.flow.get_node('tool-start-node')
 
@@ -38,3 +47,9 @@ class ToolWorkflowManage(WorkflowManage):
         @return:
         """
         return self.flow.get_node('tool-base-node')
+
+    def get_source_type(self):
+        return "TOOL"
+
+    def get_source_id(self):
+        return self.params.get('tool_id')

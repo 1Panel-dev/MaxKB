@@ -268,10 +268,16 @@ class BaseLoopNode(ILoopNode):
     def execute(self, loop_type, array, number, loop_body, **kwargs) -> NodeResult:
         from application.flow.loop_workflow_manage import LoopWorkflowManage, Workflow
         from application.flow.knowledge_loop_workflow_manage import KnowledgeLoopWorkflowManage
+        from application.flow.tool_loop_workflow_manage import ToolLoopWorkflowManage
         def workflow_manage_new_instance(loop_data, global_data, start_node_id=None,
                                          start_node_data=None, chat_record=None, child_node=None):
-            workflow_mode = WorkflowMode.KNOWLEDGE_LOOP if WorkflowMode.KNOWLEDGE == self.workflow_manage.flow.workflow_mode else WorkflowMode.APPLICATION_LOOP
-            c = KnowledgeLoopWorkflowManage if workflow_mode == WorkflowMode.KNOWLEDGE_LOOP else LoopWorkflowManage
+            workflow_mode = {WorkflowMode.APPLICATION: WorkflowMode.APPLICATION_LOOP,
+                             WorkflowMode.KNOWLEDGE: WorkflowMode.KNOWLEDGE_LOOP,
+                             WorkflowMode.TOOL: WorkflowMode.TOOL_LOOP}.get(
+                self.workflow_manage.flow.workflow_mode) or WorkflowMode.APPLICATION
+            c = {WorkflowMode.APPLICATION_LOOP: LoopWorkflowManage,
+                 WorkflowMode.KNOWLEDGE_LOOP: KnowledgeLoopWorkflowManage,
+                 WorkflowMode.TOOL_LOOP: ToolLoopWorkflowManage}.get(workflow_mode) or LoopWorkflowManage
             workflow_manage = c(Workflow.new_instance(loop_body, workflow_mode),
                                 self.workflow_manage.params,
                                 LoopWorkFlowPostHandler(

@@ -123,7 +123,19 @@ class ToolWorkflowPostHandler(WorkFlowPostHandler):
 
     def handler(self, workflow):
         state = get_workflow_state(workflow)
-        ToolRecord(tool_id=self.tool_id)
+        record = ToolRecord(id=self.chat_info.tool_record_id, tool_id=self.tool_id,
+                            workspace_id=self.chat_info.workspace_id,
+                            source_type=self.chat_info.source_type,
+                            source_id=self.chat_info.source_id,
+                            state=state,
+                            meta={
+                                'output': workflow.out_context,
+                                'details': workflow.get_runtime_details(),
+                                'answer_text_list': workflow.get_answer_text_list()
+                            })
+        self.chat_info.set_record(record)
+        self.chat_info = None
+        self.tool_id = None
 
 
 def get_loop_workflow_node(node_list):

@@ -42,6 +42,7 @@ class ToolType(models.TextChoices):
 class ToolTaskTypeChoices(models.TextChoices):
     APPLICATION = 'APPLICATION'
     KNOWLEDGE = 'KNOWLEDGE'
+    TOOL = 'TOOL'
     TRIGGER = 'TRIGGER'
 
 

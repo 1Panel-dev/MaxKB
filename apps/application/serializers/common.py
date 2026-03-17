@@ -22,6 +22,75 @@ from knowledge.models import Document
 from models_provider.models import Model
 from models_provider.tools import get_model_credential
 from system_manage.models.resource_mapping import ResourceMapping
+from tools.models import ToolRecord
+
+
+class ToolExecute:
+    def __init__(self, tool_id: str,
+                 tool_record_id: str,
+                 workspace_id: str,
+                 source_type,
+                 source_id,
+                 debug=False):
+        self.tool_id = tool_id
+        self.workspace_id = workspace_id
+        self.source_type = source_type
+        self.source_id = source_id
+        self.tool_record_id = tool_record_id
+        self.debug = debug
+
+    def get_record(self):
+        if self.tool_record_id:
+            if self.debug:
+                return self.to_record(cache.get(Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.tool_record_id),
+                                                version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version()))
+            else:
+                return QuerySet(ToolRecord).filter(tool_id=self.tool_id, id=self.tool_record_id).first()
+        return None
+
+    def to_record(self, tool_record_dict):
+        if tool_record_dict is None:
+            return None
+        return ToolRecord(id=tool_record_dict.get('id'),
+                          tool_id=tool_record_dict.get('tool_id'),
+                          workspace_id=tool_record_dict.get('workspace_id'),
+                          source_type=tool_record_dict.get('source_type'),
+                          source_id=tool_record_dict.get('source_id'),
+                          meta=tool_record_dict.get('meta'),
+                          state=tool_record_dict.get('state'),
+                          run_time=tool_record_dict.get('run_time'))
+
+    def to_dict(self, tool_record):
+        return {'id': tool_record.id,
+                'tool_id': tool_record.tool_id,
+                'workspace_id': tool_record.workspace_id,
+                'source_type': tool_record.source_type,
+                'source_id': tool_record.source_id,
+                'meta': tool_record.meta,
+                'state': tool_record.state,
+                'run_time': tool_record.run_time}
+
+    def set_record(self, tool_record):
+        cache.set(Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.tool_record_id), self.to_dict(tool_record),
+                  version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version(),
+                  timeout=60 * 30)
+        if not self.debug:
+            QuerySet(ToolRecord).update_or_create(id=tool_record.id,
+                                                  create_defaults={'id': tool_record.id,
+                                                                   'tool_id': tool_record.tool_id,
+                                                                   'workspace_id': tool_record.workspace_id,
+                                                                   "source_type": tool_record.source_type,
+                                                                   'source_id': tool_record.source_id,
+                                                                   'meta': tool_record.meta,
+                                                                   'run_time': tool_record.run_time},
+                                                  defaults={
+                                                      'workspace_id': tool_record.workspace_id,
+                                                      'tool_id': tool_record.tool_id,
+                                                      "source_type": tool_record.source_type,
+                                                      'source_id': tool_record.source_id,
+                                                      'meta': tool_record.meta,
+                                                      'run_time': tool_record.run_time
+                                                  })
 
 
 class ChatInfo:

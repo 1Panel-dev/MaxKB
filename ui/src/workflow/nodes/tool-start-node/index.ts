@@ -15,7 +15,7 @@ class ToolBaseNode extends AppNode {
     })
     const tbn = this.props.graphModel.getNodeModelById('tool-base-node')
     console.log(tbn)
-    const output = tbn.properties.user_output_field_list.map((i: any) => {
+    const output = tbn.properties?.user_output_field_list?.map((i: any) => {
       return { label: i.label || i.name, value: i.field }
     })
 
