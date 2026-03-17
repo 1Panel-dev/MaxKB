@@ -23,6 +23,8 @@ from rest_framework import serializers, status
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler
 from application.flow.tool_workflow_manage import ToolWorkflowManage
+from application.models import ChatRecord
+from application.serializers.common import ToolExecute
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.result import result
@@ -220,18 +222,42 @@ class ToolWorkflowSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            tool_record_id = instance.get('chat_record_id') or str(uuid.uuid7())
+            took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id,
+                                       self.data.get("workspace_id"),
+                                       None,
+                                       None,
+                                       True)
+            record = took_execute.get_record()
             work_flow_manage = ToolWorkflowManage(
                 Workflow.new_instance(tool_workflow.work_flow, WorkflowMode.TOOL),
                 {
+                    'chat_record_id': tool_record_id,
                     'tool_id': self.data.get("tool_id"),
                     'stream': True,
                     'workspace_id': self.data.get("workspace_id"),
                     **instance},
-                ToolWorkflowPostHandler(None, self.data.get("tool_id")),
-                is_the_task_interrupted=lambda: False)
+
+                ToolWorkflowPostHandler(took_execute, self.data.get("tool_id")),
+                is_the_task_interrupted=lambda: False,
+                child_node=instance.get('child_node'),
+                start_node_id=instance.get('runtime_node_id'),
+                start_node_data=instance.get('node_data'),
+                chat_record=self.to_chat_record(record)
+            )
 
             r = work_flow_manage.run()
             return r
+
+        @staticmethod
+        def to_chat_record(record):
+            if record is None:
+                return None
+            return ChatRecord(
+                answer_text_list=record.meta.get('answer_text_list'),
+                details=record.meta.get('details'),
+                answer_text='',
+            )
 
         def publish(self, with_valid=True):
             if with_valid:

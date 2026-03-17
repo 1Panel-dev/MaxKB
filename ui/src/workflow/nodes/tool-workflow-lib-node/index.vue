@@ -195,6 +195,9 @@ const update_field = () => {
 }
 
 onMounted(() => {
+  if (props.nodeModel.properties.config?.fields?.length) {
+    set(props.nodeModel.properties.config, 'fields', props.nodeModel.properties.config.fields)
+  }
   if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
     if (isLastNode(props.nodeModel)) {
       set(props.nodeModel.properties.node_data, 'is_result', true)

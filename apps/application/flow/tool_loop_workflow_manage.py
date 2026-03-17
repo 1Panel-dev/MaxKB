@@ -6,16 +6,16 @@
     @date：2024/1/9 17:40
     @desc:
 """
-from application.flow.i_step_node import KnowledgeFlowParamsSerializer
+from application.flow.i_step_node import ToolFlowParamsSerializer
 from application.flow.loop_workflow_manage import LoopWorkflowManage
 
 
-class KnowledgeLoopWorkflowManage(LoopWorkflowManage):
+class ToolLoopWorkflowManage(LoopWorkflowManage):
     def get_params_serializer_class(self):
-        return KnowledgeFlowParamsSerializer
+        return ToolFlowParamsSerializer
 
     def get_source_type(self):
-        return "KNOWLEDGE"
+        return "TOOL"
 
     def get_source_id(self):
-        return self.params.get('knowledge_id')
+        return self.params.get('tool_id')

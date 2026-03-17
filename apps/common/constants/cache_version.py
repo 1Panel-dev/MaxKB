@@ -39,6 +39,8 @@ class Cache_Version(Enum):
 
     CHAT_USER_TOKEN = "CHAT_USER_TOKEN", lambda token: token
 
+    TOOL_WORKFLOW_EXECUTE = "TOOL_WORKFLOW_EXECUTE", lambda key: key
+
     def get_version(self):
         return self.value[0]
 

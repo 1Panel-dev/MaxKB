@@ -122,3 +122,9 @@ class KnowledgeWorkflowManage(WorkflowManage):
             current_node.node_chunk.end()
             QuerySet(KnowledgeAction).filter(id=self.params.get('knowledge_action_id')).update(
                 details=self.get_runtime_details())
+
+    def get_source_type(self):
+        return "KNOWLEDGE"
+
+    def get_source_id(self):
+        return self.params.get('knowledge_id')

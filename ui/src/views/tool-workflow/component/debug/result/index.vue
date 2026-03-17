@@ -35,7 +35,12 @@ const details = {
   show_avatar: false,
   show_user_avatar: false,
 }
+const currentToolId = ref<string>()
+const currentData = ref<any>({})
 const execute = (toolId: string, data: any) => {
+  console.log('execute')
+  currentToolId.value = toolId
+  currentData.value = data
   ChatManagement.addChatRecord(currentChat, 50, loading)
   ChatManagement.write(currentChat.id)
   return loadSharedApi({ type: 'tool', isShared: props.isShared, systemType: props.apiType })
@@ -158,25 +163,34 @@ const getWrite = (chat: any, reader: any, stream: boolean) => {
 
   return stream ? write_stream : write_json
 }
-function chatMessage(toolId: string, chat?: any, other_params_data?: any) {
-  if (!chat) {
-    chat = reactive({})
-    chatList.value.push(chat)
-    ChatManagement.addChatRecord(chat, 50, loading)
-    ChatManagement.write(chat.id)
-  }
-  if (chat.run_time) {
-    ChatManagement.addChatRecord(chat, 50, loading)
-    ChatManagement.write(chat.id)
-  }
-  const obj = {
-    ...other_params_data,
-  }
-  // 对话
-  execute(toolId, obj)
-}
-const sendMessage = () => {
-  console.log('ss')
+
+const sendMessage = (val: string, other_params_data?: any, chat?: chatType) => {
+  loadSharedApi({ type: 'tool', isShared: props.isShared, systemType: props.apiType })
+    .debugToolWorkflow(currentToolId.value, { ...other_params_data, ...currentData.value })
+    .then((response: any) => {
+      if (response.status === 460) {
+        return Promise.reject(t('chat.tip.errorIdentifyMessage'))
+      } else if (response.status === 461) {
+        return Promise.reject(t('chat.tip.errorLimitMessage'))
+      } else {
+        const reader = response.body.getReader()
+        // 处理流数据
+        const write = getWrite(
+          currentChat,
+          reader,
+          response.headers.get('Content-Type') !== 'application/json',
+        )
+        return write()
+      }
+    })
+    .finally(() => {
+      console.log('close')
+      ChatManagement.close(currentChat.id)
+    })
+    .catch((e: any) => {
+      console.log(e)
+    })
+  return Promise.resolve(true)
 }
 defineExpose({
   execute,
