@@ -1050,10 +1050,6 @@ export const toolWorkflowLibNode = {
     stepName: t('workflow.nodes.toolWorlflowNode.label','工作流工具'),
     config: {
       fields: [
-        {
-          label: t('common.result'),
-          value: 'result',
-        },
       ],
     },
   },

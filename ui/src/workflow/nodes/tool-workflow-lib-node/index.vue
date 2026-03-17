@@ -160,7 +160,7 @@ const update_field = () => {
         const old_config_fields = props.nodeModel.properties.config?.fields || []
         const config_field_list = new_output_list.map((item: any) => {
           const old = old_config_fields.find((o: any) => o.value === item.field)
-          return old ?? { label: item.label, value: item.field }
+          return old ? JSON.parse(JSON.stringify(old)) : { label: item.label, value: item.field }
         })
 
         const input_title = baseNode.properties.user_input_config?.title
@@ -180,11 +180,14 @@ const update_field = () => {
         })
 
         set(props.nodeModel.properties.node_data, 'input_field_list', merged_input_list)
-        set(props.nodeModel.properties.config, 'fields', config_field_list)
+        set(props.nodeModel.properties, 'config', {
+          fields: config_field_list,
+          output_title: output_title,
+        })
         set(props.nodeModel.properties.node_data, 'input_title', input_title)
-        set(props.nodeModel.properties.config, 'output_title', output_title)
       }
       set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)
+      props.nodeModel.clear_next_node_field(true)
     })
     .catch(() => {
       set(props.nodeModel.properties, 'status', 500)
