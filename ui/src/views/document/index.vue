@@ -202,6 +202,74 @@
               :label="$t('views.document.fileStatus.label')"
               width="120"
             >
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.fileStatus.label') }}</span>
+                  <el-dropdown trigger="click" @command="dropdownHandle">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['status'] ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu style="width: 100px">
+                        <el-dropdown-item
+                          :class="filterMethod['status'] ? '' : 'is-active'"
+                          :command="beforeCommand('status', '')"
+                          class="justify-center"
+                          >{{ $t('common.status.all') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.SUCCESS)"
+                          >{{ $t('common.status.success') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.FAILURE)"
+                          >{{ $t('common.status.fail') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] == TaskType.EMBEDDING
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
+                          >{{ $t('views.document.fileStatus.EMBEDDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.PENDING)"
+                          >{{ $t('views.document.fileStatus.PENDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="
+                            beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)
+                          "
+                          >{{ $t('views.document.fileStatus.GENERATE') }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
               <template #default="{ row }">
                 <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
               </template>
