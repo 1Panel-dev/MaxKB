@@ -24,6 +24,7 @@ from .len_le_compare import *
 from .len_lt_compare import *
 from .lt_compare import *
 from .not_contain_compare import *
+from .not_equal_compare import *
 from .start_with import StartWithCompare
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
