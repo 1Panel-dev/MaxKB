@@ -14,6 +14,16 @@ from django.utils.translation import gettext_lazy as _
 minimax_llm_model_credential = MiniMaxLLMModelCredential()
 minimax_tts_model_credential = MiniMaxTTSModelCredential()
 
+minimax_m2_7 = ModelInfo('MiniMax-M2.7',
+                         _('Latest flagship model with enhanced reasoning and coding. 204K context window'),
+                         ModelTypeConst.LLM,
+                         minimax_llm_model_credential, MiniMaxChatModel)
+
+minimax_m2_7_highspeed = ModelInfo('MiniMax-M2.7-highspeed',
+                                   _('High-speed version of M2.7 for low-latency scenarios. 204K context window'),
+                                   ModelTypeConst.LLM,
+                                   minimax_llm_model_credential, MiniMaxChatModel)
+
 minimax_m2_5 = ModelInfo('MiniMax-M2.5',
                          _('Peak Performance. Ultimate Value. 204K context window'),
                          ModelTypeConst.LLM,
@@ -36,9 +46,11 @@ minimax_tts_turbo = ModelInfo('speech-2.8-turbo',
 
 model_info_manage = (
     ModelInfoManage.builder()
+    .append_model_info(minimax_m2_7)
+    .append_model_info(minimax_m2_7_highspeed)
     .append_model_info(minimax_m2_5)
     .append_model_info(minimax_m2_5_highspeed)
-    .append_default_model_info(minimax_m2_5)
+    .append_default_model_info(minimax_m2_7)
     .append_model_info(minimax_tts_hd)
     .append_model_info(minimax_tts_turbo)
     .append_default_model_info(minimax_tts_hd)
