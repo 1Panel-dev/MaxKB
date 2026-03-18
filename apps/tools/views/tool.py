@@ -565,10 +565,10 @@ class ToolView(APIView):
                            CompareConstants.AND),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, record_id: str):
-            return result.success(ToolSerializer.ToolRecord(data={
+            return result.success(ToolSerializer.ToolRecord.Operate(data={
                 'tool_id': tool_id,
                 'workspace_id': workspace_id,
-                'record_id': record_id,
+                'id': record_id,
             }).one())
 
     class UploadSkillFile(APIView):
@@ -599,4 +599,3 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'file': request.FILES.get('file'),
             }).upload())
-

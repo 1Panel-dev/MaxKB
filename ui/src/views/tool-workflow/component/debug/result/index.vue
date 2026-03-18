@@ -1,30 +1,73 @@
 <template>
   <el-tabs v-model="activeName" class="demo-tabs">
     <el-tab-pane label="输出" name="result">
-      <AnswerContent
-        :application="details"
-        :loading="loading"
-        v-model:chat-record="currentChat"
-        type="ai-chat"
-        :send-message="sendMessage"
-        :chat-management="ChatManagement"
-        :executionIsRightPanel="false"
-        @open-execution-detail="() => {}"
-        @openParagraph="() => {}"
-        @openParagraphDocument="() => {}"
-        :selection="true"
-      ></AnswerContent
-    ></el-tab-pane>
-    <el-tab-pane label="执行详情" name="executionDetails">执行详情</el-tab-pane>
+      <div class="mt-8">
+        <h4 class="title-decoration-1 mb-16 mt-16">回复内容</h4>
+
+        <el-card
+          style="height: 400px; overflow: auto"
+          :class="isSuccess ? '' : 'color-danger'"
+          class="pre-wrap"
+          shadow="never"
+        >
+          <AnswerContent
+            :application="details"
+            :loading="loading"
+            v-model:chat-record="currentChat"
+            type="ai-chat"
+            :send-message="sendMessage"
+            :chat-management="ChatManagement"
+            :executionIsRightPanel="false"
+            @open-execution-detail="() => {}"
+            @openParagraph="() => {}"
+            @openParagraphDocument="() => {}"
+            :selection="true"
+          ></AnswerContent>
+        </el-card>
+      </div>
+      <h4 class="title-decoration-1 mb-16 mt-16">输出参数</h4>
+      <div class="mb-16">
+        <el-alert
+          v-if="isSuccess"
+          :title="$t('views.tool.form.debug.runSuccess')"
+          type="success"
+          show-icon
+          :closable="false"
+        />
+        <el-alert
+          v-else
+          :title="$t('views.tool.form.debug.runFailed')"
+          type="error"
+          show-icon
+          :closable="false"
+        />
+      </div>
+      <el-card
+        style="overflow: auto"
+        :class="isSuccess ? '' : 'color-danger'"
+        class="pre-wrap"
+        shadow="never"
+      >
+        {{ output }}
+      </el-card>
+    </el-tab-pane>
+    <el-tab-pane label="执行详情" name="executionDetails">
+      <template v-for="(item, index) in arraySort(executionDetails ?? [], 'index')" :key="index">
+        <ExecutionDetailCard :data="item"> </ExecutionDetailCard>
+      </template>
+    </el-tab-pane>
   </el-tabs>
 </template>
 <script setup lang="ts">
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { randomId } from '@/utils/common'
 import { ChatManagement, type chatType } from '@/api/type/application'
 import { t } from '@/locales'
 import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import { arraySort } from '@/utils/array'
+
 const props = defineProps<{
   isShared: boolean
   apiType: 'systemShare' | 'workspace' | 'systemManage' | 'workspaceShare'
@@ -37,8 +80,30 @@ const details = {
 }
 const currentToolId = ref<string>()
 const currentData = ref<any>({})
+
+const output = computed(() => {
+  if (toolRecord.value) {
+    return toolRecord.value.meta.output
+  }
+  return {}
+})
+
+const executionDetails = computed(() => {
+  if (toolRecord.value) {
+    return Object.values(toolRecord.value.meta.details)
+  }
+  return []
+})
+
+const showResult = ref<boolean>(false)
+
+const isSuccess = computed(() => {
+  return true
+})
+
+const toolRecord = ref<any>()
+
 const execute = (toolId: string, data: any) => {
-  console.log('execute')
   currentToolId.value = toolId
   currentData.value = data
   ChatManagement.addChatRecord(currentChat, 50, loading)
@@ -62,13 +127,13 @@ const execute = (toolId: string, data: any) => {
       }
     })
     .finally(() => {
+      getToolRecord()
       ChatManagement.close(currentChat.id)
     })
     .catch((e: any) => {
       console.log(e)
     })
 }
-const chatList = ref<Array<any>>([])
 const loading = ref<boolean>(false)
 const currentChat = reactive<any>({
   id: randomId(),
@@ -184,13 +249,24 @@ const sendMessage = (val: string, other_params_data?: any, chat?: chatType) => {
       }
     })
     .finally(() => {
-      console.log('close')
       ChatManagement.close(currentChat.id)
+      getToolRecord()
     })
     .catch((e: any) => {
       console.log(e)
     })
   return Promise.resolve(true)
+}
+const getToolRecord = () => {
+  loadSharedApi({
+    type: 'tool',
+    isShared: props.isShared,
+    systemType: props.apiType,
+  })
+    .getToolRecordDetail(currentToolId.value, currentChat.record_id)
+    .then((ok: any) => {
+      toolRecord.value = ok.data
+    })
 }
 defineExpose({
   execute,

@@ -67,7 +67,7 @@ const inputFieldList = ref<any[]>([])
 const inputFieldConfig = ref({ title: t('chat.userInput') })
 
 function openAddDialog(data?: any, index?: any) {
-  if (index) {
+  if (index !== undefined) {
     currentIndex.value = index
   }
   inputFieldFormDialogRef.value?.open(data)
