@@ -6,34 +6,33 @@ SELECT application_chat_record_temp.id                     AS id,
        application_chat_record_temp.message_tokens         as message_tokens,
        application_chat_record_temp.answer_tokens          as answer_tokens,
        application_chat_record_temp.run_time               as run_time,
-       application_chat_record_temp.details::JSON as details, application_chat_record_temp."index" as "index",
+       application_chat_record_temp.details::JSON          as details, application_chat_record_temp."index" as "index",
        application_chat_record_temp.improve_paragraph_list as improve_paragraph_list,
        application_chat_record_temp.vote_status            as vote_status,
        application_chat_record_temp.create_time            as create_time,
        to_json(application_chat.asker)                     as asker
 FROM application_chat application_chat
-         LEFT JOIN (SELECT COUNT
-                           ("id")                                                                               AS chat_record_count,
-                           SUM(CASE WHEN "vote_status" = '0' THEN 1 ELSE 0 END)                                 AS star_num,
-                           SUM(CASE WHEN "vote_status" = '1' THEN 1 ELSE 0 END)                                 AS trample_num,
-                           SUM(CASE
-                                   WHEN array_length(application_chat_record.improve_paragraph_id_list, 1) IS NULL
-                                       THEN 0
-                                   ELSE array_length(application_chat_record.improve_paragraph_id_list, 1) END) AS mark_sum,
-                           chat_id
-                    FROM application_chat_record
-                    WHERE chat_id IN (SELECT id
-                                      FROM application_chat ${inner_queryset})
-                    GROUP BY application_chat_record.chat_id) chat_record_temp
+
+         LEFT JOIN (SELECT COUNT(acr."id")                                                  AS chat_record_count,
+                           SUM((acr."vote_status" = '0')::int)                              AS star_num,
+                           SUM((acr."vote_status" = '1')::int)                              AS trample_num,
+                           SUM(COALESCE(array_length(acr.improve_paragraph_id_list, 1), 0)) AS mark_sum,
+                           acr.chat_id
+                    FROM application_chat_record acr
+                    WHERE EXISTS (SELECT 1
+                                  FROM application_chat ac2
+                        ${inner_queryset}
+                            AND ac2.id = acr.chat_id)
+                    GROUP BY acr.chat_id) chat_record_temp
                    ON application_chat."id" = chat_record_temp.chat_id
-         LEFT JOIN (SELECT *,
-                           CASE
-                               WHEN array_length(application_chat_record.improve_paragraph_id_list, 1) IS NULL THEN
-                                   '{}'
-                               ELSE (SELECT ARRAY_AGG(row_to_json(paragraph))
-                                     FROM paragraph
-                                     WHERE "id" = ANY (application_chat_record.improve_paragraph_id_list))
-                               END as improve_paragraph_list
-                    FROM application_chat_record application_chat_record) application_chat_record_temp
+
+         LEFT JOIN (SELECT acr.*,
+                           COALESCE(p.paragraph_list, '{}') as improve_paragraph_list
+                    FROM application_chat_record acr
+                             LEFT JOIN LATERAL (
+                        SELECT ARRAY_AGG(row_to_json(paragraph)) as paragraph_list
+                        FROM paragraph
+                        WHERE paragraph."id" = ANY (acr.improve_paragraph_id_list)
+                            ) p ON TRUE) application_chat_record_temp
                    ON application_chat_record_temp.chat_id = application_chat."id"
     ${default_queryset}

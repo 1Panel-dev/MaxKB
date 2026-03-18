@@ -1,19 +1,21 @@
 SELECT
-	*,to_json(asker) as asker
-FROM
-	application_chat application_chat
-	LEFT JOIN (
-	SELECT COUNT
-		( "id" ) AS chat_record_count,
-		SUM ( CASE WHEN "vote_status" = '0' THEN 1 ELSE 0 END ) AS star_num,
-		SUM ( CASE WHEN "vote_status" = '1' THEN 1 ELSE 0 END ) AS trample_num,
-		SUM ( CASE WHEN array_length( application_chat_record.improve_paragraph_id_list, 1 ) IS NULL THEN 0 ELSE array_length( application_chat_record.improve_paragraph_id_list, 1 ) END ) AS mark_sum,
-		chat_id
-	FROM
-		application_chat_record
-	WHERE chat_id IN (
-	  SELECT id FROM application_chat ${inner_queryset})
-	GROUP BY
-	application_chat_record.chat_id
-	) chat_record_temp ON application_chat."id" = chat_record_temp.chat_id
+    application_chat.*,
+    to_json(application_chat.asker) AS asker,
+    chat_record_temp.chat_record_count,
+    chat_record_temp.star_num,
+    chat_record_temp.trample_num,
+    chat_record_temp.mark_sum
+FROM application_chat
+LEFT JOIN (
+    SELECT
+        application_chat_record.chat_id,
+        COUNT(application_chat_record.id) AS chat_record_count,
+        SUM((application_chat_record.vote_status = '0')::int) AS star_num,
+        SUM((application_chat_record.vote_status = '1')::int) AS trample_num,
+        SUM(COALESCE(array_length(application_chat_record.improve_paragraph_id_list, 1), 0)) AS mark_sum
+    FROM application_chat_record
+    JOIN application_chat application_chat ON application_chat.id = application_chat_record.chat_id
+    ${inner_queryset}
+    GROUP BY application_chat_record.chat_id
+) chat_record_temp ON application_chat.id = chat_record_temp.chat_id
 ${default_queryset}
