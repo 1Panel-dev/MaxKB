@@ -9286,3 +9286,6 @@ msgstr "批量刪除標籤下的文件"
 
 msgid "Document does not belong to current knowledge"
 msgstr "文件不屬於當前知識庫"
+
+msgid "Move an application"
+msgstr "移動應用程序"

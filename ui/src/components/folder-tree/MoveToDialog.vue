@@ -130,7 +130,7 @@ const submitHandle = async () => {
         dialogVisible.value = false
       })
     } else if (props.source === SourceTypeEnum.APPLICATION) {
-      ApplicationApi.putApplication(detail.value.id, obj, loading).then((res) => {
+      ApplicationApi.moveApplication(detail.value.id, obj.folder_id, loading).then((res) => {
         MsgSuccess(t('common.saveSuccess'))
         emit('refresh', detail.value)
         dialogVisible.value = false

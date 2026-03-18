@@ -699,9 +699,12 @@ class ApplicationSerializer(serializers.Serializer):
                            file_clean_time=application.get('file_clean_time') or 180,
                            file_upload_enable=application.get('file_upload_enable'),
                            file_upload_setting=application.get('file_upload_setting'),
-                           tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('tool_ids', [])],
-                           skill_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('skill_tool_ids', [])],
-                           mcp_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('mcp_tool_ids', [])],
+                           tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
+                                     application.get('tool_ids', [])],
+                           skill_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
+                                           application.get('skill_tool_ids', [])],
+                           mcp_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
+                                         application.get('mcp_tool_ids', [])],
                            )
 
     class StoreApplication(serializers.Serializer):
@@ -926,7 +929,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -986,6 +989,14 @@ class ApplicationOperateSerializer(serializers.Serializer):
             other_knowledge_id_list = [knowledge_id for knowledge_id in all_knowledge_id_list if
                                        not view_knowledge_id_list.__contains__(knowledge_id)]
             node_data['knowledge_id_list'] = other_knowledge_id_list + knowledge_id_list
+
+    def move(self, folder_id: str):
+        self.is_valid(raise_exception=True)
+        application_id = self.data.get("application_id")
+        application = QuerySet(Application).get(id=application_id)
+        application.folder_id = folder_id
+        application.save()
+        return True
 
     @transaction.atomic
     def edit(self, instance: Dict, with_valid=True):

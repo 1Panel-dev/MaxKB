@@ -9166,3 +9166,6 @@ msgstr "Batch Remove Documents from Tag"
 
 msgid "Document does not belong to current knowledge"
 msgstr "Document does not belong to current knowledge"
+
+msgid "Move an application"
+msgstr "Move an application"
