@@ -5054,7 +5054,7 @@ msgstr "語音合成"
 
 #: community/apps/setting/models_provider/base_model_provider.py:150
 msgid "Vision Model"
-msgstr "圖片理解"
+msgstr "視覺模型"
 
 #: community/apps/setting/models_provider/base_model_provider.py:151
 msgid "Image Generation"
