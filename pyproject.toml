@@ -33,6 +33,7 @@ dependencies = [
     "langgraph==1.1.1",
     "deepagents==0.4.10",
     "torch==2.8.0",
+    "numpy==1.26.4",
     "sentence-transformers==5.0.0",
     "qianfan==0.4.12.3",
     "zhipuai==2.1.5.20250708",
