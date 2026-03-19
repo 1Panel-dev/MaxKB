@@ -322,7 +322,9 @@ export default {
       text: '按聚合策略聚合每組的變量',
       Strategy: '聚合策略',
       placeholder: '返回每組的第一個非空值',
-      placeholder1: '返回每組變量的集合',
+      placeholder1: '返回每組變量的數組（Array）',
+      placeholder2: '返回每組變量的字典（Dict）',
+      placeholder_key: '輸入鍵名',
       group: {
         noneError: '名稱不能為空',
         dupError: '名稱不能重複',

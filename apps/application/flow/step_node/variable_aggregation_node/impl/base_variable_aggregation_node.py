@@ -31,7 +31,6 @@ class BaseVariableAggregationNode(IVariableAggregation):
         self.context['exception_message'] = details.get('err_message')
 
     def get_first_non_null(self, variable_list):
-
         for variable in variable_list:
             v = self.workflow_manage.get_reference_field(
                 variable.get('variable')[0],
@@ -40,11 +39,15 @@ class BaseVariableAggregationNode(IVariableAggregation):
                 return v
         return None
 
-    def set_variable_to_json(self, variable_list):
-
+    def set_variable_to_array(self, variable_list):
         return [self.workflow_manage.get_reference_field(
             variable.get('variable')[0],
             variable.get('variable')[1:]) for variable in variable_list]
+
+    def set_variable_to_dict(self, variable_list):
+        return {(variable.get('key') or variable.get('variable')[-1]): self.workflow_manage.get_reference_field(
+            variable.get('variable')[0],
+            variable.get('variable')[1:]) for variable in variable_list}
 
     def reset_variable(self, variable):
         value = self.workflow_manage.get_reference_field(
@@ -65,8 +68,13 @@ class BaseVariableAggregationNode(IVariableAggregation):
 
     def execute(self, strategy, group_list, **kwargs) -> NodeResult:
         strategy_map = {'first_non_null': self.get_first_non_null,
-                        'variable_to_json': self.set_variable_to_json,
+                        'variable_to_array': self.set_variable_to_array,
+                        'variable_to_dict': self.set_variable_to_dict,
                         }
+
+        # 向下兼容
+        if strategy == 'variable_to_json':
+            strategy = 'variable_to_array'
 
         result = {item.get('field'): strategy_map[strategy](item.get('variable_list')) for item in group_list}
 

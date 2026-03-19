@@ -10,8 +10,14 @@ class VariableAggregationNode extends AppNode {
   }
 }
 
+class VariableAggregationNodeModel extends AppNodeModel {
+  get_width() {
+    return 450
+  }
+}
+
 export default {
   type: 'variable-aggregation-node',
-  model: AppNodeModel,
+  model: VariableAggregationNodeModel,
   view: VariableAggregationNode,
 }

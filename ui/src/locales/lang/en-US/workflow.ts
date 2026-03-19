@@ -323,7 +323,9 @@ You are a master of problem optimization, adept at accurately inferring user int
       text: 'Aggregate variables of each group according to the aggregation strategy',
       Strategy: 'Aggregation Strategy',
       placeholder: 'Return the first non-null value of each group',
-      placeholder1: 'Return the set of variables for each group',
+      placeholder1: 'Return the array of variables for each group',
+      placeholder2: 'Return the dict of variables for each group',
+      placeholder_key: 'Input key',
       group: {
         noneError: 'Name cannot be empty',
         dupError: 'Name cannot be duplicated',

@@ -11,6 +11,7 @@ from application.flow.i_step_node import INode, NodeResult
 
 class VariableListSerializer(serializers.Serializer):
     v_id = serializers.CharField(required=True, label=_("Variable id"))
+    key = serializers.CharField(required=False, label=_("Key"))
     variable = serializers.ListField(required=True, label=_("Variable"))
 
 

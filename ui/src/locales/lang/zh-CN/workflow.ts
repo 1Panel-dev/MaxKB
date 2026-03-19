@@ -304,7 +304,9 @@ export default {
       text: '按聚合策略聚合每组的变量',
       Strategy: '聚合策略',
       placeholder: '返回每组的第一个非空值',
-      placeholder1: '返回每组变量的集合',
+      placeholder1: '返回每组变量的数组（Array）',
+      placeholder2: '返回每组变量的字典（Dict）',
+      placeholder_key: '输入键名',
       group: {
         noneError: '名称不能为空',
         dupError: '名称不能重复',
