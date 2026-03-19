@@ -62,7 +62,8 @@
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <div v-for="(msg, index) in AiResponse" :key="index">
-            <span>{{ msg.content }}</span>
+            <MdRenderer v-if="msg.content" :source="msg.content"></MdRenderer>
+            <template v-else> -</template>
           </div>
         </div>
       </div>
@@ -84,6 +85,7 @@ import { ref, computed } from 'vue'
 import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 import { arraySort } from '@/utils/array'
 import { isWorkFlow } from '@/utils/application'
+import MdRenderer from '@/components/markdown/MdRenderer.vue'
 
 const props = defineProps<{
   detail?: any[]
@@ -162,4 +164,10 @@ const AiResponse = computed(() => {
   return messages.slice(messages.length - 1, messages.length)
 })
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.execution-details {
+  :deep(.md-editor-previewOnly) {
+    background: none !important;
+  }
+}
+</style>
