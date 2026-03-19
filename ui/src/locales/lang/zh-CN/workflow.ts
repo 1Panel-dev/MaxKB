@@ -496,7 +496,7 @@ export default {
       expression: {
         label: '表达式',
         placeholder: '请输入表达式',
-        tooltip: '请使用JSON Path 表达式拆分变量，例如：$.store.book',
+        tooltip: '请使用 JSON Path 表达式拆分变量，例如：$.store.book 。详情见 https://pypi.org/project/jsonpath-ng/1.8.0/',
       },
     },
     parameterExtractionNode: {
