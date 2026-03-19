@@ -71,6 +71,7 @@ accelerate = "1.6.0"
 captcha = "0.7.1"
 [build-system]
 requires = ["poetry-core"]
+volcengine-python-sdk = {extras = ["ark"], version = "4.0.5"}
 build-backend = "poetry.core.masonry.api"
 
 [[tool.poetry.source]]

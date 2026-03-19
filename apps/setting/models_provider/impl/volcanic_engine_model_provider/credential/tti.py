@@ -15,23 +15,27 @@ class VolcanicEngineTTIModelGeneralParams(BaseForm):
         TooltipLabel(_('Image size'),
                      _('If the gap between width, height and 512 is too large, the picture rendering effect will be poor and the probability of excessive delay will increase significantly. Recommended ratio and corresponding width and height before super score: width*height')),
         required=True,
-        default_value='512*512',
+        default_value='512x512',
         option_list=[
-            {'value': '512*512', 'label': '512*512'},
-            {'value': '512*384', 'label': '512*384'},
-            {'value': '384*512', 'label': '384*512'},
-            {'value': '512*341', 'label': '512*341'},
-            {'value': '341*512', 'label': '341*512'},
-            {'value': '512*288', 'label': '512*288'},
-            {'value': '288*512', 'label': '288*512'},
+            {'label': '512x512', 'value': '512x512'},
+            {'label': '1024x1024', 'value': '1024x1024'},
+            {'label': '864x1152', 'value': '864x1152'},
+            {'label': '1152x864', 'value': '1152x864'},
+            {'label': '1280x720', 'value': '1280x720'},
+            {'label': '720x1280', 'value': '720x1280'},
+            {'label': '832x1248', 'value': '832x1248'},
+            {'label': '1248x832', 'value': '1248x832'},
+            {'label': '1512x648', 'value': '1512x648'},
+
         ],
         text_field='label',
         value_field='value')
 
 
 class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
-    access_key = forms.PasswordInputField('Access Key ID', required=True)
-    secret_key = forms.PasswordInputField('Secret Access Key', required=True)
+    volcanic_api_url = forms.TextInputField('API URL', required=True,
+                                            default_value='https://ark.cn-beijing.volces.com/api/v3')
+    api_key = forms.PasswordInputField('Api key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
@@ -40,7 +44,7 @@ class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
-        for key in ['access_key', 'secret_key']:
+        for key in ['api_key']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
@@ -62,7 +66,7 @@ class VolcanicEngineTTIModelCredential(BaseForm, BaseModelCredential):
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'secret_key': super().encryption(model.get('secret_key', ''))}
+        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     def get_model_params_setting_form(self, model_name):
         return VolcanicEngineTTIModelGeneralParams()
