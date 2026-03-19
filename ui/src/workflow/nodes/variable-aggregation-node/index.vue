@@ -91,7 +91,7 @@
                     <NodeCascader
                       ref="nodeCascaderRef"
                       :nodeModel="nodeModel"
-                      :style="{ width: form_data.strategy === 'variable_to_dict' ? '200px' : '310px'}"
+                      :style="{ width: form_data.strategy === 'variable_to_dict' ? '200px' : '308px'}"
                       :placeholder="$t('workflow.variable.placeholder')"
                       v-model="item.variable"
                     />
