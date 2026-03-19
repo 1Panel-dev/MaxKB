@@ -73,6 +73,7 @@ captcha = "0.7.1"
 requires = ["poetry-core"]
 volcengine-python-sdk = {extras = ["ark"], version = "4.0.5"}
 build-backend = "poetry.core.masonry.api"
+setuptools = "^75.0.0"
 
 [[tool.poetry.source]]
 name = "pytorch"
