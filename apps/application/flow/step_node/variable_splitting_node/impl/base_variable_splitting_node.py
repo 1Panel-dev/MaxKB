@@ -7,7 +7,7 @@
     @desc:
 """
 import json
-from jsonpath_ng import parse
+from jsonpath_ng.ext import parse
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.variable_splitting_node.i_variable_splitting_node import IVariableSplittingNode
