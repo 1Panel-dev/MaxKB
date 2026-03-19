@@ -31,9 +31,9 @@ class OllamaEmbedding(MaxKBBaseModel, OllamaEmbeddings):
         Returns:
             List of embeddings, one for each text.
         """
-        instruction_pairs = [f"{text}" for text in texts]
-        embeddings = self._embed(instruction_pairs)
-        return embeddings
+        return self._client.embed(
+            self.model, texts, options=self._default_params, keep_alive=self.keep_alive
+        )["embeddings"]
 
     def embed_query(self, text: str) -> List[float]:
         """Embed a query using a Ollama deployed embedding model.
