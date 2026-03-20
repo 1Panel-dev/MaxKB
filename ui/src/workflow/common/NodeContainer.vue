@@ -95,7 +95,7 @@
             <template v-if="nodeFields.length > 0">
               <div class="flex-between">
                 <h5 class="title-decoration-1 mb-8 mt-8">
-                  {{ $t('common.param.outputParam') }}
+                  {{ output_title }}
                 </h5>
                 <div v-if="exceptionNodeList.includes(nodeModel.type)" class="text-right">
                   <span class="mt-8 mr-8 lighter">{{ $t('common.param.exception') }}</span>
@@ -408,6 +408,10 @@ const nodeFields = computed(() => {
   return []
 })
 
+const output_title = computed(() => {
+  return props.nodeModel.properties.config.output_title ?? t('common.param.outputParam')
+})
+
 const abnormalNodeFields = computed(() => {
   return [
     {
@@ -443,6 +447,8 @@ function showConditionOperate(type: string) {
     ![
       WorkflowType.Start,
       WorkflowType.Base,
+      WorkflowType.ToolBaseNode,
+      WorkflowType.ToolStartNode,
       WorkflowType.KnowledgeBase,
       WorkflowType.LoopStartNode.toString(),
       WorkflowType.DataSourceLocalNode,
@@ -530,5 +536,13 @@ onMounted(() => {
       border: 1px solid #f54a45 !important;
     }
   }
+}
+:deep(.el-card) {
+  overflow: visible;
+}
+.app-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
 }
 </style>

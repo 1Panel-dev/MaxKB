@@ -154,7 +154,6 @@
           </el-button>
         </div>
       </el-form-item>
-
     </el-form>
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <FileUploadSettingDialog
@@ -168,7 +167,7 @@
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted, nextTick, inject } from 'vue'
+import { ref, computed, onMounted, nextTick, inject, provide } from 'vue'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
@@ -261,6 +260,18 @@ const validate = () => {
 }
 
 const resource = getResourceDetail()
+
+provide('getSelectModelList', (params: any) => {
+  const obj =
+    apiType.value === 'systemManage'
+      ? { ...params, workspace_id: resource.value?.workspace_id }
+      : { ...params }
+  return loadSharedApi({ type: 'model', systemType: apiType.value }).getSelectModelList(obj)
+})
+
+provide('getModelParamsForm', (model_id: string) => {
+  return loadSharedApi({ type: 'model', systemType: apiType.value }).getModelParamsForm(model_id)
+})
 
 function getSTTModel() {
   const obj =

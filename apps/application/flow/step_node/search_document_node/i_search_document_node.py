@@ -43,7 +43,7 @@ class SearchDocumentStepNodeSerializer(serializers.Serializer):
 
 class ISearchDocumentStepNode(INode):
     type = 'search-document-node'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return SearchDocumentStepNodeSerializer

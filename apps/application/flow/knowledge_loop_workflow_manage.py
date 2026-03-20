@@ -13,3 +13,9 @@ from application.flow.loop_workflow_manage import LoopWorkflowManage
 class KnowledgeLoopWorkflowManage(LoopWorkflowManage):
     def get_params_serializer_class(self):
         return KnowledgeFlowParamsSerializer
+
+    def get_source_type(self):
+        return "KNOWLEDGE"
+
+    def get_source_id(self):
+        return self.params.get('knowledge_id')

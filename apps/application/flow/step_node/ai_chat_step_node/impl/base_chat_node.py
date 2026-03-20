@@ -151,6 +151,8 @@ class BaseChatNode(IChatNode):
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None,
+                model_id_type=None,
+                model_id_reference=None,
                 dialogue_type=None,
                 model_setting=None,
                 mcp_servers=None,
@@ -165,8 +167,20 @@ class BaseChatNode(IChatNode):
         if dialogue_type is None:
             dialogue_type = 'WORKFLOW'
 
-        if model_params_setting is None:
+        if model_id_type == 'reference' and model_id_reference:
+
+            reference_data = self.workflow_manage.get_reference_field(
+                model_id_reference[0],
+                model_id_reference[1:],
+            )
+
+            if reference_data and isinstance(reference_data, dict):
+                model_id = reference_data.get('model_id', model_id)
+                model_params_setting = reference_data.get('model_params_setting')
+
+        if  model_params_setting is None and model_id:
             model_params_setting = get_default_model_params_setting(model_id)
+
         if model_setting is None:
             model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
                              'reasoning_content_start': '<think>'}

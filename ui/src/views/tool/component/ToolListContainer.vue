@@ -82,6 +82,16 @@
                 </div>
               </el-dropdown-item>
 
+              <el-dropdown-item @click="openCreateWorkflowDialog()">
+                <div class="flex align-center">
+                  <el-avatar class="avatar-purple" shape="square" :size="32">
+                    <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
+                  </el-avatar>
+                  <div class="pre-wrap ml-8">
+                    <div class="lighter">创建工作流</div>
+                  </div>
+                </div>
+              </el-dropdown-item>
               <el-dropdown-item @click="openCreateDataSourceDialog()">
                 <div class="flex align-center">
                   <el-avatar class="avatar-purple" shape="square" :size="32">
@@ -403,12 +413,13 @@
     :source="SourceTypeEnum.TOOL"
   ></ResourceTriggerDrawer>
   <ToolRecordDrawer ref="toolRecordDrawerRef" />
+  <WorkflowFormDialog ref="workflowFormDialogRef"></WorkflowFormDialog>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { cloneDeep } from 'lodash'
-import { useRoute, onBeforeRouteLeave } from 'vue-router'
+import { useRoute, onBeforeRouteLeave, useRouter } from 'vue-router'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
@@ -424,6 +435,7 @@ import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
 import ToolStoreDescDrawer from '@/views/tool/component/ToolStoreDescDrawer.vue'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+import WorkflowFormDialog from '../WorkflowFormDialog.vue'
 import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
 import ToolStoreApi from '@/api/tool/store.ts'
 import { resetUrl, i18n_name } from '@/utils/common'
@@ -436,7 +448,7 @@ import useStore from '@/stores'
 import { t } from '@/locales'
 
 import bus from '@/bus'
-
+const router = useRouter()
 const route = useRoute()
 
 const { folder, user, tool } = useStore()
@@ -454,7 +466,7 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
-
+const workflowFormDialogRef = ref<InstanceType<typeof WorkflowFormDialog>>()
 const isShared = computed(() => {
   return folder.currentFolder.id === 'share'
 })
@@ -559,6 +571,10 @@ function openAuthorizedWorkspaceDialog(row: any) {
 const toolStoreDescDrawerRef = ref<InstanceType<typeof ToolStoreDescDrawer>>()
 
 function openCreateDialog(data?: any) {
+  if (data && data.tool_type === 'WORKFLOW') {
+    router.push({ name: 'ToolWorkflow', params: { id: data.id, folderId: data.folder_id } })
+    return
+  }
   // mcp工具
   if (data?.tool_type === 'MCP') {
     bus.emit('select_node', data.folder_id)
@@ -671,7 +687,28 @@ function openCreateSkillDialog(data?: any) {
     SkillToolFormDrawerRef.value.open(data)
   }
 }
-
+const openCreateWorkflowDialog = (data?: any) => {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+  // 共享过来的工具不让编辑
+  if (isShared.value) {
+    return
+  }
+  DataSourceToolDrawertitle.value = data
+    ? t('views.tool.dataSource.editDataSource')
+    : t('views.tool.dataSource.createDataSource')
+  if (data) {
+    loadSharedApi({ type: 'tool', systemType: apiType.value })
+      .getToolById(data?.id, loading)
+      .then((res: any) => {
+        workflowFormDialogRef.value?.open(res.data)
+      })
+  } else {
+    workflowFormDialogRef.value?.open(data)
+  }
+}
 function openCreateDataSourceDialog(data?: any) {
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {

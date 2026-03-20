@@ -90,8 +90,22 @@
           <el-scrollbar height="450">
             <NodeContent
               :list="toolList"
-              @clickNodes="(val: any) => clickNodes(toolLibNode, val, 'tool')"
-              @onmousedown="(val: any) => onmousedown(toolLibNode, val, 'tool')"
+              @clickNodes="
+                (val: any) =>
+                  clickNodes(
+                    val.tool_type === 'WORKFLOW' ? toolWorkflowLibNode : toolLibNode,
+                    val,
+                    'tool',
+                  )
+              "
+              @onmousedown="
+                (val: any) =>
+                  onmousedown(
+                    val.tool_type === 'WORKFLOW' ? toolWorkflowLibNode : toolLibNode,
+                    val,
+                    'tool',
+                  )
+              "
             />
           </el-scrollbar>
         </LayoutContainer>
@@ -123,7 +137,12 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed, inject } from 'vue'
-import { getMenuNodes, toolLibNode, applicationNode } from '@/workflow/common/data'
+import {
+  getMenuNodes,
+  toolLibNode,
+  applicationNode,
+  toolWorkflowLibNode,
+} from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { isWorkFlow } from '@/utils/application'
@@ -261,13 +280,15 @@ async function getToolFolder() {
 }
 
 async function getToolList() {
+  const baseType = activeName.value == 'DATA_SOURCE_TOOL' ? 'DATA_SOURCE' : 'CUSTOM'
+
   const res = await loadSharedApi({
     type: 'tool',
     isShared: folder.currentFolder?.id === 'share',
     systemType: apiType.value,
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    tool_type: 'CUSTOM',
+    tool_type_list: [baseType, 'WORKFLOW'],
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)

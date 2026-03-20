@@ -40,13 +40,14 @@ class ReplyNodeParamsSerializer(serializers.Serializer):
 class IReplyNode(INode):
     type = 'reply-node'
     support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP,
-               WorkflowMode.KNOWLEDGE]
+               WorkflowMode.KNOWLEDGE, WorkflowMode.TOOL]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ReplyNodeParamsSerializer
 
     def _run(self):
-        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+            WorkflowMode.TOOL_LOOP].__contains__(
                 self.workflow_manage.flow.workflow_mode):
             return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
                                 **{'stream': True})
