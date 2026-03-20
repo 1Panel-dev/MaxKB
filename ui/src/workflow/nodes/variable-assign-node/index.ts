@@ -7,8 +7,14 @@ class VariableAssignNode extends AppNode {
   }
 }
 
+class VariableAssignModel extends AppNodeModel {
+  get_width() {
+    return 450
+  }
+}
+
 export default {
   type: 'variable-assign-node',
-  model: AppNodeModel,
+  model: VariableAssignModel,
   view: VariableAssignNode
 }
