@@ -45,7 +45,7 @@
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
               <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
               <el-option :label="$t('common.custom')" value="custom" />
-              <el-option :label="null" value="null" />
+              <el-option label="null" value="null" />
             </el-select>
           </div>
 
