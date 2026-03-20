@@ -62,7 +62,7 @@
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <div v-for="(msg, index) in AiResponse" :key="index">
-            <MdRenderer v-if="msg.content" :source="msg.content"></MdRenderer>
+            <MdRenderer v-if="msg.content" :source="msg.content" noImgZoomIn></MdRenderer>
             <template v-else> -</template>
           </div>
         </div>
