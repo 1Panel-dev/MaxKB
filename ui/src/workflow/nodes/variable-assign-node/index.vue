@@ -67,8 +67,8 @@
             </el-select>
 
             <el-form-item
+              class="w-full"
               v-if="item.type === 'string'"
-              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: t('common.inputPlaceholder'),
@@ -86,8 +86,8 @@
               ></el-input>
             </el-form-item>
             <el-form-item
+              class="w-full"
               v-else-if="item.type === 'num'"
-              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -95,10 +95,10 @@
                 required: true,
               }"
             >
-              <el-input-number v-model="item.value" class="w-full"></el-input-number>
+              <el-input-number v-model="item.value"></el-input-number>
             </el-form-item>
             <el-form-item
-              class="w-full mr-8"
+              class="w-full"
               v-else-if="item.type === 'json'"
               :prop="'variable_list.' + index + '.value'"
               :rules="[
@@ -123,14 +123,15 @@
               <CodemirrorEditor
                 title="JSON"
                 v-model="item.value"
-                style="height: 100px"
-                class="w-full"
+                :style="{
+                  height: '100px',
+                  width: '155px',
+                }"
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'bool'"
-              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -138,7 +139,7 @@
                 required: true,
               }"
             >
-              <el-select v-model="item.value" class="w-full" :teleported="false">
+              <el-select v-model="item.value" style="width: 155px" :teleported="false">
                 <el-option label="true" :value="true" />
                 <el-option label="false" :value="false" />
               </el-select>
@@ -147,7 +148,7 @@
             <el-select
               v-if="item.type === 'string'"
               v-model="item.target_type"
-              style="max-width: 120px"
+              style="max-width: 120px; margin-left: 8px"
               :placeholder="$t('workflow.nodes.variableAssignNode.convertType')"
             >
               <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
@@ -157,13 +158,12 @@
             <NodeCascader
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
-              class="mr-8"
               style="width: 230px"
               :placeholder="$t('workflow.variable.placeholder')"
               v-model="item.reference"
             />
 
-            <el-select v-model="item.target_type" style="max-width: 120px" :placeholder="$t('workflow.nodes.variableAssignNode.convertType')">
+            <el-select v-model="item.target_type" style="max-width: 120px; margin-left: 8px" :placeholder="$t('workflow.nodes.variableAssignNode.convertType')">
               <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
             </el-select>
           </el-form-item>
