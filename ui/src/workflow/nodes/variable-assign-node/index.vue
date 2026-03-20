@@ -68,7 +68,6 @@
 
             <el-form-item
               v-if="item.type === 'string'"
-              class="mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: t('common.inputPlaceholder'),
@@ -86,7 +85,6 @@
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'num'"
-              class="mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -97,7 +95,7 @@
               <el-input-number v-model="item.value"></el-input-number>
             </el-form-item>
             <el-form-item
-              class="mr-8"
+              class="w-full"
               v-else-if="item.type === 'json'"
               :prop="'variable_list.' + index + '.value'"
               :rules="[
@@ -131,7 +129,6 @@
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'bool'"
-              class="mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -144,24 +141,15 @@
                 <el-option label="false" :value="false" />
               </el-select>
             </el-form-item>
-
-            <el-select v-model="item.target_type" style="max-width: 100px" placeholder="转换类型">
-              <el-option v-for="item in targetTypeOptions" :key="item" :label="item" :value="item" />
-            </el-select>
           </div>
           <el-form-item v-else>
             <NodeCascader
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
-              class="mr-8"
-              style="width: 250px"
+              class="w-full"
               :placeholder="$t('workflow.variable.placeholder')"
               v-model="item.reference"
             />
-
-            <el-select v-model="item.target_type" style="max-width: 100px" placeholder="转换类型">
-              <el-option v-for="item in targetTypeOptions" :key="item" :label="item" :value="item" />
-            </el-select>
           </el-form-item>
         </el-card>
       </template>
@@ -186,7 +174,6 @@ const workflowMode = inject('workflowMode') as WorkflowMode
 const props = defineProps<{ nodeModel: any }>()
 
 const typeOptions = ['string', 'num', 'json', 'bool']
-const targetTypeOptions = ['string', 'int', 'float', 'json_object', 'json_string', 'boolean']
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
