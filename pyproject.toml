@@ -69,11 +69,12 @@ opencv-python-headless = "4.11.0.86"
 pymysql = "1.1.1"
 accelerate = "1.6.0"
 captcha = "0.7.1"
+setuptools = "^75.0.0"
+volcengine-python-sdk = {extras = ["ark"], version = "4.0.5"}
 [build-system]
 requires = ["poetry-core"]
-volcengine-python-sdk = {extras = ["ark"], version = "4.0.5"}
 build-backend = "poetry.core.masonry.api"
-setuptools = "^75.0.0"
+
 
 [[tool.poetry.source]]
 name = "pytorch"
