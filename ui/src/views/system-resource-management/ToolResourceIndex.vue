@@ -396,7 +396,7 @@
 
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-    <SkillToolFormDrawer ref="SkillToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <SkillToolFormDrawer ref="SkillToolFormDrawerRef" @refresh="refresh" :title="SkillToolDrawertitle" />
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <DataSourceToolFormDrawer
       ref="DataSourceToolFormDrawerRef"
