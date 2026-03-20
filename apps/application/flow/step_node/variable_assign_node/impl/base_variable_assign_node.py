@@ -36,16 +36,28 @@ class BaseVariableAssignNode(IVariableAssignNode):
             return val
 
         if target_type == 'json_object':
+            if isinstance(val, dict) or isinstance(val, list):
+                return val
             return json.loads(val)
         elif target_type == 'json_string':
+            if isinstance(val, str):
+                return val
             return json.dumps(val, ensure_ascii=False)
         elif target_type == 'string':
+            if isinstance(val, str):
+                return val
             return str(val)
         elif target_type == 'int':
+            if isinstance(val, int):
+                return val
             return int(val)
         elif target_type == 'float':
+            if isinstance(val, float):
+                return val
             return float(val)
         elif target_type == 'boolean':
+            if isinstance(val, bool):
+                return val
             return bool(val)
         else:
             return val

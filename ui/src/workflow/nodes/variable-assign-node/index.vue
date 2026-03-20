@@ -144,7 +144,12 @@
               </el-select>
             </el-form-item>
 
-            <el-select v-model="item.target_type" style="max-width: 120px" :placeholder="$t('workflow.nodes.variableAssignNode.convertType')">
+            <el-select
+              v-if="item.type === 'string'"
+              v-model="item.target_type"
+              style="max-width: 120px"
+              :placeholder="$t('workflow.nodes.variableAssignNode.convertType')"
+            >
               <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
             </el-select>
           </div>
