@@ -318,7 +318,7 @@
                 <!-- 技能 -->
                 <div class="mb-8 mt-12 flex-between">
                   <span class="mr-4 lighter">
-                    {{ $t('views.application.skill') }}
+                    {{ $t('views.tool.skill.title') }}
                   </span>
                   <div class="flex" v-if="toolPermissionPrecise.read()">
                     <el-checkbox
@@ -327,7 +327,7 @@
                     />
                   </div>
                 </div>
-                <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+                <el-card shadow="never" class="card-never mb-8" style="--el-card-padding: 12px">
                   <!-- MCP-->
                   <div v-if="toolPermissionPrecise.read()">
                     <div class="flex-between mb-8" @click="collapseData.MCP = !collapseData.MCP">
@@ -510,7 +510,7 @@
                         >
                           <CaretRight />
                         </el-icon>
-                        {{ $t('views.application.skill') }}
+                        Skills
                         <span class="ml-4" v-if="applicationForm.skill_tool_ids?.length">
                           ({{ applicationForm.skill_tool_ids?.length }})</span
                         >

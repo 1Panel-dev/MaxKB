@@ -168,7 +168,7 @@
 
         <div class="mb-8 mt-12 flex-between">
           <span class="mr-4 lighter">
-            {{ $t('views.application.skill') }}
+            {{ $t('views.tool.skill.title') }}
           </span>
           <div class="flex">
             <el-checkbox
@@ -313,7 +313,7 @@
                 <el-icon class="mr-8 arrow-icon" :class="collapseData.skill ? 'rotate-90' : ''">
                   <CaretRight />
                 </el-icon>
-                {{ $t('views.application.skill') }}
+                Skills
                 <span class="ml-4" v-if="chat_data.skill_tool_ids?.length">
                   ({{ chat_data.skill_tool_ids?.length }})</span
                 >

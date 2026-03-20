@@ -165,12 +165,25 @@
                   <KnowledgeIcon :type="item.type" />
                 </template>
                 <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
+                  <el-text class="color-secondary lighter flex align-center" size="small">
+                    <span
+                      :title="i18n_name(item.nick_name)"
+                      class="ellipsis"
+                      style="max-width: 90px"
+                    >
+                      {{ i18n_name(item.nick_name) }}
+                    </span>
+                    <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                    <span> {{ dateFormat(item.create_time) }}</span>
                   </el-text>
                 </template>
                 <template #tag>
-                  <el-tag v-if="isShared || isSystemShare" type="info" class="info-tag">
+                  <el-tag
+                    v-if="isShared || isSystemShare"
+                    size="small"
+                    type="info"
+                    class="info-tag"
+                  >
                     {{ $t('views.shared.title') }}
                   </el-tag>
                 </template>
@@ -346,6 +359,7 @@ import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreD
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { numberFormat, i18n_name } from '@/utils/common'
+import { dateFormat } from '@/utils/time'
 import { SourceTypeEnum } from '@/enums/common'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'

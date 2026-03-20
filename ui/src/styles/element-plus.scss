@@ -2,9 +2,10 @@
   --el-color-primary: #3370ff;
   --el-color-success: #34c724;
   --el-text-color-primary: #1f2329;
+  --el-text-color-primary-rgb: 31, 35, 41;
   --el-border-radius-base: 6px;
   --el-menu-item-height: 45px;
-  --el-border-color: rgba(31, 35, 41, 0.15);
+  --el-border-color: rgba(var(--el-text-color-primary-rgb), 0.15);
 }
 
 .el-avatar {
@@ -22,8 +23,8 @@
 .el-card {
   --el-card-padding: calc(var(--app-base-px) * 2);
   --el-card-border-radius: 6px;
-  box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12) !important;
-
+  box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12) !important;
+  overflow: visible;
   &.is-never-shadow {
     border: 1px solid var(--el-card-border-color);
     box-shadow: none !important;
@@ -32,7 +33,7 @@
     overflow: inherit;
   }
   &.is-hover-shadow:hover {
-    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08) !important;
+    box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08) !important;
   }
 }
 
@@ -46,7 +47,7 @@
   border-radius: var(--el-border-radius-base);
   padding: 7px 0;
   &:hover {
-    background: var(--app-text-color-light-1);
+    background: rgba(var(--el-text-color-primary-rgb), 0.1);
   }
 }
 .el-tree--highlight-current .el-tree-node.is-current > .el-tree-node__content {
@@ -64,13 +65,12 @@
   --el-button-font-weight: 400;
   --el-button-text-color: var(--el-text-color-primary);
   padding: 5px 12px;
-  // color: var(--el-text-color-primary);
   &.is-text {
     padding: 4px !important;
     font-size: 16px;
     max-height: 24px;
     &:not(.is-disabled):hover {
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
   &:focus {
@@ -114,7 +114,7 @@
   }
   &:not(.is-disabled):focus,
   &:not(.is-active):focus {
-    background-color: var(--app-text-color-light-1);
+    background-color: rgba(var(--el-text-color-primary-rgb), 0.1);
     color: var(--el-text-color-primary);
   }
   &.is-active,
@@ -201,6 +201,7 @@
   --el-table-header-bg-color: var(--app-layout-bg-color);
   --el-table-text-color: var(--app-text-color);
   --el-table-border-color: #dee0e3;
+  --el-table-row-hover-bg-color: #eff0f1;
   font-weight: 400;
   thead {
     color: var(--app-text-color-secondary);
@@ -305,21 +306,27 @@
 
 // el-tag
 .el-tag {
-  padding: 0 4px;
-  height: 20px;
+  --el-tag-font-size: 14px;
+  padding: 0 6px;
   font-weight: 400;
+}
+.el-tag--small {
+  --el-tag-font-size: 12px;
 }
 .el-tag--plain.el-tag--info {
   color: var(--app-text-color-secondary);
   font-weight: 500;
-  border-color: var(--app-text-color-light-1);
+  border-color: rgba(var(--el-text-color-primary-rgb), 0.1);
+}
+.el-tag.never {
+  background: none;
 }
 
 .el-check-tag {
   font-weight: 400;
   padding: 7px 8px;
   color: var(--el-text-color-primary);
-  background-color: var(--app-text-color-light-1);
+  background-color: rgba(var(--el-text-color-primary-rgb), 0.1);
 }
 .el-check-tag.el-check-tag--primary.is-checked {
   background: var(--el-color-primary-light-8);
@@ -332,7 +339,7 @@
   font-weight: 400;
   .el-tag {
     color: var(--el-text-color-primary);
-    background-color: var(--app-text-color-light-1);
+    background-color: rgba(var(--el-text-color-primary-rgb), 0.1);
     height: 24px;
     font-size: 14px;
     font-weight: 400;

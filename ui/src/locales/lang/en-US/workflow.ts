@@ -40,6 +40,7 @@ export default {
     copyError: 'Node already copied',
     paramErrorMessage: 'Parameter already exists: ',
     saveMessage: 'Current changes have not been saved. Save before exiting?',
+    searchPlaceholder: 'Please enter node name',
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
@@ -523,6 +524,7 @@ You are a master of problem optimization, adept at accurately inferring user int
     contain: 'Contains',
     not_contain: 'Does not contain',
     eq: 'Equal to',
+    not_eq: 'Not equal to',
     ge: 'Greater than or equal to',
     gt: 'Greater than',
     le: 'Less than or equal to',

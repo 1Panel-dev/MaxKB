@@ -166,12 +166,53 @@ const loopLayout = () => {
   LoopBodyContainerRef.value?.zoom()
   lf.value?.extension?.dagre.layout()
 }
+const selectOn = (node: any, kw: string) => {
+  lf.value?.graphModel.getNodeModelById(node.id).selectOn(kw)
+}
+const focusOn = (node: any, kw: string) => {
+  lf.value?.graphModel.transformModel.focusOn(
+    node.x,
+    node.y,
+    lf.value?.container.clientWidth,
+    lf.value?.container.clientHeight,
+  )
+  lf.value?.graphModel.getNodeModelById(node.id).focusOn(kw)
+}
+
+const getSelectNodes = (kw: string) => {
+  const graph_data = lf.value?.getGraphData()
+  return graph_data.nodes.filter((node: any) => node.properties.stepName.includes(kw))
+}
+const onSearchSelect = (node: any, kw: string) => {
+  lf.value?.graphModel.getNodeModelById(node.id).selectOn(kw)
+}
+const onClearSearchSelect = (node: any, kw: string) => {
+  lf.value?.graphModel.getNodeModelById(node.id).clearSelectOn(kw)
+}
+const clearSelectElements = () => {
+  lf.value.graphModel.clearSelectElements()
+}
 onMounted(() => {
   renderGraphData(cloneDeep(props.nodeModel.properties.workflow))
   set(props.nodeModel, 'validate', validate)
   set(props.nodeModel, 'set_loop_body', set_loop_body)
   set(props.nodeModel, 'loopLayout', loopLayout)
+  set(props.nodeModel, 'getSelectNodes', getSelectNodes)
+  set(props.nodeModel, 'focusOn', (event: any) => {
+    focusOn(event.node, event.kw)
+  })
+  set(props.nodeModel, 'selectOn', (event: any) => {
+    selectOn(event.node, event.kw)
+  })
+  set(props.nodeModel, 'clearSelectOn', (event: any) => {
+    onSearchSelect(event.node, event.kw)
+  })
+  set(props.nodeModel, 'clearSelectElements', clearSelectElements)
+  set(props.nodeModel, 'onClearSearchSelect', (event: any) => {
+    onClearSearchSelect(event.node, event.kw)
+  })
 })
+
 onUnmounted(() => {
   disconnectByFlow(lf.value.graphModel.flowId)
   lf.value = null

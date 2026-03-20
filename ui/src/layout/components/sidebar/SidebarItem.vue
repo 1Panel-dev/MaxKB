@@ -84,7 +84,7 @@ const menuIcon = computed(() => {
     font-weight: 500;
     border-radius: 4px;
     &:hover {
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
       color: var(--el-menu-text-color);
     }
   }

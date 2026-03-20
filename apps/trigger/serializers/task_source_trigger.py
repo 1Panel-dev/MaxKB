@@ -6,26 +6,16 @@
     @date：2026/1/22 16:18
     @desc:
 """
-import os.path
-import re
 from typing import Dict
 
-import uuid_utils.compat as uuid
-from django.core import validators
-from django.db import models, transaction
+from django.db import transaction
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Application
-from common.db.search import page_search, get_dynamics_model, native_page_search, native_search
 from common.exception.app_exception import AppApiException
-from common.field.common import ObjectField
-from common.utils.common import get_file_content
-from knowledge.serializers.common import BatchSerializer
-from maxkb.conf import PROJECT_DIR
 from tools.models import Tool
-from tools.serializers.tool import ToolModelSerializer
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask
 from trigger.serializers.trigger import TriggerModelSerializer, TriggerSerializer, ApplicationTriggerTaskSerializer, \
     ToolTriggerTaskSerializer, TriggerTaskModelSerializer

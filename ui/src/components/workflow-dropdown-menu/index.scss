@@ -10,7 +10,7 @@
   right: 16px;
   z-index: 99;
   width: 600px;
-  box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
+  box-shadow: 0px 4px 8px 0px rgba(var(--el-text-color-primary-rgb), 0.1);
   padding-bottom: 8px;
 
   .title {
@@ -18,7 +18,7 @@
   }
   .workflow-dropdown-item {
     &:hover {
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
 

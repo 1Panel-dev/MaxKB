@@ -315,7 +315,7 @@
             >
               <img
                 v-show="isDisabledChat || loading || uploadLoading"
-                src="@/assets/icon_send.svg"
+                src="@/assets/chat/icon_send.svg"
                 alt=""
               />
               <SendIcon v-show="!isDisabledChat && !loading && !uploadLoading" />
@@ -1333,7 +1333,7 @@ async function saveUrl() {
   z-index: 10;
 
   :deep(.operate-textarea) {
-    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
     background-color: #ffffff;
     border-radius: 8px;
     border: 1px solid #ffffff;

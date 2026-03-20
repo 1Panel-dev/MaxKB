@@ -460,7 +460,7 @@ const handleDrop = (draggingNode: any, dropNode: any, dropType: string, ev: Drag
     folderApi
       .putFolder(dragData.id, props.source, obj, loading)
       .then(() => {
-        sortAfterDrop(dragData, dropData, dropType, newParentId)
+        emit('refreshTree')
 
         MsgSuccess(t('common.saveSuccess'))
       })
@@ -727,7 +727,7 @@ onUnmounted(() => {
     }
     &:hover {
       border-radius: var(--app-border-radius-small);
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
     &.is-active {
       &:hover {

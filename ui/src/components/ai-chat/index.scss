@@ -29,7 +29,7 @@
     }
   }
   .video-stop-button {
-    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
 
     &:hover {
       background: #ffffff;
@@ -40,7 +40,7 @@
     line-height: inherit;
   }
   .is-selected {
-    background: rgba(31, 35, 41, 0.08);
+    background: rgba(var(--el-text-color-primary-rgb), 0.08);
   }
   .mul-operation {
     position: fixed;
@@ -50,7 +50,7 @@
     box-sizing: border-box;
     background: #ffffff;
     z-index: 22;
-    box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
   }
 }
 

@@ -7,7 +7,7 @@
             <div class="flex align-center">
               <img :src="item.logoSrc" alt="" width="24px" />
               <h5 class="ml-8">{{ item.name }}</h5>
-              <el-tag v-if="item.isValid" type="success" class="ml-8"
+              <el-tag v-if="item.isValid" size="small" type="success" class="ml-8"
                 >{{ $t('views.system.authentication.scanTheQRCode.effective') }}
               </el-tag>
             </div>

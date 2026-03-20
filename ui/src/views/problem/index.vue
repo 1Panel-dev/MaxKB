@@ -304,8 +304,10 @@ function editName(val: string, problemId: string) {
   }
 }
 
-function cellMouseEnter(row: any) {
-  currentMouseId.value = row.id
+function cellMouseEnter(row: any, column: any) {
+  if (column && column.property === 'content') {
+    currentMouseId.value = row.id
+  }
 }
 
 function cellMouseLeave() {

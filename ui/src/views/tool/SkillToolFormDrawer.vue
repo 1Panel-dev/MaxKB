@@ -93,33 +93,9 @@
           </el-table-column>
           <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')">
             <template #default="{ row }">
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'"
-                >{{ $t('dynamicsForm.input_type_list.TextInput') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'PasswordInput'"
-                >{{ $t('dynamicsForm.input_type_list.PasswordInput') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'"
-                >{{ $t('dynamicsForm.input_type_list.Slider') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'"
-                >{{ $t('dynamicsForm.input_type_list.SwitchInput') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'"
-                >{{ $t('dynamicsForm.input_type_list.SingleSelect') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'"
-                >{{ $t('dynamicsForm.input_type_list.MultiSelect') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'"
-                >{{ $t('dynamicsForm.input_type_list.RadioCard') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'"
-                >{{ $t('dynamicsForm.input_type_list.DatePicker') }}
-              </el-tag>
-              <el-tag type="info" class="info-tag" v-if="row.input_type === 'JsonInput'"
-                >{{ $t('dynamicsForm.input_type_list.JsonInput') }}
-              </el-tag>
+              <el-tag size="small" type="info" class="info-tag">{{
+                input_type_list.find((item) => item.value === row.input_type)?.label
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column :label="$t('common.required')">
@@ -233,6 +209,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue'
 import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
+import UserFieldFormDialog from '@/views/tool/component/UserFieldFormDialog.vue'
+import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import type { toolData } from '@/api/type/tool'
 import type { FormInstance, UploadFiles } from 'element-plus'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
@@ -243,7 +221,6 @@ import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import UserFieldFormDialog from '@/views/tool/component/UserFieldFormDialog.vue'
 
 const route = useRoute()
 

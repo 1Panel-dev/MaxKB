@@ -88,7 +88,7 @@
                           <el-dropdown-menu>
                             <el-dropdown-item
                               @click.stop="shareHandle()"
-                              :disabled="currentChatId !== row.id && chat_loading"
+                              :disabled="currentChatId !== row.id || chat_loading"
                             >
                               <AppIcon iconName="app-share" class="color-secondary"></AppIcon>
                               {{ $t('chat.share') }}
@@ -344,7 +344,7 @@ function refreshFieldTitle(chatId: string, abstract: string) {
     padding-left: 8px;
     padding-right: 8px;
     &:hover {
-      background-color: var(--app-text-color-light-1);
+      background-color: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
     &.is-active {
       background-color: #ffffff;

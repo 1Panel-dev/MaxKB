@@ -132,7 +132,6 @@
                   style="width: 120px"
                   @change="search_type_change"
                 >
-                  <el-option :label="$t('dynamicsForm.tag.label')" value="tag" />
                   <el-option :label="$t('common.name')" value="name" />
                 </el-select>
                 <el-input
@@ -140,14 +139,6 @@
                   v-model="search_form.name"
                   @change="refresh"
                   :placeholder="$t('common.searchBar.placeholder')"
-                  style="width: 220px"
-                  clearable
-                />
-                <el-input
-                  v-if="search_type === 'tag'"
-                  v-model="search_form.tag"
-                  @change="refresh"
-                  :placeholder="$t('views.document.tag.requiredMessage3')"
                   style="width: 220px"
                   clearable
                 />
@@ -187,6 +178,7 @@
             v-loading="loading"
             :row-key="(row: any) => row.id"
             :storeKey="storeKey"
+            @cell-click="cellClickHandle"
           >
             <el-table-column
               type="selection"
@@ -208,8 +200,76 @@
             <el-table-column
               prop="status"
               :label="$t('views.document.fileStatus.label')"
-              width="130"
+              width="120"
             >
+              <template #header>
+                <div>
+                  <span>{{ $t('views.document.fileStatus.label') }}</span>
+                  <el-dropdown trigger="click" @command="dropdownHandle">
+                    <el-button
+                      style="margin-top: 1px"
+                      link
+                      :type="filterMethod['status'] ? 'primary' : ''"
+                    >
+                      <el-icon>
+                        <Filter />
+                      </el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu style="width: 100px">
+                        <el-dropdown-item
+                          :class="filterMethod['status'] ? '' : 'is-active'"
+                          :command="beforeCommand('status', '')"
+                          class="justify-center"
+                          >{{ $t('common.status.all') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.SUCCESS ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.SUCCESS)"
+                          >{{ $t('common.status.success') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.FAILURE ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.FAILURE)"
+                          >{{ $t('common.status.fail') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] == TaskType.EMBEDDING
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="beforeCommand('status', State.STARTED, TaskType.EMBEDDING)"
+                          >{{ $t('views.document.fileStatus.EMBEDDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
+                          class="justify-center"
+                          :command="beforeCommand('status', State.PENDING)"
+                          >{{ $t('views.document.fileStatus.PENDING') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] === TaskType.GENERATE_PROBLEM
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="
+                            beforeCommand('status', State.STARTED, TaskType.GENERATE_PROBLEM)
+                          "
+                          >{{ $t('views.document.fileStatus.GENERATE') }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                </div>
+              </template>
               <template #default="{ row }">
                 <StatusValue :status="row.status" :status-meta="row.status_meta"></StatusValue>
               </template>
@@ -218,7 +278,7 @@
               prop="char_length"
               :label="$t('views.document.table.char_length')"
               align="right"
-              min-width="90"
+              min-width="120"
               sortable
             >
               <template #default="{ row }">
@@ -229,11 +289,11 @@
               prop="paragraph_count"
               :label="$t('views.document.table.paragraph')"
               align="right"
-              min-width="90"
+              min-width="120"
               sortable
             />
 
-            <el-table-column width="130">
+            <el-table-column width="110">
               <template #header>
                 <div>
                   <span>{{ $t('views.document.enableStatus.label') }}</span>
@@ -289,10 +349,11 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column width="160">
+            <el-table-column width="150" prop="tag">
               <template #header>
                 <div>
-                  <span>{{ $t('views.document.tag.label') }}</span>
+                  <span>{{ $t('dynamicsForm.tag.label') }}</span>
+
                   <el-dropdown trigger="click" @visible-change="handleTagVisibleChange">
                     <el-button
                       style="margin-top: 1px"
@@ -324,42 +385,42 @@
               <template #default="{ row }">
                 <el-popover
                   trigger="hover"
-                  placement="bottom"
+                  placement="bottom-start"
                   :disabled="!row.tag_count"
-                  :width="160"
+                  :popper-style="{ width: 'auto', maxWidth: '300px' }"
                 >
-                  <div v-for="tag in row.tags" :key="tag.id" flex class="pt-4">
-                    <span class="mr-8 color-input-placeholder">{{ tag.key }}</span
-                    >{{ tag.value }}
+                  <div
+                    v-for="tag in row.tags"
+                    :key="tag.id"
+                    class="flex align-center lighter color-text-primary mt-4 mb-4"
+                  >
+                    <span class="color-secondary ellipsis-1" style="width: 40%" :title="tag.key">{{
+                      tag.key
+                    }}</span>
+                    <span class="ml-4 ellipsis-1" :title="tag.value"> {{ tag.value }}</span>
                   </div>
 
                   <template #reference>
-                    <el-space :size="4">
-                      <el-button
-                        size="small"
-                        style="padding: 1px 6px"
-                        @click.stop="openTagSettingDrawer(row)"
-                        :disabled="!permissionPrecise.doc_tag(id)"
-                      >
+                    <el-tag v-if="row.tag_count" type="info" effect="plain" class="never mr-4">
+                      <div class="flex align-center color-text-primary">
                         <AppIcon iconName="app-tag"></AppIcon>
-                        <span>{{ row.tag_count || 0 }}</span>
-                      </el-button>
-                      <el-button
-                        size="small"
-                        plain
-                        style="padding: 1px 6px; border-style: dashed"
-                        :disabled="!permissionPrecise.doc_tag(id)"
-                        @click.stop="openAddTagDialog(row.id)"
-                      >
-                        <el-icon class="color-secondary"><Plus /></el-icon>
-                        <span class="color-secondary">{{ $t('views.document.tag.key') }}</span>
-                      </el-button>
-                    </el-space>
+                        <span class="ml-4">{{ row.tag_count }}</span>
+                      </div>
+                    </el-tag>
                   </template>
                 </el-popover>
+                <el-button
+                  class="button-new-tag"
+                  size="small"
+                  :disabled="!permissionPrecise.doc_tag(id)"
+                  @click.stop="openAddTagDialog(row.id)"
+                >
+                  <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                  {{ $t('views.document.tag.key') }}
+                </el-button>
               </template>
             </el-table-column>
-            <el-table-column width="170">
+            <el-table-column width="165">
               <template #header>
                 <div>
                   <span>{{ $t('views.document.form.hit_handling_method.label') }}</span>
@@ -1084,10 +1145,10 @@ function refreshDocument(row: any) {
 }
 
 function rowClickHandle(row: any, column: any) {
-  if (column && column.type === 'selection') {
+  console.log(column)
+  if (column && (column.type === 'selection' || column.property === 'tag')) {
     return
   }
-
   router.push({
     path: `/paragraph/${id}/${row.id}`,
     query: { from: apiType.value, isShared: isShared.value ? 'true' : 'false' },
@@ -1295,8 +1356,10 @@ function editName(val: string, id: string) {
   }
 }
 
-function cellMouseEnter(row: any) {
-  currentMouseId.value = row.id
+function cellMouseEnter(row: any, column: any) {
+  if (column && column.property === 'name') {
+    currentMouseId.value = row.id
+  }
 }
 
 function cellMouseLeave() {
@@ -1369,6 +1432,12 @@ function openGenerateDialog(row?: any) {
   GenerateRelatedDialogRef.value.open(arr, 'document')
 }
 
+function cellClickHandle(row: any, column: any, cell: any, event: any) {
+  if (column.property === 'tag' && permissionPrecise.value.doc_tag(id)) {
+    event.stopPropagation()
+    openTagSettingDrawer(row)
+  }
+}
 const tagFilterValue = ref<string[]>([])
 const tagFilterDirty = ref(false)
 const tagFilterOptions = ref<any[]>([])
@@ -1485,7 +1554,7 @@ onBeforeUnmount(() => {
     box-sizing: border-box;
     background: #ffffff;
     z-index: 22;
-    box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
   }
   .document-table {
     :deep(.el-table__row) {

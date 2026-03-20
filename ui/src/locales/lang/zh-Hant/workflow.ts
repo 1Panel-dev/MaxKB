@@ -39,6 +39,7 @@ export default {
     copyError: '已複製節點',
     paramErrorMessage: '參數已存在: ',
     saveMessage: '當前修改未保存，是否保存後退出？',
+    searchPlaceholder: '請輸入節點名稱',
   },
   delete: {
     confirmTitle: '確定刪除該節點？',
@@ -508,6 +509,7 @@ export default {
     contain: '包含',
     not_contain: '不包含',
     eq: '等於',
+    not_eq: '不等於',
     ge: '大於等於',
     gt: '大於',
     le: '小於等於',
@@ -523,5 +525,5 @@ export default {
   SystemPromptPlaceholder: '系統提示詞，可以引用系統中的變量：如',
   UserPromptPlaceholder: '用戶提示詞，可以引用系統中的變量：如',
   initiator: '發起人',
-   abnormalInformation: '異常信息'
+  abnormalInformation: '異常信息',
 }

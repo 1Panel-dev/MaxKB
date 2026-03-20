@@ -11,7 +11,6 @@ export default {
   simplePlaceholder: '通过表单设置方式，快速搭建基础功能的智能体',
   advancedPlaceholder: '使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体',
   appTest: '调试预览',
-  skill: '技能',
 
   operation: {
     addModel: '添加模型',

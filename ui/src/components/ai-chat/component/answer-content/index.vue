@@ -1,61 +1,64 @@
 <template>
   <div class="item-content lighter">
-    <el-space :fill="true" wrap class="w-full">
-      <div v-for="(answer_text, index) in answer_text_list" :key="index">
-        <div class="avatar mr-8" v-if="showAvatar">
-          <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
-          <LogoIcon v-else height="28px" width="28px" />
-        </div>
-        <div
-          class="content"
-          @mouseup="openControl"
-          :style="{
-            'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
-          }"
-        >
-          <el-card shadow="always" class="border-r-8" style="--el-card-padding: 6px 16px">
-            <MdRenderer
-              v-if="
-                (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
-                answer_text.length == 0
-              "
-              :source="$t('chat.tip.answerMessage')"
-            ></MdRenderer>
-            <template v-else-if="answer_text.length > 0">
-              <MdRenderer
-                v-for="(answer, index) in answer_text"
-                :key="index"
-                :chat_record_id="answer.chat_record_id"
-                :child_node="answer.child_node"
-                :runtime_node_id="answer.runtime_node_id"
-                :reasoning_content="answer.reasoning_content"
-                :disabled="loading || type == 'log'"
-                :source="answer.content"
-                :send-message="chatMessage"
-              ></MdRenderer>
-            </template>
-            <p v-else-if="chatRecord.is_stop" shadow="always" style="margin: 0.5rem 0">
-              {{ $t('chat.tip.stopAnswer') }}
-            </p>
-            <p v-else shadow="always" style="margin: 0.5rem 0">
-              {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
-            </p>
-            <!-- 知识来源 -->
-            <KnowledgeSourceComponent
-              :data="chatRecord"
-              :application="application"
-              :type="type"
-              :appType="application.type"
-              :executionIsRightPanel="props.executionIsRightPanel"
-              @open-execution-detail="emit('openExecutionDetail')"
-              @openParagraph="emit('openParagraph')"
-              @openParagraphDocument="(val: string) => emit('openParagraphDocument', val)"
-              v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
-            />
-          </el-card>
-        </div>
+    <div v-for="(answer_text, index) in answer_text_list" :key="index" class="mb-8">
+      <div class="avatar mr-8" v-if="showAvatar">
+        <img v-if="application.avatar" :src="application.avatar" height="28px" width="28px" />
+        <LogoIcon v-else height="28px" width="28px" />
       </div>
-    </el-space>
+      <div
+        class="content"
+        @mouseup="openControl"
+        :style="{
+          'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
+        }"
+      >
+        <el-card shadow="always" class="border-r-8" style="--el-card-padding: 6px 16px">
+          <MdRenderer
+            v-if="
+              (chatRecord.write_ed === undefined || chatRecord.write_ed === true) &&
+              answer_text.length == 0 &&
+              answer_text
+                .map((item) => item.content)
+                .join('')
+                .trim().length == 0
+            "
+            :source="$t('chat.tip.answerMessage')"
+          ></MdRenderer>
+          <template v-else-if="answer_text.length > 0">
+            <MdRenderer
+              v-for="(answer, index) in answer_text"
+              :key="index"
+              :chat_record_id="answer.chat_record_id"
+              :child_node="answer.child_node"
+              :runtime_node_id="answer.runtime_node_id"
+              :reasoning_content="answer.reasoning_content"
+              :disabled="loading || type == 'log'"
+              :source="answer.content"
+              :send-message="chatMessage"
+            ></MdRenderer>
+          </template>
+          <p v-else-if="chatRecord.is_stop" shadow="always" style="margin: 0.5rem 0">
+            {{ $t('chat.tip.stopAnswer') }}
+          </p>
+          <p v-else shadow="always" style="margin: 0.5rem 0">
+            {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
+          </p>
+          <!-- 知识来源 -->
+          <KnowledgeSourceComponent
+            :data="chatRecord"
+            :application="application"
+            :type="type"
+            :appType="application.type"
+            :executionIsRightPanel="props.executionIsRightPanel"
+            @open-execution-detail="emit('openExecutionDetail')"
+            @openParagraph="emit('openParagraph')"
+            @openParagraphDocument="(val: string) => emit('openParagraphDocument', val)"
+            v-if="showSource(chatRecord) && index === chatRecord.answer_text_list.length - 1"
+          />
+        </el-card>
+      </div>
+    </div>
+
     <div
       class="content"
       :style="{

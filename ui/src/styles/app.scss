@@ -60,6 +60,10 @@ ul {
   margin: 0;
   padding: 0;
 }
+pre {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
 
 /* 滚动条整体部分 */
 ::-webkit-scrollbar {
@@ -225,6 +229,9 @@ h5 {
 .p-24 {
   padding: calc(var(--app-base-px) * 3);
 }
+.p-4-12 {
+  padding: calc(var(--app-base-px) - 4px) calc(var(--app-base-px) + 4px);
+}
 .p-8-12 {
   padding: calc(var(--app-base-px)) calc(var(--app-base-px) + 4px);
 }
@@ -284,6 +291,10 @@ h5 {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-end {
+  justify-content: end;
 }
 
 .text-left {
@@ -497,7 +508,7 @@ h5 {
 }
 
 .info-tag {
-  background: var(--app-text-color-light-1);
+  background: rgba(var(--el-text-color-primary-rgb), 0.1);
   color: var(--app-text-color-secondary);
   border: none;
 }

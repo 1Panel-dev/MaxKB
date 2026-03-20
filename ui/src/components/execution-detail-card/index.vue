@@ -237,14 +237,8 @@
                 {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                <MdPreview
-                  v-if="data.answer"
-                  ref="editorRef"
-                  editorId="preview-only"
-                  :modelValue="data.answer"
-                  style="background: none"
-                  noImgZoomIn
-                />
+                <MdRenderer v-if="data.answer" :source="data.answer" noImgZoomIn></MdRenderer>
+
                 <template v-else> -</template>
               </div>
             </div>
@@ -1299,7 +1293,7 @@ import { WorkflowType } from '@/enums/application'
 import { getImgUrl } from '@/utils/common'
 import { arraySort } from '@/utils/array'
 import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
-
+import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import { t } from '@/locales'
 
 const props = defineProps({

@@ -181,7 +181,7 @@
           />
           <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
             <template #default="{ row }">
-              <el-tag type="info" class="info-tag">{{
+              <el-tag size="small" type="info" class="info-tag">{{
                 input_type_list.find((item) => item.value === row.input_type)?.label
               }}</el-tag>
             </template>
@@ -237,10 +237,10 @@ import type { Dict, KeyValue } from '@/api/type/common'
 import ProviderApi from '@/api/model/provider'
 import type { FormField } from '@/components/dynamics-form/type'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
+import AddParamDrawer from '@/views/model/component/AddParamDrawer.vue'
+import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import type { FormRules } from 'element-plus'
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
-import { input_type_list } from '@/components/dynamics-form/constructor/data'
-import AddParamDrawer from '@/views/model/component/AddParamDrawer.vue'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'

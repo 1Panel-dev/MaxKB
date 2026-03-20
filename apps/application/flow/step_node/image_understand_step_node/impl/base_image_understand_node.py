@@ -39,8 +39,15 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     response = node_variable.get('result')
     answer = ''
     for chunk in response:
-        answer += chunk.content
-        yield chunk.content
+        if isinstance(chunk.content, list):
+            for chunk_item in chunk.content:
+                text = chunk_item.get("text", "")
+                answer += text
+                yield text
+        else:
+            text = chunk.content or ""
+            answer += text
+            yield text
     _write_context(node_variable, workflow_variable, node, workflow, answer)
 
 

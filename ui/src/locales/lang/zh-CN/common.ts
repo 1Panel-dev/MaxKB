@@ -39,6 +39,7 @@ export default {
   paramSetting: '参数设置',
   name: '名称',
   creator: '创建者',
+  createdIn: '创建于',
   author: '作者',
   debug: '调试',
   required: '必填',

@@ -59,7 +59,7 @@
                 <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
               </el-avatar>
               <span>{{ mcpTool.name }}</span>
-              <el-tag v-if="mcpTool.scope === 'SHARED'" type="info" class="info-tag ml-8 mt-4">
+              <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info" class="info-tag ml-8 mt-4">
                 {{ $t('views.shared.title') }}
               </el-tag>
             </div>

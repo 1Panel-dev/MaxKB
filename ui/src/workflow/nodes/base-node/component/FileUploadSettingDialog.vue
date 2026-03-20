@@ -188,7 +188,6 @@
                         @close="handleClose(tag)"
                         type="info"
                         effect="plain"
-                        class="upload-file-tag"
                       >
                         {{ tag }}
                       </el-tag>

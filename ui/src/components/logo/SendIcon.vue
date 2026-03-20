@@ -17,7 +17,7 @@
     />
   </svg>
 
-  <img v-else src="@/assets/icon_send_colorful.svg" />
+  <img v-else src="@/assets/chat/icon_send_colorful.svg" />
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'

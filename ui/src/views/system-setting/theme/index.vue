@@ -404,7 +404,7 @@ onMounted(() => {
     background: #ffffff;
     text-align: right;
     box-sizing: border-box;
-    box-shadow: 0px -2px 4px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
   }
 
   .theme-preview {

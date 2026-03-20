@@ -12,7 +12,6 @@ export default {
   advancedPlaceholder:
     'Using low-code drag-and-drop methods, flexibly orchestrate complex logic and feature-rich agents',
   appTest: 'Debug Preview',
-  skill: 'Skill',
   operation: {
     addModel: 'Add Model',
     toChat: 'Chat',

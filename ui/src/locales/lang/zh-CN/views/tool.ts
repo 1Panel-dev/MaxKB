@@ -31,11 +31,11 @@ export default {
   },
   skill: {
     title: '技能',
-    copySkillTool: '复制技能',
-    createSkillTool: '创建技能',
-    editSkillTool: '编辑技能',
-    initParamPlaceholder: '启用技能时需要配置的参数',
-    skillFile: '技能文件',
+    copySkillTool: '复制 Skills',
+    createSkillTool: '创建 Skills',
+    editSkillTool: '编辑 Skills',
+    initParamPlaceholder: '启用 Skills 时需要配置的参数',
+    skillFile: 'Skills 文件',
     reUpload: '重新上传',
   },
   mcp: {
@@ -74,9 +74,8 @@ export default {
       requiredMessage: '请输入 MCP 名称',
     },
     skillName: {
-      name: '技能名称',
-      placeholder: '请输入技能名称',
-      requiredMessage: '请输入技能名称',
+      placeholder: '请输入 Skills 名称',
+      requiredMessage: '请输入 Skills 名称',
     },
     paramName: {
       label: '参数名',

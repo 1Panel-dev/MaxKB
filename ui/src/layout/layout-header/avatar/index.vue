@@ -247,7 +247,7 @@ onMounted(() => {
     padding: 12px 11px;
 
     &:hover {
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
 }

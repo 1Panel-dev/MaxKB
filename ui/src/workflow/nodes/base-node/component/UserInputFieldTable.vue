@@ -44,29 +44,8 @@
     </el-table-column>
     <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="95">
       <template #default="{ row }">
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'TextInput'">{{
-          $t('dynamicsForm.input_type_list.TextInput')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'PasswordInput'">{{
-          $t('dynamicsForm.input_type_list.PasswordInput')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'Slider'">{{
-          $t('dynamicsForm.input_type_list.Slider')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SwitchInput'">{{
-          $t('dynamicsForm.input_type_list.SwitchInput')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'SingleSelect'">{{
-          $t('dynamicsForm.input_type_list.SingleSelect')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'MultiSelect'">{{
-          $t('dynamicsForm.input_type_list.MultiSelect')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'RadioCard'">{{
-          $t('dynamicsForm.input_type_list.RadioCard')
-        }}</el-tag>
-        <el-tag type="info" class="info-tag" v-if="row.input_type === 'DatePicker'">{{
-          $t('dynamicsForm.input_type_list.DatePicker')
+        <el-tag size="small" type="info" class="info-tag">{{
+          input_type_list.find((item) => item.value === row.input_type)?.label
         }}</el-tag>
       </template>
     </el-table-column>
@@ -113,6 +92,7 @@ import UserFieldFormDialog from './UserFieldFormDialog.vue'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
 import UserInputTitleDialog from '@/workflow/nodes/base-node/component/UserInputTitleDialog.vue'
+import { input_type_list } from '@/components/dynamics-form/constructor/data'
 const props = defineProps<{ nodeModel: any }>()
 
 const tableRef = ref()

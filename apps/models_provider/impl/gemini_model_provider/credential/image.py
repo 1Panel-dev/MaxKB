@@ -32,6 +32,7 @@ class GeminiImageModelParams(BaseForm):
 
 class GeminiImageModelCredential(BaseForm, BaseModelCredential):
     api_key = forms.PasswordInputField('API Key', required=True)
+    base_url = forms.TextInputField('Base URL', required=True, default_value='https://generativelanguage.googleapis.com')
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
                  raise_exception=False):
@@ -40,7 +41,7 @@ class GeminiImageModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
-        for key in ['api_key']:
+        for key in ['api_key', 'base_url']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))

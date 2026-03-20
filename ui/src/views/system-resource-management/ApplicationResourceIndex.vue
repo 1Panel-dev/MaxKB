@@ -74,10 +74,10 @@
 
         <el-table-column prop="tool_type" :label="$t('common.type')" width="100">
           <template #default="scope">
-            <el-tag class="warning-tag" v-if="isWorkFlow(scope.row.type)">
+            <el-tag size="small" class="warning-tag" v-if="isWorkFlow(scope.row.type)">
               {{ $t('views.application.senior') }}
             </el-tag>
-            <el-tag class="blue-tag" v-else>
+            <el-tag size="small" class="blue-tag" v-else>
               {{ $t('views.application.simple') }}
             </el-tag>
           </template>

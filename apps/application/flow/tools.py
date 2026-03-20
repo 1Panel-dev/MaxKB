@@ -6,6 +6,14 @@
     @date：2024/6/6 15:15
     @desc:
 """
+from tools.models import ToolRecord, Tool
+from maxkb.const import CONFIG
+from knowledge.models.knowledge_action import State
+from knowledge.models import File
+from common.utils.logger import maxkb_logger
+from common.result import result
+from application.flow.i_step_node import WorkFlowPostHandler
+from application.flow.backend.sandbox_shell import SandboxShellBackend
 import asyncio
 import io
 import json
@@ -13,7 +21,6 @@ import os
 import queue
 import re
 import shutil
-import tempfile
 import threading
 import zipfile
 from functools import reduce
@@ -28,14 +35,45 @@ from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, 
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import MemorySaver
 
-from application.flow.backend.sandbox_shell import SandboxShellBackend
-from application.flow.i_step_node import WorkFlowPostHandler
-from common.result import result
-from common.utils.logger import maxkb_logger
-from knowledge.models import File
-from knowledge.models.knowledge_action import State
-from maxkb.const import CONFIG
-from tools.models import ToolRecord, Tool
+# ---------------------------------------------------------------------------
+# Fix: qwen's OpenAI-compatible streaming sends id='' (empty string) for
+# intermediate tool_call_chunks while only the first chunk carries the real
+# id ('call_xxx...'). langchain-core's merge_lists treats '' != 'call_xxx' as
+# an ID conflict and _appends_ instead of merging → the accumulated AIMessage
+# ends up with two separate tool_calls (one with empty args, one with empty
+# id) instead of one correct entry. This causes the Qwen API to reject the
+# next request with "function.arguments must be in JSON format".
+#
+# Patch: normalise id='' → None for items that have an 'index' key
+# (i.e. tool_call_chunk dicts). merge_lists treats None as "no id" and will
+# merge with any existing entry, keeping the real id from the first chunk.
+# ---------------------------------------------------------------------------
+import langchain_core.messages.ai as _lc_ai_module
+from langchain_core.utils._merge import merge_lists as _original_merge_lists
+
+
+def _merge_lists_normalize_empty_tool_chunk_ids(left, *others):
+    """Wrapper around merge_lists that normalises empty-string IDs to None in
+    tool_call_chunk items (those with an 'index' key) so that qwen streaming
+    chunks with id='' are merged correctly by index."""
+    def _norm(lst):
+        if lst is None:
+            return lst
+        result = []
+        for item in lst:
+            if isinstance(item, dict) and 'index' in item and item.get('id') == '':
+                item = {**item, 'id': None}
+            result.append(item)
+        return result
+
+    return _original_merge_lists(
+        _norm(left),
+        *[_norm(o) for o in others],
+    )
+
+
+# Replace the module-level reference used by add_ai_message_chunks in ai.py
+_lc_ai_module.merge_lists = _merge_lists_normalize_empty_tool_chunk_ids
 
 
 class Reasoning:
@@ -47,7 +85,8 @@ class Reasoning:
         self.reasoning_content_end_tag = reasoning_content_end
         self.reasoning_content_start_tag_len = len(
             reasoning_content_start) if reasoning_content_start is not None else 0
-        self.reasoning_content_end_tag_len = len(reasoning_content_end) if reasoning_content_end is not None else 0
+        self.reasoning_content_end_tag_len = len(
+            reasoning_content_end) if reasoning_content_end is not None else 0
         self.reasoning_content_end_tag_prefix = reasoning_content_end[
             0] if self.reasoning_content_end_tag_len > 0 else ''
         self.reasoning_content_is_start = False
@@ -115,9 +154,11 @@ class Reasoning:
         # 是否包含结束
         if reasoning_content_end_tag_prefix_index > -1:
             if len(self.reasoning_content_chunk) - reasoning_content_end_tag_prefix_index >= self.reasoning_content_end_tag_len:
-                reasoning_content_end_tag_index = self.reasoning_content_chunk.find(self.reasoning_content_end_tag)
+                reasoning_content_end_tag_index = self.reasoning_content_chunk.find(
+                    self.reasoning_content_end_tag)
                 if reasoning_content_end_tag_index > -1:
-                    reasoning_content_chunk = self.reasoning_content_chunk[0:reasoning_content_end_tag_index]
+                    reasoning_content_chunk = self.reasoning_content_chunk[
+                        0:reasoning_content_end_tag_index]
                     content_chunk = self.reasoning_content_chunk[
                         reasoning_content_end_tag_index + self.reasoning_content_end_tag_len:]
                     self.reasoning_content += reasoning_content_chunk
@@ -126,8 +167,10 @@ class Reasoning:
                     self.reasoning_content_is_end = True
                     return {'content': content_chunk, 'reasoning_content': reasoning_content_chunk}
                 else:
-                    reasoning_content_chunk = self.reasoning_content_chunk[0:reasoning_content_end_tag_prefix_index + 1]
-                    self.reasoning_content_chunk = self.reasoning_content_chunk.replace(reasoning_content_chunk, '')
+                    reasoning_content_chunk = self.reasoning_content_chunk[
+                        0:reasoning_content_end_tag_prefix_index + 1]
+                    self.reasoning_content_chunk = self.reasoning_content_chunk.replace(
+                        reasoning_content_chunk, '')
                     self.reasoning_content += reasoning_content_chunk
                     return {'content': '', 'reasoning_content': reasoning_content_chunk}
             else:
@@ -141,7 +184,8 @@ class Reasoning:
                         }
             else:
                 # aaa
-                result = {'content': '', 'reasoning_content': self.reasoning_content_chunk}
+                result = {'content': '',
+                          'reasoning_content': self.reasoning_content_chunk}
                 self.reasoning_content += self.reasoning_content_chunk
                 self.reasoning_content_chunk = ""
                 return result
@@ -190,7 +234,8 @@ def to_stream_response(chat_id, chat_record_id, response: Iterator[BaseMessageCh
     @return: 响应
     """
     r = StreamingHttpResponse(
-        streaming_content=event_content(chat_id, chat_record_id, response, workflow, write_context, post_handler),
+        streaming_content=event_content(
+            chat_id, chat_record_id, response, workflow, write_context, post_handler),
         content_type='text/event-stream;charset=utf-8',
         charset='utf-8')
 
@@ -236,34 +281,21 @@ def to_stream_response_simple(stream_event):
     return r
 
 
-tool_message_json_template = """
-%s
-"""
-
 def generate_tool_message_complete(icon, name, input_content, output_content):
     """生成包含输入和输出的工具消息模版"""
-    # 格式化输入
-    if '```' not in input_content:
-        input_formatted = tool_message_json_template % input_content
-    else:
-        input_formatted = input_content
-
+    # 确保输入内容是字符串，如果不是则尝试转换为 JSON 字符串
+    if not isinstance(input_content, str):
+        input_content = json.dumps(input_content, ensure_ascii=False)
     # 格式化输出
-    if '```' not in output_content:
-        try:
-            json.loads(output_content)
-            output_formatted = tool_message_json_template % output_content
-        except:
-            output_formatted = output_content
-    else:
-        output_formatted = output_content
+    if not isinstance(output_content, str):
+        output_content = json.dumps(output_content, ensure_ascii=False)
     content = {
         "icon": icon,
         "title": name,
         "type": "simple-tool-calls",
         "content": {
-            "input": input_formatted,
-            "output": output_formatted
+            "input": input_content,
+            "output": output_content
         }
     }
     return f'<tool_calls_render>{json.dumps(content)}</tool_calls_render>'
@@ -287,7 +319,8 @@ def get_global_loop():
                 asyncio.set_event_loop(_global_loop)
                 _global_loop.run_forever()
 
-            _loop_thread = threading.Thread(target=run_forever, daemon=True, name="GlobalAsyncLoop")
+            _loop_thread = threading.Thread(
+                target=run_forever, daemon=True, name="GlobalAsyncLoop")
             _loop_thread.start()
 
     return _global_loop
@@ -364,113 +397,286 @@ async def _initialize_skills(mcp_servers, temp_dir):
 
     client = MultiServerMCPClient(mcp_config)
 
-    return client, skills_dir
+    return client
 
 
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True, tool_init_params={},
-                              source_id=None, source_type=None, temp_dir=None):
+                              source_id=None, source_type=None, temp_dir=None, chat_id=None):
     try:
         checkpointer = MemorySaver()
-        client, skills_dir = await _initialize_skills(mcp_servers, temp_dir)
+        client = await _initialize_skills(mcp_servers, temp_dir)
         tools = await client.get_tools()
         agent = create_deep_agent(
             model=chat_model,
-            backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=False),
-            skills=[skills_dir],
+            backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=True),
+            skills=['/skills'],
             tools=tools,
             interrupt_on={
-                "write_file": False,  # Default: approve, edit, reject
-                "read_file": False,  # No interrupts needed
-                "edit_file": False  # Default: approve, edit, reject
+                "write_file": False,
+                "read_file": False,
+                "edit_file": False
             },
-            checkpointer=checkpointer,  # Required!
+            checkpointer=checkpointer,
         )
-        recursion_limit = int(CONFIG.get("LANGCHAIN_GRAPH_RECURSION_LIMIT", '25'))
+        recursion_limit = int(CONFIG.get(
+            "LANGCHAIN_GRAPH_RECURSION_LIMIT", '100'))
         response = agent.astream(
             {"messages": message_list},
-            config={"recursion_limit": recursion_limit, "configurable": {"thread_id": str(uuid.uuid7())}},
+            config={"recursion_limit": recursion_limit,
+                    "configurable": {"thread_id": chat_id}},
             stream_mode='messages'
         )
 
-        # 用于存储工具调用信息
         tool_calls_info = {}  # tool_id -> {'name': ..., 'input': ...}
-        _tool_fragments = {}  # index -> {'id': ..., 'name': ..., 'arguments': ...}
+        # key(index/id) -> {'id': ..., 'name': ..., 'arguments': ...}
+        _tool_fragments = {}
+
+        def _merge_arguments(entry, part_args):
+            if not isinstance(part_args, str):
+                try:
+                    part_args = json.dumps(part_args, ensure_ascii=False)
+                except Exception:
+                    part_args = str(part_args) if part_args else ''
+            if not part_args:
+                return
+
+            # Some providers first emit placeholder args like "{}" and then
+            # stream the real JSON fragments via later chunks. Prefer fragments.
+            if entry['arguments'] in ('{}', '[]') and part_args.startswith('{'):
+                entry['arguments'] = part_args
+                return
+
+            if entry['arguments']:
+                try:
+                    existing_obj = json.loads(entry['arguments'])
+                    new_obj = json.loads(part_args)
+                    if isinstance(existing_obj, dict) and isinstance(new_obj, dict):
+                        merged = {**existing_obj, **new_obj}
+                        entry['arguments'] = json.dumps(
+                            merged, ensure_ascii=False)
+                    else:
+                        entry['arguments'] += part_args
+                except (json.JSONDecodeError, ValueError):
+                    entry['arguments'] += part_args
+            else:
+                entry['arguments'] = part_args
+
+        def _get_fragment_key(idx, raw_id):
+            if idx is not None:
+                return f'idx:{idx}'
+            if raw_id and str(raw_id).strip():
+                return f"id:{_extract_tool_id(str(raw_id).strip())}"
+            return None
+
+        def _upsert_fragment(key, raw_id, func_name, part_args):
+            if key is None:
+                return
+            entry = _tool_fragments.setdefault(
+                key, {'id': '', 'name': '', 'arguments': ''})
+
+            if raw_id and str(raw_id).strip():
+                new_id = str(raw_id).strip()
+                if entry.get('completed') and entry.get('id') and entry['id'] != new_id:
+                    maxkb_logger.debug(
+                        f"Resetting completed fragment {key}: old ID {entry['id']} -> new ID {new_id}")
+                    entry.clear()
+                    entry.update({'id': '', 'name': '', 'arguments': ''})
+                entry['id'] = new_id
+
+            if func_name:
+                entry['name'] = func_name
+
+            _merge_arguments(entry, part_args)
 
         async for chunk in response:
+            # print(chunk)
             if isinstance(chunk[0], AIMessageChunk):
-                tool_calls = chunk[0].additional_kwargs.get('tool_calls', [])
-                for tool_call in tool_calls:
-                    idx = tool_call.get('index')
-                    if idx is None:
-                        continue
+                # ----------------------------------------------------------------
+                # 1. 从 tool_call_chunks 中聚合工具调用片段
+                #    (qwen/OpenAI streaming 通过 tool_call_chunks 传递，
+                #     additional_kwargs['tool_calls'] 在流式时通常为空)
+                # ----------------------------------------------------------------
+                for tc_chunk in (chunk[0].tool_call_chunks or []):
+                    raw_id = tc_chunk.get('id')
+                    key = _get_fragment_key(tc_chunk.get('index'), raw_id)
+                    _upsert_fragment(
+                        key,
+                        raw_id,
+                        tc_chunk.get('name'),
+                        tc_chunk.get('args', '')
+                    )
 
-                    entry = _tool_fragments.setdefault(idx, {'id': '', 'name': '', 'arguments': ''})
+                # ----------------------------------------------------------------
+                # 1.1 兼容部分模型将工具调用放在 chunk.tool_calls，且 tool_call_chunks
+                #     的 index 为空（例如 ollama/qwen）
+                # ----------------------------------------------------------------
+                has_tool_call_chunks = bool(chunk[0].tool_call_chunks)
+                for tool_call in (chunk[0].tool_calls or []):
+                    raw_id = tool_call.get('id')
+                    part_args = tool_call.get('args', '')
+                    # qwen-plus often emits {} here as a placeholder while
+                    # the real args are split in tool_call_chunks/invalid_tool_calls.
+                    if has_tool_call_chunks and (
+                        part_args == '' or part_args == {} or part_args == []
+                    ):
+                        part_args = ''
+                    key = _get_fragment_key(tool_call.get('index'), raw_id)
+                    _upsert_fragment(
+                        key,
+                        raw_id,
+                        tool_call.get('name'),
+                        part_args
+                    )
 
-                    # 更新 id
-                    if tool_call.get('id'):
-                        entry['id'] = tool_call.get('id')
+                # ----------------------------------------------------------------
+                # 1.2 兼容 invalid_tool_calls 分片（部分模型会把中间 JSON 片段放这里）
+                # ----------------------------------------------------------------
+                for invalid_tool_call in (chunk[0].invalid_tool_calls or []):
+                    raw_id = invalid_tool_call.get('id')
+                    key = _get_fragment_key(
+                        invalid_tool_call.get('index'), raw_id)
+                    _upsert_fragment(
+                        key,
+                        raw_id,
+                        invalid_tool_call.get('name'),
+                        invalid_tool_call.get('args', '')
+                    )
 
-                    # 更新 name 和 arguments
+                # ----------------------------------------------------------------
+                # 2. 兼容 additional_kwargs['tool_calls'] 方式（旧格式/非流式情况）
+                # ----------------------------------------------------------------
+                legacy_tool_calls = chunk[0].additional_kwargs.get(
+                    'tool_calls', [])
+                for tool_call in legacy_tool_calls:
+                    raw_id = tool_call.get('id')
                     func = tool_call.get('function', {})
                     if isinstance(func, dict):
-                        if func.get('name'):
-                            entry['name'] = func.get('name')
+                        func_name = func.get('name')
                         part_args = func.get('arguments', '')
                     else:
+                        func_name = tool_call.get('name')
                         part_args = tool_call.get('arguments', '')
+                    key = _get_fragment_key(tool_call.get('index'), raw_id)
+                    _upsert_fragment(key, raw_id, func_name, part_args)
 
-                    # 统一为字符串
-                    if not isinstance(part_args, str):
-                        try:
-                            part_args = json.dumps(part_args, ensure_ascii=False)
-                        except Exception:
-                            part_args = str(part_args)
+                # ----------------------------------------------------------------
+                # 3. 检测工具调用结束，更新 tool_calls_info
+                # ----------------------------------------------------------------
+                is_finish_chunk = (
+                    chunk[0].response_metadata.get(
+                        'finish_reason') == 'tool_calls'
+                    or chunk[0].chunk_position == 'last'
+                )
 
-                    entry['arguments'] += part_args
+                if is_finish_chunk:
+                    # 在 finish chunk 时，将所有未完成的 fragment 标记完成并更新 tool_calls_info
+                    maxkb_logger.debug(
+                        f"Processing finish chunk. Tool fragments: {_tool_fragments}")
+                    for idx, entry in _tool_fragments.items():
+                        if entry.get('completed'):
+                            maxkb_logger.debug(
+                                f"Skipping fragment {idx}: already completed")
+                            continue
+                        if not entry.get('id'):
+                            maxkb_logger.debug(
+                                f"Skipping fragment {idx}: missing id. Fragment: {entry}")
+                            continue
+                        if not entry.get('arguments'):
+                            maxkb_logger.debug(
+                                f"Skipping fragment {idx}: missing arguments. Fragment: {entry}")
+                            continue
 
-                    # 尝试解析 JSON,判断是否完整
-                    if entry['id'] and entry['arguments']:
-                        try:
-                            parsed_args = json.loads(entry['arguments'])
-                            # 过滤掉 tool_init_params 中的参数
-                            if tool_init_params:
+                        if not entry.get('completed') and entry.get('id') and entry.get('arguments'):
+                            try:
+                                parsed_args = json.loads(entry['arguments'])
                                 filtered_args = {
                                     k: v for k, v in parsed_args.items()
                                     if k not in tool_init_params
+                                } if tool_init_params else parsed_args
+                                normalized_id = _extract_tool_id(entry['id'])
+                                info = {
+                                    'name': entry['name'],
+                                    'input': json.dumps(filtered_args, ensure_ascii=False)
                                 }
-                            else:
-                                filtered_args = parsed_args
+                                tool_calls_info[entry['id']] = info
+                                if normalized_id and normalized_id != entry['id']:
+                                    tool_calls_info[normalized_id] = info
+                                entry['completed'] = True
+                                maxkb_logger.debug(
+                                    f"Added tool call {entry['id']} to tool_calls_info")
+                            except (json.JSONDecodeError, ValueError) as e:
+                                # JSON parsing failed, but still add to tool_calls_info with raw arguments
+                                # to prevent "Tool ID not found" errors when ToolMessage arrives
+                                maxkb_logger.warning(
+                                    f"Failed to parse tool arguments at finish for tool {entry.get('id', 'unknown')}: "
+                                    f"{entry['arguments']}, error: {e}. Using raw arguments.")
+                                normalized_id = _extract_tool_id(entry['id'])
+                                info = {
+                                    'name': entry['name'],
+                                    # Use raw arguments
+                                    'input': entry['arguments']
+                                }
+                                tool_calls_info[entry['id']] = info
+                                if normalized_id and normalized_id != entry['id']:
+                                    tool_calls_info[normalized_id] = info
+                                entry['completed'] = True
 
-                            # JSON 完整,保存到 tool_calls_info
-                            tool_calls_info[entry['id']] = {
-                                'name': entry['name'],
-                                'input': json.dumps(filtered_args, ensure_ascii=False)
-                            }
-                            # 从 fragments 中移除
-                            del _tool_fragments[idx]
-                        except (json.JSONDecodeError, ValueError):
-                            # JSON 不完整,继续等待
-                            pass
+                # ----------------------------------------------------------------
+                # 4. 修复 tool_call_chunks 中的空 id（回填已知 id）
+                # ----------------------------------------------------------------
+                if chunk[0].tool_call_chunks:
+                    for tc_chunk in chunk[0].tool_call_chunks:
+                        key = _get_fragment_key(
+                            tc_chunk.get('index'), tc_chunk.get('id'))
+                        if key is not None:
+                            frag = _tool_fragments.get(key)
+                            if frag and frag.get('id') and not tc_chunk.get('id'):
+                                tc_chunk['id'] = frag['id']
+
+                # ----------------------------------------------------------------
+                # 5. 修复 additional_kwargs['tool_calls']（兼容旧格式）
+                #    仅在 finish chunk 时写入完整参数，避免污染中间 chunk 的
+                #    additional_kwargs（中间 chunk 会被 ainvoke 累积，如果写入
+                #    不完整 JSON 会导致下一轮 API 调用出现 arguments 非 JSON 格式错误）
+                # ----------------------------------------------------------------
+                if legacy_tool_calls and is_finish_chunk:
+                    fixed_tool_calls = []
+                    for tool_call in legacy_tool_calls:
+                        key = _get_fragment_key(
+                            tool_call.get('index'), tool_call.get('id'))
+                        frag = _tool_fragments.get(
+                            key) if key is not None else None
+                        tc = dict(tool_call)
+                        if frag and frag.get('id') and not tc.get('id'):
+                            tc['id'] = frag['id']
+                        if frag and isinstance(tc.get('function'), dict):
+                            tc['function'] = dict(tc['function'])
+                            if frag.get('completed'):
+                                tc['function']['arguments'] = frag['arguments']
+                        fixed_tool_calls.append(tc)
+                    chunk[0].additional_kwargs['tool_calls'] = fixed_tool_calls
 
                 yield chunk[0]
 
             if mcp_output_enable and isinstance(chunk[0], ToolMessage):
-                # 直接使用 tool_call_id,不进行提取
                 tool_id = chunk[0].tool_call_id
+                normalized_tool_id = _extract_tool_id(tool_id)
+                tool_info = tool_calls_info.get(tool_id) or tool_calls_info.get(
+                    normalized_tool_id)
 
-                if tool_id in tool_calls_info:
-                    tool_info = tool_calls_info[tool_id]
+                if tool_info:
                     try:
                         if isinstance(chunk[0].content, str):
                             tool_result = json.loads(chunk[0].content)
                         elif isinstance(chunk[0].content, dict):
                             tool_result = chunk[0].content
                         elif isinstance(chunk[0].content, list):
-                            tool_result = chunk[0].content[0] if len(chunk[0].content) > 0 else {}
+                            tool_result = chunk[0].content[0] if len(
+                                chunk[0].content) > 0 else {}
                         else:
                             tool_result = {}
-                        text = tool_result.pop('text') if 'text' in tool_result else None
-                        text_result = json.loads(text)
+                        text = tool_result.get('text') if 'text' in tool_result else None
+                        text_result = json.loads(text) if text else tool_result
                         if text:
                             tool_lib_id = text_result.pop('tool_id') if 'tool_id' in text_result else None
                         else:
@@ -488,9 +694,12 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
                     )
                     chunk[0].content = content
                 else:
-                    # 如果找不到对应的工具信息,记录日志
                     maxkb_logger.warning(
-                        f"Tool ID {tool_id} not found in tool_calls_info. Available IDs: {list(tool_calls_info.keys())}")
+                        f"Tool ID {tool_id} not found in tool_calls_info. "
+                        f"Normalized Tool ID: {normalized_tool_id}. "
+                        f"Available IDs: {list(tool_calls_info.keys())}. "
+                        f"Tool fragments at this point: {_tool_fragments}"
+                    )
 
                 yield chunk[0]
 
@@ -525,12 +734,15 @@ async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_ty
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True, tool_init_params={},
-                           source_id=None, source_type=None):
+                           source_id=None, source_type=None, chat_id=None):
     """使用全局事件循环，不创建新实例"""
     result_queue = queue.Queue()
     loop = get_global_loop()  # 使用共享循环
     # 创建临时文件夹
-    temp_dir = tempfile.mkdtemp(dir='/tmp')
+    if chat_id:
+        temp_dir = os.path.join('/tmp', chat_id[:8])
+    else:
+        temp_dir = os.path.join('/tmp', uuid.uuid7().hex[:8])
     skills_dir = os.path.join(temp_dir, 'skills')
     os.makedirs(skills_dir, exist_ok=True)
 
@@ -539,7 +751,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_ena
     async def _run():
         try:
             async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable, tool_init_params,
-                                            source_id, source_type, temp_dir)
+                                            source_id, source_type, temp_dir, chat_id)
             async for chunk in async_gen:
                 result_queue.put(('data', chunk))
         except Exception as e:
@@ -619,7 +831,8 @@ def get_workflow_resource(workflow, node_handle):
                 for r in rs:
                     response.append(r)
             if node.get('type') == 'loop-node':
-                r = get_workflow_resource(node.get('properties', {}).get('node_data', {}).get('loop_body'), node_handle)
+                r = get_workflow_resource(node.get('properties', {}).get(
+                    'node_data', {}).get('loop_body'), node_handle)
                 for rn in r:
                     response.append(rn)
         return list({(str(item.target_type) + str(item.target_id)): item for item in response}.values())
@@ -634,8 +847,10 @@ application_instance_field_call_dict = {
     ],
     'MODEL': [
         lambda instance: [instance.model_id] if instance.model_id else [],
-        lambda instance: [instance.tts_model_id] if instance.tts_model_id else [],
-        lambda instance: [instance.stt_model_id] if instance.stt_model_id else []
+        lambda instance: [
+            instance.tts_model_id] if instance.tts_model_id else [],
+        lambda instance: [
+            instance.stt_model_id] if instance.stt_model_id else []
     ]
 }
 knowledge_instance_field_call_dict = {
@@ -647,7 +862,8 @@ def get_instance_resource(instance, source_type, source_id, instance_field_call_
     response = []
     from system_manage.models.resource_mapping import ResourceMapping
     for target_type, call_list in instance_field_call_dict.items():
-        target_id_list = reduce(lambda x, y: [*x, *y], [call(instance) for call in call_list], [])
+        target_id_list = reduce(
+            lambda x, y: [*x, *y], [call(instance) for call in call_list], [])
         if target_id_list:
             for target_id in target_id_list:
                 response.append(ResourceMapping(source_type=source_type, target_type=target_type, source_id=source_id,
@@ -660,7 +876,8 @@ def save_workflow_mapping(workflow, source_type, source_id, other_resource_mappi
         other_resource_mapping = []
     from system_manage.models.resource_mapping import ResourceMapping
     from django.db.models import QuerySet
-    QuerySet(ResourceMapping).filter(source_type=source_type, source_id=source_id).delete()
+    QuerySet(ResourceMapping).filter(
+        source_type=source_type, source_id=source_id).delete()
     resource_mapping_list = get_workflow_resource(workflow,
                                                   get_node_handle_callback(source_type,
                                                                            source_id))
@@ -674,11 +891,13 @@ def get_tool_id_list(workflow):
     _result = []
     for node in workflow.get('nodes', []):
         if node.get('type') == 'tool-lib-node':
-            tool_id = node.get('properties', {}).get('node_data', {}).get('tool_lib_id')
+            tool_id = node.get('properties', {}).get(
+                'node_data', {}).get('tool_lib_id')
             if tool_id:
                 _result.append(tool_id)
         elif node.get('type') == 'loop-node':
-            r = get_tool_id_list(node.get('properties', {}).get('node_data', {}).get('loop_body', {}))
+            r = get_tool_id_list(node.get('properties', {}).get(
+                'node_data', {}).get('loop_body', {}))
             for item in r:
                 _result.append(item)
         elif node.get('type') == 'ai-chat-node':
@@ -689,7 +908,8 @@ def get_tool_id_list(workflow):
             for _id in mcp_tool_ids + tool_ids + skill_tool_ids:
                 _result.append(_id)
         elif node.get('type') == 'mcp-node':
-            mcp_tool_id = node.get('properties', {}).get('node_data', {}).get('mcp_tool_id')
+            mcp_tool_id = node.get('properties', {}).get(
+                'node_data', {}).get('mcp_tool_id')
             if mcp_tool_id:
                 _result.append(mcp_tool_id)
     return _result

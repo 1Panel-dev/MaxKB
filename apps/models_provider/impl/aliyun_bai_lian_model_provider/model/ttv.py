@@ -1,15 +1,13 @@
 import time
 from http import HTTPStatus
-from typing import Dict, Optional
+from typing import Dict
+
 import requests
 from dashscope import VideoSynthesis
-from langchain_core.messages import HumanMessage
-from django.utils.translation import gettext
 
-from langchain_community.chat_models import ChatTongyi
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.base_ttv import BaseGenerationVideo
-from common.utils.logger import maxkb_logger
 
 
 class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):

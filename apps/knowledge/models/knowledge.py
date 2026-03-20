@@ -398,7 +398,9 @@ class File(AppModelMixin):
         try:
             # 解压数据
             with zipfile.ZipFile(buffer) as zip_file:
-                return zip_file.read(self.file_name)
+                # 用 zip 内实际存储的条目名，避免文件名不匹配
+                name = zip_file.namelist()[0]
+                return zip_file.read(name)
         except Exception as e:
             # 如果数据不是zip格式，直接返回原始数据
             return buffer.getvalue()

@@ -45,7 +45,7 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
-        for key in ['api_key']:
+        for key in ['api_key', 'base_url']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
@@ -71,6 +71,7 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
     api_key = forms.PasswordInputField('API Key', required=True)
+    base_url = forms.TextInputField('Base URL', required=True, default_value='https://generativelanguage.googleapis.com')
 
     def get_model_params_setting_form(self, model_name):
         return GeminiLLMModelParams()

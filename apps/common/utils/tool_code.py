@@ -23,7 +23,7 @@ from common.utils.logger import maxkb_logger
 from maxkb.const import BASE_DIR, CONFIG
 from maxkb.const import PROJECT_DIR
 
-_enable_sandbox = bool(CONFIG.get('SANDBOX', 0))
+_enable_sandbox = bool(int(CONFIG.get('SANDBOX', 0)))
 _run_user = 'sandbox' if _enable_sandbox else getpass.getuser()
 _sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox') if _enable_sandbox else os.path.join(PROJECT_DIR,
                                                                                                           'data',

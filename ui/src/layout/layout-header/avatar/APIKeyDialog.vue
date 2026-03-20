@@ -66,10 +66,10 @@
       </el-table-column>
       <el-table-column :label="$t('layout.crossSettings')" width="100" prop="allow_cross_domain">
         <template #default="{ row }">
-          <el-tag type="info" class="info-tag" v-if="row.allow_cross_domain">
+          <el-tag size="small" type="info" class="info-tag" v-if="row.allow_cross_domain">
             {{ $t('views.system.authentication.scanTheQRCode.alreadyTurnedOn') }}
           </el-tag>
-          <el-tag class="blue-tag" v-else>
+          <el-tag size="small" class="blue-tag" v-else>
             {{ $t('views.system.authentication.scanTheQRCode.notEnabled') }}
           </el-tag>
         </template>

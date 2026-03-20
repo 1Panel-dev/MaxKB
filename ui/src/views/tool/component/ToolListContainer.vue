@@ -174,18 +174,32 @@
                     <span class="ellipsis-1" :title="item.name">
                       {{ item.name }}
                     </span>
-                    <el-tag v-if="item.version" class="ml-4" type="info" effect="plain">
+                    <el-tag
+                      v-if="item.version"
+                      class="ml-4"
+                      size="small"
+                      type="info"
+                      effect="plain"
+                    >
                       {{ item.version }}
                     </el-tag>
                   </div>
                 </template>
                 <template #subTitle>
-                  <el-text class="color-secondary lighter" size="small">
-                    {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
+                  <el-text class="color-secondary lighter flex align-center" size="small">
+                    <span
+                      :title="i18n_name(item.nick_name)"
+                      class="ellipsis"
+                      style="max-width: 90px"
+                    >
+                      {{ i18n_name(item.nick_name) }}
+                    </span>
+                    <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                    <span> {{ dateFormat(item.create_time) }}</span>
                   </el-text>
                 </template>
                 <template #tag="{ hoverShow }">
-                  <el-tag v-if="isShared" type="info" class="info-tag">
+                  <el-tag v-if="isShared" size="small" type="info" class="info-tag">
                     {{ t('views.shared.title') }}
                   </el-tag>
                   <el-tooltip effect="dark" :content="$t('views.tool.updatedVersion')">
@@ -427,6 +441,7 @@ import ToolStoreApi from '@/api/tool/store.ts'
 import { resetUrl, i18n_name } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { SourceTypeEnum } from '@/enums/common'
+import { dateFormat } from '@/utils/time'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
@@ -639,6 +654,18 @@ function openCreateMcpDialog(data?: any) {
 }
 
 function openCreateSkillDialog(data?: any) {
+  // 有版本号的展示readme，是商店更新过来的
+  if (data?.version) {
+    let readMe = ''
+    storeTools.value
+      .filter((item) => item.id === data.template_id)
+      .forEach((item) => {
+        readMe = item.readMe
+      })
+    bus.emit('select_node', data.folder_id)
+    toolStoreDescDrawerRef.value?.open(readMe, data)
+    return
+  }
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
     return

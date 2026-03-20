@@ -15,7 +15,6 @@ from typing import List
 
 import fitz
 from django.utils.translation import gettext_lazy as _
-from langchain_community.document_loaders import PyPDFLoader
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger

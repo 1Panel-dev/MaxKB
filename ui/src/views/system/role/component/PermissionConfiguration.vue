@@ -61,7 +61,6 @@ import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
 import {hasPermission} from "@/utils/permission";
 import {EditionConst, RoleConst} from "@/utils/permission/data.ts";
-import { max } from 'moment'
 
 const props = defineProps<{
   currentRole?: RoleItem

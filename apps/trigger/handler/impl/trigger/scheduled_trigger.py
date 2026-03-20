@@ -1,5 +1,4 @@
 # coding=utf-8
-
 from django.db.models import QuerySet
 
 from common.utils.logger import maxkb_logger
@@ -132,6 +131,30 @@ def _deploy_monthly(trigger: dict, trigger_tasks: list[dict], setting: dict, tri
                     replace_existing=True,
                 )
 
+def _deploy_cron(trigger: dict, trigger_tasks: list[dict], setting: dict, trigger_id: str) -> None:
+    from common.job import scheduler
+    from apscheduler.triggers.cron import CronTrigger
+
+    cron_expression = setting.get('cron_expression')
+    if not cron_expression:
+        maxkb_logger.warning(f"empty cron_expression, trigger_id={trigger_id}")
+        return
+
+    try:
+        cron_trigger = CronTrigger.from_crontab(cron_expression.strip())
+    except ValueError:
+        maxkb_logger.warning(f"invalid cron_expression={cron_expression}, trigger_id={trigger_id}")
+        return
+
+    for task in trigger_tasks:
+        job_id = f"trigger:{trigger_id}:task:{task['id']}:cron:{cron_expression.strip()}"
+        scheduler.add_job(
+            ScheduledTrigger.execute,
+            trigger=cron_trigger,
+            id=job_id,
+            kwargs={"trigger": trigger, "trigger_task": task},
+            replace_existing=True,
+        )
 
 def _deploy_interval(trigger: dict, trigger_tasks: list[dict], setting: dict, trigger_id: str) -> None:
     from common.job import scheduler
@@ -184,6 +207,7 @@ def deploy_scheduled_trigger(trigger: dict, trigger_tasks: list[dict], setting: 
         "weekly": _deploy_weekly,
         "monthly": _deploy_monthly,
         "interval": _deploy_interval,
+        'cron': _deploy_cron
     }
     fn = deployers.get(schedule_type)
     if not fn:

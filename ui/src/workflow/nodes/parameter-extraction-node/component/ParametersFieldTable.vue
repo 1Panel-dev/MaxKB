@@ -41,7 +41,7 @@
       "
     >
       <template #default="{ row }">
-        <el-tag type="info" class="info-tag"> {{ row.parameter_type }}</el-tag>
+        <el-tag size="small" type="info" class="info-tag"> {{ row.parameter_type }}</el-tag>
       </template>
     </el-table-column>
     <el-table-column :label="$t('common.operation')" align="left" width="80">

@@ -1,16 +1,31 @@
 <template>
-  <el-collapse>
-    <el-collapse-item title="Consistency">
-      <template #title>
-        <div class="flex" style="flex-wrap: nowrap; align-items: center">
-          <el-avatar class="avatar-gradient mr-8" style="height: 20px; width: 20px" shape="square">
-            <img :src="toolCallsContent.icon || defaultIcon" /> </el-avatar
-          >{{ toolCallsContent.title || '工具执行' }}
-        </div>
-      </template>
-      <Content :content="toolCallsContent"></Content>
-    </el-collapse-item>
-  </el-collapse>
+  <el-card shadow="never" class="layout-bg mt-8" style="--el-card-padding: 8px 12px">
+    <div class="flex-between cursor" @click="showContent = !showContent">
+      <div class="flex align-center" style="line-height: 20px">
+        <el-avatar
+          v-if="toolCallsContent.icon"
+          shape="square"
+          :size="24"
+          style="background: none"
+          class="mr-4"
+        >
+          <img :src="toolCallsContent.icon" alt="" />
+        </el-avatar>
+        <ToolIcon v-else :size="24" class="mr-4" />
+        <span class="ml-4">{{ toolCallsContent.title || '-' }}</span>
+      </div>
+      <div>
+        <el-icon class="arrow-icon" :class="showContent ? 'rotate-180' : ''">
+          <ArrowDown />
+        </el-icon>
+      </div>
+    </div>
+    <el-collapse-transition>
+      <div v-show="showContent">
+        <Content :content="toolCallsContent"></Content>
+      </div>
+    </el-collapse-transition>
+  </el-card>
 </template>
 <script lang="ts" setup>
 import Content from './content/index.vue'
@@ -26,5 +41,7 @@ const toolCallsContent = computed<ToolCalls>(() => {
     return { type: 'simple-tool-calls', icon: '', title: '', content: {} }
   }
 })
+
+const showContent = ref<boolean>(false)
 </script>
 <style lang="scss" scoped></style>

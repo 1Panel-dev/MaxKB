@@ -8,7 +8,7 @@
 """
 from typing import Dict
 
-from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings
 
 from models_provider.base_model_provider import MaxKBBaseModel
 

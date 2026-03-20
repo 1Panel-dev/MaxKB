@@ -41,11 +41,11 @@ export default {
   },
   skill: {
     title: '技能',
-    copySkillTool: '複製技能',
-    createSkillTool: '創建技能',
-    editSkillTool: '編輯技能',
-    initParamPlaceholder: '啟用技能時需要配置的參數',
-    skillFile: '技能文件',
+    copySkillTool: '複製 Skills',
+    createSkillTool: '創建 Skills',
+    editSkillTool: '編輯 Skills',
+    initParamPlaceholder: '啟用 Skills 時需要配置的參數',
+    skillFile: 'Skills 文件',
     reUpload: '重新上傳',
   },
   tip: {

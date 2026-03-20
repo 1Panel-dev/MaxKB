@@ -1,7 +1,6 @@
 # coding=utf-8
 import base64
 from concurrent.futures import ThreadPoolExecutor
-from requests.exceptions import ConnectTimeout, ReadTimeout
 from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping
 
 from langchain_core.language_models import LanguageModelInput
@@ -14,9 +13,11 @@ from langchain_core.runnables import RunnableConfig, ensure_config
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
 from langchain_openai.chat_models.base import _create_usage_metadata
+from requests.exceptions import ReadTimeout
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from common.utils.logger import maxkb_logger
+
 
 def custom_get_token_ids(text: str):
     tokenizer = TokenizerManage.get_tokenizer()
@@ -26,6 +27,7 @@ def custom_get_token_ids(text: str):
 def _convert_delta_to_message_chunk(
         _dict: Mapping[str, Any], default_class: type[BaseMessageChunk]
 ) -> BaseMessageChunk:
+    """Convert to a LangChain message chunk."""
     id_ = _dict.get("id")
     role = cast(str, _dict.get("role"))
     content = cast(str, _dict.get("content") or "")
@@ -39,7 +41,6 @@ def _convert_delta_to_message_chunk(
         additional_kwargs["function_call"] = function_call
     tool_call_chunks = []
     if raw_tool_calls := _dict.get("tool_calls"):
-        additional_kwargs["tool_calls"] = raw_tool_calls
         try:
             tool_call_chunks = [
                 tool_call_chunk(
@@ -55,14 +56,14 @@ def _convert_delta_to_message_chunk(
 
     if role == "user" or default_class == HumanMessageChunk:
         return HumanMessageChunk(content=content, id=id_)
-    elif role == "assistant" or default_class == AIMessageChunk:
+    if role == "assistant" or default_class == AIMessageChunk:
         return AIMessageChunk(
             content=content,
             additional_kwargs=additional_kwargs,
             id=id_,
             tool_call_chunks=tool_call_chunks,  # type: ignore[arg-type]
         )
-    elif role in ("system", "developer") or default_class == SystemMessageChunk:
+    if role in ("system", "developer") or default_class == SystemMessageChunk:
         if role == "developer":
             additional_kwargs = {"__openai_role__": "developer"}
         else:
@@ -70,16 +71,15 @@ def _convert_delta_to_message_chunk(
         return SystemMessageChunk(
             content=content, id=id_, additional_kwargs=additional_kwargs
         )
-    elif role == "function" or default_class == FunctionMessageChunk:
+    if role == "function" or default_class == FunctionMessageChunk:
         return FunctionMessageChunk(content=content, name=_dict["name"], id=id_)
-    elif role == "tool" or default_class == ToolMessageChunk:
+    if role == "tool" or default_class == ToolMessageChunk:
         return ToolMessageChunk(
             content=content, tool_call_id=_dict["tool_call_id"], id=id_
         )
-    elif role or default_class == ChatMessageChunk:
+    if role or default_class == ChatMessageChunk:
         return ChatMessageChunk(content=content, role=role, id=id_)
-    else:
-        return default_class(content=content, id=id_)  # type: ignore
+    return default_class(content=content, id=id_)  # type: ignore[call-arg]#
 
 
 class BaseChatOpenAI(ChatOpenAI):
@@ -135,25 +135,32 @@ class BaseChatOpenAI(ChatOpenAI):
             self,
             chunk: dict,
             default_chunk_class: type,
-            base_generation_info: Optional[dict],
-    ) -> Optional[ChatGenerationChunk]:
-        if chunk.get("type") == "content.delta":  # from beta.chat.completions.stream
+            base_generation_info: dict | None,
+    ) -> ChatGenerationChunk | None:
+        if chunk.get("type") == "content.delta":  # From beta.chat.completions.stream
             return None
         token_usage = chunk.get("usage")
         choices = (
                 chunk.get("choices", [])
-                # from beta.chat.completions.stream
+                # From beta.chat.completions.stream
                 or chunk.get("chunk", {}).get("choices", [])
         )
 
-        usage_metadata: Optional[UsageMetadata] = (
-            _create_usage_metadata(token_usage) if token_usage and token_usage.get("prompt_tokens") else None
+        usage_metadata: UsageMetadata | None = (
+            _create_usage_metadata(token_usage, chunk.get("service_tier"))
+            if token_usage
+            else None
         )
         if len(choices) == 0:
             # logprobs is implicitly None
             generation_chunk = ChatGenerationChunk(
-                message=default_chunk_class(content="", usage_metadata=usage_metadata)
+                message=default_chunk_class(content="", usage_metadata=usage_metadata),
+                generation_info=base_generation_info,
             )
+            if self.output_version == "v1":
+                generation_chunk.message.content = []
+                generation_chunk.message.response_metadata["output_version"] = "v1"
+
             return generation_chunk
 
         choice = choices[0]
@@ -171,6 +178,8 @@ class BaseChatOpenAI(ChatOpenAI):
                 generation_info["model_name"] = model_name
             if system_fingerprint := chunk.get("system_fingerprint"):
                 generation_info["system_fingerprint"] = system_fingerprint
+            if service_tier := chunk.get("service_tier"):
+                generation_info["service_tier"] = service_tier
 
         logprobs = choice.get("logprobs")
         if logprobs:
@@ -179,10 +188,10 @@ class BaseChatOpenAI(ChatOpenAI):
         if usage_metadata and isinstance(message_chunk, AIMessageChunk):
             message_chunk.usage_metadata = usage_metadata
 
-        generation_chunk = ChatGenerationChunk(
+        message_chunk.response_metadata["model_provider"] = "openai"
+        return ChatGenerationChunk(
             message=message_chunk, generation_info=generation_info or None
         )
-        return generation_chunk
 
     def invoke(
             self,
@@ -212,12 +221,12 @@ class BaseChatOpenAI(ChatOpenAI):
             'token_usage'] if 'token_usage' in chat_result.response_metadata else chat_result.usage_metadata
         return chat_result
 
-
     def upload_file_and_get_url(self, file_stream, file_name):
         """上传文件并获取文件URL"""
         base64_video = base64.b64encode(file_stream).decode("utf-8")
         video_format = get_video_format(file_name)
         return f'data:{video_format};base64,{base64_video}'
+
 
 def get_video_format(file_name):
     extension = file_name.split('.')[-1].lower()

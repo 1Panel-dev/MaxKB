@@ -38,6 +38,7 @@ export default {
   paramSetting: '參數設定',
   name: '名稱',
   creator: '建立者',
+  createdIn: '創建於',
   author: '作者',
   debug: '調試',
   required: '必填',

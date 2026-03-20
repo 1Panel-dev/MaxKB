@@ -1,6 +1,6 @@
 from typing import Sequence, Optional, Dict
 
-from langchain_community.embeddings import OllamaEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from langchain_core.callbacks import Callbacks
 from langchain_core.documents import Document
 from pydantic import BaseModel, Field

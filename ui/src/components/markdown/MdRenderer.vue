@@ -247,7 +247,4 @@ function handleQuestionClick(content: string) {
   }
 }
 
-.cursor {
-  cursor: pointer;
-}
 </style>

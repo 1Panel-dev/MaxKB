@@ -319,7 +319,7 @@ watch(dialogVisible, (val: boolean) => {
   position: relative;
   overflow: inherit;
   &:hover {
-    background: var(--app-text-color-light-1);
+    background: rgba(var(--el-text-color-primary-rgb), 0.1);
     border: 1px solid #dee0e3;
   }
   &.disabled {

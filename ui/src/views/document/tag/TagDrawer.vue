@@ -39,7 +39,14 @@
       @cell-mouse-leave="cellMouseLeave"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column :label="$t('views.document.tag.key')">
+      <el-table-column
+        prop="key"
+        :label="
+          multipleSelection.length === 0
+            ? $t('views.document.tag.key')
+            : `${$t('common.selected')} ${multipleSelection.length} ${$t('views.document.items')}`
+        "
+      >
         <template #default="{ row }">
           <div class="flex-between">
             {{ row.key }}
@@ -89,6 +96,13 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('views.document.tag.relatedDoc')" align="right">
+        <template #default="{ row }">
+          <el-link type="primary" underline @click="openTagLinkedDocumentDialog(row)">
+            {{ row.doc_count }}
+          </el-link>
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('common.operation')" align="left" width="100" fixed="right">
         <template #default="{ row }">
           <span class="mr-4">
@@ -116,7 +130,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <div class="app-table__pagination mt-16">
+    <div class="mt-16 flex justify-end">
       <el-pagination
         v-model:current-page="pageNum"
         v-model:page-size="pageSize"
@@ -128,6 +142,7 @@
   </el-drawer>
   <CreateTagDialog ref="createTagDialogRef" @refresh="handleDialogRefresh" />
   <EditTagDialog ref="editTagDialogRef" @refresh="handleDialogRefresh" />
+  <TaglinkedDocumentDialog ref="taglinkedDocumentDialogRef" @refresh="handleDialogRefresh" />
 </template>
 
 <script setup lang="ts">
@@ -135,6 +150,7 @@ import { computed, ref, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import CreateTagDialog from './CreateTagDialog.vue'
+import TaglinkedDocumentDialog from './TaglinkedDocumentDialog.vue'
 import { MsgConfirm } from '@/utils/message.ts'
 import { t } from '@/locales'
 import EditTagDialog from '@/views/document/tag/EditTagDialog.vue'
@@ -181,10 +197,12 @@ const tags = ref<Array<any>>([])
 const currentMouseId = ref<number | null>(null)
 const pageNum = ref(1)
 const pageSize = ref(20)
-const tableMaxHeight = computed(() => `calc(100vh - 260px)`)
+const tableMaxHeight = computed(() => `calc(100vh - 200px)`)
 
-function cellMouseEnter(row: any) {
-  currentMouseId.value = row.id
+function cellMouseEnter(row: any, column: any) {
+  if (column && column.property === 'key') {
+    currentMouseId.value = row.id
+  }
 }
 
 function cellMouseLeave() {
@@ -201,6 +219,7 @@ const tableData = computed(() => {
           id: value.id,
           key: tag.key,
           value: value.value,
+          doc_count: value.doc_count,
           keyIndex: index, // 同一个 key 下第几行
         })
       })
@@ -328,6 +347,12 @@ function delTag(row: any) {
         })
     })
     .catch(() => {})
+}
+
+const taglinkedDocumentDialogRef = ref()
+
+const openTagLinkedDocumentDialog = (row: any) => {
+  taglinkedDocumentDialogRef.value?.open(row)
 }
 
 function editTagValue(row: any) {

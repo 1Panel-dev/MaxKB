@@ -93,7 +93,7 @@
               {{ $t('views.tool.dataSource.title') }}
             </span>
             <span v-else-if="scope.row.tool_type === 'SKILL'">
-              {{ $t('views.application.skill') }}
+              Skills
             </span>
             <span v-else> {{ $t('views.tool.title') }} </span>
           </template>
@@ -373,7 +373,7 @@
                   <el-dropdown-item
                     text
                     @click.stop="openToolRecordDrawer(row)"
-                    v-if="permissionPrecise.record()"
+                    v-if="row.tool_type === 'CUSTOM' && permissionPrecise.record()"
                   >
                     <AppIcon iconName="app-schedule-report" class="color-secondary" />
                     {{ $t('common.ExecutionRecord.subTitle') }}
@@ -396,7 +396,7 @@
 
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-    <SkillToolFormDrawer ref="SkillToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
+    <SkillToolFormDrawer ref="SkillToolFormDrawerRef" @refresh="refresh" :title="SkillToolDrawertitle" />
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <DataSourceToolFormDrawer
       ref="DataSourceToolFormDrawerRef"
@@ -465,7 +465,7 @@ const type_options = ref<any[]>([
     value: 'CUSTOM',
   },
   {
-    label: t('views.application.skill'),
+    label: 'Skills',
     value: 'SKILL',
   },
 ])
@@ -635,8 +635,8 @@ function openCreateSkillToolDialog(data?: any) {
   }
 
   SkillToolDrawertitle.value = data
-    ? t('views.application.skill.editSkill')
-    : t('views.application.skill.createSkill')
+    ? t('views.tool.skill.editSkillTool')
+    : t('views.tool.skill.createSkillTool')
   if (data) {
     ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
       SkillToolFormDrawerRef.value.open(res.data)

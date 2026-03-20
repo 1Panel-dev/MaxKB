@@ -1,11 +1,18 @@
 <template>
-  <div class="reasoning">
-    <el-button text @click="showThink = !showThink" class="reasoning-button">
-      {{ $t('workflow.nodes.aiChatNode.think') }}
-      <el-icon class="ml-4" :class="showThink ? 'rotate-180' : ''"><ArrowDownBold /> </el-icon>
-    </el-button>
+  <el-card shadow="never" class="reasoning mt-8" style="--el-card-padding: 12px">
+    <div class="flex-between cursor" @click="showThink = !showThink">
+      <div class="flex align-center" style="line-height: 20px">
+        <img src="@/assets/chat/icon_reasoning.svg" alt="" />
+        <span class="ml-4">{{ $t('workflow.nodes.aiChatNode.think') }}</span>
+      </div>
+      <div>
+        <el-icon class="arrow-icon" :class="showThink ? 'rotate-180' : ''">
+          <ArrowDown />
+        </el-icon>
+      </div>
+    </div>
     <el-collapse-transition>
-      <div class="border-l mt-8" v-show="showThink">
+      <div v-show="showThink">
         <MdPreview
           ref="editorRef"
           editorId="preview-only"
@@ -14,7 +21,7 @@
         />
       </div>
     </el-collapse-transition>
-  </div>
+  </el-card>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue'
@@ -23,12 +30,7 @@ const showThink = ref<boolean>(true)
 </script>
 <style lang="scss" scoped>
 .reasoning {
-  .reasoning-button {
-    font-size: 14px;
-    color: var(--app-text-color-secondary) !important;
-  }
   .reasoning-md {
-    padding-left: 8px;
     --md-color: var(--app-input-color-placeholder) !important;
   }
 }

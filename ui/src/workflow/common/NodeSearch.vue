@@ -1,47 +1,69 @@
 <template>
   <div>
-    <!-- 搜索遮罩层 -->
-    <Teleport to="body">
-      <div v-if="showSearch" class="search-mask" @click.self="closeSearch">
-        <div class="search-container">
-          <el-input
-            ref="searchInputRef"
-            v-model="searchText"
-            placeholder="搜索..."
-            :prefix-icon="Search"
-            clearable
-            @keyup.enter="handleSearch"
-            @keyup.esc="closeSearch"
-          >
-            <template #append>
-              <el-button @click="closeSearch">取消</el-button>
-            </template>
-          </el-input>
-        </div>
+    <!-- 搜索 -->
+    <el-card
+      class="workflow-search"
+      v-if="showSearch"
+      shadow="always"
+      style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+    >
+      <div class="workflow-search-container flex-between">
+        <el-input
+          ref="searchInputRef"
+          v-bind:modelValue="searchText"
+          @update:modelValue="handleSearch"
+          :placeholder="$t('workflow.tip.searchPlaceholder')"
+          clearable
+          @keyup.enter="next"
+          @keyup.esc="closeSearch"
+        >
+        </el-input>
+        <span>
+          <el-space :size="4">
+            <span class="lighter" v-if="selectedCount && selectedCount > 0">
+              {{ currentIndex + 1 }}/{{ selectedCount }}
+            </span>
+            <span
+              class="lighter color-secondary"
+              style="width: 42px"
+              v-else-if="searchText.length > 0"
+            >
+              无结果
+            </span>
+            <el-divider direction="vertical" />
+
+            <el-button text>
+              <el-icon @click="up"><ArrowUp /></el-icon>
+            </el-button>
+            <el-button text>
+              <el-icon @click="next"><ArrowDown /></el-icon>
+            </el-button>
+            <el-button text @click="closeSearch()">
+              <el-icon><Close /></el-icon>
+            </el-button>
+          </el-space>
+        </span>
       </div>
-    </Teleport>
+    </el-card>
+    <!-- 开启搜索按钮 -->
+    <el-button v-else @click="openSearch()" circle class="workflow-search-button" size="large">
+      <el-icon :size="20"><Search /></el-icon>
+    </el-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { Search } from '@element-plus/icons-vue'
-
+import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
 // Props定义
 interface Props {
-  onSearch?: (keyword: string) => void // 搜索回调
+  lf?: any
 }
-
-const props = withDefaults(defineProps<Props>(), {
-  useElementPlus: false,
-  onSearch: undefined,
-})
+const props = withDefaults(defineProps<Props>(), {})
 
 // 状态
 const showSearch = ref(false)
 const searchText = ref('')
 const searchInputRef = ref<any>(null)
-const nativeInputRef = ref<HTMLInputElement | null>(null)
 
 // 快捷键处理
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,6 +79,102 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 }
 
+const focusOn = (node: any) => {
+  props.lf?.graphModel.transformModel.focusOn(
+    node.x,
+    node.y,
+    props.lf?.container.clientWidth,
+    props.lf?.container.clientHeight,
+  )
+}
+const selectedNodes = ref<Array<any>>()
+const currentIndex = ref<number>(0)
+const selectedCount = computed(() => {
+  return selectedNodes.value?.length
+})
+
+const getSelectNodes = (kw: string) => {
+  const result: Array<any> = []
+  const graph_data = props.lf?.getGraphData()
+  graph_data.nodes.filter((node: any) => {
+    if (node.properties.stepName.includes(kw)) {
+      if (node.type !== 'loop-body-node') {
+        result.push({
+          ...node,
+          order: 1,
+          focusOn: () => {
+            focusOn(node)
+            props.lf?.graphModel.getNodeModelById(node.id)?.focusOn(searchText.value)
+          },
+          selectOn: () => {
+            props.lf?.graphModel.getNodeModelById(node.id)?.selectOn(searchText.value)
+          },
+          clearSelectOn: () => {
+            props.lf?.graphModel.getNodeModelById(node.id)?.clearSelectOn(searchText.value)
+          },
+        })
+      }
+    }
+    if (node.type == 'loop-body-node') {
+      const nodeModel = props.lf?.graphModel
+      const childNodeModel = nodeModel.getNodeModelById(node.id)
+      childNodeModel.getSelectNodes(searchText.value).map((childNode: any) => {
+        result.push({
+          ...childNode,
+          order: 2,
+          focusOn: () => {
+            focusOn(node)
+            childNodeModel.focusOn({ node: childNode, kw: searchText.value })
+          },
+          selectOn: () => {
+            childNodeModel.selectOn({ node: childNode, kw: searchText.value })
+          },
+          clearSelectOn: () => {
+            childNodeModel.clearSelectOn({ node: childNode, kw: searchText.value })
+          },
+        })
+      })
+    }
+  })
+  result.sort((a, b) => a.order - b.order || a.y - b.y || a.x - b.x)
+  return result
+}
+const selectNodes = (nodes: Array<any>) => {
+  nodes.forEach((node) => node.selectOn())
+}
+const next = () => {
+  if (selectedNodes.value && selectedNodes.value.length > 0) {
+    selectedNodes.value[currentIndex.value]?.selectOn()
+    if (selectedNodes.value.length - 1 >= currentIndex.value + 1) {
+      currentIndex.value++
+    } else {
+      currentIndex.value = 0
+    }
+    selectedNodes.value[currentIndex.value]?.focusOn()
+  }
+}
+const up = () => {
+  if (selectedNodes.value && selectedNodes.value.length > 0) {
+    selectedNodes.value[currentIndex.value]?.selectOn()
+    if (currentIndex.value - 1 < 0) {
+      currentIndex.value = selectedNodes.value.length - 1
+    } else {
+      currentIndex.value--
+    }
+    selectedNodes.value[currentIndex.value]?.focusOn()
+  }
+}
+
+const onSearch = (kw: string) => {
+  if (selectedNodes.value === undefined) {
+    const selected = getSelectNodes(kw)
+    if (selected && selected.length > 0) {
+      selectedNodes.value = selected
+      selectNodes(selected)
+      selected[currentIndex.value].focusOn()
+    }
+  }
+}
 // 打开搜索
 const openSearch = () => {
   showSearch.value = true
@@ -69,17 +187,39 @@ const openSearch = () => {
 
 // 关闭搜索
 const closeSearch = () => {
+  clearSelect()
   showSearch.value = false
   searchText.value = ''
 }
-
+const clearSelect = () => {
+  if (selectedNodes.value) {
+    selectedNodes.value.forEach((node) => {
+      node.clearSelectOn()
+    })
+  }
+  selectedNodes.value = undefined
+  currentIndex.value = 0
+  props.lf?.graphModel.clearSelectElements()
+  const graph_data = props.lf?.getGraphData()
+  graph_data.nodes.forEach((node: any) => {
+    if (node.type == 'loop-body-node') {
+      props.lf?.graphModel.getNodeModelById(node.id).clearSelectElements()
+    }
+  })
+}
 // 执行搜索
-const handleSearch = () => {
+const handleSearch = (kw: string) => {
+  searchText.value = kw
+  clearSelect()
+
   if (searchText.value.trim()) {
-    props.onSearch?.(searchText.value)
+    onSearch?.(searchText.value)
   }
 }
-
+const reSearch = () => {
+  console.log('ss')
+  handleSearch(searchText.value)
+}
 // 生命周期
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
@@ -88,82 +228,28 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown)
 })
+defineExpose({ reSearch })
 </script>
 
 <style scoped>
-.search-mask {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.3);
-  display: flex;
-  justify-content: center;
-  z-index: 9999;
-  padding-top: 20vh;
+.workflow-search-button {
+  position: absolute;
+  top: 72px;
+  left: 24px;
+  z-index: 2;
 }
-
-.search-container {
-  width: 500px;
-  max-width: 90%;
-  animation: slideDown 0.2s ease;
+.workflow-search {
+  position: absolute;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
 }
-
-/* 原生输入框样式 */
-.native-search {
-  display: flex;
-  gap: 8px;
-  background: white;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.native-search input {
-  flex: 1;
-  padding: 10px 12px;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-}
-
-.native-search input:focus {
-  border-color: #409eff;
-}
-
-.native-search button {
-  padding: 0 16px;
-  background: white;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.native-search button:hover {
-  border-color: #409eff;
-  color: #409eff;
-}
-
-.content {
-  padding: 20px;
-}
-
-.item {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+.workflow-search-container {
+  width: 360px;
+  :deep(.el-input__wrapper) {
+    box-shadow: none;
+    padding: 0 8px 0 1px !important;
   }
 }
 </style>

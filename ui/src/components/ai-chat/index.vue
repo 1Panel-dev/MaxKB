@@ -36,15 +36,19 @@
             :application="applicationDetails"
             :available="available"
             :send-message="sendMessage"
+            v-if="!selection"
           ></PrologueContent>
           <el-checkbox-group v-model="multipleSelectionChat" @change="handleCheckedChatChange">
             <template v-for="(item, index) in chatList" :key="index">
               <div class="flex-between w-full">
-                <el-checkbox :value="item.id" v-if="selection" />
+                <el-checkbox :value="item.record_id" v-if="selection" />
                 <div
                   class="w-full border-r-8"
-                  :class="selection ? 'is-selected p-12 mt-8 mb-8 cursor' : 'mt-24'"
-                  @click="toggleSelect(item.id)"
+                  :class="[
+                    selection ? 'p-12 mt-8 mb-8 cursor' : 'mt-24',
+                    multipleSelectionChat.includes(item.record_id) ? 'is-selected' : '',
+                  ]"
+                  @click="toggleSelect(item.record_id)"
                 >
                   <!-- 问题 -->
                   <QuestionContent
@@ -59,11 +63,14 @@
                 </div>
               </div>
               <div class="flex align-center w-full">
-                <el-checkbox :value="item.id" v-if="selection" />
+                <el-checkbox :value="item.record_id" v-if="selection" />
                 <div
                   class="w-full border-r-8"
-                  :class="selection ? 'is-selected p-12 cursor' : ''"
-                  @click="toggleSelect(item.id)"
+                  :class="[
+                    selection ? 'p-12 cursor' : '',
+                    multipleSelectionChat.includes(item.record_id) ? 'is-selected' : '',
+                  ]"
+                  @click="toggleSelect(item.record_id)"
                 >
                   <!-- 回答 -->
                   <AnswerContent
@@ -97,13 +104,15 @@
       <div style="position: relative">
         <!-- 置底按钮 -->
         <el-button v-if="isBottom" circle class="back-bottom-button" @click="setScrollBottom">
-          <el-icon><ArrowDownBold /></el-icon>
+          <el-icon>
+            <ArrowDownBold />
+          </el-icon>
         </el-button>
         <div class="mul-operation border-t w-full" v-if="selection === true">
           <div class="flex-between chat-width">
             <el-checkbox v-model="checkAll" @change="handleCheckAllChange">
-              {{ $t('common.allCheck') }}</el-checkbox
-            >
+              {{ $t('common.allCheck') }}
+            </el-checkbox>
             <div>
               <el-button @click="cancelCheckHandle">
                 {{ $t('common.cancel') }}
@@ -314,14 +323,22 @@ watch(
   },
 )
 
+// 选择对话分享
+const checkAll = ref(false)
+const multipleSelectionChat = ref<any[]>([])
+const shareLoading = ref(false)
+
 watch(
   () => props.selection,
   (value) => {
     if (value) {
       if (value && multipleSelectionChat.value.length === 0) {
-        multipleSelectionChat.value = chatList.value.map((v) => v.id)
+        multipleSelectionChat.value = chatList.value.map((v) => v.record_id)
         checkAll.value = true
       }
+    } else {
+      checkAll.value = false
+      multipleSelectionChat.value = []
     }
   },
   {
@@ -329,13 +346,12 @@ watch(
   },
 )
 
-// 选择对话分享
-const checkAll = ref(false)
-const multipleSelectionChat = ref<any[]>([])
-const shareLoading = ref(false)
 function shareChatHandle() {
+  const validIds = new Set(chatList.value.map((v) => v.record_id))
+  const selectedIds = multipleSelectionChat.value.filter((id) => validIds.has(id))
+
   const obj = {
-    chat_record_ids: multipleSelectionChat.value,
+    chat_record_ids: selectedIds,
     is_current_all: checkAll.value,
   }
   chatAPI.postShareChat(id || props.appId, chartOpenId.value, obj, shareLoading).then((res) => {
@@ -346,7 +362,7 @@ function shareChatHandle() {
 }
 
 const handleCheckAllChange = (val: CheckboxValueType) => {
-  multipleSelectionChat.value = val ? chatList.value.map((v) => v.id) : []
+  multipleSelectionChat.value = val ? chatList.value.map((v) => v.record_id) : []
   checkAll.value = val as boolean
 }
 const handleCheckedChatChange = (value: CheckboxValueType[]) => {
@@ -355,13 +371,17 @@ const handleCheckedChatChange = (value: CheckboxValueType[]) => {
 }
 
 function toggleSelect(id: number) {
-  const index = multipleSelectionChat.value.indexOf(id)
-  if (index === -1) {
-    multipleSelectionChat.value.push(id)
-  } else {
-    multipleSelectionChat.value.splice(index, 1)
+  if (props.selection) {
+    const index = multipleSelectionChat.value.indexOf(id)
+    if (index === -1) {
+      multipleSelectionChat.value.push(id)
+    } else {
+      multipleSelectionChat.value.splice(index, 1)
+    }
+    checkAll.value = multipleSelectionChat.value.length === chatList.value.length
   }
 }
+
 function cancelCheckHandle() {
   checkAll.value = false
   multipleSelectionChat.value = []
@@ -381,6 +401,7 @@ function UserFormConfirm() {
   firsUserInput.value = false
   showUserInput.value = false
 }
+
 function UserFormCancel() {
   // 恢复初始数据
   form_data.value = JSON.parse(JSON.stringify(initialFormData.value))
@@ -506,6 +527,7 @@ const getChatRecordDetailsAPI = (row: any) => {
   }
   return Promise.reject('404')
 }
+
 /**
  * 获取对话详情
  * @param row
@@ -520,6 +542,7 @@ function getSourceDetail(row: any) {
     })
   })
 }
+
 /**
  * 对话
  */
@@ -616,6 +639,7 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
+
 // 保存上传文件列表
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
@@ -762,8 +786,15 @@ const handleScroll = () => {
   if (props.type !== 'log' && scrollDiv.value) {
     // 内部高度小于外部高度 就需要出滚动条
     if (scrollDiv.value.wrapRef.offsetHeight < dialogScrollbar.value.scrollHeight) {
-      // 滚动到底部
-      scrollDiv.value.setScrollTop(dialogScrollbar.value.scrollHeight)
+      // 只有在用户已经在底部附近时才自动滚动到底部
+      const isNearBottom =
+        dialogScrollbar.value.scrollHeight -
+          (scrollTop.value + scrollDiv.value.wrapRef.offsetHeight) <=
+        40
+      if (scorll.value || isNearBottom) {
+        // 滚动到底部
+        scrollDiv.value.setScrollTop(dialogScrollbar.value.scrollHeight)
+      }
     }
   }
 }
@@ -800,6 +831,7 @@ function parseTransform(transformStr: string) {
 
   return result
 }
+
 onMounted(() => {
   if (isUserInput.value && localStorage.getItem(`${accessToken}userForm`)) {
     const userFormData = JSON.parse(localStorage.getItem(`${accessToken}userForm`) || '{}')
@@ -861,6 +893,7 @@ onMounted(() => {
   })
   bus.on('click:share', (id: string) => {
     multipleSelectionChat.value.push(id)
+    checkAll.value = multipleSelectionChat.value.length === chatList.value.length
     emit('update:selection', true)
   })
 })

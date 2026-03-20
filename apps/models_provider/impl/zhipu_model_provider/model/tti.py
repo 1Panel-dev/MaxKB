@@ -1,8 +1,8 @@
 from typing import Dict
 
 from django.utils.translation import gettext
-from langchain_community.chat_models import ChatZhipuAI
 from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
 from zhipuai import ZhipuAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
@@ -46,9 +46,10 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
         return False
 
     def check_auth(self):
-        chat = ChatZhipuAI(
-            zhipuai_api_key=self.api_key,
-            model_name=self.model,
+        chat = ChatOpenAI(
+            api_key=self.api_key,
+            base_url='https://open.bigmodel.cn/api/paas/v4',
+            model=self.model,
         )
         chat.invoke([HumanMessage([{"type": "text", "text": gettext('Hello')}])])
 

@@ -61,9 +61,10 @@
               >
                 <el-popover
                   placement="bottom-start"
-                  :width="350"
+                  :width="400"
                   popper-style="--el-popover-border-radius:8px;--el-popover-padding:16px 16px 0"
                   :persistent="false"
+                  :show-after="500"
                 >
                   <template #reference>
                     <CardCheckbox
@@ -87,8 +88,16 @@
                         <KnowledgeIcon :type="item.type" />
                       </template>
                       <template #subTitle>
-                        <el-text class="color-secondary lighter" size="small">
-                          {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
+                        <el-text class="color-secondary lighter flex align-center" size="small">
+                          <span
+                            :title="i18n_name(item.nick_name)"
+                            class="ellipsis"
+                            style="max-width: 90px"
+                          >
+                            {{ i18n_name(item.nick_name) }}
+                          </span>
+                          <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                          <span> {{ dateFormat(item.create_time) }}</span>
                         </el-text>
                       </template>
                       <template #footer>
@@ -146,6 +155,7 @@ import useStore from '@/stores'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { uniqueArray } from '@/utils/array'
 import { numberFormat, i18n_name } from '@/utils/common'
+import { dateFormat } from '@/utils/time'
 const route = useRoute()
 const props = defineProps({
   data: {

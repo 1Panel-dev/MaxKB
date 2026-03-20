@@ -163,7 +163,7 @@ onMounted(() => {
   }
   &__footer {
     &:hover {
-      background-color: var(--app-text-color-light-1);
+      background-color: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
 }

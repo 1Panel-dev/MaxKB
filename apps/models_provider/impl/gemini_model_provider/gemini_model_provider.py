@@ -15,6 +15,7 @@ from models_provider.impl.gemini_model_provider.credential.embedding import Gemi
 from models_provider.impl.gemini_model_provider.credential.image import GeminiImageModelCredential
 from models_provider.impl.gemini_model_provider.credential.llm import GeminiLLMModelCredential
 from models_provider.impl.gemini_model_provider.credential.stt import GeminiSTTModelCredential
+from models_provider.impl.gemini_model_provider.credential.tti import GeminiTextToImageModelCredential
 from models_provider.impl.gemini_model_provider.model.embedding import GeminiEmbeddingModel
 from models_provider.impl.gemini_model_provider.model.image import GeminiImage
 from models_provider.impl.gemini_model_provider.model.llm import GeminiChatModel
@@ -22,11 +23,13 @@ from models_provider.impl.gemini_model_provider.model.stt import GeminiSpeechToT
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
+from models_provider.impl.gemini_model_provider.model.tti import GeminiTextToImage
 
 gemini_llm_model_credential = GeminiLLMModelCredential()
 gemini_image_model_credential = GeminiImageModelCredential()
 gemini_stt_model_credential = GeminiSTTModelCredential()
 gemini_embedding_model_credential = GeminiEmbeddingCredential()
+gemini_tti_model_credential = GeminiTextToImageModelCredential()
 
 model_info_list = [
     ModelInfo('gemini-1.0-pro', _('Latest Gemini 1.0 Pro model, updated with Google update'),
@@ -72,16 +75,25 @@ model_embedding_info_list = [
               GeminiEmbeddingModel),
 ]
 
+model_tti_info_list = [
+    ModelInfo('gemini-3.1-flash-image-preview', "",
+              ModelTypeConst.TTI,
+              gemini_tti_model_credential,
+              GeminiTextToImage)
+]
+
 model_info_manage = (
     ModelInfoManage.builder()
     .append_model_info_list(model_info_list)
     .append_model_info_list(model_image_info_list)
     .append_model_info_list(model_stt_info_list)
     .append_model_info_list(model_embedding_info_list)
+    .append_model_info_list(model_tti_info_list)
     .append_default_model_info(model_info_list[0])
     .append_default_model_info(model_image_info_list[0])
     .append_default_model_info(model_stt_info_list[0])
     .append_default_model_info(model_embedding_info_list[0])
+    .append_default_model_info(model_tti_info_list[0])
     .build()
 )
 

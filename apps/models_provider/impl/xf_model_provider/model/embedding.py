@@ -10,12 +10,61 @@
 import base64
 import json
 from typing import Dict, Optional
-
-import numpy as np
 from langchain_community.embeddings import SparkLLMTextEmbeddings
 from numpy import ndarray
 
 from models_provider.base_model_provider import MaxKBBaseModel
+import time
+import json
+import base64
+import numpy as np
+import threading
+import queue
+
+_task_queue = queue.Queue()
+
+
+def _worker():
+    while True:
+        message, future = _task_queue.get()
+
+        for i in range(3):
+            try:
+                data = json.loads(message)
+                code = data["header"]["code"]
+
+                if code != 0:
+                    raise Exception(f"Request error: {code}, {data}")
+
+                text_base = data["payload"]["feature"]["text"]
+                text_data = base64.b64decode(text_base)
+
+                dt = np.dtype(np.float32)
+                dt = dt.newbyteorder("<")
+
+                text = np.frombuffer(text_data, dtype=dt)
+
+                if len(text) > 2560:
+                    array = text[:2560]
+                else:
+                    array = text
+
+                future["result"] = array
+                future["event"].set()
+                break
+
+            except Exception as e:
+
+                if i == 2:
+                    future["error"] = e
+                    future["event"].set()
+                else:
+                    time.sleep(0.5)
+
+        time.sleep(0.5)  # QPS=2
+
+
+threading.Thread(target=_worker, daemon=True).start()
 
 
 class XFEmbedding(MaxKBBaseModel, SparkLLMTextEmbeddings):
@@ -32,19 +81,17 @@ class XFEmbedding(MaxKBBaseModel, SparkLLMTextEmbeddings):
     def _parser_message(
             message: str,
     ) -> Optional[ndarray]:
-        data = json.loads(message)
-        code = data["header"]["code"]
-        if code != 0:
-            # 这里是讯飞的QPS限制会报错,所以不建议用讯飞的向量模型
-            raise Exception(f"Request error: {code}, {data}")
-        else:
-            text_base = data["payload"]["feature"]["text"]
-            text_data = base64.b64decode(text_base)
-            dt = np.dtype(np.float32)
-            dt = dt.newbyteorder("<")
-            text = np.frombuffer(text_data, dtype=dt)
-            if len(text) > 2560:
-                array = text[:2560]
-            else:
-                array = text
-            return array
+        future = {
+            "event": threading.Event(),
+            "result": None,
+            "error": None
+        }
+
+        _task_queue.put((message, future))
+
+        future["event"].wait()
+
+        if future["error"]:
+            raise future["error"]
+
+        return future["result"]

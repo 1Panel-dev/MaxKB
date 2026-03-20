@@ -157,7 +157,7 @@
   .el-dropdown-menu__item {
     padding: 8px 12px;
     &:hover {
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
 }
@@ -333,7 +333,7 @@
 // 分段预览的tab样式
 .paragraph-tabs {
   .el-tabs__item {
-    background: var(--app-text-color-light-1);
+    background: rgba(var(--el-text-color-primary-rgb), 0.1);
     margin: 4px;
     border-radius: 4px;
     padding: 5px 10px 5px 8px !important;
@@ -358,17 +358,12 @@
   }
 }
 
-// 添加标签样式
-.upload-file-tag {
-  height: 24px !important;
-  padding: 0 6px !important;
-  font-size: 14px !important;
-}
 .button-new-tag {
   color: var(--app-input-color-placeholder);
   border: 1px dashed var(--el-button-border-color);
   padding: 5px 6px !important;
   font-size: 14px !important;
+  background: none;
   &:hover {
     background: var(--app-layout-bg-color);
     color: var(--app-input-color-placeholder);
@@ -382,8 +377,8 @@
     padding: 0 !important;
   }
   .status-tag {
-    top: 0!important;
-    right: 0!important;
+    top: 0 !important;
+    right: 0 !important;
   }
 }
 
@@ -398,4 +393,3 @@
     color: var(--el-color-primary-light-5);
   }
 }
-

@@ -23,7 +23,7 @@
                       :write="row.writeStatus"
                       @close="closeWrite(row)"
                     />
-                    <el-tag v-if="index === 0" class="default-tag ml-4">{{
+                    <el-tag v-if="index === 0" size="small" class="default-tag ml-4">{{
                         $t('workflow.setting.latestRelease')
                       }}
                     </el-tag>

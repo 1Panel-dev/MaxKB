@@ -39,6 +39,7 @@ export default {
     copyError: '已复制节点',
     paramErrorMessage: '参数已存在: ',
     saveMessage: '当前的更改尚未保存，是否保存后退出?',
+    searchPlaceholder: '请输入节点名称'
   },
   delete: {
     confirmTitle: '确定删除该节点？',
@@ -514,6 +515,7 @@ export default {
     contain: '包含',
     not_contain: '不包含',
     eq: '等于',
+    not_eq: '不等于',
     ge: '大于等于',
     gt: '大于',
     le: '小于等于',

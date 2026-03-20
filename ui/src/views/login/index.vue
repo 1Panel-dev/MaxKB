@@ -263,13 +263,13 @@ onBeforeMount(() => {
             if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
               loginMode.value = ''
             }
-            if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2'].includes(modeList.value[0])) {
+            if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2', 'SAML2'].includes(modeList.value[0])) {
               redirectAuth(modeList.value[0])
             }
             // 这里的modeList 是oauth2 cas ldap oidc 这四个 还会有 lark wecom dingtalk
             // 获取到的 modeList中除'CAS', 'OIDC', 'OAuth2' LOCAL之外的登录方式
             QrList.value = modeList.value.filter(
-              (item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP'].includes(item),
+              (item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP', 'SAML2'].includes(item),
             )
             // modeList需要去掉lark wecom dingtalk
             modeList.value = modeList.value.filter((item) => !['lark', 'wecom', 'dingtalk'].includes(item))

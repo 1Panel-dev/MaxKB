@@ -20,16 +20,19 @@
     <template #title>
       <div class="flex align-center">
         <span :title="props.tool?.name" class="ellipsis"> {{ props.tool?.name }}</span>
-        <el-tag v-if="props.tool?.version" class="ml-4" type="info" effect="plain">
+        <el-tag v-if="props.tool?.version" size="small" class="ml-4" type="info" effect="plain">
           {{ props.tool?.version }}
         </el-tag>
       </div>
     </template>
     <template #tag>
-      <el-tag type="info" v-if="props.tool?.label === 'data_source'" class="info-tag">
+      <el-tag size="small" type="info" v-if="props.tool?.label === 'data_source'" class="info-tag">
         {{ $t('views.tool.dataSource.title') }}
       </el-tag>
-      <el-tag type="info" class="info-tag" v-else>
+      <el-tag size="small" type="info" v-else-if="props.tool?.label === 'skill'" class="info-tag">
+        Skills
+      </el-tag>
+      <el-tag size="small" type="info" class="info-tag" v-else>
         {{ $t('views.tool.title') }}
       </el-tag>
     </template>

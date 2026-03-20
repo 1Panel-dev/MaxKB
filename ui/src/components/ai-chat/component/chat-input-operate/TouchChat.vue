@@ -132,7 +132,7 @@ function onTouchEnd() {
   transform: translateX(-50%);
   width: 92%;
   border: 1px solid #ffffff;
-  box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+  box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
   z-index: 999;
   text-align: center;
   color: var(--app-text-color-secondary);
@@ -143,7 +143,7 @@ function onTouchEnd() {
   -ms-user-select: none;
   user-select: none;
   .close {
-    box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
+    box-shadow: 0px 4px 8px 0px rgba(var(--el-text-color-primary-rgb), 0.1);
     border: 1px solid rgba(222, 224, 227, 1);
     background: rgba(255, 255, 255, 1);
     color: var(--app-text-color-secondary);

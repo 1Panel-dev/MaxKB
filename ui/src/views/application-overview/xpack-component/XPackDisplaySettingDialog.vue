@@ -706,7 +706,7 @@ defineExpose({ open })
     background-repeat: no-repeat;
     background-position: center;
     background-size: auto 100%;
-    box-shadow: 0px 4px 8px 0px var(--app-text-color-light-1);
+    box-shadow: 0px 4px 8px 0px rgba(var(--el-text-color-primary-rgb), 0.1);
     overflow: hidden;
     width: 330px;
     height: 520px;

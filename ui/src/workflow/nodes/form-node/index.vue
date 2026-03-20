@@ -47,10 +47,7 @@
             @submitDialog="submitDialog"
           />
         </el-form-item>
-        <el-form-item
-          :label="$t('workflow.nodes.formNode.formSetting')"
-          @click.prevent
-        >
+        <el-form-item :label="$t('workflow.nodes.formNode.formSetting')" @click.prevent>
           <template #label>
             <div class="flex-between">
               <h5 class="lighter">
@@ -96,7 +93,7 @@
 
             <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="110px">
               <template #default="{ row }">
-                <el-tag type="info" class="info-tag">{{
+                <el-tag size="small" type="info" class="info-tag">{{
                   input_type_list.find((item) => item.value === row.input_type)?.label
                 }}</el-tag>
               </template>

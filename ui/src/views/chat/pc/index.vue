@@ -126,7 +126,12 @@
               <span v-if="paginationConfig.total" class="lighter">
                 {{ paginationConfig.total }} {{ $t('chat.question_count') }}
               </span>
-              <el-tooltip effect="dark" :content="$t('chat.share')" placement="top">
+              <el-tooltip
+                effect="dark"
+                :content="$t('chat.share')"
+                placement="top"
+                v-if="!showSelection"
+              >
                 <el-button
                   text
                   class="ml-12"
@@ -136,7 +141,7 @@
                   <AppIcon iconName="app-share"></AppIcon>
                 </el-button>
               </el-tooltip>
-              <el-dropdown class="ml-8">
+              <el-dropdown class="ml-8" v-if="!showSelection">
                 <el-button text>
                   <AppIcon iconName="app-export" :title="$t('chat.exportRecords')"></AppIcon>
                 </el-button>
@@ -387,6 +392,7 @@ function handleScroll(event: any) {
 }
 
 function newChat() {
+  showSelection.value = false
   if (!chatLogData.value.some((v) => v.id === 'new')) {
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
@@ -458,6 +464,7 @@ function getChatRecord() {
 
 const clickListHandle = (item: any) => {
   if (item.id !== currentChatId.value) {
+    showSelection.value = false
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []
@@ -589,7 +596,7 @@ function closeExecutionDetail() {
       position: absolute;
       top: 20px;
       right: -13px;
-      box-shadow: 0px 5px 10px 0px var(--app-text-color-light-1);
+      box-shadow: 0px 5px 10px 0px rgba(var(--el-text-color-primary-rgb), 0.1);
       z-index: 1;
       width: 24px;
       height: 24px;
@@ -620,6 +627,7 @@ function closeExecutionDetail() {
 
         .execution-details {
           padding: 16px;
+          word-break: break-all;
         }
       }
     }

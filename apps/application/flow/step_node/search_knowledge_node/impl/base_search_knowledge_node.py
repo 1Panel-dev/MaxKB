@@ -19,6 +19,7 @@ from common.constants.permission_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import get_file_content
+from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model_instance_by_model_workspace_id
@@ -97,10 +98,11 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         if get_knowledge_list_of_authorized is not None and RoleConstants.CHAT_USER.value.name == chat_user_type:
             knowledge_id_list = get_knowledge_list_of_authorized(self.workflow_manage.get_body().get('chat_user_id'),
                                                                  knowledge_id_list)
+        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        knowledge_id_list = filter_authorized_ids('knowledge', knowledge_id_list, workspace_id)
         if len(knowledge_id_list) == 0:
             return get_none_result(question)
         model_id = get_embedding_id(knowledge_id_list)
-        workspace_id = self.workflow_manage.get_body().get('workspace_id')
         embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()

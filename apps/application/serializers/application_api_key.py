@@ -51,11 +51,9 @@ class ApplicationKeySerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
-        application = QuerySet(Application).filter(id=application_id).first()
         secret_key = 'agent-' + hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()
         application_api_key = ApplicationApiKey(id=uuid.uuid7(),
                                                 secret_key=secret_key,
-                                                user_id=application.user_id,
                                                 application_id=application_id)
         application_api_key.save()
         return ApplicationKeySerializerModel(application_api_key).data

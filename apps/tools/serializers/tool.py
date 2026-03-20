@@ -899,6 +899,18 @@ class ToolSerializer(serializers.Serializer):
             res = requests.get(download_url, timeout=5)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
             tool_id = uuid.uuid7()
+            # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
+            if tool_data.get('tool_type') == ToolType.SKILL:
+                skill_file_id = uuid.uuid7()
+                skill_file = File(
+                    id=skill_file_id,
+                    file_name=f"{tool_data.get('name')}.zip",
+                    source_type=FileSourceType.TOOL,
+                    source_id=tool_id,
+                    meta={}
+                )
+                skill_file.save(base64.b64decode(tool_data.get('code')))
+                tool_data['code'] = skill_file_id
             tool = Tool(
                 id=tool_id,
                 name=instance.get('name'),
@@ -953,6 +965,18 @@ class ToolSerializer(serializers.Serializer):
             )
             res = requests.get(self.data.get('download_url'), timeout=5)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
+            # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
+            if tool_data.get('tool_type') == ToolType.SKILL:
+                skill_file_id = uuid.uuid7()
+                skill_file = File(
+                    id=skill_file_id,
+                    file_name=f"{tool_data.get('name')}.zip",
+                    source_type=FileSourceType.TOOL,
+                    source_id=tool.id,
+                    meta={}
+                )
+                skill_file.save(base64.b64decode(tool_data.get('code')))
+                tool_data['code'] = skill_file_id
             tool.desc = tool_data.get('desc')
             tool.code = tool_data.get('code')
             tool.input_field_list = tool_data.get('input_field_list', [])

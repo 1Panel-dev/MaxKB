@@ -48,7 +48,7 @@ class ApplicationKey(APIView):
                      )
     def post(self, request: Request, workspace_id: str, application_id: str):
         return result.success(ApplicationKeySerializer(
-            data={'application_id': application_id, 'user_id': request.user.id,
+            data={'application_id': application_id,
                   'workspace_id': workspace_id}).generate())
 
     class Page(APIView):

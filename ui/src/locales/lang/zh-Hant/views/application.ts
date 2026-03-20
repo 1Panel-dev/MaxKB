@@ -11,7 +11,6 @@ export default {
   simplePlaceholder: '通過表單設置方式，快速搭建基礎功能的智能體',
   advancedPlaceholder: '使用低代碼拖拉拽方式，靈活編排複雜邏輯、功能豐富的智能體',
   appTest: '調試預覽',
-  skill: '技能',
   operation: {
     toChat: '去對話',
     addModel: '新增模型',

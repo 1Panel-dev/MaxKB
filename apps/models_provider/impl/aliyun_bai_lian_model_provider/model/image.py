@@ -1,18 +1,15 @@
 # coding=utf-8
-import datetime
+import json
 import time
 from typing import Dict, Optional, Any, Iterator
 
 import requests
-from langchain_community.chat_models import ChatTongyi
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import HumanMessage, BaseMessageChunk, AIMessage
-from django.utils.translation import gettext
+from langchain_core.messages import BaseMessageChunk, AIMessage
 from langchain_core.runnables import RunnableConfig
 
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
-import json
 
 
 class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):

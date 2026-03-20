@@ -1,7 +1,7 @@
 <template>
   <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
     <div
-      class="step-container app-card p-16"
+      class="step-container white-bg border-r-8 p-16"
       :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
       style="overflow: visible"
     >
@@ -21,7 +21,10 @@
               :size="24"
               :item="nodeModel?.properties.node_data"
             />
-            <h4 class="ellipsis-1 break-all">{{ nodeModel.properties.stepName }}</h4>
+            <h4
+              class="ellipsis-1 break-all"
+              v-html="highlightedStepName(nodeModel.properties.stepName)"
+            ></h4>
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
@@ -99,26 +102,49 @@
                   <el-switch v-model="enable_exception" size="small" />
                 </div>
               </div>
-
-              <template v-for="(item, index) in nodeFields" :key="index">
-                <div
-                  class="flex-between border-r-6 p-8-12 mb-8 layout-bg lighter"
-                  @mouseenter="showicon = index"
-                  @mouseleave="showicon = null"
-                >
-                  <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                  <el-tooltip
-                    effect="dark"
-                    :content="$t('workflow.setting.copyParam')"
-                    placement="top"
-                    v-if="showicon === index"
+              <div class="border-r-6 p-4-12 layout-bg lighter">
+                <template v-for="(item, index) in nodeFields" :key="index">
+                  <div
+                    class="flex-between mb-8 mt-8"
+                    @mouseenter="showicon = index"
+                    @mouseleave="showicon = null"
                   >
-                    <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
-                      <AppIcon iconName="app-copy"></AppIcon>
-                    </el-button>
-                  </el-tooltip>
-                </div>
-              </template>
+                    <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('workflow.setting.copyParam')"
+                      placement="top"
+                      v-if="showicon === index"
+                    >
+                      <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                        <AppIcon iconName="app-copy"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                </template>
+              </div>
+
+              <div class="border-r-6 p-4-12 layout-bg lighter mt-8" v-if="enable_exception">
+                <template v-for="(item, index) in abnormalNodeFields" :key="index">
+                  <div
+                    class="flex-between mb-8 mt-8"
+                    @mouseenter="showicon = 'abnormal' + index"
+                    @mouseleave="showicon = null"
+                  >
+                    <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('workflow.setting.copyParam')"
+                      placement="top"
+                      v-if="showicon === 'abnormal' + index"
+                    >
+                      <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                        <AppIcon iconName="app-copy"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                </template>
+              </div>
             </template>
           </div>
         </el-collapse-transition>
@@ -288,7 +314,7 @@ const mousedown = (event?: any) => {
   set(props.nodeModel, 'isHovered', !props.nodeModel.isSelected)
   props.nodeModel.graphModel.toFront(props.nodeModel.id)
 }
-const showicon = ref<number | null>(null)
+const showicon = ref<number | string | null>(null)
 const copyNode = () => {
   props.nodeModel.graphModel.clearSelectElements()
   const cloneNode = props.nodeModel.graphModel.cloneNode(props.nodeModel.id)
@@ -377,17 +403,6 @@ const nodeFields = computed(() => {
         globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
       }
     })
-    if (enable_exception.value) {
-      return [
-        ...fields,
-        {
-          label: t('workflow.abnormalInformation'),
-          value: 'exception_message',
-          globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
-          globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
-        },
-      ]
-    }
     return fields
   }
   return []
@@ -397,6 +412,16 @@ const output_title = computed(() => {
   return props.nodeModel.properties.config.output_title ?? t('common.param.outputParam')
 })
 
+const abnormalNodeFields = computed(() => {
+  return [
+    {
+      label: t('workflow.abnormalInformation'),
+      value: 'exception_message',
+      globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
+      globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
+    },
+  ]
+})
 watch(enable_exception, () => {
   props.nodeModel.graphModel.eventCenter.emit(
     'delete_edge',
@@ -439,10 +464,60 @@ const closeNodeMenu = () => {
   showAnchor.value = false
   anchorData.value = undefined
 }
+/**
+ * 检索选中时候触发
+ * @param kw
+ */
+
+const keyWord = ref('')
+const currentKeyWord = ref(false)
+const selectOn = (kw: string) => {
+  keyWord.value = kw
+  props.nodeModel.isSelected = false
+  currentKeyWord.value = false
+}
+/**
+ * 定位时触发
+ * @param kw
+ */
+const focusOn = (kw: string) => {
+  props.nodeModel.setSelected(true)
+  currentKeyWord.value = true
+}
+/**
+ * 清除时触发
+ */
+const clearSelectOn = () => {
+  keyWord.value = ''
+  currentKeyWord.value = false
+}
+
+// 高亮选中关键字
+
+const highlightedStepName = (contentText: string) => {
+  let res = contentText
+  if (keyWord.value === '') {
+    return res
+  } else {
+    const wordsArray = contentText.split('')
+    for (let i = 0; i < wordsArray.length; i++) {
+      if (keyWord.value.includes(wordsArray[i])) {
+        wordsArray[i] = currentKeyWord.value
+          ? `<span style='background: #FF8800;'>${wordsArray[i]}</span>`
+          : `<span style='background: #FFC60A;'>${wordsArray[i]}</span>`
+      }
+    }
+    res = wordsArray.join('')
+    return res
+  }
+}
 onMounted(() => {
   set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
     showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
   })
+  set(props.nodeModel, 'selectOn', selectOn)
+  set(props.nodeModel, 'focusOn', focusOn)
+  set(props.nodeModel, 'clearSelectOn', clearSelectOn)
 })
 </script>
 <style lang="scss" scoped>
@@ -450,8 +525,9 @@ onMounted(() => {
   .step-container {
     border: 2px solid #ffffff !important;
     box-sizing: border-box;
+    box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12);
     &:hover {
-      box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+      box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
     }
     &.isSelected {
       border: 2px solid var(--el-color-primary) !important;

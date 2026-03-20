@@ -162,7 +162,7 @@ const handleSharedNodeClick = () => {
     font-weight: 400;
     &:hover {
       border-radius: var(--app-border-radius-small);
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
   }
   .all-mode-active {
@@ -185,7 +185,7 @@ const handleSharedNodeClick = () => {
       height: 40px;
       background: none;
       &:hover {
-        background: var(--app-text-color-light-1);
+        background: rgba(var(--el-text-color-primary-rgb), 0.1);
         border-radius: var(--app-border-radius-small);
       }
     }
@@ -221,7 +221,7 @@ const handleSharedNodeClick = () => {
     }
     &:hover {
       border-radius: var(--app-border-radius-small);
-      background: var(--app-text-color-light-1);
+      background: rgba(var(--el-text-color-primary-rgb), 0.1);
     }
     &.is-active {
       &:hover {

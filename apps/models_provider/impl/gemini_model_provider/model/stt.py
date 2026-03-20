@@ -53,9 +53,24 @@ class GeminiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             google_api_key=self.api_key
         )
         audio_data = audio_file.read()
+        system_instruction = """You are a professional speech-to-text assistant. Your task is to:
+1. Transcribe the audio content accurately into text
+2. Output ONLY the transcribed text without any additional comments..."""
+
         msg = HumanMessage(content=[
-            {'type': 'text', 'text': _('convert audio to text')},
+            {'type': 'text', 'text': system_instruction},
             {"type": "media", 'mime_type': 'audio/mp3', "data": audio_data}
         ])
         res = client.invoke([msg])
-        return res.content
+        if isinstance(res.content, list):
+            for item in res.content:
+                if isinstance(item, dict) and 'text' in item:
+                    return item['text'].strip()
+                elif hasattr(item, 'text'):
+                    return item.text.strip()
+            return ''
+        elif isinstance(res.content, dict):
+            return res.content.get('text', '').strip()
+        else:
+            return str(res.content).strip() if res.content else ''
+

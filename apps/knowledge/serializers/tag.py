@@ -12,6 +12,7 @@ from typing import Dict
 import uuid_utils.compat as uuid
 from django.db import transaction
 from django.db.models import QuerySet
+from django.db.models.aggregates import Count
 from django.db.models.query_utils import Q
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -225,12 +226,20 @@ class TagSerializers(serializers.Serializer):
                     knowledge_id=self.data.get('knowledge_id')
                 ).values('key', 'value', 'id', 'create_time', 'update_time').order_by('create_time', 'key', 'value')
 
+            tag_ids = [tag['id'] for tag in tags]
+
+            tag_doc_count_map = {row['tag_id']: row['doc_count'] for row in
+                                 QuerySet(DocumentTag).filter(tag_id__in=tag_ids)
+                                 .values('tag_id').annotate(doc_count=Count('document_id'))
+                                 }
+
             # 按key分组
             grouped_tags = defaultdict(list)
             for tag in tags:
                 grouped_tags[tag['key']].append({
                     'id': tag['id'],
                     'value': tag['value'],
+                    'doc_count': tag_doc_count_map.get(tag['id'],0),
                     'create_time': tag['create_time'],
                     'update_time': tag['update_time']
                 })

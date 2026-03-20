@@ -47,7 +47,7 @@
 
                     <span class="color-danger" v-if="item.is_required">*</span>
 
-                    <el-tag type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
+                    <el-tag size="small" type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
                   </div>
                 </div>
               </template>

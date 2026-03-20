@@ -82,6 +82,7 @@ interface Model {
    */
   model_params_form: Dict<any>[]
   resource_count: number
+  create_time?: any
 }
 interface CreateModelRequest {
   /**

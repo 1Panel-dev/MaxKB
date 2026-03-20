@@ -83,7 +83,7 @@
                 >
                   <img
                     v-show="!inputValue.trim() || loading || isStreaming"
-                    src="@/assets/icon_send.svg"
+                    src="@/assets/chat/icon_send.svg"
                     alt=""
                   />
                   <SendIcon v-show="inputValue.trim() && !loading && !isStreaming" />
@@ -530,7 +530,7 @@ defineExpose({
   z-index: 10;
 
   :deep(.operate-textarea) {
-    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
     background-color: #ffffff;
     border-radius: var(--app-border-radius-large);
     border: 1px solid #ffffff;
@@ -576,7 +576,7 @@ defineExpose({
     }
   }
   .video-stop-button {
-    box-shadow: 0px 6px 24px 0px rgba(31, 35, 41, 0.08);
+    box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
 
     &:hover {
       background: #ffffff;

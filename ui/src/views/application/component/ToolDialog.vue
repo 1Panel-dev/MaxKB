@@ -53,8 +53,9 @@
               <el-col :span="12" v-for="(item, index) in searchData" :key="index" class="mb-16">
                 <el-popover
                   placement="bottom-start"
-                  :width="350"
+                  :width="400"
                   popper-style="--el-popover-border-radius:8px;--el-popover-padding:16px 16px 0"
+                  :show-after="500"
                 >
                   <template #reference>
                     <CardCheckbox
@@ -98,18 +99,32 @@
                         <ToolIcon v-else :size="32" :type="item?.tool_type" />
                       </template>
                       <template #title>
-                        <div class="flex align-center" style="margin-top: 1px;">
+                        <div class="flex align-center" style="margin-top: 1px">
                           <span class="ellipsis-1" :title="item.name">
                             {{ item.name }}
                           </span>
-                          <el-tag v-if="item.version" class="ml-4" type="info" effect="plain">
+                          <el-tag
+                            v-if="item.version"
+                            size="small"
+                            class="ml-4"
+                            type="info"
+                            effect="plain"
+                          >
                             {{ item.version }}
                           </el-tag>
                         </div>
                       </template>
                       <template #subTitle>
-                        <el-text class="color-secondary lighter" size="small">
-                          {{ $t('common.creator') }}: {{ i18n_name(item.nick_name) }}
+                        <el-text class="color-secondary lighter flex align-center" size="small">
+                          <span
+                            :title="i18n_name(item.nick_name)"
+                            class="ellipsis"
+                            style="max-width: 90px"
+                          >
+                            {{ i18n_name(item.nick_name) }}
+                          </span>
+                          <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                          <span> {{ dateFormat(item.create_time) }}</span>
                         </el-text>
                       </template>
 
@@ -168,6 +183,7 @@ import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { resetUrl, i18n_name } from '@/utils/common'
+import { dateFormat } from '@/utils/time'
 const route = useRoute()
 
 const props = defineProps({
