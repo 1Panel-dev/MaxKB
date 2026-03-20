@@ -1,0 +1,4 @@
+root = true
+
+[*.py]
+max_line_length = 120
