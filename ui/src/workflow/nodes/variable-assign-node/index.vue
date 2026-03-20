@@ -68,7 +68,7 @@
 
             <el-form-item
               v-if="item.type === 'string'"
-              class="mr-8"
+              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: t('common.inputPlaceholder'),
@@ -77,6 +77,7 @@
               }"
             >
               <el-input
+                class="w-full"
                 v-model="item.value"
                 :placeholder="$t('common.inputPlaceholder')"
                 show-word-limit
@@ -86,7 +87,7 @@
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'num'"
-              class="mr-8"
+              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -94,10 +95,10 @@
                 required: true,
               }"
             >
-              <el-input-number v-model="item.value"></el-input-number>
+              <el-input-number v-model="item.value" class="w-full"></el-input-number>
             </el-form-item>
             <el-form-item
-              class="mr-8"
+              class="w-full mr-8"
               v-else-if="item.type === 'json'"
               :prop="'variable_list.' + index + '.value'"
               :rules="[
@@ -122,16 +123,14 @@
               <CodemirrorEditor
                 title="JSON"
                 v-model="item.value"
-                :style="{
-                  height: '100px',
-                  width: '155px',
-                }"
+                style="height: 100px"
+                class="w-full"
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />
             </el-form-item>
             <el-form-item
               v-else-if="item.type === 'bool'"
-              class="mr-8"
+              class="w-full mr-8"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
                 message: $t('common.inputPlaceholder'),
@@ -139,14 +138,14 @@
                 required: true,
               }"
             >
-              <el-select v-model="item.value" style="width: 155px" :teleported="false">
+              <el-select v-model="item.value" class="w-full" :teleported="false">
                 <el-option label="true" :value="true" />
                 <el-option label="false" :value="false" />
               </el-select>
             </el-form-item>
 
-            <el-select v-model="item.target_type" style="max-width: 100px" placeholder="转换类型">
-              <el-option v-for="item in targetTypeOptions" :key="item" :label="item" :value="item" />
+            <el-select v-model="item.target_type" style="max-width: 120px" :placeholder="$t('workflow.nodes.variableAssignNode.convertType')">
+              <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
             </el-select>
           </div>
           <el-form-item v-else>
@@ -154,13 +153,13 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="mr-8"
-              style="width: 250px"
+              style="width: 230px"
               :placeholder="$t('workflow.variable.placeholder')"
               v-model="item.reference"
             />
 
-            <el-select v-model="item.target_type" style="max-width: 100px" placeholder="转换类型">
-              <el-option v-for="item in targetTypeOptions" :key="item" :label="item" :value="item" />
+            <el-select v-model="item.target_type" style="max-width: 120px" :placeholder="$t('workflow.nodes.variableAssignNode.convertType')">
+              <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
             </el-select>
           </el-form-item>
         </el-card>
@@ -186,7 +185,15 @@ const workflowMode = inject('workflowMode') as WorkflowMode
 const props = defineProps<{ nodeModel: any }>()
 
 const typeOptions = ['string', 'num', 'json', 'bool']
-const targetTypeOptions = ['string', 'int', 'float', 'json_object', 'json_string', 'boolean']
+const targetTypeOptions = [
+  { label: t('workflow.nodes.variableAssignNode.convertType'), key: '' },
+  { label: 'string', key: 'string' },
+  { label: 'int', key: 'int' },
+  { label: 'float', key: 'float' },
+  { label: 'json_object', key: 'json_object' },
+  { label: 'json_string', key: 'json_string' },
+  { label: 'boolean', key: 'boolean' },
+]
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
