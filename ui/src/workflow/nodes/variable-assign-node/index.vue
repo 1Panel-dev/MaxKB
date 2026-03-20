@@ -187,7 +187,7 @@ import { WorkflowMode } from '@/enums/application'
 const workflowMode = inject('workflowMode') as WorkflowMode
 const props = defineProps<{ nodeModel: any }>()
 
-const typeOptions = ['string', 'num', 'json', 'bool']
+const typeOptions = ['string', 'num', 'json', 'bool', 'null']
 const targetTypeOptions = [
   { label: t('workflow.nodes.variableAssignNode.doNotConvert'), key: '' },
   { label: 'string', key: 'string' },

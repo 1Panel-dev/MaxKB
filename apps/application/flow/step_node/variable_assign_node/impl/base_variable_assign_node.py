@@ -89,6 +89,10 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 val = self.convert(val, variable.get('target_type'))
                 evaluation(variable, val)
                 result['output_value'] = val
+            elif variable['type'] == 'null':
+                val = None
+                evaluation(variable, val)
+                result['output_value'] = val
             else:
                 val = variable['value']
                 val = self.convert(val, variable.get('target_type'))
