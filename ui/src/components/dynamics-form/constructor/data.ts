@@ -54,5 +54,10 @@ const input_type_list = [
     label: t('dynamicsForm.input_type_list.UploadInput'),
     value: 'UploadInput',
   },
+
+  {
+    label: t('dynamicsForm.input_type_list.Model'),
+    value: 'Model',
+  },
 ]
 export { input_type_list }
