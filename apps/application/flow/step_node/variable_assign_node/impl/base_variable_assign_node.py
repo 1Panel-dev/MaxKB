@@ -31,6 +31,25 @@ class BaseVariableAssignNode(IVariableAssignNode):
         else:
             self.workflow_manage.chat_context[variable['fields'][1]] = value
 
+    def convert(self, val, target_type):
+        if not target_type or val is None:
+            return val
+
+        if target_type == 'json_object':
+            return json.loads(val)
+        elif target_type == 'json_string':
+            return json.dumps(val, ensure_ascii=False)
+        elif target_type == 'string':
+            return str(val)
+        elif target_type == 'int':
+            return int(val)
+        elif target_type == 'float':
+            return float(val)
+        elif target_type == 'boolean':
+            return bool(val)
+        else:
+            return val
+
     def handle(self, variable, evaluation):
         result = {
             'name': variable['name'],
@@ -42,19 +61,23 @@ class BaseVariableAssignNode(IVariableAssignNode):
                     val = variable['value']
                 else:
                     val = json.loads(variable['value'])
+                val = self.convert(val, variable['target_type'])
                 evaluation(variable, val)
                 result['output_value'] = variable['value'] = val
             elif variable['type'] == 'string':
                 # 变量解析 例如：{{global.xxx}}
                 val = self.workflow_manage.generate_prompt(variable['value'])
+                val = self.convert(val, variable['target_type'])
                 evaluation(variable, val)
                 result['output_value'] = val
             else:
                 val = variable['value']
+                val = self.convert(val, variable['target_type'])
                 evaluation(variable, val)
                 result['output_value'] = val
         else:
             reference = self.get_reference_content(variable['reference'])
+            reference = self.convert(reference, variable['target_type'])
             evaluation(variable, reference)
             result['output_value'] = reference
         return result
@@ -62,22 +85,23 @@ class BaseVariableAssignNode(IVariableAssignNode):
     def execute(self, variable_list, **kwargs) -> NodeResult:
         #
         result_list = []
-        is_chat = False
+        contains_chat_variable = False
         for variable in variable_list:
             if 'fields' not in variable:
                 continue
+
             if 'global' == variable['fields'][0]:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            if 'chat' == variable['fields'][0]:
+            elif 'chat' == variable['fields'][0]:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
-                is_chat = True
-            if 'loop' == variable['fields'][0]:
+                contains_chat_variable = True
+            elif 'loop' == variable['fields'][0]:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
 
-        if is_chat:
+        if contains_chat_variable:
             from application.flow.loop_workflow_manage import LoopWorkflowManage
             if isinstance(self.workflow_manage, LoopWorkflowManage):
                 self.workflow_manage.parentWorkflowManage.get_chat_info().set_chat_variable(
