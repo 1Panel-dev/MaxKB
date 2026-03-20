@@ -116,13 +116,25 @@ class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
                 'start_time') is not None else 0)
 
 
+def get_tool_workflow_state(workflow):
+    if workflow.is_the_task_interrupted():
+        return State.REVOKED
+    details = workflow.get_runtime_details()
+    node_list = details.values()
+    all_node = [*node_list, *get_loop_workflow_node(node_list)]
+    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
+    if err:
+        return State.FAILURE
+    return State.SUCCESS
+
+
 class ToolWorkflowPostHandler(WorkFlowPostHandler):
     def __init__(self, chat_info, tool_id):
         super().__init__(chat_info)
         self.tool_id = tool_id
 
     def handler(self, workflow):
-        state = get_workflow_state(workflow)
+        state = get_tool_workflow_state(workflow)
         record = ToolRecord(id=self.chat_info.tool_record_id, tool_id=self.tool_id,
                             workspace_id=self.chat_info.workspace_id,
                             source_type=self.chat_info.source_type,

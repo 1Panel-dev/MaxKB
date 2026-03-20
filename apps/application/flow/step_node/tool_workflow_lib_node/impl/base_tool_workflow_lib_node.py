@@ -107,10 +107,13 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         reasoning_content += reasoning_content_chunk
         answer += content_chunk
         yield chunk
+        if chunk.get('node_status', "SUCCESS") == 'ERROR':
+            is_interrupt_exec = True
+            node.status = 500
+            node.err_message = chunk.get('content')
         usage = response_content.get('usage', {})
     child_answer_data = get_answer_list(instance, child_node_node_dict, node.runtime_node_id)
     node.context['usage'] = {'usage': usage}
-    node.context['is_interrupt_exec'] = is_interrupt_exec
     node.context['child_node'] = node_child_node
     node.context['child_node_data'] = instance.get_runtime_details()
     node.context['is_interrupt_exec'] = is_interrupt_exec

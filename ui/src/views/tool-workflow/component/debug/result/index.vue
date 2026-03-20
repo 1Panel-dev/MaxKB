@@ -26,7 +26,7 @@
         </el-card>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">输出参数</h4>
-      <div class="mb-16">
+      <div class="mb-16" v-if="isSuccess !== undefined">
         <el-alert
           v-if="isSuccess"
           :title="$t('views.tool.form.debug.runSuccess')"
@@ -98,7 +98,10 @@ const executionDetails = computed(() => {
 const showResult = ref<boolean>(false)
 
 const isSuccess = computed(() => {
-  return true
+  if (toolRecord.value) {
+    return toolRecord.value.state == 'FAILURE' ? false : true
+  }
+  return undefined
 })
 
 const toolRecord = ref<any>()

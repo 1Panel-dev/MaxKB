@@ -12,7 +12,7 @@
       :workflow="toolDetail?.work_flow"
     ></Parameters>
     <Result v-else ref="resultRef" :isShared="isShared" :apiType="apiType"></Result>
-    <template #footer>
+    <template #footer v-if="active == 'parameters'">
       <el-button @click="close">取消</el-button>
       <el-button type="primary" @click="run">运行</el-button>
     </template>
@@ -20,7 +20,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import Parameters from '../debug/parameters/index.vue'
 import Result from '../debug/result/index.vue'
