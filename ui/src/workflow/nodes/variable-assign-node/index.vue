@@ -45,6 +45,7 @@
             <el-select :teleported="false" v-model="item.source" size="small" style="width: 85px">
               <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
               <el-option :label="$t('common.custom')" value="custom" />
+              <el-option :label="null" value="null" />
             </el-select>
           </div>
 
@@ -86,7 +87,6 @@
               ></el-input>
             </el-form-item>
             <el-form-item
-              class="w-full"
               v-else-if="item.type === 'num'"
               :prop="'variable_list.' + index + '.value'"
               :rules="{
@@ -152,7 +152,7 @@
               <el-option v-for="item2 in targetTypeOptions" :key="item2.key" :label="item2.label" :value="item2.key" />
             </el-select>
           </div>
-          <el-form-item v-else>
+          <el-form-item v-else-if="item.source === 'referencing'">
             <NodeCascader
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
@@ -187,7 +187,7 @@ import { WorkflowMode } from '@/enums/application'
 const workflowMode = inject('workflowMode') as WorkflowMode
 const props = defineProps<{ nodeModel: any }>()
 
-const typeOptions = ['string', 'num', 'json', 'bool', 'null']
+const typeOptions = ['string', 'num', 'json', 'bool']
 const targetTypeOptions = [
   { label: t('workflow.nodes.variableAssignNode.doNotConvert'), key: '' },
   { label: 'string', key: 'string' },
