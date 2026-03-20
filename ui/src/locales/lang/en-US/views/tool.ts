@@ -42,11 +42,11 @@ export default {
   },
   skill: {
     title: 'Capabilities',
-    copySkillTool: 'Copy Skill',
-    createSkillTool: 'Create Skill',
-    editSkillTool: 'Edit Skill',
+    copySkillTool: 'Copy Skills',
+    createSkillTool: 'Create Skills',
+    editSkillTool: 'Edit Skills',
     initParamPlaceholder: 'Parameters required to configure when enabling the skill',
-    skillFile: 'Skill File',
+    skillFile: 'Skills File',
     reUpload: 'Re-upload',
   },
   tip: {
