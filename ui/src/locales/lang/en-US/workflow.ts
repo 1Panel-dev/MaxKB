@@ -318,6 +318,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       text: 'Update the value of the global variable',
       assign: 'Set Value',
       convertType: 'Convert type',
+      doNotConvert: 'Do not convert',
     },
     variableAggregationNode: {
       label: 'Variable Aggregation',

@@ -80,23 +80,23 @@ class BaseVariableAssignNode(IVariableAssignNode):
                     val = variable['value']
                 else:
                     val = json.loads(variable['value'])
-                val = self.convert(val, variable['target_type'])
+                val = self.convert(val, variable.get('target_type'))
                 evaluation(variable, val)
                 result['output_value'] = variable['value'] = val
             elif variable['type'] == 'string':
                 # 变量解析 例如：{{global.xxx}}
                 val = self.workflow_manage.generate_prompt(variable['value'])
-                val = self.convert(val, variable['target_type'])
+                val = self.convert(val, variable.get('target_type'))
                 evaluation(variable, val)
                 result['output_value'] = val
             else:
                 val = variable['value']
-                val = self.convert(val, variable['target_type'])
+                val = self.convert(val, variable.get('target_type'))
                 evaluation(variable, val)
                 result['output_value'] = val
         else:
             reference = self.get_reference_content(variable['reference'])
-            reference = self.convert(reference, variable['target_type'])
+            reference = self.convert(reference, variable.get('target_type'))
             evaluation(variable, reference)
             result['output_value'] = reference
         return result

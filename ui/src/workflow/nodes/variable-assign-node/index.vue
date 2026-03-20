@@ -123,10 +123,8 @@
               <CodemirrorEditor
                 title="JSON"
                 v-model="item.value"
-                :style="{
-                  height: '100px',
-                  width: '155px',
-                }"
+                class="w-full"
+                style="height: 100px"
                 @submitDialog="(val: string) => (form_data.variable_list[index].value = val)"
               />
             </el-form-item>
@@ -191,7 +189,7 @@ const props = defineProps<{ nodeModel: any }>()
 
 const typeOptions = ['string', 'num', 'json', 'bool']
 const targetTypeOptions = [
-  { label: t('workflow.nodes.variableAssignNode.convertType'), key: '' },
+  { label: t('workflow.nodes.variableAssignNode.doNotConvert'), key: '' },
   { label: 'string', key: 'string' },
   { label: 'int', key: 'int' },
   { label: 'float', key: 'float' },
