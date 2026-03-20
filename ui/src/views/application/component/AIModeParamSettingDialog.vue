@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import { useRoute } from 'vue-router'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
@@ -67,16 +67,31 @@ const permissionPrecise = computed(() => {
   return permissionMap['model'][apiType.value]
 })
 
-const open = (model_id: string, application_id?: string, model_setting_data?: any) => {
+const open = (
+  model_id: string,
+  application_id?: string,
+  model_setting_data?: any,
+  model_form_field_list?: Array<any>,
+) => {
+  dialogVisible.value = true
+
   modelID.value = model_id
   form_data.value = {}
-  const api = getApi(model_id, application_id)
-  api.then((ok: any) => {
-    model_form_field.value = ok.data
+
+  if (model_form_field_list) {
+    model_form_field.value = model_form_field_list
     // 渲染动态表单
-    dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
-  })
-  dialogVisible.value = true
+    nextTick(() => {
+      dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
+    })
+  } else {
+    const api = getApi(model_id, application_id)
+    api.then((ok: any) => {
+      model_form_field.value = ok.data
+      // 渲染动态表单
+      dynamicsFormRef.value?.render(model_form_field.value, model_setting_data)
+    })
+  }
 }
 
 const reset_default = (model_id: string, application_id?: string) => {

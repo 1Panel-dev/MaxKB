@@ -16,7 +16,10 @@
           :prop="chat_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
             required: true,
-            message: chat_data.model_id_type === 'reference' ? $t('workflow.variable.placeholder') : $t('views.application.form.aiModel.placeholder'),
+            message:
+              chat_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.aiModel.placeholder'),
             trigger: 'change',
           }"
         >
@@ -28,7 +31,13 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
-              <el-select v-model="chat_data.model_id_type" :teleported="false" size="small" style="width: 85px" @change="chat_data.model_id_reference = []">
+              <el-select
+                v-model="chat_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="chat_data.model_id_reference = []"
+              >
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
