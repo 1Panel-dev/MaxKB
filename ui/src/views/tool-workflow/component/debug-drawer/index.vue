@@ -11,7 +11,13 @@
       ref="paramtersRef"
       :workflow="toolDetail?.work_flow"
     ></Parameters>
-    <Result v-else ref="resultRef" :isShared="isShared" :apiType="apiType"></Result>
+    <Result
+      v-else
+      ref="resultRef"
+      :isShared="isShared"
+      :apiType="apiType"
+      :toolDetail="toolDetail"
+    ></Result>
     <template #footer v-if="active == 'parameters'">
       <el-button @click="close">取消</el-button>
       <el-button type="primary" @click="run">运行</el-button>

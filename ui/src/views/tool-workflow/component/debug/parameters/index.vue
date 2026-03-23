@@ -59,7 +59,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import JsonInput from '@/components/dynamics-form/items/JsonInput.vue'
-import { FormInstance } from 'element-plus'
+import { type FormInstance } from 'element-plus'
 const props = defineProps<{
   workflow: any
 }>()

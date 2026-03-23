@@ -71,7 +71,7 @@ import { arraySort } from '@/utils/array'
 const props = defineProps<{
   isShared: boolean
   apiType: 'systemShare' | 'workspace' | 'systemManage' | 'workspaceShare'
-  toolDetails: any
+  toolDetails?: any
 }>()
 const activeName = ref<string>('result')
 const details = {
