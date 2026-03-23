@@ -377,7 +377,7 @@ class BaseChatNode(IChatNode):
 
     def generate_message_list(self, system: str, prompt: str, history_message):
         if system is not None and len(system) > 0:
-            return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
+            return [SystemMessage(system), *history_message,
                     HumanMessage(self.workflow_manage.generate_prompt(prompt))]
         else:
             return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
