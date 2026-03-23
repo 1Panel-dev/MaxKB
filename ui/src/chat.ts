@@ -57,6 +57,7 @@ config({
                 video: ['src', 'controls', 'width', 'height', 'preload', 'playsinline'],
                 source: ['src', 'type'],
                 input: ['class', 'disabled', 'type', 'checked'],
+                sup: ['data-title'],
                 iframe: [
                   'class',
                   'width',
