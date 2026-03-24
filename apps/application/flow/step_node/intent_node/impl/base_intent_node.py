@@ -52,7 +52,7 @@ class BaseIntentNode(IIntentNode):
         self.context['branch_id'] = details.get('branch_id')
         self.context['category'] = details.get('category')
 
-    def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch,
+    def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch, output_reason,
                 model_params_setting=None, **kwargs) -> NodeResult:
 
         # 设置默认模型参数
@@ -73,7 +73,7 @@ class BaseIntentNode(IIntentNode):
         self.context['user_input'] = user_input
 
         # 构建分类提示词
-        prompt = self.build_classification_prompt(user_input, branch)
+        prompt = self.build_classification_prompt(user_input, branch, output_reason)
 
         # 生成消息列表
         system = self.build_system_prompt()
@@ -129,7 +129,7 @@ class BaseIntentNode(IIntentNode):
         """构建系统提示词"""
         return "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
 
-    def build_classification_prompt(self, user_input: str, branch: List[Dict]) -> str:
+    def build_classification_prompt(self, user_input: str, branch: List[Dict], output_reason: bool) -> str:
         """构建分类提示词"""
 
         classification_list = []
@@ -153,7 +153,8 @@ class BaseIntentNode(IIntentNode):
 
         return PROMPT_TEMPLATE.format(
             classification_list=classification_list,
-            user_input=user_input
+            user_input=user_input,
+            output_reason=',\n"reason": ""' if output_reason is True else ""
         )
 
     def generate_message_list(self, system: str, prompt: str, history_message):

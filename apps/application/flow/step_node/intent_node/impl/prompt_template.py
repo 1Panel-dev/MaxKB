@@ -21,8 +21,7 @@ Note:
 - Do not add prefix ```json or suffix ```
 - The answer needs to include the following fields such as:
 {{
-"classificationId": 0,
-"reason": ""
+"classificationId": 0{output_reason}
 }}
 
 ## Limit

@@ -447,6 +447,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       classify: {
         label: 'Intent classify',
       },
+      output_reason: 'Output Reason',
       input: {
         label: 'Input',
       },

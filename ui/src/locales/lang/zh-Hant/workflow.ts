@@ -439,6 +439,7 @@ export default {
       classify: {
         label: '意圖分類',
       },
+      output_reason: '輸出理由',
       input: {
         label: '輸入',
       },
