@@ -702,7 +702,7 @@ function openCreateSkillDialog(data?: any) {
   }
 }
 
-function toWorkflow(data?: any) {
+function toWorkflow(data: any) {
   router.push({ name: 'ToolWorkflow', params: { id: data.id, folderId: data.folder_id } })
 }
 

@@ -60,6 +60,7 @@ export default {
     ReferencingRequired: '引用變量必填',
     ReferencingError: '引用變量錯誤',
     NoReferencing: '不存在的引用變量',
+    placeholder_key: '請輸入鍵名',
     placeholder: '請選擇變量',
     inputPlaceholder: '請輸入變量',
     loop: '循環變量',
@@ -322,7 +323,8 @@ export default {
       text: '按聚合策略聚合每組的變量',
       Strategy: '聚合策略',
       placeholder: '返回每組的第一個非空值',
-      placeholder1: '返回每組變量的集合',
+      placeholder1: '返回每組變量的數組（Array）',
+      placeholder2: '返回每組變量的字典（Dict）',
       group: {
         noneError: '名稱不能為空',
         dupError: '名稱不能重複',

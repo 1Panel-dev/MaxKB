@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import secrets
 from contextlib import contextmanager
 from contextlib import suppress
 from textwrap import dedent
@@ -90,7 +91,7 @@ class ToolExecutor:
         maxkb_logger.error(f'Exception: {e}', exc_info=True)
 
     def exec_code(self, code_str, keywords, function_name=None):
-        _id = str(uuid.uuid7())
+        _id = secrets.token_hex(32)
         action_function = f'({function_name !a}, locals_v.get({function_name !a}))' if function_name else 'locals_v.popitem()'
         set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
         _exec_code = f"""
@@ -100,6 +101,7 @@ try:
     path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {_sandbox_python_sys_path}
+    _id = os.environ.get("_ID")
     locals_v={{}}
     keywords={keywords}
     globals_v={{}}
@@ -110,29 +112,31 @@ try:
         f_name, f = {action_function}
         globals_v.update(locals_v)
         exec_result=f(**keywords)
-    sys.stdout.write("\\n{_id}:")
-    json.dump({{'code':200,'msg':'success','data':exec_result}}, sys.stdout, default=str)
+    result = {{'code':200,'msg':'success','data':exec_result}}
 except Exception as e:
     if isinstance(e, MemoryError): e = Exception("Cannot allocate more memory: exceeded the limit of {_process_limit_mem_mb} MB.")
-    sys.stdout.write("\\n{_id}:")
-    json.dump({{'code':500,'msg':str(e),'data':None}}, sys.stdout, default=str)
-sys.stdout.write("\\n")
-sys.stdout.flush()
+    result = {{'code':500,'msg':str(e),'data':None}}
+finally:
+    sys.stdout.write("\\n" + _id)
+    json.dump(result, sys.stdout, default=str)
+    sys.stdout.write("\\n__END__\\n")
+    sys.stdout.flush()
 """
-        maxkb_logger.debug(f"Sandbox execute code: {_exec_code}")
+        maxkb_logger.debug(f"Tool execution({_id}) execute code: {_exec_code}")
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=True) as f:
             f.write(_exec_code)
             f.flush()
             with execution_timer(_id):
-                subprocess_result = self._exec(f.name)
+                subprocess_result = self._exec(f.name, _id)
         if subprocess_result.returncode != 0:
             raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
-        result_line = [line for line in lines if line.startswith(_id)]
-        if not result_line:
-            maxkb_logger.error("\n".join(lines))
+        if len(lines) < 2 or lines[-1] != "__END__":
+            raise Exception("Execution interrupted or tampered")
+        last_line = lines[-2]
+        if not last_line.startswith(_id):
             raise Exception("No result found.")
-        result = json.loads(result_line[-1].split(":", 1)[1])
+        result = json.loads(last_line[len(_id):])
         if result.get('code') == 200:
             return result.get('data')
         raise Exception(result.get('msg') + (f'\n{subprocess_result.stderr}' if subprocess_result.stderr else ''))
@@ -286,9 +290,10 @@ exec({dedent(code)!a})
         }
         return app_config
 
-    def _exec(self, execute_file):
+    def _exec(self, execute_file, _id):
         kwargs = {'cwd': BASE_DIR, 'env': {
             'LD_PRELOAD': f'{_sandbox_path}/lib/sandbox.so',
+            '_ID': _id,
         }}
         def _set_resource_limit():
             if not _enable_sandbox or not sys.platform.startswith("linux"): return

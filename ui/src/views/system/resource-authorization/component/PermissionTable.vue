@@ -75,7 +75,12 @@
                 style="font-size: 20px"
               ></AppIcon>
               <!--  知识库 icon -->
-              <KnowledgeIcon :size="20" v-else-if="isKnowledge" :type="row.icon" />
+              <KnowledgeIcon
+                :size="20"
+                v-else-if="isKnowledge"
+                :type="row.icon"
+                style="--el-avatar-border-radius: 6px"
+              />
               <!--  应用/工具 自定义 icon -->
               <el-avatar
                 v-else-if="isAppIcon(row?.icon) && !isModel"
@@ -88,7 +93,12 @@
               <!--  应用 icon -->
               <LogoIcon v-else-if="isApplication" height="20px" />
               <!-- 工具 icon -->
-              <ToolIcon v-else-if="isTool" :size="20" :type="row?.tool_type" />
+              <ToolIcon
+                v-else-if="isTool"
+                :size="20"
+                :type="row?.tool_type"
+                style="--el-avatar-border-radius: 6px"
+              />
               <!-- 模型 icon -->
               <span
                 v-else-if="isModel"
