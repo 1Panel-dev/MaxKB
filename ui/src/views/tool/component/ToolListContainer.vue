@@ -780,17 +780,16 @@ async function changeState(row: any) {
         })
     })
   } else {
-    if (row.tool_type === 'WORKFLOW' && !row.is_publish) {
+    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+      row.id,
+      changeStateloading,
+    )
+    if (row.tool_type === 'WORKFLOW' && !res.data.is_publish) {
       MsgConfirm(t('common.tip'), t('views.tool.toolWorkflow.toActiveTip')).then(() => {
         toWorkflow(row)
       })
       return
     }
-
-    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
-      row.id,
-      changeStateloading,
-    )
     if (
       (!res.data.init_params || Object.keys(res.data.init_params).length === 0) &&
       res.data.init_field_list &&
