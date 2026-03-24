@@ -565,3 +565,28 @@ h5 {
 .arrow-icon {
   transition: 0.2s;
 }
+.sup-popover {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  width: 240px;
+  padding: 10px 12px;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  font-size: 13px;
+  line-height: 1.5;
+  color: #303133;
+  word-break: break-word;
+}
+
+.sup-popover__arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #fff;
+  transform: rotate(45deg);
+  box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.08);
+}

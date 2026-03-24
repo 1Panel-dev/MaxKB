@@ -1,8 +1,4 @@
-<script setup lang="ts">
-import PopoverManager from '@/components/popover-manager/index.vue'
-</script>
-
+<script setup lang="ts"></script>
 <template>
   <RouterView />
-  <PopoverManager></PopoverManager>
 </template>

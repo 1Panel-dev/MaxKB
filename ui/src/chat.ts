@@ -11,7 +11,7 @@ import router from '@/router/chat'
 import i18n from '@/locales'
 import Components from '@/components'
 import directives from '@/directives'
-
+import { supPopover } from '@/utils/supPopover'
 import { getDefaultWhiteList } from 'xss'
 import { config, XSSPlugin } from 'md-editor-v3'
 import screenfull from 'screenfull'
@@ -90,6 +90,7 @@ config({
     ]
   },
 })
+supPopover.init()
 const app = createApp(App)
 app.use(createPinia())
 for (const [key, component] of Object.entries(ElementPlusIcons)) {
