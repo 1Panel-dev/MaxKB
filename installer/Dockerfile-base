@@ -28,7 +28,7 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && \
     mkdir -p /opt/maxkb-app/sandbox/lib && chmod -R 550 /opt/maxkb-app/sandbox && \
     useradd --no-create-home --home /opt/maxkb-app/sandbox -s /usr/sbin/nologin sandbox -g root && \
     chmod g-rwx /usr/local/bin/* /usr/bin/* /bin/* /usr/sbin/* /sbin/* /usr/lib/postgresql/17/bin/* && \
-    chmod g+xr /usr/bin/ld.so /usr/local/bin/python* `which env` && \
+    chmod g+xr /usr/bin/ld.so /usr/local/bin/python* && \
     chmod -R g-rwx /tmp /var/tmp /var/lock && \
     chmod g+rx /tmp && \
     apt-get clean all && \

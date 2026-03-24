@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('views.tool.form.toolName.name')"
+    :title="$t('views.tool.form.toolName.label')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"

@@ -29,6 +29,26 @@
   ul {
     list-style: circle;
   }
+  sup[data-title] {
+    display: inline-flex;
+    align-items: center;
+    vertical-align: super;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background-color: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+    border: 1px solid var(--el-color-primary-light-7);
+    cursor: default;
+    white-space: nowrap;
+    letter-spacing: 0.02em;
+    transition:
+      background-color 0.15s,
+      color 0.15s;
+    cursor: pointer;
+  }
 }
 
 @media only screen and (max-width: 768px) {

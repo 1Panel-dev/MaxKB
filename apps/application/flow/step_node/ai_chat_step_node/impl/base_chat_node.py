@@ -248,7 +248,8 @@ class BaseChatNode(IChatNode):
             mcp_tool_ids = []
         if mcp_tool_id:
             mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
-        if mcp_source == 'custom' and mcp_servers and '"stdio"' not in mcp_servers:
+        if mcp_source == 'custom' and mcp_servers:
+            ToolExecutor().validate_mcp_transport(mcp_servers)
             mcp_servers_config = json.loads(mcp_servers)
             mcp_servers_config = self.handle_variables(mcp_servers_config)
         elif mcp_tool_ids:

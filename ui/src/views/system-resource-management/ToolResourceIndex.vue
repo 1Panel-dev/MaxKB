@@ -92,9 +92,7 @@
             <span v-else-if="scope.row.tool_type === 'DATA_SOURCE'">
               {{ $t('views.tool.dataSource.title') }}
             </span>
-            <span v-else-if="scope.row.tool_type === 'SKILL'">
-              Skills
-            </span>
+            <span v-else-if="scope.row.tool_type === 'SKILL'"> Skills </span>
             <span v-else> {{ $t('views.tool.title') }} </span>
           </template>
         </el-table-column>
@@ -297,7 +295,23 @@
                 </el-button>
               </span>
             </el-tooltip>
-
+            <el-tooltip
+              effect="dark"
+              :content="$t('common.edit')"
+              placement="top"
+              v-if="!row.template_id && row.tool_type === 'WORKFLOW' && permissionPrecise.edit()"
+            >
+              <span class="mr-8">
+                <el-button
+                  type="primary"
+                  text
+                  @click.stop="openCreateWorkflowDialog(row)"
+                  :title="$t('common.edit')"
+                >
+                  <AppIcon iconName="app-edit"></AppIcon>
+                </el-button>
+              </span>
+            </el-tooltip>
             <el-tooltip
               effect="dark"
               :content="$t('common.copy')"
@@ -321,6 +335,13 @@
               </el-button>
               <template #dropdown>
                 <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-if="row.tool_type === 'WORKFLOW'"
+                    @click.stop="toWorkflow(row)"
+                  >
+                    <AppIcon iconName="app-workflow" class="color-secondary"></AppIcon>
+                    {{ $t('workflow.workflow') }}
+                  </el-dropdown-item>
                   <el-dropdown-item
                     v-if="row.init_field_list?.length > 0 && permissionPrecise.edit()"
                     @click.stop="configInitParams(row)"
@@ -396,7 +417,11 @@
 
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
-    <SkillToolFormDrawer ref="SkillToolFormDrawerRef" @refresh="refresh" :title="SkillToolDrawertitle" />
+    <SkillToolFormDrawer
+      ref="SkillToolFormDrawerRef"
+      @refresh="refresh"
+      :title="SkillToolDrawertitle"
+    />
     <McpToolFormDrawer ref="McpToolFormDrawerRef" @refresh="refresh" :title="McpToolDrawertitle" />
     <DataSourceToolFormDrawer
       ref="DataSourceToolFormDrawerRef"
@@ -412,11 +437,16 @@
       ref="resourceTriggerDrawerRef"
       :source="SourceTypeEnum.TOOL"
     ></ResourceTriggerDrawer>
+    <WorkflowFormDialog
+      ref="workflowFormDialogRef"
+      :title="workflowFormDialogtitle"
+    ></WorkflowFormDialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolResourceApi from '@/api/system-resource-management/tool'
@@ -426,6 +456,7 @@ import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
 import DataSourceToolFormDrawer from '@/views/tool/DataSourceToolFormDrawer.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
+import WorkflowFormDialog from '@/views/tool/WorkflowFormDialog.vue'
 import { t } from '@/locales'
 import { SourceTypeEnum } from '@/enums/common'
 import { resetUrl } from '@/utils/common'
@@ -439,10 +470,10 @@ import permissionMap from '@/permission'
 import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
-import SkillToolFormDrawer from "@/views/tool/SkillToolFormDrawer.vue";
+import SkillToolFormDrawer from '@/views/tool/SkillToolFormDrawer.vue'
 
 const { user } = useStore()
-
+const router = useRouter()
 const search_type = ref('name')
 const search_form = ref<any>({
   name: '',
@@ -600,7 +631,9 @@ function openCreateMcpDialog(data?: any) {
     return
   }
 
-  McpToolDrawertitle.value = data ? t('views.tool.mcp.editMcpTool') : t('views.tool.mcp.createMcpTool')
+  McpToolDrawertitle.value = data
+    ? t('views.tool.mcp.editMcpTool')
+    : t('views.tool.mcp.createMcpTool')
   if (data) {
     ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
       McpToolFormDrawerRef.value.open(res.data)
@@ -646,6 +679,24 @@ function openCreateSkillToolDialog(data?: any) {
   }
 }
 
+const workflowFormDialogRef = ref<InstanceType<typeof WorkflowFormDialog>>()
+const workflowFormDialogtitle = ref('')
+const openCreateWorkflowDialog = (data?: any) => {
+  // 有template_id的不允许编辑，是模板转换来的
+  if (data?.template_id) {
+    return
+  }
+
+  workflowFormDialogtitle.value = t('common.edit')
+  if (data) {
+    ToolResourceApi.getToolById(data?.id, loading).then((res: any) => {
+      workflowFormDialogRef.value?.open(res.data)
+    })
+  } else {
+    workflowFormDialogRef.value?.open(data)
+  }
+}
+
 const AddInternalToolDialogRef = ref<InstanceType<typeof AddInternalToolDialog>>()
 
 function addInternalTool(data?: any, isEdit?: boolean) {
@@ -686,6 +737,13 @@ async function changeState(row: any) {
         })
     })
   } else {
+    if (row.tool_type === 'WORKFLOW' && !row.is_publish) {
+      MsgConfirm(t('common.tip'), t('views.tool.toolWorkflow.toActiveTip')).then(() => {
+        toWorkflow(row)
+      })
+      return
+    }
+
     const res = await ToolResourceApi.getToolById(row.id, changeStateloading)
     if (
       (!res.data.init_params || Object.keys(res.data.init_params).length === 0) &&
@@ -709,6 +767,10 @@ async function changeState(row: any) {
         return false
       })
   }
+}
+
+function toWorkflow(data: any) {
+  router.push({ name: 'ToolWorkflow', params: { id: data.id, folderId: 'resource-management' } })
 }
 
 const filterText = ref('')

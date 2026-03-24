@@ -403,11 +403,11 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
             emit('refresh', res.data)
-            return user.profile()
+            return user.profile().then(() => {
+              visible.value = false
+            })
           })
-          .then(() => {
-            visible.value = false
-          })
+
           .finally(() => {
             loading.value = false
           })
@@ -421,10 +421,9 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             emit('refresh')
-            return user.profile()
-          })
-          .then(() => {
-            visible.value = false
+            return user.profile().then(() => {
+              visible.value = false
+            })
           })
           .finally(() => {
             loading.value = false

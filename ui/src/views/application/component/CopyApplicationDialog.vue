@@ -151,17 +151,16 @@ const submitHandle = async (formEl: FormInstance | undefined) => {
         .postApplication({ ...applicationForm.value, folder_id: currentFolder.value }, loading)
         .then((res) => {
           return user.profile().then(() => {
-            return res
+            MsgSuccess(t('common.createSuccess'))
+            if (isWorkFlow(applicationForm.value.type)) {
+              router.push({ path: `/application/workspace/${res.data.id}/workflow` })
+            } else {
+              router.push({
+                path: `/application/workspace/${res.data.id}/${res.data.type}/setting`,
+              })
+            }
+            dialogVisible.value = false
           })
-        })
-        .then((res) => {
-          MsgSuccess(t('common.createSuccess'))
-          if (isWorkFlow(applicationForm.value.type)) {
-            router.push({ path: `/application/workspace/${res.data.id}/workflow` })
-          } else {
-            router.push({ path: `/application/workspace/${res.data.id}/${res.data.type}/setting` })
-          }
-          dialogVisible.value = false
         })
     }
   })

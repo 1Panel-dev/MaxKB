@@ -129,19 +129,15 @@ const submitHandle = async () => {
             dialogVisible.value = false
           })
       } else {
-        folderApi.postFolder(sourceType.value, folderForm.value, loading)
-          .then((res) => {
-            return user.profile().then(() => {
-              return res
-            })
+        folderApi.postFolder(sourceType.value, folderForm.value, loading).then((res) => {
+          return user.profile().then(() => {
+            MsgSuccess(t('common.createSuccess'))
+            folder.setCurrentFolder(res.data)
+            folder.asyncGetFolder(sourceType.value, {}, 'workspace', loading)
+            clearData()
+            emit('refresh')
+            dialogVisible.value = false
           })
-          .then((res) => {
-          MsgSuccess(t('common.createSuccess'))
-          folder.setCurrentFolder(res.data)
-          folder.asyncGetFolder(sourceType.value, {}, 'workspace',loading)
-          clearData()
-          emit('refresh')
-          dialogVisible.value = false
         })
       }
     }

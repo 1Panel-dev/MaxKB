@@ -44,6 +44,7 @@
                           :is="iconComponent(`${item.type}-icon`)"
                           class="mr-8"
                           :size="20"
+                          style="--el-avatar-border-radius: 6px"
                         />
                         <div class="lighter">{{ item.label }}</div>
                       </div>

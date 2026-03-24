@@ -34,7 +34,11 @@
           />
           <el-option
             :label="t('workflow.nodes.variableAggregationNode.placeholder1')"
-            value="variable_to_json"
+            value="variable_to_array"
+          />
+          <el-option
+            :label="t('workflow.nodes.variableAggregationNode.placeholder2')"
+            value="variable_to_dict"
           />
         </el-select>
       </el-form-item>
@@ -77,10 +81,17 @@
                       trigger: 'change',
                     }"
                   >
+                    <el-input
+                      v-if="form_data.strategy === 'variable_to_dict'"
+                      v-model="item.key"
+                      :placeholder="$t('workflow.variable.placeholder_key')"
+                      style="width: 100px; margin-right: 8px"
+                      maxlength="256"
+                    />
                     <NodeCascader
                       ref="nodeCascaderRef"
                       :nodeModel="nodeModel"
-                      style="width: 200px"
+                      :style="{ width: form_data.strategy === 'variable_to_dict' ? '200px' : '308px'}"
                       :placeholder="$t('workflow.variable.placeholder')"
                       v-model="item.variable"
                     />
@@ -149,7 +160,10 @@ const form = {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
-      return props.nodeModel.properties.node_data
+      // 向下兼容
+      if (props.nodeModel.properties.node_data.strategy === 'variable_to_json') {
+        props.nodeModel.properties.node_data.strategy = 'variable_to_array'
+      }
     } else {
       set(props.nodeModel.properties, 'node_data', form)
     }

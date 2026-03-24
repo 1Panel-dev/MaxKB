@@ -20,6 +20,7 @@
               class="mr-8"
               :size="24"
               :item="nodeModel?.properties.node_data"
+              style="--el-avatar-border-radius: 6px"
             />
             <h4
               class="ellipsis-1 break-all"
@@ -439,6 +440,8 @@ function showOperate(type: string) {
     WorkflowType.Base,
     WorkflowType.KnowledgeBase,
     WorkflowType.LoopStartNode.toString(),
+    WorkflowType.ToolBaseNode,
+    WorkflowType.ToolStartNode,
   ].includes(type)
 }
 

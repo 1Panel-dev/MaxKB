@@ -219,15 +219,11 @@ static int match_banned_ip(const char *ip_str, const char *rules) {
     free(list);
     return blocked;
 }
-
-// ------------------ 网络拦截 ------------------
-int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
-    RESOLVE_REAL(connect);
-    ensure_config_loaded();
-    if (is_sandbox_user() && addr->sa_family == AF_UNIX) {
+static int match_banned_addr(const struct sockaddr *addr) {
+    if (addr->sa_family == AF_UNIX) {
         struct sockaddr_un *un = (struct sockaddr_un *)addr;
         throw_permission_denied_err(false, "access unix socket: %s", un->sun_path[0] ? un->sun_path : "(abstract)");
-        return -1;
+        return 1;
     }
     char ip[INET6_ADDRSTRLEN] = {0};
     if (addr->sa_family == AF_INET) {
@@ -244,12 +240,13 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
             inet_ntop(AF_INET6, &sin6->sin6_addr, ip, sizeof(ip));
         }
     }
-    if (is_sandbox_user() && match_banned_ip(ip, banned_hosts)) {
+    if (match_banned_ip(ip, banned_hosts)) {
         throw_permission_denied_err(false, "access %s", ip);
-        return -1;
+        return 1;
     }
-    return real_connect(sockfd, addr, addrlen);
+    return 0;
 }
+// ------------------ 网络拦截 ------------------
 int getaddrinfo(const char *node, const char *service,
                 const struct addrinfo *hints,
                 struct addrinfo **res) {
@@ -266,6 +263,34 @@ int getaddrinfo(const char *node, const char *service,
         }
     }
     return real_getaddrinfo(node, service, hints, res);
+}
+int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen) {
+    RESOLVE_REAL(connect);
+    ensure_config_loaded();
+    if (is_sandbox_user() && match_banned_addr(addr)) {
+        return -1;
+    }
+    return real_connect(sockfd, addr, addrlen);
+}
+ssize_t sendto(int sockfd, const void *buf, size_t len, int flags,
+               const struct sockaddr *addr, socklen_t addrlen) {
+    RESOLVE_REAL(sendto);
+    ensure_config_loaded();
+    if (is_sandbox_user() && match_banned_addr(addr)) {
+        return -1;
+    }
+    return real_sendto(sockfd, buf, len, flags, addr, addrlen);
+}
+ssize_t sendmsg(int sockfd, const struct msghdr *msg, int flags) {
+    RESOLVE_REAL(sendmsg);
+    ensure_config_loaded();
+    if (msg && msg->msg_name) {
+        const struct sockaddr *addr = (const struct sockaddr *)msg->msg_name;
+        if (is_sandbox_user() && match_banned_addr(addr)) {
+            return -1;
+        }
+    }
+    return real_sendmsg(sockfd, msg, flags);
 }
 /**
  * 限制创建子进程
@@ -331,6 +356,9 @@ int __execlp(const char *file, const char *arg, ...) {
 }
 int execle(const char *path, const char *arg, ...) {
     return not_supported("execle");
+}
+int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags) {
+    return not_supported("sendmmsg");
 }
 pid_t fork(void) {
     RESOLVE_REAL(fork);

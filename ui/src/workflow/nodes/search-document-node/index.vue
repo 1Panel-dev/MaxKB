@@ -31,10 +31,7 @@
                   v-model="form_data.search_scope_type"
                   style="width: 85px"
                 >
-                  <el-option
-                    :label="$t('workflow.variable.Referencing')"
-                    value="referencing"
-                  />
+                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
                   <el-option :label="$t('common.custom')" value="custom" />
                 </el-select>
               </span>
@@ -142,9 +139,7 @@
             v-if="form_data.search_mode === 'auto'"
             prop="question_reference"
             :rules="{
-              message: $t(
-                'workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage',
-              ),
+              message: $t('workflow.nodes.searchKnowledgeNode.searchQuestion.requiredMessage'),
               trigger: 'blur',
               required: true,
             }"
@@ -159,9 +154,7 @@
               ref="nodeCascaderRef2"
               :nodeModel="nodeModel"
               class="w-full"
-              :placeholder="
-                $t('workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')
-              "
+              :placeholder="$t('workflow.nodes.searchKnowledgeNode.searchQuestion.placeholder')"
               v-model="form_data.question_reference"
             />
           </el-form-item>
@@ -185,11 +178,7 @@
             <div v-for="(c, index) in form_data.search_condition_list" :key="index">
               <el-row :gutter="8" class="mb-8">
                 <el-col :span="8">
-                  <el-select
-                    v-model="c.key"
-                    filterable
-                    :filter-method="filterMethod"
-                  >
+                  <el-select v-model="c.key" filterable :filter-method="filterMethod">
                     <el-option
                       v-for="tag in form_data.knowledge_tags"
                       :key="tag"
@@ -337,7 +326,7 @@ function addCondition() {
   set(form_data.value, 'search_condition_list', list)
 }
 
-function delCondition(index: number) {
+function delCondition(index: number | string) {
   const list = cloneDeep(form_data.value.search_condition_list)
   list.splice(index, 1)
   set(form_data.value, 'search_condition_list', list)
@@ -357,7 +346,9 @@ function getAllTags(knowledge_ids: any) {
 }
 
 function filterMethod(val: string) {
-  form_data.value.knowledge_tags = all_knowledge_tags.value.filter((item: any) => item.key.indexOf(val) > -1).slice(0, 100)
+  form_data.value.knowledge_tags = all_knowledge_tags.value
+    .filter((item: any) => item.key.indexOf(val) > -1)
+    .slice(0, 100)
 }
 
 watch(
@@ -365,7 +356,7 @@ watch(
   (newVal) => {
     getAllTags(newVal)
   },
-  {immediate: true, deep: true},
+  { immediate: true, deep: true },
 )
 
 const validate = () => {
