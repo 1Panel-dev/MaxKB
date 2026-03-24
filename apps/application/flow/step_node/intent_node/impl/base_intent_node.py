@@ -189,8 +189,14 @@ class BaseIntentNode(IIntentNode):
             return None
 
         try:
-            result_json = json.loads(result)
-            classification_id = result_json.get('classificationId')
+            # 先尝试解析为数字（自定义提示词模板时，可提示大模型只输出ID值）
+            classification_id = self.to_int(result)
+
+            # 再尝试解析为 JSON
+            if classification_id is None:
+                result_json = json.loads(result)
+                classification_id = result_json.get('classificationId')
+
             # 如果是 0 ，返回其他分支
             matched_branch = get_branch_by_id(classification_id)
             if matched_branch:
@@ -229,6 +235,12 @@ class BaseIntentNode(IIntentNode):
                     return reason
 
             return ''
+
+    def to_int(self, str):
+        try:
+            return int(str)
+        except ValueError:
+            return None
 
     def find_other_branch(self, branch: List[Dict]) -> Dict[str, Any] | None:
         """查找其他分支"""
