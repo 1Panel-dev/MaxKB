@@ -28,7 +28,7 @@ class LoopContinueNodeSerializer(serializers.Serializer):
 
 class ILoopContinueNode(INode):
     type = 'loop-continue-node'
-    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP]
+    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return LoopContinueNodeSerializer

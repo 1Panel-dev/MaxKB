@@ -191,3 +191,9 @@ class LoopWorkflowManage(WorkflowManage):
         prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
         value = prompt_template.format(context=context)
         return value
+
+    def get_source_type(self):
+        return "APPLICATION"
+
+    def get_source_id(self):
+        return self.params.get('application_id')

@@ -74,6 +74,7 @@ class ToolView(APIView):
                 'name': request.query_params.get('name'),
                 'scope': request.query_params.get('scope', ToolScope.WORKSPACE),
                 'tool_type': request.query_params.get('tool_type'),
+                'tool_type_list': request.query_params.getlist('tool_type_list[]'),
                 'user_id': request.user.id,
                 'create_user': request.query_params.get('create_user'),
             }
@@ -564,10 +565,10 @@ class ToolView(APIView):
                            CompareConstants.AND),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, record_id: str):
-            return result.success(ToolSerializer.ToolRecord(data={
+            return result.success(ToolSerializer.ToolRecord.Operate(data={
                 'tool_id': tool_id,
                 'workspace_id': workspace_id,
-                'record_id': record_id,
+                'id': record_id,
             }).one())
 
     class UploadSkillFile(APIView):
@@ -595,4 +596,3 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'file': request.FILES.get('file'),
             }).upload())
-

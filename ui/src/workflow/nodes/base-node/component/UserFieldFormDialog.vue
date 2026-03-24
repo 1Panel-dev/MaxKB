@@ -133,6 +133,7 @@ const inputTypeList = ref([
   { label: t('dynamicsForm.input_type_list.RadioRow'), value: 'RadioRowConstructor' },
   { label: t('dynamicsForm.input_type_list.TextareaInput'), value: 'TextareaInputConstructor' },
   { label: t('dynamicsForm.input_type_list.MultiRow'), value: 'MultiRowConstructor' },
+  { label: t('dynamicsForm.input_type_list.Model'), value: 'ModelConstructor' },
 ])
 
 const dialogVisible = ref<boolean>(false)

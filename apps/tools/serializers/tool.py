@@ -9,7 +9,7 @@ import re
 import tempfile
 import zipfile
 from typing import Dict
-
+from django.core.cache import cache
 import requests
 import uuid_utils.compat as uuid
 from django.core import validators
@@ -24,6 +24,7 @@ from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
 from application.models import Application
+from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search, native_page_search, native_search
 from common.exception.app_exception import AppApiException
@@ -40,6 +41,7 @@ from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolFolder, ToolType, ToolRecord
+from tools.models.tool_workflow import ToolWorkflow
 from trigger.models import TriggerTask, Trigger
 from users.serializers.user import is_workspace_manage
 
@@ -391,7 +393,8 @@ class ToolSerializer(serializers.Serializer):
                 'user_id': self.data.get('user_id'),
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource(str(tool_id))
-
+            if instance.get('tool_type') == ToolType.WORKFLOW:
+                ToolWorkflow(id=uuid.uuid7(), tool_id=tool_id, work_flow=instance.get('work_flow', {})).save()
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get('tool_type') == ToolType.SKILL:
                 file_id = instance.get('code')
@@ -609,11 +612,18 @@ class ToolSerializer(serializers.Serializer):
                     'name': skill_file.file_name,
                     'size': skill_file.file_size,
                 } if skill_file else None
+            work_flow = {}
+            if tool.tool_type == 'WORKFLOW':
+                tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=tool.id).first()
+                if tool_workflow:
+                    work_flow = tool_workflow.work_flow
+
             return {
                 **ToolModelSerializer(tool).data,
                 'init_params': tool.init_params if tool.init_params else {},
                 'nick_name': nick_name,
-                'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else []
+                'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else [],
+                'work_flow': work_flow
             }
 
         def export(self):
@@ -989,6 +999,30 @@ class ToolSerializer(serializers.Serializer):
         source_type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('source type'))
         state = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('state'))
 
+        class Operate(serializers.Serializer):
+            id = serializers.UUIDField(required=False, allow_null=True, label=_('record id'))
+            tool_id = serializers.UUIDField(required=True, label=_('tool id'))
+            workspace_id = serializers.CharField(required=False, allow_null=True, label=_('workspace id'))
+
+            def one(self):
+                self.is_valid(raise_exception=True)
+                tool_record = cache.get(Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.data.get('id')),
+                                        version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version())
+                if tool_record:
+                    return tool_record
+                tool_record = QuerySet(ToolRecord).filter(id=self.data.get('id'), tool_id=self.data.get('tool_id'),
+                                                          workspace_id=self.data.get('workspace_id')).first()
+                if tool_record:
+                    return {'id': tool_record.id,
+                            'tool_id': tool_record.tool_id,
+                            'workspace_id': tool_record.workspace_id,
+                            'source_type': tool_record.source_type,
+                            'source_id': tool_record.source_id,
+                            'meta': tool_record.meta,
+                            'state': tool_record.state,
+                            'run_time': tool_record.run_time}
+                raise AppApiException(500, _('Tool record does not exist'))
+
         def one(self):
             self.is_valid(raise_exception=True)
             if self.data.get('record_id'):
@@ -1081,6 +1115,8 @@ class ToolTreeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
         scope = serializers.CharField(required=True, label=_('scope'))
         tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
+        tool_type_list = serializers.ListField(child=serializers.CharField(), required=False, label=_('tool type list'),
+                                               allow_null=True, allow_empty=True)
         create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
@@ -1142,7 +1178,11 @@ class ToolTreeSerializer(serializers.Serializer):
 
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
-            if tool_type:
+
+            tool_type_list = self.data.get('tool_type_list')
+            if tool_type_list:
+                tool_query_set = tool_query_set.filter(tool_type__in=tool_type_list)
+            elif tool_type:
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {

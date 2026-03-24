@@ -25,7 +25,7 @@ class FormNodeParamsSerializer(serializers.Serializer):
 class IFormNode(INode):
     type = 'form-node'
     view_type = 'single_view'
-    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP]
+    support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return FormNodeParamsSerializer

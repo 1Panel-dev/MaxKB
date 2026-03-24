@@ -2,11 +2,14 @@ export default {
   title: '工具',
   createTool: '创建工具',
   editTool: '编辑工具',
-
   copyTool: '复制工具',
   importTool: '导入工具',
   settingTool: '设置工具',
   updatedVersion: '更新版本',
+  toolWorkflow: {
+    creatToolWorkflow: '创建工作流',
+    toActiveTip: '无法启用，请先发布工作流。',
+  },
   dataSource: {
     title: '数据源',
     createDataSource: '创建数据源',
@@ -64,18 +67,22 @@ export default {
   },
   form: {
     toolName: {
-      name: '工具名称',
+      label: '工具名称',
       placeholder: '请输入工具名称',
       requiredMessage: '请输入工具名称',
     },
     mcpName: {
-      name: 'MCP 名称',
       placeholder: '请输入 MCP 名称',
       requiredMessage: '请输入 MCP 名称',
     },
     skillName: {
       placeholder: '请输入 Skills 名称',
       requiredMessage: '请输入 Skills 名称',
+    },
+    workflowName: {
+      label: '工作流名称',
+      placeholder: '请输入工作流名称',
+      requiredMessage: '请输入工作流名称',
     },
     paramName: {
       label: '参数名',

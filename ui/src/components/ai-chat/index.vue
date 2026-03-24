@@ -194,12 +194,21 @@ import { t } from '@/locales'
 import bus from '@/bus'
 import { throttle } from 'lodash-es'
 import { copyClick } from '@/utils/clipboard'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return props.type === 'debug-ai-chat'
     ? applicationApi.postUploadFile(file, 'TEMPORARY_120_MINUTE', 'TEMPORARY_120_MINUTE', loading)
     : chatAPI.postUploadFile(file, chartOpenId.value, 'CHAT', loading)
 })
+provide('getSelectModelList', (params: any) => {
+  if (route.path.includes('resource-management')) {
+    return loadSharedApi({ type: 'model', systemType: 'systemManage' }).getSelectModelList(params)
+  } else {
+    return loadSharedApi({ type: 'model', systemType: 'workspace' }).getSelectModelList(params)
+  }
+})
+
 const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
 const route = useRoute()

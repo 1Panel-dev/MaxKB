@@ -79,15 +79,13 @@ const submitHandle = async () => {
     loadSharedApi({ type: 'knowledge', systemType: apiType.value })
       .createWorkflowKnowledge(obj, loading)
       .then(async (res: any) => {
-        await user.profile()
-        return res
-      })
-      .then((res: any) => {
-        MsgSuccess(t('common.createSuccess'))
-        router.push({
-          path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/workflow`,
+        await user.profile().then(() => {
+          MsgSuccess(t('common.createSuccess'))
+          router.push({
+            path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/workflow`,
+          })
+          emit('refresh')
         })
-        emit('refresh')
       })
   } else {
     return false

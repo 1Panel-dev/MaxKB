@@ -29,7 +29,7 @@ class LoopBreakNodeSerializer(serializers.Serializer):
 
 class ILoopBreakNode(INode):
     type = 'loop-break-node'
-    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP]
+    support = [WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return LoopBreakNodeSerializer

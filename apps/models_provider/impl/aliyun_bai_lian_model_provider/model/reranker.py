@@ -56,4 +56,4 @@ class AliyunBaiLianReranker(MaxKBBaseModel, BaseDocumentCompressor):
                 for item in resp.output.get('results', [])
             ]
         else:
-            return []
+            raise Exception(f'Failed, status_code: {resp.status_code}, message: {resp.message}')

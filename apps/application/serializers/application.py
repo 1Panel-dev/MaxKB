@@ -44,6 +44,7 @@ from common.field.common import UploadedFileField
 from common.utils.common import get_file_content, restricted_loads, generate_uuid, _remove_empty_lines, \
     bytes_to_uploaded_file
 from common.utils.logger import maxkb_logger
+from common.utils.tool_code import ToolExecutor
 from knowledge.models import Knowledge, KnowledgeScope, File, FileSourceType
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
@@ -1035,6 +1036,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if 'work_flow' in instance:
             # 修改语音配置相关
             self.update_work_flow_model(instance)
+        if 'mcp_servers' in instance:
+            ToolExecutor().validate_mcp_transport(instance.get('mcp_servers'))
         update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                        'knowledge_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',

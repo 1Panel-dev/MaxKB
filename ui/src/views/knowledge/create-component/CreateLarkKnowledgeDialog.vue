@@ -58,7 +58,7 @@ import BaseForm from '@/views/knowledge/component/BaseForm.vue'
 import { MsgSuccess, MsgAlert } from '@/utils/message'
 import { t } from '@/locales'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import useStore from "@/stores";
+import useStore from '@/stores'
 const emit = defineEmits(['refresh'])
 
 const { user } = useStore()
@@ -162,18 +162,16 @@ const submitHandle = async () => {
         loadSharedApi({ type: 'knowledge', systemType: apiType.value })
           .postLarkKnowledge(obj, loading)
           .then(async (res: any) => {
-            await user.profile();
-            return res
-          })
-          .then((res: any) => {
-            MsgSuccess(t('common.createSuccess'))
-            router.push({
-              path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/2/document`,
-              query: {
-                from: apiType.value,
-              },
+            await user.profile().then(() => {
+              MsgSuccess(t('common.createSuccess'))
+              router.push({
+                path: `/knowledge/${res.data.id}/${currentFolder.value.id || 'shared'}/2/document`,
+                query: {
+                  from: apiType.value,
+                },
+              })
+              emit('refresh')
             })
-            emit('refresh')
           })
       } else {
         return false

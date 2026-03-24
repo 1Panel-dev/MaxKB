@@ -13,6 +13,7 @@ export default {
     UploadInput: 'File upload',
     TextareaInput: 'Multiline Input',
     MultiRow: 'Multi Row',
+    Model: 'Model',
   },
   default: {
     label: 'Default',

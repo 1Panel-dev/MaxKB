@@ -7,6 +7,10 @@ export default {
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
   updatedVersion: 'Updated Version',
+  toolWorkflow: {
+    creatToolWorkflow: 'Create Workflow',
+    toActiveTip: 'Unable to enable. Please publish the workflow first.',
+  },
   dataSource: {
     title: 'Data Source',
     createDataSource: 'Create Data Source',
@@ -67,14 +71,18 @@ export default {
 
   form: {
     toolName: {
-      name: 'Tool Name',
+      label: 'Tool Name',
       placeholder: 'Please enter the tool name',
       requiredMessage: 'Please enter the tool name',
     },
     mcpName: {
-      name: 'MCP Name',
       placeholder: 'Please enter the MCP name',
       requiredMessage: 'Please enter the MCP name',
+    },
+    workflowName: {
+      label: 'Workflow Name',
+      placeholder: 'Please enter the Workflow name',
+      requiredMessage: 'Please enter the Workflow name',
     },
     paramName: {
       label: 'Parameter Name',

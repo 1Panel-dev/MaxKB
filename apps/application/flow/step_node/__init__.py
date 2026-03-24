@@ -35,11 +35,13 @@ from .text_to_speech_step_node.impl.base_text_to_speech_node import BaseTextToSp
 from .text_to_video_step_node.impl.base_text_to_video_node import BaseTextToVideoNode
 from .tool_lib_node import *
 from .tool_node import *
+from .tool_workflow_lib_node import BaseToolWorkflowLibNodeNode
 from .variable_aggregation_node.impl.base_variable_aggregation_node import BaseVariableAggregationNode
 from .variable_assign_node import BaseVariableAssignNode
 from .variable_splitting_node import BaseVariableSplittingNode
 from .video_understand_step_node import BaseVideoUnderstandNode
 from .document_split_node import BaseDocumentSplitNode
+from .tool_start_node import BaseToolStartStepNode
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearchDocumentNode, BaseQuestionNode,
              BaseConditionNode, BaseReplyNode,
@@ -51,7 +53,8 @@ node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearc
              BaseIntentNode, BaseLoopNode, BaseLoopStartStepNode,
              BaseLoopContinueNode,
              BaseLoopBreakNode, BaseVariableSplittingNode, BaseParameterExtractionNode, BaseVariableAggregationNode,
-             BaseDataSourceLocalNode, BaseDataSourceWebNode, BaseKnowledgeWriteNode, BaseDocumentSplitNode]
+             BaseDataSourceLocalNode, BaseDataSourceWebNode, BaseKnowledgeWriteNode, BaseDocumentSplitNode,
+             BaseToolStartStepNode, BaseToolWorkflowLibNodeNode]
 
 node_map = {n.type: {w: n for w in n.support} for n in node_list}
 

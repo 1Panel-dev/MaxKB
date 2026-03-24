@@ -38,7 +38,7 @@
         <slot name="footer"></slot>
       </div>
       <div @mouseenter="subHoveredEnter">
-        <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
+        <slot name="mouseEnter"  v-if="$slots.mouseEnter && show" />
       </div>
     </div>
   </el-card>
@@ -80,7 +80,6 @@ function cardLeave() {
 function subHoveredEnter() {
   subHovered.value = true
 }
-
 </script>
 <style lang="scss" scoped>
 .card-box {

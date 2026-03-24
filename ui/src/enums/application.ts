@@ -15,6 +15,7 @@ export enum WorkflowType {
   Condition = 'condition-node',
   Reply = 'reply-node',
   ToolLib = 'tool-lib-node',
+  ToolWorkflowLib = 'tool-workflow-lib-node',
   ToolLibCustom = 'tool-node',
   RerankerNode = 'reranker-node',
   Application = 'application-node',
@@ -42,6 +43,8 @@ export enum WorkflowType {
   DataSourceLocalNode = 'data-source-local-node',
   DataSourceWebNode = 'data-source-web-node',
   KnowledgeWriteNode = 'knowledge-write-node',
+  ToolStartNode = 'tool-start-node',
+  ToolBaseNode = 'tool-base-node',
 }
 export enum WorkflowKind {
   DataSource = 'data-source',
@@ -53,6 +56,10 @@ export enum WorkflowMode {
   ApplicationLoop = 'application-loop',
   // 知识库工作流
   Knowledge = 'knowledge',
+  // 工具
+  Tool = 'tool',
+  // 工具循环体
+  ToolLoop = 'tool-loop',
   // 知识库工作流循环体
   KnowledgeLoop = 'knowledge-loop',
 }
