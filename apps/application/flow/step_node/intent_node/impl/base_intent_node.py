@@ -74,6 +74,7 @@ class BaseIntentNode(IIntentNode):
 
         # 构建分类提示词
         prompt = self.build_classification_prompt(user_input, branch, output_reason)
+        self.context['system'] = prompt
 
         # 生成消息列表
         system = self.build_system_prompt()
