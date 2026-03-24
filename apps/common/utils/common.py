@@ -17,6 +17,7 @@ import uuid
 from functools import reduce
 from typing import List, Dict
 
+from django.contrib.auth.hashers import check_password, make_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
@@ -26,16 +27,62 @@ from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
 
 
+def _legacy_md5_hash(row_password):
+    """
+    Legacy MD5 hashing — used only to detect old hashes during migration.
+    Do NOT use for new passwords.
+    """
+    md5 = hashlib.md5()
+    md5.update(row_password.encode())
+    return md5.hexdigest()
+
+
 def password_encrypt(row_password):
     """
-    密码 md5加密
+    密码加密（使用 Django PBKDF2）
     :param row_password: 密码
     :return:  加密后密码
     """
-    md5 = hashlib.md5()  # 2，实例化md5() 方法
-    md5.update(row_password.encode())  # 3，对字符串的字节类型加密
-    result = md5.hexdigest()  # 4，加密
-    return result
+    return make_password(row_password)
+
+
+def password_verify(row_password, hashed_password):
+    """
+    验证密码是否匹配已存储的哈希值。
+    支持透明升级：如果存储的是旧版 MD5 哈希，也能正确验证。
+    :param row_password: 明文密码
+    :param hashed_password: 数据库中存储的密码哈希
+    :return: 是否匹配
+    """
+    # First try Django's built-in check (PBKDF2, bcrypt, argon2, etc.)
+    if check_password(row_password, hashed_password):
+        return True
+    # Fall back to legacy MD5 comparison for not-yet-migrated hashes
+    if _is_legacy_md5_hash(hashed_password):
+        return _legacy_md5_hash(row_password) == hashed_password
+    return False
+
+
+def _is_legacy_md5_hash(hashed_password):
+    """
+    Detect legacy unsalted MD5 hex-digest hashes (exactly 32 hex chars).
+    Django password hashes always contain '$' separators.
+    """
+    if hashed_password and len(hashed_password) == 32:
+        try:
+            int(hashed_password, 16)
+            return True
+        except ValueError:
+            pass
+    return False
+
+
+def needs_password_upgrade(hashed_password):
+    """
+    Check if a stored password hash should be upgraded to PBKDF2.
+    Returns True for legacy MD5 hashes.
+    """
+    return _is_legacy_md5_hash(hashed_password)
 
 
 def group_by(list_source: List, key):

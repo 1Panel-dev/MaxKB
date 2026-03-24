@@ -26,9 +26,10 @@ from common.constants.permission_constants import RoleConstants, Auth, ResourceA
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
-from common.utils.common import valid_license, password_encrypt, get_random_chars
+from common.utils.common import valid_license, password_encrypt, password_verify, get_random_chars
 from common.utils.rsa_util import decrypt
 from maxkb import settings
+from maxkb.const import CONFIG
 from maxkb.conf import PROJECT_DIR
 from system_manage.models import SystemSetting, SettingType, AuthTargetType, WorkspaceUserResourcePermission
 from users.models import User
@@ -116,7 +117,7 @@ class UserProfileSerializer(serializers.Serializer):
             'source': user.source,
             'role': auth.role_list,
             'permissions': auth.permission_list,
-            'is_edit_password': user.password == 'd880e722c47a34d8e9fce789fc62389d' if user.source == 'LOCAL' else False,
+            'is_edit_password': password_verify(CONFIG.get('DEFAULT_PASSWORD', 'MaxKB@123..'), user.password) if user.source == 'LOCAL' else False,
             'language': user.language,
             'workspace_list': workspace_list,
             'role_name': role_name
