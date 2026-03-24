@@ -511,6 +511,7 @@ long syscall(long number, ...) {
         case SYS_accept:
         case SYS_accept4:
         case SYS_sendto:
+        case SYS_sendmsg:
         case SYS_recvmsg:
         case SYS_getsockopt:
         case SYS_setsockopt:
@@ -542,6 +543,9 @@ long syscall(long number, ...) {
         case SYS_shmget:
         case SYS_shmctl:
         case SYS_prctl:
+        case SYS_io_uring_setup:
+        case SYS_io_uring_enter:
+        case SYS_io_uring_register:
             if (!allow_access_syscall()) {
                 throw_permission_denied_err(true, "access syscall %ld", number);
              }

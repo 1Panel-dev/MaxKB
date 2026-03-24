@@ -175,7 +175,7 @@ import { WorkflowMode } from '@/enums/application'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { toolBaseNode, toolStartNode } from '@/workflow/common/data'
 import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
-import DebugDrawer from './component/debug-drawer/index.vue'
+import DebugDrawer from './debug-drawer/DebugDrawer.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
 provide('loopWorkflowMode', WorkflowMode.ToolLoop)

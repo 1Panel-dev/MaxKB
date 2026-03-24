@@ -1036,8 +1036,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if 'work_flow' in instance:
             # 修改语音配置相关
             self.update_work_flow_model(instance)
-        if 'mcp_servers' in instance:
-            ToolExecutor().validate_mcp_transport(instance.get('mcp_servers'))
+        if 'mcp_servers' in instance and len(instance.get('mcp_servers', {})) > 0:
+            ToolExecutor().validate_mcp_transport(json.dumps(instance.get('mcp_servers')))
         update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                        'knowledge_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
