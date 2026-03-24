@@ -155,7 +155,7 @@ class BaseIntentNode(IIntentNode):
         return PROMPT_TEMPLATE.format(
             classification_list=classification_list,
             user_input=user_input,
-            output_reason=',\n"reason": ""' if output_reason is True else ""
+            output_reason=',\n"reason": ""' if output_reason is True else ''
         )
 
     def generate_message_list(self, system: str, prompt: str, history_message):
