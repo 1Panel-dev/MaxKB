@@ -73,7 +73,7 @@ class BaseIntentNode(IIntentNode):
         self.context['user_input'] = user_input
 
         # 构建分类提示词
-        prompt_template = self.workflow_manage.generate_prompt(prompt_template)
+        prompt_template = self.workflow_manage.generate_prompt(prompt_template) if prompt_template else None
         prompt = self.build_classification_prompt(prompt_template, user_input, branch, output_reason)
         self.context['system'] = prompt
 
