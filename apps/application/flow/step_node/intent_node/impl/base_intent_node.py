@@ -66,7 +66,7 @@ class BaseIntentNode(IIntentNode):
         )
 
         # 获取历史对话
-        history_message = self.get_history_message(history_chat_record, dialogue_number)
+        history_message = self.get_history_message(history_chat_record, dialogue_number) if history_chat_record and dialogue_number > 0 else []
         self.context['history_message'] = history_message
 
         # 保存问题到上下文
@@ -78,8 +78,7 @@ class BaseIntentNode(IIntentNode):
         self.context['system'] = prompt
 
         # 生成消息列表
-        system = self.build_system_prompt()
-        message_list = self.generate_message_list(system, prompt, history_message)
+        message_list = self.generate_message_list(prompt, history_message)
         self.context['message_list'] = message_list
 
         # 调用模型进行分类
@@ -127,10 +126,6 @@ class BaseIntentNode(IIntentNode):
                 message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
-    def build_system_prompt(self) -> str:
-        """构建系统提示词"""
-        return "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
-
     def build_classification_prompt(self, prompt_template: str, user_input: str, branch: List[Dict], output_reason: bool) -> str:
         """构建分类提示词"""
 
@@ -163,13 +158,9 @@ class BaseIntentNode(IIntentNode):
             output_json=output_json
         )
 
-    def generate_message_list(self, system: str, prompt: str, history_message):
+    def generate_message_list(self, prompt: str, history_message):
         """生成消息列表"""
-        if system is None or len(system) == 0:
-            return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
-        else:
-            return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
-                    HumanMessage(self.workflow_manage.generate_prompt(prompt))]
+        return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
 
     def parse_classification_result(self, result: str, branch: List[Dict]) -> Dict[str, Any]:
         """解析分类结果"""
