@@ -154,11 +154,11 @@ class BaseIntentNode(IIntentNode):
                 classification_id += 1
 
         # 构建输出JSON结构
-        output_reason = ', "reason": ""' if output_reason is True else ''
-        output_json = f'{{"classificationId": 0{output_reason}}}'
+        output_reason = ',\n  "reason": ""' if output_reason is True else ''
+        output_json = f'{{\n  "classificationId": 0{output_reason}\n}}'
 
         return (prompt_template or DEFAULT_PROMPT_TEMPLATE).format(
-            classification_list=classification_list,
+            classification_list=json.dumps(classification_list, ensure_ascii=False),
             user_input=user_input,
             output_json=output_json
         )

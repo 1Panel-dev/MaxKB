@@ -83,7 +83,7 @@ export default {
     prompt_template: {
       label: '提示詞模板',
       requiredMessage: '請輸入提示詞模板',
-      tooltip: '請注意模板中的佔位符 `{{xxx}}`',
+      tooltip: '請注意模板中的佔位符',
     },
     historyRecord: {
       label: '歷史對話紀錄',
