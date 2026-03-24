@@ -14,6 +14,7 @@ export default {
     TextareaInput: '多行文字框',
     MultiRow: '單行多選卡',
     Model: '模型',
+    Knowledge: '知識庫',
   },
   default: {
     label: '預設值',
