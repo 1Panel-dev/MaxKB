@@ -189,10 +189,13 @@ class BaseIntentNode(IIntentNode):
             return None
 
         try:
-            # 先尝试解析为数字（自定义提示词模板时，可提示大模型只输出ID值）
-            classification_id = self.to_int(result)
+            classification_id = None
 
-            # 再尝试解析为 JSON
+            # 如果返回长度小于5，先尝试解析为数字（增加自由度：自定义提示词模板时，可提示大模型只输出ID值）
+            if len(result) < 5:
+                classification_id = self.to_int(result)
+
+            # 尝试解析为 JSON
             if classification_id is None:
                 result_json = json.loads(result)
                 classification_id = result_json.get('classificationId')
@@ -202,7 +205,7 @@ class BaseIntentNode(IIntentNode):
             if matched_branch:
                 return matched_branch
 
-        except Exception as e:
+        except Exception:
             # json 解析失败，re 提取
             numbers = re.findall(r'"classificationId":\s*(\d+)', result)
             if numbers:
