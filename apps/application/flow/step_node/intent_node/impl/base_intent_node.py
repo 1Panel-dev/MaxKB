@@ -12,7 +12,7 @@ from application.flow.i_step_node import INode, NodeResult
 from application.flow.step_node.intent_node.i_intent_node import IIntentNode
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
-from .prompt_template import PROMPT_TEMPLATE
+from .prompt_template import DEFAULT_PROMPT_TEMPLATE
 
 
 def get_default_model_params_setting(model_id):
@@ -52,7 +52,7 @@ class BaseIntentNode(IIntentNode):
         self.context['branch_id'] = details.get('branch_id')
         self.context['category'] = details.get('category')
 
-    def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch, output_reason,
+    def execute(self, model_id, prompt_template, dialogue_number, history_chat_record, user_input, branch, output_reason,
                 model_params_setting=None, **kwargs) -> NodeResult:
 
         # 设置默认模型参数
@@ -73,7 +73,8 @@ class BaseIntentNode(IIntentNode):
         self.context['user_input'] = user_input
 
         # 构建分类提示词
-        prompt = self.build_classification_prompt(user_input, branch, output_reason)
+        prompt_template = self.workflow_manage.generate_prompt(prompt_template)
+        prompt = self.build_classification_prompt(prompt_template, user_input, branch, output_reason)
         self.context['system'] = prompt
 
         # 生成消息列表
@@ -130,7 +131,7 @@ class BaseIntentNode(IIntentNode):
         """构建系统提示词"""
         return "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
 
-    def build_classification_prompt(self, user_input: str, branch: List[Dict], output_reason: bool) -> str:
+    def build_classification_prompt(self, prompt_template: str, user_input: str, branch: List[Dict], output_reason: bool) -> str:
         """构建分类提示词"""
 
         classification_list = []
@@ -152,10 +153,14 @@ class BaseIntentNode(IIntentNode):
                 })
                 classification_id += 1
 
-        return PROMPT_TEMPLATE.format(
+        # 构建输出JSON结构
+        output_reason = ', "reason": ""' if output_reason is True else ''
+        output_json = f'{{"classificationId": 0{output_reason}}}'
+
+        return (prompt_template or DEFAULT_PROMPT_TEMPLATE).format(
             classification_list=classification_list,
             user_input=user_input,
-            output_reason=',\n"reason": ""' if output_reason is True else ''
+            output_json=output_json
         )
 
     def generate_message_list(self, system: str, prompt: str, history_message):

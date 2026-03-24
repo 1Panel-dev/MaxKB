@@ -17,6 +17,7 @@ class IntentBranchSerializer(serializers.Serializer):
 
 class IntentNodeSerializer(serializers.Serializer):
     model_id = serializers.CharField(required=True, label=_("Model id"))
+    prompt_template = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Prompt template"))
     content_list = serializers.ListField(required=True, label=_("Text content"))
     dialogue_number = serializers.IntegerField(required=True, label=
     _("Number of multi-round conversations"))

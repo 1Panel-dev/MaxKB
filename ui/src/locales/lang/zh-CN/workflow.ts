@@ -533,6 +533,7 @@ export default {
   },
   SystemPromptPlaceholder: '系统提示词，可以引用系统中的变量：如',
   UserPromptPlaceholder: '用户提示词，可以引用系统中的变量：如',
+  PromptTemplatePlaceholder: '提示词模板，可以引用系统中的变量：如',
   initiator: '发起人',
   abnormalInformation: '异常信息'
 

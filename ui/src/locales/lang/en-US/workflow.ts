@@ -542,6 +542,7 @@ You are a master of problem optimization, adept at accurately inferring user int
   },
   SystemPromptPlaceholder: 'System Prompt, can reference variables in the system, such as',
   UserPromptPlaceholder: 'User Prompt, can reference variables in the system, such as',
+  PromptTemplatePlaceholder: 'Prompt Template, can reference variables in the system, such as',
   initiator: 'Iniiator',
   abnormalInformation: 'Abnormal Information',
 }

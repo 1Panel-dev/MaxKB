@@ -80,6 +80,11 @@ export default {
 回答要求：
 - 請使用中文回答用戶問題`,
     },
+    prompt_template: {
+      label: '提示詞模板',
+      requiredMessage: '請輸入提示詞模板',
+      tooltip: '請注意模板中的佔位符 `{xxx}`',
+    },
     historyRecord: {
       label: '歷史對話紀錄',
     },
