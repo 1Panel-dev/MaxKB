@@ -1,6 +1,12 @@
 <template>
   <div class="w-full">
-    <el-select v-model="modelValue" popper-class="select-model" :clearable="true" filterable v-bind="$attrs">
+    <el-select
+      v-model="modelValue"
+      popper-class="select-model"
+      :clearable="true"
+      filterable
+      v-bind="$attrs"
+    >
       <el-option-group
         v-for="(value, label) in options"
         :key="value"
@@ -20,7 +26,12 @@
             ></span>
             <span>{{ item.name }}</span>
 
-            <el-tag v-if="item.type === 'share'" size="small" type="info" class="info-tag ml-8" style="margin-top: 7px;">
+            <el-tag
+              v-if="item.type === 'share'"
+              type="info"
+              class="info-tag ml-8"
+              style="margin-top: 7px"
+            >
               {{ t('views.shared.title') }}
             </el-tag>
           </div>
@@ -50,6 +61,11 @@
           </el-icon>
         </el-option>
       </el-option-group>
+
+      <template #tag v-if="$slots.tag">
+        <slot name="tag"></slot>
+      </template>
+
       <template #footer v-if="showFooter">
         <slot name="footer">
           <div class="w-full text-left cursor" @click="openCreateModel(undefined, props.modelType)">

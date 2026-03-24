@@ -450,9 +450,19 @@ class AppNodeModel extends HtmlResize.model {
     const { id, x, y, width } = this
     const showNode = this.properties.showNode === undefined ? true : this.properties.showNode
     const anchors: any = []
-    if (![WorkflowType.Base as string, WorkflowType.KnowledgeBase as string].includes(this.type)) {
+    if (
+      ![
+        WorkflowType.Base as string,
+        WorkflowType.KnowledgeBase as string,
+        WorkflowType.ToolBaseNode as string,
+      ].includes(this.type)
+    ) {
       if (
-        ![WorkflowType.Start, WorkflowType.LoopStartNode.toString()].includes(this.type) &&
+        ![
+          WorkflowType.Start,
+          WorkflowType.LoopStartNode.toString(),
+          WorkflowType.ToolStartNode,
+        ].includes(this.type) &&
         this.properties.kind != WorkflowKind.DataSource
       ) {
         anchors.push({

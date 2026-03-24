@@ -13,10 +13,13 @@
       >
         <el-form-item
           :label="$t('views.application.form.aiModel.label')"
-          prop="model_id"
+          :prop="chat_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
             required: true,
-            message: $t('views.application.form.aiModel.placeholder'),
+            message:
+              chat_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.aiModel.placeholder'),
             trigger: 'change',
           }"
         >
@@ -28,7 +31,33 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
-
+              <el-select
+                v-model="chat_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="chat_data.model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="chat_data.model_id_type !== 'reference'">
+            <div>
+              <ModelSelect
+                @change="model_change"
+                @wheel="wheel"
+                :teleported="false"
+                v-model="chat_data.model_id"
+                :placeholder="$t('views.application.form.aiModel.placeholder')"
+                :options="modelOptions"
+                @submitModel="getSelectModel"
+                showFooter
+                :model-type="'LLM'"
+              ></ModelSelect>
+            </div>
+            <div class="ml-8">
               <el-button
                 :disabled="!chat_data.model_id"
                 type="primary"
@@ -39,18 +68,15 @@
                 <AppIcon iconName="app-setting"></AppIcon>
               </el-button>
             </div>
-          </template>
-          <ModelSelect
-            @change="model_change"
-            @wheel="wheel"
-            :teleported="false"
-            v-model="chat_data.model_id"
-            :placeholder="$t('views.application.form.aiModel.placeholder')"
-            :options="modelOptions"
-            @submitModel="getSelectModel"
-            showFooter
-            :model-type="'LLM'"
-          ></ModelSelect>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="chat_data.model_id_reference"
+          />
         </el-form-item>
 
         <el-form-item>
@@ -71,7 +97,7 @@
                 type="primary"
                 link
                 @click="openGeneratePromptDialog(chat_data.model_id)"
-                :disabled="!chat_data.model_id"
+                :disabled="chat_data.model_id_type === 'reference' || !chat_data.model_id"
               >
                 <AppIcon iconName="app-generate-star"></AppIcon>
               </el-button>
@@ -458,6 +484,7 @@
 <script setup lang="ts">
 import { cloneDeep, set, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, inject, reactive } from 'vue'
 import { isLastNode } from '@/workflow/common/data'
@@ -532,6 +559,8 @@ const collapseData = reactive({
 
 const form = {
   model_id: '',
+  model_id_type: 'custom',
+  model_id_reference: [],
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 1,
@@ -556,6 +585,12 @@ const chat_data = computed({
           reasoning_content_enable: false,
         })
       }
+      if (!props.nodeModel.properties.node_data.model_id_type) {
+        set(props.nodeModel.properties.node_data, 'model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
@@ -573,6 +608,7 @@ const aiChatNodeFormRef = ref<FormInstance>()
 
 const modelOptions = ref<any>(null)
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const nodeCascaderRef = ref()
 const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
 const validate = () => {
   return aiChatNodeFormRef.value?.validate().catch((err) => {

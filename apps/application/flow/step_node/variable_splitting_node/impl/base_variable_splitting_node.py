@@ -41,7 +41,7 @@ class BaseVariableSplittingNode(IVariableSplittingNode):
         self.context['exception_message'] = details.get('err_message')
 
     def execute(self, input_variable, variable_list, **kwargs) -> NodeResult:
-        if type(input_variable).__name__ == "str":
+        if isinstance(input_variable, str):
             try:
                 input_variable = json.loads(input_variable)
             except Exception:

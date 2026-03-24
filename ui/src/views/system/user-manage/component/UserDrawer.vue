@@ -69,18 +69,17 @@
       :deleteButtonDisabled="deleteButtonDisabled"
     />
     <template #footer>
-      <div style="display: flex; width: 100%;">
+      <div style="display: flex; width: 100%">
         <el-button @click="openDialog" v-if="!isEdit && showPermission">
           {{ $t('views.system.resourceAuthorization.setting.defaultPermission') }}
         </el-button>
-        <div style="margin-left: auto;">
+        <div style="margin-left: auto">
           <el-button @click.prevent="visible = false">{{ $t('common.cancel') }}</el-button>
           <el-button type="primary" @click="submit(userFormRef)" :loading="loading">
             {{ $t('common.save') }}
           </el-button>
         </div>
       </div>
-
     </template>
   </el-drawer>
   <el-dialog
@@ -91,11 +90,11 @@
   >
     <template #header="{ titleId, titleClass }" v-if="user.isEE()">
       <div class="dialog-header">
-        <h4 :id="titleId" :class="titleClass" style="margin: 0;">
+        <h4 :id="titleId" :class="titleClass" style="margin: 0">
           {{ $t('views.system.resourceAuthorization.setting.defaultPermission') }}
           <span class="dialog-subtitle">
-          {{ $t('views.system.resourceAuthorization.setting.defaultPermissionTip') }}
-        </span>
+            {{ $t('views.system.resourceAuthorization.setting.defaultPermissionTip') }}
+          </span>
         </h4>
       </div>
     </template>
@@ -116,21 +115,21 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, reactive, watch, onBeforeMount, computed} from 'vue'
-import type {FormInstance} from 'element-plus'
+import { ref, reactive, watch, onBeforeMount, computed } from 'vue'
+import type { FormInstance } from 'element-plus'
 import userManageApi from '@/api/system/user-manage'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
-import type {FormItemModel} from '@/api/type/role'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import type { FormItemModel } from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import {AuthorizationEnum, RoleTypeEnum} from '@/enums/system'
+import { AuthorizationEnum, RoleTypeEnum } from '@/enums/system'
 import useStore from '@/stores'
-import {hasPermission} from "@/utils/permission";
-import {EditionConst} from "@/utils/permission/data.ts";
-import forge from "node-forge";
+import { hasPermission } from '@/utils/permission'
+import { EditionConst } from '@/utils/permission/data.ts'
+import forge from 'node-forge'
 
-const {user} = useStore()
+const { user } = useStore()
 const props = defineProps({
   title: String,
 })
@@ -174,33 +173,31 @@ const permissionOptions = computed(() => {
       label: t('views.system.resourceAuthorization.setting.notAuthorized'),
       value: AuthorizationEnum.NOT_AUTH,
       desc: '',
-    }
-  ];
+    },
+  ]
 
   if (hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')) {
     baseOptions.splice(2, 0, {
       label: t('views.system.resourceAuthorization.setting.role'),
       value: AuthorizationEnum.ROLE,
       desc: t('views.system.resourceAuthorization.setting.roleDesc'),
-    });
+    })
   }
 
-  return baseOptions;
-});
+  return baseOptions
+})
 
 const showPermission = computed(() => {
   //社区版本的可以显示 别的版本 过期了 也可以显示
   if (user.isCE() || user.isExpire()) {
     return true
   }
-  const hasUserRole = list.value.some((item) => userRoleList.value.includes(item.role_id));
+  const hasUserRole = list.value.some((item) => userRoleList.value.includes(item.role_id))
   return (user.isEE() || user.isPE()) && hasUserRole
 })
 
-
 function deleteButtonDisabled(element: any) {
-  return isAdmin.value && ['ADMIN', 'WORKSPACE_MANAGE', 'USER'].includes(element.role_id);
-
+  return isAdmin.value && ['ADMIN', 'WORKSPACE_MANAGE', 'USER'].includes(element.role_id)
 }
 
 async function getRoleFormItem() {
@@ -231,7 +228,6 @@ async function getRoleFormItem() {
     userRoleList.value = res.data
       .filter((item) => item.type === RoleTypeEnum.USER)
       .map((item) => item.id)
-
   } catch (e) {
     console.error(e)
   }
@@ -293,7 +289,7 @@ onBeforeMount(async () => {
     }
     formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
   }
-  list.value = [{role_id: '', workspace_ids: []}]
+  list.value = [{ role_id: '', workspace_ids: [] }]
 })
 
 const rules = reactive({
@@ -365,7 +361,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
-    list.value = [{role_id: '', workspace_ids: []}]
+    list.value = [{ role_id: '', workspace_ids: [] }]
     userFormRef.value?.clearValidate()
   }
 })
@@ -409,12 +405,12 @@ const submit = async (formEl: FormInstance | undefined) => {
 
           // 如果是管理员角色，则设置为 ['None']
           if (isAdminRole) {
-            return {...item, workspace_ids: ['None']}
+            return { ...item, workspace_ids: ['None'] }
           }
 
           // 如果是普通用户且是 PE 类型，则设置为 ['default']
           if (user.isPE()) {
-            return {...item, workspace_ids: ['default']}
+            return { ...item, workspace_ids: ['default'] }
           }
 
           // 其他情况保持原样
@@ -426,37 +422,27 @@ const submit = async (formEl: FormInstance | undefined) => {
         role_setting: list.value,
       }
       if (isEdit.value) {
-        userManageApi
-          .putUserManage(userForm.value.id, params, loading)
-          .then((res) => {
-            return user.profile(loading).then(() => {
-              return res
-            })
-          })
-          .then((res) => {
+        userManageApi.putUserManage(userForm.value.id, params, loading).then((res) => {
+          return user.profile(loading).then(() => {
             emit('refresh')
             MsgSuccess(t('common.editSuccess'))
             visible.value = false
           })
+        })
       } else {
         params.defaultPermission = defaultPermission.value
-        const publicKey = forge.pki.publicKeyFromPem(user.rasKey);
-        const utf8Bytes = forge.util.encodeUtf8(params.password);
-        const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5');
-        params.password = forge.util.encode64(encrypted);
-        params.encrypted = true;
-        userManageApi
-          .postUserManage(params, loading)
-          .then((res) => {
-            return user.profile(loading).then(() => {
-              return res
-            })
-          })
-          .then((res) => {
+        const publicKey = forge.pki.publicKeyFromPem(user.rasKey)
+        const utf8Bytes = forge.util.encodeUtf8(params.password)
+        const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5')
+        params.password = forge.util.encode64(encrypted)
+        params.encrypted = true
+        userManageApi.postUserManage(params, loading).then((res) => {
+          return user.profile(loading).then(() => {
             emit('refresh')
             MsgSuccess(t('common.createSuccess'))
             visible.value = false
           })
+        })
       }
     }
   })
@@ -475,8 +461,7 @@ const submitDialog = () => {
   closeDialog()
 }
 
-
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .dialog-header {
@@ -492,5 +477,4 @@ defineExpose({open})
     color: var(--el-text-color-secondary);
   }
 }
-
 </style>

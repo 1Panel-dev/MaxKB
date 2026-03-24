@@ -61,6 +61,7 @@ export default {
     ReferencingRequired: 'Referenced variable is required',
     ReferencingError: 'Invalid referenced variable',
     NoReferencing: 'Referenced variable does not exist',
+    placeholder_key: 'Enter key',
     placeholder: 'Please select a variable',
     inputPlaceholder: 'Please enter variable',
     loop: 'Loop Variable',
@@ -323,7 +324,8 @@ You are a master of problem optimization, adept at accurately inferring user int
       text: 'Aggregate variables of each group according to the aggregation strategy',
       Strategy: 'Aggregation Strategy',
       placeholder: 'Return the first non-null value of each group',
-      placeholder1: 'Return the set of variables for each group',
+      placeholder1: 'Return the array of variables for each group',
+      placeholder2: 'Return the dict of variables for each group',
       group: {
         noneError: 'Name cannot be empty',
         dupError: 'Name cannot be duplicated',

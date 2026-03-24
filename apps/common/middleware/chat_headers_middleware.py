@@ -10,6 +10,7 @@ from django.utils.deprecation import MiddlewareMixin
 
 from common.cache_data.application_access_token_cache import get_application_access_token
 from maxkb.const import CONFIG
+from html import escape
 
 
 class ChatHeadersMiddleware(MiddlewareMixin):
@@ -24,8 +25,8 @@ class ChatHeadersMiddleware(MiddlewareMixin):
             if application_access_token is not None:
                 white_active = application_access_token.get('white_active', False)
                 white_list = application_access_token.get('white_list', [])
-                application_icon = application_access_token.get('application_icon')
-                application_name = application_access_token.get('application_name')
+                application_icon = escape(application_access_token.get('application_icon') or '')
+                application_name = escape(application_access_token.get('application_name') or '')
                 if white_active:
                     # 添加自定义的响应头
                     response[

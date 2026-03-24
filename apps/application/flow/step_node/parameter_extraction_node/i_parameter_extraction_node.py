@@ -25,7 +25,7 @@ class VariableSplittingNodeParamsSerializer(serializers.Serializer):
 class IParameterExtractionNode(INode):
     type = 'parameter-extraction-node'
     support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE,
-               WorkflowMode.KNOWLEDGE_LOOP]
+               WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return VariableSplittingNodeParamsSerializer

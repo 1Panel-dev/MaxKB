@@ -16,7 +16,10 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class ChatNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                    label=_("Role Setting"))
     prompt = serializers.CharField(required=True, label=_("Prompt word"))
@@ -41,23 +44,24 @@ class ChatNodeSerializer(serializers.Serializer):
     tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
                                      label=_("Tool IDs"), )
     application_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
-                                     label=_("App IDs"), )
+                                            label=_("App IDs"), )
     skill_tool_ids = serializers.ListField(child=serializers.UUIDField(), required=False, allow_empty=True,
-                                     label=_("Skill IDs"), )
+                                           label=_("Skill IDs"), )
     mcp_output_enable = serializers.BooleanField(required=False, default=True, label=_("Whether to enable MCP output"))
 
 
 class IChatNode(INode):
     type = 'ai-chat-node'
     support = [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.KNOWLEDGE_LOOP,
-               WorkflowMode.KNOWLEDGE]
+               WorkflowMode.KNOWLEDGE, WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP]
 
     def get_node_params_serializer_class(self) -> Type[serializers.Serializer]:
         return ChatNodeSerializer
 
     def _run(self):
-        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
-                self.workflow_manage.flow.workflow_mode):
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+            WorkflowMode.TOOL_LOOP].__contains__(
+            self.workflow_manage.flow.workflow_mode):
             return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
                                 **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
         else:
@@ -66,6 +70,8 @@ class IChatNode(INode):
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id,
                 chat_record_id,
                 model_params_setting=None,
+                model_id_type=None,
+                model_id_reference=None,
                 dialogue_type=None,
                 model_setting=None,
                 mcp_servers=None,

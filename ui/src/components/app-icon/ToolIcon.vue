@@ -8,6 +8,9 @@
   <el-avatar v-else-if="type == 'DATA_SOURCE'" class="avatar-purple" shape="square" :size="size">
     <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
   </el-avatar>
+  <el-avatar v-else-if="type == 'WORKFLOW'" class="avatar-green" shape="square" :size="size">
+    <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt="" />
+  </el-avatar>
   <el-avatar v-else class="avatar-green" shape="square" :size="size">
     <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
   </el-avatar>

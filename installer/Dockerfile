@@ -6,7 +6,7 @@ RUN cd ui && ls -la && if [ -d "dist" ]; then exit 0; fi && \
     NODE_OPTIONS="--max-old-space-size=4096" npx concurrently "npm run build" "npm run build-chat" && \
     find . -maxdepth 1 ! -name '.' ! -name 'dist' ! -name 'public' -exec rm -rf {} +
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.7-20260212 AS stage-build
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.7-20260323 AS stage-build
 COPY --chmod=700 . /opt/maxkb-app
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc g++ gettext libexpat1-dev libffi-dev && \
@@ -24,7 +24,7 @@ RUN gcc -shared -fPIC -o ${MAXKB_SANDBOX_HOME}/lib/sandbox.so /opt/maxkb-app/ins
     rm -rf /opt/maxkb-app/installer
 COPY --from=web-build --chmod=700 ui /opt/maxkb-app/ui
 
-FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.7-20260212
+FROM ghcr.io/1panel-dev/maxkb-base:python3.11-pg17.7-20260323
 ARG DOCKER_IMAGE_TAG=dev \
     BUILD_AT \
     GITHUB_COMMIT

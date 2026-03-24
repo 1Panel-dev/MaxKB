@@ -930,9 +930,11 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{
-                  data.strategy === 'variable_to_json'
-                    ? t('workflow.nodes.variableAggregationNode.placeholder1')
-                    : t('workflow.nodes.variableAggregationNode.placeholder')
+                  data.strategy === 'first_non_null'
+                    ? t('workflow.nodes.variableAggregationNode.placeholder')
+                    : data.strategy === 'variable_to_dict'
+                      ? t('workflow.nodes.variableAggregationNode.placeholder2')
+                      : t('workflow.nodes.variableAggregationNode.placeholder1')
                 }}
               </div>
             </div>

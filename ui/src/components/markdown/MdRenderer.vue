@@ -92,11 +92,7 @@ const TAG_PLUGINS: TagPlugin[] = [
     tag: 'echarts_rander',
     type: 'echarts_rander',
     transform: (c) => {
-      try {
-        return JSON.parse(c)
-      } catch {
-        return c
-      }
+      return c
     },
   },
   { tag: 'form_rander', type: 'form_rander', nested: true },
@@ -211,9 +207,9 @@ function getComponentProps(item: RenderNode) {
     case 'echarts_rander':
       return { option: item.content }
     case 'html_rander':
-      return { source: item.content }
+      return { source: item.content, sendMessage: props.sendMessage }
     case 'iframe_render':
-      return { source: item.content }
+      return { source: item.content, sendMessage: props.sendMessage }
     case 'tool_calls_render':
       return { content: item.content }
 
@@ -246,5 +242,4 @@ function handleQuestionClick(content: string) {
     background: var(--app-layout-bg-color);
   }
 }
-
 </style>

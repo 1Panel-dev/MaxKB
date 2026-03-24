@@ -13,6 +13,7 @@ export default {
     UploadInput: '文件上傳',
     TextareaInput: '多行文字框',
     MultiRow: '單行多選卡',
+    Model: '模型',
   },
   default: {
     label: '預設值',

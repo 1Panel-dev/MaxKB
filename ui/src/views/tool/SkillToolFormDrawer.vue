@@ -389,12 +389,12 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
             emit('refresh', res.data)
-            return user.profile()
+            return user.profile().then(() => {
+              visible.value = false
+              uploadRef.value?.clearFiles()
+            })
           })
-          .then(() => {
-            visible.value = false
-            uploadRef.value?.clearFiles()
-          })
+
           .finally(() => {
             loading.value = false
           })
@@ -408,11 +408,10 @@ const submit = async (formEl: FormInstance | undefined) => {
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             emit('refresh')
-            return user.profile()
-          })
-          .then(() => {
-            visible.value = false
-            uploadRef.value?.clearFiles()
+            return user.profile().then(() => {
+              visible.value = false
+              uploadRef.value?.clearFiles()
+            })
           })
           .finally(() => {
             loading.value = false

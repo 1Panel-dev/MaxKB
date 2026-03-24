@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile } from '@/request/index'
+import { get, post, del, put, exportFile, postStream } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { AddInternalToolParam, toolData } from '@/api/type/tool'
@@ -85,7 +85,6 @@ const postToolTestConnection: (data: toolData, loading?: Ref<boolean>) => Promis
   return post(`${prefix.value}/test_connection`, data, undefined, loading)
 }
 
-
 /**
  * 获取工具详情
  * @param tool_id 工具id
@@ -159,7 +158,6 @@ const addInternalTool: (
   return post(`${prefix.value}/${tool_id}/add_internal_tool`, param, undefined, loading)
 }
 
-
 /**
  * 工具商店-添加
  */
@@ -179,12 +177,7 @@ const updateStoreTool: (
   return post(`${prefix.value}/${tool_id}/update_store_tool`, param, undefined, loading)
 }
 
-const pageToolRecord = (
-  tool_id: string,
-  page: pageRequest,
-  param: any,
-  loading?: Ref<boolean>,
-) => {
+const pageToolRecord = (tool_id: string, page: pageRequest, param: any, loading?: Ref<boolean>) => {
   return get(
     `${prefix.value}/${tool_id}/tool_record/${page.current_page}/${page.page_size}`,
     param,
@@ -192,10 +185,7 @@ const pageToolRecord = (
   )
 }
 
-const getToolRecordDetail = (
- tool_id: string,
- record_id: string
-) => {
+const getToolRecordDetail = (tool_id: string, record_id: string) => {
   return get(`${prefix.value}/${tool_id}/tool_record/${record_id}`)
 }
 
@@ -205,8 +195,110 @@ const uploadSkillFile: (data: toolData, loading?: Ref<boolean>) => Promise<Resul
 ) => {
   return put(`${prefix.value}/upload_skill_file`, data, undefined, loading)
 }
+/**
+ * 保存工具工作流
+ * @param tool_id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const putToolWorkflow: (
+  tool_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, data, loading) => {
+  return put(`${prefix.value}/${tool_id}/workflow`, data, undefined, loading)
+}
 
+/**
+ * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportKnowledgeWorkflow = (
+  knowledge_id: string,
+  knowledge_name: string,
+  loading?: Ref<boolean>,
+) => {
+  return exportFile(
+    knowledge_name + '.kbwf',
+    `${prefix.value}/${knowledge_id}/workflow/export`,
+    undefined,
+    loading,
+  )
+}
+/**
+ * 导出知识库工作流
+ * @param knowledge_id
+ * @param knowledge_name
+ * @param loading
+ * @returns
+ */
+const exportToolWorkflow = (tool_id: string, tool_name: string, loading?: Ref<boolean>) => {
+  return exportFile(
+    tool_name + '.tool',
+    `${prefix.value}/${tool_id}/workflow/export`,
+    undefined,
+    loading,
+  )
+}
+/**
+ * 导入工具工作流
+ */
+const importToolWorkflow: (
+  tool_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, data, loading) => {
+  return post(`${prefix.value}/${tool_id}/workflow/import`, data, undefined, loading)
+}
+/**
+ * 获取工具工作流版本列表
+ * @param tool_id
+ * @param loading
+ * @returns
+ */
+const listToolWorkflowVersion: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id: string,
+  loading,
+) => {
+  return get(`${prefix.value}/${tool_id}/tool_version`, {}, loading)
+}
+/**
+ *
+ * @param tool_id 工具id
+ * @param tool_version_id 工具版本id
+ * @param data 数据
+ * @param loading
+ * @returns
+ */
+const updateToolWorkflowVersion: (
+  tool_id: string,
+  tool_version_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id: string, tool_version_id, data, loading) => {
+  return put(`${prefix.value}/${tool_id}/tool_version/${tool_version_id}`, data, {}, loading)
+}
+const publish: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id: string,
+  loading,
+) => {
+  return put(`${prefix.value}/${tool_id}/publish`, {}, {}, loading)
+}
 
+/**
+ * 调试工作流
+ * @param 参数
+ * chat_id: string
+ * data
+ */
+const debugToolWorkflow: (tool_id: string, data: any) => Promise<any> = (tool_id, data) => {
+  const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${p}${prefix.value}/${tool_id}/debug`, data)
+}
 export default {
   getToolList,
   getAllToolList,
@@ -227,4 +319,11 @@ export default {
   pageToolRecord,
   getToolRecordDetail,
   uploadSkillFile,
+  putToolWorkflow,
+  importToolWorkflow,
+  listToolWorkflowVersion,
+  updateToolWorkflowVersion,
+  publish,
+  exportToolWorkflow,
+  debugToolWorkflow,
 }

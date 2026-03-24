@@ -287,10 +287,6 @@ async function handleStoreAdd(tool: any) {
   }
 }
 
-function radioChange() {
-  searchValue.value = ''
-  getList()
-}
 
 defineExpose({ open })
 </script>

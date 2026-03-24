@@ -108,7 +108,7 @@
               <el-dropdown-item @click="openCreateDialog(CreateWorkflowKnowledgeDialog)">
                 <div class="flex">
                   <el-avatar class="avatar-orange mt-4" shape="square" :size="32">
-                    <img src="@/assets/knowledge/logo_workflow.svg" style="width: 60%" alt="" />
+                    <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
                   </el-avatar>
                   <div class="pre-wrap ml-8">
                     <div class="lighter">

@@ -11,9 +11,9 @@
       <el-tooltip
         :content="isCollapse ? $t('common.expand') : $t('common.collapse')"
         placement="right"
+        v-if="props.showCollapse"
       >
         <el-button
-          v-if="props.showCollapse"
           class="collapse"
           size="small"
           circle
