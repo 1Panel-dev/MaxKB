@@ -97,7 +97,7 @@ class BaseIntentNode(IIntentNode):
                 'history_message': history_message,
                 'user_input': user_input,
                 'branch_id': matched_branch['id'],
-                'reason': self.parse_result_reason(r.content),
+                'reason': self.parse_result_reason(r.content) if output_reason is True else '',
                 'category': matched_branch.get('content', matched_branch['id'])
             }, {}, _write_context=write_context)
 
@@ -154,8 +154,8 @@ class BaseIntentNode(IIntentNode):
                 classification_id += 1
 
         # 构建输出JSON结构
-        output_reason = ',\n  "reason": ""' if output_reason is True else ''
-        output_json = f'{{\n  "classificationId": 0{output_reason}\n}}'
+        output_reason = ', "reason": ""' if output_reason is True else ''
+        output_json = f'{{"classificationId": 0{output_reason}}}'
 
         return (prompt_template or DEFAULT_PROMPT_TEMPLATE).format(
             classification_list=json.dumps(classification_list, ensure_ascii=False),
