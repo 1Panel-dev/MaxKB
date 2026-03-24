@@ -208,6 +208,14 @@ provide('getSelectModelList', (params: any) => {
     return loadSharedApi({ type: 'model', systemType: 'workspace' }).getSelectModelList(params)
   }
 })
+provide('chatUserProfile', () => {
+  if (props.type === 'ai-chat') {
+    if (chatUser.chat_profile?.authentication_type === 'login') {
+      return chatUser.getChatUserProfile()
+    }
+  }
+  return Promise.resolve(null)
+})
 
 const transcribing = ref<boolean>(false)
 defineOptions({ name: 'AiChat' })
@@ -798,16 +806,6 @@ const handleScroll = () => {
     }
   }
 }
-onBeforeMount(() => {
-  window.chatUserProfile = () => {
-    if (props.type === 'ai-chat') {
-      if (chatUser.chat_profile?.authentication_type === 'login') {
-        return chatUser.getChatUserProfile()
-      }
-    }
-    return Promise.resolve(null)
-  }
-})
 
 function parseTransform(transformStr: string) {
   const result = { scale: 1, translateX: 0, translateY: 0, translateZ: 0 }

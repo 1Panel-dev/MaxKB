@@ -22,15 +22,18 @@
 #include <pty.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <execinfo.h>
 
 #define CONFIG_FILE ".sandbox.conf"
 #define KEY_BANNED_HOSTS "SANDBOX_PYTHON_BANNED_HOSTS"
 #define KEY_ALLOW_DL_PATHS "SANDBOX_PYTHON_ALLOW_DL_PATHS"
+#define KEY_ALLOW_DL_OPEN "SANDBOX_PYTHON_ALLOW_DL_OPEN"
 #define KEY_ALLOW_SUBPROCESS "SANDBOX_PYTHON_ALLOW_SUBPROCESS"
 #define KEY_ALLOW_SYSCALL "SANDBOX_PYTHON_ALLOW_SYSCALL"
 
 static char *banned_hosts = NULL;
 static char *allow_dl_paths = NULL;
+static int allow_dl_open = 0;
 static int allow_subprocess = 0; // 默认禁止
 static int allow_syscall = 0;
 
@@ -39,6 +42,7 @@ static void load_sandbox_config() {
     if (dladdr((void *)load_sandbox_config, &info) == 0 || !info.dli_fname) {
         banned_hosts = strdup("");
         allow_dl_paths = strdup("");
+        allow_dl_open = 0;
         allow_subprocess = 0;
         allow_syscall = 0;
         return;
@@ -53,6 +57,7 @@ static void load_sandbox_config() {
     if (!fp) {
         banned_hosts = strdup("");
         allow_dl_paths = strdup("");
+        allow_dl_open = 0;
         allow_subprocess = 0;
         allow_syscall = 0;
         return;
@@ -62,6 +67,7 @@ static void load_sandbox_config() {
     if (allow_dl_paths) { free(allow_dl_paths); allow_dl_paths = NULL; }
     banned_hosts = strdup("");
     allow_dl_paths = strdup("");
+    allow_dl_open = 0;
     allow_subprocess = 0;
     allow_syscall = 0;
     while (fgets(line, sizeof(line), fp)) {
@@ -80,6 +86,8 @@ static void load_sandbox_config() {
         } else if (strcmp(key, KEY_ALLOW_DL_PATHS) == 0) {
             free(allow_dl_paths);
             allow_dl_paths = strdup(value);  // 逗号分隔字符串
+        } else if (strcmp(key, KEY_ALLOW_DL_OPEN) == 0) {
+            allow_dl_open = atoi(value);
         } else if (strcmp(key, KEY_ALLOW_SUBPROCESS) == 0) {
             allow_subprocess = atoi(value);
         } else if (strcmp(key, KEY_ALLOW_SYSCALL) == 0) {
@@ -519,6 +527,7 @@ long syscall(long number, ...) {
 #endif
         case SYS_fchmodat:
         case SYS_mprotect:
+        case SYS_pkey_mprotect:
 #ifdef SYS_open
         case SYS_open:
 #endif
@@ -543,7 +552,24 @@ long syscall(long number, ...) {
 /**
  * 限制加载动态链接库
  */
-static int is_in_allow_dl_paths(const char *filename) {
+static int called_from_python_import() {
+    if (allow_dl_open) return 1;
+    void *buf[32];
+    int n = backtrace(buf, 32);
+    for (int i = 0; i < n; i++) {
+        Dl_info info;
+        if (dladdr(buf[i], &info) && info.dli_sname) {
+            if (strstr(info.dli_sname, "PyImport") ||
+                strstr(info.dli_sname, "_PyImport")) {
+                return 1;
+            }
+        }
+    }
+    throw_permission_denied_err(true, "open dynamic link library");
+    return 0;
+}
+static int is_allow_dl(const char *filename) {
+    if (!called_from_python_import()) return 0;
     if (!filename || !*filename) return 1;
     ensure_config_loaded();
     if (!allow_dl_paths || !*allow_dl_paths) return 0;
@@ -570,7 +596,7 @@ static int is_in_allow_dl_paths(const char *filename) {
 }
 void *dlopen(const char *filename, int flag) {
     RESOLVE_REAL(dlopen);
-    if (is_sandbox_user() && !is_in_allow_dl_paths(filename)) {
+    if (is_sandbox_user() && !is_allow_dl(filename)) {
         throw_permission_denied_err(true, "access file %s", filename);
     }
     return real_dlopen(filename, flag);
@@ -580,7 +606,7 @@ void *__dlopen(const char *filename, int flag) {
 }
 void *dlmopen(Lmid_t lmid, const char *filename, int flags) {
     RESOLVE_REAL(dlmopen);
-    if (is_sandbox_user() && !is_in_allow_dl_paths(filename)) {
+    if (is_sandbox_user() && !is_allow_dl(filename)) {
         throw_permission_denied_err(true, "access file %s", filename);
     }
     return real_dlmopen(lmid, filename, flags);
@@ -602,7 +628,7 @@ void* mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off) {
             throw_permission_denied_err(true, "mmap(readlink failed)");
         }
         real_path[n] = '\0';
-        if (!is_in_allow_dl_paths(real_path)) {
+        if (!is_allow_dl(real_path)) {
             throw_permission_denied_err(true, "mmap %s", real_path);
         }
     }
