@@ -63,7 +63,7 @@
       <el-button @click="close">{{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="run"> {{ $t('views.tool.form.debug.run') }}</el-button>
     </template>
-    <ResultDrawer ref="ToolResultDrawerRef" />
+    <ResultDrawer @close="closeResult" :key="index" ref="ToolResultDrawerRef" />
   </el-drawer>
 </template>
 <script setup lang="ts">
@@ -73,7 +73,8 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import JsonInput from '@/components/dynamics-form/items/JsonInput.vue'
 import { type FormInstance } from 'element-plus'
 import ResultDrawer from './ResultDrawer.vue'
-
+import { number } from 'echarts'
+const index = ref<number>(0)
 const route = useRoute()
 const {
   params: { folderId },
@@ -103,7 +104,9 @@ const userInputFieldList = computed(() => {
       ?.properties?.user_input_field_list || []
   )
 })
-
+const closeResult = () => {
+  index.value++
+}
 function getDetail(toolId: string) {
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
     .getToolById(toolId)
@@ -117,10 +120,14 @@ const userInputForm = ref<any>({})
 const ToolResultDrawerRef = ref()
 
 const run = () => {
-  formRef.value?.validate((valid: boolean) => {
-    if (!valid) return
+  if (userInputFieldList.value.length === 0) {
     ToolResultDrawerRef.value?.open(toolDetail.value.id, userInputForm.value)
-  })
+  } else {
+    formRef.value?.validate((valid: boolean) => {
+      if (!valid) return
+      ToolResultDrawerRef.value?.open(toolDetail.value.id, userInputForm.value)
+    })
+  }
 }
 
 const drawer = ref<boolean>(false)

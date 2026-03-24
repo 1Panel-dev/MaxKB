@@ -129,7 +129,7 @@ const details = {
 const activeName = ref<string>('result')
 const currentToolId = ref<string>()
 const currentData = ref<any>({})
-
+const emit = defineEmits(['close'])
 const output = computed(() => {
   if (toolRecord.value) {
     return toolRecord.value.meta.output
@@ -246,6 +246,7 @@ const open = (toolId: string, data: any) => {
 }
 const close = () => {
   ChatManagement.close(currentChat.id)
+  emit('close')
   resultDrawer.value = false
   toolRecord.value = null
   currentChat.value = {
