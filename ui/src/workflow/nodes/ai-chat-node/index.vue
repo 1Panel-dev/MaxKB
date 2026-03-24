@@ -44,7 +44,7 @@
             </div>
           </template>
           <div class="flex-between w-full" v-if="chat_data.model_id_type !== 'reference'">
-            <div>
+            <div class="w-full">
               <ModelSelect
                 @change="model_change"
                 @wheel="wheel"
