@@ -103,6 +103,9 @@ class BaseVariableAssignNode(IVariableAssignNode):
             reference = self.convert(reference, variable.get('target_type'))
             evaluation(variable, reference)
             result['output_value'] = reference
+
+        result['input_type'] = type(result.get('input_value')).__name__ if result.get('input_value') is not None else 'null'
+        result['output_type'] = type(result.get('output_value')).__name__ if result.get('output_value') is not None else 'null'
         return result
 
     def execute(self, variable_list, **kwargs) -> NodeResult:

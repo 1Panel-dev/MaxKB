@@ -880,7 +880,7 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ f.name }}:</span> {{ f.input_value }}
+                  <span class="color-secondary">{{ f.name }} ({{ f.input_type }}):</span> {{ f.input_value }}
                 </div>
               </div>
             </div>
@@ -890,7 +890,7 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ f.name }}:</span> {{ f.output_value }}
+                  <span class="color-secondary">{{ f.name }} ({{ f.output_type }}):</span> {{ f.output_value }}
                 </div>
               </div>
             </div>
