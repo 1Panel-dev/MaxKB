@@ -9,6 +9,7 @@ export default {
   toolWorkflow: {
     creatToolWorkflow: '創建工作流',
     toActiveTip: '無法啓用，請先發布工作流。',
+    debugResult: '調試結果',
   },
   dataSource: {
     title: '數據源',

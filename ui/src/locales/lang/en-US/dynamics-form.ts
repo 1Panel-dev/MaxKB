@@ -14,6 +14,7 @@ export default {
     TextareaInput: 'Multiline Input',
     MultiRow: 'Multi Row',
     Model: 'Model',
+    Knowledge: 'Knowledge',
   },
   default: {
     label: 'Default',

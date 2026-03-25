@@ -9,8 +9,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onBeforeUnmount } from 'vue'
-
+import { computed, ref, onMounted, onBeforeUnmount, inject } from 'vue'
+const chatUserProfile = inject('chatUserProfile') as any
 const htmlRef = ref<HTMLIFrameElement>()
 const props = withDefaults(
   defineProps<{
@@ -37,6 +37,40 @@ function createIframeHtml(sourceHtml: string) {
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html, body { margin: 0 !important; padding: 0 !important; overflow: hidden; }
 </style>
+<script>
+const _INSTANCE_ID = '${instanceId}';
+window.chatUserProfile=function chatUserProfile() {
+  return new Promise((resolve, reject) => {
+    const requestId = Date.now() + '_' + Math.random()
+
+    function handler(e) {
+      const data = e.data
+
+      if (
+        data?.type === 'chatUserProfile:response' &&
+        data.requestId === requestId
+      ) {
+        window.removeEventListener('message', handler)
+        resolve(data.data)
+      }
+    }
+    window.addEventListener('message', handler)
+    parent.postMessage(
+      {
+        type: 'chatUserProfile',
+        requestId,
+        instanceId: _INSTANCE_ID
+      },
+      '*'
+    )
+
+    setTimeout(() => {
+      window.removeEventListener('message', handler)
+      reject(new Error('timeout'))
+    }, 10000)
+  })
+}
+<\/script>
 </head>
 <body>
 ${sourceHtml}
@@ -46,7 +80,6 @@ const INSTANCE_ID = '${instanceId}';
 function sendMessage(message) {
   parent.postMessage({ type: 'chatMessage', instanceId: INSTANCE_ID, message }, '*');
 }
-
 let lastSentHeight = 0;
 let timer = null;
 
@@ -87,6 +120,20 @@ function onMessage(e: MessageEvent) {
 
   if (e.data.type === 'chatMessage') {
     props.sendMessage?.(e.data.message, 'new')
+  }
+  if (e.data?.type === 'chatUserProfile') {
+    const iframe = htmlRef.value
+    if (!iframe) return
+    chatUserProfile().then((ok: any) => {
+      iframe.contentWindow?.postMessage(
+        {
+          type: 'chatUserProfile:response',
+          requestId: e.data.requestId,
+          data: ok,
+        },
+        '*',
+      )
+    })
   }
 }
 
