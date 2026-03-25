@@ -324,7 +324,11 @@ const model_change = (model_id?: string) => {
   }
 }
 
-const default_prompt_template = t('workflow.nodes.intentNode.default_prompt_template')
+const default_prompt_template = t('workflow.nodes.intentNode.default_prompt_template', {
+  classification_list: '{classification_list}',
+  user_input: '{user_input}',
+  output_json: '{output_json}',
+})
 
 const form = {
   model_id: '',
