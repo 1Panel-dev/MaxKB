@@ -45,8 +45,17 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             self.answer_text = details.get('answer')
 
     def execute(self, tts_model_id,
-                content, model_params_setting=None,
+                content, model_params_setting=None, tts_model_id_type=None, tts_model_id_reference=None,
                 max_length=1024, **kwargs) -> NodeResult:
+        # 处理引用类型
+        if tts_model_id_type == 'reference' and tts_model_id_reference:
+            reference_data = self.workflow_manage.get_reference_field(
+                tts_model_id_reference[0],
+                tts_model_id_reference[1:],
+            )
+            if reference_data and isinstance(reference_data, dict):
+                tts_model_id = reference_data.get('tts_model_id', reference_data.get('model_id', tts_model_id))
+                model_params_setting = reference_data.get('model_params_setting')
         # 分割文本为合理片段
         content = _remove_empty_lines(content)
         content_chunks = [content[i:i + max_length]

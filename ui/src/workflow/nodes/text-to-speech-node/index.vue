@@ -13,10 +13,15 @@
       >
         <el-form-item
           :label="$t('workflow.nodes.textToSpeechNode.tts_model.label')"
-          prop="tts_model_id"
+          :prop="
+            form_data.tts_model_id_type === 'reference' ? 'tts_model_id_reference' : 'tts_model_id'
+          "
           :rules="{
             required: true,
-            message: $t('views.application.form.voicePlay.placeholder'),
+            message:
+              form_data.tts_model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.voicePlay.placeholder'),
             trigger: 'change',
           }"
         >
@@ -28,26 +33,44 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
-              <el-button
-                type="primary"
-                link
-                @click="openTTSParamSettingDialog"
-                :disabled="!form_data.tts_model_id"
-                class="mr-4"
+              <el-select
+                v-model="form_data.tts_model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.tts_model_id_reference = []"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
-              </el-button>
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
             </div>
           </template>
-          <ModelSelect
-            @wheel="wheel"
-            :teleported="false"
-            v-model="form_data.tts_model_id"
-            :placeholder="$t('views.application.form.voicePlay.placeholder')"
-            :options="modelOptions"
-            showFooter
-            :model-type="'TTS'"
-          ></ModelSelect>
+          <div class="flex-between w-full" v-if="form_data.tts_model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              v-model="form_data.tts_model_id"
+              :placeholder="$t('views.application.form.voicePlay.placeholder')"
+              :options="modelOptions"
+              showFooter
+              :model-type="'TTS'"
+            ></ModelSelect>
+            <div class="ml-8">
+              <el-button @click="openTTSParamSettingDialog" :disabled="!form_data.tts_model_id">
+                <el-icon>
+                  <Operation />
+                </el-icon>
+              </el-button>
+            </div>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.tts_model_id_reference"
+          />
         </el-form-item>
         <el-form-item
           prop="content_list"
@@ -167,6 +190,8 @@ const wheel = (e: any) => {
 
 const form = {
   tts_model_id: '',
+  tts_model_id_type: 'custom',
+  tts_model_id_reference: [],
   is_result: true,
   content_list: [],
   model_params_setting: {},
@@ -175,6 +200,12 @@ const form = {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.tts_model_id_type) {
+        set(props.nodeModel.properties.node_data, 'tts_model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.tts_model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'tts_model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)

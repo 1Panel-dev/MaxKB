@@ -16,7 +16,10 @@ class IntentBranchSerializer(serializers.Serializer):
 
 
 class IntentNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
     content_list = serializers.ListField(required=True, label=_("Text content"))
     dialogue_number = serializers.IntegerField(required=True, label=
     _("Number of multi-round conversations"))
@@ -52,5 +55,5 @@ class IIntentNode(INode):
                                 user_input=str(question))
 
     def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch,
-                model_params_setting=None, **kwargs) -> NodeResult:
+                model_params_setting=None, model_id_type=None, model_id_reference=None, **kwargs) -> NodeResult:
         pass
