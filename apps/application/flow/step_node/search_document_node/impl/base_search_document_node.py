@@ -59,7 +59,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
             )
             authorized_knowledge_ids = get_knowledge_list_of_authorized(
                 self.workflow_manage.get_body().get('chat_user_id'),
-                actual_knowledge_ids
+                [str(k_id) for k_id in actual_knowledge_ids]
             )
             document_id_list = QuerySet(Document).filter(
                 id__in=document_id_list,
