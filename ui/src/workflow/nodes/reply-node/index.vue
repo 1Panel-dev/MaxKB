@@ -43,7 +43,14 @@
           />
         </el-form-item>
         <el-form-item
-          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
           :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
         >
