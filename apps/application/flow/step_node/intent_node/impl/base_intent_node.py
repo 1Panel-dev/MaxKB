@@ -182,7 +182,7 @@ class BaseIntentNode(IIntentNode):
         try:
             classification_id = None
 
-            # 如果返回长度小于5，先尝试解析为数字（增加自由度：自定义提示词模板时，可提示大模型只输出意图分类的ID值）
+            # 如果长度小于5，先尝试解析为数字（增加自由度，在自定义提示词模板时，可提示大模型只输出意图分类的ID值）
             if len(result) < 5:
                 classification_id = self.to_int(result)
 
