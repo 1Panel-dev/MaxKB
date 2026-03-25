@@ -105,7 +105,7 @@ class BaseIntentNode(IIntentNode):
                 'history_message': history_message,
                 'user_input': user_input,
                 'branch_id': matched_branch['id'],
-                'reason': self.parse_result_reason(r.content) if output_reason is True else '',
+                'reason': self.parse_result_reason(r.content) if output_reason is not False else '',
                 'category': matched_branch.get('content', matched_branch['id'])
             }, {}, _write_context=write_context)
 
@@ -135,7 +135,7 @@ class BaseIntentNode(IIntentNode):
                 message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
-    def build_classification_prompt(self, prompt_template: str, user_input: str, branch: List[Dict], reason_field: bool) -> str:
+    def build_classification_prompt(self, prompt_template: str, user_input: str, branch: List[Dict], output_reason: bool) -> str:
         """构建分类提示词"""
 
         classification_list = []
@@ -158,7 +158,7 @@ class BaseIntentNode(IIntentNode):
                 classification_id += 1
 
         # 构建输出JSON结构
-        reason_field = ',\n"reason": ""' if reason_field is True else ''
+        reason_field = ',\n"reason": ""' if output_reason is not False else ''
         output_json = f'{{\n"classificationId": 0{reason_field}\n}}'
 
         return (prompt_template or DEFAULT_PROMPT_TEMPLATE).format(
