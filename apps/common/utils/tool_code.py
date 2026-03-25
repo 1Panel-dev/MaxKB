@@ -71,6 +71,7 @@ class ToolExecutor:
             os.remove(sandbox_conf_file_path)
         banned_hosts = CONFIG.get("SANDBOX_PYTHON_BANNED_HOSTS", '').strip()
         allow_dl_paths = CONFIG.get("SANDBOX_PYTHON_ALLOW_DL_PATHS",'').strip()
+        allow_dl_open = CONFIG.get("SANDBOX_PYTHON_ALLOW_DL_OPEN",'0')
         allow_subprocess = CONFIG.get("SANDBOX_PYTHON_ALLOW_SUBPROCESS", '0')
         allow_syscall = CONFIG.get("SANDBOX_PYTHON_ALLOW_SYSCALL", '0')
         if banned_hosts:
@@ -81,6 +82,7 @@ class ToolExecutor:
         with open(sandbox_conf_file_path, "w") as f:
             f.write(f"SANDBOX_PYTHON_BANNED_HOSTS={banned_hosts}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_DL_PATHS={','.join(sorted(set(filter(None, sys.path + _sandbox_python_sys_path + allow_dl_paths.split(',')))))}\n")
+            f.write(f"SANDBOX_PYTHON_ALLOW_DL_OPEN={allow_dl_open}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_SUBPROCESS={allow_subprocess}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_SYSCALL={allow_syscall}\n")
         os.system(f"chmod -R 550 {_sandbox_path}")

@@ -215,7 +215,6 @@ const render = (
     | (() => Promise<Result<Array<FormField>>>),
   data?: Dict<any>,
 ) => {
-  console.log(data, '-----')
   formFieldList.value = []
   nextTick(() => {
     if (typeof render_data == 'string') {
@@ -247,7 +246,6 @@ const render = (
 }
 const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
   form_data = form_data ? form_data : {}
-  console.log(form_data)
   const value = fieldList
     .map((item) => {
       if (form_data[item.field] !== undefined) {
@@ -276,7 +274,6 @@ const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
       return {}
     })
     .reduce((x, y) => ({ ...x, ...y }), {})
-  console.log(value)
   return value
 }
 /**
