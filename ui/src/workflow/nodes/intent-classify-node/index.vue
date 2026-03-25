@@ -324,34 +324,11 @@ const model_change = (model_id?: string) => {
   }
 }
 
-const defaultPromptTemplate = `# Role
-You are an intention classification expert, good at being able to judge which classification the user's input belongs to.
-
-## Skills
-Skill 1: Clearly determine which of the following intention classifications the user's input belongs to.
-Intention classification list:
-{classification_list}
-
-Note:
-- Please determine the match between the user's input content and the Intention classification list content, without judging or categorizing the match with the classification ID.
-- **When classifying, you must give higher weight to the context and intent continuity shown in the historical conversation. Do not rely solely on the literal meaning of the current input; instead, prioritize the most consistent classification with the previous dialogue flow.**
-
-## User Input
-{user_input}
-
-## Reply requirements
-- The answer must be returned in JSON format.
-- Strictly ensure that the output is in a valid JSON format.
-- Do not add prefix \`\`\`json or suffix \`\`\`
-- The answer needs to include the following fields such as:
-{output_json}
-
-## Limit
-- Please do not reply in text.`
+const default_prompt_template = t('workflow.nodes.intentNode.other')
 
 const form = {
   model_id: '',
-  prompt_template: defaultPromptTemplate,
+  prompt_template: default_prompt_template,
   branch: [
     {
       id: randomId(),
@@ -386,7 +363,7 @@ const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
       if (!props.nodeModel.properties.node_data.prompt_template) {
-        set(props.nodeModel.properties.node_data, 'prompt_template', defaultPromptTemplate)
+        set(props.nodeModel.properties.node_data, 'prompt_template', default_prompt_template)
       }
       return props.nodeModel.properties.node_data
     } else {
