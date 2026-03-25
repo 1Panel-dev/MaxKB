@@ -83,7 +83,7 @@ export default {
     prompt_template: {
       label: '提示词模板',
       requiredMessage: '请输入提示词模板',
-      tooltip: '请注意模板中的占位符',
+      tooltip: '请注意模板中的占位符: {classification_list}、{user_input}、{output_json}',
     },
     historyRecord: {
       label: '历史聊天记录',

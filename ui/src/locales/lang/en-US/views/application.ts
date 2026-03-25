@@ -90,7 +90,7 @@ export default {
     prompt_template: {
       label: 'Prompt Template',
       requiredMessage: 'Please enter Prompt template',
-      tooltip: 'Please pay attention to the placeholders in the template',
+      tooltip: 'Please pay attention to the placeholders in the template: {classification_list}、{user_input}、{output_json}',
     },
     historyRecord: {
       label: 'Chat History',

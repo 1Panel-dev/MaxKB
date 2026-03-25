@@ -69,7 +69,11 @@
                 >
               </div>
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content>{{ $t('views.application.form.prompt_template.tooltip') }} </template>
+                <template #content>{{ $t('views.application.form.prompt_template.tooltip', {
+                  classification_list: '{classification_list}',
+                  user_input: '{user_input}',
+                  output_json: '{output_json}',
+                }) }}</template>
                 <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
               </el-tooltip>
             </div>
