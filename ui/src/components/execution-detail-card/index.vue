@@ -1,5 +1,5 @@
 <template>
-  <el-card class="mb-8" shadow="never" style="--el-card-padding: 12px 16px">
+  <el-card class="mb-8 execution-detail-card" shadow="never" style="--el-card-padding: 12px 16px">
     <div class="flex-between cursor" @click="data['show'] = !data['show']">
       <div class="flex align-center">
         <el-icon class="mr-8 arrow-icon" :class="data['show'] ? 'rotate-90' : ''">
@@ -1313,4 +1313,10 @@ const currentLoopNode = ref(0)
 const currentParagraph = ref(0)
 const currentWriteContent = ref(0)
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.execution-detail-card {
+  :deep(.md-editor-previewOnly) {
+    background: none !important;
+  }
+}
+</style>
