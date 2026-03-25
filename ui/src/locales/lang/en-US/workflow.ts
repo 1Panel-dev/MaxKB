@@ -188,7 +188,7 @@ export default {
       result: 'Search Results',
       searchParam: 'Search Parameters',
       select_variable: 'Select Variable',
-      valueMessage: `Value or name `,
+      valueMessage: 'Value or name',
 
       searchQuestion: {
         label: 'Search Question',
