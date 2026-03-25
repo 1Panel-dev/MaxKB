@@ -250,6 +250,7 @@ class BaseToolLibNodeNode(IToolLibNode):
     def tool_exec_record(self, tool_lib, all_params):
         task_record_id = uuid.uuid7()
         start_time = time.time()
+        filtered_args = all_params
         try:
             # 过滤掉 tool_init_params 中的参数
             tool_init_params = json.loads(rsa_long_decrypt(tool_lib.init_params)) if tool_lib.init_params else {}
@@ -258,8 +259,6 @@ class BaseToolLibNodeNode(IToolLibNode):
                     k: v for k, v in all_params.items()
                     if k not in tool_init_params
                 }
-            else:
-                filtered_args = all_params
             ToolRecord(
                 id=task_record_id,
                 workspace_id=tool_lib.workspace_id,

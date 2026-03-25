@@ -226,7 +226,6 @@ class ParagraphSerializers(serializers.Serializer):
             return self.one(), instance, self.data.get('knowledge_id')
 
         def get_problem_list(self):
-            ProblemParagraphMapping(ProblemParagraphMapping)
             problem_paragraph_mapping = QuerySet(ProblemParagraphMapping).filter(
                 paragraph_id=self.data.get("paragraph_id"))
             if len(problem_paragraph_mapping) > 0:
