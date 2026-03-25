@@ -613,17 +613,19 @@ class ToolSerializer(serializers.Serializer):
                     'size': skill_file.file_size,
                 } if skill_file else None
             work_flow = {}
+            is_publish = False
             if tool.tool_type == 'WORKFLOW':
                 tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=tool.id).first()
                 if tool_workflow:
                     work_flow = tool_workflow.work_flow
-
+                    is_publish = tool_workflow.is_publish
             return {
                 **ToolModelSerializer(tool).data,
                 'init_params': tool.init_params if tool.init_params else {},
                 'nick_name': nick_name,
                 'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else [],
-                'work_flow': work_flow
+                'work_flow': work_flow,
+                'is_publish': is_publish
             }
 
         def export(self):

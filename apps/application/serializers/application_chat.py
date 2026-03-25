@@ -193,6 +193,8 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
     def reset_value(value):
         if isinstance(value, str):
             value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
+            if value.startswith(('=', '+', '-', '@')):
+                value = "'" + value
         if isinstance(value, datetime.datetime):
             eastern = pytz.timezone(TIME_ZONE)
             c = datetime.timezone(eastern._utcoffset)

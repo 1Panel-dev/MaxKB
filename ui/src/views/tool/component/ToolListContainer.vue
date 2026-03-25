@@ -317,7 +317,7 @@
                             @click.stop="openTriggerDrawer(item)"
                             v-if="
                               ['workspace', 'systemManage'].includes(apiType) &&
-                              item.tool_type === 'CUSTOM' &&
+                              (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
                               permissionPrecise.trigger_read(item.id)
                             "
                           >
@@ -338,7 +338,10 @@
                           <el-dropdown-item
                             text
                             @click.stop="openToolRecordDrawer(item)"
-                            v-if="item.tool_type === 'CUSTOM' && permissionPrecise.record(item.id)"
+                            v-if="
+                              (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
+                              permissionPrecise.record(item.id)
+                            "
                           >
                             <AppIcon
                               iconName="app-schedule-report"
@@ -780,17 +783,16 @@ async function changeState(row: any) {
         })
     })
   } else {
-    if (row.tool_type === 'WORKFLOW' && !row.is_publish) {
+    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+      row.id,
+      changeStateloading,
+    )
+    if (row.tool_type === 'WORKFLOW' && !res.data.is_publish) {
       MsgConfirm(t('common.tip'), t('views.tool.toolWorkflow.toActiveTip')).then(() => {
         toWorkflow(row)
       })
       return
     }
-
-    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
-      row.id,
-      changeStateloading,
-    )
     if (
       (!res.data.init_params || Object.keys(res.data.init_params).length === 0) &&
       res.data.init_field_list &&
