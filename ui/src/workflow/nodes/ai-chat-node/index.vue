@@ -58,12 +58,12 @@
             <div class="ml-8">
               <el-button
                 :disabled="!chat_data.model_id"
-                type="primary"
-                link
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
+                <el-icon>
+                  <Operation />
+                </el-icon>
               </el-button>
             </div>
           </div>
