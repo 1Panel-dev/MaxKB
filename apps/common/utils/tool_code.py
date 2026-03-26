@@ -13,7 +13,7 @@ import subprocess
 import sys
 import tempfile
 import time
-import secrets
+
 from contextlib import contextmanager
 from contextlib import suppress
 from textwrap import dedent
@@ -26,16 +26,11 @@ from maxkb.const import PROJECT_DIR
 
 _enable_sandbox = bool(int(CONFIG.get('SANDBOX', 0)))
 _run_user = 'sandbox' if _enable_sandbox else getpass.getuser()
-_sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox') if _enable_sandbox else os.path.join(PROJECT_DIR,
-                                                                                                          'data',
-                                                                                                          'sandbox')
+_sandbox_path = CONFIG.get("SANDBOX_HOME", '/opt/maxkb-app/sandbox') if _enable_sandbox else os.path.join(PROJECT_DIR, 'data', 'sandbox')
 _sandbox_python_sys_path = CONFIG.get_sandbox_python_package_paths().split(',')
 _process_limit_timeout_seconds = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_TIMEOUT_SECONDS", '3600'))
-_process_limit_cpu_cores = min(max(int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_CPU_CORES", '1')), 1),
-                               len(os.sched_getaffinity(0))) if sys.platform.startswith(
-    "linux") else os.cpu_count()  # 只支持linux，window和mac不支持
+_process_limit_cpu_cores = min(max(int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_CPU_CORES", '1')), 1), len(os.sched_getaffinity(0))) if sys.platform.startswith("linux") else os.cpu_count()  # 只支持linux，window和mac不支持
 _process_limit_mem_mb = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_MEM_MB", '256'))
-
 
 class ToolExecutor:
 
@@ -49,8 +44,7 @@ class ToolExecutor:
             return
         try:
             # 只初始化一次
-            fd = os.open(os.path.join(PROJECT_DIR, 'tmp', 'tool_executor_init_dir.lock'),
-                         os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+            fd = os.open(os.path.join(PROJECT_DIR, 'tmp', 'tool_executor_init_dir.lock'), os.O_CREAT | os.O_EXCL | os.O_WRONLY)
             os.close(fd)
         except FileExistsError:
             # 文件已存在 → 已初始化过
@@ -93,7 +87,7 @@ class ToolExecutor:
         maxkb_logger.error(f'Exception: {e}', exc_info=True)
 
     def exec_code(self, code_str, keywords, function_name=None):
-        _id = secrets.token_hex(32)
+        _id = str(uuid.uuid7())
         action_function = f'({function_name !a}, locals_v.get({function_name !a}))' if function_name else 'locals_v.popitem()'
         set_run_user = f'os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});' if _enable_sandbox else ''
         _exec_code = f"""
@@ -104,16 +98,16 @@ try:
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {_sandbox_python_sys_path}
     _id = os.environ.get("_ID")
-    locals_v={{}}
-    keywords={keywords}
-    globals_v={{}}
+    locals_v = {{}}
+    keywords = {keywords}
+    globals_v = {{}}
     {set_run_user}
     os.environ.clear()
     with redirect_stdout(open(os.devnull, 'w')):
         exec({dedent(code_str)!a}, globals_v, locals_v)
         f_name, f = {action_function}
         globals_v.update(locals_v)
-        exec_result=f(**keywords)
+        exec_result = f(**keywords)
     result = {{'code':200,'msg':'success','data':exec_result}}
 except Exception as e:
     if isinstance(e, MemoryError): e = Exception("Cannot allocate more memory: exceeded the limit of {_process_limit_mem_mb} MB.")
@@ -187,15 +181,12 @@ finally:
                             # 如果某个参数没有默认值,需要添加 None 占位
                             defaults.append(ast.Constant(value=None))
                     node.args.defaults = defaults
-
                 # 修改返回类型注解为 Result
                 node.returns = ast.Name(id='Result', ctx=ast.Load())
-
                 # 修改 return 语句为 return Result(result=..., tool_id=...)
                 class ReturnTransformer(ast.NodeTransformer):
                     def __init__(self, func_name):
                         self.func_name = func_name
-
                     def visit_Return(self, node):
                         if node.value is None:
                             # return 语句没有返回值
@@ -222,18 +213,15 @@ finally:
                                 )
                             )
                         return ast.copy_location(new_return, node)
-
                 transformer = ReturnTransformer(node.name)
                 node = transformer.visit(node)
                 ast.fix_missing_locations(node)
-
                 func_code = ast.unparse(node)
                 # 有些模型不支持name是中文,例如: deepseek, 其他模型未知
                 escaped_desc = (name + ' ' + description).replace('\n', ' ').replace("'", " ")
                 functions.append(f"@mcp.tool(description='{escaped_desc}')\n{func_code}\n")
             else:
                 other_code.append(ast.unparse(node))
-
         # 构建完整的 MCP 服务器代码
         code_parts = ["from mcp.server.fastmcp import FastMCP"]
         code_parts.extend(imports)
@@ -319,7 +307,6 @@ exec({dedent(code)!a})
         for server, config in servers.items():
             if config.get('transport') not in ['sse', 'streamable_http']:
                 raise Exception(_('Only support transport=sse or transport=streamable_http'))
-
 
 @contextmanager
 def execution_timer(id=""):

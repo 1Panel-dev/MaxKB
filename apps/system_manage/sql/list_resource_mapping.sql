@@ -20,7 +20,7 @@ WITH source_data_cte AS (SELECT 'APPLICATION' as source_type,
                          FROM knowledge)
 SELECT rm.*,
        sdc.*,
-       u.username as username
+       u.nick_name as username
 FROM resource_mapping rm
          LEFT JOIN source_data_cte sdc
                    ON rm.source_type = sdc.source_type

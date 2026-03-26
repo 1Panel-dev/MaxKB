@@ -128,6 +128,16 @@ def get_tool_workflow_state(workflow):
     return State.SUCCESS
 
 
+class ToolWorkflowCallPostHandler(WorkFlowPostHandler):
+    def __init__(self, chat_info, tool_id):
+        super().__init__(chat_info)
+        self.tool_id = tool_id
+
+    def handler(self, workflow):
+        self.chat_info = None
+        self.tool_id = None
+
+
 class ToolWorkflowPostHandler(WorkFlowPostHandler):
     def __init__(self, chat_info, tool_id):
         super().__init__(chat_info)

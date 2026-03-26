@@ -51,6 +51,10 @@ export default {
       placeholder: 'Please select a type',
       requiredMessage: 'Type is a required property',
     },
+    desc: {
+      label: 'description',
+      placeholder: 'Please enter a description',
+    },
   },
   DatePicker: {
     placeholder: 'Select Date',

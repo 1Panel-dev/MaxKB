@@ -527,7 +527,7 @@ function openAuthorization(item: any) {
   ResourceAuthorizationDrawerRef.value.open(item.id)
 }
 
-const toolRecordDrawerRef = ref<InstanceType<typeof ToolRecordDrawer>>()
+const toolRecordDrawerRef = ref<InstanceType<typeof ExecutionRecordDrawer>>()
 const openToolRecordDrawer = (data: any) => {
   toolRecordDrawerRef.value?.open(data)
 }

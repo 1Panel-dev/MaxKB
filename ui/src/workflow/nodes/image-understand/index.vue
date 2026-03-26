@@ -27,7 +27,8 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ t('workflow.nodes.imageUnderstandNode.model.label')
+                >{{
+                    t('workflow.nodes.imageUnderstandNode.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -74,6 +75,7 @@
             v-model="form_data.model_id_reference"
           />
         </el-form-item>
+
         <el-form-item>
           <template #label>
             <div class="flex-between">
@@ -118,7 +120,8 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.application.form.prompt.label')
+                >{{
+                    $t('views.application.form.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -156,8 +159,8 @@
                 style="width: 100px"
                 :teleported="false"
               >
-                <el-option :label="$t('workflow.node')" value="NODE" />
-                <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
+                <el-option :label="$t('workflow.node')" value="NODE"/>
+                <el-option :label="$t('workflow.workflow')" value="WORKFLOW"/>
               </el-select>
             </div>
           </template>
@@ -181,7 +184,8 @@
           }"
         >
           <template #label
-            >{{ $t('workflow.nodes.imageUnderstandNode.image.label')
+          >{{
+              $t('workflow.nodes.imageUnderstandNode.image.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
@@ -191,6 +195,31 @@
             :placeholder="$t('workflow.nodes.imageUnderstandNode.image.requiredMessage')"
             v-model="form_data.image_list"
           />
+        </el-form-item>
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
+              </div>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                  v-if="form_data.model_setting.reasoning_content_enable"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="form_data.model_setting.reasoning_content_enable"
+                />
+              </div>
+            </div>
+          </template>
         </el-form-item>
         <el-form-item
           :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
@@ -217,33 +246,43 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result" />
+          <el-switch size="small" v-model="form_data.is_result"/>
         </el-form-item>
       </el-form>
     </el-card>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
-    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam"/>
+    <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef"/>
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref, inject } from 'vue'
-import { groupBy, set } from 'lodash'
+import {computed, onMounted, ref, inject} from 'vue'
+import {cloneDeep, groupBy, set} from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type { FormInstance } from 'element-plus'
+import type {FormInstance} from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-import { t } from '@/locales'
-import { useRoute } from 'vue-router'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {t} from '@/locales'
+import {useRoute} from 'vue-router'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
-import { WorkflowMode } from '@/enums/application'
+import {WorkflowMode} from '@/enums/application'
+import ReasoningParamSettingDialog
+  from "@/views/application/component/ReasoningParamSettingDialog.vue";
+
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
-
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
+const openReasoningParamSettingDialog = () => {
+  ReasoningParamSettingDialogRef.value?.open(form_data.value.model_setting)
+}
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiType = computed(() => {
@@ -267,7 +306,7 @@ const validate = () => {
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
@@ -295,6 +334,11 @@ const form = {
   temperature: null,
   max_tokens: null,
   image_list: ['start-node', 'image'],
+  model_setting: {
+    reasoning_content_start: '<think>',
+    reasoning_content_end: '</think>',
+    reasoning_content_enable: false,
+  },
 }
 
 const form_data = computed({
@@ -305,6 +349,13 @@ const form_data = computed({
       }
       if (!props.nodeModel.properties.node_data.model_id_reference) {
         set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
+      if (!props.nodeModel.properties.node_data.model_setting) {
+        set(props.nodeModel.properties.node_data, 'model_setting', {
+          reasoning_content_start: '<think>',
+          reasoning_content_end: '</think>',
+          reasoning_content_enable: false,
+        })
       }
       return props.nodeModel.properties.node_data
     } else {
@@ -334,6 +385,16 @@ function getSelectModel() {
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
+}
+
+function submitReasoningDialog(val: any) {
+  let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
+  model_setting = {
+    ...model_setting,
+    ...val,
+  }
+
+  set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
 }
 
 function submitSystemDialog(val: string) {

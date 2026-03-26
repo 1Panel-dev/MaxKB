@@ -235,9 +235,7 @@ static int match_banned_addr(const struct sockaddr *addr) {
     }
     char ip[INET6_ADDRSTRLEN] = {0};
     if (addr->sa_family == AF_INET) {
-        inet_ntop(AF_INET,
-                  &((struct sockaddr_in *)addr)->sin_addr,
-                  ip, sizeof(ip));
+        inet_ntop(AF_INET, &((struct sockaddr_in *)addr)->sin_addr, ip, sizeof(ip));
     } else if (addr->sa_family == AF_INET6) {
         struct sockaddr_in6 *sin6 = (struct sockaddr_in6 *)addr;
         if (IN6_IS_ADDR_V4MAPPED(&sin6->sin6_addr)) {
@@ -263,8 +261,7 @@ int getaddrinfo(const char *node, const char *service,
     if (node && is_sandbox_user()) {
         struct in_addr ip4;
         struct in6_addr ip6;
-        int is_ip = inet_pton(AF_INET, node, &ip4) == 1 ||
-                    inet_pton(AF_INET6, node, &ip6) == 1;
+        int is_ip = inet_pton(AF_INET, node, &ip4) == 1 || inet_pton(AF_INET6, node, &ip6) == 1;
         if (!is_ip && match_banned_domain(node, banned_hosts)) {
             throw_permission_denied_err(false, "access %s", node);
             return EAI_SYSTEM;
@@ -563,8 +560,7 @@ static int called_from_python_import() {
     for (int i = 0; i < n; i++) {
         Dl_info info;
         if (dladdr(buf[i], &info) && info.dli_sname) {
-            if (strstr(info.dli_sname, "PyImport") ||
-                strstr(info.dli_sname, "_PyImport")) {
+            if (strstr(info.dli_sname, "PyImport") || strstr(info.dli_sname, "_PyImport")) {
                 return 1;
             }
         }
