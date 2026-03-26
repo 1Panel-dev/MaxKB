@@ -83,11 +83,22 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 model_params_setting,
                 chat_record_id,
                 image,
+                model_id_type=None, model_id_reference=None,
                 **kwargs) -> NodeResult:
+        # 处理引用类型
+        if model_id_type == 'reference' and model_id_reference:
+            reference_data = self.workflow_manage.get_reference_field(
+                model_id_reference[0],
+                model_id_reference[1:],
+            )
+            if reference_data and isinstance(reference_data, dict):
+                model_id = reference_data.get('model_id', model_id)
+                model_params_setting = reference_data.get('model_params_setting')
+
         # 处理不正确的参数
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         image_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
-                                                               **model_params_setting)
+                                                               **(model_params_setting or {}))
         # 执行详情中的历史消息不需要图片内容
         history_message = self.get_history_message_for_details(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message

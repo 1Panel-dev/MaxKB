@@ -13,10 +13,15 @@
       >
         <el-form-item
           :label="$t('workflow.nodes.speechToTextNode.stt_model.label')"
-          prop="stt_model_id"
+          :prop="
+            form_data.stt_model_id_type === 'reference' ? 'stt_model_id_reference' : 'stt_model_id'
+          "
           :rules="{
             required: true,
-            message: $t('views.application.form.voiceInput.placeholder'),
+            message:
+              form_data.stt_model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.voiceInput.placeholder'),
             trigger: 'change',
           }"
         >
@@ -28,27 +33,45 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
-              <el-button
-                type="primary"
-                link
-                @click="openSTTParamSettingDialog"
-                :disabled="!form_data.stt_model_id"
-                class="mr-4"
+              <el-select
+                v-model="form_data.stt_model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.stt_model_id_reference = []"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
-              </el-button>
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
             </div>
           </template>
-          <ModelSelect
-            @wheel="wheel"
-            :teleported="false"
-            @change="sttModelChange"
-            v-model="form_data.stt_model_id"
-            :placeholder="$t('views.application.form.voiceInput.placeholder')"
-            :options="modelOptions"
-            showFooter
-            :model-type="'STT'"
-          ></ModelSelect>
+          <div class="flex-between w-full" v-if="form_data.stt_model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              @change="sttModelChange"
+              v-model="form_data.stt_model_id"
+              :placeholder="$t('views.application.form.voiceInput.placeholder')"
+              :options="modelOptions"
+              showFooter
+              :model-type="'STT'"
+            ></ModelSelect>
+            <div class="ml-8">
+              <el-button @click="openSTTParamSettingDialog" :disabled="!form_data.stt_model_id">
+                <el-icon>
+                  <Operation />
+                </el-icon>
+              </el-button>
+            </div>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.stt_model_id_reference"
+          />
         </el-form-item>
         <el-form-item
           :label="$t('workflow.nodes.speechToTextNode.audio.label')"
@@ -168,6 +191,8 @@ const wheel = (e: any) => {
 
 const form = {
   stt_model_id: '',
+  stt_model_id_type: 'custom',
+  stt_model_id_reference: [],
   is_result: true,
   audio_list: [],
   model_params_setting: {},
@@ -176,6 +201,12 @@ const form = {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.stt_model_id_type) {
+        set(props.nodeModel.properties.node_data, 'stt_model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.stt_model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'stt_model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)

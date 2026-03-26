@@ -54,7 +54,7 @@
             <el-col :span="6" v-if="apiType === 'systemShare'">
               <p class="color-secondary mb-4">{{ $t('views.workspace.title') }}</p>
               <p class="flex align-center">
-                {{props.currentContent?.workspace_name}}
+                {{ props.currentContent?.workspace_name }}
               </p>
             </el-col>
             <el-col :span="6">
@@ -120,15 +120,15 @@
                 <CaretRight />
               </el-icon>
               <el-avatar
-                v-if="detail?.tool_icon"
+                v-if="props.currentContent?.tool_icon"
                 shape="square"
                 :size="24"
                 style="background: none"
               >
-                <img :src="resetUrl(detail?.tool_icon)" alt="" />
+                <img :src="resetUrl(props.currentContent?.tool_icon)" alt="" />
               </el-avatar>
-              <ToolIcon v-else :size="24" :type="detail?.tool_type" />
-              <h4 class="ml-8">{{ detail?.tool_name }}</h4>
+              <ToolIcon v-else :size="24" type="WORKFLOW" />
+              <h4 class="ml-8">{{ props.currentContent?.tool_name }}</h4>
             </div>
             <div class="flex align-center">
               <span class="mr-16 color-secondary" v-if="detail?.state !== 'STARTED'"
@@ -147,17 +147,34 @@
           </div>
           <el-collapse-transition>
             <div class="mt-12" v-if="showDetail">
-              <!-- 工具库 -->
-              <div class="card-never border-r-6 mt-8">
-                <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
-                <div class="p-8-12 border-t-dashed lighter break-all">
-                  {{ detail?.meta.input || '-' }}
+              <div class="card-never border-r-6">
+                <h5 class="p-8-12">
+                  {{ $t('common.param.inputParam') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                  <div v-for="(f, i) in detail?.meta?.input" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
                 </div>
               </div>
               <div class="card-never border-r-6 mt-8">
-                <h5 class="p-8-12">{{ $t('chat.executionDetails.output') }}</h5>
-                <div class="p-8-12 border-t-dashed lighter break-all">
-                  {{ detail?.meta.output || '-' }}
+                <h5 class="p-8-12">
+                  {{ $t('common.param.outputParam') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in detail?.meta?.output" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
+                </div>
+              </div>
+              <div class="card-never border-r-6 mt-8">
+                <h5 class="p-8-12">
+                  {{ $t('chat.executionDetails.title') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter">
+                  <template v-for="(cLoop, cIndex) in detail?.meta?.details" :key="cIndex">
+                    <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
+                  </template>
                 </div>
               </div>
             </div>
@@ -184,6 +201,7 @@ import { useRoute } from 'vue-router'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 const props = withDefaults(
   defineProps<{
     /**

@@ -11,8 +11,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class TextToSpeechNodeSerializer(serializers.Serializer):
-    tts_model_id = serializers.CharField(required=True, label=_("Model id"))
-
+    tts_model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    tts_model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    tts_model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                                   label=_("Reference Field"))
     is_result = serializers.BooleanField(required=False,
                                          label=_('Whether to return content'))
 
@@ -35,6 +37,6 @@ class ITextToSpeechNode(INode):
         return self.execute(content=content, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, tts_model_id,
-                content, model_params_setting=None,
+                content, model_params_setting=None, tts_model_id_type=None, tts_model_id_reference=None,
                 **kwargs) -> NodeResult:
         pass
