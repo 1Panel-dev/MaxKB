@@ -8,9 +8,9 @@
       require-asterisk-position="right"
       hide-required-asterisk
     >
-      <h5 class="title-decoration-1 mb-16">{{ chat_data.input_title }}</h5>
+      <h5 class="title-decoration-1 mb-8">{{ chat_data.input_title }}</h5>
 
-      <el-card shadow="never" class="card-never mb-16" style="--el-card-padding: 12px">
+      <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
         <div v-if="chat_data.input_field_list?.length">
           <template v-for="(item, index) in chat_data.input_field_list" :key="item.field">
             <el-form-item

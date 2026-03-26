@@ -1274,6 +1274,54 @@
               </div>
             </div>
           </template>
+
+          <!-- 工作流开始 节点-->
+          <template v-if="data.type === WorkflowType.ToolStartNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.global_fields" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 工作流 节点 -->
+          <div class="card-never border-r-6" v-if="data.type === WorkflowType.ToolWorkflowLib">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-for="(f, i) in data.input" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.output" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('chat.executionDetails.title') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-for="(cLoop, cIndex) in data.details" :key="cIndex">
+                  <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
+                </template>
+              </div>
+            </div>
+          </div>
           <slot></slot>
         </template>
         <template v-else>

@@ -10,8 +10,10 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class SpeechToTextNodeSerializer(serializers.Serializer):
-    stt_model_id = serializers.CharField(required=True, label=_("Model id"))
-
+    stt_model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    stt_model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    stt_model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                                   label=_("Reference Field"))
     is_result = serializers.BooleanField(required=False,
                                          label=_('Whether to return content'))
 
@@ -40,6 +42,6 @@ class ISpeechToTextNode(INode):
         return self.execute(audio=res, **self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, stt_model_id,
-                audio, model_params_setting=None,
+                audio, model_params_setting=None, stt_model_id_type=None, stt_model_id_reference=None,
                 **kwargs) -> NodeResult:
         pass
