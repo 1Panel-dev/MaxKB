@@ -187,7 +187,7 @@ class BaseChatNode(IChatNode):
         self.context['model_setting'] = model_setting
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
-                                                              **model_params_setting)
+                                                              **(model_params_setting or {}))
         history_message = self.get_history_message(history_chat_record, dialogue_number, dialogue_type,
                                                    self.runtime_node_id)
         self.context['history_message'] = [{'content': message.content, 'role': message.type} for message in

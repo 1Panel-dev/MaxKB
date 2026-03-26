@@ -13,10 +13,13 @@
       >
         <el-form-item
           :label="$t('workflow.nodes.videoUnderstandNode.model.label')"
-          prop="model_id"
+          :prop="form_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
             required: true,
-            message: $t('workflow.nodes.videoUnderstandNode.model.requiredMessage'),
+            message:
+              form_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('workflow.nodes.videoUnderstandNode.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -28,29 +31,49 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
+              <el-select
+                v-model="form_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="form_data.model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              v-model="form_data.model_id"
+              :placeholder="$t('workflow.nodes.videoUnderstandNode.model.requiredMessage')"
+              :options="modelOptions"
+              showFooter
+              :model-type="'IMAGE'"
+            ></ModelSelect>
+            <div class="ml-8">
               <el-button
                 :disabled="!form_data.model_id"
-                type="primary"
-                link
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
+                <el-icon>
+                  <Operation />
+                </el-icon>
               </el-button>
             </div>
-          </template>
-
-          <ModelSelect
-            @wheel="wheel"
-            :teleported="false"
-            v-model="form_data.model_id"
-            :placeholder="$t('workflow.nodes.videoUnderstandNode.model.requiredMessage')"
-            :options="modelOptions"
-            showFooter
-            :model-type="'IMAGE'"
-          ></ModelSelect>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.model_id_reference"
+          />
         </el-form-item>
-
         <el-form-item>
           <template #label>
             <div class="flex-between">
@@ -261,6 +284,8 @@ const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
+  model_id_type: 'custom',
+  model_id_reference: [],
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 0,
@@ -274,6 +299,12 @@ const form = {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.model_id_type) {
+        set(props.nodeModel.properties.node_data, 'model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)

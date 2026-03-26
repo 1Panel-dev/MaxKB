@@ -10,7 +10,10 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class VideoUnderstandNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                    label=_("Role Setting"))
     prompt = serializers.CharField(required=True, label=_("Prompt word"))
@@ -52,5 +55,6 @@ class IVideoUnderstandNode(INode):
                 model_params_setting,
                 chat_record_id,
                 video,
+                model_id_type=None, model_id_reference=None,
                 **kwargs) -> NodeResult:
         pass

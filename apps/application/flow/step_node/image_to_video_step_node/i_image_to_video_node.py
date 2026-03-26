@@ -10,7 +10,10 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class ImageToVideoNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
 
     prompt = serializers.CharField(required=True, label=_("Prompt word (positive)"))
 
@@ -69,5 +72,6 @@ class IImageToVideoNode(INode):
                 model_params_setting,
                 chat_record_id,
                 first_frame_url, last_frame_url,
+                model_id_type=None, model_id_reference=None,
                 **kwargs) -> NodeResult:
         pass
