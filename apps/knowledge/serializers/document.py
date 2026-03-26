@@ -228,19 +228,17 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             language = get_language()
             if self.data.get('type') == 'csv':
-                file = open(
+                with open(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
                                  f'csv_template_{to_locale(language)}.csv'),
-                    "rb")
-                content = file.read()
-                file.close()
+                    "rb") as file:
+                    content = file.read()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'text/csv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
-                file = open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
-                                         f'excel_template_{to_locale(language)}.xlsx'), "rb")
-                content = file.read()
-                file.close()
+                with open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                       f'excel_template_{to_locale(language)}.xlsx'), "rb") as file:
+                    content = file.read()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
                                                                   'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
             else:
@@ -251,20 +249,18 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             language = get_language()
             if self.data.get('type') == 'csv':
-                file = open(
+                with open(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
                                  f'table_template_{to_locale(language)}.csv'),
-                    "rb")
-                content = file.read()
-                file.close()
+                    "rb") as file:
+                    content = file.read()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'text/csv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
-                file = open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
-                                         f'table_template_{to_locale(language)}.xlsx'),
-                            "rb")
-                content = file.read()
-                file.close()
+                with open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
+                                       f'table_template_{to_locale(language)}.xlsx'),
+                          "rb") as file:
+                    content = file.read()
                 return HttpResponse(content, status=200, headers={'Content-Type': 'application/vnd.ms-excel',
                                                                   'Content-Disposition': 'attachment; filename="excel_template.xlsx"'})
             else:
