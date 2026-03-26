@@ -179,7 +179,7 @@ def is_valid_uuid(s):
 
 def write_image(zip_path: str, image_list: List[str]):
     for image in image_list:
-        search = re.search("\(.*\)", image)
+        search = re.search(r"\(.*\)", image)
         if search:
             text = search.group()
             if text.startswith('(./oss/file/'):

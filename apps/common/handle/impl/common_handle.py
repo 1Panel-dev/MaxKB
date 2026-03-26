@@ -121,10 +121,10 @@ def xlsx_embed_cells_images(buffer) -> {}:
             continue
         if len(image_excel_id_list) > 0:
             image_excel_id = image_excel_id_list[-1]
-            f = archive.open(img.target)
-            img_byte = io.BytesIO()
-            im = PILImage.open(f).convert('RGB')
-            im.save(img_byte, format='JPEG')
+            with archive.open(img.target) as f:
+                img_byte = io.BytesIO()
+                im = PILImage.open(f).convert('RGB')
+                im.save(img_byte, format='JPEG')
             image = File(id=uuid.uuid7(), file_name=img.path, meta={'debug': False, 'content': img_byte.getvalue()})
             result['=' + image_excel_id] = image
     archive.close()

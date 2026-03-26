@@ -130,7 +130,7 @@ def reset_application_node_dict(application_node_dict, runtime_node_id, node_dat
             application_node = application_node_dict[key]
             if application_node.get('runtime_node_id') == runtime_node_id:
                 content: str = application_node.get('content')
-                match = re.search('<form_rander>.*?</form_rander>', content)
+                match = re.search(r'<form_rander>.*?</form_rander>', content)
                 if match:
                     form_setting_str = match.group().replace('<form_rander>', '').replace('</form_rander>', '')
                     form_setting = json.loads(form_setting_str)
