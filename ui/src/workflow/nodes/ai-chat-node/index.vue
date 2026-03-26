@@ -488,7 +488,7 @@
       @refresh="submitReasoningDialog"
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
-    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
     <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
   </NodeContainer>
@@ -724,12 +724,12 @@ function getToolSelectOptions() {
     apiType.value === 'systemManage'
       ? {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
           workspace_id: resource.value?.workspace_id,
         }
       : {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
         }
 
   loadSharedApi({ type: 'tool', systemType: apiType.value })

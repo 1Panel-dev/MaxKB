@@ -9,23 +9,123 @@
 import json
 import re
 import time
+import uuid
 from functools import reduce
 from typing import List, Dict
 
-from application.flow.i_step_node import NodeResult, INode
+from langchain_core.tools import StructuredTool
+
+from application.flow.common import Workflow, WorkflowMode
+from application.flow.i_step_node import NodeResult, INode, ToolWorkflowPostHandler, ToolWorkflowCallPostHandler
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, mcp_response_generator
 from application.models import Application, ApplicationApiKey, ApplicationAccessToken
+from application.serializers.common import ToolExecute
 from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
-from django.db.models import QuerySet
+from django.db.models import QuerySet, OuterRef, Subquery
 from django.utils.translation import gettext as _
 from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
-from tools.models import Tool
+from tools.models import Tool, ToolWorkflowVersion, ToolType
+from pydantic import BaseModel, Field, create_model
+import uuid_utils.compat as uuid
+
+
+def build_schema(fields: dict):
+    return create_model("dynamicSchema", **fields)
+
+
+def get_type(_type: str):
+    if _type == 'float':
+        return float
+    if _type == 'string':
+        return str
+    if _type == 'int':
+        return int
+    if _type == 'dict':
+        return dict
+    if _type == 'array':
+        return list
+    if _type == 'boolean':
+        return bool
+    return object
+
+
+def get_workflow_args(tool, qv):
+    for node in qv.work_flow.get('nodes'):
+        if node.get('type') == 'tool-base-node':
+            input_field_list = node.get('properties').get('user_input_field_list')
+            return build_schema(
+                {field.get('field'): (get_type(field.get('type')), Field(..., description=field.get('desc')))
+                 for field in input_field_list})
+
+    return build_schema({})
+
+
+def get_workflow_func(tool, qv, workspace_id):
+    tool_id = tool.id
+    tool_record_id = str(uuid.uuid7())
+    took_execute = ToolExecute(tool_id, tool_record_id,
+                               workspace_id,
+                               None,
+                               None,
+                               True)
+
+    def inner(**kwargs):
+        from application.flow.tool_workflow_manage import ToolWorkflowManage
+        work_flow_manage = ToolWorkflowManage(
+            Workflow.new_instance(qv.work_flow, WorkflowMode.TOOL),
+            {
+                'chat_record_id': tool_record_id,
+                'tool_id': tool_id,
+                'stream': True,
+                'workspace_id': workspace_id,
+                **kwargs},
+
+            ToolWorkflowCallPostHandler(took_execute, tool_id),
+            is_the_task_interrupted=lambda: False,
+            child_node=None,
+            start_node_id=None,
+            start_node_data=None,
+            chat_record=None
+        )
+        res = work_flow_manage.run()
+        for r in res:
+            pass
+        return work_flow_manage.out_context
+
+    return inner
+
+
+def get_tools(tool_workflow_ids, workspace_id):
+    tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id)
+    latest_subquery = ToolWorkflowVersion.objects.filter(
+        tool_id=OuterRef('tool_id')
+    ).order_by('-create_time')
+
+    qs = ToolWorkflowVersion.objects.filter(
+        tool_id__in=[t.id for t in tools],
+        id=Subquery(latest_subquery.values('id')[:1])
+    )
+    qd = {q.tool_id: q for q in qs}
+    results = []
+    for tool in tools:
+        qv = qd.get(tool.id)
+        func = get_workflow_func(tool, qv, workspace_id)
+        args = get_workflow_args(tool, qv)
+        tool = StructuredTool.from_function(
+            func=func,
+            name=tool.name,
+            description=tool.desc,
+            args_schema=args,
+        )
+        results.append(tool)
+
+    return results
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
@@ -178,7 +278,7 @@ class BaseChatNode(IChatNode):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
 
-        if  model_params_setting is None and model_id:
+        if model_params_setting is None and model_id:
             model_params_setting = get_default_model_params_setting(model_id)
 
         if model_setting is None:
@@ -216,7 +316,7 @@ class BaseChatNode(IChatNode):
         mcp_result = self._handle_mcp_request(
             mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
             application_ids, skill_tool_ids, mcp_output_enable,
-            chat_model, message_list, history_message, question, chat_id
+            chat_model, message_list, history_message, question, chat_id, workspace_id
         )
         if mcp_result:
             return mcp_result
@@ -236,7 +336,8 @@ class BaseChatNode(IChatNode):
 
     def _handle_mcp_request(self, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
                             application_ids, skill_tool_ids,
-                            mcp_output_enable, chat_model, message_list, history_message, question, chat_id):
+                            mcp_output_enable, chat_model, message_list, history_message, question, chat_id,
+                            workspace_id):
 
         mcp_servers_config = {}
 
@@ -259,11 +360,12 @@ class BaseChatNode(IChatNode):
                     mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
                     mcp_servers_config = self.handle_variables(mcp_servers_config)
         tool_init_params = {}
+        tools = get_tools(tool_ids, workspace_id)
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context['tool_ids'] = tool_ids
             for tool_id in tool_ids:
-                tool = QuerySet(Tool).filter(id=tool_id).first()
-                if not tool.is_active:
+                tool = QuerySet(Tool).filter(id=tool_id, tool_type=ToolType.CUSTOM).first()
+                if tool is None or not tool.is_active:
                     continue
                 executor = ToolExecutor()
                 if tool.init_params is not None:
@@ -323,7 +425,7 @@ class BaseChatNode(IChatNode):
                 })
             mcp_servers_config['skills'] = skill_file_items
 
-        if len(mcp_servers_config) > 0:
+        if len(mcp_servers_config) > 0 or len(tools) > 0:
             # 安全获取 application
             application_id = None
             if (self.workflow_manage and
@@ -334,7 +436,7 @@ class BaseChatNode(IChatNode):
             source_id = application_id or knowledge_id
             source_type = 'APPLICATION' if application_id else 'KNOWLEDGE'
             r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable,
-                                       tool_init_params, source_id, source_type, chat_id)
+                                       tool_init_params, source_id, source_type, chat_id, tools)
             return NodeResult(
                 {'result': r, 'chat_model': chat_model, 'message_list': message_list,
                  'history_message': [{'content': message.content, 'role': message.type} for message in
