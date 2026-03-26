@@ -93,7 +93,7 @@
             </div>
           </template>
           <NodeCascader
-            ref="nodeCascaderRef"
+            ref="inputVariableCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -220,10 +220,14 @@ const model_change = (model_id?: string) => {
 
 const VariableSplittingRef = ref()
 const nodeCascaderRef = ref()
+const inputVariableCascaderRef = ref()
 
 const validate = async () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    inputVariableCascaderRef.value
+      ? inputVariableCascaderRef.value.validate()
+      : Promise.resolve(''),
     VariableSplittingRef.value.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
