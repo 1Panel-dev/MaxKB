@@ -131,7 +131,7 @@ class BaseIntentNode(IIntentNode):
 
         for message in history_message:
             if isinstance(message.content, str):
-                message.content = re.sub(r'<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
+                message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
     def build_system_prompt(self) -> str:
