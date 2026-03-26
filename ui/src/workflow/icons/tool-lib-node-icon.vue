@@ -14,7 +14,7 @@
   <el-avatar v-else-if="item?.tool_type === 'DATA_SOURCE'" class="avatar-purple" shape="square">
     <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
   </el-avatar>
-  <el-avatar v-else shape="square" style="background: #34c724">
+  <el-avatar v-else shape="square" class="avatar-green">
     <img src="@/assets/tool/icon_tool.svg" style="width: 75%" alt="" />
   </el-avatar>
 </template>

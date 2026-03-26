@@ -428,7 +428,7 @@
       ref="resourceTriggerDrawerRef"
       :source="SourceTypeEnum.TOOL"
     ></ResourceTriggerDrawer>
-    <ToolRecordDrawer ref="toolRecordDrawerRef" />
+    <ExecutionRecordDrawer ref="toolRecordDrawerRef" />
     <WorkflowFormDialog
       ref="workflowFormDialogRef"
       :title="workflowFormDialogtitle"
@@ -456,7 +456,7 @@ import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
 import ToolStoreDescDrawer from '@/views/tool/component/ToolStoreDescDrawer.vue'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import WorkflowFormDialog from '../WorkflowFormDialog.vue'
-import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
+import ExecutionRecordDrawer from '@/views/tool-workflow/execution-record/ExecutionRecordDrawer.vue'
 import ToolStoreApi from '@/api/tool/store.ts'
 import { resetUrl, i18n_name } from '@/utils/common'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
