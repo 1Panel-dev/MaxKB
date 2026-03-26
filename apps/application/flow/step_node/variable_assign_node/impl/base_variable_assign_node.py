@@ -99,7 +99,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
             evaluation(variable, val)
             result['output_value'] = val
         else:
-            reference = self.get_reference_content(variable.get('reference'))
+            reference = self.get_reference_content(variable['reference'])
             reference = self.convert(reference, variable.get('target_type'))
             evaluation(variable, reference)
             result['output_value'] = reference
