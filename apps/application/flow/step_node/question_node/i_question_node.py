@@ -16,7 +16,10 @@ from application.flow.i_step_node import INode, NodeResult
 
 
 class QuestionNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                    label=_("Role Setting"))
     prompt = serializers.CharField(required=True, label=_("Prompt word"))
@@ -42,6 +45,6 @@ class IQuestionNode(INode):
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
-                model_params_setting=None,
+                model_params_setting=None, model_id_type=None, model_id_reference=None,
                 **kwargs) -> NodeResult:
         pass

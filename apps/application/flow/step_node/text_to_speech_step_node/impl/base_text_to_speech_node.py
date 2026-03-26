@@ -69,7 +69,7 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             self.context['content'] = chunk
             workspace_id = self.workflow_manage.get_body().get('workspace_id')
             model = get_model_instance_by_model_workspace_id(
-                tts_model_id, workspace_id, **model_params_setting)
+                tts_model_id, workspace_id, **(model_params_setting or {}))
 
             audio_byte = model.text_to_speech(chunk)
 

@@ -56,6 +56,7 @@ def _merge_lists_normalize_empty_tool_chunk_ids(left, *others):
     """Wrapper around merge_lists that normalises empty-string IDs to None in
     tool_call_chunk items (those with an 'index' key) so that qwen streaming
     chunks with id='' are merged correctly by index."""
+
     def _norm(lst):
         if lst is None:
             return lst
@@ -158,9 +159,9 @@ class Reasoning:
                     self.reasoning_content_end_tag)
                 if reasoning_content_end_tag_index > -1:
                     reasoning_content_chunk = self.reasoning_content_chunk[
-                        0:reasoning_content_end_tag_index]
+                                              0:reasoning_content_end_tag_index]
                     content_chunk = self.reasoning_content_chunk[
-                        reasoning_content_end_tag_index + self.reasoning_content_end_tag_len:]
+                                    reasoning_content_end_tag_index + self.reasoning_content_end_tag_len:]
                     self.reasoning_content += reasoning_content_chunk
                     self.content += content_chunk
                     self.reasoning_content_chunk = ""
@@ -168,7 +169,7 @@ class Reasoning:
                     return {'content': content_chunk, 'reasoning_content': reasoning_content_chunk}
                 else:
                     reasoning_content_chunk = self.reasoning_content_chunk[
-                        0:reasoning_content_end_tag_prefix_index + 1]
+                                              0:reasoning_content_end_tag_prefix_index + 1]
                     self.reasoning_content_chunk = self.reasoning_content_chunk.replace(
                         reasoning_content_chunk, '')
                     self.reasoning_content += reasoning_content_chunk
@@ -401,11 +402,14 @@ async def _initialize_skills(mcp_servers, temp_dir):
 
 
 async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable=True, tool_init_params={},
-                              source_id=None, source_type=None, temp_dir=None, chat_id=None):
+                              source_id=None, source_type=None, temp_dir=None, chat_id=None, extra_tools=None):
     try:
         checkpointer = MemorySaver()
         client = await _initialize_skills(mcp_servers, temp_dir)
         tools = await client.get_tools()
+        if extra_tools:
+            for tool in extra_tools:
+                tools.append(tool)
         agent = create_deep_agent(
             model=chat_model,
             backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=True),
@@ -517,7 +521,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
                     # qwen-plus often emits {} here as a placeholder while
                     # the real args are split in tool_call_chunks/invalid_tool_calls.
                     if has_tool_call_chunks and (
-                        part_args == '' or part_args == {} or part_args == []
+                            part_args == '' or part_args == {} or part_args == []
                     ):
                         part_args = ''
                     key = _get_fragment_key(tool_call.get('index'), raw_id)
@@ -563,9 +567,9 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
                 # 3. 检测工具调用结束，更新 tool_calls_info
                 # ----------------------------------------------------------------
                 is_finish_chunk = (
-                    chunk[0].response_metadata.get(
-                        'finish_reason') == 'tool_calls'
-                    or chunk[0].chunk_position == 'last'
+                        chunk[0].response_metadata.get(
+                            'finish_reason') == 'tool_calls'
+                        or chunk[0].chunk_position == 'last'
                 )
 
                 if is_finish_chunk:
@@ -734,7 +738,7 @@ async def save_tool_record(tool_id, tool_info, tool_result, source_id, source_ty
 
 
 def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_enable=True, tool_init_params={},
-                           source_id=None, source_type=None, chat_id=None):
+                           source_id=None, source_type=None, chat_id=None, extra_tools=None):
     """使用全局事件循环，不创建新实例"""
     result_queue = queue.Queue()
     loop = get_global_loop()  # 使用共享循环
@@ -751,7 +755,7 @@ def mcp_response_generator(chat_model, message_list, mcp_servers, mcp_output_ena
     async def _run():
         try:
             async_gen = _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_enable, tool_init_params,
-                                            source_id, source_type, temp_dir, chat_id)
+                                            source_id, source_type, temp_dir, chat_id, extra_tools)
             async for chunk in async_gen:
                 result_queue.put(('data', chunk))
         except Exception as e:
