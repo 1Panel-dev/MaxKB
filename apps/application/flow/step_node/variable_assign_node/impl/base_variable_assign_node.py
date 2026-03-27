@@ -68,6 +68,11 @@ class BaseVariableAssignNode(IVariableAssignNode):
             reference = self.get_reference_content(variable['reference'])
             evaluation(variable, reference)
             result['output_value'] = reference
+
+        # 获取输入输出值的类型，用于显示在执行详情页面中
+        result['input_type'] = type(result.get('input_value')).__name__ if result.get('input_value') is not None else 'null'
+        result['output_type'] = type(result.get('output_value')).__name__ if result.get('output_value') is not None else 'null'
+
         return result
 
     def execute(self, variable_list, **kwargs) -> NodeResult:
