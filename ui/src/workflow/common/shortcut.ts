@@ -104,6 +104,8 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     const nodes = elements.nodes.filter((node) =>
       [
         'start-node',
+        'tool-start-node',
+        'tool-base-node',
         'base-node',
         'loop-body-node',
         'loop-start-node',
