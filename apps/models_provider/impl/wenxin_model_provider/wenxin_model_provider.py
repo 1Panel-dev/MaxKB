@@ -13,13 +13,17 @@ from models_provider.base_model_provider import ModelProvideInfo, ModelTypeConst
     ModelInfoManage
 from models_provider.impl.wenxin_model_provider.credential.embedding import QianfanEmbeddingCredential
 from models_provider.impl.wenxin_model_provider.credential.llm import WenxinLLMModelCredential
+from models_provider.impl.wenxin_model_provider.credential.reranker import QfRerankerCredential
 from models_provider.impl.wenxin_model_provider.model.embedding import QianfanEmbeddings
 from models_provider.impl.wenxin_model_provider.model.llm import QianfanChatModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
+from models_provider.impl.wenxin_model_provider.model.reranker import QfBgeReranker
+
 win_xin_llm_model_credential = WenxinLLMModelCredential()
 qianfan_embedding_credential = QianfanEmbeddingCredential()
+qf_reranker_credential = QfRerankerCredential()
 model_info_list = [ModelInfo('ERNIE-Bot-4',
                              _('ERNIE-Bot-4 is a large language model independently developed by Baidu. It covers massive Chinese data and has stronger capabilities in dialogue Q&A, content creation and generation.'),
                              ModelTypeConst.LLM, win_xin_llm_model_credential, QianfanChatModel),
@@ -46,13 +50,19 @@ embedding_model_info_list = [ModelInfo('Embedding-V1',
                              ModelInfo('bge-large-zh', '', ModelTypeConst.EMBEDDING, qianfan_embedding_credential,
                                        QianfanEmbeddings)
                              ]
-model_info_manage = ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
+rerank_model_info_list = [ModelInfo('bce-reranker-base',
+                                    _(''),
+                                    ModelTypeConst.RERANKER, qf_reranker_credential, QfBgeReranker),
+                          ]
+model_info_manage = (ModelInfoManage.builder().append_model_info_list(model_info_list).append_default_model_info(
     ModelInfo('ERNIE-Bot-4',
               _('ERNIE-Bot-4 is a large language model independently developed by Baidu. It covers massive Chinese data and has stronger capabilities in dialogue Q&A, content creation and generation.'),
               ModelTypeConst.LLM,
               win_xin_llm_model_credential,
               QianfanChatModel)).append_model_info_list(embedding_model_info_list).append_default_model_info(
-    embedding_model_info_list[0]).build()
+    embedding_model_info_list[0]).
+                     append_model_info_list(rerank_model_info_list).append_default_model_info(
+    rerank_model_info_list[0]).build())
 
 
 class WenxinModelProvider(IModelProvider):

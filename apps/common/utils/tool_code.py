@@ -108,15 +108,14 @@ try:
         f_name, f = {action_function}
         globals_v.update(locals_v)
         exec_result = f(**keywords)
-    result = {{'code':200,'msg':'success','data':exec_result}}
+    sys.stdout.write("\\n" + _id)
+    json.dump({{'code':200,'msg':'success','data':exec_result}}, sys.stdout, default=str)
 except Exception as e:
     if isinstance(e, MemoryError): e = Exception("Cannot allocate more memory: exceeded the limit of {_process_limit_mem_mb} MB.")
-    result = {{'code':500,'msg':str(e),'data':None}}
-finally:
     sys.stdout.write("\\n" + _id)
-    json.dump(result, sys.stdout, default=str)
-    sys.stdout.write("\\n__END__\\n")
-    sys.stdout.flush()
+    json.dump({{'code':500,'msg':str(e),'data':None}}, sys.stdout, default=str)
+sys.stdout.write("\\n" + _id + "__END__\\n")
+sys.stdout.flush()
 """
         maxkb_logger.debug(f"Tool execution({_id}) execute code: {_exec_code}")
         with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=True) as f:
@@ -127,7 +126,7 @@ finally:
         if subprocess_result.returncode != 0:
             raise Exception(subprocess_result.stderr or subprocess_result.stdout or "Unknown exception occurred")
         lines = subprocess_result.stdout.splitlines()
-        if len(lines) < 2 or lines[-1] != "__END__":
+        if len(lines) < 2 or lines[-1] != f"{_id}__END__":
             raise Exception("Execution interrupted or tampered")
         last_line = lines[-2]
         if not last_line.startswith(_id):

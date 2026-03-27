@@ -574,7 +574,11 @@ static int is_allow_dl(const char *filename) {
     ensure_config_loaded();
     if (!allow_dl_paths || !*allow_dl_paths) return 0;
     char real_file[PATH_MAX];
-    if (!realpath(filename, real_file)) return 0;
+    if (strchr(filename, '/') == NULL) {
+        return 1;
+    } else {
+        if (!realpath(filename, real_file)) return 0;
+    }
     char *rules = strdup(allow_dl_paths);
     if (!rules) return 0;
     int allowed = 0;
