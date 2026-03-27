@@ -29,6 +29,8 @@ class VideoUnderstandNodeSerializer(serializers.Serializer):
 
     model_params_setting = serializers.JSONField(required=False, default=dict,
                                                  label=_("Model parameter settings"))
+    model_setting = serializers.DictField(required=False,
+                                          label='Model settings')
 
 
 class IVideoUnderstandNode(INode):
@@ -45,7 +47,7 @@ class IVideoUnderstandNode(INode):
 
         if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
             WorkflowMode.TOOL_LOOP].__contains__(
-                self.workflow_manage.flow.workflow_mode):
+            self.workflow_manage.flow.workflow_mode):
             return self.execute(video=res, **self.node_params_serializer.data, **self.flow_params_serializer.data,
                                 **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
         else:
@@ -56,5 +58,6 @@ class IVideoUnderstandNode(INode):
                 chat_record_id,
                 video,
                 model_id_type=None, model_id_reference=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         pass

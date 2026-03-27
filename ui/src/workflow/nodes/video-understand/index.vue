@@ -74,6 +74,7 @@
             v-model="form_data.model_id_reference"
           />
         </el-form-item>
+
         <el-form-item>
           <template #label>
             <div class="flex-between">
@@ -191,6 +192,31 @@
             v-model="form_data.video_list"
           />
         </el-form-item>
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
+              </div>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                  v-if="form_data.model_setting.reasoning_content_enable"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="form_data.model_setting.reasoning_content_enable"
+                />
+              </div>
+            </div>
+          </template>
+        </el-form-item>
         <el-form-item
           :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
@@ -221,6 +247,10 @@
       </el-form>
     </el-card>
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+        <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
     <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
   </NodeContainer>
 </template>
@@ -228,7 +258,7 @@
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref, inject } from 'vue'
-import { groupBy, set } from 'lodash'
+import {cloneDeep, groupBy, set} from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
@@ -237,6 +267,8 @@ import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { WorkflowMode } from '@/enums/application'
+import ReasoningParamSettingDialog
+  from "@/views/application/component/ReasoningParamSettingDialog.vue";
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
@@ -254,6 +286,10 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
+const openReasoningParamSettingDialog = () => {
+  ReasoningParamSettingDialogRef.value?.open(form_data.value.model_setting)
+}
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
@@ -294,6 +330,11 @@ const form = {
   temperature: null,
   max_tokens: null,
   video_list: ['start-node', 'video'],
+  model_setting: {
+    reasoning_content_start: '<think>',
+    reasoning_content_end: '</think>',
+    reasoning_content_enable: false,
+  },
 }
 
 const form_data = computed({
@@ -304,6 +345,13 @@ const form_data = computed({
       }
       if (!props.nodeModel.properties.node_data.model_id_reference) {
         set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
+      if (!props.nodeModel.properties.node_data.model_setting) {
+        set(props.nodeModel.properties.node_data, 'model_setting', {
+          reasoning_content_start: '<think>',
+          reasoning_content_end: '</think>',
+          reasoning_content_enable: false,
+        })
       }
       return props.nodeModel.properties.node_data
     } else {
@@ -360,6 +408,16 @@ const replace = (v: any) => {
 
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
+}
+
+function submitReasoningDialog(val: any) {
+  let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
+  model_setting = {
+    ...model_setting,
+    ...val,
+  }
+
+  set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
 }
 
 onMounted(() => {
