@@ -3,7 +3,7 @@ RUN python3 -m venv /opt/py3
 
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.3 AS vector-model
 
-FROM postgres:17.7-trixie
+FROM postgres:17.9-trixie
 COPY --from=python-stage /usr/local /usr/local
 COPY --from=python-stage /opt/py3 /opt/py3
 COPY --chmod=500 installer/*.sh /usr/bin/

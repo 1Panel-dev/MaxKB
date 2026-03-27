@@ -29,10 +29,21 @@ class BaseImageToVideoNode(IImageToVideoNode):
                 model_params_setting,
                 chat_record_id,
                 first_frame_url, last_frame_url=None,
+                model_id_type=None, model_id_reference=None,
                 **kwargs) -> NodeResult:
+        # 处理引用类型
+        if model_id_type == 'reference' and model_id_reference:
+            reference_data = self.workflow_manage.get_reference_field(
+                model_id_reference[0],
+                model_id_reference[1:],
+            )
+            if reference_data and isinstance(reference_data, dict):
+                model_id = reference_data.get('model_id', model_id)
+                model_params_setting = reference_data.get('model_params_setting')
+
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         ttv_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
-                                                             **model_params_setting)
+                                                             **(model_params_setting or {}))
         history_message = self.get_history_message(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)

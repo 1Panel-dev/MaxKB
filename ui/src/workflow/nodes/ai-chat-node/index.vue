@@ -58,12 +58,12 @@
             <div class="ml-8">
               <el-button
                 :disabled="!chat_data.model_id"
-                type="primary"
-                link
                 @click="openAIParamSettingDialog(chat_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
+                <el-icon>
+                  <Operation />
+                </el-icon>
               </el-button>
             </div>
           </div>
@@ -142,7 +142,14 @@
           />
         </el-form-item>
         <el-form-item
-          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
         >
           <template #label>
             <div class="flex-between">
@@ -447,7 +454,14 @@
         </el-form-item>
         <el-form-item
           @click.prevent
-          v-if="[WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflowMode)"
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
         >
           <template #label>
             <div class="flex align-center">
@@ -474,7 +488,7 @@
       @refresh="submitReasoningDialog"
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
-    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
     <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
   </NodeContainer>
@@ -710,12 +724,12 @@ function getToolSelectOptions() {
     apiType.value === 'systemManage'
       ? {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
           workspace_id: resource.value?.workspace_id,
         }
       : {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
         }
 
   loadSharedApi({ type: 'tool', systemType: apiType.value })

@@ -28,7 +28,7 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
             # stream_options={"include_usage": True},
             streaming=True,
             stream_usage=True,
-            extra_body=optional_params
+            extra_body={"enable_thinking": True},
         )
         return chat_tong_yi
 
@@ -101,94 +101,94 @@ class QwenVLChatModel(MaxKBBaseModel, BaseChatOpenAI):
                 else:
                     raise Exception(f"文件上传失败，已重试{max_retries}次: {str(e)}")
 
-    def stream(
-            self,
-            input: LanguageModelInput,
-            config: Optional[RunnableConfig] = None,
-            *,
-            stop: Optional[list[str]] = None,
-            **kwargs: Any,
-    ) -> Iterator[BaseMessageChunk]:
-        url = f"{self.openai_api_base}/chat/completions"
-
-        headers = {
-            "Authorization": f"Bearer {self.openai_api_key.get_secret_value()}",
-            "Content-Type": "application/json",
-            "X-DashScope-OssResourceResolve": "enable"
-        }
-        # 遍历input 获取所有的content 构造新的消息体
-        messages = []
-        for message in input:
-            if message.type == "human":
-                messages.append({
-                    "role": "user",
-                    "content": message.content
-                })
-            elif message.type == "ai":
-                messages.append({
-                    "role": "assistant",
-                    "content": message.content
-                })
-            elif message.type == "system":
-                messages.append({
-                    "role": "system",
-                    "content": message.content
-                })
-
-        data = {
-            "model": self.model_name,
-            "messages": messages,
-            **self.extra_body,
-            "stream": True,
-        }
-
-        # 增加重试机制
-        max_retries = 3
-        retry_delay = 1
-
-        for attempt in range(max_retries):
-            try:
-                response = requests.post(url, headers=headers, json=data, stream=True, timeout=30)
-                if response.status_code != 200:
-                    raise Exception(f"Failed to get response: {response.text}")
-
-                for line in response.iter_lines():
-                    if line:
-                        try:
-                            decoded_line = line.decode('utf-8')
-                            # 检查是否是有效的SSE数据行
-                            if decoded_line.startswith('data: '):
-                                # 提取JSON部分
-                                json_str = decoded_line[6:]  # 移除 'data: ' 前缀
-                                # 检查是否是结束标记
-                                if json_str.strip() == '[DONE]':
-                                    continue
-
-                                # 尝试解析JSON
-                                chunk_data = json.loads(json_str)
-
-                                if 'choices' in chunk_data and chunk_data['choices']:
-                                    delta = chunk_data['choices'][0].get('delta', {})
-                                    content = delta.get('content', '')
-                                    if content:
-                                        yield AIMessage(content=content)
-                        except json.JSONDecodeError:
-                            # 忽略无法解析的行
-                            continue
-                        except Exception as e:
-                            # 处理其他可能的异常
-                            continue
-                break  # 成功执行则退出重试循环
-
-            except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError) as e:
-                if attempt < max_retries - 1:
-                    time.sleep(retry_delay * (2 ** attempt))  # 指数退避
-                    continue
-                else:
-                    raise Exception(f"网络连接失败，已重试{max_retries}次: {str(e)}")
-            except Exception as e:
-                if attempt < max_retries - 1:
-                    time.sleep(retry_delay * (2 ** attempt))
-                    continue
-                else:
-                    raise Exception(f"请求失败，已重试{max_retries}次: {str(e)}")
+    # def stream(
+    #         self,
+    #         input: LanguageModelInput,
+    #         config: Optional[RunnableConfig] = None,
+    #         *,
+    #         stop: Optional[list[str]] = None,
+    #         **kwargs: Any,
+    # ) -> Iterator[BaseMessageChunk]:
+    #     url = f"{self.openai_api_base}/chat/completions"
+    #
+    #     headers = {
+    #         "Authorization": f"Bearer {self.openai_api_key.get_secret_value()}",
+    #         "Content-Type": "application/json",
+    #         "X-DashScope-OssResourceResolve": "enable"
+    #     }
+    #     # 遍历input 获取所有的content 构造新的消息体
+    #     messages = []
+    #     for message in input:
+    #         if message.type == "human":
+    #             messages.append({
+    #                 "role": "user",
+    #                 "content": message.content
+    #             })
+    #         elif message.type == "ai":
+    #             messages.append({
+    #                 "role": "assistant",
+    #                 "content": message.content
+    #             })
+    #         elif message.type == "system":
+    #             messages.append({
+    #                 "role": "system",
+    #                 "content": message.content
+    #             })
+    #     extra_body = {"enable_thinking": True},
+    #     data = {
+    #         "model": self.model_name,
+    #         "messages": messages,
+    #         "extra_body": extra_body,
+    #         "stream": True,
+    #     }
+    #
+    #     # 增加重试机制
+    #     max_retries = 3
+    #     retry_delay = 1
+    #
+    #     for attempt in range(max_retries):
+    #         try:
+    #             response = requests.post(url, headers=headers, json=data, stream=True, timeout=30)
+    #             if response.status_code != 200:
+    #                 raise Exception(f"Failed to get response: {response.text}")
+    #
+    #             for line in response.iter_lines():
+    #                 if line:
+    #                     try:
+    #                         decoded_line = line.decode('utf-8')
+    #                         # 检查是否是有效的SSE数据行
+    #                         if decoded_line.startswith('data: '):
+    #                             # 提取JSON部分
+    #                             json_str = decoded_line[6:]  # 移除 'data: ' 前缀
+    #                             # 检查是否是结束标记
+    #                             if json_str.strip() == '[DONE]':
+    #                                 continue
+    #
+    #                             # 尝试解析JSON
+    #                             chunk_data = json.loads(json_str)
+    #
+    #                             if 'choices' in chunk_data and chunk_data['choices']:
+    #                                 delta = chunk_data['choices'][0].get('delta', {})
+    #                                 content = delta.get('content', '')
+    #                                 if content:
+    #                                     yield AIMessage(content=content)
+    #                     except json.JSONDecodeError:
+    #                         # 忽略无法解析的行
+    #                         continue
+    #                     except Exception as e:
+    #                         # 处理其他可能的异常
+    #                         continue
+    #             break  # 成功执行则退出重试循环
+    #
+    #         except (requests.exceptions.ProxyError, requests.exceptions.ConnectionError) as e:
+    #             if attempt < max_retries - 1:
+    #                 time.sleep(retry_delay * (2 ** attempt))  # 指数退避
+    #                 continue
+    #             else:
+    #                 raise Exception(f"网络连接失败，已重试{max_retries}次: {str(e)}")
+    #         except Exception as e:
+    #             if attempt < max_retries - 1:
+    #                 time.sleep(retry_delay * (2 ** attempt))
+    #                 continue
+    #             else:
+    #                 raise Exception(f"请求失败，已重试{max_retries}次: {str(e)}")

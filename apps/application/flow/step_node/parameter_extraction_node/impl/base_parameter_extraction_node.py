@@ -94,11 +94,12 @@ class BaseParameterExtractionNode(IParameterExtractionNode):
     def execute(self, input_variable, variable_list, model_params_setting, model_id, **kwargs) -> NodeResult:
         input_variable = str(input_variable)
         self.context['request'] = input_variable
-        if model_params_setting is None:
+        if model_params_setting is None and model_id:
             model_params_setting = get_default_model_params_setting(model_id)
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
-                                                              **model_params_setting)
+                                                              **(model_params_setting or {}))
+
         content = generate_content(input_variable, variable_list)
         response = chat_model.invoke([HumanMessage(content=content)])
         result = json_loads(response.content, variable_list)

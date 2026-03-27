@@ -11,7 +11,10 @@ from django.utils.translation import gettext_lazy as _
 
 
 class ImageUnderstandNodeSerializer(serializers.Serializer):
-    model_id = serializers.CharField(required=True, label=_("Model id"))
+    model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
+    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
+    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
+                                               label=_("Reference Field"))
     system = serializers.CharField(required=False, allow_blank=True, allow_null=True,
                                    label=_("Role Setting"))
     prompt = serializers.CharField(required=True, label=_("Prompt word"))
@@ -27,6 +30,8 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
 
     model_params_setting = serializers.JSONField(required=False, default=dict,
                                                  label=_("Model parameter settings"))
+    model_setting = serializers.DictField(required=False,
+                                          label='Model settings')
 
 
 class IImageUnderstandNode(INode):
@@ -52,5 +57,7 @@ class IImageUnderstandNode(INode):
                 model_params_setting,
                 chat_record_id,
                 image,
+                model_id_type=None, model_id_reference=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         pass

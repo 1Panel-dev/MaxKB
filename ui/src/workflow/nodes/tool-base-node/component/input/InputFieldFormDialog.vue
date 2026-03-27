@@ -32,6 +32,15 @@
           @blur="form.label = form.label?.trim()"
         />
       </el-form-item>
+      <el-form-item :label="$t('dynamicsForm.paramForm.desc.label')">
+        <el-input
+          v-model="form.desc"
+          :placeholder="$t('dynamicsForm.paramForm.desc.placeholder')"
+          :maxlength="128"
+          show-word-limit
+          @blur="form.label = form.desc?.trim()"
+        />
+      </el-form-item>
       <el-form-item :label="$t('views.tool.form.dataType.label')">
         <el-select v-model="form.type">
           <el-option v-for="item in typeOptions" :key="item" :label="item" :value="item" />
@@ -66,6 +75,7 @@ const form = ref<any>({
   field: '',
   type: typeOptions[0],
   label: '',
+  desc: '',
   is_required: true,
 })
 

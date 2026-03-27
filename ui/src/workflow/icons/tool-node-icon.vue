@@ -1,5 +1,5 @@
 <template>
-  <el-avatar shape="square" style="background: #34c724">
+  <el-avatar shape="square"  class="avatar-green">
     <img src="@/assets/tool/icon_tool_custom.svg" style="width: 65%" alt="" />
   </el-avatar>
 </template>
