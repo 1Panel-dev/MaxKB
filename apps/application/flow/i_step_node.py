@@ -150,7 +150,12 @@ class ToolWorkflowPostHandler(WorkFlowPostHandler):
                             source_type=self.chat_info.source_type,
                             source_id=self.chat_info.source_id,
                             state=state,
+                            run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
+                                'start_time') is not None else 0,
                             meta={
+                                'input_field_list': workflow.get_input_field_list(),
+                                'output_field_list': workflow.get_output_field_list(),
+                                'input': workflow.get_input(),
                                 'output': workflow.out_context,
                                 'details': workflow.get_runtime_details(),
                                 'answer_text_list': workflow.get_answer_text_list()

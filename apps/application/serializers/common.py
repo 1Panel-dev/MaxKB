@@ -78,6 +78,7 @@ class ToolExecute:
             QuerySet(ToolRecord).update_or_create(id=tool_record.id,
                                                   create_defaults={'id': tool_record.id,
                                                                    'tool_id': tool_record.tool_id,
+                                                                   'state': tool_record.state,
                                                                    'workspace_id': tool_record.workspace_id,
                                                                    "source_type": tool_record.source_type,
                                                                    'source_id': tool_record.source_id,
@@ -88,6 +89,7 @@ class ToolExecute:
                                                       'tool_id': tool_record.tool_id,
                                                       "source_type": tool_record.source_type,
                                                       'source_id': tool_record.source_id,
+                                                      'state': tool_record.state,
                                                       'meta': tool_record.meta,
                                                       'run_time': tool_record.run_time
                                                   })

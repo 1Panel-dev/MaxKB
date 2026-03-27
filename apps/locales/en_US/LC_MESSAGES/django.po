@@ -9169,3 +9169,9 @@ msgstr "Document does not belong to current knowledge"
 
 msgid "Move an application"
 msgstr "Move an application"
+
+msgid "Batch delete applications"
+msgstr "Batch delete applications"
+
+msgid "Batch move applications"
+msgstr "Batch move applications"

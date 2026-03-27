@@ -596,3 +596,20 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'file': request.FILES.get('file'),
             }).upload())
+
+    class GenerateCode(APIView):
+        authentication_classes = [TokenAuth]
+
+        @has_permissions(
+            PermissionConstants.TOOL_CREATE.get_workspace_permission(),
+            PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
+        )
+        def post(self, request: Request, workspace_id: str):
+            return ToolSerializer.GenerateCodeSerializer(data={
+                'workspace_id': workspace_id,
+                **request.data
+            }).generate_code()

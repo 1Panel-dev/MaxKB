@@ -7,11 +7,26 @@
     @desc:
 """
 import json
-from jsonpath_ng import parse
+from jsonpath_ng.ext import parse
+from common.cache.mem_cache import MemCache
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.variable_splitting_node.i_variable_splitting_node import IVariableSplittingNode
 
+jsonpath_expr_cache = MemCache('parse_path', {
+    'TIMEOUT': 3600, # 缓存有效期为 1 小时
+    'OPTIONS': {
+        'MAX_ENTRIES': 1000, # 最多缓存 500 个条目
+        'CULL_FREQUENCY': 10, # 达到上限时，删除约 1/10 的缓存
+    },
+})
+
+def parse_and_cache(path):
+    jsonpath_expr = jsonpath_expr_cache.get(path)
+    if not jsonpath_expr:
+        jsonpath_expr = parse(path)
+        jsonpath_expr_cache.set(path, jsonpath_expr)
+    return jsonpath_expr
 
 def smart_jsonpath_search(data: dict, path: str):
     """
@@ -21,7 +36,7 @@ def smart_jsonpath_search(data: dict, path: str):
     - 多个匹配: 返回值的列表
     - 无匹配: 返回None
     """
-    jsonpath_expr = parse(path)
+    jsonpath_expr = parse_and_cache(path)
     matches = jsonpath_expr.find(data)
 
     if not matches:

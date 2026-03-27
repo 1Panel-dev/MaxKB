@@ -13,10 +13,15 @@ import uuid
 from functools import reduce
 from typing import List, Dict
 
+import uuid_utils.compat as uuid
+from django.db.models import QuerySet, OuterRef, Subquery
+from django.utils.translation import gettext as _
+from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
 from langchain_core.tools import StructuredTool
+from pydantic import Field, create_model
 
 from application.flow.common import Workflow, WorkflowMode
-from application.flow.i_step_node import NodeResult, INode, ToolWorkflowPostHandler, ToolWorkflowCallPostHandler
+from application.flow.i_step_node import NodeResult, INode, ToolWorkflowPostHandler
 from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, mcp_response_generator
 from application.models import Application, ApplicationApiKey, ApplicationAccessToken
@@ -25,14 +30,9 @@ from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
-from django.db.models import QuerySet, OuterRef, Subquery
-from django.utils.translation import gettext as _
-from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool, ToolWorkflowVersion, ToolType
-from pydantic import BaseModel, Field, create_model
-import uuid_utils.compat as uuid
 
 
 def build_schema(fields: dict):
@@ -66,14 +66,14 @@ def get_workflow_args(tool, qv):
     return build_schema({})
 
 
-def get_workflow_func(tool, qv, workspace_id):
+def get_workflow_func(node, tool, qv, workspace_id):
     tool_id = tool.id
     tool_record_id = str(uuid.uuid7())
     took_execute = ToolExecute(tool_id, tool_record_id,
                                workspace_id,
-                               None,
-                               None,
-                               True)
+                               node.workflow_manage.get_source_type(),
+                               node.workflow_manage.get_source_id(),
+                               False)
 
     def inner(**kwargs):
         from application.flow.tool_workflow_manage import ToolWorkflowManage
@@ -86,7 +86,7 @@ def get_workflow_func(tool, qv, workspace_id):
                 'workspace_id': workspace_id,
                 **kwargs},
 
-            ToolWorkflowCallPostHandler(took_execute, tool_id),
+            ToolWorkflowPostHandler(took_execute, tool_id),
             is_the_task_interrupted=lambda: False,
             child_node=None,
             start_node_id=None,
@@ -101,7 +101,7 @@ def get_workflow_func(tool, qv, workspace_id):
     return inner
 
 
-def get_tools(tool_workflow_ids, workspace_id):
+def get_tools(node, tool_workflow_ids, workspace_id):
     tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id)
     latest_subquery = ToolWorkflowVersion.objects.filter(
         tool_id=OuterRef('tool_id')
@@ -115,7 +115,7 @@ def get_tools(tool_workflow_ids, workspace_id):
     results = []
     for tool in tools:
         qv = qd.get(tool.id)
-        func = get_workflow_func(tool, qv, workspace_id)
+        func = get_workflow_func(node, tool, qv, workspace_id)
         args = get_workflow_args(tool, qv)
         tool = StructuredTool.from_function(
             func=func,
@@ -360,7 +360,7 @@ class BaseChatNode(IChatNode):
                     mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
                     mcp_servers_config = self.handle_variables(mcp_servers_config)
         tool_init_params = {}
-        tools = get_tools(tool_ids, workspace_id)
+        tools = get_tools(self, tool_ids, workspace_id)
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context['tool_ids'] = tool_ids
             for tool_id in tool_ids:

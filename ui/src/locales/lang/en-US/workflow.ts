@@ -507,7 +507,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       expression: {
         label: 'Expression',
         placeholder: 'Please enter expression',
-        tooltip: 'Please use JSON Path expressions to split variables, e.g.: $.store.book',
+        tooltip: 'Please use JSON Path expressions to split variables, e.g.: $.store.book <a href="https://pypi.org/project/jsonpath-ng/1.8.0/" target="_blank" class="expression_tip">Click for details ➜ pypi.org</a>',
       },
     },
     parameterExtractionNode: {

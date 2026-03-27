@@ -10,8 +10,8 @@ from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
 from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
-from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_workspace_id
+from oss.serializers.file import FileSerializer
 
 
 class BaseImageGenerateNode(IImageGenerateNode):
@@ -117,6 +117,8 @@ class BaseImageGenerateNode(IImageGenerateNode):
         if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
                 self.workflow_manage.flow.workflow_mode):
             return self.upload_knowledge_file(file)
+        if [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+            return self.upload_tool_file(file)
         return self.upload_application_file(file)
 
     def upload_knowledge_file(self, file):
@@ -130,6 +132,20 @@ class BaseImageGenerateNode(IImageGenerateNode):
             'meta': meta,
             'source_id': knowledge_id,
             'source_type': FileSourceType.KNOWLEDGE.value
+        }).upload()
+        return file_url
+
+    def upload_tool_file(self, file):
+        tool_id = self.workflow_params.get('tool_id')
+        meta = {
+            'debug': False,
+            'tool_id': tool_id,
+        }
+        file_url = FileSerializer(data={
+            'file': file,
+            'meta': meta,
+            'source_id': tool_id,
+            'source_type': FileSourceType.TOOL.value
         }).upload()
         return file_url
 
