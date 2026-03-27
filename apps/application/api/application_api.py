@@ -15,6 +15,7 @@ from application.serializers.application import ApplicationCreateSerializer, App
     ApplicationImportRequest, ApplicationEditSerializer, TextToSpeechRequest, SpeechToTextRequest, PlayDemoTextRequest
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
+from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 
 
 class ApplicationCreateRequest(ApplicationCreateSerializer.SimplateRequest):
@@ -158,6 +159,27 @@ class ApplicationOperateAPI(APIMixin):
                 required=True,
             )
         ]
+
+
+class ApplicationBatchOperateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+    @staticmethod
+    def get_request():
+        return BatchSerializer
+
+    @staticmethod
+    def get_move_request():
+        return BatchMoveSerializer
 
 
 class ApplicationExportAPI(APIMixin):

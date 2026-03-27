@@ -15,12 +15,14 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import ApplicationCreateAPI, ApplicationQueryAPI, ApplicationImportAPI, \
-    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI
+    ApplicationExportAPI, ApplicationOperateAPI, ApplicationEditAPI, TextToSpeechAPI, SpeechToTextAPI, PlayDemoTextAPI, \
+    ApplicationBatchOperateAPI
 from application.models import Application
-from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer
+from application.serializers.application import ApplicationSerializer, Query, ApplicationOperateSerializer, \
+    ApplicationBatchOperateSerializer
 from common import result
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions, get_is_permissions
+from common.auth.authentication import has_permissions, get_is_permissions, check_batch_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 from tools.api.tool import GetInternalToolAPI
@@ -31,6 +33,16 @@ def get_application_operation_object(application_id):
     if application_model is not None:
         return {
             'name': application_model.name
+        }
+    return {}
+
+
+def get_application_operation_object_batch(application_id_list):
+    application_model_list = QuerySet(model=Application).filter(id__in=application_id_list)
+    if application_model_list is not None:
+        return {
+            "name": f'[{",".join([app.name for app in application_model_list])}]',
+            'application_list': [{'name': app.name} for app in application_model_list]
         }
     return {}
 
@@ -296,6 +308,81 @@ class ApplicationAPI(APIView):
                 'name': request.query_params.get('name', ''),
             }).get_appstore_templates())
 
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch delete applications"),
+            summary=_("Batch delete applications"),
+            operation_id=_("Batch delete applications"),
+            parameters=ApplicationBatchOperateAPI.get_parameters(),
+            request=ApplicationBatchOperateAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Application')]
+        )
+        @has_permissions(PermissionConstants.APPLICATION_BATCH_DELETE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'application_id',
+                (PermissionConstants.APPLICATION_DELETE.get_workspace_application_permission(),
+                 PermissionConstants.APPLICATION_DELETE.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()), workspace_id=workspace_id
+            )
+            @log(menu='Application', operate='Batch delete applications',
+                 get_operation_object=lambda r, k: get_application_operation_object_batch(permitted_ids))
+            def inner(view,r, **kwargs):
+                return ApplicationBatchOperateSerializer(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id}
+                ).batch_delete({'id_list': permitted_ids})
+
+            return result.success(inner(self,request, workspace_id=workspace_id))
+
+    class BatchMove(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch move applications"),
+            summary=_("Batch move applications"),
+            operation_id=_("Batch move applications"),
+            parameters=ApplicationBatchOperateAPI.get_parameters(),
+            request=ApplicationBatchOperateAPI.get_move_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Application')]
+        )
+        @has_permissions(PermissionConstants.APPLICATION_BATCH_MOVE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'application_id',
+                (PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
+                 PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()),
+                workspace_id=workspace_id
+            )
+
+            @log(menu='Application', operate='Batch move applications',
+                 get_operation_object=lambda r, k: get_application_operation_object_batch(permitted_ids))
+            def inner(view,r, **kwargs):
+                return ApplicationBatchOperateSerializer(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id}
+                ).batch_move({'id_list': permitted_ids, 'folder_id': request.data.get('folder_id')})
+
+            return result.success(inner(self,request, workspace_id=workspace_id))
 
 class McpServers(APIView):
     authentication_classes = [TokenAuth]

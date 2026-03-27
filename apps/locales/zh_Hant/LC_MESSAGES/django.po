@@ -9289,3 +9289,9 @@ msgstr "文件不屬於當前知識庫"
 
 msgid "Move an application"
 msgstr "移動應用程序"
+
+msgid "Batch delete applications"
+msgstr "批量刪除應用"
+
+msgid "Batch move applications"
+msgstr "批量移動應用"

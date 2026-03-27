@@ -46,6 +46,7 @@ from common.utils.common import get_file_content, restricted_loads, generate_uui
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import Knowledge, KnowledgeScope, File, FileSourceType
+from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeModelSerializer
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model
@@ -1314,3 +1315,52 @@ class ApplicationOperateSerializer(serializers.Serializer):
         tts_model_id = instance.pop('tts_model_id')
         model = get_model_instance_by_model_workspace_id(tts_model_id, self.data.get('workspace_id'), **instance)
         return model.text_to_speech(text)
+
+
+class ApplicationBatchOperateSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+
+    @transaction.atomic
+    def batch_delete(self, instance: Dict, with_valid=True):
+        from trigger.handler.simple_tools import deploy
+        from trigger.serializers.trigger import TriggerModelSerializer
+
+        if with_valid:
+            BatchSerializer(data=instance).is_valid(model=Application,raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get("id_list")
+        workspace_id = self.data.get('workspace_id')
+
+        QuerySet(ApplicationVersion).filter(application_id__in=id_list).delete()
+        QuerySet(ResourceMapping).filter(
+            Q(target_id__in=id_list) | Q(source_id__in=id_list)
+        ).delete()
+
+        QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).delete()
+
+        trigger_ids = list(
+            QuerySet(TriggerTask).filter(
+                source_type="APPLICATION", source_id__in=id_list
+            ).values('trigger_id').distinct()
+        )
+        QuerySet(TriggerTask).filter(source_type="APPLICATION", source_id__in=id_list).delete()
+
+        for trigger_id in trigger_ids:
+            trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
+            if trigger and trigger.is_active:
+                deploy(TriggerModelSerializer(trigger).data, **{})
+        return True
+
+    def batch_move(self, instance: Dict, with_valid=True):
+        if with_valid:
+            BatchMoveSerializer(data=instance).is_valid(model=Application, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get("id_list")
+        folder_id = instance.get("folder_id")
+        workspace_id = self.data.get('workspace_id')
+
+        QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
+        return True

@@ -62,6 +62,8 @@ class BatchSerializer(serializers.Serializer):
                 raise AppApiException(500, _('The following id does not exist: {error_id_list}').format(
                     error_id_list=error_id_list))
 
+class BatchMoveSerializer(BatchSerializer):
+    folder_id = serializers.CharField(required=True, label=_('folder id'))
 
 class ProblemParagraphObject:
     def __init__(self, knowledge_id: str, document_id: str, paragraph_id: str, problem_content: str):
