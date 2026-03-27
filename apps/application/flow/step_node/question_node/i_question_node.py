@@ -42,7 +42,12 @@ class IQuestionNode(INode):
         return QuestionNodeSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+            WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'history_chat_record': [], 'stream': True, 'chat_id': None, 'chat_record_id': None})
+        else:
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, model_id, system, prompt, dialogue_number, history_chat_record, stream, chat_id, chat_record_id,
                 model_params_setting=None, model_id_type=None, model_id_reference=None,

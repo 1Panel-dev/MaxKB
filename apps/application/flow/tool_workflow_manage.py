@@ -6,6 +6,7 @@
     @date：2026/3/12 15:17
     @desc:
 """
+import time
 from concurrent.futures import ThreadPoolExecutor
 
 from django.db import close_old_connections
@@ -32,6 +33,14 @@ class ToolWorkflowManage(WorkflowManage):
     def get_params_serializer_class(self):
         return ToolFlowParamsSerializer
 
+    def run(self):
+        self.context['start_time'] = time.time()
+        close_old_connections()
+        language = get_language()
+        if self.params.get('stream'):
+            return self.run_stream(self.start_node, None, language)
+        return self.run_block(language)
+
     def stream(self):
         close_old_connections()
         language = get_language()
@@ -47,6 +56,30 @@ class ToolWorkflowManage(WorkflowManage):
         @return:
         """
         return self.flow.get_node('tool-base-node')
+
+    def get_input_field_list(self):
+        """
+        获取输入字段列表
+        @return: 输入字段配置
+        """
+        base_node = self.get_base_node()
+        return base_node.properties.get("user_input_field_list") or []
+
+    def get_output_field_list(self):
+        """
+        获取输出字段列表配置
+        @return:  输出字段列表配置
+        """
+        base_node = self.get_base_node()
+        return base_node.properties.get("user_output_field_list") or []
+
+    def get_input(self):
+        """
+        获取用户输入
+        @return: 用户输入
+        """
+        input_field_list = self.get_input_field_list()
+        return {f.get('field'): self.params.get(f.get('field')) for f in input_field_list}
 
     def get_source_type(self):
         return "TOOL"

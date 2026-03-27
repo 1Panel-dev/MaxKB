@@ -34,7 +34,7 @@ class BaseToolStartStepNode(IToolStartNode):
         global_value = {}
         params = self.workflow_manage.get_body()
         for item in base_node.properties.get('user_input_field_list', []):
-            global_value[item.get('field')] = params[item.get('field')]
+            global_value[item.get('field')] = params.get(item.get('field'))
 
         self.workflow_manage.out_context = {
             item.get('field'): None
@@ -48,7 +48,7 @@ class BaseToolStartStepNode(IToolStartNode):
         for field in self.node.properties.get('config')['globalFields']:
             key = field['value']
             global_fields.append({
-                'label': field['label'],
+                'label': field.get('label'),
                 'key': key,
                 'value': self.workflow_manage.context[key] if key in self.workflow_manage.context else ''
             })
