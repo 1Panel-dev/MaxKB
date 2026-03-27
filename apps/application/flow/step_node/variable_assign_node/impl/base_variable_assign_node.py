@@ -60,14 +60,14 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 val = variable['value']
                 evaluation(variable, val)
                 result['output_value'] = val
-        elif variable['source'] == 'null':
-            val = None
-            evaluation(variable, val)
-            result['output_value'] = val
-        else:
+        elif variable['source'] == 'referencing':
             reference = self.get_reference_content(variable['reference'])
             evaluation(variable, reference)
             result['output_value'] = reference
+        else:
+            val = None
+            evaluation(variable, val)
+            result['output_value'] = val
 
         # 获取输入输出值的类型，用于显示在执行详情页面中
         result['input_type'] = type(result.get('input_value')).__name__ if result.get('input_value') is not None else 'null'
