@@ -60,6 +60,10 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 val = variable['value']
                 evaluation(variable, val)
                 result['output_value'] = val
+        elif variable['source'] == 'null':
+            val = None
+            evaluation(variable, val)
+            result['output_value'] = val
         else:
             reference = self.get_reference_content(variable['reference'])
             evaluation(variable, reference)
@@ -67,26 +71,27 @@ class BaseVariableAssignNode(IVariableAssignNode):
         return result
 
     def execute(self, variable_list, **kwargs) -> NodeResult:
-        #
         result_list = []
-        is_chat = False
+        contains_chat_variable = False
         for variable in variable_list:
             if 'fields' not in variable:
                 continue
+
             if 'global' == variable['fields'][0]:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            if 'chat' == variable['fields'][0]:
+            elif 'chat' == variable['fields'][0]:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
-                is_chat = True
-            if 'loop' == variable['fields'][0]:
+                contains_chat_variable = True
+            elif 'loop' == variable['fields'][0]:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
-            if 'output' == variable['fields'][0]:
+            elif 'output' == variable['fields'][0]:
                 result = self.handle(variable, self.out_evaluation)
                 result_list.append(result)
-        if is_chat:
+
+        if contains_chat_variable:
             from application.flow.loop_workflow_manage import LoopWorkflowManage
             if isinstance(self.workflow_manage, LoopWorkflowManage):
                 self.workflow_manage.parentWorkflowManage.get_chat_info().set_chat_variable(
