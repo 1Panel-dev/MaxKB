@@ -71,7 +71,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
         result_list = []
         is_chat = False
         for variable in variable_list:
-            if 'fields' not in variable:
+            if not variable.get('fields'):
                 continue
 
             if 'global' == variable['fields'][0]:
