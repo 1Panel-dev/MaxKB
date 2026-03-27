@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile } from '@/request/index'
+import { get, post, del, put, exportFile, postStream } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { toolData } from '@/api/type/tool'
@@ -156,6 +156,15 @@ const uploadSkillFile: (data: toolData, loading?: Ref<boolean>) => Promise<Resul
   return put(`${prefix}/upload_skill_file`, data, undefined, loading)
 }
 
+const generateCode: (data:any) => Promise<Result<any>> = (
+  data: any,
+) => {
+  const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(
+    `${p}${prefix}/generate_code`,
+    data,
+  )
+}
 
 
 export default {
@@ -173,4 +182,5 @@ export default {
   pageToolRecord,
   getToolRecordDetail,
   uploadSkillFile,
+  generateCode,
 }

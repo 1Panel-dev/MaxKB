@@ -71,7 +71,7 @@ class BaseIntentNode(IIntentNode):
         # 获取模型实例
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         chat_model = get_model_instance_by_model_workspace_id(
-            model_id, workspace_id, **model_params_setting
+            model_id, workspace_id, **(model_params_setting or {})
         )
 
         # 获取历史对话

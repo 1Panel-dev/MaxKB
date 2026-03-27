@@ -30,6 +30,8 @@ class ImageUnderstandNodeSerializer(serializers.Serializer):
 
     model_params_setting = serializers.JSONField(required=False, default=dict,
                                                  label=_("Model parameter settings"))
+    model_setting = serializers.DictField(required=False,
+                                          label='Model settings')
 
 
 class IImageUnderstandNode(INode):
@@ -56,5 +58,6 @@ class IImageUnderstandNode(INode):
                 chat_record_id,
                 image,
                 model_id_type=None, model_id_reference=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
         pass

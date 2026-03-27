@@ -299,6 +299,18 @@ const debugToolWorkflow: (tool_id: string, data: any) => Promise<any> = (tool_id
   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
   return postStream(`${p}${prefix.value}/${tool_id}/debug`, data)
 }
+
+const generateCode: (data:any) => Promise<Result<any>> = (
+  data: any,
+) => {
+  const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(
+    `${p}${prefix.value}/generate_code`,
+    data,
+  )
+}
+
+
 export default {
   getToolList,
   getAllToolList,
@@ -326,4 +338,5 @@ export default {
   publish,
   exportToolWorkflow,
   debugToolWorkflow,
+  generateCode,
 }

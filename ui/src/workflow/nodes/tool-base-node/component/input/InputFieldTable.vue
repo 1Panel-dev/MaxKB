@@ -79,6 +79,7 @@ function openChangeTitleDialog() {
 
 function deleteField(index: any) {
   inputFieldList.value.splice(index, 1)
+  set(props.nodeModel.properties, 'user_input_field_list', cloneDeep(inputFieldList.value))
   props.nodeModel.graphModel.eventCenter.emit('refreshFieldList')
   onDragHandle()
 }

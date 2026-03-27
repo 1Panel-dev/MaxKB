@@ -432,7 +432,7 @@
     <McpToolConfigDialog ref="McpToolConfigDialogRef" @refresh="refresh" />
     <ResourceAuthorizationDrawer :type="SourceTypeEnum.TOOL" ref="ResourceAuthorizationDrawerRef" />
     <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
-    <ToolRecordDrawer ref="toolRecordDrawerRef" />
+    <ExecutionRecordDrawer ref="toolRecordDrawerRef" />
     <ResourceTriggerDrawer
       ref="resourceTriggerDrawerRef"
       :source="SourceTypeEnum.TOOL"
@@ -469,7 +469,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import permissionMap from '@/permission'
 import McpToolConfigDialog from '@/views/tool/component/McpToolConfigDialog.vue'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
-import ToolRecordDrawer from '@/views/tool/execution-record/TriggerRecordDrawer.vue'
+import ExecutionRecordDrawer from '@/views/tool-workflow/execution-record/ExecutionRecordDrawer.vue'
 import SkillToolFormDrawer from '@/views/tool/SkillToolFormDrawer.vue'
 
 const { user } = useStore()
@@ -840,7 +840,7 @@ const openResourceMappingDrawer = (tool: any) => {
   resourceMappingDrawerRef.value?.open('TOOL', tool)
 }
 
-const toolRecordDrawerRef = ref<InstanceType<typeof ToolRecordDrawer>>()
+const toolRecordDrawerRef = ref<InstanceType<typeof ExecutionRecordDrawer>>()
 const openToolRecordDrawer = (data: any) => {
   toolRecordDrawerRef.value?.open(data)
 }

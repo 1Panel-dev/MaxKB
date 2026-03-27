@@ -51,6 +51,10 @@ export default {
       placeholder: '請選擇組件類型',
       requiredMessage: '組件類型 為必填屬性',
     },
+    desc: {
+      label: '描述',
+      placeholder: '請輸入描述',
+    },
   },
   DatePicker: {
     placeholder: '選擇日期',

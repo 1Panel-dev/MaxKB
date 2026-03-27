@@ -9,15 +9,17 @@ import re
 import tempfile
 import zipfile
 from typing import Dict
-from django.core.cache import cache
+
 import requests
 import uuid_utils.compat as uuid
 from django.core import validators
+from django.core.cache import cache
 from django.db import transaction
 from django.db.models import QuerySet, Q, Subquery, OuterRef, CharField, Value, When, Case
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from langchain_core.messages import HumanMessage, AIMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from pylint.lint import Run
 from pylint.reporters import JSON2Reporter
@@ -36,6 +38,7 @@ from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType, Knowledge
 from maxkb.const import PROJECT_DIR
+from models_provider.models import Model
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
@@ -1107,6 +1110,69 @@ class ToolSerializer(serializers.Serializer):
             )
             file.save(self.data.get('file').read())
             return file_id
+
+    class GenerateCodeSerializer(serializers.Serializer):
+        workspace_id = serializers.CharField(required=True, label=_('Workspace ID'))
+        model_id = serializers.UUIDField(required=True, label=_('Model ID'))
+        prompt = serializers.CharField(required=True, label=_('Prompt'))
+        messages = serializers.ListField(required=True, label=_('Messages'))
+        model_params_setting = serializers.DictField(required=False, default=dict, label=_('Model Params Setting'))
+        init_field_list = serializers.ListField(required=False, default=list, label=_('Init Field List'))
+        input_field_list = serializers.ListField(required=False, default=list, label=_('Input Field List'))
+
+        def generate_code(self):
+            from models_provider.tools import get_model_instance_by_model_workspace_id
+            from application.flow.tools import to_stream_response_simple
+
+            self.is_valid(raise_exception=True)
+
+            workspace_id = self.data.get('workspace_id')
+            model_id = self.data.get('model_id')
+            prompt = self.data.get('prompt')
+            messages = self.data.get('messages')
+            model_params_setting = self.data.get('model_params_setting')
+            init_field_list = self.data.get('init_field_list')
+            input_field_list = self.data.get('input_field_list')
+
+            init_params = list({i["field"]: i.get('default_value') for i in init_field_list}.keys())
+            input_params = list({field.get('name'): field.get('value') for field in input_field_list}.keys())
+
+            message = messages[-1]['content']
+            q = prompt.replace(
+                "{userInput}", message
+            ).replace(
+                "{params}", ','.join(init_params + input_params)
+            )
+
+            messages[-1]['content'] = q
+            SUPPORTED_MODEL_TYPES = ["LLM"]
+            model_exist = QuerySet(Model).filter(
+                id=model_id,
+                model_type__in=SUPPORTED_MODEL_TYPES
+            ).exists()
+            if not model_exist:
+                raise Exception(_("Model does not exists or is not an LLM model"))
+
+            def process():
+                model = get_model_instance_by_model_workspace_id(
+                    model_id=model_id, workspace_id=workspace_id, **model_params_setting
+                )
+                try:
+                    for r in model.stream([
+                        # SystemMessage(content=SYSTEM_ROLE),
+                        *[
+                            HumanMessage(
+                                content=m.get('content')
+                            ) if m.get('role') == 'user' else AIMessage(
+                                content=m.get('content')
+                            ) for m in messages
+                        ]
+                    ]):
+                        yield 'data: ' + json.dumps({'content': r.content}) + '\n\n'
+                except Exception as e:
+                    yield 'data: ' + json.dumps({'error': str(e)}) + '\n\n'
+
+            return to_stream_response_simple(process())
 
 
 class ToolTreeSerializer(serializers.Serializer):

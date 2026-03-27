@@ -279,6 +279,12 @@ function getFolder() {
 
 function getList() {
   const folder_id = currentFolder.value?.id || user.getWorkspaceId()
+  const query: any = {}
+  if (props.tool_type.includes(',')) {
+    query['tool_type_list'] = props.tool_type.split(',')
+  } else {
+    query['tool_type'] = props.tool_type
+  }
   loadSharedApi({
     type: 'tool',
     isShared: folder_id === 'share',
@@ -286,7 +292,7 @@ function getList() {
   })
     .getToolList({
       folder_id: folder_id,
-      tool_type: props.tool_type,
+      ...query,
     })
     .then((res: any) => {
       toolList.value = res.data?.tools || res.data || []

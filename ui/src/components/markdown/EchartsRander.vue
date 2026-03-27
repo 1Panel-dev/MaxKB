@@ -1,6 +1,12 @@
 <template>
   <div class="charts-container">
-    <iframe v-show="false" ref="iframeRef" :srcdoc="iframeHtml" @load="onIframeLoad"></iframe>
+    <iframe
+      v-show="false"
+      ref="iframeRef"
+      sandbox="allow-scripts"
+      :srcdoc="iframeHtml"
+      @load="onIframeLoad"
+    ></iframe>
     <div ref="chartsRef" :style="style" v-resize="onResize"></div>
   </div>
 </template>

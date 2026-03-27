@@ -13,43 +13,68 @@
       >
         <el-form-item
           :label="$t('views.application.form.aiModel.label')"
-          prop="model_id"
+          :prop="form_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
             required: true,
-            message: $t('views.application.form.aiModel.placeholder'),
+            message:
+              form_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.aiModel.placeholder'),
             trigger: 'change',
           }"
         >
           <template #label>
-            <div class="flex-between">
+            <div class="flex-between w-full">
               <div>
                 <span
                   >{{ $t('views.application.form.aiModel.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
+              <el-select
+                v-model="form_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="form_data.model_id_type !== 'reference'">
+            <ModelSelect
+              @change="model_change"
+              @wheel="wheel"
+              :teleported="false"
+              v-model="form_data.model_id"
+              :placeholder="$t('views.application.form.aiModel.placeholder')"
+              :options="modelOptions"
+              @submitModel="getSelectModel"
+              showFooter
+              :model-type="'LLM'"
+            ></ModelSelect>
+            <div class="ml-8">
               <el-button
-                type="primary"
-                link
                 :disabled="!form_data.model_id"
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
+                <el-icon>
+                  <Operation />
+                </el-icon>
               </el-button>
             </div>
-          </template>
-          <ModelSelect
-            @change="model_change"
-            @wheel="wheel"
-            :teleported="false"
-            v-model="form_data.model_id"
-            :placeholder="$t('views.application.form.aiModel.placeholder')"
-            :options="modelOptions"
-            @submitModel="getSelectModel"
-            showFooter
-            :model-type="'LLM'"
-          ></ModelSelect>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.model_id_reference"
+          />
         </el-form-item>
         <el-form-item>
           <template #label>
@@ -152,7 +177,7 @@
 </template>
 <script setup lang="ts">
 import { set, groupBy } from 'lodash'
-
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import type { FormInstance } from 'element-plus'
@@ -211,6 +236,8 @@ const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
+  model_id_type: 'custom',
+  model_id_reference: [],
   system: t('workflow.nodes.questionNode.systemDefault'),
   prompt: defaultPrompt,
   dialogue_number: 1,
@@ -228,6 +255,12 @@ const openAIParamSettingDialog = (modelId: string) => {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.model_id_type) {
+        set(props.nodeModel.properties.node_data, 'model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
@@ -238,14 +271,19 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   },
 })
+
 const props = defineProps<{ nodeModel: any }>()
 
 const questionNodeFormRef = ref<FormInstance>()
 
 const modelOptions = ref<any>(null)
+const nodeCascaderRef = ref()
 
 const validate = () => {
-  return questionNodeFormRef.value?.validate().catch((err) => {
+  return Promise.all([
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    questionNodeFormRef.value?.validate(),
+  ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }

@@ -10,11 +10,13 @@ from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AI
 
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.image_understand_step_node.i_image_understand_node import IImageUnderstandNode
+from application.flow.tools import Reasoning
 from knowledge.models import File
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
 
-def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str):
+def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
+                   reasoning_content: str):
     chat_model = node_variable.get('chat_model')
     message_tokens = node_variable['usage_metadata']['output_tokens'] if 'usage_metadata' in node_variable else 0
     answer_tokens = chat_model.get_num_tokens(answer)
@@ -24,6 +26,7 @@ def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wo
     node.context['history_message'] = node_variable['history_message']
     node.context['question'] = node_variable['question']
     node.context['run_time'] = time.time() - node.context['start_time']
+    node.context['reasoning_content'] = reasoning_content
     if workflow.is_result(node, NodeResult(node_variable, workflow_variable)):
         node.answer_text = answer
 
@@ -38,17 +41,55 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     """
     response = node_variable.get('result')
     answer = ''
+    reasoning_content = ''
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start', '<think>'),
+                          model_setting.get('reasoning_content_end', '</think>'))
+    response_reasoning_content = False
+
     for chunk in response:
+        if workflow.is_the_task_interrupted():
+            break
+
+        # 处理 reasoning content
+        reasoning_chunk = reasoning.get_reasoning_content(chunk)
+        content_chunk = reasoning_chunk.get('content')
+        if 'reasoning_content' in chunk.additional_kwargs:
+            response_reasoning_content = True
+            reasoning_content_chunk = chunk.additional_kwargs.get('reasoning_content', '')
+        else:
+            reasoning_content_chunk = reasoning_chunk.get('reasoning_content')
+
+        answer += content_chunk
+        if reasoning_content_chunk is None:
+            reasoning_content_chunk = ''
+        reasoning_content += reasoning_content_chunk
+
+        # 处理 chunk.content 为 list 的情况
         if isinstance(chunk.content, list):
             for chunk_item in chunk.content:
                 text = chunk_item.get("text", "")
-                answer += text
-                yield text
+                yield {'content': text,
+                       'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                                         False) else ''}
         else:
             text = chunk.content or ""
-            answer += text
-            yield text
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+            yield {'content': text,
+                   'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                                     False) else ''}
+
+    reasoning_chunk = reasoning.get_end_reasoning_content()
+    answer += reasoning_chunk.get('content')
+    reasoning_content_chunk = ""
+    if not response_reasoning_content:
+        reasoning_content_chunk = reasoning_chunk.get(
+            'reasoning_content')
+    yield {'content': reasoning_chunk.get('content'),
+           'reasoning_content': reasoning_content_chunk if model_setting.get('reasoning_content_enable',
+                                                                             False) else ''}
+    _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
 def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow):
@@ -60,8 +101,20 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     @param workflow:           工作流管理器
     """
     response = node_variable.get('result')
-    answer = response.content
-    _write_context(node_variable, workflow_variable, node, workflow, answer)
+    model_setting = node.context.get('model_setting',
+                                     {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                                      'reasoning_content_start': '<think>'})
+    reasoning = Reasoning(model_setting.get('reasoning_content_start'), model_setting.get('reasoning_content_end'))
+    reasoning_result = reasoning.get_reasoning_content(response)
+    reasoning_result_end = reasoning.get_end_reasoning_content()
+    content = reasoning_result.get('content') + reasoning_result_end.get('content')
+    meta = {**response.response_metadata, **response.additional_kwargs}
+    if 'reasoning_content' in meta:
+        reasoning_content = (meta.get('reasoning_content', '') or '')
+    else:
+        reasoning_content = (reasoning_result.get('reasoning_content') or '') + (
+                reasoning_result_end.get('reasoning_content') or '')
+    _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
 def file_id_to_base64(file_id: str):
@@ -84,7 +137,12 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 chat_record_id,
                 image,
                 model_id_type=None, model_id_reference=None,
+                model_setting=None,
                 **kwargs) -> NodeResult:
+        if model_setting is None:
+            model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
+                             'reasoning_content_start': '<think>'}
+        self.context['model_setting'] = model_setting
         # 处理引用类型
         if model_id_type == 'reference' and model_id_reference:
             reference_data = self.workflow_manage.get_reference_field(
@@ -266,6 +324,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                                     'history_message') is not None else [])],
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
+            'reasoning_content': self.context.get('reasoning_content'),
             'type': self.node.type,
             'message_tokens': self.context.get('message_tokens'),
             'answer_tokens': self.context.get('answer_tokens'),

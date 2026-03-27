@@ -51,6 +51,10 @@ export default {
       placeholder: '请选择组件类型',
       requiredMessage: '组建类型 为必填属性',
     },
+    desc: {
+      label: '描述',
+      placeholder: '请输入描述',
+    },
   },
   DatePicker: {
     placeholder: '选择日期',

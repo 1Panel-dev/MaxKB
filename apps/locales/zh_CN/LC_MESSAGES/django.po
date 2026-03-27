@@ -9292,3 +9292,9 @@ msgstr "文档不属于当前知识库"
 
 msgid "Move an application"
 msgstr "移动应用程序"
+
+msgid "Batch delete applications"
+msgstr "批量删除应用"
+
+msgid "Batch move applications"
+msgstr "批量移动应用"

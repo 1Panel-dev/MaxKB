@@ -13,10 +13,13 @@
       >
         <el-form-item
           :label="$t('workflow.nodes.videoUnderstandNode.model.label')"
-          prop="model_id"
+          :prop="form_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
             required: true,
-            message: $t('workflow.nodes.videoUnderstandNode.model.requiredMessage'),
+            message:
+              form_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('workflow.nodes.videoUnderstandNode.model.requiredMessage'),
             trigger: 'change',
           }"
         >
@@ -28,27 +31,48 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
+              <el-select
+                v-model="form_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="form_data.model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              v-model="form_data.model_id"
+              :placeholder="$t('workflow.nodes.videoUnderstandNode.model.requiredMessage')"
+              :options="modelOptions"
+              showFooter
+              :model-type="'IMAGE'"
+            ></ModelSelect>
+            <div class="ml-8">
               <el-button
                 :disabled="!form_data.model_id"
-                type="primary"
-                link
                 @click="openAIParamSettingDialog(form_data.model_id)"
                 @refreshForm="refreshParam"
               >
-                <AppIcon iconName="app-setting"></AppIcon>
+                <el-icon>
+                  <Operation />
+                </el-icon>
               </el-button>
             </div>
-          </template>
-
-          <ModelSelect
-            @wheel="wheel"
-            :teleported="false"
-            v-model="form_data.model_id"
-            :placeholder="$t('workflow.nodes.videoUnderstandNode.model.requiredMessage')"
-            :options="modelOptions"
-            showFooter
-            :model-type="'IMAGE'"
-          ></ModelSelect>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.model_id_reference"
+          />
         </el-form-item>
 
         <el-form-item>
@@ -168,6 +192,31 @@
             v-model="form_data.video_list"
           />
         </el-form-item>
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
+              </div>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                  v-if="form_data.model_setting.reasoning_content_enable"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="form_data.model_setting.reasoning_content_enable"
+                />
+              </div>
+            </div>
+          </template>
+        </el-form-item>
         <el-form-item
           :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
           @click.prevent
@@ -198,6 +247,10 @@
       </el-form>
     </el-card>
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+        <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
     <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
   </NodeContainer>
 </template>
@@ -205,7 +258,7 @@
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref, inject } from 'vue'
-import { groupBy, set } from 'lodash'
+import {cloneDeep, groupBy, set} from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
@@ -214,6 +267,8 @@ import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { WorkflowMode } from '@/enums/application'
+import ReasoningParamSettingDialog
+  from "@/views/application/component/ReasoningParamSettingDialog.vue";
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
@@ -231,6 +286,10 @@ const apiType = computed(() => {
     return 'workspace'
   }
 })
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
+const openReasoningParamSettingDialog = () => {
+  ReasoningParamSettingDialogRef.value?.open(form_data.value.model_setting)
+}
 
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
@@ -261,6 +320,8 @@ const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
+  model_id_type: 'custom',
+  model_id_reference: [],
   system: '',
   prompt: defaultPrompt,
   dialogue_number: 0,
@@ -269,11 +330,29 @@ const form = {
   temperature: null,
   max_tokens: null,
   video_list: ['start-node', 'video'],
+  model_setting: {
+    reasoning_content_start: '<think>',
+    reasoning_content_end: '</think>',
+    reasoning_content_enable: false,
+  },
 }
 
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.model_id_type) {
+        set(props.nodeModel.properties.node_data, 'model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
+      if (!props.nodeModel.properties.node_data.model_setting) {
+        set(props.nodeModel.properties.node_data, 'model_setting', {
+          reasoning_content_start: '<think>',
+          reasoning_content_end: '</think>',
+          reasoning_content_enable: false,
+        })
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
@@ -329,6 +408,16 @@ const replace = (v: any) => {
 
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
+}
+
+function submitReasoningDialog(val: any) {
+  let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
+  model_setting = {
+    ...model_setting,
+    ...val,
+  }
+
+  set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
 }
 
 onMounted(() => {

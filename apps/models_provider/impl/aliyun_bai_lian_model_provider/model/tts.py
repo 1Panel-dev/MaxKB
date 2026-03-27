@@ -26,7 +26,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'voice': 'longxiaochun', 'speech_rate': 1.0}}
+        optional_params = {'params': {}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value

@@ -15,6 +15,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/tool/tool_list', views.ToolView.Query.as_view()),
     path('workspace/<str:workspace_id>/tool/test_connection', views.ToolView.TestConnection.as_view()),
     path('workspace/<str:workspace_id>/tool/upload_skill_file', views.ToolView.UploadSkillFile.as_view()),
+    path('workspace/<str:workspace_id>/tool/generate_code', views.ToolView.GenerateCode.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>', views.ToolView.Operate.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/publish', views.ToolWorkflowView.Publish.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/debug', views.ToolWorkflowDebugView.as_view()),
