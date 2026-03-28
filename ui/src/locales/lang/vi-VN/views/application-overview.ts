@@ -1,0 +1,105 @@
+export default {
+  title: 'Overview',
+  appInfo: {
+    publicAccessLink: 'URL công khai',
+    openText: 'On',
+    closeText: 'Off',
+    demo: 'Preview',
+    embedInWebsite: 'Nhận mã nhúng',
+    accessControl: 'Kiểm soát truy cập',
+    displaySetting: 'Cài đặt hiển thị',
+    apiAccessCredentials: 'Thông tin xác thực truy cập API',
+    apiKey: 'API Key',
+    refreshToken: {
+      msgConfirm1: 'Bạn có chắc chắn muốn tạo lại URL công khai không?',
+      msgConfirm2:
+        'Việc tạo lại URL công khai sẽ ảnh hưởng đến mọi mã nhúng hiện có trên trang web của bên thứ ba. Bạn sẽ cần cập nhật mã nhúng và tích hợp lại mã đó vào các trang web đó. Tiến hành thận trọng!',
+      refreshSuccess: 'Đã làm mới thành công',
+    },
+    APIKeyDialog: {
+      saveSettings: 'Lưu cài đặt',
+      msgConfirm1: 'Bạn có chắc chắn muốn xóa Khóa API',
+      msgConfirm2:
+        'Hành động này là không thể đảo ngược. Sau khi xóa, Khóa API sẽ không thể khôi phục được. Bạn vẫn muốn tiếp tục chứ?',
+    },
+    EmbedDialog: {
+      fullscreenModeTitle: 'Chế độ toàn màn hình',
+      copyInstructions: 'Sao chép mã bên dưới để nhúng',
+      floatingModeTitle: 'Chế độ nổi',
+      mobileModeTitle: 'Chế độ di động',
+    },
+    LimitDialog: {
+      clientQueryLimitLabel: 'Giới hạn truy vấn cho mỗi khách hàng',
+      authentication: 'Authentication',
+      authenticationValue: 'Truy cập bằng mật khẩu',
+      timesDays: 'truy vấn mỗi ngày',
+      whitelistLabel: 'Tên miền được phép',
+      whitelistPlaceholder:
+        'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+      loginMethod: 'Phương thức đăng nhập',
+      loginMethodRequired: 'Vui lòng chọn phương thức đăng nhập',
+      toSettingChatUser: 'Đi tới cấu hình người dùng trò chuyện',
+      displayCodeRequired: 'Vui lòng nhập số lần thử không thành công',
+      authenticationTooltip:
+        'Việc bật xác thực đăng nhập yêu cầu người dùng trò chuyện phải đặt cấu hình ủy quyền cho cả tổng đài viên và cơ sở kiến ​​thức liên quan của nó. Nếu không có sự ủy quyền phù hợp, người dùng sẽ không thể đăng nhập hoặc truy cập các tính năng truy xuất cơ sở kiến ​​thức.',
+    },
+    SettingAPIKeyDialog: {
+      allowCrossDomainLabel: 'Cho phép truy cập tên miền chéo',
+      crossDomainPlaceholder:
+        'Enter allowed cross-domain addresses. If enabled but left blank, no restrictions will apply.\nEnter one per line, e.g.:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+    },
+  },
+  SettingDisplayDialog: {
+    showSourceLabel: 'Hiển thị nguồn kiến ​​thức',
+    showExecutionDetail: 'Hiển thị chi tiết thực hiện',
+    restoreDefault: 'Khôi phục mặc định',
+    customThemeColor: 'Màu chủ đề tùy chỉnh',
+    headerTitleFontColor: 'Tiêu đề Tiêu đề Màu phông chữ',
+    default: 'Default',
+    askUserAvatar: 'Avatar người dùng (Hỏi)',
+    replace: 'Replace',
+
+    imageMessage:
+      'Kích thước đề xuất: 32×32 pixel. Hỗ trợ các định dạng JPG, PNG và GIF. Kích thước tối đa: 10 MB',
+    AIAvatar: 'Hình đại diện AI',
+    display: 'Display',
+    floatIcon: 'Biểu tượng nổi',
+    iconDefaultPosition: 'Vị trí biểu tượng mặc định',
+    iconPosition: {
+      left: 'Left',
+      right: 'Right',
+      bottom: 'Bottom',
+      top: 'Top',
+    },
+    draggablePosition: 'Vị trí có thể kéo',
+    showHistory: 'Hiển thị lịch sử trò chuyện',
+    displayGuide: 'Hiển thị hình ảnh hướng dẫn (Chế độ nổi)',
+    disclaimer: 'Disclaimer',
+    disclaimerValue: 'Nội dung này do AI tạo ra và chỉ mang tính chất tham khảo.',
+    chatBackground: 'Nền trò chuyện',
+    chatBackgroundMessage: 'Các định dạng được hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 10 MB.',
+  },
+  monitor: {
+    monitoringStatistics: 'Thống kê theo dõi',
+    customRange: 'Phạm vi tùy chỉnh',
+    startDatePlaceholder: 'Ngày bắt đầu',
+    endDatePlaceholder: 'Ngày kết thúc',
+    pastDayOptions: {
+      past7Days: '7 ngày qua',
+      past30Days: '30 ngày qua',
+      past90Days: '90 ngày qua',
+      past183Days: '6 tháng qua',
+    },
+    charts: {
+      customerTotal: 'Tổng số người dùng',
+      customerNew: 'Người dùng mới',
+      queryCount: 'Tổng số truy vấn',
+      tokensTotal: 'Tổng số token được sử dụng',
+      userSatisfaction: 'Số liệu phản hồi của người dùng',
+      approval: 'Like',
+      disapproval: 'Dislike',
+      tokenUsage: 'Mã thông báo do người dùng sử dụng',
+      topQuestions: 'Số lượng câu hỏi của người dùng',
+    },
+  },
+}

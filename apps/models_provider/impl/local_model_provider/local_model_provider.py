@@ -21,10 +21,13 @@ from models_provider.impl.local_model_provider.model.reranker import LocalRerank
 
 embedding_text2vec_base_chinese = ModelInfo('shibing624/text2vec-base-chinese', '', ModelTypeConst.EMBEDDING,
                                             LocalEmbeddingCredential(), LocalEmbedding)
+embedding_vietnamese = ModelInfo('AITeamVN/Vietnamese_Embedding', _('Vietnamese embedding model'),
+                                 ModelTypeConst.EMBEDDING, LocalEmbeddingCredential(), LocalEmbedding)
 bge_reranker_v2_m3 = ModelInfo('BAAI/bge-reranker-v2-m3', '', ModelTypeConst.RERANKER,
                                LocalRerankerCredential(), LocalReranker)
 
 model_info_manage = (ModelInfoManage.builder().append_model_info(embedding_text2vec_base_chinese)
+                     .append_model_info(embedding_vietnamese)
                      .append_default_model_info(embedding_text2vec_base_chinese)
                      .append_model_info(bge_reranker_v2_m3)
                      .append_default_model_info(bge_reranker_v2_m3)

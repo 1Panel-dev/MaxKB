@@ -27,6 +27,8 @@ export function getBrowserLang() {
     defaultBrowserLang = 'zh-Hant'
   } else if (browserLang === 'zh-CN') {
     defaultBrowserLang = 'zh-CN'
+  } else if (browserLang?.startsWith('vi')) {
+    defaultBrowserLang = 'vi-VN'
   } else {
     defaultBrowserLang = 'en-US'
   }

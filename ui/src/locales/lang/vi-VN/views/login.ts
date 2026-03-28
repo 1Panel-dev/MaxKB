@@ -1,0 +1,61 @@
+export default {
+  title: 'Đăng nhập',
+  loginForm: {
+    username: {
+      label: 'Tên đăng nhập',
+      placeholder: 'Vui lòng nhập tên người dùng',
+      requiredMessage: 'Vui lòng nhập tên người dùng',
+      lengthMessage: 'Độ dài phải từ 4 đến 20 ký tự',
+    },
+    password: {
+      label: 'thông tin đăng nhập mật khẩu',
+      placeholder: 'Vui lòng nhập mật khẩu',
+      requiredMessage: 'Vui lòng nhập mật khẩu',
+      lengthMessage: 'Độ dài phải từ 6 đến 20 ký tự',
+    },
+    captcha: {
+      label: 'ID xác thực',
+      placeholder: 'Vui lòng nhập mã xác minh',
+      requiredMessage: 'Vui lòng nhập mã xác minh',
+      validatorMessage: 'ID xác định không chính xác',
+    },
+    new_password: {
+      label: 'New mật khẩu',
+      placeholder: 'Vui lòng nhập mật khẩu mới',
+      requiredMessage: 'Vui lòng nhập mật khẩu mới',
+    },
+    re_password: {
+      label: 'Xác nhận mật khẩu',
+      placeholder: 'Vui lòng nhập mật khẩu xác thực',
+      requiredMessage: 'Vui lòng nhập mật khẩu xác thực',
+      validatorMessage: 'Mật khẩu không khớp',
+    },
+    email: {
+      label: 'Email',
+      placeholder: 'Vui lòng nhập email',
+      requiredMessage: 'Vui lòng nhập email',
+      validatorEmail: 'Vui lòng nhập hợp lệ email định dạng!',
+    },
+  },
+  jump_tip: 'Bạn sẽ được chuyển hướng đến nguồn xác thực để xác thực',
+  jump: 'Chuyển hướng',
+  resetPassword: 'Đổi mật khẩu',
+  forgotPassword: 'Quên mật khẩu',
+  userRegister: 'Đăng ký người dùng',
+  buttons: {
+    login: 'Đăng nhập',
+    register: 'Đăng ký',
+    backLogin: 'Quay lại đăng nhập',
+    checkCode: 'Xác minh ngay',
+  },
+  newPassword: 'New mật khẩu',
+  enterPassword: 'Vui lòng nhập mật khẩu mới của bạn',
+  useEmail: 'Sử dụng email',
+  moreMethod: 'Thêm thông tin đăng nhập phương thức',
+  verificationCode: {
+    placeholder: 'Vui lòng nhập mã xác minh',
+    getVerificationCode: 'Nhận mã xác thực',
+    successMessage: 'Nếu email địa chỉ đã được đăng ký, chúng tôi sẽ gửi email. Vui lòng kiểm tra hộp thư của bạn',
+    resend: 'Gửi lại',
+  },
+}

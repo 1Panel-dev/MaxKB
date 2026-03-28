@@ -4,6 +4,7 @@ import * as ElementPlusIcons from '@element-plus/icons-vue'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import enUs from 'element-plus/es/locale/lang/en'
 import zhTW from 'element-plus/es/locale/lang/zh-tw'
+import viVn from 'element-plus/es/locale/lang/vi'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
@@ -101,6 +102,7 @@ const locale_map: any = {
   'zh-CN': zhCn,
   'zh-Hant': zhTW,
   'en-US': enUs,
+  'vi-VN': viVn,
 }
 app.use(ElementPlus, {
   locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'en-US'],

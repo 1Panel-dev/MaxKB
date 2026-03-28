@@ -1,0 +1,26 @@
+export default {
+  quickCreatePlaceholder: 'Tạo nhanh tài liệu trống',
+  quickCreateName: 'tên tài liệu',
+  noData: 'Không có dữ liệu',
+  loading: 'Loading',
+  noMore: 'Không còn nữa!',
+  noDesc: 'Không có mô tả',
+  selectParagraph: {
+    title: 'Chọn phân đoạn',
+    error: 'Chỉ xử lý các phân đoạn bị lỗi',
+    all: 'Tất cả các phân đoạn',
+  },
+  folder: {
+    addFolder: 'Thêm thư mục',
+    addChildFolder: 'Thêm thư mục con',
+    editFolder: 'Chỉnh sửa thư mục',
+    folderNamePlaceholder: 'Vui lòng nhập tên',
+    requiredMessage: 'Vui lòng chọn một thư mục',
+    deleteConfirmMessage: 'Các thư mục chứa tài nguyên sẽ bị xóa, hãy thận trọng.',
+    ascTime: 'Thời gian sáng tạo: Tăng dần',
+    descTime: 'Thời gian sáng tạo: Giảm dần',
+    ascName: 'Tên: Tăng dần',
+    descName: 'Tên: Giảm dần',
+    custom: 'Kéo để sắp xếp lại',
+  },
+}

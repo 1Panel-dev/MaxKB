@@ -1,0 +1,56 @@
+export default {
+  title: 'Trigger',
+  tip: 'Khi được kích hoạt, hệ thống sẽ tự động gọi thực thi tác vụ dựa trên cài đặt thông số đầu vào',
+  task: 'Task',
+  nextTime: 'Thời gian thực hiện tiếp theo',
+  triggerTask: 'Nhiệm vụ kích hoạt',
+  taskExecution: 'Thực thi nhiệm vụ',
+  triggerSource: 'Nguồn kích hoạt',
+  delete: {
+    confirmTitle: 'Xác nhận xóa trình kích hoạt:',
+    confirmTitle2: 'kích hoạt?',
+  },
+  triggerCycle: {
+    title: 'Chu kỳ kích hoạt',
+    days: 'Days',
+    daily: 'Kích hoạt hàng ngày',
+    weekly: 'Kích hoạt hàng tuần',
+    monthly: 'Kích hoạt hàng tháng',
+    interval: 'Kích hoạt khoảng thời gian',
+    monday: 'Monday',
+    tuesday: 'Tuesday',
+    wednesday: 'Wednesday',
+    thursday: 'Thursday',
+    friday: 'Friday',
+    saturday: 'Saturday',
+    sunday: 'Sunday',
+    hours: 'Hours',
+    minutes: 'Minutes',
+    cronExpression: 'Biểu thức cron',
+    switchCycle: 'Chuyển sang chu kỳ kích hoạt',
+    switchCron: 'Chuyển sang biểu thức Cron',
+    placeholder: 'Vui lòng nhập biểu thức Cron (ví dụ: 0 0 1 * *)'
+
+  },
+  type: {
+    scheduled: 'Trình kích hoạt theo lịch trình',
+    scheduledDesc: 'Thực hiện các nhiệm vụ hàng tháng, hàng tuần, hàng ngày hoặc theo khoảng thời gian',
+    event: 'Trình kích hoạt sự kiện',
+    eventDesc: 'Thực hiện nhiệm vụ khi một sự kiện nhất định được gửi',
+  },
+  createTrigger: 'Tạo trình kích hoạt',
+  editTrigger: 'Chỉnh sửa trình kích hoạt',
+  from: {
+    triggerName: {
+      label: 'Tên kích hoạt',
+      placeholder: 'Vui lòng nhập tên trình kích hoạt',
+      requiredMessage: 'Vui lòng nhập tên trình kích hoạt',
+    },
+    event_url: {
+      label: 'Sao chép URL vào ứng dụng của bạn',
+    },
+  },
+  requestParameter: 'Thông số yêu cầu',
+  triggerParam: 'Thông số đầu vào kích hoạt',
+  errorMsg: 'Thông báo lỗi',
+}
