@@ -12,7 +12,7 @@ from typing import List
 from application.flow.compare import Compare
 from common.cache.mem_cache import MemCache
 
-pattern_cache = MemCache('regex', {
+match_cache = MemCache('regex', {
     'TIMEOUT': 3600, # 缓存有效期为 1 小时
     'OPTIONS': {
         'MAX_ENTRIES': 500, # 最多缓存 500 个条目
@@ -22,11 +22,11 @@ pattern_cache = MemCache('regex', {
 
 
 def compile_and_cache(regex):
-    pattern = pattern_cache.get(regex)
-    if not pattern:
-        pattern = re.compile(regex)
-        pattern_cache.set(regex, pattern)
-    return pattern
+    match = match_cache.get(regex)
+    if not match:
+        match = re.compile(regex).match
+        match_cache.set(regex, match)
+    return match
 
 class RegexCompare(Compare):
 
@@ -35,5 +35,5 @@ class RegexCompare(Compare):
             return True
 
     def compare(self, source_value, compare, target_value):
-        pattern = compile_and_cache(str(target_value))
-        return bool(pattern.match(str(source_value)))
+        match = compile_and_cache(str(target_value))
+        return bool(match(str(source_value)))
