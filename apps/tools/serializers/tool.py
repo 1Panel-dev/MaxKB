@@ -1173,6 +1173,65 @@ class ToolSerializer(serializers.Serializer):
 
             return to_stream_response_simple(process())
 
+class ToolBatchOperateSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+
+    @transaction.atomic
+    def batch_delete(self, instance: Dict, with_valid=True):
+        from knowledge.serializers.common import BatchSerializer
+        from trigger.handler.simple_tools import deploy
+        from trigger.serializers.trigger import TriggerModelSerializer
+
+        if with_valid:
+            BatchSerializer(data=instance).is_valid(model=Tool, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get('id_list')
+        workspace_id = self.data.get('workspace_id')
+
+        tool_query_set = QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id)
+
+        for tool in tool_query_set:
+            if tool.template_id is None and tool.icon != '':
+                QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
+            if tool.tool_type == ToolType.SKILL:
+                QuerySet(File).filter(id=tool.code).delete()
+
+        QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
+        QuerySet(ResourceMapping).filter(target_id__in=id_list).delete()
+        QuerySet(ToolRecord).filter(tool_id__in=id_list).delete()
+
+        trigger_ids = list(
+            QuerySet(TriggerTask).filter(
+                source_type="TOOL", source_id__in=id_list
+            ).values('trigger_id').distinct()
+        )
+
+        QuerySet(TriggerTask).filter(source_type="TOOL", source_id__in=id_list).delete()
+        for trigger_id in trigger_ids:
+            trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
+            if trigger and trigger.is_active:
+                deploy(TriggerModelSerializer(trigger).data, **{})
+
+        tool_query_set.delete()
+        return True
+
+    def batch_move(self, instance: Dict, with_valid=True):
+        from knowledge.serializers.common import BatchMoveSerializer
+        if with_valid:
+            BatchMoveSerializer(data=instance).is_valid(model=Tool, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get('id_list')
+        folder_id = instance.get('folder_id')
+        workspace_id = self.data.get('workspace_id')
+
+        QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
+        return True
+
+
+
 
 class ToolTreeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):

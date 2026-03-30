@@ -4,6 +4,7 @@ from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
+from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from tools.serializers.tool import ToolModelSerializer, ToolCreateRequest, ToolDebugRequest, ToolEditRequest, \
     PylintInstance, AddInternalToolRequest
 
@@ -322,4 +323,26 @@ class AddInternalToolAPI(APIMixin):
                 required=True,
             ),
         ]
+
+class ToolBatchOperateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            )
+        ]
+
+    @staticmethod
+    def get_request():
+        return BatchSerializer
+
+    @staticmethod
+    def get_move_request():
+        return BatchMoveSerializer
+
 
