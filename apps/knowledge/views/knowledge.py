@@ -4,19 +4,29 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
+from common.auth.authentication import has_permissions, check_batch_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
-from common.result import result
+from common import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
-    GetModelAPI, KnowledgeExportAPI
+    GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI
 from knowledge.models import KnowledgeScope
 from knowledge.serializers.common import get_knowledge_operation_object
-from knowledge.serializers.knowledge import KnowledgeSerializer
+from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeBatchOperateSerializer
 from models_provider.serializers.model_serializer import ModelSerializer
 from tools.api.tool import GetInternalToolAPI
+from django.db.models import QuerySet
+from knowledge.models import Knowledge
 
+def get_knowledge_operation_object_batch(knowledge_id_list):
+    knowledge_model_list = QuerySet(model=Knowledge).filter(id__in=knowledge_id_list)
+    if knowledge_model_list is not None:
+        return {
+            "name": f'[{",".join([app.name for app in knowledge_model_list])}]',
+            'knowledge_list': [{'name': app.name} for app in knowledge_model_list]
+        }
+    return {}
 
 class KnowledgeView(APIView):
     authentication_classes = [TokenAuth]
@@ -123,6 +133,83 @@ class KnowledgeView(APIView):
             return result.success(KnowledgeSerializer.Operate(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id, 'knowledge_id': knowledge_id}
             ).one())
+
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch delete knowledge"),
+            summary=_("Batch delete knowledge"),
+            operation_id=_("Batch delete knowledge"),
+            parameters=KnowledgeBatchOperateAPI.get_parameters(),
+            request=KnowledgeBatchOperateAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Knowledge Base')]
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_BATCH_DELETE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'knowledge_id',
+                (PermissionConstants.KNOWLEDGE_DELETE.get_workspace_knowledge_permission(),
+                 PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()), workspace_id=workspace_id
+            )
+
+            @log(menu='Knowledge Base', operate='Batch delete knowledge',
+                 get_operation_object=lambda r, k: get_knowledge_operation_object_batch(permitted_ids))
+            def inner(view, r, **kwargs):
+                return KnowledgeBatchOperateSerializer(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id}
+                ).batch_delete({'id_list': permitted_ids})
+
+            return result.success(inner(self, request, workspace_id=workspace_id))
+
+    class BatchMove(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch move knowledge"),
+            summary=_("Batch move knowledge"),
+            operation_id=_("Batch move knowledge"),
+            parameters=KnowledgeBatchOperateAPI.get_parameters(),
+            request=KnowledgeBatchOperateAPI.get_move_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Knowledge Base')]
+        )
+        @has_permissions(PermissionConstants.KNOWLEDGE_BATCH_MOVE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'knowledge_id',
+                (PermissionConstants.KNOWLEDGE_EDIT.get_workspace_knowledge_permission(),
+                 PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()),
+                workspace_id=workspace_id
+            )
+
+            @log(menu='Knowledge Base', operate='Batch move knowledge',
+                 get_operation_object=lambda r, k: get_knowledge_operation_object_batch(permitted_ids))
+            def inner(view, r, **kwargs):
+                return KnowledgeBatchOperateSerializer(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id}
+                ).batch_move({'id_list': permitted_ids, 'folder_id': request.data.get('folder_id')})
+
+            return result.success(inner(self, request, workspace_id=workspace_id))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

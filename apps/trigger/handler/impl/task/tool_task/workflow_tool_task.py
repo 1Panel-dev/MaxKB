@@ -2,8 +2,8 @@
 """
     @project: MaxKB
     @Author：虎虎
-    @file： application_task.py
-    @date：2026/1/14 19:14
+    @file： workflow_tool_task.py.py
+    @date：2026/3/27 18:47
     @desc:
 """
 import json
@@ -14,12 +14,14 @@ import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
+from application.flow.common import WorkflowMode, Workflow
+from application.flow.i_step_node import ToolWorkflowPostHandler, get_tool_workflow_state
+from application.serializers.common import ToolExecute
 from common.utils.logger import maxkb_logger
-from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models.knowledge_action import State
-from tools.models import Tool, ToolRecord, ToolTaskTypeChoices
-from trigger.handler.base_task import BaseTriggerTask
+from tools.models import ToolRecord, ToolTaskTypeChoices, ToolWorkflowVersion, ToolType
+from trigger.handler.impl.task.tool_task.common import BaseToolTriggerTask
 from trigger.models import TaskRecord
 
 executor = ToolExecutor()
@@ -77,52 +79,16 @@ def get_tool_execute_parameters(input_field_list, parameter_setting, kwargs):
     return parameters
 
 
-def get_loop_workflow_node(node_list):
-    result = []
-    for item in node_list:
-        if item.get('type') == 'loop-node':
-            for loop_item in item.get('loop_node_data') or []:
-                for inner_item in loop_item.values():
-                    result.append(inner_item)
-    return result
+class ToolTask(BaseToolTriggerTask):
+    def support(self, tool, trigger_task, **kwargs):
+        return tool.tool_type == ToolType.WORKFLOW
 
-
-def get_workflow_state(details):
-    node_list = details.values()
-    all_node = [*node_list, *get_loop_workflow_node(node_list)]
-    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
-    if err:
-        return State.FAILURE
-    return State.SUCCESS
-
-
-def _get_result_detail(result):
-    if isinstance(result, dict):
-        result_dict = {k: (str(v)[:500] if len(str(v)) > 500 else v) for k, v in result.items()}
-    elif isinstance(result, list):
-        result_dict = [str(item)[:500] if len(str(item)) > 500 else item for item in result]
-    elif isinstance(result, str):
-        result_dict = result[:500] if len(result) > 500 else result
-    else:
-        result_dict = result
-    return result_dict
-
-
-class ToolTask(BaseTriggerTask):
-    def support(self, trigger_task, **kwargs):
-        return trigger_task.get('source_type') == 'TOOL'
-
-    def execute(self, trigger_task, **kwargs):
+    def execute(self, tool, trigger_task, **kwargs):
         parameter_setting = trigger_task.get('parameter')
         tool_id = trigger_task.get('source_id')
         task_record_id = uuid.uuid7()
         start_time = time.time()
         try:
-            tool = QuerySet(Tool).filter(id=tool_id, is_active=True).first()
-            if not tool:
-                maxkb_logger.info(f"Tool with id {tool_id} not found or inactive.")
-                return
-
             TaskRecord(
                 id=task_record_id,
                 trigger_id=trigger_task.get('trigger'),
@@ -142,30 +108,45 @@ class ToolTask(BaseTriggerTask):
                 meta={'input': parameter_setting, 'output': {}},
                 state=State.STARTED
             ).save()
-
-            parameters = get_tool_execute_parameters(tool.input_field_list, parameter_setting, kwargs)
-            init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
-
-            if tool.init_params is not None:
-                all_params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params)) | parameters
-            else:
-                all_params = init_params_default_value | parameters
-
-            result = executor.exec_code(tool.code, all_params)
-
-            result_dict = _get_result_detail(result)
-
-            maxkb_logger.debug(f"Tool execution result: {result}")
-
-            QuerySet(TaskRecord).filter(id=task_record_id).update(
-                state=State.SUCCESS,
-                run_time=time.time() - start_time,
-                meta={'input': parameter_setting, 'output': result_dict}
+            tool_workflow_version = QuerySet(ToolWorkflowVersion).filter(tool_id=tool.id).order_by(
+                '-create_time')[0:1].first()
+            if not tool_workflow_version:
+                maxkb_logger.info(f"Tool with id {tool_id} not found or inactive.")
+                return
+            flow = Workflow.new_instance(tool_workflow_version.work_flow, WorkflowMode.TOOL)
+            base_node = flow.get_node('tool-base-node')
+            user_input_field_list = base_node.properties.get("user_input_field_list") or []
+            parameters = get_tool_execute_parameters(user_input_field_list,
+                                                     parameter_setting.get('user_input_field_list'), kwargs)
+            took_execute = ToolExecute(tool_id, str(task_record_id),
+                                       tool.workspace_id,
+                                       ToolTaskTypeChoices.TRIGGER,
+                                       trigger_task.get('trigger'),
+                                       False)
+            from application.flow.tool_workflow_manage import ToolWorkflowManage
+            work_flow_manage = ToolWorkflowManage(
+                flow,
+                {
+                    'chat_record_id': task_record_id,
+                    'tool_id': tool_id,
+                    'stream': True,
+                    'workspace_id': tool.workspace_id,
+                    **parameters},
+                ToolWorkflowPostHandler(took_execute, tool_id),
+                is_the_task_interrupted=lambda: False,
+                child_node=None,
+                start_node_id=None,
+                start_node_data=None,
+                chat_record=None
             )
-            QuerySet(ToolRecord).filter(id=task_record_id).update(
-                state=State.SUCCESS,
+            res = work_flow_manage.run()
+            for r in res:
+                pass
+            state = get_tool_workflow_state(work_flow_manage)
+            QuerySet(TaskRecord).filter(id=task_record_id).update(
+                state=state,
                 run_time=time.time() - start_time,
-                meta={'input': parameters, 'output': result_dict}
+                meta={'input': parameter_setting, 'output': work_flow_manage.out_context}
             )
         except Exception as e:
             maxkb_logger.error(f"Tool execution error: {traceback.format_exc()}")

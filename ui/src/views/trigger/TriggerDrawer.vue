@@ -505,7 +505,7 @@
       </el-form-item>
     </el-form>
     <ApplicationDialog @refresh="applicationRefresh" ref="applicationDialogRef"></ApplicationDialog>
-    <ToolDialog @refresh="toolRefresh" ref="toolDialogRef"></ToolDialog>
+    <ToolDialog @refresh="toolRefresh" ref="toolDialogRef" tool_type="CUSTOM,WORKFLOW"></ToolDialog>
     <template #footer>
       <el-button @click="close">{{ $t('common.cancel') }}</el-button>
       <el-button v-if="!is_edit || editPermission" type="primary" @click="submit">{{

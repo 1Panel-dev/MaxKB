@@ -17,14 +17,15 @@
           :label="item.model_name"
           :value="item.model_id"
         >
-          <div class="flex">
+          <el-space :size="8">
             <span
-              v-html="relatedObject(providerList, providerName, 'provider')?.icon"
-              class="model-icon mr-8"
+              :innerHTML="relatedObject(providerList, providerName, 'provider')?.icon"
+              class="select-model-icon"
+              style="margin-top: -7px"
             >
             </span>
             <span>{{ item.model_name }}</span>
-          </div>
+          </el-space>
         </el-option>
       </el-option-group>
     </el-select>
@@ -114,10 +115,6 @@ const handleModelChange = (selectedId: string) => {
     &:hover {
       background-color: var(--el-fill-color-light);
     }
-  }
-
-  .model-icon {
-    width: 18px;
   }
 
   .check-icon {

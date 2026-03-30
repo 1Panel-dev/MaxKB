@@ -594,3 +594,18 @@ h5 {
   transform: rotate(45deg);
   box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.08);
 }
+
+// select-model
+.select-model-icon {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  object-fit: contain;
+}
+.el-select__tags-text {
+  .select-model-icon {
+    width: 14px;
+    height: 14px;
+    display: inline-block;
+  }
+}

@@ -34,6 +34,7 @@ from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
     ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, KnowledgeWorkflow
+from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir, \
@@ -877,3 +878,50 @@ class KnowledgeSerializer(serializers.Serializer):
                 })
 
             return result
+
+
+class KnowledgeBatchOperateSerializer(serializers.Serializer):
+    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+
+    @transaction.atomic
+    def batch_delete(self, instance: Dict, with_valid=True):
+        if with_valid:
+            BatchSerializer(data=instance).is_valid(model=Knowledge, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get('id_list')
+        workspace_id = self.data.get('workspace_id')
+        knowledge_query_set = QuerySet(Knowledge).filter(id__in=id_list,workspace_id=workspace_id)
+
+        # 删除所有关联
+        QuerySet(Document).filter(knowledge__in=knowledge_query_set).delete()
+        QuerySet(ProblemParagraphMapping).filter(knowledge__in=knowledge_query_set).delete()
+        QuerySet(Paragraph).filter(knowledge__in=knowledge_query_set).delete()
+        QuerySet(Problem).filter(knowledge__in=knowledge_query_set).delete()
+        QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
+
+        for k_id in id_list:
+            drop_knowledge_index(knowledge_id=k_id)
+            delete_embedding_by_knowledge(k_id)
+
+        File.objects.filter(source_id__in=id_list).delete()
+        QuerySet(ResourceMapping).filter(
+            Q(target_id__in=id_list) | Q(source_id__in=id_list)
+        ).delete()
+
+        knowledge_query_set.delete()
+        return True
+
+    def batch_move(self, instance: Dict, with_valid=True):
+        if with_valid:
+            BatchMoveSerializer(data=instance).is_valid(model=Knowledge, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get('id_list')
+        folder_id = instance.get('folder_id')
+        workspace_id = self.data.get('workspace_id')
+
+        QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
+        return True
+
