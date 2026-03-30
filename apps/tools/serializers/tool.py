@@ -659,7 +659,7 @@ class ToolSerializer(serializers.Serializer):
 
         def get_child_tool_list(self, work_flow, response):
             from application.flow.tools import get_tool_id_list
-            tool_id_list = get_tool_id_list(work_flow)
+            tool_id_list = get_tool_id_list(work_flow, False)
             tool_id_list = [tool_id for tool_id in tool_id_list if
                             len([r for r in response if r.get('id') == tool_id]) == 0]
             tool_list = []
@@ -1307,6 +1307,7 @@ class ToolSerializer(serializers.Serializer):
 
             return to_stream_response_simple(process())
 
+
 class ToolBatchOperateSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_('workspace id'))
 
@@ -1363,8 +1364,6 @@ class ToolBatchOperateSerializer(serializers.Serializer):
 
         QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True
-
-
 
 
 class ToolTreeSerializer(serializers.Serializer):

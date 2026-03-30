@@ -6,7 +6,7 @@
     @date：2024/6/6 15:15
     @desc:
 """
-from tools.models import ToolRecord, Tool
+from tools.models import ToolRecord, Tool, ToolScope
 from maxkb.const import CONFIG
 from knowledge.models.knowledge_action import State
 from knowledge.models import File
@@ -891,7 +891,8 @@ def save_workflow_mapping(workflow, source_type, source_id, other_resource_mappi
             {(str(item.target_type) + str(item.target_id)): item for item in resource_mapping_list}.values())
 
 
-def get_tool_id_list(workflow):
+def get_tool_id_list(workflow, with_deep=False):
+    from tools.models import ToolWorkflow, ToolType
     _result = []
     for node in workflow.get('nodes', []):
         if node.get('type') == 'tool-lib-node':
@@ -921,4 +922,34 @@ def get_tool_id_list(workflow):
                 'node_data', {}).get('mcp_tool_id')
             if mcp_tool_id:
                 _result.append(mcp_tool_id)
+    if with_deep:
+        workflow_list = QuerySet(Tool).filter(id__in=_result, tool_type=ToolType.WORKFLOW)
+        tool_work_flow_list = QuerySet(ToolWorkflow).filter(tool_id__in=[wl.id for wl in workflow_list])
+        for tool_work_flow in tool_work_flow_list:
+            child_tool_id_list = get_child_tool_id_list(tool_work_flow.work_flow, [])
+            for c in child_tool_id_list:
+                _result.append(c)
     return _result
+
+
+def get_child_tool_id_list(work_flow, response):
+    from tools.models import ToolWorkflow, ToolType
+    tool_id_list = get_tool_id_list(work_flow, False)
+    tool_id_list = [tool_id for tool_id in tool_id_list if
+                    len([r for r in response if r == tool_id]) == 0]
+    tool_list = []
+    if len(tool_id_list) > 0:
+        tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+        work_flow_tools = [tool for tool in tool_list if tool.tool_type == ToolType.WORKFLOW]
+        if len(work_flow_tools) > 0:
+
+            work_flow_tool_dict = {tw.tool_id: tw for tw in
+                                   QuerySet(ToolWorkflow).filter(tool_id__in=[t.id for t in work_flow_tools])}
+            for tool in tool_list:
+                response.append(str(tool.id))
+                if tool.tool_type == ToolType.WORKFLOW:
+                    get_child_tool_id_list(work_flow_tool_dict.get(tool.id).work_flow, response)
+    else:
+        for tool in tool_list:
+            response.append(str(tool.id))
+    return response
