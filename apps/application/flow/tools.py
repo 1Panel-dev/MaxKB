@@ -789,7 +789,8 @@ target_source_node_mapping = {
              'ai-chat-node': lambda n: [*(n.get('properties').get('node_data').get('mcp_tool_ids') or []),
                                         *(n.get('properties').get('node_data').get('tool_ids') or []),
                                         *(n.get('properties').get('node_data').get('skill_tool_ids') or [])],
-             'mcp-node': lambda n: [n.get('properties').get('node_data').get('mcp_tool_id')]
+             'mcp-node': lambda n: [n.get('properties').get('node_data').get('mcp_tool_id')],
+             'tool-workflow-lib-node': lambda n: [n.get('properties').get('node_data').get('tool_lib_id')]
              },
     'MODEL': {'ai-chat-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               'question-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
