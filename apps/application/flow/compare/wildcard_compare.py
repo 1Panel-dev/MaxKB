@@ -6,11 +6,29 @@
     @date：2026/3/30 12:11
     @desc:
 """
+import fnmatch
+import re
 from typing import List
 
 from application.flow.compare import Compare
+from common.cache.mem_cache import MemCache
 
-import fnmatch
+pattern_cache = MemCache('wildcard_to_regex', {
+    'TIMEOUT': 3600, # 缓存有效期为 1 小时
+    'OPTIONS': {
+        'MAX_ENTRIES': 500, # 最多缓存 500 个条目
+        'CULL_FREQUENCY': 10, # 达到上限时，删除约 1/10 的缓存
+    },
+})
+
+# 转成正则执行，性能更高
+def translate_and_compile_and_cache(wildcard):
+    pattern = pattern_cache.get(wildcard)
+    if not pattern:
+        regex = fnmatch.translate(wildcard)
+        pattern = re.compile(regex)
+        pattern_cache.set(wildcard, pattern)
+    return pattern
 
 class WildcardCompare(Compare):
 
@@ -19,4 +37,6 @@ class WildcardCompare(Compare):
             return True
 
     def compare(self, source_value, compare, target_value):
-        return fnmatch.fnmatch(str(source_value), str(target_value))
+        # 转成正则执行，性能更高
+        pattern = translate_and_compile_and_cache(str(target_value))
+        return bool(pattern.match(str(source_value)))
