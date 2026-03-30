@@ -28,7 +28,7 @@ def compile_and_cache(regex_str):
         regex_cache.set(regex_str, regex)
     return regex
 
-class RegularExpressionCompare(Compare):
+class RegexCompare(Compare):
 
     def support(self, node_id, fields: List[str], source_value, compare, target_value):
         if compare == 'regex':
