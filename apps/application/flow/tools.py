@@ -904,6 +904,11 @@ def get_tool_id_list(workflow):
                 'node_data', {}).get('loop_body', {}))
             for item in r:
                 _result.append(item)
+        elif node.get('type') == 'tool-workflow-lib-node':
+            tool_id = node.get('properties', {}).get(
+                'node_data', {}).get('tool_lib_id')
+            if tool_id:
+                _result.append(tool_id)
         elif node.get('type') == 'ai-chat-node':
             node_data = node.get('properties', {}).get('node_data', {})
             mcp_tool_ids = node_data.get('mcp_tool_ids') or []
