@@ -1092,7 +1092,8 @@ export const compareList = [
   { value: 'is_true', label: t('workflow.compare.is_true') },
   { value: 'is_not_true', label: t('workflow.compare.is_not_true') },
   { value: 'start_with', label: 'startWith' },
-  { value: 'end_with', label: 'endWith' },
+  { value: 'regex', label: t('workflow.compare.regex') },
+  { value: 'wildcard', label: t('workflow.compare.wildcard') },
 ]
 export const nodeDict: any = {
   [WorkflowType.AiChat]: aiChatNode,

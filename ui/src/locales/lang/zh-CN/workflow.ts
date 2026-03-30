@@ -529,6 +529,8 @@ export default {
     len_lt: '长度小于',
     is_true: '为真',
     is_not_true: '不为真',
+    regex: '正则匹配',
+    wildcard: '通配符匹配',
   },
   SystemPromptPlaceholder: '系统提示词，可以引用系统中的变量：如',
   UserPromptPlaceholder: '用户提示词，可以引用系统中的变量：如',

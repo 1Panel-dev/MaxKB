@@ -538,6 +538,8 @@ You are a master of problem optimization, adept at accurately inferring user int
     len_lt: 'Length less than',
     is_true: 'Is true',
     is_not_true: 'Is not true',
+    regex: 'Regex matching',
+    wildcard: 'Wildcard matching',
   },
   SystemPromptPlaceholder: 'System Prompt, can reference variables in the system, such as',
   UserPromptPlaceholder: 'User Prompt, can reference variables in the system, such as',

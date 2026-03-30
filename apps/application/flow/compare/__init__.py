@@ -26,9 +26,11 @@ from .lt_compare import *
 from .not_contain_compare import *
 from .not_equal_compare import *
 from .start_with import StartWithCompare
+from .regex_compare import *
+from .wildcard_compare import *
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
                        LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
                        IsNullCompare(),
                        IsNotNullCompare(), NotContainCompare(), NotEqualCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
-                       EndWithCompare()]
+                       EndWithCompare(), RegexCompare(), WildcardCompare()]
