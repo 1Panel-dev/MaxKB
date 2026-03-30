@@ -129,4 +129,14 @@ export default {
       popover_default: '是否为默认值',
     },
   },
+  ModelConstructor: {
+    optionalModel: '可选模型',
+    defaultModel: '默认模型',
+    modelPlaceholder: '请选择模型',
+  },
+  KnowledgeConstructor: {
+    optionalKnowledge: '可选知识库',
+    optionalKnowledgePlaceholder: '请选择可选知识库',
+    defaultKnowledge: '默认知识库',
+  },
 }

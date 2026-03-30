@@ -9298,3 +9298,16 @@ msgstr "批量删除应用"
 
 msgid "Batch move applications"
 msgstr "批量移动应用"
+
+msgid "Batch delete knowledge"
+msgstr "批量删除知识库"
+
+msgid "Batch move knowledge"
+msgstr "批量移动知识库"
+
+msgid "Batch delete tools"
+msgstr "批量删除工具"
+
+msgid "Batch move tools"
+msgstr "批量移动工具"
+

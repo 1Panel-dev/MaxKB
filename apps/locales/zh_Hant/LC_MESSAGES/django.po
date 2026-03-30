@@ -9295,3 +9295,16 @@ msgstr "批量刪除應用"
 
 msgid "Batch move applications"
 msgstr "批量移動應用"
+
+msgid "Batch delete knowledge"
+msgstr "批量刪除知識庫"
+
+msgid "Batch move knowledge"
+msgstr "批量移動知識庫"
+
+msgid "Batch delete tools"
+msgstr "批量刪除工具"
+
+msgid "Batch move tools"
+msgstr "批量移動工具"
+

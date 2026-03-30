@@ -24,7 +24,7 @@ from common.field.common import ObjectField
 from common.utils.common import get_file_content
 from knowledge.serializers.common import BatchSerializer
 from maxkb.conf import PROJECT_DIR
-from tools.models import Tool
+from tools.models import Tool, ToolWorkflow
 from trigger.models import TriggerTypeChoices, Trigger, TriggerTaskTypeChoices, TriggerTask, TaskRecord
 
 
@@ -82,19 +82,24 @@ class ApplicationTaskParameterSerializer(serializers.Serializer):
 
 
 class ToolTaskParameterSerializer(serializers.Serializer):
+    user_input_field_list = serializers.JSONField(required=False)
 
-    def to_internal_value(self, data):
-        if not isinstance(data, dict):
-            raise serializers.ValidationError("must be a dict")
+    @staticmethod
+    def _validate_input_dict(value, field_name):
+        if not value:
+            return value
+        if not isinstance(value, dict):
+            raise serializers.ValidationError(_("%s must be a dict") % field_name)
 
-        validated = {}
-        for key, val in data.items():
+        for key, val in value.items():
             serializer = InputField(data=val)
             if not serializer.is_valid():
-                raise serializers.ValidationError({key: serializer.errors})
-            validated[key] = serializer.validated_data
+                raise serializers.ValidationError({f"{field_name}.{key}": serializer.errors})
+        return value
 
-        return validated
+    def validate_user_input_field_list(self, value):
+        return self._validate_input_dict(value, 'user_input_field_list')
+
 
 class TriggerValidationMixin:
 
@@ -160,7 +165,7 @@ class TriggerValidationMixin:
     def _validate_scheduled_setting(self, setting):
         schedule_type = setting.get('schedule_type')
 
-        valid_types = ['daily', 'weekly', 'monthly', 'interval','cron']
+        valid_types = ['daily', 'weekly', 'monthly', 'interval', 'cron']
         if schedule_type not in valid_types:
             raise serializers.ValidationError(
                 {'trigger_setting': _('schedule_type must be one of %s') % ', '.join(valid_types)
@@ -175,6 +180,7 @@ class TriggerValidationMixin:
             self._validate_interval(setting)
         elif schedule_type == 'cron':
             self._validate_cron(setting)
+
     def _validate_daily(self, setting):
         self._validate_required_field(setting, 'time', 'daily')
         self._validate_time_array(setting['time'])
@@ -213,6 +219,7 @@ class TriggerValidationMixin:
             raise serializers.ValidationError({
                 'trigger_setting': _('interval_unit must be one of %s') % ', '.join(valid_units)
             })
+
     @staticmethod
     def _validate_cron(setting):
         from apscheduler.triggers.cron import CronTrigger
@@ -598,8 +605,24 @@ class TriggerOperateSerializer(serializers.Serializer):
         tool_task_list = []
         if tool_ids:
             tools = Tool.objects.filter(workspace_id=workspace_id, id__in=tool_ids)
-            tool_task_list = ToolTriggerTaskSerializer(tools, many=True).data
-
+            workflows = ToolWorkflow.objects.filter(
+                tool_id__in=tools.filter(tool_type='WORKFLOW').values_list('id', flat=True),
+                is_publish=True
+            )
+            workflow_dict = {wf.tool_id: wf.work_flow for wf in workflows}
+            tool_task_list = []
+            for tool in tools:
+                tool_data = {
+                    'id': str(tool.id),
+                    'name': tool.name,
+                    'input_field_list': tool.input_field_list,
+                    'icon': tool.icon,
+                    'tool_type': tool.tool_type
+                }
+                # 如果是工作流类型，添加 work_flow 字段
+                if tool.tool_type == 'WORKFLOW':
+                    tool_data['work_flow'] = workflow_dict.get(tool.id)
+                tool_task_list.append(tool_data)
         return {
             **TriggerModelSerializer(trigger).data,
             'trigger_task': trigger_task_list,

@@ -4,28 +4,23 @@
       v-model="selectedIds"
       multiple
       class="w-full"
-      :placeholder="$t('dynamicsForm.Knowledge.placeholder', '请选择知识库')"
+      :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
     >
       <el-option v-for="item in availableList" :key="item.id" :label="item.name" :value="item.id">
-        <div class="flex align-center">
-          <KnowledgeIcon :type="item.type" class="mr-8" :size="20" />
+        <el-space :size="8">
+          <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />
           <span>{{ item.name }}</span>
-        </div>
+        </el-space>
       </el-option>
-      <template #tag>
-        <el-tag
-          v-for="item in selectedItems"
-          :key="item.id"
-          closable
-          type="info"
-          @close="removeItem(item.id)"
-          style="margin-right: 4px"
-        >
-          <div class="flex align-center">
-            <KnowledgeIcon :type="item.type" class="mr-4" :size="16" />
-            <span>{{ item.name }}</span>
-          </div>
-        </el-tag>
+      <template #label="{ label, value }">
+        <el-space :size="8">
+          <KnowledgeIcon
+            :type="relatedObject(availableList, value, 'id')?.type"
+            :size="14"
+            style="--el-avatar-border-radius: 4px"
+          />
+          <span>{{ label }}</span>
+        </el-space>
       </template>
     </el-select>
   </div>
@@ -34,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { FormField } from '../../type'
-
+import { relatedObject } from '@/utils/array'
 const props = withDefaults(
   defineProps<{
     modelValue?: string[]
@@ -57,19 +52,11 @@ const availableList = computed(() => {
   return (props.formField.attrs?.knowledge_list as any[]) || []
 })
 
-const selectedItems = computed(() => {
-  return availableList.value.filter((k: any) => selectedIds.value.includes(k.id))
-})
-
 const selectedIds = computed({
   get: () => model_value.value || [],
   set: (ids: string[]) => {
     model_value.value = ids
   },
 })
-
-function removeItem(id: string) {
-  model_value.value = model_value.value.filter((item_id: string) => item_id !== id)
-}
 </script>
 <style lang="scss" scoped></style>

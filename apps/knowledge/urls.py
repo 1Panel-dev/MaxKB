@@ -15,6 +15,8 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/model', views.KnowledgeView.Model.as_view()),
     path('workspace/<str:workspace_id>/knowledge/embedding_model', views.KnowledgeView.EmbeddingModel.as_view()),
     path('workspace/<str:workspace_id>/knowledge/tags', views.KnowledgeView.Tags.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/batch_delete', views.KnowledgeView.BatchDelete.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/batch_move', views.KnowledgeView.BatchMove.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>', views.KnowledgeView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/sync', views.KnowledgeView.SyncWeb.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/workflow', views.KnowledgeWorkflowView.Operate.as_view()),

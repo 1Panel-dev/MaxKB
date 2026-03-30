@@ -9175,3 +9175,16 @@ msgstr "Batch delete applications"
 
 msgid "Batch move applications"
 msgstr "Batch move applications"
+
+msgid "Batch delete knowledge"
+msgstr "Batch delete knowledge"
+
+msgid "Batch move knowledge"
+msgstr "Batch move knowledge"
+
+msgid "Batch delete tools"
+msgstr "Batch delete tools"
+
+msgid "Batch move tools"
+msgstr "Batch move tools"
+
