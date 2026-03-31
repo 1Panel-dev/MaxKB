@@ -79,20 +79,21 @@ class BaseVariableAssignNode(IVariableAssignNode):
         result_list = []
         contains_chat_variable = False
         for variable in variable_list:
-            if 'fields' not in variable:
+            if not variable.get('fields'):
                 continue
 
-            if 'global' == variable['fields'][0]:
+            field0 = variable['fields'][0]
+            if 'global' == field0:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            elif 'chat' == variable['fields'][0]:
+            elif 'chat' == field0:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
                 contains_chat_variable = True
-            elif 'loop' == variable['fields'][0]:
+            elif 'loop' == field0:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
-            elif 'output' == variable['fields'][0]:
+            elif 'output' == field0:
                 result = self.handle(variable, self.out_evaluation)
                 result_list.append(result)
 
