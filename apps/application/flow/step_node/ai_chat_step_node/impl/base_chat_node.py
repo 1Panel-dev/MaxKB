@@ -428,13 +428,19 @@ class BaseChatNode(IChatNode):
         if len(mcp_servers_config) > 0 or len(tools) > 0:
             # 安全获取 application
             application_id = None
-            if (self.workflow_manage and
-                    self.workflow_manage.work_flow_post_handler and
-                    self.workflow_manage.work_flow_post_handler.chat_info):
+            tool_id = None
+            knowledge_id = None
+            if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                    self.workflow_manage.flow.workflow_mode):
+                knowledge_id = self.workflow_params.get('knowledge_id')
+            elif [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP].__contains__(
+                    self.workflow_manage.flow.workflow_mode):
                 application_id = self.workflow_manage.work_flow_post_handler.chat_info.application.id
-            knowledge_id = self.workflow_params.get('knowledge_id')
-            source_id = application_id or knowledge_id
-            source_type = 'APPLICATION' if application_id else 'KNOWLEDGE'
+            elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+                tool_id = self.workflow_params.get('tool_id')
+
+            source_id = application_id or knowledge_id or tool_id
+            source_type = 'APPLICATION' if application_id else 'KNOWLEDGE' if knowledge_id else 'TOOL'
             r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable,
                                        tool_init_params, source_id, source_type, chat_id, tools)
             return NodeResult(
