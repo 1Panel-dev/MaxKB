@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.api.application_api import SpeechToTextAPI
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
@@ -13,7 +14,7 @@ from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
 from tools.api.tool_workflow import ToolWorkflowApi, ToolWorkflowExportApi, ToolWorkflowImportApi
-from tools.serializers.tool_workflow import ToolWorkflowSerializer
+from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer
 from tools.views import get_tool_operation_object
 
 
@@ -160,3 +161,29 @@ class ToolWorkflowDebugView(APIView):
             request.data,
             request.user,
             True)
+
+
+class McpServers(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get the list of MCP tools"),
+        summary=_("Get the list of MCP tools"),
+        operation_id=_("Get the list of MCP tools"),  # type: ignore
+        parameters=SpeechToTextAPI.get_parameters(),
+        request=SpeechToTextAPI.get_request(),
+        responses=SpeechToTextAPI.get_response(),
+        tags=[_('Tool')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+                     PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id, tool_id: str):
+        return result.success(ToolWorkflowMcpSerializer(
+            data={'mcp_servers': request.query_params.get('mcp_servers'), 'workspace_id': workspace_id,
+                  'user_id': request.user.id,
+                  'tool_id': tool_id}).get_mcp_servers(request.data))

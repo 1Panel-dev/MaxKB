@@ -64,7 +64,12 @@
                 </el-avatar>
                 <ToolIcon v-else :size="20" :type="mcpTool?.tool_type" class="mr-8" />
                 <span>{{ mcpTool.name }}</span>
-                <el-tag v-if="mcpTool.scope === 'SHARED'" size="small" type="info" class="info-tag ml-8">
+                <el-tag
+                  v-if="mcpTool.scope === 'SHARED'"
+                  size="small"
+                  type="info"
+                  class="info-tag ml-8"
+                >
                   {{ t('views.shared.title') }}
                 </el-tag>
               </div>
@@ -371,15 +376,22 @@ function getTools() {
 }
 
 function _getTools(mcp_servers: any) {
-  console.log({ type: [WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflow_mode)
-      ? 'application'
-      : 'knowledge',
-    systemType: apiType.value
-  })
-  loadSharedApi({
+  console.log({
     type: [WorkflowMode.Application, WorkflowMode.ApplicationLoop].includes(workflow_mode)
       ? 'application'
       : 'knowledge',
+    systemType: apiType.value,
+  })
+  const resourceDict = {
+    [WorkflowMode.Application]: 'application',
+    [WorkflowMode.ApplicationLoop]: 'application',
+    [WorkflowMode.Knowledge]: 'knowledge',
+    [WorkflowMode.KnowledgeLoop]: 'knowledge',
+    [WorkflowMode.Tool]: 'tool',
+    [WorkflowMode.ToolLoop]: 'tool',
+  }
+  loadSharedApi({
+    type: resourceDict[workflow_mode],
     systemType: apiType.value,
   })
     .getMcpTools(id, mcp_servers, loading)

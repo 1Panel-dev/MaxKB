@@ -33,5 +33,6 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/tool_version', views.ToolWorkflowVersionView.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/tool_version/<int:current_page>/<int:page_size>', views.ToolWorkflowVersionView.Page.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/tool_version/<str:tool_version_id>', views.ToolWorkflowVersionView.Operate.as_view()),
+    path('workspace/<str:workspace_id>/tool/<str:tool_id>/mcp_tools', views.McpServers.as_view()),
 
 ]

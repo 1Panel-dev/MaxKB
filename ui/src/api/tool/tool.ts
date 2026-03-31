@@ -290,7 +290,16 @@ const generateCode: (data: any) => Promise<Result<any>> = (data: any) => {
   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
   return postStream(`${p}${prefix.value}/generate_code`, data)
 }
-
+/**
+ * mcp 节点
+ */
+const getMcpTools: (
+  tool_id: string,
+  mcp_servers: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, mcp_servers, loading) => {
+  return post(`${prefix.value}/${tool_id}/mcp_tools`, { mcp_servers }, {}, loading)
+}
 export default {
   getToolList,
   getAllToolList,
@@ -318,4 +327,5 @@ export default {
   publish,
   debugToolWorkflow,
   generateCode,
+  getMcpTools,
 }

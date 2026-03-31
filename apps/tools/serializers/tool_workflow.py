@@ -6,6 +6,8 @@
     @date：2026/3/6 13:59
     @desc:
 """
+import asyncio
+import json
 # coding=utf-8
 import pickle
 from functools import reduce
@@ -24,6 +26,7 @@ from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler
 from application.flow.tool_workflow_manage import ToolWorkflowManage
 from application.models import ChatRecord
+from application.serializers.application import McpServersSerializer, get_mcp_tools
 from application.serializers.common import ToolExecute
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
@@ -169,6 +172,9 @@ class ToolWorkflowSerializer(serializers.Serializer):
                                                                          'work_flow': instance.get('work_flow',
                                                                                                    {}), },
                                                         defaults={
+                                                            'tool_id': self.data.get("tool_id"),
+                                                            'workspace_id': self.data.get(
+                                                                'workspace_id'),
                                                             'work_flow': instance.get('work_flow')
                                                         })
                 return self.one()
@@ -192,5 +198,40 @@ class ToolWorkflowSerializer(serializers.Serializer):
 
         def one(self):
             self.is_valid(raise_exception=True)
-            workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get('knowledge_id')).first()
+            workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get('tool_id')).first()
             return {**ToolWorkflowModelSerializer(workflow).data}
+
+
+class ToolWorkflowMcpSerializer(serializers.Serializer):
+    tool_id = serializers.UUIDField(required=True, label=_('Tool id'))
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get('workspace_id')
+        query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _('Tool id does not exist'))
+
+    def get_mcp_servers(self, instance, with_valid=True):
+        if with_valid:
+            self.is_valid(raise_exception=True)
+            McpServersSerializer(data=instance).is_valid(raise_exception=True)
+        servers = json.loads(instance.get('mcp_servers'))
+        for server, config in servers.items():
+            if config.get('transport') not in ['sse', 'streamable_http']:
+                raise AppApiException(500, _('Only support transport=sse or transport=streamable_http'))
+        tools = []
+        for server in servers:
+            tools += [
+                {
+                    'server': server,
+                    'name': tool.name,
+                    'description': tool.description,
+                    'args_schema': tool.args_schema,
+                }
+                for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
+        return tools
