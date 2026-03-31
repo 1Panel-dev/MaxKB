@@ -36,7 +36,7 @@ class ToolType(models.TextChoices):
     SKILL = "SKILL", "技能"
     MCP = "MCP", "MCP工具"
     DATA_SOURCE = "DATA_SOURCE", "数据源"
-    WORKFLOW = "WORKFLOW"
+    WORKFLOW = "WORKFLOW", "工作流"
 
 
 class ToolTaskTypeChoices(models.TextChoices):

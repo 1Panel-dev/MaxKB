@@ -5,6 +5,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from application.api.application_api import SpeechToTextAPI
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
@@ -13,7 +14,7 @@ from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
 from tools.api.tool_workflow import ToolWorkflowApi, ToolWorkflowExportApi, ToolWorkflowImportApi
-from tools.serializers.tool_workflow import ToolWorkflowSerializer
+from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer
 from tools.views import get_tool_operation_object
 
 
@@ -46,73 +47,6 @@ class ToolWorkflowView(APIView):
                 ToolWorkflowSerializer.Operate(
                     data={'tool_id': tool_id, 'user_id': request.user.id,
                           'workspace_id': workspace_id, }).publish())
-
-    class Export(APIView):
-        authentication_classes = [TokenAuth]
-
-        @extend_schema(
-            methods=['GET'],
-            description=_('Export tool workflow'),
-            summary=_('Export tool workflow'),
-            operation_id=_('Export tool workflow'),  # type: ignore
-            parameters=ToolWorkflowExportApi.get_parameters(),
-            request=None,
-            responses=ToolWorkflowExportApi.get_response(),
-            tags=[_('Tool')]  # type: ignore
-        )
-        @has_permissions(
-            PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
-            PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_tool_permission()],
-                CompareConstants.AND
-            )
-        )
-        @log(menu='Tool', operate="Export tool workflow",
-             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-             )
-        def get(self, request: Request, workspace_id: str, tool_id: str):
-            return ToolWorkflowSerializer.Export(
-                data={'tool_id': tool_id, 'user_id': request.user.id, 'workspace_id': workspace_id}
-            ).export()
-
-    class Import(APIView):
-        authentication_classes = [TokenAuth]
-
-        @extend_schema(
-            methods=['POST'],
-            description=_('Import tool workflow'),
-            summary=_('Import tool workflow'),
-            operation_id=_('Import tool workflow'),  # type: ignore
-            parameters=ToolWorkflowImportApi.get_parameters(),
-            request=ToolWorkflowImportApi.get_request(),
-            responses=ToolWorkflowImportApi.get_response(),
-            tags=[_('Tool')]  # type: ignore
-        )
-        @has_permissions(
-            PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
-            PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission(
-                [RoleConstants.USER.get_workspace_role()],
-                [PermissionConstants.KNOWLEDGE.get_workspace_tool_permission()],
-                CompareConstants.AND
-            )
-        )
-        @log(menu='Tool', operate="Import tool workflow",
-             get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool')),
-             )
-        def post(self, request: Request, workspace_id: str, tool_id: str):
-            is_import_tool = get_is_permissions(request, workspace_id=workspace_id)(
-                PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
-                PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
-                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
-            )
-            return result.success(ToolWorkflowSerializer.Import(data={
-                'tool_id': tool_id, 'user_id': request.user.id, 'workspace_id': workspace_id
-            }).import_({'file': request.FILES.get('file')}, is_import_tool))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
@@ -227,3 +161,29 @@ class ToolWorkflowDebugView(APIView):
             request.data,
             request.user,
             True)
+
+
+class McpServers(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get the list of MCP tools"),
+        summary=_("Get the list of MCP tools"),
+        operation_id=_("Get the list of MCP tools"),  # type: ignore
+        parameters=SpeechToTextAPI.get_parameters(),
+        request=SpeechToTextAPI.get_request(),
+        responses=SpeechToTextAPI.get_response(),
+        tags=[_('Tool')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
+                     PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id, tool_id: str):
+        return result.success(ToolWorkflowMcpSerializer(
+            data={'mcp_servers': request.query_params.get('mcp_servers'), 'workspace_id': workspace_id,
+                  'user_id': request.user.id,
+                  'tool_id': tool_id}).get_mcp_servers(request.data))

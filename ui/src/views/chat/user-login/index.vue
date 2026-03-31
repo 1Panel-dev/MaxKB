@@ -314,25 +314,27 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
     const config = res.data.config
     const queryParams = new URLSearchParams(route.query as any).toString()
     // 构造带查询参数的redirectUrl
-    let redirectUrl = `${config.redirectUrl}/${accessToken}`
+    let redirectUrl = `${config.redirectUrl}`
+    let redirectUrlCallback = `${config.redirectUrl}/${accessToken}`
     if (queryParams) {
-      redirectUrl += `?${queryParams}`
+      redirectUrlCallback += `?${queryParams}`
+      redirectUrl += `&${queryParams}`
     }
     let url
     if (authType === 'CAS') {
       url = config.ldpUri
       url +=
         url.indexOf('?') !== -1
-          ? `&service=${encodeURIComponent(redirectUrl)}`
-          : `?service=${encodeURIComponent(redirectUrl)}`
+          ? `&service=${encodeURIComponent(redirectUrlCallback)}`
+          : `?service=${encodeURIComponent(redirectUrlCallback)}`
     } else if (authType === 'OIDC') {
       const scope = config.scope || 'openid+profile+email'
-      url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`
+      url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrlCallback}&response_type=code&scope=${scope}`
       if (config.state) {
         url += `&state=${config.state}`
       }
     } else if (authType === 'OAuth2') {
-      url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}`
+      url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${uuidv4()}_${accessToken}`
       if (config.scope) {
         url += `&scope=${config.scope}`
       }

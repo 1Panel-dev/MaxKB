@@ -6,10 +6,16 @@ export default {
   importTool: '导入工具',
   settingTool: '设置工具',
   updatedVersion: '更新版本',
+  generateCodeDialog: {
+    generatePrompt: '生成 Python 代码',
+    placeholder: '请输入主题',
+    title: 'python 代码显示在这里',
+  },
   toolWorkflow: {
+    title: '工作流',
     creatToolWorkflow: '创建工作流',
     toActiveTip: '无法启用，请先发布工作流。',
-    debugResult:'调试结果'
+    debugResult: '调试结果',
   },
   dataSource: {
     title: '数据源',

@@ -130,7 +130,7 @@ export default {
     continue: '继续生成',
     replace: '替换',
     exit: '确认退出并舍弃 AI 生成的内容吗？',
-    loading: '生成中...',
+    loading: '生成中',
   },
   dialog: {
     addKnowledge: '添加关联知识库',

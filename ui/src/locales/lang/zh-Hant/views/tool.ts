@@ -6,7 +6,13 @@ export default {
   importTool: '匯入工具',
   settingTool: '設定工具',
   updatedVersion: '更新版本',
+  generateCodeDialog: {
+    generatePrompt: '生成 Python 代码',
+    placeholder: '請輸入主題',
+    title: 'python 代码顯示在這裡',
+  },
   toolWorkflow: {
+    title: '工作流',
     creatToolWorkflow: '創建工作流',
     toActiveTip: '無法啓用，請先發布工作流。',
     debugResult: '調試結果',

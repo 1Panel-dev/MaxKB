@@ -413,7 +413,7 @@ const importKnowledgeWorkflow = (file: any) => {
 
 function exportToolWorkflow(name: string, id: string) {
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
-    .exportToolWorkflow(id, name, loading)
+    .exportTool(id, name, loading)
     .catch((error: any) => {
       if (error.response.status !== 403) {
         error.response.data.text().then((res: string) => {

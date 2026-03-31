@@ -190,9 +190,9 @@
                 <el-icon class="mr-8 arrow-icon" :class="collapseData.MCP ? 'rotate-90' : ''">
                   <CaretRight /> </el-icon
                 >MCP
-                <span class="ml-4" v-if="chat_data.mcp_tool_ids?.length">
-                  ({{ chat_data.mcp_tool_ids?.length }})</span
-                >
+                <span class="ml-4" v-if="chat_data.mcp_tool_ids?.filter((id: any) => relatedObject(mcpToolSelectOptions, id, 'id'))?.length">
+                  ({{ chat_data.mcp_tool_ids?.filter((id: any) => relatedObject(mcpToolSelectOptions, id, 'id'))?.length }})
+                </span>
               </div>
               <div class="flex">
                 <el-button
@@ -268,9 +268,9 @@
                   <CaretRight />
                 </el-icon>
                 {{ $t('views.tool.title') }}
-                <span class="ml-4" v-if="chat_data.tool_ids?.length">
-                  ({{ chat_data.tool_ids?.length }})</span
-                >
+                <span class="ml-4" v-if="chat_data.tool_ids?.filter((id: any) => relatedObject(toolSelectOptions, id, 'id'))?.length">
+                  ({{ chat_data.tool_ids?.filter((id: any) => relatedObject(toolSelectOptions, id, 'id'))?.length }})
+                </span>
               </div>
               <div class="flex">
                 <el-button type="primary" link @click="openToolDialog" @refreshForm="refreshParam">
@@ -280,7 +280,11 @@
             </div>
             <div class="w-full mb-16" v-if="chat_data.tool_ids?.length > 0 && collapseData.tool">
               <template v-for="(item, index) in chat_data.tool_ids" :key="index">
-                <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+                <div
+                  class="flex-between border border-r-6 white-bg mb-4"
+                  style="padding: 5px 8px"
+                  v-if="relatedObject(toolSelectOptions, item, 'id')"
+                >
                   <div class="flex align-center" style="line-height: 20px">
                     <el-avatar
                       v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
@@ -319,9 +323,9 @@
                   <CaretRight />
                 </el-icon>
                 Skills
-                <span class="ml-4" v-if="chat_data.skill_tool_ids?.length">
-                  ({{ chat_data.skill_tool_ids?.length }})</span
-                >
+                <span class="ml-4" v-if="chat_data.skill_tool_ids?.filter((id: any) => relatedObject(skillToolSelectOptions, id, 'id'))?.length">
+                  ({{ chat_data.skill_tool_ids?.filter((id: any) => relatedObject(skillToolSelectOptions, id, 'id'))?.length }})
+                </span>
               </div>
               <div class="flex">
                 <el-button

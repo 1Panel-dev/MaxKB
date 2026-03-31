@@ -23,7 +23,7 @@
           @blur="form.field = form.field.trim()"
         />
       </el-form-item>
-      <el-form-item :label="$t('dynamicsForm.paramForm.name.label')">
+      <el-form-item :label="$t('dynamicsForm.paramForm.name.label')" prop="label">
         <el-input
           v-model="form.label"
           :placeholder="$t('dynamicsForm.paramForm.name.placeholder')"
@@ -84,6 +84,13 @@ const rules = reactive({
     {
       required: true,
       message: t('views.tool.form.paramName.placeholder'),
+      trigger: 'blur',
+    },
+  ],
+  label: [
+    {
+      required: true,
+      message: t('dynamicsForm.paramForm.name.placeholder'),
       trigger: 'blur',
     },
   ],

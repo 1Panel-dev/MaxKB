@@ -6,14 +6,15 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
+from common.auth.authentication import has_permissions, check_batch_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
-from common.result import result
+from common import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
-    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI, GetInternalToolAPI, AddInternalToolAPI
+    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI, GetInternalToolAPI, AddInternalToolAPI, \
+    ToolBatchOperateAPI
 from tools.models import ToolScope, Tool
-from tools.serializers.tool import ToolSerializer, ToolTreeSerializer
+from tools.serializers.tool import ToolSerializer, ToolTreeSerializer, ToolBatchOperateSerializer
 
 
 def get_tool_operation_object(tool_id):
@@ -21,6 +22,15 @@ def get_tool_operation_object(tool_id):
     if tool_model is not None:
         return {
             "name": tool_model.name
+        }
+    return {}
+
+def get_tool_operation_object_batch(tool_id_list):
+    tool_model_list = QuerySet(model=Tool).filter(id__in=tool_id_list)
+    if tool_model_list is not None:
+        return {
+            "name": f'[{",".join([t.name for t in tool_model_list])}]',
+            'tool_list': [{'name': t.name} for t in tool_model_list]
         }
     return {}
 
@@ -185,6 +195,83 @@ class ToolView(APIView):
             return result.success(ToolSerializer.Operate(
                 data={'id': tool_id, 'workspace_id': workspace_id}
             ).delete())
+
+    class BatchDelete(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch delete tools"),
+            summary=_("Batch delete tools"),
+            operation_id=_("Batch delete tools"),
+            parameters=ToolBatchOperateAPI.get_parameters(),
+            request=ToolBatchOperateAPI.get_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Tool')]
+        )
+        @has_permissions(PermissionConstants.TOOL_BATCH_DELETE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'tool_id',
+                (PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
+                 PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()), workspace_id=workspace_id
+            )
+
+            @log(menu='Tool', operate='Batch delete tools',
+                 get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids))
+            def inner(view, r, **kwargs):
+                return ToolBatchOperateSerializer(
+                    data={'workspace_id': workspace_id}
+                ).batch_delete({'id_list': permitted_ids})
+
+            return result.success(inner(self, request, workspace_id=workspace_id))
+
+    class BatchMove(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch move tools"),
+            summary=_("Batch move tools"),
+            operation_id=_("Batch move tools"),
+            parameters=ToolBatchOperateAPI.get_parameters(),
+            request=ToolBatchOperateAPI.get_move_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Tool')]
+        )
+        @has_permissions(PermissionConstants.TOOL_BATCH_MOVE.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'tool_id',
+                (PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+                 PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()),
+                workspace_id=workspace_id
+            )
+
+            @log(menu='Tool', operate='Batch move tools',
+                 get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids))
+            def inner(view, r, **kwargs):
+                return ToolBatchOperateSerializer(
+                    data={'workspace_id': workspace_id}
+                ).batch_move({'id_list': permitted_ids, 'folder_id': request.data.get('folder_id')})
+
+            return result.success(inner(self, request, workspace_id=workspace_id))
 
     class Page(APIView):
         authentication_classes = [TokenAuth]

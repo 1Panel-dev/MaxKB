@@ -80,7 +80,13 @@ class IDocumentSplitNode(INode):
         return DocumentSplitNodeSerializer
 
     def _run(self):
-        return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+            WorkflowMode.TOOL_LOOP].__contains__(
+            self.workflow_manage.flow.workflow_mode):
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
+                                **{'knowledge_id': None})
+        else:
+            return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data)
 
     def execute(self, document_list, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
                 paragraph_title_relate_problem, paragraph_title_relate_problem_reference,

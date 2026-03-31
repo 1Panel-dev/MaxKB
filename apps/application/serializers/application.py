@@ -55,7 +55,7 @@ from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolScope, ToolType
+from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from tools.serializers.tool import ToolExportModelSerializer
 from trigger.models import TriggerTask, Trigger
 from users.models import User
@@ -93,6 +93,10 @@ def hand_node(node, update_tool_map):
         mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
         node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
                                                                                              mcp_tool_id)
+    if node.get('type') == 'tool-workflow-lib-node':
+        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
+        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id,
+                                                                                             tool_lib_id)
 
 
 class MKInstance:
@@ -628,6 +632,12 @@ class ApplicationSerializer(serializers.Serializer):
         if is_import_tool:
             if len(tool_model_list) > 0:
                 QuerySet(Tool).bulk_create(tool_model_list)
+                QuerySet(ToolWorkflow).bulk_create(
+                    [ToolWorkflow(workspace_id=workspace_id,
+                                  work_flow=self.reset_workflow(tool.get('work_flow'), update_tool_map),
+                                  tool_id=tool.get('id'))
+                     for
+                     tool in tool_list if tool.get('tool_type') == ToolType.WORKFLOW])
                 UserResourcePermissionSerializer(data={
                     'workspace_id': self.data.get('workspace_id'),
                     'user_id': self.data.get('user_id'),
@@ -669,6 +679,15 @@ class ApplicationSerializer(serializers.Serializer):
                     scope=ToolScope.WORKSPACE,
                     folder_id=workspace_id,
                     workspace_id=workspace_id)
+
+    @staticmethod
+    def reset_workflow(work_flow, update_tool_map):
+        for node in work_flow.get('nodes', []):
+            hand_node(node, update_tool_map)
+            if node.get('type') == 'loop-node':
+                for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
+                    hand_node(n, update_tool_map)
+        return work_flow
 
     @staticmethod
     def to_application(application, workspace_id, user_id, update_tool_map, folder_id):
@@ -844,13 +863,16 @@ class ApplicationOperateSerializer(serializers.Serializer):
             application_id = self.data.get('application_id')
             application = QuerySet(Application).filter(id=application_id).first()
             from application.flow.tools import get_tool_id_list
-            tool_id_list = get_tool_id_list(application.work_flow)
+            tool_id_list = get_tool_id_list(application.work_flow, True)
             if len(tool_id_list) > 0:
                 tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
             else:
                 tool_list = QuerySet(Tool).filter(
                     id__in=application.tool_ids + application.mcp_tool_ids + application.skill_tool_ids
                 ).exclude(scope=ToolScope.SHARED)
+            tw_dict = {tw.tool_id: tw
+                       for tw in QuerySet(ToolWorkflow).filter(
+                    tool_id__in=[tool.id for tool in tool_list if tool.tool_type == ToolType.WORKFLOW])}
             # 如果是技能工具，则需要将code字段转换为文件内容的base64字符串
             for tool in tool_list:
                 if tool.tool_type == ToolType.SKILL:
@@ -862,7 +884,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             mk_instance = MKInstance(application_dict,
                                      [],
                                      'v2',
-                                     [ToolExportModelSerializer(tool).data for tool in
+                                     [self.to_tool_dict(tool, tw_dict) for tool in
                                       tool_list])
             application_pickle = pickle.dumps(mk_instance)
             response = HttpResponse(content_type='text/plain', content=application_pickle)
@@ -870,6 +892,12 @@ class ApplicationOperateSerializer(serializers.Serializer):
             return response
         except Exception as e:
             return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    @staticmethod
+    def to_tool_dict(tool, tool_workflow_dict):
+        if tool.tool_type == ToolType.WORKFLOW:
+            return {**ToolExportModelSerializer(tool).data, 'work_flow': tool_workflow_dict.get(tool.id).work_flow}
+        return ToolExportModelSerializer(tool).data
 
     @staticmethod
     def reset_application_version(application_version, application):
@@ -1329,7 +1357,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
         from trigger.serializers.trigger import TriggerModelSerializer
 
         if with_valid:
-            BatchSerializer(data=instance).is_valid(model=Application,raise_exception=True)
+            BatchSerializer(data=instance).is_valid(model=Application, raise_exception=True)
             self.is_valid(raise_exception=True)
         id_list = instance.get("id_list")
         workspace_id = self.data.get('workspace_id')

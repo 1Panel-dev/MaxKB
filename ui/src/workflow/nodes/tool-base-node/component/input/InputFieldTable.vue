@@ -17,7 +17,20 @@
   </div>
 
   <el-table ref="inputFieldTableRef" :data="inputFieldList" class="mb-16">
-    <el-table-column prop="field" :label="$t('views.tool.form.paramName.label')" />
+    <el-table-column prop="field" :label="$t('views.tool.form.paramName.label')">
+      <template #default="{ row }">
+        <span class="ellipsis-1" :title="row.field">
+          {{ row.field }}
+        </span>
+      </template>
+    </el-table-column>
+    <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')">
+      <template #default="{ row }">
+        <span class="ellipsis-1" :title="row.label">
+          {{ row.label }}
+        </span>
+      </template>
+    </el-table-column>
     <el-table-column :label="$t('views.tool.form.dataType.label')">
       <template #default="{ row }">
         <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
@@ -26,7 +39,7 @@
     <el-table-column :label="$t('common.required')">
       <template #default="{ row }">
         <div @click.stop>
-          <el-switch size="small" v-model="row.is_required" />
+          <el-switch disabled size="small" v-model="row.is_required" />
         </div>
       </template>
     </el-table-column>

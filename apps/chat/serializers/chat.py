@@ -446,6 +446,8 @@ class ChatSerializers(serializers.Serializer):
         application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
         if application_access_token and application_access_token.authentication and application_access_token.authentication_value.get(
                 'type') == 'login':
+            if chat_user_type == ChatUserType.ANONYMOUS_USER.value:
+                raise ChatException(500, _("The chat user is not authorized."))
             if chat_user_type == ChatUserType.CHAT_USER.value and is_auth_chat_user:
                 is_auth = is_auth_chat_user(chat_user_id, application_id)
                 if not is_auth:
