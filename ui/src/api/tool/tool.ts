@@ -229,21 +229,7 @@ const exportKnowledgeWorkflow = (
     loading,
   )
 }
-/**
- * 导出知识库工作流
- * @param knowledge_id
- * @param knowledge_name
- * @param loading
- * @returns
- */
-const exportToolWorkflow = (tool_id: string, tool_name: string, loading?: Ref<boolean>) => {
-  return exportFile(
-    tool_name + '.tool',
-    `${prefix.value}/${tool_id}/workflow/export`,
-    undefined,
-    loading,
-  )
-}
+
 /**
  * 导入工具工作流
  */
@@ -300,17 +286,20 @@ const debugToolWorkflow: (tool_id: string, data: any) => Promise<any> = (tool_id
   return postStream(`${p}${prefix.value}/${tool_id}/debug`, data)
 }
 
-const generateCode: (data:any) => Promise<Result<any>> = (
-  data: any,
-) => {
+const generateCode: (data: any) => Promise<Result<any>> = (data: any) => {
   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
-  return postStream(
-    `${p}${prefix.value}/generate_code`,
-    data,
-  )
+  return postStream(`${p}${prefix.value}/generate_code`, data)
 }
-
-
+/**
+ * mcp 节点
+ */
+const getMcpTools: (
+  tool_id: string,
+  mcp_servers: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, mcp_servers, loading) => {
+  return post(`${prefix.value}/${tool_id}/mcp_tools`, { mcp_servers }, {}, loading)
+}
 export default {
   getToolList,
   getAllToolList,
@@ -336,7 +325,7 @@ export default {
   listToolWorkflowVersion,
   updateToolWorkflowVersion,
   publish,
-  exportToolWorkflow,
   debugToolWorkflow,
   generateCode,
+  getMcpTools,
 }

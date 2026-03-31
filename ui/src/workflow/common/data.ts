@@ -976,7 +976,13 @@ const toolMenuNodes = [
   },
   {
     label: t('views.knowledge.title'),
-    list: [searchKnowledgeNode, searchDocumentNode, rerankerNode, documentExtractNode],
+    list: [
+      searchKnowledgeNode,
+      searchDocumentNode,
+      rerankerNode,
+      documentExtractNode,
+      documentSplitNode,
+    ],
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
@@ -1043,14 +1049,13 @@ export const toolLibNode = {
  */
 export const toolWorkflowLibNode = {
   type: WorkflowType.ToolWorkflowLib,
-  text: t('workflow.nodes.toolWorlflowNode.text','工作流工具'),
-  label: t('workflow.nodes.toolWorlflowNode.label','工作流工具'),
+  text: t('workflow.nodes.toolWorlflowNode.text', '工作流工具'),
+  label: t('workflow.nodes.toolWorlflowNode.label', '工作流工具'),
   height: 170,
   properties: {
-    stepName: t('workflow.nodes.toolWorlflowNode.label','工作流工具'),
+    stepName: t('workflow.nodes.toolWorlflowNode.label', '工作流工具'),
     config: {
-      fields: [
-      ],
+      fields: [],
     },
   },
 }

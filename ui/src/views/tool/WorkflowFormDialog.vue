@@ -80,18 +80,20 @@
         </el-button>
       </span>
     </template>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="WORKFLOW"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="WORKFLOW" />
   </el-dialog>
 </template>
 <script setup lang="ts">
 import { ref, watch, reactive, computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
 import { isAppIcon } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
+const router = useRouter()
 const { user, folder } = useStore()
 const emit = defineEmits(['refresh'])
 
@@ -194,6 +196,10 @@ const submitHandle = async () => {
             MsgSuccess(t('common.createSuccess'))
             emit('refresh', res.data)
             return user.profile().then(() => {
+              router.push({
+                name: 'ToolWorkflow',
+                params: { id: res.data.id, folderId: res.data.folder_id },
+              })
               dialogVisible.value = false
             })
           })

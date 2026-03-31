@@ -19,5 +19,5 @@ class RegoloImage(MaxKBBaseModel, BaseChatOpenAI):
             openai_api_key=model_credential.get('api_key'),
             streaming=True,
             stream_usage=True,
-            extra_body=optional_params
+            **optional_params,
         )

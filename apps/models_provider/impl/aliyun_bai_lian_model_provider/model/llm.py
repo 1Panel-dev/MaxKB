@@ -21,5 +21,5 @@ class BaiLianChatModel(MaxKBBaseModel, BaseChatOpenAI):
             openai_api_base=model_credential.get('api_base'),
             openai_api_key=model_credential.get('api_key'),
             streaming=True,
-            extra_body=optional_params
+            **optional_params,
         )

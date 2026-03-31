@@ -59,7 +59,8 @@ class IImageToVideoNode(INode):
                 self.node_params_serializer.data.get('last_frame_url')[1:])
         node_params_data = {k: v for k, v in self.node_params_serializer.data.items()
                             if k not in ['first_frame_url', 'last_frame_url']}
-        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+            WorkflowMode.TOOL_LOOP].__contains__(
                 self.workflow_manage.flow.workflow_mode):
             return self.execute(first_frame_url=first_frame_url, last_frame_url=last_frame_url, **node_params_data,
                                 **self.flow_params_serializer.data,
