@@ -151,11 +151,12 @@ watch(dialogVisible, (bool) => {
     FolderFormRef.value.resetFields()
   }
 })
-
+const details = ref<any>()
 const open = (data?: any) => {
   if (data) {
     //  编辑当前id
     editId.value = data.id
+    details.value = data
     workflowForm.value.name = data.name
     workflowForm.value.desc = data.desc
     workflowForm.value.icon = data.icon
@@ -166,7 +167,7 @@ const open = (data?: any) => {
 
 const EditAvatarDialogRef = ref()
 function openEditAvatar() {
-  EditAvatarDialogRef.value.open(workflowForm.value)
+  EditAvatarDialogRef.value.open(details.value)
 }
 
 function refreshTool(data: any) {
