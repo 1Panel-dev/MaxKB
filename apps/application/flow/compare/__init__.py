@@ -25,8 +25,8 @@ from .len_lt_compare import *
 from .lt_compare import *
 from .not_contain_compare import *
 from .not_equal_compare import *
-from .start_with import StartWithCompare
 from .regex_compare import RegexCompare
+from .start_with import StartWithCompare
 from .wildcard_compare import WildcardCompare
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
