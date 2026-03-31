@@ -12,6 +12,7 @@ from typing import List
 from application.flow.compare import Compare
 from common.cache.mem_cache import MemCache
 
+
 match_cache = MemCache('regex', {
     'TIMEOUT': 3600, # 缓存有效期为 1 小时
     'OPTIONS': {

@@ -13,6 +13,7 @@ from typing import List
 from application.flow.compare import Compare
 from common.cache.mem_cache import MemCache
 
+
 match_cache = MemCache('wildcard_to_regex', {
     'TIMEOUT': 3600, # 缓存有效期为 1 小时
     'OPTIONS': {
@@ -21,7 +22,7 @@ match_cache = MemCache('wildcard_to_regex', {
     },
 })
 
-# 转成正则执行，性能更高
+
 def translate_and_compile_and_cache(wildcard):
     match = match_cache.get(wildcard)
     if not match:
@@ -37,6 +38,6 @@ class WildcardCompare(Compare):
             return True
 
     def compare(self, source_value, compare, target_value):
-        # 转成正则执行，性能更高
+        # 转成正则，性能更高
         match = translate_and_compile_and_cache(str(target_value))
         return bool(match(str(source_value)))
