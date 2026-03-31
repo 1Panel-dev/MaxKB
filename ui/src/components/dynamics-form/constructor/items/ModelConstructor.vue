@@ -46,6 +46,7 @@
   <el-form-item
     :label="$t('dynamicsForm.ModelConstructor.defaultModel')"
     required
+    prop="default_value.model_id"
     :rules="[
       {
         required: true,
@@ -82,7 +83,7 @@
           </el-option>
         </el-option-group>
         <template #label="{ label, value }">
-          <el-space :size="8">
+          <el-space :size="8" v-if="value?.model_id">
             <span
               class="select-model-icon"
               :innerHTML="
@@ -218,7 +219,7 @@ const fetchModelByType = (type: string) => {
 
 const handleModelTypeChange = (val: string) => {
   formValue.value.provider_list = []
-  formValue.value.default_value = ''
+  formValue.value.default_value = {}
 
   if (val) {
     fetchModelByType(val)
@@ -275,7 +276,7 @@ const getData = () => {
 const rander = (form_data: any) => {
   formValue.value.model_type = form_data.model_type
   formValue.value.provider_list = form_data.attrs?.provider_list || []
-  formValue.value.default_value = form_data.default_value || ''
+  formValue.value.default_value = form_data.default_value || {}
 
   if (form_data.model_type) {
     fetchModelByType(form_data.model_type)
