@@ -80,7 +80,7 @@ class IDocumentSplitNode(INode):
         return DocumentSplitNodeSerializer
 
     def _run(self):
-        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP, WorkflowMode.TOOL,
+        if [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP, WorkflowMode.TOOL,
             WorkflowMode.TOOL_LOOP].__contains__(
             self.workflow_manage.flow.workflow_mode):
             return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data,
