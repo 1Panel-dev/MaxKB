@@ -98,16 +98,26 @@ class ToolWorkflowInstance:
 class ToolWorkflowSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
         tool_id = serializers.UUIDField(required=True, label=_('tool id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Tool id does not exist'))
 
         def debug(self, instance: Dict, user, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            workspace_id = tool_workflow.workspace_id
             tool_record_id = instance.get('chat_record_id') or str(uuid.uuid7())
             took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id,
-                                       self.data.get("workspace_id"),
+                                       workspace_id,
                                        None,
                                        None,
                                        True)
@@ -118,7 +128,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                     'chat_record_id': tool_record_id,
                     'tool_id': self.data.get("tool_id"),
                     'stream': True,
-                    'workspace_id': self.data.get("workspace_id"),
+                    'workspace_id': workspace_id,
                     **instance},
 
                 ToolWorkflowPostHandler(took_execute, self.data.get("tool_id")),
@@ -146,10 +156,10 @@ class ToolWorkflowSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid()
             user_id = self.data.get('user_id')
-            workspace_id = self.data.get("workspace_id")
+
             user = QuerySet(User).filter(id=user_id).first()
-            tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id"),
-                                                          workspace_id=workspace_id).first()
+            tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            workspace_id = tool_workflow.workspace_id
             work_flow_version = ToolWorkflowVersion(work_flow=tool_workflow.work_flow,
                                                     tool_id=self.data.get("tool_id"),
                                                     name=timezone.localtime(timezone.now()).strftime(
@@ -165,19 +175,19 @@ class ToolWorkflowSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
+            tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
+            workflow_id = tool.workspace_id
             if instance.get("work_flow"):
                 QuerySet(ToolWorkflow).update_or_create(tool_id=self.data.get("tool_id"),
                                                         create_defaults={'id': uuid.uuid7(),
                                                                          'tool_id': self.data.get(
                                                                              "tool_id"),
-                                                                         "workspace_id": self.data.get(
-                                                                             'workspace_id'),
+                                                                         "workspace_id": workflow_id,
                                                                          'work_flow': instance.get('work_flow',
                                                                                                    {}), },
                                                         defaults={
                                                             'tool_id': self.data.get("tool_id"),
-                                                            'workspace_id': self.data.get(
-                                                                'workspace_id'),
+                                                            'workspace_id': workflow_id,
                                                             'work_flow': instance.get('work_flow')
                                                         })
                 return self.one()
@@ -189,7 +199,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
                 ToolSerializer.Import(data={
                     'user_id': self.data.get('user_id'),
-                    'workspace_id': self.data.get('workspace_id'),
+                    'workspace_id': workflow_id,
                     'folder_id': tool.folder_id,
                     'file': bytes_to_uploaded_file(res.content, 'file.tool')
                 }).update_template_workflow(str(self.data.get('tool_id')))
