@@ -494,6 +494,39 @@ const postTransformWorkflow: (
   return post(`${prefix.value}/${knowledge_id}/transform_workflow`, data, undefined, loading)
 }
 
+/**
+ * 导出知识库
+ * @param knowledge_name 
+ * @param knowledge_id 
+ * @param loading 
+ * @returns 
+ */
+const exportKnowledgeBundle: (
+  knowledge_name: string,
+  knowledge_id: string,
+  loading?: Ref<boolean>
+) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+  return exportFile(
+    knowledge_name + '.zip',
+    `${prefix.value}/${knowledge_id}/export_knowledge`,undefined, loading
+  )
+}
+
+/**
+ * 导入知识库
+ * @param data 
+ * @param loading 
+ * @returns 
+ */
+const importKnowledgeBundle: (
+  data: any,
+  loading: Ref<boolean>
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix.value}/import_knowledge`, data, undefined, loading)
+}
+
+
+
 
 export default {
   getKnowledgeList,
@@ -534,4 +567,6 @@ export default {
   exportKnowledgeWorkflow,
   importKnowledgeWorkflow,
   postTransformWorkflow,
+  exportKnowledgeBundle,
+  importKnowledgeBundle
 }

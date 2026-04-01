@@ -9311,3 +9311,36 @@ msgstr "批量移動工具"
 msgid "Model is not allowed to be empty"
 msgstr "模型不能为空"
 
+msgid "Not a valid zip file"
+msgstr "不是有效的 zip 檔案"
+
+msgid "Not a valid KB export file, missing knowledge.json"
+msgstr "不是有效的知識庫匯出檔案，缺少 knowledge.json"
+
+msgid "Not a valid KB export file, missing knowledge.xlsx"
+msgstr "不是有效的知識庫匯出檔案，缺少 knowledge.xlsx"
+
+msgid "Tags"
+msgstr "標籤"
+
+msgid "Hit handling method"
+msgstr "命中處理方式"
+
+msgid "Directly return similarity"
+msgstr "直接回傳相似度"
+
+msgid "Paragraph is active"
+msgstr "段落是否啟用"
+
+msgid "Document type"
+msgstr "文件類型"
+
+msgid "Document meta"
+msgstr "文件元資料"
+
+msgid "Export knowledge bundle"
+msgstr "匯出知識庫"
+
+msgid "Import knowledge bundle"
+msgstr "匯入知識庫"
+

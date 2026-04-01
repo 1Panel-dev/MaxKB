@@ -1,6 +1,7 @@
 import io
 import json
 import os
+import pickle
 import re
 import tempfile
 import traceback
@@ -9,17 +10,19 @@ from collections import defaultdict
 from functools import reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
+from urllib.parse import quote
 
 import requests
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
 from django.core import validators
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction, models
 from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
 from common.config.embedding_config import VectorStore
@@ -28,13 +31,15 @@ from common.db.search import native_search, get_dynamics_model, native_page_sear
 from common.db.sql_execute import select_list
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
-from common.utils.common import post, get_file_content, parse_image
+from common.field.common import UploadedFileField
+from common.utils.common import post, get_file_content, parse_image, bulk_create_in_batches
 from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, KnowledgeWorkflow
-from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
+    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, DocumentTag, KnowledgeWorkflow, \
+    FileSourceType
+from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer, ProblemParagraphObject
 from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, \
     GenerateRelatedSerializer, get_embedding_model_by_knowledge_id, list_paragraph, write_image, zip_dir, \
@@ -65,6 +70,10 @@ class KnowledgeBaseCreateRequest(serializers.Serializer):
     folder_id = serializers.CharField(required=True, label=_('folder id'))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('knowledge description'))
     embedding_model_id = serializers.CharField(required=True, label=_('knowledge embedding'))
+
+
+class KnowledgeImportRequest(serializers.Serializer):
+    file = UploadedFileField(required=True, label=_("file"))
 
 
 class KnowledgeWebCreateRequest(serializers.Serializer):
@@ -479,6 +488,167 @@ class KnowledgeSerializer(serializers.Serializer):
             response.write(zip_buffer.getvalue())
             return response
 
+        def export_knowledge(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            knowledge_id = self.data.get("knowledge_id")
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+
+            document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
+            paragraph_list = native_search(
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph_document_name.sql')
+                )
+            )
+            problem_mapping_list = native_search(
+                QuerySet(ProblemParagraphMapping).filter(knowledge_id=self.data.get("knowledge_id")),
+                get_file_content(os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_problem_mapping.sql')),
+                with_table_name=True
+            )
+            data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
+                paragraph_list, problem_mapping_list, document_list
+            )
+
+            # 查询标签和文档标签关联
+            tag_list = list(QuerySet(Tag).filter(knowledge_id=knowledge_id).values('id', 'key', 'value'))
+            document_tag_list = list(
+                QuerySet(DocumentTag).filter(document__knowledge_id=knowledge_id).values('document_id', 'tag_id')
+            )
+            # 知识库标签map
+            tag_map = {t['id']: t for t in tag_list}
+            # 文档标签map
+            doc_tag_map = defaultdict(list)
+
+            for dt in document_tag_list:
+                tag = tag_map.get(dt['tag_id'])
+                if tag:
+                    doc_tag_map[dt['document_id']].append(f"{tag['key']}:{tag['value']}")
+
+            # doc_id -> document_obj
+            doc_obj_map = {doc.id: doc for doc in document_list}
+
+            # paragraph_id -> is_active
+            paragraph_active_map = {}
+            for p in paragraph_list:
+                doc_id = p.get('document_id')
+                if doc_id not in paragraph_active_map:
+                    paragraph_active_map[doc_id] = []
+                paragraph_active_map[doc_id].append('1' if p.get('is_active') else '0')
+
+            res = [parse_image(paragraph.get('content')) for paragraph in paragraph_list]
+            # 新增字段
+            workbook = self._get_knowledge_workbook(data_dict, document_dict, doc_tag_map, doc_obj_map,
+                                                    paragraph_active_map)
+
+            response = HttpResponse(content_type='application/zip')
+            response['Content-Disposition'] = f"attachment; filename*=UTF-8''{quote(knowledge.name)}.zip"
+            zip_buffer = io.BytesIO()
+            with TemporaryDirectory() as tempdir:
+                knowledge_file_path = os.path.join(tempdir, 'knowledge.xlsx')
+                workbook.save(knowledge_file_path)
+
+                for r in res:
+                    write_image(tempdir, r)
+
+                knowledge_json = {
+                    'name': knowledge.name,
+                    'desc': knowledge.desc,
+                    'type': knowledge.type,
+                    'meta': knowledge.meta if knowledge.meta else {},
+                    'file_size_limit': knowledge.file_size_limit,
+                    'file_count_limit': knowledge.file_count_limit,
+                    'tags': [{'key': t['key'], 'value': t['value']} for t in tag_list]
+                }
+
+                with open(os.path.join(tempdir, 'knowledge.json'), 'w', encoding='utf-8') as f:
+                    json.dump(knowledge_json, f, ensure_ascii=False)
+
+                if knowledge.type == KnowledgeType.WORKFLOW:
+                    knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
+                    if knowledge_workflow:
+                        from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
+                        from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowModelSerializer
+                        from application.flow.tools import get_tool_id_list
+                        from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
+                        from knowledge.serializers.knowledge_workflow import KBWFInstance
+
+                        tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
+                        tool_list = []
+                        if len(tool_id_list) > 0:
+                            tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                        tw_dict = {tw.tool_id: tw
+                                   for tw in QuerySet(ToolWorkflow).filter(
+                                tool_id__in=[tool.id for tool in tool_list if tool.tool_type == ToolType.WORKFLOW])}
+                        knowledge_workflow_dict = KnowledgeWorkflowModelSerializer(knowledge_workflow).data
+
+                        kbwf_instance = KBWFInstance(
+                            knowledge_workflow_dict,
+                            [],
+                            'v2',
+                            [KnowledgeWorkflowSerializer.Export.to_tool_dict(tool, tw_dict) for tool in tool_list]
+                        )
+                        knowledge_workflow_pickle = pickle.dumps(kbwf_instance)
+                        with open(os.path.join(tempdir, 'workflow.kbwf'), 'wb') as f:
+                            f.write(knowledge_workflow_pickle)
+                zip_dir(tempdir, zip_buffer)
+            response.write(zip_buffer.getvalue())
+            return response
+
+        @staticmethod
+        def _get_knowledge_workbook(data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict,
+                                    paragraph_active_map: dict):
+            import openpyxl
+            from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+            workbook = openpyxl.Workbook()
+            workbook.remove(workbook.active)
+            if len(data_dict.keys()) == 0:
+                data_dict['sheet'] = []
+            for sheet_id in data_dict:
+                sheet_name = document_dict.get(sheet_id)
+                worksheet = workbook.create_sheet(sheet_name)
+
+                doc = doc_obj_map.get(sheet_id) if sheet_id in doc_obj_map else None
+                tags_str = '|'.join(doc_tag_map.get(sheet_id, []))
+                hit_method = doc.hit_handling_method if doc else ''
+                similarity = doc.directly_return_similarity if doc else ''
+                is_active = '1' if (doc and doc.is_active) else '0'
+                doc_type = doc.type if doc else ''
+                doc_meta = json.dumps(doc.meta, ensure_ascii=False) if (doc and doc.meta) else ''
+
+                header = [gettext('Section title (optional)'),
+                          gettext('Section content (required, question answer, no more than 4096 characters)'),
+                          gettext('Question (optional, one per line in the cell)'),
+                          gettext('Tags'),
+                          gettext('Hit handling method'),
+                          gettext('Directly return similarity'),
+                          gettext('Is active'),
+                          gettext('Paragraph is active'),
+                          gettext('Document type'),
+                          gettext('Document meta')]
+
+                rows = data_dict.get(sheet_id, [])
+                para_active_list = paragraph_active_map.get(sheet_id, [])
+                # 初始化标题
+                data = [header]
+                for row_idx, row in enumerate(rows):
+                    para_active = para_active_list[row_idx] if row_idx < len(para_active_list) else '1'
+                    if row_idx == 0:
+                        data.append(
+                            [*row, tags_str, hit_method, similarity, is_active, para_active, doc_type, doc_meta])
+                    else:
+                        data.append([*row, '', '', '', '', para_active, '', ''])
+
+                for row_idx, row in enumerate(data):
+                    for col_idx, col in enumerate(row):
+                        cell = worksheet.cell(row=row_idx + 1, column=col_idx + 1)
+                        if isinstance(col, str):
+                            col = re.sub(ILLEGAL_CHARACTERS_RE, '', col)
+                            if col.startswith(('=', '+', '-', '@')):
+                                col = '\ufeff' + col
+                        cell.value = col
+            return workbook
+
         @staticmethod
         def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict]):
             result = {}
@@ -504,6 +674,215 @@ class KnowledgeSerializer(serializers.Serializer):
                 for index, d_id in enumerate(document_dict.get(d_name)):
                     result_document_dict[d_id] = d_name if index == 0 else d_name + str(index)
             return result, result_document_dict
+
+    class ImportKnowledge(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_('user id'))
+        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        folder_id = serializers.CharField(required=True, label=_('folder id'))
+
+        @transaction.atomic
+        def import_knowledge(self, file, is_import_tool=False, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+                KnowledgeImportRequest(data={'file': file}).is_valid(raise_exception=True)
+
+            try:
+                zf = zipfile.ZipFile(file)
+            except zipfile.BadZipFile:
+                raise AppApiException(500, _('Not a valid zip file'))
+
+            namelist = zf.namelist()
+            if 'knowledge.json' not in namelist:
+                raise AppApiException(500, _('Not a valid KB export file, missing knowledge.json'))
+            if 'knowledge.xlsx' not in namelist:
+                raise AppApiException(500, _('Not a valid KB export file, missing knowledge.xlsx'))
+
+            # knowledge.json -> knowledge
+            knowledge_data = json.loads(zf.read('knowledge.json'))
+            workspace_id = self.data.get('workspace_id')
+            user_id = self.data.get('user_id')
+            knowledge_id = uuid.uuid7()
+            folder_id = self.data.get('folder_id')
+            knowledge = Knowledge(
+                id=knowledge_id,
+                name=knowledge_data.get('name', 'Untitled'),
+                desc=knowledge_data.get('desc', ''),
+                type=knowledge_data.get('type', KnowledgeType.BASE),
+                scope=self.data.get('scope', KnowledgeScope.WORKSPACE),
+                meta=knowledge_data.get('meta', {}),
+                file_size_limit=knowledge_data.get('file_size_limit', 100),
+                file_count_limit=knowledge_data.get('file_count_limit', 50),
+                embedding_model=None,
+                user_id=user_id,
+                workspace_id=workspace_id,
+                folder_id=folder_id
+            )
+            knowledge.save()
+
+            # 图片
+            old_to_new_file_map = {}
+            for name in namelist:
+                if name.startswith('oss/file/') and name != 'oss/file/':
+                    old_id = name.split('/')[-1]
+                    if not old_id:
+                        continue
+                    file_bytes = zf.read(name)
+                    new_file = File(
+                        id=uuid.uuid7(),
+                        file_name=old_id,
+                        source_type=FileSourceType.KNOWLEDGE,
+                        source_id=str(knowledge_id),
+                        meta={}
+                    )
+                    new_file.save(bytea=file_bytes)
+                    old_to_new_file_map[old_id] = str(new_file.id)
+
+            # knowledge.xlsx -> doc + para + problem
+            import openpyxl
+            xlsx_bytes = io.BytesIO(zf.read('knowledge.xlsx'))
+            workbook = openpyxl.load_workbook(xlsx_bytes)
+
+            document_model_list = []
+            paragraph_model_list = []
+            problem_paragraph_object_list = []
+            doc_tags_map = {}
+
+            for sheet in workbook.worksheets:
+                doc_name = sheet.title
+                rows = list(sheet.iter_rows(min_row=2, values_only=True))
+                if not rows:
+                    continue
+
+                # 首行文档元数据
+                first_row = rows[0]
+                tags_str = first_row[3] if len(first_row) > 3 and first_row[3] else ''
+                hit_method = first_row[4] if len(first_row) > 4 and first_row[4] else 'optimization'
+                similarity = first_row[5] if len(first_row) > 5 and first_row[5] else 0.9
+                doc_is_active = first_row[6] if len(first_row) > 6 and first_row[6] else '1'
+                doc_type = first_row[8] if len(first_row) > 8 and first_row[8] else knowledge_data.get('type',
+                                                                                                       KnowledgeType.BASE)
+                doc_meta_str = first_row[9] if len(first_row) > 9 and first_row[9] else '{}'
+
+                try:
+                    doc_meta = json.loads(doc_meta_str) if isinstance(doc_meta_str, str) else {}
+                except (json.JSONDecodeError, TypeError):
+                    doc_meta = {}
+
+                char_length = sum(len(row[1] or '') for row in rows)
+                document_id = uuid.uuid7()
+                document = Document(
+                    id=document_id,
+                    knowledge_id=knowledge_id,
+                    name=doc_name,
+                    char_length=char_length,
+                    is_active=str(doc_is_active) == '1',
+                    type=doc_type,
+                    hit_handling_method=hit_method,
+                    directly_return_similarity=float(similarity) if similarity else 0.9,
+                    meta=doc_meta
+                )
+
+                document_model_list.append(document)
+                if tags_str:
+                    doc_tags_map[document_id] = tags_str
+                # 逐行创建 para + problem
+                for row_idx, row in enumerate(rows):
+                    title = row[0] or '' if len(row) > 0 else ''
+                    content = row[1] or '' if len(row) > 1 else ''
+                    problems_str = row[2] or '' if len(row) > 2 else ''
+                    para_is_active = row[7] if len(row) > 7 and row[7] else '1'
+
+                    # 图片 link 替换
+                    for old_id, new_id in old_to_new_file_map.items():
+                        content = content.replace(old_id, new_id)
+
+                    if title.startswith('\ufeff'):
+                        title = title[1:]
+                    if content.startswith('\ufeff'):
+                        content = content[1:]
+
+                    paragraph_id = uuid.uuid7()
+                    paragraph = Paragraph(
+                        id=paragraph_id,
+                        document_id=document_id,
+                        knowledge_id=knowledge_id,
+                        title=title,
+                        content=content,
+                        is_active=str(para_is_active) == '1',
+                        position=row_idx + 1
+                    )
+                    paragraph_model_list.append(paragraph)
+
+                    if problems_str:
+                        if problems_str.startswith('\ufeff'):
+                            problems_str = problems_str[1:]
+                        for problem_content in problems_str.split('\n'):
+                            problem_content = problem_content.strip()
+                            if problem_content:
+                                problem_paragraph_object_list.append(ProblemParagraphObject(
+                                    knowledge_id, document_id, paragraph_id, problem_content
+                                ))
+            # bulk create
+            QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
+            QuerySet(Paragraph).bulk_create(paragraph_model_list) if len(paragraph_model_list) > 0 else None
+
+            # 问题
+            problem_model_list, problem_paragraph_mapping_list = (
+                ProblemParagraphManage(problem_paragraph_object_list, knowledge_id).to_problem_model_list()
+            )
+            bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
+            bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
+
+            # Tag
+            tag_list = knowledge_data.get('tags', [])
+            if tag_list:
+                tag_model_list = []
+                tag_key_value_to_model = {}
+                for tag in tag_list:
+                    tag_model = Tag(
+                        id=uuid.uuid7(),
+                        knowledge_id=knowledge_id,
+                        key=tag['key'],
+                        value=tag['value']
+                    )
+                    tag_model_list.append(tag_model)
+
+                    tag_key_value_to_model[f"{tag['key']}:{tag['value']}"] = tag_model
+                QuerySet(Tag).bulk_create(tag_model_list)
+
+                # Document_Tag
+                document_tag_model_list = []
+                for doc_id, tags_str in doc_tags_map.items():
+                    for tag_str in tags_str.split('|'):
+                        tag_str = tag_str.strip()
+                        if tag_str and tag_str in tag_key_value_to_model:
+                            document_tag_model_list.append(DocumentTag(
+                                id=uuid.uuid7(),
+                                document_id=doc_id,
+                                tag_id=tag_key_value_to_model[tag_str].id
+                            ))
+                QuerySet(DocumentTag).bulk_create(document_tag_model_list) if len(document_tag_model_list) > 0 else None
+
+                # 工作流导入
+            if 'workflow.kbwf' in namelist:
+                workflow_bytes = zf.read('workflow.kbwf')
+                from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
+                workflow_file = SimpleUploadedFile('workflow.kbwf', workflow_bytes)
+                KnowledgeWorkflowSerializer.Import(
+                    data={'knowledge_id': str(knowledge_id), 'user_id': user_id, 'workspace_id': workspace_id}
+                ).import_({'file': workflow_file}, is_import_tool)
+
+            # 授权 + 资源映射
+            UserResourcePermissionSerializer(data={
+                'workspace_id': self.data.get('workspace_id'),
+                'user_id': self.data.get('user_id'),
+                'auth_target_type': AuthTargetType.KNOWLEDGE.value
+            }).auth_resource(str(knowledge_id))
+
+            update_resource_mapping_by_knowledge(str(knowledge_id))
+
+            zf.close()
+            return {'knowledge_id': str(knowledge_id), 'type': knowledge.type}
 
     class Create(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
@@ -895,7 +1274,7 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         id_list = instance.get('id_list')
         workspace_id = self.data.get('workspace_id')
-        knowledge_query_set = QuerySet(Knowledge).filter(id__in=id_list,workspace_id=workspace_id)
+        knowledge_query_set = QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id)
 
         # 删除所有关联
         QuerySet(Document).filter(knowledge__in=knowledge_query_set).delete()
@@ -926,4 +1305,5 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
 
         QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True
+
 

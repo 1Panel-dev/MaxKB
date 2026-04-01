@@ -9191,3 +9191,38 @@ msgstr "Batch move tools"
 msgid "Model is not allowed to be empty"
 msgstr ""
 
+msgid "Not a valid zip file"
+msgstr "Not a valid zip file"
+
+msgid "Not a valid KB export file, missing knowledge.json"
+msgstr "Not a valid KB export file, missing knowledge.json"
+
+msgid "Not a valid KB export file, missing knowledge.xlsx"
+msgstr "Not a valid KB export file, missing knowledge.xlsx"
+
+msgid "Tags"
+msgstr "Tags"
+
+msgid "Hit handling method"
+msgstr "Hit handling method"
+
+msgid "Directly return similarity"
+msgstr "Directly return similarity"
+
+msgid "Paragraph is active"
+msgstr "Paragraph is active"
+
+msgid "Document type"
+msgstr "Document type"
+
+msgid "Document meta"
+msgstr "Document meta"
+
+msgid "Export knowledge bundle"
+msgstr "Export knowledge bundle"
+
+msgid "Import knowledge bundle"
+msgstr "Import knowledge bundle"
+
+
+

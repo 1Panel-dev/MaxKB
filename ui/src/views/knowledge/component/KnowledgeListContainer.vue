@@ -120,6 +120,29 @@
                   </div>
                 </div>
               </el-dropdown-item>
+              <el-upload
+                ref="importKnowledgeUploadRef"
+                :file-list="[]"
+                action="#"
+                multiple
+                :auto-upload="false"
+                :show-file-list="false"
+                :limit="1"
+                accept=".zip"
+                :on-change="(file: any) => importKnowledgeBundle(file)"
+                class="import-button"
+              >
+                <el-dropdown-item>
+                  <div class="flex align-center w-full">
+                    <el-avatar shape="square" :size="32" style="background: none">
+                      <img src="@/assets/icon_import.svg" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('common.importCreate') }}</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+              </el-upload>
               <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
                 <div class="flex align-center">
                   <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
@@ -296,6 +319,14 @@
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                             >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
                           >
+                          <el-dropdown-item
+                            @click.stop="exportKnowledgeBundle(item)"
+                            v-if="permissionPrecise.export(item.id)"
+                          >
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
+                            >{{ $t('views.document.setting.export') }} 知识库
+                          </el-dropdown-item>
+
                           <el-dropdown-item
                             type="danger"
                             @click.stop="deleteKnowledge(item)"
@@ -481,6 +512,47 @@ function syncKnowledge(row: any) {
 
 const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
+}
+
+const exportKnowledgeBundle = (item: any) => {
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .exportKnowledgeBundle(item.name, item.id, loading)
+    .then(() => {
+      MsgSuccess(t('common.exportSuccess'))
+    })
+}
+
+const importKnowledgeUploadRef = ref()
+
+function importKnowledgeBundle(file: any) {
+  const formData = new FormData()
+  formData.append('file', file.raw)
+  formData.append('folder_id', folder.currentFolder.id || user.getWorkspaceId())
+  importKnowledgeUploadRef.value.clearFiles()
+
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .importKnowledgeBundle(formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        const knowledgeId = res.data.knowledge_id
+        const knowledgeType = res.data.type
+        const folderId = folder.currentFolder.id || user.getWorkspaceId()
+        router.push({
+          path: `/knowledge/${knowledgeId}/${folderId}/${knowledgeType}/document`,
+          query: { imported: 'true' },
+        })
+      }
+    })
+    .catch((e: any) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
 }
 
 const GenerateRelatedDialogRef = ref<InstanceType<typeof GenerateRelatedDialog>>()

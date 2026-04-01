@@ -1,16 +1,17 @@
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
+from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions, check_batch_permissions
+from common.auth.authentication import has_permissions, check_batch_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 from common import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
     KnowledgeEditAPI, KnowledgeReadAPI, KnowledgePageAPI, SyncWebAPI, GenerateRelatedAPI, HitTestAPI, EmbeddingAPI, \
-    GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI
+    GetModelAPI, KnowledgeExportAPI, KnowledgeBatchOperateAPI, KnowledgeImportAPI
 from knowledge.models import KnowledgeScope
 from knowledge.serializers.common import get_knowledge_operation_object
 from knowledge.serializers.knowledge import KnowledgeSerializer, KnowledgeBatchOperateSerializer
@@ -408,6 +409,68 @@ class KnowledgeView(APIView):
             return KnowledgeSerializer.Operate(data={
                 'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
             }).export_zip()
+
+    class ExportKnowledge(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            summary=_('Export knowledge bundle'),
+            operation_id=_('Export knowledge bundle'),  # type: ignore
+            parameters=KnowledgeExportAPI.get_parameters(),
+            responses=KnowledgeExportAPI.get_response(),
+            tags=[_('Knowledge Base')]  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+        )
+        @log(
+            menu='Knowledge Base', operate="Export knowledge bundle",
+            get_operation_object=lambda r, keywords: get_knowledge_operation_object(keywords.get('knowledge_id')),
+        )
+        def get(self, request: Request, workspace_id: str, knowledge_id: str):
+            return KnowledgeSerializer.Operate(data={
+                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
+            }).export_knowledge()
+
+
+    class ImportKnowledge(APIView):
+        authentication_classes = [TokenAuth]
+        parser_classes = [MultiPartParser]
+
+        @extend_schema(
+            methods=['POST'],
+            description=_('Import knowledge bundle'),
+            summary=_('Import knowledge bundle'),
+            operation_id=_('Import knowledge bundle'),
+            parameters=KnowledgeImportAPI.get_parameters(),
+            request=KnowledgeImportAPI.get_request(),
+            responses=KnowledgeImportAPI.get_response(),
+            tags=[_('Knowledge Base')]
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_CREATE.get_workspace_permission(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
+        )
+        @log(
+            menu='Knowledge Base', operate="Import knowledge bundle",
+        )
+        def post(self, request: Request, workspace_id: str):
+            is_import_tool = get_is_permissions(request, workspace_id=workspace_id)(
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
+                PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
+                RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            )
+            return result.success(
+                KnowledgeSerializer.ImportKnowledge(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id, 'folder_id': request.data.get('folder_id',workspace_id)}
+                ).import_knowledge(request.FILES.get('file'), is_import_tool)
+            )
+
 
     class GenerateRelated(APIView):
         authentication_classes = [TokenAuth]

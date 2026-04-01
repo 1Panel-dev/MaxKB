@@ -150,4 +150,5 @@ export default {
     subTitle: '查看執行記錄',
   },
   sourceType: '資源類型',
+  knowledgeImportTip: '匯入建立知識庫成功，文件資料尚未向量化，請先設定知識庫的向量模型，並對文件進行向量化操作'
 }
