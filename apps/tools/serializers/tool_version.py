@@ -96,7 +96,7 @@ class ToolWorkflowVersionSerializer(serializers.Serializer):
                 ToolWorkflowVersionEditSerializer(data=instance).is_valid(raise_exception=True)
             tool_version = QuerySet(ToolWorkflowVersion).filter(tool_id=self.data.get('tool_id'),
                                                                 id=self.data.get(
-                                                                    'knowledge_version_id')).first()
+                                                                    'tool_version_id')).first()
             if tool_version is not None:
                 name = instance.get('name', None)
                 if name is not None and len(name) > 0:
