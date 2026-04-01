@@ -758,7 +758,7 @@ class ToolSerializer(serializers.Serializer):
             return work_flow
 
         @staticmethod
-        def to_tool(tool, workspace_id, user_id):
+        def to_tool(tool, workspace_id, user_id, folder_id):
             return Tool(id=tool.get('id'),
                         user_id=user_id,
                         name=tool.get('name'),
@@ -769,11 +769,28 @@ class ToolSerializer(serializers.Serializer):
                         is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
                         tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                         scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
-                        folder_id='default' if workspace_id == 'None' else workspace_id,
+                        folder_id=folder_id if folder_id else 'default' if workspace_id == 'None' else workspace_id,
                         workspace_id=workspace_id)
 
-        def import_workflow_tools(self, tool, workspace_id, user_id):
-            tool_list = tool.get('tool_list') or []
+        def import_workflow_tools(self, tool, workspace_id, user_id, folder_id, new_child_policy):
+            """
+
+            @param tool:                  工具对象
+            @param workspace_id:          工作空间id
+            @param user_id:               用户id
+            @param folder_id:             文件夹id
+            @param new_child_policy:      子工具创建策略
+                                          0: 不创建
+                                          1: 对比创建: 如果存在就不创建 不存在则创建
+                                          2: 全部创建
+            @return:
+            """
+            if new_child_policy == 0:
+                tool_list = []
+            elif new_child_policy == 1:
+                tool_list = tool.get('tool_list') or []
+            else:
+                tool_list = [{**tool, 'id': str(uuid.uuid7())} for tool in tool.get('tool_list') or []]
             update_tool_map = {}
             if len(tool_list) > 0:
                 tool_id_list = reduce(lambda x, y: [*x, *y],
@@ -800,19 +817,31 @@ class ToolSerializer(serializers.Serializer):
                 tool.get('work_flow'),
                 update_tool_map,
             )
-            tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
+            QuerySet(ToolWorkflow).update_or_create(tool_id=tool.get('id'),
+                                                    create_defaults={'id': uuid.uuid7(),
+                                                                     'tool_id': tool.get('id'),
+                                                                     "workspace_id": workspace_id,
+                                                                     'work_flow': work_flow, },
+                                                    defaults={
+                                                        'tool_id': tool.get('id'),
+                                                        'workspace_id': workspace_id,
+                                                        'work_flow': work_flow
+                                                    })
+            tool_model_list = [self.to_tool(tool, workspace_id, user_id, folder_id) for tool in tool_list]
             workflow_tool_model_list = [{'tool_id': t.get('id'), 'workflow': self.to_tool_workflow(
                 t.get('work_flow'),
                 update_tool_map,
             )} for t in tool_list if tool.get('tool_type') == ToolType.WORKFLOW]
-            workflow_tool_model_list.append({'tool_id': tool.get('id'), 'workflow': work_flow})
+
             existing_records = QuerySet(ToolWorkflow).filter(
                 tool_id__in=[wt.get('tool_id') for wt in workflow_tool_model_list],
                 workspace_id=workspace_id)
+
             existing_map = {
                 record.tool_id: record
                 for record in existing_records
             }
+
             QuerySet(ToolWorkflow).bulk_create(
                 [ToolWorkflow(work_flow=wt.get('workflow'), workspace_id=workspace_id,
                               tool_id=wt.get('tool_id')) for wt in
@@ -825,6 +854,21 @@ class ToolSerializer(serializers.Serializer):
                     'user_id': self.data.get('user_id'),
                     'auth_target_type': AuthTargetType.TOOL.value
                 }).auth_resource_batch([t.id for t in tool_model_list])
+
+        def update_template_workflow(self, tool_id: str):
+            self.is_valid(raise_exception=True)
+            tool_instance_bytes = self.data.get('file').read()
+            try:
+                tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
+            except Exception as e:
+                raise AppApiException(1001, _("Unsupported file format"))
+            tool = tool_instance.tool
+            tool['id'] = tool_id
+            folder_id = self.data.get('folder_id')
+            self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'),
+                                       user_id=self.data.get('user_id'),
+                                       folder_id=folder_id, new_child_policy=2)
+            return True
 
         @transaction.atomic
         def import_(self, scope=ToolScope.WORKSPACE, name=None):
@@ -871,7 +915,8 @@ class ToolSerializer(serializers.Serializer):
             tool_model.save()
             if tool.get('tool_type') == ToolType.WORKFLOW:
                 tool['id'] = tool_id
-                self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id)
+                self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id,
+                                           folder_id=folder_id, new_child_policy=1)
             # 自动授权给创建者
             UserResourcePermissionSerializer(data={
                 'workspace_id': self.data.get('workspace_id'),

@@ -174,7 +174,7 @@ import permissionMap from '@/permission'
 import { WorkflowMode } from '@/enums/application'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { toolBaseNode, toolStartNode } from '@/workflow/common/data'
-import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
+import TemplateStoreDialog from '@/views/tool-workflow/template-store/TemplateStoreDialog.vue'
 import DebugDrawer from './debug-drawer/DebugDrawer.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
@@ -472,7 +472,7 @@ function getDetail() {
     .then((res: any) => {
       detail.value = res.data
       saveTime.value = res.data?.update_time
-      console.log(res.data)
+
       if (!detail.value.work_flow || !('nodes' in detail.value.work_flow)) {
         detail.value.work_flow = { nodes: [toolBaseNode, toolStartNode] }
       }
@@ -481,6 +481,7 @@ function getDetail() {
       nextTick(() => {
         workflowRef.value?.render(detail.value.work_flow)
         cloneWorkFlow.value = getGraphData()
+        workflowRef.value?.fitView()
       })
     })
 }

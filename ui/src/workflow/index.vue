@@ -7,7 +7,7 @@
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
-import { ref, onMounted, onUnmounted, inject } from 'vue'
+import { ref, onMounted, onUnmounted, inject, nextTick } from 'vue'
 import AppEdge from './common/edge'
 import loopEdge from './common/loopEdge'
 import Control from './common/NodeControl.vue'
@@ -175,6 +175,11 @@ const addNode = (shapeItem: ShapeItem) => {
 const clearGraphData = () => {
   return lf.value.clearData()
 }
+const fitView = () => {
+  nextTick(() => {
+    lf.value?.fitView()
+  })
+}
 
 defineExpose({
   onmousedown,
@@ -184,6 +189,7 @@ defineExpose({
   clearGraphData,
   renderGraphData,
   render,
+  fitView,
 })
 </script>
 <style lang="scss">

@@ -13,8 +13,9 @@ from common.log.log import log
 from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
+from tools.api.tool import GetInternalToolAPI
 from tools.api.tool_workflow import ToolWorkflowApi, ToolWorkflowExportApi, ToolWorkflowImportApi
-from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer
+from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer, StoreToolWorkflow
 from tools.views import get_tool_operation_object
 
 
@@ -187,3 +188,21 @@ class McpServers(APIView):
             data={'mcp_servers': request.query_params.get('mcp_servers'), 'workspace_id': workspace_id,
                   'user_id': request.user.id,
                   'tool_id': tool_id}).get_mcp_servers(request.data))
+
+
+class StoreToolWorkflowView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get Appstore tools"),
+        summary=_("Get Appstore tools"),
+        operation_id=_("Get Appstore tools"),  # type: ignore
+        responses=GetInternalToolAPI.get_response(),
+        tags=[_("Tool")]  # type: ignore
+    )
+    def get(self, request: Request):
+        return result.success(StoreToolWorkflow(data={
+            'user_id': request.user.id,
+            'name': request.query_params.get('name', ''),
+        }).get_appstore_templates())
