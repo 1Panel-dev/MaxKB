@@ -340,7 +340,8 @@
                               v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >{{ $t('views.document.setting.export') }} 知识库
+                              >{{ $t('views.document.setting.export') }}
+                              {{ $t('views.knowledge.title') }}
                             </el-dropdown-item>
 
                             <el-dropdown-item
