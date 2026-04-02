@@ -7,7 +7,7 @@ from typing import List, Dict
 
 from django.db.models import QuerySet
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
-
+from django.utils.translation import gettext_lazy as _
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.image_understand_step_node.i_image_understand_node import IImageUnderstandNode
 from application.flow.tools import Reasoning
@@ -153,6 +153,8 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
 
+        if model_id is None or model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
         # 处理不正确的参数
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         image_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
@@ -205,7 +207,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
     def generate_history_human_message_for_details(self, chat_record):
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'image_list' in data:
-                image_list = data['image_list']
+                image_list = data['image_list'] or []
                 if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
 
@@ -236,7 +238,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
 
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'image_list' in data:
-                image_list = data['image_list']
+                image_list = data['image_list'] or []
                 if len(image_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
                 file_id_list = []

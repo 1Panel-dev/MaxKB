@@ -33,12 +33,12 @@ from common.db.search import page_search, native_page_search, native_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
-from common.utils.common import get_file_content, generate_uuid
+from common.utils.common import get_file_content, generate_uuid, bytes_to_uploaded_file
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import File, FileSourceType, Knowledge
-from maxkb.const import PROJECT_DIR
+from maxkb.const import PROJECT_DIR, CONFIG
 from models_provider.models import Model
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
@@ -400,6 +400,25 @@ class ToolSerializer(serializers.Serializer):
                 if instance.get('tool_type') == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get('code', ''))
 
+            # 处理 work_flow_template
+            if instance.get('work_flow_template') is not None:
+                template_instance = instance.get('work_flow_template')
+                download_url = template_instance.get('downloadUrl')
+                # 查找匹配的版本名称
+                res = requests.get(download_url, timeout=5)
+                tool = ToolSerializer.Import(data={
+                    'file': bytes_to_uploaded_file(res.content, 'file.tool'),
+                    'user_id': self.data.get('user_id'),
+                    'workspace_id': self.data.get('workspace_id'),
+                    'folder_id': str(instance.get('folder_id', self.data.get('workspace_id'))),
+                }).import_(name=instance.get('name'))
+
+                try:
+                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                except Exception as e:
+                    maxkb_logger.error(f"callback appstore tool download error: {e}")
+                return tool
+
             tool_id = uuid.uuid7()
             Tool(
                 id=tool_id,
@@ -739,7 +758,7 @@ class ToolSerializer(serializers.Serializer):
             return work_flow
 
         @staticmethod
-        def to_tool(tool, workspace_id, user_id):
+        def to_tool(tool, workspace_id, user_id, folder_id):
             return Tool(id=tool.get('id'),
                         user_id=user_id,
                         name=tool.get('name'),
@@ -750,11 +769,28 @@ class ToolSerializer(serializers.Serializer):
                         is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
                         tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                         scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
-                        folder_id='default' if workspace_id == 'None' else workspace_id,
+                        folder_id=folder_id if folder_id else 'default' if workspace_id == 'None' else workspace_id,
                         workspace_id=workspace_id)
 
-        def import_workflow_tools(self, tool, workspace_id, user_id):
-            tool_list = tool.get('tool_list') or []
+        def import_workflow_tools(self, tool, workspace_id, user_id, folder_id, new_child_policy):
+            """
+
+            @param tool:                  工具对象
+            @param workspace_id:          工作空间id
+            @param user_id:               用户id
+            @param folder_id:             文件夹id
+            @param new_child_policy:      子工具创建策略
+                                          0: 不创建
+                                          1: 对比创建: 如果存在就不创建 不存在则创建
+                                          2: 全部创建
+            @return:
+            """
+            if new_child_policy == 0:
+                tool_list = []
+            elif new_child_policy == 1:
+                tool_list = tool.get('tool_list') or []
+            else:
+                tool_list = [{**tool, 'id': str(uuid.uuid7())} for tool in tool.get('tool_list') or []]
             update_tool_map = {}
             if len(tool_list) > 0:
                 tool_id_list = reduce(lambda x, y: [*x, *y],
@@ -781,19 +817,31 @@ class ToolSerializer(serializers.Serializer):
                 tool.get('work_flow'),
                 update_tool_map,
             )
-            tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
+            QuerySet(ToolWorkflow).update_or_create(tool_id=tool.get('id'),
+                                                    create_defaults={'id': uuid.uuid7(),
+                                                                     'tool_id': tool.get('id'),
+                                                                     "workspace_id": workspace_id,
+                                                                     'work_flow': work_flow, },
+                                                    defaults={
+                                                        'tool_id': tool.get('id'),
+                                                        'workspace_id': workspace_id,
+                                                        'work_flow': work_flow
+                                                    })
+            tool_model_list = [self.to_tool(tool, workspace_id, user_id, folder_id) for tool in tool_list]
             workflow_tool_model_list = [{'tool_id': t.get('id'), 'workflow': self.to_tool_workflow(
                 t.get('work_flow'),
                 update_tool_map,
             )} for t in tool_list if tool.get('tool_type') == ToolType.WORKFLOW]
-            workflow_tool_model_list.append({'tool_id': tool.get('id'), 'workflow': work_flow})
+
             existing_records = QuerySet(ToolWorkflow).filter(
                 tool_id__in=[wt.get('tool_id') for wt in workflow_tool_model_list],
                 workspace_id=workspace_id)
+
             existing_map = {
                 record.tool_id: record
                 for record in existing_records
             }
+
             QuerySet(ToolWorkflow).bulk_create(
                 [ToolWorkflow(work_flow=wt.get('workflow'), workspace_id=workspace_id,
                               tool_id=wt.get('tool_id')) for wt in
@@ -807,8 +855,23 @@ class ToolSerializer(serializers.Serializer):
                     'auth_target_type': AuthTargetType.TOOL.value
                 }).auth_resource_batch([t.id for t in tool_model_list])
 
+        def update_template_workflow(self, tool_id: str):
+            self.is_valid(raise_exception=True)
+            tool_instance_bytes = self.data.get('file').read()
+            try:
+                tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
+            except Exception as e:
+                raise AppApiException(1001, _("Unsupported file format"))
+            tool = tool_instance.tool
+            tool['id'] = tool_id
+            folder_id = self.data.get('folder_id')
+            self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'),
+                                       user_id=self.data.get('user_id'),
+                                       folder_id=folder_id, new_child_policy=2)
+            return True
+
         @transaction.atomic
-        def import_(self, scope=ToolScope.WORKSPACE):
+        def import_(self, scope=ToolScope.WORKSPACE, name=None):
             self.is_valid()
 
             user_id = self.data.get('user_id')
@@ -837,7 +900,7 @@ class ToolSerializer(serializers.Serializer):
                 code = skill_file_id
             tool_model = Tool(
                 id=tool_id,
-                name=tool.get('name'),
+                name=name or tool.get('name'),
                 desc=tool.get('desc'),
                 code=code,
                 user_id=user_id,
@@ -852,7 +915,8 @@ class ToolSerializer(serializers.Serializer):
             tool_model.save()
             if tool.get('tool_type') == ToolType.WORKFLOW:
                 tool['id'] = tool_id
-                self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id)
+                self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id,
+                                           folder_id=folder_id, new_child_policy=1)
             # 自动授权给创建者
             UserResourcePermissionSerializer(data={
                 'workspace_id': self.data.get('workspace_id'),
@@ -860,7 +924,9 @@ class ToolSerializer(serializers.Serializer):
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource(str(tool_id))
 
-            return True
+            return ToolSerializer.Operate(data={
+                'id': tool_id, 'workspace_id': self.data.get('workspace_id')
+            }).one()
 
     class IconOperate(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("function ID"))
@@ -978,7 +1044,8 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             # 下载zip文件
             try:
-                res = requests.get('https://apps-assets.fit2cloud.com/stable/maxkb.json.zip', timeout=5)
+                appstore_url = CONFIG.get('APPSTORE_URL', 'https://apps-assets.fit2cloud.com/stable/maxkb.json.zip')
+                res = requests.get(appstore_url, timeout=5)
                 res.raise_for_status()
                 # 创建临时文件保存zip
                 with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_zip:

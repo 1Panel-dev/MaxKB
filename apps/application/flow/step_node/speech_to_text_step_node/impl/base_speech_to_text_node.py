@@ -33,6 +33,10 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
                 stt_model_id = reference_data.get('stt_model_id', reference_data.get('model_id', stt_model_id))
                 model_params_setting = reference_data.get('model_params_setting')
 
+        from django.utils.translation import gettext_lazy as _
+
+        if stt_model_id is None or stt_model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         stt_model = get_model_instance_by_model_workspace_id(stt_model_id, workspace_id, **(model_params_setting or {}))
         audio_list = audio

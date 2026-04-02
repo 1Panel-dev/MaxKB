@@ -16,10 +16,6 @@ export default {
     confirmMessage:
       '刪除該用戶後，該使用者建立的所有資源（智能體、知識庫、模型）都不會被刪除，請謹慎操作。',
   },
-  disabled: {
-    confirmTitle: '是否停用工具？',
-    confirmMessage: '停用後，引用該工具的智能體在查詢時會報錯，請謹慎操作。',
-  },
   userForm: {
     nick_name: {
       label: '姓名',

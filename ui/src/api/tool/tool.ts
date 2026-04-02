@@ -300,6 +300,34 @@ const getMcpTools: (
 ) => Promise<Result<any>> = (tool_id, mcp_servers, loading) => {
   return post(`${prefix.value}/${tool_id}/mcp_tools`, { mcp_servers }, {}, loading)
 }
+
+/**
+ * 批量删除工具
+ * @param 参数
+ * {
+  "id_list": [String]
+}
+ */
+const delMulTool: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading,
+) => {
+  return put(`${prefix.value}/batch_delete`, { id_list: data }, undefined, loading)
+}
+/**
+ * 批量删除工具
+ * @param 参数
+ * {
+  "id_list": [String]
+  "folder_id": string
+}
+ */
+const putMulMoveTool: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading,
+) => {
+  return put(`${prefix.value}/batch_move`, data, undefined, loading)
+}
 export default {
   getToolList,
   getAllToolList,
@@ -328,4 +356,6 @@ export default {
   debugToolWorkflow,
   generateCode,
   getMcpTools,
+  delMulTool,
+  putMulMoveTool
 }

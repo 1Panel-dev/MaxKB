@@ -31,6 +31,26 @@ const workspace = {
       ],
       'OR'
     ),
+  batchDelete: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_BATCH_DELETE.getWorkspacePermission,
+        PermissionConst.TOOL_BATCH_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  batchMove: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_BATCH_MOVE.getWorkspacePermission,
+        PermissionConst.TOOL_BATCH_MOVE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   import: () =>
     hasPermission(
       [

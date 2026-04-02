@@ -14,6 +14,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否删除知识库：',
+    confirmTitle2: '个知识库?',
     confirmMessage1: '此知识库关联',
     confirmMessage2: '个智能体，删除后无法恢复，请谨慎操作。',
     resourceCountMessage: '此知识库关联 {count} 个资源，删除后无法使用，请谨慎操作。',

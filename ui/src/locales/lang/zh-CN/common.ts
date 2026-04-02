@@ -114,6 +114,7 @@ export default {
   username: '用户名',
   importCreate: '导入创建',
   detail: '详情',
+  total: '共',
   selected: '已选',
   notFound: {
     title: '404',
@@ -150,4 +151,5 @@ export default {
     subTitle: '查看执行记录',
   },
   sourceType: '资源类型',
+  knowledgeImportTip: '导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作'
 }

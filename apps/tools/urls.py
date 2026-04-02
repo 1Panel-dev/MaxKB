@@ -7,6 +7,7 @@ app_name = "tool"
 urlpatterns = [
     path('workspace/internal/tool', views.ToolView.InternalTool.as_view()),
     path('workspace/store/tool', views.ToolView.StoreTool.as_view()),
+    path('workspace/store/tool_workflow_template', views.StoreToolWorkflowView.as_view()),
     path('workspace/<str:workspace_id>/tool', views.ToolView.as_view()),
     path('workspace/<str:workspace_id>/tool/workflow', views.ToolWorkflowView.as_view()),
     path('workspace/<str:workspace_id>/tool/import', views.ToolView.Import.as_view()),

@@ -63,6 +63,8 @@ const systemManage = {
             'OR'
     ),
   create: () => false,
+  batchDelete: () => false,
+  batchMove: () => false,
   import: () => false,
   switch: () =>
     hasPermission(

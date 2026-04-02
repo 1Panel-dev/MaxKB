@@ -249,6 +249,8 @@ class Workflow:
         node_list = [node for node in self.nodes if (
                 node.type == 'ai-chat-node' or node.type == 'question-node' or node.type == 'parameter-extraction-node')]
         for node in node_list:
+            if (node.properties.get('node_data', {}).get('model_id_type') or 'custom') == 'reference':
+                continue
             model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
             if model is None:
                 raise ValidationError(ErrorDetail(

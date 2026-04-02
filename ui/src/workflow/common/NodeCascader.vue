@@ -94,7 +94,11 @@ const get_up_node_field_list = (contain_self: boolean, use_cache: boolean) => {
   return result.filter((v: any) => v.children && v.children.length > 0)
 }
 const getOptionsValue = () => {
-  if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop].includes(workflowMode)) {
+  if (
+    [WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop, WorkflowMode.ToolLoop].includes(
+      workflowMode,
+    )
+  ) {
     return props.global
       ? get_up_node_field_list(false, true).filter(
           (v: any) =>
