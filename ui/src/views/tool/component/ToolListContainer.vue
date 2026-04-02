@@ -34,7 +34,10 @@
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
-        <span class="ml-8" v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())">
+        <span
+          class="ml-8"
+          v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())"
+        >
           <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
             <AppIcon iconName="app-batch-delete" class="mr-4" />
             {{ $t('views.paragraph.setting.batchSelected') }}
@@ -487,6 +490,7 @@
     <ExecutionRecordDrawer ref="toolRecordDrawerRef" />
     <WorkflowFormDialog
       ref="workflowFormDialogRef"
+      @refresh="toWorkflow"
       :title="workflowFormDialogtitle"
     ></WorkflowFormDialog>
   </ContentContainer>
@@ -866,7 +870,7 @@ const openCreateWorkflowDialog = (data?: any) => {
     loadSharedApi({ type: 'tool', systemType: apiType.value })
       .getToolById(data?.id, loading)
       .then((res: any) => {
-        toWorkflow( res.data)
+        toWorkflow(res.data)
         workflowFormDialogRef.value?.open(res.data)
       })
   } else {
@@ -978,6 +982,14 @@ async function copyTool(row: any) {
   if (row?.tool_type === 'SKILL') {
     bus.emit('select_node', row.folder_id)
     await copySkillTool(row)
+    return
+  }
+  if (row?.tool_type === 'WORKFLOW') {
+    const res = await loadSharedApi({ type: 'tool', systemType: apiType.value }).getToolById(
+      row.id,
+      changeStateloading,
+    )
+    workflowFormDialogRef.value?.open(res.data)
     return
   }
   ToolDrawertitle.value = t('views.tool.copyTool')
