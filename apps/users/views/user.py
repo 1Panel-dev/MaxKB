@@ -127,7 +127,7 @@ class UserList(APIView):
                    tags=[_("User Management")],  # type: ignore
                    responses=UserListApi.get_response())
     @has_permissions(RoleConstants.WORKSPACE_MANAGE, RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN,
-                     RoleConstants.EXTENDS_WORKSPACE_MANAGE)
+                     RoleConstants.EXTENDS_WORKSPACE_MANAGE, RoleConstants.USER, RoleConstants.EXTENDS_USER)
     def get(self, request: Request):
         return result.success(UserManageSerializer().get_all_user_list())
 

@@ -107,10 +107,7 @@ class MaxKBBaseModel(ABC):
         optional_params = {}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming', 'show_ref_label', 'stream']:
-                if key == 'extra_body' and isinstance(value, dict):
-                    optional_params = {**optional_params, **value}
-                else:
-                    optional_params[key] = value
+                optional_params[key] = value
         return optional_params
 
 

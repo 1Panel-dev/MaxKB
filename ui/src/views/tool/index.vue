@@ -22,16 +22,20 @@
           </h2>
           <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" v-else />
           <el-divider direction="vertical" />
-          <el-radio-group v-model="toolType" @change="radioChange" class="app-radio-button-group">
-            <el-radio-button value="">{{ $t('common.status.all') }}</el-radio-button>
-            <el-radio-button value="CUSTOM">{{ $t('views.tool.title') }}</el-radio-button>
-            <el-radio-button value="SKILL">Skills</el-radio-button>
-            <el-radio-button value="WORKFLOW">{{ $t('workflow.workflow') }}</el-radio-button>
-            <el-radio-button value="MCP">MCP</el-radio-button>
-            <el-radio-button value="DATA_SOURCE">{{
-              $t('views.tool.dataSource.title')
-            }}</el-radio-button>
-          </el-radio-group>
+          <el-select
+            v-model="toolType"
+            style="width: 90px"
+            @change="radioChange"
+            :empty-values="[null, undefined]"
+            :value-on-clear="null"
+          >
+            <el-option :label="$t('common.status.all')" value="" />
+            <el-option :label="$t('views.tool.title')" value="CUSTOM" />
+            <el-option label="Skills" value="SKILL" />
+            <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
+            <el-option label="MCP" value="MCP" />
+            <el-option :label="$t('views.tool.dataSource.title')" value="DATA_SOURCE" />
+          </el-select>
         </el-space>
       </template>
     </ToolListContainer>
@@ -45,7 +49,6 @@ import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
 import { useRoute } from 'vue-router'
 import useStore from '@/stores'
-import bus from '@/bus'
 const route = useRoute()
 const { folder, tool } = useStore()
 

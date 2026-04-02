@@ -52,13 +52,14 @@ const treeRef = ref()
 const loading = ref(false)
 const dialogVisible = ref(false)
 const folderList = ref<any[]>([])
-const detail = ref<any>({})
+const detail = ref<any>(null) // 保存交互所需信息：批量操作是id_list
 const selectForderId = ref<any>('')
 const currentNodeKey = ref<string>('')
+const isBatch = ref(false)
 
 watch(dialogVisible, (bool) => {
   if (!bool) {
-    detail.value = {}
+    detail.value = null
     selectForderId.value = ''
     folderList.value = []
     currentNodeKey.value = ''
@@ -70,6 +71,7 @@ const isFolder = ref<boolean>(false)
 
 const open = (data: any, is_folder?: any) => {
   detail.value = data
+  isBatch.value = data?.id_list
   isFolder.value = is_folder
   getFolder()
   dialogVisible.value = true
@@ -110,31 +112,55 @@ const submitHandle = async () => {
           dialogVisible.value = false
         })
     } else if (props.source === SourceTypeEnum.KNOWLEDGE) {
-      if (detail.value.type === 2) {
-        KnowledgeApi.putLarkKnowledge(detail.value.id, obj, loading).then(() => {
+      if (isBatch.value) {
+        ToolApi.putMulMoveTool(obj, loading).then(() => {
           MsgSuccess(t('common.saveSuccess'))
-          emit('refresh', detail.value)
+          emit('refresh')
           dialogVisible.value = false
         })
       } else {
-        KnowledgeApi.putKnowledge(detail.value.id, obj, loading).then(() => {
+        if (detail.value.type === 2) {
+          KnowledgeApi.putLarkKnowledge(detail.value.id, obj, loading).then(() => {
+            MsgSuccess(t('common.saveSuccess'))
+            emit('refresh', detail.value)
+            dialogVisible.value = false
+          })
+        } else {
+          KnowledgeApi.putKnowledge(detail.value.id, obj, loading).then(() => {
+            MsgSuccess(t('common.saveSuccess'))
+            emit('refresh', detail.value)
+            dialogVisible.value = false
+          })
+        }
+      }
+    } else if (props.source === SourceTypeEnum.TOOL) {
+      if (isBatch.value) {
+        ToolApi.putMulMoveTool(obj, loading).then(() => {
+          MsgSuccess(t('common.saveSuccess'))
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      } else {
+        ToolApi.putTool(detail.value.id, obj, loading).then(() => {
           MsgSuccess(t('common.saveSuccess'))
           emit('refresh', detail.value)
           dialogVisible.value = false
         })
       }
-    } else if (props.source === SourceTypeEnum.TOOL) {
-      ToolApi.putTool(detail.value.id, obj, loading).then(() => {
-        MsgSuccess(t('common.saveSuccess'))
-        emit('refresh', detail.value)
-        dialogVisible.value = false
-      })
     } else if (props.source === SourceTypeEnum.APPLICATION) {
-      ApplicationApi.moveApplication(detail.value.id, obj.folder_id, loading).then((res) => {
-        MsgSuccess(t('common.saveSuccess'))
-        emit('refresh', detail.value)
-        dialogVisible.value = false
-      })
+      if (isBatch.value) {
+        ApplicationApi.putMulMoveApplication(obj, loading).then(() => {
+          MsgSuccess(t('common.saveSuccess'))
+          emit('refresh')
+          dialogVisible.value = false
+        })
+      } else {
+        ApplicationApi.moveApplication(detail.value.id, obj.folder_id, loading).then((res) => {
+          MsgSuccess(t('common.saveSuccess'))
+          emit('refresh', detail.value)
+          dialogVisible.value = false
+        })
+      }
     }
   } else {
     MsgError(t('components.folder.requiredMessage'))

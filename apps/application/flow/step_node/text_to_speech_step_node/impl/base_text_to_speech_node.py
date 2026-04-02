@@ -56,6 +56,11 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
             if reference_data and isinstance(reference_data, dict):
                 tts_model_id = reference_data.get('tts_model_id', reference_data.get('model_id', tts_model_id))
                 model_params_setting = reference_data.get('model_params_setting')
+
+        from django.utils.translation import gettext_lazy as _
+
+        if tts_model_id is None or tts_model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
         # 分割文本为合理片段
         content = _remove_empty_lines(content)
         content_chunks = [content[i:i + max_length]

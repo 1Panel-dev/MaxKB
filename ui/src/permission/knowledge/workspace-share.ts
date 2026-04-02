@@ -4,6 +4,8 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 const workspaceShare = {
   is_share: () => true,
   create: () => false,
+  batchDelete: () => false,
+  batchMove: () => false,
   sync: () => false,
   vector: () => false,
   generate: () => false,

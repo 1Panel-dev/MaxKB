@@ -256,6 +256,13 @@
                     {{ $t('views.document.setting.export') }} ZIP
                   </el-dropdown-item>
                   <el-dropdown-item
+                    @click.stop="exportKnowledgeBundle(row)"
+                    v-if="permissionPrecise.export()"
+                  >
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.export') }} {{ $t('views.knowledge.title') }}
+                  </el-dropdown-item>
+                  <el-dropdown-item
                     text
                     @click.stop="openResourceMappingDrawer(row)"
                     v-if="permissionPrecise.relate_map()"
@@ -377,6 +384,12 @@ const exportKnowledge = (item: any) => {
 }
 const exportZipKnowledge = (item: any) => {
   KnowledgeResourceApi.exportZipKnowledge(item.name, item.id, loading).then(() => {
+    MsgSuccess(t('common.exportSuccess'))
+  })
+}
+
+const exportKnowledgeBundle = (item: any) => {
+  KnowledgeResourceApi.exportKnowledgeBundle(item.name, item.id, loading).then(() => {
     MsgSuccess(t('common.exportSuccess'))
   })
 }

@@ -7,7 +7,13 @@ export default {
   importTool: 'Import Tool',
   settingTool: 'Set Tool',
   updatedVersion: 'Updated Version',
+  generateCodeDialog: {
+    generatePrompt: 'Generate Python Code',
+    placeholder: 'Please enter the topic',
+    title: 'Python code will be displayed here',
+  },
   toolWorkflow: {
+    title: 'Workflow',
     creatToolWorkflow: 'Create Workflow',
     toActiveTip: 'Unable to enable. Please publish the workflow first.',
     debugResult: 'Debug results',
@@ -59,6 +65,7 @@ export default {
   },
   delete: {
     confirmTitle: 'Confirm deletion of tool:',
+    confirmTitle2: 'tools?',
     confirmMessage:
       'Deleting this tool will cause errors in agent that reference it when they are queried. Please proceed with caution.',
     resourceCountMessage:
@@ -67,7 +74,7 @@ export default {
   disabled: {
     confirmTitle: 'Confirm disable tool:',
     confirmMessage:
-      'Disabling this tool will cause errors in agent that reference it when they are queried. Please proceed with caution.',
+      'Disabling this tool will cause errors in resources that reference it when they are executed. Please proceed with caution.',
   },
 
   form: {

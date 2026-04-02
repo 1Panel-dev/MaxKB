@@ -17,11 +17,6 @@ export default {
     confirmMessage:
       'Deleting this user will also not delete all resources (agent, knowledge, models) created by this user. Please proceed with caution.',
   },
-  disabled: {
-    confirmTitle: 'Confirm disable tool:',
-    confirmMessage:
-      'Disabling this tool will cause errors when agent that reference it are queried. Please proceed with caution.',
-  },
   userForm: {
     nick_name: {
       label: 'Name',

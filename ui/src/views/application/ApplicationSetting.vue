@@ -852,7 +852,7 @@
       @refresh="submitReasoningDialog"
     />
     <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
-    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
     <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
   </div>

@@ -38,7 +38,7 @@ from knowledge.serializers.knowledge import KnowledgeModelSerializer
 from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolScope
+from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from tools.serializers.tool import ToolExportModelSerializer
 from users.models import User
 
@@ -64,6 +64,10 @@ def hand_node(node, update_tool_map):
         mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
         node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
                                                                                              mcp_tool_id)
+    if node.get('type') == 'tool-workflow-lib-node':
+        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
+        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id,
+                                                                                             tool_lib_id)
 
 
 class KnowledgeWorkflowModelSerializer(serializers.ModelSerializer):
@@ -356,6 +360,12 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             if is_import_tool:
                 if len(tool_model_list) > 0:
                     QuerySet(Tool).bulk_create(tool_model_list)
+                    QuerySet(ToolWorkflow).bulk_create(
+                        [ToolWorkflow(workspace_id=workspace_id,
+                                      work_flow=self.reset_workflow(tool.get('work_flow'), update_tool_map),
+                                      tool_id=tool.get('id'))
+                         for
+                         tool in tool_list if tool.get('tool_type') == ToolType.WORKFLOW])
                     UserResourcePermissionSerializer(data={
                         'workspace_id': self.data.get('workspace_id'),
                         'user_id': self.data.get('user_id'),
@@ -370,6 +380,15 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             for node in work_flow.get('nodes', []):
                 hand_node(node, update_tool_map)
                 if node.get('type') == 'loop_node':
+                    for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
+                        hand_node(n, update_tool_map)
+            return work_flow
+
+        @staticmethod
+        def reset_workflow(work_flow, update_tool_map):
+            for node in work_flow.get('nodes', []):
+                hand_node(node, update_tool_map)
+                if node.get('type') == 'loop-node':
                     for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
                         hand_node(n, update_tool_map)
             return work_flow
@@ -402,17 +421,20 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                 knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
                 from application.flow.tools import get_tool_id_list
-                tool_id_list = get_tool_id_list(knowledge_workflow.work_flow)
+                tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                 tool_list = []
                 if len(tool_id_list) > 0:
                     tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
+                tw_dict = {tw.tool_id: tw
+                           for tw in QuerySet(ToolWorkflow).filter(
+                        tool_id__in=[tool.id for tool in tool_list if tool.tool_type == ToolType.WORKFLOW])}
                 knowledge_workflow_dict = KnowledgeWorkflowModelSerializer(knowledge_workflow).data
 
                 kbwf_instance = KBWFInstance(
                     knowledge_workflow_dict,
                     [],
                     'v2',
-                    [ToolExportModelSerializer(tool).data for tool in tool_list]
+                    [self.to_tool_dict(tool, tw_dict) for tool in tool_list]
                 )
                 knowledge_workflow_pickle = pickle.dumps(kbwf_instance)
                 response = HttpResponse(content_type='text/plain', content=knowledge_workflow_pickle)
@@ -420,6 +442,12 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 return response
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        @staticmethod
+        def to_tool_dict(tool, tool_workflow_dict):
+            if tool.tool_type == ToolType.WORKFLOW:
+                return {**ToolExportModelSerializer(tool).data, 'work_flow': tool_workflow_dict.get(tool.id).work_flow}
+            return ToolExportModelSerializer(tool).data
 
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))

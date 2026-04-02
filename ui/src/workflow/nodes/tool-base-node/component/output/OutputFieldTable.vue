@@ -56,7 +56,7 @@ const inputFieldList = ref<any[]>([])
 const outputFieldConfig = ref({ title: t('chat.userOutput', '输出参数') })
 
 function openAddDialog(data?: any, index?: any) {
-  if (index) {
+  if (index !== undefined) {
     currentIndex.value = index
   }
   inputFieldFormDialogRef.value?.open(data)
@@ -73,6 +73,14 @@ function deleteField(index: any) {
 const currentIndex = ref<number | null>(null)
 function refreshFieldList(data: any) {
   if (currentIndex.value !== null) {
+    if (
+      inputFieldList.value
+        .filter((item, index) => index != currentIndex.value)
+        .some((field) => field.field == data.field)
+    ) {
+      MsgError(t('workflow.tip.paramErrorMessage') + data.field)
+      return
+    }
     inputFieldList.value?.splice(currentIndex.value, 1, data)
   } else {
     if (inputFieldList.value.some((field) => field.field == data.field)) {

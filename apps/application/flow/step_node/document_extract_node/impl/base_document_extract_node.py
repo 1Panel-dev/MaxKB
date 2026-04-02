@@ -5,6 +5,7 @@ import io
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.document_extract_node.i_document_extract_node import IDocumentExtractNode
 from knowledge.models import File, FileSourceType
@@ -28,20 +29,25 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
 
         # 安全获取 application
         application_id = None
-        if (self.workflow_manage and
-                self.workflow_manage.work_flow_post_handler and
-                self.workflow_manage.work_flow_post_handler.chat_info):
+        tool_id = None
+        knowledge_id = None
+        if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+            knowledge_id = self.workflow_params.get('knowledge_id')
+        elif [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP].__contains__(
+                self.workflow_manage.flow.workflow_mode):
             application_id = self.workflow_manage.work_flow_post_handler.chat_info.application.id
-        knowledge_id = self.workflow_params.get('knowledge_id')
+        elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+            tool_id = self.workflow_params.get('tool_id')
 
         # doc文件中的图片保存
         def save_image(image_list):
             for image in image_list:
                 meta = {
-                    'debug': False if (application_id or knowledge_id) else True,
+                    'debug': False if (application_id or knowledge_id or tool_id) else True,
                     'chat_id': chat_id,
                     'application_id': str(application_id) if application_id else None,
                     'knowledge_id': str(knowledge_id) if knowledge_id else None,
+                    'tool_id': str(tool_id) if tool_id else None,
                     'file_id': str(image.id)
                 }
                 file_bytes = image.meta.pop('content')
@@ -49,9 +55,8 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     id=meta['file_id'],
                     file_name=image.file_name,
                     file_size=len(file_bytes),
-                    source_type=FileSourceType.APPLICATION.value if meta[
-                        'application_id'] else FileSourceType.KNOWLEDGE.value,
-                    source_id=meta['application_id'] if meta['application_id'] else meta['knowledge_id'],
+                    source_type=FileSourceType.APPLICATION.value if application_id else FileSourceType.KNOWLEDGE.value if knowledge_id else FileSourceType.APPLICATION.value,
+                    source_id=application_id or tool_id or knowledge_id,
                     meta=meta
                 )
                 if not QuerySet(File).filter(id=new_file.id).exists():

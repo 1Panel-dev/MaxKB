@@ -16,6 +16,7 @@ export default {
   },
   delete: {
     confirmTitle: 'Confirm deletion of knowledge:',
+    confirmTitle2: 'knowledges?',
     confirmMessage1: 'This knowledge is related with',
     confirmMessage2: 'agent. Deleting it will be irreversible, please proceed with caution.',
     resourceCountMessage:

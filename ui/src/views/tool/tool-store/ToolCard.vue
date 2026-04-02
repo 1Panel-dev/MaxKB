@@ -32,6 +32,9 @@
       <el-tag size="small" type="info" v-else-if="props.tool?.label === 'skill'" class="info-tag">
         Skills
       </el-tag>
+      <el-tag size="small" type="info" v-else-if="props.tool?.label === 'workflow_template'" class="info-tag">
+        {{ $t('views.tool.toolWorkflow.title') }}
+      </el-tag>
       <el-tag size="small" type="info" class="info-tag" v-else>
         {{ $t('views.tool.title') }}
       </el-tag>
