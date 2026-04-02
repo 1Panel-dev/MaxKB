@@ -4,6 +4,8 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 const share = {
   is_share: () => false,
   create: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_CREATE], 'OR'),
+    batchDelete: () => false,
+  batchMove: () => false,
   sync: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_SYNC], 'OR'),
   vector: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_VECTOR], 'OR'),
   generate: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_GENERATE], 'OR'),

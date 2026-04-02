@@ -34,7 +34,7 @@
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
-        <span class="ml-8" v-if="!isShared && permissionPrecise.create()">
+        <span class="ml-8" v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())">
           <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
             <AppIcon iconName="app-batch-delete" class="mr-4" />
             {{ $t('views.paragraph.setting.batchSelected') }}
@@ -422,11 +422,16 @@
         class="ml-16"
         :disabled="multipleSelection.length === 0"
         @click="openMoveToDialog()"
+        v-if="permissionPrecise.batchMove()"
       >
         {{ $t('common.moveTo') }}
       </el-button>
 
-      <el-button :disabled="multipleSelection.length === 0" @click="deleteMulTool">
+      <el-button
+        :disabled="multipleSelection.length === 0"
+        @click="deleteMulTool"
+        v-if="permissionPrecise.batchDelete()"
+      >
         {{ $t('common.delete') }}
       </el-button>
       <span class="color-secondary ml-24 mr-16">
