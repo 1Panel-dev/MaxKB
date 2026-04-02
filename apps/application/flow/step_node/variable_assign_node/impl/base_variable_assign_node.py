@@ -71,23 +71,21 @@ class BaseVariableAssignNode(IVariableAssignNode):
         result_list = []
         is_chat = False
         for variable in variable_list:
-            if not variable.get('fields'):
+            if 'fields' not in variable:
                 continue
-
             if 'global' == variable['fields'][0]:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            elif 'chat' == variable['fields'][0]:
+            if 'chat' == variable['fields'][0]:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
                 is_chat = True
-            elif 'loop' == variable['fields'][0]:
+            if 'loop' == variable['fields'][0]:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
-            elif 'output' == variable['fields'][0]:
+            if 'output' == variable['fields'][0]:
                 result = self.handle(variable, self.out_evaluation)
                 result_list.append(result)
-
         if is_chat:
             from application.flow.loop_workflow_manage import LoopWorkflowManage
             if isinstance(self.workflow_manage, LoopWorkflowManage):

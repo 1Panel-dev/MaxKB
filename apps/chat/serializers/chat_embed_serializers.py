@@ -32,8 +32,9 @@ class ChatEmbedSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         index_path = os.path.join(PROJECT_DIR, 'apps', "chat", 'template', 'embed.js')
-        with open(index_path, "r", encoding='utf-8') as file:
-            content = file.read()
+        file = open(index_path, "r", encoding='utf-8')
+        content = file.read()
+        file.close()
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             access_token=self.data.get('token')).first()
         is_draggable = 'false'
