@@ -9344,3 +9344,9 @@ msgstr "匯出知識庫"
 msgid "Import knowledge bundle"
 msgstr "匯入知識庫"
 
+msgid "Export system knowledge bundle"
+msgstr "匯出系統知識庫"
+
+msgid "Export shared knowledge bundle"
+msgstr "匯出共享知識庫"
+

@@ -9224,5 +9224,11 @@ msgstr "Export knowledge bundle"
 msgid "Import knowledge bundle"
 msgstr "Import knowledge bundle"
 
+msgid "Export system knowledge bundle"
+msgstr "Export system knowledge bundle"
+
+msgid "Export shared knowledge bundle"
+msgstr "Export shared knowledge bundle"
+
 
 

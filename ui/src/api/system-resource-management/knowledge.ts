@@ -129,6 +129,26 @@ const exportZipKnowledge: (
 }
 
 /**
+ * 导出知识库
+ * @param knowledge_name 
+ * @param knowledge_id 
+ * @param loading 
+ * @returns 
+ */
+const exportKnowledgeBundle: (
+  knowledge_name: string,
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+  return exportFile(
+    knowledge_name + '.zip',
+    `${prefix}/${knowledge_id}/export_knowledge`,
+    undefined,
+    loading
+  )
+}
+
+/**
  * 生成关联问题
  * @param knowledge_id 知识库id
  * @param data
@@ -428,6 +448,7 @@ export default {
   exportKnowledgeWorkflow,
   importKnowledgeWorkflow,
   postTransformWorkflow,
+  exportKnowledgeBundle
 } as {
   [key: string]: any
 }
