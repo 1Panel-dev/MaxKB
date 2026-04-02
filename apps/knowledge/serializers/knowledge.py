@@ -633,6 +633,8 @@ class KnowledgeSerializer(serializers.Serializer):
                 data = [header]
                 for row_idx, row in enumerate(rows):
                     para_active = para_active_list[row_idx] if row_idx < len(para_active_list) else '1'
+                    # None 转为 ''
+                    row = [col if col is not None else '' for col in row]
                     if row_idx == 0:
                         data.append(
                             [*row, tags_str, hit_method, similarity, is_active, para_active, doc_type, doc_meta])
@@ -787,9 +789,9 @@ class KnowledgeSerializer(serializers.Serializer):
                     doc_tags_map[document_id] = tags_str
                 # 逐行创建 para + problem
                 for row_idx, row in enumerate(rows):
-                    title = row[0] or '' if len(row) > 0 else ''
-                    content = row[1] or '' if len(row) > 1 else ''
-                    problems_str = row[2] or '' if len(row) > 2 else ''
+                    title = str(row[0]) if len(row) > 0 and row[0] is not None else ''
+                    content = str(row[1]) if len(row) > 1 and row[1] is not None else ''
+                    problems_str = str(row[2]) if len(row) > 2 and row[2] is not None else ''
                     para_is_active = row[7] if len(row) > 7 and row[7] else '1'
 
                     # 图片 link 替换

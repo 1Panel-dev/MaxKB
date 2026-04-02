@@ -310,6 +310,7 @@
                               {{ $t('common.moveTo') }}
                             </el-dropdown-item>
 
+<<<<<<< Updated upstream
                             <el-dropdown-item
                               @click.stop="
                                 router.push({
@@ -342,6 +343,41 @@
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon
                               >{{ $t('views.document.setting.export') }} 知识库
                             </el-dropdown-item>
+=======
+                          <el-dropdown-item
+                            @click.stop="
+                              router.push({
+                                path: `/knowledge/${item.id}/${folder.currentFolder.id || 'shared'}/${item.type}/setting`,
+                              })
+                            "
+                            v-if="permissionPrecise.edit(item.id)"
+                          >
+                            <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                            {{ $t('common.setting') }}
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.stop="exportKnowledge(item)"
+                            v-if="permissionPrecise.export(item.id)"
+                          >
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
+                            >{{ $t('views.document.setting.export') }} Excel
+                          </el-dropdown-item>
+                          <el-dropdown-item
+                            @click.stop="exportZipKnowledge(item)"
+                            v-if="permissionPrecise.export(item.id)"
+                          >
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
+                            >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                          >
+                          <el-dropdown-item
+                            @click.stop="exportKnowledgeBundle(item)"
+                            v-if="permissionPrecise.export(item.id)"
+                          >
+                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon
+                            >{{ $t('views.document.setting.export') }}
+                            {{ $t('views.knowledge.title') }}
+                          </el-dropdown-item>
+>>>>>>> Stashed changes
 
                             <el-dropdown-item
                               type="danger"
