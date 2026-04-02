@@ -64,8 +64,12 @@
   <el-form-item
     :label="$t('dynamicsForm.KnowledgeConstructor.defaultKnowledge')"
     prop="default_value"
-    required
-    :rules="[{ message: $t('views.chatLog.selectKnowledgePlaceholder'), type: 'array', min: 1 }]"
+    :required="formValue.required"
+    :rules="
+      formValue.required
+        ? [{ message: $t('views.chatLog.selectKnowledgePlaceholder'), type: 'array', min: 1 }]
+        : []
+    "
     v-if="formValue.knowledge_list && formValue.knowledge_list.length > 0"
   >
     <div class="w-full" v-if="formValue.knowledge_list?.length > 0">
