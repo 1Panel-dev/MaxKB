@@ -7,6 +7,7 @@
     :destroy-on-close="true"
     :before-close="close"
     append-to-body
+    align-center
   >
     <DynamicsFormConstructor
       v-model="currentRow"

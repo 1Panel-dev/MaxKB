@@ -130,4 +130,14 @@ export default {
       popover_default: 'Is Default',
     },
   },
+  ModelConstructor: {
+    optionalModel: 'Optional Model',
+    defaultModel: 'Default Model',
+    modelPlaceholder: 'Please enter a model',
+  },
+  KnowledgeConstructor: {
+    optionalModel: 'Optional Model',
+    defaultModel: 'Default Model',
+    modelPlaceholder: 'Please enter a model',
+  },
 }

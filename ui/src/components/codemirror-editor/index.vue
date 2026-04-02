@@ -18,6 +18,12 @@
     </div>
     <!-- Codemirror 弹出层 -->
     <el-dialog v-model="dialogVisible" :title="title" append-to-body fullscreen>
+      <template #title>
+        <div class="flex-between">
+          <h4>{{ title }}</h4>
+          <slot name="header-extra"> </slot>
+        </div>
+      </template>
       <form @submit.prevent>
         <Codemirror
           v-model="cloneContent"
@@ -160,6 +166,13 @@ watch(dialogVisible, (bool) => {
     emit('submitDialog', cloneContent.value)
   }
 })
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    cloneContent.value = newValue
+  },
+)
 
 const openCodemirrorDialog = () => {
   cloneContent.value = props.modelValue

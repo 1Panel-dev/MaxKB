@@ -20,13 +20,13 @@
   </el-form-item>
 
   <el-form-item
-    :label="$t('views.model.modelForm.model_type.kexuan', '可选模型')"
+    :label="$t('dynamicsForm.ModelConstructor.optionalModel')"
     required
     prop="provider_list"
     :rules="[
       {
         required: true,
-        message: $t('views.model.modelForm.model_type.requiredMessage'),
+        message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
         type: 'array',
       },
     ]"
@@ -35,53 +35,22 @@
       <ModelSelect
         multiple
         v-model="selectedIds"
-        :placeholder="$t('views.application.form.voicePlay.placeholder')"
+        :placeholder="$t('dynamicsForm.ModelConstructor.modelPlaceholder')"
         :options="groupedModelOptions"
         @change="handleProviderListChange"
         :model-type="formValue.model_type"
       >
-        <template #tag>
-          <el-tag
-            v-for="provider in formValue.provider_list"
-            :key="provider.model_id"
-            closable
-            type="info"
-            @close="removeSelectedModel(provider.model_id)"
-            style="margin-right: 4px"
-          >
-            <div class="flex align-center">
-              <span
-                v-html="
-                  relatedObject(
-                    providerOptions,
-                    getModelInfo(provider.model_id)?.provider,
-                    'provider',
-                  )?.icon
-                "
-                class="model-icon mr-4"
-              ></span>
-              <span class="mr-4">{{
-                relatedObject(
-                  providerOptions,
-                  getModelInfo(provider.model_id)?.provider,
-                  'provider',
-                )?.name
-              }}</span>
-              <span class="mr-4"> > </span>
-              <span>{{ getModelInfo(provider.model_id)?.name }}</span>
-            </div>
-          </el-tag>
-        </template>
       </ModelSelect>
     </div>
   </el-form-item>
   <el-form-item
-    :label="$t('views.model.modelForm.model_type.moren', '默认模型')"
+    :label="$t('dynamicsForm.ModelConstructor.defaultModel')"
     required
+    prop="default_value.model_id"
     :rules="[
       {
         required: true,
-        message: $t('views.model.modelForm.model_type.requiredMessage'),
+        message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
       },
     ]"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
@@ -90,7 +59,7 @@
       <el-select
         v-model="formValue.default_value"
         value-key="model_id"
-        placeholder="请选择默认模型"
+        :placeholder="$t('dynamicsForm.ModelConstructor.modelPlaceholder')"
       >
         <el-option-group
           v-for="(modelList, providerName) in selectedModelsOptions"
@@ -103,15 +72,36 @@
             :label="item.name"
             :value="getProviderItem(item.id)"
           >
-            <div class="flex">
+            <el-space :size="8">
               <span
-                v-html="relatedObject(providerOptions, providerName, 'provider')?.icon"
-                class="model-icon mr-8"
+                :innerHTML="relatedObject(providerOptions, providerName, 'provider')?.icon"
+                class="select-model-icon"
+                style="margin-top: -7px"
               ></span>
               <span>{{ item.name }}</span>
-            </div>
+            </el-space>
           </el-option>
         </el-option-group>
+        <template #label="{ label, value }">
+          <el-space :size="8" v-if="value?.model_id">
+            <span
+              class="select-model-icon"
+              :innerHTML="
+                relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')
+                  ?.icon
+              "
+            >
+            </span>
+            <span>
+              <span>{{
+                relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')
+                  ?.name
+              }}</span>
+              <span>/</span>
+              <span>{{ label }}</span>
+            </span>
+          </el-space>
+        </template>
       </el-select>
       <div class="ml-8">
         <el-button @click="openParamSetting" @refreshForm="handleParamRefresh">
@@ -229,7 +219,7 @@ const fetchModelByType = (type: string) => {
 
 const handleModelTypeChange = (val: string) => {
   formValue.value.provider_list = []
-  formValue.value.default_value = ''
+  formValue.value.default_value = {}
 
   if (val) {
     fetchModelByType(val)
@@ -262,13 +252,6 @@ function handleProviderListChange() {
   }
 }
 
-function removeSelectedModel(modelId: string) {
-  formValue.value.provider_list = formValue.value.provider_list.filter(
-    (p: any) => p.model_id !== modelId,
-  )
-  handleProviderListChange()
-}
-
 const getData = () => {
   const providerList = (formValue.value.provider_list || []).map((p: any) => {
     const modelInfo = getModelInfo(p.model_id)
@@ -293,7 +276,7 @@ const getData = () => {
 const rander = (form_data: any) => {
   formValue.value.model_type = form_data.model_type
   formValue.value.provider_list = form_data.attrs?.provider_list || []
-  formValue.value.default_value = form_data.default_value || ''
+  formValue.value.default_value = form_data.default_value || {}
 
   if (form_data.model_type) {
     fetchModelByType(form_data.model_type)
@@ -302,10 +285,4 @@ const rander = (form_data: any) => {
 
 defineExpose({ getData, rander })
 </script>
-<style lang="scss" scoped>
-// AI模型选择：添加模型hover样式
-
-.model-icon {
-  width: 18px;
-}
-</style>
+<style lang="scss" scoped></style>

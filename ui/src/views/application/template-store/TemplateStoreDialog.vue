@@ -301,6 +301,7 @@ defineExpose({ open })
 
         &.is-active {
           color: var(--el-color-primary);
+          // TODO
           background-color: #3370ff1a;
         }
       }

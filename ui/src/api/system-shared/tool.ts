@@ -1,8 +1,8 @@
-import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile, postStream } from '@/request/index'
-import { type Ref } from 'vue'
-import type { pageRequest } from '@/api/type/common'
-import type { toolData, AddInternalToolParam } from '@/api/type/tool'
+import {Result} from '@/request/Result'
+import {get, post, del, put, exportFile, postStream} from '@/request/index'
+import {type Ref} from 'vue'
+import type {pageRequest} from '@/api/type/common'
+import type {toolData, AddInternalToolParam} from '@/api/type/tool'
 
 const prefix = '/system/shared/tool'
 
@@ -138,7 +138,7 @@ const postPylint: (code: string, loading?: Ref<boolean>) => Promise<Result<any>>
   code,
   loading,
 ) => {
-  return post(`${prefix}/pylint`, { code }, {}, loading)
+  return post(`${prefix}/pylint`, {code}, {}, loading)
 }
 
 
@@ -187,8 +187,8 @@ const pageToolRecord = (
 }
 
 const getToolRecordDetail = (
- tool_id: string,
- record_id: string
+  tool_id: string,
+  record_id: string
 ) => {
   return get(`${prefix}/${tool_id}/tool_record/${record_id}`)
 }
@@ -200,7 +200,7 @@ const uploadSkillFile: (data: toolData, loading?: Ref<boolean>) => Promise<Resul
   return put(`${prefix}/upload_skill_file`, data, undefined, loading)
 }
 
-const generateCode: (data:any) => Promise<Result<any>> = (
+const generateCode: (data: any) => Promise<Result<any>> = (
   data: any,
 ) => {
   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
@@ -210,6 +210,76 @@ const generateCode: (data:any) => Promise<Result<any>> = (
   )
 }
 
+/**
+ * 导入工具工作流
+ */
+const importToolWorkflow: (
+  tool_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, data, loading) => {
+  return post(`${prefix}/${tool_id}/workflow/import`, data, undefined, loading)
+}
+/**
+ * 获取工具工作流版本列表
+ * @param tool_id
+ * @param loading
+ * @returns
+ */
+const listToolWorkflowVersion: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id: string,
+  loading,
+) => {
+  return get(`${prefix}/${tool_id}/tool_version`, {}, loading)
+}
+/**
+ *
+ * @param tool_id 工具id
+ * @param tool_version_id 工具版本id
+ * @param data 数据
+ * @param loading
+ * @returns
+ */
+const updateToolWorkflowVersion: (
+  tool_id: string,
+  tool_version_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id: string, tool_version_id, data, loading) => {
+  return put(`${prefix}/${tool_id}/tool_version/${tool_version_id}`, data, {}, loading)
+}
+const publish: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id: string,
+  loading,
+) => {
+  return put(`${prefix}/${tool_id}/publish`, {}, {}, loading)
+}
+
+/**
+ * 调试工作流
+ * @param 参数
+ * chat_id: string
+ * data
+ */
+const debugToolWorkflow: (tool_id: string, data: any) => Promise<any> = (tool_id, data) => {
+  const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+  return postStream(`${p}${prefix}/${tool_id}/debug`, data)
+}
+
+/**
+ * 保存工具工作流
+ * @param tool_id
+ * @param data
+ * @param loading
+ * @returns
+ */
+const putToolWorkflow: (
+  tool_id: string,
+  data: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (tool_id, data, loading) => {
+  return put(`${prefix}/${tool_id}/workflow`, data, undefined, loading)
+}
 
 export default {
   getToolList,
@@ -232,4 +302,10 @@ export default {
   getToolRecordDetail,
   uploadSkillFile,
   generateCode,
+  putToolWorkflow,
+  importToolWorkflow,
+  listToolWorkflowVersion,
+  updateToolWorkflowVersion,
+  publish,
+  debugToolWorkflow,
 }

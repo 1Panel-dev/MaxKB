@@ -22,7 +22,7 @@
             <el-select
               class="complex-search__left"
               v-model="search_type"
-              style="width: 120px"
+              style="width: 100px"
               @change="search_type_change"
             >
               <el-option :label="$t('common.creator')" value="create_user" />
@@ -36,7 +36,7 @@
               v-model="search_form.name"
               @change="searchHandle"
               :placeholder="$t('common.searchBar.placeholder')"
-              style="width: 220px"
+              style="width: 190px"
               clearable
             />
             <el-select
@@ -45,7 +45,7 @@
               @change="searchHandle"
               filterable
               clearable
-              style="width: 220px"
+              style="width: 190px"
             >
               <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
@@ -55,100 +55,112 @@
               @change="searchHandle"
               filterable
               clearable
-              style="width: 220px"
+              style="width: 190px"
             >
               <el-option :label="$t('common.status.published')" value="published" />
               <el-option :label="$t('common.status.unpublished')" value="unpublished" />
             </el-select>
           </div>
-          <el-button
-            class="ml-8"
-            v-if="permissionPrecise.create()"
-            @click="openTemplateStoreDialog()"
-          >
-            <AppIcon iconName="app-template-center" class="mr-4" />
-            {{ $t('workflow.setting.templateCenter') }}
-          </el-button>
-          <el-dropdown trigger="click" v-if="permissionPrecise.create()">
-            <el-button type="primary" class="ml-8">
-              {{ $t('common.create') }}
-              <el-icon class="el-icon--right">
-                <arrow-down />
-              </el-icon>
+          <span class="ml-8" v-if="permissionPrecise.batchDelete() || permissionPrecise.batchMove()">
+            <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
+              {{ $t('views.paragraph.setting.batchSelected') }}
             </el-button>
-            <template #dropdown>
-              <el-dropdown-menu class="create-dropdown">
-                <el-dropdown-item @click="openCreateDialog('SIMPLE')">
-                  <div class="flex">
-                    <el-avatar shape="square" class="avatar-blue mt-4" :size="32">
-                      <img
-                        src="@/assets/application/icon_simple_application.svg"
-                        style="width: 65%"
-                        alt=""
-                      />
-                    </el-avatar>
-                    <div class="pre-wrap ml-8">
-                      <div class="lighter">
-                        {{ $t('views.application.simpleAgent') }}
-                      </div>
-                      <el-text type="info" size="small" class="color-secondary"
-                        >{{ $t('views.application.simplePlaceholder') }}
-                      </el-text>
-                    </div>
-                  </div>
-                </el-dropdown-item>
-                <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
-                  <div class="flex">
-                    <el-avatar shape="square" class="avatar-purple mt-4" :size="32">
-                      <img
-                        src="@/assets/application/icon_workflow_application.svg"
-                        style="width: 65%"
-                        alt=""
-                      />
-                    </el-avatar>
-                    <div class="pre-wrap ml-8">
-                      <div class="lighter">{{ $t('views.application.AdvancedAgent') }}</div>
-                      <el-text type="info" size="small" class="color-secondary"
-                        >{{ $t('views.application.advancedPlaceholder') }}
-                      </el-text>
-                    </div>
-                  </div>
-                </el-dropdown-item>
-                <el-upload
-                  class="import-button"
-                  ref="elUploadRef"
-                  :file-list="[]"
-                  action="#"
-                  multiple
-                  :auto-upload="false"
-                  :show-file-list="false"
-                  :limit="1"
-                  :on-change="(file: any, fileList: any) => importApplication(file)"
-                >
-                  <el-dropdown-item>
-                    <div class="flex align-center w-full">
-                      <el-avatar shape="square" class="mt-4" :size="32" style="background: none">
-                        <img src="@/assets/icon_import.svg" alt="" />
+            <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
+              {{ $t('views.paragraph.setting.cancelSelected') }}
+            </el-button>
+          </span>
+          <div v-if="isBatch === false">
+            <el-button
+              class="ml-8"
+              v-if="permissionPrecise.create()"
+              @click="openTemplateStoreDialog()"
+            >
+              <AppIcon iconName="app-template-center" class="mr-4" />
+              {{ $t('workflow.setting.templateCenter') }}
+            </el-button>
+            <el-dropdown trigger="click" v-if="permissionPrecise.create()">
+              <el-button type="primary" class="ml-8">
+                {{ $t('common.create') }}
+                <el-icon class="el-icon--right">
+                  <arrow-down />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu class="create-dropdown">
+                  <el-dropdown-item @click="openCreateDialog('SIMPLE')">
+                    <div class="flex">
+                      <el-avatar shape="square" class="avatar-blue mt-4" :size="32">
+                        <img
+                          src="@/assets/application/icon_simple_application.svg"
+                          style="width: 65%"
+                          alt=""
+                        />
                       </el-avatar>
                       <div class="pre-wrap ml-8">
-                        <div class="lighter">{{ $t('views.application.importApplication') }}</div>
+                        <div class="lighter">
+                          {{ $t('views.application.simpleAgent') }}
+                        </div>
+                        <el-text type="info" size="small" class="color-secondary"
+                          >{{ $t('views.application.simplePlaceholder') }}
+                        </el-text>
                       </div>
                     </div>
                   </el-dropdown-item>
-                </el-upload>
-                <el-dropdown-item @click="openCreateFolder" divided>
-                  <div class="flex align-center">
-                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-                    <div class="pre-wrap ml-4">
-                      <div class="lighter">
-                        {{ $t('components.folder.addFolder') }}
+                  <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
+                    <div class="flex">
+                      <el-avatar shape="square" class="avatar-purple mt-4" :size="32">
+                        <img
+                          src="@/assets/application/icon_workflow_application.svg"
+                          style="width: 65%"
+                          alt=""
+                        />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">{{ $t('views.application.AdvancedAgent') }}</div>
+                        <el-text type="info" size="small" class="color-secondary"
+                          >{{ $t('views.application.advancedPlaceholder') }}
+                        </el-text>
                       </div>
                     </div>
-                  </div>
-                </el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+                  </el-dropdown-item>
+                  <el-upload
+                    class="import-button"
+                    ref="elUploadRef"
+                    :file-list="[]"
+                    action="#"
+                    multiple
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :limit="1"
+                    :on-change="(file: any, fileList: any) => importApplication(file)"
+                  >
+                    <el-dropdown-item>
+                      <div class="flex align-center w-full">
+                        <el-avatar shape="square" class="mt-4" :size="32" style="background: none">
+                          <img src="@/assets/icon_import.svg" alt="" />
+                        </el-avatar>
+                        <div class="pre-wrap ml-8">
+                          <div class="lighter">{{ $t('views.application.importApplication') }}</div>
+                        </div>
+                      </div>
+                    </el-dropdown-item>
+                  </el-upload>
+                  <el-dropdown-item @click="openCreateFolder" divided>
+                    <div class="flex align-center">
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                      <div class="pre-wrap ml-4">
+                        <div class="lighter">
+                          {{ $t('components.folder.addFolder') }}
+                        </div>
+                      </div>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </div>
       </template>
       <div
@@ -163,149 +175,188 @@
           @load="getList"
           :loading="loading"
         >
-          <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
-            <template v-for="(item, index) in applicationList" :key="index">
-              <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-                <CardBox
-                  :title="item.name"
-                  :description="item.desc"
-                  class="cursor"
-                  @click="goApp(item)"
-                >
-                  <template #icon>
-                    <el-avatar shape="square" :size="32" style="background: none">
-                      <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
-                    </el-avatar>
-                  </template>
-                  <template #subTitle>
-                    <el-text class="color-secondary lighter flex align-center" size="small">
-                      <span
-                        :title="i18n_name(item.nick_name)"
-                        class="ellipsis"
-                        style="max-width: 90px"
-                      >
-                        {{ i18n_name(item.nick_name) }}
-                      </span>
-                      <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
-                      <span> {{ dateFormat(item.create_time) }}</span>
-                    </el-text>
-                  </template>
-                  <template #tag>
-                    <el-tag size="small" v-if="isWorkFlow(item.type)" class="warning-tag">
-                      {{ $t('views.application.senior') }}
-                    </el-tag>
-                    <el-tag size="small" class="blue-tag" v-else>
-                      {{ $t('views.application.simple') }}
-                    </el-tag>
-                  </template>
+          <el-checkbox-group v-model="multipleSelection" @change="handleCheckedChatChange">
+            <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
+              <template v-for="(item, index) in applicationList" :key="index">
+                <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                  <CardBox
+                    :title="item.name"
+                    :description="item.desc"
+                    class="cursor"
+                    @click="goApp(item)"
+                    :disabled="isBatch"
+                  >
+                    <template #icon>
+                      <el-avatar shape="square" :size="32" style="background: none">
+                        <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                      </el-avatar>
+                    </template>
+                    <template #subTitle>
+                      <el-text class="color-secondary lighter flex align-center" size="small">
+                        <span
+                          :title="i18n_name(item.nick_name)"
+                          class="ellipsis"
+                          style="max-width: 90px"
+                        >
+                          {{ i18n_name(item.nick_name) }}
+                        </span>
+                        <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                        <span> {{ dateFormat(item.create_time) }}</span>
+                      </el-text>
+                    </template>
+                    <template #tag>
+                      <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)" />
+                      <div v-else>
+                        <el-tag size="small" v-if="isWorkFlow(item.type)" class="warning-tag">
+                          {{ $t('views.application.senior') }}
+                        </el-tag>
+                        <el-tag size="small" class="blue-tag" v-else>
+                          {{ $t('views.application.simple') }}
+                        </el-tag>
+                      </div>
+                    </template>
 
-                  <template #footer>
-                    <div v-if="item.is_publish" class="flex align-center">
-                      <el-icon class="color-success mr-8" style="font-size: 16px">
-                        <SuccessFilled />
-                      </el-icon>
-                      <span class="color-secondary">
-                        {{ $t('common.status.published') }}
-                      </span>
-                      <el-divider direction="vertical" />
-                      <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
+                    <template #footer>
+                      <div v-if="item.is_publish" class="flex align-center">
+                        <el-icon class="color-success mr-8" style="font-size: 16px">
+                          <SuccessFilled />
+                        </el-icon>
+                        <span class="color-secondary">
+                          {{ $t('common.status.published') }}
+                        </span>
+                        <el-divider direction="vertical" />
+                        <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
 
-                      <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
-                    </div>
-                    <div v-else class="flex align-center">
-                      <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-                      <span class="color-secondary">
-                        {{ $t('common.status.unpublished') }}
-                      </span>
-                    </div>
-                  </template>
-                  <template #mouseEnter>
-                    <div @click.stop>
-                      <el-tooltip
-                        effect="dark"
-                        :content="$t('views.application.operation.toChat')"
-                        placement="top"
-                      >
-                        <el-button text @click.stop="toChat(item)">
-                          <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
-                        </el-button>
-                      </el-tooltip>
-                      <el-divider direction="vertical" />
-                      <el-dropdown trigger="click">
-                        <el-button text @click.stop>
-                          <AppIcon iconName="app-more"></AppIcon>
-                        </el-button>
-                        <template #dropdown>
-                          <el-dropdown-menu>
-                            <el-dropdown-item
-                              @mousedown.stop="settingApplication($event, item)"
-                              v-if="permissionPrecise.edit(item.id)"
-                              @click.stop
-                            >
-                              <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
-                              {{ $t('common.setting') }}
-                            </el-dropdown-item>
+                        <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
+                      </div>
+                      <div v-else class="flex align-center">
+                        <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                        <span class="color-secondary">
+                          {{ $t('common.status.unpublished') }}
+                        </span>
+                      </div>
+                    </template>
+                    <template #mouseEnter>
+                      <div @click.stop>
+                        <el-tooltip
+                          effect="dark"
+                          :content="$t('views.application.operation.toChat')"
+                          placement="top"
+                        >
+                          <el-button text @click.stop="toChat(item)">
+                            <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
+                          </el-button>
+                        </el-tooltip>
+                        <el-divider direction="vertical" />
+                        <el-dropdown trigger="click">
+                          <el-button text @click.stop>
+                            <AppIcon iconName="app-more"></AppIcon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item
+                                @mousedown.stop="settingApplication($event, item)"
+                                v-if="permissionPrecise.edit(item.id)"
+                                @click.stop
+                              >
+                                <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                                {{ $t('common.setting') }}
+                              </el-dropdown-item>
 
-                            <el-dropdown-item
-                              @click.stop="openAuthorization(item)"
-                              v-if="permissionPrecise.auth(item.id)"
-                            >
-                              <AppIcon
-                                iconName="app-resource-authorization"
-                                class="color-secondary"
-                              ></AppIcon>
-                              {{ $t('views.system.resourceAuthorization.title') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="openTriggerDrawer(item)"
-                              v-if="
-                                apiType === 'workspace' && permissionPrecise.trigger_read(item.id)
-                              "
-                            >
-                              <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
-                              {{ $t('views.trigger.title') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              @click.stop="openMoveToDialog(item)"
-                              v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
-                            >
-                              <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
-                              {{ $t('common.moveTo') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              @click="copyApplication(item)"
-                              v-if="permissionPrecise.create()"
-                            >
-                              <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
-                              {{ $t('common.copy') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              divided
-                              @click.stop="exportApplication(item)"
-                              v-if="permissionPrecise.export(item.id)"
-                            >
-                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                              {{ $t('common.export') }}
-                            </el-dropdown-item>
-                            <el-dropdown-item
-                              divided
-                              @click.stop="deleteApplication(item)"
-                              v-if="permissionPrecise.delete(item.id)"
-                            >
-                              <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
-                              {{ $t('common.delete') }}
-                            </el-dropdown-item>
-                          </el-dropdown-menu>
-                        </template>
-                      </el-dropdown>
-                    </div>
-                  </template>
-                </CardBox>
-              </el-col>
-            </template>
-          </el-row>
-          <el-empty :description="$t('common.noData')" v-else />
+                              <el-dropdown-item
+                                @click.stop="openAuthorization(item)"
+                                v-if="permissionPrecise.auth(item.id)"
+                              >
+                                <AppIcon
+                                  iconName="app-resource-authorization"
+                                  class="color-secondary"
+                                ></AppIcon>
+                                {{ $t('views.system.resourceAuthorization.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="openTriggerDrawer(item)"
+                                v-if="
+                                  apiType === 'workspace' && permissionPrecise.trigger_read(item.id)
+                                "
+                              >
+                                <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
+                                {{ $t('views.trigger.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="openMoveToDialog(item)"
+                                v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
+                              >
+                                <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
+                                {{ $t('common.moveTo') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click="copyApplication(item)"
+                                v-if="permissionPrecise.create()"
+                              >
+                                <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                                {{ $t('common.copy') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                divided
+                                @click.stop="exportApplication(item)"
+                                v-if="permissionPrecise.export(item.id)"
+                              >
+                                <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                                {{ $t('common.export') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                divided
+                                @click.stop="deleteApplication(item)"
+                                v-if="permissionPrecise.delete(item.id)"
+                              >
+                                <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </template>
+                  </CardBox>
+                </el-col>
+              </template>
+            </el-row>
+            <el-empty :description="$t('common.noData')" v-else />
+          </el-checkbox-group>
         </InfiniteScroll>
+      </div>
+      <!-- 批量操作拦 -->
+      <div class="mul-operation border-t w-full flex align-center" v-if="isBatch">
+        <el-checkbox
+          v-model="checkAll"
+          :indeterminate="isIndeterminate"
+          @change="handleCheckAllChange"
+        >
+          {{ $t('common.allCheck') }}
+        </el-checkbox>
+        <el-button
+          class="ml-16"
+          :disabled="multipleSelection.length === 0"
+          @click="openMoveToDialog()"
+          v-if="permissionPrecise.batchMove()"
+        >
+          {{ $t('common.moveTo') }}
+        </el-button>
+
+        <el-button :disabled="multipleSelection.length === 0" @click="deleteMulApplication" v-if="permissionPrecise.batchDelete()">
+          {{ $t('common.delete') }}
+        </el-button>
+        <span class="color-secondary ml-24 mr-16">
+          {{ $t('common.selected') }} {{ multipleSelection.length }}
+          {{ $t('views.document.items') }}
+        </span>
+        <span class="color-secondary mr-16">
+          {{ $t('common.total') }} {{ paginationConfig.total }}
+          {{ $t('views.document.items') }}
+        </span>
+        <el-button link type="primary" @click="batchSelectedHandle(false)">
+          {{ $t('views.paragraph.setting.cancelSelected') }}
+        </el-button>
       </div>
     </ContentContainer>
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
@@ -332,6 +383,7 @@
 <script lang="ts" setup>
 import { onMounted, ref, reactive, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import type { CheckboxValueType } from 'element-plus'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
@@ -384,6 +436,62 @@ const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const CopyApplicationDialogRef = ref()
 
+// 批量操作
+const isBatch = ref(false)
+const multipleSelection = ref<any[]>([])
+const checkAll = ref(false)
+const isIndeterminate = computed(() => {
+  return (
+    multipleSelection.value.length > 0 &&
+    multipleSelection.value.length < applicationList.value.length
+  )
+})
+function batchSelectedHandle(bool: boolean) {
+  isBatch.value = bool
+  multipleSelection.value = []
+  checkAll.value = false
+}
+
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  multipleSelection.value = val ? applicationList.value.map((v) => v.id) : []
+  checkAll.value = val as boolean
+}
+const handleCheckedChatChange = (value: CheckboxValueType[]) => {
+  const checkedCount = value.length
+  checkAll.value = checkedCount === applicationList.value.length
+}
+
+const checkboxChange = (data?: any) => {
+  const index = multipleSelection.value.indexOf(data?.id)
+  if (index === -1) {
+    multipleSelection.value.push(data?.id)
+  } else {
+    multipleSelection.value.splice(index, 1)
+  }
+  checkAll.value = multipleSelection.value.length === applicationList.value.length
+}
+
+function deleteMulApplication() {
+  MsgConfirm(
+    `${t('views.document.delete.confirmTitle1')} ${multipleSelection.value.length} ${t('views.application.delete.confirmTitle2')}`,
+    t('views.paragraph.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ApplicationApi.delMulApplication(multipleSelection.value, loading).then(() => {
+        batchSelectedHandle(false)
+        paginationConfig.current_page = 1
+        applicationList.value = []
+        getList()
+        MsgSuccess(t('views.document.delete.successMessage'))
+      })
+    })
+    .catch(() => {})
+}
+
 const resourceTriggerDrawerRef = ref<InstanceType<typeof ResourceTriggerDrawer>>()
 const openTriggerDrawer = (data: any) => {
   resourceTriggerDrawerRef.value?.open(data)
@@ -397,23 +505,50 @@ function openAuthorization(item: any) {
 
 const MoveToDialogRef = ref()
 
-function openMoveToDialog(data: any) {
-  const obj = {
-    id: data.id,
-    folder_id: data.folder,
+function openMoveToDialog(data?: any) {
+  let obj
+  if (isBatch.value) {
+    obj = {
+      id_list: multipleSelection.value,
+    }
+  } else {
+    // 仅2个参数就行
+    obj = {
+      id: data.id,
+      folder_id: data.folder,
+    }
   }
+
   MoveToDialogRef.value?.open(obj)
 }
 
 function refreshApplicationList(row: any) {
-  // 不是根目录才会移除
-  if (folder.currentFolder?.parent_id) {
-    const index = applicationList.value.findIndex((v) => v.id === row.id)
-    applicationList.value.splice(index, 1)
+  if (row) {
+    // 不是根目录才会移除
+    if (folder.currentFolder?.parent_id) {
+      const index = applicationList.value.findIndex((v) => v.id === row.id)
+      applicationList.value.splice(index, 1)
+    }
+  } else {
+    batchSelectedHandle(false)
+    paginationConfig.current_page = 1
+    applicationList.value = []
+    getList()
   }
 }
 
 const goApp = (item: any) => {
+  if (isBatch.value) {
+    const index = multipleSelection.value.indexOf(item?.id)
+    if (index === -1) {
+      multipleSelection.value.push(item?.id)
+    } else {
+      multipleSelection.value.splice(index, 1)
+    }
+    checkAll.value = multipleSelection.value.length === applicationList.value.length
+    return
+  }
+
   router.push({ path: get_route(item) })
 }
 

@@ -170,19 +170,15 @@
         </el-table-column>
       </el-table>
 
-      <div class="flex-between">
-        <h4 class="title-decoration-1 mb-16">
+      <div class="flex-between mb-16">
+        <h4 class="title-decoration-1">
           {{ $t('views.tool.form.param.code') }}
           <span class="color-danger" style="margin-left: -10px">*</span>
           <el-text type="info" class="color-secondary">
             {{ $t('views.tool.form.param.paramInfo2') }}
           </el-text>
         </h4>
-        <el-button
-          type="primary"
-           @click="openGenerateCodeDialog"
-          link
-        >
+        <el-button type="primary" @click="openGenerateCodeDialog" link>
           <AppIcon iconName="app-generate-star" class="mr-4"></AppIcon>
           {{ $t('views.application.generateDialog.label') }}
         </el-button>
@@ -193,7 +189,15 @@
           :title="$t('views.tool.form.param.code')"
           v-model="form.code"
           @submitDialog="submitCodemirrorEditor"
-        />
+          :replaceCode="replaceCode"
+        >
+          <template #header-extra>
+            <el-button type="primary" link @click="openGenerateCodeDialog">
+              <AppIcon iconName="app-generate-star" class="mr-4"></AppIcon>
+              {{ $t('views.application.generateDialog.label') }}
+            </el-button>
+          </template>
+        </CodemirrorEditor>
       </div>
       <h4 class="title-decoration-1 mb-16 mt-16">
         {{ $t('common.param.outputParam') }}
@@ -227,7 +231,7 @@
     <FieldFormDialog ref="FieldFormDialogRef" @refresh="refreshFieldList" />
     <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshInitFieldList" />
     <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" />
-    <GenerateCodeDialog ref="GenerateCodeDialogRef" :toolData="form" @replace="replaceCode"/>
+    <GenerateCodeDialog ref="GenerateCodeDialogRef" :toolData="form" @replace="replaceCode" />
   </el-drawer>
 </template>
 
@@ -248,7 +252,7 @@ import { useRoute } from 'vue-router'
 import useStore from '@/stores'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import GenerateCodeDialog from "@/views/tool/component/GenerateCodeDialog.vue";
+import GenerateCodeDialog from '@/views/tool/component/GenerateCodeDialog.vue'
 const route = useRoute()
 
 const props = defineProps({

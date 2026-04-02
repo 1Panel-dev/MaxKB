@@ -73,7 +73,7 @@ const putKnowledge: (
  * 删除知识库
  * @param 参数 knowledge_id
  */
-const delKnowledge: (knowledge_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const delKnowledge: (knowledge_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   knowledge_id,
   loading,
 ) => {
@@ -124,6 +124,26 @@ const exportZipKnowledge: (
   return exportFile(
     knowledge_name + '.zip',
     `${prefix}/${knowledge_id}/export_zip`,
+    undefined,
+    loading,
+  )
+}
+
+/**
+ * 导出知识库
+ * @param knowledge_name 
+ * @param knowledge_id 
+ * @param loading 
+ * @returns 
+ */
+const exportKnowledgeBundle: (
+  knowledge_name: string,
+  knowledge_id: string,
+  loading?: Ref<boolean>,
+) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+  return exportFile(
+    knowledge_name + '.zip',
+    `${prefix}/${knowledge_id}/export_knowledge`,
     undefined,
     loading,
   )
@@ -498,6 +518,7 @@ export default {
   importKnowledgeWorkflow,
   getMcpTools,
   postTransformWorkflow,
+  exportKnowledgeBundle
 } as {
   [key: string]: any
 }

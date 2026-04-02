@@ -2,7 +2,9 @@ import {hasPermission} from '@/utils/permission/index'
 import {PermissionConst, RoleConst} from '@/utils/permission/data'
 
 const systemManage = {
-    create: () => false,
+  create: () => false,
+  batchDelete: () => false,
+  batchMove: () => false,
     folderCreate: () => false,
     edit: () =>
         hasPermission(

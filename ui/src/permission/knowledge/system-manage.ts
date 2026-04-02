@@ -13,6 +13,8 @@ const systemManage = {
       'OR',
     ),
   create: () => false,
+  batchDelete: () => false,
+  batchMove: () => false,
   sync: () => hasPermission(
     [
       RoleConst.ADMIN,

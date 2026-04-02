@@ -130,4 +130,9 @@ export default {
       popover_default: '是否為預設值',
     },
   },
+  ModelConstructor: {
+    optionalModel: '選擇模型',
+    defaultModel: '預設模型',
+    modelPlaceholder: '請輸入模型名稱',
+  },
 }

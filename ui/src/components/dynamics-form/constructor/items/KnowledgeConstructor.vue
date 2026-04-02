@@ -1,8 +1,13 @@
 <template>
   <el-form-item
-    :label="$t('dynamicsForm.Knowledge.label', '可选知识库')"
     prop="knowledge_list"
-    :rules="[{ message: '请至少选择一个可选知识库', type: 'array', min: 1 }]"
+    :rules="[
+      {
+        message: $t('dynamicsForm.KnowledgeConstructor.optionalKnowledgePlaceholder'),
+        type: 'array',
+        min: 1,
+      },
+    ]"
   >
     <template #label>
       <div
@@ -16,7 +21,10 @@
           >
             <CaretRight />
           </el-icon>
-          <span class="lighter">可选知识库</span>
+          <span class="lighter"
+            >{{ $t('dynamicsForm.KnowledgeConstructor.optionalKnowledge') }}
+            <span class="color-danger">*</span>
+          </span>
           <span class="ml-4" v-if="formValue.knowledge_list?.length"
             >({{ formValue.knowledge_list.length }})</span
           >
@@ -29,14 +37,16 @@
       </div>
     </template>
     <div class="w-full" v-if="collapseData.optional_knowledge">
-      <el-text type="info" v-if="formValue.knowledge_list?.length === 0">
-        请选择关联的知识库
-      </el-text>
-      <div v-else>
-        <template v-for="(item, index) in formValue.knowledge_list" :key="item.id">
-          <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+      <div v-if="formValue.knowledge_list?.length > 0">
+        <template v-for="(item, index) in formValue.knowledge_list" :key="index">
+          <div class="flex-between border border-r-6 white-bg mb-8" style="padding: 3px 12px">
             <div class="flex align-center" style="width: 80%">
-              <KnowledgeIcon :type="item.type" class="mr-8" :size="20" />
+              <KnowledgeIcon
+                :type="item.type"
+                class="mr-8"
+                :size="20"
+                style="--el-avatar-border-radius: 6px"
+              />
 
               <span class="ellipsis cursor" :title="item.name"> {{ item.name }}</span>
             </div>
@@ -46,19 +56,20 @@
           </div>
         </template>
       </div>
+      <el-text type="info" v-else>
+        {{ $t('dynamicsForm.KnowledgeConstructor.optionalKnowledgePlaceholder') }}
+      </el-text>
     </div>
   </el-form-item>
   <el-form-item
-    :label="$t('dynamicsForm.Knowledge.defaultLabel', '默认知识库')"
+    :label="$t('dynamicsForm.KnowledgeConstructor.defaultKnowledge')"
     prop="default_value"
     required
-    :rules="[{ message: '请选择默认知识库', type: 'array', min: 1 }]"
+    :rules="[{ message: $t('views.chatLog.selectKnowledgePlaceholder'), type: 'array', min: 1 }]"
+    v-if="formValue.knowledge_list && formValue.knowledge_list.length > 0"
   >
     <div class="w-full" v-if="formValue.knowledge_list?.length > 0">
-      <Knowledge
-        v-model="formValue.default_value"
-        :form-field="{ attrs: { knowledge_list: formValue.knowledge_list } } as any"
-      />
+      <Knowledge v-model="formValue.default_value" :form-field="formField" />
     </div>
   </el-form-item>
   <AddKnowledgeDialog
@@ -71,7 +82,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import AddKnowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
-import Knowledge from '../../items/Knowledge/Knowledge.vue'
+import Knowledge from '../../items/knowledge/Knowledge.vue'
+import type { FormField } from '../../type'
 
 const props = defineProps<{
   modelValue: any
@@ -91,6 +103,10 @@ const formValue = computed({
   get: () => {
     return props.modelValue || { knowledge_list: [], default_value: [] }
   },
+})
+
+const formField = computed<FormField>(() => {
+  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as any
 })
 
 const getData = () => {

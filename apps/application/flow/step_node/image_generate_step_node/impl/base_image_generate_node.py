@@ -4,7 +4,7 @@ from typing import List
 
 import requests
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
-
+from django.utils.translation import gettext_lazy as _
 from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.image_generate_step_node.i_image_generate_node import IImageGenerateNode
@@ -36,6 +36,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if reference_data and isinstance(reference_data, dict):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
+
+        if model_id is None or model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
 
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         tti_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,

@@ -21,6 +21,8 @@ const share = {
       ],
       'OR',
     ),
+  batchDelete: () => false,
+  batchMove: () => false,
   import: () =>
     hasPermission(
       [

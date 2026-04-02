@@ -148,6 +148,11 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
 
+        from django.utils.translation import gettext_lazy as _
+
+        if model_id is None or model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
+
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         if model_setting is None:
             model_setting = {'reasoning_content_enable': False, 'reasoning_content_end': '</think>',
@@ -204,7 +209,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
     def generate_history_human_message_for_details(self, chat_record):
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'video_list' in data:
-                video_list = data['video_list']
+                video_list = data['video_list'] or  []
                 # 增加对 None 和空列表的检查
                 if not video_list or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
@@ -235,7 +240,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
 
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'video_list' in data:
-                video_list = data['video_list']
+                video_list = data['video_list'] or  []
                 if video_list is None or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
                 file_id_list = []

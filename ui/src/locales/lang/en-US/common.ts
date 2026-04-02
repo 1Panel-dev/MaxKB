@@ -38,7 +38,7 @@ export default {
   paramSetting: 'Parameter Settings',
   name: 'Name',
   creator: 'Creator',
-  createdIn:'created in',
+  createdIn: 'created in',
   author: 'Author',
   debug: 'Debug',
   required: 'Required',
@@ -113,6 +113,7 @@ export default {
   username: 'username',
   importCreate: 'Import Create',
   detail: 'Detail',
+  total: 'Total',
   selected: 'Selected',
   notFound: {
     title: '404',
@@ -150,4 +151,5 @@ export default {
     subTitle: 'View Execution Record',
   },
   sourceType: 'Source type',
+  knowledgeImportTip: 'Knowledge base imported successfully. Documents have not been vectorized yet. Please configure the embedding model and vectorize the documents.'
 }

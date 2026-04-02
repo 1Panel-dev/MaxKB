@@ -38,15 +38,15 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
         </el-button>
-        <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
+        <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.read()">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}
         </el-button>
-        <el-button v-if="permissionPrecise.workflow_edit(id)" @click="saveTool(true)">
+        <el-button v-if="permissionPrecise.edit(id)" @click="saveTool(true)">
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" v-if="permissionPrecise.workflow_edit(id)" @click="publish">
+        <el-button type="primary" v-if="permissionPrecise.edit(id)" @click="publish">
           {{ $t('common.publish') }}
         </el-button>
 
@@ -58,7 +58,7 @@
             <el-dropdown-menu>
               <el-dropdown-item
                 @click.stop="exportToolWorkflow(detail.name, detail.id)"
-                v-if="permissionPrecise.workflow_export(id)"
+                v-if="permissionPrecise.export(id)"
               >
                 <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                 {{ $t('workflow.operation.exportWorkflow') }}
@@ -68,7 +68,7 @@
                 <AppIcon iconName="app-history-outlined" class="color-secondary"></AppIcon>
                 {{ $t('workflow.setting.releaseHistory') }}
               </el-dropdown-item>
-              <el-dropdown-item v-if="permissionPrecise.workflow_edit(id)">
+              <el-dropdown-item v-if="permissionPrecise.edit(id)">
                 <AppIcon iconName="app-save-outlined" class="color-secondary"></AppIcon>
                 {{ $t('workflow.setting.autoSave') }}
                 <div class="ml-4">
@@ -174,7 +174,7 @@ import permissionMap from '@/permission'
 import { WorkflowMode } from '@/enums/application'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { toolBaseNode, toolStartNode } from '@/workflow/common/data'
-import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
+import TemplateStoreDialog from '@/views/tool-workflow/template-store/TemplateStoreDialog.vue'
 import DebugDrawer from './debug-drawer/DebugDrawer.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
@@ -193,15 +193,13 @@ const apiType = computed(() => {
     return 'systemShare'
   } else if (route.path.includes('resource-management')) {
     return 'systemManage'
-  } else if (route.path.includes('share/')) {
-    return 'workspaceShare'
   } else {
     return 'workspace'
   }
 })
 
 const permissionPrecise = computed(() => {
-  return permissionMap['knowledge'][apiType.value]
+  return permissionMap['tool'][apiType.value]
 })
 
 const isDefaultTheme = computed(() => {
@@ -413,7 +411,7 @@ const importKnowledgeWorkflow = (file: any) => {
 
 function exportToolWorkflow(name: string, id: string) {
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
-    .exportToolWorkflow(id, name, loading)
+    .exportTool(id, name, loading)
     .catch((error: any) => {
       if (error.response.status !== 403) {
         error.response.data.text().then((res: string) => {
@@ -472,7 +470,7 @@ function getDetail() {
     .then((res: any) => {
       detail.value = res.data
       saveTime.value = res.data?.update_time
-      console.log(res.data)
+
       if (!detail.value.work_flow || !('nodes' in detail.value.work_flow)) {
         detail.value.work_flow = { nodes: [toolBaseNode, toolStartNode] }
       }
@@ -481,6 +479,7 @@ function getDetail() {
       nextTick(() => {
         workflowRef.value?.render(detail.value.work_flow)
         cloneWorkFlow.value = getGraphData()
+        workflowRef.value?.fitView()
       })
     })
 }

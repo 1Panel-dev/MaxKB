@@ -113,6 +113,7 @@ export default {
   username: '用戶名',
   importCreate: '導入創建',
   detail: '详情',
+  total: '共',
   selected: '已選',
   notFound: {
     title: '404',
@@ -149,4 +150,5 @@ export default {
     subTitle: '查看執行記錄',
   },
   sourceType: '資源類型',
+  knowledgeImportTip: '匯入建立知識庫成功，文件資料尚未向量化，請先設定知識庫的向量模型，並對文件進行向量化操作'
 }

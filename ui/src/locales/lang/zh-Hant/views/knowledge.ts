@@ -14,6 +14,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否刪除知識庫：',
+    confirmTitle2: '個知識庫?',
     confirmMessage1: '此知識庫關聯',
     confirmMessage2: '個智能體，刪除後無法恢復，請謹慎操作。',
     resourceCountMessage: '此知識庫關聯 {count} 個資源，刪除後無法使用，請謹慎操作。',

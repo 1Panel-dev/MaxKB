@@ -243,6 +243,8 @@ const addLoading = ref(false)
 async function handleAdd(tool: any) {
   if (tool.tool_type === 'INTERNAL') {
     await handleInternalAdd(tool)
+  } else if (tool.label === 'workflow_template') {
+    await handleTemplateAdd(tool)
   } else {
     await handleStoreAdd(tool)
   }
@@ -282,6 +284,31 @@ async function handleStoreAdd(tool: any) {
     emit('refresh')
     MsgSuccess(t('common.addSuccess'))
     dialogVisible.value = false
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function handleTemplateAdd(tool: any) {
+  try {
+    const obj = {
+      name: tool.name,
+      folder_id: folderId.value,
+      code: '{}',
+      work_flow_template: tool
+    }
+    await loadSharedApi({ type: 'tool', systemType: props.apiType })
+      .postTool(obj)
+      .then((res: any) => {
+        MsgSuccess(t('common.addSuccess'))
+        emit('refresh')
+        return user.profile().then(() => {
+          dialogVisible.value = false
+        })
+      })
+      .finally(() => {
+        loading.value = false
+      })
   } catch (error) {
     console.error(error)
   }

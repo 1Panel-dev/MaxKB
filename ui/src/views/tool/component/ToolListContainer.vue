@@ -9,7 +9,7 @@
           <el-select
             class="complex-search__left"
             v-model="search_type"
-            style="width: 120px"
+            style="width: 90px"
             @change="search_type_change"
           >
             <el-option :label="$t('common.creator')" value="create_user" />
@@ -20,7 +20,7 @@
             v-model="search_form.name"
             @change="searchHandle"
             :placeholder="$t('common.searchBar.placeholder')"
-            style="width: 220px"
+            style="width: 190px"
             clearable
           />
           <el-select
@@ -29,115 +29,126 @@
             @change="searchHandle"
             filterable
             clearable
-            style="width: 220px"
+            style="width: 190px"
           >
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
-        <el-button
-          class="ml-8"
-          v-if="!isShared && permissionPrecise.create()"
-          @click="openToolStoreDialog()"
-        >
-          <AppIcon iconName="app-tool-store" class="mr-4" />
-          {{ $t('views.tool.toolStore.title') }}
-        </el-button>
-        <el-dropdown trigger="click">
-          <el-button type="primary" class="ml-8" v-if="!isShared && permissionPrecise.create()">
-            {{ $t('common.create') }}
-            <el-icon class="el-icon--right">
-              <arrow-down />
-            </el-icon>
+        <span class="ml-8" v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())">
+          <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+            <AppIcon iconName="app-batch-delete" class="mr-4" />
+            {{ $t('views.paragraph.setting.batchSelected') }}
           </el-button>
-          <template #dropdown>
-            <el-dropdown-menu class="create-dropdown">
-              <el-dropdown-item @click="openCreateDialog()">
-                <div class="flex align-center">
-                  <el-avatar class="avatar-green" shape="square" :size="32">
-                    <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('views.tool.title') }}</div>
-                  </div>
-                </div>
-              </el-dropdown-item>
-              <el-dropdown-item @click="openCreateWorkflowDialog()">
-                <div class="flex align-center">
-                  <el-avatar class="avatar-green mt-4" shape="square" :size="32">
-                    <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('workflow.workflow') }}</div>
-                  </div>
-                </div>
-              </el-dropdown-item>
-              <el-dropdown-item @click="openCreateSkillDialog()">
-                <div class="flex align-center">
-                  <el-avatar shape="square" :size="32">
-                    <img src="@/assets/tool/icon_skill.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">Skills</div>
-                  </div>
-                </div>
-              </el-dropdown-item>
-              <el-dropdown-item @click="openCreateMcpDialog()">
-                <div class="flex align-center">
-                  <el-avatar shape="square" :size="32">
-                    <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">MCP</div>
-                  </div>
-                </div>
-              </el-dropdown-item>
+          <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+            <AppIcon iconName="app-batch-delete" class="mr-4" />
+            {{ $t('views.paragraph.setting.cancelSelected') }}
+          </el-button>
+        </span>
+        <div v-if="isBatch === false">
+          <span class="ml-8" v-if="!isShared && permissionPrecise.create()">
+            <el-button @click="openToolStoreDialog()">
+              <AppIcon iconName="app-tool-store" class="mr-4" />
+              {{ $t('views.tool.toolStore.title') }}
+            </el-button>
+          </span>
 
-              <el-dropdown-item @click="openCreateDataSourceDialog()">
-                <div class="flex align-center">
-                  <el-avatar class="avatar-purple" shape="square" :size="32">
-                    <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
-                  </el-avatar>
-                  <div class="pre-wrap ml-8">
-                    <div class="lighter">{{ $t('views.tool.dataSource.title') }}</div>
-                  </div>
-                </div>
-              </el-dropdown-item>
-              <el-upload
-                ref="elUploadRef"
-                :file-list="[]"
-                action="#"
-                multiple
-                :auto-upload="false"
-                :show-file-list="false"
-                :limit="1"
-                :on-change="(file: any, fileList: any) => importTool(file)"
-                class="import-button"
-              >
-                <el-dropdown-item v-if="permissionPrecise.import()">
-                  <div class="flex align-center w-full">
-                    <el-avatar shape="square" :size="32" style="background: none">
-                      <img src="@/assets/icon_import.svg" alt="" />
+          <el-dropdown trigger="click">
+            <el-button type="primary" class="ml-8" v-if="!isShared && permissionPrecise.create()">
+              {{ $t('common.create') }}
+              <el-icon class="el-icon--right">
+                <arrow-down />
+              </el-icon>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu class="create-dropdown">
+                <el-dropdown-item @click="openCreateDialog()">
+                  <div class="flex align-center">
+                    <el-avatar class="avatar-green" shape="square" :size="32">
+                      <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
-                      <div class="lighter">{{ $t('common.importCreate') }}</div>
+                      <div class="lighter">{{ $t('views.tool.title') }}</div>
                     </div>
                   </div>
                 </el-dropdown-item>
-              </el-upload>
-              <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
-                <div class="flex align-center">
-                  <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
-
-                  <div class="pre-wrap ml-4">
-                    <div class="lighter">
-                      {{ $t('components.folder.addFolder') }}
+                <el-dropdown-item @click="openCreateWorkflowDialog()">
+                  <div class="flex align-center">
+                    <el-avatar class="avatar-green mt-4" shape="square" :size="32">
+                      <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('workflow.workflow') }}</div>
                     </div>
                   </div>
-                </div>
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateSkillDialog()">
+                  <div class="flex align-center">
+                    <el-avatar shape="square" :size="32">
+                      <img src="@/assets/tool/icon_skill.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">Skills</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-dropdown-item @click="openCreateMcpDialog()">
+                  <div class="flex align-center">
+                    <el-avatar shape="square" :size="32">
+                      <img src="@/assets/tool/icon_mcp.svg" style="width: 75%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">MCP</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+
+                <el-dropdown-item @click="openCreateDataSourceDialog()">
+                  <div class="flex align-center">
+                    <el-avatar class="avatar-purple" shape="square" :size="32">
+                      <img src="@/assets/tool/icon_datasource.svg" style="width: 58%" alt="" />
+                    </el-avatar>
+                    <div class="pre-wrap ml-8">
+                      <div class="lighter">{{ $t('views.tool.dataSource.title') }}</div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+                <el-upload
+                  ref="elUploadRef"
+                  :file-list="[]"
+                  action="#"
+                  multiple
+                  :auto-upload="false"
+                  :show-file-list="false"
+                  :limit="1"
+                  :on-change="(file: any, fileList: any) => importTool(file)"
+                  class="import-button"
+                >
+                  <el-dropdown-item v-if="permissionPrecise.import()">
+                    <div class="flex align-center w-full">
+                      <el-avatar shape="square" :size="32" style="background: none">
+                        <img src="@/assets/icon_import.svg" alt="" />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">{{ $t('common.importCreate') }}</div>
+                      </div>
+                    </div>
+                  </el-dropdown-item>
+                </el-upload>
+                <el-dropdown-item @click="openCreateFolder" divided v-if="apiType === 'workspace'">
+                  <div class="flex align-center">
+                    <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+
+                    <div class="pre-wrap ml-4">
+                      <div class="lighter">
+                        {{ $t('components.folder.addFolder') }}
+                      </div>
+                    </div>
+                  </div>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
       </div>
     </template>
 
@@ -153,242 +164,287 @@
         @load="getList"
         :loading="loading"
       >
-        <el-row v-if="tool.toolList.length > 0" :gutter="15" class="w-full">
-          <template v-for="(item, index) in tool.toolList" :key="index">
-            <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
-              <CardBox
-                :title="item.name"
-                :description="item.desc"
-                class="cursor"
-                @click.stop="openEditDialog(item)"
-                :disabled="permissionPrecise.edit(item.id)"
-              >
-                <template #icon>
-                  <el-avatar v-if="item?.icon" shape="square" :size="32" style="background: none">
-                    <img :src="resetUrl(item?.icon)" alt="" />
-                  </el-avatar>
-                  <ToolIcon v-else :size="32" :type="item?.tool_type" />
-                </template>
-                <template #title>
-                  <div class="flex align-center">
-                    <span class="ellipsis-1" :title="item.name">
-                      {{ item.name }}
-                    </span>
-                    <el-tag
-                      v-if="item.version"
-                      class="ml-4"
-                      size="small"
-                      type="info"
-                      effect="plain"
-                    >
-                      {{ item.version }}
-                    </el-tag>
-                  </div>
-                </template>
-                <template #subTitle>
-                  <el-text class="color-secondary lighter flex align-center" size="small">
-                    <span
-                      :title="i18n_name(item.nick_name)"
-                      class="ellipsis"
-                      style="max-width: 90px"
-                    >
-                      {{ i18n_name(item.nick_name) }}
-                    </span>
-                    <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
-                    <span> {{ dateFormat(item.create_time) }}</span>
-                  </el-text>
-                </template>
-                <template #tag="{ hoverShow }">
-                  <el-tag v-if="isShared" size="small" type="info" class="info-tag">
-                    {{ t('views.shared.title') }}
-                  </el-tag>
-                  <el-tooltip
-                    effect="dark"
-                    :content="$t('views.tool.updatedVersion')"
-                    v-if="showUpdateStoreTool(item) && !isShared && permissionPrecise.edit(item.id)"
-                  >
-                    <el-button text @click.stop="updateStoreTool(item)">
-                      <el-icon v-if="hoverShow">
-                        <Refresh />
+        <el-checkbox-group v-model="multipleSelection" @change="handleCheckedChatChange">
+          <el-row v-if="tool.toolList.length > 0" :gutter="15" class="w-full">
+            <template v-for="(item, index) in tool.toolList" :key="index">
+              <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                <CardBox
+                  :title="item.name"
+                  :description="item.desc"
+                  class="cursor"
+                  :class="[multipleSelection.includes(item.id) ? 'border-active' : '']"
+                  @click.stop="openEditDialog(item)"
+                  :disabled="!permissionPrecise.edit(item.id) || isBatch"
+                >
+                  <template #icon>
+                    <el-avatar v-if="item?.icon" shape="square" :size="32" style="background: none">
+                      <img :src="resetUrl(item?.icon)" alt="" />
+                    </el-avatar>
+                    <ToolIcon v-else :size="32" :type="item?.tool_type" />
+                  </template>
+                  <template #title>
+                    <div class="flex align-center">
+                      <span class="ellipsis-1" :title="item.name">
+                        {{ item.name }}
+                      </span>
+                      <el-tag
+                        v-if="item.version"
+                        class="ml-4"
+                        size="small"
+                        type="info"
+                        effect="plain"
+                      >
+                        {{ item.version }}
+                      </el-tag>
+                    </div>
+                  </template>
+                  <template #subTitle>
+                    <el-text class="color-secondary lighter flex align-center" size="small">
+                      <span
+                        :title="i18n_name(item.nick_name)"
+                        class="ellipsis"
+                        style="max-width: 90px"
+                      >
+                        {{ i18n_name(item.nick_name) }}
+                      </span>
+                      <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                      <span> {{ dateFormat(item.create_time) }}</span>
+                    </el-text>
+                  </template>
+                  <template #tag="{ hoverShow }">
+                    <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)" />
+                    <div v-else>
+                      <el-tag v-if="isShared" size="small" type="info" class="info-tag">
+                        {{ t('views.shared.title') }}
+                      </el-tag>
+                      <el-tooltip
+                        effect="dark"
+                        :content="$t('views.tool.updatedVersion')"
+                        v-if="
+                          showUpdateStoreTool(item) && !isShared && permissionPrecise.edit(item.id)
+                        "
+                      >
+                        <el-button text @click.stop="updateStoreTool(item)">
+                          <el-icon v-if="hoverShow">
+                            <Refresh />
+                          </el-icon>
+                          <div v-else class="dot-success"></div>
+                        </el-button>
+                      </el-tooltip>
+                    </div>
+                  </template>
+
+                  <template #footer>
+                    <div v-if="item.is_active" class="flex align-center">
+                      <el-icon class="color-success mr-8" style="font-size: 16px">
+                        <SuccessFilled />
                       </el-icon>
-                      <div v-else class="dot-success"></div>
-                    </el-button>
-                  </el-tooltip>
-                </template>
+                      <span class="color-secondary">
+                        {{ $t('common.status.enabled') }}
+                      </span>
+                    </div>
+                    <div v-else class="flex align-center">
+                      <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                      <span class="color-secondary">
+                        {{ $t('common.status.disabled') }}
+                      </span>
+                    </div>
+                  </template>
+                  <template #mouseEnter>
+                    <div @click.stop v-if="!isShared && MoreFieldPermission(item.id)">
+                      <el-switch
+                        v-model="item.is_active"
+                        :before-change="() => changeState(item)"
+                        size="small"
+                        class="mr-4"
+                        v-if="permissionPrecise.switch(item.id)"
+                      />
+                      <el-divider direction="vertical" />
+                      <el-dropdown trigger="click">
+                        <el-button text @click.stop>
+                          <AppIcon iconName="app-more"></AppIcon>
+                        </el-button>
+                        <template #dropdown>
+                          <el-dropdown-menu>
+                            <el-dropdown-item
+                              v-if="item.tool_type === 'MCP'"
+                              @click.stop="showMcpConfig(item)"
+                            >
+                              <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
+                              {{ $t('views.tool.mcp.mcpConfig') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="item.template_id && permissionPrecise.edit(item.id)"
+                              @click.stop="addInternalTool(item, true)"
+                            >
+                              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-else-if="
+                                item.tool_type === 'WORKFLOW' && permissionPrecise.edit(item.id)
+                              "
+                              @click.stop="openCreateWorkflowDialog(item)"
+                            >
+                              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-else-if="permissionPrecise.edit(item.id)"
+                              @click.stop="openEditDialog(item)"
+                            >
+                              <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                              {{ $t('common.edit') }}
+                            </el-dropdown-item>
 
-                <template #footer>
-                  <div v-if="item.is_active" class="flex align-center">
-                    <el-icon class="color-success mr-8" style="font-size: 16px">
-                      <SuccessFilled />
-                    </el-icon>
-                    <span class="color-secondary">
-                      {{ $t('common.status.enabled') }}
-                    </span>
-                  </div>
-                  <div v-else class="flex align-center">
-                    <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
-                    <span class="color-secondary">
-                      {{ $t('common.status.disabled') }}
-                    </span>
-                  </div>
-                </template>
-                <template #mouseEnter>
-                  <div @click.stop v-if="!isShared && MoreFieldPermission(item.id)">
-                    <el-switch
-                      v-model="item.is_active"
-                      :before-change="() => changeState(item)"
-                      size="small"
-                      class="mr-4"
-                      v-if="permissionPrecise.switch(item.id)"
-                    />
-                    <el-divider direction="vertical" />
-                    <el-dropdown trigger="click">
-                      <el-button text @click.stop>
-                        <AppIcon iconName="app-more"></AppIcon>
-                      </el-button>
-                      <template #dropdown>
-                        <el-dropdown-menu>
-                          <el-dropdown-item
-                            v-if="item.tool_type === 'MCP'"
-                            @click.stop="showMcpConfig(item)"
-                          >
-                            <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
-                            {{ $t('views.tool.mcp.mcpConfig') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="item.template_id && permissionPrecise.edit(item.id)"
-                            @click.stop="addInternalTool(item, true)"
-                          >
-                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-else-if="
-                              item.tool_type === 'WORKFLOW' && permissionPrecise.edit(item.id)
-                            "
-                            @click.stop="openCreateWorkflowDialog(item)"
-                          >
-                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-else-if="permissionPrecise.edit(item.id)"
-                            @click.stop="openEditDialog(item)"
-                          >
-                            <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
-                            {{ $t('common.edit') }}
-                          </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="item.tool_type === 'WORKFLOW'"
+                              @click.stop="toWorkflow(item)"
+                            >
+                              <AppIcon iconName="app-workflow" class="color-secondary"></AppIcon>
+                              {{ $t('workflow.workflow') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="!item.template_id && permissionPrecise.copy(item.id)"
+                              @click.stop="copyTool(item)"
+                            >
+                              <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                              {{ $t('common.copy') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="
+                                item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)
+                              "
+                              @click.stop="configInitParams(item)"
+                            >
+                              <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
+                              {{ $t('common.param.initParam') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.stop="openAuthorization(item)"
+                              v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
+                            >
+                              <AppIcon
+                                iconName="app-resource-authorization"
+                                class="color-secondary"
+                              ></AppIcon>
+                              {{ $t('views.system.resourceAuthorization.title') }}
+                            </el-dropdown-item>
 
-                          <el-dropdown-item
-                            v-if="item.tool_type === 'WORKFLOW'"
-                            @click.stop="toWorkflow(item)"
-                          >
-                            <AppIcon iconName="app-workflow" class="color-secondary"></AppIcon>
-                            {{ $t('workflow.workflow') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.copy(item.id)"
-                            @click.stop="copyTool(item)"
-                          >
-                            <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
-                            {{ $t('common.copy') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="
-                              item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)
-                            "
-                            @click.stop="configInitParams(item)"
-                          >
-                            <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
-                            {{ $t('common.param.initParam') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            @click.stop="openAuthorization(item)"
-                            v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
-                          >
-                            <AppIcon
-                              iconName="app-resource-authorization"
-                              class="color-secondary"
-                            ></AppIcon>
-                            {{ $t('views.system.resourceAuthorization.title') }}
-                          </el-dropdown-item>
-
-                          <el-dropdown-item
-                            @click.stop="openTriggerDrawer(item)"
-                            v-if="
-                              ['workspace', 'systemManage'].includes(apiType) &&
-                              (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
-                              permissionPrecise.trigger_read(item.id)
-                            "
-                          >
-                            <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
-                            {{ $t('views.trigger.title') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            text
-                            @click.stop="openResourceMappingDrawer(item)"
-                            v-if="permissionPrecise.relate_map(item.id)"
-                          >
-                            <AppIcon
-                              iconName="app-resource-mapping"
-                              class="color-secondary"
-                            ></AppIcon>
-                            {{ $t('views.system.resourceMapping.title') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            text
-                            @click.stop="openToolRecordDrawer(item)"
-                            v-if="
-                              (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
-                              permissionPrecise.record(item.id)
-                            "
-                          >
-                            <AppIcon
-                              iconName="app-schedule-report"
-                              class="color-secondary"
-                            ></AppIcon>
-                            {{ $t('common.ExecutionRecord.subTitle') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            @click.stop="openMoveToDialog(item)"
-                            v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
-                          >
-                            <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
-                            {{ $t('common.moveTo') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="isSystemShare"
-                            @click.stop="openAuthorizedWorkspaceDialog(item)"
-                          >
-                            <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
-                            {{ $t('views.shared.authorized_workspace') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="!item.template_id && permissionPrecise.export(item.id)"
-                            @click.stop="exportTool(item)"
-                          >
-                            <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                            {{ $t('common.export') }}
-                          </el-dropdown-item>
-                          <el-dropdown-item
-                            v-if="permissionPrecise.delete(item.id)"
-                            divided
-                            @click.stop="deleteTool(item)"
-                          >
-                            <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
-                            {{ $t('common.delete') }}
-                          </el-dropdown-item>
-                        </el-dropdown-menu>
-                      </template>
-                    </el-dropdown>
-                  </div>
-                </template>
-              </CardBox>
-            </el-col>
-          </template>
-        </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+                            <el-dropdown-item
+                              @click.stop="openTriggerDrawer(item)"
+                              v-if="
+                                ['workspace', 'systemManage'].includes(apiType) &&
+                                (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
+                                permissionPrecise.trigger_read(item.id)
+                              "
+                            >
+                              <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
+                              {{ $t('views.trigger.title') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              text
+                              @click.stop="openResourceMappingDrawer(item)"
+                              v-if="permissionPrecise.relate_map(item.id)"
+                            >
+                              <AppIcon
+                                iconName="app-resource-mapping"
+                                class="color-secondary"
+                              ></AppIcon>
+                              {{ $t('views.system.resourceMapping.title') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              text
+                              @click.stop="openToolRecordDrawer(item)"
+                              v-if="
+                                (item.tool_type === 'CUSTOM' || item.tool_type === 'WORKFLOW') &&
+                                permissionPrecise.record(item.id)
+                              "
+                            >
+                              <AppIcon
+                                iconName="app-schedule-report"
+                                class="color-secondary"
+                              ></AppIcon>
+                              {{ $t('common.ExecutionRecord.subTitle') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              @click.stop="openMoveToDialog(item)"
+                              v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
+                            >
+                              <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
+                              {{ $t('common.moveTo') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="isSystemShare"
+                              @click.stop="openAuthorizedWorkspaceDialog(item)"
+                            >
+                              <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
+                              {{ $t('views.shared.authorized_workspace') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="!item.template_id && permissionPrecise.export(item.id)"
+                              @click.stop="exportTool(item)"
+                            >
+                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                              {{ $t('common.export') }}
+                            </el-dropdown-item>
+                            <el-dropdown-item
+                              v-if="permissionPrecise.delete(item.id)"
+                              divided
+                              @click.stop="deleteTool(item)"
+                            >
+                              <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                              {{ $t('common.delete') }}
+                            </el-dropdown-item>
+                          </el-dropdown-menu>
+                        </template>
+                      </el-dropdown>
+                    </div>
+                  </template>
+                </CardBox>
+              </el-col>
+            </template>
+          </el-row>
+          <el-empty :description="$t('common.noData')" v-else />
+        </el-checkbox-group>
       </InfiniteScroll>
+    </div>
+    <!-- 批量操作拦 -->
+    <div class="mul-operation border-t w-full flex align-center" v-if="isBatch">
+      <el-checkbox
+        v-model="checkAll"
+        :indeterminate="isIndeterminate"
+        @change="handleCheckAllChange"
+      >
+        {{ $t('common.allCheck') }}
+      </el-checkbox>
+      <el-button
+        class="ml-16"
+        :disabled="multipleSelection.length === 0"
+        @click="openMoveToDialog()"
+        v-if="permissionPrecise.batchMove()"
+      >
+        {{ $t('common.moveTo') }}
+      </el-button>
+
+      <el-button
+        :disabled="multipleSelection.length === 0"
+        @click="deleteMulTool"
+        v-if="permissionPrecise.batchDelete()"
+      >
+        {{ $t('common.delete') }}
+      </el-button>
+      <span class="color-secondary ml-24 mr-16">
+        {{ $t('common.selected') }} {{ multipleSelection.length }}
+        {{ $t('views.document.items') }}
+      </span>
+      <span class="color-secondary mr-16">
+        {{ $t('common.total') }} {{ paginationConfig.total }}
+        {{ $t('views.document.items') }}
+      </span>
+      <el-button link type="primary" @click="batchSelectedHandle(false)">
+        {{ $t('views.paragraph.setting.cancelSelected') }}
+      </el-button>
     </div>
     <InitParamDrawer ref="InitParamDrawerRef" @refresh="refresh" />
     <ToolFormDrawer ref="ToolFormDrawerRef" @refresh="refresh" :title="ToolDrawertitle" />
@@ -440,6 +496,7 @@
 import { onMounted, ref, reactive, computed, watch } from 'vue'
 import { cloneDeep } from 'lodash'
 import { useRoute, onBeforeRouteLeave, useRouter } from 'vue-router'
+import type { CheckboxValueType } from 'element-plus'
 import InitParamDrawer from '@/views/tool/component/InitParamDrawer.vue'
 import ToolFormDrawer from '@/views/tool/ToolFormDrawer.vue'
 import McpToolFormDrawer from '@/views/tool/McpToolFormDrawer.vue'
@@ -560,37 +617,72 @@ const McpToolDrawertitle = ref('')
 const SkillToolDrawertitle = ref('')
 const DataSourceToolDrawertitle = ref('')
 
-const MoveToDialogRef = ref()
-
-function openMoveToDialog(data: any) {
-  const obj = {
-    id: data.id,
-    folder_id: data.folder,
-  }
-  MoveToDialogRef.value?.open(obj)
+// 批量操作
+const isBatch = ref(false)
+const multipleSelection = ref<any[]>([])
+const checkAll = ref(false)
+const isIndeterminate = computed(() => {
+  return multipleSelection.value.length > 0 && multipleSelection.value.length < tool.toolList.length
+})
+function batchSelectedHandle(bool: boolean) {
+  isBatch.value = bool
+  multipleSelection.value = []
+  checkAll.value = false
 }
 
-function refreshToolList(row: any) {
-  // 不是根目录才会移除
-  if (folder.currentFolder?.parent_id) {
-    const list = cloneDeep(tool.toolList)
-    const index = list.findIndex((v) => v.id === row.id)
-    list.splice(index, 1)
-    tool.setToolList(list)
-  }
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  multipleSelection.value = val ? tool.toolList.map((v) => v.id) : []
+  checkAll.value = val as boolean
+}
+const handleCheckedChatChange = (value: CheckboxValueType[]) => {
+  const checkedCount = value.length
+  checkAll.value = checkedCount === tool.toolList.length
 }
 
-const AuthorizedWorkspaceDialogRef = ref()
-
-function openAuthorizedWorkspaceDialog(row: any) {
-  if (AuthorizedWorkspaceDialogRef.value) {
-    AuthorizedWorkspaceDialogRef.value.open(row, 'Tool')
+const checkboxChange = (data?: any) => {
+  const index = multipleSelection.value.indexOf(data?.id)
+  if (index === -1) {
+    multipleSelection.value.push(data?.id)
+  } else {
+    multipleSelection.value.splice(index, 1)
   }
+  checkAll.value = multipleSelection.value.length === tool.toolList.length
 }
 
-const toolStoreDescDrawerRef = ref<InstanceType<typeof ToolStoreDescDrawer>>()
+function deleteMulTool() {
+  MsgConfirm(
+    `${t('views.document.delete.confirmTitle1')} ${multipleSelection.value.length} ${t('views.tool.delete.confirmTitle2')}`,
+    t('views.paragraph.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
+        .delMulTool(multipleSelection.value, loading)
+        .then(() => {
+          batchSelectedHandle(false)
+          paginationConfig.current_page = 1
+          tool.setToolList([])
+          getList()
+          MsgSuccess(t('views.document.delete.successMessage'))
+        })
+    })
+    .catch(() => {})
+}
 
 function openEditDialog(data?: any) {
+  if (isBatch.value) {
+    const index = multipleSelection.value.indexOf(data?.id)
+    if (index === -1) {
+      multipleSelection.value.push(data?.id)
+    } else {
+      multipleSelection.value.splice(index, 1)
+    }
+    checkAll.value = multipleSelection.value.length === tool.toolList.length
+    return
+  }
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
     return
@@ -643,6 +735,52 @@ function openEditDialog(data?: any) {
       })
   }
 }
+
+const MoveToDialogRef = ref()
+
+function openMoveToDialog(data?: any) {
+  let obj
+  if (isBatch.value) {
+    obj = {
+      id_list: multipleSelection.value,
+    }
+  } else {
+    obj = {
+      id: data.id,
+      folder_id: data.folder,
+    }
+  }
+
+  MoveToDialogRef.value?.open(obj)
+}
+
+function refreshToolList(row: any) {
+  if (row) {
+    // 不是根目录才会移除
+    if (folder.currentFolder?.parent_id) {
+      const list = cloneDeep(tool.toolList)
+      const index = list.findIndex((v) => v.id === row.id)
+      list.splice(index, 1)
+      tool.setToolList(list)
+    }
+  } else {
+    batchSelectedHandle(false)
+    paginationConfig.current_page = 1
+    tool.setToolList([])
+    getList()
+  }
+}
+
+const AuthorizedWorkspaceDialogRef = ref()
+
+function openAuthorizedWorkspaceDialog(row: any) {
+  if (AuthorizedWorkspaceDialogRef.value) {
+    AuthorizedWorkspaceDialogRef.value.open(row, 'Tool')
+  }
+}
+
+const toolStoreDescDrawerRef = ref<InstanceType<typeof ToolStoreDescDrawer>>()
+
 function openCreateDialog() {
   ToolDrawertitle.value = t('views.tool.createTool')
   ToolFormDrawerRef.value.open()
@@ -706,7 +844,8 @@ function openCreateSkillDialog(data?: any) {
 }
 
 function toWorkflow(data: any) {
-  router.push({ name: 'ToolWorkflow', params: { id: data.id, folderId: data.folder_id } })
+  const folderId = data.scope === 'SHARED' ? 'shared' : data.folder_id
+  router.push({ name: 'ToolWorkflow', params: { id: data.id, folderId: folderId } })
 }
 
 const workflowFormDialogRef = ref<InstanceType<typeof WorkflowFormDialog>>()
@@ -727,6 +866,7 @@ const openCreateWorkflowDialog = (data?: any) => {
     loadSharedApi({ type: 'tool', systemType: apiType.value })
       .getToolById(data?.id, loading)
       .then((res: any) => {
+        toWorkflow( res.data)
         workflowFormDialogRef.value?.open(res.data)
       })
   } else {

@@ -423,6 +423,35 @@ const getFile: (application_id: string, params: any) => Promise<Result<any>> = (
 ) => {
   return get(`/oss/get_url/${application_id}`, params)
 }
+
+/**
+ * 批量删除智能体
+ * @param 参数
+ * {
+  "id_list": [String]
+}
+ */
+const delMulApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading,
+) => {
+  return put(`${prefix.value}/batch_delete`, { id_list: data }, undefined, loading)
+}
+/**
+ * 批量删除智能体
+ * @param 参数
+ * {
+  "id_list": [String]
+  "folder_id": string
+}
+ */
+const putMulMoveApplication: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading,
+) => {
+  return put(`${prefix.value}/batch_move`, data, undefined, loading)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -455,4 +484,6 @@ export default {
   topQuestions,
   getFile,
   moveApplication,
+  delMulApplication,
+  putMulMoveApplication,
 }

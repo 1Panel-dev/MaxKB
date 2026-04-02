@@ -2,7 +2,7 @@
   <el-dialog
     align-center
     v-model="dialogVisible"
-    style="width: 600px"
+    style="width: 800px"
     append-to-body
     :close-on-click-modal="true"
     :close-on-press-escape="true"
@@ -10,9 +10,9 @@
   >
     <template #title>
       <div class="flex-between">
-        <div class="flex">生成Python代码</div>
-        <div class="flex">
-          <div>{{ $t('views.application.form.aiModel.label') }}</div>
+        <h4>{{ $t('views.tool.generateCodeDialog.generatePrompt') }}</h4>
+        <div class="flex align-center">
+          <div class="mr-4 lighter">{{ $t('views.application.form.aiModel.label') }}</div>
           <ModelSelect
             v-model="model_id"
             :placeholder="$t('views.application.form.aiModel.placeholder')"
@@ -21,14 +21,10 @@
             @submitModel="getSelectModel"
             showFooter
             :model-type="'LLM'"
-            style="width: 200px;"
+            style="width: 200px"
           >
           </ModelSelect>
-          <el-button
-            class="ml-8"
-            @click="openAIParamSettingDialog"
-            :disabled="!model_id"
-          >
+          <el-button class="ml-8" @click="openAIParamSettingDialog" :disabled="!model_id">
             <el-icon>
               <Operation />
             </el-icon>
@@ -51,14 +47,14 @@
             </div>
             <p v-else-if="loading" shadow="always" style="margin: 0.5rem 0">
               <el-icon class="is-loading color-primary mr-4">
-                <Loading/>
+                <Loading />
               </el-icon>
               {{ $t('views.application.generateDialog.loading') }}
               <span class="dotting"></span>
             </p>
             <p v-else class="flex align-center">
               <AppIcon iconName="app-generate-star" class="color-primary mr-4"></AppIcon>
-              {{ $t('生成python代码') }}
+              {{ $t('views.tool.generateCodeDialog.title') }}
             </p>
           </el-scrollbar>
 
@@ -93,7 +89,7 @@
               v-model="inputValue"
               :autosize="{ minRows: 1, maxRows: 10 }"
               type="textarea"
-              :placeholder="$t('views.application.generateDialog.placeholder')"
+              :placeholder="$t('views.tool.generateCodeDialog.placeholder')"
               :maxlength="100000"
               class="chat-operate-textarea"
               @keydown.enter="handleSubmit($event)"
@@ -120,7 +116,7 @@
         </div>
       </div>
     </div>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm"/>
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
   </el-dialog>
 </template>
 
@@ -131,13 +127,13 @@ import { MsgConfirm } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
 import { copyClick } from '@/utils/clipboard'
-import { loadSharedApi } from "@/utils/dynamics-api/shared-api.ts";
-import { groupBy } from "lodash";
-import AIModeParamSettingDialog from "@/views/application/component/AIModeParamSettingDialog.vue";
-import SendIcon from "@/components/logo/SendIcon.vue";
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+import { groupBy } from 'lodash'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+import SendIcon from '@/components/logo/SendIcon.vue'
 
 const emit = defineEmits(['replace'])
-const {user} = useStore()
+const { user } = useStore()
 const route = useRoute()
 
 const chatMessages = ref<Array<any>>([])
@@ -168,8 +164,6 @@ const promptTemplates = {
 
 - 仅输出纯 Python 代码块，无任何多余的文字解释、注释以外的说明；
 - 代码兼容 Python 3.8 及以上版本，符合 PEP8 编码规范，关键逻辑添加简洁中文注释；
-- 适配 MaxKB 工具 / 数据源的调用逻辑：支持接收平台配置的「启动参数」「输入参数」，包含完整的异常捕获（网络、参数、权限、执行异常等）；
-- 代码结构模块化，函数命名清晰，返回值为 MaxKB 平台可解析的标准化结果；
 - 仅使用 MaxKB 内置依赖（如 requests、pymysql、pandas、json 等），不引入未声明的第三方库。
 
 {userInput}
@@ -177,9 +171,9 @@ const promptTemplates = {
 请为 MaxKB 工具 生成 Python 代码，需求如下：
 
 - 核心功能：用户输入的主题 / 功能需求
-- 启动参数：平台配置的启动参数，如 API 密钥、数据库地址、账号密码等不需要默认值
-- 输入参数：平台配置的输入参数，格式为 “参数名：数据类型：是否必填”不需要默认值
-- 函数定义：列举所有启动参数和输入参数并声明返回类型 {params}
+- 启动参数：平台配置的启动参数，如 API 密钥、数据库地址、账号密码等, 已声明参数：{initFieldList}
+- 输入参数：平台配置的输入参数，已声明参数：{inputFieldList}
+- 函数定义：依次列举所有启动参数和输入参数并声明返回类型
 - 输出要求：代码需接收输入参数，启动参数完成业务逻辑，仅输出函数定义
 `,
 }
@@ -263,7 +257,7 @@ const continueStreaming = () => {
  */
 const getWrite = (reader: any) => {
   let tempResult = ''
-  const middleAnswer = reactive({content: '', role: 'ai'})
+  const middleAnswer = reactive({ content: '', role: 'ai' })
   chatMessages.value.push(middleAnswer)
 
   // 初始化状态并
@@ -278,7 +272,7 @@ const getWrite = (reader: any) => {
    * @param done  是否结束
    * @param value 值
    */
-  const write_stream = ({done, value}: { done: boolean; value: any }) => {
+  const write_stream = ({ done, value }: { done: boolean; value: any }) => {
     try {
       if (done) {
         // 流数据接收完成，但定时器继续运行直到显示完所有内容
@@ -287,7 +281,7 @@ const getWrite = (reader: any) => {
         return
       }
       const decoder = new TextDecoder('utf-8')
-      let str = decoder.decode(value, {stream: true})
+      let str = decoder.decode(value, { stream: true })
       // 这里解释一下 start 因为数据流返回流并不是按照后端chunk返回 我们希望得到的chunk是data:{xxx}\n\n 但是它获取到的可能是 data:{ -> xxx}\n\n 总而言之就是 fetch不能保证每个chunk都说以data:开始 \n\n结束
       tempResult += str
       const split = tempResult.match(/data:.*}\n\n/g)
@@ -353,7 +347,7 @@ function generatePrompt(inputValue: any) {
   isApiComplete.value = false
   loading.value = true
   const workspaceId = user.getWorkspaceId() || 'default'
-  chatMessages.value.push({content: inputValue, role: 'user'})
+  chatMessages.value.push({ content: inputValue, role: 'user' })
   const requestData = {
     messages: chatMessages.value,
     prompt: promptTemplates.INIT_TEMPLATE,
@@ -363,7 +357,7 @@ function generatePrompt(inputValue: any) {
     model_params_setting: model_params_setting.value,
   }
 
-  loadSharedApi({type: 'tool', systemType: apiType.value})
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
     .generateCode(requestData)
     .then((response: any) => {
       nextTick(() => {
@@ -425,21 +419,20 @@ const insertNewlineAtCursor = (event?: any) => {
   })
 }
 
-
 function getSelectModel() {
   loading.value = true
 
   const obj =
     apiType.value === 'systemManage'
       ? {
-        model_type: 'LLM',
-        // todo workspace_id
-        workspace_id: ''
-      }
+          model_type: 'LLM',
+          // todo workspace_id
+          workspace_id: '',
+        }
       : {
-        model_type: 'LLM',
-      }
-  loadSharedApi({type: 'model', systemType: apiType.value})
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
     .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
@@ -461,11 +454,7 @@ const model_change = (modelId: string) => {
 
 const openAIParamSettingDialog = () => {
   if (model_id.value) {
-    AIModeParamSettingDialogRef.value?.open(
-      model_id.value,
-      '',
-      model_params_setting.value,
-    )
+    AIModeParamSettingDialogRef.value?.open(model_id.value, '', model_params_setting.value)
   }
 }
 
@@ -536,7 +525,7 @@ watch(
   () => {
     handleScroll()
   },
-  {deep: true, immediate: true},
+  { deep: true, immediate: true },
 )
 
 onMounted(() => {
