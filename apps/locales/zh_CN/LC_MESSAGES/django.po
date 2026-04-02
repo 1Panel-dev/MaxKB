@@ -9353,3 +9353,8 @@ msgstr "导出系统知识库"
 msgid "Export shared knowledge bundle"
 msgstr "导出共享知识库"
 
+msgid "Batch delete"
+msgstr "批量删除"
+
+msgid "Batch move"
+msgstr "批量移动"

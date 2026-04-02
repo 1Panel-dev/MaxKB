@@ -9350,3 +9350,10 @@ msgstr "匯出系統知識庫"
 msgid "Export shared knowledge bundle"
 msgstr "匯出共享知識庫"
 
+msgid "Batch delete"
+msgstr "批量刪除"
+
+msgid "Batch move"
+msgstr "批量移動"
+
+

@@ -9230,5 +9230,12 @@ msgstr "Export system knowledge bundle"
 msgid "Export shared knowledge bundle"
 msgstr "Export shared knowledge bundle"
 
+msgid "Batch delete"
+msgstr "Batch delete"
+
+msgid "Batch move"
+msgstr "Batch move"
+
+
 
 
