@@ -298,6 +298,7 @@ class INode:
                                                                                              node.id]))),
                                                                      "utf-8")).hexdigest() + (
                                    "__" + str(salt) if salt is not None else '')
+        self.extra = {}
 
     def valid_args(self, node_params, flow_params):
         flow_params_serializer_class = self.get_flow_params_serializer_class()

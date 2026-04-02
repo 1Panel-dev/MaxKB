@@ -8,8 +8,11 @@
 """
 import asyncio
 import json
+import os
 # coding=utf-8
 import pickle
+import tempfile
+import zipfile
 from functools import reduce
 from typing import Dict, List
 
@@ -39,7 +42,7 @@ from knowledge.models import KnowledgeWorkflow
 from system_manage.models import AuthTargetType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolWorkflow, ToolWorkflowVersion
-from tools.serializers.tool import ToolExportModelSerializer
+from tools.serializers.tool import ToolExportModelSerializer, ToolSerializer
 from users.models import User
 
 tool_executor = ToolExecutor()
@@ -95,16 +98,26 @@ class ToolWorkflowInstance:
 class ToolWorkflowSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
         tool_id = serializers.UUIDField(required=True, label=_('tool id'))
+
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get('workspace_id')
+            query_set = QuerySet(Tool).filter(id=self.data.get('tool_id'))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _('Tool id does not exist'))
 
         def debug(self, instance: Dict, user, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            workspace_id = tool_workflow.workspace_id
             tool_record_id = instance.get('chat_record_id') or str(uuid.uuid7())
             took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id,
-                                       self.data.get("workspace_id"),
+                                       workspace_id,
                                        None,
                                        None,
                                        True)
@@ -115,7 +128,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                     'chat_record_id': tool_record_id,
                     'tool_id': self.data.get("tool_id"),
                     'stream': True,
-                    'workspace_id': self.data.get("workspace_id"),
+                    'workspace_id': workspace_id,
                     **instance},
 
                 ToolWorkflowPostHandler(took_execute, self.data.get("tool_id")),
@@ -143,10 +156,10 @@ class ToolWorkflowSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid()
             user_id = self.data.get('user_id')
-            workspace_id = self.data.get("workspace_id")
+
             user = QuerySet(User).filter(id=user_id).first()
-            tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id"),
-                                                          workspace_id=workspace_id).first()
+            tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
+            workspace_id = tool_workflow.workspace_id
             work_flow_version = ToolWorkflowVersion(work_flow=tool_workflow.work_flow,
                                                     tool_id=self.data.get("tool_id"),
                                                     name=timezone.localtime(timezone.now()).strftime(
@@ -162,19 +175,19 @@ class ToolWorkflowSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
+            tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
+            workflow_id = tool.workspace_id
             if instance.get("work_flow"):
                 QuerySet(ToolWorkflow).update_or_create(tool_id=self.data.get("tool_id"),
                                                         create_defaults={'id': uuid.uuid7(),
                                                                          'tool_id': self.data.get(
                                                                              "tool_id"),
-                                                                         "workspace_id": self.data.get(
-                                                                             'workspace_id'),
+                                                                         "workspace_id": workflow_id,
                                                                          'work_flow': instance.get('work_flow',
                                                                                                    {}), },
                                                         defaults={
                                                             'tool_id': self.data.get("tool_id"),
-                                                            'workspace_id': self.data.get(
-                                                                'workspace_id'),
+                                                            'workspace_id': workflow_id,
                                                             'work_flow': instance.get('work_flow')
                                                         })
                 return self.one()
@@ -183,11 +196,13 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 download_url = template_instance.get('downloadUrl')
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
-                ToolWorkflowSerializer.Import(data={
+                tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
+                ToolSerializer.Import(data={
                     'user_id': self.data.get('user_id'),
-                    'workspace_id': self.data.get('workspace_id'),
-                    'tool_id': str(self.data.get('tool_id')),
-                }).import_({'file': bytes_to_uploaded_file(res.content, 'file.tool')}, is_import_tool=False)
+                    'workspace_id': workflow_id,
+                    'folder_id': tool.folder_id,
+                    'file': bytes_to_uploaded_file(res.content, 'file.tool')
+                }).update_template_workflow(str(self.data.get('tool_id')))
 
                 try:
                     requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
@@ -235,3 +250,55 @@ class ToolWorkflowMcpSerializer(serializers.Serializer):
                 }
                 for tool in asyncio.run(get_mcp_tools({server: servers[server]}))]
         return tools
+
+
+class StoreToolWorkflow(serializers.Serializer):
+    user_id = serializers.UUIDField(required=True, label=_("User ID"))
+    name = serializers.CharField(required=False, label=_("tool name"), allow_null=True, allow_blank=True)
+
+    def get_appstore_templates(self):
+        self.is_valid(raise_exception=True)
+        # 下载zip文件
+        try:
+            res = requests.get('https://apps-assets.fit2cloud.com/stable/maxkb.json.zip', timeout=5)
+            res.raise_for_status()
+            # 创建临时文件保存zip
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_zip:
+                temp_zip.write(res.content)
+                temp_zip_path = temp_zip.name
+
+            try:
+                # 解压zip文件
+                with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
+                    # 获取zip中的第一个文件（假设只有一个json文件）
+                    json_filename = zip_ref.namelist()[0]
+                    json_content = zip_ref.read(json_filename)
+
+                # 将json转换为字典
+                tool_store = json.loads(json_content.decode('utf-8'))
+                tag_dict = {tag['name']: tag['key'] for tag in tool_store['additionalProperties']['tags']}
+                filter_apps = []
+                for tool in tool_store['apps']:
+                    if self.data.get('name', '') != '':
+                        if self.data.get('name').lower() not in tool.get('name', '').lower():
+                            continue
+                    if not tool['downloadUrl'].endswith('.tool') or not [tag_dict[tag] for tag in
+                                                                         tool.get('tags')].__contains__(
+                        'workflow_template'):
+                        continue
+                    versions = tool.get('versions', [])
+                    tool['label'] = tag_dict[tool.get('tags')[0]] if tool.get('tags') else ''
+                    tool['version'] = next(
+                        (version.get('name') for version in versions if
+                         version.get('downloadUrl') == tool['downloadUrl']),
+                    )
+                    filter_apps.append(tool)
+
+                tool_store['apps'] = filter_apps
+                return tool_store
+            finally:
+                # 清理临时文件
+                os.unlink(temp_zip_path)
+        except Exception as e:
+            maxkb_logger.error(f"fetch appstore tools error: {e}")
+            return {'apps': [], 'additionalProperties': {'tags': []}}

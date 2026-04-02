@@ -82,7 +82,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import AddKnowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
-import Knowledge from '../../items/Knowledge/Knowledge.vue'
+import Knowledge from '../../items/knowledge/Knowledge.vue'
 import type { FormField } from '../../type'
 
 const props = defineProps<{

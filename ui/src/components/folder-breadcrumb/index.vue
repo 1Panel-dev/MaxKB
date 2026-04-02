@@ -6,7 +6,7 @@
     <template v-if="breadcrumbData?.length > 3">
       <el-breadcrumb-item>
         <el-button link @click="handleClick(breadcrumbData[0])" :title="breadcrumbData[0].name">
-          <span class="ellipsis"> {{ breadcrumbData[0].name }}</span>
+          <span class="ellipsis" style="max-width: 60px"> {{ breadcrumbData[0].name }}</span>
         </el-button>
       </el-breadcrumb-item>
       <el-breadcrumb-item>
@@ -15,19 +15,27 @@
         </el-button>
       </el-breadcrumb-item>
       <el-breadcrumb-item>
-        <h5 class="ml-4 ellipsis" :title="breadcrumbData[breadcrumbData.length - 1].name">
+        <h5
+          class="ml-4 ellipsis"
+          :title="breadcrumbData[breadcrumbData.length - 1].name"
+        >
           {{ breadcrumbData[breadcrumbData.length - 1].name }}
         </h5>
       </el-breadcrumb-item>
     </template>
     <template v-else>
       <el-breadcrumb-item v-for="(item, index) in breadcrumbData" :key="index">
-        <h5 class="ml-4 ellipsis" v-if="index === breadcrumbData.length - 1" :title="item.name">
+        <h5
+          class="ml-4 ellipsis"
+          style="max-width: 100px"
+          v-if="index === breadcrumbData.length - 1"
+          :title="item.name"
+        >
           {{ item.name }}
         </h5>
 
         <el-button v-else link @click="handleClick(item)" :title="item.name">
-          <span class="ellipsis"> {{ item.name }}</span>
+          <span class="ellipsis" style="max-width: 60px"> {{ item.name }}</span>
         </el-button>
       </el-breadcrumb-item>
     </template>
@@ -39,7 +47,7 @@ import { computed } from 'vue'
 import { TreeToFlatten } from '@/utils/array'
 defineOptions({ name: 'FolderBreadcrumb' })
 import useStore from '@/stores'
-import {i18n_name} from "@/utils/common.ts";
+import { i18n_name } from '@/utils/common.ts'
 const { folder, user } = useStore()
 
 const props = defineProps({

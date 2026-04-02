@@ -7,14 +7,14 @@ from rest_framework.views import APIView
 
 from application.api.application_api import SpeechToTextAPI
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions, get_is_permissions
+from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
 from common.result import result, DefaultResultSerializer
 from knowledge.api.knowledge_workflow import KnowledgeWorkflowApi
-from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
-from tools.api.tool_workflow import ToolWorkflowApi, ToolWorkflowExportApi, ToolWorkflowImportApi
-from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer
+from tools.api.tool import GetInternalToolAPI
+from tools.api.tool_workflow import ToolWorkflowApi
+from tools.serializers.tool_workflow import ToolWorkflowSerializer, ToolWorkflowMcpSerializer, StoreToolWorkflow
 from tools.views import get_tool_operation_object
 
 
@@ -105,34 +105,6 @@ class ToolWorkflowView(APIView):
             ).one())
 
 
-class KnowledgeWorkflowVersionView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=['GET'],
-        description=_('Get tool workflow version list'),
-        summary=_('Get tool workflow version list'),
-        operation_id=_('Get tool workflow version list'),  # type: ignore
-        parameters=ToolWorkflowApi.get_parameters(),
-        responses=ToolWorkflowApi.get_response(),
-        tags=[_('Tool')]  # type: ignore
-    )
-    @has_permissions(
-        PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
-        PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        ViewPermission(
-            [RoleConstants.USER.get_workspace_role()],
-            [PermissionConstants.TOOL.get_workspace_tool_permission()],
-            CompareConstants.AND
-        ),
-    )
-    def get(self, request: Request, workspace_id: str, tool_id: str):
-        return result.success(KnowledgeWorkflowSerializer.Operate(
-            data={'user_id': request.user.id, 'workspace_id': workspace_id, 'tool_id': tool_id}
-        ).one())
-
-
 class ToolWorkflowDebugView(APIView):
     authentication_classes = [TokenAuth]
 
@@ -187,3 +159,21 @@ class McpServers(APIView):
             data={'mcp_servers': request.query_params.get('mcp_servers'), 'workspace_id': workspace_id,
                   'user_id': request.user.id,
                   'tool_id': tool_id}).get_mcp_servers(request.data))
+
+
+class StoreToolWorkflowView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_("Get Appstore tools"),
+        summary=_("Get Appstore tools"),
+        operation_id=_("Get Appstore tools"),  # type: ignore
+        responses=GetInternalToolAPI.get_response(),
+        tags=[_("Tool")]  # type: ignore
+    )
+    def get(self, request: Request):
+        return result.success(StoreToolWorkflow(data={
+            'user_id': request.user.id,
+            'name': request.query_params.get('name', ''),
+        }).get_appstore_templates())

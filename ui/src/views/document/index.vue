@@ -821,7 +821,7 @@ import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { hitHandlingMethod } from '@/enums/document'
-import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { MsgSuccess, MsgConfirm, MsgError, MsgAlert } from '@/utils/message'
 import useStore from '@/stores'
 import StatusValue from '@/views/document/component/Status.vue'
 import GenerateRelatedDialog from '@/components/generate-related-dialog/index.vue'
@@ -1535,6 +1535,12 @@ onMounted(() => {
   getList()
   // 初始化定时任务
   initInterval()
+
+  if (route.query.imported === 'true') {
+    MsgAlert(t('common.tip'), t('common.knowledgeImportTip')).then(() => {
+      router.replace({ query: {} })
+    })
+  }
 })
 
 onBeforeUnmount(() => {
@@ -1545,16 +1551,8 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .document {
   .mul-operation {
-    position: fixed;
-    margin-left: var(--sidebar-width);
-    bottom: 0;
     right: 24px;
     width: calc(100% - var(--sidebar-width) - 48px);
-    padding: 16px 24px;
-    box-sizing: border-box;
-    background: #ffffff;
-    z-index: 22;
-    box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
   }
   .document-table {
     :deep(.el-table__row) {

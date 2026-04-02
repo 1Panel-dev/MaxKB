@@ -5,11 +5,19 @@
   .el-select__wrapper {
     box-shadow: none !important;
     border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;
+    min-height: 30px !important;
   }
   .el-input__wrapper {
     box-shadow: none !important;
     border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;
   }
+  .el-input__inner {
+    height: 28px !important;
+  }
+  .el-select__input {
+    height: 22px !important;
+  }
+
   &__left {
     border-right: 1px solid var(--el-border-color);
     .el-select__wrapper {
@@ -392,4 +400,18 @@
   .hover:hover {
     color: var(--el-color-primary-light-5);
   }
+}
+
+// 批量操作拦
+.mul-operation {
+  position: fixed;
+  margin-left: var(--sidebar-width);
+  bottom: 0;
+  right: 0;
+  width: calc(100% - var(--sidebar-width));
+  padding: 16px 24px;
+  box-sizing: border-box;
+  background: #ffffff;
+  z-index: 22;
+  box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
 }

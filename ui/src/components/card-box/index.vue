@@ -38,13 +38,13 @@
         <slot name="footer"></slot>
       </div>
       <div @mouseenter="subHoveredEnter">
-        <slot name="mouseEnter"  v-if="$slots.mouseEnter && show" />
+        <slot name="mouseEnter" v-if="$slots.mouseEnter && show" />
       </div>
     </div>
   </el-card>
 </template>
 <script setup lang="ts">
-import { ref, useSlots } from 'vue'
+import { ref, watch } from 'vue'
 import { t } from '@/locales'
 defineOptions({ name: 'CardBox' })
 const props = withDefaults(
@@ -61,14 +61,25 @@ const props = withDefaults(
      * 是否展示icon
      */
     showIcon?: boolean
+    disabled?: boolean
   }>(),
-  { title: t('common.title'), description: '', showIcon: true, border: true },
+  { title: t('common.title'), description: '', showIcon: true, border: true, disabled: false },
 )
 
+watch(
+  () => props.disabled,
+  (val) => {
+    if (val) {
+      show.value = false
+      subHovered.value = false
+    }
+  },
+)
 const show = ref(false)
 // card上面存在dropdown菜单
 const subHovered = ref(false)
 function cardEnter() {
+  if (props.disabled) return
   show.value = true
   subHovered.value = false
 }

@@ -122,6 +122,78 @@
           :detail="detail"
           :appType="props.currentContent.type"
         ></ExecutionDetailContent>
+        <el-card
+          v-else-if="props.currentContent?.type === 'WORKFLOW'"
+          class="mb-8"
+          shadow="never"
+          style="--el-card-padding: 12px 16px"
+        >
+          <div class="flex-between cursor" @click="showDetail = !showDetail">
+            <div class="flex align-center">
+              <el-icon class="mr-8 arrow-icon" :class="showDetail ? 'rotate-90' : ''">
+                <CaretRight />
+              </el-icon>
+              <el-avatar
+                v-if="taskRecordDetails?.tool_icon"
+                shape="square"
+                :size="24"
+                style="background: none"
+              >
+                <img :src="resetUrl(taskRecordDetails?.tool_icon)" alt="" />
+              </el-avatar>
+              <ToolIcon v-else :size="24" type="WORKFLOW" />
+              <h4 class="ml-8">{{ taskRecordDetails?.tool_name }}</h4>
+            </div>
+            <div class="flex align-center">
+              <span class="mr-16 color-secondary" v-if="taskRecordDetails?.state !== 'STARTED'"
+                >{{ taskRecordDetails?.run_time?.toFixed(2) || 0.0 }} s</span
+              >
+              <el-icon class="color-success" :size="16" v-if="taskRecordDetails?.state === 'SUCCESS'">
+                <CircleCheck />
+              </el-icon>
+              <el-icon class="is-loading" :size="16" v-else-if="taskRecordDetails?.state === 'STARTED'">
+                <Loading />
+              </el-icon>
+              <el-icon class="color-danger" :size="16" v-else>
+                <CircleClose />
+              </el-icon>
+            </div>
+          </div>
+          <el-collapse-transition>
+            <div class="mt-12" v-if="showDetail">
+              <div class="card-never border-r-6">
+                <h5 class="p-8-12">
+                  {{ $t('common.param.inputParam') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                  <div v-for="(f, i) in taskRecordDetails?.meta?.input" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
+                </div>
+              </div>
+              <div class="card-never border-r-6 mt-8">
+                <h5 class="p-8-12">
+                  {{ $t('common.param.outputParam') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in taskRecordDetails?.meta?.output" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
+                </div>
+              </div>
+              <div class="card-never border-r-6 mt-8">
+                <h5 class="p-8-12">
+                  {{ $t('chat.executionDetails.title') }}
+                </h5>
+                <div class="p-8-12 border-t-dashed lighter">
+                  <template v-for="(cLoop, cIndex) in taskRecordDetails?.meta?.details" :key="cIndex">
+                    <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </el-collapse-transition>
+        </el-card>
         <template v-else v-for="(item, index) in arraySort(detail ?? [], 'index')" :key="index">
           <ExecutionDetailCard :data="item"> </ExecutionDetailCard>
         </template>
@@ -187,6 +259,7 @@ const apiType = computed(() => {
 })
 const taskRecordDetails = ref<any>()
 const detail = ref<any>(null)
+const showDetail = ref<boolean>(true)
 
 const loading = ref(false)
 const visible = ref(false)

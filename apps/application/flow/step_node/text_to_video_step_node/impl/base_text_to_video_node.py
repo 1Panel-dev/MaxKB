@@ -38,6 +38,10 @@ class BaseTextToVideoNode(ITextToVideoNode):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
 
+        from django.utils.translation import gettext_lazy as _
+
+        if model_id is None or model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
         ttv_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
                                                              **(model_params_setting or {}))

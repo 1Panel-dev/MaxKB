@@ -91,7 +91,6 @@
     <!-- </LayoutContainer> -->
   </el-dialog>
   <InternalDescDrawer ref="internalDescDrawerRef" @addTool="handleOpenAdd" />
-  <CreateApplicationDialog ref="CreateKnowledgeDialogRef" />
 </template>
 
 <script setup lang="ts">
@@ -103,8 +102,8 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import InternalDescDrawer from './InternalDescDrawer.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import useStore from '@/stores'
+
 import { useRoute } from 'vue-router'
-import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 
 const { user } = useStore()
 const route = useRoute()
@@ -128,7 +127,7 @@ const props = defineProps({
   },
   source: {
     type: String,
-    default: 'application',
+    default: 'knowledge',
   },
 })
 const emit = defineEmits(['refresh'])
@@ -172,7 +171,7 @@ async function getList() {
 
 async function getStoreToolList() {
   try {
-    const res = await ToolStoreApi.getStoreAppList({ name: searchValue.value }, loading)
+    const res = await ToolStoreApi.getStoreToolWorkflowList({ name: searchValue.value }, loading)
     const tags = res.data.additionalProperties.tags
     const storeTools = res.data.apps
     let categories = []
@@ -207,7 +206,7 @@ async function handleDetail(tool: any) {
   internalDescDrawerRef.value?.open(tool.readMe, tool)
 }
 
-const CreateKnowledgeDialogRef = ref()
+const CreateWorkflowToolDialogRef = ref()
 
 function handleOpenAdd(data?: any, isEdit?: boolean) {
   if (props.source === 'work_flow') {
@@ -224,7 +223,7 @@ function handleOpenAdd(data?: any, isEdit?: boolean) {
       })
       .catch(() => {})
   } else {
-    CreateKnowledgeDialogRef.value.open(folderId.value, 'WORK_FLOW', data)
+    CreateWorkflowToolDialogRef.value.open({ id: folderId.value }, data)
   }
 }
 
@@ -232,8 +231,8 @@ const addLoading = ref(false)
 
 function handleStoreAdd(tool: any) {
   try {
-    loadSharedApi({ type: 'application', systemType: props.apiType })
-      .putApplication(id, { work_flow_template: tool }, addLoading)
+    loadSharedApi({ type: 'tool', systemType: props.apiType })
+      .putToolWorkflow(id, { work_flow_template: tool })
       .then(() => {
         emit('refresh')
         MsgSuccess(t('common.addSuccess'))
@@ -301,7 +300,6 @@ defineExpose({ open })
 
         &.is-active {
           color: var(--el-color-primary);
-          // TODO
           background-color: #3370ff1a;
         }
       }

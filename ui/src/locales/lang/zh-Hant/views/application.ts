@@ -17,6 +17,7 @@ export default {
   },
   delete: {
     confirmTitle: '是否刪除智能體：',
+    confirmTitle2: '個智能體?',
     confirmMessage: '刪除後該智能體將不再提供服務，請謹慎操作。',
     resourceCountMessage: '此智能體關聯 {count} 個資源，刪除後無法使用，請謹慎操作。',
   },

@@ -6,7 +6,7 @@ from common.result import ResultSerializer, DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from knowledge.serializers.common import GenerateRelatedSerializer
 from knowledge.serializers.knowledge import KnowledgeBaseCreateRequest, KnowledgeModelSerializer, KnowledgeEditRequest, \
-    KnowledgeWebCreateRequest, HitTestSerializer
+    KnowledgeWebCreateRequest, HitTestSerializer, KnowledgeImportRequest
 
 
 class KnowledgeCreateResponse(ResultSerializer):
@@ -306,3 +306,26 @@ class KnowledgeBatchOperateAPI(APIMixin):
     @staticmethod
     def get_move_request():
         return BatchMoveSerializer
+
+
+class KnowledgeImportAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location='path',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return KnowledgeImportRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+

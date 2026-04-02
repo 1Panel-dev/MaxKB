@@ -18,6 +18,7 @@ export default {
   },
   delete: {
     confirmTitle: 'Are you sure you want to delete this agent: ',
+    confirmTitle2: 'agents?',
     confirmMessage:
       'Deleting this agent will no longer provide its services. Please proceed with caution.',
     resourceCountMessage:

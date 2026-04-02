@@ -25,26 +25,19 @@
         <div class="scrollbar-height">
           <h4 class="title-decoration-1 mb-16 mt-8">回复内容</h4>
 
-          <el-scrollbar>
-            <div style="max-height: 400px">
-              <el-card :class="isSuccess ? '' : 'color-danger'" class="pre-wrap" shadow="never">
-                <AnswerContent
-                  :application="details"
-                  :loading="loading"
-                  v-model:chat-record="currentChat"
-                  type="ai-chat"
-                  :send-message="sendMessage"
-                  :chat-management="ChatManagement"
-                  :executionIsRightPanel="false"
-                  @open-execution-detail="() => {}"
-                  @openParagraph="() => {}"
-                  @openParagraphDocument="() => {}"
-                  :selection="true"
-                ></AnswerContent>
-              </el-card>
-            </div>
-          </el-scrollbar>
-
+          <AnswerContent
+            :application="details"
+            :loading="loading"
+            v-model:chat-record="currentChat"
+            type="ai-chat"
+            :send-message="sendMessage"
+            :chat-management="ChatManagement"
+            :executionIsRightPanel="false"
+            @open-execution-detail="() => {}"
+            @openParagraph="() => {}"
+            @openParagraphDocument="() => {}"
+            :selection="true"
+          ></AnswerContent>
           <div v-if="toolRecord">
             <h4 class="title-decoration-1 mb-16 mt-16">输出参数</h4>
             <div class="mb-16" v-if="isSuccess !== undefined">

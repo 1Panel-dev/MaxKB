@@ -158,32 +158,51 @@
             </el-scrollbar>
           </div>
         </div>
+        <div class="mul-operation border-t w-full" v-if="isBatch === true">
+          <div class="flex align-center" style="max-width: 1000px; margin: auto; flex-grow: 1">
+            <el-checkbox
+              v-model="checkAll"
+              :indeterminate="isIndeterminate"
+              @change="handleCheckAllChange"
+            >
+              {{ $t('common.allCheck') }}
+            </el-checkbox>
+            <el-button
+              class="ml-16"
+              :disabled="multipleSelection.length === 0"
+              @click="openGenerateDialog()"
+            >
+              {{ $t('views.document.generateQuestion.title') }}
+            </el-button>
+            <el-button
+              :disabled="multipleSelection.length === 0"
+              @click="openSelectDocumentDialog()"
+            >
+              {{ $t('views.document.setting.migration') }}
+            </el-button>
+
+            <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
+              {{ $t('common.delete') }}
+            </el-button>
+            <span class="color-secondary ml-24 mr-16">
+              {{ $t('common.selected') }} {{ multipleSelection.length }}
+              {{ $t('views.document.items') }}
+            </span>
+            <span class="color-secondary mr-16">
+              {{ $t('common.total') }} {{ paginationConfig.total }}
+              {{ $t('views.document.items') }}
+            </span>
+            <el-button
+              link
+              type="primary"
+              v-if="multipleSelection.length > 0"
+              @click="multipleSelection = []"
+            >
+              {{ $t('common.clear') }}
+            </el-button>
+          </div>
+        </div>
       </LayoutContainer>
-
-      <div class="mul-operation border-t w-full flex align-center" v-if="isBatch === true">
-        <el-button :disabled="multipleSelection.length === 0" @click="openGenerateDialog()">
-          {{ $t('views.document.generateQuestion.title') }}
-        </el-button>
-        <el-button :disabled="multipleSelection.length === 0" @click="openSelectDocumentDialog()">
-          {{ $t('views.document.setting.migration') }}
-        </el-button>
-
-        <el-button :disabled="multipleSelection.length === 0" @click="deleteMulParagraph">
-          {{ $t('common.delete') }}
-        </el-button>
-        <span class="color-secondary ml-24 mr-16">
-          {{ $t('common.selected') }} {{ multipleSelection.length }}
-          {{ $t('views.document.items') }}
-        </span>
-        <el-button
-          link
-          type="primary"
-          v-if="multipleSelection.length > 0"
-          @click="multipleSelection = []"
-        >
-          {{ $t('common.clear') }}
-        </el-button>
-      </div>
     </el-card>
     <ParagraphDialog
       ref="ParagraphDialogRef"
@@ -203,6 +222,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import type { CheckboxValueType } from 'element-plus'
 import ParagraphDialog from './component/ParagraphDialog.vue'
 import ParagraphCard from './component/ParagraphCard.vue'
 import SelectDocumentDialog from './component/SelectDocumentDialog.vue'
@@ -275,6 +295,17 @@ const handleClick = (e: MouseEvent, ele: any) => {
 // 批量操作
 const isBatch = ref(false)
 const multipleSelection = ref<any[]>([])
+const checkAll = ref(false)
+const isIndeterminate = computed(() => {
+  return (
+    multipleSelection.value.length > 0 &&
+    multipleSelection.value.length < paragraphDetail.value.length
+  )
+})
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  multipleSelection.value = val ? paragraphDetail.value.map((v) => v.id) : []
+  checkAll.value = val as boolean
+}
 
 function toggleSelect(id: number) {
   const index = multipleSelection.value.indexOf(id)
@@ -472,11 +503,6 @@ onMounted(() => {
     box-sizing: border-box;
     .mul-operation {
       position: absolute;
-      bottom: 0;
-      left: 0;
-      padding: 16px 24px;
-      box-sizing: border-box;
-      background: #ffffff;
     }
   }
   .paragraph-card {

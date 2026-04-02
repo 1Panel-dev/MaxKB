@@ -20,6 +20,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 
+from application.flow.common import WorkflowMode
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.tool_lib_node.i_tool_lib_node import IToolLibNode
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -260,14 +261,23 @@ class BaseToolLibNodeNode(IToolLibNode):
                 }
             else:
                 filtered_args = all_params
+            if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
+                    self.workflow_manage.flow.workflow_mode):
+                source_id = self.workflow_manage.params.get('knowledge_id')
+                source_type = ToolTaskTypeChoices.KNOWLEDGE.value
+            elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
+                source_id = self.workflow_manage.params.get('application_id')
+                source_type = ToolTaskTypeChoices.APPLICATION.value
+            else:
+                source_id = self.workflow_manage.params.get('tool_id')
+                source_type = ToolTaskTypeChoices.TOOL.value
+
             ToolRecord(
                 id=task_record_id,
                 workspace_id=tool_lib.workspace_id,
                 tool_id=tool_lib.id,
-                source_type=ToolTaskTypeChoices.KNOWLEDGE.value if self.workflow_manage.params.get(
-                    'knowledge_id') else ToolTaskTypeChoices.APPLICATION.value,
-                source_id=self.workflow_manage.params.get('knowledge_id') or self.workflow_manage.params.get(
-                    'application_id'),
+                source_type=source_type,
+                source_id=source_id,
                 meta={'input': filtered_args, 'output': {}},
                 state=State.STARTED
             ).save()

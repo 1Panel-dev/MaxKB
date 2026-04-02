@@ -115,11 +115,14 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     child_answer_data = get_answer_list(instance, child_node_node_dict, node.runtime_node_id)
     node.context['usage'] = {'usage': usage}
     node.context['child_node'] = node_child_node
-    node.context['child_node_data'] = instance.get_runtime_details()
+    node.context['details'] = instance.get_runtime_details()
     node.context['is_interrupt_exec'] = is_interrupt_exec
-    node.context['child_node_data'] = instance.get_runtime_details()
     node.context['child_answer_data'] = child_answer_data
     node.context['run_time'] = time.time() - node.context.get("start_time")
+    node.extra['input_field_list'] = instance.get_input_field_list()
+    node.extra['output_field_list'] = instance.get_output_field_list()
+    node.extra['input'] = instance.get_input()
+    node.extra['output'] = instance.out_context
     for key, value in instance.out_context.items():
         node.context[key] = value
 
@@ -144,9 +147,15 @@ class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
 
     def save_context(self, details, workflow_manage):
         self.context['child_answer_data'] = details.get('child_answer_data')
-        self.context['child_node_data'] = details.get('child_node_data')
+        self.context['details'] = details.get('details')
+        self.extra['input_field_list'] = details.get('input_field_list')
+        self.extra['output_field_list'] = details.get('input_field_list')
+        self.extra['input'] = details.get('input')
+        self.extra['output'] = details.get('output')
         self.context['result'] = details.get('result')
         self.context['exception_message'] = details.get('err_message')
+        for key, value in (details.get('output') or {}).items():
+            self.context[key] = value
         if self.node_params.get('is_result'):
             self.answer_text = str(details.get('result'))
 
@@ -210,7 +219,11 @@ class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'status': self.status,
-            'child_node_data': self.context.get("child_node_data"),
+            'input': self.extra.get('input'),
+            'output': self.extra.get('output'),
+            'input_field_list': self.extra.get('input_field_list'),
+            'output_field_list': self.extra.get('output_field_list'),
+            'details': self.context.get("details"),
             'child_answer_data': self.context.get("child_answer_data"),
             'err_message': self.err_message,
             'enableException': self.node.properties.get('enableException'),
