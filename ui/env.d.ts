@@ -6,5 +6,6 @@ interface Window {
   MaxKB: {
     prefix: string
     chatPrefix: string
+    defaultExecuteCondition: string
   }
 }

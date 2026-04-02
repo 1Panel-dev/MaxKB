@@ -41,15 +41,15 @@
               placement="bottom-start"
             >
               <el-button text>
-                <img src="@/assets/workflow/icon_or.svg" alt="" v-if="condition === 'OR'" />
-                <img src="@/assets/workflow/icon_and.svg" alt="" v-if="condition === 'AND'" />
+                <img src="@/assets/workflow/icon_or.svg" alt="" v-if="executeCondition === 'OR'" />
+                <img src="@/assets/workflow/icon_and.svg" alt="" v-if="executeCondition === 'AND'" />
               </el-button>
               <template #dropdown>
                 <div style="width: 280px" class="p-12-16">
                   <h5>{{ $t('workflow.condition.title') }}</h5>
                   <p class="mt-8 lighter">
                     <span>{{ $t('workflow.condition.front') }}</span>
-                    <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
+                    <el-select v-model="executeCondition" size="small" style="width: 60px; margin: 0 8px">
                       <el-option :label="$t('workflow.condition.AND')" value="AND" />
                       <el-option :label="$t('workflow.condition.OR')" value="OR" />
                     </el-select>
@@ -245,7 +245,7 @@ const form = ref<any>({
   title: '',
 })
 
-const condition = computed({
+const executeCondition = computed({
   set: (v) => {
     set(props.nodeModel.properties, 'condition', v)
   },
@@ -253,7 +253,7 @@ const condition = computed({
     if (props.nodeModel.properties.condition) {
       return props.nodeModel.properties.condition
     }
-    set(props.nodeModel.properties, 'condition', 'AND')
+    set(props.nodeModel.properties, 'condition', window.MaxKB.defaultExecuteCondition || 'AND')
     return true
   },
 })

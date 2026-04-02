@@ -115,6 +115,10 @@ class Config(dict):
     def get_chat_path(self):
         return self.get('CHAT_PATH', '/chat')
 
+    def get_default_execute_condition(self):
+        val = self.get('DEFAULT_EXECUTE_CONDITION', 'AND')
+        return 'OR' if val.upper() == 'OR' else 'AND'
+
     def get_session_timeout(self):
         return int(self.get('SESSION_TIMEOUT', 28800))
 
