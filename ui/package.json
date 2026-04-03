@@ -28,7 +28,7 @@
     "cropperjs": "^1.6.2",
     "dingtalk-jsapi": "^3.1.0",
     "echarts": "^5.6.0",
-    "element-plus": "^2.11.7",
+    "element-plus": "2.11.7",
     "file-saver": "^2.0.5",
     "highlight.js": "^11.11.1",
     "html-to-image": "^1.11.13",
