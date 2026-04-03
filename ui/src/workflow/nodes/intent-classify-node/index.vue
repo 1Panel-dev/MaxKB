@@ -69,7 +69,7 @@
           </div>
           <NodeCascader
             v-else
-            ref="nodeCascaderRef"
+            ref="modelCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -357,10 +357,12 @@ const props = defineProps<{ nodeModel: any }>()
 
 const IntentClassifyNodeFormRef = ref<FormInstance>()
 const modelOptions = ref<any>(null)
+const modelCascaderRef = ref()
 
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     IntentClassifyNodeFormRef.value?.validate(),
   ])
     .then(() => {
