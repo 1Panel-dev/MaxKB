@@ -266,11 +266,11 @@ class BaseToolLibNodeNode(IToolLibNode):
                 source_id = self.workflow_manage.params.get('knowledge_id')
                 source_type = ToolTaskTypeChoices.KNOWLEDGE.value
             elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
-                source_id = self.workflow_manage.params.get('application_id')
-                source_type = ToolTaskTypeChoices.APPLICATION.value
-            else:
                 source_id = self.workflow_manage.params.get('tool_id')
                 source_type = ToolTaskTypeChoices.TOOL.value
+            else:
+                source_id = self.workflow_manage.params.get('application_id')
+                source_type = ToolTaskTypeChoices.APPLICATION.value
 
             ToolRecord(
                 id=task_record_id,
