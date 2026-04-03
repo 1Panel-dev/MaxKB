@@ -94,6 +94,10 @@ class BaseParameterExtractionNode(IParameterExtractionNode):
     def execute(self, input_variable, variable_list, model_params_setting, model_id, **kwargs) -> NodeResult:
         input_variable = str(input_variable)
         self.context['request'] = input_variable
+
+        if not model_id:
+            raise Exception(_('Model is not allowed to be empty'))
+
         if model_params_setting is None and model_id:
             model_params_setting = get_default_model_params_setting(model_id)
         workspace_id = self.workflow_manage.get_body().get('workspace_id')
