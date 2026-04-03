@@ -14,10 +14,11 @@ from Crypto.Cipher import PKCS1_v1_5 as PKCS1_cipher
 from Crypto.PublicKey import RSA
 from django.core import cache
 from django.db.models import QuerySet
-
+from common.cache.mem_cache import MemCache
 from common.constants.cache_version import Cache_Version
 from system_manage.models import SystemSetting, SettingType
 
+rsa_message_cache = MemCache('rsa', {})
 lock = threading.Lock()
 rsa_cache = cache.cache
 cache_key = "rsa_key"
@@ -39,15 +40,18 @@ def generate():
     return {'key': key.publickey().export_key(), 'value': encrypted_key}
 
 
+version, get_key = Cache_Version.SYSTEM.value
+
+
 def get_key_pair():
-    rsa_value = rsa_cache.get(cache_key)
+    rsa_value = rsa_cache.get(get_key(key='rsa_key'), version=version)
     if rsa_value is None:
         with lock:
-            rsa_value = rsa_cache.get(cache_key)
+            rsa_value = rsa_cache.get(get_key(key='rsa_key'), version=version)
             if rsa_value is not None:
                 return rsa_value
             rsa_value = get_key_pair_by_sql()
-            version, get_key = Cache_Version.SYSTEM.value
+
             rsa_cache.set(get_key(key='rsa_key'), rsa_value, timeout=None, version=version)
     return rsa_value
 
@@ -88,7 +92,6 @@ def decrypt(msg, pri_key: str | None = None):
     cipher = _get_cipher(pri_key)
     decrypt_data = cipher.decrypt(base64.b64decode(msg), 0)
     return decrypt_data.decode("utf-8")
-
 
 
 @lru_cache(maxsize=2)
@@ -138,6 +141,9 @@ def rsa_long_decrypt(message, pri_key: str | None = None, length=256):
     :param  length :     1024bit的证书用128,2048bit证书用256位
     :return: 解密后的数据
     """
+    result = rsa_message_cache.get(message)
+    if result is not None:
+        return result
     if pri_key is None:
         pri_key = get_key_pair().get('value')
 
@@ -149,5 +155,6 @@ def rsa_long_decrypt(message, pri_key: str | None = None, length=256):
     for i in range(0, len(base64_de), length):
         result.extend(cipher.decrypt(base64_de[i:i + length], 0))
 
-    return result.decode()
-
+    r = result.decode()
+    rsa_message_cache.set(message, r, timeout=60 * 60 * 8)
+    return r
