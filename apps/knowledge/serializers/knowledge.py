@@ -555,7 +555,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     'name': knowledge.name,
                     'desc': knowledge.desc,
                     'type': knowledge.type,
-                    'meta': knowledge.meta if knowledge.meta else {},
+                    'meta': {} if knowledge.type == KnowledgeType.LARK else (knowledge.meta if knowledge.meta else {}),
                     'file_size_limit': knowledge.file_size_limit,
                     'file_count_limit': knowledge.file_count_limit,
                     'tags': [{'key': t['key'], 'value': t['value']} for t in tag_list]
