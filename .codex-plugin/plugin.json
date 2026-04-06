@@ -1,0 +1,16 @@
+{
+  "name": "MaxKB",
+  "version": "0.1.0",
+  "description": "\ud83d\udd25 MaxKB is an open-source platform for building enterprise-grade agents.  \u5f3a\u5927\u6613\u7528\u7684\u5f00\u6e90\u4f01\u4e1a\u7ea7\u667a\u80fd\u4f53\u5e73\u53f0\u3002",
+  "author": {
+    "name": "1Panel-dev",
+    "url": "https://github.com/1Panel-dev"
+  },
+  "homepage": "https://github.com/1Panel-dev/MaxKB",
+  "repository": "https://github.com/1Panel-dev/MaxKB",
+  "keywords": [
+    "mcp",
+    "codex"
+  ],
+  "mcpServers": "./.mcp.json"
+}

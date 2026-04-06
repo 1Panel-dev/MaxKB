@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "MaxKB": {
+      "command": "npx",
+      "args": [
+        "1Panel-dev-MaxKB"
+      ]
+    }
+  }
+}
