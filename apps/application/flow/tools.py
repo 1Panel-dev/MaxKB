@@ -984,7 +984,7 @@ def get_child_tool_id_list(work_flow, response):
                 response.append(str(tool.id))
                 if tool.tool_type == ToolType.WORKFLOW:
                     get_child_tool_id_list(work_flow_tool_dict.get(tool.id).work_flow, response)
-    else:
-        for tool in tool_list:
-            response.append(str(tool.id))
+        else:
+            for tool in tool_list:
+                response.append(str(tool.id))
     return response
