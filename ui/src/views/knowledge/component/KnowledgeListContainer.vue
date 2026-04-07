@@ -691,6 +691,7 @@ function importKnowledgeBundle(file: any) {
         const knowledgeId = res.data.knowledge_id
         const knowledgeType = res.data.type
         const folderId = folder.currentFolder.id || user.getWorkspaceId()
+        await user.profile()
         router.push({
           path: `/knowledge/${knowledgeId}/${folderId}/${knowledgeType}/document`,
           query: { imported: 'true' },
