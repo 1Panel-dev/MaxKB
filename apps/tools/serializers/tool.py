@@ -788,7 +788,8 @@ class ToolSerializer(serializers.Serializer):
                         template_id=tool.get('template_id'),
                         input_field_list=tool.get('input_field_list'),
                         init_field_list=tool.get('init_field_list'),
-                        is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
+                        is_active=False if (len((tool.get('init_field_list') or [])) > 0 or tool.get(
+                            'tool_type') == ToolType.WORKFLOW) else tool.get('is_active'),
                         tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                         scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
                         folder_id=folder_id if folder_id else 'default' if workspace_id == 'None' else workspace_id,
