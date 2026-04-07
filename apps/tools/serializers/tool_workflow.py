@@ -182,6 +182,9 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get('user_id')
+            if workspace_id == 'None':
+                return [{**KnowledgeModelSerializer(k).data, 'scope': 'SHARED'} for k in
+                        QuerySet(Knowledge).filter(workspace_id='None')]
             knowledge_workspace_authorization_model = DatabaseModelManage.get_model('knowledge_workspace_authorization')
             share_knowledge_list = []
             if knowledge_workspace_authorization_model is not None:
@@ -374,7 +377,6 @@ class StoreToolWorkflow(serializers.Serializer):
         except Exception as e:
             maxkb_logger.error(f"fetch appstore tools error: {e}")
             return {'apps': [], 'additionalProperties': {'tags': []}}
-
 
 
 def update_resource_mapping_by_tool(tool_id: str, other_resource_mapping=None):
