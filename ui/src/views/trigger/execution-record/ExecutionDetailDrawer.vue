@@ -148,10 +148,18 @@
               <span class="mr-16 color-secondary" v-if="taskRecordDetails?.state !== 'STARTED'"
                 >{{ taskRecordDetails?.run_time?.toFixed(2) || 0.0 }} s</span
               >
-              <el-icon class="color-success" :size="16" v-if="taskRecordDetails?.state === 'SUCCESS'">
+              <el-icon
+                class="color-success"
+                :size="16"
+                v-if="taskRecordDetails?.state === 'SUCCESS'"
+              >
                 <CircleCheck />
               </el-icon>
-              <el-icon class="is-loading" :size="16" v-else-if="taskRecordDetails?.state === 'STARTED'">
+              <el-icon
+                class="is-loading"
+                :size="16"
+                v-else-if="taskRecordDetails?.state === 'STARTED'"
+              >
                 <Loading />
               </el-icon>
               <el-icon class="color-danger" :size="16" v-else>
@@ -186,7 +194,13 @@
                   {{ $t('chat.executionDetails.title') }}
                 </h5>
                 <div class="p-8-12 border-t-dashed lighter">
-                  <template v-for="(cLoop, cIndex) in taskRecordDetails?.meta?.details" :key="cIndex">
+                  <template
+                    v-for="(cLoop, cIndex) in arraySort(
+                      Object.values(taskRecordDetails?.meta?.details ?? {}) ?? [],
+                      'index',
+                    )"
+                    :key="cIndex"
+                  >
                     <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
                   </template>
                 </div>
