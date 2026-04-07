@@ -6,13 +6,17 @@
     @date：2024/6/6 15:15
     @desc:
 """
-from tools.models import ToolRecord, Tool, ToolScope
+from langchain_core.tools import StructuredTool
+
+from application.flow.common import Workflow, WorkflowMode
+from application.serializers.common import ToolExecute
+from tools.models import ToolRecord, Tool, ToolScope, ToolWorkflowVersion, ToolType
 from maxkb.const import CONFIG
 from knowledge.models.knowledge_action import State
 from knowledge.models import File
 from common.utils.logger import maxkb_logger
 from common.result import result
-from application.flow.i_step_node import WorkFlowPostHandler
+from application.flow.i_step_node import WorkFlowPostHandler, ToolWorkflowPostHandler
 from application.flow.backend.sandbox_shell import SandboxShellBackend
 import asyncio
 import io
@@ -25,11 +29,11 @@ import threading
 import zipfile
 from functools import reduce
 from typing import Iterator
-
+from pydantic import Field, create_model
 import uuid_utils.compat as uuid
 from asgiref.sync import sync_to_async
 from deepagents import create_deep_agent
-from django.db.models import QuerySet
+from django.db.models import QuerySet, OuterRef, Subquery
 from django.http import StreamingHttpResponse
 from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk, SystemMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -990,3 +994,97 @@ def get_child_tool_id_list(work_flow, response):
             for tool in tool_list:
                 response.append(str(tool.id))
     return response
+
+
+def build_schema(fields: dict):
+    return create_model("dynamicSchema", **fields)
+
+
+def get_type(_type: str):
+    if _type == 'float':
+        return float
+    if _type == 'string':
+        return str
+    if _type == 'int':
+        return int
+    if _type == 'dict':
+        return dict
+    if _type == 'array':
+        return list
+    if _type == 'boolean':
+        return bool
+    return object
+
+
+def get_workflow_args(tool, qv):
+    for node in qv.work_flow.get('nodes'):
+        if node.get('type') == 'tool-base-node':
+            input_field_list = node.get('properties').get('user_input_field_list')
+            return build_schema(
+                {field.get('field'): (get_type(field.get('type')), Field(..., description=field.get('desc')))
+                 for field in input_field_list})
+
+    return build_schema({})
+
+
+def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
+    tool_id = tool.id
+    tool_record_id = str(uuid.uuid7())
+    took_execute = ToolExecute(tool_id, tool_record_id,
+                               workspace_id,
+                               source_type,
+                               source_id,
+                               False)
+
+    def inner(**kwargs):
+        from application.flow.tool_workflow_manage import ToolWorkflowManage
+        work_flow_manage = ToolWorkflowManage(
+            Workflow.new_instance(qv.work_flow, WorkflowMode.TOOL),
+            {
+                'chat_record_id': tool_record_id,
+                'tool_id': tool_id,
+                'stream': True,
+                'workspace_id': workspace_id,
+                **kwargs},
+
+            ToolWorkflowPostHandler(took_execute, tool_id),
+            is_the_task_interrupted=lambda: False,
+            child_node=None,
+            start_node_id=None,
+            start_node_data=None,
+            chat_record=None
+        )
+        res = work_flow_manage.run()
+        for r in res:
+            pass
+        return work_flow_manage.out_context
+
+    return inner
+
+
+def get_tools(source_type, source_id, tool_workflow_ids, workspace_id):
+    tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id)
+    latest_subquery = ToolWorkflowVersion.objects.filter(
+        tool_id=OuterRef('tool_id')
+    ).order_by('-create_time')
+
+    qs = ToolWorkflowVersion.objects.filter(
+        tool_id__in=[t.id for t in tools],
+        id=Subquery(latest_subquery.values('id')[:1])
+    )
+    qd = {q.tool_id: q for q in qs}
+    results = []
+    for tool in tools:
+        qv = qd.get(tool.id)
+        func = get_workflow_func(source_type, source_id, tool, qv,
+                                 workspace_id)
+        args = get_workflow_args(tool, qv)
+        tool = StructuredTool.from_function(
+            func=func,
+            name=tool.name,
+            description=tool.desc,
+            args_schema=args,
+        )
+        results.append(tool)
+
+    return results
