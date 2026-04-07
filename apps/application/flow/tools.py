@@ -407,6 +407,8 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         checkpointer = MemorySaver()
         client = await _initialize_skills(mcp_servers, temp_dir)
         tools = await client.get_tools()
+        for tool in tools:
+            tool.handle_tool_error = True
         if extra_tools:
             for tool in extra_tools:
                 tools.append(tool)
