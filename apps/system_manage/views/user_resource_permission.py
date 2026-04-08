@@ -131,7 +131,9 @@ class WorkspaceResourceUserPermissionView(APIView):
         return result.success(ResourceUserPermissionSerializer(
             data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource.replace('_FOLDER',''),
                   }).list(
-            {'username': request.query_params.get("username"), 'nick_name': request.query_params.get("nick_name"),
+            {'username': request.query_params.get("username"),
+             'role': request.query_params.get("role"),
+             'nick_name': request.query_params.get("nick_name"),
              'permission': request.query_params.getlist("permission[]")
              }))
 
