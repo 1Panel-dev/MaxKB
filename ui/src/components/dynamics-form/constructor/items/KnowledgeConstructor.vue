@@ -119,6 +119,7 @@ const getData = () => {
       id: k.id,
       name: k.name,
       type: k.type,
+      embedding_model_id: k.embedding_model_id,
     }
   })
 
