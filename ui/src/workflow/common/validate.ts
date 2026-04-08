@@ -21,6 +21,7 @@ const end_nodes: Array<string> = [
   WorkflowType.VideoUnderstandNode,
   WorkflowType.VariableAssignNode,
   WorkflowType.KnowledgeWriteNode,
+  WorkflowType.ToolWorkflowLib,
 ]
 
 const loop_end_nodes: Array<string> = [
