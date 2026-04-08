@@ -942,7 +942,7 @@ export const toolLoopMenuNodes = [
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
-    list: [conditionNode, replyNode, loopContinueNode, loopBreakNode],
+    list: [conditionNode, formNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
     label: t('workflow.nodes.classify.dataProcessing'),
