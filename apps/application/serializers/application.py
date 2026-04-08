@@ -845,6 +845,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         QuerySet(ResourceMapping).filter(
             Q(target_id=application_id) | Q(source_id=application_id)
         ).delete()
+        QuerySet(WorkspaceUserResourcePermission).filter(target=application_id).delete()
         QuerySet(Application).filter(id=application_id).delete()
         trigger_ids = list(
             QuerySet(TriggerTask).filter(
@@ -1368,6 +1369,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
         QuerySet(ResourceMapping).filter(
             Q(target_id__in=id_list) | Q(source_id__in=id_list)
         ).delete()
+        QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
 
         QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).delete()
 
