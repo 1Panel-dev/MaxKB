@@ -1063,7 +1063,8 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
 
 
 def get_tools(source_type, source_id, tool_workflow_ids, workspace_id):
-    tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id)
+    tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, is_active=True, tool_type=ToolType.WORKFLOW,
+                                  workspace_id=workspace_id)
     latest_subquery = ToolWorkflowVersion.objects.filter(
         tool_id=OuterRef('tool_id')
     ).order_by('-create_time')
