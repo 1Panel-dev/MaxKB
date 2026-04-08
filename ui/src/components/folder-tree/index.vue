@@ -8,7 +8,7 @@
         clearable
       />
       <el-dropdown trigger="click" :teleported="false" @command="switchSortMethod">
-        <el-button class="ml-8" style="width: 32px;">
+        <el-button class="ml-8" style="width: 32px">
           <AppIcon :iconName="sortIconName"></AppIcon>
         </el-button>
         <template #dropdown>
@@ -581,6 +581,7 @@ function rebalanceAndInsert(
 
 onBeforeRouteLeave((to, from) => {
   if (from?.name === 'ToolWorkflow') return
+  if (from?.name === 'AppSetting') return
   folder.setCurrentFolder({})
 })
 
