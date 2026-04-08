@@ -22,7 +22,7 @@ from django.db import transaction
 from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
@@ -50,6 +50,47 @@ from tools.serializers.tool import ToolExportModelSerializer, ToolSerializer
 from users.models import User
 
 tool_executor = ToolExecutor()
+
+
+def is_valid_tool_workflow_circular_dependency(workflow, _id, visited=None, stack=None):
+    """
+    workflow: 当前要检查的 workflow 对象
+    visited: 全局已经访问过的 workflow id
+    stack: 当前递归栈里的 workflow id
+    """
+    if visited is None:
+        visited = set()
+    if stack is None:
+        stack = set()
+
+    if _id in stack:
+        return False
+
+    if _id in visited:
+        return True
+
+    stack.add(_id)
+
+    for node in workflow.get('nodes', []):
+        child_tool_ids = []
+        if node.get('type') == 'ai-chat-node':
+            node_data = node.get('properties', {}).get('node_data', {})
+            child_tool_ids = node_data.get('tool_ids') or []
+        if node.get('type') == 'tool-workflow-lib-node':
+            child_tool_id = node.get('properties', {}).get('node_data', {}).get('tool_lib_id')
+            child_tool_ids.append(child_tool_id)
+        for child_tool_id in child_tool_ids:
+            if child_tool_id:
+                child_workflow = QuerySet(ToolWorkflow).filter(tool_id=child_tool_id).first()
+                if child_workflow:
+                    if not is_valid_tool_workflow_circular_dependency(child_workflow.work_flow, str(child_tool_id),
+                                                                      visited,
+                                                                      stack):
+                        return False
+
+    stack.remove(_id)
+    visited.add(_id)
+    return True
 
 
 def hand_node(node, update_tool_map):
@@ -233,6 +274,10 @@ class ToolWorkflowSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             workflow_id = tool.workspace_id
             if instance.get("work_flow"):
+                dependency = is_valid_tool_workflow_circular_dependency(workflow=instance.get('work_flow'),
+                                                                        _id=str(tool.id))
+                if not dependency:
+                    raise Exception(gettext('There is a circular dependency in the tool workflow'))
                 QuerySet(ToolWorkflow).update_or_create(tool_id=self.data.get("tool_id"),
                                                         create_defaults={'id': uuid.uuid7(),
                                                                          'tool_id': self.data.get(
