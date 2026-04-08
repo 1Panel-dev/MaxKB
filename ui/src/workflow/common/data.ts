@@ -99,8 +99,8 @@ export const toolBaseNode = {
 export const toolStartNode = {
   id: WorkflowType.ToolStartNode,
   type: WorkflowType.ToolStartNode,
-  x: 360,
-  y: 2761.3875,
+  x: 280,
+  y: 3301,
   text: '',
   properties: {
     height: 728.375,
