@@ -89,12 +89,18 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   },
 })
-const showNode = computed(() => {
-  if (props.nodeModel.properties.showNode !== undefined) {
-    return props.nodeModel.properties.showNode
-  }
-  set(props.nodeModel.properties, 'showNode', true)
-  return true
+const showNode = computed({
+  get: () => {
+    console.log(props.nodeModel.properties.showNode)
+    if (props.nodeModel.properties.showNode !== undefined) {
+      return props.nodeModel.properties.showNode
+    }
+    set(props.nodeModel.properties, 'showNode', true)
+    return true
+  },
+  set: (_v: boolean) => {
+    set(props.nodeModel.properties, 'showNode', _v)
+  },
 })
 watch(showNode, () => {
   if (showNode.value) {
@@ -161,7 +167,7 @@ onMounted(() => {
     }
   }
   set(props.nodeModel, 'validate', validate)
-  if (!props.nodeModel.virtual) {
+  if (!props.nodeModel.virtual && showNode.value) {
     mountLoopBodyNode()
   }
 })
