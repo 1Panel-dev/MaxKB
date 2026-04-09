@@ -368,6 +368,7 @@ const handleSelectionChange = (val: any[]) => {
 }
 
 const dialogVisible = ref(false)
+const rowWorkspaceId = ref<string | null>(null)
 const singleSelectDialogVisible = ref(false)
 const pendingPermissionChange = ref<{ val: any; row: any } | null>(null)
 const radioPermission = ref('')
@@ -431,7 +432,7 @@ function permissionsHandle(val: any, row: any) {
 }
 
 function submitPermissions(obj: any) {
-  const workspaceId = user.getWorkspaceId() || 'default'
+  const workspaceId = rowWorkspaceId.value ?? user.getWorkspaceId() ?? 'default'
   loadSharedApi({ type: 'resourceAuthorization', systemType: apiType.value })
     .putResourceAuthorization(workspaceId, targetId.value, props.type, obj, loading)
     .then(() => {
@@ -440,7 +441,7 @@ function submitPermissions(obj: any) {
     })
 }
 const getPermissionList = () => {
-  const workspaceId = user.getWorkspaceId() || 'default'
+  const workspaceId = rowWorkspaceId.value ?? user.getWorkspaceId() ?? 'default'
   const params: any = {}
   if (searchForm.value[searchType.value]) {
     params[searchType.value] = searchForm.value[searchType.value]
@@ -466,9 +467,10 @@ const getPermissionList = () => {
     })
 }
 
-const open = (id: string, folder_data?: any) => {
+const open = (id: string, folder_data?: any, workspace_id?: string) => {
   targetId.value = id
   folderData.value = folder_data
+  rowWorkspaceId.value = workspace_id ?? null
   drawerVisible.value = true
   getPermissionList()
 }
