@@ -172,7 +172,13 @@
                   {{ $t('chat.executionDetails.title') }}
                 </h5>
                 <div class="p-8-12 border-t-dashed lighter">
-                  <template v-for="(cLoop, cIndex) in detail?.meta?.details" :key="cIndex">
+                  <template
+                    v-for="(cLoop, cIndex) in arraySort(
+                      Object.values(detail?.meta?.details ?? {}) ?? [],
+                      'index',
+                    )"
+                    :key="cIndex"
+                  >
                     <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
                   </template>
                 </div>
@@ -202,6 +208,7 @@ import { isAppIcon, resetUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import { arraySort } from '@/utils/array'
 const props = withDefaults(
   defineProps<{
     /**
