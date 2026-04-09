@@ -643,7 +643,8 @@ class ToolSerializer(serializers.Serializer):
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
             QuerySet(Tool).filter(id=self.data.get('id')).delete()
-            ResourceMapping.objects.filter(target_id=self.data.get('id')).delete()
+            ResourceMapping.objects.filter(
+                Q(target_id=self.data.get('id')) | Q(source_id=self.data.get('id'))).delete()
             QuerySet(ToolRecord).filter(tool_id=self.data.get('id')).delete()
             trigger_ids = list(
                 QuerySet(TriggerTask).filter(
@@ -1445,7 +1446,7 @@ class ToolBatchOperateSerializer(serializers.Serializer):
                 QuerySet(File).filter(id=tool.code).delete()
 
         QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
-        QuerySet(ResourceMapping).filter(target_id__in=id_list).delete()
+        QuerySet(ResourceMapping).filter(Q(target_id__in=id_list) | Q(source_id__in=id_list)).delete()
         QuerySet(ToolRecord).filter(tool_id__in=id_list).delete()
 
         trigger_ids = list(

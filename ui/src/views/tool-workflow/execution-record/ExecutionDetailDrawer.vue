@@ -128,7 +128,7 @@
                 <img :src="resetUrl(props.currentContent?.tool_icon)" alt="" />
               </el-avatar>
               <ToolIcon v-else :size="24" type="WORKFLOW" />
-              <h4 class="ml-8">{{ props.currentContent?.tool_name }}</h4>
+              <h4 class="ml-8">{{ props.currentContent?.source_name }}</h4>
             </div>
             <div class="flex align-center">
               <span class="mr-16 color-secondary" v-if="detail?.state !== 'STARTED'"
