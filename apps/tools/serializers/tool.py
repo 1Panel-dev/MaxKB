@@ -717,9 +717,9 @@ class ToolSerializer(serializers.Serializer):
                     if skill_file:
                         tool.code = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
                         response.append(ToolExportModelSerializer(tool).data)
-            else:
-                for tool in tool_list:
-                    response.append(ToolExportModelSerializer(tool).data)
+                else:
+                    for tool in tool_list:
+                        response.append(ToolExportModelSerializer(tool).data)
             return response
 
         def export(self):
@@ -774,7 +774,7 @@ class ToolSerializer(serializers.Serializer):
         def to_tool_workflow(work_flow, update_tool_map):
             for node in work_flow.get('nodes', []):
                 hand_node(node, update_tool_map)
-                if node.get('type') == 'loop_node':
+                if node.get('type') == 'loop-node':
                     for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
                         hand_node(n, update_tool_map)
             return work_flow
