@@ -711,15 +711,16 @@ class ToolSerializer(serializers.Serializer):
                             self.get_child_tool_list(work_flow_tool_dict.get(tool.id).work_flow, response)
                         else:
                             response.append(ToolExportModelSerializer(tool).data)
+                else:
+                    for tool in tool_list:
+                        response.append(ToolExportModelSerializer(tool).data)
                 skill_tools = [tool for tool in tool_list if tool.tool_type == ToolType.SKILL]
                 for tool in skill_tools:
                     skill_file = QuerySet(File).filter(id=tool.code).first()
                     if skill_file:
                         tool.code = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
                         response.append(ToolExportModelSerializer(tool).data)
-                else:
-                    for tool in tool_list:
-                        response.append(ToolExportModelSerializer(tool).data)
+
             return response
 
         def export(self):
@@ -842,8 +843,8 @@ class ToolSerializer(serializers.Serializer):
                                       QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
                 # 需要更新的工具集合
                 update_tool_map = {tool.get('id'): new_uuid.generate_uuid(
-                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
-                                          (tool.get('id') + workspace_id or '')) for tool
+                    tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                    (tool.get('id') + workspace_id or '')) for tool
                                    in
                                    tool_list if
                                    not exits_tool_id_list.__contains__(
@@ -853,8 +854,8 @@ class ToolSerializer(serializers.Serializer):
                              not exits_tool_id_list.__contains__(
                                  tool.get('id')) and not exits_tool_id_list.__contains__(
                                  new_uuid.generate_uuid(
-                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
-                                          (tool.get('id') + workspace_id or '')))]
+                                     tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                     (tool.get('id') + workspace_id or '')))]
 
             work_flow = self.to_tool_workflow(
                 tool.get('work_flow'),
