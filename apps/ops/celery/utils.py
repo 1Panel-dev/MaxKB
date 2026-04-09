@@ -42,7 +42,7 @@ def get_task_log_path(base_path, task_id, level=2):
     task_id = str(task_id)
     try:
         uuid.UUID(task_id)
-    except:
+    except (ValueError, AttributeError):
         return os.path.join(PROJECT_DIR, 'data', 'caution.txt')
 
     rel_path = os.path.join(*task_id[:level], task_id + '.log')

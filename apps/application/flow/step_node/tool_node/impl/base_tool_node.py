@@ -51,7 +51,7 @@ def valid_reference_value(_type, value, name):
             raise Exception(_(
                 'Field: {name} Type: {_type} Value: {value} Unsupported types'
             ).format(name=name, _type=_type))
-    except:
+    except (json.JSONDecodeError, TypeError, ValueError):
         return value
     if not isinstance(value, instance_type):
         raise Exception(_(
