@@ -93,6 +93,19 @@ ALLOWED_CLASSES = {
 }
 
 
+class NewUUID:
+    def __init__(self):
+        self.uuid_dict = {}
+
+    def generate_uuid(self, _id):
+        _id = str(_id)
+        if _id in self.uuid_dict:
+            return self.uuid_dict.get(_id)
+        r = str(uuid.uuid7())
+        self.uuid_dict[_id] = r
+        return r
+
+
 def to_dict(message, file_name):
     return {
         'line': message.line,
@@ -414,7 +427,7 @@ class ToolSerializer(serializers.Serializer):
                     'user_id': self.data.get('user_id'),
                     'workspace_id': self.data.get('workspace_id'),
                     'folder_id': str(instance.get('folder_id', self.data.get('workspace_id'))),
-                }).import_(name=instance.get('name'))
+                }).import_(name=instance.get('name'), source='template')
 
                 try:
                     requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
@@ -810,15 +823,17 @@ class ToolSerializer(serializers.Serializer):
             """
             if new_child_policy == 0:
                 tool_list = []
-            elif new_child_policy == 1:
-                tool_list = tool.get('tool_list') or []
             else:
-                tool_list = [{**tool, 'id': str(uuid.uuid7())} for tool in tool.get('tool_list') or []]
+                tool_list = tool.get('tool_list') or []
+
             tool_list = {tool.get('id'): tool for tool in tool_list}.values()
             update_tool_map = {}
             if len(tool_list) > 0:
+                new_uuid = NewUUID()
                 tool_id_list = reduce(lambda x, y: [*x, *y],
-                                      [[tool.get('id'), generate_uuid((tool.get('id') + workspace_id or ''))]
+                                      [[tool.get('id'), new_uuid.generate_uuid(
+                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                          (tool.get('id') + workspace_id or ''))]
                                        for tool
                                        in
                                        tool_list], [])
@@ -826,7 +841,9 @@ class ToolSerializer(serializers.Serializer):
                 exits_tool_id_list = [str(tool.id) for tool in
                                       QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
                 # 需要更新的工具集合
-                update_tool_map = {tool.get('id'): generate_uuid((tool.get('id') + workspace_id or '')) for tool
+                update_tool_map = {tool.get('id'): new_uuid.generate_uuid(
+                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                          (tool.get('id') + workspace_id or '')) for tool
                                    in
                                    tool_list if
                                    not exits_tool_id_list.__contains__(
@@ -835,7 +852,9 @@ class ToolSerializer(serializers.Serializer):
                 tool_list = [{**tool, 'id': update_tool_map.get(tool.get('id'))} for tool in tool_list if
                              not exits_tool_id_list.__contains__(
                                  tool.get('id')) and not exits_tool_id_list.__contains__(
-                                 generate_uuid((tool.get('id') + workspace_id or '')))]
+                                 new_uuid.generate_uuid(
+                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                          (tool.get('id') + workspace_id or '')))]
 
             work_flow = self.to_tool_workflow(
                 tool.get('work_flow'),
@@ -895,7 +914,7 @@ class ToolSerializer(serializers.Serializer):
             return True
 
         @transaction.atomic
-        def import_(self, scope=ToolScope.WORKSPACE, name=None):
+        def import_(self, scope=ToolScope.WORKSPACE, name=None, source=None):
             self.is_valid()
 
             user_id = self.data.get('user_id')
@@ -940,7 +959,7 @@ class ToolSerializer(serializers.Serializer):
             if tool.get('tool_type') == ToolType.WORKFLOW:
                 tool['id'] = tool_id
                 self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id,
-                                           folder_id=folder_id, new_child_policy=1)
+                                           folder_id=folder_id, new_child_policy=2 if source == 'template' else 1)
             # 自动授权给创建者
             UserResourcePermissionSerializer(data={
                 'workspace_id': self.data.get('workspace_id'),
