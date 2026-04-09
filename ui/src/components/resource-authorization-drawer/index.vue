@@ -98,9 +98,7 @@
         :label="$t('views.login.loginForm.username.label')"
       />
       <el-table-column
-        v-if="
-          hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR') && apiType === 'workspace'
-        "
+        v-if="hasPermission([EditionConst.IS_EE, EditionConst.IS_PE], 'OR')"
         prop="role_name"
         :label="$t('views.role.member.role')"
         width="160"
