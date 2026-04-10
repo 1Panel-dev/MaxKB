@@ -180,6 +180,34 @@ sys.stdout.flush()
                             # 如果某个参数没有默认值,需要添加 None 占位
                             defaults.append(ast.Constant(value=None))
                     node.args.defaults = defaults
+                # 将不支持 JSON Schema 的参数类型注解替换为 Any，
+                # 避免 FastMCP/Pydantic 生成 schema 时崩溃（如 requests.Response）
+                _safe_annotation_names = {
+                    'str', 'int', 'float', 'bool', 'dict', 'list', 'tuple',
+                    'set', 'bytes', 'Any', 'Optional', 'Union', 'List',
+                    'Dict', 'Tuple', 'Set', 'Sequence', 'None', 'NoneType',
+                }
+
+                def _is_safe_annotation(node_ann):
+                    if node_ann is None:
+                        return True
+                    if isinstance(node_ann, ast.Constant):
+                        return True
+                    if isinstance(node_ann, ast.Name):
+                        return node_ann.id in _safe_annotation_names
+                    if isinstance(node_ann, ast.Attribute):
+                        # e.g. requests.Response, typing.Optional — treat none as safe
+                        return False
+                    if isinstance(node_ann, (ast.Subscript, ast.BinOp)):
+                        # e.g. Optional[str], str | None — recurse
+                        if isinstance(node_ann, ast.Subscript):
+                            return _is_safe_annotation(node_ann.value) and _is_safe_annotation(node_ann.slice)
+                        return _is_safe_annotation(node_ann.left) and _is_safe_annotation(node_ann.right)
+                    return False
+
+                for arg in node.args.args:
+                    if not _is_safe_annotation(arg.annotation):
+                        arg.annotation = ast.Name(id='Any', ctx=ast.Load())
                 # 修改返回类型注解为 Result
                 node.returns = ast.Name(id='Result', ctx=ast.Load())
                 # 修改 return 语句为 return Result(result=..., tool_id=...)
