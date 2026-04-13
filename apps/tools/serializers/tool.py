@@ -552,7 +552,7 @@ class ToolSerializer(serializers.Serializer):
                     raise Exception(_('type error'))
                 return value
             except Exception as e:
-                raise AppApiException(500, _('Field: {name} Type: {_type} Value: {value} Type conversion error').format(
+                raise AppApiException(500, _('Field: {name} Type: {type} Value: {value} Type conversion error').format(
                     name=name, type=_type, value=value
                 ))
 
