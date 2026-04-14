@@ -4,6 +4,7 @@
     class="iframe"
     style="border: 0; width: 100%"
     :srcdoc="fSource"
+    allow="geolocation"
     sandbox="allow-scripts"
   />
 </template>
