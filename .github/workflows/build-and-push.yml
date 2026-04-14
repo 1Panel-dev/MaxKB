@@ -43,7 +43,7 @@ jobs:
           ls -la
           rm -rf -- ./* ./.??*
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
       - name: Prepare
@@ -99,7 +99,7 @@ jobs:
           ls -la
           rm -rf -- ./* ./.??*
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
       - name: Prepare
