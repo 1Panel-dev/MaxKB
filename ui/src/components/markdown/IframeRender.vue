@@ -6,6 +6,7 @@
       style="border: 0; width: 100%"
       class="iframe"
       :srcdoc="finalSource"
+      allow="geolocation"
       sandbox="allow-scripts"
     />
   </div>

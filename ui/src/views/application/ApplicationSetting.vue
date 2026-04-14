@@ -483,7 +483,13 @@
                                 alt=""
                               />
                             </el-avatar>
-                            <ToolIcon v-else class="mr-8" :size="20" />
+                            <ToolIcon
+                              v-else
+                              class="mr-8"
+                              :size="20"
+                              style="--el-avatar-border-radius: 6px"
+                              :type="relatedObject(toolSelectOptions, item, 'id')?.tool_type"
+                            />
 
                             <div
                               class="ellipsis-1"
@@ -1179,12 +1185,12 @@ function getToolSelectOptions() {
     apiType.value === 'systemManage'
       ? {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
           workspace_id: applicationForm.value?.workspace_id,
         }
       : {
           scope: 'WORKSPACE',
-          tool_type: 'CUSTOM',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
         }
 
   loadSharedApi({ type: 'tool', systemType: apiType.value })

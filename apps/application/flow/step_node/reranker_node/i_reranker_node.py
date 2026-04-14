@@ -31,7 +31,9 @@ class RerankerStepNodeSerializer(serializers.Serializer):
     reranker_setting = RerankerSettingSerializer(required=True)
 
     question_reference_address = serializers.ListField(required=True)
-    reranker_model_id = serializers.UUIDField(required=True)
+    reranker_model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    reranker_model_id_type = serializers.CharField(required=False, default='custom')
+    reranker_model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True)
     reranker_reference_list = serializers.ListField(required=True, child=serializers.ListField(required=True))
     show_knowledge = serializers.BooleanField(required=True,
                                               label=_("The results are displayed in the knowledge sources"))
@@ -55,9 +57,27 @@ class IRerankerNode(INode):
             reference[0],
             reference[1:]) for reference in
             self.node_params_serializer.data.get('reranker_reference_list')]
-        return self.execute(**self.node_params_serializer.data, question=str(question),
 
-                            reranker_list=reranker_list)
+        node_params_data = dict(self.node_params_serializer.data)
+
+        reranker_model_id_type = node_params_data.pop('reranker_model_id_type', None)
+        reranker_model_id_reference = node_params_data.pop('reranker_model_id_reference', None)
+        reranker_model_id = node_params_data.pop('reranker_model_id', None)
+
+        # 处理引用类型
+        if reranker_model_id_type == 'reference' and reranker_model_id_reference:
+            reference_data = self.workflow_manage.get_reference_field(
+                reranker_model_id_reference[0],
+                reranker_model_id_reference[1:],
+            )
+            if reference_data and isinstance(reference_data, dict):
+                reranker_model_id = reference_data.get('reranker_model_id',
+                                                       reference_data.get('model_id', reranker_model_id))
+        if reranker_model_id is None or reranker_model_id == '':
+            raise Exception(_('Model is not allowed to be empty'))
+
+        return self.execute(**node_params_data, question=str(question),
+                            reranker_list=reranker_list, reranker_model_id=reranker_model_id)
 
     def execute(self, question, reranker_setting, reranker_list, reranker_model_id, show_knowledge,
                 **kwargs) -> NodeResult:

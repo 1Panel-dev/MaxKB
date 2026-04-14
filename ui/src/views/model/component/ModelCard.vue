@@ -71,7 +71,7 @@
     <template #mouseEnter v-if="MoreFilledPermission(model.id)">
       <el-dropdown trigger="click" v-if="!isShared">
         <el-button text @click.stop>
-          <AppIcon iconName="app-more"></AppIcon>
+          <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
         </el-button>
         <template #dropdown>
           <el-dropdown-menu>

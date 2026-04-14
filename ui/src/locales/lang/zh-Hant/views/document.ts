@@ -10,6 +10,8 @@ export default {
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成',
     export: '匯出',
+    exportDocument: '匯出文檔',
+    exportKnowledge: '匯出知識庫',
     download: '下載原文件',
     replace: '替換原文件',
   },
@@ -171,9 +173,8 @@ export default {
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度',
     },
-    allow_download: {
-      label: '允許在知識庫來源下載',
-    },
+    allow_download: '允許在知識來源中下載',
+    allow_preview: '允許在知識來源中預覽',
   },
   hitHandlingMethod: {
     optimization: '模型優化',

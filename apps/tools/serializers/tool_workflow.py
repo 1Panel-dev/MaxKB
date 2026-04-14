@@ -19,11 +19,12 @@ from typing import Dict, List
 import requests
 import uuid_utils.compat as uuid
 from django.db import transaction
-from django.db.models import QuerySet
+from django.db.models import QuerySet, Q
 from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers, status
+from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler
@@ -31,6 +32,7 @@ from application.flow.tool_workflow_manage import ToolWorkflowManage
 from application.models import ChatRecord
 from application.serializers.application import McpServersSerializer, get_mcp_tools
 from application.serializers.common import ToolExecute
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.result import result
@@ -38,14 +40,58 @@ from common.utils.common import bytes_to_uploaded_file
 from common.utils.common import restricted_loads, generate_uuid
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import KnowledgeWorkflow
+from knowledge.models import KnowledgeWorkflow, Knowledge, KnowledgeScope
+from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeSerializer
+from maxkb.const import CONFIG
 from system_manage.models import AuthTargetType
+from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from tools.models import Tool, ToolScope, ToolWorkflow, ToolWorkflowVersion
 from tools.serializers.tool import ToolExportModelSerializer, ToolSerializer
 from users.models import User
 
 tool_executor = ToolExecutor()
+
+
+def is_valid_tool_workflow_circular_dependency(workflow, _id, visited=None, stack=None):
+    """
+    workflow: 当前要检查的 workflow 对象
+    visited: 全局已经访问过的 workflow id
+    stack: 当前递归栈里的 workflow id
+    """
+    if visited is None:
+        visited = set()
+    if stack is None:
+        stack = set()
+
+    if _id in stack:
+        return False
+
+    if _id in visited:
+        return True
+
+    stack.add(_id)
+
+    for node in workflow.get('nodes', []):
+        child_tool_ids = []
+        if node.get('type') == 'ai-chat-node':
+            node_data = node.get('properties', {}).get('node_data', {})
+            child_tool_ids = node_data.get('tool_ids') or []
+        if node.get('type') == 'tool-workflow-lib-node':
+            child_tool_id = node.get('properties', {}).get('node_data', {}).get('tool_lib_id')
+            child_tool_ids.append(child_tool_id)
+        for child_tool_id in child_tool_ids:
+            if child_tool_id:
+                child_workflow = QuerySet(ToolWorkflow).filter(tool_id=child_tool_id).first()
+                if child_workflow:
+                    if not is_valid_tool_workflow_circular_dependency(child_workflow.work_flow, str(child_tool_id),
+                                                                      visited,
+                                                                      stack):
+                        return False
+
+    stack.remove(_id)
+    visited.add(_id)
+    return True
 
 
 def hand_node(node, update_tool_map):
@@ -173,11 +219,66 @@ class ToolWorkflowSerializer(serializers.Serializer):
             ).update(is_publish=True, publish_time=timezone.now())
             return True
 
+        def list_knowledge(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            user_id = self.data.get('user_id')
+            if workspace_id == 'None':
+                return [{**KnowledgeModelSerializer(k).data, 'scope': 'SHARED'} for k in
+                        QuerySet(Knowledge).filter(workspace_id='None')]
+            knowledge_workspace_authorization_model = DatabaseModelManage.get_model('knowledge_workspace_authorization')
+            share_knowledge_list = []
+            if knowledge_workspace_authorization_model is not None:
+                white_list_condition = Q(authentication_type='WHITE_LIST') & Q(
+                    workspace_id_list__contains=[workspace_id])
+                default_condition = ~Q(authentication_type='WHITE_LIST') & ~Q(
+                    workspace_id_list__contains=[workspace_id])
+                # 组合查询
+                query = white_list_condition | default_condition
+                inner = QuerySet(knowledge_workspace_authorization_model).filter(query)
+                share_knowledge_list = [{**KnowledgeModelSerializer(k).data, 'scope': 'SHARED'} for k in
+                                        QuerySet(Knowledge).filter(id__in=inner)]
+            workspace_knowledge_list = [{**k, 'scope': 'WORKSPACE'} for k in KnowledgeSerializer.Query(
+                data={
+                    'workspace_id': workspace_id,
+                    'scope': KnowledgeScope.WORKSPACE,
+                    'user_id': user_id
+                }
+            ).list() if k.get('resource_type') == 'knowledge']
+
+            return [*workspace_knowledge_list, *share_knowledge_list]
+
+        @staticmethod
+        def get_tool_knowledge_mapping(application_knowledge_id_list, knowledge_id_list, tool_id):
+            """
+
+            @param application_knowledge_id_list:  当前应用可修改的知识库列表
+            @param knowledge_id_list:              用户修改的知识库列表
+            @param application_id:                 应用id
+            @return:
+            """
+            # 当前知识库和应用已关联列表
+            knowledge_application_mapping_list = QuerySet(ResourceMapping).filter(source_id=tool_id,
+                                                                                  source_type='TOOL',
+                                                                                  target_type="KNOWLEDGE",
+                                                                                  ).exclude(
+                target_id__in=application_knowledge_id_list)
+            edit_knowledge_list = [ResourceMapping(source_id=tool_id, target_id=knowledge_id,
+                                                   source_type='TOOL',
+                                                   target_type="KNOWLEDGE")
+                                   for knowledge_id in knowledge_id_list]
+            return list(knowledge_application_mapping_list) + edit_knowledge_list
+
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
             tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             workflow_id = tool.workspace_id
             if instance.get("work_flow"):
+                dependency = is_valid_tool_workflow_circular_dependency(workflow=instance.get('work_flow'),
+                                                                        _id=str(tool.id))
+                if not dependency:
+                    raise Exception(gettext('There is a circular dependency in the tool workflow'))
                 QuerySet(ToolWorkflow).update_or_create(tool_id=self.data.get("tool_id"),
                                                         create_defaults={'id': uuid.uuid7(),
                                                                          'tool_id': self.data.get(
@@ -190,6 +291,26 @@ class ToolWorkflowSerializer(serializers.Serializer):
                                                             'workspace_id': workflow_id,
                                                             'work_flow': instance.get('work_flow')
                                                         })
+                # 当前用户可修改关联的知识库列表
+                tool_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
+                                          self.list_knowledge(with_valid=False)]
+                knowledge_id_list = []
+                if 'knowledge_id_list' in instance:
+                    # 当前用户可修改关联的知识库列表
+                    application_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
+                                                     self.list_knowledge(with_valid=False)]
+                    knowledge_id_list = instance.get('knowledge_id_list')
+                    for knowledge_id in knowledge_id_list:
+                        if not application_knowledge_id_list.__contains__(knowledge_id):
+                            message = lazy_format(_('Unknown knowledge base id {dataset_id}, unable to associate'),
+                                                  dataset_id=knowledge_id)
+                            raise AppApiException(500, str(message))
+
+                update_resource_mapping_by_tool(self.data.get("tool_id"),
+                                                self.get_tool_knowledge_mapping(
+                                                    tool_knowledge_id_list,
+                                                    knowledge_id_list,
+                                                    self.data.get("tool_id")))
                 return self.one()
             if instance.get("work_flow_template"):
                 template_instance = instance.get('work_flow_template')
@@ -260,7 +381,8 @@ class StoreToolWorkflow(serializers.Serializer):
         self.is_valid(raise_exception=True)
         # 下载zip文件
         try:
-            res = requests.get('https://apps-assets.fit2cloud.com/stable/maxkb.json.zip', timeout=5)
+            appstore_url = CONFIG.get('APPSTORE_URL', 'https://apps-assets.fit2cloud.com/stable/maxkb.json.zip')
+            res = requests.get(appstore_url, timeout=5)
             res.raise_for_status()
             # 创建临时文件保存zip
             with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_zip:
@@ -302,3 +424,17 @@ class StoreToolWorkflow(serializers.Serializer):
         except Exception as e:
             maxkb_logger.error(f"fetch appstore tools error: {e}")
             return {'apps': [], 'additionalProperties': {'tags': []}}
+
+
+def update_resource_mapping_by_tool(tool_id: str, other_resource_mapping=None):
+    from application.flow.tools import get_instance_resource, save_workflow_mapping
+    from system_manage.models.resource_mapping import ResourceType
+    if other_resource_mapping is None:
+        other_resource_mapping = []
+    tool = QuerySet(ToolWorkflow).filter(tool_id=tool_id).first()
+    instance_mapping = get_instance_resource(tool, ResourceType.TOOL, str(tool_id),
+                                             {})
+    save_workflow_mapping(tool.work_flow, ResourceType.TOOL, str(tool_id),
+                          instance_mapping + other_resource_mapping)
+
+    return

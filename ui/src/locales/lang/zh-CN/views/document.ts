@@ -11,6 +11,8 @@ export default {
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成',
     export: '导出',
+    exportDocument: '导出文档',
+    exportKnowledge: '导出知识库',
     download: '下载原文档',
     replace: '替换原文档',
   },
@@ -170,9 +172,8 @@ export default {
       placeholder: '直接返回分段内容',
       requiredMessage: '请输入相似度',
     },
-    allow_download: {
-      label: '允许在知识库来源中下载',
-    },
+    allow_download: '允许在知识来源中下载',
+    allow_preview: '允许在知识来源中预览',
   },
   hitHandlingMethod: {
     optimization: '模型优化',

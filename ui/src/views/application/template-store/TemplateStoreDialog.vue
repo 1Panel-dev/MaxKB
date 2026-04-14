@@ -3,7 +3,7 @@
     v-model="dialogVisible"
     width="1000"
     append-to-body
-    class="tool-store-dialog"
+    class="template-store-dialog"
     align-center
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -27,34 +27,13 @@
         </div>
       </div>
     </template>
-
-    <!-- <LayoutContainer v-loading="loading" :minLeftWidth="204">
-      <template #left>
-        <el-anchor
-          direction="vertical"
-          :offset="130"
-          type="default"
-          container=".category-scrollbar"
-          @click="handleClick"
-        >
-          <el-anchor-link
-            v-for="category in categories"
-            :key="category.id"
-            :href="`#category-${category.id}`"
-            :title="category.title"
-          />
-        </el-anchor>
-      </template> -->
-
-    <el-scrollbar class="layout-bg" wrap-class="p-16-24 category-scrollbar">
+    <el-scrollbar
+      class="layout-bg"
+      wrap-class="p-16-24 category-scrollbar"
+      style="border-radius: 0 0 8px 8px"
+    >
       <template v-if="filterList === null">
         <div v-for="category in categories" :key="category.id">
-          <!-- <h4
-              class="title-decoration-1 mb-16 mt-8 color-text-primary"
-              :id="`category-${category.id}`"
-            >
-              {{ category.title }}
-            </h4> -->
           <el-row :gutter="16">
             <el-col v-for="tool in category.tools" :key="tool.id" :span="8" class="mb-16">
               <TemplateCard
@@ -70,10 +49,6 @@
         </div>
       </template>
       <div v-else>
-        <!-- <h4 class="color-text-primary medium mb-16">
-            <span class="color-primary">{{ searchValue }}</span>
-            {{ t('views.tool.toolStore.searchResult', { count: filterList.length }) }}
-          </h4> -->
         <el-row :gutter="16" v-if="filterList.length">
           <el-col v-for="tool in filterList" :key="tool.id" :span="8" class="mb-16">
             <TemplateCard
@@ -88,7 +63,6 @@
         <el-empty v-else :description="$t('common.noData')" />
       </div>
     </el-scrollbar>
-    <!-- </LayoutContainer> -->
   </el-dialog>
   <InternalDescDrawer ref="internalDescDrawerRef" @addTool="handleOpenAdd" />
   <CreateApplicationDialog ref="CreateKnowledgeDialogRef" />
@@ -197,10 +171,6 @@ async function getStoreToolList() {
   }
 }
 
-const handleClick = (e: MouseEvent) => {
-  e.preventDefault()
-}
-
 const internalDescDrawerRef = ref<InstanceType<typeof InternalDescDrawer>>()
 
 async function handleDetail(tool: any) {
@@ -247,7 +217,7 @@ function handleStoreAdd(tool: any) {
 defineExpose({ open })
 </script>
 <style lang="scss">
-.tool-store-dialog {
+.template-store-dialog {
   padding: 0;
 
   .el-dialog__headerbtn {
@@ -269,17 +239,6 @@ defineExpose({ open })
       }
     }
   }
-
-  .layout-container__left {
-    background-color: var(--app-layout-bg-color);
-    border-radius: 0 0 0 8px;
-  }
-
-  .layout-container__right {
-    background-color: var(--app-layout-bg-color);
-    border-radius: 0 0 8px 0;
-  }
-
   .el-anchor {
     background-color: var(--app-layout-bg-color);
 
@@ -301,16 +260,15 @@ defineExpose({ open })
 
         &.is-active {
           color: var(--el-color-primary);
-          // TODO
-          background-color: #3370ff1a;
+          background-color: var(--el-color-primary-light-9);
         }
       }
     }
   }
 
   .category-scrollbar {
-    height: calc(100vh - 200px);
-    // min-height: 500px;
+    max-height: calc(100vh - 200px);
+    min-height: 500px;
   }
 }
 </style>

@@ -1,5 +1,6 @@
-import { RoleTypeEnum } from '@/enums/system'
-import type { FormItemRule } from 'element-plus'
+import {RoleTypeEnum} from '@/enums/system'
+import type {FormItemRule} from 'element-plus'
+
 interface RoleItem {
   id: string,
   role_name: string,
@@ -56,6 +57,7 @@ interface CreateMemberParamsItem {
 }
 
 type Arrayable<T> = T | T[]
+
 interface FormItemModel {
   path: string
   label?: string
@@ -66,7 +68,17 @@ interface FormItemModel {
     placeholder?: string
     multiple?: boolean
     clearableFunction?: (e: any) => boolean
+    remoteMethod?: (query: string, element: any) => Promise<{ label: string, value: string }[]>
   }
 }
 
-export type { RoleItem, FormItemModel, RolePermissionItem, RoleTableDataItem, CreateOrUpdateParams, ChildrenPermissionItem, RoleMemberItem, CreateMemberParamsItem }
+export type {
+  RoleItem,
+  FormItemModel,
+  RolePermissionItem,
+  RoleTableDataItem,
+  CreateOrUpdateParams,
+  ChildrenPermissionItem,
+  RoleMemberItem,
+  CreateMemberParamsItem
+}

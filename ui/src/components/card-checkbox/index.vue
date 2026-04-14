@@ -2,7 +2,7 @@
   <el-card
     shadow="hover"
     class="card-checkbox cursor"
-    :class="modelValue.includes(toModelValue) ? 'active' : ''"
+    :class="modelValue.includes(toModelValue) ? 'border-active' : ''"
     @click="checked"
   >
     <div class="flex-between">

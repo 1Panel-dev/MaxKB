@@ -539,7 +539,7 @@ const delMulKnowledge: (data: any, loading?: Ref<boolean>) => Promise<Result<boo
   return put(`${prefix.value}/batch_delete`, { id_list: data }, undefined, loading)
 }
 /**
- * 批量删除知识库
+ * 批量转移知识库
  * @param 参数
  * {
   "id_list": [String]

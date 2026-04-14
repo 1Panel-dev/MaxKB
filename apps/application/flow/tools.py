@@ -6,13 +6,17 @@
     @date：2024/6/6 15:15
     @desc:
 """
-from tools.models import ToolRecord, Tool, ToolScope
+from langchain_core.tools import StructuredTool
+
+from application.flow.common import Workflow, WorkflowMode
+from application.serializers.common import ToolExecute
+from tools.models import ToolRecord, Tool, ToolScope, ToolWorkflowVersion, ToolType
 from maxkb.const import CONFIG
 from knowledge.models.knowledge_action import State
 from knowledge.models import File
 from common.utils.logger import maxkb_logger
 from common.result import result
-from application.flow.i_step_node import WorkFlowPostHandler
+from application.flow.i_step_node import WorkFlowPostHandler, ToolWorkflowPostHandler
 from application.flow.backend.sandbox_shell import SandboxShellBackend
 import asyncio
 import io
@@ -25,13 +29,13 @@ import threading
 import zipfile
 from functools import reduce
 from typing import Iterator
-
+from pydantic import Field, create_model
 import uuid_utils.compat as uuid
 from asgiref.sync import sync_to_async
 from deepagents import create_deep_agent
-from django.db.models import QuerySet
+from django.db.models import QuerySet, OuterRef, Subquery
 from django.http import StreamingHttpResponse
-from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk
+from langchain_core.messages import BaseMessageChunk, BaseMessage, ToolMessage, AIMessageChunk, SystemMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from langgraph.checkpoint.memory import MemorySaver
 
@@ -407,14 +411,50 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         checkpointer = MemorySaver()
         client = await _initialize_skills(mcp_servers, temp_dir)
         tools = await client.get_tools()
+        for tool in tools:
+            tool.handle_tool_error = True
         if extra_tools:
             for tool in extra_tools:
                 tools.append(tool)
+
+        # ---------------------------------------------------------------------------
+        # Fix: vLLM (and Qwen chat templates) reject conversations that contain more
+        # than one SystemMessage, or a SystemMessage that is not the very first
+        # message.  create_deep_agent always prepends its own BASE_AGENT_PROMPT as a
+        # SystemMessage before calling the model (factory.py line ~1319).  If
+        # message_list already contains a SystemMessage (built in base_chat_node.py
+        # via generate_message_list), the API receives two system messages and raises
+        # "System message must be at the beginning."
+        #
+        # Solution: strip the user-supplied SystemMessage out of message_list and
+        # pass its text as the system_prompt argument of create_deep_agent.
+        # deepagents will then merge it with BASE_AGENT_PROMPT into a single
+        # combined system message, so the model only ever sees one.
+        # ---------------------------------------------------------------------------
+        user_system_prompt = None
+        filtered_message_list = []
+        for msg in message_list:
+            if isinstance(msg, SystemMessage):
+                # Normalise content to plain string regardless of whether the
+                # message was built with a str or a list of content blocks.
+                if isinstance(msg.content, str):
+                    user_system_prompt = msg.content
+                elif isinstance(msg.content, list):
+                    user_system_prompt = ''.join(
+                        item.get('text', '') if isinstance(item, dict) else str(item)
+                        for item in msg.content
+                    )
+                else:
+                    user_system_prompt = str(msg.content)
+            else:
+                filtered_message_list.append(msg)
+
         agent = create_deep_agent(
             model=chat_model,
             backend=SandboxShellBackend(root_dir=temp_dir, virtual_mode=True),
             skills=['/skills'],
             tools=tools,
+            system_prompt=user_system_prompt,
             interrupt_on={
                 "write_file": False,
                 "read_file": False,
@@ -425,7 +465,7 @@ async def _yield_mcp_response(chat_model, message_list, mcp_servers, mcp_output_
         recursion_limit = int(CONFIG.get(
             "LANGCHAIN_GRAPH_RECURSION_LIMIT", '100'))
         response = agent.astream(
-            {"messages": message_list},
+            {"messages": filtered_message_list},
             config={"recursion_limit": recursion_limit,
                     "configurable": {"thread_id": chat_id}},
             stream_mode='messages'
@@ -950,7 +990,102 @@ def get_child_tool_id_list(work_flow, response):
                 response.append(str(tool.id))
                 if tool.tool_type == ToolType.WORKFLOW:
                     get_child_tool_id_list(work_flow_tool_dict.get(tool.id).work_flow, response)
-    else:
-        for tool in tool_list:
-            response.append(str(tool.id))
+        else:
+            for tool in tool_list:
+                response.append(str(tool.id))
     return response
+
+
+def build_schema(fields: dict):
+    return create_model("dynamicSchema", **fields)
+
+
+def get_type(_type: str):
+    if _type == 'float':
+        return float
+    if _type == 'string':
+        return str
+    if _type == 'int':
+        return int
+    if _type == 'dict':
+        return dict
+    if _type == 'array':
+        return list
+    if _type == 'boolean':
+        return bool
+    return object
+
+
+def get_workflow_args(tool, qv):
+    for node in qv.work_flow.get('nodes'):
+        if node.get('type') == 'tool-base-node':
+            input_field_list = node.get('properties').get('user_input_field_list')
+            return build_schema(
+                {field.get('field'): (get_type(field.get('type')), Field(..., description=field.get('desc')))
+                 for field in input_field_list})
+
+    return build_schema({})
+
+
+def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
+    tool_id = tool.id
+    tool_record_id = str(uuid.uuid7())
+    took_execute = ToolExecute(tool_id, tool_record_id,
+                               workspace_id,
+                               source_type,
+                               source_id,
+                               False)
+
+    def inner(**kwargs):
+        from application.flow.tool_workflow_manage import ToolWorkflowManage
+        work_flow_manage = ToolWorkflowManage(
+            Workflow.new_instance(qv.work_flow, WorkflowMode.TOOL),
+            {
+                'chat_record_id': tool_record_id,
+                'tool_id': tool_id,
+                'stream': True,
+                'workspace_id': workspace_id,
+                **kwargs},
+
+            ToolWorkflowPostHandler(took_execute, tool_id),
+            is_the_task_interrupted=lambda: False,
+            child_node=None,
+            start_node_id=None,
+            start_node_data=None,
+            chat_record=None
+        )
+        res = work_flow_manage.run()
+        for r in res:
+            pass
+        return work_flow_manage.out_context
+
+    return inner
+
+
+def get_tools(source_type, source_id, tool_workflow_ids, workspace_id):
+    tools = QuerySet(Tool).filter(id__in=tool_workflow_ids, is_active=True, tool_type=ToolType.WORKFLOW,
+                                  workspace_id=workspace_id)
+    latest_subquery = ToolWorkflowVersion.objects.filter(
+        tool_id=OuterRef('tool_id')
+    ).order_by('-create_time')
+
+    qs = ToolWorkflowVersion.objects.filter(
+        tool_id__in=[t.id for t in tools],
+        id=Subquery(latest_subquery.values('id')[:1])
+    )
+    qd = {q.tool_id: q for q in qs}
+    results = []
+    for tool in tools:
+        qv = qd.get(tool.id)
+        func = get_workflow_func(source_type, source_id, tool, qv,
+                                 workspace_id)
+        args = get_workflow_args(tool, qv)
+        tool = StructuredTool.from_function(
+            func=func,
+            name=tool.name,
+            description=tool.desc,
+            args_schema=args,
+        )
+        results.append(tool)
+
+    return results

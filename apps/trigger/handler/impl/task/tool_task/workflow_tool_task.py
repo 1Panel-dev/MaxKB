@@ -73,9 +73,10 @@ def get_tool_execute_parameters(input_field_list, parameter_setting, kwargs):
     type_map = {f.get("name"): f.get("type") for f in (input_field_list or []) if f.get("name")}
 
     parameters = {}
-    for key, value in parameter_setting.items():
-        raw = get_field_value(value, kwargs)
-        parameters[key] = _convert_value(type_map.get(key), raw)
+    if parameter_setting:
+        for key, value in parameter_setting.items():
+            raw = get_field_value(value, kwargs)
+            parameters[key] = _convert_value(type_map.get(key), raw)
     return parameters
 
 

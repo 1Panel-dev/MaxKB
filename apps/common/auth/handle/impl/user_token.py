@@ -115,6 +115,14 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
     @param workspace_user_role_mapping_dict:   工作空间用户角色关联字典  key为role_id
     @return: 工作空间用户资源的权限列表
     """
+    # 判断用户在当前工作空间是否为内置USER
+    workspace_role_ids = [
+        wur.role_id
+        for wur in
+        workspace_user_role_mapping_dict.get(workspace_user_resource_permission.workspace_id,[])
+    ]
+    is_builtin_user = RoleConstants.USER.value.__str__() in workspace_role_ids
+
     role_permission_mapping_list = [role_permission_mapping_dict.get(workspace_user_role_mapping.role_id, []) for
                                     workspace_user_role_mapping in
                                     workspace_user_role_mapping_dict.get(
@@ -124,12 +132,15 @@ def get_workspace_resource_permission_list_by_workspace_user_permission(
     if (workspace_user_resource_permission.auth_type == ResourceAuthType.ROLE
             and workspace_user_resource_permission.permission_list.__contains__(
                 ResourcePermissionRole.ROLE)):
-        return [
+        per_op_permissions = [
             f"{role_permission_mapping.permission_id}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
             for role_permission_mapping in role_permission_mapping_list if (permission_constants_dict.get(role_permission_mapping.permission_id).value.parent_group or []).__contains__(
-                                        WorkspaceGroup(workspace_user_resource_permission.auth_target_type))] + [
-            f"{workspace_user_resource_permission.auth_target_type}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"]
-
+                                        WorkspaceGroup(workspace_user_resource_permission.auth_target_type))]
+        if is_builtin_user:
+            per_op_permissions.append(
+                f"{workspace_user_resource_permission.auth_target_type}:/WORKSPACE/{workspace_user_resource_permission.workspace_id}/{workspace_user_resource_permission.auth_target_type}/{workspace_user_resource_permission.target}"
+            )
+        return per_op_permissions
     elif workspace_user_resource_permission.auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP:
         resource_permission_list = [
             [

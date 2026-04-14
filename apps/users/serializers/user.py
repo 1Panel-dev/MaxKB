@@ -587,8 +587,11 @@ class UserManageSerializer(serializers.Serializer):
             User.objects.filter(id__in=user_ids).exclude(id='f0dd8f71-e4ee-11ee-8c84-a8a1595801ab').delete()
             return True
 
-    def get_all_user_list(self):
-        users = User.objects.all().values('id', 'nick_name', 'username')
+    def get_all_user_list(self, nick_name=None):
+        query_set = User.objects.all()
+        if nick_name:
+            query_set = query_set.filter(nick_name__contains=nick_name)
+        users = query_set.values('id', 'nick_name', 'username')[:200]
         return list(users)
 
 

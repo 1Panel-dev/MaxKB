@@ -21,6 +21,9 @@
                 : true
             "
             filterable
+            remote
+            :remote-method="(query: any) => handleRemoteSearch(query, element, model)"
+            :loading="loadingStates[`${index}-${model.path}`]"
             multiple
             :reserve-keyword="false"
             style="width: 100%"
@@ -29,7 +32,7 @@
             v-bind="model.selectProps"
           >
             <el-option
-              v-for="opt in model.selectProps?.options"
+              v-for="opt in getOptions(element, model)"
               :key="opt.value"
               :label="opt.label"
               :value="opt.value"
@@ -65,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import {ref, watch, computed} from 'vue'
+import {computed, reactive, ref, watch} from 'vue'
 import type {FormItemModel} from '@/api/type/role'
 
 const props = withDefaults(defineProps<{
@@ -85,9 +88,36 @@ const form = defineModel<Record<string, any>[]>('form', {
   default: [],
 })
 
+const loadingStates = reactive<Record<string, boolean>>({})
+
 const selectedRoles = computed(() => {
   return form.value.map((item) => item.role_id)
 })
+
+function getOptions(element: any, model: FormItemModel) {
+  const dynamicOptions = element[`_${model.path}_options`]
+  return dynamicOptions || model.selectProps?.options || []
+}
+
+async function handleRemoteSearch(query: string, element: any, model: FormItemModel) {
+  if (!model.selectProps?.remoteMethod) {
+    return
+  }
+
+  const key = `${form.value.indexOf(element)}-${model.path}`
+  loadingStates[key] = true
+
+  try {
+    await new Promise(resolve => setTimeout(resolve, 100))
+
+    element[`_${model.path}_options`] = await model.selectProps.remoteMethod(query, element)
+  } catch (error) {
+    console.error('Remote search failed:', error)
+    element[`_${model.path}_options`] = []
+  } finally {
+    loadingStates[key] = false
+  }
+}
 
 function handleAdd() {
   form.value.push({...formItem})

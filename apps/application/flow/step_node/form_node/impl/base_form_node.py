@@ -6,6 +6,7 @@
     @date：2024/11/4 14:52
     @desc:
 """
+import copy
 import json
 import time
 from typing import Dict, List
@@ -76,6 +77,7 @@ class BaseFormNode(IFormNode):
                 self.context[key] = form_data[key]
 
     def reset_field(self, field):
+        field = copy.copy(field)
         reset_field = ['field', 'label', 'default_value']
         for f in reset_field:
             _value = field[f]

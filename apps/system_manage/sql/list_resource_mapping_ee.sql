@@ -16,11 +16,22 @@ WITH source_data_cte AS (SELECT 'APPLICATION' as source_type,
                                 "user_id",
                                 "workspace_id",
                                 "type"::text as "icon" , "type"::text as "type", "folder_id"
-                         FROM knowledge)
+                         FROM knowledge
+                         UNION ALL
+                         SELECT 'TOOL'      as source_type,
+                                id,
+                                "name",
+                                "desc",
+                                "user_id",
+                                "workspace_id",
+                                "icon",
+                                "tool_type" as "type",
+                                "folder_id"
+                         FROM tool)
 SELECT rm.*,
        sdc.*,
        u.nick_name as username,
-       w.name     as workspace_name
+       w.name      as workspace_name
 FROM resource_mapping rm
          LEFT JOIN source_data_cte sdc
                    ON rm.source_type = sdc.source_type
