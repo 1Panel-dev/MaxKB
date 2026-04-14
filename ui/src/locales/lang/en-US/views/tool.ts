@@ -14,6 +14,7 @@ export default {
   },
   toolWorkflow: {
     title: 'Workflow',
+    copyToolWorkflow: 'Copy Workflow',
     creatToolWorkflow: 'Create Workflow',
     toActiveTip: 'Unable to enable. Please publish the workflow first.',
     debugResult: 'Debug results',

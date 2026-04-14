@@ -248,7 +248,10 @@ async function getToolFolder() {
 }
 
 async function getToolList() {
-  const baseType = activeName.value == 'DATA_SOURCE_TOOL' ? 'DATA_SOURCE' : 'CUSTOM'
+  const baseTypeParams =
+    activeName.value == 'DATA_SOURCE_TOOL'
+      ? { tool_type: 'DATA_SOURCE' }
+      : { tool_type_list: ['CUSTOM', 'WORKFLOW'] }
 
   const res = await loadSharedApi({
     type: 'tool',
@@ -256,7 +259,7 @@ async function getToolList() {
     systemType: apiType.value,
   }).getToolList({
     folder_id: folder.currentFolder?.id || user.getWorkspaceId(),
-    tool_type_list: [baseType, 'WORKFLOW'],
+    ...baseTypeParams,
   })
   toolList.value = res.data?.tools || res.data || []
   toolList.value = toolList.value?.filter((item: any) => item.is_active)

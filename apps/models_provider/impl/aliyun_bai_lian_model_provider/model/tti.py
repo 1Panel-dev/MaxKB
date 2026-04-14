@@ -88,7 +88,13 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             file_urls = []
             if rsp.status_code == HTTPStatus.OK:
                 for result in rsp.output.choices:
-                    file_urls.append(result.message.content[0].get('image'))
+                    if isinstance(result.message.content, list):
+                        for item in result.message.content:
+                            if isinstance(item, dict) and item.get('image'):
+                                file_urls.append(item.get('image'))
+                    elif isinstance(result.message.content, dict):
+                        if result.message.content.get('image'):
+                            file_urls.append(result.message.content.get('image'))
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))
@@ -135,7 +141,13 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             file_urls = []
             if rsp.status_code == HTTPStatus.OK:
                 for result in rsp.output.choices:
-                    file_urls.append(result.message.content[0].get('image'))
+                    if isinstance(result.message.content, list):
+                        for item in result.message.content:
+                            if isinstance(item, dict) and item.get('image'):
+                                file_urls.append(item.get('image'))
+                    elif isinstance(result.message.content, dict):
+                        if result.message.content.get('image'):
+                            file_urls.append(result.message.content.get('image'))
             else:
                 maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
                                    (rsp.status_code, rsp.code, rsp.message))

@@ -19,9 +19,10 @@ from application.flow.i_step_node import NodeResult, ToolWorkflowPostHandler, IN
 from application.flow.step_node.tool_workflow_lib_node.i_tool_workflow_lib_node import IToolWorkflowLibNode
 from application.models import ChatRecord
 from application.serializers.common import ToolExecute
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import ChatException
 from common.handle.impl.response.loop_to_response import LoopToResponse
-from tools.models import ToolWorkflowVersion
+from tools.models import ToolWorkflowVersion, Tool
 
 
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
@@ -131,6 +132,18 @@ def _is_interrupt_exec(node, node_variable: Dict, workflow_variable: Dict):
     return node.context.get('is_interrupt_exec', False)
 
 
+def valid_function(tool_lib, workspace_id):
+    if tool_lib is None:
+        raise Exception(_('Tool does not exist'))
+    get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
+    if tool_lib and tool_lib.workspace_id != workspace_id and get_authorized_tool is not None:
+        tool_lib = get_authorized_tool(QuerySet(Tool).filter(id=tool_lib.id), workspace_id).first()
+    if tool_lib is None:
+        raise Exception(_("Tool does not exist"))
+    if not tool_lib.is_active:
+        raise Exception(_("Tool is not active"))
+
+
 class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
     def get_parameters(self, input_field_list):
         result = {}
@@ -176,6 +189,8 @@ class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
             '-create_time')[0:1].first()
         if tool_workflow_version is None:
             raise ChatException(500, _("The tool has not been published. Please use it after publishing."))
+        tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
+        valid_function(tool_lib, workspace_id)
         parameters = self.get_parameters(input_field_list)
         tool_record_id = (self.node_params.get('child_node') or {}).get('chat_record_id') or str(uuid.uuid7())
         took_execute = ToolExecute(tool_lib_id, tool_record_id,

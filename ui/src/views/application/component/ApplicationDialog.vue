@@ -17,7 +17,7 @@
         </div>
 
         <el-button link class="mr-24" @click="refresh">
-          <el-icon :size="18"><Refresh /></el-icon>
+          <el-icon :size="18" class="color-secondary "><Refresh /></el-icon>
         </el-button>
       </div>
     </template>
@@ -45,7 +45,7 @@
         </div>
 
         <el-scrollbar>
-          <div class="p-16-24 pt-0" style="height: calc(100vh - 200px)">
+          <div class="p-16-24 pt-0" style="height: calc(100vh - 268px)">
             <el-row :gutter="12" v-loading="apiLoading" v-if="searchData.length">
               <el-col :span="12" v-for="(item, index) in searchData" :key="index" class="mb-16">
                 <el-popover

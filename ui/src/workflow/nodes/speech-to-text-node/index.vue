@@ -66,7 +66,7 @@
           </div>
           <NodeCascader
             v-else
-            ref="nodeCascaderRef"
+            ref="modelCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -169,10 +169,13 @@ const modelOptions = ref<any>(null)
 const STTModeParamSettingDialogRef = ref<InstanceType<typeof STTModeParamSettingDialog>>()
 
 const aiChatNodeFormRef = ref<FormInstance>()
+const modelCascaderRef = ref()
+
 const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })

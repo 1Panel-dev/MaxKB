@@ -236,7 +236,7 @@ async function getToolList() {
     tool_type_list: [baseType, 'WORKFLOW'],
   })
   toolList.value = res.data?.tools || res.data || []
-  toolList.value = toolList.value?.filter((item: any) => item.is_active)
+  toolList.value = toolList.value?.filter((item: any) => item.is_active && item.id !== props.id)
 }
 
 function folderClickHandle(row: any) {

@@ -84,7 +84,7 @@ class AuthProfileSerializer(serializers.Serializer):
                         'type', 'password'),
                     'max_attempts': max_attempts,
                     'login_value': final_login_value,
-                    'rasKey' : get_key_pair_by_sql().get('key')
+                    'rsaKey' : get_key_pair_by_sql().get('key')
                 }
         return profile
 

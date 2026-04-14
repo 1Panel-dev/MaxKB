@@ -1,4 +1,5 @@
 import json
+import re
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
@@ -69,7 +70,7 @@ class MCPToolHandler:
 
         payload = {
             'message': args.get('message'),
-            'stream': False,
+            'stream': True,
             're_chat': False
         }
         resp = ChatSerializers(data={
@@ -81,6 +82,24 @@ class MCPToolHandler:
             'source': {"type": ChatSourceChoices.ONLINE.value},
             'debug': False,
         }).chat(payload)
-        data = json.loads(str(resp.text))
+        chunks = []
+        for raw_line in resp:
+            line = raw_line.decode("utf-8", errors="replace").rstrip("\r\n")
+            if not line.startswith("data:"):
+                continue
+            payload = line[5:].strip()
+            if not payload or payload == "[DONE]":
+                continue
+            try:
+                event = json.loads(payload)
+            except json.JSONDecodeError:
+                continue
+            if event.get("operate") is True:
+                chunks.append(event.get("content", ""))
+                if event.get("is_end"):
+                    break
 
-        return {"content": [{"type": "text", "text": data.get('data', {}).get('content')}]}
+        data = ''.join(chunks)
+        # 排除<tool_calls_render></tool_calls_render>标签
+        data = re.sub(r'<tool_calls_render>.*?</tool_calls_render>', '', data, flags=re.DOTALL)
+        return {"content": [{"type": "text", "text": data}]}

@@ -101,6 +101,7 @@ export default defineConfig((conf: any) => {
     },
     build: {
       outDir: `dist${ENV.VITE_BASE_PATH}`,
+      target: 'es2022',
       rollupOptions: {
         input: ENV.VITE_ENTRY,
       },

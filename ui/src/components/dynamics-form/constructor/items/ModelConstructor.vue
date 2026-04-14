@@ -45,14 +45,18 @@
   </el-form-item>
   <el-form-item
     :label="$t('dynamicsForm.ModelConstructor.defaultModel')"
-    required
     prop="default_value.model_id"
-    :rules="[
-      {
-        required: true,
-        message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
-      },
-    ]"
+    :required="formValue.required"
+    :rules="
+      formValue.required
+        ? [
+            {
+              required: true,
+              message: $t('dynamicsForm.ModelConstructor.modelPlaceholder'),
+            },
+          ]
+        : []
+    "
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
     <div class="flex-between w-full">

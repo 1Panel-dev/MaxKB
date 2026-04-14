@@ -7,7 +7,8 @@
     :append-to-body="true"
     size="60%"
   >
-    <el-form label-position="top" ref="settingFormRef" :model="form">
+    <el-form label-position="top" ref="settingFormRef" :model="form"
+             require-asterisk-position="right">
       <el-form-item label="API KEY">
         <div class="complex-input flex align-center w-full"
              style="background-color: var(--el-disabled-bg-color);">

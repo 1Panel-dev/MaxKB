@@ -122,32 +122,62 @@
         </el-form-item>
         <el-form-item
           :label="$t('workflow.nodes.rerankerNode.reranker_model.label')"
-          prop="reranker_model_id"
+          :prop="
+            form_data.reranker_model_id_type === 'reference'
+              ? 'reranker_model_id_reference'
+              : 'reranker_model_id'
+          "
           :rules="{
             required: true,
-            message: $t('workflow.nodes.rerankerNode.reranker_model.placeholder'),
+            message:
+              form_data.reranker_model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('workflow.nodes.rerankerNode.reranker_model.placeholder'),
             trigger: 'change',
           }"
         >
           <template #label>
-            <div class="flex-between">
-              <span
-                >{{ $t('workflow.nodes.rerankerNode.reranker_model.label')
-                }}<span class="color-danger">*</span></span
+            <div class="flex-between w-full">
+              <div>
+                <span
+                  >{{ $t('workflow.nodes.rerankerNode.reranker_model.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-select
+                v-model="form_data.reranker_model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.reranker_model_id_reference = []"
               >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
             </div>
           </template>
-          <ModelSelect
-            @wheel="wheel"
-            :teleported="false"
-            v-model="form_data.reranker_model_id"
-            :placeholder="$t('workflow.nodes.rerankerNode.reranker_model.placeholder')"
-            :options="modelOptions"
-            @submitModel="getSelectModel"
-            showFooter
-            :model-type="'RERANKER'"
-          ></ModelSelect>
+          <div class="flex-between w-full" v-if="form_data.reranker_model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              v-model="form_data.reranker_model_id"
+              :placeholder="$t('workflow.nodes.rerankerNode.reranker_model.placeholder')"
+              :options="modelOptions"
+              @submitModel="getSelectModel"
+              showFooter
+              :model-type="'RERANKER'"
+            ></ModelSelect>
+          </div>
+          <NodeCascader
+            v-else
+            ref="modelCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.reranker_model_id_reference"
+          />
         </el-form-item>
+
         <el-form-item
           :label="$t('workflow.nodes.searchKnowledgeNode.showKnowledge.label')"
           prop="show_knowledge"
@@ -192,6 +222,8 @@ const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const form = {
   reranker_reference_list: [[]],
   reranker_model_id: '',
+  reranker_model_id_type: 'custom',
+  reranker_model_id_reference: [],
   question_reference_address: [],
   reranker_setting: {
     top_n: 3,
@@ -222,6 +254,12 @@ const wheel = (e: any) => {
 const form_data = computed({
   get: () => {
     if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.reranker_model_id_type) {
+        set(props.nodeModel.properties.node_data, 'reranker_model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.reranker_model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'reranker_model_id_reference', [])
+      }
       return props.nodeModel.properties.node_data
     } else {
       set(props.nodeModel.properties, 'node_data', form)
@@ -232,9 +270,12 @@ const form_data = computed({
     set(props.nodeModel.properties, 'node_data', value)
   },
 })
+
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'reranker_setting', data)
 }
+
+const modelCascaderRef = ref()
 
 const resource = getResourceDetail()
 function getSelectModel() {
@@ -264,6 +305,7 @@ const nodeCascaderRef = ref()
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     rerankerNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })

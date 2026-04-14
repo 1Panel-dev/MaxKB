@@ -105,7 +105,8 @@ function toUrl(url: string) {
     margin-left: 4px !important;
   }
   .active {
-    background: #ffffff;
+    background-color: #ffffff;
+    box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12);
     &:hover {
       background: #ffffff;
     }

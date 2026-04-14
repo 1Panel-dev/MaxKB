@@ -82,7 +82,11 @@
       </el-form-item>
       <el-form-item prop="allow_download">
         <el-checkbox v-model="form.allow_download">
-          {{ $t('views.document.form.allow_download.label') }}
+          {{
+            type === '1'
+              ? $t('views.document.form.allow_preview')
+              : $t('views.document.form.allow_download')
+          }}
         </el-checkbox>
       </el-form-item>
     </el-form>
@@ -106,7 +110,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { t } from '@/locales'
 const route = useRoute()
 const {
-  params: { id },
+  params: { id, type },
 } = route as any
 
 const props = defineProps({

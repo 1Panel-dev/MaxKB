@@ -242,27 +242,6 @@
                     {{ $t('views.system.resourceAuthorization.title') }}
                   </el-dropdown-item>
                   <el-dropdown-item
-                    @click.stop="exportKnowledge(row)"
-                    v-if="permissionPrecise.export()"
-                  >
-                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                    {{ $t('views.document.setting.export') }} Excel
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    @click.stop="exportZipKnowledge(row)"
-                    v-if="permissionPrecise.export()"
-                  >
-                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                    {{ $t('views.document.setting.export') }} ZIP
-                  </el-dropdown-item>
-                  <el-dropdown-item
-                    @click.stop="exportKnowledgeBundle(row)"
-                    v-if="permissionPrecise.export()"
-                  >
-                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                    {{ $t('views.document.setting.export') }} {{ $t('views.knowledge.title') }}
-                  </el-dropdown-item>
-                  <el-dropdown-item
                     text
                     @click.stop="openResourceMappingDrawer(row)"
                     v-if="permissionPrecise.relate_map()"
@@ -271,6 +250,30 @@
                     {{ $t('views.system.resourceMapping.title') }}
                   </el-dropdown-item>
                   <el-dropdown-item
+                    divided
+                    @click.stop="exportKnowledge(row)"
+                    v-if="permissionPrecise.export()"
+                  >
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.exportDocument') }} Excel
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.stop="exportZipKnowledge(row)"
+                    v-if="permissionPrecise.export()"
+                  >
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.exportDocument') }} ZIP
+                  </el-dropdown-item>
+                  <el-dropdown-item
+                    @click.stop="exportKnowledgeBundle(row)"
+                    v-if="permissionPrecise.export()"
+                  >
+                    <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                    {{ $t('views.document.setting.exportKnowledge') }}
+                  </el-dropdown-item>
+
+                  <el-dropdown-item
+                    divided
                     type="danger"
                     @click.stop="deleteKnowledge(row)"
                     v-if="permissionPrecise.delete()"
@@ -374,7 +377,7 @@ const paginationConfig = reactive({
 const ResourceAuthorizationDrawerRef = ref()
 
 function openAuthorization(item: any) {
-  ResourceAuthorizationDrawerRef.value.open(item.id)
+  ResourceAuthorizationDrawerRef.value.open(item.id, undefined, item.workspace_id)
 }
 
 const exportKnowledge = (item: any) => {

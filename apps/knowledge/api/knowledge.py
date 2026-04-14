@@ -221,6 +221,13 @@ class SyncWebAPI(APIMixin):
                 location='path',
                 required=True,
             ),
+            OpenApiParameter(
+                name="sync_type",
+                description="同步类型 (replace: 替换同步, complete: 完整同步)",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
         ]
 
     @staticmethod

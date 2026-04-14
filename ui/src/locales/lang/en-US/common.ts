@@ -151,5 +151,6 @@ export default {
     subTitle: 'View Execution Record',
   },
   sourceType: 'Source type',
-  knowledgeImportTip: 'Knowledge base imported successfully. Documents have not been vectorized yet. Please configure the embedding model and vectorize the documents.'
+  knowledgeImportTip: 'Knowledge base imported successfully. Documents have not been vectorized yet. Please configure the embedding model and vectorize the documents.',
+  import: 'Import',
 }

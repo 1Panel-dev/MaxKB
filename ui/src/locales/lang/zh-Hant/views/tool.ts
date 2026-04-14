@@ -13,6 +13,7 @@ export default {
   },
   toolWorkflow: {
     title: '工作流',
+        copyToolWorkflow: '复制工作流',
     creatToolWorkflow: '創建工作流',
     toActiveTip: '無法啓用，請先發布工作流。',
     debugResult: '調試結果',

@@ -92,6 +92,7 @@ import {MsgSuccess} from '@/utils/message'
 import {t} from '@/locales'
 import useStore from '@/stores'
 import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import {cloneDeep} from "lodash";
 
 const router = useRouter()
 const {user, folder} = useStore()
@@ -155,12 +156,10 @@ const details = ref<any>()
 const open = (data?: any) => {
   if (data) {
     //  编辑当前id
-    editId.value = data.id
+    isEdit.value = !!data?.id
+    editId.value = data?.id
     details.value = data
-    workflowForm.value.name = data.name
-    workflowForm.value.desc = data.desc
-    workflowForm.value.icon = data.icon
-    isEdit.value = true
+    workflowForm.value = cloneDeep(data)
   }
   dialogVisible.value = true
 }
@@ -196,7 +195,6 @@ const submitHandle = async () => {
           .postTool({...workflowForm.value, folder_id: folder.currentFolder?.id, code: 'None'})
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
-            emit('refresh', res.data)
             return user.profile().then(() => {
               const folderId = res.data.scope === 'SHARED' ? 'shared' : res.data.folder_id
               router.push({

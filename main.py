@@ -32,14 +32,34 @@ def collect_static():
 def perform_db_migrate():
     """
     初始化数据库表
+    wait-for-it 仅检测 TCP 端口，PostgreSQL 崩溃恢复期间端口已开放但拒绝查询，
+    因此在此处增加重试逻辑，等待数据库真正就绪后再执行 migrate。
     """
     logging.info("Check database structure change ...")
     logging.info("Migrate model change to database ...")
-    try:
-        management.call_command('migrate')
-    except Exception as e:
-        logging.error('Perform migrate failed, exit', exc_info=True)
-        sys.exit(11)
+    max_retries = 10
+    retry_interval = 5  # seconds
+    for attempt in range(1, max_retries + 1):
+        try:
+            management.call_command('migrate')
+            return
+        except Exception as e:
+            err_msg = str(e)
+            # 判断是否为数据库仍在启动中（崩溃恢复场景）
+            is_db_starting = (
+                'the database system is starting up' in err_msg
+                or 'starting up' in err_msg
+                or 'Connection refused' in err_msg
+            )
+            if is_db_starting and attempt < max_retries:
+                logging.warning(
+                    f'Database is not ready yet (attempt {attempt}/{max_retries}), '
+                    f'retrying in {retry_interval}s... Error: {err_msg}'
+                )
+                time.sleep(retry_interval)
+            else:
+                logging.error('Perform migrate failed, exit', exc_info=True)
+                sys.exit(11)
 
 
 def start_services():

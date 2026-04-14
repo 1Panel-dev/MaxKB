@@ -1,7 +1,7 @@
 <template>
-  <div class="tag-group" v-if="props.tags.length">
-    <el-tag :size="props.size" class="default-tag tag-ellipsis" :title="props.tags[0]">
-      {{ i18n_name(props.tags[0]) }}
+  <div class="tag-group">
+    <el-tag :size="props.size" class="default-tag tag-ellipsis" :title="props.tags?.[0]">
+      {{ i18n_name(props.tags?.[0]) }}
     </el-tag>
     <el-popover
       placement="bottom"
