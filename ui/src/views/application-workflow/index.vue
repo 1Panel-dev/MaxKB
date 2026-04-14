@@ -229,6 +229,9 @@ const shareUrl = computed(
 
 function back() {
   if (JSON.stringify(cloneWorkFlow.value) !== JSON.stringify(getGraphData())) {
+    console.debug("JSON.stringify(cloneWorkFlow.value):", JSON.stringify(cloneWorkFlow.value))
+    console.debug("JSON.stringify(getGraphData()):", JSON.stringify(getGraphData()))
+
     MsgConfirm(t('common.tip'), t('workflow.tip.saveMessage'), {
       confirmButtonText: t('workflow.setting.exitSave'),
       cancelButtonText: t('workflow.setting.exit'),
@@ -699,7 +702,7 @@ onBeforeUnmount(() => {
   bottom: 16px;
   right: 16px;
   overflow: hidden;
-  width: 460px;
+  width: 550px;
   height: 680px;
 
   .workflow-debug-header {

@@ -12,7 +12,7 @@ from application.flow.i_step_node import INode, NodeResult
 from application.flow.step_node.intent_node.i_intent_node import IIntentNode
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id, get_model_credential
-from .prompt_template import PROMPT_TEMPLATE
+from .prompt_template import DEFAULT_PROMPT_TEMPLATE
 
 
 def get_default_model_params_setting(model_id):
@@ -52,7 +52,7 @@ class BaseIntentNode(IIntentNode):
         self.context['branch_id'] = details.get('branch_id')
         self.context['category'] = details.get('category')
 
-    def execute(self, model_id, dialogue_number, history_chat_record, user_input, branch,
+    def execute(self, model_id, prompt_template, dialogue_number, history_chat_record, user_input, branch, output_reason,
                 model_params_setting=None, model_id_type=None, model_id_reference=None, **kwargs) -> NodeResult:
         # 处理引用类型
         if model_id_type == 'reference' and model_id_reference:
@@ -77,18 +77,19 @@ class BaseIntentNode(IIntentNode):
         )
 
         # 获取历史对话
-        history_message = self.get_history_message(history_chat_record, dialogue_number)
+        history_message = self.get_history_message(history_chat_record, dialogue_number) if history_chat_record and dialogue_number > 0 else []
         self.context['history_message'] = history_message
 
         # 保存问题到上下文
         self.context['user_input'] = user_input
 
         # 构建分类提示词
-        prompt = self.build_classification_prompt(user_input, branch)
+        prompt_template = self.workflow_manage.generate_prompt(prompt_template) if prompt_template else None
+        prompt = self.build_classification_prompt(prompt_template, user_input, branch, output_reason)
+        self.context['system'] = prompt
 
         # 生成消息列表
-        system = self.build_system_prompt()
-        message_list = self.generate_message_list(system, prompt, history_message)
+        message_list = self.generate_message_list(prompt, history_message)
         self.context['message_list'] = message_list
 
         # 调用模型进行分类
@@ -106,7 +107,7 @@ class BaseIntentNode(IIntentNode):
                 'history_message': history_message,
                 'user_input': user_input,
                 'branch_id': matched_branch['id'],
-                'reason': self.parse_result_reason(r.content),
+                'reason': self.parse_result_reason(r.content) if output_reason is not False else '',
                 'category': matched_branch.get('content', matched_branch['id'])
             }, {}, _write_context=write_context)
 
@@ -136,11 +137,7 @@ class BaseIntentNode(IIntentNode):
                 message.content = re.sub('<form_rander>[\d\D]*?<\/form_rander>', '', message.content)
         return history_message
 
-    def build_system_prompt(self) -> str:
-        """构建系统提示词"""
-        return "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
-
-    def build_classification_prompt(self, user_input: str, branch: List[Dict]) -> str:
+    def build_classification_prompt(self, prompt_template: str, user_input: str, branch: List[Dict], output_reason: bool) -> str:
         """构建分类提示词"""
 
         classification_list = []
@@ -162,18 +159,19 @@ class BaseIntentNode(IIntentNode):
                 })
                 classification_id += 1
 
-        return PROMPT_TEMPLATE.format(
-            classification_list=classification_list,
-            user_input=user_input
+        # 构建输出JSON结构
+        reason_field = ',\n"reason": ""' if output_reason is not False else ''
+        output_json = f'{{\n"classificationId": 0{reason_field}\n}}'
+
+        return (prompt_template or DEFAULT_PROMPT_TEMPLATE).format(
+            classification_list=json.dumps(classification_list, ensure_ascii=False),
+            user_input=user_input,
+            output_json=output_json
         )
 
-    def generate_message_list(self, system: str, prompt: str, history_message):
+    def generate_message_list(self, prompt: str, history_message):
         """生成消息列表"""
-        if system is None or len(system) == 0:
-            return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
-        else:
-            return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
-                    HumanMessage(self.workflow_manage.generate_prompt(prompt))]
+        return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
 
     def parse_classification_result(self, result: str, branch: List[Dict]) -> Dict[str, Any]:
         """解析分类结果"""
@@ -193,14 +191,23 @@ class BaseIntentNode(IIntentNode):
             return None
 
         try:
-            result_json = json.loads(result)
-            classification_id = result_json.get('classificationId')
+            classification_id = None
+
+            # 如果长度小于5，先尝试解析为数字（增加自由度，在自定义提示词模板时，可提示大模型只输出意图分类的ID值）
+            if len(result) < 5:
+                classification_id = self.to_int(result)
+
+            # 尝试解析为 JSON
+            if classification_id is None:
+                result_json = json.loads(result)
+                classification_id = result_json.get('classificationId')
+
             # 如果是 0 ，返回其他分支
             matched_branch = get_branch_by_id(classification_id)
             if matched_branch:
                 return matched_branch
 
-        except Exception as e:
+        except Exception:
             # json 解析失败，re 提取
             numbers = re.findall(r'"classificationId":\s*(\d+)', result)
             if numbers:
@@ -218,7 +225,7 @@ class BaseIntentNode(IIntentNode):
         try:
             result_json = json.loads(result)
             return result_json.get('reason', '')
-        except Exception as e:
+        except Exception:
             reason_patterns = [
                 r'"reason":\s*"([^"]*)"',  # 标准格式
                 r'"reason":\s*"([^"]*)',  # 缺少结束引号
@@ -233,6 +240,12 @@ class BaseIntentNode(IIntentNode):
                     return reason
 
             return ''
+
+    def to_int(self, str):
+        try:
+            return int(str)
+        except ValueError:
+            return None
 
     def find_other_branch(self, branch: List[Dict]) -> Dict[str, Any] | None:
         """查找其他分支"""

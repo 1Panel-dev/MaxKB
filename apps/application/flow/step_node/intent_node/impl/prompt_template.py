@@ -1,6 +1,6 @@
 
 
-PROMPT_TEMPLATE = """# Role
+DEFAULT_PROMPT_TEMPLATE = """# Role
 You are an intention classification expert, good at being able to judge which classification the user's input belongs to.
 
 ## Skills
@@ -20,10 +20,7 @@ Note:
 - Strictly ensure that the output is in a valid JSON format.
 - Do not add prefix ```json or suffix ```
 - The answer needs to include the following fields such as:
-{{
-"classificationId": 0,
-"reason": ""
-}}
+{output_json}
 
 ## Limit
 - Please do not reply in text."""

@@ -1074,11 +1074,10 @@ class SendEmailSerializer(serializers.Serializer):
                                                          ]), range(6))))
         # 获取邮件模板
         language = get_language()
-        file = open(
-            os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template_{to_locale(language)}.html'), "r",
-            encoding='utf-8')
-        content = file.read()
-        file.close()
+        with open(
+                os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template_{to_locale(language)}.html'),
+                "r", encoding='utf-8') as file:
+            content = file.read()
         code_cache_key = email + ":" + state
         code_cache_key_lock = code_cache_key + "_lock"
         # 设置缓存

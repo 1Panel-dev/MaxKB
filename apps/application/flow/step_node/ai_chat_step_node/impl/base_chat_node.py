@@ -364,7 +364,7 @@ class BaseChatNode(IChatNode):
                 tool_params[k] = self.workflow_manage.generate_prompt(tool_params[k])
             if type(v) == dict:
                 self.handle_variables(v)
-            if (type(v) == list) and (type(v[0]) == str):
+            if (type(v) == list) and len(v) > 0 and (type(v[0]) == str):
                 tool_params[k] = self.get_reference_content(v)
         return tool_params
 
@@ -390,7 +390,7 @@ class BaseChatNode(IChatNode):
 
     def generate_message_list(self, system: str, prompt: str, history_message):
         if system is not None and len(system) > 0:
-            return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
+            return [SystemMessage(system), *history_message,
                     HumanMessage(self.workflow_manage.generate_prompt(prompt))]
         else:
             return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]

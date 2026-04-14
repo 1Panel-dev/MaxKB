@@ -80,9 +80,8 @@ if not settings.DEBUG:
 
 
 def get_index_html(index_path):
-    file = open(index_path, "r", encoding='utf-8')
-    content = file.read()
-    file.close()
+    with open(index_path, "r", encoding='utf-8') as file:
+        content = file.read()
     return content
 
 

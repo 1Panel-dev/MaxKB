@@ -86,46 +86,45 @@ def handle_images(deps, archive: ZipFile) -> []:
 
 
 def xlsx_embed_cells_images(buffer) -> {}:
-    archive = ZipFile(buffer)
-    # 解析cellImage.xml文件
-    deps = get_dependents(archive, get_rels_path("xl/cellimages.xml"))
-    image_rel = handle_images(deps=deps, archive=archive)
-    # 工作表及其中图片ID
-    sheet_list = {}
-    for item in archive.namelist():
-        if not item.startswith('xl/worksheets/sheet'):
-            continue
-        key = item.split('/')[-1].split('.')[0].split('sheet')[-1]
-        sheet_list[key] = parse_element_sheet_xml(fromstring(archive.read(item)))
-    cell_images_xml = parse_element(fromstring(archive.read("xl/cellimages.xml")))
-    cell_images_rel = {}
-    for image in image_rel:
-        cell_images_rel[image.embed] = image
-    for cnv, embed in cell_images_xml.items():
-        cell_images_xml[cnv] = cell_images_rel.get(embed)
-    result = {}
-    for key, img in cell_images_xml.items():
-        all_cells = [
-            cell
-            for _sheet_id, sheet in sheet_list.items()
-            if sheet is not None
-            for cell in sheet or []
-        ]
+    with ZipFile(buffer) as archive:
+        # 解析cellImage.xml文件
+        deps = get_dependents(archive, get_rels_path("xl/cellimages.xml"))
+        image_rel = handle_images(deps=deps, archive=archive)
+        # 工作表及其中图片ID
+        sheet_list = {}
+        for item in archive.namelist():
+            if not item.startswith('xl/worksheets/sheet'):
+                continue
+            key = item.split('/')[-1].split('.')[0].split('sheet')[-1]
+            sheet_list[key] = parse_element_sheet_xml(fromstring(archive.read(item)))
+        cell_images_xml = parse_element(fromstring(archive.read("xl/cellimages.xml")))
+        cell_images_rel = {}
+        for image in image_rel:
+            cell_images_rel[image.embed] = image
+        for cnv, embed in cell_images_xml.items():
+            cell_images_xml[cnv] = cell_images_rel.get(embed)
+        result = {}
+        for key, img in cell_images_xml.items():
+            all_cells = [
+                cell
+                for _sheet_id, sheet in sheet_list.items()
+                if sheet is not None
+                for cell in sheet or []
+            ]
 
-        image_excel_id_list = [
-            cell for cell in all_cells
-            if isinstance(cell, str) and key in cell
-        ]
-        # print(key, img)
-        if img is None:
-            continue
-        if len(image_excel_id_list) > 0:
-            image_excel_id = image_excel_id_list[-1]
-            f = archive.open(img.target)
-            img_byte = io.BytesIO()
-            im = PILImage.open(f).convert('RGB')
-            im.save(img_byte, format='JPEG')
-            image = File(id=uuid.uuid7(), file_name=img.path, meta={'debug': False, 'content': img_byte.getvalue()})
-            result['=' + image_excel_id] = image
-    archive.close()
+            image_excel_id_list = [
+                cell for cell in all_cells
+                if isinstance(cell, str) and key in cell
+            ]
+            # print(key, img)
+            if img is None:
+                continue
+            if len(image_excel_id_list) > 0:
+                image_excel_id = image_excel_id_list[-1]
+                with archive.open(img.target) as f:
+                    img_byte = io.BytesIO()
+                    im = PILImage.open(f).convert('RGB')
+                    im.save(img_byte, format='JPEG')
+                image = File(id=uuid.uuid7(), file_name=img.path, meta={'debug': False, 'content': img_byte.getvalue()})
+                result['=' + image_excel_id] = image
     return result

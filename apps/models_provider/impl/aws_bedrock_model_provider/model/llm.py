@@ -92,7 +92,11 @@ def _update_aws_credentials(profile_name, access_key_id, secret_access_key):
     credentials_path = os.path.join(os.path.expanduser("~"), ".aws", "credentials")
     os.makedirs(os.path.dirname(credentials_path), exist_ok=True)
 
-    content = open(credentials_path, 'r').read() if os.path.exists(credentials_path) else ''
+    if os.path.exists(credentials_path):
+        with open(credentials_path, 'r') as f:
+            content = f.read()
+    else:
+        content = ''
     pattern = rf'\n*\[{profile_name}\]\n*(aws_access_key_id = .*)\n*(aws_secret_access_key = .*)\n*'
     content = re.sub(pattern, '', content, flags=re.DOTALL)
 

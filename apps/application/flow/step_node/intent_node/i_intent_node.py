@@ -20,12 +20,14 @@ class IntentNodeSerializer(serializers.Serializer):
     model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
     model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
                                                label=_("Reference Field"))
+    prompt_template = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Prompt template"))
     content_list = serializers.ListField(required=True, label=_("Text content"))
     dialogue_number = serializers.IntegerField(required=True, label=
     _("Number of multi-round conversations"))
     model_params_setting = serializers.DictField(required=False,
                                                  label=_("Model parameter settings"))
     branch = IntentBranchSerializer(many=True)
+    output_reason = serializers.BooleanField(required=False, label=_("Output reason"), default=True)
 
 
 class IIntentNode(INode):
