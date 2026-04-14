@@ -382,10 +382,10 @@ class ChatSerializers(serializers.Serializer):
                                 str(chat_record.id) == str(chat_record_id)]
             if chat_record_list is not None and len(chat_record_list):
                 return chat_record_list[-1]
-            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_info.chat_id).first()
-            if chat_record is None:
-                if not is_valid_uuid(chat_record_id):
-                    raise ChatException(500, _("Conversation record does not exist"))
+        chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_info.chat_id).first()
+        if chat_record is None:
+            if not is_valid_uuid(chat_record_id):
+                raise ChatException(500, _("Conversation record does not exist"))
         chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
         return chat_record
 

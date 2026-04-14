@@ -77,42 +77,6 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('views.application.form.prompt_template.label')"
-          prop="prompt_template"
-          :rules="{
-            required: true,
-            message: $t('views.application.form.prompt_template.requiredMessage'),
-            trigger: 'blur',
-          }"
-        >
-          <template #label>
-            <div class="flex align-center">
-              <div class="mr-4">
-                <span
-                >{{ $t('views.application.form.prompt_template.label')
-                  }}<span class="color-danger">*</span></span
-                >
-              </div>
-              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content>{{ $t('views.application.form.prompt_template.tooltip', {
-                  classification_list: '{classification_list}',
-                  user_input: '{user_input}',
-                  output_json: '{output_json}',
-                }) }}</template>
-                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip>
-            </div>
-          </template>
-          <MdEditorMagnify
-            @wheel="wheel"
-            :title="$t('views.application.form.prompt_template.label')"
-            v-model="form_data.prompt_template"
-            style="height: 100px"
-            @submitDialog="submitTemplateDialog"
-            :placeholder="`${t('workflow.PromptTemplatePlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
-          />
-        </el-form-item>
-        <el-form-item
           prop="content_list"
           :label="$t('workflow.nodes.intentNode.input.label')"
           :rules="{
@@ -196,19 +160,6 @@
                   </el-col>
                 </el-row>
               </el-form-item>
-            </div>
-          </div>
-        </el-form-item>
-        <el-form-item>
-          <div class="flex-between w-full">
-            <div>
-              <span>{{ $t('workflow.nodes.intentNode.output_reason') }}</span>
-            </div>
-            <div>
-              <el-switch
-                size="small"
-                v-model="form_data.output_reason"
-              />
             </div>
           </div>
         </el-form-item>
@@ -353,17 +304,10 @@ const model_change = (model_id?: string) => {
   }
 }
 
-const default_prompt_template = t('workflow.nodes.intentNode.default_prompt_template', {
-  classification_list: '{classification_list}',
-  user_input: '{user_input}',
-  output_json: '{output_json}',
-})
-
 const form = {
   model_id: '',
   model_id_type: 'custom',
   model_id_reference: [],
-  prompt_template: default_prompt_template,
   branch: [
     {
       id: randomId(),
@@ -378,15 +322,10 @@ const form = {
   ],
   dialogue_number: 1,
   content_list: [],
-  output_reason: true,
 }
 
 function refreshParam(data: any) {
   set(props.nodeModel.properties.node_data, 'model_params_setting', data)
-}
-
-function submitTemplateDialog(val: string) {
-  set(props.nodeModel.properties.node_data, 'prompt_template', val)
 }
 
 const openAIParamSettingDialog = (modelId: string) => {
@@ -402,12 +341,6 @@ const form_data = computed({
       }
       if (!props.nodeModel.properties.node_data.model_id_reference) {
         set(props.nodeModel.properties.node_data, 'model_id_reference', [])
-      }
-      if (!props.nodeModel.properties.node_data.prompt_template) {
-        set(props.nodeModel.properties.node_data, 'prompt_template', default_prompt_template)
-      }
-      if (props.nodeModel.properties.node_data.output_reason == null) {
-        set(props.nodeModel.properties.node_data, 'output_reason', true)
       }
       return props.nodeModel.properties.node_data
     } else {

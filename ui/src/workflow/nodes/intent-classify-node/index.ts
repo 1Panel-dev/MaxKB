@@ -48,11 +48,11 @@ class IntentModel extends AppNodeModel {
 
         if (branch_condition_list) {
 
-            const FORM_ITEMS_HEIGHT = 542  // 上方表单占用高度
-
+            const FORM_ITEMS_HEIGHT = 397  // 上方表单占用高度
+            
             for (let index = 0; index < branch_condition_list.length; index++) {
                 const element = branch_condition_list[index]
-
+               
                 anchors.push({
                 x: x + width / 2 - 10,
                 y: showNode

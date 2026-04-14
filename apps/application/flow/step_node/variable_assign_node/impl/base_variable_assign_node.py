@@ -94,41 +94,38 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 val = self.convert(val, variable.get('target_type'))
                 evaluation(variable, val)
                 result['output_value'] = val
-        elif variable['source'] == 'referencing':
+        elif variable['source'] == 'null':
+            val = None
+            evaluation(variable, val)
+            result['output_value'] = val
+        else:
             reference = self.get_reference_content(variable['reference'])
             reference = self.convert(reference, variable.get('target_type'))
             evaluation(variable, reference)
             result['output_value'] = reference
-        else:
-            val = None
-            evaluation(variable, val)
-            result['output_value'] = val
 
-        # 获取输入输出值的类型，用于显示在执行详情页面中
         result['input_type'] = type(result.get('input_value')).__name__ if result.get('input_value') is not None else 'null'
         result['output_type'] = type(result.get('output_value')).__name__ if result.get('output_value') is not None else 'null'
-
         return result
 
     def execute(self, variable_list, **kwargs) -> NodeResult:
         result_list = []
         contains_chat_variable = False
         for variable in variable_list:
-            if not variable.get('fields'):
+            if 'fields' not in variable:
                 continue
 
-            field0 = variable['fields'][0]
-            if 'global' == field0:
+            if 'global' == variable['fields'][0]:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            elif 'chat' == field0:
+            elif 'chat' == variable['fields'][0]:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
                 contains_chat_variable = True
-            elif 'loop' == field0:
+            elif 'loop' == variable['fields'][0]:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
-            elif 'output' == field0:
+            elif 'output' == variable['fields'][0]:
                 result = self.handle(variable, self.out_evaluation)
                 result_list.append(result)
 

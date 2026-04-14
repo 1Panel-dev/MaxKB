@@ -25,12 +25,10 @@ from .len_lt_compare import *
 from .lt_compare import *
 from .not_contain_compare import *
 from .not_equal_compare import *
-from .regex_compare import RegexCompare
 from .start_with import StartWithCompare
-from .wildcard_compare import WildcardCompare
 
 compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
                        LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
                        IsNullCompare(),
                        IsNotNullCompare(), NotContainCompare(), NotEqualCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
-                       EndWithCompare(), RegexCompare(), WildcardCompare()]
+                       EndWithCompare()]

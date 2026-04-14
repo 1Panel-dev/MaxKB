@@ -24,7 +24,7 @@ class BaseVariableAggregationNode(IVariableAggregation):
 
     def save_context(self, details, workflow_manage):
         for key, value in details.get('result').items():
-            self.context[key] = value
+            self.context['key'] = value
         self.context['result'] = details.get('result')
         self.context['strategy'] = details.get('strategy')
         self.context['group_list'] = details.get('group_list')
