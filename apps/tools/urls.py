@@ -28,6 +28,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/add_internal_tool', views.ToolView.AddInternalTool.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/add_store_tool', views.ToolView.AddStoreTool.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/update_store_tool', views.ToolView.UpdateStoreTool.as_view()),
+    path('workspace/<str:workspace_id>/tool/<str:tool_id>/download_skill_file', views.ToolView.DownloadSkillFile.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/tool_record/<str:record_id>', views.ToolView.ToolRecord.as_view()),
     path('workspace/<str:workspace_id>/tool/<str:tool_id>/tool_record/<int:current_page>/<int:page_size>', views.ToolView.PageToolRecord.as_view()),
     path('workspace/<str:workspace_id>/tool/<int:current_page>/<int:page_size>', views.ToolView.Page.as_view()),

@@ -5,11 +5,11 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, check_batch_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.log.log import log
-from common import result
 from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
     ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI, GetInternalToolAPI, AddInternalToolAPI, \
     ToolBatchOperateAPI
@@ -24,6 +24,7 @@ def get_tool_operation_object(tool_id):
             "name": tool_model.name
         }
     return {}
+
 
 def get_tool_operation_object_batch(tool_id_list):
     tool_model_list = QuerySet(model=Tool).filter(id__in=tool_id_list)
@@ -683,6 +684,22 @@ class ToolView(APIView):
                 'user_id': request.user.id,
                 'file': request.FILES.get('file'),
             }).upload())
+
+    class DownloadSkillFile(APIView):
+        authentication_classes = [TokenAuth]
+
+        @has_permissions(
+            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role()
+        )
+        def get(self, request: Request, workspace_id: str, tool_id: str):
+            return ToolSerializer.DownloadSkillFile(data={
+                'workspace_id': workspace_id,
+                'user_id': request.user.id,
+                'tool_id': tool_id,
+            }).download()
 
     class GenerateCode(APIView):
         authentication_classes = [TokenAuth]
