@@ -555,7 +555,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     'name': knowledge.name,
                     'desc': knowledge.desc,
                     'type': knowledge.type,
-                    'meta': knowledge.meta if knowledge.meta else {},
+                    'meta': {} if knowledge.type == KnowledgeType.LARK else (knowledge.meta if knowledge.meta else {}),
                     'file_size_limit': knowledge.file_size_limit,
                     'file_count_limit': knowledge.file_count_limit,
                     'tags': [{'key': t['key'], 'value': t['value']} for t in tag_list]
@@ -635,6 +635,8 @@ class KnowledgeSerializer(serializers.Serializer):
                     para_active = para_active_list[row_idx] if row_idx < len(para_active_list) else '1'
                     # None 转为 ''
                     row = [col if col is not None else '' for col in row]
+                    # 补齐到3列
+                    row = (row + ['','',''])[:3]
                     if row_idx == 0:
                         data.append(
                             [*row, tags_str, hit_method, similarity, is_active, para_active, doc_type, doc_meta])

@@ -61,7 +61,10 @@
               <el-option :label="$t('common.status.unpublished')" value="unpublished" />
             </el-select>
           </div>
-          <span class="ml-8" v-if="permissionPrecise.batchDelete() || permissionPrecise.batchMove()">
+          <span
+            class="ml-8"
+            v-if="permissionPrecise.batchDelete() || permissionPrecise.batchMove()"
+          >
             <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
               <AppIcon iconName="app-batch-delete" class="mr-4" />
               {{ $t('views.paragraph.setting.batchSelected') }}
@@ -250,7 +253,7 @@
                         <el-divider direction="vertical" />
                         <el-dropdown trigger="click">
                           <el-button text @click.stop>
-                            <AppIcon iconName="app-more"></AppIcon>
+                            <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
                           </el-button>
                           <template #dropdown>
                             <el-dropdown-menu>
@@ -343,15 +346,15 @@
           {{ $t('common.moveTo') }}
         </el-button>
 
-        <el-button :disabled="multipleSelection.length === 0" @click="deleteMulApplication" v-if="permissionPrecise.batchDelete()">
+        <el-button
+          :disabled="multipleSelection.length === 0"
+          @click="deleteMulApplication"
+          v-if="permissionPrecise.batchDelete()"
+        >
           {{ $t('common.delete') }}
         </el-button>
         <span class="color-secondary ml-24 mr-16">
-          {{ $t('common.selected') }} {{ multipleSelection.length }}
-          {{ $t('views.document.items') }}
-        </span>
-        <span class="color-secondary mr-16">
-          {{ $t('common.total') }} {{ paginationConfig.total }}
+          {{ $t('common.selected') }} {{ multipleSelection.length }} /  {{ paginationConfig.total }}
           {{ $t('views.document.items') }}
         </span>
         <el-button link type="primary" @click="batchSelectedHandle(false)">
@@ -453,8 +456,14 @@ function batchSelectedHandle(bool: boolean) {
 }
 
 const handleCheckAllChange = (val: CheckboxValueType) => {
-  multipleSelection.value = val ? applicationList.value.map((v) => v.id) : []
-  checkAll.value = val as boolean
+  let bool
+  if (isIndeterminate.value) {
+    bool = true
+  } else {
+    bool = val as boolean
+  }
+  multipleSelection.value = bool ? applicationList.value.map((v) => v.id) : []
+  checkAll.value = bool as boolean
 }
 const handleCheckedChatChange = (value: CheckboxValueType[]) => {
   const checkedCount = value.length
@@ -844,6 +853,7 @@ function folderClickHandle(row: any) {
   if (row.id === folder.currentFolder?.id) {
     return
   }
+  batchSelectedHandle(false)
   folder.setCurrentFolder(row)
   paginationConfig.current_page = 1
   applicationList.value = []

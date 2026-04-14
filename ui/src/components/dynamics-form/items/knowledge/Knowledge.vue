@@ -41,7 +41,9 @@ const props = withDefaults(
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const model_value = computed({
-  get: () => props.modelValue || [],
+  get: () =>
+    props.modelValue.filter((id: string) => availableList.value.some((item) => item.id === id)) ||
+    [],
   set: (value: string[]) => {
     emit('update:modelValue', value)
     emit('change', props.formField)

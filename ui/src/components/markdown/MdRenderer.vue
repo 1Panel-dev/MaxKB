@@ -43,7 +43,15 @@ config({
   markdownItConfig(md) {
     md.renderer.rules.image = (tokens, idx, options) => {
       tokens[idx].attrSet('style', 'display:inline-block;min-height:33px;padding:0;margin:0')
-      tokens[idx].attrSet('onerror', 'this.src="/load_error.png"')
+      tokens[idx].attrSet(
+        'onerror',
+        `
+      this.onerror=null;
+      if(!this.src.endsWith("load_error.png")){
+        this.src="./load_error.png";
+     }
+  `,
+      )
       return md.renderer.renderToken(tokens, idx, options)
     }
 

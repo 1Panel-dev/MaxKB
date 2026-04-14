@@ -31,15 +31,14 @@
             >
               <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
             </el-avatar>
-            <el-avatar
+
+            <ToolIcon
               v-else
-              class="avatar-green"
-              shape="square"
+              class="mr-12"
               :size="20"
               style="--el-avatar-border-radius: 6px"
-            >
-              <img src="@/assets/tool/icon_tool.svg" style="width: 58%" alt="" />
-            </el-avatar>
+              :type="item?.tool_type"
+            />
             <span class="ml-8 ellipsis" :title="item.name">{{ item.name }}</span>
           </div>
         </template>

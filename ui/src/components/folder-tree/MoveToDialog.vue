@@ -21,7 +21,12 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitHandle" :loading="loading">
+        <el-button
+          type="primary"
+          @click="submitHandle"
+          :loading="loading"
+          :disabled="!selectForderId || selectForderId === folder?.currentFolder?.id"
+        >
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -113,7 +118,7 @@ const submitHandle = async () => {
         })
     } else if (props.source === SourceTypeEnum.KNOWLEDGE) {
       if (isBatch.value) {
-        ToolApi.putMulMoveTool(obj, loading).then(() => {
+        KnowledgeApi.putMulMoveKnowledge(obj, loading).then(() => {
           MsgSuccess(t('common.saveSuccess'))
           emit('refresh')
           dialogVisible.value = false

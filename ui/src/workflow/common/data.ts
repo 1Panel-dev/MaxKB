@@ -1,6 +1,7 @@
 import { WorkflowKind } from './../../enums/application'
 import { WorkflowType, WorkflowMode } from '@/enums/application'
 import { t } from '@/locales'
+import call$ from 'dingtalk-jsapi/api/biz/telephone/call'
 
 export const startNode = {
   id: WorkflowType.Start,
@@ -99,8 +100,8 @@ export const toolBaseNode = {
 export const toolStartNode = {
   id: WorkflowType.ToolStartNode,
   type: WorkflowType.ToolStartNode,
-  x: 360,
-  y: 2761.3875,
+  x: 280,
+  y: 3301,
   text: '',
   properties: {
     height: 728.375,
@@ -942,7 +943,7 @@ export const toolLoopMenuNodes = [
   },
   {
     label: t('workflow.nodes.classify.businessLogic'),
-    list: [conditionNode, replyNode, loopContinueNode, loopBreakNode],
+    list: [conditionNode, formNode, replyNode, loopContinueNode, loopBreakNode],
   },
   {
     label: t('workflow.nodes.classify.dataProcessing'),
@@ -1021,6 +1022,42 @@ export const getMenuNodes = (workflowMode: WorkflowMode) => {
   if (workflowMode == WorkflowMode.ToolLoop) {
     return toolLoopMenuNodes
   }
+}
+export const workflowModelDict: any = {
+  [WorkflowMode.Application]: (node: any) => {
+    return (
+      ['application-node', 'tool-workflow-lib-node', 'tool-lib-node'].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== 'DATA_SOURCE'
+    )
+  },
+  [WorkflowMode.ApplicationLoop]: (node: any) => {
+    return (
+      ['application-node', 'tool-workflow-lib-node', 'tool-lib-node'].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== 'DATA_SOURCE'
+    )
+  },
+  [WorkflowMode.Knowledge]: (node: any) => {
+    console.log(['tool-workflow-lib-node', 'tool-lib-node'].includes(node))
+    return ['tool-workflow-lib-node', 'tool-lib-node'].includes(node.type)
+  },
+  [WorkflowMode.KnowledgeLoop]: (node: any) => {
+    return (
+      ['tool-workflow-lib-node', 'tool-lib-node'].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== 'DATA_SOURCE'
+    )
+  },
+  [WorkflowMode.Tool]: (node: any) => {
+    return (
+      ['tool-workflow-lib-node', 'tool-lib-node'].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== 'DATA_SOURCE'
+    )
+  },
+  [WorkflowMode.ToolLoop]: (node: any) => {
+    return (
+      ['tool-workflow-lib-node', 'tool-lib-node'].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== 'DATA_SOURCE'
+    )
+  },
 }
 
 /**

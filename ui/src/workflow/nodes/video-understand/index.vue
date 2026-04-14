@@ -67,7 +67,7 @@
           </div>
           <NodeCascader
             v-else
-            ref="nodeCascaderRef"
+            ref="modelCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -247,7 +247,7 @@
       </el-form>
     </el-card>
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
-        <ReasoningParamSettingDialog
+    <ReasoningParamSettingDialog
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
     />
@@ -258,7 +258,7 @@
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { computed, onMounted, ref, inject } from 'vue'
-import {cloneDeep, groupBy, set} from 'lodash'
+import { cloneDeep, groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
@@ -267,8 +267,7 @@ import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { WorkflowMode } from '@/enums/application'
-import ReasoningParamSettingDialog
-  from "@/views/application/component/ReasoningParamSettingDialog.vue";
+import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
@@ -297,9 +296,12 @@ const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDi
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const nodeCascaderRef = ref()
+const modelCascaderRef = ref()
+
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })

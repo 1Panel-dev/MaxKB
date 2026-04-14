@@ -269,6 +269,8 @@ class BaseLoopNode(ILoopNode):
         from application.flow.loop_workflow_manage import LoopWorkflowManage, Workflow
         from application.flow.knowledge_loop_workflow_manage import KnowledgeLoopWorkflowManage
         from application.flow.tool_loop_workflow_manage import ToolLoopWorkflowManage
+        self.node_params['is_result'] = True
+
         def workflow_manage_new_instance(loop_data, global_data, start_node_id=None,
                                          start_node_data=None, chat_record=None, child_node=None):
             workflow_mode = {WorkflowMode.APPLICATION: WorkflowMode.APPLICATION_LOOP,

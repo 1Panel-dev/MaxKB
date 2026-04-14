@@ -431,7 +431,7 @@ const submit = async (formEl: FormInstance | undefined) => {
         })
       } else {
         params.defaultPermission = defaultPermission.value
-        const publicKey = forge.pki.publicKeyFromPem(user.rasKey)
+        const publicKey = forge.pki.publicKeyFromPem(user.rsaKey)
         const utf8Bytes = forge.util.encodeUtf8(params.password)
         const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5')
         params.password = forge.util.encode64(encrypted)

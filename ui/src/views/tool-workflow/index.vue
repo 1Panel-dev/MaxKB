@@ -179,7 +179,7 @@ import DebugDrawer from './debug-drawer/DebugDrawer.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
 provide('loopWorkflowMode', WorkflowMode.ToolLoop)
-const { theme } = useStore()
+const { theme, folder } = useStore()
 const router = useRouter()
 const route = useRoute()
 const {
@@ -512,6 +512,7 @@ const go = () => {
   } else if (route.path.includes('shared')) {
     return router.push({ path: '/system/shared/tool' })
   } else {
+    folder.setCurrentFolder({ id: folderId })
     return router.push({ path: '/tool' })
   }
 }

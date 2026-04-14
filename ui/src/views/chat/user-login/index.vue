@@ -251,7 +251,7 @@ const loginHandle = () => {
         })
       })
     } else {
-      const publicKey = forge.pki.publicKeyFromPem(chatUser?.chat_profile?.rasKey as any);
+      const publicKey = forge.pki.publicKeyFromPem(chatUser?.chat_profile?.rsaKey as any);
       const jsonData = JSON.stringify(loginForm.value);
       const utf8Bytes = forge.util.encodeUtf8(jsonData);
       const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5');

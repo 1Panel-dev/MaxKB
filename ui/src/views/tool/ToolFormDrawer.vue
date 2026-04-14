@@ -416,6 +416,7 @@ function openGenerateCodeDialog() {
 function replaceCode(code: string) {
   const match = code.replace('```python', '').replace('```', '')
   form.value.code = match
+  MsgSuccess(t('views.document.tip.replaceSuccess'))
 }
 
 const submit = async (formEl: FormInstance | undefined) => {

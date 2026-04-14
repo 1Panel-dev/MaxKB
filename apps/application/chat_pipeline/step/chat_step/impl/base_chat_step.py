@@ -22,7 +22,7 @@ from rest_framework import status
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import IChatStep, PostResponseHandler
-from application.flow.tools import Reasoning, mcp_response_generator
+from application.flow.tools import Reasoning, mcp_response_generator, get_tools
 from application.models import ApplicationChatUserStats, ChatUserType, Application, ApplicationApiKey, \
     ApplicationAccessToken
 from common.exception.app_exception import AppApiException
@@ -31,7 +31,7 @@ from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
 from models_provider.tools import get_model_instance_by_model_workspace_id
-from tools.models import Tool
+from tools.models import Tool, ToolType
 
 
 def add_access_num(chat_user_id=None, chat_user_type=None, application_id=None):
@@ -232,7 +232,7 @@ class BaseChatStep(IChatStep):
 
     def _handle_mcp_request(self, mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
                             application_ids, skill_tool_ids, mcp_output_enable, chat_model, message_list, agent_id,
-                            chat_id):
+                            chat_id, workspace_id):
 
         mcp_servers_config = {}
 
@@ -252,10 +252,12 @@ class BaseChatStep(IChatStep):
                     mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
 
         tool_init_params = {}
+        tools = get_tools("APPLICATION", agent_id, tool_ids,
+                          workspace_id)
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context['tool_ids'] = tool_ids
             for tool_id in tool_ids:
-                tool = QuerySet(Tool).filter(id=tool_id).first()
+                tool = QuerySet(Tool).filter(id=tool_id, tool_type=ToolType.CUSTOM).first()
                 if tool is None or tool.is_active is False:
                     continue
                 executor = ToolExecutor()
@@ -316,12 +318,12 @@ class BaseChatStep(IChatStep):
                 })
             mcp_servers_config['skills'] = skill_file_items
 
-        if len(mcp_servers_config) > 0:
+        if len(mcp_servers_config) > 0 or len(tools) > 0:
             source_id = agent_id
             source_type = 'APPLICATION'
             return mcp_response_generator(
                 chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable,
-                tool_init_params, source_id, source_type, chat_id
+                tool_init_params, source_id, source_type, chat_id, tools
             )
 
         return None
@@ -372,7 +374,7 @@ class BaseChatStep(IChatStep):
             mcp_result = self._handle_mcp_request(
                 mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
                 application_ids, skill_tool_ids, mcp_output_enable, chat_model,
-                message_list, agent_id, chat_id
+                message_list, agent_id, chat_id, workspace_id
             )
             if mcp_result:
                 return mcp_result, True
@@ -461,7 +463,7 @@ class BaseChatStep(IChatStep):
             mcp_result = self._handle_mcp_request(
                 mcp_source, mcp_servers, mcp_tool_ids, tool_ids,
                 application_ids, skill_tool_ids, mcp_output_enable,
-                chat_model, message_list, application_id, chat_id
+                chat_model, message_list, application_id, chat_id, workspace_id
             )
             if mcp_result:
                 return mcp_result, True
@@ -496,7 +498,7 @@ class BaseChatStep(IChatStep):
             chat_result, is_ai_chat = self.get_block_result(message_list, chat_model, paragraph_list,
                                                             no_references_setting, problem_text,
                                                             mcp_tool_ids, mcp_servers, mcp_source,
-                                                            tool_ids, application_ids, skill_tool_ids,workspace_id,
+                                                            tool_ids, application_ids, skill_tool_ids, workspace_id,
                                                             mcp_output_enable, manage.context.get('application_id'),
                                                             chat_id)
             if is_ai_chat:

@@ -38,7 +38,7 @@
           :placeholder="$t('dynamicsForm.paramForm.desc.placeholder')"
           :maxlength="128"
           show-word-limit
-          @blur="form.label = form.desc?.trim()"
+          @blur="form.desc = form.desc?.trim()"
         />
       </el-form-item>
       <el-form-item :label="$t('views.tool.form.dataType.label')">

@@ -128,7 +128,7 @@
                 <img :src="resetUrl(props.currentContent?.tool_icon)" alt="" />
               </el-avatar>
               <ToolIcon v-else :size="24" type="WORKFLOW" />
-              <h4 class="ml-8">{{ props.currentContent?.tool_name }}</h4>
+              <h4 class="ml-8">{{ props.currentContent?.source_name }}</h4>
             </div>
             <div class="flex align-center">
               <span class="mr-16 color-secondary" v-if="detail?.state !== 'STARTED'"
@@ -172,7 +172,13 @@
                   {{ $t('chat.executionDetails.title') }}
                 </h5>
                 <div class="p-8-12 border-t-dashed lighter">
-                  <template v-for="(cLoop, cIndex) in detail?.meta?.details" :key="cIndex">
+                  <template
+                    v-for="(cLoop, cIndex) in arraySort(
+                      Object.values(detail?.meta?.details ?? {}) ?? [],
+                      'index',
+                    )"
+                    :key="cIndex"
+                  >
                     <ExecutionDetailCard :data="cLoop"></ExecutionDetailCard>
                   </template>
                 </div>
@@ -202,6 +208,7 @@ import { isAppIcon, resetUrl } from '@/utils/common'
 import { datetimeFormat } from '@/utils/time'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import { arraySort } from '@/utils/array'
 const props = withDefaults(
   defineProps<{
     /**

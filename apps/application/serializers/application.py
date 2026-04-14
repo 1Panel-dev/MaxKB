@@ -335,8 +335,8 @@ class ApplicationCreateSerializer(serializers.Serializer):
 
 class ApplicationQueryRequest(serializers.Serializer):
     folder_id = serializers.CharField(required=False, label=_("folder id"))
-    name = serializers.CharField(required=False, label=_('Application Name'))
-    desc = serializers.CharField(required=False, label=_("Application Description"))
+    name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('Application Name'))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Application Description"))
     publish_status = serializers.ChoiceField(required=False, label=_("Publish status"),
                                              choices=[('published', _("Published")),
                                                       ('unpublished', _("Unpublished"))])
@@ -413,10 +413,11 @@ class Query(serializers.Serializer):
         self.is_valid(raise_exception=True)
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get("user_id")
-        ApplicationQueryRequest(data=instance).is_valid(raise_exception=True)
+        req_dict = ApplicationQueryRequest(data=instance)
+        req_dict.is_valid(raise_exception=True)
         workspace_manage = is_workspace_manage(user_id, workspace_id)
         is_x_pack_ee = self.is_x_pack_ee()
-        return native_search(self.get_query_set(instance, workspace_manage, is_x_pack_ee),
+        return native_search(self.get_query_set(req_dict.data, workspace_manage, is_x_pack_ee),
                              select_string=get_file_content(
                                  os.path.join(PROJECT_DIR, "apps", "application", 'sql',
                                               'list_application.sql' if workspace_manage else (
@@ -425,13 +426,14 @@ class Query(serializers.Serializer):
 
     def page(self, current_page: int, page_size: int, instance: Dict):
         self.is_valid(raise_exception=True)
-        ApplicationQueryRequest(data=instance).is_valid(raise_exception=True)
+        req_dict = ApplicationQueryRequest(data=instance)
+        req_dict.is_valid(raise_exception=True)
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get("user_id")
         workspace_manage = is_workspace_manage(user_id, workspace_id)
         is_x_pack_ee = self.is_x_pack_ee()
         result = native_page_search(current_page, page_size,
-                                    self.get_query_set(instance, workspace_manage, is_x_pack_ee),
+                                    self.get_query_set(req_dict.data, workspace_manage, is_x_pack_ee),
                                     get_file_content(
                                         os.path.join(PROJECT_DIR, "apps", "application", 'sql',
                                                      'list_application.sql' if workspace_manage else (
@@ -845,6 +847,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         QuerySet(ResourceMapping).filter(
             Q(target_id=application_id) | Q(source_id=application_id)
         ).delete()
+        QuerySet(WorkspaceUserResourcePermission).filter(target=application_id).delete()
         QuerySet(Application).filter(id=application_id).delete()
         trigger_ids = list(
             QuerySet(TriggerTask).filter(
@@ -1368,6 +1371,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
         QuerySet(ResourceMapping).filter(
             Q(target_id__in=id_list) | Q(source_id__in=id_list)
         ).delete()
+        QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
 
         QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).delete()
 

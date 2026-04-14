@@ -319,7 +319,7 @@ const MoreFilledPermission = () => {
 const ResourceAuthorizationDrawerRef = ref()
 
 function openAuthorization(item: any) {
-  ResourceAuthorizationDrawerRef.value.open(item.id)
+  ResourceAuthorizationDrawerRef.value.open(item.id, undefined, item.workspace_id)
 }
 
 const deleteModel = (row: any) => {

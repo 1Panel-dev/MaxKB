@@ -157,6 +157,22 @@ def parse_title_level(text, content_level_pattern: List, index):
     return result
 
 
+def mask_code_blocks(text: str) -> str:
+    """
+    将代码块内容替换为等长空格,防止代码块内的#被识别为标题
+    """
+    result = list(text)
+    for match in re.finditer(r'```[^\n]*\n.*?```', text, re.DOTALL):
+        start = match.start()
+        end = match.end()
+        inner_start = text.index('\n', start) + 1
+        closing_fence_start = text.rindex('```', start, end)
+        for i in range(inner_start, closing_fence_start):
+            if result[i] != '\n':
+                result[i] = ' '
+    return ''.join(result)
+
+
 def parse_level(text, pattern: str):
     """
     获取正则匹配到的文本
@@ -164,7 +180,8 @@ def parse_level(text, pattern: str):
     :param pattern:  正则
     :return: 符合正则的文本
     """
-    level_content_list = list(map(to_tree_obj, [r[0:255] for r in re_findall(pattern, text) if r is not None]))
+    masked_text = mask_code_blocks(text)
+    level_content_list = list(map(to_tree_obj, [r[0:255] for r in re_findall(pattern, masked_text) if r is not None]))
     # 过滤掉空标题或只包含#和空白字符的标题
     filtered_list = [item for item in level_content_list
                      if item['content'].strip(' ') and item['content'].replace('#', '').strip(' ')]
