@@ -71,6 +71,9 @@ def hand_node(node, update_tool_map):
         tool_ids = node_data.get('tool_ids') or []
         node_data['tool_ids'] = [update_tool_map.get(tool_id,
                                                      tool_id) for tool_id in tool_ids]
+        skill_tool_ids = node_data.get('skill_tool_ids') or []
+        node_data['skill_tool_ids'] = [update_tool_map.get(tool_id,
+                                                           tool_id) for tool_id in skill_tool_ids]
     if node.get('type') == 'mcp-node':
         mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
         node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
@@ -88,6 +91,19 @@ ALLOWED_CLASSES = {
     ('uuid', 'UUID'),
     ("tools.serializers.tool", "ToolInstance")
 }
+
+
+class NewUUID:
+    def __init__(self):
+        self.uuid_dict = {}
+
+    def generate_uuid(self, _id):
+        _id = str(_id)
+        if _id in self.uuid_dict:
+            return self.uuid_dict.get(_id)
+        r = str(uuid.uuid7())
+        self.uuid_dict[_id] = r
+        return r
 
 
 def to_dict(message, file_name):
@@ -411,7 +427,7 @@ class ToolSerializer(serializers.Serializer):
                     'user_id': self.data.get('user_id'),
                     'workspace_id': self.data.get('workspace_id'),
                     'folder_id': str(instance.get('folder_id', self.data.get('workspace_id'))),
-                }).import_(name=instance.get('name'))
+                }).import_(name=instance.get('name'), source='template')
 
                 try:
                     requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
@@ -536,7 +552,7 @@ class ToolSerializer(serializers.Serializer):
                     raise Exception(_('type error'))
                 return value
             except Exception as e:
-                raise AppApiException(500, _('Field: {name} Type: {_type} Value: {value} Type conversion error').format(
+                raise AppApiException(500, _('Field: {name} Type: {type} Value: {value} Type conversion error').format(
                     name=name, type=_type, value=value
                 ))
 
@@ -627,7 +643,8 @@ class ToolSerializer(serializers.Serializer):
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
             QuerySet(Tool).filter(id=self.data.get('id')).delete()
-            ResourceMapping.objects.filter(target_id=self.data.get('id')).delete()
+            ResourceMapping.objects.filter(
+                Q(target_id=self.data.get('id')) | Q(source_id=self.data.get('id'))).delete()
             QuerySet(ToolRecord).filter(tool_id=self.data.get('id')).delete()
             trigger_ids = list(
                 QuerySet(TriggerTask).filter(
@@ -695,9 +712,16 @@ class ToolSerializer(serializers.Serializer):
                             self.get_child_tool_list(work_flow_tool_dict.get(tool.id).work_flow, response)
                         else:
                             response.append(ToolExportModelSerializer(tool).data)
-            else:
-                for tool in tool_list:
-                    response.append(ToolExportModelSerializer(tool).data)
+                else:
+                    for tool in tool_list:
+                        response.append(ToolExportModelSerializer(tool).data)
+                skill_tools = [tool for tool in tool_list if tool.tool_type == ToolType.SKILL]
+                for tool in skill_tools:
+                    skill_file = QuerySet(File).filter(id=tool.code).first()
+                    if skill_file:
+                        tool.code = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
+                        response.append(ToolExportModelSerializer(tool).data)
+
             return response
 
         def export(self):
@@ -752,13 +776,26 @@ class ToolSerializer(serializers.Serializer):
         def to_tool_workflow(work_flow, update_tool_map):
             for node in work_flow.get('nodes', []):
                 hand_node(node, update_tool_map)
-                if node.get('type') == 'loop_node':
+                if node.get('type') == 'loop-node':
                     for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
                         hand_node(n, update_tool_map)
             return work_flow
 
         @staticmethod
         def to_tool(tool, workspace_id, user_id, folder_id):
+            # 如果是技能类型的工具，需要将code保存为文件
+            code = tool.get('code')
+            if tool.get('tool_type') == ToolType.SKILL:
+                skill_file_id = uuid.uuid7()
+                skill_file = File(
+                    id=skill_file_id,
+                    file_name=f"{tool.get('name')}.zip",
+                    source_type=FileSourceType.TOOL,
+                    source_id=tool.get('id'),
+                    meta={}
+                )
+                skill_file.save(base64.b64decode(code))
+                tool['code'] = skill_file_id
             return Tool(id=tool.get('id'),
                         user_id=user_id,
                         name=tool.get('name'),
@@ -766,7 +803,8 @@ class ToolSerializer(serializers.Serializer):
                         template_id=tool.get('template_id'),
                         input_field_list=tool.get('input_field_list'),
                         init_field_list=tool.get('init_field_list'),
-                        is_active=False if len((tool.get('init_field_list') or [])) > 0 else tool.get('is_active'),
+                        is_active=False if (len((tool.get('init_field_list') or [])) > 0 or tool.get(
+                            'tool_type') == ToolType.WORKFLOW) else tool.get('is_active'),
                         tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
                         scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
                         folder_id=folder_id if folder_id else 'default' if workspace_id == 'None' else workspace_id,
@@ -787,14 +825,17 @@ class ToolSerializer(serializers.Serializer):
             """
             if new_child_policy == 0:
                 tool_list = []
-            elif new_child_policy == 1:
-                tool_list = tool.get('tool_list') or []
             else:
-                tool_list = [{**tool, 'id': str(uuid.uuid7())} for tool in tool.get('tool_list') or []]
+                tool_list = tool.get('tool_list') or []
+
+            tool_list = {tool.get('id'): tool for tool in tool_list}.values()
             update_tool_map = {}
             if len(tool_list) > 0:
+                new_uuid = NewUUID()
                 tool_id_list = reduce(lambda x, y: [*x, *y],
-                                      [[tool.get('id'), generate_uuid((tool.get('id') + workspace_id or ''))]
+                                      [[tool.get('id'), new_uuid.generate_uuid(
+                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                          (tool.get('id') + workspace_id or ''))]
                                        for tool
                                        in
                                        tool_list], [])
@@ -802,7 +843,9 @@ class ToolSerializer(serializers.Serializer):
                 exits_tool_id_list = [str(tool.id) for tool in
                                       QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
                 # 需要更新的工具集合
-                update_tool_map = {tool.get('id'): generate_uuid((tool.get('id') + workspace_id or '')) for tool
+                update_tool_map = {tool.get('id'): new_uuid.generate_uuid(
+                    tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                    (tool.get('id') + workspace_id or '')) for tool
                                    in
                                    tool_list if
                                    not exits_tool_id_list.__contains__(
@@ -811,7 +854,9 @@ class ToolSerializer(serializers.Serializer):
                 tool_list = [{**tool, 'id': update_tool_map.get(tool.get('id'))} for tool in tool_list if
                              not exits_tool_id_list.__contains__(
                                  tool.get('id')) and not exits_tool_id_list.__contains__(
-                                 generate_uuid((tool.get('id') + workspace_id or '')))]
+                                 new_uuid.generate_uuid(
+                                     tool.get('id')) if new_child_policy == 2 else generate_uuid(
+                                     (tool.get('id') + workspace_id or '')))]
 
             work_flow = self.to_tool_workflow(
                 tool.get('work_flow'),
@@ -831,7 +876,7 @@ class ToolSerializer(serializers.Serializer):
             workflow_tool_model_list = [{'tool_id': t.get('id'), 'workflow': self.to_tool_workflow(
                 t.get('work_flow'),
                 update_tool_map,
-            )} for t in tool_list if tool.get('tool_type') == ToolType.WORKFLOW]
+            )} for t in tool_list if t.get('tool_type') == ToolType.WORKFLOW]
 
             existing_records = QuerySet(ToolWorkflow).filter(
                 tool_id__in=[wt.get('tool_id') for wt in workflow_tool_model_list],
@@ -871,7 +916,7 @@ class ToolSerializer(serializers.Serializer):
             return True
 
         @transaction.atomic
-        def import_(self, scope=ToolScope.WORKSPACE, name=None):
+        def import_(self, scope=ToolScope.WORKSPACE, name=None, source=None):
             self.is_valid()
 
             user_id = self.data.get('user_id')
@@ -916,7 +961,7 @@ class ToolSerializer(serializers.Serializer):
             if tool.get('tool_type') == ToolType.WORKFLOW:
                 tool['id'] = tool_id
                 self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id,
-                                           folder_id=folder_id, new_child_policy=1)
+                                           folder_id=folder_id, new_child_policy=2 if source == 'template' else 1)
             # 自动授权给创建者
             UserResourcePermissionSerializer(data={
                 'workspace_id': self.data.get('workspace_id'),
@@ -1275,7 +1320,7 @@ class ToolSerializer(serializers.Serializer):
             if self.data.get('state'):
                 query_set = query_set.filter(Q(state=self.data.get('state', '')))
             if self.data.get('source_name'):
-                query_set = query_set.filter(Q(source_name__icontains=self.data.get('source_name', '')))
+                query_set = query_set.filter(Q(tool_name__icontains=self.data.get('source_name', '')))
             if self.data.get('record_id'):
                 query_set = query_set.filter(Q(id=self.data.get('record_id')))
             if self.data.get('workspace_id'):
@@ -1286,8 +1331,7 @@ class ToolSerializer(serializers.Serializer):
                 current_page, page_size, query_set,
                 lambda record: {
                     **ToolRecordModelSerializer(record).data,
-                    'source_name': record.source_name,
-                    'tool_name': record.tool_name,
+                    'source_name': record.tool_name,
                     'tool_icon': record.tool_icon,
                     'trigger_type': record.trigger_type,
                 }
@@ -1402,7 +1446,7 @@ class ToolBatchOperateSerializer(serializers.Serializer):
                 QuerySet(File).filter(id=tool.code).delete()
 
         QuerySet(WorkspaceUserResourcePermission).filter(target__in=id_list).delete()
-        QuerySet(ResourceMapping).filter(target_id__in=id_list).delete()
+        QuerySet(ResourceMapping).filter(Q(target_id__in=id_list) | Q(source_id__in=id_list)).delete()
         QuerySet(ToolRecord).filter(tool_id__in=id_list).delete()
 
         trigger_ids = list(

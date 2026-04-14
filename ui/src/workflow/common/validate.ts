@@ -21,6 +21,7 @@ const end_nodes: Array<string> = [
   WorkflowType.VideoUnderstandNode,
   WorkflowType.VariableAssignNode,
   WorkflowType.KnowledgeWriteNode,
+  WorkflowType.ToolWorkflowLib,
 ]
 
 const loop_end_nodes: Array<string> = [
@@ -40,6 +41,7 @@ const loop_end_nodes: Array<string> = [
   WorkflowType.LoopNode,
   WorkflowType.LoopBreakNode,
   WorkflowType.VariableAssignNode,
+  WorkflowType.ToolWorkflowLib,
 ]
 const end_nodes_dict = {
   [WorkflowMode.Application]: end_nodes,

@@ -35,7 +35,10 @@
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
-        <span class="ml-8" v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())">
+        <span
+          class="ml-8"
+          v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())"
+        >
           <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
             <AppIcon iconName="app-batch-delete" class="mr-4" />
             {{ $t('views.paragraph.setting.batchSelected') }}
@@ -240,7 +243,7 @@
                     <div @click.stop v-if="!isShared">
                       <el-dropdown trigger="click">
                         <el-button text @click.stop v-if="MoreFilledPermission(item)">
-                          <AppIcon iconName="app-more"></AppIcon>
+                          <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
                         </el-button>
                         <template #dropdown>
                           <el-dropdown-menu>
@@ -322,29 +325,33 @@
                               {{ $t('common.setting') }}
                             </el-dropdown-item>
                             <el-dropdown-item
+                              divided
                               @click.stop="exportKnowledge(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >{{ $t('views.document.setting.export') }} Excel
+                              >{{ $t('views.document.setting.exportDocument') }} Excel
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="exportZipKnowledge(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >{{ $t('views.document.setting.export') }} ZIP</el-dropdown-item
+                              >{{
+                                $t('views.document.setting.exportDocument')
+                              }}
+                              ZIP</el-dropdown-item
                             >
                             <el-dropdown-item
                               @click.stop="exportKnowledgeBundle(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
-                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >{{ $t('views.document.setting.export') }}
-                              {{ $t('views.knowledge.title') }}
+                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                              {{ $t('views.document.setting.exportKnowledge') }}
                             </el-dropdown-item>
 
                             <el-dropdown-item
+                              divided
                               type="danger"
                               @click.stop="deleteKnowledge(item)"
                               v-if="permissionPrecise.delete(item.id)"
@@ -391,13 +398,10 @@
         {{ $t('common.delete') }}
       </el-button>
       <span class="color-secondary ml-24 mr-16">
-        {{ $t('common.selected') }} {{ multipleSelection.length }}
+        {{ $t('common.selected') }} {{ multipleSelection.length }}/{{ paginationConfig.total }}
         {{ $t('views.document.items') }}
       </span>
-      <span class="color-secondary mr-16">
-        {{ $t('common.total') }} {{ paginationConfig.total }}
-        {{ $t('views.document.items') }}
-      </span>
+
       <el-button link type="primary" @click="batchSelectedHandle(false)">
         {{ $t('views.paragraph.setting.cancelSelected') }}
       </el-button>
@@ -534,8 +538,14 @@ function batchSelectedHandle(bool: boolean) {
 }
 
 const handleCheckAllChange = (val: CheckboxValueType) => {
-  multipleSelection.value = val ? knowledge.knowledgeList.map((v) => v.id) : []
-  checkAll.value = val as boolean
+  let bool
+  if (isIndeterminate.value) {
+    bool = true
+  } else {
+    bool = val as boolean
+  }
+  multipleSelection.value = bool ? knowledge.knowledgeList.map((v) => v.id) : []
+  checkAll.value = bool as boolean
 }
 const handleCheckedChatChange = (value: CheckboxValueType[]) => {
   const checkedCount = value.length
@@ -682,6 +692,7 @@ function importKnowledgeBundle(file: any) {
         const knowledgeId = res.data.knowledge_id
         const knowledgeType = res.data.type
         const folderId = folder.currentFolder.id || user.getWorkspaceId()
+        await user.profile()
         router.push({
           path: `/knowledge/${knowledgeId}/${folderId}/${knowledgeType}/document`,
           query: { imported: 'true' },
@@ -764,6 +775,7 @@ watch(
   () => folder.currentFolder,
   (newValue) => {
     if (newValue && newValue.id && !isSystemShare.value) {
+      batchSelectedHandle(false)
       paginationConfig.current_page = 1
       knowledge.setKnowledgeList([])
       getList()
@@ -786,10 +798,6 @@ function getList() {
       paginationConfig.total = res.data?.total
       knowledge.setKnowledgeList([...knowledge.knowledgeList, ...res.data.records])
     })
-}
-
-function clickFolder(item: any) {
-  folder.setCurrentFolder(item)
 }
 
 function searchHandle() {

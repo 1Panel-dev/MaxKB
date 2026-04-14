@@ -12,7 +12,7 @@ interface ChatProfile {
   // 登录类型
   login_value?: Array<string>
   max_attempts?: number
-  rasKey?: string
+  rsaKey?: string
 }
 
 interface ChatUserProfile {

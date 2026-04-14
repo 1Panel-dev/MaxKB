@@ -149,7 +149,7 @@ class FolderSerializer(serializers.Serializer):
 
             Folder = get_folder_type(self.data.get('source'))  # noqa
             if QuerySet(Folder).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
-                raise serializers.ValidationError(_('Folder name already exists'))
+                raise Exception(_('Folder name already exists'))
             # Folder 不能超过3层
             check_depth(self.data.get('source'), parent_id, workspace_id)
 

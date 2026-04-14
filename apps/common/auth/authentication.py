@@ -95,6 +95,20 @@ def get_is_permissions(request, **kwargs):
 
 def check_batch_permissions(request: Request, id_list: List[str], id_key: str, permissions: tuple,
                             compare=CompareConstants.OR, **kwargs) -> List[str]:
+
+    if not id_list:
+        return []
+
+    # workspace manager 直接放行
+    # 预检
+    kwargs[id_key] = '__workspace_level_pre_check__'
+    pre_check = list(
+            map(lambda p: exist(request.auth.role_list, request.auth.permission_list, p, request, **kwargs),
+                permissions)
+        )
+    if any(pre_check) if compare == CompareConstants.OR else all(pre_check):
+        return list(id_list)
+    # 逐个资源校验
     result_list = []
     for resource_id in id_list:
         kwargs[id_key] = resource_id

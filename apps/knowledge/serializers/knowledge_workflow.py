@@ -1,5 +1,6 @@
 # coding=utf-8
 import asyncio
+import base64
 import json
 import pickle
 from functools import reduce
@@ -31,7 +32,8 @@ from common.utils.common import restricted_loads, generate_uuid
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow, KnowledgeWorkflowVersion
+from knowledge.models import KnowledgeScope, Knowledge, KnowledgeType, KnowledgeWorkflow, KnowledgeWorkflowVersion, \
+    File, FileSourceType
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
 from knowledge.serializers.knowledge import KnowledgeModelSerializer
@@ -60,6 +62,10 @@ def hand_node(node, update_tool_map):
         tool_ids = node_data.get('tool_ids') or []
         node_data['tool_ids'] = [update_tool_map.get(tool_id,
                                                      tool_id) for tool_id in tool_ids]
+
+        skill_tool_ids = node_data.get('skill_tool_ids') or []
+        node_data['skill_tool_ids'] = [update_tool_map.get(tool_id,
+                                                     tool_id) for tool_id in skill_tool_ids]
     if node.get('type') == 'mcp-node':
         mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
         node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
@@ -395,6 +401,19 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
         @staticmethod
         def to_tool(tool, workspace_id, user_id):
+            # 如果是技能类型的工具，需要将code保存为文件
+            code = tool.get('code')
+            if tool.get('tool_type') == ToolType.SKILL:
+                skill_file_id = uuid.uuid7()
+                skill_file = File(
+                    id=skill_file_id,
+                    file_name=f"{tool.get('name')}.zip",
+                    source_type=FileSourceType.TOOL,
+                    source_id=tool.get('id'),
+                    meta={}
+                )
+                skill_file.save(base64.b64decode(code))
+                tool['code'] = skill_file_id
             return Tool(id=tool.get('id'),
                         user_id=user_id,
                         name=tool.get('name'),
@@ -428,6 +447,14 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 tw_dict = {tw.tool_id: tw
                            for tw in QuerySet(ToolWorkflow).filter(
                         tool_id__in=[tool.id for tool in tool_list if tool.tool_type == ToolType.WORKFLOW])}
+
+                # 如果是技能工具，则需要将code字段转换为文件内容的base64字符串
+                for tool in tool_list:
+                    if tool.tool_type == ToolType.SKILL:
+                        skill_file = QuerySet(File).filter(id=tool.code).first()
+                        if skill_file:
+                            tool.code = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
+
                 knowledge_workflow_dict = KnowledgeWorkflowModelSerializer(knowledge_workflow).data
 
                 kbwf_instance = KBWFInstance(

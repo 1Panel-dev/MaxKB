@@ -8,7 +8,7 @@
         clearable
       />
       <el-dropdown trigger="click" :teleported="false" @command="switchSortMethod">
-        <el-button class="ml-4">
+        <el-button class="ml-8" style="width: 32px">
           <AppIcon :iconName="sortIconName"></AppIcon>
         </el-button>
         <template #dropdown>
@@ -178,6 +178,7 @@ import { TreeToFlatten } from '@/utils/array'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import permissionMap from '@/permission'
 import bus from '@/bus'
+
 const { folder, user } = useStore()
 
 defineOptions({ name: 'FolderTree' })
@@ -580,6 +581,8 @@ function rebalanceAndInsert(
 }
 
 onBeforeRouteLeave((to, from) => {
+  if (from?.name === 'ToolWorkflow') return
+  if (from?.name === 'AppSetting') return
   folder.setCurrentFolder({})
 })
 
@@ -619,7 +622,11 @@ const title = ref('')
 const loading = ref(false)
 
 watch(filterText, (val) => {
-  treeRef.value!.filter(val)
+  let v = val
+  if (val) {
+    v = val.trim()
+  }
+  treeRef.value!.filter(v)
 })
 const filterNode = (value: string, data: Tree) => {
   if (!value) return true

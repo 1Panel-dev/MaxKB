@@ -2,3 +2,5 @@ root = true
 
 [*.py]
 max_line_length = 120
+ij_visual_guides = 120
+

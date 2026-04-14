@@ -295,7 +295,7 @@ async function handleTemplateAdd(tool: any) {
       name: tool.name,
       folder_id: folderId.value,
       code: '{}',
-      work_flow_template: tool
+      work_flow_template: tool,
     }
     await loadSharedApi({ type: 'tool', systemType: props.apiType })
       .postTool(obj)
@@ -313,7 +313,6 @@ async function handleTemplateAdd(tool: any) {
     console.error(error)
   }
 }
-
 
 defineExpose({ open })
 </script>
@@ -370,7 +369,7 @@ defineExpose({ open })
 
         &.is-active {
           color: var(--el-color-primary);
-          background-color: #3370ff1a;
+          background-color: var(--el-color-primary-light-9);
         }
       }
     }

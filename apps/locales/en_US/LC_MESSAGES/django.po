@@ -9236,6 +9236,5 @@ msgstr "Batch delete"
 msgid "Batch move"
 msgstr "Batch move"
 
-
-
-
+msgid "There is a circular dependency in the tool workflow"
+msgstr "There is a circular dependency in the tool workflow"

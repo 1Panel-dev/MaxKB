@@ -1,6 +1,7 @@
 .md-editor {
   font-weight: 400;
   --md-color: var(--el-text-color-primary);
+  border-radius: var(--el-border-radius-base);
   .cm-content {
     font-weight: 400;
     color: var(--el-text-color-primary);
@@ -24,6 +25,9 @@
   }
   img {
     border: 0 !important;
+    max-width: 360px !important;
+  }
+  video {
     max-width: 360px !important;
   }
   ul {

@@ -17,7 +17,7 @@ export interface userStateTypes {
   edition: 'CE' | 'PE' | 'EE'
   workspace_id: string
   workspace_list: Array<any>,
-  rasKey: string
+  rsaKey: string
 }
 
 const useUserStore = defineStore('user', {
@@ -28,7 +28,7 @@ const useUserStore = defineStore('user', {
     edition: 'CE',
     workspace_id: '',
     workspace_list: [],
-    rasKey: '',
+    rsaKey: '',
   }),
   actions: {
     getLanguage() {
@@ -142,7 +142,7 @@ const useUserStore = defineStore('user', {
             this.license_is_valid = ok.data.license_is_valid
             this.edition = ok.data.edition
             this.version = ok.data.version
-            this.rasKey = ok.data.ras
+            this.rsaKey = ok.data.rsa
             const theme = useThemeStore()
             if (this.isEE() || this.isPE()) {
               await theme.theme()

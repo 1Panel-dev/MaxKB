@@ -53,6 +53,8 @@ def _deploy_daily(trigger: dict, trigger_tasks: list[dict], setting: dict, trigg
                 id=job_id,
                 kwargs={"trigger": trigger, "trigger_task": task},
                 replace_existing=True,
+                misfire_grace_time=60,
+                max_instances=1,
             )
 
 
@@ -90,6 +92,8 @@ def _deploy_weekly(trigger: dict, trigger_tasks: list[dict], setting: dict, trig
                     id=job_id,
                     kwargs={"trigger": trigger, "trigger_task": task},
                     replace_existing=True,
+                    misfire_grace_time=60,
+                    max_instances=1,
                 )
 
 
@@ -129,6 +133,8 @@ def _deploy_monthly(trigger: dict, trigger_tasks: list[dict], setting: dict, tri
                     id=job_id,
                     kwargs={"trigger": trigger, "trigger_task": task},
                     replace_existing=True,
+                    misfire_grace_time=60,
+                    max_instances=1,
                 )
 
 def _deploy_cron(trigger: dict, trigger_tasks: list[dict], setting: dict, trigger_id: str) -> None:
@@ -154,6 +160,8 @@ def _deploy_cron(trigger: dict, trigger_tasks: list[dict], setting: dict, trigge
             id=job_id,
             kwargs={"trigger": trigger, "trigger_task": task},
             replace_existing=True,
+            misfire_grace_time=60,
+            max_instances=1,
         )
 
 def _deploy_interval(trigger: dict, trigger_tasks: list[dict], setting: dict, trigger_id: str) -> None:
@@ -182,6 +190,8 @@ def _deploy_interval(trigger: dict, trigger_tasks: list[dict], setting: dict, tr
             id=job_id,
             kwargs={"trigger": trigger, "trigger_task": task},
             replace_existing=True,
+            misfire_grace_time=60,
+            max_instances=1,
             **{unit: value_i},
         )
 

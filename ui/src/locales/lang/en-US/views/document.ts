@@ -10,6 +10,8 @@ export default {
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation',
     export: 'Export to',
+    exportDocument: 'Export Document',
+    exportKnowledge: 'Export Knowledge',
     download: 'Download',
     replace: 'Replace',
   },
@@ -28,7 +30,7 @@ export default {
     fileLimitSizeTip1: 'each file must not exceed',
     toImportDocConfirm:
       'The workflow of the current knowledge base is not published, and documents cannot be imported. Please publish the workflow first.',
-     fileLimitSizeTip2: 'size must not exceed',
+    fileLimitSizeTip2: 'size must not exceed',
   },
   upload: {
     selectFile: 'Select File',
@@ -180,9 +182,8 @@ export default {
       placeholder: 'Directly return segment content',
       requiredMessage: 'Please enter similarity value',
     },
-    allow_download: {
-      label: 'Allow download in knowledge base source',
-    },
+    allow_download: 'Allow download in knowledge base source',
+    allow_preview: 'Allow preview in knowledge base source',
   },
   hitHandlingMethod: {
     optimization: 'Model optimization',

@@ -104,6 +104,7 @@ def run():
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
-            scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log')
+            scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log',
+                              misfire_grace_time=300, max_instances=1)
         finally:
             rlock.un_lock('clean_chat_log_job')

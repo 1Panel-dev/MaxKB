@@ -32,8 +32,8 @@ def _convert_delta_to_message_chunk(
     role = cast(str, _dict.get("role"))
     content = cast(str, _dict.get("content") or "")
     additional_kwargs: dict = {}
-    if 'reasoning_content' in _dict:
-        additional_kwargs['reasoning_content'] = _dict.get('reasoning_content')
+    if reasoning := _dict.get('reasoning_content') or _dict.get('reasoning'):
+        additional_kwargs['reasoning_content'] = reasoning
     if _dict.get("function_call"):
         function_call = dict(_dict["function_call"])
         if "name" in function_call and function_call["name"] is None:
@@ -79,7 +79,7 @@ def _convert_delta_to_message_chunk(
         )
     if role or default_class == ChatMessageChunk:
         return ChatMessageChunk(content=content, role=role, id=id_)
-    return default_class(content=content, id=id_)  # type: ignore[call-arg]#
+    return default_class(content=content, id=id_)  # type: ignore[call-arg]
 
 
 class BaseChatOpenAI(ChatOpenAI):

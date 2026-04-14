@@ -37,7 +37,7 @@ class ToolWorkflowView(APIView):
         @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
                          PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                        [PermissionConstants.TOOL.get_workspace_knowledge_permission()],
+                                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Tool', operate='Publishing an tool',

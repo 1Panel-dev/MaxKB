@@ -27,8 +27,7 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                >{{
-                    t('workflow.nodes.imageUnderstandNode.model.label')
+                  >{{ t('workflow.nodes.imageUnderstandNode.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -68,7 +67,7 @@
           </div>
           <NodeCascader
             v-else
-            ref="nodeCascaderRef"
+            ref="modelCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -120,8 +119,7 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                >{{
-                    $t('views.application.form.prompt.label')
+                  >{{ $t('views.application.form.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -159,8 +157,8 @@
                 style="width: 100px"
                 :teleported="false"
               >
-                <el-option :label="$t('workflow.node')" value="NODE"/>
-                <el-option :label="$t('workflow.workflow')" value="WORKFLOW"/>
+                <el-option :label="$t('workflow.node')" value="NODE" />
+                <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
               </el-select>
             </div>
           </template>
@@ -184,8 +182,7 @@
           }"
         >
           <template #label
-          >{{
-              $t('workflow.nodes.imageUnderstandNode.image.label')
+            >{{ $t('workflow.nodes.imageUnderstandNode.image.label')
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
@@ -246,33 +243,32 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result"/>
+          <el-switch size="small" v-model="form_data.is_result" />
         </el-form-item>
       </el-form>
     </el-card>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam"/>
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
     <ReasoningParamSettingDialog
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
     />
-    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef"/>
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import {computed, onMounted, ref, inject} from 'vue'
-import {cloneDeep, groupBy, set} from 'lodash'
+import { computed, onMounted, ref, inject } from 'vue'
+import { cloneDeep, groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type {FormInstance} from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-import {t} from '@/locales'
-import {useRoute} from 'vue-router'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
-import {WorkflowMode} from '@/enums/application'
-import ReasoningParamSettingDialog
-  from "@/views/application/component/ReasoningParamSettingDialog.vue";
+import { WorkflowMode } from '@/enums/application'
+import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
 
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
@@ -282,7 +278,7 @@ const openReasoningParamSettingDialog = () => {
   ReasoningParamSettingDialogRef.value?.open(form_data.value.model_setting)
 }
 const {
-  params: {id},
+  params: { id },
 } = route as any
 
 const apiType = computed(() => {
@@ -301,12 +297,15 @@ const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDi
 
 const aiChatNodeFormRef = ref<FormInstance>()
 const nodeCascaderRef = ref()
+const modelCascaderRef = ref()
+
 const validate = () => {
   return Promise.all([
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
-    return Promise.reject({node: props.nodeModel, errMessage: err})
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
 }
 

@@ -9356,4 +9356,5 @@ msgstr "批量刪除"
 msgid "Batch move"
 msgstr "批量移動"
 
-
+msgid "There is a circular dependency in the tool workflow"
+msgstr "工具工作流存在迴圈依賴"

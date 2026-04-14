@@ -200,7 +200,7 @@ const loginHandle = () => {
             loading.value = false
           })
       } else {
-        const publicKey = forge.pki.publicKeyFromPem(user.rasKey);
+        const publicKey = forge.pki.publicKeyFromPem(user.rsaKey);
         // 转换为UTF-8编码后再加密
         const jsonData = JSON.stringify(loginForm.value);
         const utf8Bytes = forge.util.encodeUtf8(jsonData);

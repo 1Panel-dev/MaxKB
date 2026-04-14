@@ -69,7 +69,7 @@
           </div>
           <NodeCascader
             v-else
-            ref="nodeCascaderRef"
+            ref="modelReferenceCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.variable.placeholder')"
@@ -154,7 +154,7 @@
             }}<span class="color-danger">*</span></template
           >
           <NodeCascader
-            ref="nodeCascaderRef"
+            ref="firstFrameCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.nodes.imageToVideoGenerate.first_frame.requiredMessage')"
@@ -174,7 +174,7 @@
             >{{ $t('workflow.nodes.imageToVideoGenerate.last_frame.label') }}
           </template>
           <NodeCascader
-            ref="nodeCascaderRef"
+            ref="lastFrameCascaderRef"
             :nodeModel="nodeModel"
             class="w-full"
             :placeholder="$t('workflow.nodes.imageToVideoGenerate.last_frame.requiredMessage')"
@@ -248,12 +248,16 @@ const apiType = computed(() => {
 const props = defineProps<{ nodeModel: any }>()
 const modelOptions = ref<any>(null)
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
-const nodeCascaderRef = ref()
 
 const aiChatNodeFormRef = ref<FormInstance>()
+const firstFrameCascaderRef = ref()
+const lastFrameCascaderRef = ref()
+const modelReferenceCascaderRef = ref()
+
 const validate = () => {
   return Promise.all([
-    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    firstFrameCascaderRef.value?.validate() ?? Promise.resolve(''),
+    modelReferenceCascaderRef.value?.validate() ?? Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })

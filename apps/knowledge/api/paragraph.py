@@ -244,13 +244,6 @@ class ParagraphPageAPI(APIMixin):
                 required=True,
             ),
             OpenApiParameter(
-                name="paragraph_id",
-                description="段落id",
-                type=OpenApiTypes.STR,
-                location='path',
-                required=True,
-            ),
-            OpenApiParameter(
                 name="current_page",
                 description="当前页",
                 type=OpenApiTypes.INT,
