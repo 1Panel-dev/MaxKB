@@ -1,5 +1,5 @@
 import { Result } from '@/request/Result'
-import { get, post, del, put, exportFile, postStream } from '@/request/index'
+import { get, post, del, put, exportFile, postStream, download } from '@/request/index'
 import { type Ref } from 'vue'
 import type { pageRequest } from '@/api/type/common'
 import type { AddInternalToolParam, toolData } from '@/api/type/tool'
@@ -195,6 +195,14 @@ const uploadSkillFile: (data: toolData, loading?: Ref<boolean>) => Promise<Resul
 ) => {
   return put(`${prefix.value}/upload_skill_file`, data, undefined, loading)
 }
+
+const downloadSkillFile: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  tool_id,
+  loading,
+) => {
+  return download(`${prefix.value}/${tool_id}/download_skill_file`, 'GET', undefined, undefined, loading)
+}
+
 /**
  * 保存工具工作流
  * @param tool_id
@@ -348,6 +356,7 @@ export default {
   pageToolRecord,
   getToolRecordDetail,
   uploadSkillFile,
+  downloadSkillFile,
   putToolWorkflow,
   importToolWorkflow,
   listToolWorkflowVersion,
