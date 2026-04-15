@@ -169,7 +169,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             'padding_problem_text': chat_record.details.get('problem_padding').get(
                 'padding_problem_text') if 'problem_padding' in chat_record.details else None,
             **(show_source_dict if show_source else {}),
-            **(show_exec_dict if show_exec else show_exec_dict)
+            **(show_exec_dict if show_exec else {})
         }
 
     def page(self, current_page: int, page_size: int, with_valid=True, show_source=None, show_exec=None):
