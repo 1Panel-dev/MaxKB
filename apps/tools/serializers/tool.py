@@ -1356,6 +1356,27 @@ class ToolSerializer(serializers.Serializer):
             file.save(self.data.get('file').read())
             return file_id
 
+    class DownloadSkillFile(serializers.Serializer):
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        tool_id = serializers.CharField(required=True, label=_("tool id"))
+
+        def download(self):
+            self.is_valid(raise_exception=True)
+            tool = QuerySet(Tool).filter(
+                id=self.data.get('tool_id'), workspace_id=self.data.get('workspace_id'), tool_type=ToolType.SKILL
+            ).first()
+
+            if tool is None:
+                raise AppApiException(500, _('Tool does not exist'))
+            skill_file = QuerySet(File).filter(id=tool.code).first()
+            if skill_file is None:
+                raise AppApiException(500, _('Skill file does not exist'))
+
+            response = HttpResponse(content_type='application/zip', content=skill_file.get_bytes())
+            response['Content-Disposition'] = f'attachment; filename="{skill_file.file_name}"'
+            return response
+
     class GenerateCodeSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('Workspace ID'))
         model_id = serializers.UUIDField(required=True, label=_('Model ID'))

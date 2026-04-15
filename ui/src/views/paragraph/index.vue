@@ -444,15 +444,18 @@ function openGenerateDialog(row?: any) {
 }
 
 function onEnd(event?: any, params?: any, index?: number) {
-  // console.log('onEnd', event, params, index)
+  console.log('onEnd', event, params, index)
+  if (event && event.newIndex === event.oldIndex) {
+    // 没有移动
+    return
+  }
   const p = cloneDeep(params)
   if (p) {
     p.new_position = p.new_position + 1 // 由于拖拽时会将当前段落位置作为新位置，所以需要加1
   }
   const obj = p ?? {
     paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
-    new_position:
-      paragraphDetail.value[event.newIndex + 1]?.position || paragraphDetail.value.length, // 新位置的段落位置
+    new_position: event.newIndex + 1,
   }
   // console.log(paragraphDetail.value[event.newIndex], obj)
   loadSharedApi({ type: 'paragraph', systemType: apiType.value }).putAdjustPosition(
