@@ -83,7 +83,7 @@ def get_image_list(result_list: list, zip_files: List[str]):
                     if not zip_files.__contains__(image_path):
                         continue
                     if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
-                        image_id = image_path.replace('oss/file/', '').replace('oss/file/', '')
+                        image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
                         if is_valid_uuid(image_id):
                             image_file_list.append({'source_file': image_path,
                                                     'image_id': image_id})
@@ -115,7 +115,7 @@ def get_image_list_by_content(name: str, content: str, zip_files: List[str]):
             if not zip_files.__contains__(image_path):
                 continue
             if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
-                image_id = image_path.replace('oss/file/', '').replace('oss/file/', '')
+                image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
                 if is_valid_uuid(image_id):
                     image_file_list.append({'source_file': image_path,
                                             'image_id': image_id})
