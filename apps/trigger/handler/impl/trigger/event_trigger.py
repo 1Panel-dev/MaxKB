@@ -119,7 +119,7 @@ class EventTrigger(BaseTrigger):
         trigger_setting = trigger.get('trigger_setting')
         if trigger_setting.get('token'):
             token = request.META.get('HTTP_AUTHORIZATION')
-            if trigger_setting.get('token') != token.replace('Bearer ', ''):
+            if not token or trigger_setting.get('token') != token.replace('Bearer ', ''):
                 raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
         is_active = trigger.get('is_active')
         if not is_active:

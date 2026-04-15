@@ -251,6 +251,7 @@ class BaseToolLibNodeNode(IToolLibNode):
     def tool_exec_record(self, tool_lib, all_params):
         task_record_id = uuid.uuid7()
         start_time = time.time()
+        filtered_args = all_params
         try:
             # 过滤掉 tool_init_params 中的参数
             tool_init_params = json.loads(rsa_long_decrypt(tool_lib.init_params)) if tool_lib.init_params else {}
@@ -259,8 +260,6 @@ class BaseToolLibNodeNode(IToolLibNode):
                     k: v for k, v in all_params.items()
                     if k not in tool_init_params
                 }
-            else:
-                filtered_args = all_params
             if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
                     self.workflow_manage.flow.workflow_mode):
                 source_id = self.workflow_manage.params.get('knowledge_id')
