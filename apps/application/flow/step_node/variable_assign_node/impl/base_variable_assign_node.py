@@ -60,33 +60,44 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 val = variable['value']
                 evaluation(variable, val)
                 result['output_value'] = val
-        else:
+        elif variable['source'] == 'referencing':
             reference = self.get_reference_content(variable['reference'])
             evaluation(variable, reference)
             result['output_value'] = reference
+        else:
+            val = None
+            evaluation(variable, val)
+            result['output_value'] = val
+
+        # 获取输入输出值的类型，用于显示在执行详情页面中
+        result['input_type'] = type(result.get('input_value')).__name__ if result.get('input_value') is not None else 'null'
+        result['output_type'] = type(result.get('output_value')).__name__ if result.get('output_value') is not None else 'null'
+
         return result
 
     def execute(self, variable_list, **kwargs) -> NodeResult:
-        #
         result_list = []
-        is_chat = False
+        contains_chat_variable = False
         for variable in variable_list:
-            if 'fields' not in variable:
+            if not variable.get('fields'):
                 continue
-            if 'global' == variable['fields'][0]:
+
+            field0 = variable['fields'][0]
+            if 'global' == field0:
                 result = self.handle(variable, self.global_evaluation)
                 result_list.append(result)
-            if 'chat' == variable['fields'][0]:
+            elif 'chat' == field0:
                 result = self.handle(variable, self.chat_evaluation)
                 result_list.append(result)
-                is_chat = True
-            if 'loop' == variable['fields'][0]:
+                contains_chat_variable = True
+            elif 'loop' == field0:
                 result = self.handle(variable, self.loop_evaluation)
                 result_list.append(result)
-            if 'output' == variable['fields'][0]:
+            elif 'output' == field0:
                 result = self.handle(variable, self.out_evaluation)
                 result_list.append(result)
-        if is_chat:
+
+        if contains_chat_variable:
             from application.flow.loop_workflow_manage import LoopWorkflowManage
             if isinstance(self.workflow_manage, LoopWorkflowManage):
                 self.workflow_manage.parentWorkflowManage.get_chat_info().set_chat_variable(
