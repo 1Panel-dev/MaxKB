@@ -145,17 +145,19 @@
                 </div>
               </el-card>
             </template>
-
-            <el-upload
-              v-model:file-list="form.fileList"
-              action="#"
-              :auto-upload="false"
-              :show-file-list="false"
-              accept=".zip"
-              :on-change="fileHandleChange"
-            >
-              <el-button link type="primary">{{ $t('views.tool.skill.reUpload') }}</el-button>
-            </el-upload>
+            <div class="flex">
+              <el-upload
+                v-model:file-list="form.fileList"
+                action="#"
+                :auto-upload="false"
+                :show-file-list="false"
+                accept=".zip"
+                :on-change="fileHandleChange"
+              >
+                <el-button link type="primary">{{ $t('views.tool.skill.reUpload') }}</el-button>
+              </el-upload>
+              <el-button link type="primary" @click="downloadZip">下载</el-button>
+            </div>
           </div>
           <el-upload
             v-else
@@ -375,6 +377,25 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     .then((res: any) => {
       form.value.code = res.data
       loading.value = false
+    })
+}
+
+const downloadZip = () => {
+  if (!form.value.code) {
+    MsgError(t('views.tool.skill.noFileTip'))
+    return
+  }
+  const fileName = form.value.fileList && form.value.fileList[0] ? form.value.fileList[0].name : `${form.value.name}.zip`
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .downloadSkillFile(form.value.id as string)
+    .then((res: any) => {
+      const url = window.URL.createObjectURL(new Blob([res]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', fileName)
+      document.body.appendChild(link)
+      link.click()
+      window.URL.revokeObjectURL(link.href)
     })
 }
 
