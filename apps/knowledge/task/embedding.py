@@ -116,9 +116,9 @@ def embedding_by_knowledge(knowledge_id, model_id):
                 pass
     except Exception as e:
         maxkb_logger.error(
-            _('Vectorized knowledge: {knowledge_id} error {error} {traceback}'.format(knowledge_id=knowledge_id,
+            _('Vectorized knowledge: {knowledge_id} error {error} {traceback}').format(knowledge_id=knowledge_id,
                                                                                       error=str(e),
-                                                                                      traceback=traceback.format_exc())))
+                                                                                      traceback=traceback.format_exc()))
     finally:
         maxkb_logger.info(_('End--->Vectorized knowledge: {knowledge_id}').format(knowledge_id=knowledge_id))
 
