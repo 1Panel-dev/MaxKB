@@ -81,7 +81,7 @@ class BaseDataSourceWebNode(IDataSourceWebNode):
                 return NodeResult({'document_list': document_list, 'source_url': source_url, 'selector': selector},
                                   self.workflow_manage.params.get('knowledge_base') or {})
             maxkb_logger.error(_('data source web node:{node_id} error{error}{traceback}').format(
-                knowledge_id=node_id, error=str(e), traceback=traceback.format_exc()))
+                node_id=node_id, error=str(e), traceback=traceback.format_exc()))
 
     def get_details(self, index: int, **kwargs):
         return {

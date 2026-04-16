@@ -264,7 +264,7 @@ class Workflow:
                 node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
             if node.properties.get('status', 200) != 200:
                 raise ValidationError(
-                    ErrorDetail(_("Node {node} is unavailable").format(node.properties.get("stepName"))))
+                    ErrorDetail(_("Node {node} is unavailable").format(node=node.properties.get("stepName"))))
         node_list = [node for node in self.nodes if (node.type == 'function-lib-node')]
         for node in node_list:
             function_lib_id = node.properties.get('node_data', {}).get('function_lib_id')
