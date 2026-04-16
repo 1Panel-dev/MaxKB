@@ -257,7 +257,7 @@ class DocumentSerializers(serializers.Serializer):
                     "rb")
                 content = file.read()
                 file.close()
-                return HttpResponse(content, status=200, headers={'Content-Type': 'text/cxv',
+                return HttpResponse(content, status=200, headers={'Content-Type': 'text/csv',
                                                                   'Content-Disposition': 'attachment; filename="csv_template.csv"'})
             elif self.data.get('type') == 'excel':
                 file = open(os.path.join(PROJECT_DIR, "apps", "knowledge", 'template',
