@@ -104,6 +104,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
     def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
+        QuerySet(ChatRecord).filter(chat_id=self.data.get('chat_id'))
         order_by = 'create_time' if self.data.get('order_asc') is None or self.data.get(
             'order_asc') else '-create_time'
         return [ChatRecordSerializerModel(chat_record).data for chat_record in
