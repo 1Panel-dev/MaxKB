@@ -75,7 +75,7 @@ def valid_reference_value(_type, value, name):
         else:
             raise Exception(_(
                 'Field: {name} Type: {_type} Value: {value} Unsupported types'
-            ).format(name=name, _type=_type))
+            ).format(name=name, _type=_type, value=value))
     except:
         return value
     if not isinstance(value, instance_type):
