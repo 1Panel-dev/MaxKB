@@ -52,3 +52,20 @@ class FileGetAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+class GetUrlContentAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="url",
+                description="文件url",
+                type=OpenApiTypes.STR,
+                location='query',
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
