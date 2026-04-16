@@ -139,6 +139,7 @@
                                     {
                                       paragraph_id: item.id,
                                       new_position: setPosition(val, index),
+                                      target_index: setTargetIndex(val, index),
                                     },
                                     index,
                                   )
@@ -266,14 +267,21 @@ watch(
 
 function setPosition(val: string, index: number) {
   if (val === 'top') {
-    return 0
+    return 1
   } else if (val === 'bottom') {
-    return paginationConfig.total - 1
+    return paragraphDetail.value[paragraphDetail.value.length - 1]?.position ?? paginationConfig.total
   } else if (val === 'up') {
-    return index - 1
+    return paragraphDetail.value[index - 1]?.position ?? paragraphDetail.value[index].position
   } else if (val === 'down') {
-    return index + 1
+    return paragraphDetail.value[index + 1]?.position ?? paragraphDetail.value[index].position
   }
+}
+function setTargetIndex(val: string, index: number) {
+  if (val === 'top') return 0
+  if (val === 'bottom') return paragraphDetail.value.length - 1
+  if (val === 'up') return index - 1
+  if (val === 'down') return index + 1
+  return index
 }
 function dialogVisibleChange(val: boolean) {
   dialogVisible.value = val
@@ -450,12 +458,13 @@ function onEnd(event?: any, params?: any, index?: number) {
     return
   }
   const p = cloneDeep(params)
-  if (p) {
-    p.new_position = p.new_position + 1 // 由于拖拽时会将当前段落位置作为新位置，所以需要加1
-  }
   const obj = p ?? {
     paragraph_id: paragraphDetail.value[event.newIndex].id, // 当前拖动的段落ID
-    new_position: event.newIndex + 1,
+    // 向下拖动时取前一个元素的position，向上拖动时取后一个元素的position
+    new_position:
+      event.newIndex > event.oldIndex
+        ? paragraphDetail.value[event.newIndex - 1]?.position ?? paragraphDetail.value.length
+        : paragraphDetail.value[event.newIndex + 1]?.position ?? paragraphDetail.value.length,
   }
   // console.log(paragraphDetail.value[event.newIndex], obj)
   loadSharedApi({ type: 'paragraph', systemType: apiType.value }).putAdjustPosition(
@@ -466,7 +475,7 @@ function onEnd(event?: any, params?: any, index?: number) {
   )
   if (params) {
     const movedItem = paragraphDetail.value.splice(index as number, 1)[0]
-    paragraphDetail.value.splice(params.new_position, 0, movedItem)
+    paragraphDetail.value.splice(params.target_index, 0, movedItem)
   }
 }
 
