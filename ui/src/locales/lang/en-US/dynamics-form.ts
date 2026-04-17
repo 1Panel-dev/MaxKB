@@ -56,6 +56,18 @@ export default {
       placeholder: 'Please enter a description',
     },
   },
+  TreeSelect: {
+    label: 'Tree Select',
+    select: 'Option',
+    allowMultipleSelections: 'Allow Multiple Selections',
+    addDialog: {
+      addFirstOption: 'Add Root Option',
+      addSubOptions: 'Add Sub Option',
+      require: 'Please enter at least one complete item',
+      nodeNotFound: 'Parent node not found',
+      tagRequire: 'Label and value cannot be empty',
+    },
+  },
   DatePicker: {
     placeholder: 'Select Date',
     year: 'Year',

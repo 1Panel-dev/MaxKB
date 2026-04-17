@@ -56,6 +56,18 @@ export default {
       placeholder: '請輸入描述',
     },
   },
+  TreeSelect: {
+    label: '樹狀選擇器',
+    select: '選項',
+    allowMultipleSelections: '允許多選',
+    addDialog: {
+      addFirstOption: '新增第一層選項',
+      addSubOptions: '新增子選項',
+      require: '請至少填寫一筆完整資料',
+      nodeNotFound: '找不到父節點',
+      tagRequire: '標籤與選項值不可為空',
+    },
+  },
   DatePicker: {
     placeholder: '選擇日期',
     year: '年',
