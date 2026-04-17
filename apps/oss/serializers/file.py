@@ -123,7 +123,7 @@ class FileSerializer(serializers.Serializer):
             # 对于非范围请求或其他类型文件，返回完整内容
             headers = {
                 'Content-Type': content_type,
-                'Content-Disposition': f'"attachment"; filename={encoded_filename}'
+                'Content-Disposition': f'attachment; filename={encoded_filename}'
             }
             return HttpResponse(
                 file_bytes,
