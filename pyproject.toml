@@ -22,7 +22,7 @@ dependencies = [
     "beautifulsoup4==4.13.4",
     "jieba==0.42.1",
     "langchain==1.2.15",
-    "langchain-core==1.2.30",
+    "langchain-core==1.2.31",
     "langchain-openai==1.1.14",
     "langchain-anthropic==1.4.0",
     "langchain-community==0.4.1",
