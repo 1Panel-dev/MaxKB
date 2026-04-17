@@ -4,6 +4,7 @@ import { type GraphModel } from '@logicflow/core'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { WorkflowType } from '@/enums/application'
 import { t } from '@/locales'
+import { copyClick } from '@/utils/clipboard'
 import { getMenuNodes, workflowModelDict } from './data'
 let selected: any | null = null
 
@@ -68,20 +69,24 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     selected = cloneDeep(elements)
     selected.nodes.forEach((node: any) => translationNodeData(node, TRANSLATION_DISTANCE))
     selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
-    MsgSuccess(t('workflow.tip.copyError'))
+    copyClick(JSON.stringify(selected))
     return false
   }
 
-  const paste_node = () => {
+  const paste_node = async (e: ClipboardEvent) => {
     if (!keyboardOptions?.enabled) return true
     if (graph.textEditElement) return true
+    const text = e.clipboardData?.getData('text/plain') || ''
+    const data = parseAndValidate(text)
+    selected = data
     const workflowMode = lf.graphModel.get_provide(null, null).workflowMode
     const menus = getMenuNodes(workflowMode)
     const nodes = menus?.flatMap((m: any) => m.list).map((n) => n.type)
-    selected.nodes = selected.nodes.filter(
-      (n: any) => nodes?.includes(n.type) || workflowModelDict[workflowMode](n),
-    )
+
     if (selected && (selected.nodes || selected.edges)) {
+      selected.nodes = selected.nodes.filter(
+        (n: any) => nodes?.includes(n.type) || workflowModelDict[workflowMode](n),
+      )
       lf.clearSelectElements()
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
       if (!addElements) return true
@@ -91,8 +96,50 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       selected.edges.forEach((edge: any) => translationEdgeData(edge, TRANSLATION_DISTANCE))
       CHILDREN_TRANSLATION_DISTANCE = CHILDREN_TRANSLATION_DISTANCE + TRANSLATION_DISTANCE
     }
+    selected = undefined
     return false
   }
+
+  const parseAndValidate = (text: string) => {
+    let data: any
+    try {
+      data = JSON.parse(text)
+    } catch {
+      throw new Error('数据不是合法的 JSON')
+    }
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error('数据必须是对象')
+    }
+
+    if (!('nodes' in data)) {
+      throw new Error('数据缺少 nodes 字段')
+    }
+
+    if (!('edges' in data)) {
+      throw new Error('数据缺少 edges 字段')
+    }
+
+    if (!Array.isArray(data.nodes)) {
+      throw new Error('nodes 必须是数组')
+    }
+
+    for (let i = 0; i < data.nodes.length; i++) {
+      const node = data.nodes[i]
+
+      if (!node || typeof node !== 'object' || Array.isArray(node)) {
+        throw new Error(`nodes[${i}] 必须是对象`)
+      }
+
+      if (!('id' in node) || node.id === undefined || node.id === null || node.id === '') {
+        throw new Error(`nodes[${i}] 缺少 id`)
+      }
+    }
+
+    return data
+  }
+  document.addEventListener('paste', paste_node)
+
   const delete_node = () => {
     const elements = graph.getSelectElements(true)
     lf.clearSelectElements()
@@ -147,7 +194,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
   // 复制
   keyboard.on(['cmd + c', 'ctrl + c'], copy_node)
   // 粘贴
-  keyboard.on(['cmd + v', 'ctrl + v'], paste_node)
+  keyboard.on(['cmd + v', 'ctrl + v'], () => {})
   // undo
   keyboard.on(['cmd + z', 'ctrl + z'], () => {
     // if (!keyboardOptions?.enabled) return true
