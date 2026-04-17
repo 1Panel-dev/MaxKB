@@ -56,6 +56,7 @@ config({
               whiteList: Object.assign({}, getDefaultWhiteList(), {
                 video: ['src', 'controls', 'width', 'height', 'preload', 'playsinline'],
                 source: ['src', 'type'],
+                a: ['href', 'style'],
                 input: ['class', 'disabled', 'type', 'checked'],
                 sup: ['data-title'],
                 iframe: [
