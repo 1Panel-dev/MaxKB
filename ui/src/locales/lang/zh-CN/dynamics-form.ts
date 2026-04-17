@@ -15,6 +15,7 @@ export default {
     MultiRow: '单行多选卡',
     Model: '模型',
     Knowledge: '知识库',
+    TreeSelect: '树形选择器',
   },
   default: {
     label: '默认值',
@@ -54,6 +55,18 @@ export default {
     desc: {
       label: '描述',
       placeholder: '请输入描述',
+    },
+  },
+  TreeSelect: {
+    label: '树形选择器',
+    select: '选项',
+    allowMultipleSelections: '允许多选',
+    addDialog: {
+      addFirstOption: '添加一级选项',
+      addSubOptions: '添加子选项',
+      require: '请至少填写一条完整数据',
+      nodeNotFound: '未找到父节点',
+      tagRequire: '标签和选项值不能为空',
     },
   },
   DatePicker: {

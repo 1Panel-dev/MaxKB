@@ -59,9 +59,13 @@ const input_type_list = [
     label: t('dynamicsForm.input_type_list.Model'),
     value: 'Model',
   },
-    {
+  {
     label: t('dynamicsForm.input_type_list.Knowledge'),
     value: 'Knowledge',
+  },
+  {
+    label: t('dynamicsForm.input_type_list.TreeSelect'),
+    value: 'TreeSelect',
   },
 ]
 export { input_type_list }
