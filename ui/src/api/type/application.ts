@@ -39,6 +39,11 @@ interface ApplicationFormType {
   skill_tool_ids?: string[]
   mcp_output_enable?: boolean
   work_flow_template?: any
+  long_term_enable?: boolean
+  long_term_model_id?: string
+  long_term_model_params_setting?: any
+  long_term_trigger_setting?: any
+  long_term_trigger_type?: string
 }
 
 interface Chunk {

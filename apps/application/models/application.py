@@ -105,6 +105,12 @@ class Application(AppModelMixin):
     skill_tool_ids = models.JSONField(verbose_name="技能ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
     file_clean_time = models.IntegerField(verbose_name="文件清理时间", default=180)
+    long_term_enable = models.BooleanField(verbose_name='长期记忆是否开启', default=False)
+    long_term_model = models.ForeignKey(Model, related_name='long_term_model_id', on_delete=models.SET_NULL,
+                                        db_constraint=False, blank=True, null=True)
+    long_term_model_params_setting = models.JSONField(verbose_name="长期记忆模型参数相关设置", default=dict)
+    long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
+    long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
 
     @staticmethod
     def get_default_model_prompt():
@@ -181,6 +187,11 @@ class ApplicationVersion(AppModelMixin):
     application_ids = models.JSONField(verbose_name="应用ID列表", default=list)
     skill_tool_ids = models.JSONField(verbose_name="技能ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
+    long_term_enable = models.BooleanField(verbose_name='长期记忆是否开启', default=False)
+    long_term_model_id = models.UUIDField(verbose_name="长期记忆模型id", blank=True, null=True)
+    long_term_model_params_setting = models.JSONField(verbose_name="长期记忆模型参数相关设置", default=dict)
+    long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
+    long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
 
     class Meta:
         db_table = "application_version"

@@ -153,3 +153,18 @@ class ChatShareLink(AppModelMixin):
 
     class Meta:
         db_table = "application_chat_share_link"
+
+
+
+class ApplicationLongTermMemory(AppModelMixin):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, db_constraint=False, verbose_name="所属应用")
+    chat_user_id = models.CharField( max_length=128, verbose_name="对话用户id", db_index=True)
+    memory = models.TextField(verbose_name="长期记忆内容", default="")
+
+    class Meta:
+        db_table = "application_long_term_memory"
+        unique_together = [('application', 'chat_user_id')]
+        indexes = [
+            models.Index(fields=['application_id', 'chat_user_id']),
+        ]

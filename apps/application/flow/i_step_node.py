@@ -18,6 +18,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, ErrorDetail
 
 from application.flow.common import Answer, NodeChunk
+from application.long_term_memory import extract_long_term_memory
 from application.models import ApplicationChatUserStats
 from application.models import ChatRecord, ChatUserType
 from common.field.common import InstanceField
@@ -101,6 +102,10 @@ class WorkFlowPostHandler:
                 application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
                 application_public_access_client.save()
         self.chat_info = None
+
+        extract_long_term_memory.delay(
+            workflow_body.get('workspace_id'), workflow_body.get('application_id'), workflow_body.get('chat_user_id')
+        )
 
 
 class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
