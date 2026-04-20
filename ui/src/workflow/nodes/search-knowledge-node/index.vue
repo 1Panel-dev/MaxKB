@@ -30,10 +30,7 @@
                   v-model="form_data.search_scope_type"
                   style="width: 85px"
                 >
-                  <el-option
-                    :label="$t('workflow.variable.Referencing')"
-                    value="referencing"
-                  />
+                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
                   <el-option :label="$t('common.custom')" value="custom" />
                 </el-select>
               </span>
@@ -200,7 +197,7 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { set } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
@@ -260,6 +257,22 @@ const openParamSettingDialog = () => {
 function removeknowledge(id: any) {
   const list = props.nodeModel.properties.node_data.knowledge_id_list.filter((v: any) => v !== id)
   set(props.nodeModel.properties.node_data, 'knowledge_id_list', list)
+
+  if (props.nodeModel.properties.node_data.knowledge_list) {
+    const objList = props.nodeModel.properties?.node_data.knowledge_list.filter(
+      (v: any) => v.id !== id,
+    )
+    set(props.nodeModel.properties.node_data, 'knowledge_list', cloneDeep(objList))
+  }
+
+  knowledgeList.value = knowledgeList.value.filter((v: any) => v.id !== id)
+
+  if (props.nodeModel.properties.node_data.all_knowledge_id_list) {
+    const allList = props.nodeModel.properties.node_data.all_knowledge_id_list.filter(
+      (v: any) => v !== id,
+    )
+    set(props.nodeModel.properties.node_data, 'all_knowledge_id_list', cloneDeep(allList))
+  }
 }
 
 function addKnowledge(val: Array<any>) {
@@ -268,7 +281,7 @@ function addKnowledge(val: Array<any>) {
     'knowledge_id_list',
     val.map((item) => item.id),
   )
-  set(props.nodeModel.properties.node_data, 'knowledge_list', val)
+  set(props.nodeModel.properties.node_data, 'knowledge_list', cloneDeep(val))
   knowledgeList.value = val
 }
 
