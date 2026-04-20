@@ -192,6 +192,61 @@
                     :step-strictly="true"
                   />
                 </el-form-item>
+                <el-form-item>
+                  <template #label>
+                    <div class="flex-between">
+                      <div class="flex align-center">
+                        <span class="mr-4">长期记忆</span>
+                        <el-tooltip
+                          effect="dark"
+                          :content="$t('{memory} 为长期记忆的占位符，开启后可以在系统提示词中引用')"
+                          placement="right"
+                          popper-class="max-w-350"
+                        >
+                          <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                        </el-tooltip>
+                      </div>
+                      <div>
+                        <el-button
+                          v-if="applicationForm.long_term_enable"
+                          type="primary"
+                          link
+                          @click="openLongTermConfigDialog"
+                        >
+                          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+                        </el-button>
+                        <el-switch
+                          class="ml-8"
+                          size="small"
+                          v-model="applicationForm.long_term_enable"
+                          @change="switchLongTerm"
+                        />
+                      </div>
+                    </div>
+                  </template>
+                  <div v-if="applicationForm.long_term_enable" class="flex-between w-full">
+                    <ModelSelect
+                      v-model="applicationForm.long_term_model_id"
+                      :placeholder="$t('views.application.form.aiModel.placeholder')"
+                      :options="modelOptions"
+                      @change="long_term_model_change"
+                      @submitModel="getSelectModel"
+                      showFooter
+                      :model-type="'LLM'"
+                    >
+                    </ModelSelect>
+                    <el-button
+                      class="ml-8"
+                      :disabled="!applicationForm.long_term_model_id"
+                      @click="openLongTermParamSettingDialog"
+                      @refreshForm="refreshParam"
+                    >
+                      <el-icon>
+                        <Operation/>
+                      </el-icon>
+                    </el-button>
+                  </div>
+                </el-form-item>
 
                 <p class="mb-12 lighter">
                   {{ $t('views.knowledge.title') }}
@@ -843,6 +898,7 @@
     </el-card>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
+    <AIModeParamSettingDialog ref="LongTermModeParamSettingDialogRef" @refresh="refreshLongTermForm" />
     <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm" />
@@ -861,6 +917,7 @@
     <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
     <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
+    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog"/>
   </div>
 </template>
 <script setup lang="ts">
@@ -888,6 +945,8 @@ import McpServersDialog from '@/views/application/component/McpServersDialog.vue
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
 import useStore from '@/stores'
+import AppIcon from "@/components/app-icon/AppIcon.vue";
+import LongTermSettingDialog from "@/views/application/component/LongTermSettingDialog.vue";
 const route = useRoute()
 const router = useRouter()
 const {
@@ -921,6 +980,12 @@ const optimizationPrompt =
   '<data></data>' +
   t('views.application.dialog.defaultPrompt2')
 
+const longTermPrompt = `=======长期记忆========
+{memory}
+=======================
+请根据以上长期记忆回答用户问题
+`
+
 const collapseData = reactive({
   prompt: true,
   knowledge_setting: true,
@@ -930,6 +995,8 @@ const collapseData = reactive({
   agent: true,
 })
 const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const LongTermModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const LongTermSettingDialogRef = ref<InstanceType<typeof LongTermSettingDialog>>()
 const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
 const TTSModeParamSettingDialogRef = ref<InstanceType<typeof TTSModeParamSettingDialog>>()
 const STTModeParamSettingDialogRef = ref<InstanceType<typeof STTModeParamSettingDialog>>()
@@ -984,6 +1051,11 @@ const applicationForm = ref<ApplicationFormType>({
   tool_ids: [],
   skill_tool_ids: [],
   mcp_output_enable: false,
+  long_term_enable: false,
+  long_term_model_id: '',
+  long_term_model_params_setting: {},
+  long_term_trigger_setting: {},
+  long_term_trigger_type: 'ROUND'
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -1055,12 +1127,32 @@ const model_change = (model_id?: string) => {
     refreshForm({})
   }
 }
+
+const long_term_model_change = (model_id?: string) => {
+  applicationForm.value.long_term_model_id = model_id
+  if (model_id) {
+    LongTermModeParamSettingDialogRef.value?.reset_default(model_id, id)
+  } else {
+    refreshLongTermForm({})
+  }
+}
+
 const openAIParamSettingDialog = () => {
   if (applicationForm.value.model_id) {
     AIModeParamSettingDialogRef.value?.open(
       applicationForm.value.model_id,
       id,
       applicationForm.value.model_params_setting,
+    )
+  }
+}
+
+const openLongTermParamSettingDialog = () => {
+  if (applicationForm.value.long_term_model_id) {
+    LongTermModeParamSettingDialogRef.value?.open(
+      applicationForm.value.long_term_model_id,
+      id,
+      applicationForm.value.long_term_model_params_setting,
     )
   }
 }
@@ -1101,6 +1193,21 @@ const openSTTParamSettingDialog = () => {
 
 const openParamSettingDialog = () => {
   ParamSettingDialogRef.value?.open(applicationForm.value)
+}
+
+function openLongTermConfigDialog() {
+  LongTermSettingDialogRef.value?.open(applicationForm.value.long_term_trigger_type, applicationForm.value.long_term_trigger_setting)
+}
+
+function switchLongTerm() {
+  if (applicationForm.value.long_term_enable) {
+    applicationForm.value.model_setting.system = applicationForm.value.model_setting.system || longTermPrompt
+  }
+}
+
+function submitLongTermSettingDialog(data: any) {
+  applicationForm.value.long_term_trigger_type = data.trigger_type
+  applicationForm.value.long_term_trigger_setting = data.trigger_setting
 }
 
 function removeTool(id: any) {
@@ -1274,6 +1381,10 @@ function refreshSTTForm(data: any) {
   applicationForm.value.stt_model_params_setting = data
 }
 
+function refreshLongTermForm(data: any) {
+  applicationForm.value.long_term_model_params_setting = data
+}
+
 function removeKnowledge(id: any) {
   if (applicationForm.value.knowledge_id_list) {
     applicationForm.value.knowledge_id_list.splice(
@@ -1301,6 +1412,7 @@ function getDetail() {
       applicationForm.value.stt_model_id = res.data.stt_model
       applicationForm.value.tts_model_id = res.data.tts_model
       applicationForm.value.tts_type = res.data.tts_type
+      applicationForm.value.long_term_model_id = res.data.long_term_model
       knowledgeList.value = res.data.knowledge_list
       applicationForm.value.model_setting.no_references_prompt =
         res.data.model_setting.no_references_prompt || '{question}'

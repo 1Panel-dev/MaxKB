@@ -566,6 +566,12 @@ const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
 ${t('views.problem.title')}：
 {{${t('workflow.nodes.startNode.label')}.question}}`
 
+const longTermPrompt = `=======长期记忆========
+{{${t('workflow.nodes.startNode.label')}.memory}}
+=======================
+请根据以上长期记忆回答用户问题
+`
+
 const collapseData = reactive({
   MCP: true,
   tool: true,
@@ -827,6 +833,18 @@ function getSkillToolSelectOptions() {
       )
     })
 }
+
+function refreshLongTermConfig() {
+  const form_data = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .filter((v: any) => v.properties.node_data.long_term_enable)
+    .filter((v: any) => v)
+
+  if (form_data.length > 0) {
+    chat_data.value.system = chat_data.value.system || longTermPrompt
+  }
+}
+props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
 
 onMounted(() => {
   getSelectModel()

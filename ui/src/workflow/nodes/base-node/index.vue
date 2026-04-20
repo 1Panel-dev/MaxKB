@@ -49,6 +49,61 @@
         <template #label>
           <div class="flex-between">
             <div class="flex align-center">
+              <span class="mr-4">长期记忆</span>
+              <el-tooltip
+                effect="dark"
+                :content="longTermTips"
+                placement="right"
+                popper-class="max-w-350"
+              >
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <div>
+              <el-button
+                v-if="form_data.long_term_enable"
+                type="primary"
+                link
+                @click="openLongTermConfigDialog"
+              >
+                <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+              </el-button>
+              <el-switch
+                class="ml-8"
+                size="small"
+                v-model="form_data.long_term_enable"
+                @change="switchLongTerm"
+              />
+            </div>
+          </div>
+        </template>
+        <div v-if="form_data.long_term_enable" class="flex-between w-full">
+          <ModelSelect
+            v-model="form_data.long_term_model_id"
+            :placeholder="$t('views.application.form.aiModel.placeholder')"
+            :options="modelOptions"
+            @change="long_term_model_change"
+            @submitModel="getSelectModel"
+            showFooter
+            :model-type="'LLM'"
+          >
+          </ModelSelect>
+          <el-button
+            class="ml-8"
+            :disabled="!form_data.long_term_model_id"
+            @click="openLongTermParamSettingDialog"
+            @refreshForm="refreshParam"
+          >
+            <el-icon>
+              <Operation/>
+            </el-icon>
+          </el-button>
+        </div>
+      </el-form-item>
+      <el-form-item>
+        <template #label>
+          <div class="flex-between">
+            <div class="flex align-center">
               <span class="mr-4">{{ $t('workflow.nodes.baseNode.fileUpload.label') }}</span>
               <el-tooltip
                 effect="dark"
@@ -161,6 +216,8 @@
       :node-model="nodeModel"
       @refresh="refreshFileUploadForm"
     />
+    <AIModeParamSettingDialog ref="LongTermModeParamSettingDialogRef" @refresh="refreshLongTermForm" />
+    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog"/>
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -177,6 +234,9 @@ import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUp
 import ChatFieldTable from './component/ChatFieldTable.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import AppIcon from "@/components/app-icon/AppIcon.vue";
+import AIModeParamSettingDialog from "@/views/application/component/AIModeParamSettingDialog.vue";
+import LongTermSettingDialog from "@/views/application/component/LongTermSettingDialog.vue";
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
@@ -206,6 +266,10 @@ const form = {
   desc: '',
   prologue: t('views.application.form.defaultPrologue'),
 }
+
+const longTermTips = `
+{{${t('workflow.nodes.startNode.label')}.memory}} 为长期记忆占位符，开启后可以在系统提示词中引用
+`
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -369,6 +433,73 @@ const refreshFileUploadForm = (data: any) => {
   form_data.value.file_upload_setting = data
 }
 
+const LongTermModeParamSettingDialogRef = ref()
+const LongTermSettingDialogRef = ref()
+const modelOptions = ref<any>(null)
+const loading = ref(false)
+const long_term_model_change = (model_id?: string) => {
+  form_data.value.long_term_model_id = model_id
+  if (model_id) {
+    LongTermModeParamSettingDialogRef.value?.reset_default(model_id, id)
+  } else {
+    refreshLongTermForm({})
+  }
+}
+
+function switchLongTerm() {
+  props.nodeModel.graphModel.eventCenter.emit('refreshLongTermConfig')
+}
+
+function openLongTermConfigDialog() {
+  LongTermSettingDialogRef.value?.open(form_data.value.long_term_trigger_type, form_data.value.long_term_trigger_setting)
+}
+
+function submitLongTermSettingDialog(data: any) {
+  form_data.value.long_term_trigger_type = data.trigger_type
+  form_data.value.long_term_trigger_setting = data.trigger_setting
+}
+
+function refreshLongTermForm(data: any) {
+  form_data.value.long_term_model_params_setting = data
+}
+
+function openLongTermParamSettingDialog() {
+  if (form_data.value.long_term_model_id) {
+    LongTermModeParamSettingDialogRef.value?.open(
+      form_data.value.long_term_model_id,
+      id,
+      form_data.value.long_term_model_params_setting,
+    )
+  }
+}
+
+function refreshParam(data: any) {
+  form_data.value = { ...form_data.value, ...data }
+}
+
+function getSelectModel() {
+  loading.value = true
+
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          workspace_id: form_data.value?.workspace_id,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+      loading.value = false
+    })
+    .catch(() => {
+      loading.value = false
+    })
+}
+
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
   if (!props.nodeModel.properties.node_data.tts_type) {
@@ -376,6 +507,7 @@ onMounted(() => {
   }
   getTTSModel()
   getSTTModel()
+  getSelectModel()
 })
 </script>
 <style lang="scss" scoped></style>

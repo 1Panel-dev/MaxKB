@@ -200,7 +200,7 @@ class BaseChatNode(IChatNode):
         self.context['question'] = question.content
         system = self.workflow_manage.generate_prompt(system)
         self.context['system'] = system
-        message_list = self.generate_message_list(system, prompt, history_message)
+        message_list = self.generate_message_list(prompt, history_message)
         self.context['message_list'] = message_list
 
         # 过滤tool_id
@@ -220,7 +220,7 @@ class BaseChatNode(IChatNode):
         mcp_result = self._handle_mcp_request(
             mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
             application_ids, skill_tool_ids, mcp_output_enable,
-            chat_model, message_list, history_message, question, chat_id, workspace_id
+            chat_model, SystemMessage(system), message_list, history_message, question, chat_id, workspace_id
         )
         if mcp_result:
             return mcp_result
@@ -240,8 +240,8 @@ class BaseChatNode(IChatNode):
 
     def _handle_mcp_request(self, mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids, tool_ids,
                             application_ids, skill_tool_ids,
-                            mcp_output_enable, chat_model, message_list, history_message, question, chat_id,
-                            workspace_id):
+                            mcp_output_enable, chat_model, system_prompt, message_list, history_message, question,
+                            chat_id, workspace_id):
 
         mcp_servers_config = {}
 
@@ -346,7 +346,8 @@ class BaseChatNode(IChatNode):
 
             source_id = application_id or knowledge_id or tool_id
             source_type = 'APPLICATION' if application_id else 'KNOWLEDGE' if knowledge_id else 'TOOL'
-            r = mcp_response_generator(chat_model, message_list, json.dumps(mcp_servers_config), mcp_output_enable,
+            r = mcp_response_generator(chat_model, system_prompt, message_list, json.dumps(mcp_servers_config),
+                                       mcp_output_enable,
                                        tool_init_params, source_id, source_type, chat_id, tools)
             return NodeResult(
                 {'result': r, 'chat_model': chat_model, 'message_list': message_list,
@@ -388,12 +389,8 @@ class BaseChatNode(IChatNode):
     def generate_prompt_question(self, prompt):
         return HumanMessage(self.workflow_manage.generate_prompt(prompt))
 
-    def generate_message_list(self, system: str, prompt: str, history_message):
-        if system is not None and len(system) > 0:
-            return [SystemMessage(self.workflow_manage.generate_prompt(system)), *history_message,
-                    HumanMessage(self.workflow_manage.generate_prompt(prompt))]
-        else:
-            return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
+    def generate_message_list(self, prompt: str, history_message):
+        return [*history_message, HumanMessage(self.workflow_manage.generate_prompt(prompt))]
 
     @staticmethod
     def reset_message_list(message_list: List[BaseMessage], answer_text):
