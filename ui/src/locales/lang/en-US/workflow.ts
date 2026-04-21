@@ -41,6 +41,7 @@ export default {
     paramErrorMessage: 'Parameter already exists: ',
     saveMessage: 'Current changes have not been saved. Save before exiting?',
     searchPlaceholder: 'Please enter node name',
+    disabled: 'The node has been disabled',
   },
   delete: {
     confirmTitle: 'Confirm to delete this node?',
@@ -507,7 +508,8 @@ You are a master of problem optimization, adept at accurately inferring user int
       expression: {
         label: 'Expression',
         placeholder: 'Please enter expression',
-        tooltip: 'Please use JSON Path expressions to split variables, e.g.: $.store.book <a href="https://pypi.org/project/jsonpath-ng/1.8.0/" target="_blank" class="expression_tip">Click for details ➜ pypi.org</a>',
+        tooltip:
+          'Please use JSON Path expressions to split variables, e.g.: $.store.book <a href="https://pypi.org/project/jsonpath-ng/1.8.0/" target="_blank" class="expression_tip">Click for details ➜ pypi.org</a>',
       },
     },
     parameterExtractionNode: {
