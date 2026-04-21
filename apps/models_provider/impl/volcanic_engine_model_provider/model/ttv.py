@@ -9,6 +9,7 @@ from volcenginesdkarkruntime import Ark
 
 class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     api_key: str
+    base_url: str
     model_name: str
     params: dict
     max_retries: int = 3
@@ -17,6 +18,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.base_url = kwargs.get('base_url')
         self.model_name = kwargs.get('model_name')
         self.params = kwargs.get('params', {})
         self.retry_delay = 5
@@ -34,6 +36,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         return GenerationVideoModel(
             model_name=model_name,
             api_key=model_credential.get('api_key'),
+            base_url=model_credential.get('base_url', "https://ark.cn-beijing.volces.com/api/v3"),
             **optional_params,
         )
 
@@ -73,7 +76,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     # --- 通用异步生成函数 ---
     def generate_video(self, prompt, negative_prompt=None, first_frame_url=None, last_frame_url=None, **kwargs):
-        client = Ark(api_key=self.api_key)
+        client = Ark(api_key=self.api_key,base_url=self.base_url)
         # 根据params设置其他参数 豆包的参数和别的不一样  需要拼接在text里
         # --rt 16:9 --dur 5 --fps 24 --rs 720p --wm true --cf false
         prompt = self._build_prompt(prompt)

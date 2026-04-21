@@ -1,4 +1,3 @@
-import role from './role'
 
 export default {
   title: '系统管理',
@@ -168,5 +167,7 @@ export default {
   resourceMapping: {
     title: '查看关联资源',
     sub_title: '关联资源',
+    dependency: '依赖',
+    dependent: '被依赖'
   },
 }

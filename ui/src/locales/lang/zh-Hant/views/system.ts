@@ -168,5 +168,7 @@ export default {
   resourceMapping: {
     title: '查看關聯資源',
     sub_title: '關聯資源',
+    dependency: '依賴',
+    dependent: '被依賴'
   },
 }

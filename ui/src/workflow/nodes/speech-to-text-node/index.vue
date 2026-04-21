@@ -29,7 +29,8 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ $t('workflow.nodes.speechToTextNode.stt_model.label')
+                >{{
+                    $t('workflow.nodes.speechToTextNode.stt_model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -40,8 +41,8 @@
                 style="width: 85px"
                 @change="form_data.stt_model_id_reference = []"
               >
-                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
-                <el-option :label="$t('common.custom')" value="custom" />
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference"/>
+                <el-option :label="$t('common.custom')" value="custom"/>
               </el-select>
             </div>
           </template>
@@ -59,7 +60,7 @@
             <div class="ml-8">
               <el-button @click="openSTTParamSettingDialog" :disabled="!form_data.stt_model_id">
                 <el-icon>
-                  <Operation />
+                  <Operation/>
                 </el-icon>
               </el-button>
             </div>
@@ -83,13 +84,23 @@
           }"
         >
           <template #label>
-            <div class="flex-between w-full">
+            <div class="flex align-center">
               <div>
                 <span
-                  >{{ $t('workflow.nodes.speechToTextNode.audio.label')
+                >{{
+                    $t('workflow.nodes.speechToTextNode.audio.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace;">{{
+                      fileTooltip
+                    }}
+                  </div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
             </div>
           </template>
           <NodeCascader
@@ -126,32 +137,34 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result" />
+          <el-switch size="small" v-model="form_data.is_result"/>
         </el-form-item>
       </el-form>
     </el-card>
-    <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm" />
+    <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm"/>
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref, inject } from 'vue'
-import { groupBy, set } from 'lodash'
+import {computed, onMounted, ref, inject} from 'vue'
+import {groupBy, set} from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type { FormInstance } from 'element-plus'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
-import { useRoute } from 'vue-router'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import type {FormInstance} from 'element-plus'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {useRoute} from 'vue-router'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 import STTModeParamSettingDialog from '@/views/application/component/STTModelParamSettingDialog.vue'
-import { WorkflowMode } from '@/enums/application'
+import {WorkflowMode} from '@/enums/application'
+import {fileTooltip} from "@/workflow/common/data.ts";
+
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiType = computed(() => {
@@ -178,7 +191,7 @@ const validate = () => {
     modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
@@ -243,22 +256,24 @@ function sttModelChange(model_id: string) {
 }
 
 const resource = getResourceDetail()
+
 function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-          model_type: 'STT',
-          workspace_id: resource.value?.workspace_id,
-        }
+        model_type: 'STT',
+        workspace_id: resource.value?.workspace_id,
+      }
       : {
-          model_type: 'STT',
-        }
-  loadSharedApi({ type: 'model', systemType: apiType.value })
+        model_type: 'STT',
+      }
+  loadSharedApi({type: 'model', systemType: apiType.value})
     .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
     })
 }
+
 onMounted(() => {
   getSelectModel()
 
