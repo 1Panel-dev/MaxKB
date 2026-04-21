@@ -20,5 +20,5 @@ class IsNullCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             return source_value is None or len(source_value) == 0
-        except Exception as e:
-            return False
+        except Exception:
+            return source_value is None
