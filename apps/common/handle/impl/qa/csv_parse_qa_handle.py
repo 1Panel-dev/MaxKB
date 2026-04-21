@@ -18,7 +18,7 @@ from common.utils.logger import maxkb_logger
 
 def read_csv_standard(file_path):
     data = []
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         reader = csv.reader(file)
         for row in reader:
             data.append(row)
