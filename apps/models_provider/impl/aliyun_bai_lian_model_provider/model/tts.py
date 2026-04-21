@@ -11,12 +11,14 @@ from models_provider.impl.base_tts import BaseTextToSpeech
 
 class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     api_key: str
+    base_url: str
     model: str
     params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.base_url = kwargs.get('base_url')
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
 
@@ -34,6 +36,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         return AliyunBaiLianTextToSpeech(
             model=model_name,
             api_key=model_credential.get('api_key'),
+            base_url=model_credential.get('api_base', "https://dashscope.aliyuncs.com/api/v1"),
             **optional_params,
         )
 
@@ -42,6 +45,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     def text_to_speech(self, text):
         dashscope.api_key = self.api_key
+        dashscope.base_http_api_url = self.base_url
         text = _remove_empty_lines(text)
         if 'sambert' in self.model:
             from dashscope.audio.tts import SpeechSynthesizer
@@ -55,4 +59,3 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         if type(audio) == str:
             raise Exception(audio)
         return audio
-
