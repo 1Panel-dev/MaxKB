@@ -181,10 +181,24 @@
             trigger: 'change',
           }"
         >
-          <template #label
-            >{{ $t('workflow.nodes.imageUnderstandNode.image.label')
-            }}<span class="color-danger">*</span></template
-          >
+           <div class="flex align-center">
+            <div>
+                <span
+                >{{
+                    $t('workflow.nodes.imageUnderstandNode.image.label')
+                  }}<span class="color-danger">*</span></span
+                >
+            </div>
+            <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+              <template #content>
+                <div style="white-space: pre-wrap; font-family: monospace;">{{
+                    fileTooltip
+                  }}
+                </div>
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
@@ -269,6 +283,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { WorkflowMode } from '@/enums/application'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import {fileTooltip} from "@/workflow/common/data.ts";
 
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any

@@ -485,6 +485,21 @@ class ModelSerializer(serializers.Serializer):
                 model_params_form = []
             model_id = self.data.get('id')
             model = QuerySet(Model).filter(id=model_id).first()
+            if not isinstance(model_params_form, list):
+                raise AppApiException(500, _('model_params_form must be a list'))
+            # 还需要校验几个字段：label required default_value
+            # 校验每个配置项的必要字段
+            for index, param in enumerate(model_params_form):
+                if not isinstance(param, dict):
+                    raise AppApiException(500, _('The {index}th item in model_params_form must be a dictionary').format(
+                        index=index))
+
+                # 校验 label 字段
+                if 'label' not in param or param['label'] is None:
+                    raise AppApiException(500,
+                                          _('The label field is required for the {index}th item in model_params_form').format(
+                                              index=index))
+
             model.model_params_form = model_params_form
             model.save()
             return True

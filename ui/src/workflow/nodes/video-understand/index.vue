@@ -27,7 +27,8 @@
             <div class="flex-between w-full">
               <div>
                 <span
-                  >{{ t('workflow.nodes.videoUnderstandNode.model.label')
+                >{{
+                    t('workflow.nodes.videoUnderstandNode.model.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -38,8 +39,8 @@
                 style="width: 85px"
                 @change="form_data.model_id_reference = []"
               >
-                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
-                <el-option :label="$t('common.custom')" value="custom" />
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference"/>
+                <el-option :label="$t('common.custom')" value="custom"/>
               </el-select>
             </div>
           </template>
@@ -60,7 +61,7 @@
                 @refreshForm="refreshParam"
               >
                 <el-icon>
-                  <Operation />
+                  <Operation/>
                 </el-icon>
               </el-button>
             </div>
@@ -119,7 +120,8 @@
             <div class="flex align-center">
               <div class="mr-4">
                 <span
-                  >{{ $t('views.application.form.prompt.label')
+                >{{
+                    $t('views.application.form.prompt.label')
                   }}<span class="color-danger">*</span></span
                 >
               </div>
@@ -157,8 +159,8 @@
                 style="width: 100px"
                 :teleported="false"
               >
-                <el-option :label="$t('workflow.node')" value="NODE" />
-                <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
+                <el-option :label="$t('workflow.node')" value="NODE"/>
+                <el-option :label="$t('workflow.workflow')" value="WORKFLOW"/>
               </el-select>
             </div>
           </template>
@@ -180,10 +182,24 @@
             trigger: 'change',
           }"
         >
-          <template #label
-            >{{ $t('workflow.nodes.videoUnderstandNode.video.label')
-            }}<span class="color-danger">*</span></template
-          >
+          <div class="flex align-center">
+            <div>
+                <span
+                >{{
+                    $t('workflow.nodes.videoUnderstandNode.video.label')
+                  }}<span class="color-danger">*</span></span
+                >
+            </div>
+            <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+              <template #content>
+                <div style="white-space: pre-wrap; font-family: monospace;">{{
+                    fileTooltip
+                  }}
+                </div>
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
           <NodeCascader
             ref="nodeCascaderRef"
             :nodeModel="nodeModel"
@@ -242,38 +258,41 @@
               </el-tooltip>
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.is_result" />
+          <el-switch size="small" v-model="form_data.is_result"/>
         </el-form-item>
       </el-form>
     </el-card>
-    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam"/>
     <ReasoningParamSettingDialog
       ref="ReasoningParamSettingDialogRef"
       @refresh="submitReasoningDialog"
     />
-    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef"/>
   </NodeContainer>
 </template>
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
-import { computed, onMounted, ref, inject } from 'vue'
-import { cloneDeep, groupBy, set } from 'lodash'
+import {computed, onMounted, ref, inject} from 'vue'
+import {cloneDeep, groupBy, set} from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
-import type { FormInstance } from 'element-plus'
+import type {FormInstance} from 'element-plus'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
-import { t } from '@/locales'
-import { useRoute } from 'vue-router'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {t} from '@/locales'
+import {useRoute} from 'vue-router'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
-import { WorkflowMode } from '@/enums/application'
-import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import {WorkflowMode} from '@/enums/application'
+import ReasoningParamSettingDialog
+  from '@/views/application/component/ReasoningParamSettingDialog.vue'
+
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
+import {fileTooltip} from "@/workflow/common/data.ts";
 
 const {
-  params: { id },
+  params: {id},
 } = route as any
 
 const apiType = computed(() => {
@@ -304,7 +323,7 @@ const validate = () => {
     modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
     aiChatNodeFormRef.value?.validate(),
   ]).catch((err: any) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 
@@ -372,13 +391,13 @@ function getSelectModel() {
   const obj =
     apiType.value === 'systemManage'
       ? {
-          model_type: 'IMAGE',
-          workspace_id: resource.value?.workspace_id,
-        }
+        model_type: 'IMAGE',
+        workspace_id: resource.value?.workspace_id,
+      }
       : {
-          model_type: 'IMAGE',
-        }
-  loadSharedApi({ type: 'model', systemType: apiType.value })
+        model_type: 'IMAGE',
+      }
+  loadSharedApi({type: 'model', systemType: apiType.value})
     .getSelectModelList(obj)
     .then((res: any) => {
       modelOptions.value = groupBy(res?.data, 'provider')
