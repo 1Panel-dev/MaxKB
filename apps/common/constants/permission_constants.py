@@ -708,15 +708,15 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_BATCH_DELETE = Permission(group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE,
-                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
-                                    parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
-                                    )
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+                                        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
+                                        )
     KNOWLEDGE_BATCH_MOVE = Permission(group=Group.KNOWLEDGE, operate=Operate.BATCH_MOVE,
-                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
-                                    parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
-                                    )
+                                      role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                      resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+                                      parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE],
+                                      )
     KNOWLEDGE_RESOURCE_AUTHORIZATION = Permission(
         group=Group.KNOWLEDGE, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
@@ -1055,21 +1055,26 @@ class PermissionConstants(Enum):
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     )
     APPLICATION_BATCH_DELETE = Permission(group=Group.APPLICATION, operate=Operate.BATCH_DELETE,
-                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
-                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    )
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                          resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                          parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                          )
     APPLICATION_BATCH_MOVE = Permission(group=Group.APPLICATION, operate=Operate.BATCH_MOVE,
-                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
-                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    )
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                        )
     APPLICATION_RESOURCE_AUTHORIZATION = Permission(group=Group.APPLICATION, operate=Operate.AUTH,
                                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                                     resource_permission_group_list=[
                                                         ResourcePermissionConst.APPLICATION_MANGE],
                                                     )
+    APPLICATION_RELATE_RESOURCE_VIEW = Permission(
+        group=Group.APPLICATION, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+        resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
+    )
     APPLICATION_TRIGGER_READ = Permission(
         group=Group.APPLICATION, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
@@ -1590,6 +1595,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_APPLICATION_TRIGGER_DELETE = Permission(
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_DELETE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_APPLICATION], is_ee=settings.edition == "EE"
+    )
+    RESOURCE_APPLICATION_RELATE_RESOURCE_VIEW = Permission(
+        group=Group.SYSTEM_RES_APPLICATION, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION], is_ee=settings.edition == "EE"
     )
     RESOURCE_APPLICATION_OVERVIEW_READ = Permission(
