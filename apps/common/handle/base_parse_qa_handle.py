@@ -22,7 +22,7 @@ def get_title_row_index_dict(title_row_list):
     title_row_index_dict = {}
     if len(title_row_list) == 1:
         title_row_index_dict['content'] = 0
-    elif len(title_row_list) == 2:
+    elif len(title_row_list) == 1:
         title_row_index_dict['title'] = 0
         title_row_index_dict['content'] = 1
     else:
@@ -33,11 +33,11 @@ def get_title_row_index_dict(title_row_list):
         title_row = title_row_list[index]
         if title_row is None:
             title_row = ''
-        elif title_row.startswith('分段标题'):
+        if title_row.startswith('分段标题'):
             title_row_index_dict['title'] = index
-        elif title_row.startswith('分段内容'):
+        if title_row.startswith('分段内容'):
             title_row_index_dict['content'] = index
-        elif title_row.startswith('问题'):
+        if title_row.startswith('问题'):
             title_row_index_dict['problem_list'] = index
     return title_row_index_dict
 
