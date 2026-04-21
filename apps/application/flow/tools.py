@@ -845,7 +845,8 @@ target_source_node_mapping = {
               },
     'KNOWLEDGE': {'search-knowledge-node': lambda n: n.get('properties').get('node_data').get('knowledge_id_list')},
     'APPLICATION': {
-        'application-node': lambda n: [n.get('properties').get('node_data').get('application_id')]
+        'application-node': lambda n: [n.get('properties').get('node_data').get('application_id')],
+        'ai-chat-node': lambda n: [*(n.get('properties').get('node_data').get('application_ids') or [])],
     }
 }
 

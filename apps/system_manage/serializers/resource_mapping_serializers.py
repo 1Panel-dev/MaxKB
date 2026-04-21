@@ -101,3 +101,54 @@ class ResourceMappingSerializer(serializers.Serializer):
                         model['resource_count'] = count_dict.get(model_id, 0)
 
         return result_list
+
+
+class MappingResourceSerializer(serializers.Serializer):
+    resource = serializers.CharField(required=True, label=_('resource'))
+    resource_id = serializers.UUIDField(required=True, label=_('resource Id'))
+
+    resource_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('resource Name'))
+    target_type = serializers.ListField(
+        label=_('target Type'),
+        child=serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('target Type')))
+    user_name = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('creator'))
+    workspace_ids = serializers.CharField(required=False, label=_('workspace_ids'))
+
+    def get_query_set(self):
+        queryset = QuerySet(model=get_dynamics_model({
+            'tdc.name': models.CharField(),
+            'source_id': models.CharField(),
+            "source_type": models.CharField(),
+            "u.username": models.CharField(),
+            'rm.target_type': models.CharField(),
+            'workspace_id': models.CharField(),
+        }))
+
+        queryset = queryset.filter(source_id=self.data.get('resource_id'),
+                                   source_type=self.data.get('resource'))
+
+        if self.data.get('resource_name'):
+            queryset = queryset.filter(**{'tdc.name__icontains': self.data.get('resource_name')})
+        if self.data.get('user_name'):
+            queryset = queryset.filter(**{'u.username__icontains': self.data.get('user_name')})
+        if self.data.get("target_type"):
+            queryset = queryset.filter(**{'rm.target_type__in': self.data.get('target_type')})
+        if self.data.get('workspace_ids') is not None and len(self.data.get('workspace_ids')) > 0:
+            workspace_ids = json.loads(self.data.get('workspace_ids'))
+            queryset = queryset.filter(**{'workspace_id__in': workspace_ids})
+
+        return queryset
+
+    @staticmethod
+    def is_x_pack_ee():
+        workspace_model = DatabaseModelManage.get_model("workspace_model")
+        return workspace_model is not None
+
+    def page(self, current_page, page_size):
+        is_x_pack_ee = self.is_x_pack_ee()
+
+        return native_page_search(current_page, page_size, self.get_query_set(), get_file_content(
+            os.path.join(PROJECT_DIR, "apps", "system_manage",
+                         'sql', 'list_mapping_resource_ee.sql' if is_x_pack_ee else 'list_mapping_resource.sql')),
+                                  with_table_name=False
+                                  )
