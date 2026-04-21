@@ -57,7 +57,7 @@
         :class="
           showShared && hasPermission(EditionConst.IS_EE, 'OR')
             ? 'tree-height-shared'
-            : 'tree-height '
+            : 'tree-height'
         "
         :style="treeStyle"
         ref="treeRef"

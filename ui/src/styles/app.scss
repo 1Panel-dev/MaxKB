@@ -540,6 +540,9 @@ h5 {
 /*
    图标旋转90度
 */
+.arrow-icon {
+  transition: transform 0.2s ease-in-out;
+}
 .rotate-90 {
   transform: rotateZ(90deg);
 }
@@ -566,9 +569,6 @@ h5 {
   background-size: cover;
 }
 
-.arrow-icon {
-  transition: 0.2s;
-}
 .sup-popover {
   display: none;
   position: absolute;
