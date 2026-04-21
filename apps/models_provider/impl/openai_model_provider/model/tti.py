@@ -61,4 +61,4 @@ class OpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
 
             return file_urls
         except Exception as e:
-            raise f"OpenAI generate image error: {e}"
+            raise RuntimeError(f"OpenAI generate image error: {e}") from e

@@ -100,7 +100,6 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         # --- 等待任务完成 ---
         rsp = self._safe_call(VideoSynthesis.wait, task=rsp, api_key=self.api_key)
         if rsp.status_code == HTTPStatus.OK:
-            maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
             if rsp.output.task_status == "SUCCEEDED":
                 maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
                 return rsp.output.video_url
