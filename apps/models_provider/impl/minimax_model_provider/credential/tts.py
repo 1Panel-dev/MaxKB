@@ -11,19 +11,14 @@ from common.utils.logger import maxkb_logger
 
 
 class MiniMaxTTSModelGeneralParams(BaseForm):
-    voice_id = forms.SingleSelect(
-        TooltipLabel(_('Voice'),
-                     _('Select a voice for speech synthesis')),
-        required=True, default_value='English_Graceful_Lady',
-        text_field='value',
-        value_field='value',
-        option_list=[
-            {'text': 'English_Graceful_Lady', 'value': 'English_Graceful_Lady'},
-            {'text': 'English_Insightful_Speaker', 'value': 'English_Insightful_Speaker'},
-            {'text': 'English_radiant_girl', 'value': 'English_radiant_girl'},
-            {'text': 'English_Persuasive_Man', 'value': 'English_Persuasive_Man'},
-            {'text': 'English_Lucky_Robot', 'value': 'English_Lucky_Robot'},
-        ])
+    voice_setting = forms.BaseField(
+        input_type='JsonInput',
+        label=_('Voice Setting'),
+        required=True,
+        default_value={
+            'voice_id': 'English_Graceful_Lady',
+        }
+    )
 
 
 class MiniMaxTTSModelCredential(BaseForm, BaseModelCredential):
