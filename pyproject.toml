@@ -13,7 +13,7 @@ dependencies = [
     "django-mptt==0.17.0",
     "djangorestframework==3.17.1",
     "psycopg[binary]==3.2.9",
-    "python-dotenv==1.1.1",
+    "python-dotenv==1.2.2",
     "uuid-utils==0.14.0",
     "captcha==0.7.1",
     "pytz==2025.2",
