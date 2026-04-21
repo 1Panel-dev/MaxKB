@@ -532,37 +532,189 @@ onMounted(() => {
 })
 </script>
 <style lang="scss" scoped>
+:deep(.el-form-item__error) {
+  color: #ff5722;
+  padding-top: 4px;
+}
+
+.login-title-section {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.login-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #5d4037;
+  margin: 0;
+}
+
+.login-form {
+  :deep(.el-form-item) {
+    margin-bottom: 20px;
+  }
+
+  :deep(.el-input) {
+    --el-input-bg-color: #fffaf5;
+    --el-input-border-color: #ffe4c9;
+    --el-input-hover-border-color: #ffb74d;
+    --el-input-focus-border-color: #ff9800;
+  }
+
+  :deep(.el-input__wrapper) {
+    background: #fffaf5;
+    border: 1px solid #ffe4c9;
+    border-radius: 12px;
+    padding: 12px 16px;
+    transition: all 0.3s ease;
+    box-shadow: none;
+
+    &:hover {
+      border-color: #ffb74d;
+      box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.1);
+    }
+
+    &.is-focus {
+      border-color: #ff9800;
+      box-shadow: 0 0 0 3px rgba(255, 152, 0, 0.15);
+      background: #fff;
+    }
+  }
+
+  :deep(.el-input__inner) {
+    color: #5d4037;
+    font-size: 15px;
+
+    &::placeholder {
+      color: #bcaaa4;
+    }
+  }
+
+  :deep(.el-input__prefix-inner),
+  :deep(.el-input__suffix-inner) {
+    color: #ff9800;
+  }
+}
+
+.input-item {
+  width: 100%;
+}
+
+:deep(.el-button) {
+  border-radius: 12px;
+  padding: 14px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  height: auto;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-button--primary) {
+  --el-button-bg-color: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+  --el-button-border-color: transparent;
+  --el-button-hover-bg-color: linear-gradient(135deg, #ffb74d 0%, #ff7043 100%);
+  --el-button-hover-border-color: transparent;
+  --el-button-active-bg-color: linear-gradient(135deg, #f57c00 0%, #e64a19 100%);
+  --el-button-active-border-color: transparent;
+
+  background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+  border: none;
+  box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+
+  &:hover {
+    background: linear-gradient(135deg, #ffb74d 0%, #ff7043 100%);
+    box-shadow: 0 6px 20px rgba(255, 87, 34, 0.4);
+    transform: translateY(-2px);
+  }
+
+  &:active {
+    background: linear-gradient(135deg, #f57c00 0%, #e64a19 100%);
+    box-shadow: 0 2px 10px rgba(255, 87, 34, 0.3);
+    transform: translateY(0);
+  }
+
+  &.is-loading {
+    background: linear-gradient(135deg, #ffb74d 0%, #ff7043 100%);
+  }
+}
+
+:deep(.el-button--text) {
+  color: #ff5722;
+  padding: 8px 12px;
+  font-weight: 500;
+
+  &:hover {
+    color: #e64a19;
+    background: rgba(255, 87, 34, 0.08);
+  }
+}
+
+.operate-container {
+  margin-top: 16px;
+}
+
+.forgot-password {
+  font-size: 14px;
+  padding: 0 !important;
+}
+
 .login-gradient-divider {
   position: relative;
   text-align: center;
-  color: var(--el-color-info);
+  color: #bcaaa4;
+  margin: 28px 0;
+  font-size: 14px;
 
   ::before {
     content: '';
-    width: 25%;
+    width: 30%;
     height: 1px;
-    background: linear-gradient(90deg, rgba(222, 224, 227, 0) 0%, #dee0e3 100%);
+    background: linear-gradient(90deg, transparent 0%, #ffe4c9 100%);
     position: absolute;
-    left: 16px;
+    left: 0;
     top: 50%;
   }
 
   ::after {
     content: '';
-    width: 25%;
+    width: 30%;
     height: 1px;
-    background: linear-gradient(90deg, #dee0e3 0%, rgba(222, 224, 227, 0) 100%);
+    background: linear-gradient(90deg, #ffe4c9 0%, transparent 100%);
     position: absolute;
-    right: 16px;
+    right: 0;
     top: 50%;
   }
 }
 
 .login-button-circle {
   padding: 20px !important;
-  margin: 0 4px;
-  width: 32px;
-  height: 32px;
+  margin: 0 6px;
+  width: 44px;
+  height: 44px;
   text-align: center;
+  background: #fffaf5;
+  border: 1px solid #ffe4c9;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+    border-color: transparent;
+    box-shadow: 0 4px 12px rgba(255, 87, 34, 0.3);
+    transform: translateY(-2px);
+
+    :deep(.el-button__text) {
+      color: #fff !important;
+    }
+  }
+
+  :deep(.el-button__text) {
+    color: #ff5722;
+    font-weight: 600;
+  }
+}
+
+.text-center {
+  margin-top: 20px;
 }
 </style>
