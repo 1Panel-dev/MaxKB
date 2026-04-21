@@ -274,7 +274,7 @@ def get_role_list(user,
                                                    for
                                                    workspace_user_role_mapping in
                                                    workspace_user_role_mapping_list], [])))
-            cache.set(key, workspace_list, version=version)
+            cache.set(key, role_list, version=version)
             return role_list
         else:
             if user.role == RoleConstants.ADMIN.value.__str__():
