@@ -16,7 +16,7 @@ class MiniMaxTTSModelGeneralParams(BaseForm):
         label=_('Voice Setting'),
         required=True,
         default_value={
-            'voice_id': 'English_Graceful_Lady',
+            'voice_id': 'Chinese (Mandarin)_Lyrical_Voice',
         }
     )
 
