@@ -21,4 +21,4 @@ class IsNotNullCompare(Compare):
         try:
             return source_value is not None and len(source_value) > 0
         except Exception:
-            return source_value is not None
+            return True
