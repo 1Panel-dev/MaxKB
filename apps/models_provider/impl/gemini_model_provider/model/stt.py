@@ -3,6 +3,7 @@ from typing import Dict
 from django.utils.translation import gettext as _
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
+from openai import base_url
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel
