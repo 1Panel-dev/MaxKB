@@ -219,9 +219,9 @@ class SafeHTTPAdapter(HTTPAdapter):
 def get_url_content(url, application_id: str):
     application = Application.objects.filter(id=application_id).first()
     if application is None:
-        return AppApiException(500, _('Application does not exist'))
+        raise AppApiException(500, _('Application does not exist'))
     if not application.file_upload_enable:
-        return AppApiException(500, _('File upload is not enabled'))
+        raise AppApiException(500, _('File upload is not enabled'))
     file_limit = 50 * 1024 * 1024
     if application.file_upload_setting and application.file_upload_setting.get('fileLimit'):
         file_limit = application.file_upload_setting.get('fileLimit') * 1024 * 1024
