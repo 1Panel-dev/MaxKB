@@ -9361,3 +9361,12 @@ msgstr "批量移动"
 
 msgid "There is a circular dependency in the tool workflow"
 msgstr "工具工作流存在循环依赖"
+
+msgid "model_params_form must be a list"
+msgstr "model_params_form 必须是一个列表"
+
+msgid "The {index}th item in model_params_form must be a dictionary"
+msgstr "model_params_form 中的第 {index} 项必须是一个字典"
+
+msgid "The label field is required for the {index}th item in model_params_form"
+msgstr "model_params_form 中的第 {index} 项的 label 字段是必填项"

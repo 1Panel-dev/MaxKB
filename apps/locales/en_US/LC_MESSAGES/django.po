@@ -9238,3 +9238,12 @@ msgstr "Batch move"
 
 msgid "There is a circular dependency in the tool workflow"
 msgstr "There is a circular dependency in the tool workflow"
+
+msgid "model_params_form must be a list"
+msgstr ""
+
+msgid "The {index}th item in model_params_form must be a dictionary"
+msgstr ""
+
+msgid "The label field is required for the {index}th item in model_params_form"
+msgstr ""

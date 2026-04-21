@@ -10,6 +10,7 @@ from common.forms.switch_field import SwitchField
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class VolcanicEngineTTVModelGeneralParams(BaseForm):
     resolution = SingleSelect(
         TooltipLabel(_('Resolution'), _('Resolution')),
@@ -52,6 +53,8 @@ class VolcanicEngineTTVModelGeneralParams(BaseForm):
 
 
 class VolcanicEngineTTVModelCredential(BaseForm, BaseModelCredential):
+    api_base = forms.TextInputField('API URL', required=True,
+                                    default_value='https://ark.cn-beijing.volces.com/api/v3')
     api_key = forms.PasswordInputField('Api key', required=True)
 
     def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
@@ -61,7 +64,7 @@ class VolcanicEngineTTVModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(ValidCode.valid_error.value,
                                   gettext('{model_type} Model type is not supported').format(model_type=model_type))
 
-        for key in ['api_key']:
+        for key in ['api_key', 'api_base']:
             if key not in model_credential:
                 if raise_exception:
                     raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
