@@ -48,18 +48,13 @@ class MiniMaxTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         api_base = self.api_base.rstrip('/')
         url = f'{api_base}/t2a_v2'
 
-        voice_id = self.params.get('voice_id', 'English_Graceful_Lady')
-
+        if 'audio_setting' not in self.params:
+            self.params['audio_setting'] = {'format': 'mp3', }
         payload = {
             'model': self.model,
             'text': text,
             'stream': False,
-            'voice_setting': {
-                'voice_id': voice_id,
-            },
-            'audio_setting': {
-                'format': 'mp3',
-            },
+            **self.params,
         }
 
         headers = {
