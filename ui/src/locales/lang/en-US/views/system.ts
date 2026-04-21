@@ -167,5 +167,7 @@ export default {
   resourceMapping: {
     title: 'View Associated Resources',
     sub_title: 'Associated Resources',
+    dependency: 'Dependency',
+    dependent: 'Dependent'
   },
 }

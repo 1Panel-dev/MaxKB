@@ -277,6 +277,16 @@
                                 {{ $t('views.system.resourceAuthorization.title') }}
                               </el-dropdown-item>
                               <el-dropdown-item
+                                @click.stop="openResourceMappingDrawer(item)"
+                                v-if="permissionPrecise.relate_map(item.id)"
+                              >
+                                <AppIcon
+                                  iconName="app-resource-mapping"
+                                  class="color-secondary"
+                                ></AppIcon>
+                                {{ $t('views.system.resourceMapping.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
                                 @click.stop="openTriggerDrawer(item)"
                                 v-if="
                                   apiType === 'workspace' && permissionPrecise.trigger_read(item.id)
@@ -354,7 +364,7 @@
           {{ $t('common.delete') }}
         </el-button>
         <span class="color-secondary ml-24 mr-16">
-          {{ $t('common.selected') }} {{ multipleSelection.length }} /  {{ paginationConfig.total }}
+          {{ $t('common.selected') }} {{ multipleSelection.length }} / {{ paginationConfig.total }}
           {{ $t('views.document.items') }}
         </span>
         <el-button link type="primary" @click="batchSelectedHandle(false)">
@@ -362,6 +372,7 @@
         </el-button>
       </div>
     </ContentContainer>
+    <ResourceMappingDrawer ref="resourceMappingDrawerRef" />
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
     <CopyApplicationDialog ref="CopyApplicationDialogRef" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
@@ -405,6 +416,7 @@ import permissionMap from '@/permission'
 import { hasPermission } from '@/utils/permission'
 import { ComplexPermission } from '@/utils/permission/type'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import useStore from '@/stores'
 import { t } from '@/locales'
 const router = useRouter()
@@ -504,6 +516,11 @@ function deleteMulApplication() {
 const resourceTriggerDrawerRef = ref<InstanceType<typeof ResourceTriggerDrawer>>()
 const openTriggerDrawer = (data: any) => {
   resourceTriggerDrawerRef.value?.open(data)
+}
+
+const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
+const openResourceMappingDrawer = (data: any) => {
+  resourceMappingDrawerRef.value?.open('APPLICATION', data)
 }
 
 const ResourceAuthorizationDrawerRef = ref()
