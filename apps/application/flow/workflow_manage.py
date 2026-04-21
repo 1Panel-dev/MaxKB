@@ -699,8 +699,7 @@ class WorkflowManage:
                         node_list.append(
                             self.get_node_cls_by_id(edge.targetNodeId,
                                                     [*current_node.up_node_id_list, current_node.node.id]))
-
-        return node_list
+        return [node for node in node_list if not node.node.properties.get('disabled')]
 
     def get_reference_field(self, node_id: str, fields: List[str]):
         """
