@@ -17,6 +17,7 @@ from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class GeminiLLMModelParams(BaseForm):
     temperature = forms.SliderField(TooltipLabel(_('Temperature'),
                                                  _('Higher values make the output more random, while lower values make it more focused and deterministic')),
@@ -70,8 +71,9 @@ class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
+    base_url = forms.TextInputField('Base URL', required=True,
+                                    default_value='https://generativelanguage.googleapis.com')
     api_key = forms.PasswordInputField('API Key', required=True)
-    base_url = forms.TextInputField('Base URL', required=True, default_value='https://generativelanguage.googleapis.com')
 
     def get_model_params_setting_form(self, model_name):
         return GeminiLLMModelParams()

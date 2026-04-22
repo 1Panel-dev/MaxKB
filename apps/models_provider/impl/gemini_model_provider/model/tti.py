@@ -4,6 +4,7 @@ from typing import Dict
 from openai import OpenAI
 
 from common.config.tokenizer_manage_config import TokenizerManage
+from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
 
@@ -78,7 +79,7 @@ class GeminiTextToImage(MaxKBBaseModel, BaseTextToImage):
 
             for part in response.parts:
                 if part.text is not None:
-                    print(part.text)
+                    maxkb_logger.info(part.text)
                 elif part.inline_data is not None:
                     image_bytes = part.inline_data.data
                     img_base64 = base64.b64encode(image_bytes).decode("utf-8")

@@ -12,6 +12,7 @@ from models_provider.base_ttv import BaseGenerationVideo
 
 class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     api_key: str
+    api_base: str
     model_name: str
     params: dict
     max_retries: int = 3
@@ -20,6 +21,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.api_base = kwargs.get('api_base')
         self.model_name = kwargs.get('model_name')
         self.params = kwargs.get('params', {})
         self.max_retries = kwargs.get('max_retries', 3)
@@ -35,9 +37,13 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
+        api_base = model_credential.get('api_base')
+        if api_base is None:
+            api_base = 'https://dashscope.aliyuncs.com/api/v1'
         return GenerationVideoModel(
             model_name=model_name,
             api_key=model_credential.get('api_key'),
+            api_base=api_base,
             **optional_params,
         )
 
@@ -66,13 +72,18 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             last_frame_url: 结束关键帧图片 URL (KF2V 必填)
             如果没有提供last_frame_url，则表示只提供了first_frame_url，生成的是单关键帧视频（KFV） 参数是img_url
             """
+        import dashscope
+        dashscope.base_http_api_url = self.api_base
+
+        is_kf2v_model = 'kf2v' in self.model_name.lower()
 
         # 构建基础参数
         params = {"api_key": self.api_key, "prompt": prompt, "model": self.model_name,
                   "negative_prompt": negative_prompt}
-        if first_frame_url and last_frame_url:
+
+        if is_kf2v_model:
             params['first_frame_url'] = first_frame_url
-            params["last_frame_url"] = last_frame_url
+            params['last_frame_url'] = last_frame_url
         elif first_frame_url:
             params['img_url'] = first_frame_url
 
@@ -100,13 +111,12 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         # --- 等待任务完成 ---
         rsp = self._safe_call(VideoSynthesis.wait, task=rsp, api_key=self.api_key)
         if rsp.status_code == HTTPStatus.OK:
-            maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
             if rsp.output.task_status == "SUCCEEDED":
-                maxkb_logger.info("视频生成完成！视频 URL:", rsp.output.video_url)
+                maxkb_logger.info(f'视频生成完成！视频 URL: {rsp.output.video_url}')
                 return rsp.output.video_url
             else:
-                maxkb_logger.error("视频生成失败！")
-                raise RuntimeError(f'生成失败, message: {rsp.output.message}')
+                maxkb_logger.error(f'视频生成失败: {rsp.output.message}')
+                raise RuntimeError(f'视频生成失败, message: {rsp.output.message}')
         else:
             maxkb_logger.error(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
             raise RuntimeError(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')

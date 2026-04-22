@@ -10,7 +10,7 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
     api_base: str
     params: Dict[str, object]
 
-    def __init__(self, api_key: str, model: str, api_base: str, params: Dict[str, object] = None):
+    def __init__(self, api_key: str, model: str, api_base: str, **params):
         self.client = Ark(
             api_key=api_key,
             base_url=api_base
@@ -37,21 +37,22 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
         return res[0]
 
     def embed_documents(
-            self, texts: List[str], chunk_size: int | None = None
+            self, texts: List[str]
     ) -> List[List[float]]:
         if self.model_name.startswith("doubao-embedding-vision-"):
-            multimodal_inputs = []
+            embeddings = []
             for text in texts:
-                multimodal_inputs.append({
-                    "type": "text",
-                    "text": text
-                })
-            resp = self.client.multimodal_embeddings.create(
-                model=self.model_name,
-                input=multimodal_inputs,
-                **(self.params or {})
-            )
-            return [resp.data.get('embedding')]
+                multimodal_input = {"type": "text", "text": text}
+                resp = self.client.multimodal_embeddings.create(
+                    model=self.model_name,
+                    input=[multimodal_input],
+                    encoding_format="float",
+                    **(self.params or {})
+                )
+                embedding = self._extract_embedding(resp.data)
+                if embedding is not None:
+                    embeddings.append(embedding)
+            return embeddings
         else:
             resp = self.client.embeddings.create(
                 model=self.model_name,
@@ -59,3 +60,17 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
                 **(self.params or {})
             )
             return [e.embedding for e in resp.data]
+
+    def _extract_embedding(self, data):
+        if isinstance(data, list) and len(data) > 0:
+            item = data[0]
+        else:
+            item = data
+
+        if hasattr(item, 'embedding'):
+            return item.embedding
+        elif isinstance(item, dict):
+            return item.get('embedding')
+        elif isinstance(item, list):
+            return item
+        return None

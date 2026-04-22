@@ -17,12 +17,14 @@ def custom_get_token_ids(text: str):
 
 class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
     api_key: str
+    base_url: str
     model: str
     params: dict
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
+        self.base_url = kwargs.get('base_url')
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
 
@@ -39,6 +41,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
         return ZhiPuTextToImage(
             model=model_name,
             api_key=model_credential.get('api_key'),
+            base_url=model_credential.get('base_url', "https://open.bigmodel.cn/api/paas/v4"),
             **optional_params,
         )
 
@@ -48,7 +51,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
     def check_auth(self):
         chat = ChatOpenAI(
             api_key=self.api_key,
-            base_url='https://open.bigmodel.cn/api/paas/v4',
+            base_url=self.base_url,
             model=self.model,
         )
         chat.invoke([HumanMessage([{"type": "text", "text": gettext('Hello')}])])
@@ -60,7 +63,7 @@ class ZhiPuTextToImage(MaxKBBaseModel, BaseTextToImage):
         #     zhipuai_api_key=self.api_key,
         #     model_name=self.model,
         # )
-        chat = ZhipuAI(api_key=self.api_key)
+        chat = ZhipuAI(api_key=self.api_key, base_url=self.base_url)
         response = chat.images.generations(
             model=self.model,  # 填写需要调用的模型编码
             prompt=prompt,  # 填写需要生成图片的文本

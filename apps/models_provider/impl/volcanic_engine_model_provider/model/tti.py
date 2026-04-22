@@ -60,8 +60,20 @@ class VolcanicEngineTextToImage(MaxKBBaseModel, BaseTextToImage):
             prompt=prompt,
             **self.params
         )
-        if imagesResponse.data[0].url:
-            file_urls.append(imagesResponse.data[0].url)
-        elif imagesResponse.data[0].b64_json:
-            file_urls.append(imagesResponse.data[0].b64_json)
+        # 如果 data 是列表，遍历所有图片
+        if isinstance(imagesResponse.data, list):
+            for item in imagesResponse.data:
+                # 优先使用 URL，其次使用 base64
+                if hasattr(item, 'url') and item.url:
+                    file_urls.append(item.url)
+                elif hasattr(item, 'b64_json') and item.b64_json:
+                    file_urls.append(item.b64_json)
+        else:
+            # 如果 data 是单个对象
+            item = imagesResponse.data
+            if hasattr(item, 'url') and item.url:
+                file_urls.append(item.url)
+            elif hasattr(item, 'b64_json') and item.b64_json:
+                file_urls.append(item.b64_json)
+
         return file_urls

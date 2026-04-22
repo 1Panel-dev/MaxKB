@@ -28,9 +28,9 @@ def get_embedding_model(model_id):
 
 
 class EmbedDocuments(serializers.Serializer):
-    texts = serializers.ListField(required=True, child=serializers.CharField(required=True,
-                                                                             label=_('vector text')),
-                                  label=_('vector text list')),
+    texts = serializers.ListField(required=True,
+                                  child=serializers.CharField(required=True, label=_('vector text')),
+                                  label=_('vector text list'))
 
 
 class EmbedQuery(serializers.Serializer):

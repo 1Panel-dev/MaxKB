@@ -190,8 +190,19 @@
                 <el-icon class="mr-8 arrow-icon" :class="collapseData.MCP ? 'rotate-90' : ''">
                   <CaretRight /> </el-icon
                 >MCP
-                <span class="ml-4" v-if="chat_data.mcp_tool_ids?.filter((id: any) => relatedObject(mcpToolSelectOptions, id, 'id'))?.length">
-                  ({{ chat_data.mcp_tool_ids?.filter((id: any) => relatedObject(mcpToolSelectOptions, id, 'id'))?.length }})
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.mcp_tool_ids?.filter((id: any) =>
+                      relatedObject(mcpToolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.mcp_tool_ids?.filter((id: any) =>
+                      relatedObject(mcpToolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
                 </span>
               </div>
               <div class="flex">
@@ -268,8 +279,19 @@
                   <CaretRight />
                 </el-icon>
                 {{ $t('views.tool.title') }}
-                <span class="ml-4" v-if="chat_data.tool_ids?.filter((id: any) => relatedObject(toolSelectOptions, id, 'id'))?.length">
-                  ({{ chat_data.tool_ids?.filter((id: any) => relatedObject(toolSelectOptions, id, 'id'))?.length }})
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.tool_ids?.filter((id: any) =>
+                      relatedObject(toolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.tool_ids?.filter((id: any) =>
+                      relatedObject(toolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
                 </span>
               </div>
               <div class="flex">
@@ -298,7 +320,12 @@
                         alt=""
                       />
                     </el-avatar>
-                    <ToolIcon v-else class="mr-8" :size="20" />
+                    <ToolIcon
+                      v-else
+                      class="mr-8"
+                      :size="20"
+                      :type="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.tool_type)"
+                    />
 
                     <div
                       class="ellipsis"
@@ -323,8 +350,19 @@
                   <CaretRight />
                 </el-icon>
                 Skills
-                <span class="ml-4" v-if="chat_data.skill_tool_ids?.filter((id: any) => relatedObject(skillToolSelectOptions, id, 'id'))?.length">
-                  ({{ chat_data.skill_tool_ids?.filter((id: any) => relatedObject(skillToolSelectOptions, id, 'id'))?.length }})
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.skill_tool_ids?.filter((id: any) =>
+                      relatedObject(skillToolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.skill_tool_ids?.filter((id: any) =>
+                      relatedObject(skillToolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
                 </span>
               </div>
               <div class="flex">
@@ -565,6 +603,11 @@ const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
 {{${t('workflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
 {{${t('workflow.nodes.startNode.label')}.question}}`
+
+const longTermPrompt =
+  t('views.application.longTermMemory.tips1') +
+  '{{memory}}' +
+  t('views.application.longTermMemory.tips2')
 
 const collapseData = reactive({
   MCP: true,
@@ -827,6 +870,18 @@ function getSkillToolSelectOptions() {
       )
     })
 }
+
+function refreshLongTermConfig() {
+  const form_data = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .filter((v: any) => v.properties.node_data.long_term_enable)
+    .filter((v: any) => v)
+
+  if (form_data.length > 0) {
+    chat_data.value.system = chat_data.value.system || longTermPrompt
+  }
+}
+props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
 
 onMounted(() => {
   getSelectModel()

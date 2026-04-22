@@ -154,10 +154,35 @@ const refreshFileUploadConfig = () => {
 }
 props.nodeModel.graphModel.eventCenter.on('refreshFileUploadConfig', refreshFileUploadConfig)
 
+const refreshLongTermConfig = () => {
+  let fields = cloneDeep(props.nodeModel.properties.config.fields)
+  const form_data = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .filter((v: any) => v.properties.node_data.long_term_enable)
+    .filter((v: any) => v)
+
+  fields = fields.filter(
+    (item: any) => {
+      return item.value !== 'memory'
+    }
+  )
+
+  if (form_data.length === 0) {
+    set(props.nodeModel.properties.config, 'fields', fields)
+    return
+  }
+  if (form_data[0]) {
+    set(props.nodeModel.properties.config, 'fields', [...fields, { label: t('views.application.longTermMemory.title'), value: 'memory' }])
+  }
+}
+
+props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
+
 onMounted(() => {
   refreshChatFieldList()
   refreshFieldList()
   refreshFileUploadConfig()
+  refreshLongTermConfig()
 })
 </script>
 <style lang="scss" scoped></style>

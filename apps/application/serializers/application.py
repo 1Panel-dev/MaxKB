@@ -31,6 +31,7 @@ from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
+from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationTypeChoices, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -964,7 +965,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-                       8:24]
+            8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -1010,6 +1011,16 @@ class ApplicationOperateSerializer(serializers.Serializer):
                     instance['file_upload_setting'] = node_data['file_upload_setting']
                 if 'name' in node_data:
                     instance['name'] = node_data['name']
+                if 'long_term_enable' in node_data:
+                    instance['long_term_enable'] = node_data['long_term_enable']
+                if 'long_term_model_id' in node_data:
+                    instance['long_term_model_id'] = node_data['long_term_model_id']
+                if 'long_term_model_params_setting' in node_data:
+                    instance['long_term_model_params_setting'] = node_data['long_term_model_params_setting']
+                if 'long_term_trigger_type' in node_data:
+                    instance['long_term_trigger_type'] = node_data['long_term_trigger_type']
+                if 'long_term_trigger_setting' in node_data:
+                    instance['long_term_trigger_setting'] = node_data['long_term_trigger_setting']
                 break
         knowledge_node_list = ApplicationOperateSerializer.get_search_node(instance.get('work_flow'))
         for knowledge_node in knowledge_node_list:
@@ -1067,8 +1078,15 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 id=instance.get('tts_model_id')).first()
             if model is None:
                 raise AppApiException(500, _("Model does not exist"))
+        if instance.get('long_term_model_id') is None or len(instance.get('long_term_model_id')) == 0:
+            application.long_term_model_id = None
+        else:
+            model = QuerySet(Model).filter(
+                id=instance.get('long_term_model_id')).first()
+            if model is None:
+                raise AppApiException(500, _("Model does not exist"))
         if 'work_flow' in instance:
-            # 修改语音配置相关
+            # 把工作流中的字段提取到表上
             self.update_work_flow_model(instance)
         if 'mcp_servers' in instance and len(instance.get('mcp_servers', {})) > 0:
             ToolExecutor().validate_mcp_transport(json.dumps(instance.get('mcp_servers')))
@@ -1080,6 +1098,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
                        'stt_model_params_setting',
                        'mcp_enable', 'mcp_tool_ids', 'mcp_servers', 'mcp_source', 'tool_enable', 'tool_ids',
                        'mcp_output_enable', 'application_enable', 'application_ids', 'skill_tool_ids',
+                       'long_term_enable', 'long_term_model_id', 'long_term_model_params_setting',
+                       'long_term_trigger_setting', 'long_term_trigger_type',
                        'problem_optimization_prompt', 'clean_time', 'file_clean_time', 'folder_id']
         for update_key in update_keys:
             if update_key in instance and instance.get(update_key) is not None:
@@ -1104,6 +1124,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                                self.get_application_knowledge_mapping(application_knowledge_id_list,
                                                                                       knowledge_id_list,
                                                                                       application_id))
+        schedule_extract_long_term_memory.delay(
+            application.workspace_id, application_id,
+            application.long_term_enable, application.long_term_trigger_type, application.long_term_trigger_setting
+        )
         return self.one(with_valid=False)
 
     def update_template_workflow(self, instance: Dict, app: Application):
