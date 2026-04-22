@@ -258,10 +258,10 @@ def get_role_list(user,
     """
     version = Cache_Version.ROLE_LIST.get_version()
     key = Cache_Version.ROLE_LIST.get_key(user_id=user.id)
-    workspace_list = cache.get(key, version=version)
+    role_list = cache.get(key, version=version)
     # 获取权限列表
     is_query_model = workspace_user_role_mapping_model is not None and workspace_model is not None and role_model is not None and role_permission_mapping_model is not None
-    if workspace_list is None:
+    if role_list is None:
         if is_query_model:
             # 获取工作空间 用户 角色映射数据
             workspace_user_role_mapping_list = QuerySet(workspace_user_role_mapping_model).filter(user_id=user.id)
@@ -274,16 +274,14 @@ def get_role_list(user,
                                                    for
                                                    workspace_user_role_mapping in
                                                    workspace_user_role_mapping_list], [])))
-            cache.set(key, workspace_list, version=version)
-            return role_list
+            cache.set(key, role_list, version=version)
         else:
             if user.role == RoleConstants.ADMIN.value.__str__():
                 role_list = [user.role, get_role_permission(RoleConstants.WORKSPACE_MANAGE, 'default')]
             else:
                 role_list = [user.role, get_role_permission(RoleConstants.USER, 'default')]
             cache.set(key, role_list, version=version)
-            return role_list
-    return workspace_list
+    return role_list
 
 
 def get_auth(user):
