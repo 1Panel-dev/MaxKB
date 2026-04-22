@@ -75,12 +75,15 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         import dashscope
         dashscope.base_http_api_url = self.api_base
 
+        is_kf2v_model = 'kf2v' in self.model_name.lower()
+
         # 构建基础参数
         params = {"api_key": self.api_key, "prompt": prompt, "model": self.model_name,
                   "negative_prompt": negative_prompt}
-        if first_frame_url and last_frame_url:
+
+        if is_kf2v_model:
             params['first_frame_url'] = first_frame_url
-            params["last_frame_url"] = last_frame_url
+            params['last_frame_url'] = last_frame_url
         elif first_frame_url:
             params['img_url'] = first_frame_url
 
