@@ -7,49 +7,54 @@
           <span class="color-danger">*</span>
         </span>
         <div class="flex">
-          <el-checkbox v-model="formValue.multiple" label="允许多选" size="large" class="pr-8" />
+          <el-checkbox
+            v-model="formValue.multiple"
+            :label="$t('dynamicsForm.TreeSelect.allowMultipleSelections')"
+            size="large"
+            class="pr-8"
+          />
           <el-button link type="primary" @click="openAddRootDialog">
             <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
-            {{ $t('common.add') }}
           </el-button>
         </div>
       </div>
     </template>
+    <el-card shadow="never" class="border-r-6 w-full" style="--el-card-padding: 8px">
+      <el-tree
+        :data="treeData"
+        node-key="id"
+        default-expand-all
+        :expand-on-click-node="false"
+        :props="treeProps"
+        class="option-tree"
+      >
+        <template #default="{ data }">
+          <div class="flex-between w-full">
+            <div class="ellipsis" :title="`${data.label}-${data.value}`" style="max-width: 350px">
+              <span>{{ data.label }}-{{ data.value }}</span>
+            </div>
 
-    <el-tree
-      :data="treeData"
-      node-key="id"
-      default-expand-all
-      :expand-on-click-node="false"
-      :props="treeProps"
-      class="option-tree"
-    >
-      <template #default="{ data }">
-        <div class="tree-node">
-          <div class="tree-node__main">
-            <span class="tree-node__label">{{ data.label }}</span>
-            <span class="tree-node__colon">：</span>
-            <span class="tree-node__value">{{ data.value }}</span>
+            <div>
+              <span class="mr-4">
+                <el-button link @click.stop="openAddChildDialog(data)">
+                  <AppIcon iconName="app-add-outlined" class="color-secondary"></AppIcon>
+                </el-button>
+              </span>
+              <span class="mr-4">
+                <el-button link @click.stop="openEditDialog(data)">
+                  <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                </el-button>
+              </span>
+              <span>
+                <el-button link @click.stop="handleDelete(data)">
+                  <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                </el-button>
+              </span>
+            </div>
           </div>
-
-          <div class="tree-node__actions">
-            <el-button link type="primary" @click.stop="openAddChildDialog(data)">
-              <el-icon class="action-btn">
-                <Plus />
-              </el-icon>
-            </el-button>
-
-            <el-button link type="primary" @click.stop="openEditDialog(data)">
-              <el-icon class="action-btn"> <Edit /></el-icon>
-            </el-button>
-
-            <el-button link type="danger" @click.stop="handleDelete(data)">
-              <el-icon class="action-btn"> <Delete /></el-icon>
-            </el-button>
-          </div>
-        </div>
-      </template>
-    </el-tree>
+        </template>
+      </el-tree>
+    </el-card>
   </el-form-item>
 
   <el-form-item
@@ -86,35 +91,57 @@
     "
     width="520px"
     destroy-on-close
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
   >
-    <div class="dialog-body">
-      <div v-for="(item, index) in addDialog.formList" :key="item.key" class="dialog-row">
-        <el-input
-          v-model.trim="item.label"
-          :placeholder="$t('dynamicsForm.tag.placeholder')"
-          maxlength="50"
-        />
-        <el-input
-          v-model.trim="item.value"
-          :placeholder="$t('dynamicsForm.Select.placeholder')"
-          maxlength="100"
-        />
-        <el-button
-          link
-          type="danger"
-          :disabled="addDialog.formList.length === 1"
-          @click="removeAddRow(index)"
-        >
-          <el-icon class="action-btn"> <Delete /></el-icon>
-        </el-button>
-      </div>
-
-      <el-button link type="primary" @click="appendAddRow">
-        <AppIcon iconName="app-add-outlined" class="mr-4" />
-        {{ $t('common.add') }}
-      </el-button>
-    </div>
-
+    <el-scrollbar>
+      <el-row :gutter="8" style="margin-right: 10px" class="tag-list-max-list">
+        <template v-for="(item, index) in addDialog.formList" :key="index">
+          <el-col :span="12">
+            <el-form-item>
+              <template #label>
+                {{ index === 0 ? $t('dynamicsForm.tag.label') : '' }}
+                <span class="color-danger" v-if="index === 0"> *</span>
+              </template>
+              <el-input
+                v-model.trim="item.label"
+                class="w-full"
+                :placeholder="$t('dynamicsForm.tag.placeholder')"
+                maxlength="50"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="11">
+            <el-form-item class="w-full">
+              <template #label>
+                {{ index === 0 ? $t('dynamicsForm.Select.label') : '' }}
+                <span class="color-danger" v-if="index === 0">*</span>
+              </template>
+              <el-input
+                v-model.trim="item.value"
+                :placeholder="$t('dynamicsForm.Select.placeholder')"
+                maxlength="100"
+              ></el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="1">
+            <el-button
+              :disabled="addDialog.formList.length === 1"
+              link
+              @click="removeAddRow(index)"
+              :style="{ marginTop: index === 0 ? '35px' : '12px' }"
+            >
+              <AppIcon iconName="app-delete"></AppIcon>
+            </el-button>
+          </el-col>
+        </template>
+      </el-row>
+    </el-scrollbar>
+    <el-button link type="primary" @click="appendAddRow">
+      <AppIcon iconName="app-add-outlined" class="mr-4" />
+      {{ $t('common.add') }}
+    </el-button>
     <template #footer>
       <el-button @click="closeAddDialog">{{ $t('common.cancel') }}</el-button>
       <el-button type="primary" @click="submitAdd">{{ $t('common.add') }}</el-button>
@@ -122,21 +149,43 @@
   </el-dialog>
 
   <!-- 编辑弹窗 -->
-  <el-dialog v-model="editDialog.visible" :title="$t('common.edit')" width="520px" destroy-on-close>
-    <div class="dialog-body">
-      <div class="dialog-row dialog-row--edit">
-        <el-input
-          v-model.trim="editDialog.form.label"
-          :placeholder="$t('dynamicsForm.tag.placeholder')"
-          maxlength="50"
-        />
-        <el-input
-          v-model.trim="editDialog.form.value"
-          :placeholder="$t('dynamicsForm.Select.placeholder')"
-          maxlength="100"
-        />
-      </div>
-    </div>
+  <el-dialog
+    v-model="editDialog.visible"
+    :title="$t('common.edit')"
+    width="520px"
+    destroy-on-close
+    label-position="top"
+    require-asterisk-position="right"
+    @submit.prevent
+  >
+    <el-row :gutter="8">
+      <el-col :span="12">
+        <el-form-item>
+          <template #label>
+            {{ $t('dynamicsForm.tag.label') }}
+            <span class="color-danger"> *</span>
+          </template>
+          <el-input
+            v-model.trim="editDialog.form.label"
+            :placeholder="$t('dynamicsForm.tag.placeholder')"
+            maxlength="50"
+          />
+        </el-form-item>
+      </el-col>
+      <el-col :span="12">
+        <el-form-item class="w-full">
+          <template #label>
+            {{ $t('dynamicsForm.Select.label') }}
+            <span class="color-danger">*</span>
+          </template>
+          <el-input
+            v-model.trim="editDialog.form.value"
+            :placeholder="$t('dynamicsForm.Select.placeholder')"
+            maxlength="100"
+          />
+        </el-form-item>
+      </el-col>
+    </el-row>
 
     <template #footer>
       <el-button @click="closeEditDialog">{{ $t('common.cancel') }}</el-button>
@@ -146,7 +195,6 @@
 </template>
 <script setup lang="ts">
 import { computed, onMounted, watch, ref, reactive } from 'vue'
-import { Edit, Plus, Delete } from '@element-plus/icons-vue'
 import { t } from '@/locales/'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -396,100 +444,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
 }
 </script>
 <style lang="scss" scoped>
-.defaultValueItem {
-  position: relative;
-  .defaultValueCheckbox {
-    position: absolute;
-    right: 0;
-    top: -35px;
-  }
-}
-.dynamic-option-tree {
-  width: 100%;
-}
-
-.tree-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 12px;
-}
-
-.tree-header__title {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--el-text-color-primary);
-  font-size: 14px;
-}
-
-.required {
-  color: var(--el-color-danger);
-}
-
-.tree-empty {
-  width: 100%;
-  padding: 24px 0;
-  border: 1px dashed var(--el-border-color);
-  border-radius: 8px;
-}
-.option-tree {
-  width: 100%;
-}
-.option-tree :deep(.el-tree-node__content) {
-  height: 18px;
-}
-
-.tree-node {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-right: 8px;
-}
-
-.tree-node__main {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.tree-node__label,
-.tree-node__colon,
-.tree-node__value {
-  font-size: 14px;
-  color: var(--el-text-color-primary);
-}
-
-.tree-node__actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.tree-node:hover .tree-node__actions {
-  opacity: 1;
-}
-
-.dialog-body {
-  padding-top: 8px;
-}
-
-.dialog-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 40px;
-  gap: 12px;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.dialog-row--edit {
-  grid-template-columns: 1fr 1fr;
+.tag-list-max-list {
+  max-height: calc(100vh - 260px);
 }
 </style>
