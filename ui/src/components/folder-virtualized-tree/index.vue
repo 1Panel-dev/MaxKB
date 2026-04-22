@@ -51,6 +51,7 @@
       </div>
     </div>
     <VirtualizedTree
+      ref="treeRef"
       class="folder-tree__main"
       v-model="sortedData"
       :class="
@@ -59,12 +60,10 @@
       @node-drop="handleDrop"
       @handleNodeClick="handleNodeClick"
       :current-node-key="currentNodeKey"
+      :filter-node-method="filterNode"
     >
       <template #default="{ node, stat }">
-        <div
-          @mouseenter.stop="handleMouseEnter(node)"
-          class="flex align-center w-full custom-tree-node"
-        >
+        <div @mouseenter.stop="handleMouseEnter(node)" class="flex align-center custom-tree-node">
           <AppIcon iconName="app-folder" style="font-size: 20px"></AppIcon>
           <span class="tree-label ml-8 lighter" :title="node.name">{{ i18n_name(node.name) }}</span>
           <div
@@ -232,6 +231,24 @@ const MoreFilledPermission = (node: any) => {
 
 const emit = defineEmits(['handleNodeClick', 'refreshTree'])
 
+const treeRef = ref()
+const filterText = ref('')
+const hoverNodeId = ref<string | undefined>('')
+const title = ref('')
+const loading = ref(false)
+
+watch(filterText, (val) => {
+  let v = val
+  if (val) {
+    v = val.trim()
+  }
+  treeRef.value!.filter(v)
+})
+const filterNode = (data: any, value: string) => {
+  if (!value) return true
+  return data.name.toLowerCase().includes(value.toLowerCase())
+}
+
 const handleDrop = (draggingNode: any, dropNode: any, dropType: string) => {
   const dragData = draggingNode.data
   const dropData = dropNode.data
@@ -375,11 +392,6 @@ function getSortContext(positions: Record<string, number>, nodeId: string) {
 
   return { dropPos, sortedNodes, dropIndex }
 }
-const treeRef = ref()
-const filterText = ref('')
-const hoverNodeId = ref<string | undefined>('')
-const title = ref('')
-const loading = ref(false)
 
 const isDropdownOpen = ref(false)
 let time: any
@@ -687,26 +699,11 @@ onUnmounted(() => {})
     height: calc(100vh - 180px);
   }
   :deep(.folder-tree__main) {
-    padding: 4px 0 0 8px;
+    padding: 4px 2px 0 8px;
     .custom-tree-node {
       box-sizing: content-box;
       position: relative;
     }
   }
-
-  // :deep(.folder-tree__main) {
-  //   .el-tree-node.is-dragging {
-  //     opacity: 0.5;
-  //   }
-  //   .el-tree-node.is-drop-inner > .el-tree-node__content {
-  //     background-color: var(--el-color-primary-light-9);
-  //     border: 2px dashed var(--el-color-primary);
-  //     border-radius: 4px;
-  //   }
-
-  //   .el-tree-node__children {
-  //     overflow: inherit !important;
-  //   }
-  // }
 }
 </style>

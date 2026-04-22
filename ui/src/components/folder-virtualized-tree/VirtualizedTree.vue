@@ -4,6 +4,7 @@
     virtualization
     :defaultOpen="false"
     v-bind="$attrs"
+    :model-value="filteredTreeData"
     class="maxkb-virtualized-tree"
     @click:node="handleNodeClick"
     @after-drop="onAfterDrop"
@@ -33,13 +34,23 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { Draggable, dragContext } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 const props = defineProps({
+  modelValue: {
+    type: Array,
+    default: () => [],
+  },
   currentNodeKey: {
     type: String,
     default: 'default',
+  },
+  filterNodeMethod: {
+    type: Function,
+    default: (node: any, filterText: string) => {
+      return node.name?.toLowerCase().includes(filterText.toLowerCase())
+    },
   },
 })
 
@@ -105,25 +116,83 @@ function onAfterDrop() {
 }
 const statHandler = (stat: any) => {
   stat.open = stat.level === 1
+  if (filterText.value) {
+    stat.open = true
+  }
   return stat
 }
+
+// 过滤文本
+const filterText = ref('')
+/**
+ * 递归过滤树
+ * @param nodes 节点数组
+ * @param text 过滤文本
+ * @returns 过滤后的新树（新对象，但节点内的基本属性保持原引用）
+ */
+const filterTree = (nodes: any[], text: string): any[] => {
+  if (!text || !props.filterNodeMethod) {
+    return nodes
+  }
+
+  const result: any[] = []
+  for (const node of nodes) {
+    const isMatch = props.filterNodeMethod(node, text)
+    let filteredChildren: any[] = []
+    if (node.children && node.children.length) {
+      filteredChildren = filterTree(node.children, text)
+    }
+    if (isMatch || filteredChildren.length) {
+      // 创建新节点对象，保留原有属性，替换 children
+      result.push({
+        ...node,
+        children: filteredChildren,
+      })
+    }
+  }
+  return result
+}
+
+// 计算过滤后的树数据
+const filteredTreeData = computed(() => {
+  return filterTree(props.modelValue, filterText.value)
+})
+
+// 暴露过滤方法给父组件
+const filter = (text: string) => {
+  filterText.value = text
+}
+
+defineExpose({
+  filter,
+})
 </script>
 
 <style lang="scss">
 .maxkb-virtualized-tree {
-  overflow: overlay !important;
+  overflow: auto !important;
   scrollbar-gutter: stable;
-
-  ::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.2);
+  // 滚动条
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
     border-radius: 5px;
-    transition: all 0.2s ease-in-out;
-
-    &:hover {
-      cursor: pointer;
-      background-color: rgba(0, 0, 0, 0.3);
-    }
+    background-color: transparent;
   }
+  ::-webkit-scrollbar-thumb {
+    transition: all 0.2s ease-in-out;
+    background-color: transparent;
+    background-clip: padding-box;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+
   .tree-arrow-icon {
     color: var(--app-text-color-secondary);
     padding: 6px;
@@ -152,5 +221,11 @@ const statHandler = (stat: any) => {
       font-weight: 500;
     }
   }
+}
+.he-tree-drag-placeholder {
+  background-color: var(--el-color-primary-light-9);
+  border: 2px dashed var(--el-color-primary);
+  border-radius: 4px;
+  width: 98%;
 }
 </style>
