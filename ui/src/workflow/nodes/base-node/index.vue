@@ -49,7 +49,7 @@
         <template #label>
           <div class="flex-between">
             <div class="flex align-center">
-              <span class="mr-4">长期记忆</span>
+              <span class="mr-4">{{$t('views.application.longTermMemory.title')}}</span>
               <el-tooltip
                 effect="dark"
                 :content="longTermTips"
@@ -267,9 +267,7 @@ const form = {
   prologue: t('views.application.form.defaultPrologue'),
 }
 
-const longTermTips = `
-{{${t('workflow.nodes.startNode.label')}.memory}} 为长期记忆占位符，开启后可以在系统提示词中引用
-`
+const longTermTips = t('views.application.longTermMemory.tips1') + '{{memory}}' + t('views.application.longTermMemory.tips2')
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {

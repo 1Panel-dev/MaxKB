@@ -28,14 +28,14 @@
         :props="treeProps"
         class="option-tree"
       >
-        <template #default="{ data }">
+        <template #default="{ data, node }">
           <div class="flex-between w-full">
             <div class="ellipsis" :title="`${data.label}-${data.value}`" style="max-width: 350px">
               <span>{{ data.label }}-{{ data.value }}</span>
             </div>
 
             <div>
-              <span class="mr-4">
+              <span class="mr-4" v-if="node.level < 5">
                 <el-button link @click.stop="openAddChildDialog(data)">
                   <AppIcon iconName="app-add-outlined" class="color-secondary"></AppIcon>
                 </el-button>
