@@ -1,3 +1,4 @@
+import re
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from langchain_core.messages import HumanMessage
@@ -165,6 +166,8 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
         )
     ]):
         content += chunk.content
+
+    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
 
     if long_term_memory:
         long_term_memory.memory = content
