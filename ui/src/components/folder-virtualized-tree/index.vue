@@ -50,7 +50,7 @@
         </div>
       </div>
     </div>
-    <HeTree
+    <VirtualizedTree
       class="folder-tree__main"
       v-model="sortedData"
       :class="
@@ -126,7 +126,7 @@
           </div>
         </div>
       </template>
-    </HeTree>
+    </VirtualizedTree>
 
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" :title="title" />
     <MoveToDialog ref="MoveToDialogRef" :source="props.source" @refresh="emit('refreshTree')" />
@@ -142,7 +142,7 @@
 <script lang="ts" setup>
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
-import HeTree from './HeTree.vue'
+import VirtualizedTree from './VirtualizedTree.vue'
 import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
