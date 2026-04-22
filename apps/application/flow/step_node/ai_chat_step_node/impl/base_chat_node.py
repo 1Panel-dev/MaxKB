@@ -365,7 +365,7 @@ class BaseChatNode(IChatNode):
                 tool_params[k] = self.workflow_manage.generate_prompt(tool_params[k])
             elif type(v) == dict:
                 self.handle_variables(v)
-            elif (type(v) == list) and len(v) > 0 and type(v[0]) == str:
+            elif (type(v) == list) and len(v) > 0 and (type(v[0]) == str):
                 tool_params[k] = self.get_reference_content(v)
         return tool_params
 
