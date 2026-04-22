@@ -58,4 +58,4 @@ class RegoloTextToImage(MaxKBBaseModel, BaseTextToImage):
                 file_urls.append(url)
             return file_urls
         except Exception as e:
-            raise f"RegoloTextToImage generate_image error: {e}"
+            raise RuntimeError(f"RegoloTextToImage generate_image error: {e}") from e
