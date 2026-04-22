@@ -1125,7 +1125,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                                                                       knowledge_id_list,
                                                                                       application_id))
         schedule_extract_long_term_memory.delay(
-            application.workspace_id, application_id, application.long_term_trigger_setting
+            application.workspace_id, application_id,
+            application.long_term_enable, application.long_term_trigger_type, application.long_term_trigger_setting
         )
         return self.one(with_valid=False)
 

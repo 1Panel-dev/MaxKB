@@ -451,7 +451,7 @@ def extract_long_term_memory(workspace_id, application_id, chat_user_id):
 
 
 @celery_app.task(name="celery:schedule_extract_long_term_memory")
-def schedule_extract_long_term_memory(workspace_id, application_id, trigger_setting):
+def schedule_extract_long_term_memory(workspace_id, application_id, enabled, trigger_type, trigger_setting):
     # 先清理旧的调度任务
     _remove_long_term_jobs(application_id)
 
@@ -460,15 +460,6 @@ def schedule_extract_long_term_memory(workspace_id, application_id, trigger_sett
         return
 
     # 应用关闭长期记忆或不再是定时触发，则只清理不再部署
-    if application.type == 'WORK_FLOW':
-        node_list = application.work_flow.get('nodes', []) if application.work_flow else []
-        base_node = next((n for n in node_list if n.get('id') == 'base-node'), None)
-        node_data = (base_node or {}).get('properties', {}).get('node_data', {})
-        enabled = node_data.get('long_term_enable', False)
-        trigger_type = node_data.get('long_term_trigger_type')
-    else:
-        enabled = application.long_term_enable
-        trigger_type = application.long_term_trigger_type
     if not enabled or trigger_type != 'SCHEDULED':
         return
 
