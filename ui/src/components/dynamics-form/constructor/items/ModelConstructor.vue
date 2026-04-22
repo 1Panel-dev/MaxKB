@@ -97,11 +97,6 @@
             >
             </span>
             <span>
-              <span>{{
-                relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')
-                  ?.name
-              }}</span>
-              <span>/</span>
               <span>{{ label }}</span>
             </span>
           </el-space>
