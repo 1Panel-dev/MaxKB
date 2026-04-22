@@ -1124,11 +1124,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
                                                self.get_application_knowledge_mapping(application_knowledge_id_list,
                                                                                       knowledge_id_list,
                                                                                       application_id))
-        # 定时提取长期记忆
-        if application.long_term_trigger_type == 'SCHEDULED':
-            schedule_extract_long_term_memory.delay(
-                application.workspace_id, application_id, application.long_term_trigger_setting
-            )
+        schedule_extract_long_term_memory.delay(
+            application.workspace_id, application_id, application.long_term_trigger_setting
+        )
         return self.one(with_valid=False)
 
     def update_template_workflow(self, instance: Dict, app: Application):
