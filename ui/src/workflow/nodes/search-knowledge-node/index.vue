@@ -30,8 +30,8 @@
                   v-model="form_data.search_scope_type"
                   style="width: 85px"
                 >
-                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing" />
-                  <el-option :label="$t('common.custom')" value="custom" />
+                  <el-option :label="$t('workflow.variable.Referencing')" value="referencing"/>
+                  <el-option :label="$t('common.custom')" value="custom"/>
                 </el-select>
               </span>
             </div>
@@ -54,7 +54,9 @@
                   </div>
                 </div>
                 <el-button text @click="removeknowledge(item)">
-                  <el-icon><Close /></el-icon>
+                  <el-icon>
+                    <Close/>
+                  </el-icon>
                 </el-button>
               </div>
             </template>
@@ -69,11 +71,22 @@
               }"
             >
               <template #label>
-                <div class="flex-between">
+                <div class="flex-between align-center ">
+                  <div>
                   <span>
                     {{ $t('workflow.nodes.searchDocumentNode.select_variable') }}
                     <span class="color-danger">*</span>
                   </span>
+                    <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                      <template #content>
+                        <div style="white-space: pre-wrap; font-family: monospace;">{{
+                            ['019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4', '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f3']
+                          }}
+                        </div>
+                      </template>
+                      <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                    </el-tooltip>
+                  </div>
                   <span>
                     <el-select
                       :teleported="false"
@@ -116,28 +129,35 @@
           <div class="w-full">
             <el-row>
               <el-col :span="12" class="color-secondary lighter">{{
-                $t('views.application.dialog.selectSearchMode')
-              }}</el-col>
+                  $t('views.application.dialog.selectSearchMode')
+                }}
+              </el-col>
               <el-col :span="12" class="lighter">
                 {{
                   $t(SearchMode[form_data.knowledge_setting.search_mode as keyof typeof SearchMode])
-                }}</el-col
+                }}
+              </el-col
               >
               <el-col :span="12" class="color-secondary lighter">
-                {{ $t('views.application.dialog.similarityThreshold') }}</el-col
+                {{ $t('views.application.dialog.similarityThreshold') }}
+              </el-col
               >
               <el-col :span="12" class="lighter">
-                {{ form_data.knowledge_setting.similarity?.toFixed(3) }}</el-col
+                {{ form_data.knowledge_setting.similarity?.toFixed(3) }}
+              </el-col
               >
               <el-col :span="12" class="color-secondary lighter">{{
-                $t('views.application.dialog.topReferences')
-              }}</el-col>
+                  $t('views.application.dialog.topReferences')
+                }}
+              </el-col>
               <el-col :span="12" class="lighter"> {{ form_data.knowledge_setting.top_n }}</el-col>
               <el-col :span="12" class="color-secondary lighter">
-                {{ $t('views.application.dialog.maxCharacters') }}</el-col
+                {{ $t('views.application.dialog.maxCharacters') }}
+              </el-col
               >
               <el-col :span="12" class="lighter">
-                {{ form_data.knowledge_setting.max_paragraph_char_number }}</el-col
+                {{ form_data.knowledge_setting.max_paragraph_char_number }}
+              </el-col
               >
             </el-row>
           </div>
@@ -183,11 +203,11 @@
               >
             </div>
           </template>
-          <el-switch size="small" v-model="form_data.show_knowledge" />
+          <el-switch size="small" v-model="form_data.show_knowledge"/>
         </el-form-item>
       </el-form>
     </el-card>
-    <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam" />
+    <ParamSettingDialog ref="ParamSettingDialogRef" @refresh="refreshParam"/>
     <AddknowledgeDialog
       ref="AddknowledgeDialogRef"
       @addData="addKnowledge"
@@ -197,17 +217,18 @@
   </NodeContainer>
 </template>
 <script setup lang="ts">
-import { cloneDeep, set } from 'lodash'
+import {cloneDeep, set} from 'lodash'
 
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import AddknowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
 import ParamSettingDialog from '@/views/application/component/ParamSettingDialog.vue'
-import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted } from 'vue'
-import { relatedObject } from '@/utils/array'
-import { SearchMode } from '@/enums/application'
+import type {FormInstance} from 'element-plus'
+import {ref, computed, onMounted} from 'vue'
+import {relatedObject} from '@/utils/array'
+import {SearchMode} from '@/enums/application'
 import AppIcon from '@/components/app-icon/AppIcon.vue'
+import {fileTooltip} from "@/workflow/common/data.ts";
 
 const props = defineProps<{ nodeModel: any }>()
 const nodeCascaderRef = ref()
@@ -296,7 +317,7 @@ const validate = () => {
     nodeCascaderRef.value.validate(),
     knowledgeNodeFormRef.value?.validate(),
   ]).catch((err) => {
-    return Promise.reject({ node: props.nodeModel, errMessage: err })
+    return Promise.reject({node: props.nodeModel, errMessage: err})
   })
 }
 

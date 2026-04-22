@@ -94,7 +94,7 @@
               <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
                 <template #content>
                   <div style="white-space: pre-wrap; font-family: monospace;">{{
-                      fileTooltip
+                      ""
                     }}
                   </div>
                 </template>
