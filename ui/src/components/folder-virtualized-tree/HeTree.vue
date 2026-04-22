@@ -8,7 +8,7 @@
     @click:node="handleNodeClick"
     @after-drop="onAfterDrop"
     :rootDroppable="false"
-    @enter="enter"
+    :statHandler="statHandler"
   >
     <template #default="{ node, stat }">
       <div
@@ -102,6 +102,10 @@ function onAfterDrop() {
   if (args) {
     emit('node-drop', args[0], args[1], args[2])
   }
+}
+const statHandler = (stat: any) => {
+  stat.open = stat.level === 1
+  return stat
 }
 </script>
 
