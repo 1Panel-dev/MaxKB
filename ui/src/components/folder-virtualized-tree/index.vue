@@ -56,6 +56,7 @@
       :class="
         showShared && hasPermission(EditionConst.IS_EE, 'OR') ? 'tree-height-shared' : 'tree-height'
       "
+      @node-drop="handleDrop"
       @handleNodeClick="handleNodeClick"
       :current-node-key="currentNodeKey"
     >
@@ -231,6 +232,149 @@ const MoreFilledPermission = (node: any) => {
 
 const emit = defineEmits(['handleNodeClick', 'refreshTree'])
 
+const handleDrop = (draggingNode: any, dropNode: any, dropType: string) => {
+  const dragData = draggingNode.data
+  const dropData = dropNode.data
+  console.log(draggingNode, dropNode, dropType)
+
+  const oldParentId = dragData.parent_id
+  let newParentId: string
+  if (dropType === 'inner') {
+    newParentId = dropData.id
+  } else if (dropType === 'prev' || dropType === 'next') {
+    newParentId = dropData.parent_id
+  } else {
+    newParentId = dropData.parent_id
+  }
+
+  const isCrossNode: boolean = oldParentId !== newParentId
+
+  if (isCrossNode) {
+    const obj = {
+      ...dragData,
+      parent_id: newParentId,
+    }
+    folderApi
+      .putFolder(dragData.id, props.source, obj, loading)
+      .then(() => {
+        emit('refreshTree')
+
+        MsgSuccess(t('common.saveSuccess'))
+      })
+      .catch(() => {
+        emit('refreshTree')
+      })
+  } else {
+    // 同级拖拽，直接放置
+    sortAfterDrop(dragData, dropData, dropType, newParentId)
+  }
+}
+
+const savePositions = debounce(doSave, 300)
+function sortAfterDrop(
+  draggingNodeData: any,
+  dropNodeData: any,
+  dropType: string,
+  newParentId: string,
+) {
+  const sortMethod = localStorage.getItem(FOLDER_SORT_TYPE)
+  currentSort.value = sortMethod as SortType
+
+  if (sortMethod === SORT_TYPES.CUSTOM) {
+    const positions = getPositions(newParentId)
+    let prevPos: number
+    let nextPos: number
+    if (dropType === 'inner') {
+      const childrenPositions: number[] = Object.values(positions)
+      if (childrenPositions.length === 0) {
+        positions[draggingNodeData.id] = encode(1, 0)
+        savePositions(newParentId, positions)
+        return
+      }
+      // 放到最后
+      const maxPos = Math.max(...childrenPositions)
+      positions[draggingNodeData.id] = maxPos + encode(1, 0)
+      savePositions(newParentId, positions)
+    } else if (dropType === 'before') {
+      const { dropPos, sortedNodes, dropIndex } = getSortContext(positions, dropNodeData.id)
+      const prevNode: any[] = sortedNodes[dropIndex - 1]
+
+      prevPos = prevNode ? prevNode[1] : 0
+      nextPos = dropPos
+
+      const newPos = mid(prevPos, nextPos)
+
+      if (newPos === null) {
+        // rebalance
+        rebalanceAndInsert(newParentId, draggingNodeData.id, dropNodeData.id, 'before')
+        return
+      }
+      positions[draggingNodeData.id] = newPos
+      savePositions(newParentId, positions)
+    } else if (dropType === 'after') {
+      const { dropPos, sortedNodes, dropIndex } = getSortContext(positions, dropNodeData.id)
+      const nextNode: any[] = sortedNodes[dropIndex + 1]
+
+      prevPos = dropPos
+      nextPos = nextNode ? nextNode[1] : Infinity
+
+      if (nextPos === Infinity) {
+        positions[draggingNodeData.id] = prevPos + encode(1, 0)
+      } else {
+        const newPos = mid(prevPos, nextPos)
+
+        if (newPos === null) {
+          rebalanceAndInsert(newParentId, draggingNodeData.id, dropNodeData.id, 'after')
+          return
+        }
+        positions[draggingNodeData.id] = newPos
+      }
+
+      savePositions(newParentId, positions)
+    }
+  } else {
+    emit('refreshTree')
+  }
+}
+
+function rebalanceAndInsert(
+  parentId: string,
+  dragNodeId: string,
+  dropNodeId: string,
+  position: 'before' | 'after',
+) {
+  const positions = getPositions(parentId)
+  const sortedIds = Object.entries(positions)
+    .sort((a: any[], b: any[]) => a[1] - b[1])
+    .map(([id]) => id)
+
+  const dragIndex = sortedIds.indexOf(dragNodeId)
+  if (dragIndex > -1) {
+    sortedIds.splice(dragIndex, 1)
+  }
+  const dropIndex = sortedIds.indexOf(dropNodeId)
+  if (position === 'before') {
+    sortedIds.splice(dropIndex, 0, dragNodeId)
+  } else {
+    sortedIds.splice(dropIndex + 1, 0, dragNodeId)
+  }
+
+  const tempPositions: Record<string, number> = {}
+  sortedIds.forEach((id, index) => {
+    tempPositions[id] = index
+  })
+
+  const newPositions = rebalance(tempPositions)
+  savePositionsInit(parentId, newPositions)
+  // rebalance finish
+}
+function getSortContext(positions: Record<string, number>, nodeId: string) {
+  const dropPos = positions[nodeId]
+  const sortedNodes = Object.entries(positions).sort((a: any[], b: any[]) => a[1] - b[1])
+  const dropIndex = sortedNodes.findIndex(([id]) => id === nodeId)
+
+  return { dropPos, sortedNodes, dropIndex }
+}
 const treeRef = ref()
 const filterText = ref('')
 const hoverNodeId = ref<string | undefined>('')

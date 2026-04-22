@@ -6,6 +6,9 @@
     v-bind="$attrs"
     class="maxkb-virtualized-tree"
     @click:node="handleNodeClick"
+    @after-drop="onAfterDrop"
+    :rootDroppable="false"
+    @enter="enter"
   >
     <template #default="{ node, stat }">
       <div
@@ -31,7 +34,7 @@
 
 <script lang="ts" setup>
 import { ref, watch, nextTick } from 'vue'
-import { Draggable } from '@he-tree/vue'
+import { Draggable, dragContext } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 const props = defineProps({
   currentNodeKey: {
@@ -42,11 +45,63 @@ const props = defineProps({
 
 type DraggableInstance = InstanceType<typeof Draggable>
 const treeRef = ref<DraggableInstance | null>(null)
-const emit = defineEmits(['handleNodeClick'])
+const emit = defineEmits(['handleNodeClick', 'node-drop'])
 
 const handleNodeClick = (node: any) => {
   node.open = !node.open
   emit('handleNodeClick', node.data)
+}
+
+type DropType = 'before' | 'after' | 'inner'
+const buildNodeDropArgs = () => {
+  const draggingNode = dragContext.dragNode as any
+  const targetInfo = dragContext.targetInfo as any
+
+  if (!draggingNode || !targetInfo) {
+    return null
+  }
+
+  const newParent = targetInfo.parent ?? null
+  const siblings = Array.isArray(targetInfo.siblings) ? targetInfo.siblings : []
+
+  let newIndex =
+    typeof targetInfo.indexBeforeDrop === 'number'
+      ? targetInfo.indexBeforeDrop
+      : siblings.indexOf(draggingNode)
+
+  if (newIndex < 0) {
+    newIndex = siblings.indexOf(draggingNode)
+  }
+
+  let dropNode: any | null = null
+  let dropType: DropType = 'after'
+
+  if (newParent && siblings.length === 1 && siblings[0] === draggingNode) {
+    dropNode = newParent
+    dropType = 'inner'
+    return [draggingNode, dropNode, dropType] as const
+  }
+
+  if (siblings.length <= 1) {
+    return [draggingNode, newParent, 'inner'] as const
+  }
+
+  if (newIndex === 0) {
+    dropNode = siblings[1]
+    dropType = 'before'
+    return [draggingNode, dropNode, dropType] as const
+  }
+
+  dropNode = siblings[newIndex - 1]
+  dropType = 'after'
+
+  return [draggingNode, dropNode, dropType] as const
+}
+function onAfterDrop() {
+  const args = buildNodeDropArgs()
+  if (args) {
+    emit('node-drop', args[0], args[1], args[2])
+  }
 }
 </script>
 
