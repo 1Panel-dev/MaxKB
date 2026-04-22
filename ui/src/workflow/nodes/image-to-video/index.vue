@@ -159,7 +159,7 @@
                   }}<span class="color-danger">*</span></span
                 >
             </div>
-            <el-tooltip effect="dark" placement="right">
+            <el-tooltip effect="dark" placement="right" popper-class="white-tooltip">
               <template #content>
                 <div style="white-space: pre-wrap; font-family: monospace;">{{
                     fileTooltip
@@ -194,7 +194,7 @@
                   }}<span class="color-danger">*</span></span
                 >
             </div>
-            <el-tooltip effect="dark" placement="right">
+            <el-tooltip effect="dark" placement="right" popper-class="white-tooltip">
               <template #content>
                 <div style="white-space: pre-wrap; font-family: monospace;">{{
                     fileTooltip
