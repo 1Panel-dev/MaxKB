@@ -196,10 +196,10 @@
                   <template #label>
                     <div class="flex-between">
                       <div class="flex align-center">
-                        <span class="mr-4">长期记忆</span>
+                        <span class="mr-4">{{ $t('views.application.longTermMemory.title') }}</span>
                         <el-tooltip
                           effect="dark"
-                          :content="$t('{memory} 为长期记忆的占位符，开启后可以在系统提示词中引用')"
+                          :content="longTermPrompt"
                           placement="right"
                           popper-class="max-w-350"
                         >
@@ -242,7 +242,7 @@
                       @refreshForm="refreshParam"
                     >
                       <el-icon>
-                        <Operation/>
+                        <Operation />
                       </el-icon>
                     </el-button>
                   </div>
@@ -898,7 +898,10 @@
     </el-card>
 
     <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshForm" />
-    <AIModeParamSettingDialog ref="LongTermModeParamSettingDialogRef" @refresh="refreshLongTermForm" />
+    <AIModeParamSettingDialog
+      ref="LongTermModeParamSettingDialogRef"
+      @refresh="refreshLongTermForm"
+    />
     <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
     <TTSModeParamSettingDialog ref="TTSModeParamSettingDialogRef" @refresh="refreshTTSForm" />
     <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm" />
@@ -917,7 +920,7 @@
     <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
     <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
     <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
-    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog"/>
+    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog" />
   </div>
 </template>
 <script setup lang="ts">
@@ -945,8 +948,8 @@ import McpServersDialog from '@/views/application/component/McpServersDialog.vue
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
 import useStore from '@/stores'
-import AppIcon from "@/components/app-icon/AppIcon.vue";
-import LongTermSettingDialog from "@/views/application/component/LongTermSettingDialog.vue";
+import AppIcon from '@/components/app-icon/AppIcon.vue'
+import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
 const route = useRoute()
 const router = useRouter()
 const {
@@ -980,11 +983,10 @@ const optimizationPrompt =
   '<data></data>' +
   t('views.application.dialog.defaultPrompt2')
 
-const longTermPrompt = `=======长期记忆========
-{memory}
-=======================
-请根据以上长期记忆回答用户问题
-`
+const longTermPrompt =
+  t('views.application.longTermMemory.tips1') +
+  '{{memory}}' +
+  t('views.application.longTermMemory.tips2')
 
 const collapseData = reactive({
   prompt: true,
@@ -1055,7 +1057,7 @@ const applicationForm = ref<ApplicationFormType>({
   long_term_model_id: '',
   long_term_model_params_setting: {},
   long_term_trigger_setting: {},
-  long_term_trigger_type: 'ROUND'
+  long_term_trigger_type: 'ROUND',
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -1196,12 +1198,16 @@ const openParamSettingDialog = () => {
 }
 
 function openLongTermConfigDialog() {
-  LongTermSettingDialogRef.value?.open(applicationForm.value.long_term_trigger_type, applicationForm.value.long_term_trigger_setting)
+  LongTermSettingDialogRef.value?.open(
+    applicationForm.value.long_term_trigger_type,
+    applicationForm.value.long_term_trigger_setting,
+  )
 }
 
 function switchLongTerm() {
   if (applicationForm.value.long_term_enable) {
-    applicationForm.value.model_setting.system = applicationForm.value.model_setting.system || longTermPrompt
+    applicationForm.value.model_setting.system =
+      applicationForm.value.model_setting.system || longTermPrompt
   }
 }
 

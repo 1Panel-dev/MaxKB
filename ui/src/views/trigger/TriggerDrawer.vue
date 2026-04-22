@@ -619,7 +619,7 @@ const validateCron = () => {
   }
   const fields = cron.split(/\s+/)
   if (fields.length !== 5 || !isValidCron(cron)) {
-    cronError.value = 'Cron表达式不合法'
+    cronError.value = t('views.application.longTermMemory.cronExpressionInvalid')
   } else {
     cronError.value = ''
   }

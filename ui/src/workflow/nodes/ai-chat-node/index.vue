@@ -604,11 +604,10 @@ const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
 ${t('views.problem.title')}：
 {{${t('workflow.nodes.startNode.label')}.question}}`
 
-const longTermPrompt = `=======长期记忆========
-{{${t('workflow.nodes.startNode.label')}.memory}}
-=======================
-请根据以上长期记忆回答用户问题
-`
+const longTermPrompt =
+  t('views.application.longTermMemory.tips1') +
+  '{{memory}}' +
+  t('views.application.longTermMemory.tips2')
 
 const collapseData = reactive({
   MCP: true,

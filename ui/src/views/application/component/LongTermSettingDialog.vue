@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     align-center
-    :title="$t('长期记忆设置')"
+    :title="$t('views.application.longTermMemory.setting')"
     v-model="dialogVisible"
     style="width: 550px"
     append-to-body
@@ -13,11 +13,10 @@
       ref="paramFormRef"
       :model="form"
       require-asterisk-position="right"
-      hide-required-asterisk
       @submit.prevent
     >
       <el-form-item
-        :label="$t('触发方式')"
+        :label="$t('views.application.longTermMemory.triggerType')"
         prop="trigger_type"
         :rules="{
           message: $t('common.selectPlaceholder'),
@@ -33,19 +32,23 @@
         >
           <div class="flex align-center line-height-22">
             <el-avatar shape="square" class="avatar-orange" :size="32">
-              <img src="@/assets/trigger/icon_event.svg" style="width: 58%" alt=""/>
+              <img src="@/assets/trigger/icon_event.svg" style="width: 58%" alt="" />
             </el-avatar>
             <div class="ml-12">
-              <h5>{{ $t('按轮次触发') }}</h5>
-              <el-text type="info" class="color-secondary font-small">{{
-                  $t('累计到N轮后，自动提炼N轮对话，生成记忆')
-                }}
+              <h5>{{ $t('views.application.longTermMemory.roundTrigger') }}</h5>
+              <el-text type="info" class="color-secondary font-small"
+                >{{ $t('views.application.longTermMemory.roundTriggerTip') }}
               </el-text>
             </div>
           </div>
           <el-card v-if="form.trigger_type === 'ROUND'" shadow="never" class="card-never mt-16">
-            <el-form-item :label="$t('触发间隔')">
-              <el-input-number v-model="form.trigger_setting.rounds"/>
+            <el-form-item :label="$t('views.application.longTermMemory.triggerInterval')" required>
+              <el-input-number
+                v-model="form.trigger_setting.rounds"
+                :value-on-clear="0"
+                :min="5"
+                :max="100"
+              />
             </el-form-item>
           </el-card>
         </el-card>
@@ -57,13 +60,12 @@
         >
           <div class="flex align-center line-height-22">
             <el-avatar shape="square" :size="32">
-              <img src="@/assets/trigger/icon_scheduled.svg" style="width: 58%" alt=""/>
+              <img src="@/assets/trigger/icon_scheduled.svg" style="width: 58%" alt="" />
             </el-avatar>
             <div class="ml-12">
-              <h5>{{ $t('按时间触发') }}</h5>
-              <el-text type="info" class="color-secondary font-small">{{
-                  $t('到设定时间后，自动提炼周期内所有对话，生成记忆')
-                }}
+              <h5>{{ $t('views.application.longTermMemory.scheduledTrigger') }}</h5>
+              <el-text type="info" class="color-secondary font-small"
+                >{{ $t('views.application.longTermMemory.scheduledTriggerTip') }}
               </el-text>
             </div>
           </div>
@@ -92,7 +94,7 @@
               >
                 <el-button text @click.stop="switchScheduleType">
                   <el-icon>
-                    <Switch/>
+                    <Switch />
                   </el-icon>
                 </el-button>
               </el-tooltip>
@@ -127,18 +129,15 @@
         </el-button>
       </span>
     </template>
-
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-
-
-import { computed, ref } from "vue";
-import { triggerCycleOptions } from "@/utils/trigger.ts";
-import { t } from "@/locales";
-import { cloneDeep } from "lodash";
-import { isValidCron } from "cron-validator";
+import { computed, ref } from 'vue'
+import { triggerCycleOptions } from '@/utils/trigger.ts'
+import { t } from '@/locales'
+import { cloneDeep } from 'lodash'
+import { isValidCron } from 'cron-validator'
 
 const emit = defineEmits(['refresh'])
 const dialogVisible = ref(false)
@@ -147,7 +146,7 @@ const loading = ref(false)
 const form = ref<any>({
   trigger_type: 'ROUND',
   trigger_setting: {
-    rounds: 10
+    rounds: 10,
   },
 })
 
@@ -166,7 +165,7 @@ const validateCron = () => {
   }
   const fields = cron.split(/\s+/)
   if (fields.length !== 5 || !isValidCron(cron)) {
-    cronError.value = 'Cron表达式不合法'
+    cronError.value = t('views.application.longTermMemory.cronExpressionInvalid')
   } else {
     cronError.value = ''
   }
@@ -247,7 +246,7 @@ const scheduled = computed({
 
 const open = (trigger_type: any, trigger_setting: any) => {
   dialogVisible.value = true
-  form.value.trigger_setting = trigger_setting ?? {rounds: 10}
+  form.value.trigger_setting = trigger_setting ?? { rounds: 10 }
   form.value.trigger_type = trigger_type ?? 'ROUND'
 }
 
@@ -260,7 +259,7 @@ const submit = () => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 
 <style lang="scss" scoped></style>

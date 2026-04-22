@@ -172,7 +172,7 @@ const refreshLongTermConfig = () => {
     return
   }
   if (form_data[0]) {
-    set(props.nodeModel.properties.config, 'fields', [...fields, { label: t('长期记忆'), value: 'memory' }])
+    set(props.nodeModel.properties.config, 'fields', [...fields, { label: t('views.application.longTermMemory.title'), value: 'memory' }])
   }
 }
 
