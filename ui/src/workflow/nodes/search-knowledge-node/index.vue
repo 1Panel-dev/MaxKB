@@ -77,7 +77,7 @@
                     {{ $t('workflow.nodes.searchDocumentNode.select_variable') }}
                     <span class="color-danger">*</span>
                   </span>
-                    <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                    <el-tooltip effect="dark" placement="right">
                       <template #content>
                         <div style="white-space: pre-wrap; font-family: monospace;">{{
                             ['019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4', '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f3']

@@ -159,7 +159,7 @@
                   }}<span class="color-danger">*</span></span
                 >
             </div>
-            <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+            <el-tooltip effect="dark" placement="right">
               <template #content>
                 <div style="white-space: pre-wrap; font-family: monospace;">{{
                     fileTooltip
@@ -186,9 +186,24 @@
             trigger: 'change',
           }"
         >
-          <template #label
-          >{{ $t('workflow.nodes.imageToVideoGenerate.last_frame.label') }}
-          </template>
+          <div class="flex align-center">
+            <div>
+                <span
+                >{{
+                    $t('workflow.nodes.imageToVideoGenerate.last_frame.label')
+                  }}<span class="color-danger">*</span></span
+                >
+            </div>
+            <el-tooltip effect="dark" placement="right">
+              <template #content>
+                <div style="white-space: pre-wrap; font-family: monospace;">{{
+                    fileTooltip
+                  }}
+                </div>
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
           <NodeCascader
             ref="lastFrameCascaderRef"
             :nodeModel="nodeModel"
