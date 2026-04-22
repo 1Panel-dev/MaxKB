@@ -32,16 +32,10 @@
         <el-space :size="8" v-if="value">
           <span
             class="select-model-icon"
-            :innerHTML="
-              relatedObject(providerList, getModelProvider(value), 'provider')?.icon
-            "
+            :innerHTML="relatedObject(providerList, getModelProvider(value), 'provider')?.icon"
           >
           </span>
           <span>
-            <span>{{
-              relatedObject(providerList, getModelProvider(value), 'provider')?.name
-            }}</span>
-            <span>/</span>
             <span>{{ label }}</span>
           </span>
         </el-space>
