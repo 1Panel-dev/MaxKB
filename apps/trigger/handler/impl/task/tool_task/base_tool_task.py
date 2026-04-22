@@ -50,7 +50,8 @@ def _convert_value(_type, value):
     if _type == 'int':
         return int(value)
     if _type == 'boolean':
-        value = 0 if ['0', '[]'].__contains__(value) else value
+        if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
+            return False
         return bool(value)
     if _type == 'float':
         return float(value)

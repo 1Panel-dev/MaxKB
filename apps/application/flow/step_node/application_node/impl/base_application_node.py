@@ -141,7 +141,7 @@ def reset_application_node_dict(application_node_dict, runtime_node_id, node_dat
                                  '${value}', content)
                     application_node['content'] = res.replace('${value}', value)
     except Exception as e:
-        pass
+        maxkb_logger.warning(f'reset_application_node_dict error: {e}', exc_info=True)
 
 
 class BaseApplicationNode(IApplicationNode):

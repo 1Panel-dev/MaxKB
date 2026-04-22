@@ -343,3 +343,5 @@ class PdfSplitHandle(BaseSplitHandle):
         finally:
             if pdf_document is not None:
                 pdf_document.close()
+            # 处理完后可以删除临时文件
+            os.remove(temp_file_path)

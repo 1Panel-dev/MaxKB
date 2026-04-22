@@ -217,7 +217,6 @@ const handleSearch = (kw: string) => {
   }
 }
 const reSearch = () => {
-  console.log('ss')
   handleSearch(searchText.value)
 }
 // 生命周期
