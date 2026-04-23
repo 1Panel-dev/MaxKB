@@ -53,6 +53,5 @@ def undeploy(trigger, **kwargs):
     @return:
     """
     for simple_trigger_handler in simple_trigger_handlers:
-        if simple_trigger_handler.support(trigger, **kwargs):
-            return simple_trigger_handler.undeploy(trigger, **kwargs)
+        return simple_trigger_handler.undeploy(trigger, **kwargs)
     raise Exception("不支持的触发器类型")

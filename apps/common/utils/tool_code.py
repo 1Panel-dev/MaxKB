@@ -73,7 +73,7 @@ class ToolExecutor:
             local_ip = socket.gethostbyname(hostname)
             banned_hosts = f"{banned_hosts},{local_ip}"
             banned_hosts = ",".join(s.strip() for s in banned_hosts.split(",") if s.strip() and s.strip().lower() != hostname.lower())
-        with open(sandbox_conf_file_path, "w", encoding='utf-8') as f:
+        with open(sandbox_conf_file_path, "w") as f:
             f.write(f"SANDBOX_PYTHON_BANNED_HOSTS={banned_hosts}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_DL_PATHS={','.join(sorted(set(filter(None, sys.path + _sandbox_python_sys_path + allow_dl_paths.split(',')))))}\n")
             f.write(f"SANDBOX_PYTHON_ALLOW_DL_OPEN={allow_dl_open}\n")
