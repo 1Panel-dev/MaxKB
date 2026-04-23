@@ -303,7 +303,7 @@ def generate_tool_message_complete(icon, name, input_content, output_content):
             "output": output_content
         }
     }
-    return f'<tool_calls_render>{json.dumps(content)}</tool_calls_render>'
+    return f'<tool_calls_render>{json.dumps(content, ensure_ascii=False)}</tool_calls_render>'
 
 
 # 全局单例事件循环
