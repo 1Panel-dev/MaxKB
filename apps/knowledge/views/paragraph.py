@@ -65,7 +65,6 @@ class ParagraphView(APIView):
         menu='Paragraph', operate='Create Paragraph',
         get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
             get_knowledge_operation_object(keywords.get('knowledge_id')),
-            get_knowledge_operation_object(keywords.get('knowledge_id')),
             get_document_operation_object(keywords.get('document_id'))
         ),
     )
