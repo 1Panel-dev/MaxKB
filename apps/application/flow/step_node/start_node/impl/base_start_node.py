@@ -9,11 +9,14 @@
 import time
 from datetime import datetime
 from typing import List, Type
+
+from django.db.models import QuerySet
 from django.utils import timezone
 from rest_framework import serializers
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.start_node.i_start_node import IStarNode
+from application.models import ApplicationLongTermMemory
 
 
 def get_default_global_variable(input_field_list: List):
@@ -69,6 +72,12 @@ class BaseStartStepNode(IStarNode):
         default_global_variable = get_default_global_variable(base_node.properties.get('user_input_field_list', []))
         default_api_global_variable = get_default_global_variable(base_node.properties.get('api_input_field_list', []))
         workflow_variable = {**default_global_variable, **default_api_global_variable, **get_global_variable(self)}
+        chat_user_id = workflow_variable.get('chat_user_id')
+        long_term_memory = None
+        if chat_user_id:
+            long_term_memory = QuerySet(ApplicationLongTermMemory).filter(
+                chat_user_id=chat_user_id, application_id=self.workflow_params.get('application_id')
+            ).first()
         """
         开始节点 初始化全局变量
         """
@@ -79,8 +88,8 @@ class BaseStartStepNode(IStarNode):
             'audio': self.workflow_manage.audio_list,
             'video': self.workflow_manage.video_list,
             'other': self.workflow_manage.other_list,
-
         }
+        workflow_variable['memory'] =  long_term_memory.memory if long_term_memory else ''
         self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
         return NodeResult(node_variable, workflow_variable)
 
