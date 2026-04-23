@@ -8,6 +8,7 @@ from django.utils.translation import gettext as _
 from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult, INode
 from application.flow.step_node.application_node.i_application_node import IApplicationNode
+from common.utils.logger import maxkb_logger
 from application.models import Chat, ChatSourceChoices
 
 
@@ -141,7 +142,7 @@ def reset_application_node_dict(application_node_dict, runtime_node_id, node_dat
                                  '${value}', content)
                     application_node['content'] = res.replace('${value}', value)
     except Exception as e:
-        pass
+        maxkb_logger.warning(f'reset_application_node_dict error: {e}', exc_info=True)
 
 
 class BaseApplicationNode(IApplicationNode):
