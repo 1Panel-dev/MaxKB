@@ -17,6 +17,7 @@
         :class="currentNodeKey === node.id ? 'is-current' : ''"
       >
         <el-icon
+          @click.stop="stat.open = !stat.open"
           class="tree-arrow-icon"
           :class="stat.open ? 'rotate-90' : ''"
           :style="{ visibility: stat.children.length ? 'visible' : 'hidden' }"
@@ -59,7 +60,10 @@ const treeRef = ref<DraggableInstance | null>(null)
 const emit = defineEmits(['handleNodeClick', 'node-drop'])
 
 const handleNodeClick = (node: any) => {
-  node.open = !node.open
+  if (node.data.id === props.currentNodeKey) {
+    node.open = !node.open
+    return
+  }
   emit('handleNodeClick', node.data)
 }
 
@@ -114,9 +118,22 @@ function onAfterDrop() {
     emit('node-drop', args[0], args[1], args[2])
   }
 }
+
+const containsCurrentNodeKey = (node: any): boolean => {
+  if (node.id === props.currentNodeKey) {
+    return true
+  }
+  if (node.children && node.children.length) {
+    return node.children.some((child: any) => containsCurrentNodeKey(child))
+  }
+  return false
+}
 const statHandler = (stat: any) => {
   stat.open = stat.level === 1
   if (filterText.value) {
+    stat.open = true
+  }
+  if (containsCurrentNodeKey(stat.data)) {
     stat.open = true
   }
   return stat

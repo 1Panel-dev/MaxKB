@@ -3,14 +3,14 @@
     <template #left>
       <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.tool.title') }}</h4>
 
-      <folder-tree
+      <FolderVirtualizedTree
         :source="SourceTypeEnum.TOOL"
         :data="folderList"
         :currentNodeKey="folder.currentFolder?.id"
         @handleNodeClick="folderClickHandle"
-        @refreshTree="refreshFolder"
         :shareTitle="$t('views.shared.shared_tool')"
         :showShared="permissionPrecise['is_share']()"
+        @refreshTree="refreshFolder"
         :draggable="true"
       />
     </template>
