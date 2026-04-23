@@ -290,6 +290,7 @@
                     {{ $t('common.export') }}
                   </el-dropdown-item>
                   <el-dropdown-item
+                    :disabled="!row.is_publish"
                     @click.stop="openTriggerDrawer(row)"
                     v-if="permissionPrecise.trigger_read()"
                   >
