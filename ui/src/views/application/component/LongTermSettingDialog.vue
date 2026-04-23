@@ -246,7 +246,11 @@ const scheduled = computed({
 
 const open = (trigger_type: any, trigger_setting: any) => {
   dialogVisible.value = true
-  form.value.trigger_setting = trigger_setting ?? { rounds: 10 }
+  if (trigger_setting && trigger_setting.rounds) {
+    form.value.trigger_setting = trigger_setting
+  } else {
+    form.value.trigger_setting = { rounds: 10 }
+  }
   form.value.trigger_type = trigger_type ?? 'ROUND'
 }
 

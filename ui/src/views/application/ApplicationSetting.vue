@@ -1056,7 +1056,7 @@ const applicationForm = ref<ApplicationFormType>({
   long_term_enable: false,
   long_term_model_id: '',
   long_term_model_params_setting: {},
-  long_term_trigger_setting: {},
+  long_term_trigger_setting: { rounds: 10 },
   long_term_trigger_type: 'ROUND',
 })
 
