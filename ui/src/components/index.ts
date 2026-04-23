@@ -7,6 +7,7 @@ import AppIcon from './app-icon/AppIcon.vue'
 import LayoutContainer from './layout-container/index.vue'
 import ContentContainer from './layout-container/ContentContainer.vue'
 import CardBox from './card-box/index.vue'
+import FolderVirtualizedTree from './folder-virtualized-tree/index.vue'
 import FolderTree from './folder-tree/index.vue'
 import CommonList from './common-list/index.vue'
 import BackButton from './back-button/index.vue'
@@ -59,5 +60,6 @@ export default {
     app.component('TagGroup', TagGroup)
     app.component('WorkspaceDropdown', WorkspaceDropdown)
     app.component('FolderBreadcrumb', FolderBreadcrumb)
+    app.component('FolderVirtualizedTree', FolderVirtualizedTree)
   },
 }
