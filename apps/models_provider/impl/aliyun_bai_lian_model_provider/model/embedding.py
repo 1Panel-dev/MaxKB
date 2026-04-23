@@ -48,7 +48,7 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
             self, texts: List[str], chunk_size: int | None = None
     ) -> List[List[float]]:
         # 处理多模态的向量化
-        if 'vl-embedding' in self.model_name or 'embedding-vision' in self.model_name or 'multimodal' in self.model_name:
+        if any(k in self.model_name for k in ("vl-embedding", "embedding-vision", "multimodal")):
             import dashscope
             dashscope.api_key = self.api_key
             dashscope.base_http_api_url = self.api_base
