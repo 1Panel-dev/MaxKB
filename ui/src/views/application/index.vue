@@ -288,6 +288,7 @@
                               </el-dropdown-item>
                               <el-dropdown-item
                                 @click.stop="openTriggerDrawer(item)"
+                                :disabled="!item.is_publish"
                                 v-if="
                                   apiType === 'workspace' && permissionPrecise.trigger_read(item.id)
                                 "
