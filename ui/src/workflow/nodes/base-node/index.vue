@@ -267,7 +267,7 @@ const form = {
   prologue: t('views.application.form.defaultPrologue'),
 }
 
-const longTermTips = t('views.application.longTermMemory.tips1') + '{{memory}}' + t('views.application.longTermMemory.tips2')
+const longTermTips = t('views.application.longTermMemory.tips1') + '{memory}' + t('views.application.longTermMemory.tips2')
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {

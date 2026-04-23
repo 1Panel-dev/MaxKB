@@ -606,7 +606,7 @@ ${t('views.problem.title')}：
 
 const longTermPrompt =
   t('views.application.longTermMemory.tips1') +
-  '{{memory}}' +
+  '{memory}' +
   t('views.application.longTermMemory.tips2')
 
 const collapseData = reactive({

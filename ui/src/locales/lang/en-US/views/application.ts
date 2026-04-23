@@ -35,7 +35,20 @@ export default {
     confirmUse: 'Are you sure you want to use',
     overwrite: 'overwrite the current workflow',
   },
-
+  longTermMemory: {
+    title: 'Long-term Memory',
+    setting: 'Long-term Memory Settings',
+    triggerType: 'Trigger Type',
+    roundTrigger: 'Round-based Trigger',
+    roundTriggerTip: 'After accumulating N rounds, automatically extract N rounds of conversation to generate memory',
+    triggerInterval: 'Trigger Interval',
+    scheduledTrigger: 'Scheduled Trigger',
+    scheduledTriggerTip: 'After reaching the set time, automatically extract all conversations within the cycle to generate memory',
+    cronExpressionInvalid: 'Cron expression is invalid',
+    tips1: `After enabling, new conversations will be recorded from the activation time and memory will be generated periodically, which can be called through`,
+    tips2: `variables in the system prompt.
+After disabling, the long-term memory of the conversation users will be cleared, and re-enabling will resume accumulation from the activation point.`,
+  },
   form: {
     appName: {
       placeholder: 'Please enter the agent name',

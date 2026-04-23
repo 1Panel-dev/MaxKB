@@ -10,6 +10,8 @@
     @after-drop="onAfterDrop"
     :rootDroppable="false"
     :statHandler="statHandler"
+    :disableDrag="draggable"
+    :disableDrop="draggable"
   >
     <template #default="{ node, stat }">
       <div
@@ -52,6 +54,10 @@ const props = defineProps({
     default: (node: any, filterText: string) => {
       return node.name?.toLowerCase().includes(filterText.toLowerCase())
     },
+  },
+  draggable: {
+    type: Boolean,
+    default: false,
   },
 })
 

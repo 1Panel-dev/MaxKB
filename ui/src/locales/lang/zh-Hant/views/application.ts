@@ -31,6 +31,20 @@ export default {
     confirmUse: '確定使用',
     overwrite: '覆蓋當前工作流',
   },
+  longTermMemory: {
+    title: '長期記憶',
+    setting: '長期記憶設置',
+    triggerType: '觸發方式',
+    roundTrigger: '按輪次觸發',
+    roundTriggerTip: '累計到N輪後，自動提煉N輪對話，生成記憶',
+    triggerInterval: '觸發間隔',
+    scheduledTrigger: '按时间触发',
+    scheduledTriggerTip: '到设定时间后，自动提炼周期内所有对话，生成记忆',
+    cronExpressionInvalid: 'Cron表达式不合法',
+    tips1: `開啟後，從開啟時間記錄新對話並按周期生成記憶，可通過`,
+    tips2: `變數在系統提示詞中調用。
+關閉後，將清空對話用戶的長期記憶，再次開啟將重新從開啟時點開始累積。`,
+  },
   form: {
     appName: {
       placeholder: '請輸入智能體名稱',
