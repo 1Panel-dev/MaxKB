@@ -88,8 +88,9 @@ class BaseStartStepNode(IStarNode):
             'audio': self.workflow_manage.audio_list,
             'video': self.workflow_manage.video_list,
             'other': self.workflow_manage.other_list,
+            'memory': long_term_memory.memory if long_term_memory else ''
         }
-        workflow_variable['memory'] =  long_term_memory.memory if long_term_memory else ''
+        workflow_variable['memory'] =  node_variable['memory']
         self.workflow_manage.chat_context = self.workflow_manage.get_chat_info().get_chat_variable()
         return NodeResult(node_variable, workflow_variable)
 
