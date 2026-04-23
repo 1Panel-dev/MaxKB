@@ -51,8 +51,6 @@ def valid_value_type(value, _type):
         return isinstance(value, int)
     if _type == 'boolean':
         return isinstance(value, bool)
-    if _type == 'any':
-        return True
     return isinstance(value, str)
 
 
