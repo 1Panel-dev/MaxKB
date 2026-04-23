@@ -133,7 +133,7 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
             chat__chat_user_id=chat_user_id,
         ).order_by('-create_time').only('problem_text', 'answer_text')[:history_limit]
     )
-    if not history_chat_record:
+    if len(history_chat_record) <= 1:
         return
 
     chat_model = get_model_instance_by_model_workspace_id(
