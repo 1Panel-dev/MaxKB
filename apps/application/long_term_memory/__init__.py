@@ -1,6 +1,6 @@
 import re
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
+from django.db.models import Count, QuerySet
 from langchain_core.messages import HumanMessage
 
 from application.models import Chat, ChatRecord, Application, ApplicationLongTermMemory
@@ -228,8 +228,10 @@ def _execute_scheduled_extract(workspace_id, application_id):
     chat_user_ids = list(
         QuerySet(Chat).filter(application_id=application_id)
         .exclude(chat_user_id__isnull=True)
+        .values('chat_user_id')
+        .annotate(count=Count('chat_user_id'))
+        .filter(count__gt=1)
         .values_list('chat_user_id', flat=True)
-        .distinct()
     )
     for chat_user_id in chat_user_ids:
         config = _get_long_term_config(application, chat_user_id)
