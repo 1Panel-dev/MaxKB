@@ -59,7 +59,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if isinstance(image_url, str):
                 if image_url.startswith('http'):
                     # HTTP URL 情况
-                    image_url = requests.get(image_url).content
+                    res = requests.get(image_url)
+                    res.raise_for_status()
+                    image_url = res.content
                 elif image_url.startswith('data:image'):
                     # Data URL 格式 (data:image/png;base64,...)
                     import base64

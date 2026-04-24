@@ -79,6 +79,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 }
             }
             response = requests.post(api_url, headers=headers, json=payload)
+            response.raise_for_status()
             audio_hex = response.json().get("output", {}).get("data", {}).get("audio")
             if audio_hex:
                 audio = bytes.fromhex(audio_hex)

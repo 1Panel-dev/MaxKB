@@ -590,6 +590,7 @@ class ApplicationSerializer(serializers.Serializer):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
+        res.raise_for_status()
         app = ApplicationSerializer(
             data={"user_id": self.data.get("user_id"), "workspace_id": self.data.get("workspace_id")}
         ).import_(
@@ -612,7 +613,7 @@ class ApplicationSerializer(serializers.Serializer):
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
             if not download_callback_url.startswith("https://apps.fit2cloud.com"):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5).raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
         return app
@@ -1308,6 +1309,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
+        res.raise_for_status()
         try:
             mk_instance = restricted_loads(res.content)
         except Exception as e:
@@ -1365,7 +1367,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
             if not download_callback_url.startswith("https://apps.fit2cloud.com"):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5).raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
 
