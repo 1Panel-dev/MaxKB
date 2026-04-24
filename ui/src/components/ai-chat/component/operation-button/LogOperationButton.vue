@@ -180,7 +180,7 @@ function markdownToPlainText(md: string) {
 }
 
 function removeFormRander(text: string) {
-  return text.replace(/<form_rander>[\s\S]*?<\/form_rander>/g, '').trim()
+  return text.replace(/<form_rander>[\d\D]*?<\/form_rander>/g, '').trim()
 }
 
 const playAnswerText = (text: string) => {

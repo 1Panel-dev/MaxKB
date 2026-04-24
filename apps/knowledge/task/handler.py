@@ -103,7 +103,7 @@ def save_problem(knowledge_id, document_id, paragraph_id, problem):
     # print(f"problem: {problem}")
     problem = re.sub(r"^\d+\.\s*", "", problem)
     pattern = r"<question>(.*?)</question>"
-    match = re.search(pattern, problem)
+    match = re.search(pattern, problem, flags=re.DOTALL)
     problem = match.group(1) if match else None
     if problem is None or len(problem) == 0:
         return

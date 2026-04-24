@@ -274,7 +274,7 @@ function markdownToPlainText(md: string) {
 }
 
 function removeFormRander(text: string) {
-  return text.replace(/<form_rander>[\s\S]*?<\/form_rander>/g, '').trim()
+  return text.replace(/<form_rander>[\d\D]*?<\/form_rander>/g, '').trim()
 }
 function getKey(keys: Array<number>, index: number) {
   // 从后往前查找第一个小于等于index的键
