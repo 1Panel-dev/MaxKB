@@ -1,4 +1,5 @@
 import re
+
 import uuid_utils.compat as uuid
 from django.db.models import Count, QuerySet
 from langchain_core.messages import HumanMessage
@@ -131,7 +132,7 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
         QuerySet(ChatRecord).filter(
             chat__application_id=application_id,
             chat__chat_user_id=chat_user_id,
-        ).order_by('-create_time').only('problem_text', 'answer_text')[:history_limit]
+        ).order_by('create_time').only('problem_text', 'answer_text')[:history_limit]
     )
     if len(history_chat_record) <= 1:
         return
@@ -148,8 +149,6 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
 
     existing_memory = long_term_memory.memory if long_term_memory else ''
 
-    # 反转为时间正序（旧→新）
-    history_chat_record = list(reversed(history_chat_record))
 
     new_conversation = '\n'.join(
         line
@@ -228,10 +227,8 @@ def _execute_scheduled_extract(workspace_id, application_id):
     chat_user_ids = list(
         QuerySet(Chat).filter(application_id=application_id)
         .exclude(chat_user_id__isnull=True)
-        .values('chat_user_id')
-        .annotate(count=Count('chat_user_id'))
-        .filter(count__gt=1)
         .values_list('chat_user_id', flat=True)
+        .distinct()
     )
     for chat_user_id in chat_user_ids:
         config = _get_long_term_config(application, chat_user_id)
@@ -448,8 +445,7 @@ def extract_long_term_memory(workspace_id, application_id, chat_user_id):
     if current_rounds % rounds != 0:
         return
 
-    _run_extract(workspace_id, application_id,
-                 chat_user_id, config, history_limit=rounds)
+    _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=rounds)
 
 
 @celery_app.task(name="celery:schedule_extract_long_term_memory")
