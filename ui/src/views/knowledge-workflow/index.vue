@@ -46,7 +46,7 @@
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" v-if="permissionPrecise.workflow_edit(id)" @click="publish">
+        <el-button type="primary" v-if="permissionPrecise.publish(id)" @click="publish">
           {{ $t('common.publish') }}
         </el-button>
 
