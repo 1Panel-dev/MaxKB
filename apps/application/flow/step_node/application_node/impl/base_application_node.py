@@ -131,14 +131,14 @@ def reset_application_node_dict(application_node_dict, runtime_node_id, node_dat
             application_node = application_node_dict[key]
             if application_node.get('runtime_node_id') == runtime_node_id:
                 content: str = application_node.get('content')
-                match = re.search('<form_rander>[\d\D]*?<\/form_rander>', content)
+                match = re.search(r'<form_rander>[\d\D]*?</form_rander>', content)
                 if match:
                     form_setting_str = match.group().replace('<form_rander>', '').replace('</form_rander>', '')
                     form_setting = json.loads(form_setting_str)
                     form_setting['is_submit'] = True
                     form_setting['form_data'] = node_data
                     value = f'<form_rander>{json.dumps(form_setting)}</form_rander>'
-                    res = re.sub('<form_rander>[\d\D]*?<\/form_rander>',
+                    res = re.sub(r'<form_rander>[\d\D]*?</form_rander>',
                                  '${value}', content)
                     application_node['content'] = res.replace('${value}', value)
     except Exception as e:
