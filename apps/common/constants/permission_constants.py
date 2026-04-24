@@ -157,6 +157,7 @@ class Operate(Enum):
     USE = "USE"
     IMPORT = "READ+IMPORT"
     EXPORT = "READ+EXPORT"  # 导入导出
+    PUBLISH = "READ+PUBLISH"  # 发布
     SYNC = "READ+SYNC"  # 同步
     GENERATE = "READ+GENERATE"  # 生成
     ADD_MEMBER = "READ+ADD_MEMBER"  # 添加成员
@@ -616,6 +617,11 @@ class PermissionConstants(Enum):
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
         resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
     )
+    TOOL_PUBLISH = Permission(
+        group=Group.TOOL, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
+        resource_permission_group_list=[ResourcePermissionConst.TOOL_MANGE]
+    )
     TOOL_EXECUTE_RECORD = Permission(
         group=Group.TOOL, operate=Operate.RECORD, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.TOOL, UserGroup.TOOL],
@@ -764,6 +770,11 @@ class PermissionConstants(Enum):
     )
     KNOWLEDGE_WORKFLOW_EXPORT = Permission(
         group=Group.KNOWLEDGE_WORKFLOW, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_WORKFLOW_PUBLISH = Permission(
+        group=Group.KNOWLEDGE_WORKFLOW, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
@@ -1050,6 +1061,11 @@ class PermissionConstants(Enum):
                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE]
                                     )
     APPLICATION_EXPORT = Permission(group=Group.APPLICATION, operate=Operate.EXPORT,
+                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                    )
+    APPLICATION_PUBLISH = Permission(group=Group.APPLICATION, operate=Operate.PUBLISH,
                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
@@ -1388,6 +1404,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
     )
+    SHARED_TOOL_PUBLISH = Permission(
+        group=Group.SYSTEM_TOOL, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
+    )
     SHARED_TOOL_RELATE_RESOURCE_VIEW = Permission(
         group=Group.SYSTEM_TOOL, operate=Operate.RELATE_VIEW, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
@@ -1442,6 +1462,10 @@ class PermissionConstants(Enum):
     )
     SHARED_KNOWLEDGE_WORKFLOW_EXPORT = Permission(
         group=Group.SYSTEM_KNOWLEDGE_WORKFLOW, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE], is_ee=settings.edition == "EE"
+    )
+    SHARED_KNOWLEDGE_WORKFLOW_PUBLISH = Permission(
+        group=Group.SYSTEM_KNOWLEDGE_WORKFLOW, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE], is_ee=settings.edition == "EE"
     )
     SHARED_KNOWLEDGE_DOCUMENT_READ = Permission(
@@ -1581,6 +1605,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.AUTH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION], is_ee=settings.edition == "EE"
     )
+    RESOURCE_APPLICATION_PUBLISH = Permission(
+        group=Group.SYSTEM_RES_APPLICATION, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_APPLICATION], is_ee=settings.edition == "EE"
+    )
     RESOURCE_APPLICATION_TRIGGER_READ = Permission(
         group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_APPLICATION], is_ee=settings.edition == "EE"
@@ -1683,6 +1711,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
     )
+    RESOURCE_KNOWLEDGE_PUBLISH = Permission(
+        group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
+    )
     RESOURCE_KNOWLEDGE_VECTOR = Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.VECTOR, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
@@ -1710,6 +1742,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_KNOWLEDGE_WORKFLOW_EXPORT = Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE_WORKFLOW, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
+    )
+    RESOURCE_KNOWLEDGE_WORKFLOW_PUBLISH = Permission(
+        group=Group.SYSTEM_RES_KNOWLEDGE_WORKFLOW, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
     )
     RESOURCE_KNOWLEDGE_DOCUMENT_READ = Permission(
@@ -1822,6 +1858,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_TOOL_EXPORT = Permission(
         group=Group.SYSTEM_RES_TOOL, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_TOOL], is_ee=settings.edition == "EE"
+    )
+    RESOURCE_TOOL_PUBLISH = Permission(
+        group=Group.SYSTEM_RES_TOOL, operate=Operate.PUBLISH, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_TOOL], is_ee=settings.edition == "EE"
     )
     RESOURCE_TOOL_AUTH = Permission(
