@@ -14,6 +14,7 @@ from django.utils.translation import gettext as _
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.tool_node.i_tool_node import IToolNode
+from common.utils.common import common_convert_value
 from common.utils.tool_code import ToolExecutor
 from maxkb.const import CONFIG
 
@@ -60,7 +61,7 @@ def valid_reference_value(_type, value, name):
     return value
 
 
-def convert_value(name: str, value, _type, is_required, source, node):
+def convert_value(name: str, value, _type, is_required, source, node: IToolNode):
     if not is_required and (value is None or ((isinstance(value, str) or isinstance(value, list)) and len(value) == 0)):
         return None
     if source == 'reference':
@@ -82,25 +83,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
         return value
     try:
         value = node.workflow_manage.generate_prompt(value)
-        if _type == 'int':
-            return int(value)
-        if _type == 'boolean':
-            if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
-                return False
-            return bool(value)
-        if _type == 'float':
-            return float(value)
-        if _type == 'dict':
-            v = json.loads(value)
-            if isinstance(v, dict):
-                return v
-            raise Exception(_('type error'))
-        if _type == 'array':
-            v = json.loads(value)
-            if isinstance(v, list):
-                return v
-            raise Exception(_('type error'))
-        return value
+        return common_convert_value(_type, value)
     except Exception as e:
         raise Exception(
             _('Field: {name} Type: {_type} Value: {value} Type error').format(name=name, _type=_type,

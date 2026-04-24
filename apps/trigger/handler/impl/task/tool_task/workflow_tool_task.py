@@ -6,17 +6,16 @@
     @date：2026/3/27 18:47
     @desc:
 """
-import json
 import time
 import traceback
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
-from django.utils.translation import gettext as _
 
 from application.flow.common import WorkflowMode, Workflow
 from application.flow.i_step_node import ToolWorkflowPostHandler, get_tool_workflow_state
 from application.serializers.common import ToolExecute
+from common.utils.common import common_convert_value
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
 from knowledge.models.knowledge_action import State
@@ -44,32 +43,6 @@ def get_field_value(value, kwargs):
     else:
         return get_reference(value.get('value'), kwargs)
 
-
-def _convert_value(_type, value):
-    if value is None:
-        return None
-
-    if _type == 'int':
-        return int(value)
-    if _type == 'boolean':
-        if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
-            return False
-        return bool(value)
-    if _type == 'float':
-        return float(value)
-    if _type == 'dict':
-        v = json.loads(value)
-        if isinstance(v, dict):
-            return v
-        raise Exception(_('type error'))
-    if _type == 'array':
-        v = json.loads(value)
-        if isinstance(v, list):
-            return v
-        raise Exception(_('type error'))
-    return value
-
-
 def get_tool_execute_parameters(input_field_list, parameter_setting, kwargs):
     type_map = {f.get("name"): f.get("type") for f in (input_field_list or []) if f.get("name")}
 
@@ -77,7 +50,7 @@ def get_tool_execute_parameters(input_field_list, parameter_setting, kwargs):
     if parameter_setting:
         for key, value in parameter_setting.items():
             raw = get_field_value(value, kwargs)
-            parameters[key] = _convert_value(type_map.get(key), raw)
+            parameters[key] = common_convert_value(type_map.get(key), raw)
     return parameters
 
 
