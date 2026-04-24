@@ -35,7 +35,7 @@ class MiniMaxTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 optional_params['params'][key] = value
         return MiniMaxTextToSpeech(
             model=model_name,
-            api_base=model_credential.get('api_base') or 'https://api.minimax.io/v1',
+            api_base=model_credential.get('api_base') or 'https://api.minimaxi.com/v1',
             api_key=model_credential.get('api_key'),
             **optional_params,
         )
