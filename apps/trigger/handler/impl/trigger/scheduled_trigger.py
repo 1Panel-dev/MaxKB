@@ -234,7 +234,7 @@ class ScheduledTrigger(BaseTrigger):
 
     @staticmethod
     def execute(trigger, **kwargs):
-        trigger_task = kwargs.get("trigger_task")
+        trigger_task = kwargs.pop("trigger_task", None)
         if not trigger_task:
             maxkb_logger.warning(f"unsupported task={trigger_task}")
             return
@@ -243,11 +243,11 @@ class ScheduledTrigger(BaseTrigger):
         if source_type == "APPLICATION":
             from trigger.handler.impl.task.application_task import ApplicationTask
 
-            ApplicationTask.execute(trigger_task, **kwargs)
+            ApplicationTask().execute(trigger_task, **kwargs)
         elif source_type == "TOOL":
             from trigger.handler.impl.task.tool_task import ToolTask
 
-            ToolTask.execute(trigger_task, **kwargs)
+            ToolTask().execute(trigger_task, **kwargs)
         else:
             maxkb_logger.warning(f"unsupported source_type={source_type}, task_id={trigger_task['id']}")
 
