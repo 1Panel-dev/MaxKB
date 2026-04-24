@@ -186,14 +186,14 @@ def write_image(zip_path: str, image_list: List[str]):
         if search:
             text = search.group()
             if text.startswith('(./oss/file/'):
-                r = text.replace('(./oss/file/', '').replace(')', '')
-                r = r.strip().split(" ")[0]
-                if not is_valid_uuid(r):
+                image_id = text.replace('(./oss/file/', '').replace(')', '')
+                image_id = image_id.strip().split(" ")[0]
+                if not is_valid_uuid(image_id):
                     continue
-                file = QuerySet(File).filter(id=r).first()
+                file = QuerySet(File).filter(id=image_id).first()
                 if file is None:
                     continue
-                zip_inner_path = os.path.join('oss', 'file', r)
+                zip_inner_path = os.path.join('oss', 'file', image_id)
                 file_path = os.path.join(zip_path, zip_inner_path)
                 if not os.path.exists(os.path.dirname(file_path)):
                     os.makedirs(os.path.dirname(file_path))
