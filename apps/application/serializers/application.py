@@ -523,6 +523,7 @@ class ApplicationSerializer(serializers.Serializer):
         download_url = work_flow_template.get('downloadUrl')
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
+        res.raise_for_status()
         app = ApplicationSerializer(
             data={'user_id': self.data.get('user_id'), 'workspace_id': self.data.get('workspace_id')}
         ).import_({
@@ -541,7 +542,8 @@ class ApplicationSerializer(serializers.Serializer):
             work_flow=work_flow
         )
         try:
-            requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
+            res2 = requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
+            res2.raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
         return app
@@ -1136,6 +1138,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         download_url = work_flow_template.get('downloadUrl')
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
+        res.raise_for_status()
         try:
             mk_instance = restricted_loads(res.content)
         except Exception as e:
@@ -1185,7 +1188,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource_batch([t.id for t in tool_model_list])
         try:
-            requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
+            res2 = requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
+            res2.raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
 

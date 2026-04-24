@@ -54,6 +54,7 @@ class ResourceProxy(APIView):
                 allow_redirects=True,
                 timeout=10
             )
+            response.raise_for_status()
             content_type = response.headers.get('Content-Type', '').split(';')[0]
             # 创建Django流式响应
             django_response = StreamingHttpResponse(

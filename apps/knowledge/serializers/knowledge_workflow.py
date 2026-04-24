@@ -297,6 +297,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 download_url = template_instance.get('downloadUrl')
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
+                res.raise_for_status()
                 KnowledgeWorkflowSerializer.Import(data={
                     'user_id': self.data.get('user_id'),
                     'workspace_id': self.data.get('workspace_id'),
@@ -304,7 +305,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 }).import_({'file': bytes_to_uploaded_file(res.content, 'file.kbwf')}, is_import_tool=True)
 
                 try:
-                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2.raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
@@ -523,6 +525,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 download_url = template_instance.get('downloadUrl')
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
+                res.raise_for_status()
                 KnowledgeWorkflowSerializer.Import(data={
                     'user_id': self.data.get('user_id'),
                     'workspace_id': self.data.get('workspace_id'),
@@ -530,7 +533,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 }).import_({'file': bytes_to_uploaded_file(res.content, 'file.kbwf')}, is_import_tool=False)
 
                 try:
-                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2.raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 

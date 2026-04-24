@@ -317,6 +317,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 download_url = template_instance.get('downloadUrl')
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
+                res.raise_for_status()
                 tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
                 ToolSerializer.Import(data={
                     'user_id': self.data.get('user_id'),
@@ -326,7 +327,8 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 }).update_template_workflow(str(self.data.get('tool_id')))
 
                 try:
-                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    res2.raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
