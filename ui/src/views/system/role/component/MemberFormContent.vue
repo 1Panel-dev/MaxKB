@@ -121,21 +121,10 @@ async function handleRemoteSearch(query: string, element: any, model: FormItemMo
 }
 
 async function filterLocalOptions(query: string, element: any, model: FormItemModel) {
-  if (!query) return true
-  const key = `${form.value.indexOf(element)}-${model.path}`
-  loadingStates[key] = true
-  try {
-    const options = getOptions(element, model)
-    element[`_${model.path}_options`] = options.filter((option: any) => {
-      const text = String(option.label ?? option.value ?? '').toLowerCase()
-      return text.includes(String(query).toLowerCase())
-    })
-  } catch (error) {
-    console.error('Remote search failed:', error)
-    element[`_${model.path}_options`] = []
-  } finally {
-    loadingStates[key] = false
-  }
+  const options = model.selectProps?.options || []
+  element[`_${model.path}_options`] = options.filter((opt: any) =>
+    opt.label.toLowerCase().includes(query.toLowerCase()),
+  )
 }
 
 function handleAdd() {
