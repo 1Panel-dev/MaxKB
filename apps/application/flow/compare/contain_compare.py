@@ -24,8 +24,8 @@ class ContainCompare(Compare):
             return target_value in source_value
         elif isinstance(source_value, list):
             for item in source_value:
-                if str(item) != target_value:
-                    return False
-            return True
+                if str(item) == target_value:
+                    return True
+            return False
         else:
             return target_value in str(source_value)
