@@ -30,7 +30,7 @@
             style="width: 100%"
             collapse-tags
             collapse-tags-tooltip
-            v-bind="model.selectProps"
+            v-bind="getSelectProps(model)"
           >
             <el-option
               v-for="opt in getOptions(element, model)"
@@ -97,7 +97,16 @@ const selectedRoles = computed(() => {
 
 function getOptions(element: any, model: FormItemModel) {
   const dynamicOptions = element[`_${model.path}_options`]
-  return dynamicOptions || model.selectProps?.options || []
+  // 检查是否已经设置过动态选项（包括空数组）
+  if (element.hasOwnProperty(`_${model.path}_options`)) {
+    return dynamicOptions
+  }
+  return model.selectProps?.options || []
+}
+
+function getSelectProps(model: FormItemModel) {
+  const {options, ...restProps} = model.selectProps || {}
+  return restProps
 }
 
 async function handleRemoteSearch(query: string, element: any, model: FormItemModel) {
