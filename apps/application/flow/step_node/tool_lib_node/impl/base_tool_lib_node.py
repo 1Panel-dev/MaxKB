@@ -86,7 +86,7 @@ def valid_reference_value(_type, value, name):
     return value
 
 
-def convert_value(name: str, value, _type, is_required, source, node: IToolLibNode):
+def convert_value(name: str, value, _type, is_required, source, node):
     if not is_required and (value is None or ((isinstance(value, str) or isinstance(value, list)) and len(value) == 0)):
         return None
     if source == 'reference':
