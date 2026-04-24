@@ -132,7 +132,7 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
         QuerySet(ChatRecord).filter(
             chat__application_id=application_id,
             chat__chat_user_id=chat_user_id,
-        ).order_by('create_time').only('problem_text', 'answer_text')[:history_limit]
+        ).order_by('-create_time').only('problem_text', 'answer_text')[:history_limit]
     )
     if len(history_chat_record) <= 1:
         return
@@ -149,6 +149,8 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
 
     existing_memory = long_term_memory.memory if long_term_memory else ''
 
+    # 反转为时间正序（旧→新）
+    history_chat_record = list(reversed(history_chat_record))
 
     new_conversation = '\n'.join(
         line
