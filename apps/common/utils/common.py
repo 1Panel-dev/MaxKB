@@ -125,7 +125,7 @@ def markdown_to_plain_text(md: str) -> str:
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r'\s+', ' ', text)
     # 去除表单渲染
-    re.sub(r'<form_rander>[\d\D]*?</form_rander>', '', text)
+    text = re.sub(r'<form_rander>[\d\D]*?</form_rander>', '', text)
     # 去除首尾空格
     text = text.strip()
     return text
