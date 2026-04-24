@@ -263,17 +263,18 @@ class OllamaModelProvider(IModelProvider):
     @staticmethod
     def get_base_model_list(api_base):
         base_url = get_base_url(api_base)
-        r = requests.request(method="GET", url=f"{base_url}/api/tags", timeout=5)
-        r.raise_for_status()
-        return r.json()
+        res = requests.request(method="GET", url=f"{base_url}/api/tags", timeout=5)
+        res.raise_for_status()
+        return res.json()
 
     def down_model(self, model_type: str, model_name, model_credential: Dict[str, object]) -> Iterator[DownModelChunk]:
         api_base = model_credential.get('api_base', '')
         base_url = get_base_url(api_base)
-        r = requests.request(
+        res = requests.request(
             method="POST",
             url=f"{base_url}/api/pull",
             data=json.dumps({"name": model_name}).encode(),
             stream=True,
         )
-        return convert(r)
+        res.raise_for_status()
+        return convert(res)
