@@ -78,7 +78,7 @@ After disabling, the long-term memory of the conversation users will be cleared,
     roleSettings: {
       label: 'System Prompt',
       placeholder:
-        'System prompt, you can reference variables in the system: {data} is the segment hit in the knowledge base; {question} is the question asked by the user.',
+        'System prompt, you can reference variables in the system: {data} is the segment hit in the knowledge base; {question} is the question asked by the user, {memory} is the user memory after enabling long-term memory.',
       tooltip: 'Set the role or instructions for the model to follow',
     },
 

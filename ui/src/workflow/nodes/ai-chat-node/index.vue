@@ -878,7 +878,7 @@ function refreshLongTermConfig() {
     .filter((v: any) => v)
 
   if (form_data.length > 0) {
-    chat_data.value.system = chat_data.value.system || longTermPrompt
+    chat_data.value.system = chat_data.value.system
   }
 }
 props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)

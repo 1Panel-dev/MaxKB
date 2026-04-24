@@ -74,7 +74,7 @@ export default {
     roleSettings: {
       label: '系統提示詞',
       placeholder:
-        '系統提示詞，可以引用系統中的變數：{data} 是命中知識庫中的分段；{question} 是用戶提出的問題。',
+        '',
       tooltip: '設定模型扮演的角色或遵循的指令',
     },
     prompt: {

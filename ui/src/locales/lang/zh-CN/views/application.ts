@@ -74,7 +74,7 @@ export default {
     roleSettings: {
       label: '系统提示词',
       placeholder:
-        '系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题。',
+        '系统提示词，可以引用系统中的变量：{data} 是命中知识库中的分段；{question} 是用户提出的问题，{memory}开启长期记忆后的用户记忆。',
       tooltip: '设定模型扮演的角色或遵循的指令',
     },
 
