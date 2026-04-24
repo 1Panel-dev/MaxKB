@@ -542,8 +542,7 @@ class ApplicationSerializer(serializers.Serializer):
             work_flow=work_flow
         )
         try:
-            res2 = requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
-            res2.raise_for_status()
+            requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5).raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
         return app
@@ -1188,8 +1187,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource_batch([t.id for t in tool_model_list])
         try:
-            res2 = requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5)
-            res2.raise_for_status()
+            requests.get(work_flow_template.get('downloadCallbackUrl'), timeout=5).raise_for_status()
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
 

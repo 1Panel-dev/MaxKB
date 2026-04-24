@@ -305,8 +305,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 }).import_({'file': bytes_to_uploaded_file(res.content, 'file.kbwf')}, is_import_tool=True)
 
                 try:
-                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
-                    res2.raise_for_status()
+                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5).raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
@@ -533,8 +532,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 }).import_({'file': bytes_to_uploaded_file(res.content, 'file.kbwf')}, is_import_tool=False)
 
                 try:
-                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
-                    res2.raise_for_status()
+                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5).raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 

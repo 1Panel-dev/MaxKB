@@ -327,8 +327,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 }).update_template_workflow(str(self.data.get('tool_id')))
 
                 try:
-                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
-                    res2.raise_for_status()
+                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5).raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 

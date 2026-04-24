@@ -431,8 +431,7 @@ class ToolSerializer(serializers.Serializer):
                 }).import_(name=instance.get('name'), source='template')
 
                 try:
-                    res2 = requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
-                    res2.raise_for_status()
+                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5).raise_for_status()
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
                 return tool
@@ -1193,8 +1192,7 @@ class ToolSerializer(serializers.Serializer):
                 'auth_target_type': AuthTargetType.TOOL.value
             }).auth_resource(str(tool_id))
             try:
-                res2 = requests.get(instance.get('download_callback_url'), timeout=5)
-                res2.raise_for_status()
+                requests.get(instance.get('download_callback_url'), timeout=5).raise_for_status()
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
@@ -1243,8 +1241,7 @@ class ToolSerializer(serializers.Serializer):
             # tool.is_active = False
             tool.save()
             try:
-                res2 = requests.get(self.data.get('download_callback_url'), timeout=5)
-                res2.raise_for_status()
+                requests.get(self.data.get('download_callback_url'), timeout=5).raise_for_status()
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
