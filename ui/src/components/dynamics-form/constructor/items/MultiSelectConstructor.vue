@@ -8,7 +8,11 @@
 
     <el-row style="width: 100%" :gutter="10">
       <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
-        <el-radio :value="item.value" size="large" v-for="(item,index) in assignment_method_option_list" :key="index"
+        <el-radio
+          :value="item.value"
+          size="large"
+          v-for="(item, index) in assignment_method_option_list"
+          :key="index"
           >{{ item.label }}
           <el-popover
             width="300px"
@@ -129,6 +133,7 @@
       :reserve-keyword="false"
       v-model="formValue.default_value"
       :teleported="false"
+      popper-class="custom-select-popper"
     >
       <el-option
         v-for="(option, index) in formValue.option_list"

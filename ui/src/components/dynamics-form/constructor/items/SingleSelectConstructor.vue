@@ -125,7 +125,7 @@
       />
     </div>
 
-    <el-select v-model="formValue.default_value" :teleported="false">
+    <el-select v-model="formValue.default_value" :teleported="false" popper-class="custom-select-popper">
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
