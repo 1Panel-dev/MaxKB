@@ -19,6 +19,9 @@ MaxKB = Max Knowledge Brain, it is an open-source platform for building enterpri
 - **Model-Agnostic**: Supports various large models, including private models (such as DeepSeek, Llama, Qwen, etc.) and public models (like OpenAI, Claude, Gemini, MiniMax, etc.).
 - **Multi Modal**: Native support for input and output text, image, audio and video.
 
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2FMaxKB.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2FMaxKB?ref=badge_large)
+
 ## Quick start
 
 Execute the script below to start a MaxKB container using Docker:
@@ -57,6 +60,7 @@ Access MaxKB web interface at `http://your_server_ip:8080` with default admin cr
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=1Panel-dev/MaxKB&type=Date)](https://star-history.com/#1Panel-dev/MaxKB&Date)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2F1Panel-dev%2FMaxKB.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2F1Panel-dev%2FMaxKB?ref=badge_shield)
 
 ## License
 
