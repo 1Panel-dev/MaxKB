@@ -18,7 +18,7 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 def _write_context(node_variable: Dict, workflow_variable: Dict, node: INode, workflow, answer: str,
                    reasoning_content: str):
     chat_model = node_variable.get('chat_model')
-    message_tokens = node_variable['usage_metadata']['output_tokens'] if 'usage_metadata' in node_variable else 0
+    message_tokens = chat_model.get_num_tokens_from_messages(node_variable.get('message_list'))
     answer_tokens = chat_model.get_num_tokens(answer)
     node.context['message_tokens'] = message_tokens
     node.context['answer_tokens'] = answer_tokens
@@ -256,7 +256,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                         *[{'type': 'image_url',
                            'image_url': {'url': f'data:image/{base64_image[1]};base64,{base64_image[0]}'}} for
                           base64_image in image_base64_list],
-                        *[{'type': 'image_url', 'image_url': url} for url in url_list]
+                        *[{'type': 'image_url', 'image_url': {'url': url}} for url in url_list]
                     ])
         return HumanMessage(content=chat_record.problem_text)
 
