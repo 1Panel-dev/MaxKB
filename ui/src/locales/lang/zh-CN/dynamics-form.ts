@@ -60,6 +60,7 @@ export default {
   TreeSelect: {
     label: '树形选择器',
     select: '选项',
+    selectRequired: '选项必填',
     allowMultipleSelections: '允许多选',
     addDialog: {
       addFirstOption: '添加一级选项',

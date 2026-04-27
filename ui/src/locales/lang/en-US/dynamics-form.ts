@@ -59,6 +59,7 @@ export default {
   TreeSelect: {
     label: 'Tree Select',
     select: 'Option',
+    selectRequired: 'Options are required',
     allowMultipleSelections: 'Allow Multiple Selections',
     addDialog: {
       addFirstOption: 'Add Root Option',

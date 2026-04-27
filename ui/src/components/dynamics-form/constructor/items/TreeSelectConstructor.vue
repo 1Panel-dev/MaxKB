@@ -1,5 +1,15 @@
 <template>
-  <el-form-item>
+  <el-form-item
+    prop="treeData"
+    :rules="[
+      {
+        message: $t('dynamicsForm.TreeSelect.selectRequired'),
+        blur: 'change',
+        type: 'array',
+        min: 1,
+      },
+    ]"
+  >
     <template #label>
       <div class="flex-between">
         <span>
@@ -21,7 +31,7 @@
     </template>
     <el-card shadow="never" class="border-r-6 w-full" style="--el-card-padding: 8px">
       <el-tree
-        :data="treeData"
+        :data="formValue.treeData"
         node-key="id"
         default-expand-all
         :expand-on-click-node="false"
@@ -75,7 +85,7 @@
   >
     <el-tree-select
       v-model="formValue.default_value"
-      :data="treeData"
+      :data="formValue.treeData"
       :multiple="formValue.multiple"
       :render-after-expand="false"
       style="width: 100%"
@@ -194,7 +204,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, watch, ref, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { t } from '@/locales/'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
@@ -214,7 +224,7 @@ const formValue = computed({
 const getData = () => {
   return {
     input_type: 'TreeSelect',
-    attrs: { multiple: formValue.value.multiple, data: treeData.value },
+    attrs: { multiple: formValue.value.multiple, data: formValue.value.treeData, filterable: true },
     default_value: formValue.value.default_value,
     show_default_value: formValue.value.show_default_value,
   }
@@ -222,7 +232,7 @@ const getData = () => {
 const rander = (form_data: any) => {
   const attrs = form_data.attrs || {}
   formValue.value.multiple = attrs.multiple
-  treeData.value = attrs.data || []
+  formValue.value.treeData = attrs.data || []
   formValue.value.default_value = form_data.default_value
   formValue.value.show_default_value = form_data.show_default_value
 }
@@ -254,8 +264,6 @@ const treeProps = {
   children: 'children',
   label: 'label',
 }
-
-const treeData = ref<TreeNode[]>([])
 
 const addDialog = reactive<{
   visible: boolean
@@ -349,7 +357,7 @@ function submitAdd() {
   }))
 
   if (addDialog.mode === 'root') {
-    treeData.value.push(...newNodes)
+    formValue.value.treeData.push(...newNodes)
   } else {
     const parent = addDialog.parentNode
     if (!parent) {
@@ -411,7 +419,7 @@ function handleDelete(node: TreeNode) {
     type: 'warning',
   })
     .then(() => {
-      const removed = removeNodeById(treeData.value, node.id)
+      const removed = removeNodeById(formValue.value.treeData, node.id)
       if (removed) {
         ElMessage.success(t('common.deleteSuccess'))
       } else {
