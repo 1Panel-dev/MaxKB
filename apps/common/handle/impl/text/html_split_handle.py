@@ -12,7 +12,7 @@ from typing import List
 
 from bs4 import BeautifulSoup
 from charset_normalizer import detect
-from html2text import html2text
+from markdownify import markdownify
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger
@@ -44,6 +44,12 @@ class HTMLSplitHandle(BaseSplitHandle):
             return True
         return False
 
+    def _remove_anchor_links(self, html: str) -> str:
+        soup = BeautifulSoup(html, 'html.parser')
+        for a in soup.find_all('a', href=re.compile('^#')):
+            a.unwrap()
+        return str(soup)
+
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         if type(limit) is str:
@@ -57,7 +63,8 @@ class HTMLSplitHandle(BaseSplitHandle):
         try:
             encoding = get_encoding(buffer)
             content = buffer.decode(encoding)
-            content = html2text(content)
+            content = self._remove_anchor_links(content)
+            content = markdownify(content, heading_style='ATX')
         except BaseException as e:
             maxkb_logger.error(f"Error processing HTML file {file.name}: {e}, {traceback.format_exc()}")
 
@@ -75,7 +82,8 @@ class HTMLSplitHandle(BaseSplitHandle):
         try:
             encoding = get_encoding(buffer)
             content = buffer.decode(encoding)
-            return html2text(content)
+            content = self._remove_anchor_links(content)
+            return markdownify(content, heading_style='ATX')
         except BaseException as e:
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
             return f'{e}'

@@ -49,7 +49,6 @@ dependencies = [
     "django-celery-beat==2.8.1",
     "celery-once==3.0.1",
     "django-apscheduler==0.7.0",
-    "html2text==2025.4.15",
     "openpyxl==3.1.5",
     "python-docx==1.2.0",
     "xlrd==2.0.2",
@@ -63,7 +62,8 @@ dependencies = [
     "websockets==15.0.1",
     "ruff==0.15.12",
     "cohere==5.17.0",
-    "jsonpath-ng==1.8.0"
+    "jsonpath-ng==1.8.0",
+    "markdownify>=1.2.2",
 ]
 
 [tool.uv]
