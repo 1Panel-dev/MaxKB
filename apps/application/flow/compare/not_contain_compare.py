@@ -18,9 +18,14 @@ class NotContainCompare(Compare):
             return True
 
     def compare(self, source_value, compare, target_value):
+        target_value = str(target_value)
+
         if isinstance(source_value, str):
-            return str(target_value) not in source_value
+            return target_value not in source_value
         elif isinstance(source_value, list):
-            return not any([str(item) == str(target_value) for item in source_value])
+            for item in source_value:
+                if str(item) == target_value:
+                    return False
+            return True
         else:
-            return str(target_value) not in str(source_value)
+            return target_value not in str(source_value)
