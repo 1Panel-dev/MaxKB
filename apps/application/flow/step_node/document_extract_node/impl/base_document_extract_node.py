@@ -55,8 +55,8 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     id=meta['file_id'],
                     file_name=image.file_name,
                     file_size=len(file_bytes),
-                    source_type=FileSourceType.APPLICATION.value if application_id else FileSourceType.KNOWLEDGE.value if knowledge_id else FileSourceType.APPLICATION.value,
-                    source_id=application_id or tool_id or knowledge_id,
+                    source_type=FileSourceType.APPLICATION.value if application_id else FileSourceType.KNOWLEDGE.value if knowledge_id else FileSourceType.TOOL.value,
+                    source_id=application_id or knowledge_id or tool_id,
                     meta=meta
                 )
                 if not QuerySet(File).filter(id=new_file.id).exists():

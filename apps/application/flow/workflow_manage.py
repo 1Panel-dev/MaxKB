@@ -503,7 +503,7 @@ class WorkflowManage:
                 return None
             if not enableException:
                 chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
-                                                                       self.params.get('chat_id'),
+                                                                       self.params.get('chat_record_id'),
                                                                        current_node.id,
                                                                        current_node.up_node_id_list,
                                                                        'Exception:' + str(e), False, 0, 0,

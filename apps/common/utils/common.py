@@ -135,7 +135,7 @@ def encryption(message: str):
                        range(0, max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(pre_len))])
     end_str = "".join(
         [message[index] for index in
-         range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len), message_len)])
+         range(message_len - (post_len if post_len < max_post_len else max_post_len), message_len)])
     content = "***************"
     return pre_str + content + end_str
 

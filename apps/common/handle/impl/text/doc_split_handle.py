@@ -214,7 +214,7 @@ class DocSplitHandle(BaseSplitHandle):
             else:
                 split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         except BaseException as e:
-            maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
+            maxkb_logger.error(f"Error processing DOC file {file.name}: {e}, {traceback.format_exc()}")
             return {
                 'name': file_name,
                 'content': []
