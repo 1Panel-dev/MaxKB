@@ -129,7 +129,6 @@
       :reserve-keyword="false"
       v-model="formValue.default_value"
       :teleported="false"
-      popper-class="max-w-350"
     >
       <el-option
         v-for="(option, index) in formValue.option_list"
