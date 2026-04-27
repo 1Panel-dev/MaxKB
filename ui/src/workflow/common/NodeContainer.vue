@@ -70,12 +70,24 @@
                   <el-dropdown-item @click="copyNode" class="p-8">{{
                     $t('common.copy')
                   }}</el-dropdown-item>
-                  <el-dropdown-item v-if="nodeDisabled" @click="enable()" class="p-8">{{
-                    $t('common.status.enable')
-                  }}</el-dropdown-item>
-                  <el-dropdown-item v-else @click="disable()" class="p-8">{{
-                    $t('common.status.disable')
-                  }}</el-dropdown-item>
+                  <template
+                    v-if="
+                      !(
+                        (nodeModel.type == 'tool-lib-node' &&
+                          nodeModel['properties'].kind == WorkflowKind.DataSource) ||
+                        nodeModel.type == 'data-source-local-node' ||
+                        nodeModel.type == 'data-source-web-node'
+                      )
+                    "
+                  >
+                    <el-dropdown-item v-if="nodeDisabled" @click="enable()" class="p-8">{{
+                      $t('common.status.enable')
+                    }}</el-dropdown-item>
+                    <el-dropdown-item v-else @click="disable()" class="p-8">{{
+                      $t('common.status.disable')
+                    }}</el-dropdown-item></template
+                  >
+
                   <el-dropdown-item @click="deleteNode" class="border-t p-8">{{
                     $t('common.delete')
                   }}</el-dropdown-item>
