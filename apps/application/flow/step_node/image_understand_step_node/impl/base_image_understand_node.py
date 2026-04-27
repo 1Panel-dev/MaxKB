@@ -256,7 +256,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
                         *[{'type': 'image_url',
                            'image_url': {'url': f'data:image/{base64_image[1]};base64,{base64_image[0]}'}} for
                           base64_image in image_base64_list],
-                        *[{'type': 'image_url', 'image_url': url} for url in url_list]
+                        *[{'type': 'image_url', 'image_url': {'url': url}} for url in url_list]
                     ])
         return HumanMessage(content=chat_record.problem_text)
 
