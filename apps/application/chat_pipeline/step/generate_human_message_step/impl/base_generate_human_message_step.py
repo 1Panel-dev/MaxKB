@@ -57,13 +57,13 @@ class BaseGenerateHumanMessageStep(IGenerateHumanMessageStep):
                     content=no_references_setting.get('value').replace('{question}', problem))
             else:
                 return HumanMessage(content=prompt.replace('{data}', "").replace('{question}', problem))
-        temp_data = ""
+        temp_len = 0
         data_list = []
         for p in paragraph_list:
             content = f"{p.title}:{p.content}"
-            temp_data += content
-            if len(temp_data) > max_paragraph_char_number:
-                row_data = content[0:max_paragraph_char_number - len(temp_data)]
+            temp_len += len(content)
+            if temp_len > max_paragraph_char_number:
+                row_data = content[0:max_paragraph_char_number - temp_len]
                 data_list.append(f"<data>{row_data}</data>")
                 break
             else:
