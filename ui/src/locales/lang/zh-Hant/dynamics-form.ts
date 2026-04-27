@@ -59,6 +59,7 @@ export default {
   TreeSelect: {
     label: '樹狀選擇器',
     select: '選項',
+    selectRequired: '選項必填',
     allowMultipleSelections: '允許多選',
     addDialog: {
       addFirstOption: '新增第一層選項',
