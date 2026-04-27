@@ -303,7 +303,7 @@ class BaseLoopNode(ILoopNode):
                           _is_interrupt=_is_interrupt_exec)
 
     def get_loop_context_data(self):
-        fields = self.node.properties.get('config', []).get('fields', []) or []
+        fields = self.node.properties.get('config', {}).get('fields', []) or []
         return {f.get('value'): self.context.get(f.get('value')) for f in fields if
                 self.context.get(f.get('value')) is not None}
 
