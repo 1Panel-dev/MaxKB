@@ -198,7 +198,7 @@ const workspace = {
       ],
       'OR',
     ),
-    relate_map: (source_id: string) =>
+  relate_map: (source_id: string) =>
     hasPermission(
       [
         new ComplexPermission(
@@ -230,6 +230,21 @@ const workspace = {
       ],
       'OR',
     ),
+  publish: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_PUBLISH.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_PUBLISH.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   delete: (source_id: string) =>
     hasPermission(
       [
@@ -256,12 +271,8 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(
-          source_id,
-        ),
-        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getKnowledgeWorkspaceResourcePermission(
-          source_id,
-        ),
+        PermissionConst.KNOWLEDGE_DOCUMENT_READ.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_WORKFLOW_READ.getKnowledgeWorkspaceResourcePermission(source_id),
         PermissionConst.KNOWLEDGE_DOCUMENT_READ.getWorkspacePermissionWorkspaceManageRole,
         PermissionConst.KNOWLEDGE_WORKFLOW_READ.getWorkspacePermissionWorkspaceManageRole,
       ],
@@ -655,7 +666,9 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
         PermissionConst.KNOWLEDGE_WORKFLOW_EXPORT.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',

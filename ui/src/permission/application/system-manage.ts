@@ -7,6 +7,8 @@ const systemManage = {
   batchMove: () => false,
   folderCreate: () => false,
   edit: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_EDIT], 'OR'),
+  publish: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_PUBLISH], 'OR'),
   folderEdit: () => false,
   folderRead: () => false,
   folderManage: () => false,

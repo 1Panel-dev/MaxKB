@@ -34,8 +34,8 @@ class ToolWorkflowView(APIView):
             responses=DefaultResultSerializer,
             tags=[_('Tool')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
-                         PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.TOOL_PUBLISH.get_workspace_tool_permission(),
+                         PermissionConstants.TOOL_PUBLISH.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
                                         CompareConstants.AND),

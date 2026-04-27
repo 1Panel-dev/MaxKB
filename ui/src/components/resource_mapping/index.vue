@@ -64,7 +64,7 @@
           :placeholder="$t('common.search')"
           style="width: 220px"
           clearable
-          @keyup.enter="pageResourceMapping()"
+          @keyup.enter="currentTab === 'dependency' ? pageMappingResource() : pageResourceMapping()"
         />
         <el-input
           v-if="searchType === 'user_name'"
@@ -72,7 +72,7 @@
           :placeholder="$t('common.search')"
           style="width: 220px"
           clearable
-          @keyup.enter="pageResourceMapping()"
+          @keyup.enter="currentTab === 'dependency' ? pageMappingResource() : pageResourceMapping()"
         />
         <el-select
           v-else-if="searchType === 'source_type'"

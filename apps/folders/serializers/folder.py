@@ -39,6 +39,7 @@ def has_exact_permission_by_role(user_id: str, workspace_id: str, permission_id:
 
     return False
 
+
 def get_source_type(source):
     if source == Group.TOOL.name:
         return Tool
@@ -149,7 +150,7 @@ class FolderSerializer(serializers.Serializer):
 
             Folder = get_folder_type(self.data.get('source'))  # noqa
             if QuerySet(Folder).filter(name=name, workspace_id=workspace_id, parent_id=parent_id).exists():
-                raise Exception(_('Folder name already exists'))
+                raise AppApiException(500, _('Folder name already exists'))
             # Folder 不能超过3层
             check_depth(self.data.get('source'), parent_id, workspace_id)
 
@@ -197,7 +198,7 @@ class FolderSerializer(serializers.Serializer):
                         parent_id=parent_id,
                         workspace_id=current_node.workspace_id
                 ).exclude(id=current_id).exists():
-                    raise serializers.ValidationError(_('Folder name already exists'))
+                    raise AppApiException(500, _('Folder name already exists'))
 
             edit_field_list = ['name', 'desc']
             edit_dict = {field: instance.get(field) for field in edit_field_list if (
@@ -218,7 +219,7 @@ class FolderSerializer(serializers.Serializer):
 
                     if QuerySet(Folder).filter(name=current_node.name, parent_id=parent_id,
                                                workspace_id=current_node.workspace_id).exists():
-                        raise serializers.ValidationError(_('Folder name already exists'))
+                        raise AppApiException(500, _('Folder name already exists'))
 
                     current_node.parent = parent
                     current_node.save()
@@ -352,7 +353,9 @@ class FolderTreeSerializer(serializers.Serializer):
         if name is not None:
             base_q &= Q(name__contains=name)
         if not workspace_manage:
-            having_read_permission_by_role = has_exact_permission_by_role(user_id, workspace_id, f"{source}_FOLDER:READ", RoleConstants.USER.value.__str__())
+            having_read_permission_by_role = has_exact_permission_by_role(user_id, workspace_id,
+                                                                          f"{source}_FOLDER:READ",
+                                                                          RoleConstants.USER.value.__str__())
             permission_condition = ['VIEW']
             if having_read_permission_by_role:
                 permission_condition = ['VIEW', 'ROLE']

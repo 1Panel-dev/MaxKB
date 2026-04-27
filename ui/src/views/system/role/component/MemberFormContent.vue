@@ -23,13 +23,14 @@
             filterable
             remote
             :remote-method="(query: any) => handleRemoteSearch(query, element, model)"
+            :filter-method="!model.selectProps?.remoteMethod ? (query: any) => filterLocalOptions(query, element, model) : undefined"
             :loading="loadingStates[`${index}-${model.path}`]"
             multiple
             :reserve-keyword="false"
             style="width: 100%"
             collapse-tags
             collapse-tags-tooltip
-            v-bind="model.selectProps"
+            v-bind="getSelectProps(model)"
           >
             <el-option
               v-for="opt in getOptions(element, model)"
@@ -96,7 +97,16 @@ const selectedRoles = computed(() => {
 
 function getOptions(element: any, model: FormItemModel) {
   const dynamicOptions = element[`_${model.path}_options`]
-  return dynamicOptions || model.selectProps?.options || []
+  // 检查是否已经设置过动态选项（包括空数组）
+  if (element.hasOwnProperty(`_${model.path}_options`)) {
+    return dynamicOptions
+  }
+  return model.selectProps?.options || []
+}
+
+function getSelectProps(model: FormItemModel) {
+  const {options, ...restProps} = model.selectProps || {}
+  return restProps
 }
 
 async function handleRemoteSearch(query: string, element: any, model: FormItemModel) {
@@ -117,6 +127,13 @@ async function handleRemoteSearch(query: string, element: any, model: FormItemMo
   } finally {
     loadingStates[key] = false
   }
+}
+
+async function filterLocalOptions(query: string, element: any, model: FormItemModel) {
+  const options = model.selectProps?.options || []
+  element[`_${model.path}_options`] = options.filter((opt: any) =>
+    opt.label.toLowerCase().includes(query.toLowerCase()),
+  )
 }
 
 function handleAdd() {

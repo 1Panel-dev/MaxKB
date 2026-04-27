@@ -8,6 +8,7 @@
 """
 import hashlib
 import io
+import json
 import mimetypes
 import pickle
 import random
@@ -360,3 +361,31 @@ def is_valid_uuid(uuid_string):
         return str(uuid_obj) == uuid_string
     except ValueError:
         return False
+
+def common_convert_value(_type, value):
+    if value is None:
+        return None
+
+    if _type == 'int':
+        return int(value)
+    if _type == 'boolean':
+        if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
+            return False
+        return bool(value)
+    if _type == 'float':
+        return float(value)
+    if _type == 'dict':
+        if isinstance(value, dict):
+            return value
+        v = json.loads(value)
+        if isinstance(v, dict):
+            return v
+        raise Exception(_('type error'))
+    if _type == 'array':
+        if isinstance(value, list):
+            return value
+        v = json.loads(value)
+        if isinstance(v, list):
+            return v
+        raise Exception(_('type error'))
+    return value
