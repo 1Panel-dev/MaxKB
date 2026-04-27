@@ -54,7 +54,7 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
             dashscope.base_http_api_url = self.api_base
             multimodal_input = [{"text": text} for text in texts]
             resp = dashscope.MultiModalEmbedding.call(
-                model="tongyi-embedding-vision-plus",
+                model=self.model_name,
                 input=multimodal_input,  # type: ignore
                 **self.optional_params
             )
