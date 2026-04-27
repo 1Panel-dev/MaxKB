@@ -85,7 +85,7 @@ const iframeRef = ref<HTMLIFrameElement>()
 const finalSource = computed(() => {
   if (props.script_exec) return fSource.value
 
-  return fSource.value.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+  return fSource.value.replace(/<script.*?>.*?<\/script>/gsi, '')
 })
 function onMessage(e: MessageEvent) {
   if (e.data?.instanceId !== instanceId) return

@@ -71,7 +71,7 @@ def json_loads(response, expected_fields):
     extraction_strategies = [
         lambda: json.loads(cleaned),
         lambda: json.loads(re.search(r'```(?:json)?\s*(\{.*?\})\s*```', cleaned, re.DOTALL).group(1)),
-        lambda: json.loads(re.search(r'(\{[\s\S]*\})', cleaned).group(1)),
+        lambda: json.loads(re.search(r'(\{.*\})', cleaned, flags=re.DOTALL).group(1)),
     ]
     for strategy in extraction_strategies:
         try:

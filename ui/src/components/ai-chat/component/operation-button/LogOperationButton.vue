@@ -172,7 +172,7 @@ function markdownToPlainText(md: string) {
       // 移除行内代码 `code`
       .replace(/`(.*?)`/g, '$1')
       // 移除代码块 ```code```
-      .replace(/```[\s\S]*?```/g, '')
+      .replace(/```.*?```/gs, '')
       // 移除多余的换行符
       .replace(/\n{2,}/g, '\n')
       .trim()
@@ -180,7 +180,7 @@ function markdownToPlainText(md: string) {
 }
 
 function removeFormRander(text: string) {
-  return text.replace(/<form_rander>[\s\S]*?<\/form_rander>/g, '').trim()
+  return text.replace(/<form_rander>.*?<\/form_rander>/gs, '').trim()
 }
 
 const playAnswerText = (text: string) => {
