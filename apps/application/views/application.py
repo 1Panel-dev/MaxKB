@@ -277,8 +277,8 @@ class ApplicationAPI(APIView):
             responses=result.DefaultResultSerializer,
             tags=[_('Application')]  # type: ignore
         )
-        @has_permissions(PermissionConstants.APPLICATION_EDIT.get_workspace_application_permission(),
-                         PermissionConstants.APPLICATION_EDIT.get_workspace_permission_workspace_manage_role(),
+        @has_permissions(PermissionConstants.APPLICATION_PUBLISH.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_PUBLISH.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
                                         CompareConstants.AND),

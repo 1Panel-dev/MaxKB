@@ -46,7 +46,7 @@
           <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
           {{ $t('common.save') }}
         </el-button>
-        <el-button type="primary" @click="publish" v-if="permissionPrecise.edit(id)">
+        <el-button type="primary" @click="publish" v-if="permissionPrecise.publish(id)">
           {{ $t('common.publish') }}
         </el-button>
 
@@ -145,7 +145,7 @@
       v-click-outside="clickoutsideHistory"
       @refreshVersion="refreshVersion"
     />
-     <TemplateStoreDialog
+    <TemplateStoreDialog
       ref="templateStoreDialogRef"
       :api-type="apiType"
       source="work_flow"
@@ -173,7 +173,7 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { WorkflowMode } from '@/enums/application'
-import TemplateStoreDialog from "@/views/application/template-store/TemplateStoreDialog.vue";
+import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Application)
 provide('loopWorkflowMode', WorkflowMode.ApplicationLoop)

@@ -234,7 +234,7 @@ class ScheduledTrigger(BaseTrigger):
 
     @staticmethod
     def execute(trigger, **kwargs):
-        trigger_task = kwargs.get("trigger_task")
+        trigger_task = kwargs.pop("trigger_task", None)
         if not trigger_task:
             maxkb_logger.warning(f"unsupported task={trigger_task}")
             return

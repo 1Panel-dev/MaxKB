@@ -50,6 +50,21 @@ const workspace = {
       ],
       'OR',
     ),
+  publish: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_PUBLISH.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.APPLICATION_PUBLISH.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   folderCreate: (folder_id: string) =>
     hasPermission(
       [

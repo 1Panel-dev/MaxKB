@@ -94,7 +94,7 @@
                     {{ $t('common.edit') }}
                   </el-dropdown-item>
                   <el-dropdown-item
-                    @click.stop="openMoveToDialog(data)"
+                    @click.stop="openMoveToDialog(node)"
                     v-if="node.level !== 1 && permissionPrecise.folderEdit(node.id)"
                   >
                     <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>

@@ -130,6 +130,7 @@
                       $t('views.application.form.roleSettings.placeholder', {
                         data: '{data}',
                         question: '{question}',
+                        memory: '{memory}',
                       })
                     "
                   />
@@ -1206,8 +1207,7 @@ function openLongTermConfigDialog() {
 
 function switchLongTerm() {
   if (applicationForm.value.long_term_enable) {
-    applicationForm.value.model_setting.system =
-      applicationForm.value.model_setting.system || longTermPrompt
+    applicationForm.value.model_setting.system = applicationForm.value.model_setting.system
   }
 }
 

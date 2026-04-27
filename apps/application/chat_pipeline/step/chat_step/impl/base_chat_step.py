@@ -142,9 +142,12 @@ def event_content(response,
                                                                       'node_type': 'ai-chat-node'})
         if not manage.debug:
             add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
-    except Exception as e:
-        maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
-        all_text = 'Exception:' + str(e)
+    except BaseException as e:
+        if isinstance(e, GeneratorExit):
+            maxkb_logger.error(f'Generator was closed (client disconnected)')
+        else:
+            maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
+            all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
                                       all_text, manage, step, padding_problem_text, reasoning_content='')

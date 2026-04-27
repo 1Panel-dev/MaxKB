@@ -33,7 +33,7 @@ from common.db.search import page_search, native_page_search, native_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
-from common.utils.common import get_file_content, generate_uuid, bytes_to_uploaded_file
+from common.utils.common import get_file_content, generate_uuid, bytes_to_uploaded_file, common_convert_value
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
@@ -534,25 +534,7 @@ class ToolSerializer(serializers.Serializer):
             if not is_required and (value is None or (isinstance(value, str) and len(value.strip()) == 0)):
                 return None
             try:
-                if _type == 'int':
-                    return int(value)
-                if _type == 'boolean':
-                    if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
-                        return False
-                    return bool(value)
-                if _type == 'float':
-                    return float(value)
-                if _type == 'dict':
-                    v = json.loads(value)
-                    if isinstance(v, dict):
-                        return v
-                    raise Exception(_('type error'))
-                if _type == 'array':
-                    v = json.loads(value)
-                    if isinstance(v, list):
-                        return v
-                    raise Exception(_('type error'))
-                return value
+                return common_convert_value(_type, value)
             except Exception as e:
                 raise AppApiException(500, _('Field: {name} Type: {type} Value: {value} Type conversion error').format(
                     name=name, type=_type, value=value

@@ -4,18 +4,26 @@ import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/dat
 const share = {
   is_share: () => false,
   create: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_CREATE], 'OR'),
-    batchDelete: () => false,
+  batchDelete: () => false,
   batchMove: () => false,
   sync: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_SYNC], 'OR'),
   vector: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_VECTOR], 'OR'),
   generate: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_GENERATE], 'OR'),
   edit: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_EDIT], 'OR'),
+  publish: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PUBLISH], 'OR'),
   export: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_EXPORT], 'OR'),
   delete: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DELETE], 'OR'),
 
   doc_read: () => false,
   jump_read: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ], 'OR'),
+    hasPermission(
+      [
+        RoleConst.ADMIN,
+        PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_READ,
+        PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_READ,
+      ],
+      'OR',
+    ),
   doc_create: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE], 'OR'),
   doc_vector: () =>
@@ -65,11 +73,12 @@ const share = {
   workflow_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EDIT], 'OR'),
   workflow_export: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EXPORT], 'OR'),  
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_WORKFLOW_EXPORT], 'OR'),
   chat_user_edit: () => false,
 
   auth: () => false,
-  relate_map: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
+  relate_map: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,
@@ -77,6 +86,5 @@ const share = {
   folderAuth: () => false,
   folderDelete: () => false,
   hit_test: () => false,
-  
 }
 export default share
