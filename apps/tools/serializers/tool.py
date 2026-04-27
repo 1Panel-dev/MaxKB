@@ -6,6 +6,8 @@ import json
 import os
 import pickle
 import re
+import subprocess
+import sys
 import tempfile
 import zipfile
 from functools import reduce
@@ -22,8 +24,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
-from pylint.lint import Run
-from pylint.reporters import JSON2Reporter
 from rest_framework import serializers, status
 
 from application.models import Application
@@ -737,17 +737,81 @@ class ToolSerializer(serializers.Serializer):
             if is_valid:
                 self.is_valid(raise_exception=True)
                 PylintInstance(data=instance).is_valid(raise_exception=True)
-            code = instance.get('code')
+
+            code = instance.get('code') or ''
             file_name = get_file_name()
-            with open(file_name, 'w') as file:
-                file.write(code)
-            reporter = JSON2Reporter(output=io.StringIO())
-            Run([file_name,
-                 "--disable=line-too-long",
-                 '--module-rgx=[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}'],
-                reporter=reporter, exit=False)
-            os.remove(file_name)
-            return [to_dict(m, os.path.basename(file_name)) for m in reporter.messages]
+            if not file_name.endswith('.py'):
+                file_name = file_name + '.py'
+
+            try:
+                with open(file_name, 'w', encoding='utf-8') as file:
+                    file.write(code)
+                result = subprocess.run(
+                    [
+                        sys.executable,
+                        '-m',
+                        'ruff',
+                        'check',
+                        file_name,
+                        '--output-format=json',
+                        '--ignore=E501',
+                        '--extend-select=PL',
+                        '--no-cache',
+                    ],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=10,
+                )
+
+                if result.returncode not in (0, 1):
+                    raise Exception(result.stderr or result.stdout)
+
+                if not result.stdout.strip():
+                    return []
+
+                messages = json.loads(result.stdout)
+                base_name = os.path.basename(file_name)
+                return [
+                    {
+                        'type': 'error' if (
+                                item.get('code') == 'E999'
+                                or str(item.get('code') or '').startswith('E9')
+                                or item.get('code') in ['F821', 'F822', 'F823']
+                        ) else 'warning',
+                        'module': '',
+                        'obj': '',
+                        'line': item.get('location', {}).get('row', 1),
+
+                        # Ruff column 是 1-based，前端 CodeMirror 用 0-based
+                        'column': max(item.get('location', {}).get('column', 1) - 1, 0),
+
+                        'endLine': item.get('end_location', {}).get(
+                            'row',
+                            item.get('location', {}).get('row', 1)
+                        ),
+                        'endColumn': max(
+                            item.get('end_location', {}).get(
+                                'column',
+                                item.get('location', {}).get('column', 1) + 1
+                            ) - 1,
+                            0
+                        ),
+
+                        'path': base_name,
+                        'symbol': item.get('code') or '',
+                        'message': (
+                            f"{item.get('code')}: {item.get('message')}"
+                            if item.get('code')
+                            else item.get('message')
+                        ),
+                    }
+                    for item in messages
+                ]
+
+            finally:
+                if os.path.exists(file_name):
+                    os.remove(file_name)
 
     class Import(serializers.Serializer):
         file = UploadedFileField(required=True, label=_("file"))

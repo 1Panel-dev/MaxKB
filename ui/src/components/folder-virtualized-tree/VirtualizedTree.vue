@@ -10,8 +10,8 @@
     @after-drop="onAfterDrop"
     :rootDroppable="false"
     :statHandler="statHandler"
-    :disableDrag="draggable"
-    :disableDrop="draggable"
+    :disableDrag="!draggable"
+    :disableDrop="!draggable"
   >
     <template #default="{ node, stat }">
       <div
