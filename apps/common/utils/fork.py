@@ -5,7 +5,7 @@ from functools import reduce
 from typing import List, Set
 from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, urlunparse
 
-import html2text as ht
+from markdownify import markdownify
 import requests
 from bs4 import BeautifulSoup
 
@@ -138,6 +138,9 @@ class Fork:
             tag_list = bf.find_all(**{field: re.compile('^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*')})
             for tag in tag_list:
                 self.reset_url(tag, field, self.base_fork_url)
+            # 去掉 href 以 # 开头的锚点链接，保留文字
+        for a in bf.find_all('a', href=re.compile('^#')):
+            a.unwrap()
         return bf
 
     @staticmethod
@@ -189,7 +192,8 @@ class Fork:
         bf = self.reset_beautiful_soup(bf)
         link_list = self.get_child_link_list(bf)
         content = self.get_content_html(bf)
-        r = ht.html2text(content)
+
+        r = markdownify(content, heading_style='ATX')
         return Fork.Response.success(r, link_list)
 
 
