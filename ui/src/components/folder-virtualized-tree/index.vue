@@ -61,6 +61,8 @@
       @handleNodeClick="handleNodeClick"
       :current-node-key="currentNodeKey"
       :filter-node-method="filterNode"
+      :draggable="draggable"
+      :style="treeStyle"
     >
       <template #default="{ node, stat }">
         <div @mouseenter.stop="handleMouseEnter(node)" class="flex align-center custom-tree-node">
@@ -142,10 +144,14 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { onBeforeRouteLeave } from 'vue-router'
 import VirtualizedTree from './VirtualizedTree.vue'
-import CreateFolderDialog from '@/components/folder-tree/CreateFolderDialog.vue'
+import CreateFolderDialog from '@/components/folder-virtualized-tree/CreateFolderDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
-import MoveToDialog from '@/components/folder-tree/MoveToDialog.vue'
-import { SORT_MENU_CONFIG, SORT_TYPES, type SortType } from '@/components/folder-tree/constant'
+import MoveToDialog from '@/components/folder-virtualized-tree/MoveToDialog.vue'
+import {
+  SORT_MENU_CONFIG,
+  SORT_TYPES,
+  type SortType,
+} from '@/components/folder-virtualized-tree/constant'
 import { t } from '@/locales'
 import { debounce } from 'lodash'
 import { i18n_name } from '@/utils/common'

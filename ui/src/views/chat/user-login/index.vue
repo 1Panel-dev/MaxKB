@@ -180,8 +180,8 @@ import QrCodeTab from '@/views/chat/user-login/scanCompinents/QrCodeTab.vue'
 import {MsgConfirm, MsgError} from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
 import {isAppIcon, loadScript} from '@/utils/common'
-import forge from "node-forge";
 import * as dd from "dingtalk-jsapi";
+import JSEncrypt from "jsencrypt";
 
 useResize()
 const router = useRouter()
@@ -251,11 +251,13 @@ const loginHandle = () => {
         })
       })
     } else {
-      const publicKey = forge.pki.publicKeyFromPem(chatUser?.chat_profile?.rsaKey as any);
+      // JSEncrypt 在有些打包环境可能作为 default export 或直接导出，兼容两种情况
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+      const js = new (JSEncryptCtor as any)();
+      js.setPublicKey(chatUser?.chat_profile?.rsaKey as any);
       const jsonData = JSON.stringify(loginForm.value);
-      const utf8Bytes = forge.util.encodeUtf8(jsonData);
-      const encrypted = publicKey.encrypt(utf8Bytes, 'RSAES-PKCS1-V1_5');
-      const encryptedBase64 = forge.util.encode64(encrypted);
+      const encryptedBase64 = js.encrypt(jsonData);
+
       chatUser.login({
         encryptedData: encryptedBase64,
         username: loginForm.value.username

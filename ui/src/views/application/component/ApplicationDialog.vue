@@ -17,13 +17,14 @@
         </div>
 
         <el-button link class="mr-24" @click="refresh">
-          <el-icon :size="18" class="color-secondary "><Refresh /></el-icon>
+          <el-icon :size="18" class="color-secondary"><Refresh /></el-icon>
         </el-button>
       </div>
     </template>
     <LayoutContainer class="application-manage">
       <template #left>
-        <folder-tree
+
+        <FolderVirtualizedTree
           :data="folderList"
           :currentNodeKey="currentFolder?.id"
           @handleNodeClick="folderClickHandle"

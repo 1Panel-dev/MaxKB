@@ -6,12 +6,12 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     align-center
+    width="720"
   >
-    <folder-tree
-      ref="treeRef"
+    <FolderVirtualizedTree
       :source="source"
       :data="folderList"
-      :default-expanded-keys="[currentNodeKey]"
+      :currentNodeKey="currentNodeKey"
       :canOperation="false"
       class="move-to-dialog-tree"
       @handleNodeClick="folderClickHandle"
@@ -25,7 +25,7 @@
           type="primary"
           @click="submitHandle"
           :loading="loading"
-          :disabled="!selectForderId || selectForderId === folder?.currentFolder?.id"
+          :disabled="!selectForderId || (!isFolder && selectForderId === folder?.currentFolder?.id)"
         >
           {{ $t('common.confirm') }}
         </el-button>
@@ -53,7 +53,6 @@ const props = defineProps({
   },
 })
 
-const treeRef = ref()
 const loading = ref(false)
 const dialogVisible = ref(false)
 const folderList = ref<any[]>([])
@@ -68,7 +67,6 @@ watch(dialogVisible, (bool) => {
     selectForderId.value = ''
     folderList.value = []
     currentNodeKey.value = ''
-    treeRef.value?.clearCurrentKey()
   }
 })
 
@@ -95,6 +93,7 @@ function getFolder() {
 }
 
 function folderClickHandle(item: any) {
+  currentNodeKey.value = item.id
   selectForderId.value = item.id
 }
 
@@ -180,11 +179,9 @@ defineExpose({ open })
     padding: 0 !important;
     margin-bottom: 8px;
   }
-  :deep(.el-scrollbar) {
+  :deep(.maxkb-virtualized-tree) {
     border: 1px solid var(--el-border-color-light);
     border-radius: 6px;
-  }
-  :deep(.el-tree) {
     height: calc(100vh - 320px) !important;
   }
 }
