@@ -301,7 +301,7 @@ class ChatInfo:
 
     def append_chat_record(self, chat_record: ChatRecord):
         chat_record.problem_text = chat_record.problem_text[0:10240] if chat_record.problem_text is not None else ""
-        chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.answer_text is not None else ""
+        chat_record.answer_text = chat_record.answer_text[0:40960] if chat_record.problem_text is not None else ""
         is_save = True
         # 存入缓存中
         for index in range(len(self.chat_record_list)):

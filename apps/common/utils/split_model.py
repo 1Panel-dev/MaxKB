@@ -485,8 +485,9 @@ def get_split_model(filename: str, with_filter: bool = False, limit: int = 10000
     """
     if filename.endswith(".md"):
         pattern_list = default_split_pattern.get('md')
-    else:
-        pattern_list = default_split_pattern.get('default')
+        return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
+
+    pattern_list = default_split_pattern.get('md')
     return SplitModel(pattern_list, with_filter=with_filter, limit=limit)
 
 

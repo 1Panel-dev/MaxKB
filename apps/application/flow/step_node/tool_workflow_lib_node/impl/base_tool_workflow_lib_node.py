@@ -162,7 +162,7 @@ class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
         self.context['child_answer_data'] = details.get('child_answer_data')
         self.context['details'] = details.get('details')
         self.extra['input_field_list'] = details.get('input_field_list')
-        self.extra['output_field_list'] = details.get('output_field_list')
+        self.extra['output_field_list'] = details.get('input_field_list')
         self.extra['input'] = details.get('input')
         self.extra['output'] = details.get('output')
         self.context['result'] = details.get('result')

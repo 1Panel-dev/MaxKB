@@ -62,9 +62,9 @@ def generate_content(input_variable, variable_list):
     return value
 
 
-def json_loads(response, variable_list):
+def json_loads(response, expected_fields):
     if not response or not isinstance(response, str):
-        return generate_example(variable_list)
+        return {field: None for field in expected_fields}
 
     cleaned = response.strip()
 
@@ -79,7 +79,7 @@ def json_loads(response, variable_list):
             return result
         except:
             continue
-    return generate_example(variable_list)
+    return generate_example(expected_fields)
 
 
 class BaseParameterExtractionNode(IParameterExtractionNode):
