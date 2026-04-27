@@ -26,7 +26,7 @@ class ParagraphPipelineModel:
         self.knowledge_id = knowledge_id
         self.content = content
         self.title = title
-        self.status = status,
+        self.status = status
         self.is_active = is_active
         self.comprehensive_score = comprehensive_score
         self.similarity = similarity
