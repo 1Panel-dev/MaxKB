@@ -595,7 +595,7 @@
                   <el-space wrap>
                     <template v-for="(f, i) in data.image_list" :key="i">
                       <el-image
-                        :src="f.url || f.file_id ? `./oss/file/${f.file_id}` : ''"
+                        :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
                         alt=""
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"

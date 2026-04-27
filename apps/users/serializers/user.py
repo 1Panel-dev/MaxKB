@@ -31,7 +31,6 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import valid_license, password_encrypt, password_verify, get_random_chars
 from common.utils.rsa_util import decrypt
 from maxkb import settings
-from maxkb.const import CONFIG
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from system_manage.models import SystemSetting, SettingType, AuthTargetType, WorkspaceUserResourcePermission
