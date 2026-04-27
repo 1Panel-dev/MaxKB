@@ -37,7 +37,7 @@ class ResourceMappingSerializer(serializers.Serializer):
             'sdc.name': models.CharField(),
             'target_id': models.CharField(),
             "target_type": models.CharField(),
-            "u.username": models.CharField(),
+            "u.nick_name": models.CharField(),
             'rm.source_type': models.CharField(),
             'workspace_id': models.CharField(),
         }))
@@ -48,7 +48,7 @@ class ResourceMappingSerializer(serializers.Serializer):
         if self.data.get('resource_name'):
             queryset = queryset.filter(**{'sdc.name__icontains': self.data.get('resource_name')})
         if self.data.get('user_name'):
-            queryset = queryset.filter(**{'u.username__icontains': self.data.get('user_name')})
+            queryset = queryset.filter(**{'u.nick_name__icontains': self.data.get('user_name')})
         if self.data.get("source_type"):
             queryset = queryset.filter(**{'rm.source_type__in': self.data.get('source_type')})
         if self.data.get('workspace_ids') is not None and len(self.data.get('workspace_ids')) > 0:
@@ -119,7 +119,7 @@ class MappingResourceSerializer(serializers.Serializer):
             'tdc.name': models.CharField(),
             'source_id': models.CharField(),
             "source_type": models.CharField(),
-            "u.username": models.CharField(),
+            "u.nick_name": models.CharField(),
             'rm.target_type': models.CharField(),
             'workspace_id': models.CharField(),
         }))
@@ -130,7 +130,7 @@ class MappingResourceSerializer(serializers.Serializer):
         if self.data.get('resource_name'):
             queryset = queryset.filter(**{'tdc.name__icontains': self.data.get('resource_name')})
         if self.data.get('user_name'):
-            queryset = queryset.filter(**{'u.username__icontains': self.data.get('user_name')})
+            queryset = queryset.filter(**{'u.nick_name__icontains': self.data.get('user_name')})
         if self.data.get("target_type"):
             queryset = queryset.filter(**{'rm.target_type__in': self.data.get('target_type')})
         if self.data.get('workspace_ids') is not None and len(self.data.get('workspace_ids')) > 0:
