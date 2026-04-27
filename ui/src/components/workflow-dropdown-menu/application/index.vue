@@ -76,7 +76,7 @@
       <el-tab-pane :label="$t('views.tool.title')" name="tool">
         <LayoutContainer>
           <template #left>
-            <folder-tree
+            <FolderVirtualizedTree
               :source="SourceTypeEnum.TOOL"
               :data="toolTreeData"
               :currentNodeKey="folder.currentFolder?.id"
@@ -114,7 +114,7 @@
       <el-tab-pane :label="$t('views.application.title')" name="application">
         <LayoutContainer>
           <template #left>
-            <folder-tree
+            <FolderVirtualizedTree
               :source="SourceTypeEnum.APPLICATION"
               :data="applicationTreeData"
               :currentNodeKey="folder.currentFolder?.id"

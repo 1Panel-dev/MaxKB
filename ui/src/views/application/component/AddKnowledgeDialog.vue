@@ -27,7 +27,7 @@
     </template>
     <LayoutContainer class="application-manage">
       <template #left>
-        <folder-tree
+        <FolderVirtualizedTree
           :data="folderList"
           :currentNodeKey="currentFolder?.id"
           @handleNodeClick="folderClickHandle"

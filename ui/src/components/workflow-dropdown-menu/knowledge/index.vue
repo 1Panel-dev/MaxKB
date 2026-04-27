@@ -76,7 +76,7 @@
       <el-tab-pane :label="$t('views.tool.dataSource.title')" name="DATA_SOURCE_TOOL">
         <LayoutContainer :showLeft="!route.path.includes('shared')">
           <template #left>
-            <folder-tree
+            <FolderVirtualizedTree
               :source="SourceTypeEnum.TOOL"
               :data="toolTreeData"
               :currentNodeKey="folder.currentFolder?.id"
@@ -100,7 +100,7 @@
       <el-tab-pane :label="$t('views.tool.title')" name="CUSTOM_TOOL">
         <LayoutContainer :showLeft="!route.path.includes('shared')">
           <template #left>
-            <folder-tree
+            <FolderVirtualizedTree
               :source="SourceTypeEnum.TOOL"
               :data="toolTreeData"
               :currentNodeKey="folder.currentFolder?.id"

@@ -62,6 +62,7 @@
       :current-node-key="currentNodeKey"
       :filter-node-method="filterNode"
       :draggable="draggable"
+      :style="treeStyle"
     >
       <template #default="{ node, stat }">
         <div @mouseenter.stop="handleMouseEnter(node)" class="flex align-center custom-tree-node">
