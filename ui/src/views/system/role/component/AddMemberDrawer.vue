@@ -97,22 +97,9 @@ async function getUserFormItem() {
   }
 }
 
-// 同样修改 workspace
 async function getWorkspaceFormItem() {
   try {
-    const fetchWorkspaceOptions = async (query?: string) => {
-      const res = await loadPermissionApi('workspace').getWorkspaceList(
-        query ? {name: query} : {},
-        memberFormContentLoading
-      )
-      return res.data?.map((item: any) => ({
-        label: item.name,
-        value: item.id,
-      })) || []
-    }
-
-    const initialOptions = await fetchWorkspaceOptions()
-
+    const res = await loadPermissionApi('workspace').getWorkspaceList(memberFormContentLoading)
     workspaceFormItem.value = [
       {
         path: 'workspace_ids',
@@ -124,18 +111,12 @@ async function getWorkspaceFormItem() {
           },
         ],
         selectProps: {
-          options: initialOptions,
+          options:
+            res.data?.map((item: any) => ({
+              label: item.name,
+              value: item.id,
+            })) || [],
           placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.workspace')}`,
-          remoteMethod: async (query: string, element: any) => {
-            const newOptions = await fetchWorkspaceOptions(query)
-            const currentItem = workspaceFormItem.value.find(
-              item => item.path === 'workspace_ids'
-            )
-            if (currentItem?.selectProps) {
-              currentItem.selectProps.options = newOptions
-            }
-            return newOptions
-          }
         },
       },
     ]
