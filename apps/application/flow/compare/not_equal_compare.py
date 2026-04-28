@@ -6,8 +6,6 @@
     @date：2026/3/17 9:41
     @desc:
 """
-from typing import List
-
 from application.flow.compare import Compare
 
 

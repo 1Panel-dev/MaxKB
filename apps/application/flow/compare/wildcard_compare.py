@@ -8,7 +8,6 @@
 """
 import fnmatch
 import re
-from typing import List
 
 from application.flow.compare import Compare
 from common.cache.mem_cache import MemCache

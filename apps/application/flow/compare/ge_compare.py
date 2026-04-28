@@ -6,8 +6,6 @@
     @date：2024/6/11 9:52
     @desc: 大于比较器
 """
-from typing import List
-
 from application.flow.compare import Compare
 
 
