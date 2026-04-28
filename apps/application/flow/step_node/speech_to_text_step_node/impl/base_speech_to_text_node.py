@@ -16,7 +16,7 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
 
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
-        self.context['result'] = details.get('answer')
+        self.context['result'] = details.get('result')
         if self.node_params.get('is_result', False):
             self.answer_text = details.get('answer')
         self.context['exception_message'] = details.get('err_message')
