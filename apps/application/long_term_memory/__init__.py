@@ -459,8 +459,12 @@ def schedule_extract_long_term_memory(workspace_id, application_id, enabled, tri
     if not application:
         return
 
-    # 应用关闭长期记忆或不再是定时触发，则只清理不再部署
-    if not enabled or trigger_type != 'SCHEDULED':
+    # 应用关闭长期记忆
+    if not enabled:
+        QuerySet(ApplicationLongTermMemory).filter(application_id=application_id).delete()
+        return
+    # 不再是定时触发，则只清理不再部署
+    if trigger_type != 'SCHEDULED':
         return
 
     setting = trigger_setting or {}
