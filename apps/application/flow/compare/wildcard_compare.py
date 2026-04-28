@@ -33,10 +33,6 @@ def translate_and_compile_and_cache(wildcard):
 
 class WildcardCompare(Compare):
 
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'wildcard':
-            return True
-
     def compare(self, source_value, compare, target_value):
         # 转成正则，性能更高
         match = translate_and_compile_and_cache(str(target_value))

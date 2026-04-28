@@ -13,10 +13,6 @@ from application.flow.compare import Compare
 
 class GTCompare(Compare):
 
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'gt':
-            return True
-
     def compare(self, source_value, compare, target_value):
         try:
             return float(source_value) > float(target_value)

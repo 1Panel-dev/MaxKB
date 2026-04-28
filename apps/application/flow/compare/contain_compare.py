@@ -13,10 +13,6 @@ from application.flow.compare.compare import Compare
 
 class ContainCompare(Compare):
 
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'contain':
-            return True
-
     def compare(self, source_value, compare, target_value):
         target_value = str(target_value)
 

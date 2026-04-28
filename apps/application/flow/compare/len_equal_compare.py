@@ -13,10 +13,6 @@ from application.flow.compare import Compare
 
 class LenEqualCompare(Compare):
 
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'len_eq':
-            return True
-
     def compare(self, source_value, compare, target_value):
         try:
             return len(source_value) == int(target_value)

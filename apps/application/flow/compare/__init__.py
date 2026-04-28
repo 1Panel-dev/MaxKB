@@ -29,8 +29,46 @@ from .regex_compare import RegexCompare
 from .start_with import StartWithCompare
 from .wildcard_compare import WildcardCompare
 
-compare_handle_list = [GECompare(), GTCompare(), ContainCompare(), EqualCompare(), LTCompare(), LECompare(),
-                       LenLECompare(), LenGECompare(), LenEqualCompare(), LenGTCompare(), LenLTCompare(),
-                       IsNullCompare(),
-                       IsNotNullCompare(), NotContainCompare(), NotEqualCompare(), IsTrueCompare(), IsNotTrueCompare(), StartWithCompare(),
-                       EndWithCompare(), RegexCompare(), WildcardCompare()]
+_compare_handle_dict = {
+    'is_null': IsNullCompare(),
+    'is_not_null': IsNotNullCompare(),
+    'contain': ContainCompare(),
+    'not_contain': NotContainCompare(),
+    'eq': EqualCompare(),
+    'not_eq': NotEqualCompare(),
+    'ge': GECompare(),
+    'gt': GTCompare(),
+    'lt': LTCompare(),
+    'le': LECompare(),
+    'len_eq': LenEqualCompare(),
+    'len_ge': LenGECompare(),
+    'len_gt': LenGTCompare(),
+    'len_le': LenLECompare(),
+    'len_lt': LenLTCompare(),
+    'is_true': IsTrueCompare(),
+    'is_not_true': IsNotTrueCompare(),
+    'start_with': StartWithCompare(),
+    'end_with': EndWithCompare(),
+    'regex': RegexCompare(),
+    'wildcard': WildcardCompare(),
+}
+
+
+def _do_compare(source_value, compare, target_value):
+    compare_handle = _compare_handle_dict.get(compare)
+    if compare_handle:
+        return compare_handle.compare(source_value, compare, target_value)
+    return False
+
+
+def do_assertion(workflow_manage, field_list: List[str], compare: str, value):
+    try:
+        value = workflow_manage.generate_prompt(value)
+    except Exception:
+        pass
+    field_value = None
+    try:
+        field_value = workflow_manage.get_reference_field(field_list[0], field_list[1:])
+    except  Exception:
+        pass
+    return _do_compare(field_value, compare, value)

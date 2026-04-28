@@ -13,10 +13,6 @@ from application.flow.compare import Compare
 
 class NotContainCompare(Compare):
 
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'not_contain':
-            return True
-
     def compare(self, source_value, compare, target_value):
         target_value = str(target_value)
 
