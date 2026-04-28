@@ -44,8 +44,8 @@ class FolderView(APIView):
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"
                                      ),
         lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                         [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
-                                                     operate=Operate.EDIT,
+                                         [Permission(group=Group(kwargs.get('source')),
+                                                     operate=Operate.SELF,
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{r.data.get('parent_id')}"
                                                      )], CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
@@ -106,8 +106,8 @@ class FolderView(APIView):
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                          ),
             lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                             [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
-                                                         operate=Operate.EDIT,
+                                             [Permission(group=Group(kwargs.get('source')),
+                                                         operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                                          )], CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
@@ -158,8 +158,8 @@ class FolderView(APIView):
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                          ),
             lambda r, kwargs: ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                             [Permission(group=Group(f"{kwargs.get('source')}_FOLDER"),
-                                                         operate=Operate.DELETE,
+                                             [Permission(group=Group(kwargs.get('source')),
+                                                         operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
                                                          )], CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
