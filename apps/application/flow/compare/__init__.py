@@ -54,14 +54,14 @@ _compare_handle_dict = {
 }
 
 
-def _do_compare(source_value, compare, target_value):
+def _compare(source_value, compare, target_value):
     compare_handle = _compare_handle_dict.get(compare)
     if compare_handle:
         return compare_handle.compare(source_value, compare, target_value)
     return False
 
 
-def do_assertion(workflow_manage, field_list: List[str], compare: str, value):
+def _assertion(workflow_manage, field_list: List[str], compare: str, value):
     try:
         value = workflow_manage.generate_prompt(value)
     except Exception:
@@ -71,4 +71,12 @@ def do_assertion(workflow_manage, field_list: List[str], compare: str, value):
         field_value = workflow_manage.get_reference_field(field_list[0], field_list[1:])
     except  Exception:
         pass
-    return _do_compare(field_value, compare, value)
+    return _compare(field_value, compare, value)
+
+
+def do_assertion(workflow_manage, condition, condition_list):
+    b = False if condition == 'and' else True
+    for row in condition_list:
+        if _assertion(workflow_manage, row.get('field'), row.get('compare'), row.get('value')) is b:
+            return b
+    return not b

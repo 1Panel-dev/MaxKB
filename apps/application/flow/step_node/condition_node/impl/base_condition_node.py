@@ -31,13 +31,7 @@ class BaseConditionNode(IConditionNode):
                 return branch
 
     def branch_assertion(self, branch):
-        condition_list = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
-                          branch.get('conditions')]
-        condition = branch.get('condition')
-        return all(condition_list) if condition == 'and' else any(condition_list)
-
-    def assertion(self, field_list: List[str], compare: str, value):
-        return do_assertion(self.workflow_manage, field_list, compare, value)
+        return do_assertion(self.workflow_manage, branch.get('condition'), branch.get('conditions'))
 
     def get_details(self, index: int, **kwargs):
         return {

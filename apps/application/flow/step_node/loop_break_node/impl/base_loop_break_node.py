@@ -26,18 +26,13 @@ class BaseLoopBreakNode(ILoopBreakNode):
         self.context['exception_message'] = details.get('err_message')
 
     def execute(self, condition, condition_list, **kwargs) -> NodeResult:
-        r = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
-             condition_list]
-        is_break = all(r) if condition == 'and' else any(r)
+        is_break = do_assertion(self.workflow_manage, condition, condition_list)
         if is_break:
             self.node_params['is_result'] = True
         self.context['is_break'] = is_break
         return NodeResult({'is_break': is_break}, {},
                           _write_context=_write_context,
                           _is_interrupt=lambda n, v, w: is_break)
-
-    def assertion(self, field_list: List[str], compare: str, value):
-        return do_assertion(self.workflow_manage, field_list, compare, value)
 
     def get_details(self, index: int, **kwargs):
         return {

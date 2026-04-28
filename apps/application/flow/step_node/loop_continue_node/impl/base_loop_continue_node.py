@@ -18,16 +18,11 @@ class BaseLoopContinueNode(ILoopContinueNode):
         self.context['exception_message'] = details.get('err_message')
 
     def execute(self, condition, condition_list, **kwargs) -> NodeResult:
-        condition_list = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
-                          condition_list]
-        is_continue = all(condition_list) if condition == 'and' else any(condition_list)
+        is_continue = do_assertion(self.workflow_manage, condition, condition_list)
         self.context['is_continue'] = is_continue
         if is_continue:
             return NodeResult({'is_continue': is_continue, 'branch_id': 'continue'}, {})
         return NodeResult({'is_continue': is_continue}, {})
-
-    def assertion(self, field_list: List[str], compare: str, value):
-        return do_assertion(self.workflow_manage, field_list, compare, value)
 
     def get_details(self, index: int, **kwargs):
         return {
