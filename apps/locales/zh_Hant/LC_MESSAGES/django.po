@@ -605,8 +605,8 @@ msgid "Field: {name} No value set"
 msgstr "欄位：{name} 未設置值"
 
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:59
-msgid "Field: {name} Type: {_type} Value: {value} Unsupported types"
-msgstr "欄位：{name} 類型：{_type} 值：{value} 類型轉換錯誤"
+msgid "Field: {name} Type: {_type} Value: {value} Unsupported type"
+msgstr "欄位：{name} 類型：{_type} 值：{value} 不支持類型"
 
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:63
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:100
