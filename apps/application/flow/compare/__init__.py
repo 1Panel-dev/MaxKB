@@ -7,8 +7,6 @@
     @desc:
 """
 
-from common.utils.logger import maxkb_logger
-
 from .contain_compare import *
 from .end_with import EndWithCompare
 from .equal_compare import *
