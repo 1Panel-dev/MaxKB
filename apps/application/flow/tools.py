@@ -163,9 +163,9 @@ class Reasoning:
                     self.reasoning_content_end_tag)
                 if reasoning_content_end_tag_index > -1:
                     reasoning_content_chunk = self.reasoning_content_chunk[
-                        0:reasoning_content_end_tag_index]
+                                              0:reasoning_content_end_tag_index]
                     content_chunk = self.reasoning_content_chunk[
-                        reasoning_content_end_tag_index + self.reasoning_content_end_tag_len:]
+                                    reasoning_content_end_tag_index + self.reasoning_content_end_tag_len:]
                     self.reasoning_content += reasoning_content_chunk
                     self.content += content_chunk
                     self.reasoning_content_chunk = ""
@@ -173,7 +173,7 @@ class Reasoning:
                     return {'content': content_chunk, 'reasoning_content': reasoning_content_chunk}
                 else:
                     reasoning_content_chunk = self.reasoning_content_chunk[
-                        0:reasoning_content_end_tag_prefix_index + 1]
+                                              0:reasoning_content_end_tag_prefix_index + 1]
                     self.reasoning_content_chunk = self.reasoning_content_chunk.replace(
                         reasoning_content_chunk, '')
                     self.reasoning_content += reasoning_content_chunk
@@ -864,6 +864,9 @@ application_instance_field_call_dict = {
         lambda instance: instance.mcp_tool_ids or [],
         lambda instance: instance.skill_tool_ids or [],
         lambda instance: instance.tool_ids or []
+    ],
+    'APPLICATION': [
+        lambda instance: instance.application_ids or [],
     ],
     'MODEL': [
         lambda instance: [instance.model_id] if instance.model_id else [],
