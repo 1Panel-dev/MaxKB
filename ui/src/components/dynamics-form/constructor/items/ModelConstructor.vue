@@ -37,7 +37,6 @@
         v-model="selectedIds"
         :placeholder="$t('dynamicsForm.ModelConstructor.modelPlaceholder')"
         :options="groupedModelOptions"
-        @change="handleProviderListChange"
         :model-type="formValue.model_type"
       >
       </ModelSelect>
@@ -148,6 +147,12 @@ const selectedIds = computed({
       return existing || { model_id: id, model_params_setting: {} }
     })
     formValue.value.provider_list = newList
+
+    const currentId = formValue.value.default_value?.model_id
+    if (currentId && !newIds.includes(currentId)) {
+      formValue.value.default_value = {}
+    }
+
     // find new model then get it default value
     const oldIds = oldList.map((p: any) => p.model_id)
     const addedIds = newIds.filter((id: string) => !oldIds.includes(id))
@@ -240,15 +245,6 @@ const getProviderItem = (modelId: string) => {
     return rest
   }
   return { model_id: modelId, model_params_setting: {} }
-}
-
-function handleProviderListChange() {
-  const ids = (formValue.value.provider_list || []).map((p: any) => p.model_id)
-  const currentId = formValue.value.default_value?.model_id
-
-  if (currentId && !ids.includes(currentId)) {
-    formValue.value.default_value = {}
-  }
 }
 
 const getData = () => {
