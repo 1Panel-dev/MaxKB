@@ -7,6 +7,8 @@
     @desc:
 """
 
+from common.utils.logger import maxkb_logger
+
 from .contain_compare import *
 from .end_with import EndWithCompare
 from .equal_compare import *
@@ -29,7 +31,7 @@ from .regex_compare import RegexCompare
 from .start_with import StartWithCompare
 from .wildcard_compare import WildcardCompare
 
-_compare_handle_dict = {
+_compare_handler_dict = {
     'is_null': IsNullCompare(),
     'is_not_null': IsNotNullCompare(),
     'contain': ContainCompare(),
@@ -55,10 +57,10 @@ _compare_handle_dict = {
 
 
 def _compare(source_value, compare, target_value):
-    compare_handle = _compare_handle_dict.get(compare)
-    if compare_handle:
-        return compare_handle.compare(source_value, compare, target_value)
-    return False
+    compare_handler = _compare_handler_dict.get(compare)
+    if compare_handler is None:
+        raise RuntimeError(f"Unknown compare handler '{compare}'")
+    return compare_handler.compare(source_value, compare, target_value)
 
 
 def _assertion(workflow_manage, field_list: List[str], compare: str, value):
