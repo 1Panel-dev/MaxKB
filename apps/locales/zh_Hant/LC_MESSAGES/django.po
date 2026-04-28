@@ -9367,3 +9367,6 @@ msgstr "model_params_form 中的第 {index} 项必须是一个字典"
 
 msgid "The label field is required for the {index}th item in model_params_form"
 msgstr "model_params_form 中的第 {index} 项的 label 字段是必填项"
+
+msgid "Publish"
+msgstr "發布"
