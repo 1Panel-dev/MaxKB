@@ -58,26 +58,24 @@ def get_field_value(debug_field_list, name, is_required):
 
 
 def valid_reference_value(_type, value, name):
-    try:
-        if _type == 'int':
-            instance_type = int | float
-        elif _type == 'boolean':
-            instance_type = bool
-        elif _type == 'float':
-            instance_type = float | int
-        elif _type == 'dict':
-            value = json.loads(value) if isinstance(value, str) else value
-            instance_type = dict
-        elif _type == 'array':
-            value = json.loads(value) if isinstance(value, str) else value
-            instance_type = list
-        elif _type == 'string':
-            instance_type = str
-        else:
-            raise Exception(_(
-                'Field: {name} Type: {_type} Value: {value} Unsupported types'
-            ).format(name=name, _type=_type, value=value))
-    except:
+    if _type == 'int':
+        instance_type = int | float
+    elif _type == 'boolean':
+        instance_type = bool
+    elif _type == 'float':
+        instance_type = float | int
+    elif _type == 'dict':
+        value = json.loads(value) if isinstance(value, str) else value
+        instance_type = dict
+    elif _type == 'array':
+        value = json.loads(value) if isinstance(value, str) else value
+        instance_type = list
+    elif _type == 'string':
+        instance_type = str
+    else:
+        maxkb_logger.error(_(
+            'Field: {name} Type: {_type} Value: {value} Unsupported this type'
+        ).format(name=name, _type=_type, value=value))
         return value
     if not isinstance(value, instance_type):
         raise Exception(_(
