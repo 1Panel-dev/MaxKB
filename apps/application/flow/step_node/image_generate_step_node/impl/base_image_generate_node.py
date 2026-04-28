@@ -54,8 +54,8 @@ class BaseImageGenerateNode(IImageGenerateNode):
         image_urls = tti_model.generate_image(question, negative_prompt)
         # 保存图片
         file_urls = []
-        file_name = 'generated_image.png'
         for image_url in image_urls:
+            file_name = 'generated_image.png'
             if isinstance(image_url, str):
                 if image_url.startswith('http'):
                     # HTTP URL 情况
