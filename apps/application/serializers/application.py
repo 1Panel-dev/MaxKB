@@ -343,6 +343,7 @@ class ApplicationQueryRequest(serializers.Serializer):
                                              choices=[('published', _("Published")),
                                                       ('unpublished', _("Unpublished"))])
     user_id = serializers.UUIDField(required=False, label=_("User ID"))
+    create_user = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('create user'))
 
 
 class ApplicationListResponse(serializers.Serializer):
@@ -968,7 +969,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
