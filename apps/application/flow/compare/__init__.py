@@ -6,6 +6,7 @@
     @date：2024/6/7 14:43
     @desc:
 """
+from typing import List
 
 from .contain_compare import ContainCompare
 from .end_with import EndWithCompare
