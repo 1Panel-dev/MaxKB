@@ -83,7 +83,7 @@ class AliyunBaiLianTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             if audio_hex:
                 audio = bytes.fromhex(audio_hex)
             else:
-                raise Exception('Failed to get audio data from response')
+                raise Exception('Failed to get audio data from response' + str(response.text))
         else:
             from dashscope.audio.tts_v2 import SpeechSynthesizer
             synthesizer = SpeechSynthesizer(model=self.model, **self.params)
