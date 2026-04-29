@@ -21,12 +21,7 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button
-          type="primary"
-          @click="submitHandle"
-          :loading="loading"
-          :disabled="!selectForderId || (!isFolder && selectForderId === folder?.currentFolder?.id)"
-        >
+        <el-button type="primary" @click="submitHandle" :loading="loading" :disabled="disableConfirm">
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -34,7 +29,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, reactive } from 'vue'
+import { ref, watch, computed } from 'vue'
 import folderApi from '@/api/workspace/folder'
 import { MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
@@ -71,6 +66,14 @@ watch(dialogVisible, (bool) => {
 })
 
 const isFolder = ref<boolean>(false)
+
+const disableConfirm = computed(() => {
+  return (
+    !selectForderId.value ||
+    (!isFolder.value && selectForderId.value === folder?.currentFolder?.id) ||
+    detail.value?.id === selectForderId.value
+  )
+})
 
 const open = (data: any, is_folder?: any) => {
   detail.value = data
