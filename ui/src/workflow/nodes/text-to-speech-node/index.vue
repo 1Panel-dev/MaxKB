@@ -91,15 +91,6 @@
                   }}<span class="color-danger">*</span></span
                 >
               </div>
-              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
-                <template #content>
-                  <div style="white-space: pre-wrap; font-family: monospace;">{{
-                      ""
-                    }}
-                  </div>
-                </template>
-                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-              </el-tooltip>
             </div>
           </template>
           <NodeCascader
