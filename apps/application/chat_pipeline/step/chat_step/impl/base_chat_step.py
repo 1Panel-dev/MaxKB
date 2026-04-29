@@ -392,6 +392,7 @@ class BaseChatStep(IChatStep):
                 if isinstance(msg, SystemMessage):
                     if isinstance(msg.content, str):
                         user_system_prompt = msg.content.replace('{memory}', memory)
+                        msg.content = user_system_prompt
                     elif isinstance(msg.content, list):
                         user_system_prompt = ''.join(
                             item.get('text', '') if isinstance(item, dict) else str(item)
