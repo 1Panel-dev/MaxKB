@@ -7,7 +7,7 @@
     @desc:
 """
 import time
-from typing import List, Dict
+from typing import Dict
 
 from application.flow.compare import do_assertion
 from application.flow.i_step_node import NodeResult

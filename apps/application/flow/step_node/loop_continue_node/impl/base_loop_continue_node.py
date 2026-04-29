@@ -6,8 +6,6 @@
     @date：2025/9/15 12:13
     @desc:
 """
-from typing import List
-
 from application.flow.compare import do_assertion
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.loop_continue_node.i_loop_continue_node import ILoopContinueNode
