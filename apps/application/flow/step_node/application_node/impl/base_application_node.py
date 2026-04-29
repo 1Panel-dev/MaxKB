@@ -73,6 +73,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
                            'child_node': child_node}
 
         if real_node_id is not None:
+            real_node_id = real_node_id + '__' + node.runtime_node_id
             application_node = application_node_dict.get(real_node_id, None)
             if application_node is None:
 
