@@ -84,11 +84,11 @@ function getFolder() {
   const params = {}
   folder.asyncGetFolder(props.source, params, 'workspace', loading).then((res: any) => {
     folderList.value = res.data
-    if (folderList.value?.length > 0) {
-      currentNodeKey.value = folderList.value[0]?.id
-    } else {
-      currentNodeKey.value = ''
-    }
+    // if (folderList.value?.length > 0) {
+    //   currentNodeKey.value = folderList.value[0]?.id
+    // } else {
+    //   currentNodeKey.value = ''
+    // }
   })
 }
 
