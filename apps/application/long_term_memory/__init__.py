@@ -1,7 +1,9 @@
 import re
+from datetime import timedelta
 
 import uuid_utils.compat as uuid
 from django.db.models import Count, QuerySet
+from django.utils import timezone
 from langchain_core.messages import HumanMessage
 
 from application.models import Chat, ChatRecord, Application, ApplicationLongTermMemory
@@ -10,79 +12,111 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from ops import celery_app
 
 long_term_prompt = '''
-你是一个专业的长期记忆管理助手，负责从对话中提炼并维护用户的结构化长期记忆。
+你是一个专业的用户长期记忆提炼引擎。你的唯一职责是：从对话中精确识别具有持久价值的用户信息，并与已有记忆进行结构化融合，输出供 AI 助手长期使用的用户画像记忆。
 
 ## 输入
-
 【已有记忆】：
 {{existing_memory}}
 
-【新对话内容】：
+【本轮新增对话】：
 {{new_conversation}}
 
 ---
 
-## 任务说明
+## 提取门槛（必须同时满足，才可提取）
 
-根据以上输入，生成更新后的长期记忆。遵循以下逻辑：
-- 若【已有记忆】为空：仅从【新对话内容】中提炼结构化记忆。
-- 若【已有记忆】不为空：在其基础上进行增量融合——新信息覆盖或补充旧信息，不得删除未被新对话否定的已有记忆。
+1. **跨会话复用价值**：这条信息在未来其他对话中仍然适用，而非当次临时需求
+2. **明确可证**：可从对话原文直接支撑，不得推断、脑补或延伸
+3. **改善回答质量**：记住这条信息后，AI 的回答会对该用户更准确或更贴合
 
----
-
-## 处理规则
-
-严格按以下三类处理，**不得推测、捏造或补全对话中未明确出现的信息**：
-
-### 一、用户偏好
-> 关注用户对"如何回答"的期望与习惯
-
-常见维度：回答风格、回答长度、语言风格、格式偏好、编程语言、是否需要举例、是否需要解释、输出语言等
-
-- 已有记忆为空：从新对话中提取，无则写「无」
-- 已有记忆不为空：新偏好**覆盖**同维度旧偏好；新维度**追加**
-
-### 二、关键事实
-> 关注用户客观背景信息
-
-常见维度：职业、行业、技术栈、身份、使用场景、设备环境、地域、项目背景、当前需求等
-
-- 已有记忆为空：从新对话中提取，无则写「无」
-- 已有记忆不为空：新对话中与旧记忆**冲突的事实以新对话为准**；新事实**追加**
-
-### 三、规则约定
-> 关注用户明确提出的行为约束或指令规则
-
-常见维度：触发词、执行动作、禁止动作、生效条件、生效时间范围等
-
-- 已有记忆为空：从新对话中提取，无则写「无」
-- 已有记忆不为空：新规则**覆盖**同类旧规则；新规则**追加**
+**以下内容禁止提取：**
+- 用户的一次性临时要求（如「这次用表格输出就好」）
+- 用户提问的具体内容本身（问题不是记忆）
+- 无法从对话原文直接证明的推断
+- 闲聊、问候、感谢等无信息量内容
+- AI 的回答内容（只提取用户侧信息）
 
 ---
 
-## 输出要求
+## 四类记忆分类与融合规则
 
-1. **只输出结构化记忆本身**，不得包含任何开场白、解释、总结或额外说明
-2. 每条记忆使用 `- [维度标签]` 开头，标签尽量精准简洁
-3. 某类确实无内容时，必须明确写「无」，不得省略该章节
-4. 输出语言与【新对话内容】保持一致
+### 【偏好】交互偏好
+用户对「AI 如何回应」的稳定期望，需明确声明或在多轮中反复体现才可录入。
+
+常见维度：回答详略 / 语言风格（正式/口语）/ 输出格式（表格/列表/段落）/ 是否要举例 / 代码风格偏好 / 回复语言
+
+融合规则：
+- 同维度出现新偏好 → **覆盖**旧值，条目末标注 `※已更新`
+- 新维度 → 直接追加
+- 旧偏好无新证据但未被否定 → **保留**
+
+---
+
+### 【背景】用户背景
+用户的客观身份与环境信息，稳定性强，用户未明确更正则不主动变动。
+
+常见维度：职业/角色 / 所在行业 / 技术栈与熟练度 / 使用产品或系统 / 团队规模 / 所在地区
+
+融合规则：
+- 与旧记忆冲突 → **以新对话为准**，标注 `※已更新`，删除旧值
+- 新增信息 → 追加
+- 信息模糊无法确认 → 追加时标注 `※待确认`
+
+---
+
+### 【约定】明确约定
+用户明确要求 AI 固定遵守的行为规则，须有明确指令性语言支撑，不可自行解读。
+
+常见维度：禁止行为 / 固定执行动作 / 特定触发词响应 / 内容边界 / 输出限制
+
+融合规则：
+- 同类新规则 → **覆盖**旧规则，标注 `※已更新`
+- 新增规则 → 追加
+- 用户明确取消的规则 → **直接删除**
+
+---
+
+### 【目标】当前目标
+用户近期或长期正在推进的具体目标，有助于 AI 主动提供更相关的帮助。
+
+常见维度：正在进行的项目 / 学习计划 / 待解决的核心问题 / 关键决策
+
+融合规则：
+- 已明确完成或放弃的目标 → **删除**
+- 新目标 → 追加
+- 已有目标有进展更新 → **覆盖**旧描述
+
+---
+
+## 输出规范
+
+1. **只输出记忆内容本身**，不含任何开头语、解释、总结或分隔说明
+2. 四个章节**全部输出**，确无内容写「暂无」，不可省略章节
+3. 每条格式：`- [维度标签] 内容`，标签 2~5 字，精准简洁
+4. 有变更标记（`※已更新` / `※待确认`）的条目置于各章节**最前**
+5. 每条记忆控制在 **60 字以内**，信息密度优先，超出则拆为两条
+6. 输出语言与【本轮新增对话】主要语言保持一致
+
+---
 
 ## 输出格式
 
-### 一、用户偏好
-- [维度标签] 具体内容
-- [维度标签] 具体内容
-（若无则写：无）
+### 【偏好】交互偏好
+- [维度标签] 内容
+（暂无则写：暂无）
 
-### 二、关键事实
-- [维度标签] 具体内容
-- [维度标签] 具体内容
-（若无则写：无）
+### 【背景】用户背景
+- [维度标签] 内容
+（暂无则写：暂无）
 
-### 三、规则约定
-- [维度标签] 具体内容
-- [维度标签] 具体内容
-（若无则写：无）
+### 【约定】明确约定
+- [维度标签] 内容
+（暂无则写：暂无）
+
+### 【目标】当前目标
+- [维度标签] 内容
+（暂无则写：暂无）
+
 '''
 
 
@@ -121,20 +155,64 @@ def _get_long_term_config(application, chat_user_id):
         }
 
 
-def _run_extract(workspace_id, application_id, chat_user_id, config, history_limit):
+def _get_since_time_from_setting(setting: dict):
     """
-    执行一次长期记忆提取：取最近 history_limit 条对话，调用模型生成/更新记忆。
+    根据定时设置推算本次应提取的对话起始时间。
+    返回 datetime（aware），或 None 表示无法推断（回退到 rounds 限制）。
     """
-    if history_limit <= 0:
+    now = timezone.now()
+    schedule_type = setting.get("schedule_type")
+
+    if schedule_type == "daily":
+        return now - timedelta(days=1)
+    if schedule_type == "weekly":
+        return now - timedelta(weeks=1)
+    if schedule_type == "monthly":
+        return now - timedelta(days=30)
+    if schedule_type == "interval":
+        unit = (setting.get("interval_unit") or "").strip()
+        try:
+            value_i = int(setting.get("interval_value"))
+            if value_i <= 0:
+                return None
+        except Exception:
+            return None
+        delta_map = {
+            "seconds": timedelta(seconds=value_i),
+            "minutes": timedelta(minutes=value_i),
+            "hours": timedelta(hours=value_i),
+            "days": timedelta(days=value_i),
+        }
+        delta = delta_map.get(unit)
+        return now - delta if delta else None
+    # cron 等无法从表达式推断间隔，返回 None
+    return None
+
+
+def _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=None, since_time=None):
+    """
+    执行一次长期记忆提取。
+    - since_time 不为 None 时：提取该时间点之后产生的对话。
+    - 否则按 history_limit 条数限制。
+    """
+    if since_time is None and (history_limit is None or history_limit <= 0):
         return
 
-    history_chat_record = list(
-        QuerySet(ChatRecord).filter(
+    qs = (
+        QuerySet(ChatRecord)
+        .filter(
             chat__application_id=application_id,
             chat__chat_user_id=chat_user_id,
-        ).order_by('-create_time').only('problem_text', 'answer_text')[:history_limit]
+        )
+        .order_by('-create_time')
+        .only('problem_text', 'answer_text')
     )
-    if len(history_chat_record) <= 1:
+
+    if since_time is not None:
+        history_chat_record = list(qs.filter(create_time__gte=since_time))
+    else:
+        history_chat_record = list(qs[:history_limit])
+    if len(history_chat_record) == 0:
         return
 
     chat_model = get_model_instance_by_model_workspace_id(
@@ -238,9 +316,12 @@ def _execute_scheduled_extract(workspace_id, application_id):
             continue
         if config['trigger_type'] != 'SCHEDULED':
             continue
-        history_limit = (config['trigger_setting'] or {}).get('rounds', 20)
+        setting = config['trigger_setting'] or {}
+        since_time = _get_since_time_from_setting(setting)
+        history_limit = None if since_time is not None else setting.get('rounds', 20)
         try:
-            _run_extract(workspace_id, application_id, chat_user_id, config, history_limit=history_limit)
+            _run_extract(workspace_id, application_id, chat_user_id, config,
+                         history_limit=history_limit, since_time=since_time)
         except Exception as e:
             maxkb_logger.warning(
                 f"scheduled extract long_term_memory failed, "
