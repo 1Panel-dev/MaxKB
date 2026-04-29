@@ -32,6 +32,7 @@ from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
 from application.long_term_memory import schedule_extract_long_term_memory
+from application.models import ApplicationLongTermMemory
 from application.models.application import Application, ApplicationTypeChoices, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -860,6 +861,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
             if trigger and trigger.is_active:
                 deploy(TriggerModelSerializer(trigger).data, **{})
+        #
+        schedule_extract_long_term_memory(self.data.get('workspace_id'), application_id, False, None, None)
         return True
 
     def export(self, with_valid=True):
@@ -1410,6 +1413,9 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
             trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
             if trigger and trigger.is_active:
                 deploy(TriggerModelSerializer(trigger).data, **{})
+
+        for app_id in id_list:
+            schedule_extract_long_term_memory(self.data.get('workspace_id'), app_id, False, None, None)
         return True
 
     def batch_move(self, instance: Dict, with_valid=True):
