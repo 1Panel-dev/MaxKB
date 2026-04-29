@@ -210,20 +210,4 @@ defineExpose({
 .lf-drag-able {
   cursor: pointer;
 }
-
-/* 全局样式，用于覆盖 teleport 到 body 的 tooltip 弹层背景 */
-.white-tooltip,
-.white-tooltip .el-popper,
-.white-tooltip .el-tooltip__popper {
-  background: #ffffff !important;
-  color: #222 !important;
-  border: 1px solid #e6e6e6 !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
-  padding: 8px 12px !important;
-}
-
-.white-tooltip .el-popper__arrow::before {
-  background: #ffffff !important;
-  border: 1px solid #e6e6e6 !important;
-}
 </style>

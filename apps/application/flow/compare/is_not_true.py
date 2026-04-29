@@ -12,4 +12,7 @@ from .compare import Compare
 class IsNotTrueCompare(Compare):
 
     def compare(self, source_value, compare, target_value):
-        return source_value is False
+        try:
+            return source_value is False
+        except Exception:
+            return False

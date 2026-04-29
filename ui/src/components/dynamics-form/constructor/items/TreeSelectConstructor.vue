@@ -239,6 +239,7 @@ const rander = (form_data: any) => {
 
 defineExpose({ getData, rander })
 onMounted(() => {
+  formValue.value.treeData = []
   formValue.value.default_value = ''
   if (formValue.value.show_default_value === undefined) {
     formValue.value.show_default_value = true
