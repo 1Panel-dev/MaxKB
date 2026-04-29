@@ -6,7 +6,7 @@
     @date：2025/10/20 10:37
     @desc:
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class StartWithCompare(Compare):

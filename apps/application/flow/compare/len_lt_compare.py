@@ -6,7 +6,7 @@
     @date：2024/6/11 9:52
     @desc: 小于比较器
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class LenLTCompare(Compare):
@@ -14,5 +14,5 @@ class LenLTCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             return len(source_value) < int(target_value)
-        except Exception as e:
+        except Exception:
             return False

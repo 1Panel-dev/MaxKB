@@ -6,7 +6,7 @@
     @date：2024/6/28 10:45
     @desc:
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class IsNotNullCompare(Compare):

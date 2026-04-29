@@ -6,7 +6,7 @@
     @date：2024/6/7 14:44
     @desc:
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class EqualCompare(Compare):

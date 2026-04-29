@@ -6,7 +6,7 @@
     @date：2026/3/17 9:41
     @desc:
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class NotEqualCompare(Compare):

@@ -9,7 +9,7 @@
 import fnmatch
 import re
 
-from application.flow.compare import Compare
+from .compare import Compare
 from common.cache.mem_cache import MemCache
 
 

@@ -6,7 +6,7 @@
     @date：2025/4/7 13:44
     @desc:
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class IsNotTrueCompare(Compare):
@@ -14,5 +14,5 @@ class IsNotTrueCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             return source_value is False
-        except Exception as e:
+        except Exception:
             return False

@@ -6,7 +6,7 @@
     @date：2024/6/11 9:52
     @desc: 大于比较器
 """
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class GTCompare(Compare):
@@ -14,9 +14,9 @@ class GTCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             return float(source_value) > float(target_value)
-        except Exception as e:
+        except Exception:
             try:
                 return str(source_value) > str(target_value)
-            except Exception as _:
+            except Exception:
                 pass
             return False
