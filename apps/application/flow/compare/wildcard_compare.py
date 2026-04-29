@@ -8,9 +8,8 @@
 """
 import fnmatch
 import re
-from typing import List
 
-from application.flow.compare import Compare
+from .compare import Compare
 from common.cache.mem_cache import MemCache
 
 
@@ -32,10 +31,6 @@ def translate_and_compile_and_cache(wildcard):
     return match
 
 class WildcardCompare(Compare):
-
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'wildcard':
-            return True
 
     def compare(self, source_value, compare, target_value):
         # 转成正则，性能更高

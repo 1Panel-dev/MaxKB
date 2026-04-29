@@ -6,16 +6,10 @@
     @date：2024/6/7 14:44
     @desc:
 """
-from typing import List
-
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class LenEqualCompare(Compare):
-
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'len_eq':
-            return True
 
     def compare(self, source_value, compare, target_value):
         try:

@@ -7,9 +7,9 @@
     @desc:
 """
 import time
-from typing import List, Dict
+from typing import Dict
 
-from application.flow.compare import compare_handle_list
+from application.flow.compare import do_assertion
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.loop_break_node.i_loop_break_node import ILoopBreakNode
 
@@ -26,29 +26,13 @@ class BaseLoopBreakNode(ILoopBreakNode):
         self.context['exception_message'] = details.get('err_message')
 
     def execute(self, condition, condition_list, **kwargs) -> NodeResult:
-        r = [self.assertion(row.get('field'), row.get('compare'), row.get('value')) for row in
-             condition_list]
-        is_break = all(r) if condition == 'and' else any(r)
+        is_break = do_assertion(self.workflow_manage, condition, condition_list)
         if is_break:
             self.node_params['is_result'] = True
         self.context['is_break'] = is_break
         return NodeResult({'is_break': is_break}, {},
                           _write_context=_write_context,
                           _is_interrupt=lambda n, v, w: is_break)
-
-    def assertion(self, field_list: List[str], compare: str, value):
-        try:
-            value = self.workflow_manage.generate_prompt(value)
-        except Exception as e:
-            pass
-        field_value = None
-        try:
-            field_value = self.workflow_manage.get_reference_field(field_list[0], field_list[1:])
-        except  Exception as e:
-            pass
-        for compare_handler in compare_handle_list:
-            if compare_handler.support(field_list[0], field_list[1:], field_value, compare, value):
-                return compare_handler.compare(field_value, compare, value)
 
     def get_details(self, index: int, **kwargs):
         return {
