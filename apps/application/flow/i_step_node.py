@@ -105,9 +105,9 @@ class WorkFlowPostHandler:
 
         extract_long_term_memory.apply_async(
             args=(
-                workflow_body.context.get('workspace_id'),
-                workflow_body.context.get('application_id'),
-                workflow_body.context.get('chat_user_id'),
+                workflow_body.get('workspace_id'),
+                workflow_body.get('application_id'),
+                workflow_body.get('chat_user_id'),
             ),
             countdown=1,
         )
