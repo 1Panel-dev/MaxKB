@@ -7,6 +7,7 @@
     @desc:
 """
 import time
+import uuid
 from typing import Dict, List
 
 from django.utils.translation import gettext as _
@@ -172,7 +173,7 @@ def loop(workflow_manage_new_instance, node: INode, generate_loop):
             content_chunk = (chunk.get('content', '') or '')
             reasoning_content_chunk = (chunk.get('reasoning_content', '') or '')
             if chunk.get('real_node_id'):
-                chunk['real_node_id'] = chunk['real_node_id'] + '__' + str(index)
+                chunk['real_node_id'] = chunk['real_node_id'] + '__' + node.runtime_node_id + '__' + str(index)
             reasoning_content += reasoning_content_chunk
             answer += content_chunk
             yield chunk

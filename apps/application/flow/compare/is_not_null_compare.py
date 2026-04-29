@@ -6,16 +6,10 @@
     @date：2024/6/28 10:45
     @desc:
 """
-from typing import List
-
-from application.flow.compare import Compare
+from .compare import Compare
 
 
 class IsNotNullCompare(Compare):
-
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'is_not_null':
-            return True
 
     def compare(self, source_value, compare, target_value):
         try:

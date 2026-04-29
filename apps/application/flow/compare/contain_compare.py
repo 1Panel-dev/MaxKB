@@ -6,16 +6,10 @@
     @date：2024/6/11 10:02
     @desc:
 """
-from typing import List
-
-from application.flow.compare.compare import Compare
+from .compare import Compare
 
 
 class ContainCompare(Compare):
-
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'contain':
-            return True
 
     def compare(self, source_value, compare, target_value):
         target_value = str(target_value)

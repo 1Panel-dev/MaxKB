@@ -7,9 +7,8 @@
     @desc:
 """
 import re
-from typing import List
 
-from application.flow.compare import Compare
+from .compare import Compare
 from common.cache.mem_cache import MemCache
 
 
@@ -30,10 +29,6 @@ def compile_and_cache(regex):
     return match
 
 class RegexCompare(Compare):
-
-    def support(self, node_id, fields: List[str], source_value, compare, target_value):
-        if compare == 'regex':
-            return True
 
     def compare(self, source_value, compare, target_value):
         match = compile_and_cache(str(target_value))

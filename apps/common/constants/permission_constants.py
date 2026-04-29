@@ -338,6 +338,7 @@ Permission_Label = {
     WorkspaceGroup.OTHER.value: _("Other"),
     Operate.READ.value: _("Read"),
     Operate.EDIT.value: _("Edit"),
+    Operate.PUBLISH.value: _("Publish"),
     Operate.CREATE.value: _("Create"),
     Operate.DELETE.value: _("Delete"),
     Group.EMAIL_SETTING.value: _("Email Setting"),

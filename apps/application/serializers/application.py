@@ -32,6 +32,7 @@ from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
 from application.long_term_memory import schedule_extract_long_term_memory
+from application.models import ApplicationLongTermMemory
 from application.models.application import Application, ApplicationTypeChoices, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -342,6 +343,7 @@ class ApplicationQueryRequest(serializers.Serializer):
                                              choices=[('published', _("Published")),
                                                       ('unpublished', _("Unpublished"))])
     user_id = serializers.UUIDField(required=False, label=_("User ID"))
+    create_user = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('create user'))
 
 
 class ApplicationListResponse(serializers.Serializer):
@@ -860,6 +862,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
             if trigger and trigger.is_active:
                 deploy(TriggerModelSerializer(trigger).data, **{})
+        #
+        schedule_extract_long_term_memory(self.data.get('workspace_id'), application_id, False, None, None)
         return True
 
     def export(self, with_valid=True):
@@ -965,7 +969,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -1410,6 +1414,9 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
             trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
             if trigger and trigger.is_active:
                 deploy(TriggerModelSerializer(trigger).data, **{})
+
+        for app_id in id_list:
+            schedule_extract_long_term_memory(self.data.get('workspace_id'), app_id, False, None, None)
         return True
 
     def batch_move(self, instance: Dict, with_valid=True):

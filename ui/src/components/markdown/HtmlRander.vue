@@ -40,6 +40,9 @@ html, body { margin: 0 !important; padding: 0 !important; overflow: hidden; }
 </style>
 <script>
 const _INSTANCE_ID = '${instanceId}';
+window.jump=function jump(url){
+  window.parent.postMessage({ type: 'jump', instanceId: INSTANCE_ID, url }, '*');
+}
 window.chatUserProfile=function chatUserProfile() {
   return new Promise((resolve, reject) => {
     const requestId = Date.now() + '_' + Math.random()
@@ -118,7 +121,9 @@ function onMessage(e: MessageEvent) {
     if (!iframe) return
     iframe.style.height = e.data.height + 'px'
   }
-
+  if (e.data.type === 'jump') {
+    window.open(e.data.url, '_blank')
+  }
   if (e.data.type === 'chatMessage') {
     props.sendMessage?.(e.data.message, 'new')
   }
