@@ -144,7 +144,7 @@ class ToolWorkflowInstance:
 class ToolWorkflowSerializer(serializers.Serializer):
     class Operate(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=False, label=_('workspace id'))
+        workspace_id = serializers.CharField(required=False, label=_('workspace id'),allow_blank=True,allow_null=True)
         tool_id = serializers.UUIDField(required=True, label=_('tool id'))
 
         def is_valid(self, *, raise_exception=False):
@@ -293,12 +293,20 @@ class ToolWorkflowSerializer(serializers.Serializer):
                                                         })
                 # 当前用户可修改关联的知识库列表
                 tool_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
-                                          self.list_knowledge(with_valid=False)]
+                                          ToolWorkflowSerializer.Operate(data={
+                                              'user_id': self.data.get("user_id"),
+                                              'tool_id': self.data.get("tool_id"),
+                                              'workspace_id': workflow_id}
+                                          ).list_knowledge()]
                 knowledge_id_list = []
                 if 'knowledge_id_list' in instance:
                     # 当前用户可修改关联的知识库列表
                     application_knowledge_id_list = [str(knowledge.get('id')) for knowledge in
-                                                     self.list_knowledge(with_valid=False)]
+                                                     ToolWorkflowSerializer.Operate(data={
+                                                         'user_id': self.data.get("user_id"),
+                                                         'tool_id': self.data.get("tool_id"),
+                                                         'workspace_id': workflow_id}
+                                                     ).list_knowledge()]
                     knowledge_id_list = instance.get('knowledge_id_list')
                     for knowledge_id in knowledge_id_list:
                         if not application_knowledge_id_list.__contains__(knowledge_id):
