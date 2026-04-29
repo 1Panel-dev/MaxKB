@@ -4,7 +4,7 @@
     @Author：虎
     @file： equal_compare.py
     @date：2024/6/7 14:44
-    @desc:
+    @desc: 长度相等比较器
 """
 from .compare import Compare
 
@@ -12,7 +12,18 @@ from .compare import Compare
 class LenEqualCompare(Compare):
 
     def compare(self, source_value, compare, target_value):
+        # 获取target_value的长度
         try:
-            return len(source_value) == int(target_value)
-        except Exception as e:
+            target_length = int(target_value)
+        except Exception:
             return False
+
+        # 获取source_value的长度
+        try:
+            source_length = 0 if source_value is None else len(source_value)
+        except Exception:
+            # 可计算数字长度
+            source_length = len(str(source_value))
+
+        # 长度等于比较
+        return source_length == target_length

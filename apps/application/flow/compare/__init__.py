@@ -23,6 +23,7 @@ from .len_ge_compare import LenGECompare
 from .len_gt_compare import LenGTCompare
 from .len_le_compare import LenLECompare
 from .len_lt_compare import LenLTCompare
+from .len_not_equal_compare import LenNotEqualCompare
 from .lt_compare import LTCompare
 from .not_contain_compare import NotContainCompare
 from .not_equal_compare import NotEqualCompare
@@ -42,6 +43,7 @@ _compare_handler_dict = {
     'le': LECompare(),
     'lt': LTCompare(),
     'len_eq': LenEqualCompare(),
+    'len_not_eq': LenNotEqualCompare(),
     'len_ge': LenGECompare(),
     'len_gt': LenGTCompare(),
     'len_le': LenLECompare(),

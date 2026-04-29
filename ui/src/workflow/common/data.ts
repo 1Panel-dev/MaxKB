@@ -1127,6 +1127,7 @@ export const compareList = [
   {value: 'le', label: t('workflow.compare.le')},
   {value: 'lt', label: t('workflow.compare.lt')},
   {value: 'len_eq', label: t('workflow.compare.len_eq')},
+  {value: 'len_not_eq', label: t('workflow.compare.len_not_eq')},
   {value: 'len_ge', label: t('workflow.compare.len_ge')},
   {value: 'len_gt', label: t('workflow.compare.len_gt')},
   {value: 'len_le', label: t('workflow.compare.len_le')},

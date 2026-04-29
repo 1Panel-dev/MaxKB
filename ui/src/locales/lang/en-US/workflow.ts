@@ -534,6 +534,7 @@ You are a master of problem optimization, adept at accurately inferring user int
     le: 'Less than or equal to',
     lt: 'Less than',
     len_eq: 'Length equal to',
+    len_not_eq: 'Length not equal to',
     len_ge: 'Length greater than or equal to',
     len_gt: 'Length greater than',
     len_le: 'Length less than or equal to',

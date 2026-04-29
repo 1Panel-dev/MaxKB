@@ -519,6 +519,7 @@ export default {
     le: '小於等於',
     lt: '小於',
     len_eq: '長度等於',
+    len_not_eq: '長度不等於',
     len_ge: '長度大於等於',
     len_gt: '長度大於',
     len_le: '長度小於等於',
