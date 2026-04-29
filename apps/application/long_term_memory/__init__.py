@@ -525,6 +525,7 @@ def extract_long_term_memory(workspace_id, application_id, chat_user_id):
         chat__application_id=application_id,
         chat__chat_user_id=chat_user_id,
     ).count()
+    maxkb_logger.info(f'extract_long_term_memory: current_rounds={current_rounds}, rounds={rounds}')
     if current_rounds % rounds != 0:
         return
 

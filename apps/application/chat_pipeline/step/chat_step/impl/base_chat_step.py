@@ -214,8 +214,13 @@ class BaseChatStep(IChatStep):
 
     def get_details(self, manage, **kwargs):
         # 提取长期记忆
-        extract_long_term_memory.delay(
-            manage.context.get('workspace_id'), manage.context.get('application_id'), manage.context.get('chat_user_id')
+        extract_long_term_memory.apply_async(
+            args=(
+                manage.context.get('workspace_id'),
+                manage.context.get('application_id'),
+                manage.context.get('chat_user_id'),
+            ),
+            countdown=1,
         )
         return {
             'status': self.status,
