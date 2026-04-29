@@ -9247,3 +9247,6 @@ msgstr ""
 
 msgid "The label field is required for the {index}th item in model_params_form"
 msgstr ""
+
+msgid "Publish"
+msgstr ""

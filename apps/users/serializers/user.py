@@ -662,6 +662,8 @@ def update_user_role(instance, user, user_id=None):
             )
         permission_version, permission_get_key = Cache_Version.PERMISSION_LIST.value
         cache.delete(permission_get_key(str(user.id)), version=permission_version)
+        role_version, role_get_key = Cache_Version.ROLE_LIST.value
+        cache.delete(role_get_key(str(user.id)), version=role_version)
 
 
 def set_default_permission(user_id, instance):

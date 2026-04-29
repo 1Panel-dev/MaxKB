@@ -17,7 +17,7 @@
           type="primary"
           @click="publish(applicationFormRef)"
           :disabled="loading"
-          v-if="permissionPrecise.edit(id)"
+          v-if="permissionPrecise.publish(id)"
         >
           {{ $t('common.publish') }}
         </el-button>
