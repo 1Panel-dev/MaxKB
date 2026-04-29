@@ -41,7 +41,7 @@ def valid_parameter_type(value, _type, desc):
         instance_type = str
     else:
         maxkb_logger.error(_(
-            'Field: {name} Type: {_type} Value: {value} Unsupported type'
+            'Field: {name} Type: {_type} Value: {value} Unsupported this type'
         ).format(name=desc, _type=_type, value=value))
         return
     if not isinstance(value, instance_type):

@@ -50,7 +50,7 @@ def valid_reference_value(_type, value, name):
         instance_type = str
     else:
         maxkb_logger.error(_(
-            'Field: {name} Type: {_type} Value: {value} Unsupported type'
+            'Field: {name} Type: {_type} Value: {value} Unsupported this type'
         ).format(name=name, _type=_type, value=value))
         return value
     if not isinstance(value, instance_type):

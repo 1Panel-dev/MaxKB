@@ -605,8 +605,8 @@ msgid "Field: {name} No value set"
 msgstr "字段：{name} 未设置值"
 
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:59
-msgid "Field: {name} Type: {_type} Value: {value} Unsupported type"
-msgstr "字段：{name} 类型：{_type} 值：{value} 不支持类型"
+msgid "Field: {name} Type: {_type} Value: {value} Unsupported this type"
+msgstr "字段：{name} 类型：{_type} 值：{value} 不支持该类型"
 
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:63
 #: apps/application/flow/step_node/function_lib_node/impl/base_function_lib_node.py:100
