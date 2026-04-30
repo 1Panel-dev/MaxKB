@@ -9,21 +9,21 @@
 from .compare import Compare
 
 
-def compute_length(source_value, target_value) -> list:
+def compute_length(source_value, target_length) -> list:
     """
     计算长度
 
     Args:
         source_value: 引用变量
-        target_value: 目标长度字符串
+        target_length: 目标长度字符串
 
     Raises:
         ValueError: 当 target_value 不是数字 或 小于0时，抛出该异常
     """
     # 获取target_value的长度
-    target_length = int(target_value) if target_value else 0
+    target_length = int(target_length) if target_length else 0
     if target_length < 0:
-        raise ValueError("The target length must be greater than or equal to 0.")
+        raise ValueError("The target length must be greater than or equal to 0")
 
     # 获取source_value的长度
     try:
