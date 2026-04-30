@@ -9,7 +9,7 @@
 from .compare import Compare
 
 
-def computeLength(source_value, target_value) -> list:
+def compute_length(source_value, target_value) -> list:
     """
     计算长度
 
@@ -40,7 +40,7 @@ class LenEqualCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             # 计算长度
-            source_length, target_length = computeLength(source_value, target_value)
+            source_length, target_length = compute_length(source_value, target_value)
 
             # 长度等于 比较
             return source_length == target_length

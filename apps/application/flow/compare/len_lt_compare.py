@@ -7,7 +7,7 @@
     @desc: 长度小于比较器
 """
 from .compare import Compare
-from .len_equal_compare import computeLength
+from .len_equal_compare import compute_length
 
 
 class LenLTCompare(Compare):
@@ -15,7 +15,7 @@ class LenLTCompare(Compare):
     def compare(self, source_value, compare, target_value):
         try:
             # 计算长度
-            source_length, target_length = computeLength(source_value, target_value)
+            source_length, target_length = compute_length(source_value, target_value)
 
             # 长度小于 比较
             return source_length < target_length
