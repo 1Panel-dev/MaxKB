@@ -150,7 +150,8 @@ def event_content(response,
             all_text = 'Exception:' + str(e)
         write_context(step, manage, 0, 0, all_text)
         post_response_handler.handler(chat_id, chat_record_id, paragraph_list, problem_text,
-                                      all_text, manage, step, padding_problem_text, reasoning_content='')
+                                      all_text, manage, step, padding_problem_text,
+                                      reasoning_content=reasoning_content if reasoning_content_enable else '')
         if not manage.debug:
             add_access_num(chat_user_id, chat_user_type, manage.context.get('application_id'))
         yield manage.get_base_to_response().to_stream_chunk_response(chat_id, str(chat_record_id), 'ai-chat-node',
