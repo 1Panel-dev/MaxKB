@@ -604,10 +604,6 @@ const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
 ${t('views.problem.title')}：
 {{${t('workflow.nodes.startNode.label')}.question}}`
 
-const longTermPrompt =
-  t('views.application.longTermMemory.tips1') +
-  '{memory}' +
-  t('views.application.longTermMemory.tips2')
 
 const collapseData = reactive({
   MCP: true,
