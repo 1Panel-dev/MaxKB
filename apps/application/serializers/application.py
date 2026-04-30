@@ -726,12 +726,17 @@ class ApplicationSerializer(serializers.Serializer):
                            file_clean_time=application.get('file_clean_time') or 180,
                            file_upload_enable=application.get('file_upload_enable'),
                            file_upload_setting=application.get('file_upload_setting'),
+                           long_term_enable=application.get('long_term_enable'),
+                           long_term_model_params_setting=application.get('long_term_model_params_setting'),
+                           long_term_trigger_type=application.get('long_term_trigger_type'),
+                           long_term_trigger_setting=application.get('long_term_trigger_setting'),
                            tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
                                      application.get('tool_ids', [])],
                            skill_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
                                            application.get('skill_tool_ids', [])],
                            mcp_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
                                          application.get('mcp_tool_ids', [])],
+
                            )
 
     class StoreApplication(serializers.Serializer):
