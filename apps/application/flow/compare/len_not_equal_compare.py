@@ -2,7 +2,7 @@
 """
     @project: maxkb
     @Author：wangliang181230
-    @file： equal_compare.py
+    @file： len_not_equal_compare.py
     @date：2026/4/28 20:17
     @desc: 长度不等于比较器
 """
