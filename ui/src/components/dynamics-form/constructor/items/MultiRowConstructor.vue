@@ -8,32 +8,34 @@
 
     <el-row style="width: 100%" :gutter="10">
       <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
-        <el-radio :value="item.value" size="large" v-for="(item,index) in assignment_method_option_list" :key="index"
-          >{{ item.label }}
-          <el-popover
-            width="300px"
-            v-if="item.value == 'ref_variables'"
-            class="box-item"
-            placement="top-start"
-            :persistent="false"
-          >
-            {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:<br />
-            [<br />
-            {<br />
-            "label": "xx",<br />
-            "value": "xx",<br />
-            "default": false<br />
-            }<br />
-            ]<br />
-            label: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_label') }}
-            {{ $t('common.required') }}<br />
-            value: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_value') }}
-            {{ $t('common.required') }}<br />
-            default:{{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_default') }}
-            <template #reference>
-              <el-icon><InfoFilled /></el-icon>
-            </template>
-          </el-popover>
+        <el-radio
+          :value="item.value"
+          size="large"
+          v-for="(item, index) in assignment_method_option_list"
+          :key="index"
+        >
+          <span class="flex align-center">
+            {{ item.label }}
+
+            <el-tooltip effect="dark" placement="right" v-if="item.value == 'ref_variables'">
+              <template #content>
+                {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:<br />
+                [<br />
+                {<br />
+                "label": "xx",<br />
+                "value": "xx",<br />
+                "default": false<br />
+                }<br />
+                ]<br />
+                label: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_label') }}
+                {{ $t('common.required') }}<br />
+                value: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_value') }}
+                {{ $t('common.required') }}<br />
+                default:{{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_default') }}
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+            </el-tooltip>
+          </span>
         </el-radio>
       </el-radio-group>
     </el-row>

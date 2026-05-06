@@ -8,22 +8,23 @@
 
     <el-row style="width: 100%" :gutter="10">
       <el-radio-group v-model="formValue.default_value_assignment_method">
-        <el-radio :value="item.value" size="large" v-for="(item,index) in assignment_method_option_list" :key="index"
-          >{{ item.label }}
-          <el-popover
-            width="300px"
-            v-if="item.value == 'ref_variables'"
-            class="box-item"
-            placement="top-start"
-            :persistent="false"
-          >
-            {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:
-            {{ $t('dynamicsForm.AssignmentMethod.ref_variables.json_format') }}
+        <el-radio
+          :value="item.value"
+          size="large"
+          v-for="(item, index) in assignment_method_option_list"
+          :key="index"
+        >
+          <span class="flex align-center">
+            {{ item.label }}
 
-            <template #reference>
-              <el-icon><InfoFilled /></el-icon>
-            </template>
-          </el-popover>
+            <el-tooltip effect="dark" placement="right" v-if="item.value == 'ref_variables'">
+              <template #content>
+                {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:
+                {{ $t('dynamicsForm.AssignmentMethod.ref_variables.json_format') }}
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+            </el-tooltip>
+          </span>
         </el-radio>
       </el-radio-group>
     </el-row>
@@ -137,9 +138,7 @@ const default_ref_variables_value_rule = {
   required: true,
   validator: (rule: any, value: any, callback: any) => {
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback(
-        t('workflow.variable.Referencing') + t('common.required'),
-      )
+      callback(t('workflow.variable.Referencing') + t('common.required'))
     }
 
     return true

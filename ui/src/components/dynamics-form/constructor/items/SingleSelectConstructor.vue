@@ -13,31 +13,29 @@
           size="large"
           v-for="(item, index) in assignment_method_option_list"
           :key="index"
-          >{{ item.label }}
-          <el-popover
-            width="300px"
-            v-if="item.value == 'ref_variables'"
-            class="box-item"
-            placement="top-start"
-            :persistent="false"
-          >
-            {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:<br />
-            [<br />
-            {<br />
-            "label": "xx",<br />
-            "value": "xx",<br />
-            "default": false<br />
-            }<br />
-            ]<br />
-            label: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_label') }}
-            {{ $t('common.required') }}<br />
-            value: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_value') }}
-            {{ $t('common.required') }}<br />
-            default: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_default') }}
-            <template #reference>
-              <el-icon><InfoFilled /></el-icon>
-            </template>
-          </el-popover>
+        >
+          <span class="flex align-center">
+            {{ item.label }}
+
+            <el-tooltip effect="dark" placement="right" v-if="item.value == 'ref_variables'">
+              <template #content>
+                {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover') }}:<br />
+                [<br />
+                {<br />
+                "label": "xx",<br />
+                "value": "xx",<br />
+                "default": false<br />
+                }<br />
+                ]<br />
+                label: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_label') }}
+                {{ $t('common.required') }}<br />
+                value: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_value') }}
+                {{ $t('common.required') }}<br />
+                default: {{ $t('dynamicsForm.AssignmentMethod.ref_variables.popover_default') }}
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+            </el-tooltip>
+          </span>
         </el-radio>
       </el-radio-group>
     </el-row>
@@ -125,7 +123,11 @@
       />
     </div>
 
-    <el-select v-model="formValue.default_value" :teleported="false" popper-class="custom-select-popper">
+    <el-select
+      v-model="formValue.default_value"
+      :teleported="false"
+      popper-class="custom-select-popper"
+    >
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"
