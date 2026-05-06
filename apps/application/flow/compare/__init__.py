@@ -30,6 +30,8 @@ from .regex_compare import RegexCompare
 from .start_with import StartWithCompare
 from .wildcard_compare import WildcardCompare
 
+from common.utils.logger import maxkb_logger
+
 _compare_handler_dict = {
     'is_null': IsNullCompare(),
     'is_not_null': IsNotNullCompare(),
@@ -65,13 +67,13 @@ def _compare(source_value, compare, target_value):
 def _assertion(workflow_manage, field_list: List[str], compare: str, value):
     try:
         value = workflow_manage.generate_prompt(value)
-    except Exception:
-        pass
+    except Exception as e:
+        maxkb_logger.debug(f"Failed to generate field value for comparison: {e}")
     field_value = None
     try:
         field_value = workflow_manage.get_reference_field(field_list[0], field_list[1:])
-    except  Exception:
-        pass
+    except Exception as e:
+        maxkb_logger.debug(f"Failed to get reference field for comparison: {e}")
     return _compare(field_value, compare, value)
 
 
