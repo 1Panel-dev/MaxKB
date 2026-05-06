@@ -504,6 +504,8 @@ const currentSourceName = computed(() => {
     return t('views.tool.title')
   } else if (currentSourceType.value === 'MODEL') {
     return t('views.model.title')
+  } else if (currentSourceType.value === 'APPLICATION') {
+    return t('views.application.title')
   } else {
     return t('views.knowledge.title')
   }
