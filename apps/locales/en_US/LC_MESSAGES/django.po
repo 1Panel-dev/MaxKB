@@ -9250,3 +9250,6 @@ msgstr ""
 
 msgid "Publish"
 msgstr ""
+
+msgid "token is required for EVENT triggers"
+msgstr ""
