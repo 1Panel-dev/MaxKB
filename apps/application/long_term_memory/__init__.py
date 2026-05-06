@@ -155,6 +155,27 @@ def _get_long_term_config(application, chat_user_id):
         }
 
 
+def _get_cron_interval(cron_expression: str):
+    """
+    通过计算 cron 表达式的连续两次触发时间之差，估算执行间隔。
+    返回 timedelta，或 None（无法推断时）。
+    """
+    from apscheduler.triggers.cron import CronTrigger
+
+    try:
+        trigger = CronTrigger.from_crontab(cron_expression.strip())
+        now = timezone.now()
+        t1 = trigger.get_next_fire_time(None, now)
+        if t1 is None:
+            return None
+        t2 = trigger.get_next_fire_time(t1, t1)
+        if t2 is None:
+            return None
+        return t2 - t1
+    except Exception:
+        return None
+
+
 def _get_since_time_from_setting(setting: dict):
     """
     根据定时设置推算本次应提取的对话起始时间。
@@ -185,7 +206,10 @@ def _get_since_time_from_setting(setting: dict):
         }
         delta = delta_map.get(unit)
         return now - delta if delta else None
-    # cron 等无法从表达式推断间隔，返回 None
+    if schedule_type == "cron":
+        cron_expression = setting.get("cron_expression") or ""
+        delta = _get_cron_interval(cron_expression)
+        return now - delta if delta else None
     return None
 
 
