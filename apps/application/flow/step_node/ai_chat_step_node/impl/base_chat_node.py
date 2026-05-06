@@ -224,7 +224,7 @@ class BaseChatNode(IChatNode):
         )
         if mcp_result:
             return mcp_result
-
+        message_list = [SystemMessage(system)] + message_list
         if stream:
             r = chat_model.stream(message_list)
             return NodeResult({'result': r, 'chat_model': chat_model, 'message_list': message_list,
