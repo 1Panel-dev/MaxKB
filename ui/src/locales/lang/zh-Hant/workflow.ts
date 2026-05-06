@@ -87,6 +87,10 @@ export default {
     loopNodeBreakNodeRequired: '無限循環必須存在 Break 節點',
   },
   nodes: {
+    toolWorlflowNode: {
+      label: '工作流工具',
+      text: '工作流工具',
+    },
     knowledgeWriteNode: {
       label: '知識庫寫入',
       text: '將輸入的分段列表寫入當前知識庫，並完成向量化處理',

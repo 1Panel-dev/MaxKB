@@ -87,6 +87,10 @@ export default {
     loopNodeBreakNodeRequired: 'Wireless loop must have a Break node',
   },
   nodes: {
+    toolWorlflowNode: {
+      label: 'Workflow Tool',
+      text: 'Workflow Tool',
+    },
     knowledgeWriteNode: {
       label: 'Knowledge write',
       text: 'Write the input paragraph list into the current knowledge base and complete vectorization processing',
