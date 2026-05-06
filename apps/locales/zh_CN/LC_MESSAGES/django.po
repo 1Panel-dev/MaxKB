@@ -9373,3 +9373,6 @@ msgstr "model_params_form 中的第 {index} 项的 label 字段是必填项"
 
 msgid "Publish"
 msgstr "发布"
+
+msgid "token is required for EVENT triggers"
+msgstr "事件触发器必须设置 token"

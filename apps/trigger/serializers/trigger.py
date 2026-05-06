@@ -243,6 +243,10 @@ class TriggerValidationMixin:
             raise serializers.ValidationError({
                 'trigger_setting': _('body must be an array')
             })
+        if not setting.get('token'):
+            raise serializers.ValidationError({
+                'trigger_setting': _('token is required for EVENT triggers')
+            })
 
 
 class TriggerTaskCreateRequest(serializers.Serializer):
