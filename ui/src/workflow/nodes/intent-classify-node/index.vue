@@ -163,6 +163,19 @@
             </div>
           </div>
         </el-form-item>
+        <el-form-item>
+          <div class="flex-between w-full">
+            <div>
+              <span>{{ $t('workflow.nodes.intentNode.output_reason') }}</span>
+            </div>
+            <div>
+              <el-switch
+                size="small"
+                v-model="form_data.output_reason"
+              />
+            </div>
+          </div>
+        </el-form-item>
       </el-form>
     </el-card>
 
@@ -322,6 +335,7 @@ const form = {
   ],
   dialogue_number: 1,
   content_list: [],
+  output_reason: true,
 }
 
 function refreshParam(data: any) {
@@ -341,6 +355,9 @@ const form_data = computed({
       }
       if (!props.nodeModel.properties.node_data.model_id_reference) {
         set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
+      if (props.nodeModel.properties.node_data.output_reason == null) {
+        set(props.nodeModel.properties.node_data, 'output_reason', true)
       }
       return props.nodeModel.properties.node_data
     } else {

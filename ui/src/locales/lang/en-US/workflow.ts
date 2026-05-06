@@ -217,9 +217,9 @@ You are a master of problem optimization, adept at accurately inferring user int
 
 ##Skills
 ###Skill 1: Optimizing Problems
-2. Receive user input questions.
-3. Carefully analyze the meaning of the problem based on the context.
-4. Output optimized problems.
+1. Receive user input questions.
+2. Carefully analyze the meaning of the problem based on the context.
+3. Output optimized problems.
 
 ##Limitations:
 -Only return the optimized problem without any additional explanation or clarification.
@@ -458,6 +458,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       classify: {
         label: 'Intent classify',
       },
+      output_reason: 'Output Reason',
       input: {
         label: 'Input',
       },

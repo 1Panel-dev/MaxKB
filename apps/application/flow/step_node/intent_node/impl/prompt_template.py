@@ -20,10 +20,7 @@ Note:
 - Strictly ensure that the output is in a valid JSON format.
 - Do not add prefix ```json or suffix ```
 - The answer needs to include the following fields such as:
-{{
-"classificationId": 0,
-"reason": ""
-}}
+{output_json}
 
 ## Limit
 - Please do not reply in text."""

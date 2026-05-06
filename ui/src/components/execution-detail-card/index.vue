@@ -304,7 +304,7 @@
                 {{ $t('aiChat.executionDetails.currentChat') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
-                {{ data.question || '-' }}
+                {{ data.question || data.user_input || '-' }}
               </div>
             </div>
             <div class="card-never border-r-6 mt-8">

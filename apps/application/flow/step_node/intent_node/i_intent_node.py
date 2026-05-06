@@ -26,6 +26,7 @@ class IntentNodeSerializer(serializers.Serializer):
     model_params_setting = serializers.DictField(required=False,
                                                  label=_("Model parameter settings"))
     branch = IntentBranchSerializer(many=True)
+    output_reason = serializers.BooleanField(required=False, default=True, label=_("Output reason"))
 
 
 class IIntentNode(INode):
