@@ -11,12 +11,11 @@ import re
 from .compare import Compare
 from common.cache.mem_cache import MemCache
 
-
 match_cache = MemCache('regex', {
-    'TIMEOUT': 3600, # 缓存有效期为 1 小时
+    'TIMEOUT': 3600,  # 缓存有效期为 1 小时
     'OPTIONS': {
-        'MAX_ENTRIES': 500, # 最多缓存 500 个条目
-        'CULL_FREQUENCY': 10, # 达到上限时，删除约 1/10 的缓存
+        'MAX_ENTRIES': 500,  # 最多缓存 500 个条目
+        'CULL_FREQUENCY': 10,  # 达到上限时，删除约 1/10 的缓存
     },
 })
 
@@ -24,9 +23,10 @@ match_cache = MemCache('regex', {
 def compile_and_cache(regex):
     match = match_cache.get(regex)
     if not match:
-        match = re.compile(regex).match
+        match = re.compile(regex).fullmatch
         match_cache.set(regex, match)
     return match
+
 
 class RegexCompare(Compare):
 
