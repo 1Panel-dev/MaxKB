@@ -32,7 +32,7 @@ class AliyunBaiLianReranker(MaxKBBaseModel, BaseDocumentCompressor):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return AliyunBaiLianReranker(model=model_name,
                                      api_key=model_credential.get('dashscope_api_key'),
-                                     base_url=model_credential.get('api_base') or 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+                                     base_url=model_credential.get('api_base') or 'https://dashscope.aliyuncs.com/api/v1',
                                      top_n=model_kwargs.get('top_n', 3))
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \

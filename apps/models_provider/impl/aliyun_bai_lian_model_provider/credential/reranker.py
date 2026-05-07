@@ -19,7 +19,7 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
     Provides validation and encryption for the model credentials.
     """
     api_base = forms.TextInputField(_('API URL'), required=True,
-                                    default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
+                                    default_value='https://dashscope.aliyuncs.com/api/v1')
     dashscope_api_key = PasswordInputField('API Key', required=True)
 
     def is_valid(
