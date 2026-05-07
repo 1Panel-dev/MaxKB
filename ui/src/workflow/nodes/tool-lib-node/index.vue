@@ -169,7 +169,7 @@ const update_field = () => {
         if (find_field && find_field.source == item.source) {
           return { ...item, value: JSON.parse(JSON.stringify(find_field.value)) }
         }
-        return { ...item, value: item.source == 'reference' ? [] : '' }
+        return { ...item, value: item.source === 'reference' ? [] : (item.default_value || '') }
       })
       set(props.nodeModel.properties.node_data, 'input_field_list', merge_input_field_list)
       set(props.nodeModel.properties, 'status', ok.data.is_active ? 200 : 500)

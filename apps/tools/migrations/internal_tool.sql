@@ -62,7 +62,7 @@ def langsearch(query, apikey):
         raise Exception(f"API请求失败: {response.status_code}, 错误信息: {response.text}")
         return (response.text)', '[{"name": "query", "type": "string", "source": "reference", "is_required": true}]', '[{"attrs": {"type": "password", "maxlength": 200, "minlength": 1, "show-password": true, "show-word-limit": true}, "field": "apikey", "label": "API Key", "required": true, "input_type": "PasswordInput", "props_info": {"rules": [{"message": "API Key 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "API Key 长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}]', './tool/langsearch/icon.png', true, 'INTERNAL', 'INTERNAL', null, 'None', '', 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', 'default');
 INSERT INTO tool (create_time, update_time, id, name, label, "desc", code, input_field_list, init_field_list, icon, is_active, scope, tool_type, template_id, workspace_id, init_params, user_id, folder_id) VALUES ('2025-03-17 08:16:32.626245 +00:00', '2025-03-17 08:16:32.626308 +00:00', '22c21b76-0308-11f0-9694-5618c4394482', 'MySQL 查询','database_search', '一个连接MySQL数据库执行SQL查询的工具', e'
-def query_mysql(host,port, user, password, database, sql):
+def query_mysql(host, port, user, password, database, sql: str, to_json_str: bool):
     import pymysql
     import json
     from pymysql.cursors import DictCursor
@@ -76,6 +76,7 @@ def query_mysql(host,port, user, password, database, sql):
             return float(obj)  # 将 Decimal 转换为 float
         raise TypeError(f"Type {type(obj)} not serializable")
 
+    db = None
     try:
         # 创建连接
         db = pymysql.connect(
@@ -102,16 +103,20 @@ def query_mysql(host,port, user, password, database, sql):
                 if isinstance(value, bytes):
                     row[key] = value.decode("utf-8")  # 转换为字符串
 
-        # 将数据序列化为 JSON
-        json_data = json.dumps(data, default=default_serializer, ensure_ascii=False)
-        return json_data
-
-        # 关闭数据库连接
-        db.close()
+        if to_json_str is None or to_json_str is True:
+          # 将数据序列化为 JSON
+          return json.dumps(data, default=default_serializer, ensure_ascii=False)
+        else:
+          # 直接输出数组（list）对象
+          return data
 
     except Exception as e:
         print(f"Error while connecting to MySQL: {e}")
-        raise e', '[{"name": "sql", "type": "string", "source": "reference", "is_required": true}]', '[{"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "host", "label": "host", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "host 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "host长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 20, "minlength": 1, "show-word-limit": true}, "field": "port", "label": "port", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "port 为必填属性", "required": true}, {"max": 20, "min": 1, "message": "port长度在 1 到 20 个字符", "trigger": "blur"}]}, "default_value": "3306", "show_default_value": false}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "user", "label": "user", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "user 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "user长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "root", "show_default_value": false}, {"attrs": {"type": "password", "maxlength": 200, "minlength": 1, "show-password": true, "show-word-limit": true}, "field": "password", "label": "password", "required": true, "input_type": "PasswordInput", "props_info": {"rules": [{"message": "password 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "password长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "database", "label": "database", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "database 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "database长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}]', './tool/mysql/icon.png', true, 'INTERNAL', 'INTERNAL', null, 'None', null, 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', 'default');
+        raise e
+
+    finally:
+        if db:
+            db.close()', '[{"name": "sql", "type": "string", "source": "reference", "is_required": true}, {"name": "to_json_str", "desc": "结果是否转换为JSON字符串：1=是 | 0=否", "type": "boolean", "source": "custom", "is_required": false, "default_value": "1"}]', '[{"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "host", "label": "host", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "host 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "host长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 20, "minlength": 1, "show-word-limit": true}, "field": "port", "label": "port", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "port 为必填属性", "required": true}, {"max": 20, "min": 1, "message": "port长度在 1 到 20 个字符", "trigger": "blur"}]}, "default_value": "3306", "show_default_value": true}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "user", "label": "user", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "user 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "user长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "root", "show_default_value": true}, {"attrs": {"type": "password", "maxlength": 200, "minlength": 1, "show-password": true, "show-word-limit": true}, "field": "password", "label": "password", "required": true, "input_type": "PasswordInput", "props_info": {"rules": [{"message": "password 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "password长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}, {"attrs": {"maxlength": 200, "minlength": 1, "show-word-limit": true}, "field": "database", "label": "database", "required": true, "input_type": "TextInput", "props_info": {"rules": [{"message": "database 为必填属性", "required": true}, {"max": 200, "min": 1, "message": "database长度在 1 到 200 个字符", "trigger": "blur"}]}, "default_value": "x", "show_default_value": false}]', './tool/mysql/icon.png', true, 'INTERNAL', 'INTERNAL', null, 'None', null, 'f0dd8f71-e4ee-11ee-8c84-a8a1595801ab', 'default');
 INSERT INTO tool (create_time, update_time, id, name, label, "desc", code, input_field_list, init_field_list, icon, is_active, scope, tool_type, template_id, workspace_id, init_params, user_id, folder_id) VALUES ('2025-03-17 07:37:54.620836 +00:00', '2025-03-17 07:37:54.620887 +00:00', 'bd1e8b88-0302-11f0-87bb-5618c4394482', 'PostgreSQL 查询','database_search', '一个连接PostgreSQL数据库执行SQL查询的工具', e'
 def queryPgSQL(database, user, password, host, port, query):
     import psycopg2

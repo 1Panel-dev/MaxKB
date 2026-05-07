@@ -55,6 +55,10 @@ export default {
       label: '描述',
       placeholder: '請輸入描述',
     },
+    default_value: {
+      label: '默認值',
+      placeholder: '請輸入默認值',
+    },
   },
   TreeSelect: {
     label: '樹狀選擇器',

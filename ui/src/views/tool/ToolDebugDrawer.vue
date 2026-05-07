@@ -61,6 +61,17 @@
                   <div class="flex">
                     <span
                       >{{ item.name }}
+                      <el-tooltip
+                        v-if="item.desc"
+                        effect="dark"
+                        placement="right"
+                        popper-class="max-w-200"
+                      >
+                        <template #content>
+                          {{ item.desc }}
+                        </template>
+                        <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                      </el-tooltip>
                       <span class="color-danger" v-if="item.is_required">*</span></span
                     >
                     <el-tag size="small" type="info" class="info-tag ml-4">{{ item.type }}</el-tag>
@@ -182,7 +193,7 @@ const open = (data: any) => {
   if (data.input_field_list.length > 0) {
     data.input_field_list.forEach((item: any) => {
       form.value.debug_field_list.push({
-        value: '',
+        value: (item.default_value || ''),
         ...item,
       })
     })

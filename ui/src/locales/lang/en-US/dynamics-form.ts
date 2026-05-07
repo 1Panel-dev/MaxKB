@@ -55,6 +55,10 @@ export default {
       label: 'description',
       placeholder: 'Please enter a description',
     },
+    default_value: {
+      label: 'Default Value',
+      placeholder: 'Please enter a default value',
+    },
   },
   TreeSelect: {
     label: 'Tree Select',

@@ -180,7 +180,7 @@ function clickNodes(item: any, data?: any) {
       tool_lib_id: data.id,
       input_field_list: data.input_field_list.map((field: any) => ({
         ...field,
-        value: field.source == 'reference' ? [] : '',
+        value: field.source === 'reference' ? [] : (field.default_value || ''),
       })),
     }
   }
@@ -202,7 +202,7 @@ function onmousedown(item: any, data?: any) {
       tool_lib_id: data.id,
       input_field_list: data.input_field_list.map((field: any) => ({
         ...field,
-        value: field.source == 'reference' ? [] : '',
+        value: field.source === 'reference' ? [] : (field.default_value || ''),
       })),
     }
   }

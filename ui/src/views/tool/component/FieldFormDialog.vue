@@ -43,6 +43,15 @@
           <el-option :label="$t('common.custom')" value="custom" />
         </el-select>
       </el-form-item>
+      <el-form-item v-if="form.source === 'custom'" :label="$t('dynamicsForm.paramForm.default_value.label')">
+        <el-input
+          v-model="form.default_value"
+          :placeholder="$t('dynamicsForm.paramForm.default_value.placeholder')"
+          :maxlength="1024"
+          show-word-limit
+          @blur="form.default_value = form.default_value?.trim()"
+        />
+      </el-form-item>
       <el-form-item :label="$t('dynamicsForm.paramForm.required.label')" @click.prevent>
         <el-switch size="small" v-model="form.is_required"></el-switch>
       </el-form-item>
@@ -97,6 +106,7 @@ watch(dialogVisible, (bool) => {
       type: typeOptions[0],
       desc: '',
       source: 'reference',
+      default_value: '',
       is_required: true,
     }
     isEdit.value = false
