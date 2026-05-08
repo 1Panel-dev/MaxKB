@@ -173,7 +173,6 @@
           />
         </el-form-item>
         <el-form-item
-          :label="$t('workflow.nodes.imageUnderstandNode.image.label')"
           :rules="{
             type: 'array',
             required: true,
