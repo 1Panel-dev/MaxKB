@@ -32,7 +32,6 @@ from rest_framework.utils.formatting import lazy_format
 
 from application.flow.common import Workflow
 from application.long_term_memory import schedule_extract_long_term_memory
-from application.models import ApplicationLongTermMemory
 from application.models.application import Application, ApplicationTypeChoices, \
     ApplicationFolder, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -703,41 +702,38 @@ class ApplicationSerializer(serializers.Serializer):
             if node.get('type') == 'loop-node':
                 for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
                     hand_node(n, update_tool_map)
-        return Application(id=uuid.uuid7(),
-                           user_id=user_id,
-                           name=application.get('name'),
-                           workspace_id=workspace_id,
-                           folder_id=folder_id,
-                           desc=application.get('desc'),
-                           prologue=application.get('prologue'), dialogue_number=application.get('dialogue_number'),
-                           knowledge_setting=application.get('knowledge_setting'),
-                           model_setting=application.get('model_setting'),
-                           model_params_setting=application.get('model_params_setting'),
-                           tts_model_params_setting=application.get('tts_model_params_setting'),
-                           problem_optimization=application.get('problem_optimization'),
-                           icon="./favicon.ico",
-                           work_flow=work_flow,
-                           type=application.get('type'),
-                           problem_optimization_prompt=application.get('problem_optimization_prompt'),
-                           tts_model_enable=application.get('tts_model_enable'),
-                           stt_model_enable=application.get('stt_model_enable'),
-                           tts_type=application.get('tts_type'),
-                           clean_time=application.get('clean_time'),
-                           file_clean_time=application.get('file_clean_time') or 180,
-                           file_upload_enable=application.get('file_upload_enable'),
-                           file_upload_setting=application.get('file_upload_setting'),
-                           long_term_enable=application.get('long_term_enable'),
-                           long_term_model_params_setting=application.get('long_term_model_params_setting'),
-                           long_term_trigger_type=application.get('long_term_trigger_type'),
-                           long_term_trigger_setting=application.get('long_term_trigger_setting'),
-                           tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
-                                     application.get('tool_ids', [])],
-                           skill_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
-                                           application.get('skill_tool_ids', [])],
-                           mcp_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in
-                                         application.get('mcp_tool_ids', [])],
-
-                           )
+        return Application(
+            id=uuid.uuid7(),
+            user_id=user_id,
+            name=application.get('name'),
+            workspace_id=workspace_id,
+            folder_id=folder_id,
+            desc=application.get('desc'),
+            prologue=application.get('prologue'), dialogue_number=application.get('dialogue_number'),
+            knowledge_setting=application.get('knowledge_setting'),
+            model_setting=application.get('model_setting'),
+            model_params_setting=application.get('model_params_setting'),
+            tts_model_params_setting=application.get('tts_model_params_setting'),
+            problem_optimization=application.get('problem_optimization'),
+            icon="./favicon.ico",
+            work_flow=work_flow,
+            type=application.get('type'),
+            problem_optimization_prompt=application.get('problem_optimization_prompt'),
+            tts_model_enable=application.get('tts_model_enable'),
+            stt_model_enable=application.get('stt_model_enable'),
+            tts_type=application.get('tts_type'),
+            clean_time=application.get('clean_time'),
+            file_clean_time=application.get('file_clean_time') or 180,
+            file_upload_enable=application.get('file_upload_enable'),
+            file_upload_setting=application.get('file_upload_setting'),
+            long_term_enable=application.get('long_term_enable') or False,
+            long_term_model_params_setting=application.get('long_term_model_params_setting') or {},
+            long_term_trigger_type=application.get('long_term_trigger_type') or 'ROUND',
+            long_term_trigger_setting=application.get('long_term_trigger_setting') or {},
+            tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('tool_ids', [])],
+            skill_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('skill_tool_ids', [])],
+            mcp_tool_ids=[update_tool_map.get(tool_id, tool_id) for tool_id in application.get('mcp_tool_ids', [])],
+        )
 
     class StoreApplication(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
@@ -974,7 +970,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-                       8:24]
+            8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
