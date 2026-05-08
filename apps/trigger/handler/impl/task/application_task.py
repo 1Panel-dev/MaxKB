@@ -32,10 +32,10 @@ def get_reference(fields, obj):
 
 
 def conversion_custom_value(value, _type):
-    if ['array', 'dict', 'float', 'int', 'boolean', 'any'].__contains__(_type):
+    if _type in ('array', 'dict', 'float', 'int', 'boolean', 'any'):
         try:
             return json.loads(value)
-        except Exception as e:
+        except Exception:
             pass
     return value
 
@@ -48,7 +48,7 @@ def valid_value_type(value, _type):
     if _type == 'float':
         return isinstance(value, float)
     if _type == 'int':
-        return isinstance(value, int)
+        return isinstance(value, int) and not isinstance(value, bool)
     if _type == 'boolean':
         return isinstance(value, bool)
     if _type == 'any':
@@ -62,15 +62,17 @@ def get_field_value(value, kwargs, _type, required, default_value, field):
         _value = value.get('value')
         if _value:
             _value = conversion_custom_value(_value, _type)
-        else:
-            if default_value:
-                return default_value
-            if required:
-                raise Exception(f'{field} is required')
-            else:
-                return None
     else:
         _value = get_reference(value.get('value'), kwargs)
+
+    if _value is None:
+        if default_value:
+            return default_value
+        if required:
+            raise Exception(f'{field} is required')
+        else:
+            return None
+
     valid = valid_value_type(_value, _type)
     if not valid:
         raise Exception(f'{field} type error')
