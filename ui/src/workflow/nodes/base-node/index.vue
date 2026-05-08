@@ -26,6 +26,18 @@
           @blur="form_data.name = form_data.name?.trim()"
         />
       </el-form-item>
+      <el-form-item
+        :label="$t('common.code')"
+        prop="code"
+      >
+        <el-input
+          v-model="form_data.code"
+          maxlength="64"
+          :placeholder="t('views.application.form.appCode.placeholder')"
+          show-word-limit
+          @blur="form_data.code = form_data.code?.replaceAll(/[^a-zA-Z0-9_-\s]+/g, '').trim().replaceAll(/\s+/g, '_')"
+        />
+      </el-form-item>
       <el-form-item :label="$t('common.desc')">
         <el-input
           v-model="form_data.desc"
@@ -263,6 +275,7 @@ const FileUploadSettingDialogRef = ref<InstanceType<typeof FileUploadSettingDial
 
 const form = {
   name: '',
+  code: '',
   desc: '',
   prologue: t('views.application.form.defaultPrologue'),
 }

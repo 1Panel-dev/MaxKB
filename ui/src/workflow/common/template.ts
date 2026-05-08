@@ -19,6 +19,7 @@ export const applicationTemplate: any = {
           node_data: {
             desc: '模板',
             name: '知识库问答助手',
+            code: '',
             prologue:
               '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
             tts_type: 'BROWSER',
@@ -800,6 +801,7 @@ export const knowledgeTemplate: any = {
           node_data: {
             desc: '',
             name: '',
+            code: '',
             prologue:
               '\u60a8\u597d\uff0c\u6211\u662f XXX \u5c0f\u52a9\u624b\uff0c\u60a8\u53ef\u4ee5\u5411\u6211\u63d0\u51fa XXX \u4f7f\u7528\u95ee\u9898\u3002\n- XXX \u4e3b\u8981\u529f\u80fd\u6709\u4ec0\u4e48\uff1f\n- XXX \u5982\u4f55\u6536\u8d39\uff1f\n- \u9700\u8981\u8f6c\u4eba\u5de5\u670d\u52a1',
             tts_type: 'BROWSER',

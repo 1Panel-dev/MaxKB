@@ -130,6 +130,7 @@ const work_flow_template = ref()
 
 const applicationForm = ref<ApplicationFormType>({
   name: '',
+  code: '',
   desc: '',
   model_id: undefined,
   dialogue_number: 1,
@@ -185,6 +186,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     applicationForm.value = {
       name: '',
+      code: '',
       desc: '',
       model_id: undefined,
       dialogue_number: 1,

@@ -39,6 +39,7 @@ export default {
   private: '私有',
   paramSetting: '参数设置',
   name: '名称',
+  code: '代码',
   creator: '创建者',
   createdIn: '创建于',
   author: '作者',

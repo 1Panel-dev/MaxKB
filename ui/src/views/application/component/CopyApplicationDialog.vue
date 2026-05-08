@@ -71,6 +71,7 @@ const dialogVisible = ref<boolean>(false)
 
 const applicationForm = ref<ApplicationFormType>({
   name: '',
+  code: '',
   desc: '',
   model_id: '',
   dialogue_number: 0,
@@ -109,6 +110,7 @@ watch(dialogVisible, (bool) => {
   if (!bool) {
     applicationForm.value = {
       name: '',
+      code: '',
       desc: '',
       model_id: '',
       dialogue_number: 0,

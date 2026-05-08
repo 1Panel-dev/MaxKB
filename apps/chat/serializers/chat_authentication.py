@@ -95,7 +95,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
     @staticmethod
     def reset_application(application, application_version):
         update_field_dict = {
-            'application_name': 'name', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
+            'application_name': 'name', 'application_code': 'code', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
             'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
             'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
             'tts_model_params_setting': 'tts_model_params_setting',

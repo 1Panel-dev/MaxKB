@@ -34,7 +34,7 @@ class MCPToolHandler:
         return {
             "tools": [
                 {
-                    "name": f'agent_{str(self.application.id)[:8]}',
+                    "name": f'agent_{str(self.application.id)[:8]}' + (f'_{self.application.code}' if self.application.code else ''),
                     "description": f'{self.application.name} {self.application.desc}',
                     "inputSchema": {
                         "type": "object",

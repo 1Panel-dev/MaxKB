@@ -37,6 +37,7 @@ export default {
   private: 'Private',
   paramSetting: 'Parameter Settings',
   name: 'Name',
+  code: 'Code',
   creator: 'Creator',
   createdIn: 'created in',
   author: 'Author',

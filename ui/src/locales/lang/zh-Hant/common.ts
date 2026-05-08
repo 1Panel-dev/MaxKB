@@ -37,6 +37,7 @@ export default {
   private: '私有',
   paramSetting: '參數設定',
   name: '名稱',
+  code: '代碼',
   creator: '建立者',
   createdIn: '創建於',
   author: '作者',

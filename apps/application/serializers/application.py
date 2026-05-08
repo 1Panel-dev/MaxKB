@@ -199,6 +199,8 @@ class ApplicationCreateSerializer(serializers.Serializer):
     class WorkflowRequest(serializers.Serializer):
         name = serializers.CharField(required=True, max_length=64, min_length=1,
                                      label=_("Application Name"))
+        code = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=64,
+                                     label=_("Application Code"))
         desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      max_length=256, min_length=1,
                                      label=_("Application Description"))
@@ -214,10 +216,12 @@ class ApplicationCreateSerializer(serializers.Serializer):
                 if node.get('id') == 'base-node':
                     node.get('properties')['node_data']['desc'] = application.get('desc')
                     node.get('properties')['node_data']['name'] = application.get('name')
+                    node.get('properties')['node_data']['code'] = application.get('code')
                     node.get('properties')['node_data']['prologue'] = application.get('prologue')
             return Application(
                 id=uuid.uuid7(),
                 name=application.get('name'),
+                code=application.get('code'),
                 desc=application.get('desc'),
                 workspace_id=workspace_id,
                 folder_id=application.get('folder_id', application.get('workspace_id')),
@@ -242,6 +246,8 @@ class ApplicationCreateSerializer(serializers.Serializer):
     class SimplateRequest(serializers.Serializer):
         name = serializers.CharField(required=True, max_length=64, min_length=1,
                                      label=_("application name"))
+        code = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=64,
+                                     label=_("application code"))
         desc = serializers.CharField(required=False, allow_null=True, allow_blank=True,
                                      max_length=256, min_length=1,
                                      label=_("application describe"))
@@ -302,6 +308,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
             return Application(
                 id=uuid.uuid7(),
                 name=application.get('name'),
+                code=application.get('code'),
                 desc=application.get('desc'),
                 workspace_id=workspace_id,
                 prologue=application.get('prologue'),
@@ -453,6 +460,8 @@ class ApplicationImportRequest(serializers.Serializer):
 class ApplicationEditSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=64, min_length=1,
                                  label=_("Application Name"))
+    code = serializers.CharField(required=False, allow_null=True, allow_blank=True, max_length=64,
+                                 label=_("Application Code"))
     desc = serializers.CharField(required=False, max_length=256, min_length=1, allow_null=True, allow_blank=True,
                                  label=_("Application Description"))
     model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True,
@@ -706,6 +715,7 @@ class ApplicationSerializer(serializers.Serializer):
             id=uuid.uuid7(),
             user_id=user_id,
             name=application.get('name'),
+            code=application.get('code'),
             workspace_id=workspace_id,
             folder_id=folder_id,
             desc=application.get('desc'),
@@ -913,7 +923,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
     @staticmethod
     def reset_application_version(application_version, application):
         update_field_dict = {
-            'application_name': 'name', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
+            'application_name': 'name', 'application_code': 'code', 'desc': 'desc', 'prologue': 'prologue', 'dialogue_number': 'dialogue_number',
             'user_id': 'user_id', 'model_id': 'model_id', 'knowledge_setting': 'knowledge_setting',
             'model_setting': 'model_setting', 'model_params_setting': 'model_params_setting',
             'tts_model_params_setting': 'tts_model_params_setting',
@@ -955,6 +965,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 node_data = base_node.get('properties').get('node_data')
                 if node_data is not None:
                     application.name = node_data.get('name')
+                    application.code = node_data.get('code')
                     application.desc = node_data.get('desc')
                     application.prologue = node_data.get('prologue')
             application.work_flow = work_flow
@@ -1095,7 +1106,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             self.update_work_flow_model(instance)
         if 'mcp_servers' in instance and len(instance.get('mcp_servers', {})) > 0:
             ToolExecutor().validate_mcp_transport(json.dumps(instance.get('mcp_servers')))
-        update_keys = ['name', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
+        update_keys = ['name', 'code', 'desc', 'model_id', 'multiple_rounds_dialogue', 'prologue', 'status',
                        'knowledge_setting', 'model_setting', 'problem_optimization', 'dialogue_number',
                        'stt_model_id', 'tts_model_id', 'tts_model_enable', 'stt_model_enable', 'tts_type',
                        'tts_autoplay', 'stt_autosend', 'file_upload_enable', 'file_upload_setting',

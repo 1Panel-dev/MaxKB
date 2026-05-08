@@ -51,6 +51,9 @@ export default {
       placeholder: '请输入智能体名称',
       requiredMessage: '请输入智能体名称',
     },
+    appCode: {
+      placeholder: '请输入智能体代码: [a-zA-Z0-9_-]',
+    },
     appDescription: {
       placeholder: '描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题',
     },

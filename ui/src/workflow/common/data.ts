@@ -47,6 +47,7 @@ export const baseNode = {
     input_field_list: [],
     node_data: {
       name: '',
+      code: '',
       desc: '',
       prologue: t('views.application.form.defaultPrologue'),
       tts_type: 'BROWSER',
@@ -69,6 +70,7 @@ export const knowledgeBaseNode = {
     input_field_list: [],
     node_data: {
       name: '',
+      code: '',
       desc: '',
       prologue: t('views.application.form.defaultPrologue'),
       tts_type: 'BROWSER',

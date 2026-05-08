@@ -14,6 +14,7 @@
                 "node_data": {
                     "desc": "",
                     "name": "maxkbapplication",
+                    "code": "",
                     "prologue": "Hello, I am the MaxKB assistant. You can ask me about MaxKB usage issues.\n-What are the main functions of MaxKB?\n-What major language models does MaxKB support?\n-What document types does MaxKB support?"
                 },
                 "input_field_list": [

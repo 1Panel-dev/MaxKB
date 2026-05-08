@@ -4,6 +4,7 @@ import bus from '@/bus'
 
 interface ApplicationFormType {
   name?: string
+  code?: string
   desc?: string
   model_id?: string
   dialogue_number?: number

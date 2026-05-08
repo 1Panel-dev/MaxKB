@@ -1014,6 +1014,7 @@ const knowledgeLoading = ref(false)
 
 const applicationForm = ref<ApplicationFormType>({
   name: '',
+  code: '',
   desc: '',
   model_id: '',
   dialogue_number: 1,

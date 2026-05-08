@@ -50,6 +50,9 @@ export default {
       placeholder: '請輸入智能體名稱',
       requiredMessage: '請輸入智能體名稱',
     },
+    appCode: {
+      placeholder: '請輸入智能體代碼: [a-zA-Z0-9_-]',
+    },
     appDescription: {
       placeholder: '描述該智能體的應用場景及用途，如：XXX 小助手回答用戶提出的 XXX 產品使用問題',
     },

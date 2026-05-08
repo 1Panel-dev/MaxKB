@@ -54,6 +54,9 @@ After disabling, the long-term memory of the conversation users will be cleared,
       placeholder: 'Please enter the agent name',
       requiredMessage: 'Agent name is required',
     },
+    appCode: {
+      placeholder: 'Please enter the agent code: [a-zA-Z0-9_-]',
+    },
     appDescription: {
       placeholder:
         'Describe the Agent scenario and use, e.g.: XXX assistant answering user questions about XXX product usage',
