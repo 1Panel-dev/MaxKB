@@ -52,10 +52,10 @@ const prologue = computed(() => {
   const temp = props.available ? props.application?.prologue : t('chat.tip.prologueMessage')
   if (temp) {
     const tag_list = [
-      /<html_rander>[\d\D]*?<\/html_rander>/g,
-      /<echarts_rander>[\d\D]*?<\/echarts_rander>/g,
-      /<quick_question>[\d\D]*?<\/quick_question>/g,
-      /<form_rander>[\d\D]*?<\/form_rander>/g,
+      /<html_rander>.*?<\/html_rander>/gs,
+      /<echarts_rander>.*?<\/echarts_rander>/gs,
+      /<quick_question>.*?<\/quick_question>/gs,
+      /<form_rander>.*?<\/form_rander>/gs,
     ]
     let _temp = temp
     for (const index in tag_list) {

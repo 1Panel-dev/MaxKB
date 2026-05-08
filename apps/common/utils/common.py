@@ -115,18 +115,18 @@ def markdown_to_plain_text(md: str) -> str:
     # 移除行内代码 `code`
     text = re.sub(r'`(.*?)`', r'\1', text)
     # 移除代码块 ```code```
-    text = re.sub(r'```[\s\S]*?```', '', text)
+    text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
     # 移除多余的换行符
     text = re.sub(r'\n{2,}', '\n', text)
     # 使用正则表达式去除所有 HTML 标签
     text = re.sub(r'<[^>]+>', '', text)
     # 先移除特定媒体标签（优先级高于通用HTML标签移除）
-    text = re.sub(r'<(?:audio|video)(?:\s+[^>]*)?>[\s\S]*?(?:</(?:audio|video)>)?', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?', '', text, flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r'<img[^>]*>', '', text)  # 匹配图片标签
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r'\s+', ' ', text)
     # 去除表单渲染
-    re.sub(r'<form_rander>[\s\S]*?<\/form_rander>', '', text)
+    text = re.sub(r'<form_rander>.*?<\/form_rander>', '', text, flags=re.DOTALL)
     # 去除首尾空格
     text = text.strip()
     return text

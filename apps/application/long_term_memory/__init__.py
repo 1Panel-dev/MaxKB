@@ -270,7 +270,7 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
     ]):
         content += chunk.content
 
-    content = re.sub(r'<think>.*?</think>', '', content, flags=re.DOTALL).strip()
+    content = re.sub(r'<think>.*?<\/think>', '', content, flags=re.DOTALL).strip()
 
     if long_term_memory:
         long_term_memory.memory = content

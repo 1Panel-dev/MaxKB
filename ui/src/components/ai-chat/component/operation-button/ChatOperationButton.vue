@@ -262,9 +262,9 @@ function markdownToPlainText(md: string) {
       // 移除行内代码 `code`
       .replace(/`(.*?)`/g, '$1')
       // 移除代码块 ```code```
-      .replace(/```[\s\S]*?```/g, '')
+      .replace(/```.*?```/gs, '')
       // 移除video标签
-      .replace(/<video>[\s\S]*?<\/video>/g, '')
+      .replace(/<video>.*?<\/video>/gs, '')
       // 移除html标签
       .replace(/<[^>]+>/g, '')
       // 移除多余的换行符
@@ -274,7 +274,7 @@ function markdownToPlainText(md: string) {
 }
 
 function removeFormRander(text: string) {
-  return text.replace(/<form_rander>[\s\S]*?<\/form_rander>/g, '').trim()
+  return text.replace(/<form_rander>.*?<\/form_rander>/gs, '').trim()
 }
 function getKey(keys: Array<number>, index: number) {
   // 从后往前查找第一个小于等于index的键
