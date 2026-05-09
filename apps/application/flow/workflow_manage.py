@@ -236,6 +236,7 @@ class WorkflowManage:
         @return: 结果
         """
         try:
+            self.params['stream'] = True
             self.run_chain_async(None, None, language)
             while self.is_run():
                 pass
