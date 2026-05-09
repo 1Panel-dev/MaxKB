@@ -189,7 +189,7 @@
                 <span
                 >{{
                     $t('workflow.nodes.imageToVideoGenerate.last_frame.label')
-                  }}<span class="color-danger">*</span></span
+                  }}</span
                 >
             </div>
             <el-tooltip effect="dark" placement="right" >
