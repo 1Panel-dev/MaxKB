@@ -1036,10 +1036,13 @@ class ApplicationOperateSerializer(serializers.Serializer):
             knowledge_id_list = node_data.get('knowledge_id_list') or []
             # 用户可以看到的知识库
             knowledge_list = node_data.get('knowledge_list') or []
+
+            no_permission_knowledge_id_list = node_data.get('no_permission_knowledge_id_list') or []
+
             view_knowledge_id_list = [knowledge.get('id') for knowledge in knowledge_list]
             other_knowledge_id_list = [knowledge_id for knowledge_id in all_knowledge_id_list if
                                        not view_knowledge_id_list.__contains__(knowledge_id)]
-            node_data['knowledge_id_list'] = other_knowledge_id_list + knowledge_id_list
+            node_data['knowledge_id_list'] = no_permission_knowledge_id_list + knowledge_id_list
 
     def move(self, folder_id: str):
         self.is_valid(raise_exception=True)
@@ -1269,6 +1272,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             knowledge_list = [available_knowledge_dict.get(knowledge_id) for knowledge_id in knowledge_id_list if
                               available_knowledge_dict.__contains__(knowledge_id)]
             node_data['all_knowledge_id_list'] = knowledge_id_list
+            node_data['no_permission_knowledge_id_list'] = [knowledge_id for knowledge_id in knowledge_id_list if not available_knowledge_dict.__contains__(knowledge_id) ]
             node_data['knowledge_id_list'] = [knowledge.get('id') for knowledge in knowledge_list]
             node_data['knowledge_list'] = knowledge_list
 
