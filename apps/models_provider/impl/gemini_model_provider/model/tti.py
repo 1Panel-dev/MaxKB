@@ -52,7 +52,7 @@ class GeminiTextToImage(MaxKBBaseModel, BaseTextToImage):
         from google.genai import types
         from PIL import Image
         file_urls = []
-        client = genai.Client(api_key=self.api_key, http_options={"base_url": self.base_url}, **self.params)
+        client = genai.Client(api_key=self.api_key, http_options={"base_url": self.base_url})
         if self.model.startswith('imagen'):
             config = types.GenerateImagesConfig(**self.params)
 
@@ -68,7 +68,9 @@ class GeminiTextToImage(MaxKBBaseModel, BaseTextToImage):
                 img_base64 = base64.b64encode(generated_image.image.image_bytes).decode("utf-8")
                 file_urls.append(f'data:{generated_image.image.mime_type};base64,{img_base64}')
         else:
-            config = types.GenerateContentConfig(**self.params)
+            config = types.GenerateContentConfig(image_config=types.ImageConfig(
+                **self.params
+            ))
             if negative_prompt:
                 config.negative_prompt = negative_prompt
             response = client.models.generate_content(
