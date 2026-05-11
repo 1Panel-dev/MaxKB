@@ -522,6 +522,8 @@ class ApplicationSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get('work_flow_template')
         download_url = work_flow_template.get('downloadUrl')
+        if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+            raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
         app = ApplicationSerializer(
@@ -1142,6 +1144,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get('work_flow_template')
         download_url = work_flow_template.get('downloadUrl')
+        if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+            raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5)
         try:

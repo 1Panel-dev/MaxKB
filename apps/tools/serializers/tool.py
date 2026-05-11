@@ -420,6 +420,8 @@ class ToolSerializer(serializers.Serializer):
             if instance.get('work_flow_template') is not None:
                 template_instance = instance.get('work_flow_template')
                 download_url = template_instance.get('downloadUrl')
+                if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+                    raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
                 tool = ToolSerializer.Import(data={
@@ -1190,6 +1192,8 @@ class ToolSerializer(serializers.Serializer):
 
             versions = instance.get('versions', [])
             download_url = instance.get('download_url')
+            if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+                raise AppApiException(500, _("Illegal download url"))
             # 查找匹配的版本名称
             version_name = next(
                 (version.get('name') for version in versions if version.get('downloadUrl') == download_url),
