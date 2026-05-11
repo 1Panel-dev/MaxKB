@@ -24,17 +24,17 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, ref } from 'vue'
+import {onBeforeMount, ref} from 'vue'
 import UserApi from '@/api/user/user'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import { t } from '@/locales'
-import { MsgSuccess } from '@/utils/message'
-import type { CreateWorkspaceMemberParamsItem, WorkspaceItem } from '@/api/type/workspace'
-import type { FormItemModel } from '@/api/type/role'
-import { RoleTypeEnum } from '@/enums/system'
-import { loadPermissionApi } from '@/utils/dynamics-api/permission-api.ts'
-import { i18n_name } from '@/utils/common'
+import {t} from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import type {CreateWorkspaceMemberParamsItem, WorkspaceItem} from '@/api/type/workspace'
+import type {FormItemModel} from '@/api/type/role'
+import {RoleTypeEnum} from '@/enums/system'
+import {loadPermissionApi} from '@/utils/dynamics-api/permission-api.ts'
+import {i18n_name} from '@/utils/common'
 
 const props = defineProps<{
   currentWorkspace?: WorkspaceItem
@@ -52,10 +52,21 @@ const memberFormContentLoading = ref(false)
 const formItemModel = ref<FormItemModel[]>([])
 const userFormItem = ref<FormItemModel[]>([])
 const roleFormItem = ref<FormItemModel[]>([])
+const userOptions = ref<Array<{ label: string; value: string }>>([])
 
 async function getUserFormItem() {
   try {
-    const res = await UserApi.getUserList(memberFormContentLoading)
+    const fetchUserOptions = async (query?: string) => {
+      const res = await UserApi.getUserList(query ? {nick_name: query} : {}, memberFormContentLoading)
+      return res.data?.map((item) => ({
+        label: item.nick_name,
+        value: item.id,
+      })) || []
+    }
+
+    // 初始加载
+    userOptions.value = await fetchUserOptions()
+
     userFormItem.value = [
       {
         path: 'user_ids',
@@ -67,12 +78,20 @@ async function getUserFormItem() {
           },
         ],
         selectProps: {
-          options:
-            res.data?.map((item) => ({
-              label: item.nick_name,
-              value: item.id,
-            })) || [],
+          options: userOptions.value,
           placeholder: `${t('common.selectPlaceholder')}${t('views.role.member.title')}`,
+          remoteMethod: async (query: string, element: any) => {
+            // 关键：直接更新 selectProps.options
+            const newOptions = await fetchUserOptions(query)
+            // 更新当前项的 options
+            const currentItem = userFormItem.value.find(
+              item => item.path === 'user_ids'
+            )
+            if (currentItem?.selectProps) {
+              currentItem.selectProps.options = newOptions
+            }
+            return newOptions
+          }
         },
       },
     ]
@@ -113,7 +132,7 @@ async function getRoleFormItem() {
 
 function init() {
   formItemModel.value = [...userFormItem.value, ...roleFormItem.value]
-  list.value = [{ user_ids: [], role_ids: [] }]
+  list.value = [{user_ids: [], role_ids: []}]
 }
 
 onBeforeMount(async () => {
@@ -132,6 +151,7 @@ function handleCancel() {
 }
 
 const memberFormContentRef = ref<InstanceType<typeof MemberFormContent>>()
+
 function handleAdd() {
   memberFormContentRef.value?.validate().then(async (valid: any) => {
     if (valid) {
@@ -147,5 +167,5 @@ function handleAdd() {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
