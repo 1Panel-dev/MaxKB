@@ -22,7 +22,7 @@ from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
-from common.utils.common import password_encrypt, get_random_chars
+from common.utils.common import password_encrypt, password_verify, needs_password_upgrade, get_random_chars
 from common.utils.rsa_util import decrypt
 from maxkb.const import CONFIG
 from users.models import User
@@ -65,7 +65,7 @@ def record_login_fail(username: str, expire: int = 600):
 def record_login_fail_lock(username: str, expire: int = 10):
     """
     使用 cache.incr 保证原子递增，并在不存在时初始化计数器并返回当前值。
-    这里的计数器用于判断是否应当进入“锁定”分支，避免依赖非原子 get -> set 的组合。
+    这里的计数器用于判断是否应当进入"锁定"分支，避免依赖非原子 get -> set 的组合。
     """
     if not username:
         return 0
@@ -144,15 +144,17 @@ class LoginSerializer(serializers.Serializer):
             if LoginSerializer._need_captcha(username, max_attempts):
                 LoginSerializer._validate_captcha(username, captcha)
 
-        # 验证用户凭据
-        user = User.objects.filter(
-            username=username,
-            password=password_encrypt(password)
-        ).first()
+        # 验证用户凭据：先按用户名查找，再用 password_verify 验证密码
+        user = User.objects.filter(username=username).first()
 
-        if not user:
+        if not user or not password_verify(password, user.password):
             LoginSerializer._handle_failed_login(username, is_license_valid, failed_attempts, lock_time)
             raise AppApiException(500, _('The username or password is incorrect'))
+
+        # Transparently upgrade legacy MD5 hash to PBKDF2
+        if needs_password_upgrade(user.password):
+            user.password = password_encrypt(password)
+            user.save(update_fields=['password'])
 
         if not user.is_active:
             raise AppApiException(1005, _("The user has been disabled, please contact the administrator!"))
@@ -213,7 +215,7 @@ class LoginSerializer(serializers.Serializer):
         - 使用 record_login_fail / record_login_fail_lock 两个原子 incr 来记录失败；
         - 不再依赖精确等于 0 的比较来触发锁，而是基于原子计数 >= 阈值来决定进入锁定分支；
         - 使用 cache.add 原子创建锁键，cache.add 保证只有第一个成功创建者可写入该键；
-          其他并发到达的请求若发现计数已到达阈值也应当返回“已锁定”响应，避免出现绕过。
+          其他并发到达的请求若发现计数已到达阈值也应当返回"已锁定"响应，避免出现绕过。
         """
         # 记录普通失败计数（供验证码触发使用）
         try:
