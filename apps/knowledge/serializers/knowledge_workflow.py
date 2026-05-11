@@ -295,6 +295,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             if instance.get('work_flow_template') is not None:
                 template_instance = instance.get('work_flow_template')
                 download_url = template_instance.get('downloadUrl')
+                if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+                    raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
                 KnowledgeWorkflowSerializer.Import(data={
@@ -521,6 +523,8 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             if instance.get("work_flow_template"):
                 template_instance = instance.get('work_flow_template')
                 download_url = template_instance.get('downloadUrl')
+                if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+                    raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
                 KnowledgeWorkflowSerializer.Import(data={
