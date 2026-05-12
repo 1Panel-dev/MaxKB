@@ -33,6 +33,8 @@
             @change="getList"
             filterable
             clearable
+            remote
+            :remote-method="getUserList"
             style="width: 220px"
           >
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
@@ -444,10 +446,18 @@ onMounted(() => {
   getWorkspaceList()
   getProvider()
 
-  UserApi.getAllMemberList('').then((res: any) => {
-    user_options.value = res.data
-  })
+  getUserList('')
 })
+
+function getUserList(query: string) {
+  UserApi.getAllMemberList(query ? {nick_name: query} : '')
+    .then((res: any) => {
+      user_options.value = res.data || []
+    })
+    .catch(() => {
+      user_options.value = []
+    })
+}
 </script>
 
 <style lang="scss" scoped></style>
