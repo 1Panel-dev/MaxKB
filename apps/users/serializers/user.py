@@ -7,6 +7,7 @@
     @desc:
 """
 import datetime
+import json
 import os
 import random
 import re
@@ -119,7 +120,8 @@ class UserProfileSerializer(serializers.Serializer):
             'source': user.source,
             'role': auth.role_list,
             'permissions': auth.permission_list,
-            'is_edit_password': password_verify(CONFIG.get('DEFAULT_PASSWORD', 'MaxKB@123..'), user.password) if user.source == 'LOCAL' else False,
+            'is_edit_password': password_verify(CONFIG.get('DEFAULT_PASSWORD', 'MaxKB@123..'),
+                                                user.password) if user.source == 'LOCAL' else False,
             'language': user.language,
             'workspace_list': workspace_list,
             'role_name': role_name
@@ -514,6 +516,16 @@ class UserManageSerializer(serializers.Serializer):
         def re_password(self, instance, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+                encrypted_data = instance.get("encryptedData", "")
+                if encrypted_data:
+                    try:
+                        decrypted_raw = decrypt(encrypted_data)
+                        # decrypt 可能返回非 JSON 字符串，防护解析异常
+                        decrypted_data = json.loads(decrypted_raw) if decrypted_raw else {}
+                        if isinstance(decrypted_data, dict):
+                            instance.update(decrypted_data)
+                    except Exception as e:
+                        raise AppApiException(500, _("Invalid encrypted data"))
                 UserManageSerializer.RePasswordInstance(data=instance).is_valid(raise_exception=True)
             user = User.objects.filter(id=self.data.get('id')).first()
             user.password = password_encrypt(instance.get('password'))
