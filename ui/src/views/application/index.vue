@@ -186,7 +186,8 @@
                     :title="item.name"
                     :description="item.desc"
                     class="cursor"
-                    @click="goApp(item)"
+                    @contextmenu.prevent
+                    @mousedown.stop="goApp($event, item)"
                     :disabled="isBatch"
                   >
                     <template #icon>
@@ -240,7 +241,7 @@
                       </div>
                     </template>
                     <template #mouseEnter>
-                      <div @click.stop>
+                      <div @click.stop @mousedown.stop>
                         <el-tooltip
                           effect="dark"
                           :content="$t('views.application.operation.toChat')"
@@ -564,7 +565,7 @@ function refreshApplicationList(row: any) {
   }
 }
 
-const goApp = (item: any) => {
+const goApp = (event: any, item: any) => {
   if (isBatch.value) {
     const index = multipleSelection.value.indexOf(item?.id)
     if (index === -1) {
@@ -576,7 +577,16 @@ const goApp = (item: any) => {
     return
   }
 
-  router.push({ path: get_route(item) })
+  if (event?.ctrlKey) {
+    event?.preventDefault()
+    event.stopPropagation()
+    const newUrl = router.resolve({
+      path: get_route(item),
+    }).href
+    window.open(newUrl)
+  } else {
+    router.push({ path: get_route(item) })
+  }
 }
 
 const get_route = (item: any) => {
