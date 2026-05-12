@@ -36,8 +36,9 @@
         </div>
       </el-form>
       <el-button size="large" type="primary" class="w-full" @click="resetPassword">{{
-        $t('common.confirm')
-      }}</el-button>
+          $t('common.confirm')
+        }}
+      </el-button>
       <div class="operate-container mt-12">
         <el-button
           size="large"
@@ -54,25 +55,29 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import {ref, onMounted} from 'vue'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
-import type { ResetPasswordRequest } from '@/api/type/user'
-import { useRouter, useRoute } from 'vue-router'
-import { MsgSuccess } from '@/utils/message'
-import type { FormInstance, FormRules } from 'element-plus'
+import type {ResetPasswordRequest} from '@/api/type/user'
+import {useRouter, useRoute} from 'vue-router'
+import {MsgSuccess} from '@/utils/message'
+import type {FormInstance, FormRules} from 'element-plus'
 import UserApi from '@/api/user/user'
-import { t } from '@/locales'
+import {t} from '@/locales'
+import JSEncrypt from "jsencrypt";
+import useStore from "@/stores";
+const {user} = useStore()
 const router = useRouter()
 const route = useRoute()
 const {
-  params: { code, email }
+  params: {code, email}
 } = route
 const resetPasswordForm = ref<ResetPasswordRequest>({
   password: '',
   re_password: '',
   email: '',
-  code: ''
+  code: '',
+  encrypted: false
 })
 
 onMounted(() => {
@@ -127,10 +132,18 @@ const loading = ref<boolean>(false)
 const resetPassword = () => {
   resetPasswordFormRef.value
     ?.validate()
-    .then(() => UserApi.postResetPassword(resetPasswordForm.value, loading))
+    .then(() => {
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+      const js = new (JSEncryptCtor as any)();
+      js.setPublicKey(user.rsaKey);
+      resetPasswordForm.value.password = js.encrypt(resetPasswordForm.value.password);
+      resetPasswordForm.value.re_password = js.encrypt(resetPasswordForm.value.re_password);
+      resetPasswordForm.value.encrypted = true
+      UserApi.postResetPassword(resetPasswordForm.value, loading)
+    })
     .then(() => {
       MsgSuccess(t('common.modifySuccess'))
-      router.push({ name: 'login' })
+      router.push({name: 'login'})
     })
 }
 </script>

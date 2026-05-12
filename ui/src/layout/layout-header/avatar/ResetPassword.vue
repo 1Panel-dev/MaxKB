@@ -47,13 +47,14 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
-import type { FormInstance, FormRules } from 'element-plus'
+import {ref} from 'vue'
+import type {ResetCurrentUserPasswordRequest} from '@/api/type/user'
+import type {FormInstance, FormRules} from 'element-plus'
 import UserApi from '@/api/user/user'
 import useStore from '@/stores'
-import { useRouter } from 'vue-router'
-import { t } from '@/locales'
+import {useRouter} from 'vue-router'
+import {t} from '@/locales'
+import JSEncrypt from "jsencrypt";
 
 const props = defineProps<{
   emitConfirm?: boolean // 在父级调接口
@@ -64,8 +65,7 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
-const { login } = useStore()
-
+const {login, user} = useStore()
 const resetPasswordDialog = ref<boolean>(false)
 
 const resetPasswordForm = ref<ResetCurrentUserPasswordRequest>({
@@ -147,9 +147,15 @@ const resetPassword = () => {
     if (props.emitConfirm) {
       emit('confirm', resetPasswordForm.value)
     } else {
-      return UserApi.resetCurrentPassword(resetPasswordForm.value).then(() => {
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+      const js = new (JSEncryptCtor as any)();
+      js.setPublicKey(user.rsaKey);
+      const jsonData = JSON.stringify(resetPasswordForm.value);
+      const encryptedBase64 = js.encrypt(jsonData);
+
+      return UserApi.resetCurrentPassword({encryptedData: encryptedBase64}).then(() => {
         login.logout()
-        router.push({ name: 'login' })
+        router.push({name: 'login'})
       })
     }
   })
@@ -158,6 +164,6 @@ const close = () => {
   resetPasswordDialog.value = false
 }
 
-defineExpose({ open, close })
+defineExpose({open, close})
 </script>
 <style lang="scss" scope></style>

@@ -16,6 +16,7 @@ from django.core.cache import cache
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
+from django.utils import translation
 from rest_framework import serializers
 import uuid_utils.compat as uuid
 
@@ -31,6 +32,7 @@ from common.utils.rsa_util import decrypt
 from maxkb import settings
 from maxkb.const import CONFIG
 from maxkb.conf import PROJECT_DIR
+from maxkb.const import CONFIG
 from system_manage.models import SystemSetting, SettingType, AuthTargetType, WorkspaceUserResourcePermission
 from users.models import User
 from django.utils.translation import gettext_lazy as _, to_locale
@@ -1149,7 +1151,10 @@ class SwitchLanguageSerializer(serializers.Serializer):
     def switch(self):
         self.is_valid(raise_exception=True)
         language = self.data.get('language')
-        support_language_list = ['zh-CN', 'zh-Hant', 'en-US']
-        if not support_language_list.__contains__(language):
-            raise AppApiException(500, _('language only support:') + ','.join(support_language_list))
+        support_language_list = CONFIG.get_languages()
+        #这个是一个list 完事是对象 key是语言的key value是语言的value  我只需要提取语言的key就行
+        support_keys = [lang[0] for lang in support_language_list]
+        # support_language_list = ['zh-CN', 'zh-Hant', 'en-US'] en_US,ja,zh_CN,zh_Hant
+        if not support_keys.__contains__(language):
+            raise AppApiException(500, _('language only support:') + ','.join(support_keys))
         QuerySet(User).filter(id=self.data.get('user_id')).update(language=language)
