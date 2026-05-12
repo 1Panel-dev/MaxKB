@@ -113,6 +113,7 @@ interface ResetPasswordRequest {
    * 确认密码
    */
   re_password: string
+  encrypted?: boolean
 }
 
 export type {

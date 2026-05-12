@@ -40,16 +40,18 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, reactive, watch } from 'vue'
+import {ref, reactive, watch} from 'vue'
 import useStore from '@/stores'
-import type { FormInstance, FormRules } from 'element-plus'
-import type { ResetPasswordRequest } from '@/api/type/user'
+import type {FormInstance, FormRules} from 'element-plus'
+import type {ResetPasswordRequest} from '@/api/type/user'
 import userManageApi from '@/api/system/user-manage'
-import { MsgSuccess } from '@/utils/message'
-import { t } from '@/locales'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import JSEncrypt from "jsencrypt";
+
 const emit = defineEmits(['refresh'])
 
-const { user } = useStore()
+const {user} = useStore()
 
 const userFormRef = ref()
 const userForm = ref<any>({
@@ -118,7 +120,12 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      userManageApi.putUserManagePassword(userId.value, userForm.value, loading).then((res) => {
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+      const js = new (JSEncryptCtor as any)();
+      js.setPublicKey(user.rsaKey);
+      const jsonData = JSON.stringify(userForm.value);
+      const encryptedBase64 = js.encrypt(jsonData);
+      userManageApi.putUserManagePassword(userId.value, {encryptedData: encryptedBase64}, loading).then((res) => {
         emit('refresh')
         user.profile()
         MsgSuccess(t('views.userManage.tip.updatePwdSuccess'))
@@ -128,6 +135,6 @@ const submit = async (formEl: FormInstance | undefined) => {
   })
 }
 
-defineExpose({ open })
+defineExpose({open})
 </script>
 <style lang="scss" scoped></style>

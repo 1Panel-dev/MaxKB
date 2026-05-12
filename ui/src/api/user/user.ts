@@ -80,15 +80,15 @@ const postResetPassword: (
 
 /**
  * 重置密码
- * @param request 重置密码请求参数
+ * @param data 重置密码请求参数
  * @param loading 接口加载器
  * @returns
  */
 const resetCurrentPassword: (
-  request: ResetPasswordRequest,
+  data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/user/current/reset_password', request, undefined, loading)
+) => Promise<Result<boolean>> = (data, loading) => {
+  return post('/user/current/reset_password', data, undefined, loading)
 }
 
 export default {
