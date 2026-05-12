@@ -24,7 +24,7 @@ class BaseSearchDocumentNode(ISearchDocumentStepNode):
         self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
-        return self.workflow_manage.get_reference_field(fields[0], fields[1:])
+        return self.workflow_manage.get_reference_field(fields[0], fields[1:]) if fields else None
 
     def execute(self, knowledge_id_list: List, search_mode: str, search_scope_type: str, search_scope_source: str,
                 search_scope_reference: List, question_reference: List, search_condition_type: str,
