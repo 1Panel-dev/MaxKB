@@ -186,6 +186,9 @@ class LoopWorkflowManage(WorkflowManage):
         @return: 格式化后的提示词
         """
 
+        if not prompt:
+            return ''
+
         context = {**self.get_workflow_content(), **self.parentWorkflowManage.get_workflow_content()}
         prompt = self.reset_prompt(prompt)
         prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')

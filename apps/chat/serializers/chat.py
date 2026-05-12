@@ -73,9 +73,10 @@ class GeneratePromptSerializers(serializers.Serializer):
 
 class ChatMessageSerializers(serializers.Serializer):
     message = serializers.CharField(required=True, label=_("User Questions"))
-    stream = serializers.BooleanField(required=True,
+    stream = serializers.BooleanField(required=False, default=False,
                                       label=_("Is the answer in streaming mode"))
-    re_chat = serializers.BooleanField(required=True, label=_("Do you want to reply again"))
+    re_chat = serializers.BooleanField(required=False, default=False,
+                                       label=_("Do you want to reply again"))
     chat_record_id = serializers.UUIDField(required=False, allow_null=True,
                                            label=_("Conversation record id"))
 
@@ -336,8 +337,8 @@ class ChatSerializers(serializers.Serializer):
 
     def chat_simple(self, chat_info: ChatInfo, instance, base_to_response):
         message = instance.get('message')
-        re_chat = instance.get('re_chat')
-        stream = instance.get('stream')
+        re_chat = instance.get('re_chat', False)
+        stream = instance.get('stream', False)
         chat_user_id = self.data.get('chat_user_id')
         chat_user_type = self.data.get('chat_user_type')
         ip_address = self.data.get('ip_address')
@@ -391,8 +392,8 @@ class ChatSerializers(serializers.Serializer):
 
     def chat_work_flow(self, chat_info: ChatInfo, instance: dict, base_to_response):
         message = instance.get('message')
-        re_chat = instance.get('re_chat')
-        stream = instance.get('stream')
+        re_chat = instance.get('re_chat', False)
+        stream = instance.get('stream', False)
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get('chat_user_type')
         ip_address = self.data.get('ip_address')
