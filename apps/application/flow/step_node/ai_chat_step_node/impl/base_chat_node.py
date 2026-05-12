@@ -274,11 +274,10 @@ class BaseChatNode(IChatNode):
                     continue
                 executor = ToolExecutor()
                 if tool.init_params is not None:
-                    params = json.loads(rsa_long_decrypt(tool.init_params))
                     tool_init_params = json.loads(rsa_long_decrypt(tool.init_params))
                 else:
-                    params = {}
-                tool_config = executor.get_tool_mcp_config(tool, params)
+                    tool_init_params = {i["field"]: i.get('default_value') for i in tool.init_field_list}
+                tool_config = executor.get_tool_mcp_config(tool, tool_init_params)
 
                 mcp_servers_config[str(tool.id)] = tool_config
 
