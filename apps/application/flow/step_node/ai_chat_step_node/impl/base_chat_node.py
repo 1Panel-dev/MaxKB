@@ -376,7 +376,7 @@ class BaseChatNode(IChatNode):
     def get_reference_content(self, fields: List[str]):
         return str(self.workflow_manage.get_reference_field(
             fields[0],
-            fields[1:]))
+            fields[1:])) if fields else ''
 
     @staticmethod
     def get_history_message(history_chat_record, dialogue_number, dialogue_type, runtime_node_id):
