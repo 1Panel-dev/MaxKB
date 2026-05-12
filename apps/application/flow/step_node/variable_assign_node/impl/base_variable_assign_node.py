@@ -109,7 +109,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
     def get_reference_content(self, fields: List[str]):
         return self.workflow_manage.get_reference_field(
             fields[0],
-            fields[1:])
+            fields[1:]) if fields else None
 
     def get_details(self, index: int, **kwargs):
         return {

@@ -71,7 +71,7 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
-        return self.workflow_manage.get_reference_field(fields[0], fields[1:])
+        return self.workflow_manage.get_reference_field(fields[0], fields[1:]) if fields else None
 
     def execute(self, knowledge_id_list, knowledge_setting, question, show_knowledge, search_scope_type,
                 search_scope_source,

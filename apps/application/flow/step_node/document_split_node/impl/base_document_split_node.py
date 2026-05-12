@@ -42,7 +42,7 @@ class BaseDocumentSplitNode(IDocumentSplitNode):
         self.context['exception_message'] = details.get('err_message')
 
     def get_reference_content(self, fields: List[str]):
-        return self.workflow_manage.get_reference_field(fields[0], fields[1:])
+        return self.workflow_manage.get_reference_field(fields[0], fields[1:]) if fields else None
 
     def execute(self, document_list, knowledge_id, split_strategy, paragraph_title_relate_problem_type,
                 paragraph_title_relate_problem, paragraph_title_relate_problem_reference,
