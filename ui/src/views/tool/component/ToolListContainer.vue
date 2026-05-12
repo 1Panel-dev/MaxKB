@@ -1282,8 +1282,12 @@ onMounted(() => {
   if (apiType.value !== 'workspace') {
     getList()
   }
+  let workspaceId = user.getWorkspaceId()
+  if (isSystemShare.value) {
+    workspaceId = ''
+  }
   loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value})
-    .getAllMemberList(user.getWorkspaceId(), loading)
+    .getAllMemberList(workspaceId, loading)
     .then((res: any) => {
       user_options.value = res.data
     })
