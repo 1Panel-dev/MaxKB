@@ -814,6 +814,7 @@ target_source_node_mapping = {
               'image-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               'parameter-extraction-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               'video-understand-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
+              'reranker-node': lambda n: [n.get('properties').get('node_data').get('model_id')],
               },
     'KNOWLEDGE': {'search-knowledge-node': lambda n: n.get('properties').get('node_data').get('knowledge_id_list'),
                   'search-document-node': lambda n: n.get('properties').get('node_data').get('knowledge_id_list')
