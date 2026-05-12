@@ -170,7 +170,60 @@
             :step-strictly="true"
           />
         </el-form-item>
-
+        <el-form-item
+          :rules="{
+            type: 'array',
+            required: true,
+            message: $t('workflow.nodes.imageUnderstandNode.image.requiredMessage'),
+            trigger: 'change',
+          }"
+        >
+          <div class="flex align-center">
+            <div>
+              <span>{{ $t('workflow.nodes.imageUnderstandNode.image.label') }} </span>
+            </div>
+            <el-tooltip effect="dark" placement="right">
+              <template #content>
+                <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.nodes.imageUnderstandNode.image.requiredMessage')"
+            v-model="chat_data.image_list"
+          />
+        </el-form-item>
+        <el-form-item
+          :rules="{
+            type: 'array',
+            required: false,
+            message: $t('workflow.nodes.videoUnderstandNode.video.requiredMessage'),
+            trigger: 'change',
+          }"
+        >
+          <div class="flex align-center">
+            <div>
+              <span>{{ $t('workflow.nodes.videoUnderstandNode.video.label') }} </span>
+            </div>
+            <el-tooltip effect="dark" placement="right">
+              <template #content>
+                <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+              </template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.nodes.videoUnderstandNode.video.requiredMessage')"
+            v-model="chat_data.video_list"
+          />
+        </el-form-item>
         <div class="mb-8 mt-12 flex-between">
           <span class="mr-4 lighter">
             {{ $t('views.tool.skill.title') }}
@@ -555,6 +608,7 @@ import { resetUrl } from '@/utils/common'
 import { relatedObject } from '@/utils/array.ts'
 import { WorkflowMode } from '@/enums/application'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
+import { fileTooltip } from '@/workflow/common/data.ts'
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
@@ -603,7 +657,6 @@ const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
 {{${t('workflow.nodes.searchKnowledgeNode.label')}.data}}
 ${t('views.problem.title')}：
 {{${t('workflow.nodes.startNode.label')}.question}}`
-
 
 const collapseData = reactive({
   MCP: true,
