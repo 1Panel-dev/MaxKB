@@ -13,5 +13,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/mapping_resource/<str:resource>/<str:resource_id>/<int:current_page>/<int:page_size>', views.MappingResourceView.as_view()),
     path('email_setting', views.SystemSetting.Email.as_view()),
     path('profile', views.SystemProfile.as_view()),
-    path('valid/<str:valid_type>/<int:valid_count>', views.Valid.as_view())
+    path('valid/<str:valid_type>/<int:valid_count>', views.Valid.as_view()),
+    path('display/info', views.DisplayInfo.as_view()),
+    path('display/update', views.DisplayUpdate.as_view()),
 ]

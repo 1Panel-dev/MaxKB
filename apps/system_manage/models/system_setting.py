@@ -20,6 +20,8 @@ class SettingType(models.IntegerChoices):
 
     LOG = 2, "日志清理时间"
 
+    THEME = 3, "外观设置"
+
 
 class SystemSetting(AppModelMixin):
     """
