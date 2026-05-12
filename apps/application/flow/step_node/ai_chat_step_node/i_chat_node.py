@@ -49,6 +49,10 @@ class ChatNodeSerializer(serializers.Serializer):
                                            label=_("Skill IDs"), )
     mcp_output_enable = serializers.BooleanField(required=False, default=True, label=_("Whether to enable MCP output"))
 
+    video_list = serializers.ListField(required=False, label=_("video"))
+
+    image_list = serializers.ListField(required=False, label=_("picture"))
+
 
 class IChatNode(INode):
     type = 'ai-chat-node'
