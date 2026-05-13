@@ -45,12 +45,15 @@ def _get_display_update_details(request):
 class DisplayInfo(APIView):
     """GET /display/info — 公开端点。
 
-    登录页（未认证）也要能拿到 logo / 背景 / 主色，所以不挂任何 authentication_classes。
-    返回的图片字段是 './oss/file/<uuid>' 形式相对路径，由 oss.FileRetrievalView 提供，
-    该端点同样未要求认证，可被未登录前端直接 <img src=> 引用。
+    登录页（未认证）也要能拿到 logo / 背景 / 主色，因此不能设置 authentication_classes 为
+    需要登录的鉴权类。
+    这里**有意省略** authentication_classes/permission_classes，沿用 MaxKB 在
+    REST_FRAMEWORK.DEFAULT_AUTHENTICATION_CLASSES 中配置的 AnonymousAuthentication
+    （与 oss.FileRetrievalView 公开访问模式一致）。
+    若显式写 `authentication_classes = []`，DRF 会回退到默认 AnonymousUser，触发
+    django.contrib.auth.models 导入失败（auth 不在 INSTALLED_APPS）。
+    返回的图片字段是 './oss/file/<uuid>' 形式相对路径，由 oss.FileRetrievalView 提供。
     """
-    authentication_classes = []
-    permission_classes = []
 
     @extend_schema(
         methods=['GET'],
