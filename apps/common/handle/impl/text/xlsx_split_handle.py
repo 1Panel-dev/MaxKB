@@ -15,53 +15,67 @@ from openpyxl import load_workbook
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.handle.impl.common_handle import xlsx_embed_cells_images
+from common.handle.impl.text.excel_kv_common import (
+    make_kv_paragraph,
+    normalize_headers,
+)
 from common.utils.logger import maxkb_logger
 
 splitter = '\n`-----------------------------------`\n'
 
 
-def post_cell(image_dict, cell_value):
-    image = image_dict.get(cell_value, None)
-    if image is not None:
-        return f'![](./oss/file/{image.id})'
-    return cell_value.replace('\n', '<br>').replace('|', '&#124;')
+def _row_values_with_merge(sheet, row_idx: int, merged_ranges) -> list:
+    """读取指定行的单元格值，对合并单元格做左上角值传播。
 
-
-def row_to_md(row, image_dict):
-    return '| ' + ' | '.join(
-        [post_cell(image_dict, str(cell.value if cell.value is not None else '')) if cell is not None else '' for cell
-         in row]) + ' |\n'
+    openpyxl 中合并单元格只有左上角单元有值，其余为 None；
+    这里把这些 None 替换成合并范围左上角的值，便于按行序列化。
+    """
+    row_cells = list(sheet[row_idx])
+    values = []
+    for cell in row_cells:
+        val = cell.value
+        if val is None:
+            for rng in merged_ranges:
+                if cell.coordinate in rng:
+                    val = sheet[rng.min_row][rng.min_col - 1].value
+                    break
+        values.append(val)
+    return values
 
 
 def handle_sheet(file_name, sheet, image_dict, limit: int):
-    rows = sheet.rows
+    """按行 KV 序列化整张 sheet。每一非空行 → 一个 paragraph。
+
+    file_name 实际上是 sheet 内容描述用的"上下文名称"，
+    在外层调用时已根据 sheet 数量决定是用文件名还是 sheet 名作为 context。
+    """
     paragraphs = []
     result = {'name': file_name, 'content': paragraphs}
     try:
-        title_row_list = next(rows)
-        title_md_content = row_to_md(title_row_list, image_dict)
-        title_md_content += '| ' + ' | '.join(
-            ['---' if cell is not None else '' for cell in title_row_list]) + ' |\n'
+        if sheet.max_row is None or sheet.max_row < 1 or sheet.max_column is None or sheet.max_column < 1:
+            return result
+        merged_ranges = list(sheet.merged_cells.ranges)
+        # 第一行作为表头
+        header_values = _row_values_with_merge(sheet, 1, merged_ranges)
+        headers = normalize_headers(header_values)
+        if not headers:
+            return result
+        # 从第 2 行开始作为数据
+        for row_idx in range(2, sheet.max_row + 1):
+            row_values = _row_values_with_merge(sheet, row_idx, merged_ranges)
+            paragraph = make_kv_paragraph(
+                file_name=file_name,
+                sheet_name=sheet.title,
+                row_idx=row_idx,
+                headers=headers,
+                row_values=row_values,
+                image_dict=image_dict,
+                limit=limit,
+            )
+            if paragraph is not None:
+                paragraphs.append(paragraph)
     except Exception as e:
-        return result
-    if len(title_row_list) == 0:
-        return result
-    result_item_content = ''
-    for row in rows:
-        next_md_content = row_to_md(row, image_dict)
-        next_md_content_len = len(next_md_content)
-        result_item_content_len = len(result_item_content)
-        if len(result_item_content) == 0:
-            result_item_content += title_md_content
-            result_item_content += next_md_content
-        else:
-            if result_item_content_len + next_md_content_len < limit:
-                result_item_content += next_md_content
-            else:
-                paragraphs.append({'content': result_item_content, 'title': ''})
-                result_item_content = title_md_content + next_md_content
-    if len(result_item_content) > 0:
-        paragraphs.append({'content': result_item_content, 'title': ''})
+        maxkb_logger.error(f"Error parsing XLSX sheet {sheet.title}: {e}, {traceback.format_exc()}")
     return result
 
 
@@ -113,13 +127,17 @@ class XlsxSplitHandle(BaseSplitHandle):
                 image_dict = {}
             worksheets = workbook.worksheets
             worksheets_size = len(worksheets)
-            return [row for row in
-                    [handle_sheet(file.name,
-                                  sheet,
-                                  image_dict,
-                                  limit) if worksheets_size == 1 and sheet.title == 'Sheet1' else handle_sheet(
-                        sheet.title, sheet, image_dict, limit) for sheet
-                     in worksheets] if row is not None]
+            results = []
+            for sheet in worksheets:
+                # paragraph 内的「文件：xxx」始终用真实文件名，与文档拆分名解耦
+                sheet_result = handle_sheet(file.name, sheet, image_dict, limit)
+                # 多 sheet 工作簿时，仍按 sheet 名拆分为多文档（保留原行为）
+                if worksheets_size == 1 and sheet.title == 'Sheet1':
+                    sheet_result['name'] = file.name
+                else:
+                    sheet_result['name'] = sheet.title
+                results.append(sheet_result)
+            return [r for r in results if r is not None]
         except Exception as e:
             maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'content': []}]

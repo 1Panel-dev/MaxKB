@@ -15,16 +15,11 @@ from typing import List
 from charset_normalizer import detect
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.handle.impl.text.excel_kv_common import (
+    make_kv_paragraph,
+    normalize_headers,
+)
 from common.utils.logger import maxkb_logger
-
-
-def post_cell(cell_value):
-    return cell_value.replace('\n', '<br>').replace('|', '&#124;')
-
-
-def row_to_md(row):
-    return '| ' + ' | '.join(
-        [post_cell(cell) if cell is not None else '' for cell in row]) + ' |\n'
 
 
 class CsvSplitHandle(BaseSplitHandle):
@@ -36,32 +31,27 @@ class CsvSplitHandle(BaseSplitHandle):
         try:
             if type(limit) is str:
                 limit = int(limit)
-            reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=detect(buffer)['encoding']))
+            encoding = (detect(buffer) or {}).get('encoding') or 'utf-8'
+            reader = csv.reader(io.TextIOWrapper(io.BytesIO(buffer), encoding=encoding))
             try:
-                title_row_list = reader.__next__()
-                title_md_content = row_to_md(title_row_list)
-                title_md_content += '| ' + ' | '.join(
-                    ['---' if cell is not None else '' for cell in title_row_list]) + ' |\n'
-            except Exception as e:
+                header_row = next(reader)
+            except StopIteration:
                 return result
-            if len(title_row_list) == 0:
+            headers = normalize_headers(header_row)
+            if not headers:
                 return result
-            result_item_content = ''
-            for row in reader:
-                next_md_content = row_to_md(row)
-                next_md_content_len = len(next_md_content)
-                result_item_content_len = len(result_item_content)
-                if len(result_item_content) == 0:
-                    result_item_content += title_md_content
-                    result_item_content += next_md_content
-                else:
-                    if result_item_content_len + next_md_content_len < limit:
-                        result_item_content += next_md_content
-                    else:
-                        paragraphs.append({'content': result_item_content, 'title': ''})
-                        result_item_content = title_md_content + next_md_content
-            if len(result_item_content) > 0:
-                paragraphs.append({'content': result_item_content, 'title': ''})
+            # CSV 没有 sheet 概念，sheet_name=None
+            for row_idx, row in enumerate(reader, start=2):
+                paragraph = make_kv_paragraph(
+                    file_name=file_name,
+                    sheet_name=None,
+                    row_idx=row_idx,
+                    headers=headers,
+                    row_values=row,
+                    limit=limit,
+                )
+                if paragraph is not None:
+                    paragraphs.append(paragraph)
             return result
         except Exception as e:
             maxkb_logger.error(f"Error processing CSV file {file.name}: {e}, {traceback.format_exc()}")

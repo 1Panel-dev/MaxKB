@@ -6,53 +6,68 @@
     @date：2024/5/21 14:59
     @desc:
 """
+import datetime
 import traceback
 from typing import List
 
 import xlrd
+from xlrd.xldate import xldate_as_datetime
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.handle.impl.text.excel_kv_common import (
+    make_kv_paragraph,
+    normalize_headers,
+)
 from common.utils.logger import maxkb_logger
 
 
-def post_cell(cell_value):
-    return cell_value.replace('\r\n', '<br>').replace('\n', '<br>').replace('|', '&#124;')
+def _convert_xlrd_value(workbook, sheet, row_idx: int, col_idx: int):
+    """xlrd 把日期读作 float，需要根据 cell type 还原成 datetime。
+
+    其他类型直接返回原值（make_kv_paragraph 内的 normalize_value 会兜底）。
+    """
+    try:
+        cell = sheet.cell(row_idx, col_idx)
+    except IndexError:
+        return None
+    ct = cell.ctype
+    if ct == xlrd.XL_CELL_DATE:
+        try:
+            dt = xldate_as_datetime(cell.value, workbook.datemode)
+            return dt
+        except Exception:
+            return cell.value
+    if ct == xlrd.XL_CELL_BOOLEAN:
+        return bool(cell.value)
+    if ct == xlrd.XL_CELL_EMPTY or ct == xlrd.XL_CELL_BLANK:
+        return None
+    return cell.value
 
 
-def row_to_md(row):
-    return '| ' + ' | '.join(
-        [post_cell(str(cell)) if cell is not None else '' for cell in row]) + ' |\n'
-
-
-def handle_sheet(file_name, sheet, limit: int):
-    rows = iter([sheet.row_values(i) for i in range(sheet.nrows)])
+def handle_sheet(file_name, workbook, sheet, limit: int):
     paragraphs = []
     result = {'name': file_name, 'content': paragraphs}
+    if sheet.nrows == 0 or sheet.ncols == 0:
+        return result
     try:
-        title_row_list = next(rows)
-        title_md_content = row_to_md(title_row_list)
-        title_md_content += '| ' + ' | '.join(
-            ['---' if cell is not None else '' for cell in title_row_list]) + ' |\n'
+        header_values = [_convert_xlrd_value(workbook, sheet, 0, c) for c in range(sheet.ncols)]
+        headers = normalize_headers(header_values)
+        if not headers:
+            return result
+        for r in range(1, sheet.nrows):
+            row_values = [_convert_xlrd_value(workbook, sheet, r, c) for c in range(sheet.ncols)]
+            paragraph = make_kv_paragraph(
+                file_name=file_name,
+                sheet_name=sheet.name,
+                row_idx=r + 1,  # 与 xlsx 一致使用 1-based 行号
+                headers=headers,
+                row_values=row_values,
+                limit=limit,
+            )
+            if paragraph is not None:
+                paragraphs.append(paragraph)
     except Exception as e:
-        return result
-    if len(title_row_list) == 0:
-        return result
-    result_item_content = ''
-    for row in rows:
-        next_md_content = row_to_md(row)
-        next_md_content_len = len(next_md_content)
-        result_item_content_len = len(result_item_content)
-        if len(result_item_content) == 0:
-            result_item_content += title_md_content
-            result_item_content += next_md_content
-        else:
-            if result_item_content_len + next_md_content_len < limit:
-                result_item_content += next_md_content
-            else:
-                paragraphs.append({'content': result_item_content, 'title': ''})
-                result_item_content = title_md_content + next_md_content
-    if len(result_item_content) > 0:
-        paragraphs.append({'content': result_item_content, 'title': ''})
+        maxkb_logger.error(f"Error parsing XLS sheet {sheet.name}: {e}, {traceback.format_exc()}")
     return result
 
 
@@ -65,11 +80,16 @@ class XlsSplitHandle(BaseSplitHandle):
             workbook = xlrd.open_workbook(file_contents=buffer)
             worksheets = workbook.sheets()
             worksheets_size = len(worksheets)
-            return [row for row in
-                    [handle_sheet(file.name,
-                                  sheet, limit) if worksheets_size == 1 and sheet.name == 'Sheet1' else handle_sheet(
-                        sheet.name, sheet, limit) for sheet
-                     in worksheets] if row is not None]
+            results = []
+            for sheet in worksheets:
+                # paragraph 内的「文件：xxx」始终用真实文件名（见 xlsx_split_handle 同段说明）
+                sheet_result = handle_sheet(file.name, workbook, sheet, limit)
+                if worksheets_size == 1 and sheet.name == 'Sheet1':
+                    sheet_result['name'] = file.name
+                else:
+                    sheet_result['name'] = sheet.name
+                results.append(sheet_result)
+            return [r for r in results if r is not None]
         except Exception as e:
             maxkb_logger.error(f"Error processing XLS file {file.name}: {e}, {traceback.format_exc()}")
             return [{'name': file.name, 'content': []}]
