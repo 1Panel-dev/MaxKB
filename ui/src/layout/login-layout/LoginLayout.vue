@@ -40,7 +40,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { getThemeImg } from '@/utils/theme'
 import useStore from '@/stores'
 import { useLocalStorage } from '@vueuse/core'
@@ -52,6 +52,16 @@ defineProps({
   },
 })
 const { user, theme } = useStore()
+
+// 登录页未认证状态预加载外观设置，使用户在登录前就能看到自定义品牌
+// （后端 /display/info 在 MaxKB 中为公开端点，免登录可访问）
+onMounted(() => {
+  if (!theme.themeInfo) {
+    theme.theme().catch(() => {
+      // 拉取失败时静默降级到默认主题，登录页仍可正常使用
+    })
+  }
+})
 
 const changeLang = (lang: string) => {
   useLocalStorage(localeConfigKey, getBrowserLang()).value = lang

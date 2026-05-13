@@ -543,10 +543,11 @@ const systemRouter = {
         parentName: 'system',
         sameRoute: 'setting',
         permission: [
+          // CE 版本通过自实现的 /display/* 后端开放外观设置，因此移除版本(EE/PE)限制
           new ComplexPermission(
             [RoleConst.ADMIN],
             [PermissionConst.APPEARANCE_SETTINGS_READ],
-            [EditionConst.IS_EE, EditionConst.IS_PE],
+            [],
             'OR',
           ),
           new ComplexPermission(
@@ -569,10 +570,11 @@ const systemRouter = {
             parentName: 'system',
             sameRoute: 'setting',
             permission: [
+              // 同上：CE 版本也允许进入外观设置页
               new ComplexPermission(
                 [RoleConst.ADMIN],
                 [PermissionConst.APPEARANCE_SETTINGS_READ],
-                [EditionConst.IS_EE, EditionConst.IS_PE],
+                [],
                 'OR',
               ),
             ],
