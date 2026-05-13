@@ -16,4 +16,5 @@ urlpatterns = [
     path('valid/<str:valid_type>/<int:valid_count>', views.Valid.as_view()),
     path('display/info', views.DisplayInfo.as_view()),
     path('display/update', views.DisplayUpdate.as_view()),
+    path('ocr_setting', views.OcrSetting.as_view()),
 ]

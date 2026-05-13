@@ -19,8 +19,14 @@ from pypdf.generic import Destination
 from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_split_handle import BaseSplitHandle
+from common.handle.impl.ocr import OcrConfigError, get_ocr_provider
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel, smart_split_paragraph
+
+# 当 pypdf 从一页抽到的文字短于该阈值时，认为是扫描页，尝试 OCR fallback
+_OCR_PAGE_TEXT_THRESHOLD = 10
+# OCR 时 PDF 页面渲染 DPI；越高越清晰但越慢/越占内存
+_OCR_PAGE_DPI = 200
 
 default_pattern_list = [
     re.compile("(?<=^)# .*|(?<=\\n)# .*"),
@@ -83,7 +89,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     return {"name": file.name, "content": result}
 
                 # 没有目录的pdf
-                content = self.handle_pdf_content(file, pdf_document)
+                content = self.handle_pdf_content(file, pdf_document, pdf_path=temp_file_path)
 
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
@@ -103,7 +109,70 @@ class PdfSplitHandle(BaseSplitHandle):
         return {"name": file.name, "content": split_model.parse(content)}
 
     @staticmethod
-    def handle_pdf_content(file, pdf_document):
+    def _ocr_pdf_page(pdf_path, page_num, ocr_provider):
+        """渲染指定页为 PNG bytes，喂给 OCR provider。
+        失败时抛异常，由上层 catch 并记日志，不阻断整本 PDF 处理。"""
+        import fitz  # pymupdf；在用户启用 OCR 之前不会被 import
+        with fitz.open(pdf_path) as doc:
+            page = doc.load_page(page_num)
+            pix = page.get_pixmap(dpi=_OCR_PAGE_DPI)
+            png_bytes = pix.tobytes('png')
+        return ocr_provider.recognize(png_bytes)
+
+    @staticmethod
+    def _try_ocr_empty_pages(pdf_path, page_lines):
+        """对 page_lines 中空（或几乎空）的页做 OCR fallback。
+        - OCR provider 只在确实有空页时才加载（懒初始化）
+        - OCR 未配置时直接跳过，不影响纯文本 PDF
+        - 单页失败不影响其他页
+        - 渲染依赖 pymupdf（fitz），未安装时记 warning 并跳过
+        """
+        empty_indices = [
+            i for i, lines in enumerate(page_lines)
+            if sum(len(t) for t, _ in lines) < _OCR_PAGE_TEXT_THRESHOLD
+        ]
+        if not empty_indices:
+            return  # 全文本 PDF 走这条快路
+
+        # 懒加载 OCR provider
+        try:
+            from system_manage.serializers.ocr_setting import OcrSettingSerializer
+            ocr_provider = get_ocr_provider(OcrSettingSerializer.one())
+        except OcrConfigError as e:
+            maxkb_logger.info(
+                f"PDF has {len(empty_indices)} scanned page(s) but OCR is not configured; skipping. ({e})"
+            )
+            return
+        except Exception as e:
+            maxkb_logger.error(f"PDF OCR provider init failed: {e}")
+            return
+
+        # 校验 pymupdf 可用
+        try:
+            import fitz  # noqa: F401
+        except ImportError:
+            maxkb_logger.warning(
+                "pymupdf is not installed; cannot OCR scanned PDF pages. "
+                "pip install pymupdf to enable."
+            )
+            return
+
+        for idx in empty_indices:
+            try:
+                ocr_text = PdfSplitHandle._ocr_pdf_page(pdf_path, idx, ocr_provider)
+            except Exception as e:
+                maxkb_logger.error(f"PDF OCR failed on page {idx + 1}: {e}")
+                continue
+            if not ocr_text:
+                continue
+            # OCR 文本无字号；填 0，后续会被归类为正文段落
+            page_lines[idx] = [
+                (line.strip(), 0) for line in ocr_text.split('\n') if line.strip()
+            ]
+            maxkb_logger.info(f"PDF OCR recovered page {idx + 1}: {len(ocr_text)} chars")
+
+    @staticmethod
+    def handle_pdf_content(file, pdf_document, pdf_path=None):
         # 第一步:收集所有字体大小
         font_sizes = []
         page_lines = []
@@ -113,6 +182,10 @@ class PdfSplitHandle(BaseSplitHandle):
             for line_text, font_size in lines:
                 if line_text and font_size > 0:
                     font_sizes.append(font_size)
+
+        # 扫描页 OCR fallback（仅当存在空页且 pdf_path 可用时）
+        if pdf_path:
+            PdfSplitHandle._try_ocr_empty_pages(pdf_path, page_lines)
 
         # 计算正文字体大小(众数)
         if not font_sizes:

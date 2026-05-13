@@ -40,6 +40,7 @@ from common.handle.impl.table.xlsx_parse_table_handle import XlsxParseTableHandl
 from common.handle.impl.text.csv_split_handle import CsvSplitHandle
 from common.handle.impl.text.doc_split_handle import DocSplitHandle
 from common.handle.impl.text.html_split_handle import HTMLSplitHandle
+from common.handle.impl.text.image_ocr_split_handle import ImageOcrSplitHandle
 from common.handle.impl.text.pdf_split_handle import PdfSplitHandle
 from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
@@ -72,6 +73,7 @@ split_handles = [
     XlsxSplitHandle(),
     XlsSplitHandle(),
     CsvSplitHandle(),
+    ImageOcrSplitHandle(),
     ZipSplitHandle(),
     default_split_handle
 ]

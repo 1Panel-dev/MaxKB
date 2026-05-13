@@ -22,6 +22,8 @@ class SettingType(models.IntegerChoices):
 
     THEME = 3, "外观设置"
 
+    OCR = 4, "OCR 设置"
+
 
 class SystemSetting(AppModelMixin):
     """

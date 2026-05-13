@@ -582,6 +582,27 @@ const systemRouter = {
           component: () => import('@/views/system-setting/theme/index.vue'),
         },
         {
+          path: '/system/setting/ocr',
+          name: 'ocr',
+          meta: {
+            title: 'OCR 设置',
+            activeMenu: '/system',
+            parentPath: '/system',
+            parentName: 'system',
+            sameRoute: 'setting',
+            // OCR 设置复用「外观设置」的权限，避免新增权限项需要单独迁移
+            permission: [
+              new ComplexPermission(
+                [RoleConst.ADMIN],
+                [PermissionConst.APPEARANCE_SETTINGS_READ],
+                [],
+                'OR',
+              ),
+            ],
+          },
+          component: () => import('@/views/system-setting/ocr/index.vue'),
+        },
+        {
           path: '/system/authentication',
           name: 'SystemAuthentication',
           meta: {
