@@ -24,9 +24,9 @@
               style="width: 120px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user" />
-              <el-option :label="$t('views.model.modelForm.model_type.label')" value="model_type" />
-              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name" />
+              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('views.model.modelForm.model_type.label')" value="model_type"/>
+              <el-option :label="$t('views.model.modelForm.modeName.label')" value="name"/>
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -42,9 +42,11 @@
               @change="list_model"
               filterable
               clearable
+              remote
+              :remote-method="getUserList"
               style="width: 220px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
             </el-select>
             <el-select
               v-else-if="search_type === 'model_type'"
@@ -54,7 +56,7 @@
               style="width: 220px"
             >
               <template v-for="item in modelTypeList" :key="item.value">
-                <el-option :label="item.text" :value="item.value" />
+                <el-option :label="item.text" :value="item.value"/>
               </template>
             </el-select>
           </div>
@@ -95,7 +97,7 @@
             </el-col>
           </template>
         </el-row>
-        <el-empty :description="$t('common.noData')" v-else />
+        <el-empty :description="$t('common.noData')" v-else/>
       </div>
     </ContentContainer>
 
@@ -115,21 +117,21 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref, computed } from 'vue'
-import type { Provider, Model } from '@/api/type/model'
+import {onMounted, ref, computed} from 'vue'
+import type {Provider, Model} from '@/api/type/model'
 import ModelCard from '@/views/model/component/ModelCard.vue'
 import ProviderComponent from '@/views/model/component/Provider.vue'
-import { splitArray } from '@/utils/array'
-import { modelTypeList, allObj } from '@/views/model/component/data'
+import {splitArray} from '@/utils/array'
+import {modelTypeList, allObj} from '@/views/model/component/data'
 import CreateModelDialog from '@/views/model/component/CreateModelDialog.vue'
 import SelectProviderDialog from '@/views/model/component/SelectProviderDialog.vue'
-import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
-import { useRoute } from 'vue-router'
+import {useRoute} from 'vue-router'
 import permissionMap from '@/permission'
 
 const route = useRoute()
-const { model, user } = useStore()
+const {model, user} = useStore()
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -199,26 +201,33 @@ const openCreateModel = (provider?: Provider, model_type?: string) => {
   }
 }
 
-const list_model = () => {
-  const params = active_provider.value?.provider && active_provider.value?.provider !=='share' ? { provider: active_provider.value.provider } : {}
-  loadSharedApi({ type: 'model', isShared: isShared.value, systemType: apiType.value })
-    .getModelList({ ...model_search_form.value, ...params }, list_model_loading)
-    .then((ok: any) => {
-      model_list.value = ok.data
-    })
+
+function getUserList(query: string) {
   let workspaceId = user.getWorkspaceId()
   if (isSystemShare.value) {
     workspaceId = ''
   }
-  loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
-    .getAllMemberList(workspaceId, loading)
+  const actualWorkspaceId = workspaceId || (query ? {nick_name: query} : '')
+  const actualQuery = workspaceId ? (query ? {nick_name: query} : '') : undefined
+
+  loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value})
+    .getAllMemberList(actualWorkspaceId, actualQuery, loading)
     .then((res: any) => {
       user_options.value = res.data
     })
 }
 
+const list_model = () => {
+  const params = active_provider.value?.provider && active_provider.value?.provider !== 'share' ? {provider: active_provider.value.provider} : {}
+  loadSharedApi({type: 'model', isShared: isShared.value, systemType: apiType.value})
+    .getModelList({...model_search_form.value, ...params}, list_model_loading)
+    .then((ok: any) => {
+      model_list.value = ok.data
+    })
+}
+
 const search_type_change = () => {
-  model_search_form.value = { name: '', create_user: '', model_type: '' }
+  model_search_form.value = {name: '', create_user: '', model_type: ''}
 }
 
 onMounted(() => {

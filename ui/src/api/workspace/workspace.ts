@@ -1,12 +1,12 @@
-import { Result } from '@/request/Result'
-import type { Ref } from 'vue'
-import { get, post, del } from '@/request/index'
+import {Result} from '@/request/Result'
+import type {Ref} from 'vue'
+import {get, post, del} from '@/request/index'
 import type {
   WorkspaceItem,
   CreateWorkspaceMemberParamsItem,
   WorkspaceMemberItem,
 } from '@/api/type/workspace'
-import type { pageRequest, PageList } from '@/api/type/common'
+import type {pageRequest, PageList} from '@/api/type/common'
 
 const prefix = '/workspace'
 
@@ -58,9 +58,10 @@ const getWorkspaceMemberList: (
  */
 const getAllMemberList: (
   workspace_id: string | null,
+  param: any,
   loading?: Ref<boolean>,
-) => Promise<Result<any[]>> = (workspace_id, loading) => {
-  return get(`${prefix}/${workspace_id}/user_list`, undefined, loading)
+) => Promise<Result<any[]>> = (workspace_id, param, loading) => {
+  return get(`${prefix}/${workspace_id}/user_list`, param, loading)
 }
 
 /**

@@ -29,6 +29,8 @@
             @change="searchHandle"
             filterable
             clearable
+            remote
+            :remote-method="getUserList"
             style="width: 190px"
           >
             <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
@@ -1278,19 +1280,25 @@ function searchHandle() {
   getList()
 }
 
-onMounted(() => {
-  if (apiType.value !== 'workspace') {
-    getList()
-  }
+function getUserList(query: string) {
   let workspaceId = user.getWorkspaceId()
   if (isSystemShare.value) {
     workspaceId = ''
   }
+  const actualWorkspaceId = workspaceId || (query ? {nick_name: query} : '')
+  const actualQuery = workspaceId ? (query ? {nick_name: query} : '') : undefined
+
   loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value})
-    .getAllMemberList(workspaceId, loading)
+    .getAllMemberList(actualWorkspaceId, actualQuery, loading)
     .then((res: any) => {
       user_options.value = res.data
     })
+}
+
+onMounted(() => {
+  if (apiType.value !== 'workspace') {
+    getList()
+  }
   getStoreToolList()
 })
 </script>
