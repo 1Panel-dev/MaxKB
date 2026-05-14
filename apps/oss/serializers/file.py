@@ -176,14 +176,22 @@ class SafeHTTPAdapter(HTTPAdapter):
     """
 
     def send(self, request, **kwargs):
-        # 解析 URL 获取主机名
-        parsed_url = urlparse(request.url)
-        host = parsed_url.hostname
+        parsed = urlparse(request.url)
+        host = parsed.hostname
+        port = parsed.port or (443 if parsed.scheme == 'https' else 80)
 
-        if host:
-            # 验证目标 IP 是否安全
-            self._validate_host_ip(host)
+        # Resolve ONCE
+        addr_infos = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+        validated_ip = None
+        for info in addr_infos:
+            ip = info[4][0]
+            if self._is_unsafe_ip(ip):
+                raise ValueError(f"Blocked: {ip}")
+            validated_ip = ip
 
+        # PIN: replace hostname with validated IP in the URL
+        request.url = request.url.replace(f"//{host}", f"//{validated_ip}", 1)
+        request.headers['Host'] = host  # Preserve Host header for virtual hosting
         return super().send(request, **kwargs)
 
     def _validate_host_ip(self, host: str):
