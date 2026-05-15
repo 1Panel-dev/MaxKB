@@ -45,6 +45,11 @@ const workspaceShare = {
   problem_edit: () => false,
   chat_user_edit: () => false,
 
+  termbase_read: () => false,
+  termbase_create: () => false,
+  termbase_delete: () => false,
+  termbase_edit: () => false,
+
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

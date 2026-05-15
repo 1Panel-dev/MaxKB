@@ -20,7 +20,7 @@ from common.db.search import generate_sql_by_query_dict
 from common.db.sql_execute import select_list
 from common.utils.common import get_file_content
 from common.utils.ts_vecto_util import to_ts_vector, to_query
-from knowledge.models import Embedding, SearchMode, SourceType
+from knowledge.models import Embedding, SearchMode, SourceType, Termbase
 from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
 from maxkb.conf import PROJECT_DIR
 
@@ -48,6 +48,9 @@ class PGVector(BaseVectorStore):
               embedding: Embeddings):
         text = normalize_for_embedding(text)
         text_embedding = [float(x) for x in embedding.embed_query(text)]
+        terms = list(QuerySet(Termbase).filter(
+            knowledge_id=knowledge_id,
+        ).values_list('content', flat=True))
         embedding = Embedding(
             id=uuid.uuid7(),
             knowledge_id=knowledge_id,
@@ -57,7 +60,7 @@ class PGVector(BaseVectorStore):
             source_id=source_id,
             embedding=text_embedding,
             source_type=source_type,
-            search_vector=to_ts_vector(text)
+            search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms)))
         )
         embedding.save()
         return True
@@ -75,7 +78,14 @@ class PGVector(BaseVectorStore):
                 source_id=text_list[index].get('source_id'),
                 source_type=text_list[index].get('source_type'),
                 embedding=[float(x) for x in embeddings[index]],
-                search_vector=SearchVector(Value(to_ts_vector(text_list[index]['text'])))
+                search_vector=SearchVector(Value(to_ts_vector(
+                    texts[index],
+                    user_words=list(
+                        QuerySet(Termbase).filter(
+                            knowledge_id=text_list[index]['knowledge_id']
+                        ).values_list('content', flat=True)
+                    )
+                )))
             ) for index in range(0, len(texts))]
         if not is_the_task_interrupted():
             QuerySet(Embedding).bulk_create(embedding_list) if len(embedding_list) > 0 else None
@@ -96,7 +106,8 @@ class PGVector(BaseVectorStore):
         query_set = query_set.exclude(**exclude_dict)
         for search_handle in search_handle_list:
             if search_handle.support(search_mode):
-                return search_handle.handle(query_set, query_text, embedding_query, top_number, similarity, search_mode)
+                return search_handle.handle(query_set, query_text, embedding_query, top_number, similarity, search_mode,
+                                            knowledge_id_list)
 
     def query(self, query_text: str, query_embedding: List[float], knowledge_id_list: list[str],
               document_id_list: list[str],
@@ -116,7 +127,8 @@ class PGVector(BaseVectorStore):
         query_set = query_set.exclude(**exclude_dict)
         for search_handle in search_handle_list:
             if search_handle.support(search_mode):
-                return search_handle.handle(query_set, query_text, query_embedding, top_n, similarity, search_mode)
+                return search_handle.handle(query_set, query_text, query_embedding, top_n, similarity, search_mode,
+                                            knowledge_id_list)
 
     def update_by_source_id(self, source_id: str, instance: Dict):
         QuerySet(Embedding).filter(source_id=source_id).update(**instance)
@@ -160,7 +172,7 @@ class ISearch(ABC):
 
     @abstractmethod
     def handle(self, query_set, query_text, query_embedding, top_number: int,
-               similarity: float, search_mode: SearchMode):
+               similarity: float, search_mode: SearchMode, knowledge_id_list: list[str] = None):
         pass
 
 
@@ -171,7 +183,8 @@ class EmbeddingSearch(ISearch):
                query_embedding,
                top_number: int,
                similarity: float,
-               search_mode: SearchMode):
+               search_mode: SearchMode,
+               knowledge_id_list: list[str] = None):
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
@@ -197,14 +210,18 @@ class KeywordsSearch(ISearch):
                query_embedding,
                top_number: int,
                similarity: float,
-               search_mode: SearchMode):
+               search_mode: SearchMode,
+               knowledge_id_list: list[str] = None):
         exec_sql, exec_params = generate_sql_by_query_dict({'keywords_query': query_set},
                                                            select_string=get_file_content(
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'keywords_search.sql')),
                                                            with_table_name=True)
+        terms = list(QuerySet(Termbase).filter(
+            knowledge_id__in=knowledge_id_list
+        ).values_list('content', flat=True)) if knowledge_id_list else None
         embedding_model = select_list(exec_sql, [
-            to_query(query_text),
+            to_query(query_text, user_words=terms),
             *exec_params,
             similarity,
             top_number
@@ -222,16 +239,20 @@ class BlendSearch(ISearch):
                query_embedding,
                top_number: int,
                similarity: float,
-               search_mode: SearchMode):
+               search_mode: SearchMode,
+               knowledge_id_list: list[str] = None):
         exec_sql, exec_params = generate_sql_by_query_dict({'embedding_query': query_set},
                                                            select_string=get_file_content(
                                                                os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql',
                                                                             'blend_search.sql')),
                                                            with_table_name=True)
+        terms = list(QuerySet(Termbase).filter(
+            knowledge_id__in=knowledge_id_list
+        ).values_list('content', flat=True)) if knowledge_id_list else None
         embedding_model = select_list(exec_sql, [
             len(query_embedding),
             json.dumps(query_embedding),
-            to_query(query_text),
+            to_query(query_text, user_words=terms),
             *exec_params, similarity,
             top_number
         ])

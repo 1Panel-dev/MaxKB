@@ -7,11 +7,11 @@
     @desc:
 """
 import re
-import uuid_utils.compat as uuid
 from typing import List
 
 import jieba
 import jieba.posseg
+import uuid_utils.compat as uuid
 
 jieba_word_list_cache = [chr(item) for item in range(38, 84)]
 
@@ -76,13 +76,27 @@ def get_key_by_word_dict(key, word_dict):
     return v
 
 
-def to_ts_vector(text: str):
+def _build_tokenizer(user_words: List[str] = None, user_dict_path: str = None):
+    """创建每次调用隔离的分词器实例"""
+    tokenizer = jieba.Tokenizer()
+    if user_dict_path:
+        tokenizer.load_userdict(user_dict_path)
+    if user_words:
+        for word in user_words:
+            if word:
+                tokenizer.add_word(word)
+    return tokenizer
+
+
+def to_ts_vector(text: str, user_words: List[str] = None, user_dict_path: str = None):
     # 分词
-    result = jieba.lcut(text, cut_all=True)
+    tokenizer = _build_tokenizer(user_words, user_dict_path) if (user_words or user_dict_path) else jieba
+    result = tokenizer.lcut(text, cut_all=True)
     return " ".join(result)
 
 
-def to_query(text: str):
-    extract_tags = jieba.lcut(text, cut_all=True)
+def to_query(text: str, user_words: List[str] = None, user_dict_path: str = None):
+    tokenizer = _build_tokenizer(user_words, user_dict_path) if (user_words or user_dict_path) else jieba
+    extract_tags = tokenizer.lcut(text, cut_all=True)
     result = " ".join(extract_tags)
     return result

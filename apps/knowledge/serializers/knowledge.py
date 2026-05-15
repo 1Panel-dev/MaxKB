@@ -36,9 +36,25 @@ from common.utils.common import post, get_file_content, parse_image, bulk_create
 from common.utils.fork import Fork, ChildLink
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
-from knowledge.models import Knowledge, KnowledgeScope, KnowledgeType, Document, Paragraph, Problem, \
-    ProblemParagraphMapping, TaskType, State, SearchMode, KnowledgeFolder, File, Tag, DocumentTag, KnowledgeWorkflow, \
-    FileSourceType
+from knowledge.models import (
+    Knowledge,
+    KnowledgeScope,
+    KnowledgeType,
+    Document,
+    Paragraph,
+    Problem,
+    ProblemParagraphMapping,
+    TaskType,
+    State,
+    SearchMode,
+    KnowledgeFolder,
+    File,
+    Tag,
+    DocumentTag,
+    KnowledgeWorkflow,
+    FileSourceType,
+    Termbase,
+)
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer, ProblemParagraphObject
 from knowledge.serializers.common import ProblemParagraphManage, drop_knowledge_index, \
     get_embedding_model_id_by_knowledge_id, MetaSerializer, \
@@ -527,6 +543,15 @@ class KnowledgeSerializer(serializers.Serializer):
 
             # doc_id -> document_obj
             doc_obj_map = {doc.id: doc for doc in document_list}
+            
+            # termbase
+            terms = list(
+                QuerySet(Termbase)
+                .filter(
+                    knowledge_id=knowledge_id,
+                )
+                .values_list("content", flat=True)
+            )
 
             # paragraph_id -> is_active
             paragraph_active_map = {}
@@ -558,7 +583,8 @@ class KnowledgeSerializer(serializers.Serializer):
                     'meta': {} if knowledge.type == KnowledgeType.LARK else (knowledge.meta if knowledge.meta else {}),
                     'file_size_limit': knowledge.file_size_limit,
                     'file_count_limit': knowledge.file_count_limit,
-                    'tags': [{'key': t['key'], 'value': t['value']} for t in tag_list]
+                    'tags': [{'key': t['key'], 'value': t['value']} for t in tag_list],
+                    'termbase': terms 
                 }
 
                 with open(os.path.join(tempdir, 'knowledge.json'), 'w', encoding='utf-8') as f:
@@ -866,6 +892,14 @@ class KnowledgeSerializer(serializers.Serializer):
                                 tag_id=tag_key_value_to_model[tag_str].id
                             ))
                 QuerySet(DocumentTag).bulk_create(document_tag_model_list) if len(document_tag_model_list) > 0 else None
+
+            # Termbase
+            terms = knowledge_data.get("termbase", [])
+            if terms:
+                termbase_instance_list = [
+                    Termbase(id=uuid.uuid7(), knowledge_id=knowledge_id, content=content) for content in terms
+                ]
+                QuerySet(Termbase).bulk_create(termbase_instance_list) if len(termbase_instance_list) > 0 else None
 
                 # 工作流导入
             if 'workflow.kbwf' in namelist:

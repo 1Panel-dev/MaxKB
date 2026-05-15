@@ -761,6 +761,7 @@ class DocumentSerializers(serializers.Serializer):
             except AlreadyQueued as e:
                 raise AppApiException(500, _('The task is being executed, please do not send it repeatedly.'))
 
+
         @staticmethod
         def get_workbook(data_dict, document_dict):
             # 创建工作簿对象
@@ -1333,6 +1334,20 @@ class DocumentSerializers(serializers.Serializer):
                 try:
                     DocumentSerializers.Operate(
                         data={'knowledge_id': knowledge_id, 'document_id': document_id}).refresh(state_list)
+                except AlreadyQueued as e:
+                    pass
+
+        def batch_tokenize(self, instance: Dict, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id_list = instance.get("id_list")
+            state_list = instance.get("state_list")
+            knowledge_id = self.data.get('knowledge_id')
+            for document_id in document_id_list:
+                try:
+                    DocumentSerializers.Operate(
+                        data={'knowledge_id': knowledge_id, 'document_id': document_id}
+                    ).tokenize(state_list)
                 except AlreadyQueued as e:
                     pass
 

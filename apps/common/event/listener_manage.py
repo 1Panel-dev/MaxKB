@@ -6,7 +6,6 @@
     @date：2023/10/20 14:01
     @desc:
 """
-import datetime
 import os
 import threading
 import traceback
@@ -15,8 +14,8 @@ from typing import List
 import django.db.models
 from django.db.models import QuerySet
 from django.db.models.functions import Substr, Reverse
-from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from langchain_core.embeddings import Embeddings
 
 from common.config.embedding_config import VectorStore
@@ -132,11 +131,15 @@ class ListenerManagement:
         ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.STARTED)
         try:
             data_list = native_search(
-                {'problem': QuerySet(get_dynamics_model({'paragraph.id': django.db.models.CharField()})).filter(
-                    **{'paragraph.id': paragraph_id}),
+                {
+                    'problem': QuerySet(
+                        get_dynamics_model({'paragraph.id': django.db.models.CharField()})
+                    ).filter(**{'paragraph.id': paragraph_id}),
                     'paragraph': QuerySet(Paragraph).filter(id=paragraph_id)},
                 select_string=get_file_content(
-                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')))
+                    os.path.join(PROJECT_DIR, "apps", "common", 'sql', 'list_embedding_text.sql')
+                )
+            )
             # 删除段落
             VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
 
@@ -149,8 +152,9 @@ class ListenerManagement:
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_the_task_interrupted)
             # 更新到开始状态
-            ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING,
-                                             State.SUCCESS)
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.SUCCESS
+            )
         except Exception as e:
             maxkb_logger.error(_('Vectorized paragraph: {paragraph_id} error {error} {traceback}').format(
                 paragraph_id=paragraph_id, error=str(e), traceback=traceback.format_exc()))
@@ -280,17 +284,23 @@ class ListenerManagement:
                                              State.STARTED)
 
             # 根据段落进行向量化处理
-            page_desc(QuerySet(Paragraph)
-                      .annotate(
-                reversed_status=Reverse('status'),
-                task_type_status=Substr('reversed_status', TaskType.EMBEDDING.value,
-                                        1),
-            ).filter(task_type_status__in=state_list, document_id=document_id)
-                      .values('id'), 5,
-                      ListenerManagement.get_embedding_paragraph_apply(embedding_model, is_the_task_interrupted,
-                                                                       ListenerManagement.get_aggregation_document_status(
-                                                                           document_id)),
-                      is_the_task_interrupted)
+            page_desc(
+                QuerySet(
+                    Paragraph
+                ).annotate(
+                    reversed_status=Reverse('status'),
+                    task_type_status=Substr('reversed_status', TaskType.EMBEDDING.value, 1),
+                ).filter(
+                    task_type_status__in=state_list, document_id=document_id
+                ).values('id'),
+                5,
+                ListenerManagement.get_embedding_paragraph_apply(
+                    embedding_model,
+                    is_the_task_interrupted,
+                    ListenerManagement.get_aggregation_document_status(document_id)
+                ),
+                is_the_task_interrupted
+            )
             # 检查是否存在索引
             create_knowledge_index(document_id=document_id)
         except Exception as e:

@@ -270,6 +270,17 @@ class ProblemParagraphMapping(AppModelMixin):
     class Meta:
         db_table = "problem_paragraph_mapping"
 
+class Termbase(AppModelMixin):
+    """
+    术语表
+    """
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, db_constraint=False)
+    content = models.CharField(max_length=256, verbose_name="术语内容", db_index=True)
+
+    class Meta:
+        db_table = "termbase"
+
 
 class SourceType(models.IntegerChoices):
     """订单类型"""

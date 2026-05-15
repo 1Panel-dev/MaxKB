@@ -62,6 +62,14 @@ const share = {
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_DELETE], 'OR'),
   problem_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_EDIT], 'OR'),
+  termbase_create: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_CREATE], 'OR'),
+  termbase_read: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TERMBASE_READ], 'OR'),
+  termbase_delete: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TERMBASE_DELETE], 'OR'),
+  termbase_edit: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TERMBASE_EDIT], 'OR'),
   tag_read: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TAG_READ], 'OR'),
   tag_create: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TAG_CREATE], 'OR'),

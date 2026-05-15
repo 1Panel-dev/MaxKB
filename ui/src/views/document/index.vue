@@ -51,6 +51,12 @@
                   >{{ $t('views.knowledge.setting.vectorization') }}
                 </el-button>
                 <el-button
+                  @click="batchTokenize"
+                  :disabled="multipleSelection.length === 0"
+                  v-if="permissionPrecise.doc_vector(id)"
+                  >{{ $t('分词索引') }}
+                </el-button>
+                <el-button
                   @click="openGenerateDialog()"
                   :disabled="multipleSelection.length === 0"
                   v-if="permissionPrecise.doc_generate(id)"
@@ -1275,6 +1281,16 @@ function batchRefresh() {
       })
   }
   embeddingContentDialogRef.value?.open(embeddingBatchDocument)
+}
+
+function batchTokenize() {
+  const arr: string[] = multipleSelection.value.map((v) => v.id)
+  const stateList = ['0', '1', '2', '3', '4', '5', 'n']
+  loadSharedApi({type: 'document', systemType: apiType.value})
+    .putBatchRefresh(id, arr, stateList, loading)
+    .then(() => {
+      multipleTableRef.value?.clearSelection()
+    })
 }
 
 function downloadDocument(row: any) {

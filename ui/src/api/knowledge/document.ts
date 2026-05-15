@@ -408,6 +408,7 @@ const putBatchRefresh: (
   )
 }
 
+
 /**
  * 批量同步文档
  * @param 参数 knowledge_id,
