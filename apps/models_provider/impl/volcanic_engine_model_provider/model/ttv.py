@@ -58,10 +58,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 prompt += f" --{param_map[key]} {value}"
         return prompt
 
-    def _poll_task(self, client: Ark, task_id: str, max_wait: int = 60, interval: int = 5):
-        """轮询任务状态，直到完成或超时"""
-        elapsed = 0
-        while elapsed < max_wait:
+    def _poll_task(self, client: Ark, task_id: str, interval: int = 30):
+        """轮询任务状态，直到完成"""
+        while True:
             result = client.content_generation.tasks.get(task_id=task_id)
             status = getattr(result, "status", None)
             maxkb_logger.info(f"[ArkVideo] Task {task_id} status={status}")
@@ -70,13 +69,10 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 return result
 
             time.sleep(interval)
-            elapsed += interval
-        maxkb_logger.warning(f"[ArkVideo] Task {task_id} wait timeout")
-        return None
 
     # --- 通用异步生成函数 ---
     def generate_video(self, prompt, negative_prompt=None, first_frame_url=None, last_frame_url=None, **kwargs):
-        client = Ark(api_key=self.api_key,base_url=self.base_url)
+        client = Ark(api_key=self.api_key, base_url=self.base_url)
         # 根据params设置其他参数 豆包的参数和别的不一样  需要拼接在text里
         # --rt 16:9 --dur 5 --fps 24 --rs 720p --wm true --cf false
         prompt = self._build_prompt(prompt)
