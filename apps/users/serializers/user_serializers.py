@@ -78,7 +78,7 @@ class SystemSerializer(ApiMixin, serializers.Serializer):
         return {'version': version, 'IS_XPACK': hasattr(settings, 'IS_XPACK'),
                 'XPACK_LICENSE_IS_VALID': False if xpack_cache is None else xpack_cache.get('XPACK_LICENSE_IS_VALID',
                                                                                             False),
-                'ras': get_key_pair_by_sql().get('key')}
+                'rsa': get_key_pair_by_sql().get('key')}
 
     @staticmethod
     def get_response_body_api():

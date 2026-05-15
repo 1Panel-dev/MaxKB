@@ -18,7 +18,7 @@ export interface userStateTypes {
   XPACK_LICENSE_IS_VALID: false
   isXPack: false
   themeInfo: any
-  rasKey: string
+  rsaKey: string
 }
 
 const useUserStore = defineStore({
@@ -32,7 +32,7 @@ const useUserStore = defineStore({
     XPACK_LICENSE_IS_VALID: false,
     isXPack: false,
     themeInfo: null,
-    rasKey: ''
+    rsaKey: ''
   }),
   actions: {
     getLanguage() {
@@ -103,7 +103,7 @@ const useUserStore = defineStore({
             this.version = ok.data?.version || '-'
             this.isXPack = ok.data?.IS_XPACK
             this.XPACK_LICENSE_IS_VALID = ok.data?.XPACK_LICENSE_IS_VALID
-            this.rasKey = ok.data?.ras || ''
+            this.rsaKey = ok.data?.rsa || ''
 
             if (this.isEnterprise()) {
               await this.theme()
