@@ -80,7 +80,12 @@
     </el-table-column>
   </el-table>
 
-  <UserFieldFormDialog ref="UserFieldFormDialogRef" @refresh="refreshFieldList" />
+  <UserFieldFormDialog
+    ref="UserFieldFormDialogRef"
+    @refresh="refreshFieldList"
+    :nodeModel="props.nodeModel"
+    :currentNodeFields="props.nodeModel.properties.user_input_field_list"
+  />
   <UserInputTitleDialog ref="UserInputTitleDialogRef" @refresh="refreshFieldTitle" />
 </template>
 

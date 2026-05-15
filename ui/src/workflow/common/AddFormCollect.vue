@@ -13,11 +13,16 @@
       label-position="top"
       require-asterisk-position="right"
       ref="dynamicsFormConstructorRef"
+      :nodeModel="nodeModel"
+      :currentNodeFields="currentNodeFields"
+      :currentEditingIndex="currentNodeFields?.length ?? 0"
     ></DynamicsFormConstructor>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click.prevent="dialogVisible = false"> {{$t('common.cancel')}} </el-button>
-        <el-button type="primary" @click="submit()" :loading="loading"> {{$t('common.add')}} </el-button>
+        <el-button @click.prevent="dialogVisible = false"> {{ $t('common.cancel') }} </el-button>
+        <el-button type="primary" @click="submit()" :loading="loading">
+          {{ $t('common.add') }}
+        </el-button>
       </span>
     </template>
   </el-dialog>
@@ -27,8 +32,13 @@ import { ref } from 'vue'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
 import { t } from '@/locales'
 const props = withDefaults(
-  defineProps<{ title?: string; addFormField: (form_data: any) => void }>(),
-  { title: t('common.param.addParam') }
+  defineProps<{
+    title?: string
+    addFormField: (form_data: any) => void
+    nodeModel?: any
+    currentNodeFields?: Array<any>
+  }>(),
+  { title: t('common.param.addParam') },
 )
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()

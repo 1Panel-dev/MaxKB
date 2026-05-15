@@ -14,6 +14,9 @@
       label-position="top"
       require-asterisk-position="right"
       :input_type_list="inputTypeList"
+      :nodeModel="nodeModel"
+      :currentNodeFields="currentNodeFields"
+      :currentEditingIndex="isEdit ? (currentIndex ?? undefined) : (currentNodeFields?.length ?? 0)"
       ref="DynamicsFormConstructorRef"
     ></DynamicsFormConstructor>
     <template #footer>
@@ -34,6 +37,11 @@ import type { FormField } from '@/components/dynamics-form/type'
 import _ from 'lodash'
 import { t } from '@/locales'
 const emit = defineEmits(['refresh'])
+
+const props = defineProps<{
+  nodeModel?: any
+  currentNodeFields?: Array<any>
+}>()
 
 const DynamicsFormConstructorRef = ref()
 const loading = ref<boolean>(false)
