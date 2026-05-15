@@ -133,8 +133,18 @@
         </el-form-item>
       </el-form>
     </el-card>
-    <AddFormCollect ref="addFormCollectRef" :addFormField="addFormField"></AddFormCollect>
-    <EditFormCollect ref="editFormCollectRef" :editFormField="editFormField"></EditFormCollect>
+    <AddFormCollect
+      ref="addFormCollectRef"
+      :addFormField="addFormField"
+      :nodeModel="nodeModel"
+      :currentNodeFields="form_data.form_field_list"
+    ></AddFormCollect>
+    <EditFormCollect
+      ref="editFormCollectRef"
+      :editFormField="editFormField"
+      :nodeModel="nodeModel"
+      :currentNodeFields="form_data.form_field_list"
+    />
   </NodeContainer>
 </template>
 <script setup lang="ts">

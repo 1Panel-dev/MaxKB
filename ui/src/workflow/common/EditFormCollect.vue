@@ -13,6 +13,9 @@
       label-position="top"
       require-asterisk-position="right"
       ref="dynamicsFormConstructorRef"
+      :nodeModel="nodeModel"
+      :currentNodeFields="currentNodeFields"
+      :currentEditingIndex="currentIndex"
     ></DynamicsFormConstructor>
     <template #footer>
       <span class="dialog-footer">
@@ -29,8 +32,13 @@ import { ref } from 'vue'
 import DynamicsFormConstructor from '@/components/dynamics-form/constructor/index.vue'
 import { t } from '@/locales'
 const props = withDefaults(
-  defineProps<{ title?: string; editFormField: (form_data: any, index: number) => void }>(),
-  { title: t('common.param.editParam') }
+  defineProps<{
+    title?: string
+    nodeModel?: any
+    currentNodeFields?: Array<any>
+    editFormField: (form_data: any, index: number) => void
+  }>(),
+  { title: t('common.param.editParam') },
 )
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()

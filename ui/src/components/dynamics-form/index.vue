@@ -41,6 +41,7 @@ import type { FormInstance } from 'element-plus'
 import type Result from '@/request/Result'
 import _ from 'lodash'
 import { get, post, put, del } from '@/request/index'
+import { evaluateVisibility } from './visibility'
 const request = {
   get,
   post,
@@ -102,6 +103,16 @@ const show = (field: FormField) => {
       }
     }
   }
+
+  // new
+  if (field.visibility_rules?.node_id) {
+    return evaluateVisibility(field.visibility_rules, {
+      formValue: formValue.value,
+      currentNodeId: field.visibility_rules.node_id,
+      currentNodeName: '',
+    })
+  }
+
   return true
 }
 
@@ -280,6 +291,11 @@ const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
  * 校验函数
  */
 const validate = () => {
+  for (const field of formFieldList.value) {
+    if (!show(field)) {
+      formValue.value[field.field] = null
+    }
+  }
   return Promise.all([
     ...formFieldRef.value.map((item) => item.validate()),
     ruleFormRef.value ? ruleFormRef.value.validate() : Promise.resolve(),
