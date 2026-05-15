@@ -94,10 +94,6 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 },
                 "role": "last_frame"
             })
-        create_result = client.content_generation.tasks.create(
-            model=self.model_name,
-            content=content
-        )
 
         task = client.content_generation.tasks.create(model=self.model_name, content=content)
         task_id = task.id
