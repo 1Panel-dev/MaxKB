@@ -99,6 +99,7 @@
                   currentModel.model_type === 'IMAGE' ||
                   currentModel.model_type === 'TTI' ||
                   currentModel.model_type === 'ITV' ||
+                  currentModel.model_type === 'RERANKER' ||
                   currentModel.model_type === 'EMBEDDING' ||
                   currentModel.model_type === 'TTV') &&
                 permissionPrecise.paramSetting(model.id)

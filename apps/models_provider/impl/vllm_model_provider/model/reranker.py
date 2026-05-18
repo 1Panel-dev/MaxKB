@@ -11,6 +11,7 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
     api_key: str
     api_url: str
     model: str
+    top_n: Optional[int] = 3
     params: dict
     client: Any = None
 
@@ -20,6 +21,7 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
         self.model = kwargs.get('model')
         self.params = kwargs.get('params')
         self.api_url = kwargs.get('api_url')
+        self.top_n = kwargs.get('top_n', 3)
         self.client = cohere.ClientV2(kwargs.get('api_key'), base_url=kwargs.get('api_url'))
 
     @staticmethod
@@ -43,6 +45,6 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
             return []
 
         ds = [d.page_content for d in documents]
-        result = self.client.rerank(model=self.model, query=query, documents=ds)
+        result = self.client.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n, **self.params)
         return [Document(page_content=d.document.get('text'), metadata={'relevance_score': d.relevance_score}) for d in
                 result.results]

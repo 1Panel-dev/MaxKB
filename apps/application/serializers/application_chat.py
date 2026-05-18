@@ -217,7 +217,7 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                        gettext('Other reason content'),
                        gettext('Reference segment number'),
                        gettext('Section title + content'),
-                       gettext('Annotation'), gettext('USER'), gettext('Consuming tokens'),
+                       gettext('Annotation'), gettext('User'), gettext('Consuming tokens'),
                        gettext('Ip Address'), gettext('source'),
                        gettext('Time consumed (s)'),
                        gettext('Question Time')]

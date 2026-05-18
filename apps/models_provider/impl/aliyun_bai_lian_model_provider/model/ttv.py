@@ -77,15 +77,42 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         is_kf2v_model = 'kf2v' in self.model_name.lower()
 
-        # 构建基础参数
-        params = {"api_key": self.api_key, "prompt": prompt, "model": self.model_name,
-                  "negative_prompt": negative_prompt}
+        is_wan27_model = 'wan2.7' in self.model_name.lower()
 
-        if is_kf2v_model:
-            params['first_frame_url'] = first_frame_url
-            params['last_frame_url'] = last_frame_url
-        elif first_frame_url:
-            params['img_url'] = first_frame_url
+        if is_wan27_model:
+            # wan2.7 模型使用特殊的 media 参数结构
+            media = []
+
+            # 添加首帧图片
+            if first_frame_url:
+                media.append({
+                    "type": "first_frame",
+                    "url": first_frame_url
+                })
+
+            # 添加尾帧图片（如果存在）
+            if last_frame_url:
+                media.append({
+                    "type": "last_frame",
+                    "url": last_frame_url
+                })
+            params = {
+                "api_key": self.api_key,
+                "model": self.model_name,
+                "prompt": prompt,
+                "media": media,
+                "negative_prompt": negative_prompt
+            }
+        else:
+            # 构建基础参数
+            params = {"api_key": self.api_key, "prompt": prompt, "model": self.model_name,
+                      "negative_prompt": negative_prompt}
+
+            if is_kf2v_model:
+                params['first_frame_url'] = first_frame_url
+                params['last_frame_url'] = last_frame_url
+            elif first_frame_url:
+                params['img_url'] = first_frame_url
 
         # 合并所有额外参数
         params.update(self.params)
