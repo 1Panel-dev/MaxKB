@@ -9253,3 +9253,99 @@ msgstr ""
 
 msgid "token is required for EVENT triggers"
 msgstr ""
+
+msgid "Home page"
+msgstr ""
+
+msgid "Response code"
+msgstr ""
+
+msgid "Response message"
+msgstr ""
+
+msgid "Total count"
+msgstr ""
+
+msgid "Application data aggregation"
+msgstr ""
+
+msgid "Knowledge data aggregation"
+msgstr ""
+
+msgid "Tool data aggregation"
+msgstr ""
+
+msgid "Model data aggregation"
+msgstr ""
+
+msgid "Total application count"
+msgstr ""
+
+msgid "Published application count"
+msgstr ""
+
+msgid "Unpublished application count"
+msgstr ""
+
+msgid "Total knowledge count"
+msgstr ""
+
+msgid "Total document count"
+msgstr ""
+
+msgid "Failed document count"
+msgstr ""
+
+msgid "Total tool count"
+msgstr ""
+
+msgid "Active tool count"
+msgstr ""
+
+msgid "Inactive tool count"
+msgstr ""
+
+msgid "Total model count"
+msgstr ""
+
+msgid "Active model count"
+msgstr ""
+
+msgid "Inactive model count"
+msgstr ""
+
+msgid "Top applications by token consumption"
+msgstr ""
+
+msgid "Top applications by question count"
+msgstr ""
+
+msgid "Top users by token consumption"
+msgstr ""
+
+msgid "Application tokens ranking list"
+msgstr ""
+
+msgid "Application question ranking list"
+msgstr ""
+
+msgid "User tokens ranking list"
+msgstr ""
+
+msgid "Application name"
+msgstr ""
+
+msgid "Total consumed tokens"
+msgstr ""
+
+msgid "Question count"
+msgstr ""
+
+msgid "Chat user ID"
+msgstr ""
+
+msgid "Chat user type"
+msgstr ""
+
+msgid "Asker user information"
+msgstr ""

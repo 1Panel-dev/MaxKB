@@ -9376,3 +9376,99 @@ msgstr "发布"
 
 msgid "token is required for EVENT triggers"
 msgstr "事件触发器必须设置 token"
+
+msgid "Home page"
+msgstr "首页"
+
+msgid "Response code"
+msgstr "响应码"
+
+msgid "Response message"
+msgstr "响应消息"
+
+msgid "Total count"
+msgstr "总数量"
+
+msgid "Application data aggregation"
+msgstr "应用数据聚合"
+
+msgid "Knowledge data aggregation"
+msgstr "知识库数据聚合"
+
+msgid "Tool data aggregation"
+msgstr "工具数据聚合"
+
+msgid "Model data aggregation"
+msgstr "模型数据聚合"
+
+msgid "Total application count"
+msgstr "应用总数"
+
+msgid "Published application count"
+msgstr "已发布应用数量"
+
+msgid "Unpublished application count"
+msgstr "未发布应用数量"
+
+msgid "Total knowledge count"
+msgstr "知识库总数"
+
+msgid "Total document count"
+msgstr "文档总数"
+
+msgid "Failed document count"
+msgstr "失败文档数量"
+
+msgid "Total tool count"
+msgstr "工具总数"
+
+msgid "Active tool count"
+msgstr "启用工具数量"
+
+msgid "Inactive tool count"
+msgstr "停用工具数量"
+
+msgid "Total model count"
+msgstr "模型总数"
+
+msgid "Active model count"
+msgstr "启用模型数量"
+
+msgid "Inactive model count"
+msgstr "停用模型数量"
+
+msgid "Top applications by token consumption"
+msgstr "tokens 消耗 TOP 智能体"
+
+msgid "Top applications by question count"
+msgstr "提问次数 TOP 智能体"
+
+msgid "Top users by token consumption"
+msgstr "tokens 消耗 TOP 用户"
+
+msgid "Application tokens ranking list"
+msgstr "应用 tokens 消耗排行榜列表"
+
+msgid "Application question ranking list"
+msgstr "应用提问次数排行榜列表"
+
+msgid "User tokens ranking list"
+msgstr "用户 tokens 消耗排行榜列表"
+
+msgid "Application name"
+msgstr "应用名称"
+
+msgid "Total consumed tokens"
+msgstr "消耗 tokens 总数"
+
+msgid "Question count"
+msgstr "提问次数"
+
+msgid "Chat user ID"
+msgstr "对话用户 ID"
+
+msgid "Chat user type"
+msgstr "对话用户类型"
+
+msgid "Asker user information"
+msgstr "提问用户信息"
