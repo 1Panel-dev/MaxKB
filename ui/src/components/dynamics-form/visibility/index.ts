@@ -22,6 +22,7 @@ export interface VisibilityRules {
   action: 'show' | 'hide'
   condition: 'and' | 'or'
   node_id?: string
+  node_name?: string
   conditions: VisibilityCondition[]
 }
 
@@ -42,12 +43,12 @@ export interface VisibilityCtx {
  * 预渲染为字面量，前端不会再看到这些形态。
  */
 export function resolveValue(raw: string, ctx: VisibilityCtx): string {
-  return raw.replace(/\{\{\s*([^.\s}]+)\.([^.\s}]+)\s*\}\}/g, (match, nodeName, fieldName) => {
+  return raw.replace(/\{\{([^.\s}]+)\.([^.\s}]+)\}\}/g, (match, nodeName, fieldName) => {
     if (nodeName !== ctx.currentNodeName) {
       return match // 非同表单，前置node 引用
     }
     const v = ctx.formValue?.[fieldName]
-    return v == null ? '' : String(v)
+    return v == null ? match : String(v)
   })
 }
 
@@ -105,6 +106,9 @@ export function compareByOp(left: any, op: CompareOptions, right: any): boolean 
 }
 
 function containImpl(source: any, target: any): boolean {
+  if (Array.isArray(target)) {
+    return target.every((t) => containImpl(source, t))
+  }
   const t = String(target)
   if (typeof source === 'string') return source.includes(t)
   if (Array.isArray(source)) return source.some((item) => String(item) === t)
@@ -137,6 +141,11 @@ export function evaluateVisibility(
 
   const results = rules.conditions.map((cond) => {
     const left = lookupLeft(cond, ctx)
+
+    if (left == null && cond.compare !== 'is_true' && cond.compare !== 'is_not_true') {
+      return false
+    }
+
     const right = typeof cond.value === 'string' ? resolveValue(cond.value, ctx) : cond.value
     return compareByOp(left, cond.compare as CompareOptions, right)
   })

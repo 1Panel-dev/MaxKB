@@ -109,7 +109,7 @@ const show = (field: FormField) => {
     return evaluateVisibility(field.visibility_rules, {
       formValue: formValue.value,
       currentNodeId: field.visibility_rules.node_id,
-      currentNodeName: '',
+      currentNodeName: field.visibility_rules.node_name || '',
     })
   }
 

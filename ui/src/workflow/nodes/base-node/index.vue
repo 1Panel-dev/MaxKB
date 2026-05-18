@@ -49,7 +49,7 @@
         <template #label>
           <div class="flex-between">
             <div class="flex align-center">
-              <span class="mr-4">{{$t('views.application.longTermMemory.title')}}</span>
+              <span class="mr-4">{{ $t('views.application.longTermMemory.title') }}</span>
               <el-tooltip
                 effect="dark"
                 :content="longTermTips"
@@ -95,7 +95,7 @@
             @refreshForm="refreshParam"
           >
             <el-icon>
-              <Operation/>
+              <Operation />
             </el-icon>
           </el-button>
         </div>
@@ -216,8 +216,11 @@
       :node-model="nodeModel"
       @refresh="refreshFileUploadForm"
     />
-    <AIModeParamSettingDialog ref="LongTermModeParamSettingDialogRef" @refresh="refreshLongTermForm" />
-    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog"/>
+    <AIModeParamSettingDialog
+      ref="LongTermModeParamSettingDialogRef"
+      @refresh="refreshLongTermForm"
+    />
+    <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog" />
   </NodeContainer>
 </template>
 <script setup lang="ts">
@@ -234,9 +237,9 @@ import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUp
 import ChatFieldTable from './component/ChatFieldTable.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import AppIcon from "@/components/app-icon/AppIcon.vue";
-import AIModeParamSettingDialog from "@/views/application/component/AIModeParamSettingDialog.vue";
-import LongTermSettingDialog from "@/views/application/component/LongTermSettingDialog.vue";
+import AppIcon from '@/components/app-icon/AppIcon.vue'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
@@ -267,7 +270,10 @@ const form = {
   prologue: t('views.application.form.defaultPrologue'),
 }
 
-const longTermTips = t('views.application.longTermMemory.tips1') + `{{${t('workflow.nodes.startNode.label')}.memory}}`+ t('views.application.longTermMemory.tips2')
+const longTermTips =
+  t('views.application.longTermMemory.tips1') +
+  `{{${t('workflow.nodes.startNode.label')}.memory}}` +
+  t('views.application.longTermMemory.tips2')
 
 const wheel = (e: any) => {
   if (e.ctrlKey === true) {
@@ -316,6 +322,25 @@ const validate = () => {
       errMessage: t('views.application.form.voiceInput.requiredMessage'),
     })
   }
+
+  const fieldList = props.nodeModel.properties?.user_input_field_list || []
+  for (const field of fieldList) {
+    for (const cond of field.visibility_rules?.conditions || []) {
+      if (!cond.field || cond.field.length < 2 || !cond.field[0] || !cond.field[1]) continue
+      const isCurrentNode =
+        cond.field[0] === props.nodeModel.id ||
+        (props.nodeModel.id === 'base-node' && cond.field[0] === 'global')
+      if (isCurrentNode) {
+        if (!fieldList.some((f: any) => f.field === cond.field[1])) {
+          return Promise.reject({
+            node: props.nodeModel,
+            errMessage: t('workflow.variable.NoReferencing'),
+          })
+        }
+      }
+    }
+  }
+
   return baseNodeFormRef.value?.validate().catch((err) => {
     return Promise.reject({ node: props.nodeModel, errMessage: err })
   })
@@ -449,7 +474,10 @@ function switchLongTerm() {
 }
 
 function openLongTermConfigDialog() {
-  LongTermSettingDialogRef.value?.open(form_data.value.long_term_trigger_type, form_data.value.long_term_trigger_setting)
+  LongTermSettingDialogRef.value?.open(
+    form_data.value.long_term_trigger_type,
+    form_data.value.long_term_trigger_setting,
+  )
 }
 
 function submitLongTermSettingDialog(data: any) {

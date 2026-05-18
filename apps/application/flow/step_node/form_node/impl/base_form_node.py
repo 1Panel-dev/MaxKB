@@ -16,7 +16,9 @@ from langchain_core.prompts import PromptTemplate
 from application.flow.common import Answer
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.form_node.i_form_node import IFormNode
+import re
 
+_TEMPLATE_RE = re.compile(r'\{\{([^.\s}]+)\.([^.\s}]+)\}\}')
 multi_select_list = [
     'MultiSelect',
     'MultiRow'
@@ -106,7 +108,62 @@ class BaseFormNode(IFormNode):
                 field['default_value'] = self.workflow_manage.get_reference_field(field.get('default_value')[0],
                                                                                   field.get('default_value')[1:])
 
+        visibility_rules = field.get('visibility_rules')
+        if visibility_rules and isinstance(visibility_rules.get('conditions'), list):
+            for cond in visibility_rules['conditions']:
+                cond_field = cond.get('field')
+                if not cond_field or len(cond_field) < 2 or not cond_field[0] or not cond_field[1]:
+                    continue
+
+                # cross node -------> _left
+                if cond_field[0] != self.node.id:
+                    cond['_left'] = self.workflow_manage.get_reference_field(cond_field[0], cond_field[1:])
+                # 右值 {{}}
+                cond_value = cond.get("value")
+                if isinstance(cond_value, str) and _TEMPLATE_RE.search(cond_value):
+                    cond['value'] = self._render_cond_value(cond_value)
+
         return field
+
+    def _render_cond_value(self, value):
+        """
+        render cross-node/global/chat {{}} to literal, preserve same-form {{}}
+        match.group(0)  →  "{{开始.question}}"    # 完整匹配
+        match.group(1)  →  "开始"                  # 第一个 () 捕获的
+        match.group(2)  →  "question"             # 第二个 () 捕获的
+        match.start()   →  3                      # 匹配起始位置
+        match.end()     →  16                     # 匹配结束位置
+        """
+        def replacer(match):
+            node_display = match.group(1)
+            field_name = match.group(2)
+
+            # field_list: cross_node
+            for f in self.workflow_manage.field_list:
+                if f.get('node_name') == node_display and f.get('value') == field_name:
+                    if f.get('node_id') == self.node.id:
+                        return match.group(0) # same node
+                    ref = self.workflow_manage.get_reference_field(f.get('node_id'),[field_name])
+                    return str(ref) if ref is not None else ''
+
+            # global
+            if node_display in ('全局变量', 'global'):
+                for f in self.workflow_manage.global_field_list:
+                    if f.get('value') == field_name:
+                        ref = self.workflow_manage.get_reference_field('global', [field_name])
+                        return str(ref) if ref is not None else ''
+
+            # chat
+            if node_display == 'chat':
+                for f in self.workflow_manage.chat_field_list:
+                    if f.get("value") == field_name:
+                        ref = self.workflow_manage.get_reference_field('chat', [field_name])
+                        return str(ref) if ref is not None else ''
+            return match.group(0)
+        try:
+            return _TEMPLATE_RE.sub(replacer, value)
+        except Exception:
+            return value
 
     def execute(self, form_field_list, form_content_format, form_data, **kwargs) -> NodeResult:
         if form_data is not None:

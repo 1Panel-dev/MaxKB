@@ -247,7 +247,38 @@ const getDefaultValue = (row: any) => {
 }
 
 const validate = () => {
-  return formNodeFormRef.value?.validate()
+  const v_list = [formNodeFormRef.value?.validate()]
+
+  const upstreamNodes = props.nodeModel.get_up_node_field_list(true, true)
+  for (const field of form_data.value.form_field_list) {
+    for (const cond of field.visibility_rules?.conditions || []) {
+      if (!cond.field || cond.field.length < 2 || !cond.field[0] || !cond.field[1]) continue
+      if (cond.field[0] === props.nodeModel.id) {
+        // 同节点：查 form_field_list
+        if (!form_data.value.form_field_list.some((f: any) => f.field === cond.field[1])) {
+          v_list.push(Promise.reject(t('workflow.variable.NoReferencing')))
+        }
+      } else {
+        // 跨节点：查上游
+        const nodeEntry = upstreamNodes.find((n: any) => n.value === cond.field[0])
+        console.log('cond.field:', cond.field)
+        console.log(
+          'upstreamNodes:',
+          upstreamNodes.map((n: any) => ({
+            value: n.value,
+            children: n.children?.map((c: any) => c.value),
+          })),
+        )
+        if (!nodeEntry || !nodeEntry.children?.some((c: any) => c.value === cond.field[1])) {
+          v_list.push(Promise.reject(t('workflow.variable.NoReferencing')))
+        }
+      }
+    }
+  }
+
+  return Promise.all(v_list).catch((err) =>
+    Promise.reject({ node: props.nodeModel, errMessage: err }),
+  )
 }
 function submitDialog(val: string) {
   set(props.nodeModel.properties.node_data, 'form_content_format', val)
