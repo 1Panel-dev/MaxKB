@@ -48,6 +48,7 @@ import userManageApi from '@/api/system/chat-user'
 import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import JSEncrypt from "jsencrypt";
 const emit = defineEmits(['refresh'])
 
 const { user } = useStore()
@@ -119,7 +120,12 @@ const submit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
     if (valid) {
-      loadPermissionApi('chatUser').putUserManagePassword(userId.value, userForm.value, loading).then(() => {
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+      const js = new (JSEncryptCtor as any)();
+      js.setPublicKey(user.rsaKey);
+      const jsonData = JSON.stringify(userForm.value);
+      const encryptedBase64 = js.encrypt(jsonData);
+      loadPermissionApi('chatUser').putUserManagePassword(userId.value, {encryptedData: encryptedBase64}, loading).then(() => {
         emit('refresh')
         user.profile()
         MsgSuccess(t('views.userManage.tip.updatePwdSuccess'))

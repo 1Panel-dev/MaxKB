@@ -64,7 +64,10 @@ import {t} from '@/locales'
 import type {ListItem} from '@/api/type/common'
 import {copyClick} from '@/utils/clipboard'
 import {loadPermissionApi} from "@/utils/dynamics-api/permission-api.ts";
+import JSEncrypt from "jsencrypt";
+import useStore from "@/stores";
 
+const {user} = useStore()
 const props = defineProps<{
   title: string,
   optionLoading: boolean,
@@ -174,7 +177,15 @@ const submit = async (formEl: FormInstance | undefined) => {
           visible.value = false
         })
       } else {
-        loadPermissionApi('chatUser').postUserManage(userForm.value, loading).then(() => {
+        const params = {
+          ...userForm.value,
+        }
+        const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
+        const js = new (JSEncryptCtor as any)();
+        js.setPublicKey(user.rsaKey);
+        params.password = js.encrypt(userForm.value.password);
+        params.encrypted = true
+        loadPermissionApi('chatUser').postUserManage(params, loading).then(() => {
           emit('refresh')
           MsgSuccess(t('common.createSuccess'))
           visible.value = false

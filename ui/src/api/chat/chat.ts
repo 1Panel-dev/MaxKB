@@ -235,10 +235,10 @@ const logout: (loading?: Ref<boolean>) => Promise<Result<boolean>> = (loading) =
  * 重置密码
  */
 const resetCurrentPassword: (
-  request: ResetPasswordRequest,
+  data: any,
   loading?: Ref<boolean>,
-) => Promise<Result<boolean>> = (request, loading) => {
-  return post('/chat_user/current/reset_password', request, undefined, loading)
+) => Promise<Result<boolean>> = (data, loading) => {
+  return post('/chat_user/current/reset_password', data, undefined, loading)
 }
 
 /**
