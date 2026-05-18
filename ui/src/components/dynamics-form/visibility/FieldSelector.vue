@@ -115,10 +115,31 @@ const injectDraftSiblings = (rawList: Array<any>) => {
     }))
   // 将 draft parameter 转换成 cascader 适配的 {label, value} 格式
 
+  // base-node
+  const excludeSet = new Set(
+    (props.currentNodeFields ?? [])
+      .filter((f: any, idx: number) => {
+        if (props.currentEditingIndex != null && idx >= props.currentEditingIndex) return true
+        if (props.excludeFieldName && f.field === props.excludeFieldName) return true
+        return false
+      })
+      .map((f: any) => f.field),
+  )
+
   return rawList
-    .map((entry: any) =>
-      entry.value === currentNodeId ? { ...entry, children: draftSiblings } : entry,
-    )
+    .map((entry: any) => {
+      const isCurrentNode =
+        entry.value === currentNodeId || (currentNodeId === 'base-node' && entry.value === 'global')
+      if (!isCurrentNode) return entry
+
+      return {
+        ...entry,
+        children:
+          currentNodeId === 'base-node'
+            ? (entry.children || []).filter((c: any) => !excludeSet.has(c.value))
+            : draftSiblings,
+      }
+    })
     .filter((entry: any) => entry.children && entry.children.length > 0)
 }
 
