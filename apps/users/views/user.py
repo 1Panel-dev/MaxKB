@@ -41,7 +41,7 @@ def get_user_operation_object(user_id):
     user_model = QuerySet(model=User).filter(id=user_id).first()
     if user_model is not None:
         return {
-            "name": user_model.name
+            "name": user_model.username
         }
     return {}
 
@@ -50,10 +50,13 @@ def get_re_password_details(request):
     path = request.path
     body = request.data
     query = request.query_params
+    body_copy = dict(body) if hasattr(body, 'items') else body
+    if isinstance(body_copy, dict):
+        body_copy.pop('password', None)
+        body_copy.pop('re_password', None)
     return {
         "path": path,
-        "body": {**body, 'password': encryption(body.get('password', '')),
-                 're_password': encryption(body.get('re_password', ''))},
+        "body": body_copy,
         "query": query
     }
 

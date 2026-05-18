@@ -6,6 +6,7 @@
     @date：2025/6/4 14:13
     @desc:
 """
+from qianfan.utils.utils import get_ip_address
 
 from system_manage.models.log_management import Log
 
@@ -51,10 +52,19 @@ def _get_user(request):
 def _get_details(request):
     path = request.path
     body = request.data
+
+    sensitive_fields = {'password', 're_password'}
+
+    body_copy = dict(body) if hasattr(body, 'items') else body
+
+    if isinstance(body_copy, dict):
+        for field in sensitive_fields:
+            body_copy.pop(field, None)
+
     query = request.query_params
     return {
         'path': path,
-        'body': body,
+        'body': body_copy,
         'query': query
     }
 
@@ -106,3 +116,46 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
         return run
 
     return inner
+
+
+def record_log(menu: str, operate: str, request, user: dict = None, status: int = 200,
+               get_details=_get_details, get_operation_object=None, workspace_id: str = 'default',
+               operation_object: dict = None):
+    """
+    手动记录审计日志（适用于无法使用装饰器的场景，如第三方登录回调）
+
+    @param menu: 操作菜单，如 'Chat User/login'
+    @param operate: 操作描述，如 'Log in'
+    @param request: Django Request 对象
+    @param user: 用户信息字典，包含 id, username, email 等字段
+    @param status: 状态码，默认 200
+    @param get_details: 获取请求详情的函数
+    @param get_operation_object: 获取操作对象的函数，如果提供则优先使用
+    @param get_workspace_id: 获取工作空间 ID 的函数
+    @param operation_object: 操作对象字典，如 {'name': 'username'}
+    @param workspace_id: 工作空间 ID，默认 'default'
+    @return: None
+    """
+    try:
+        ip = _get_ip_address(request)
+        details = get_details(request)
+
+        # 如果提供了 get_operation_object 函数，优先使用它获取操作对象
+        if operation_object is None and get_operation_object is not None:
+            try:
+                operation_object = get_operation_object(request, {})
+            except Exception:
+                operation_object = {}
+        Log(
+            menu=menu,
+            operate=operate,
+            user=user or {},
+            status=status,
+            ip_address=ip,
+            details=details,
+            operation_object=operation_object or {},
+            workspace_id=workspace_id
+        ).save()
+    except Exception as e:
+        # 日志记录失败不应影响主业务流程
+        pass
