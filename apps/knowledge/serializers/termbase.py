@@ -1,14 +1,14 @@
 from typing import Dict, List
 
 import uuid_utils.compat as uuid
+from common.db.search import page_search
+from common.exception.app_exception import AppApiException
 from django.db import transaction
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from common.db.search import page_search
-from common.exception.app_exception import AppApiException
-from knowledge.models import Termbase, Knowledge
+from knowledge.models import Knowledge, Termbase
 
 
 class TermbaseSerializer(serializers.ModelSerializer):
