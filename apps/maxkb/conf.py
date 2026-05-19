@@ -46,7 +46,7 @@ class Config(dict):
         # 最大连接数
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
-        "EXTERNAL_LOCALE_PATH": "/opt/maxkb-app/language",
+        "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
     }
 
     def get_debug(self) -> bool:

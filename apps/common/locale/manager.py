@@ -29,7 +29,7 @@ class LocaleManager:
 
         self.PROJECT_DIR = PROJECT_DIR
         self.external_locale_path = external_locale_path or CONFIG.get(
-            "EXTERNAL_LOCALE_PATH", "/opt/maxkb-app/language"
+            "EXTERNAL_LOCALE_PATH", "/opt/maxkb/local/locales"
         )
 
         # 目录路径
