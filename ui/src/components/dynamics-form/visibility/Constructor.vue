@@ -1,34 +1,41 @@
 <template>
   <div>
     <el-radio-group v-model="formData.action" class="mb-8">
-      <el-radio value="show">显示条件</el-radio>
-      <el-radio value="hide">隐藏条件</el-radio>
+      <el-radio value="show">{{
+        $t('workflow.nodes.baseNode.visibilitySetting.showCondition‌')
+      }}</el-radio>
+      <el-radio value="hide">{{
+        $t('workflow.nodes.baseNode.visibilitySetting.hideCondition‌')
+      }}</el-radio>
     </el-radio-group>
 
     <div class="flex align-center mb-8">
-      <span>符合以下</span>
+      <span class="lighter">{{ $t('workflow.nodes.conditionNode.conditions.info') }}</span>
       <el-select v-model="formData.condition" size="small" style="width: 60px; margin: 0 8px">
-        <el-option label="所有" value="and" />
-        <el-option label="任意" value="or" />
+        <el-option :label="$t('workflow.condition.AND')" value="and" />
+        <el-option :label="$t('workflow.condition.OR')" value="or" />
       </el-select>
-      <span>条件</span>
+      <span class="lighter">{{ $t('workflow.nodes.conditionNode.conditions.label') }}</span>
     </div>
 
-    <ConditionRow
-      v-for="(cond, idx) in formData.conditions"
-      :key="cond.id"
-      :cond="cond"
-      :index="idx"
-      :nodeModel="nodeModel"
-      :currentNodeFields="currentNodeFields"
-      :currentEditingIndex="currentEditingIndex"
-      @delete="removeCondition(idx)"
-      class="mb-8"
-    />
+    <el-scrollbar>
+      <div style="max-height: calc(100vh - 319px)">
+        <ConditionRow
+          v-for="(cond, idx) in formData.conditions"
+          :key="cond.id"
+          :cond="cond"
+          :index="idx"
+          :nodeModel="nodeModel"
+          :currentNodeFields="currentNodeFields"
+          :currentEditingIndex="currentEditingIndex"
+          @delete="removeCondition(idx)"
+        />
+      </div>
+    </el-scrollbar>
 
     <el-button link type="primary" @click="addCondition">
       <AppIcon iconName="app-add-outlined" class="mr-4" />
-      添加
+      {{ $t('common.add') }}
     </el-button>
   </div>
 </template>
@@ -39,7 +46,7 @@ import type { CompareOptions, VisibilityRules } from './index'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './field-type'
 import { compareList } from '@/workflow/common/data'
 import ConditionRow from './ConditionRow.vue'
-
+import { t } from '@/locales'
 const props = defineProps<{
   initialValue?: VisibilityRules | null
   nodeModel?: any
@@ -77,18 +84,18 @@ function validate(): Promise<void> {
     const hasAny = cond.field[0] || cond.field[1] || cond.compare
     if (!hasAny) continue
     if (!cond.field[0] || !cond.field[1]) {
-      cond._fieldError = '请选择变量'
+      cond._fieldError = t('workflow.variable.placeholder')
       hasError = true
     }
     if (!cond.compare) {
-      cond._compareError = '请选择运算符'
+      cond._compareError = t('workflow.nodes.conditionNode.conditions.requiredMessage')
       hasError = true
     }
     const isEmpty = Array.isArray(cond.value)
       ? cond.value.length === 0
       : !cond.value && cond.value !== 0
     if (!['is_true', 'is_not_true'].includes(cond.compare) && isEmpty) {
-      cond._valueError = '请填写匹配值'
+      cond._valueError = t('workflow.nodes.conditionNode.valueMessage')
       hasError = true
     }
   }

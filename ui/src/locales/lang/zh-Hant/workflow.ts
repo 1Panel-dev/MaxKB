@@ -127,6 +127,11 @@ export default {
       currentTime: '當前時間',
     },
     baseNode: {
+      visibilitySetting: {
+        label: '顯隱設置',
+        showCondition‌: '顯示條件',
+        hideCondition‌: '隱藏條件',
+      },
       fileUpload: {
         label: '文件上傳',
         tooltip: '開啟後，問答頁面會顯示上傳文件的按鈕。',

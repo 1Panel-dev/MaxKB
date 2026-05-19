@@ -1,6 +1,6 @@
 <template>
   <el-tabs v-model="activeTab">
-    <el-tab-pane :label="$t('dynamicsForm.paramForm.basicInfo', '基本信息')" name="basic">
+    <el-tab-pane :label="$t('common.info')" name="basic">
       <el-form
         @submit.prevent
         ref="ruleFormRef"
@@ -79,7 +79,7 @@
       </el-form>
     </el-tab-pane>
 
-    <el-tab-pane label="显隐设置" name="visibility">
+    <el-tab-pane :label="$t('workflow.nodes.baseNode.visibilitySetting.label')" name="visibility">
       <VisibilityConstructor
         ref="visibilityRef"
         :initialValue="visibility_rules"
