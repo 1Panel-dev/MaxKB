@@ -12,11 +12,17 @@
         v-for="(child, cIndex) in paragraph_list"
         :key="cIndex"
         shadow="never"
-        class="card-never mb-16"
+        class="paragraph-preview-card card-never mb-16"
+        @mouseenter="cardEnter(cIndex)"
+        @mouseleave="cardLeave()"
       >
-        <div class="flex-between">
-          <span>{{ child.title || '-' }}</span>
-          <div>
+        <div v-show="show === cIndex" class="mk-sticky">
+          <el-card
+            class="paragraph-box-operation mt-8 mr-8"
+            shadow="always"
+            style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px"
+            @click.stop
+          >
             <!-- 编辑分段按钮 -->
             <el-button link @click="editHandle(child, cIndex)">
               <AppIcon iconName="app-edit"></AppIcon>
@@ -25,10 +31,20 @@
             <el-button link @click="deleteHandle(child, cIndex)">
               <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
-          </div>
+          </el-card>
+        </div>
+        <div class="flex-between">
+          <span>{{ child.title || '-' }}</span>
         </div>
         <div class="lighter mt-12">
           {{ child.content }}
+          <MdPreview
+            ref="editorRef"
+            editorId="preview-only"
+            :modelValue="child.content"
+            class="maxkb-md"
+            style="background: none"
+          />
         </div>
         <div class="lighter mt-12">
           <el-text type="info">
@@ -89,6 +105,15 @@ watchEffect(() => {
 const paragraph_list = computed(() => {
   return localParagraphList.value
 })
+
+const show = ref<number | null>(null)
+function cardEnter(cIndex: number) {
+  show.value = cIndex
+}
+
+function cardLeave() {
+  show.value = null
+}
 
 const next = () => {
   if (loading.value) return
@@ -154,4 +179,23 @@ const deleteHandle = (item: any, cIndex: number) => {
     .catch(() => {})
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.paragraph-preview-card {
+  position: relative;
+  .mk-sticky {
+    height: 0;
+    position: sticky;
+    right: 0;
+    top: 12px;
+    overflow: inherit;
+    z-index: 10;
+  }
+  .paragraph-box-operation {
+    position: absolute;
+    right: -10px;
+    top: -20px;
+    overflow: inherit;
+    z-index: 10;
+  }
+}
+</style>
