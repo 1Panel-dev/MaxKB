@@ -1,6 +1,5 @@
-import base64
 import time
-from typing import Dict, Optional
+from typing import Dict
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.base_ttv import BaseGenerationVideo
 from common.utils.logger import maxkb_logger
@@ -17,10 +16,10 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.base_url = kwargs.get('base_url')
-        self.model_name = kwargs.get('model_name')
-        self.params = kwargs.get('params', {})
+        self.api_key = kwargs.get("api_key")
+        self.base_url = kwargs.get("base_url")
+        self.model_name = kwargs.get("model_name")
+        self.params = kwargs.get("params", {})
         self.retry_delay = 5
 
     @staticmethod
@@ -29,14 +28,14 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {"params": {}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
         return GenerationVideoModel(
             model_name=model_name,
-            api_key=model_credential.get('api_key'),
-            base_url=model_credential.get('base_url', "https://ark.cn-beijing.volces.com/api/v3"),
+            api_key=model_credential.get("api_key"),
+            base_url=model_credential.get("base_url", "https://ark.cn-beijing.volces.com/api/v3"),
             **optional_params,
         )
 
@@ -58,10 +57,9 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 prompt += f" --{param_map[key]} {value}"
         return prompt
 
-    def _poll_task(self, client: Ark, task_id: str, max_wait: int = 60, interval: int = 5):
-        """轮询任务状态，直到完成或超时"""
-        elapsed = 0
-        while elapsed < max_wait:
+    def _poll_task(self, client: Ark, task_id: str, interval: int = 20):
+        """轮询任务状态，直到完成"""
+        while True:
             result = client.content_generation.tasks.get(task_id=task_id)
             status = getattr(result, "status", None)
             maxkb_logger.info(f"[ArkVideo] Task {task_id} status={status}")
@@ -70,38 +68,19 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
                 return result
 
             time.sleep(interval)
-            elapsed += interval
-        maxkb_logger.warning(f"[ArkVideo] Task {task_id} wait timeout")
-        return None
 
     # --- 通用异步生成函数 ---
     def generate_video(self, prompt, negative_prompt=None, first_frame_url=None, last_frame_url=None, **kwargs):
-        client = Ark(api_key=self.api_key,base_url=self.base_url)
+        client = Ark(api_key=self.api_key, base_url=self.base_url)
         # 根据params设置其他参数 豆包的参数和别的不一样  需要拼接在text里
         # --rt 16:9 --dur 5 --fps 24 --rs 720p --wm true --cf false
         prompt = self._build_prompt(prompt)
         content = [{"type": "text", "text": prompt}]
 
         if first_frame_url:
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": first_frame_url
-                },
-                "role": "first_frame"
-            })
+            content.append({"type": "image_url", "image_url": {"url": first_frame_url}, "role": "first_frame"})
         if last_frame_url:
-            content.append({
-                "type": "image_url",
-                "image_url": {
-                    "url": last_frame_url
-                },
-                "role": "last_frame"
-            })
-        create_result = client.content_generation.tasks.create(
-            model=self.model_name,
-            content=content
-        )
+            content.append({"type": "image_url", "image_url": {"url": last_frame_url}, "role": "last_frame"})
 
         task = client.content_generation.tasks.create(model=self.model_name, content=content)
         task_id = task.id
