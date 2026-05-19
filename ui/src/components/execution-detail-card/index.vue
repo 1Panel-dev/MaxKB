@@ -188,7 +188,7 @@
           </template>
           <!-- AI 对话 -->
           <template
-            v-if="data.type == WorkflowType.AiChat || data.type == WorkflowType.ImageUnderstandNode || data.type == WorkflowType.VideoUnderstandNode">
+            v-if="data.type == WorkflowType.AiChat">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
                 {{ $t('views.application.form.roleSettings.label') }}
@@ -611,6 +611,22 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.reasoning_content"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.reasoning_content"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
                 {{ $t('chat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
@@ -691,6 +707,22 @@
                 <div>
                   {{ data.question || '-' }}
                 </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.reasoning_content"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.reasoning_content"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
               </div>
             </div>
             <div class="card-never border-r-6 mt-8">
@@ -882,7 +914,8 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ f.name }} ({{ f.input_type }}):</span> {{ f.input_value }}
+                  <span class="color-secondary">{{ f.name }} ({{ f.input_type }}):</span>
+                  {{ f.input_value }}
                 </div>
               </div>
             </div>
@@ -892,7 +925,8 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
-                  <span class="color-secondary">{{ f.name }} ({{ f.output_type }}):</span> {{ f.output_value }}
+                  <span class="color-secondary">{{ f.name }} ({{ f.output_type }}):</span>
+                  {{ f.output_value }}
                 </div>
               </div>
             </div>
