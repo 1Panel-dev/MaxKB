@@ -64,9 +64,8 @@ const typeList: any = {
 export function getImgUrl(name: string) {
   const list = Object.values(typeList).flat()
 
-  const type = list.includes(fileType(name).toLowerCase())
-    ? fileType(name).toLowerCase()
-    : 'unknown'
+  const typeStr = fileType(name).toLowerCase()
+  const type = list.includes(typeStr) ? typeStr : 'unknown'
   return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
 

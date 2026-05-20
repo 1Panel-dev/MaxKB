@@ -98,7 +98,7 @@ export default {
     dataSourceWebNode: {
       label: 'Web Site',
       text: 'Input the root URL to automatically crawl web data (single link corresponds to a single document), output a list of documents with content',
-      field_label: 'Document list',
+      field_label: 'Document List',
     },
     dataSourceLocalNode: {
       label: 'Local File',
@@ -279,6 +279,7 @@ You are a master of problem optimization, adept at accurately inferring user int
       label: 'Document Content Extraction',
       text: 'Parse input documents to output structured document content',
       content: 'Document Content',
+      image_list: 'Document Image List',
     },
     documentSplitNode: {
       label: 'Document Splitting',

@@ -278,6 +278,7 @@ export default {
       label: '文档内容提取',
       text: '解析输入文档，输出结构化文档内容',
       content: '文档内容',
+      image_list: '文档图片',
     },
     documentSplitNode: {
       label: '文档分段',

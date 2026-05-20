@@ -1,5 +1,4 @@
 # coding=utf-8
-import ast
 import io
 
 import uuid_utils.compat as uuid
@@ -23,7 +22,6 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
         get_buffer = FileBufferHandle().get_buffer
 
         self.context['document_list'] = document
-        content = []
         if document is None or not isinstance(document, list):
             return NodeResult({'content': '', 'document_list': []}, {})
 
@@ -39,7 +37,10 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
         elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
             tool_id = self.workflow_params.get('tool_id')
 
-        # doc文件中的图片保存
+        # 提取并保存成功的图片列表，用于节点输出
+        extracted_image_list = []
+
+        # 文档文件中提取到的图片保存
         def save_image(image_list):
             for image in image_list:
                 meta = {
@@ -62,6 +63,14 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                 if not QuerySet(File).filter(id=new_file.id).exists():
                     new_file.save(file_bytes)
 
+                extracted_image_list.append({
+                    "name": image.file_name,
+                    "size": new_file.file_size,
+                    "url": f"./oss/file/{new_file.id}",
+                    "file_id": new_file.id,
+                })
+
+        content = []
         document_list = []
         for doc in document:
             file = QuerySet(File).filter(id=doc['file_id']).first()
@@ -77,7 +86,11 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
                     document_list.append({'id': str(file.id), 'name': doc['name'], 'content': file_content})
                     break
 
-        return NodeResult({'content': splitter.join(content), 'document_list': document_list}, {})
+        return NodeResult({
+            'content': splitter.join(content),
+            "image_list": extracted_image_list,
+            'document_list': document_list
+        }, {})
 
     def get_details(self, index: int, **kwargs):
         content = self.context.get('content', '').split(splitter)

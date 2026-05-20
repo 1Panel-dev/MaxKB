@@ -420,6 +420,10 @@ export const documentExtractNode = {
           value: 'content',
         },
         {
+          label: t('workflow.nodes.documentExtractNode.image_list'),
+          value: 'image_list',
+        },
+        {
           label: t('workflow.nodes.dataSourceWebNode.field_label'),
           value: 'document_list',
         },
@@ -1444,7 +1448,7 @@ ${t('workflow.nodes.formNode.form_content_format2')}`,
   [formNode.properties.config.fields, ['workflow.nodes.formNode.form_data']],
   [
     documentExtractNode.properties.config.fields,
-    ['workflow.nodes.documentExtractNode.content', 'workflow.nodes.dataSourceWebNode.field_label'],
+    ['workflow.nodes.documentExtractNode.content', 'workflow.nodes.documentExtractNode.image_list', 'workflow.nodes.dataSourceWebNode.field_label'],
   ],
   [documentSplitNode.properties.config.fields, ['workflow.nodes.documentSplitNode.paragraphList']],
   [imageUnderstandNode.properties.config.fields, ['workflow.nodes.imageUnderstandNode.answer']],

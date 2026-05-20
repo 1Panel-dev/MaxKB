@@ -13,6 +13,7 @@ import tempfile
 import time
 import traceback
 from typing import List
+import uuid_utils.compat as uuid
 
 from pypdf import PdfReader
 from pypdf.generic import Destination
@@ -21,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import SplitModel, smart_split_paragraph
+from knowledge.models import File
 
 default_pattern_list = [
     re.compile("(?<=^)# .*|(?<=\\n)# .*"),
@@ -103,7 +105,7 @@ class PdfSplitHandle(BaseSplitHandle):
         return {"name": file.name, "content": split_model.parse(content)}
 
     @staticmethod
-    def handle_pdf_content(file, pdf_document):
+    def handle_pdf_content(file, pdf_document, save_image):
         # 第一步:收集所有字体大小
         font_sizes = []
         page_lines = []
@@ -124,6 +126,7 @@ class PdfSplitHandle(BaseSplitHandle):
 
         # 第二步:提取内容
         content = ""
+        image_list = []
         for page_num, page in enumerate(pdf_document.pages):
             start_time = time.time()
 
@@ -141,8 +144,41 @@ class PdfSplitHandle(BaseSplitHandle):
                 else:  # 正文
                     content += f"{text}\n"
 
+            # 处理页面中的图片
             for image_index in range(PdfSplitHandle.get_page_image_count(page)):
-                content += f"![image](image_{page_num}_{image_index})\n\n"
+                try:
+                    image_obj = page.images[image_index]
+                    image_uuid = uuid.uuid7()
+
+                    # 读取图片文件名
+                    original_name = getattr(image_obj, 'name', None) or f"image_{page_num}_{image_index}"
+                    # 移除文件扩展名（如果存在），因为后面会单独添加
+                    image_file_name = original_name.rsplit('.', 1)[0] if '.' in original_name else original_name
+                    # 清理文件名中的特殊字符
+                    image_file_name = re.sub(r'[^\w\-_\.]+', '_', image_file_name)
+                    if not image_file_name:
+                        image_file_name = f"image_{page_num}_{image_index}"
+
+                    # 获取图片扩展名
+                    file_extension = 'png'
+                    if hasattr(image_obj, 'name') and image_obj.name:
+                        ext = image_obj.name.rsplit('.', 1)[-1].lower() if '.' in image_obj.name else 'png'
+                        if ext in ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'tif', 'webp']:
+                            file_extension = ext
+
+                    # 保存图片到列表
+                    image_file = File(
+                        id=image_uuid,
+                        file_name=f"{image_file_name}.{file_extension}",
+                        meta={'debug': False, 'content': image_obj.data}
+                    )
+                    image_list.append(image_file)
+
+                    # 添加Markdown图片引用
+                    content += f"![{image_file_name}.{file_extension}](./oss/file/{image_uuid})\n\n"
+                except Exception as e:
+                    maxkb_logger.error(f"Error extracting image from PDF page {page_num}, index {image_index}: {e}")
+                    content += f"![image](image_{page_num}_{image_index})\n\n"
 
             content = content.replace("\0", "")
 
@@ -150,6 +186,10 @@ class PdfSplitHandle(BaseSplitHandle):
             maxkb_logger.debug(
                 f"File: {file.name}, Page: {page_num + 1}, Time: {elapsed_time:.3f}s"
             )
+
+        # 保存所有图片
+        if len(image_list) > 0:
+            save_image(image_list)
 
         return content
 
@@ -551,7 +591,7 @@ class PdfSplitHandle(BaseSplitHandle):
         try:
             with open(temp_file_path, "rb") as pdf_file:
                 pdf_document = PdfReader(pdf_file)
-                return self.handle_pdf_content(file, pdf_document)
+                return self.handle_pdf_content(file, pdf_document, save_image)
         except BaseException as e:
             traceback.print_exception(e)
             return f"{e}"
