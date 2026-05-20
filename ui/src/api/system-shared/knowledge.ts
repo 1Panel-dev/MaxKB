@@ -131,10 +131,10 @@ const exportZipKnowledge: (
 
 /**
  * 导出知识库
- * @param knowledge_name 
- * @param knowledge_id 
- * @param loading 
- * @returns 
+ * @param knowledge_name
+ * @param knowledge_id
+ * @param loading
+ * @returns
  */
 const exportKnowledgeBundle: (
   knowledge_name: string,
@@ -147,6 +147,19 @@ const exportKnowledgeBundle: (
     undefined,
     loading,
   )
+}
+
+/**
+ * 导入知识库
+ * @param data
+ * @param loading
+ * @returns
+ */
+const importKnowledgeBundle: (
+  data: any,
+  loading: Ref<boolean>
+) => Promise<Result<any>> = (data, loading) => {
+  return post(`${prefix}/import_knowledge`, data, undefined, loading)
 }
 
 /**
@@ -518,7 +531,8 @@ export default {
   importKnowledgeWorkflow,
   getMcpTools,
   postTransformWorkflow,
-  exportKnowledgeBundle
+  exportKnowledgeBundle,
+  importKnowledgeBundle
 } as {
   [key: string]: any
 }

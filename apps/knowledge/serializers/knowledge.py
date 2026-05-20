@@ -775,6 +775,9 @@ class KnowledgeSerializer(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("user id"))
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         folder_id = serializers.CharField(required=True, label=_("folder id"))
+        scope = serializers.ChoiceField(
+            required=False, label=_("scope"), default=KnowledgeScope.WORKSPACE, choices=KnowledgeScope.choices
+        )
 
         @transaction.atomic
         def import_knowledge(self, file, is_import_tool=False, with_valid=True):

@@ -707,10 +707,10 @@ function importKnowledgeBundle(file: any) {
       if (res?.data) {
         const knowledgeId = res.data.knowledge_id
         const knowledgeType = res.data.type
-        const folderId = folder.currentFolder.id || user.getWorkspaceId()
+        const folderId = folder.currentFolder.id
         await user.profile()
         router.push({
-          path: `/knowledge/${knowledgeId}/${folderId}/${knowledgeType}/document`,
+          path: `/knowledge/${knowledgeId}/${folderId || 'shared'}/${knowledgeType}/document`,
           query: {imported: 'true'},
         })
       }
