@@ -23,6 +23,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
 from pydub import AudioSegment
+from urllib.parse import urlparse
 
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
@@ -409,6 +410,7 @@ def is_valid_uuid(uuid_string):
     except ValueError:
         return False
 
+
 def common_convert_value(_type, value):
     if value is None:
         return None
@@ -436,3 +438,38 @@ def common_convert_value(_type, value):
             return v
         raise Exception(_('type error'))
     return value
+
+
+def get_file_name_from_content_disposition(content_disposition, default = None):
+    """
+    尝试从响应头 `Content-Disposition` 中获取文件名
+
+    :param content_disposition: 响应头 `Content-Disposition`
+    :param default:             默认文件名
+    :return: 文件名
+    """
+    if not content_disposition:
+        return default
+
+    file_name = default
+    if 'filename=' in content_disposition:
+        filename_part = content_disposition.split('filename=')[1].split(';')[0].strip('"\'')
+        if filename_part:
+            file_name = filename_part
+
+    return file_name
+
+
+def get_file_name_from_url(url, default = None):
+    """
+    尝试从url中获取文件名
+    :param url:     文件URL地址
+    :param default: 默认文件名
+    :return: 文件名
+    """
+    if not url:
+        return default
+
+    parsed_url = urlparse(url)
+    path_parts = parsed_url.path.split('/')
+    return path_parts[-1] if path_parts and path_parts[-1] else default
