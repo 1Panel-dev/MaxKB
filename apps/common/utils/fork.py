@@ -92,11 +92,15 @@ class Fork:
                                     fragment='').geturl()
 
     def get_child_link_list(self, bf: BeautifulSoup):
-        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + self.base_fork_url + "|/).*"
+        # Compute the crawl prefix: parent directory when base_fork_url is an HTML file
+        crawl_prefix = self.base_fork_url
+        if crawl_prefix.endswith(('.html', '.htm')):
+            crawl_prefix = crawl_prefix.rsplit('/', 1)[0]
+        pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + crawl_prefix + "|/).*"
         link_list = bf.find_all(name='a', href=re.compile(pattern))
         result = [ChildLink(link.get('href'), link) if link.get('href').startswith(self.base_url) else ChildLink(
             self.base_url + link.get('href'), link) for link in link_list]
-        result = [row for row in result if row.url.startswith(self.base_fork_url)]
+        result = [row for row in result if row.url.startswith(crawl_prefix)]
         return result
 
     def get_content_html(self, bf: BeautifulSoup):
@@ -118,9 +122,14 @@ class Fork:
             result_url = ParseResult(scheme=result.scheme, netloc=result.netloc, path=field_value, params='', query='',
                                      fragment='').geturl()
         else:
-            result_url = urljoin(
-                base_fork_url + '/' + (field_value if field_value.endswith('/') else field_value + '/'),
-                ".")
+            # When base_fork_url is an HTML file (not a directory), resolve relative
+            # links against its parent directory to avoid broken paths like
+            # /en/index.html/about_dolphindb.html
+            if base_fork_url.endswith(('.html', '.htm')):
+                base = base_fork_url.rsplit('/', 1)[0] + '/'
+            else:
+                base = base_fork_url + '/'
+            result_url = urljoin(base, field_value)
         result_url = result_url[:-1] if result_url.endswith('/') else result_url
         tag[field] = result_url
 
