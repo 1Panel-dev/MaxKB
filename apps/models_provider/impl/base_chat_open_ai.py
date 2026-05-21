@@ -1,7 +1,7 @@
 # coding=utf-8
 import base64
 from concurrent.futures import ThreadPoolExecutor
-from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping
+from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping, AsyncIterator
 
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.messages import BaseMessage, get_buffer_string, BaseMessageChunk, HumanMessageChunk, AIMessageChunk, \
@@ -102,7 +102,7 @@ class BaseChatOpenAI(ChatOpenAI):
             with ThreadPoolExecutor(max_workers=1) as executor:
                 future = executor.submit(super().get_num_tokens_from_messages, messages, tools)
                 try:
-                    response = future.result()
+                    response = future.result(timeout=timeout)
                     maxkb_logger.info("请求成功（未超时）")
                     return response
                 except Exception as e:
@@ -127,6 +127,13 @@ class BaseChatOpenAI(ChatOpenAI):
     def _stream(self, *args: Any, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
         kwargs['stream_usage'] = True
         for chunk in super()._stream(*args, **kwargs):
+            if chunk.message.usage_metadata is not None:
+                self.usage_metadata = chunk.message.usage_metadata
+            yield chunk
+
+    async def _astream(self, *args: Any, **kwargs: Any) -> AsyncIterator[ChatGenerationChunk]:
+        kwargs['stream_usage'] = True
+        async for chunk in super()._astream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
