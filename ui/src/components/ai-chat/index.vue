@@ -14,14 +14,21 @@
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
+        :excludeFields="
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_field_list_setting?.exposed_fields || []
+        "
+        :title="
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_field_list_setting?.menu_title
+        "
         :application="applicationDetails"
         :type="type"
         :first="firsUserInput"
         @confirm="UserFormConfirm"
         @cancel="UserFormCancel"
         ref="userFormRef"
-      >
-      </UserForm>
+      />
     </div>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
@@ -141,17 +148,15 @@
           v-model:show-user-input="showUserInput"
           v-else-if="type !== 'log' && type !== 'share'"
         >
-          <template #userInput>
-            <el-button
-              v-if="isUserInput || isAPIInput"
-              class="user-input-button mb-8"
-              @click="toggleUserInput"
+          <template #inlineParams>
+            <InlineParams
+              ref="inlineParamsRef"
+              :application="applicationDetails"
+              :maxExposed="isMobile ? 1 : 3"
+              v-model:form-data="form_data"
+              @openDialog="handleOpenDialog"
             >
-              <AppIcon iconName="app-edit" :size="16" class="mr-4"></AppIcon>
-              <span class="ellipsis">
-                {{ userInputTitle || $t('chat.userInput') }}
-              </span>
-            </el-button>
+            </InlineParams>
           </template>
         </ChatInputOperate>
       </div>
@@ -196,6 +201,7 @@ import { throttle } from 'lodash-es'
 import { copyClick } from '@/utils/clipboard'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { getWrite } from '@/utils/chat'
+import InlineParams from '@/components/ai-chat/component/inline-params/index.vue'
 
 provide('upload', (file: any, loading?: Ref<boolean>) => {
   return props.type === 'debug-ai-chat'
@@ -273,6 +279,8 @@ const showUserInput = ref(false)
 const initialFormData = ref({})
 const initialApiFormData = ref({})
 
+const inlineParamsRef = ref<InstanceType<typeof InlineParams>>()
+
 const isUserInput = computed(
   () =>
     props.applicationDetails?.work_flow?.nodes?.filter((v: any) => v.id === 'base-node')[0]
@@ -304,11 +312,6 @@ watch(
       firsUserInput.value = false
     } else {
       chartOpenId.value = ''
-      if (isUserInput.value) {
-        firsUserInput.value = true
-      } else if (props.type == 'debug-ai-chat' && isAPIInput.value) {
-        firsUserInput.value = true
-      }
     }
   },
   { deep: true, immediate: true },
@@ -391,6 +394,12 @@ function toggleSelect(id: number) {
   }
 }
 
+const handleOpenDialog = () => {
+  showUserInput.value = true
+  initialFormData.value = JSON.parse(JSON.stringify(form_data.value))
+  initialApiFormData.value = JSON.parse(JSON.stringify(api_form_data.value))
+}
+
 function cancelCheckHandle() {
   checkAll.value = false
   multipleSelectionChat.value = []
@@ -420,7 +429,7 @@ function UserFormCancel() {
 }
 
 const validate = () => {
-  return userFormRef.value?.validate() || Promise.reject(false)
+  return inlineParamsRef.value?.validate() || Promise.resolve(true)
 }
 
 function sendMessage(val: string, other_params_data?: any, chat?: chatType): Promise<boolean> {
@@ -560,7 +569,6 @@ function getChartOpenId(chat?: any, problem?: string, re_chat?: boolean, other_p
     chatMessage(chat, problem, re_chat, other_params_data)
   })
 }
-
 
 const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)

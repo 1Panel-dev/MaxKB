@@ -210,10 +210,9 @@
         @paste="handlePaste"
         class="chat-operate-textarea"
       />
-
       <div class="operate flex-between">
         <div>
-          <slot name="userInput" />
+          <slot name="inlineParams" />
         </div>
         <div class="flex align-center">
           <template v-if="props.applicationDetails.stt_model_enable">
@@ -922,9 +921,7 @@ function autoSendMessage() {
         quickInputRef.value.textarea.style.height = '45px'
       }
     })
-    .catch(() => {
-      emit('update:showUserInput', true)
-    })
+    .catch(() => {})
 }
 
 function sendChatHandle(event?: any) {

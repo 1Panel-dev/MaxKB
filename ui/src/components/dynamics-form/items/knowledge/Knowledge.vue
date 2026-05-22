@@ -6,6 +6,9 @@
       class="w-full"
       :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
     >
+      <template #header v-if="$attrs.popperHeader">
+        <SelectHeader :header="$attrs.popperHeader" />
+      </template>
       <el-option v-for="item in availableList" :key="item.id" :label="item.name" :value="item.id">
         <el-space :size="8">
           <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />
@@ -30,6 +33,7 @@
 import { computed } from 'vue'
 import type { FormField } from '../../type'
 import { relatedObject } from '@/utils/array'
+import SelectHeader from '@/components/dynamics-form/items/common/SelectHeader.vue'
 const props = withDefaults(
   defineProps<{
     modelValue?: string[]

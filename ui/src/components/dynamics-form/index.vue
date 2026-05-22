@@ -266,7 +266,9 @@ const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
             if (typeof form_data[item.field] === 'string') {
               return i[value_field] === form_data[item.field]
             } else {
-              return form_data[item.field].indexOf([value_field]) === -1
+              return form_data[item.field]
+                ? form_data[item.field].indexOf([value_field]) === -1
+                : false
             }
           })
           if (find) {
