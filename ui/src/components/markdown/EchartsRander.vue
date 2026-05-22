@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { onMounted, onBeforeUnmount, nextTick, watch, ref } from 'vue'
 import * as echarts from 'echarts'
-
+import { randomId } from '@/utils/common'
 // ── props ──────────────────────────────────────────────────────────────────
 const props = defineProps<{ option: string }>()
 
@@ -59,7 +59,7 @@ const EVAL_TIMEOUT_MS = 5000
 
 const evalInSandbox = (option_json: any): Promise<{ option: any; style: any }> => {
   return new Promise((resolve, reject) => {
-    const id = ++evalSeq
+    const id = randomId()
     let settled = false
 
     const timer = setTimeout(() => {
