@@ -8,7 +8,7 @@ from langchain_core.messages import BaseMessage, get_buffer_string, BaseMessageC
     SystemMessageChunk, FunctionMessageChunk, ChatMessageChunk
 from langchain_core.messages.ai import UsageMetadata
 from langchain_core.messages.tool import tool_call_chunk, ToolMessageChunk
-from langchain_core.outputs import ChatGenerationChunk
+from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
 from langchain_core.runnables import RunnableConfig, ensure_config
 from langchain_core.tools import BaseTool
 from langchain_openai import ChatOpenAI
