@@ -118,7 +118,6 @@ export default {
     classify: {
       aiCapability: 'AI 能力',
       businessLogic: '业务逻辑',
-      other: '其他',
       dataProcessing: '数据处理',
     },
     startNode: {
@@ -443,7 +442,6 @@ export default {
     intentNode: {
       label: '意图识别',
       text: '将用户问题与用户预设的意图分类进行匹配',
-      other: '其他',
       error2: '意图重复',
       placeholder: '请选择分类项',
       classify: {

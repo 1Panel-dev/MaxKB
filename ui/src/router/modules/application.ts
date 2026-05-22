@@ -14,7 +14,7 @@ const applicationRouter = {
     icon: 'app-agent',
     iconActive: 'app-agent-active',
     group: 'workspace',
-    order: 1,
+    order: 2,
   },
   redirect: '/application',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),

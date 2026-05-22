@@ -14,7 +14,7 @@ const ModelRouter = {
     icon: 'app-tool',
     iconActive: 'app-tool-active',
     group: 'workspace',
-    order: 3,
+    order: 4,
   },
   redirect: '/tool',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),

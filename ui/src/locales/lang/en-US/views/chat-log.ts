@@ -10,7 +10,6 @@ export default {
   },
   table: {
     abstract: 'Title',
-    username: 'User',
     chat_record_count: 'Total Messages',
     user: 'User',
     feedback: {

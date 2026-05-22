@@ -14,7 +14,7 @@ const ModelRouter = {
     icon: 'app-knowledge',
     iconActive: 'app-knowledge-active',
     group: 'workspace',
-    order: 2,
+    order: 3,
   },
   redirect: '/knowledge',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),

@@ -14,7 +14,7 @@ const ModelRouter = {
     icon: 'app-model',
     iconActive: 'app-model-active',
     group: 'workspace',
-    order: 4,
+    order: 5,
   },
   redirect: '/model',
   component: () => import('@/layout/layout-template/SimpleLayout.vue'),

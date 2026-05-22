@@ -13,7 +13,7 @@
               style="width: 75px"
             >
               <el-option :label="$t('views.chatLog.table.abstract')" value="abstract" />
-              <el-option :label="$t('views.chatLog.table.username')" value="username" />
+              <el-option :label="$t('views.chatLog.table.user')" value="username" />
             </el-select>
             <el-input
               v-model="search_form[search_type]"

@@ -423,7 +423,6 @@ import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import useStore from '@/stores'
 import {t} from '@/locales'
-import {loadSharedApi} from "@/utils/dynamics-api/shared-api.ts";
 
 const router = useRouter()
 

@@ -45,7 +45,6 @@ export default {
     inaccurate: '回答不準確',
     complete: '內容完善',
     irrelevantAnswer: '回答不相關',
-    other: '其他',
     placeholder: '告訴我們更多關於你的相關體驗',
   },
   tip: {

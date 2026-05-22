@@ -45,7 +45,6 @@ export default {
     inaccurate: 'Answer is inaccurate',
     complete: 'Content is complete',
     irrelevantAnswer: 'Answer is irrelevant',
-    other: 'Other',
     placeholder: 'Tell us more about your relevant experiences',
   },
   tip: {

@@ -794,7 +794,7 @@ export const knowledgeMenuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
@@ -833,7 +833,7 @@ export const menuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
@@ -871,7 +871,7 @@ export const applicationLoopMenuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
@@ -913,7 +913,7 @@ export const knowledgeLoopMenuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
@@ -955,7 +955,7 @@ export const toolLoopMenuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
@@ -999,7 +999,7 @@ const toolMenuNodes = [
     ],
   },
   {
-    label: t('workflow.nodes.classify.other'),
+    label: t('common.other'),
     list: [mcpNode, toolNode],
   },
 ]
