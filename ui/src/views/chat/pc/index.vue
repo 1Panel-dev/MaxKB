@@ -245,6 +245,7 @@
 import {ref, onMounted, nextTick, computed, watch, provide} from 'vue'
 import {marked} from 'marked'
 import {saveAs} from 'file-saver'
+import sanitizeHtml from 'sanitize-html'
 import chatAPI from '@/api/chat/chat'
 import useStore from '@/stores'
 import useResize from '@/layout/hooks/useResize'
@@ -541,7 +542,49 @@ async function exportHTML(): Promise<void> {
       return `# ${record.problem_text}\n\n${answerText}\n\n`
     })
     .join('\n')
-  const htmlContent: any = marked(markdownContent)
+  const rawHtmlContent = await marked(markdownContent)
+  const htmlContent = sanitizeHtml(rawHtmlContent, {
+    allowedTags: [
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'p',
+      'br',
+      'hr',
+      'blockquote',
+      'pre',
+      'code',
+      'em',
+      'strong',
+      'del',
+      'ul',
+      'ol',
+      'li',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'th',
+      'td',
+      'a',
+      'img',
+    ],
+    allowedAttributes: {
+      a: ['href', 'name', 'target', 'title'],
+      img: ['src', 'alt', 'title'],
+      code: ['class'],
+      th: ['align'],
+      td: ['align'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto', 'tel'],
+    allowedSchemesByTag: {
+      img: ['http', 'https'],
+    },
+    allowProtocolRelative: false,
+  })
 
   const blob: Blob = new Blob([htmlContent], {type: 'text/html;charset=utf-8'})
   saveAs(blob, suggestedName)
