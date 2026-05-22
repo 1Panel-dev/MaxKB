@@ -10,6 +10,9 @@
     v-bind="$attrs"
     v-model="_modelValue"
   >
+    <template #header v-if="$attrs.popperHeader">
+      <SelectHeader :header="$attrs.popperHeader" />
+    </template>
     <el-option
       v-for="(item, index) in option_list"
       :key="index"
@@ -21,6 +24,7 @@
 </template>
 <script setup lang="ts">
 import type { FormField } from '@/components/dynamics-form/type'
+import SelectHeader from '@/components/dynamics-form/items/common/SelectHeader.vue'
 import { computed, ref } from 'vue'
 import _ from 'lodash'
 const rowTemp = ref<any>()

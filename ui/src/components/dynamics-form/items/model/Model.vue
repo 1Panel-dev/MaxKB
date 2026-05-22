@@ -6,6 +6,9 @@
       v-bind="$attrs"
       popper-class="select-model"
     >
+      <template #header v-if="$attrs.popperHeader">
+        <SelectHeader :header="$attrs.popperHeader" />
+      </template>
       <el-option-group
         v-for="(modelList, providerName) in groupedOptions"
         :key="providerName"
@@ -54,6 +57,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { groupBy, flatMap } from 'lodash'
+import SelectHeader from '@/components/dynamics-form/items/common/SelectHeader.vue'
 import { relatedObject } from '@/utils/array'
 import type { FormField } from '../../type'
 import { providerList } from './provider-data'

@@ -111,7 +111,11 @@ function openAddDialog(data?: any, index?: any) {
 }
 
 function openChangeTitleDialog() {
-  UserInputTitleDialogRef.value.open(inputFieldConfig.value)
+  UserInputTitleDialogRef.value.open(
+    inputFieldConfig.value,
+    inputFieldList.value,
+    props.nodeModel.properties.user_input_field_list_setting,
+  )
 }
 
 function deleteField(index: any) {
@@ -145,8 +149,10 @@ function refreshFieldList(data: any, index: any) {
   onDragHandle()
 }
 
-function refreshFieldTitle(data: any) {
-  inputFieldConfig.value = data
+function refreshFieldTitle(setting: any) {
+  if (setting) {
+    set(props.nodeModel.properties, 'user_input_field_list_setting', setting)
+  }
   UserInputTitleDialogRef.value.close()
 }
 

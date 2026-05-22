@@ -8,8 +8,8 @@
   >
     <el-card shadow="always" class="border-r-8" style="--el-card-padding: 16px 8px">
       <div class="flex align-center cursor w-full" style="padding: 0 8px">
-        <span class="break-all ellipsis-1 mr-16" :title="inputFieldConfig.title">
-          {{ inputFieldConfig.title }}
+        <span class="break-all ellipsis-1 mr-16" :title="props.title || '更多设置'">
+          {{ props.title || '更多设置' }}
         </span>
       </div>
 
@@ -66,6 +66,8 @@ const props = defineProps<{
   api_form_data: any
   form_data: any
   first?: boolean
+  excludeFields?: string[]
+  title?: string
 }>()
 // 用于刷新动态表单
 const dynamicsFormRefresh = ref(0)
@@ -191,7 +193,11 @@ function handleInputFieldList() {
                 }
               })
           : []
-
+      if (props.excludeFields?.length) {
+        inputFieldList.value = inputFieldList.value.filter(
+          (f: any) => !props.excludeFields!.includes(f.field),
+        )
+      }
       apiInputFieldList.value = v.properties.api_input_field_list
         ? v.properties.api_input_field_list.map((v: any) => {
             switch (v.type) {
