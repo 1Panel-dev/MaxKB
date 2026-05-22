@@ -42,10 +42,18 @@ def is_workspace_manage(auth, workspace_id):
     return RoleConstants.WORKSPACE_MANAGE.value.__str__() + ":/WORKSPACE/" + workspace_id in auth.role_list
 
 
+def get_format_time(date_time):
+    d = datetime.datetime.strptime(date_time, '%Y-%m-%d').date()
+    naive = datetime.datetime.combine(d, datetime.time.min)
+    return timezone.make_aware(naive, timezone.get_default_timezone())
+
+
 class HomePageSerializer(serializers.Serializer):
     class ApplicationUserTokenRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
+        end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def ranking(self, auth, current_page, page_size, with_valid=True):
             if with_valid:
@@ -53,10 +61,13 @@ class HomePageSerializer(serializers.Serializer):
 
             workspace_id = self.validated_data.get("workspace_id")
             user_id = self.validated_data.get("user_id")
-
+            start_time = get_format_time(self.data.get("start_time"))
+            end_time = get_format_time(self.data.get("end_time"))
             base_queryset = Chat.objects.filter(
                 is_deleted=False,
                 chat_user_id__isnull=False,
+                create_time__gte=start_time,
+                create_time__lte=end_time
             ).exclude(
                 chat_user_id=""
             )
@@ -140,6 +151,8 @@ class HomePageSerializer(serializers.Serializer):
     class ApplicationQuestionRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
+        end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def ranking(self, auth, current_page, page_size, with_valid=True):
             if with_valid:
@@ -148,6 +161,11 @@ class HomePageSerializer(serializers.Serializer):
             workspace_id = self.validated_data.get("workspace_id")
             user_id = self.validated_data.get("user_id")
             queryset = Application.objects.filter(workspace_id=workspace_id)
+            start_time = get_format_time(self.data.get("start_time"))
+            end_time = get_format_time(self.data.get("end_time"))
+            queryset = queryset.filter(
+                create_time__gte=start_time,
+                create_time__lte=end_time)
             workspace_manage = is_workspace_manage(auth, workspace_id)
             if not workspace_manage:
                 permission_list = (
@@ -210,11 +228,14 @@ class HomePageSerializer(serializers.Serializer):
     class ApplicationTokensRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
+        end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def ranking(self, auth, current_page, page_size, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-
+            start_time = get_format_time(self.data.get('start_time'))
+            end_time = get_format_time(self.data.get('end_time'))
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
 
@@ -223,7 +244,9 @@ class HomePageSerializer(serializers.Serializer):
                 output_field=BigIntegerField()
             )
 
-            queryset = Application.objects.all()
+            queryset = Application.objects.filter(
+                create_time__gte=start_time,
+                create_time__lte=end_time)
 
             workspace_manage = is_workspace_manage(auth, workspace_id)
 
@@ -282,21 +305,11 @@ class HomePageSerializer(serializers.Serializer):
         start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
-        def get_end_time(self):
-            d = datetime.datetime.strptime(self.data.get('end_time'), '%Y-%m-%d').date()
-            naive = datetime.datetime.combine(d, datetime.time.max)
-            return timezone.make_aware(naive, timezone.get_default_timezone())
-
-        def get_start_time(self):
-            d = datetime.datetime.strptime(self.data.get('start_time'), '%Y-%m-%d').date()
-            naive = datetime.datetime.combine(d, datetime.time.min)
-            return timezone.make_aware(naive, timezone.get_default_timezone())
-
         def get_customer_count_trend(self, application_queryset, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            start_time = self.get_start_time()
-            end_time = self.get_end_time()
+            start_time = get_format_time(self.data.get("start_time"))
+            end_time = get_format_time(self.data.get("end_time"))
             query_set = QuerySet(ApplicationChatUserStats).filter(
                 create_time__gte=start_time,
                 create_time__lte=end_time)

@@ -35,6 +35,18 @@ class RankingBaseAPI(APIMixin):
                 description=_("Workspace ID"),
             ),
             OpenApiParameter(
+                name="start_time",
+                description="start Time",
+                type=OpenApiTypes.STR,
+                required=True,
+            ),
+            OpenApiParameter(
+                name="end_time",
+                description="end Time",
+                type=OpenApiTypes.STR,
+                required=True,
+            ),
+            OpenApiParameter(
                 name="current_page",
                 type=OpenApiTypes.INT,
                 location=OpenApiParameter.PATH,
@@ -246,6 +258,7 @@ class ToolAggregationAPI(APIMixin):
                 description=_("Workspace ID"),
             ),
         ]
+
 
 class ModelAggregationAPI(APIMixin):
 

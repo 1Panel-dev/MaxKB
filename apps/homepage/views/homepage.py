@@ -36,8 +36,12 @@ class HomePageAPI(APIView):
 
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationTokensRanking(
-                data={'user_id': request.user.id, 'workspace_id': workspace_id})
-                                  .ranking(request.auth, current_page, page_size))
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time')
+                      }).ranking(request.auth, current_page, page_size))
 
     @extend_schema(
         methods=["GET"],
@@ -53,8 +57,12 @@ class HomePageAPI(APIView):
 
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationQuestionRanking(
-                data={'user_id': request.user.id, 'workspace_id': workspace_id})
-                                  .ranking(request.auth, current_page, page_size))
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time')
+                      }).ranking(request.auth, current_page, page_size))
 
     class UserTokensRanking(APIView):
         authentication_classes = [TokenAuth]
@@ -70,7 +78,11 @@ class HomePageAPI(APIView):
         )
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationUserTokenRanking(
-                data={'user_id': request.user.id, 'workspace_id': workspace_id})
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time')})
                                   .ranking(request.auth, current_page, page_size))
 
     class ApplicationMonitoring(APIView):
