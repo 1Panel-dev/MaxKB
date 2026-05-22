@@ -518,7 +518,7 @@ class UserManageSerializer(serializers.Serializer):
             user.save()
             return True
 
-    def get_user_list(self, workspace_id):
+    def get_user_list(self, workspace_id, nick_name):
         """
         获取用户列表
         :param workspace_id: 工作空间ID
@@ -534,7 +534,11 @@ class UserManageSerializer(serializers.Serializer):
         else:
             user_ids = User.objects.values_list("id", flat=True)
 
-        users = User.objects.filter(id__in=user_ids).values("id", "nick_name")
+        query_set = User.objects.filter(id__in=user_ids)
+        if nick_name:
+            query_set = query_set.filter(nick_name__contains=nick_name)
+
+        users = query_set.values("id", "nick_name")[:200]
         return list(users)
 
     def get_user_members(self, workspace_id):
