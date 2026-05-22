@@ -408,6 +408,20 @@ const putBatchRefresh: (
   )
 }
 
+const putBatchTokenize: (
+  knowledge_id: string,
+  data: any,
+  stateList: Array<string>,
+  loading?: Ref<boolean>,
+) => Promise<Result<boolean>> = (knowledge_id, data, stateList, loading) => {
+  return put(
+    `${prefix.value}/${knowledge_id}/document/batch_tokenize`,
+    {id_list: data, state_list: stateList},
+    undefined,
+    loading,
+  )
+}
+
 
 /**
  * 批量同步文档
@@ -678,6 +692,7 @@ export default {
   putBatchGenerateRelated,
   putBatchEditHitHandling,
   putBatchRefresh,
+  putBatchTokenize,
   putMulSyncDocument,
   putMigrateMulDocument,
   postQADocument,

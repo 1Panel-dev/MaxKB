@@ -11,20 +11,7 @@ from typing import Dict, List
 import openpyxl
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
-from django.contrib.postgres.fields import JSONField
-from django.core import validators
-from django.db import transaction, models
-from django.db.models import QuerySet, Func, F, Value
-from django.db.models.aggregates import Max
-from django.db.models.functions import Substr, Reverse
-from django.db.models.query_utils import Q
-from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext, get_language, to_locale
-from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-from rest_framework import serializers
-from xlwt import Utils
-
-from common.db.search import native_search, get_dynamics_model, native_page_search
+from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.event.common import work_thread_pool
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
@@ -45,50 +32,65 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
-from common.utils.common import post, get_file_content, bulk_create_in_batches, parse_image
+from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, post
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from common.utils.split_model import get_split_model, flat_map
+from common.utils.split_model import flat_map, get_split_model
+from django.contrib.postgres.fields import JSONField
+from django.core import validators
+from django.db import models, transaction
+from django.db.models import F, Func, QuerySet, Value
+from django.db.models.aggregates import Max
+from django.db.models.functions import Reverse, Substr
+from django.db.models.query_utils import Q
+from django.http import HttpResponse
+from django.utils.translation import get_language, gettext, to_locale
+from django.utils.translation import gettext_lazy as _
+from maxkb.const import PROJECT_DIR
+from models_provider.models import Model
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+from oss.serializers.file import FileSerializer
+from rest_framework import serializers
+from xlwt import Utils
+
 from knowledge.models import (
-    Knowledge,
-    Paragraph,
-    Problem,
     Document,
-    KnowledgeType,
-    ProblemParagraphMapping,
-    State,
-    TaskType,
+    DocumentTag,
     File,
     FileSourceType,
+    Knowledge,
+    KnowledgeType,
+    Paragraph,
+    Problem,
+    ProblemParagraphMapping,
+    State,
     Tag,
-    DocumentTag,
+    TaskType,
 )
 from knowledge.serializers.common import (
-    ProblemParagraphManage,
     BatchSerializer,
-    get_embedding_model_id_by_knowledge_id,
     MetaSerializer,
+    ProblemParagraphManage,
+    get_embedding_model_id_by_knowledge_id,
     write_image,
     zip_dir,
 )
 from knowledge.serializers.paragraph import (
-    ParagraphSerializers,
     ParagraphInstanceSerializer,
+    ParagraphSerializers,
     delete_problems_and_mappings,
 )
 from knowledge.task.embedding import (
-    embedding_by_document,
-    delete_embedding_by_document_list,
     delete_embedding_by_document,
+    delete_embedding_by_document_list,
     delete_embedding_by_paragraph_ids,
+    embedding_by_document,
     embedding_by_document_list,
     update_embedding_knowledge_id,
+    tokenize_by_document,
 )
 from knowledge.task.generate import generate_related_by_document_id
 from knowledge.task.sync import sync_web_document
-from maxkb.const import PROJECT_DIR
-from models_provider.models import Model
-from oss.serializers.file import FileSerializer
 
 default_split_handle = TextSplitHandle()
 split_handles = [
@@ -872,6 +874,41 @@ class DocumentSerializers(serializers.Serializer):
 
             try:
                 embedding_by_document.delay(document_id, embedding_model_id, state_list)
+            except AlreadyQueued as e:
+                raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
+
+        def tokenize(self, state_list=None, with_valid=True):
+            if state_list is None:
+                state_list = [
+                    State.PENDING.value,
+                    State.STARTED.value,
+                    State.SUCCESS.value,
+                    State.FAILURE.value,
+                    State.REVOKE.value,
+                    State.REVOKED.value,
+                    State.IGNORED.value,
+                ]
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            document_id = self.data.get("document_id")
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph)
+                .annotate(
+                    reversed_status=Reverse("status"),
+                    task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+                )
+                .filter(task_type_status__in=state_list, document_id=document_id)
+                .values("id"),
+                TaskType.EMBEDDING,
+                State.PENDING,
+            )
+            ListenerManagement.get_aggregation_document_status(document_id)()
+
+            try:
+                tokenize_by_document.delay(document_id, state_list)
             except AlreadyQueued as e:
                 raise AppApiException(500, _("The task is being executed, please do not send it repeatedly."))
 

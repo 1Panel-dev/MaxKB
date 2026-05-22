@@ -15,71 +15,75 @@ from urllib.parse import quote
 import requests
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
-from django.core import validators
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db import transaction, models
-from django.db.models import QuerySet
-from django.db.models.functions import Reverse, Substr
-from django.db.models.query_utils import Q
-from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext
-from rest_framework import serializers
-
+from common.chunk import text_to_chunk
 from common.config.embedding_config import VectorStore
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import native_search, get_dynamics_model, native_page_search
+from common.db.search import get_dynamics_model, native_page_search, native_search
 from common.db.sql_execute import select_list
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
-from common.utils.common import post, get_file_content, parse_image, bulk_create_in_batches
-from common.utils.fork import Fork, ChildLink
+from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, post
+from common.utils.fork import ChildLink, Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import get_split_model
-from knowledge.models import (
-    Knowledge,
-    KnowledgeScope,
-    KnowledgeType,
-    Document,
-    Paragraph,
-    Problem,
-    ProblemParagraphMapping,
-    TaskType,
-    State,
-    SearchMode,
-    KnowledgeFolder,
-    File,
-    Tag,
-    DocumentTag,
-    KnowledgeWorkflow,
-    FileSourceType,
-    Termbase,
-)
-from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer, ProblemParagraphObject
-from knowledge.serializers.common import (
-    ProblemParagraphManage,
-    drop_knowledge_index,
-    get_embedding_model_id_by_knowledge_id,
-    MetaSerializer,
-    GenerateRelatedSerializer,
-    get_embedding_model_by_knowledge_id,
-    list_paragraph,
-    write_image,
-    zip_dir,
-    update_resource_mapping_by_knowledge,
-)
-from knowledge.serializers.document import DocumentSerializers
-from knowledge.task.embedding import embedding_by_knowledge, delete_embedding_by_knowledge
-from knowledge.task.generate import generate_related_by_knowledge_id
-from knowledge.task.sync import sync_web_knowledge, sync_replace_web_knowledge
+from django.core import validators
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.db import models, transaction
+from django.db.models import QuerySet
+from django.db.models.functions import Reverse, Substr
+from django.db.models.query_utils import Q
+from django.http import HttpResponse
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from models_provider.models import Model
-from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
+from rest_framework import serializers
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from users.serializers.user import is_workspace_manage
+
+from knowledge.models import (
+    Document,
+    DocumentTag,
+    File,
+    FileSourceType,
+    Knowledge,
+    KnowledgeFolder,
+    KnowledgeScope,
+    KnowledgeType,
+    KnowledgeWorkflow,
+    Paragraph,
+    Problem,
+    ProblemParagraphMapping,
+    SearchMode,
+    State,
+    Tag,
+    TaskType,
+    Termbase,
+)
+from knowledge.serializers.common import (
+    BatchMoveSerializer,
+    BatchSerializer,
+    GenerateRelatedSerializer,
+    MetaSerializer,
+    ProblemParagraphManage,
+    ProblemParagraphObject,
+    drop_knowledge_index,
+    get_embedding_model_by_knowledge_id,
+    get_embedding_model_id_by_knowledge_id,
+    list_paragraph,
+    update_resource_mapping_by_knowledge,
+    write_image,
+    zip_dir,
+)
+from knowledge.serializers.document import DocumentSerializers
+from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge
+from knowledge.task.generate import generate_related_by_knowledge_id
+from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
 
 
 class KnowledgeModelSerializer(serializers.ModelSerializer):
@@ -647,11 +651,14 @@ class KnowledgeSerializer(serializers.Serializer):
                 if knowledge.type == KnowledgeType.WORKFLOW:
                     knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                     if knowledge_workflow:
-                        from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
-                        from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowModelSerializer
                         from application.flow.tools import get_tool_id_list
                         from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
-                        from knowledge.serializers.knowledge_workflow import KBWFInstance
+
+                        from knowledge.serializers.knowledge_workflow import (
+                            KBWFInstance,
+                            KnowledgeWorkflowModelSerializer,
+                            KnowledgeWorkflowSerializer,
+                        )
 
                         tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                         tool_list = []
@@ -913,6 +920,7 @@ class KnowledgeSerializer(serializers.Serializer):
                         content=content,
                         is_active=str(para_is_active) == "1",
                         position=row_idx + 1,
+                        chunks=text_to_chunk(content),
                     )
                     paragraph_model_list.append(paragraph)
 

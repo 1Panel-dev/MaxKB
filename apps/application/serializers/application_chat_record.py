@@ -21,6 +21,7 @@ from application.models import ChatRecord, ApplicationAccessToken, Application
 from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import ChatInfo
 from common.auth.authentication import get_is_permissions
+from common.chunk import text_to_chunk
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
@@ -310,7 +311,8 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
                 document_id=document_id,
                 content=chat_record.answer_text,
                 knowledge_id=knowledge_id,
-                title=chat_record.problem_text
+                title=chat_record.problem_text,
+                chunks=text_to_chunk(chat_record.answer_text)
             )
             problem, _ = Problem.objects.get_or_create(content=chat_record.problem_text, knowledge_id=knowledge_id)
             problem_paragraph_mapping = ProblemParagraphMapping(
@@ -443,8 +445,9 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
             document_id=document_id,
             content=instance.get("content"),
             knowledge_id=knowledge_id,
-            title=instance.get("title") if 'title' in instance else '',
-            position=max_position + 1
+            title=instance.get("title") if "title" in instance else "",
+            position=max_position + 1,
+            chunks=text_to_chunk(instance.get("content", "")),
         )
         problem_text = instance.get('problem_text') if instance.get(
             'problem_text') is not None else chat_record.problem_text

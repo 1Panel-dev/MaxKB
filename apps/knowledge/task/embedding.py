@@ -4,22 +4,22 @@ import traceback
 from typing import List
 
 from celery_once import QueueOnce
-from django.db.models import QuerySet
-from django.utils.translation import gettext_lazy as _
-
 from common.config.embedding_config import ModelManage
 from common.event.listener_manage import (
     ListenerManagement,
-    UpdateProblemArgs,
-    UpdateEmbeddingKnowledgeIdArgs,
     UpdateEmbeddingDocumentIdArgs,
+    UpdateEmbeddingKnowledgeIdArgs,
+    UpdateProblemArgs,
 )
 from common.utils.logger import maxkb_logger
-from knowledge.models import Document, TaskType, State
-from knowledge.serializers.common import drop_knowledge_index
+from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from models_provider.models import Model
 from models_provider.tools import get_model, get_model_default_params
 from ops import celery_app
+
+from knowledge.models import Document, State, TaskType
+from knowledge.serializers.common import drop_knowledge_index
 
 
 def get_embedding_model(
@@ -151,6 +151,11 @@ def embedding_by_problem(args, model_id):
 def embedding_by_data_list(args: List, model_id):
     embedding_model = get_embedding_model(model_id)
     ListenerManagement.embedding_by_data_list(args, embedding_model)
+
+
+@celery_app.task(base=QueueOnce, once={"keys": ["document_id"]}, name="celery:tokenize_by_document")
+def tokenize_by_document(document_id, state_list):
+    ListenerManagement.tokenize_by_document(document_id, state_list)
 
 
 def delete_embedding_by_document(document_id):

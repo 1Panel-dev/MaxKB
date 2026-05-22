@@ -4,43 +4,46 @@ from typing import Dict
 
 import uuid_utils.compat as uuid
 from celery_once import AlreadyQueued
-from django.db import transaction
-from django.db.models import QuerySet, Count, F
-from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-
+from common.chunk import text_to_chunk
 from common.db.search import page_search
 from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.utils.common import post
+from django.db import transaction
+from django.db.models import Count, F, QuerySet
+from django.utils.translation import gettext_lazy as _
+from rest_framework import serializers
+
 from knowledge.models import (
+    Document,
+    Knowledge,
     Paragraph,
     Problem,
-    Document,
     ProblemParagraphMapping,
     SourceType,
-    TaskType,
     State,
-    Knowledge,
+    TaskType,
 )
 from knowledge.serializers.common import (
-    ProblemParagraphObject,
+    BatchSerializer,
     ProblemParagraphManage,
+    ProblemParagraphObject,
     get_embedding_model_id_by_knowledge_id,
     update_document_char_length,
-    BatchSerializer,
 )
 from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer, ProblemSerializers
 from knowledge.task.embedding import (
-    embedding_by_paragraph,
-    enable_embedding_by_paragraph,
-    disable_embedding_by_paragraph,
     delete_embedding_by_paragraph,
-    embedding_by_problem as embedding_by_problem_task,
     delete_embedding_by_paragraph_ids,
-    embedding_by_problem,
     delete_embedding_by_source,
+    disable_embedding_by_paragraph,
+    embedding_by_paragraph,
+    embedding_by_problem,
+    enable_embedding_by_paragraph,
     update_embedding_document_id,
+)
+from knowledge.task.embedding import (
+    embedding_by_problem as embedding_by_problem_task,
 )
 from knowledge.task.generate import generate_related_by_paragraph_id_list
 
@@ -225,6 +228,9 @@ class ParagraphSerializers(serializers.Serializer):
                 if update_key in instance and instance.get(update_key) is not None:
                     _paragraph.__setattr__(update_key, instance.get(update_key))
 
+            if instance.get("content") is not None:
+                _paragraph.chunks = text_to_chunk(instance.get("content", ""))
+
             if "problem_list" in instance:
                 update_problem_list = list(
                     filter(lambda row: "id" in row and row.get("id") is not None, instance.get("problem_list"))
@@ -394,6 +400,7 @@ class ParagraphSerializers(serializers.Serializer):
                 content=instance.get("content"),
                 knowledge_id=knowledge_id,
                 title=instance.get("title") if "title" in instance else "",
+                chunks=text_to_chunk(instance.get("content", "")),
             )
             problem_paragraph_object_list = [
                 ProblemParagraphObject(knowledge_id, document_id, str(paragraph.id), problem.get("content"))

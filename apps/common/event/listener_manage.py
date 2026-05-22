@@ -13,12 +13,14 @@ import traceback
 from typing import List
 
 import django.db.models
-from django.db.models import QuerySet
+from django.contrib.postgres.search import SearchVector
+from django.db.models import QuerySet, Value
 from django.db.models.functions import Reverse, Substr
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import (
     Document,
+    Embedding,
     Paragraph,
     ProblemParagraphMapping,
     SearchMode,
@@ -26,6 +28,7 @@ from knowledge.models import (
     State,
     Status,
     TaskType,
+    Termbase,
 )
 from knowledge.serializers.common import create_knowledge_index
 from langchain_core.embeddings import Embeddings
@@ -37,6 +40,7 @@ from common.utils.common import get_file_content
 from common.utils.lock import RedisLock
 from common.utils.logger import maxkb_logger
 from common.utils.page_utils import page_desc
+from common.utils.ts_vecto_util import to_ts_vector
 
 lock = threading.Lock()
 
@@ -207,6 +211,54 @@ class ListenerManagement:
             post_apply()
 
         return embedding_paragraph_apply
+
+    @staticmethod
+    def tokenize_by_paragraph(paragraph_id):
+        maxkb_logger.info(_("Start--->Tokenize paragraph: {paragraph_id}").format(paragraph_id=paragraph_id))
+        # 更新到开始状态
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.STARTED)
+        try:
+            paragraph = QuerySet(Paragraph).filter(id=paragraph_id).first()
+            if paragraph is None:
+                return
+            chunks = paragraph.chunks
+            # 提前查询一次用户词汇，避免循环内重复查询
+            user_words = list(
+                QuerySet(Termbase)
+                .filter(knowledge_id=paragraph.knowledge_id)
+                .values_list("content", flat=True)
+            )
+            data_list = list(QuerySet(Embedding).filter(paragraph_id=paragraph_id))
+            for data, chunk in zip(data_list, chunks):
+                data.search_vector = SearchVector(Value(to_ts_vector(chunk, user_words=user_words)))
+            # 批量保存，减少数据库写入次数
+            QuerySet(Embedding).filter(paragraph_id=paragraph_id).bulk_update(data_list, ["search_vector"])
+
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.SUCCESS
+            )
+        except Exception as e:
+            maxkb_logger.error(
+                _("Tokenize paragraph: {paragraph_id} error {error} {traceback}").format(
+                    paragraph_id=paragraph_id, error=str(e), traceback=traceback.format_exc()
+                )
+            )
+            ListenerManagement.update_status(
+                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.FAILURE
+            )
+        finally:
+            maxkb_logger.info(_("End--->Tokenize paragraph: {paragraph_id}").format(paragraph_id=paragraph_id))
+
+    @staticmethod
+    def get_tokenize_paragraph_apply(is_the_task_interrupted, post_apply=lambda: None):
+        def tokenize_paragraph_apply(paragraph_list):
+            for paragraph in paragraph_list:
+                if is_the_task_interrupted():
+                    break
+                ListenerManagement.tokenize_by_paragraph(str(paragraph.get("id")))
+            post_apply()
+
+        return tokenize_paragraph_apply
 
     @staticmethod
     def get_aggregation_document_status(document_id):
@@ -462,3 +514,54 @@ class ListenerManagement:
         return VectorStore.get_embedding_vector().hit_test(
             query_text, knowledge_id, exclude_document_id_list, top_number, similarity, search_mode, embedding
         )
+
+    @staticmethod
+    def tokenize_by_document(document_id, state_list):
+        if state_list is None:
+            state_list = [State.PENDING, State.SUCCESS, State.FAILURE, State.REVOKE, State.REVOKED]
+        rlock = RedisLock()
+        if not rlock.try_lock("tokenize:" + str(document_id)):
+            return
+        try:
+
+            def is_the_task_interrupted():
+                document = QuerySet(Document).filter(id=document_id).first()
+                if document is None or Status(document.status)[TaskType.EMBEDDING] == State.REVOKE:
+                    return True
+                return False
+
+            if is_the_task_interrupted():
+                return
+            maxkb_logger.info(_("Start--->Tokenize document: {document_id}").format(document_id=document_id))
+            # 批量修改状态为PADDING
+            ListenerManagement.update_status(
+                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.STARTED
+            )
+
+            # 根据段落进行向量化处理
+            page_desc(
+                QuerySet(Paragraph)
+                .annotate(
+                    reversed_status=Reverse("status"),
+                    task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+                )
+                .filter(task_type_status__in=state_list, document_id=document_id)
+                .values("id"),
+                5,
+                ListenerManagement.get_tokenize_paragraph_apply(
+                    is_the_task_interrupted,
+                    ListenerManagement.get_aggregation_document_status(document_id),
+                ),
+                is_the_task_interrupted,
+            )
+        except Exception as e:
+            maxkb_logger.error(
+                _("Tokenize document: {document_id} error {error} {traceback}").format(
+                    document_id=document_id, error=str(e), traceback=traceback.format_exc()
+                )
+            )
+        finally:
+            ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
+            ListenerManagement.get_aggregation_document_status(document_id)()
+            maxkb_logger.info(_("End--->Tokenize document: {document_id}").format(document_id=document_id))
+            rlock.un_lock("tokenize:" + str(document_id))

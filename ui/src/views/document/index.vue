@@ -1287,7 +1287,7 @@ function batchTokenize() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
   const stateList = ['0', '1', '2', '3', '4', '5', 'n']
   loadSharedApi({type: 'document', systemType: apiType.value})
-    .putBatchRefresh(id, arr, stateList, loading)
+    .putBatchTokenize(id, arr, stateList, loading)
     .then(() => {
       multipleTableRef.value?.clearSelection()
     })

@@ -1,31 +1,32 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： base_vector.py
-    @date：2023/10/18 19:16
-    @desc:
+@project: maxkb
+@Author：虎
+@file： base_vector.py
+@date：2023/10/18 19:16
+@desc:
 """
+
 import re
 import threading
 from abc import ABC, abstractmethod
 from functools import reduce
-from typing import List, Dict
-
-from langchain_core.embeddings import Embeddings
+from typing import Dict, List
 
 from common.chunk import text_to_chunk
 from common.utils.common import sub_array
-from knowledge.models import SourceType, SearchMode
+from langchain_core.embeddings import Embeddings
+
+from knowledge.models import SearchMode, SourceType
 
 lock = threading.Lock()
 
 
 def chunk_data(data: Dict):
-    if str(data.get('source_type')) == str(SourceType.PARAGRAPH.value):
-        text = data.get('text')
-        chunk_list = data.get('chunks') if data.get('chunks') else text_to_chunk(text)
-        return [{**data, 'text': chunk} for chunk in chunk_list]
+    if str(data.get("source_type")) == str(SourceType.PARAGRAPH.value):
+        text = data.get("text")
+        chunk_list = data.get("chunks") if data.get("chunks") else text_to_chunk(text)
+        return [{**data, "text": chunk} for chunk in chunk_list]
     return [data]
 
 
@@ -39,7 +40,7 @@ RE_EMOJI = re.compile(
     r"[\U0001F300-\U0001FAFF]"  # Emoji
     r"|[\u2600-\u27BF]"  # Dingbats / Symbols（⚓ 在这）
     r"|[\uFE0E\uFE0F]",  # Variation Selectors
-    flags=re.UNICODE
+    flags=re.UNICODE,
 )
 
 RE_WHITESPACE = re.compile(r"\s+")
@@ -84,10 +85,17 @@ class BaseVectorStore(ABC):
                 BaseVectorStore.vector_exists = True
         return True
 
-    def save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str,
-             source_id: str,
-             is_active: bool,
-             embedding: Embeddings):
+    def save(
+        self,
+        text,
+        source_type: SourceType,
+        knowledge_id: str,
+        document_id: str,
+        paragraph_id: str,
+        source_id: str,
+        is_active: bool,
+        embedding: Embeddings,
+    ):
         """
         插入向量数据
         :param source_id:  资源id
@@ -101,8 +109,15 @@ class BaseVectorStore(ABC):
         :return:  bool
         """
         self.save_pre_handler()
-        data = {'document_id': document_id, 'paragraph_id': paragraph_id, 'knowledge_id': knowledge_id,
-                'is_active': is_active, 'source_id': source_id, 'source_type': source_type, 'text': text}
+        data = {
+            "document_id": document_id,
+            "paragraph_id": paragraph_id,
+            "knowledge_id": knowledge_id,
+            "is_active": is_active,
+            "source_id": source_id,
+            "source_type": source_type,
+            "text": text,
+        }
         chunk_list = chunk_data(data)
         result = sub_array(chunk_list)
         for child_array in result:
@@ -126,41 +141,68 @@ class BaseVectorStore(ABC):
                 break
 
     @abstractmethod
-    def _save(self, text, source_type: SourceType, knowledge_id: str, document_id: str, paragraph_id: str,
-              source_id: str,
-              is_active: bool,
-              embedding: Embeddings):
+    def _save(
+        self,
+        text,
+        source_type: SourceType,
+        knowledge_id: str,
+        document_id: str,
+        paragraph_id: str,
+        source_id: str,
+        is_active: bool,
+        embedding: Embeddings,
+    ):
         pass
 
     @abstractmethod
     def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
         pass
 
-    def search(self, query_text, knowledge_id_list: list[str], exclude_document_id_list: list[str],
-               exclude_paragraph_list: list[str],
-               is_active: bool,
-               embedding: Embeddings):
+    def search(
+        self,
+        query_text,
+        knowledge_id_list: list[str],
+        exclude_document_id_list: list[str],
+        exclude_paragraph_list: list[str],
+        is_active: bool,
+        embedding: Embeddings,
+    ):
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
         query_text = normalize_for_embedding(query_text)
         embedding_query = embedding.embed_query(query_text)
-        result = self.query(embedding_query, knowledge_id_list, exclude_document_id_list, exclude_paragraph_list,
-                            is_active, 1, 3, 0.65)
+        result = self.query(
+            embedding_query, knowledge_id_list, exclude_document_id_list, exclude_paragraph_list, is_active, 1, 3, 0.65
+        )
         return result[0]
 
     @abstractmethod
-    def query(self, query_text: str, query_embedding: List[float], knowledge_id_list: list[str],
-              document_id_list: list[str] | None,
-              exclude_document_id_list: list[str],
-              exclude_paragraph_list: list[str], is_active: bool, top_n: int, similarity: float,
-              search_mode: SearchMode):
+    def query(
+        self,
+        query_text: str,
+        query_embedding: List[float],
+        knowledge_id_list: list[str],
+        document_id_list: list[str] | None,
+        exclude_document_id_list: list[str],
+        exclude_paragraph_list: list[str],
+        is_active: bool,
+        top_n: int,
+        similarity: float,
+        search_mode: SearchMode,
+    ):
         pass
 
     @abstractmethod
-    def hit_test(self, query_text, knowledge_id: list[str], exclude_document_id_list: list[str], top_number: int,
-                 similarity: float,
-                 search_mode: SearchMode,
-                 embedding: Embeddings):
+    def hit_test(
+        self,
+        query_text,
+        knowledge_id: list[str],
+        exclude_document_id_list: list[str],
+        top_number: int,
+        similarity: float,
+        search_mode: SearchMode,
+        embedding: Embeddings,
+    ):
         pass
 
     @abstractmethod
