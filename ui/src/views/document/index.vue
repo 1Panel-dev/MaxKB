@@ -54,7 +54,7 @@
                   @click="batchTokenize"
                   :disabled="multipleSelection.length === 0"
                   v-if="permissionPrecise.doc_vector(id)"
-                  >{{ $t('分词索引') }}
+                  >{{ $t('views.knowledge.customSegmentation.wordIndexing') }}
                 </el-button>
                 <el-button
                   @click="openGenerateDialog()"
@@ -108,14 +108,14 @@
                         :disabled="multipleSelection.length === 0"
                         v-if="permissionPrecise.doc_export(id)"
                       >
-                        {{ $t('views.document.setting.export') }} Excel
+                        {{ $t('common.export') }} Excel
                       </el-dropdown-item>
                       <el-dropdown-item
                         @click="exportMulDocumentZip"
                         :disabled="multipleSelection.length === 0"
                         v-if="permissionPrecise.doc_export(id)"
                       >
-                        {{ $t('views.document.setting.export') }} Zip
+                        {{ $t('common.export') }} Zip
                       </el-dropdown-item>
 
                       <el-dropdown-item
@@ -599,14 +599,14 @@
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                            {{ $t('views.document.setting.export') }} Excel
+                            {{ $t('common.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                            {{ $t('views.document.setting.export') }} Zip
+                            {{ $t('common.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="downloadDocument(row)"
@@ -742,14 +742,14 @@
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                            {{ $t('views.document.setting.export') }} Excel
+                            {{ $t('common.export') }} Excel
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click="exportDocumentZip(row)"
                             v-if="permissionPrecise.doc_export(id)"
                           >
                             <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
-                            {{ $t('views.document.setting.export') }} Zip
+                            {{ $t('common.export') }} Zip
                           </el-dropdown-item>
                           <el-dropdown-item
                             @click.stop="deleteDocument(row)"

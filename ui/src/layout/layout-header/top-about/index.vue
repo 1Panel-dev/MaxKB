@@ -71,7 +71,7 @@
     >
       <el-button text @click="toUrl(theme.themeInfo?.forumUrl)">
         <AppIcon
-          iconName="app-help"
+          iconName="app-problems"
           class="cursor color-secondary"
           style="font-size: 20px"
         ></AppIcon>

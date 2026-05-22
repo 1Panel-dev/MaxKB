@@ -305,9 +305,9 @@ const DocumentRouter = {
       path: 'termbase',
       name: 'Termbase',
       meta: {
-        icon: 'app-problems',
-        iconActive: 'QuestionFilled',
-        title: '自定义分词',
+        icon: 'app-custom-segmentation',
+        iconActive: 'app-custom-segmentation',
+        title: 'views.knowledge.customSegmentation.title',
         active: 'termbase',
         parentPath: '/knowledge/:id/:folderId/:type',
         parentName: 'KnowledgeDetail',

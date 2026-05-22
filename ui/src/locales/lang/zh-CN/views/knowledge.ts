@@ -118,4 +118,14 @@ export default {
     tip: '注意：转换后不可撤回。',
     comfirm: '确定转换为工作流知识库？转换后无法回退，请谨慎操作。',
   },
+  customSegmentation: {
+    title: '自定义分段',
+    tip: '避免专业术语被拆分，提升全文检索的精准度与召回率',
+    create: '创建词语',
+    quickCreate: '快速创建词语',
+    word: '词语',
+    wordplaceholder: '请输入需要保留的专业术语/专属词汇，一行一个',
+    wordRequiredMessage: '请输入词语',
+    wordIndexing: '分词索引',
+  },
 }

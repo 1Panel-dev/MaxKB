@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    :title="$t('创建词语')"
+    :title="$t('views.knowledge.customSegmentation.create')"
     v-model="dialogVisible"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
@@ -13,10 +13,10 @@
       :model="form"
       require-asterisk-position="right"
     >
-      <el-form-item :label="$t('词语')" prop="data">
+      <el-form-item :label="$t('views.knowledge.customSegmentation.word')" prop="data">
         <el-input
           v-model="form.data"
-          :placeholder="$t('请输入需要保留的专业术语/专属词汇，一行一个')"
+          :placeholder="$t('views.knowledge.customSegmentation.wordplaceholder')"
           :rows="10"
           type="textarea"
         />
@@ -63,7 +63,7 @@ const form = ref<any>({
 })
 
 const rules = reactive({
-  data: [{ required: true, message: t('请输入词语'), trigger: 'blur' }],
+  data: [{ required: true, message: t('views.knowledge.customSegmentation.wordRequiredMessage'), trigger: 'blur' }],
 })
 
 const dialogVisible = ref<boolean>(false)

@@ -9,7 +9,6 @@ export default {
     cancelGenerateQuestion: '取消生成問題',
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成',
-    export: '匯出',
     exportDocument: '匯出文檔',
     exportKnowledge: '匯出知識庫',
     download: '下載原文件',

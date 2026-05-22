@@ -949,7 +949,6 @@ import McpServersDialog from '@/views/application/component/McpServersDialog.vue
 import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
 import useStore from '@/stores'
-import AppIcon from '@/components/app-icon/AppIcon.vue'
 import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
 const route = useRoute()
 const router = useRouter()

@@ -183,7 +183,7 @@
                           v-if="themeForm.showUserManual"
                         ></AppIcon>
                         <AppIcon
-                          iconName="app-help"
+                          iconName="app-problems"
                           class="cursor color-secondary ml-8"
                           style="font-size: 20px"
                           v-if="themeForm.showForum"

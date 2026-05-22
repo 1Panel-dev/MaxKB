@@ -10,7 +10,6 @@ export default {
     cancelGenerateQuestion: '取消生成问题',
     cancelVectorization: '取消向量化',
     cancelGenerate: '取消生成',
-    export: '导出',
     exportDocument: '导出文档',
     exportKnowledge: '导出知识库',
     download: '下载原文档',

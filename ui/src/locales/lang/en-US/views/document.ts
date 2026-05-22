@@ -9,7 +9,6 @@ export default {
     cancelGenerateQuestion: 'Cancel Generating Questions',
     cancelVectorization: 'Cancel Vectorization',
     cancelGenerate: 'Cancel Generation',
-    export: 'Export to',
     exportDocument: 'Export Document',
     exportKnowledge: 'Export Knowledge',
     download: 'Download',
