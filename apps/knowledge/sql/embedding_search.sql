@@ -1,3 +1,10 @@
+WITH vector_top AS (
+	SELECT paragraph_id,
+	       (embedding::vector(%s) <=> %s) AS distance
+	FROM embedding ${embedding_query}
+	ORDER BY (embedding::vector(%s) <=> %s)
+	LIMIT LEAST(%s * 10, 500)
+)
 SELECT
     paragraph_id,
 	comprehensive_score,
@@ -5,13 +12,14 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		("paragraph_id") ( 1 - distance ),* ,(1 - distance) AS comprehensive_score
+		(vc.paragraph_id) vc.paragraph_id,
+		(1 - vc.distance) AS comprehensive_score
 	FROM
-		( SELECT *, ( embedding.embedding::vector(%s) <=>  %s ) AS distance FROM embedding ${embedding_query} ORDER BY distance) TEMP
+		vector_top vc
 	ORDER BY
-		paragraph_id,
-		distance
-	) DISTINCT_TEMP
+		vc.paragraph_id,
+		comprehensive_score DESC
+	) sub
 WHERE comprehensive_score>%s
 ORDER BY comprehensive_score DESC
 LIMIT %s

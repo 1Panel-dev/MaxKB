@@ -123,15 +123,27 @@ class PGVector(BaseVectorStore):
         exclude_dict = {}
         query_text = normalize_for_embedding(query_text)
         embedding_query = embedding.embed_query(query_text)
-        query_set = QuerySet(Embedding).filter(knowledge_id__in=knowledge_id_list, is_active=True)
         if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
             exclude_dict.__setitem__("document_id__in", exclude_document_id_list)
-        query_set = query_set.exclude(**exclude_dict)
         for search_handle in search_handle_list:
             if search_handle.support(search_mode):
-                return search_handle.handle(
-                    query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
-                )
+                # Query per knowledge base to leverage per-KB partial HNSW indexes
+                # (WHERE knowledge_id = '{k_id}'), which won't be used with knowledge_id__in
+                if len(knowledge_id_list) == 1:
+                    query_set = QuerySet(Embedding).filter(knowledge_id=knowledge_id_list[0], is_active=True).exclude(**exclude_dict)
+                    return search_handle.handle(
+                        query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
+                    )
+                else:
+                    all_results = []
+                    for kid in knowledge_id_list:
+                        query_set = QuerySet(Embedding).filter(knowledge_id=kid, is_active=True).exclude(**exclude_dict)
+                        results = search_handle.handle(
+                            query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
+                        )
+                        all_results.extend(results)
+                    all_results.sort(key=lambda x: x.get("similarity", x.get("comprehensive_score", 0)), reverse=True)
+                    return all_results[:top_number]
 
     def query(
         self,
@@ -149,19 +161,35 @@ class PGVector(BaseVectorStore):
         exclude_dict = {}
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
-        query_set = QuerySet(Embedding).filter(knowledge_id__in=knowledge_id_list, is_active=is_active)
-        if document_id_list is not None and len(document_id_list) > 0:
-            query_set = query_set.filter(document_id__in=document_id_list)
-        if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
-            query_set = query_set.exclude(document_id__in=exclude_document_id_list)
-        if exclude_paragraph_list is not None and len(exclude_paragraph_list) > 0:
-            query_set = query_set.exclude(paragraph_id__in=exclude_paragraph_list)
-        query_set = query_set.exclude(**exclude_dict)
         for search_handle in search_handle_list:
             if search_handle.support(search_mode):
-                return search_handle.handle(
-                    query_set, query_text, query_embedding, top_n, similarity, search_mode, knowledge_id_list
-                )
+                # Query per knowledge base to leverage per-KB partial HNSW indexes
+                # (WHERE knowledge_id = '{k_id}'), which won't be used with knowledge_id__in
+                def build_query_set(kid):
+                    qs = QuerySet(Embedding).filter(knowledge_id=kid, is_active=is_active)
+                    if document_id_list is not None and len(document_id_list) > 0:
+                        qs = qs.filter(document_id__in=document_id_list)
+                    if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
+                        qs = qs.exclude(document_id__in=exclude_document_id_list)
+                    if exclude_paragraph_list is not None and len(exclude_paragraph_list) > 0:
+                        qs = qs.exclude(paragraph_id__in=exclude_paragraph_list)
+                    qs = qs.exclude(**exclude_dict)
+                    return qs
+                if len(knowledge_id_list) == 1:
+                    query_set = build_query_set(knowledge_id_list[0])
+                    return search_handle.handle(
+                        query_set, query_text, query_embedding, top_n, similarity, search_mode, knowledge_id_list
+                    )
+                else:
+                    all_results = []
+                    for kid in knowledge_id_list:
+                        query_set = build_query_set(kid)
+                        results = search_handle.handle(
+                            query_set, query_text, query_embedding, top_n, similarity, search_mode, knowledge_id_list
+                        )
+                        all_results.extend(results)
+                    all_results.sort(key=lambda x: x.get("similarity", x.get("comprehensive_score", 0)), reverse=True)
+                    return all_results[:top_n]
 
     def update_by_source_id(self, source_id: str, instance: Dict):
         QuerySet(Embedding).filter(source_id=source_id).update(**instance)
@@ -236,7 +264,7 @@ class EmbeddingSearch(ISearch):
             with_table_name=True,
         )
         embedding_model = select_list(
-            exec_sql, [len(query_embedding), json.dumps(query_embedding), *exec_params, similarity, top_number]
+            exec_sql, [len(query_embedding), json.dumps(query_embedding), *exec_params, len(query_embedding), json.dumps(query_embedding), top_number, similarity, top_number]
         )
         return embedding_model
 
@@ -268,7 +296,7 @@ class KeywordsSearch(ISearch):
             else None
         )
         embedding_model = select_list(
-            exec_sql, [to_query(query_text, user_words=terms), *exec_params, similarity, top_number]
+            exec_sql, [to_query(query_text, user_words=terms), *exec_params, to_query(query_text, user_words=terms), similarity, top_number]
         )
         return embedding_model
 
@@ -302,8 +330,11 @@ class BlendSearch(ISearch):
             [
                 len(query_embedding),
                 json.dumps(query_embedding),
-                to_query(query_text, user_words=terms),
                 *exec_params,
+                len(query_embedding),
+                json.dumps(query_embedding),
+                top_number,
+                to_query(query_text, user_words=terms),
                 similarity,
                 top_number,
             ],
