@@ -1,3 +1,11 @@
+WITH vector_top AS (
+	SELECT id,
+	       paragraph_id,
+	       (embedding::vector(%s) <=> %s) AS distance
+	FROM embedding ${embedding_query}
+	ORDER BY (embedding::vector(%s) <=> %s)
+	LIMIT LEAST(%s * 10, 500)
+)
 SELECT
 	paragraph_id,
 	comprehensive_score,
@@ -5,24 +13,15 @@ SELECT
 FROM
 	(
 	SELECT DISTINCT ON
-		( "paragraph_id" ) ( 1 - distance + ts_similarity ) as similarity, *,
-		(1 - distance + ts_similarity) AS comprehensive_score
+		(vc.paragraph_id) vc.paragraph_id,
+		(1 - vc.distance + COALESCE(ts_rank_cd(e.search_vector, websearch_to_tsquery('simple', %s), 32), 0)) AS comprehensive_score
 	FROM
-		(
-		SELECT
-			*,
-			(embedding.embedding::vector(%s) <=>  %s) as distance,
-			(ts_rank_cd( embedding.search_vector, websearch_to_tsquery('simple', %s ), 32 )) AS ts_similarity
-		FROM
-			embedding ${embedding_query}
-		    ORDER BY distance
-		) TEMP
+		vector_top vc
+	JOIN embedding e ON e.id = vc.id
 	ORDER BY
-		paragraph_id,
-		similarity DESC
-	) DISTINCT_TEMP
-WHERE
-	comprehensive_score >%s
-ORDER BY
-	comprehensive_score DESC
-	LIMIT %s
+		vc.paragraph_id,
+		comprehensive_score DESC
+	) sub
+WHERE comprehensive_score>%s
+ORDER BY comprehensive_score DESC
+LIMIT %s
