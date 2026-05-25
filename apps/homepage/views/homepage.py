@@ -15,7 +15,7 @@ from common import result
 from common.auth import TokenAuth
 from homepage.api.home_page_api import ApplicationTokensRankingAPI, ApplicationQuestionRankingAPI, UserTokensRankingAPI, \
     ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI, \
-    ApplicationMonitoringAPI
+    ApplicationMonitoringAPI, RankingBaseAPI, TokensAggregationAPI
 from homepage.serializers.homepage import HomePageSerializer
 from django.utils.translation import gettext_lazy as _
 
@@ -23,18 +23,40 @@ from django.utils.translation import gettext_lazy as _
 class HomePageAPI(APIView):
     authentication_classes = [TokenAuth]
 
-    @extend_schema(
-        methods=["GET"],
-        description=_("Top applications by token consumption"),
-        summary=_("Top applications by token consumption"),
-        operation_id="homepage_application_tokens_ranking",
-        parameters=ApplicationTokensRankingAPI.get_parameters(),
-        responses=ApplicationTokensRankingAPI.get_response(),
-        tags=[_("Home page")],
-    )
+    class TokensAggregation(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Tokens data aggregation"),
+            summary=_("Tokens data aggregation"),
+            operation_id="homepage_model_aggregation",
+            parameters=TokensAggregationAPI.get_parameters(),
+            responses=TokensAggregationAPI.get_response(),
+            tags=[_("Home page")],
+        )
+        def get(self, request: Request, workspace_id: str):
+            return result.success(
+                HomePageSerializer.TokensAggregation(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id,
+                          'start_time': request.query_params.get(
+                              'start_time'),
+                          'end_time': request.query_params.get(
+                              'end_time')}).aggregation(
+                    request.auth))
+
     class ApplicationTokensRanking(APIView):
         authentication_classes = [TokenAuth]
 
+        @extend_schema(
+            methods=["GET"],
+            description=_("Top applications by token consumption"),
+            summary=_("Top applications by token consumption"),
+            operation_id="homepage_application_tokens_ranking",
+            parameters=ApplicationTokensRankingAPI.get_parameters(),
+            responses=ApplicationTokensRankingAPI.get_response(),
+            tags=[_("Home page")],
+        )
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationTokensRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
