@@ -78,13 +78,13 @@ const isSubmitDisabled = computed(() => {
 const LIKE_REASONS = [
   { label: t('chat.vote.accurate'), value: 'accurate' },
   { label: t('chat.vote.complete'), value: 'complete' },
-  { label: t('chat.vote.other'), value: 'other' },
+  { label: t('common.other'), value: 'other' },
 ]
 
 const OPPOSE_REASONS = [
   { label: t('chat.vote.inaccurate'), value: 'inaccurate' },
   { label: t('chat.vote.irrelevantAnswer'), value: 'incomplete' },
-  { label: t('chat.vote.other'), value: 'other' },
+  { label: t('common.other'), value: 'other' },
 ]
 
 const title = computed(() => {

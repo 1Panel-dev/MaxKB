@@ -11,7 +11,7 @@ export function toThousands(num: any) {
 }
 
 export function numberFormat(num: number) {
-  return num < 1000 ? toThousands(num) : toThousands((num / 1000).toFixed(1)) + 'k'
+  return num < 1000 ? toThousands(num): toThousands((num / 1000).toFixed(1)) + 'k'
 }
 
 export function filesize(size: number) {

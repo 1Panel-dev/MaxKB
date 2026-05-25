@@ -87,7 +87,6 @@ export default {
       past30Days: '過去30天',
       past90Days: '過去90天',
       past183Days: '過去半年',
-      other: '自訂义',
     },
     charts: {
       customerTotal: '用戶總數',

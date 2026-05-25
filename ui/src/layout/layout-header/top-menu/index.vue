@@ -16,7 +16,7 @@ import { hasPermission, set_next_route } from '@/utils/permission/index'
 import MenuItem from './MenuItem.vue'
 
 const topMenuList = computed(() => {
-  const menu = getChildRouteListByPathAndName('/', 'home').filter(
+  const menu = getChildRouteListByPathAndName('/', 'root').filter(
     (item) =>
       item.meta?.menu &&
       (item.meta.permission ? hasPermission(item.meta.permission as any, 'OR') : true),

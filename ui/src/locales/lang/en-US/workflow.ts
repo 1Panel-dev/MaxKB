@@ -118,7 +118,6 @@ export default {
     classify: {
       aiCapability: 'AI capability',
       businessLogic: 'Business logic',
-      other: 'Other',
       dataProcessing: 'Data Processing',
     },
     startNode: {
@@ -451,7 +450,6 @@ You are a master of problem optimization, adept at accurately inferring user int
     intentNode: {
       label: 'IntentNode',
       text: 'Match user questions with user-defined intent classifications',
-      other: 'other',
       error2: 'Repeated intent',
       placeholder: 'Please choose a classification option',
       classify: {

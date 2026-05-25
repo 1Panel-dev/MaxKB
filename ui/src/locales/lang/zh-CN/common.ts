@@ -155,4 +155,5 @@ export default {
   knowledgeImportTip:
     '导入创建知识库成功，文档数据未向量化，请先设置知识库的向量模型，并对文档进行向量化操作',
   import: '导入',
+  other: '其他',
 }

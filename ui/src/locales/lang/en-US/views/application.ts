@@ -40,10 +40,12 @@ export default {
     setting: 'Long-term Memory Settings',
     triggerType: 'Trigger Type',
     roundTrigger: 'Round-based Trigger',
-    roundTriggerTip: 'After accumulating N rounds, automatically extract N rounds of conversation to generate memory',
+    roundTriggerTip:
+      'After accumulating N rounds, automatically extract N rounds of conversation to generate memory',
     triggerInterval: 'Trigger Interval',
     scheduledTrigger: 'Scheduled Trigger',
-    scheduledTriggerTip: 'After reaching the set time, automatically extract all conversations within the cycle to generate memory',
+    scheduledTriggerTip:
+      'After reaching the set time, automatically extract all conversations within the cycle to generate memory',
     cronExpressionInvalid: 'Cron expression is invalid',
     tips1: `After enabling, new conversations will be recorded from the activation time and memory will be generated periodically, which can be called through`,
     tips2: `variables in the system prompt.
@@ -51,6 +53,7 @@ After disabling, the long-term memory of the conversation users will be cleared,
   },
   form: {
     appName: {
+      label: 'Agent name',
       placeholder: 'Please enter the agent name',
       requiredMessage: 'Agent name is required',
     },

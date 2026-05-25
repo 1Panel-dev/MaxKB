@@ -30,10 +30,10 @@
               :size="32"
               style="background: none"
             >
-              <img :src="String(workflowForm.icon)" alt=""/>
+              <img :src="String(workflowForm.icon)" alt="" />
             </el-Avatar>
             <el-avatar v-else class="avatar-green" shape="square" :size="32">
-              <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt=""/>
+              <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-Avatar
               v-if="showEditIcon"
@@ -47,7 +47,7 @@
             </el-Avatar>
           </div>
           <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
-            <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt=""/>
+            <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt="" />
           </el-avatar>
           <el-input
             v-model="workflowForm.name"
@@ -80,22 +80,22 @@
         </el-button>
       </span>
     </template>
-    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="WORKFLOW"/>
+    <EditAvatarDialog ref="EditAvatarDialogRef" @refresh="refreshTool" iconType="WORKFLOW" />
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {ref, watch, reactive, computed} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
+import { ref, watch, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import EditAvatarDialog from '@/views/tool/component/EditAvatarDialog.vue'
-import {isAppIcon} from '@/utils/common'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
+import { isAppIcon } from '@/utils/common'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
 import useStore from '@/stores'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
-import {cloneDeep} from "lodash";
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { cloneDeep } from 'lodash'
 
 const router = useRouter()
-const {user, folder} = useStore()
+const { user, folder } = useStore()
 const emit = defineEmits(['refresh'])
 
 const props = defineProps({
@@ -178,7 +178,7 @@ const submitHandle = async () => {
   await FolderFormRef.value.validate((valid: any) => {
     if (valid) {
       if (isEdit.value) {
-        loadSharedApi({type: 'tool', systemType: apiType.value})
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
           .putTool(editId.value as string, workflowForm.value)
           .then((res: any) => {
             MsgSuccess(t('common.editSuccess'))
@@ -191,15 +191,19 @@ const submitHandle = async () => {
             loading.value = false
           })
       } else {
-        loadSharedApi({type: 'tool', systemType: apiType.value})
-          .postTool({...workflowForm.value, folder_id: folder.currentFolder?.id, code: 'None'})
+        loadSharedApi({ type: 'tool', systemType: apiType.value })
+          .postTool({
+            ...workflowForm.value,
+            folder_id: folder.currentFolder?.id || user.getWorkspaceId() || 'default',
+            code: 'None',
+          })
           .then((res: any) => {
             MsgSuccess(t('common.createSuccess'))
             return user.profile().then(() => {
               const folderId = res.data.scope === 'SHARED' ? 'shared' : res.data.folder_id
               router.push({
                 name: 'ToolWorkflow',
-                params: {id: res.data.id, folderId: folderId},
+                params: { id: res.data.id, folderId: folderId },
               })
               dialogVisible.value = false
             })
@@ -212,6 +216,6 @@ const submitHandle = async () => {
   })
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped></style>

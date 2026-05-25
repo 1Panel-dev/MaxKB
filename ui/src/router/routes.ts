@@ -7,10 +7,36 @@ const rolesRoutes: RouteRecordRaw[] = [...Object.keys(modules).map((key) => modu
 export const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
-    name: 'home',
-    redirect: '/application',
+    name: 'root',
+    redirect: '/home',
     children: [
       ...rolesRoutes,
+      {
+        path: '/home',
+        name: 'home',
+        redirect: '/home',
+        meta: {
+          title: 'layout.home.title',
+          menu: true,
+          order: 1,
+          icon: 'app-home',
+          iconActive: 'app-home-active',
+          group: 'workspace',
+        },
+        children: [
+          {
+            path: '/home',
+            name: 'home-index',
+            meta: {
+              title: 'layout.home.title',
+              activeMenu: '/home',
+              sameRoute: 'home',
+            },
+            component: () => import('@/views/home/index.vue'),
+          },
+        ],
+        component: () => import('@/layout/layout-template/SimpleLayout.vue'),
+      },
       {
         path: '/no-permission',
         name: 'noPermission',

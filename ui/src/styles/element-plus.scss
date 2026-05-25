@@ -427,3 +427,8 @@
   border: 1px solid var(--app-border-color-dark);
   background: var(--app-border-color-dark);
 }
+
+// el-progress
+.el-progress-bar__inner {
+  background: linear-gradient(90deg, #adc6ff 0%, #3370ff 100%);
+}
