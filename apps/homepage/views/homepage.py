@@ -23,6 +23,28 @@ from django.utils.translation import gettext_lazy as _
 class HomePageAPI(APIView):
     authentication_classes = [TokenAuth]
 
+    class ChatRecordAggregation(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Chat record data aggregation"),
+            summary=_("Chat record aggregation"),
+            operation_id="homepage_chat_count_aggregation",
+            parameters=TokensAggregationAPI.get_parameters(),
+            responses=TokensAggregationAPI.get_response(),
+            tags=[_("Home page")],
+        )
+        def get(self, request: Request, workspace_id: str):
+            return result.success(
+                HomePageSerializer.ChatRecordAggregation(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id,
+                          'start_time': request.query_params.get(
+                              'start_time'),
+                          'end_time': request.query_params.get(
+                              'end_time')}).aggregation(
+                    request.auth))
+
     class TokensAggregation(APIView):
         authentication_classes = [TokenAuth]
 
@@ -30,7 +52,7 @@ class HomePageAPI(APIView):
             methods=["GET"],
             description=_("Tokens data aggregation"),
             summary=_("Tokens data aggregation"),
-            operation_id="homepage_model_aggregation",
+            operation_id="homepage_tokens_aggregation",
             parameters=TokensAggregationAPI.get_parameters(),
             responses=TokensAggregationAPI.get_response(),
             tags=[_("Home page")],
