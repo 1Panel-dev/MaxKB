@@ -43,58 +43,61 @@ const getModelAggregation: (loading?: Ref<boolean>) => Promise<Result<any>> = (l
 
 /**
  * Tokens 消耗
- * @params
+ * @params {end_time,start_time}
  */
-const getTokensRanking: (page: pageRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  page,
-  loading,
-) => {
+const getTokensRanking: (
+  page: pageRequest,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (page, params, loading) => {
   return get(
     `${prefix.value}/application/tokens_ranking/${page.current_page}/${page.page_size}`,
-    undefined,
+    params,
     loading,
   )
 }
 /**
  * 提问次数
- * @params
+ * @params {end_time,start_time}
  */
-const getQuestionsRanking: (page: pageRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  page,
-  loading,
-) => {
+const getQuestionsRanking: (
+  page: pageRequest,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (page, params, loading) => {
   return get(
     `${prefix.value}/application/question_ranking/${page.current_page}/${page.page_size}`,
-    undefined,
+    params,
     loading,
   )
 }
 /**
  * 用户消耗token
- * @params
+ * @params {end_time,start_time}
  */
-const getUserTokensRanking: (page: pageRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  page,
-  loading,
-) => {
+const getUserTokensRanking: (
+  page: pageRequest,
+  params: any,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (page, params, loading) => {
   return get(
     `${prefix.value}/application/user_tokens_ranking/${page.current_page}/${page.page_size}`,
-    undefined,
+    params,
     loading,
   )
 }
 
 /**
  * 与对话有关的统计趋势
- * @params
+ * @params  {application_id, end_time, start_time}
  */
-const getMonitorAggregation: (page: pageRequest, loading?: Ref<boolean>) => Promise<Result<any>> = (
-  page,
+const getMonitorAggregation: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
   loading,
 ) => {
   return get(
-    `${prefix.value}/monitor_aggregation/${page.current_page}/${page.page_size}`,
-    undefined,
+    `${prefix.value}/monitoring/aggregation`,
+    params,
     loading,
   )
 }
@@ -107,4 +110,5 @@ export default {
   getTokensRanking,
   getQuestionsRanking,
   getUserTokensRanking,
+  getMonitorAggregation,
 }

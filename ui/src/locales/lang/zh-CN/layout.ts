@@ -11,6 +11,7 @@ export default {
   home: {
     title: '首页',
     rank: '排行榜',
+    rankDetail: '排行榜详情',
     consume: '消耗',
     quickCreate: '快速创建',
     createAgent: '创建智能体',
