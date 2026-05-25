@@ -328,8 +328,8 @@ class HomePageSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             workspace_id = self.data.get("workspace_id")
-            start_time = self.get_start_time()
-            end_time = self.get_end_time()
+            start_time = get_format_time(self.data.get("start_time"))
+            end_time = get_format_time(self.data.get("end_time"))
             application_id = self.data.get('application_id')
             applicationSerializer = HomePageSerializer.Application(
                 data={"user_id": user_id, 'workspace_id': workspace_id})

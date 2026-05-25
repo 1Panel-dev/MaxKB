@@ -14,7 +14,8 @@ from application.api.application_stats import ApplicationStatsAPI
 from common import result
 from common.auth import TokenAuth
 from homepage.api.home_page_api import ApplicationTokensRankingAPI, ApplicationQuestionRankingAPI, UserTokensRankingAPI, \
-    ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI
+    ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI, \
+    ApplicationMonitoringAPI
 from homepage.serializers.homepage import HomePageSerializer
 from django.utils.translation import gettext_lazy as _
 
@@ -93,8 +94,8 @@ class HomePageAPI(APIView):
             description=_('Dialogue-related statistical trends'),
             summary=_('Dialogue-related statistical trends'),
             operation_id='Dialogue-related statistical trends',  # type: ignore
-            parameters=ApplicationStatsAPI.get_parameters(),
-            responses=ApplicationStatsAPI.get_response(),
+            parameters=ApplicationMonitoringAPI.get_parameters(),
+            responses=ApplicationMonitoringAPI.get_response(),
             tags=[_('Home page')]  # type: ignore
         )
         def get(self, request: Request, workspace_id: str):
