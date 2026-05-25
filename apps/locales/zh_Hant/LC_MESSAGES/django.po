@@ -9469,3 +9469,6 @@ msgstr "對話使用者類型"
 
 msgid "Asker user information"
 msgstr "提問使用者資訊"
+
+msgid "Termbase"
+msgstr "詞庫"
