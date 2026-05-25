@@ -48,6 +48,7 @@ export default {
   },
   form: {
     appName: {
+      label: '智能体名称',
       placeholder: '请输入智能体名称',
       requiredMessage: '请输入智能体名称',
     },

@@ -10,7 +10,8 @@ export default {
   crossSettings: '跨域设置',
   home: {
     title: '首页',
-    rank: '排行榜',
+    rankingList: '排行榜',
+    rank: '排名',
     rankDetail: '排行榜详情',
     consume: '消耗',
     quickCreate: '快速创建',
@@ -31,6 +32,9 @@ export default {
     wheel: '轮',
     person: '人',
     questions: '提问',
+    proportion: '占比',
+    perDialogueRounds: '人均对话轮次',
+    commonlyAgents: '常用智能体',
   },
   about: {
     title: '关于',

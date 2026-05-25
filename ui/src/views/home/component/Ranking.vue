@@ -73,7 +73,11 @@
                 Top
                 {{ $t('views.application.title') }}
               </h4>
-              <el-button link class="flex align-center lighter">
+              <el-button
+                link
+                class="flex align-center lighter"
+                @click="openDrawer('questions_agent')"
+              >
                 <span class="mr-4"> {{ $t('common.detail') }}</span>
                 <el-icon>
                   <ArrowRight />
@@ -118,7 +122,7 @@
                 Top
                 {{ $t('views.chatLog.table.user') }}
               </h4>
-              <el-button link class="flex align-center lighter">
+              <el-button link class="flex align-center lighter" @click="openDrawer('user_tokens_agent')">
                 <span class="mr-4"> {{ $t('common.detail') }}</span>
                 <el-icon>
                   <ArrowRight />
@@ -238,30 +242,4 @@ onMounted(() => {
   changeDayHandle(history_day.value)
 })
 </script>
-<style lang="scss" scoped>
-.rank {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 500px;
-  border: 2px solid #ffffff;
-}
-.rank-1 {
-  color: #c85719;
-  background: linear-gradient(180deg, #fee4b1 0%, #feca88 100%);
-  border-color: #ffe89d;
-}
-.rank-2 {
-  color: #2b5fd9;
-  background: linear-gradient(180deg, #c6d7ff 0%, #b6d2f7 100%);
-  border-color: #d6e2ff;
-}
-.rank-3 {
-  color: #cc710a;
-  background: linear-gradient(180deg, #ffe1cf 0%, #f4c5af 100%);
-  border-color: #ffe7cc;
-}
-</style>
+<style lang="scss" scoped></style>

@@ -47,6 +47,7 @@ export default {
   },
   form: {
     appName: {
+      label: '智能體名稱',
       placeholder: '請輸入智能體名稱',
       requiredMessage: '請輸入智能體名稱',
     },
@@ -73,8 +74,7 @@ export default {
     },
     roleSettings: {
       label: '系統提示詞',
-      placeholder:
-        '',
+      placeholder: '',
       tooltip: '設定模型扮演的角色或遵循的指令',
     },
     prompt: {
