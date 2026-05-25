@@ -49,6 +49,60 @@ def get_format_time(date_time):
 
 
 class HomePageSerializer(serializers.Serializer):
+    class ChatRecordAggregation(serializers.Serializer):
+        workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
+        user_id = serializers.UUIDField(required=True, label=_("User ID"))
+        start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
+        end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
+
+        def aggregation(self, auth, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            data = self.validated_data
+            user_id = data["user_id"]
+            workspace_id = data.get("workspace_id")
+            start_time = get_format_time(data["start_time"])
+            end_time = get_format_time(data["end_time"])
+            workspace_manage = is_workspace_manage(auth, workspace_id)
+            query = ChatRecord.objects.filter(
+                create_time__gte=start_time,
+                create_time__lte=end_time,
+            )
+            if workspace_manage:
+                query = query.filter(
+                    chat__application__workspace_id=workspace_id
+                )
+
+            else:
+                permission_list = (
+                    ["VIEW", "MANAGE", "ROLE"]
+                    if hasPermission(auth, "APPLICATION:READ")
+                    else ["VIEW", "MANAGE"]
+                )
+                permission_subquery = (
+                    WorkspaceUserResourcePermission.objects
+                    .filter(
+                        workspace_id=workspace_id,
+                        user_id=user_id,
+                        auth_type="APPLICATION",
+                        permission_list__overlap=permission_list
+                    )
+                    .annotate(
+                        target_uuid=Cast(
+                            "target",
+                            output_field=UUIDField()
+                        )
+                    )
+                    .values("target_uuid")
+                )
+                query = query.filter(
+                    chat__application_id__in=permission_subquery
+                )
+
+            return query.aggregate(
+                total_count=Count("id")
+            )["total_count"]
+
     class TokensAggregation(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("Workspace ID"))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
