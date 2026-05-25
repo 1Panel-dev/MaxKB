@@ -343,10 +343,10 @@ const DocumentRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.folderId == 'shared') {
-              return PermissionConst.SHARED_KNOWLEDGE_PROBLEM_READ
+              return PermissionConst.SHARED_KNOWLEDGE_TERMBASE_READ
             } else if (to.params.folderId == 'resource-management') {
             } else {
-              return PermissionConst.KNOWLEDGE_PROBLEM_READ.getKnowledgeWorkspaceResourcePermission(
+              return PermissionConst.KNOWLEDGE_TERMBASE_READ.getKnowledgeWorkspaceResourcePermission(
                 to ? to.params.id : '',
               )
             }
@@ -357,7 +357,7 @@ const DocumentRouter = {
               return RoleConst.ADMIN
             } else if (to.params.folderId == 'resource-management') {
             } else {
-              return PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermissionWorkspaceManageRole()
+              return PermissionConst.KNOWLEDGE_TERMBASE_READ.getWorkspacePermissionWorkspaceManageRole()
             }
           },
           () => {
@@ -365,7 +365,7 @@ const DocumentRouter = {
             if (to.params.folderId == 'share') {
               return new ComplexPermission(
                 [RoleConst.EXTENDS_USER.getWorkspaceRole()],
-                [PermissionConst.KNOWLEDGE_PROBLEM_READ.getWorkspacePermission()],
+                [PermissionConst.KNOWLEDGE_TERMBASE_READ.getWorkspacePermission()],
                 [],
                 'AND',
               )
@@ -386,7 +386,7 @@ const DocumentRouter = {
           () => {
             const to: any = get_next_route()
             if (to.params.folderId == 'resource-management') {
-              return PermissionConst.RESOURCE_KNOWLEDGE_PROBLEM_READ
+              return PermissionConst.RESOURCE_KNOWLEDGE_TERMBASE_READ
             }
           },
         ],

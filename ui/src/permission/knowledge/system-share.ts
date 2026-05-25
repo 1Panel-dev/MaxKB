@@ -63,7 +63,7 @@ const share = {
   problem_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_EDIT], 'OR'),
   termbase_create: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_PROBLEM_CREATE], 'OR'),
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TERMBASE_CREATE], 'OR'),
   termbase_read: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TERMBASE_READ], 'OR'),
   termbase_delete: () =>
