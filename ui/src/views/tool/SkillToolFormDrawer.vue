@@ -385,7 +385,10 @@ const downloadZip = () => {
     MsgError(t('views.tool.skill.noFileTip'))
     return
   }
-  const fileName = form.value.fileList && form.value.fileList[0] ? form.value.fileList[0].name : `${form.value.name}.zip`
+  const fileName =
+    form.value.fileList && form.value.fileList[0]
+      ? form.value.fileList[0].name
+      : `${form.value.name}.zip`
   loadSharedApi({ type: 'tool', systemType: apiType.value })
     .downloadSkillFile(form.value.id as string)
     .then((res: any) => {
@@ -421,7 +424,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           })
       } else {
         const obj = {
-          folder_id: folder.currentFolder?.id,
+          folder_id: folder.currentFolder?.id || user.getWorkspaceId() || 'default',
           ...form.value,
         }
         loadSharedApi({ type: 'tool', systemType: apiType.value })

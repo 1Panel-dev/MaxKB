@@ -272,7 +272,7 @@ const submit = async (formEl: FormInstance | undefined) => {
           })
       } else {
         const obj = {
-          folder_id: folder.currentFolder?.id,
+          folder_id: folder.currentFolder?.id || user.getWorkspaceId() || 'default',
           ...form.value,
         }
         loadSharedApi({ type: 'tool', systemType: apiType.value })
