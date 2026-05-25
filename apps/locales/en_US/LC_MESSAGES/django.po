@@ -9349,3 +9349,6 @@ msgstr ""
 
 msgid "Asker user information"
 msgstr ""
+
+msgid "Termbase"
+msgstr ""

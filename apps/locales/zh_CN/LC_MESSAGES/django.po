@@ -9472,3 +9472,6 @@ msgstr "对话用户类型"
 
 msgid "Asker user information"
 msgstr "提问用户信息"
+
+msgid "Termbase"
+msgstr "词库"
