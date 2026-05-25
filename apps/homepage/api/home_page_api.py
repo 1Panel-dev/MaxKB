@@ -77,6 +77,12 @@ class RankingBaseAPI(APIMixin):
                 required=True,
             ),
             OpenApiParameter(
+                name="name",
+                description="Name",
+                type=OpenApiTypes.STR,
+                required=False,
+            ),
+            OpenApiParameter(
                 name="end_time",
                 description="end Time",
                 type=OpenApiTypes.STR,
