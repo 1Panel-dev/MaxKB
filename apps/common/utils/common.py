@@ -6,6 +6,7 @@
     @date：2025/4/14 18:23
     @desc:
 """
+import datetime
 import hashlib
 import io
 import json
@@ -17,13 +18,15 @@ import shutil
 import uuid
 from functools import reduce
 from typing import List, Dict
-
+import pytz
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from pydub import AudioSegment
 
+from maxkb.settings import TIME_ZONE
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
 
@@ -168,7 +171,8 @@ def markdown_to_plain_text(md: str) -> str:
     # 使用正则表达式去除所有 HTML 标签
     text = re.sub(r'<[^>]+>', '', text)
     # 先移除特定媒体标签（优先级高于通用HTML标签移除）
-    text = re.sub(r'<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?', '', text, flags=re.DOTALL | re.IGNORECASE)
+    text = re.sub(r'<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?', '', text,
+                  flags=re.DOTALL | re.IGNORECASE)
     text = re.sub(r'<img[^>]*>', '', text)  # 匹配图片标签
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r'\s+', ' ', text)
@@ -409,6 +413,7 @@ def is_valid_uuid(uuid_string):
     except ValueError:
         return False
 
+
 def common_convert_value(_type, value):
     if value is None:
         return None
@@ -435,4 +440,16 @@ def common_convert_value(_type, value):
         if isinstance(v, list):
             return v
         raise Exception(_('type error'))
+    return value
+
+
+def reset_value(value):
+    if isinstance(value, str):
+        value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
+        if value.startswith(('=', '+', '-', '@')):
+            value = "'" + value
+    if isinstance(value, datetime.datetime):
+        eastern = pytz.timezone(TIME_ZONE)
+        c = datetime.timezone(eastern._utcoffset)
+        value = value.astimezone(c)
     return value

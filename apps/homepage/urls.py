@@ -15,5 +15,8 @@ urlpatterns = [
     path("workspace/<str:workspace_id>/homepage/tool/aggregation",views.HomePageAPI.ToolAggregation.as_view()),
     path("workspace/<str:workspace_id>/homepage/model/aggregation",views.HomePageAPI.ModelAggregation.as_view()),
     path("workspace/<str:workspace_id>/homepage/tokens/aggregation",views.HomePageAPI.TokensAggregation.as_view()),
-    path("workspace/<str:workspace_id>/homepage/chat_record/aggregation",views.HomePageAPI.ChatRecordAggregation.as_view())
+    path("workspace/<str:workspace_id>/homepage/chat_record/aggregation",views.HomePageAPI.ChatRecordAggregation.as_view()),
+    path("workspace/<str:workspace_id>/homepage/question_ranking/export",views.HomePageAPI.ApplicationQuestionRankingExport.as_view()),
+    path("workspace/<str:workspace_id>/homepage/tokens_ranking/export",views.HomePageAPI.ApplicationTokensRankingExport.as_view()),
+    path("workspace/<str:workspace_id>/homepage/user_tokens_ranking/export",views.HomePageAPI.UserTokensRankingExport.as_view())
 ]

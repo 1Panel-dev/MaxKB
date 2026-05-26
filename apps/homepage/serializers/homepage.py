@@ -10,12 +10,14 @@ import datetime
 import os
 from typing import List, Dict
 
+import openpyxl
 from django.db import models
 from django.db.models import QuerySet, Count, Q, UUIDField, Sum, F, BigIntegerField, Value, ExpressionWrapper, \
-    IntegerField, OuterRef, Subquery, JSONField
-from django.db.models.functions import Cast, Coalesce
+    IntegerField, Window
+from django.db.models.functions import Cast, Coalesce, RowNumber
+from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
 from application.models import Application, ApplicationChatUserStats, Chat, ChatRecord
@@ -28,6 +30,10 @@ from models_provider.base_model_provider import ModelTypeConst
 from models_provider.models import Model
 from system_manage.models import WorkspaceUserResourcePermission
 from tools.models import Tool, ToolType
+
+_PERM_WITH_ROLE = ["VIEW", "MANAGE", "ROLE"]
+_PERM_DEFAULT = ["VIEW", "MANAGE"]
+TOKEN_EXPR = F("chatrecord__message_tokens") + F("chatrecord__answer_tokens")
 
 
 def hasPermission(auth, permission):
@@ -169,89 +175,55 @@ class HomePageSerializer(serializers.Serializer):
         name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("User Name"))
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
-        def ranking(self, auth, current_page, page_size, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
-
+        def get_queryset(self, auth):
             workspace_id = self.validated_data.get("workspace_id")
             user_id = self.validated_data.get("user_id")
             start_time = get_format_time(self.data.get("start_time"))
             end_time = get_format_time(self.data.get("end_time"))
             name = self.data.get("name")
-            base_queryset = Chat.objects.filter(
-                is_deleted=False,
-                chat_user_id__isnull=False,
-                create_time__gte=start_time,
-                create_time__lte=end_time
-            ).exclude(
-                chat_user_id=""
+
+            # ---- 基础查询 ----
+            base_queryset = (
+                Chat.objects.filter(
+                    is_deleted=False,
+                    chat_user_id__isnull=False,
+                    create_time__gte=start_time,
+                    create_time__lte=end_time,
+                )
+                .exclude(chat_user_id="")
             )
+
             if name:
                 base_queryset = base_queryset.filter(asker__username__contains=name)
 
-            workspace_manage = is_workspace_manage(auth, workspace_id)
-            if workspace_manage:
-                base_queryset = base_queryset.filter(
-                    application__workspace_id=workspace_id
-                )
-            else:
-                permission_list = (
-                    ["VIEW", "MANAGE", "ROLE"]
-                    if hasPermission(auth, "APPLICATION:READ")
-                    else ["VIEW", "MANAGE"]
-                )
-
-                application_id_queryset = QuerySet(WorkspaceUserResourcePermission).filter(
-                    workspace_id=workspace_id,
-                    user_id=user_id,
-                    auth_type="APPLICATION",
-                    permission_list__overlap=permission_list,
-                ).annotate(
-                    target_uuid=Cast("target", output_field=UUIDField())
-                ).values_list(
-                    "target_uuid",
-                    flat=True
-                )
-
-                base_queryset = base_queryset.filter(
-                    application_id__in=application_id_queryset
-                )
-
-            token_expr = ExpressionWrapper(
-                F("chatrecord__message_tokens") + F("chatrecord__answer_tokens"),
-                output_field=BigIntegerField()
+            # ---- 权限过滤 ----
+            base_queryset = self._apply_permission_filter(
+                base_queryset, auth, workspace_id, user_id
             )
 
-            latest_asker_queryset = base_queryset.filter(
-                chat_user_id=OuterRef("chat_user_id"),
-                chat_user_type=OuterRef("chat_user_type"),
-            ).order_by(
-                "-create_time"
-            ).values(
-                "asker"
-            )[:1]
+            # ---- 窗口函数：一次查询拿到每个用户最新的 asker ----
+            asker_map = self._build_asker_map(base_queryset)
 
-            queryset = base_queryset.values(
-                "chat_user_id",
-                "chat_user_type",
-            ).annotate(
-                total_tokens=Coalesce(
-                    Sum(token_expr),
-                    Value(0),
-                    output_field=BigIntegerField()
-                ),
-                chat_record_count=Count(
-                    "chatrecord__id",
-                    distinct=True
-                ),
-                asker=Subquery(
-                    latest_asker_queryset,
-                    output_field=JSONField()
+            # ---- 聚合统计 ----
+            queryset = (
+                base_queryset
+                .values("chat_user_id", "chat_user_type")
+                .annotate(
+                    total_tokens=Coalesce(
+                        Sum(TOKEN_EXPR),
+                        Value(0),
+                        output_field=BigIntegerField(),
+                    ),
+                    chat_record_count=Count("chatrecord__id", distinct=True),
                 )
-            ).order_by(
-                "-total_tokens"
+                .order_by("-total_tokens")
             )
+            return queryset, asker_map
 
+        def ranking(self, auth, current_page, page_size, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset, asker_map = self.get_queryset(auth)
             return page_search(
                 current_page,
                 page_size,
@@ -259,11 +231,86 @@ class HomePageSerializer(serializers.Serializer):
                 lambda item: {
                     "chat_user_id": item["chat_user_id"],
                     "chat_user_type": item["chat_user_type"],
-                    "asker": item["asker"],
+                    "asker": asker_map.get(
+                        (item["chat_user_id"], item["chat_user_type"])
+                    ),
                     "total_tokens": item["total_tokens"],
                     "chat_record_count": item["chat_record_count"],
-                }
+                },
             )
+
+        def export(self, auth, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset, asker_map = self.get_queryset(auth)
+            workbook = openpyxl.Workbook(write_only=True)
+            worksheet = workbook.create_sheet(title='Sheet1')
+            headers = [gettext('ranking'),
+                       gettext('User Name'),
+                       gettext('Token consumption'),
+                       gettext('number of questions'),
+                       ]
+            worksheet.append(headers)
+            index = 0
+            for item in queryset:
+                index += 1
+                row = [index, asker_map.get(
+                    (item["chat_user_id"], item["chat_user_type"])
+                ).get('username'), item['total_tokens'], item['chat_record_count']]
+                worksheet.append(row)
+            response = HttpResponse(content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            workbook.save(response)
+            return response
+
+        def _apply_permission_filter(self, queryset, auth, workspace_id, user_id):
+            """根据用户角色过滤可见的应用范围"""
+            if is_workspace_manage(auth, workspace_id):
+                return queryset.filter(application__workspace_id=workspace_id)
+
+            permission_list = (
+                _PERM_WITH_ROLE
+                if hasPermission(auth, "APPLICATION:READ")
+                else _PERM_DEFAULT
+            )
+
+            allowed_app_ids = (
+                QuerySet(WorkspaceUserResourcePermission)
+                .filter(
+                    workspace_id=workspace_id,
+                    user_id=user_id,
+                    auth_type="APPLICATION",
+                    permission_list__overlap=permission_list,
+                )
+                .annotate(target_uuid=Cast("target", output_field=UUIDField()))
+                .values_list("target_uuid", flat=True)
+            )
+
+            return queryset.filter(application_id__in=allowed_app_ids)
+
+        @staticmethod
+        def _build_asker_map(base_queryset):
+            """
+            用窗口函数一次查询拿到每个 (chat_user_id, chat_user_type) 最新的 asker，
+            替代原来每行一次的 Subquery。
+            """
+            latest_rows = (
+                base_queryset
+                .annotate(
+                    _rn=Window(
+                        expression=RowNumber(),
+                        partition_by=[F("chat_user_id"), F("chat_user_type")],
+                        order_by=F("create_time").desc(),
+                    )
+                )
+                .filter(_rn=1)
+                .values("chat_user_id", "chat_user_type", "asker")
+            )
+
+            return {
+                (row["chat_user_id"], row["chat_user_type"]): row["asker"]
+                for row in latest_rows
+            }
 
     class ApplicationQuestionRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
@@ -272,10 +319,7 @@ class HomePageSerializer(serializers.Serializer):
         start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
-        def ranking(self, auth, current_page, page_size, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
-
+        def get_queryset(self, auth):
             workspace_id = self.validated_data.get("workspace_id")
             user_id = self.validated_data.get("user_id")
             queryset = Application.objects.filter(workspace_id=workspace_id)
@@ -309,7 +353,7 @@ class HomePageSerializer(serializers.Serializer):
                     .values_list("target_uuid", flat=True)
                 )
 
-            queryset = queryset.annotate(
+            return queryset.annotate(
                 # 问题数 / 对话轮次数量
                 chat_record_count_total=Coalesce(
                     Sum(
@@ -334,6 +378,10 @@ class HomePageSerializer(serializers.Serializer):
                 "-chat_record_count_total"
             )
 
+        def ranking(self, auth, current_page, page_size, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = self.get_queryset(auth)
             return page_search(
                 current_page,
                 page_size,
@@ -346,6 +394,28 @@ class HomePageSerializer(serializers.Serializer):
                 },
             )
 
+        def export(self, auth, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = self.get_queryset(auth)
+            workbook = openpyxl.Workbook(write_only=True)
+            worksheet = workbook.create_sheet(title='Sheet1')
+            headers = [gettext('ranking'),
+                       gettext('Application Name'),
+                       gettext('number of questions'),
+                       gettext('active users')
+                       ]
+            worksheet.append(headers)
+            index = 0
+            for item in queryset:
+                index += 1
+                row = [index, item.name, item.chat_record_count_total, item.chat_user_count]
+                worksheet.append(row)
+            response = HttpResponse(content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            workbook.save(response)
+            return response
+
     class ApplicationTokensRanking(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
@@ -353,9 +423,7 @@ class HomePageSerializer(serializers.Serializer):
         start_time = serializers.DateField(format='%Y-%m-%d', label=_("Start time"))
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
-        def ranking(self, auth, current_page, page_size, with_valid=True):
-            if with_valid:
-                self.is_valid(raise_exception=True)
+        def get_queryset(self, auth):
             start_time = get_format_time(self.data.get('start_time'))
             end_time = get_format_time(self.data.get('end_time'))
             name = self.data.get("name")
@@ -395,7 +463,7 @@ class HomePageSerializer(serializers.Serializer):
                     .values_list("target_uuid", flat=True)
                 )
 
-            queryset = queryset.annotate(
+            return queryset.annotate(
                 total_tokens=Coalesce(
                     Sum(
                         token_expr,
@@ -411,6 +479,10 @@ class HomePageSerializer(serializers.Serializer):
                 )
             ).order_by("-total_tokens")
 
+        def ranking(self, auth, current_page, page_size, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = self.get_queryset(auth)
             return page_search(
                 current_page,
                 page_size,
@@ -422,6 +494,28 @@ class HomePageSerializer(serializers.Serializer):
                     "chat_record_count": a.chat_record_count_total,
                 }
             )
+
+        def export(self, auth, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            queryset = self.get_queryset(auth)
+            workbook = openpyxl.Workbook(write_only=True)
+            worksheet = workbook.create_sheet(title='Sheet1')
+            headers = [gettext('ranking'),
+                       gettext('Application Name'),
+                       gettext('Token consumption'),
+                       gettext('number of questions')
+                       ]
+            worksheet.append(headers)
+            index = 0
+            for item in queryset:
+                index += 1
+                row = [index, item.name, item.total_tokens, item.chat_record_count_total]
+                worksheet.append(row)
+            response = HttpResponse(content_type="application/vnd.ms-excel")
+            response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
+            workbook.save(response)
+            return response
 
     class ApplicationMonitoring(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_('Workspace ID'))
