@@ -372,6 +372,10 @@ export const rerankerNode = {
           label: t('workflow.nodes.rerankerNode.result'),
           value: 'result',
         },
+        {
+          label: t('workflow.nodes.searchKnowledgeNode.is_hit_handling_method_list'),
+          value: 'is_hit_handling_method_list',
+        }
       ],
     },
   },

@@ -107,7 +107,9 @@ class BaseRerankerNode(IRerankerNode):
         max_paragraph_char_number = reranker_setting.get('max_paragraph_char_number', 5000)
         result = reset_result_list(result, documents)
         r = filter_result(result, max_paragraph_char_number, top_n, similarity)
-        return NodeResult({'result_list': r, 'result': ''.join([item.get('page_content') for item in r])}, {})
+        return NodeResult({'result_list': r, 'result': ''.join([item.get('page_content') for item in r]),
+                           'is_hit_handling_method_list': [r for row in r if
+                                                           row.get('metadata').get('is_hit_handling_method')]}, {})
 
     def get_details(self, index: int, **kwargs):
         return {
