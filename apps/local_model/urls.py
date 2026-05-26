@@ -6,6 +6,7 @@ from . import views
 
 app_name = "local_model"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('model/validate', views.LocalModelApply.Validate.as_view()),
     path('model/<str:model_id>/embed_documents', views.LocalModelApply.EmbedDocuments.as_view()),

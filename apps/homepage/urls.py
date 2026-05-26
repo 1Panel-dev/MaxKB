@@ -4,6 +4,7 @@ from . import views
 
 app_name = "homepage"
 # @formatter:off
+# fmt: off
 
 urlpatterns = [
     path("workspace/<str:workspace_id>/homepage/application/aggregation",views.HomePageAPI.ApplicationAggregation.as_view()),

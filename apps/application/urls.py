@@ -2,8 +2,9 @@ from django.urls import path
 
 from . import views
 
-app_name = 'application'
+app_name = "application"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('workspace/store/application_template', views.ApplicationAPI.StoreApplication.as_view()),
     path('workspace/<str:workspace_id>/application', views.ApplicationAPI.as_view(), name='application'),

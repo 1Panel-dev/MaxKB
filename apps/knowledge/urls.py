@@ -4,6 +4,7 @@ from . import views
 
 app_name = "knowledge"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('workspace/knowledge/document/template/export', views.Template.as_view()),
     path('workspace/knowledge/document/table_template/export', views.TableTemplate.as_view()),

@@ -6,6 +6,7 @@ from . import views
 
 app_name = "models_provider"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('provider', views.Provide.as_view()),
     path('provider/model_type_list', views.Provide.ModelTypeList.as_view()),

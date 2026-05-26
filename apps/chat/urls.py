@@ -6,6 +6,7 @@ from . import views
 
 app_name = 'chat'
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('embed', views.ChatEmbedView.as_view()),
     path('mcp', mcp_view),

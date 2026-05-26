@@ -4,6 +4,7 @@ from . import views
 
 app_name = "tool"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('workspace/internal/tool', views.ToolView.InternalTool.as_view()),
     path('workspace/store/tool', views.ToolView.StoreTool.as_view()),

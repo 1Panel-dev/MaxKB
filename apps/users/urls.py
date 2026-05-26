@@ -4,6 +4,7 @@ from . import views
 
 app_name = "user"
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('user/login', views.LoginView.as_view(), name='login'),
     path('user/profile', views.UserProfileView.as_view(), name="user_profile"),

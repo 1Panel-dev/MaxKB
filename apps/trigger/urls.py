@@ -14,6 +14,7 @@ from .handler.impl.trigger.event_trigger import EventTriggerView
 app_name = "trigger"
 
 # @formatter:off
+# fmt: off
 urlpatterns = [
     path('workspace/<str:workspace_id>/trigger', views.TriggerView.as_view(), name='trigger'),
     path('workspace/<str:workspace_id>/trigger/batch_delete', views.TriggerView.BatchDelete.as_view(), name='delete batch'),
