@@ -90,7 +90,7 @@ class HomePageSerializer(serializers.Serializer):
                     .filter(
                         workspace_id=workspace_id,
                         user_id=user_id,
-                        auth_type="APPLICATION",
+                        auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
                     )
                     .annotate(
@@ -143,7 +143,7 @@ class HomePageSerializer(serializers.Serializer):
                     .filter(
                         workspace_id=workspace_id,
                         user_id=user_id,
-                        auth_type="APPLICATION",
+                        auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
                     )
                     .annotate(
@@ -279,7 +279,7 @@ class HomePageSerializer(serializers.Serializer):
                 .filter(
                     workspace_id=workspace_id,
                     user_id=user_id,
-                    auth_type="APPLICATION",
+                    auth_target_type="APPLICATION",
                     permission_list__overlap=permission_list,
                 )
                 .annotate(target_uuid=Cast("target", output_field=UUIDField()))
@@ -344,7 +344,7 @@ class HomePageSerializer(serializers.Serializer):
                     .filter(
                         workspace_id=workspace_id,
                         user_id=user_id,
-                        auth_type="APPLICATION",
+                        auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list,
                     )
                     .annotate(
@@ -456,7 +456,7 @@ class HomePageSerializer(serializers.Serializer):
                     .filter(
                         workspace_id=workspace_id,
                         user_id=user_id,
-                        auth_type="APPLICATION",
+                        auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
                     )
                     .annotate(target_uuid=Cast("target", output_field=UUIDField()))
@@ -615,7 +615,7 @@ class HomePageSerializer(serializers.Serializer):
                 id__in=QuerySet(WorkspaceUserResourcePermission)
                 .filter(workspace_id=workspace_id,
                         user_id=user_id,
-                        auth_type="APPLICATION",
+                        auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
                         ).annotate(target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True))
@@ -649,7 +649,7 @@ class HomePageSerializer(serializers.Serializer):
             return QuerySet(Knowledge).filter(
                 id__in=QuerySet(WorkspaceUserResourcePermission).filter(workspace_id=workspace_id,
                                                                         user_id=user_id,
-                                                                        auth_type="KNOWLEDGE",
+                                                                        auth_target_type="KNOWLEDGE",
                                                                         permission_list__overlap=permission_list
                                                                         ).annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
@@ -693,7 +693,7 @@ class HomePageSerializer(serializers.Serializer):
             return QuerySet(Tool).filter(
                 id__in=QuerySet(WorkspaceUserResourcePermission).filter(workspace_id=workspace_id,
                                                                         user_id=user_id,
-                                                                        auth_type="TOOL",
+                                                                        auth_target_type="TOOL",
                                                                         permission_list__overlap=permission_list
                                                                         ).annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
@@ -734,7 +734,7 @@ class HomePageSerializer(serializers.Serializer):
             return QuerySet(Model).filter(
                 id__in=QuerySet(WorkspaceUserResourcePermission).filter(workspace_id=workspace_id,
                                                                         user_id=user_id,
-                                                                        auth_type="MODEL",
+                                                                        auth_target_type="MODEL",
                                                                         permission_list__overlap=permission_list
                                                                         ).annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
