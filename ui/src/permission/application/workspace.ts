@@ -33,6 +33,21 @@ const workspace = {
       ],
       'OR',
     ),
+  copy: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_COPY.getApplicationWorkspaceResourcePermission(source_id),
+        PermissionConst.APPLICATION_COPY.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   relate_map: (source_id: string) =>
     hasPermission(
       [

@@ -14,7 +14,7 @@
     </template>
     <ContentContainer>
       <template #header>
-        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle"/>
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
       </template>
       <template #search>
         <div class="flex">
@@ -25,11 +25,11 @@
               style="width: 100px"
               @change="search_type_change"
             >
-              <el-option :label="$t('common.creator')" value="create_user"/>
+              <el-option :label="$t('common.creator')" value="create_user" />
 
-              <el-option :label="$t('common.name')" value="name"/>
+              <el-option :label="$t('common.name')" value="name" />
 
-              <el-option :label="$t('views.application.publishStatus')" value="publish_status"/>
+              <el-option :label="$t('views.application.publishStatus')" value="publish_status" />
             </el-select>
             <el-input
               v-if="search_type === 'name'"
@@ -49,7 +49,7 @@
               :remote-method="getUserList"
               style="width: 190px"
             >
-              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
             </el-select>
             <el-select
               v-else-if="search_type === 'publish_status'"
@@ -59,8 +59,8 @@
               clearable
               style="width: 190px"
             >
-              <el-option :label="$t('common.status.published')" value="published"/>
-              <el-option :label="$t('common.status.unpublished')" value="unpublished"/>
+              <el-option :label="$t('common.status.published')" value="published" />
+              <el-option :label="$t('common.status.unpublished')" value="unpublished" />
             </el-select>
           </div>
           <span
@@ -68,11 +68,11 @@
             v-if="permissionPrecise.batchDelete() || permissionPrecise.batchMove()"
           >
             <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
-              <AppIcon iconName="app-batch-delete" class="mr-4"/>
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
               {{ $t('views.paragraph.setting.batchSelected') }}
             </el-button>
             <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
-              <AppIcon iconName="app-batch-delete" class="mr-4"/>
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
               {{ $t('views.paragraph.setting.cancelSelected') }}
             </el-button>
           </span>
@@ -82,14 +82,14 @@
               v-if="permissionPrecise.create()"
               @click="openTemplateStoreDialog()"
             >
-              <AppIcon iconName="app-template-center" class="mr-4"/>
+              <AppIcon iconName="app-template-center" class="mr-4" />
               {{ $t('workflow.setting.templateCenter') }}
             </el-button>
             <el-dropdown trigger="click" v-if="permissionPrecise.create()">
               <el-button type="primary" class="ml-8">
                 {{ $t('common.create') }}
                 <el-icon class="el-icon--right">
-                  <arrow-down/>
+                  <arrow-down />
                 </el-icon>
               </el-button>
               <template #dropdown>
@@ -108,7 +108,7 @@
                           {{ $t('views.application.simpleAgent') }}
                         </div>
                         <el-text type="info" size="small" class="color-secondary"
-                        >{{ $t('views.application.simplePlaceholder') }}
+                          >{{ $t('views.application.simplePlaceholder') }}
                         </el-text>
                       </div>
                     </div>
@@ -125,7 +125,7 @@
                       <div class="pre-wrap ml-8">
                         <div class="lighter">{{ $t('views.application.AdvancedAgent') }}</div>
                         <el-text type="info" size="small" class="color-secondary"
-                        >{{ $t('views.application.advancedPlaceholder') }}
+                          >{{ $t('views.application.advancedPlaceholder') }}
                         </el-text>
                       </div>
                     </div>
@@ -144,7 +144,7 @@
                     <el-dropdown-item>
                       <div class="flex align-center w-full">
                         <el-avatar shape="square" class="mt-4" :size="32" style="background: none">
-                          <img src="@/assets/icon_import.svg" alt=""/>
+                          <img src="@/assets/icon_import.svg" alt="" />
                         </el-avatar>
                         <div class="pre-wrap ml-8">
                           <div class="lighter">{{ $t('views.application.importApplication') }}</div>
@@ -194,7 +194,7 @@
                   >
                     <template #icon>
                       <el-avatar shape="square" :size="32" style="background: none">
-                        <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt=""/>
+                        <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
                       </el-avatar>
                     </template>
                     <template #subTitle>
@@ -211,7 +211,7 @@
                       </el-text>
                     </template>
                     <template #tag>
-                      <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)"/>
+                      <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)" />
                       <div v-else>
                         <el-tag size="small" v-if="isWorkFlow(item.type)" class="warning-tag">
                           {{ $t('views.application.senior') }}
@@ -225,12 +225,12 @@
                     <template #footer>
                       <div v-if="item.is_publish" class="flex align-center">
                         <el-icon class="color-success mr-8" style="font-size: 16px">
-                          <SuccessFilled/>
+                          <SuccessFilled />
                         </el-icon>
                         <span class="color-secondary">
                           {{ $t('common.status.published') }}
                         </span>
-                        <el-divider direction="vertical"/>
+                        <el-divider direction="vertical" />
                         <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
 
                         <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
@@ -253,7 +253,7 @@
                             <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
                           </el-button>
                         </el-tooltip>
-                        <el-divider direction="vertical"/>
+                        <el-divider direction="vertical" />
                         <el-dropdown trigger="click">
                           <el-button text @click.stop>
                             <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
@@ -308,7 +308,7 @@
                               </el-dropdown-item>
                               <el-dropdown-item
                                 @click="copyApplication(item)"
-                                v-if="permissionPrecise.create()"
+                                v-if="permissionPrecise.copy(item.id)"
                               >
                                 <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                                 {{ $t('common.copy') }}
@@ -338,7 +338,7 @@
                 </el-col>
               </template>
             </el-row>
-            <el-empty :description="$t('common.noData')" v-else/>
+            <el-empty :description="$t('common.noData')" v-else />
           </el-checkbox-group>
         </InfiniteScroll>
       </div>
@@ -376,10 +376,10 @@
         </el-button>
       </div>
     </ContentContainer>
-    <ResourceMappingDrawer ref="resourceMappingDrawerRef"/>
-    <CreateApplicationDialog ref="CreateApplicationDialogRef"/>
-    <CopyApplicationDialog ref="CopyApplicationDialogRef"/>
-    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder"/>
+    <ResourceMappingDrawer ref="resourceMappingDrawerRef" />
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+    <CopyApplicationDialog ref="CopyApplicationDialogRef" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
     <MoveToDialog
       ref="MoveToDialogRef"
       :source="SourceTypeEnum.APPLICATION"
@@ -390,7 +390,7 @@
       :type="SourceTypeEnum.APPLICATION"
       ref="ResourceAuthorizationDrawerRef"
     />
-    <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList"/>
+    <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList" />
     <ResourceTriggerDrawer
       ref="resourceTriggerDrawerRef"
       :source="SourceTypeEnum.APPLICATION"
@@ -399,9 +399,9 @@
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, computed} from 'vue'
-import {useRouter, useRoute} from 'vue-router'
-import type {CheckboxValueType} from 'element-plus'
+import { onMounted, ref, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import type { CheckboxValueType } from 'element-plus'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-virtualized-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
@@ -411,18 +411,19 @@ import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
 import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
 import ApplicationApi from '@/api/application/application'
 import WorkspaceApi from '@/api/workspace/workspace'
-import {MsgSuccess, MsgConfirm, MsgError} from '@/utils/message'
-import {i18n_name, resetUrl} from '@/utils/common'
-import {isWorkFlow} from '@/utils/application'
-import {dateFormat} from '@/utils/time'
-import {SourceTypeEnum} from '@/enums/common'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { i18n_name, resetUrl } from '@/utils/common'
+import { isWorkFlow } from '@/utils/application'
+import { dateFormat } from '@/utils/time'
+import { SourceTypeEnum } from '@/enums/common'
 import permissionMap from '@/permission'
-import {hasPermission} from '@/utils/permission'
-import {ComplexPermission} from '@/utils/permission/type'
-import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
 import useStore from '@/stores'
-import {t} from '@/locales'
+import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 
 const router = useRouter()
 
@@ -433,7 +434,7 @@ const permissionPrecise = computed(() => {
   return permissionMap['application'][apiType.value]
 })
 
-const {folder, application, user} = useStore()
+const { folder, application, user } = useStore()
 
 const loading = ref(false)
 
@@ -516,8 +517,7 @@ function deleteMulApplication() {
         MsgSuccess(t('views.document.delete.successMessage'))
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const resourceTriggerDrawerRef = ref<InstanceType<typeof ResourceTriggerDrawer>>()
@@ -590,7 +590,7 @@ const goApp = (event: any, item: any) => {
     }).href
     window.open(newUrl)
   } else {
-    router.push({path: get_route(item)})
+    router.push({ path: get_route(item) })
   }
 }
 
@@ -723,34 +723,34 @@ function openCreateDialog(type?: string) {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 function toChat(row: any) {
   const api =
     row.type == 'WORK_FLOW'
       ? (id: string) => ApplicationApi.getApplicationDetail(id)
-      : (id: string) => Promise.resolve({data: row})
+      : (id: string) => Promise.resolve({ data: row })
   api(row.id).then((ok) => {
     let aips = ok.data?.work_flow?.nodes
       ?.filter((v: any) => v.id === 'base-node')
       .map((v: any) => {
         return v.properties.api_input_field_list
           ? v.properties.api_input_field_list.map((v: any) => {
-            return {
-              name: v.variable,
-              value: v.default_value,
-            }
-          })
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
           : v.properties.input_field_list
             ? v.properties.input_field_list
-              .filter((v: any) => v.assignment_method === 'api_input')
-              .map((v: any) => {
-                return {
-                  name: v.variable,
-                  value: v.default_value,
-                }
-              })
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
             : []
       })
       .reduce((x: Array<any>, y: Array<any>) => [...x, ...y])
@@ -777,7 +777,7 @@ function copyApplication(row: any) {
   ApplicationApi.getApplicationDetail(row.id, loading).then((res: any) => {
     if (res?.data) {
       CopyApplicationDialogRef.value.open(
-        {...res.data, model_id: res.data.model},
+        { ...res.data, model_id: res.data.model },
         folder.currentFolder?.id || 'default',
       )
     }
@@ -794,10 +794,10 @@ function settingApplication(event: any, row: any) {
       }).href
       window.open(newUrl)
     } else {
-      router.push({path: `/application/workspace/${row.id}/workflow`})
+      router.push({ path: `/application/workspace/${row.id}/workflow` })
     }
   } else {
-    router.push({path: `/application/workspace/${row.id}/${row.type}/setting`})
+    router.push({ path: `/application/workspace/${row.id}/${row.type}/setting` })
   }
 }
 
@@ -820,8 +820,7 @@ function deleteApplication(row: any) {
         MsgSuccess(t('common.deleteSuccess'))
       })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const exportApplication = (application: any) => {
@@ -926,7 +925,11 @@ function getList() {
 }
 
 function getUserList(query: string) {
-  WorkspaceApi.getAllMemberList(user.getWorkspaceId(), query ? {nick_name: query} : '', loading).then((res) => {
+  WorkspaceApi.getAllMemberList(
+    user.getWorkspaceId(),
+    query ? { nick_name: query } : '',
+    loading,
+  ).then((res) => {
     user_options.value = res.data
   })
 }
