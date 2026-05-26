@@ -155,4 +155,5 @@ export default {
     'Knowledge base imported successfully. Documents have not been vectorized yet. Please configure the embedding model and vectorize the documents.',
   import: 'Import',
   other: 'Other',
+  moreSettings: 'More Settings',
 }

@@ -8,8 +8,8 @@
   >
     <el-card shadow="always" class="border-r-8" style="--el-card-padding: 16px 8px">
       <div class="flex align-center cursor w-full" style="padding: 0 8px">
-        <span class="break-all ellipsis-1 mr-16" :title="props.title || '更多设置'">
-          {{ props.title || '更多设置' }}
+        <span class="break-all ellipsis-1 mr-16" :title="props.title || $t('common.moreSettings')">
+          {{ props.title || $t('common.moreSettings') }}
         </span>
       </div>
 

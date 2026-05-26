@@ -42,7 +42,7 @@ const fieldList = ref<FormField[]>([])
 const formValue = ref<Dict<any>>({})
 const setting = ref<{ exposed_fields: string[]; menu_title: string }>({
   exposed_fields: [],
-  menu_title: '更多设置',
+  menu_title:  t('common.moreSettings'),
 })
 
 watch(
@@ -151,7 +151,7 @@ function handleInputFieldList() {
 
       setting.value = v.properties.user_input_field_list_setting || {
         exposed_fields: [],
-        menu_title: '更多设置',
+        menu_title: t('common.moreSettings'),
       }
     })
 }

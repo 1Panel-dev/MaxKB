@@ -16,8 +16,8 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item label="外置参数设置（最多可显示3个）">
-        <el-select v-model="form.exposed_fields" multiple placeholder="请选择" style="width: 100%">
+      <el-form-item :label="$t('chat.userInputSetting')">
+        <el-select v-model="form.exposed_fields" multiple style="width: 100%">
           <el-option
             v-for="item in fieldOptions"
             :key="item.field"
@@ -30,7 +30,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="标题" prop="menu_title">
+      <el-form-item :label="$t('common.title')" prop="menu_title">
         <el-input
           v-model="form.menu_title"
           maxlength="64"
@@ -61,11 +61,11 @@ const fieldOptions = ref<any[]>([])
 
 const form = ref<any>({
   exposed_fields: [],
-  menu_title: '更多设置',
+  menu_title:  t('common.moreSettings'),
 })
 
 const rules = reactive({
-  menu_title: [{ required: true, message: '请输入菜单标题', trigger: 'blur' }],
+  menu_title: [{ required: true, message: t('common.inputPlaceholder'), trigger: 'blur' }],
 })
 
 const allowedTypes = [
@@ -90,7 +90,7 @@ const getFieldLabel = (item: any) => {
 const open = (row: any, fields?: any[], setting?: any) => {
   form.value = {
     exposed_fields: setting?.exposed_fields || [],
-    menu_title: setting?.menu_title || '更多设置',
+    menu_title: setting?.menu_title || t('common.moreSettings'),
   }
   fieldOptions.value = fields || []
   dialogVisible.value = true

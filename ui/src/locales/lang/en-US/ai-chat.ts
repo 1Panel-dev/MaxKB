@@ -144,4 +144,5 @@ export default {
   editTitle: 'Edit Title',
   share: 'Share',
   copyLinkText: 'Copy Link',
+  userInputSetting: 'External Parameter Setting (up to 3 can be displayed)',
 }

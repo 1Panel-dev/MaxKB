@@ -142,4 +142,5 @@ export default {
   editTitle: '编辑标题',
   share: '分享',
   copyLinkText: '复制链接',
+  userInputSetting: '外置参数设置（最多可显示3个）',
 }
