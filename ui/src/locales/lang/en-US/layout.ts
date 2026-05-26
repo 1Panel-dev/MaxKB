@@ -35,6 +35,7 @@ export default {
     proportion: 'Proportion',
     perDialogueRounds: 'Average Dialogue Rounds',
     commonlyAgents: 'Commonly Used Agents',
+    allAgents: 'All Agents',
   },
   about: {
     title: 'About',

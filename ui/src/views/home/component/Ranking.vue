@@ -3,7 +3,7 @@
     <div class="flex-between mb-16">
       <h4>{{ $t('layout.home.rank') }} TOP5</h4>
       <div>
-        <el-select v-model="history_day" class="mr-12 w-180" @change="changeDayHandle">
+        <el-select v-model="history_day" class="w-180" @change="changeDayHandle">
           <el-option
             v-for="item in dayOptions"
             :key="item.value"
@@ -12,6 +12,7 @@
           />
         </el-select>
         <el-date-picker
+          class="ml-12"
           v-if="history_day === 'other'"
           v-model="daterangeValue"
           type="daterange"
@@ -122,7 +123,11 @@
                 Top
                 {{ $t('views.chatLog.table.user') }}
               </h4>
-              <el-button link class="flex align-center lighter" @click="openDrawer('user_tokens_agent')">
+              <el-button
+                link
+                class="flex align-center lighter"
+                @click="openDrawer('user_tokens_agent')"
+              >
                 <span class="mr-4"> {{ $t('common.detail') }}</span>
                 <el-icon>
                   <ArrowRight />

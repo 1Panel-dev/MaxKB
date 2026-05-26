@@ -35,6 +35,7 @@ export default {
     proportion: '占比',
     perDialogueRounds: '人均对话轮次',
     commonlyAgents: '常用智能体',
+    allAgents: '全部智能体',
   },
   about: {
     title: '关于',
