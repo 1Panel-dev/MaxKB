@@ -3,6 +3,7 @@ import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const systemManage = {
   create: () => false,
+  copy: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_COPY], 'OR'),
   batchDelete: () => false,
   batchMove: () => false,
   folderCreate: () => false,

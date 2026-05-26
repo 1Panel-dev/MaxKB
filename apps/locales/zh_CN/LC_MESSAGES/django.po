@@ -9475,3 +9475,6 @@ msgstr "提问用户信息"
 
 msgid "Termbase"
 msgstr "词库"
+
+msgid "Copy"
+msgstr "复制"
