@@ -440,9 +440,9 @@ class HomePageSerializer(serializers.Serializer):
                 create_time__lte=end_time)
             application_id = self.data.get('application_id')
             if application_id:
-                query_set.filter(application_id=application_id)
+                query_set = query_set.filter(application_id=application_id)
             else:
-                query_set.filter(application_id__in=application_queryset)
+                query_set = query_set.filter(application_id__in=application_queryset)
             return native_search(
                 {'default_sql': query_set},
                 select_string=get_file_content(
