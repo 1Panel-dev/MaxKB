@@ -25,4 +25,7 @@ class Migration(migrations.Migration):
                 'db_table': 'termbase',
             },
         ),
+        migrations.RunSQL(
+            "CREATE INDEX IF NOT EXISTS embedding_search_vector_gin_idx ON embedding USING GIN (search_vector)"
+        )
     ]
