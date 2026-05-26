@@ -15,7 +15,7 @@ from common import result
 from common.auth import TokenAuth
 from homepage.api.home_page_api import ApplicationTokensRankingAPI, ApplicationQuestionRankingAPI, UserTokensRankingAPI, \
     ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI, \
-    ApplicationMonitoringAPI, RankingBaseAPI, TokensAggregationAPI
+    ApplicationMonitoringAPI, RankingBaseAPI, TokensAggregationAPI, RankingBaseExportAPI
 from homepage.serializers.homepage import HomePageSerializer
 from django.utils.translation import gettext_lazy as _
 
@@ -67,6 +67,28 @@ class HomePageAPI(APIView):
                               'end_time')}).aggregation(
                     request.auth))
 
+    class ApplicationTokensRankingExport(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Top applications by token consumption export"),
+            summary=_("Top applications by token consumption export"),
+            operation_id="homepage_application_tokens_ranking_export",
+            parameters=RankingBaseExportAPI.get_parameters(),
+            responses=RankingBaseExportAPI.get_response(),
+            tags=[_("Home page")],
+        )
+        def get(self, request: Request, workspace_id: str):
+            return HomePageSerializer.ApplicationTokensRanking(
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time'),
+                      "name": request.query_params.get("name")
+                      }).export(request.auth)
+
     class ApplicationTokensRanking(APIView):
         authentication_classes = [TokenAuth]
 
@@ -89,6 +111,28 @@ class HomePageAPI(APIView):
                       "name": request.query_params.get("name")
                       }).ranking(request.auth, current_page, page_size))
 
+    class ApplicationQuestionRankingExport(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Top applications by question count export"),
+            summary=_("Top applications by question count export"),
+            operation_id="homepage_application_question_ranking_export",
+            parameters=RankingBaseExportAPI.get_parameters(),
+            responses=RankingBaseExportAPI.get_response(),
+            tags=[_("Home page")],
+        )
+        def get(self, request: Request, workspace_id: str):
+            return HomePageSerializer.ApplicationQuestionRanking(
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time'),
+                      "name": request.query_params.get("name")
+                      }).export(request.auth)
+
     class ApplicationQuestionRanking(APIView):
         authentication_classes = [TokenAuth]
 
@@ -110,6 +154,27 @@ class HomePageAPI(APIView):
                           'end_time'),
                       "name": request.query_params.get("name")
                       }).ranking(request.auth, current_page, page_size))
+
+    class UserTokensRankingExport(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["GET"],
+            description=_("Top users by token consumption export"),
+            summary=_("Top users by token consumption export"),
+            operation_id="homepage_user_tokens_ranking_export",
+            parameters=RankingBaseExportAPI.get_parameters(),
+            responses=RankingBaseExportAPI.get_response(),
+            tags=[_("Home page")],
+        )
+        def get(self, request: Request, workspace_id: str):
+            return HomePageSerializer.ApplicationUserTokenRanking(
+                data={'user_id': request.user.id, 'workspace_id': workspace_id,
+                      'start_time': request.query_params.get(
+                          'start_time'),
+                      'end_time': request.query_params.get(
+                          'end_time'),
+                      "name": request.query_params.get("name")}).export(request.auth)
 
     class UserTokensRanking(APIView):
         authentication_classes = [TokenAuth]

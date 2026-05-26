@@ -105,6 +105,43 @@ class RankingBaseAPI(APIMixin):
         ]
 
 
+class RankingBaseExportAPI(APIMixin):
+
+    @staticmethod
+    def get_request():
+        return None
+
+    @staticmethod
+    def get_parameters():
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
+                description=_("Workspace ID"),
+            ),
+            OpenApiParameter(
+                name="start_time",
+                description="start Time",
+                type=OpenApiTypes.STR,
+                required=True,
+            ),
+            OpenApiParameter(
+                name="name",
+                description="Name",
+                type=OpenApiTypes.STR,
+                required=False,
+            ),
+            OpenApiParameter(
+                name="end_time",
+                description="end Time",
+                type=OpenApiTypes.STR,
+                required=True,
+            ),
+        ]
+
+
 class ApplicationTokensRankingAPI(RankingBaseAPI):
 
     @staticmethod
