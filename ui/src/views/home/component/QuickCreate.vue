@@ -1,6 +1,14 @@
 <template>
   <el-row :gutter="16" v-loading.fullscreen.lock="importLoading">
-    <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
+    <el-col
+      :xs="12"
+      :sm="12"
+      :md="12"
+      :lg="6"
+      :xl="6"
+      class="mb-16"
+      v-if="permissionPrecise.application.workspace.create()"
+    >
       <el-dropdown
         trigger="click"
         class="w-full"
@@ -90,7 +98,15 @@
         </template>
       </el-dropdown>
     </el-col>
-    <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
+    <el-col
+      :xs="12"
+      :sm="12"
+      :md="12"
+      :lg="6"
+      :xl="6"
+      class="mb-16"
+      v-if="permissionPrecise.knowledge.workspace.create()"
+    >
       <el-dropdown
         trigger="click"
         class="w-full"
@@ -209,7 +225,15 @@
         </template>
       </el-dropdown>
     </el-col>
-    <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
+    <el-col
+      :xs="12"
+      :sm="12"
+      :md="12"
+      :lg="6"
+      :xl="6"
+      class="mb-16"
+      v-if="permissionPrecise.tool.workspace.create()"
+    >
       <el-dropdown
         trigger="click"
         class="w-full"
@@ -310,7 +334,15 @@
         </template>
       </el-dropdown>
     </el-col>
-    <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
+    <el-col
+      :xs="12"
+      :sm="12"
+      :md="12"
+      :lg="6"
+      :xl="6"
+      class="mb-16"
+      v-if="permissionPrecise.model.workspace.create()"
+    >
       <el-card shadow="never" class="cursor w-full" @click="openCreateModel(allObj)">
         <div class="flex-between">
           <div class="flex align-center">
@@ -365,7 +397,7 @@
   ></SelectProviderDialog>
 </template>
 <script setup lang="ts">
-import { ref, shallowRef, nextTick } from 'vue'
+import { ref, shallowRef, nextTick, computed } from 'vue'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import ApplicationApi from '@/api/application/application'
 import CreateKnowledgeDialog from '@/views/knowledge/create-component/CreateKnowledgeDialog.vue'
@@ -387,6 +419,7 @@ import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { useRouter, useRoute } from 'vue-router'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import permissionMap from '@/permission'
 const { user, tool } = useStore()
 const router = useRouter()
 const props = defineProps({
@@ -402,6 +435,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap
 })
 
 const importLoading = ref(false)
