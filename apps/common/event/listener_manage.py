@@ -15,7 +15,7 @@ from typing import List
 import django.db.models
 from django.contrib.postgres.search import SearchVector
 from django.db.models import QuerySet, Value
-from django.db.models.functions import Reverse, Substr
+from django.db.models.functions import Coalesce, NullIf, Reverse, Substr
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import (
@@ -543,7 +543,10 @@ class ListenerManagement:
                 QuerySet(Paragraph)
                 .annotate(
                     reversed_status=Reverse("status"),
-                    task_type_status=Substr("reversed_status", TaskType.TOKENIZE.value, 1),
+                    task_type_status=Coalesce(
+                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value('')),
+                        Value('n'),
+                    ),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)
                 .values("id"),

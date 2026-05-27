@@ -720,6 +720,39 @@
                   </el-tooltip>
                   <el-tooltip
                     effect="dark"
+                    :content="$t('views.document.setting.cancelTokenize')"
+                    placement="top"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.TOKENIZE),
+                      )
+                    "
+                  >
+                    <span class="mr-4">
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.TOKENIZE)"
+                        v-if="permissionPrecise.doc_vector(id)"
+                      >
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.knowledge.customSegmentation.wordIndexing')"
+                    placement="top"
+                    v-else
+                  >
+                    <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
+                      <el-button type="primary" text @click.stop="tokenizeDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
                     :content="$t('common.setting')"
                     placement="top"
                     v-if="permissionPrecise.doc_edit(id)"

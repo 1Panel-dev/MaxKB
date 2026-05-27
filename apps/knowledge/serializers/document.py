@@ -41,7 +41,7 @@ from django.core import validators
 from django.db import models, transaction
 from django.db.models import F, Func, QuerySet, Value
 from django.db.models.aggregates import Max
-from django.db.models.functions import Reverse, Substr
+from django.db.models.functions import Coalesce, NullIf, Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
 from django.utils.translation import get_language, gettext, to_locale
@@ -898,7 +898,10 @@ class DocumentSerializers(serializers.Serializer):
                 QuerySet(Paragraph)
                 .annotate(
                     reversed_status=Reverse("status"),
-                    task_type_status=Substr("reversed_status", TaskType.TOKENIZE.value, 1),
+                    task_type_status=Coalesce(
+                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value('')),
+                        Value('n'),
+                    ),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)
                 .values("id"),
