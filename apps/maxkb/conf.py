@@ -113,9 +113,15 @@ class Config(dict):
         获取支持的语言列表
         使用公共模块 LocaleConfigHelper，支持缓存和多项目复用
         """
-        from common.locale.config_helper import LocaleConfigHelper
+        try:
+            from common.locale.config_helper import LocaleConfigHelper
 
-        return LocaleConfigHelper.get_languages(self, PROJECT_DIR)
+            return LocaleConfigHelper.get_languages(self, PROJECT_DIR)
+        except Exception as e:
+            from common.utils.logger import maxkb_logger
+
+            maxkb_logger.warning(f"Failed to load languages, using defaults: {e}")
+            return [("en", "English"), ("zh", "中文简体"), ("zh-hant", "中文繁体")]
 
     def get_log_level(self):
         return self.get("LOG_LEVEL", "DEBUG")
