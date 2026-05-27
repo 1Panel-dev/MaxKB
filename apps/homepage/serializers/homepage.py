@@ -176,19 +176,17 @@ class HomePageSerializer(serializers.Serializer):
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def get_queryset(self, auth):
-            workspace_id = self.validated_data.get("workspace_id")
-            user_id = self.validated_data.get("user_id")
+            workspace_id = self.data.get("workspace_id")
+            user_id = self.data.get("user_id")
             start_time = get_format_time(self.data.get("start_time"))
             end_time = get_format_time(self.data.get("end_time"))
             name = self.data.get("name")
 
-            # ---- 基础查询 ----
+            # ---- 基础查询：不再按 Chat.create_time 过滤 ----
             base_queryset = (
                 Chat.objects.filter(
                     is_deleted=False,
                     chat_user_id__isnull=False,
-                    create_time__gte=start_time,
-                    create_time__lte=end_time,
                 )
                 .exclude(chat_user_id="")
             )
@@ -204,17 +202,28 @@ class HomePageSerializer(serializers.Serializer):
             # ---- 窗口函数：一次查询拿到每个用户最新的 asker ----
             asker_map = self._build_asker_map(base_queryset)
 
+            # ---- 时间条件针对 ChatRecord ----
+            record_time_filter = Q(
+                chatrecord__create_time__gte=start_time,
+                chatrecord__create_time__lte=end_time,
+            )
+
             # ---- 聚合统计 ----
             queryset = (
                 base_queryset
+                .filter(record_time_filter)
                 .values("chat_user_id", "chat_user_type")
                 .annotate(
                     total_tokens=Coalesce(
-                        Sum(TOKEN_EXPR),
+                        Sum(TOKEN_EXPR, filter=record_time_filter),
                         Value(0),
                         output_field=BigIntegerField(),
                     ),
-                    chat_record_count=Count("chatrecord__id", distinct=True),
+                    chat_record_count=Count(
+                        "chatrecord__id",
+                        filter=record_time_filter,
+                        distinct=True,
+                    ),
                 )
                 .order_by("-total_tokens")
             )
@@ -320,17 +329,14 @@ class HomePageSerializer(serializers.Serializer):
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def get_queryset(self, auth):
-            workspace_id = self.validated_data.get("workspace_id")
-            user_id = self.validated_data.get("user_id")
-            queryset = Application.objects.filter(workspace_id=workspace_id)
+            workspace_id = self.data.get("workspace_id")
+            user_id = self.data.get("user_id")
             name = self.data.get("name")
-            if name:
-                queryset = queryset.filter(name__contains=name)
             start_time = get_format_time(self.data.get("start_time"))
             end_time = get_format_time(self.data.get("end_time"))
-            queryset = queryset.filter(
-                create_time__gte=start_time,
-                create_time__lte=end_time)
+            queryset = Application.objects.filter(workspace_id=workspace_id)
+            if name:
+                queryset = queryset.filter(name__contains=name)
             workspace_manage = is_workspace_manage(auth, workspace_id)
             if not workspace_manage:
                 permission_list = (
@@ -353,12 +359,17 @@ class HomePageSerializer(serializers.Serializer):
                     .values_list("target_uuid", flat=True)
                 )
 
+            record_time_filter = (
+                    Q(chat__is_deleted=False)
+                    & Q(chat__chatrecord__create_time__gte=start_time)
+                    & Q(chat__chatrecord__create_time__lte=end_time)
+            )
             return queryset.annotate(
-                # 问题数 / 对话轮次数量
+                # 问题数（按 ChatRecord 条数统计）
                 chat_record_count_total=Coalesce(
-                    Sum(
-                        "chat__chat_record_count",
-                        filter=Q(chat__is_deleted=False),
+                    Count(
+                        "chat__chatrecord__id",
+                        filter=record_time_filter,
                     ),
                     Value(0),
                     output_field=BigIntegerField(),
@@ -368,7 +379,7 @@ class HomePageSerializer(serializers.Serializer):
                 chat_user_count=Count(
                     "chat__chat_user_id",
                     filter=(
-                            Q(chat__is_deleted=False)
+                            record_time_filter
                             & Q(chat__chat_user_id__isnull=False)
                             & ~Q(chat__chat_user_id="")
                     ),
@@ -435,17 +446,20 @@ class HomePageSerializer(serializers.Serializer):
                 output_field=BigIntegerField()
             )
 
-            queryset = Application.objects.filter(
-                create_time__gte=start_time,
-                create_time__lte=end_time)
+            # 时间条件针对 ChatRecord
+            record_time_filter = (
+                    Q(chat__is_deleted=False)
+                    & Q(chat__chatrecord__create_time__gte=start_time)
+                    & Q(chat__chatrecord__create_time__lte=end_time)
+            )
+
+            queryset = Application.objects.filter(workspace_id=workspace_id)
             if name:
                 queryset = queryset.filter(name__contains=name)
 
             workspace_manage = is_workspace_manage(auth, workspace_id)
 
-            if workspace_manage:
-                queryset = queryset.filter(workspace_id=workspace_id)
-            else:
+            if not workspace_manage:
                 permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(
                     auth,
                     "APPLICATION:READ"
@@ -467,16 +481,25 @@ class HomePageSerializer(serializers.Serializer):
                 total_tokens=Coalesce(
                     Sum(
                         token_expr,
-                        filter=Q(chat__is_deleted=False)
+                        filter=record_time_filter
                     ),
                     Value(0),
                     output_field=BigIntegerField()
                 ),
                 chat_record_count_total=Count(
                     "chat__chatrecord__id",
-                    filter=Q(chat__is_deleted=False),
+                    filter=record_time_filter,
                     output_field=IntegerField()
-                )
+                ),
+                chat_user_count=Count(
+                    "chat__chat_user_id",
+                    filter=(
+                            record_time_filter
+                            & Q(chat__chat_user_id__isnull=False)
+                            & ~Q(chat__chat_user_id="")
+                    ),
+                    distinct=True,
+                ),
             ).order_by("-total_tokens")
 
         def ranking(self, auth, current_page, page_size, with_valid=True):
@@ -492,6 +515,7 @@ class HomePageSerializer(serializers.Serializer):
                     "name": a.name,
                     "total_tokens": a.total_tokens,
                     "chat_record_count": a.chat_record_count_total,
+                    "chat_user_count": a.chat_user_count
                 }
             )
 
