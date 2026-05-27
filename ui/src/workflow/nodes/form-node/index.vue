@@ -159,6 +159,8 @@ import { input_type_list } from '@/components/dynamics-form/constructor/data'
 import { WorkflowMode } from '@/enums/application'
 import { MsgError } from '@/utils/message'
 import { set, cloneDeep } from 'lodash'
+import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import Sortable from 'sortablejs'
 import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
@@ -167,6 +169,28 @@ const workflowMode = inject('workflowMode', WorkflowMode.Application) as Workflo
 const enableVisibility = computed(
   () => workflowMode === WorkflowMode.Application || workflowMode === WorkflowMode.ApplicationLoop,
 )
+const getResourceDetail = inject('getResourceDetail') as any
+const route = useRoute()
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const resource = getResourceDetail()
+
+provide('getSelectModelList', (params: any) => {
+  const obj =
+    apiType.value === 'systemManage'
+      ? { ...params, workspace_id: resource.value?.workspace_id }
+      : { ...params }
+  return loadSharedApi({ type: 'model', systemType: apiType.value }).getSelectModelList(obj)
+})
+
+provide('getModelParamsForm', (model_id: string) => {
+  return loadSharedApi({ type: 'model', systemType: apiType.value }).getModelParamsForm(model_id)
+})
 const formNodeFormRef = ref<FormInstance>()
 const tableRef = ref()
 const editFormField = (form_field_data: any, field_index: number) => {
