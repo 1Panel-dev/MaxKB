@@ -33,7 +33,7 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'size': '1024x1024', 'quality': 'standard', 'n': 1}}
+        optional_params = {'params': {'size': '1024x1024', 'quality': 'auto', 'n': 1}}
         for key, value in model_kwargs.items():
             if key not in ['model_id', 'use_local', 'streaming']:
                 optional_params['params'][key] = value
@@ -57,8 +57,12 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
         file_urls = []
         try:
             for content in res.data:
-                url = content.url
-                file_urls.append(url)
+                if content.url:
+                    url = content.url
+                    file_urls.append(url)
+                elif content.b64_json:
+                    url = content.b64_json
+                    file_urls.append(url)
             return file_urls
         except Exception as e:
             raise e
