@@ -70,11 +70,11 @@ class HomePageSerializer(serializers.Serializer):
         def aggregation(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            data = self.validated_data
+            data = self.data
             user_id = data["user_id"]
             workspace_id = data.get("workspace_id")
-            start_time = get_start_time(data["start_time"])
-            end_time = get_end_time(data["end_time"])
+            start_time = get_start_time(data.get('start_time'))
+            end_time = get_end_time(data.get('end_time'))
             workspace_manage = is_workspace_manage(auth, workspace_id)
             query = ChatRecord.objects.filter(
                 create_time__gte=start_time,
