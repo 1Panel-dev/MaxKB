@@ -24,7 +24,7 @@
             :label="getFieldLabel(item)"
             :value="item.field"
             :disabled="
-              !allowedTypes.includes(item.input_type) ||
+              !ALLOWED_EXPOSED_TYPES.includes(item.input_type) ||
               (form.exposed_fields.length >= 3 && !form.exposed_fields.includes(item.field))
             "
           />
@@ -53,6 +53,7 @@
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
+import { ALLOWED_EXPOSED_TYPES } from '@/components/ai-chat/component/inline-params/constants'
 const emit = defineEmits(['refresh'])
 
 const fieldFormRef = ref()
@@ -68,17 +69,6 @@ const rules = reactive({
   menu_title: [{ required: true, message: t('common.inputPlaceholder'), trigger: 'blur' }],
 })
 
-const allowedTypes = [
-  'Model',
-  'Knowledge',
-  'SwitchInput',
-  'DatePicker',
-  'TreeSelect',
-  'SingleSelect',
-  'MultiSelect',
-  'RadioCard',
-  'RadioRow',
-]
 const dialogVisible = ref<boolean>(false)
 
 const getFieldLabel = (item: any) => {
