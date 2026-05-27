@@ -12,6 +12,7 @@
             v-model="search_text"
             class="mr-12 ml-12 w-240"
             :placeholder="$t('common.searchBar.placeholder')"
+            @change="searchHandle"
           >
             <template #suffix>
               <el-icon class="el-input__icon">
@@ -39,7 +40,7 @@
             @change="changeDayRangeHandle"
           />
         </div>
-        <el-button>
+        <el-button @click="exportHandle">
           {{ $t('common.export') }}
         </el-button>
       </div>
@@ -81,7 +82,9 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress :percentage="0" />
+              <el-progress
+                :percentage="TokenTotal.value ? (row?.total_tokens / TokenTotal.value) * 100 : 0"
+              />
             </template>
           </el-table-column>
           <el-table-column
@@ -152,7 +155,13 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress :percentage="0" />
+              <el-progress
+                :percentage="
+                  ChatRecordTotal.value
+                    ? (row?.chat_record_count / ChatRecordTotal.value) * 100
+                    : 0
+                "
+              />
             </template>
           </el-table-column>
           <el-table-column
@@ -218,7 +227,10 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress :percentage="0" />
+              <el-progress
+                :percentage="TokenTotal.value ? (row.total_tokens / TokenTotal.value) * 100 : 0"
+                :show-text="false"
+              />
             </template>
           </el-table-column>
           <el-table-column
@@ -258,11 +270,12 @@ import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import homeApi from '@/api/home-page/home'
 import { nowDate, beforeDay } from '@/utils/time'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
 import { t } from '@/locales'
 const { user } = useStore()
 const drawerVisible = ref(false)
 const activeName = ref('tokens_agent')
-const search_text = ref('')
+
 const loading = ref(false)
 
 const paginationConfig = reactive({
@@ -273,6 +286,11 @@ const paginationConfig = reactive({
 const tokensRankding = ref<any[]>([])
 const questionRanking = ref<any[]>()
 const userTokensRanking = ref<any[]>()
+
+const search_text = ref('')
+function searchHandle() {
+  getDetail()
+}
 
 function handleClick(tab: any) {
   activeName.value = tab
@@ -326,27 +344,87 @@ function changeDayRangeHandle(val: string) {
   getDetail()
 }
 
+const ChatRecordTotal = ref<any>(0)
+const TokenTotal = ref<any>(0)
+
 function getDetail() {
   if (activeName.value === 'tokens_agent') {
-    homeApi.getTokensRanking(paginationConfig, daterange.value, loading).then((res: any) => {
-      paginationConfig.total = res.data?.total || 0
-      tokensRankding.value = res.data?.records
+    homeApi.getTokensAggregation(daterange.value, loading).then((res: any) => {
+      TokenTotal.value = res.data
     })
+    homeApi
+      .getTokensRanking(paginationConfig, { name: search_text.value, ...daterange.value }, loading)
+      .then((res: any) => {
+        paginationConfig.total = res.data?.total || 0
+        tokensRankding.value = res.data?.records
+      })
   } else if (activeName.value === 'questions_agent') {
-    homeApi.getQuestionsRanking(paginationConfig, daterange.value, loading).then((res: any) => {
-      paginationConfig.total = res.data?.total || 0
-      questionRanking.value = res.data?.records
+    homeApi.getChatRecordAggregation(daterange.value, loading).then((res: any) => {
+      ChatRecordTotal.value = res.data
     })
+    homeApi
+      .getQuestionsRanking(
+        paginationConfig,
+        { name: search_text.value, ...daterange.value },
+        loading,
+      )
+      .then((res: any) => {
+        paginationConfig.total = res.data?.total || 0
+        questionRanking.value = res.data?.records
+      })
   } else if (activeName.value === 'user_tokens_agent') {
-    homeApi.getUserTokensRanking(paginationConfig, daterange.value, loading).then((res: any) => {
-      paginationConfig.total = res.data?.total || 0
-      userTokensRanking.value = res.data?.records
+    homeApi.getTokensAggregation(daterange.value, loading).then((res: any) => {
+      TokenTotal.value = res.data
     })
+    homeApi
+      .getUserTokensRanking(
+        paginationConfig,
+        { name: search_text.value, ...daterange.value },
+        loading,
+      )
+      .then((res: any) => {
+        paginationConfig.total = res.data?.total || 0
+        userTokensRanking.value = res.data?.records
+      })
   }
 }
 function handleSizeChange() {
   paginationConfig.current_page = 1
   changeDayHandle(history_day.value)
+}
+
+function exportHandle() {
+  if (activeName.value === 'tokens_agent') {
+    homeApi
+      .exportTokensRankings({ name: search_text.value, ...daterange.value }, loading)
+      .catch((e: any) => {
+        if (e.response.status !== 403) {
+          e.response.data.text().then((res: string) => {
+            MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+          })
+        }
+      })
+  } else if (activeName.value === 'questions_agent') {
+    homeApi
+      .exportQuestionsRankings({ name: search_text.value, ...daterange.value }, loading)
+      .catch((e: any) => {
+        if (e.response.status !== 403) {
+          e.response.data.text().then((res: string) => {
+            MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+          })
+        }
+      })
+  } else if (activeName.value === 'user_tokens_agent') {
+    homeApi
+      .exportUserTokensRankings({ name: search_text.value, ...daterange.value }, loading)
+      .catch((e: any) => {
+        if (e.response.status !== 403) {
+          e.response.data.text().then((res: string) => {
+            MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+          })
+        }
+      })
+  }
 }
 
 watch(drawerVisible, (bool) => {

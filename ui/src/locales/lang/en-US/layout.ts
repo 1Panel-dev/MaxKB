@@ -24,7 +24,7 @@ export default {
     createModel: 'Add Model',
     createModelDescribe: 'Configure large language/vector models',
     resource: 'Resources',
-    llm: 'Large Language Model',
+    llm: 'LLM',
     embedding: 'Embedding',
     chat: 'Chat',
     average‌: 'Average',

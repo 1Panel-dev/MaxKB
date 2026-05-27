@@ -102,6 +102,70 @@ const getMonitorAggregation: (params: any, loading?: Ref<boolean>) => Promise<Re
   )
 }
 
+/**
+ * 对话总数
+ * @params  {end_time, start_time}
+ */
+const getChatRecordAggregation: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(
+    `${prefix.value}/chat_record/aggregation`,
+    params,
+    loading,
+  )
+}
+/**
+ * Token总数
+ * @params  {end_time, start_time}
+ */
+const getTokensAggregation: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(
+    `${prefix.value}/tokens/aggregation`,
+    params,
+    loading,
+  )
+}
+
+/**
+ * 导出
+ * @params  {name, end_time, start_time}
+ */
+const exportTokensRankings: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(
+    `${prefix.value}/tokens_ranking/export`,
+    params,
+    loading,
+  )
+}
+const exportQuestionsRankings: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(
+    `${prefix.value}/question_ranking/export`,
+    params,
+    loading,
+  )
+}
+const exportUserTokensRankings: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
+  params,
+  loading,
+) => {
+  return get(
+    `${prefix.value}/user_tokens_ranking/export`,
+    params,
+    loading,
+  )
+}
+
 export default {
   getApplicationAggregation,
   getKnowledgeAggregation,
@@ -111,4 +175,9 @@ export default {
   getQuestionsRanking,
   getUserTokensRanking,
   getMonitorAggregation,
+  getChatRecordAggregation,
+  getTokensAggregation,
+  exportTokensRankings,
+  exportQuestionsRankings,
+  exportUserTokensRankings,
 }
