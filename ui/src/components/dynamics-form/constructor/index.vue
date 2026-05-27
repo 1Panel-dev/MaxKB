@@ -1,94 +1,174 @@
 <template>
-  <el-tabs v-model="activeTab">
-    <el-tab-pane :label="$t('common.info')" name="basic">
-      <el-form
-        @submit.prevent
-        ref="ruleFormRef"
-        class="mb-24"
-        label-width="auto"
-        :model="form_data"
-        v-bind="$attrs"
-      >
-        <el-form-item
-          :label="$t('dynamicsForm.paramForm.field.label')"
-          :required="true"
-          prop="field"
-          :rules="rules.field"
+  <template v-if="enableVisibility">
+    <el-tabs v-model="activeTab">
+      <el-tab-pane :label="$t('common.info')" name="basic">
+        <el-form
+          @submit.prevent
+          ref="ruleFormRef"
+          class="mb-24"
+          label-width="auto"
+          :model="form_data"
+          v-bind="$attrs"
         >
-          <el-input
-            v-model="form_data.field"
-            :maxlength="64"
-            :placeholder="$t('dynamicsForm.paramForm.field.placeholder')"
-            show-word-limit
-          />
-        </el-form-item>
-        <el-form-item
-          :label="$t('dynamicsForm.paramForm.name.label')"
-          :required="true"
-          prop="label"
-          :rules="rules.label"
-        >
-          <el-input
-            v-model="form_data.label"
-            :maxlength="64"
-            show-word-limit
-            :placeholder="$t('dynamicsForm.paramForm.name.placeholder')"
-          />
-        </el-form-item>
-        <el-form-item :label="$t('dynamicsForm.paramForm.tooltip.label')">
-          <el-input
-            v-model="form_data.tooltip"
-            :maxlength="128"
-            show-word-limit
-            :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
-          />
-        </el-form-item>
-        <el-form-item
-          :label="$t('dynamicsForm.paramForm.required.label')"
-          :required="true"
-          prop="required"
-          :rules="rules.required"
-          @click.prevent
-        >
-          <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
-        </el-form-item>
-        <el-form-item
-          :label="$t('dynamicsForm.paramForm.input_type.label')"
-          :required="true"
-          prop="input_type"
-          :rules="rules.input_type"
-        >
-          <el-select
-            v-model="form_data.input_type"
-            :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')"
+          <el-form-item
+            :label="$t('dynamicsForm.paramForm.field.label')"
+            :required="true"
+            prop="field"
+            :rules="rules.field"
           >
-            <el-option
-              v-for="input_type in input_type_list"
-              :key="input_type.value"
-              :label="input_type.label"
-              :value="input_type.value"
+            <el-input
+              v-model="form_data.field"
+              :maxlength="64"
+              :placeholder="$t('dynamicsForm.paramForm.field.placeholder')"
+              show-word-limit
             />
-          </el-select>
-        </el-form-item>
-        <component
-          v-if="form_data.input_type"
-          ref="componentFormRef"
-          v-model="form_data"
-          :is="form_data.input_type"
-        ></component>
-      </el-form>
-    </el-tab-pane>
+          </el-form-item>
+          <el-form-item
+            :label="$t('dynamicsForm.paramForm.name.label')"
+            :required="true"
+            prop="label"
+            :rules="rules.label"
+          >
+            <el-input
+              v-model="form_data.label"
+              :maxlength="64"
+              show-word-limit
+              :placeholder="$t('dynamicsForm.paramForm.name.placeholder')"
+            />
+          </el-form-item>
+          <el-form-item :label="$t('dynamicsForm.paramForm.tooltip.label')">
+            <el-input
+              v-model="form_data.tooltip"
+              :maxlength="128"
+              show-word-limit
+              :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="$t('dynamicsForm.paramForm.required.label')"
+            :required="true"
+            prop="required"
+            :rules="rules.required"
+            @click.prevent
+          >
+            <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
+          </el-form-item>
+          <el-form-item
+            :label="$t('dynamicsForm.paramForm.input_type.label')"
+            :required="true"
+            prop="input_type"
+            :rules="rules.input_type"
+          >
+            <el-select
+              v-model="form_data.input_type"
+              :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')"
+            >
+              <el-option
+                v-for="input_type in input_type_list"
+                :key="input_type.value"
+                :label="input_type.label"
+                :value="input_type.value"
+              />
+            </el-select>
+          </el-form-item>
+          <component
+            v-if="form_data.input_type"
+            ref="componentFormRef"
+            v-model="form_data"
+            :is="form_data.input_type"
+          ></component>
+        </el-form>
+      </el-tab-pane>
 
-    <el-tab-pane :label="$t('workflow.nodes.baseNode.visibilitySetting.label')" name="visibility">
-      <VisibilityConstructor
-        ref="visibilityRef"
-        :initialValue="visibility_rules"
-        :nodeModel="nodeModel"
-        :currentNodeFields="currentNodeFields"
-        :currentEditingIndex="currentEditingIndex"
+      <el-tab-pane :label="$t('workflow.nodes.baseNode.visibilitySetting.label')" name="visibility">
+        <VisibilityConstructor
+          ref="visibilityRef"
+          :initialValue="visibility_rules"
+          :nodeModel="nodeModel"
+          :currentNodeFields="currentNodeFields"
+          :currentEditingIndex="currentEditingIndex"
+        />
+      </el-tab-pane>
+    </el-tabs>
+  </template>
+
+  <el-form
+    v-else
+    @submit.prevent
+    ref="ruleFormRef"
+    class="mb-24"
+    label-width="auto"
+    :model="form_data"
+    v-bind="$attrs"
+  >
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.field.label')"
+      :required="true"
+      prop="field"
+      :rules="rules.field"
+    >
+      <el-input
+        v-model="form_data.field"
+        :maxlength="64"
+        :placeholder="$t('dynamicsForm.paramForm.field.placeholder')"
+        show-word-limit
       />
-    </el-tab-pane>
-  </el-tabs>
+    </el-form-item>
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.name.label')"
+      :required="true"
+      prop="label"
+      :rules="rules.label"
+    >
+      <el-input
+        v-model="form_data.label"
+        :maxlength="64"
+        show-word-limit
+        :placeholder="$t('dynamicsForm.paramForm.name.placeholder')"
+      />
+    </el-form-item>
+    <el-form-item :label="$t('dynamicsForm.paramForm.tooltip.label')">
+      <el-input
+        v-model="form_data.tooltip"
+        :maxlength="128"
+        show-word-limit
+        :placeholder="$t('dynamicsForm.paramForm.tooltip.placeholder')"
+      />
+    </el-form-item>
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.required.label')"
+      :required="true"
+      prop="required"
+      :rules="rules.required"
+      @click.prevent
+    >
+      <el-switch v-model="form_data.required" :active-value="true" :inactive-value="false" />
+    </el-form-item>
+    <el-form-item
+      :label="$t('dynamicsForm.paramForm.input_type.label')"
+      :required="true"
+      prop="input_type"
+      :rules="rules.input_type"
+    >
+      <el-select
+        v-model="form_data.input_type"
+        :placeholder="$t('dynamicsForm.paramForm.input_type.placeholder')"
+      >
+        <el-option
+          v-for="input_type in input_type_list"
+          :key="input_type.value"
+          :label="input_type.label"
+          :value="input_type.value"
+        />
+      </el-select>
+    </el-form-item>
+    <component
+      v-if="form_data.input_type"
+      ref="componentFormRef"
+      v-model="form_data"
+      :is="form_data.input_type"
+    ></component>
+  </el-form>
 </template>
 
 <script setup lang="ts">
@@ -106,8 +186,10 @@ const props = withDefaults(
     nodeModel?: any
     currentNodeFields?: Array<any>
     currentEditingIndex?: number
+    enableVisibility?: boolean
   }>(),
   {
+    enableVisibility: false,
     input_type_list: () =>
       input_type_list_data.map((item) => ({
         label: item.label,

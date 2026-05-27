@@ -17,6 +17,7 @@
       :nodeModel="nodeModel"
       :currentNodeFields="currentNodeFields"
       :currentEditingIndex="isEdit ? (currentIndex ?? undefined) : (currentNodeFields?.length ?? 0)"
+      :enableVisibility="true"
       ref="DynamicsFormConstructorRef"
     ></DynamicsFormConstructor>
     <template #footer>

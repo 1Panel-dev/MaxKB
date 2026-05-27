@@ -138,12 +138,14 @@
       :addFormField="addFormField"
       :nodeModel="nodeModel"
       :currentNodeFields="form_data.form_field_list"
+      :enableVisibility="enableVisibility"
     ></AddFormCollect>
     <EditFormCollect
       ref="editFormCollectRef"
       :editFormField="editFormField"
       :nodeModel="nodeModel"
       :currentNodeFields="form_data.form_field_list"
+      :enableVisibility="enableVisibility"
     />
   </NodeContainer>
 </template>
@@ -152,14 +154,19 @@ import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import AddFormCollect from '@/workflow/common/AddFormCollect.vue'
 import EditFormCollect from '@/workflow/common/EditFormCollect.vue'
 import { type FormInstance } from 'element-plus'
-import { ref, onMounted, computed, provide } from 'vue'
+import { ref, onMounted, computed, provide, inject } from 'vue'
 import { input_type_list } from '@/components/dynamics-form/constructor/data'
+import { WorkflowMode } from '@/enums/application'
 import { MsgError } from '@/utils/message'
 import { set, cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import { t } from '@/locales'
 const props = defineProps<{ nodeModel: any }>()
 provide('getModel', () => props.nodeModel)
+const workflowMode = inject('workflowMode', WorkflowMode.Application) as WorkflowMode
+const enableVisibility = computed(
+  () => workflowMode === WorkflowMode.Application || workflowMode === WorkflowMode.ApplicationLoop,
+)
 const formNodeFormRef = ref<FormInstance>()
 const tableRef = ref()
 const editFormField = (form_field_data: any, field_index: number) => {
