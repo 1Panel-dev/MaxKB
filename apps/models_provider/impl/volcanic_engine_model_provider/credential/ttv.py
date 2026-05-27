@@ -47,7 +47,7 @@ class VolcanicEngineTTVModelGeneralParams(BaseForm):
 
     watermark = SwitchField(
         TooltipLabel(_('Watermark'), _('Whether to add watermark')),
-        attrs={"active-value": "true", "inactive-value": "false"},
+        attrs={"active-value": True, "inactive-value": False},
         default_value=False,
     )
 
