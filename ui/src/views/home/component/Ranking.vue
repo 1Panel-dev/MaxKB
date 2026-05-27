@@ -59,7 +59,10 @@
                   </div>
                 </div>
                 <div class="text-right" style="width: 100px">
-                  <el-progress :percentage="TokenTotal.value ? (item?.total_tokens / TokenTotal.value) * 100 : 0" :show-text="false" />
+                  <el-progress
+                    :percentage="TokenTotal ? (item?.total_tokens / TokenTotal) * 100 : 0"
+                    :show-text="false"
+                  />
                   <p class="color-secondary mt-4">{{ numberFormat(item?.total_tokens || 0) }}</p>
                 </div>
               </div>
@@ -105,7 +108,12 @@
                   </div>
                 </div>
                 <div class="text-right" style="width: 100px">
-                  <el-progress :percentage="ChatRecordTotal.value ? (item?.chat_record_count / ChatRecordTotal.value) * 100 : 0" :show-text="false" />
+                  <el-progress
+                    :percentage="
+                      ChatRecordTotal ? (item?.chat_record_count / ChatRecordTotal) * 100 : 0
+                    "
+                    :show-text="false"
+                  />
                   <p class="color-secondary mt-4">
                     {{ numberFormat(item?.chat_record_count || 0) }}
                   </p>
@@ -150,7 +158,10 @@
                   </div>
                 </div>
                 <div class="text-right" style="width: 100px">
-                  <el-progress :percentage="TokenTotal.value ? (item?.total_tokens / TokenTotal.value) * 100 : 0" :show-text="false" />
+                  <el-progress
+                    :percentage="TokenTotal ? (item?.total_tokens / TokenTotal) * 100 : 0"
+                    :show-text="false"
+                  />
                   <p class="color-secondary mt-4">
                     {{ numberFormat(item?.total_tokens || 0) }}
                   </p>
