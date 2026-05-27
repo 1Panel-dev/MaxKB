@@ -63,6 +63,7 @@ dependencies = [
     "cohere==5.17.0",
     "jsonpath-ng==1.8.0",
     "markdownify==1.2.2",
+    "polib==1.2.0",
 ]
 
 [tool.uv]
