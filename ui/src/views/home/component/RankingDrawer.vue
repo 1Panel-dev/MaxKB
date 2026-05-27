@@ -82,9 +82,7 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress
-                :percentage="TokenTotal.value ? (row?.total_tokens / TokenTotal.value) * 100 : 0"
-              />
+              <el-progress :percentage="TokenTotal ? (row?.total_tokens / TokenTotal) * 100 : 0" />
             </template>
           </el-table-column>
           <el-table-column
@@ -156,11 +154,7 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="
-                  ChatRecordTotal.value
-                    ? (row?.chat_record_count / ChatRecordTotal.value) * 100
-                    : 0
-                "
+                :percentage="ChatRecordTotal ? (row?.chat_record_count / ChatRecordTotal) * 100 : 0"
               />
             </template>
           </el-table-column>
@@ -228,7 +222,7 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="TokenTotal.value ? (row.total_tokens / TokenTotal.value) * 100 : 0"
+                :percentage="TokenTotal ? (row.total_tokens / TokenTotal) * 100 : 0"
                 :show-text="false"
               />
             </template>
@@ -394,6 +388,7 @@ function handleSizeChange() {
 }
 
 function exportHandle() {
+  console.log('sss')
   if (activeName.value === 'tokens_agent') {
     homeApi
       .exportTokensRankings({ name: search_text.value, ...daterange.value }, loading)

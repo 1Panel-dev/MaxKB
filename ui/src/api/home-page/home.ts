@@ -95,11 +95,7 @@ const getMonitorAggregation: (params: any, loading?: Ref<boolean>) => Promise<Re
   params,
   loading,
 ) => {
-  return get(
-    `${prefix.value}/monitoring/aggregation`,
-    params,
-    loading,
-  )
+  return get(`${prefix.value}/monitoring/aggregation`, params, loading)
 }
 
 /**
@@ -110,11 +106,7 @@ const getChatRecordAggregation: (params: any, loading?: Ref<boolean>) => Promise
   params,
   loading,
 ) => {
-  return get(
-    `${prefix.value}/chat_record/aggregation`,
-    params,
-    loading,
-  )
+  return get(`${prefix.value}/chat_record/aggregation`, params, loading)
 }
 /**
  * Token总数
@@ -124,11 +116,7 @@ const getTokensAggregation: (params: any, loading?: Ref<boolean>) => Promise<Res
   params,
   loading,
 ) => {
-  return get(
-    `${prefix.value}/tokens/aggregation`,
-    params,
-    loading,
-  )
+  return get(`${prefix.value}/tokens/aggregation`, params, loading)
 }
 
 /**
@@ -139,17 +127,14 @@ const exportTokensRankings: (params: any, loading?: Ref<boolean>) => Promise<Res
   params,
   loading,
 ) => {
-  return get(
-    `${prefix.value}/tokens_ranking/export`,
-    params,
-    loading,
-  )
+  return exportFile('tokens_ranking', `${prefix.value}/tokens_ranking/export`, params, loading)
 }
 const exportQuestionsRankings: (params: any, loading?: Ref<boolean>) => Promise<Result<any>> = (
   params,
   loading,
 ) => {
-  return get(
+  return exportFile(
+    'questions_rankings',
     `${prefix.value}/question_ranking/export`,
     params,
     loading,
@@ -159,7 +144,8 @@ const exportUserTokensRankings: (params: any, loading?: Ref<boolean>) => Promise
   params,
   loading,
 ) => {
-  return get(
+  return exportFile(
+    'user_tokens_rankings',
     `${prefix.value}/user_tokens_ranking/export`,
     params,
     loading,
