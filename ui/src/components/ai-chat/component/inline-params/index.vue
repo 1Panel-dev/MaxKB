@@ -42,7 +42,7 @@ const fieldList = ref<FormField[]>([])
 const formValue = ref<Dict<any>>({})
 const setting = ref<{ exposed_fields: string[]; menu_title: string }>({
   exposed_fields: [],
-  menu_title:  t('common.moreSettings'),
+  menu_title: t('common.moreSettings'),
 })
 
 watch(
@@ -157,7 +157,7 @@ function handleInputFieldList() {
 }
 
 const exposedFields = computed(() => {
-  if (setting.value.exposed_fields.length === 0) return fieldList.value
+  if (setting.value.exposed_fields.length === 0) return []
   return setting.value.exposed_fields
     .map((field: string) => fieldList.value.find((f) => f.field === field))
     .filter(Boolean)
@@ -165,7 +165,7 @@ const exposedFields = computed(() => {
 })
 
 const dialogFields = computed(() => {
-  if (setting.value.exposed_fields.length === 0) return []
+  if (setting.value.exposed_fields.length === 0) return fieldList.value
   return fieldList.value.filter((f) => !setting.value.exposed_fields.includes(f.field))
 })
 
