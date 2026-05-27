@@ -48,9 +48,15 @@ def is_workspace_manage(auth, workspace_id):
     return RoleConstants.WORKSPACE_MANAGE.value.__str__() + ":/WORKSPACE/" + workspace_id in auth.role_list
 
 
-def get_format_time(date_time):
+def get_start_time(date_time):
     d = datetime.datetime.strptime(date_time, '%Y-%m-%d').date()
     naive = datetime.datetime.combine(d, datetime.time.min)
+    return timezone.make_aware(naive, timezone.get_default_timezone())
+
+
+def get_end_time(date_time):
+    d = datetime.datetime.strptime(date_time, '%Y-%m-%d').date()
+    naive = datetime.datetime.combine(d, datetime.time.max)
     return timezone.make_aware(naive, timezone.get_default_timezone())
 
 
@@ -67,8 +73,8 @@ class HomePageSerializer(serializers.Serializer):
             data = self.validated_data
             user_id = data["user_id"]
             workspace_id = data.get("workspace_id")
-            start_time = get_format_time(data["start_time"])
-            end_time = get_format_time(data["end_time"])
+            start_time = get_start_time(data["start_time"])
+            end_time = get_end_time(data["end_time"])
             workspace_manage = is_workspace_manage(auth, workspace_id)
             query = ChatRecord.objects.filter(
                 create_time__gte=start_time,
@@ -121,8 +127,8 @@ class HomePageSerializer(serializers.Serializer):
             data = self.data
             user_id = data["user_id"]
             workspace_id = data.get("workspace_id")
-            start_time = get_format_time(data["start_time"])
-            end_time = get_format_time(data["end_time"])
+            start_time = get_start_time(data["start_time"])
+            end_time = get_end_time(data["end_time"])
             workspace_manage = is_workspace_manage(auth, workspace_id)
             query = ChatRecord.objects.filter(
                 create_time__gte=start_time,
@@ -178,8 +184,8 @@ class HomePageSerializer(serializers.Serializer):
         def get_queryset(self, auth):
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
-            start_time = get_format_time(self.data.get("start_time"))
-            end_time = get_format_time(self.data.get("end_time"))
+            start_time = get_start_time(self.data.get("start_time"))
+            end_time = get_end_time(self.data.get("end_time"))
             name = self.data.get("name")
 
             # ---- 基础查询：不再按 Chat.create_time 过滤 ----
@@ -332,8 +338,8 @@ class HomePageSerializer(serializers.Serializer):
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
             name = self.data.get("name")
-            start_time = get_format_time(self.data.get("start_time"))
-            end_time = get_format_time(self.data.get("end_time"))
+            start_time = get_start_time(self.data.get("start_time"))
+            end_time = get_end_time(self.data.get("end_time"))
             queryset = Application.objects.filter(workspace_id=workspace_id)
             if name:
                 queryset = queryset.filter(name__contains=name)
@@ -435,8 +441,8 @@ class HomePageSerializer(serializers.Serializer):
         end_time = serializers.DateField(format='%Y-%m-%d', label=_("End time"))
 
         def get_queryset(self, auth):
-            start_time = get_format_time(self.data.get('start_time'))
-            end_time = get_format_time(self.data.get('end_time'))
+            start_time = get_start_time(self.data.get('start_time'))
+            end_time = get_end_time(self.data.get('end_time'))
             name = self.data.get("name")
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
@@ -551,8 +557,8 @@ class HomePageSerializer(serializers.Serializer):
         def get_customer_count_trend(self, application_queryset, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            start_time = get_format_time(self.data.get("start_time"))
-            end_time = get_format_time(self.data.get("end_time"))
+            start_time = get_start_time(self.data.get("start_time"))
+            end_time = get_end_time(self.data.get("end_time"))
             query_set = QuerySet(ApplicationChatUserStats).filter(
                 create_time__gte=start_time,
                 create_time__lte=end_time)
@@ -571,8 +577,8 @@ class HomePageSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
             workspace_id = self.data.get("workspace_id")
-            start_time = get_format_time(self.data.get("start_time"))
-            end_time = get_format_time(self.data.get("end_time"))
+            start_time = get_start_time(self.data.get("start_time"))
+            end_time = get_end_time(self.data.get("end_time"))
             application_id = self.data.get('application_id')
             applicationSerializer = HomePageSerializer.Application(
                 data={"user_id": user_id, 'workspace_id': workspace_id})
