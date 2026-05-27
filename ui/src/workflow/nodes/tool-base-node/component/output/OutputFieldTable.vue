@@ -19,7 +19,7 @@
   <el-table ref="inputFieldTableRef" :data="inputFieldList" class="mb-16">
     <el-table-column prop="field" :label="$t('views.tool.form.paramName.label')" />
     <el-table-column prop="label" :label="$t('dynamicsForm.paramForm.name.label')" />
-    <el-table-column :label="$t('common.operation')" align="left" width="90">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

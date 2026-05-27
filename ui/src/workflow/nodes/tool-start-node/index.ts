@@ -1,9 +1,10 @@
-import ToolBaseNodeVue from './index.vue'
+import ToolStartNodeVue from './index.vue'
 import { AppNode, AppNodeModel } from '@/workflow/common/app-node'
 import { t } from '@/locales'
-class ToolBaseNode extends AppNode {
+
+class ToolStartNode extends AppNode {
   constructor(props: any) {
-    super(props, ToolBaseNodeVue)
+    super(props, ToolStartNodeVue)
   }
   get_node_field_list() {
     const result = []
@@ -29,8 +30,15 @@ class ToolBaseNode extends AppNode {
     return result
   }
 }
+
+class ToolStartNodeModel extends AppNodeModel {
+  get_width() {
+    return 400
+  }
+}
+
 export default {
   type: 'tool-start-node',
-  model: AppNodeModel,
-  view: ToolBaseNode,
+  model: ToolStartNodeModel,
+  view: ToolStartNode,
 }

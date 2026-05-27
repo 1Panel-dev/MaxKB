@@ -42,27 +42,26 @@
         >
       </template>
     </el-table-column>
-    <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="95">
+    <el-table-column :label="$t('dynamicsForm.paramForm.input_type.label')" width="97">
       <template #default="{ row }">
         <el-tag size="small" type="info" class="info-tag">{{
           input_type_list.find((item) => item.value === row.input_type)?.label
         }}</el-tag>
       </template>
     </el-table-column>
-
-    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
+    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')" width="100">
       <template #default="{ row }">
         <span :title="row.default_value" class="ellipsis-1">{{ getDefaultValue(row) }}</span>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.required')">
+    <el-table-column :label="$t('common.required')" width="55">
       <template #default="{ row }">
         <div @click.stop>
           <el-switch disabled size="small" v-model="row.required" />
         </div>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.operation')" align="left" width="90">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

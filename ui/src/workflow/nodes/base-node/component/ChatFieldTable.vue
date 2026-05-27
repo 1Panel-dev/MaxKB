@@ -19,7 +19,7 @@
     ref="tableRef"
     row-key="field"
   >
-    <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" width="95">
+    <el-table-column prop="field" :label="$t('dynamicsForm.paramForm.field.label')" width="130">
       <template #default="{ row }">
         <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
       </template>
@@ -34,7 +34,7 @@
         >
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.operation')" align="left" width="90">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

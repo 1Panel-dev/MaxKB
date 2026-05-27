@@ -13,7 +13,7 @@
     ref="tableRef"
     row-key="variable"
   >
-    <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')">
+    <el-table-column prop="variable" :label="$t('dynamicsForm.paramForm.field.label')" width="130">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.variable">
           {{ row.variable }}
@@ -27,21 +27,21 @@
         </span>
       </template>
     </el-table-column>
-    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')">
+    <el-table-column prop="default_value" :label="$t('dynamicsForm.default.label')" width="100">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.default_value">
           {{ row.default_value }}
         </span>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.required')">
+    <el-table-column :label="$t('common.required')" width="55">
       <template #default="{ row }">
         <div @click.stop>
           <el-switch disabled size="small" v-model="row.is_required" />
         </div>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.operation')" align="left" width="90">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">

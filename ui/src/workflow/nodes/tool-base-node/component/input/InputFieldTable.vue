@@ -17,7 +17,7 @@
   </div>
 
   <el-table ref="inputFieldTableRef" :data="inputFieldList" class="mb-16">
-    <el-table-column prop="field" :label="$t('views.tool.form.paramName.label')">
+    <el-table-column prop="field" :label="$t('views.tool.form.paramName.label')" width="170">
       <template #default="{ row }">
         <span class="ellipsis-1" :title="row.field">
           {{ row.field }}
@@ -31,19 +31,19 @@
         </span>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('views.tool.form.dataType.label')">
+    <el-table-column :label="$t('views.tool.form.dataType.label')" width="95">
       <template #default="{ row }">
         <el-tag type="info" class="info-tag">{{ row.type }}</el-tag>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.required')">
+    <el-table-column :label="$t('common.required')" width="55">
       <template #default="{ row }">
         <div @click.stop>
           <el-switch disabled size="small" v-model="row.is_required" />
         </div>
       </template>
     </el-table-column>
-    <el-table-column :label="$t('common.operation')" align="left" width="90">
+    <el-table-column :label="$t('common.operation')" align="left" width="80">
       <template #default="{ row, $index }">
         <span class="mr-4">
           <el-tooltip effect="dark" :content="$t('common.modify')" placement="top">
