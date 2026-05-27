@@ -17,6 +17,7 @@ export default {
   editSuccess: '編輯成功',
   modify: '修改',
   modifySuccess: '修改成功',
+  showDetail: '查看詳情',
   cancel: '取消',
   confirm: '確認',
   close: '關閉',

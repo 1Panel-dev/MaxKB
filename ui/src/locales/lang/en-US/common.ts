@@ -17,6 +17,7 @@ export default {
   editSuccess: 'Successful',
   modify: 'Modify',
   modifySuccess: 'Successful',
+  showDetail: 'Show Detail',
   cancel: 'Cancel',
   confirm: 'OK',
   close: 'Close',

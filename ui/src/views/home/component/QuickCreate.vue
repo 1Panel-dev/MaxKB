@@ -269,7 +269,7 @@
             </el-dropdown-item>
             <el-dropdown-item @click="openCreateWorkflowDialog()">
               <div class="flex align-center">
-                <el-avatar class="avatar-green mt-4" shape="square" :size="32">
+                <el-avatar class="avatar-dark-green mt-4" shape="square" :size="32">
                   <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
                 </el-avatar>
                 <div class="pre-wrap ml-8">

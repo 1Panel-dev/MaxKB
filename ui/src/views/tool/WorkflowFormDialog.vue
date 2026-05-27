@@ -32,7 +32,7 @@
             >
               <img :src="String(workflowForm.icon)" alt="" />
             </el-Avatar>
-            <el-avatar v-else class="avatar-green" shape="square" :size="32">
+            <el-avatar v-else class="avatar-dark-green" shape="square" :size="32">
               <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt="" />
             </el-avatar>
             <el-Avatar
@@ -46,7 +46,7 @@
               <AppIcon iconName="app-edit"></AppIcon>
             </el-Avatar>
           </div>
-          <el-avatar v-else class="avatar-green mr-12" shape="square" :size="32">
+          <el-avatar v-else class="avatar-dark-green mr-12" shape="square" :size="32">
             <img src="@/assets/workflow/logo_workflow.svg" style="width: 58%" alt="" />
           </el-avatar>
           <el-input

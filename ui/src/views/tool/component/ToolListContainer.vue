@@ -78,7 +78,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item @click="openCreateWorkflowDialog()">
                   <div class="flex align-center">
-                    <el-avatar class="avatar-green mt-4" shape="square" :size="32">
+                    <el-avatar class="avatar-dark-green mt-4" shape="square" :size="32">
                       <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt=""/>
                     </el-avatar>
                     <div class="pre-wrap ml-8">
@@ -278,6 +278,7 @@
                               <AppIcon iconName="app-operate-log" class="color-secondary"></AppIcon>
                               {{ $t('views.tool.mcp.mcpConfig') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="item.template_id && permissionPrecise.edit(item.id)"
                               @click.stop="addInternalTool(item, true)"
@@ -303,12 +304,21 @@
                             </el-dropdown-item>
 
                             <el-dropdown-item
+                              v-if="item.version"
+                              @click.stop="openDetailDialog(item)"
+                            >
+                              <AppIcon iconName="app-document" class="color-secondary"></AppIcon>
+                              {{ $t('common.showDetail') }}
+                            </el-dropdown-item>
+
+                            <el-dropdown-item
                               v-if="item.tool_type === 'WORKFLOW'"
                               @click.stop="toWorkflow(item)"
                             >
                               <AppIcon iconName="app-workflow" class="color-secondary"></AppIcon>
                               {{ $t('workflow.workflow') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="!item.template_id && permissionPrecise.copy(item.id)"
                               @click.stop="copyTool(item)"
@@ -316,6 +326,7 @@
                               <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
                               {{ $t('common.copy') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="
                                 item.init_field_list?.length > 0 && permissionPrecise.edit(item.id)
@@ -325,6 +336,7 @@
                               <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
                               {{ $t('common.param.initParam') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               @click.stop="openAuthorization(item)"
                               v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
@@ -347,6 +359,7 @@
                               <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
                               {{ $t('views.trigger.title') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               text
                               @click.stop="openResourceMappingDrawer(item)"
@@ -358,6 +371,7 @@
                               ></AppIcon>
                               {{ $t('views.system.resourceMapping.title') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               text
                               @click.stop="openToolRecordDrawer(item)"
@@ -372,6 +386,7 @@
                               ></AppIcon>
                               {{ $t('common.ExecutionRecord.subTitle') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               @click.stop="openMoveToDialog(item)"
                               v-if="permissionPrecise.copy(item.id) && apiType === 'workspace'"
@@ -379,6 +394,7 @@
                               <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
                               {{ $t('common.moveTo') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="isSystemShare"
                               @click.stop="openAuthorizedWorkspaceDialog(item)"
@@ -386,6 +402,7 @@
                               <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
                               {{ $t('views.shared.authorized_workspace') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="!item.template_id && permissionPrecise.export(item.id)"
                               @click.stop="exportTool(item)"
@@ -393,6 +410,7 @@
                               <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                               {{ $t('common.export') }}
                             </el-dropdown-item>
+
                             <el-dropdown-item
                               v-if="permissionPrecise.delete(item.id)"
                               divided
@@ -694,27 +712,8 @@ function openEditDialog(data?: any) {
     checkAll.value = multipleSelection.value.length === tool.toolList.length
     return
   }
-  // 有template_id的不允许编辑，是模板转换来的
-  if (data?.template_id) {
-    return
-  }
-  // 共享过来的工具不让编辑
-  if (isShared.value) {
-    return
-  }
   if (data) {
     bus.emit('select_node', data.folder_id)
-  }
-  // 有版本号的展示readme，是商店更新过来的
-  if (data?.version) {
-    let readMe = ''
-    storeTools.value
-      .filter((item) => item.id === data.template_id)
-      .forEach((item) => {
-        readMe = item.readMe
-      })
-    toolStoreDescDrawerRef.value?.open(readMe, data)
-    return
   }
 
   // mcp工具
@@ -744,6 +743,19 @@ function openEditDialog(data?: any) {
       .then((res: any) => {
         ToolFormDrawerRef.value.open(res.data)
       })
+  }
+}
+
+function openDetailDialog(data?: any) {
+  // 有版本号的展示readme，是商店更新过来的
+  if (data?.version) {
+    let readMe = ''
+    storeTools.value
+      .filter((item) => item.id === data.template_id)
+      .forEach((item) => {
+        readMe = item.readMe
+      })
+    toolStoreDescDrawerRef.value?.open(readMe, data)
   }
 }
 
@@ -798,14 +810,6 @@ function openCreateDialog() {
 }
 
 function openCreateMcpDialog(data?: any) {
-  // 有template_id的不允许编辑，是模板转换来的
-  if (data?.template_id) {
-    return
-  }
-  // 共享过来的工具不让编辑
-  if (isShared.value) {
-    return
-  }
   McpToolDrawertitle.value = data
     ? t('views.tool.mcp.editMcpTool')
     : t('views.tool.mcp.createMcpTool')
@@ -821,25 +825,6 @@ function openCreateMcpDialog(data?: any) {
 }
 
 function openCreateSkillDialog(data?: any) {
-  // 有版本号的展示readme，是商店更新过来的
-  if (data?.version) {
-    let readMe = ''
-    storeTools.value
-      .filter((item) => item.id === data.template_id)
-      .forEach((item) => {
-        readMe = item.readMe
-      })
-    toolStoreDescDrawerRef.value?.open(readMe, data)
-    return
-  }
-  // 有template_id的不允许编辑，是模板转换来的
-  if (data?.template_id) {
-    return
-  }
-  // 共享过来的工具不让编辑
-  if (isShared.value) {
-    return
-  }
   SkillToolDrawertitle.value = data
     ? t('views.tool.skill.editSkillTool')
     : t('views.tool.skill.createSkillTool')
@@ -862,14 +847,6 @@ function toWorkflow(data: any) {
 const workflowFormDialogRef = ref<InstanceType<typeof WorkflowFormDialog>>()
 const workflowFormDialogTitle = ref('')
 const openCreateWorkflowDialog = (data?: any) => {
-  // 有template_id的不允许编辑，是模板转换来的
-  if (data?.template_id) {
-    return
-  }
-  // 共享过来的工具不让编辑
-  if (isShared.value) {
-    return
-  }
   workflowFormDialogTitle.value = data
     ? t('common.edit')
     : t('views.tool.toolWorkflow.creatToolWorkflow')
@@ -885,14 +862,6 @@ const openCreateWorkflowDialog = (data?: any) => {
 }
 
 function openCreateDataSourceDialog(data?: any) {
-  // 有template_id的不允许编辑，是模板转换来的
-  if (data?.template_id) {
-    return
-  }
-  // 共享过来的工具不让编辑
-  if (isShared.value) {
-    return
-  }
   DataSourceToolDrawertitle.value = data
     ? t('views.tool.dataSource.editDataSource')
     : t('views.tool.dataSource.createDataSource')

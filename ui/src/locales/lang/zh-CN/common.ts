@@ -18,6 +18,7 @@ export default {
   editSuccess: '编辑成功',
   modify: '修改',
   modifySuccess: '修改成功',
+  showDetail: '查看详情',
   add: '添加',
   addSuccess: '添加成功',
   cancel: '取消',
