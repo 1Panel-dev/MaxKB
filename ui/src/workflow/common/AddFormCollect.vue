@@ -16,6 +16,7 @@
       :nodeModel="nodeModel"
       :currentNodeFields="currentNodeFields"
       :currentEditingIndex="currentNodeFields?.length ?? 0"
+      :enableVisibility="enableVisibility"
     ></DynamicsFormConstructor>
     <template #footer>
       <span class="dialog-footer">
@@ -37,8 +38,9 @@ const props = withDefaults(
     addFormField: (form_data: any) => void
     nodeModel?: any
     currentNodeFields?: Array<any>
+    enableVisibility?: boolean
   }>(),
-  { title: t('common.param.addParam') },
+  { title: t('common.param.addParam'), enableVisibility: false },
 )
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormConstructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()
