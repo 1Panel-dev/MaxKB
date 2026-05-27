@@ -34,6 +34,8 @@ class TaskType(Enum):
     GENERATE_PROBLEM = 2
     # 同步
     SYNC = 3
+    # 分词索引
+    TOKENIZE = 4
 
 
 class State(Enum):

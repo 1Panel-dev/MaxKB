@@ -249,6 +249,20 @@ const putDocumentRefresh: (
   )
 }
 
+const putDocumentTokenize: (
+  knowledge_id: string,
+  document_id: string,
+  state_list: Array<string>,
+  loading?: Ref<boolean>,
+) => Promise<Result<any>> = (knowledge_id, document_id, state_list, loading) => {
+  return put(
+    `${prefix}/${knowledge_id}/document/${document_id}/tokenize`,
+    { state_list },
+    undefined,
+    loading,
+  )
+}
+
 /**
  * 同步web站点类型
  * @param 参数
@@ -646,6 +660,7 @@ export default {
   exportMulDocument,
   exportMulDocumentZip,
   putDocumentRefresh,
+  putDocumentTokenize,
   putDocumentSync,
   putMulDocument,
   delMulDocument,

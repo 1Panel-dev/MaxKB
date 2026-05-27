@@ -393,6 +393,44 @@ class DocumentView(APIView):
                 ).refresh(request.data.get("state_list"))
             )
 
+    class Tokenize(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=["PUT"],
+            summary=_("Tokenize document vector library"),
+            description=_("Tokenize document vector library"),
+            operation_id=_("Tokenize document vector library"),  # type: ignore
+            parameters=RefreshAPI.get_parameters(),
+            request=RefreshAPI.get_request(),
+            responses=RefreshAPI.get_response(),
+            tags=[_("Knowledge Base/Documentation")],  # type: ignore
+        )
+        @has_permissions(
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_knowledge_permission(),
+            PermissionConstants.KNOWLEDGE_DOCUMENT_VECTOR.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                CompareConstants.AND,
+            ),
+        )
+        @log(
+            menu="document",
+            operate="Refresh document vector library",
+            get_operation_object=lambda r, keywords: get_knowledge_document_operation_object(
+                get_knowledge_operation_object(keywords.get("knowledge_id")),
+                get_document_operation_object(keywords.get("document_id")),
+            ),
+        )
+        def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
+            return result.success(
+                DocumentSerializers.Operate(
+                    data={"document_id": document_id, "knowledge_id": knowledge_id, "workspace_id": workspace_id}
+                ).tokenize(request.data.get("state_list"))
+            )
+
     class CancelTask(APIView):
         authentication_classes = [TokenAuth]
 

@@ -892,17 +892,17 @@ class DocumentSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
             ListenerManagement.update_status(
-                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
+                QuerySet(Document).filter(id=document_id), TaskType.TOKENIZE, State.PENDING
             )
             ListenerManagement.update_status(
                 QuerySet(Paragraph)
                 .annotate(
                     reversed_status=Reverse("status"),
-                    task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+                    task_type_status=Substr("reversed_status", TaskType.TOKENIZE.value, 1),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)
                 .values("id"),
-                TaskType.EMBEDDING,
+                TaskType.TOKENIZE,
                 State.PENDING,
             )
             ListenerManagement.get_aggregation_document_status(document_id)()

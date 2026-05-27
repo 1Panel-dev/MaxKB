@@ -5,6 +5,7 @@ export default {
   setting: {
     vectorization: '向量化',
     sync: '同步',
+    tokenize: '分词索引',
   },
 
   tip: {

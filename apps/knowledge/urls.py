@@ -56,6 +56,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>', views.DocumentView.Operate.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/sync', views.DocumentView.SyncWeb.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/refresh', views.DocumentView.Refresh.as_view()),
+    path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/tokenize', views.DocumentView.Tokenize.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/cancel_task', views.DocumentView.CancelTask.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/export', views.DocumentView.Export.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/document/<str:document_id>/export_zip', views.DocumentView.ExportZip.as_view()),

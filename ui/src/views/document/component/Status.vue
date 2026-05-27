@@ -73,11 +73,13 @@ const startedMap = {
   [TaskType.EMBEDDING]: t('views.document.fileStatus.EMBEDDING'),
   [TaskType.GENERATE_PROBLEM]: t('views.document.fileStatus.GENERATE'),
   [TaskType.SYNC]: t('views.document.fileStatus.SYNC'),
+  [TaskType.TOKENIZE]: t('views.document.fileStatus.TOKENIZE'),
 }
 const taskTypeMap = {
   [TaskType.EMBEDDING]: t('views.knowledge.setting.vectorization'),
   [TaskType.GENERATE_PROBLEM]: t('views.document.generateQuestion.title'),
   [TaskType.SYNC]: t('views.knowledge.setting.sync'),
+  [TaskType.TOKENIZE]: t('views.knowledge.setting.tokenize'),
 }
 const stateMap: any = {
   [State.PENDING]: (type: number) => t('views.document.fileStatus.PENDING'),

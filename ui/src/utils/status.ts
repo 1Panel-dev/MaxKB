@@ -6,6 +6,8 @@ interface TaskTypeInterface {
   GENERATE_PROBLEM: number
   // 同步
   SYNC: number
+  // 分词索引
+  TOKENIZE: number
 }
 interface StateInterface {
   // 等待
@@ -25,7 +27,8 @@ interface StateInterface {
 const TaskType: TaskTypeInterface = {
   EMBEDDING: 1,
   GENERATE_PROBLEM: 2,
-  SYNC: 3
+  SYNC: 3,
+  TOKENIZE: 4,
 }
 const State: StateInterface = {
   // 等待

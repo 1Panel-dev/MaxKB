@@ -253,6 +253,17 @@
                           >{{ $t('views.document.fileStatus.EMBEDDING') }}
                         </el-dropdown-item>
                         <el-dropdown-item
+                          :class="
+                            filterMethod['status'] === State.STARTED &&
+                            filterMethod['task_type'] == TaskType.TOKENIZE
+                              ? 'is-active'
+                              : ''
+                          "
+                          class="justify-center"
+                          :command="beforeCommand('status', State.STARTED, TaskType.TOKENIZE)"
+                          >{{ $t('views.document.fileStatus.TOKENIZE') }}
+                        </el-dropdown-item>
+                        <el-dropdown-item
                           :class="filterMethod['status'] === State.PENDING ? 'is-active' : ''"
                           class="justify-center"
                           :command="beforeCommand('status', State.PENDING)"
@@ -490,7 +501,7 @@
             <el-table-column
               :label="$t('common.operation')"
               align="left"
-              width="160"
+              width="180"
               fixed="right"
               v-if="!isShared"
             >
@@ -535,6 +546,39 @@
                   >
                     <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
                       <el-button type="primary" text @click.stop="refreshDocument(row)">
+                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.document.setting.cancelTokenize')"
+                    placement="top"
+                    v-if="
+                      ([State.STARTED, State.PENDING] as Array<string>).includes(
+                        getTaskState(row.status, TaskType.TOKENIZE),
+                      )
+                    "
+                  >
+                    <span class="mr-4">
+                      <el-button
+                        type="primary"
+                        text
+                        @click.stop="cancelTask(row, TaskType.TOKENIZE)"
+                        v-if="permissionPrecise.doc_vector(id)"
+                      >
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </el-tooltip>
+                  <el-tooltip
+                    effect="dark"
+                    :content="$t('views.knowledge.customSegmentation.wordIndexing')"
+                    placement="top"
+                    v-else
+                  >
+                    <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
+                      <el-button type="primary" text @click.stop="tokenizeDocument(row)">
                         <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                       </el-button>
                     </span>
@@ -1148,6 +1192,15 @@ function refreshDocument(row: any) {
       })
   }
   embeddingContentDialogRef.value?.open(embeddingDocument)
+}
+
+function tokenizeDocument(row: any) {
+  const stateList = ['0', '1', '2', '3', '4', '5', 'n']
+  loadSharedApi({type: 'document', systemType: apiType.value})
+    .putDocumentTokenize(row.knowledge_id, row.id, stateList)
+    .then(() => {
+      getList()
+    })
 }
 
 function rowClickHandle(row: any, column: any) {

@@ -6,6 +6,7 @@ export default {
   setting: {
     vectorization: '向量化',
     sync: '同步',
+    tokenize: '分词索引',
   },
   tip: {
     professionalMessage: '社群版最多支援 50 個知識庫，如需擁有更多知識庫，請升級為專業版。',

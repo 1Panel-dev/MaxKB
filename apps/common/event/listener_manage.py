@@ -216,7 +216,7 @@ class ListenerManagement:
     def tokenize_by_paragraph(paragraph_id):
         maxkb_logger.info(_("Start--->Tokenize paragraph: {paragraph_id}").format(paragraph_id=paragraph_id))
         # 更新到开始状态
-        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.STARTED)
+        ListenerManagement.update_status(QuerySet(Paragraph).filter(id=paragraph_id), TaskType.TOKENIZE, State.STARTED)
         try:
             paragraph = QuerySet(Paragraph).filter(id=paragraph_id).first()
             if paragraph is None:
@@ -235,7 +235,7 @@ class ListenerManagement:
             QuerySet(Embedding).filter(paragraph_id=paragraph_id).bulk_update(data_list, ["search_vector"])
 
             ListenerManagement.update_status(
-                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.SUCCESS
+                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.TOKENIZE, State.SUCCESS
             )
         except Exception as e:
             maxkb_logger.error(
@@ -244,7 +244,7 @@ class ListenerManagement:
                 )
             )
             ListenerManagement.update_status(
-                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.FAILURE
+                QuerySet(Paragraph).filter(id=paragraph_id), TaskType.TOKENIZE, State.FAILURE
             )
         finally:
             maxkb_logger.info(_("End--->Tokenize paragraph: {paragraph_id}").format(paragraph_id=paragraph_id))
@@ -526,7 +526,7 @@ class ListenerManagement:
 
             def is_the_task_interrupted():
                 document = QuerySet(Document).filter(id=document_id).first()
-                if document is None or Status(document.status)[TaskType.EMBEDDING] == State.REVOKE:
+                if document is None or Status(document.status)[TaskType.TOKENIZE] == State.REVOKE:
                     return True
                 return False
 
@@ -535,7 +535,7 @@ class ListenerManagement:
             maxkb_logger.info(_("Start--->Tokenize document: {document_id}").format(document_id=document_id))
             # 批量修改状态为PADDING
             ListenerManagement.update_status(
-                QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.STARTED
+                QuerySet(Document).filter(id=document_id), TaskType.TOKENIZE, State.STARTED
             )
 
             # 根据段落进行向量化处理
@@ -543,7 +543,7 @@ class ListenerManagement:
                 QuerySet(Paragraph)
                 .annotate(
                     reversed_status=Reverse("status"),
-                    task_type_status=Substr("reversed_status", TaskType.EMBEDDING.value, 1),
+                    task_type_status=Substr("reversed_status", TaskType.TOKENIZE.value, 1),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)
                 .values("id"),
@@ -561,7 +561,7 @@ class ListenerManagement:
                 )
             )
         finally:
-            ListenerManagement.post_update_document_status(document_id, TaskType.EMBEDDING)
+            ListenerManagement.post_update_document_status(document_id, TaskType.TOKENIZE)
             ListenerManagement.get_aggregation_document_status(document_id)()
             maxkb_logger.info(_("End--->Tokenize document: {document_id}").format(document_id=document_id))
             rlock.un_lock("tokenize:" + str(document_id))
