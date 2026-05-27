@@ -115,6 +115,7 @@ function openChangeTitleDialog() {
     inputFieldConfig.value,
     inputFieldList.value,
     props.nodeModel.properties.user_input_field_list_setting,
+    props.nodeModel.properties.user_input_config?.title,
   )
 }
 

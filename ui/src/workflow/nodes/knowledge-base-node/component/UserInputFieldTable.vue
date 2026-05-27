@@ -139,7 +139,7 @@ function refreshFieldList(data: any, index: any) {
 }
 
 function refreshFieldTitle(data: any) {
-  inputFieldConfig.value = data
+  inputFieldConfig.value = { ...inputFieldConfig.value, title: data.menu_title }
   UserInputTitleDialogRef.value.close()
 }
 

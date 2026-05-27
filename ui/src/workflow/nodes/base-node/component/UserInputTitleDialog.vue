@@ -61,7 +61,7 @@ const fieldOptions = ref<any[]>([])
 
 const form = ref<any>({
   exposed_fields: [],
-  menu_title:  t('common.moreSettings'),
+  menu_title: t('common.moreSettings'),
 })
 
 const rules = reactive({
@@ -87,10 +87,10 @@ const getFieldLabel = (item: any) => {
   return item.field
 }
 
-const open = (row: any, fields?: any[], setting?: any) => {
+const open = (row: any, fields?: any[], setting?: any, legacyTitle?: string) => {
   form.value = {
     exposed_fields: setting?.exposed_fields || [],
-    menu_title: setting?.menu_title || t('common.moreSettings'),
+    menu_title: setting?.menu_title || legacyTitle || t('common.moreSettings'),
   }
   fieldOptions.value = fields || []
   dialogVisible.value = true

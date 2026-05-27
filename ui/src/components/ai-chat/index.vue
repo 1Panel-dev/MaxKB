@@ -20,7 +20,9 @@
         "
         :title="
           applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
-            ?.user_input_field_list_setting?.menu_title
+            ?.user_input_field_list_setting?.menu_title ||
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_config?.title
         "
         :application="applicationDetails"
         :type="type"
