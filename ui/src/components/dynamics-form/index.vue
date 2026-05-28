@@ -36,12 +36,12 @@
 import type { Dict } from '@/api/type/common'
 import FormItem from '@/components/dynamics-form/FormItem.vue'
 import type { FormField } from '@/components/dynamics-form/type'
-import { ref, onBeforeMount, watch, type Ref, nextTick } from 'vue'
+import { ref, onBeforeMount, watch, type Ref, nextTick, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type Result from '@/request/Result'
 import _ from 'lodash'
 import { get, post, put, del } from '@/request/index'
-import { evaluateVisibility } from './visibility'
+import { computeVisibilityMap } from './visibility'
 const request = {
   get,
   post,
@@ -81,6 +81,9 @@ const formFieldList = ref<Array<FormField>>([])
 const ruleFormRef = ref<FormInstance>()
 
 const formFieldRef = ref<Array<InstanceType<typeof FormItem>>>([])
+
+const visibilityMap = computed(() => computeVisibilityMap(formFieldList.value, formValue.value))
+
 /**
  * 当前 field是否展示
  * @param field
@@ -106,11 +109,7 @@ const show = (field: FormField) => {
 
   // new
   if (field.visibility_rules?.node_id) {
-    return evaluateVisibility(field.visibility_rules, {
-      formValue: formValue.value,
-      currentNodeId: field.visibility_rules.node_id,
-      currentNodeName: field.visibility_rules.node_name || '',
-    })
+    return visibilityMap.value[field.field] ?? true
   }
 
   return true
