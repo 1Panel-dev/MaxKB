@@ -71,6 +71,9 @@ async function discoverExternalLocales(): Promise<string[]> {
       console.warn('Failed to fetch external locales index, returning empty array')
       return []
     }
+    if (!response.headers.get('content-type')?.includes('application/json')) {
+      return []
+    }
 
     const index = await response.json()
     return Array.isArray(index.locales) ? index.locales : []
