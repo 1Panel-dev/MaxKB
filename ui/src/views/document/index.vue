@@ -743,7 +743,7 @@
                   >
                     <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
-                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                        <AppIcon iconName="app-document-wordIndexing" style="font-size: 16px"></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
