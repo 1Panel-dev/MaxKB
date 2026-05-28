@@ -257,21 +257,35 @@ class HomePageSerializer(serializers.Serializer):
         def export(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            token_count = HomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)
             queryset, asker_map = self.get_queryset(auth)
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title='Sheet1')
             headers = [gettext('ranking'),
                        gettext('User Name'),
                        gettext('Token consumption'),
+                       gettext('proportion'),
                        gettext('number of questions'),
+                       gettext('Average tokens per request'),
                        ]
             worksheet.append(headers)
             index = 0
             for item in queryset:
                 index += 1
-                row = [index, asker_map.get(
+                user_info = asker_map.get(
                     (item["chat_user_id"], item["chat_user_type"])
-                ).get('username'), item['total_tokens'], item['chat_record_count']]
+                ) or {}
+                username = user_info.get("username", "")
+                total_tokens = item.get("total_tokens", 0)
+                chat_record_count = item.get("chat_record_count", 0)
+                row = [
+                    index,
+                    username,
+                    total_tokens,
+                    total_tokens / token_count if token_count else 0,
+                    chat_record_count,
+                    total_tokens / chat_record_count if chat_record_count else 0,
+                ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
             response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
@@ -414,19 +428,29 @@ class HomePageSerializer(serializers.Serializer):
         def export(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            chat_record_number = HomePageSerializer.ChatRecordAggregation(data=self.data).aggregation(auth)
             queryset = self.get_queryset(auth)
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title='Sheet1')
             headers = [gettext('ranking'),
                        gettext('Application Name'),
                        gettext('number of questions'),
-                       gettext('active users')
+                       gettext('proportion'),
+                       gettext('active users'),
+                       gettext('Average Number of Conversation Turns per Person')
                        ]
             worksheet.append(headers)
             index = 0
             for item in queryset:
                 index += 1
-                row = [index, item.name, item.chat_record_count_total, item.chat_user_count]
+                row = [
+                    index,
+                    item.name,
+                    item.chat_record_count_total,
+                    item.chat_record_count_total / chat_record_number if chat_record_number != 0 else 0,
+                    item.chat_user_count,
+                    item.chat_user_count / item.chat_record_count_total if item.chat_record_count_total != 0 else 0
+                ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
             response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
@@ -528,19 +552,33 @@ class HomePageSerializer(serializers.Serializer):
         def export(self, auth, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            tokens_total = HomePageSerializer.TokensAggregation(data=self.data).aggregation(auth)
             queryset = self.get_queryset(auth)
             workbook = openpyxl.Workbook(write_only=True)
             worksheet = workbook.create_sheet(title='Sheet1')
             headers = [gettext('ranking'),
                        gettext('Application Name'),
                        gettext('Token consumption'),
-                       gettext('number of questions')
+                       gettext('proportion'),
+                       gettext('number of questions'),
+                       gettext('active users'),
+                       gettext('Average tokens per request'),
                        ]
             worksheet.append(headers)
             index = 0
             for item in queryset:
                 index += 1
-                row = [index, item.name, item.total_tokens, item.chat_record_count_total]
+                total_tokens = item.total_tokens
+                chat_record_count_total = item.chat_record_count_total
+                row = [
+                    index,
+                    item.name,
+                    total_tokens,
+                    total_tokens / tokens_total if tokens_total else 0,
+                    item.chat_user_count,
+                    chat_record_count_total,
+                    total_tokens / chat_record_count_total if chat_record_count_total else 0,
+                ]
                 worksheet.append(row)
             response = HttpResponse(content_type="application/vnd.ms-excel")
             response["Content-Disposition"] = f'attachment; filename="data.xlsx"'
