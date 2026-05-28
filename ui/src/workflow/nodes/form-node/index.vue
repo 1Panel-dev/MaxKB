@@ -281,6 +281,11 @@ const validate = () => {
   const v_list = [formNodeFormRef.value?.validate()]
 
   const upstreamNodes = props.nodeModel.get_up_node_field_list(true, true)
+  if (props.nodeModel.graphModel.get_up_node_field_list) {
+    const outer = props.nodeModel.graphModel.get_up_node_field_list(true, true)
+    outer.forEach((item: any) => upstreamNodes.push(item))
+  }
+
   for (const field of form_data.value.form_field_list) {
     for (const cond of field.visibility_rules?.conditions || []) {
       if (!cond.field || cond.field.length < 2 || !cond.field[0] || !cond.field[1]) continue
@@ -290,16 +295,8 @@ const validate = () => {
           v_list.push(Promise.reject(t('workflow.variable.NoReferencing')))
         }
       } else {
-        // 跨节点：查上游
+        // 跨节点：查上游（含循环外层 graph 的节点）
         const nodeEntry = upstreamNodes.find((n: any) => n.value === cond.field[0])
-        console.log('cond.field:', cond.field)
-        console.log(
-          'upstreamNodes:',
-          upstreamNodes.map((n: any) => ({
-            value: n.value,
-            children: n.children?.map((c: any) => c.value),
-          })),
-        )
         if (!nodeEntry || !nodeEntry.children?.some((c: any) => c.value === cond.field[1])) {
           v_list.push(Promise.reject(t('workflow.variable.NoReferencing')))
         }

@@ -197,6 +197,12 @@ const show = (field: FormField) => {
 
 defineExpose({
   validate: () => {
+    for (const field of fieldList.value) {
+      if (!show(field)) {
+        formValue.value[field.field] = null
+      }
+    }
+
     for (const item of exposedFields.value) {
       if (!show(item)) continue
       const isRequired = item.required ?? item.is_required
