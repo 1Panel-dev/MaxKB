@@ -202,76 +202,11 @@ class ReactiveTranslationString {
   [Symbol.iterator]() {
     return this.toString()[Symbol.iterator]()
   }
-
-  charAt(pos: number): string {
-    return this.toString().charAt(pos)
-  }
-
-  charCodeAt(index: number): number {
-    return this.toString().charCodeAt(index)
-  }
-
-  concat(...strings: string[]): string {
-    return this.toString().concat(...strings)
-  }
-
-  indexOf(searchString: string, position?: number): number {
-    return this.toString().indexOf(searchString, position)
-  }
-
-  lastIndexOf(searchString: string, position?: number): number {
-    return this.toString().lastIndexOf(searchString, position)
-  }
-
-  localeCompare(that: string): number {
-    return this.toString().localeCompare(that)
-  }
-
-  match(regexp: string | RegExp): RegExpMatchArray | null {
-    return this.toString().match(regexp)
-  }
-
-  replace(searchValue: string | RegExp, replaceValue: string): string {
-    return this.toString().replace(searchValue, replaceValue)
-  }
-
-  search(regexp: string | RegExp): number {
-    return this.toString().search(regexp)
-  }
-
-  slice(start?: number, end?: number): string {
-    return this.toString().slice(start, end)
-  }
-
-  split(separator: string | RegExp, limit?: number): string[] {
-    return this.toString().split(separator, limit)
-  }
-
-  substring(start: number, end?: number): string {
-    return this.toString().substring(start, end)
-  }
-
-  toLowerCase(): string {
-    return this.toString().toLowerCase()
-  }
-
-  toUpperCase(): string {
-    return this.toString().toUpperCase()
-  }
-
-  trim(): string {
-    return this.toString().trim()
-  }
-
-  length: number = 0
-
-  get [0]() { return this.toString()[0] }
 }
 
-function t(key: string, params?: Record<string, any> | string): any {
-  return new ReactiveTranslationString(key, params)
+function t(key: string, params?: Record<string, any> | string): string & ReactiveTranslationString {
+  return new ReactiveTranslationString(key, params) as unknown as string & ReactiveTranslationString
 }
-
 
 export {t}
 

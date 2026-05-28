@@ -59,5 +59,5 @@ export const MsgConfirm = (title: string, description: string, options?: any) =>
     cancelButtonText: t('common.cancel'),
     ...options
   }
-  return ElMessageBox.confirm(description, title, defaultOptions)
+  return ElMessageBox.confirm(description, String(title), defaultOptions)
 }
