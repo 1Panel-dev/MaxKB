@@ -10,7 +10,7 @@
   >
     <template #default>
       <h4 class="title-decoration-1 mb-16 mt-4">
-        {{ chat_title || $t('chat.userInput') }}
+        {{ chat_title || $t('aiChat.userInput') }}
       </h4>
     </template>
   </DynamicsForm>

@@ -105,7 +105,7 @@ const tableRef = ref()
 const UserFieldFormDialogRef = ref()
 const UserInputTitleDialogRef = ref()
 const inputFieldList = ref<any[]>([])
-const inputFieldConfig = ref({ title: t('chat.userInput') })
+const inputFieldConfig = ref({ title: t('aiChat.userInput') })
 
 function openAddDialog(data?: any, index?: any) {
   UserFieldFormDialogRef.value.open(data, index)

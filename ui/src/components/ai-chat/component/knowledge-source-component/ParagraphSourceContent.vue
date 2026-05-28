@@ -5,7 +5,7 @@
         <ParagraphCard :data="item" :content="item.content" :index="index" />
       </template>
     </div>
-    <span v-else> {{ $t('chat.KnowledgeSource.noSource') }}</span>
+    <span v-else> {{ $t('aiChat.KnowledgeSource.noSource') }}</span>
   </div>
 </template>
 

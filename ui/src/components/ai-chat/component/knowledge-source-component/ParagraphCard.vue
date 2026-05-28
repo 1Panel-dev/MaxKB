@@ -91,9 +91,9 @@ const parsedMeta = computed(() => {
 const meta = computed(() => (isMetaObject.value ? props.data.meta : parsedMeta.value))
 function infoMessage(data: any) {
   if (data?.meta?.allow_download === false) {
-    MsgInfo(t('chat.noPermissionDownload'))
+    MsgInfo(t('aiChat.noPermissionDownload'))
   } else {
-    MsgInfo(t('chat.noDocument'))
+    MsgInfo(t('aiChat.noDocument'))
   }
 }
 </script>

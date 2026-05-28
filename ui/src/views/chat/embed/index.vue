@@ -56,7 +56,7 @@
           <el-tooltip
             v-if="!showSelection && currentChatId !== 'new'"
             effect="dark"
-            :content="$t('chat.share')"
+            :content="$t('aiChat.share')"
             placement="top"
           >
             <el-button text @click="clickShareHandle" :disabled="AiChatRef?.loading">
@@ -186,7 +186,7 @@ function handleScroll(event: any) {
 
 const newObj = {
   id: 'new',
-  abstract: t('chat.createChat'),
+  abstract: t('aiChat.createChat'),
 }
 
 function newChat() {

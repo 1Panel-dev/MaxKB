@@ -16,7 +16,7 @@
             <Back />
           </el-icon>
         </el-button>
-        <h4>{{ $t('chat.executionDetails.title') }}</h4>
+        <h4>{{ $t('aiChat.executionDetails.title') }}</h4>
       </div>
     </template>
     <div>
@@ -85,7 +85,7 @@
               </p>
             </el-col>
             <el-col :span="6">
-              <p class="color-secondary mb-4">{{ $t('chat.KnowledgeSource.consumeTime') }}</p>
+              <p class="color-secondary mb-4">{{ $t('aiChat.KnowledgeSource.consumeTime') }}</p>
               <p>
                 {{
                   props.currentContent?.run_time != undefined
@@ -95,13 +95,13 @@
               </p>
             </el-col>
             <el-col :span="6">
-              <p class="color-secondary mb-4">{{ $t('chat.executionDetails.createTime') }}</p>
+              <p class="color-secondary mb-4">{{ $t('aiChat.executionDetails.createTime') }}</p>
               <p>{{ datetimeFormat(props.currentContent?.create_time) }}</p>
             </el-col>
           </el-row>
         </el-card>
         <h4 class="title-decoration-1 mb-16 mt-4">
-          {{ $t('chat.executionDetails.title') }}
+          {{ $t('aiChat.executionDetails.title') }}
         </h4>
         <template v-if="taskRecordDetails && taskRecordDetails.state === 'TRIGGER_ERROR'">
           <div class="card-never border-r-6 mb-12">
@@ -191,7 +191,7 @@
               </div>
               <div class="card-never border-r-6 mt-8">
                 <h5 class="p-8-12">
-                  {{ $t('chat.executionDetails.title') }}
+                  {{ $t('aiChat.executionDetails.title') }}
                 </h5>
                 <div class="p-8-12 border-t-dashed lighter">
                   <template

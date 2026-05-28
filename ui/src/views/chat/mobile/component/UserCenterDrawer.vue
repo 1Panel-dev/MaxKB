@@ -4,7 +4,7 @@
       <el-icon size="16" @click="show = false">
         <ArrowLeftBold />
       </el-icon>
-      <h4 class="medium">{{ $t('chat.mine') }}</h4>
+      <h4 class="medium">{{ $t('aiChat.mine') }}</h4>
     </div>
     <div class="card-item info p-16">
       <el-avatar :size="64">
@@ -62,7 +62,7 @@ function resetPassword() {
 }
 
 function logout() {
-  MsgConfirm(t('layout.logout'), t('chat.logoutContent'), {
+  MsgConfirm(t('layout.logout'), t('aiChat.logoutContent'), {
     confirmButtonText: t('layout.logout'),
     confirmButtonClass: 'danger',
   }).then(() => {

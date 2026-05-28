@@ -27,10 +27,10 @@ const auth = () => {
 }
 const validator_auth = (rule: any, value: string, callback: any) => {
   if (value === '') {
-    callback(new Error(t('chat.passwordValidator.errorMessage1')))
+    callback(new Error(t('aiChat.passwordValidator.errorMessage1')))
   } else {
     auth().catch(() => {
-      callback(new Error(t('chat.passwordValidator.errorMessage2')))
+      callback(new Error(t('aiChat.passwordValidator.errorMessage2')))
     })
   }
 }

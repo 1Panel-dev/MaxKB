@@ -19,7 +19,7 @@
         v-model="feedBack"
         type="textarea"
         :autosize="{ minRows: 4, maxRows: 20 }"
-        :placeholder="$t('chat.vote.placeholder')"
+        :placeholder="$t('aiChat.vote.placeholder')"
         :readonly="readonly"
       >
       </el-input>
@@ -69,19 +69,19 @@ const isSubmitDisabled = computed(() => {
 })
 
 const LIKE_REASONS = [
-  { label: t('chat.vote.accurate'), value: 'accurate' },
-  { label: t('chat.vote.complete'), value: 'complete' },
+  { label: t('aiChat.vote.accurate'), value: 'accurate' },
+  { label: t('aiChat.vote.complete'), value: 'complete' },
   { label: t('common.other'), value: 'other' },
 ]
 
 const OPPOSE_REASONS = [
-  { label: t('chat.vote.inaccurate'), value: 'inaccurate' },
-  { label: t('chat.vote.irrelevantAnswer'), value: 'incomplete' },
+  { label: t('aiChat.vote.inaccurate'), value: 'inaccurate' },
+  { label: t('aiChat.vote.irrelevantAnswer'), value: 'incomplete' },
   { label: t('common.other'), value: 'other' },
 ]
 
 const title = computed(() => {
-  return props.voteType === '0' ? t('chat.vote.likeTitle') : t('chat.vote.opposeTitle')
+  return props.voteType === '0' ? t('aiChat.vote.likeTitle') : t('aiChat.vote.opposeTitle')
 })
 
 const reasons = computed(() => {

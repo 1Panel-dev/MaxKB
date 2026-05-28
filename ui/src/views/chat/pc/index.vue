@@ -124,11 +124,11 @@
                 style="font-size: 16px"
               ></AppIcon>
               <span v-if="paginationConfig.total" class="lighter">
-                {{ paginationConfig.total }} {{ $t('chat.question_count') }}
+                {{ paginationConfig.total }} {{ $t('aiChat.question_count') }}
               </span>
               <el-tooltip
                 effect="dark"
-                :content="$t('chat.share')"
+                :content="$t('aiChat.share')"
                 placement="top"
                 v-if="!showSelection"
               >
@@ -143,7 +143,7 @@
               </el-tooltip>
               <el-dropdown class="ml-8" v-if="!showSelection">
                 <el-button text>
-                  <AppIcon iconName="app-export" :title="$t('chat.exportRecords')"></AppIcon>
+                  <AppIcon iconName="app-export" :title="$t('aiChat.exportRecords')"></AppIcon>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -326,7 +326,7 @@ const classObj = computed(() => {
 
 const newObj = {
   id: 'new',
-  abstract: t('chat.createChat'),
+  abstract: t('aiChat.createChat'),
 }
 const props = defineProps<{
   application_profile: any
@@ -354,7 +354,7 @@ const paginationConfig = ref({
 
 const currentRecordList = ref<any>([])
 const currentChatId = ref('new') // 当前历史记录Id 默认为'new'
-const currentChatName = ref(t('chat.createChat'))
+const currentChatName = ref(t('aiChat.createChat'))
 
 function refreshFieldTitle(chatId: string, abstract: string) {
   const find = chatLogData.value.find((item: any) => item.id == chatId)
@@ -367,7 +367,7 @@ function deleteLog(row: any) {
   chatAPI.deleteChat(row.id).then(() => {
     if (currentChatId.value === row.id) {
       currentChatId.value = 'new'
-      currentChatName.value = t('chat.createChat')
+      currentChatName.value = t('aiChat.createChat')
       paginationConfig.value.current_page = 1
       paginationConfig.value.total = 0
       currentRecordList.value = []
@@ -379,7 +379,7 @@ function deleteLog(row: any) {
 function clearChat() {
   chatAPI.clearChat(left_loading).then(() => {
     currentChatId.value = 'new'
-    currentChatName.value = t('chat.createChat')
+    currentChatName.value = t('aiChat.createChat')
     paginationConfig.value.current_page = 1
     paginationConfig.value.total = 0
     currentRecordList.value = []
@@ -417,7 +417,7 @@ function newChat() {
   }
   closeExecutionDetail()
   currentChatId.value = 'new'
-  currentChatName.value = t('chat.createChat')
+  currentChatName.value = t('aiChat.createChat')
 }
 
 const chatLogPagination = ref({
@@ -439,7 +439,7 @@ function getChatLog(refresh?: boolean) {
         paginationConfig.value.total = 0
         currentRecordList.value = []
         currentChatId.value = 'new'
-        currentChatName.value = t('chat.createChat')
+        currentChatName.value = t('aiChat.createChat')
       }
     })
 }
@@ -609,7 +609,7 @@ const rightPanelDetail = ref<any>()
 
 async function openExecutionDetail(row: any) {
   rightPanelSize.value = 400
-  rightPanelTitle.value = t('chat.executionDetails.title')
+  rightPanelTitle.value = t('aiChat.executionDetails.title')
   rightPanelType.value = 'executionDetail'
   if (row.execution_details) {
     executionDetail.value = cloneDeep(row.execution_details)
@@ -620,7 +620,7 @@ async function openExecutionDetail(row: any) {
 }
 
 async function openKnowledgeSource(row: any) {
-  rightPanelTitle.value = t('chat.KnowledgeSource.title')
+  rightPanelTitle.value = t('aiChat.KnowledgeSource.title')
   rightPanelType.value = 'knowledgeSource'
   rightPanelDetail.value = row
   rightPanelSize.value = 400

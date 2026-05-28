@@ -77,7 +77,7 @@ const tableRef = ref()
 const inputFieldFormDialogRef = ref<InstanceType<typeof InputFieldFormDialog>>()
 const inputTitleDialogRef = ref<InstanceType<typeof InputTitleDialog>>()
 const inputFieldList = ref<any[]>([])
-const inputFieldConfig = ref({ title: t('chat.userInput') })
+const inputFieldConfig = ref({ title: t('aiChat.userInput') })
 
 function openAddDialog(data?: any, index?: any) {
   if (index !== undefined) {

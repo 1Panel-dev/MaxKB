@@ -55,7 +55,7 @@
           </el-button>
           <el-tooltip
             effect="dark"
-            :content="$t('chat.share')"
+            :content="$t('aiChat.share')"
             placement="top"
             v-if="!showSelection && currentChatId !== 'new'"
           >
@@ -188,7 +188,7 @@ function handleScroll(event: any) {
 
 const newObj = {
   id: 'new',
-  abstract: t('chat.createChat'),
+  abstract: t('aiChat.createChat'),
 }
 function newChat() {
   paginationConfig.current_page = 1

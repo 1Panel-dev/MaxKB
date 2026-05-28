@@ -1,5 +1,5 @@
 <template>
-  <el-dialog class="responsive-dialog" :title="$t('chat.editTitle')" v-model="dialogVisible"
+  <el-dialog class="responsive-dialog" :title="$t('aiChat.editTitle')" v-model="dialogVisible"
     :close-on-click-modal="false" :close-on-press-escape="false" :destroy-on-close="true" append-to-body>
     <el-form label-position="top" ref="fieldFormRef" :model="form" require-asterisk-position="right">
       <el-form-item prop="abstract" :rules="[

@@ -4,11 +4,11 @@
       class="flex align-center mt-16"
       v-if="type === 'log' || type === 'debug-ai-chat' ? true : application.show_source"
     >
-      <span class="mr-4 color-secondary">{{ $t('chat.KnowledgeSource.title') }}</span>
+      <span class="mr-4 color-secondary">{{ $t('aiChat.KnowledgeSource.title') }}</span>
       <el-divider direction="vertical" />
       <el-button type="primary" class="mr-8" link @click="openParagraph(data)">
         <AppIcon iconName="app-reference-outlined" class="mr-4"></AppIcon>
-        {{ $t('chat.KnowledgeSource.referenceParagraph') }}
+        {{ $t('aiChat.KnowledgeSource.referenceParagraph') }}
         {{ data.paragraph_list?.length || 0 }}</el-button
       >
     </div>
@@ -71,10 +71,10 @@
     >
       <div>
         <span class="mr-8">
-          {{ $t('chat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }}
+          {{ $t('aiChat.KnowledgeSource.consume') }}: {{ data?.message_tokens + data?.answer_tokens }}
         </span>
         <span>
-          {{ $t('chat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span
+          {{ $t('aiChat.KnowledgeSource.consumeTime') }}: {{ data?.run_time?.toFixed(2) }} s</span
         >
       </div>
       <el-button
@@ -84,7 +84,7 @@
         style="padding: 0"
       >
         <el-icon class="mr-4"><Document /></el-icon>
-        {{ $t('chat.executionDetails.title') }}</el-button
+        {{ $t('aiChat.executionDetails.title') }}</el-button
       >
     </div>
     <!-- 知识库引用/执行详情 dialog -->
@@ -184,13 +184,13 @@ const dialogType = ref('')
 
 function infoMessage(data: any) {
   if (data?.meta?.allow_download === false) {
-    MsgInfo(t('chat.noPermissionDownload'))
+    MsgInfo(t('aiChat.noPermissionDownload'))
   } else {
-    MsgInfo(t('chat.noDocument'))
+    MsgInfo(t('aiChat.noDocument'))
   }
 }
 function openParagraph(row: any, id?: string) {
-  dialogTitle.value = t('chat.KnowledgeSource.title')
+  dialogTitle.value = t('aiChat.KnowledgeSource.title')
   const obj = cloneDeep(row)
   obj.paragraph_list = id
     ? obj.paragraph_list.filter((v: any) => v.knowledge_id === id)
@@ -206,7 +206,7 @@ function openParagraph(row: any, id?: string) {
   dialogVisible.value = true
 }
 function openExecutionDetail(row: any) {
-  dialogTitle.value = t('chat.executionDetails.title')
+  dialogTitle.value = t('aiChat.executionDetails.title')
   if (props.executionIsRightPanel) {
     emit('openExecutionDetail')
     return

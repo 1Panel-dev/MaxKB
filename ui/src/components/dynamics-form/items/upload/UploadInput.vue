@@ -10,7 +10,7 @@
     multiple
     :show-file-list="false"
   >
-    <el-button type="primary">{{ $t('chat.uploadFile.label') }}</el-button>
+    <el-button type="primary">{{ $t('aiChat.uploadFile.label') }}</el-button>
   </el-upload>
   <el-space wrap class="w-full media-file-width upload_content mt-16">
     <template v-for="(file, index) in model_value" :key="index">
@@ -91,19 +91,19 @@ const loading = ref<boolean>(false)
 const uploadFile = async (file: any, fileList: Array<any>) => {
   fileList.splice(fileList.indexOf(file), 1)
   if (fileArray.value.find((f: any) => f.name === file.name)) {
-    ElMessage.warning(t('chat.uploadFile.fileRepeat'))
+    ElMessage.warning(t('aiChat.uploadFile.fileRepeat'))
 
     return
   }
   const max_file_size = (props.formField as any).max_file_size
   if (file.size / 1024 / 1024 > max_file_size) {
-    ElMessage.warning(t('chat.uploadFile.sizeLimit') + max_file_size + 'MB')
+    ElMessage.warning(t('aiChat.uploadFile.sizeLimit') + max_file_size + 'MB')
     return
   }
 
   if (fileList.length > attrs.limit) {
     ElMessage.warning(
-      t('chat.uploadFile.limitMessage1') + attrs.limit + t('chat.uploadFile.limitMessage2'),
+      t('aiChat.uploadFile.limitMessage1') + attrs.limit + t('aiChat.uploadFile.limitMessage2'),
     )
     return
   }

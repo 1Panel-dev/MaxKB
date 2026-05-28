@@ -59,17 +59,17 @@ const globalFields = [
     label: t('views.application.form.historyRecord.label'),
     value: 'history_context',
   },
-  { label: t('chat.chatId'), value: 'chat_id' },
+  { label: t('aiChat.chatId'), value: 'chat_id' },
   {
-    label: t('chat.chatUserId'),
+    label: t('aiChat.chatUserId'),
     value: 'chat_user_id',
   },
   {
-    label: t('chat.chatUserType'),
+    label: t('aiChat.chatUserType'),
     value: 'chat_user_type',
   },
   {
-    label: t('chat.chatUserGroup'),
+    label: t('aiChat.chatUserGroup'),
     value: 'chat_user_group',
   },
   {

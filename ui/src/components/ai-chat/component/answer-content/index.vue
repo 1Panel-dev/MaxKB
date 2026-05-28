@@ -22,7 +22,7 @@
                 .join('')
                 .trim().length == 0
             "
-            :source="$t('chat.tip.answerMessage')"
+            :source="$t('aiChat.tip.answerMessage')"
           ></MdRenderer>
           <template v-else-if="answer_text.length > 0">
             <MdRenderer
@@ -38,10 +38,10 @@
             ></MdRenderer>
           </template>
           <p v-else-if="chatRecord.is_stop" shadow="always" style="margin: 0.5rem 0">
-            {{ $t('chat.tip.stopAnswer') }}
+            {{ $t('aiChat.tip.stopAnswer') }}
           </p>
           <p v-else shadow="always" style="margin: 0.5rem 0">
-            {{ $t('chat.tip.answerLoading') }} <span class="dotting"></span>
+            {{ $t('aiChat.tip.answerLoading') }} <span class="dotting"></span>
           </p>
           <!-- 知识来源 -->
           <KnowledgeSourceComponent

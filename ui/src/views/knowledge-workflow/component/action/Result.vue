@@ -1,7 +1,7 @@
 <template>
   <div>
     <h4 class="title-decoration-1 mb-16 mt-4">
-      {{ $t('chat.executionDetails.title') }}
+      {{ $t('aiChat.executionDetails.title') }}
     </h4>
     <div class="mb-16" v-if="!isRecord">
       <!-- 执行结果 -->

@@ -1,7 +1,7 @@
 <template>
   <el-dialog
     v-model="dialogVisible"
-    :title="$t('chat.preview')"
+    :title="$t('aiChat.preview')"
     style="overflow: auto"
     width="60%"
     :before-close="close"
@@ -21,7 +21,7 @@
     </div>
     <template #footer>
       <span class="dialog-footer">
-        <el-button :loading="loading" @click="exportPDF">{{ $t('chat.exportPDF') }}</el-button>
+        <el-button :loading="loading" @click="exportPDF">{{ $t('aiChat.exportPDF') }}</el-button>
         <el-button
           :loading="loading"
           type="primary"
@@ -32,7 +32,7 @@
             }
           "
         >
-          {{ $t('chat.exportImg') }}
+          {{ $t('aiChat.exportImg') }}
         </el-button>
       </span>
     </template>

@@ -9,7 +9,7 @@
     <template v-else>
       <div class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.paragraphSource.question') }}
+          {{ $t('aiChat.paragraphSource.question') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <span class="mb-8">user: {{ problem }}</span>
@@ -17,7 +17,7 @@
       </div>
       <div v-if="paddedProblem" class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.paragraphSource.questionPadded') }}
+          {{ $t('aiChat.paragraphSource.questionPadded') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <span class="mb-8">user: {{ paddedProblem }}</span>
@@ -34,7 +34,7 @@
 
       <div class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.history') }}
+          {{ $t('aiChat.history') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <div v-for="(msg, index) in historyRecord" :key="index">
@@ -46,10 +46,10 @@
 
       <div class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.executionDetails.currentChat') }}
+          {{ $t('aiChat.executionDetails.currentChat') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
-          <div class="mb-8">{{ $t('chat.executionDetails.knowedMessage') }}:</div>
+          <div class="mb-8">{{ $t('aiChat.executionDetails.knowedMessage') }}:</div>
           <div v-for="(msg, index) in currentChat" :key="index">
             <span>{{ msg.content }}</span>
           </div>
@@ -58,7 +58,7 @@
 
       <div class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.executionDetails.answer') }}
+          {{ $t('aiChat.executionDetails.answer') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <div v-for="(msg, index) in AiResponse" :key="index">
@@ -69,7 +69,7 @@
       </div>
       <div v-if="errStepMsg" class="card-never border-r-6 mb-12">
         <h5 class="p-8-12">
-          {{ $t('chat.executionDetails.errLog') }}
+          {{ $t('aiChat.executionDetails.errLog') }}
         </h5>
         <div class="p-8-12 border-t-dashed lighter">
           <div>

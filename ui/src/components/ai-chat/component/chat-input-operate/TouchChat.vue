@@ -10,7 +10,7 @@
       @touchend="onTouchEnd"
       :disabled="disabled"
     >
-      {{ disabled ? $t('chat.inputPlaceholder.chatting') : $t('chat.inputPlaceholder.holdToTalk') }}
+      {{ disabled ? $t('aiChat.inputPlaceholder.chatting') : $t('aiChat.inputPlaceholder.holdToTalk') }}
     </el-button>
     <!-- 使用 custom-class 自定义样式 -->
     <transition name="el-fade-in-linear">
@@ -63,7 +63,7 @@ const emit = defineEmits(['TouchStart', 'TouchEnd'])
 const startY = ref(0)
 const isTouching = ref(false)
 const dialogVisible = ref(false)
-const message = ref(t('chat.inputPlaceholder.holdToTalk'))
+const message = ref(t('aiChat.inputPlaceholder.holdToTalk'))
 
 watch(
   () => [props.time, props.start],
@@ -71,7 +71,7 @@ watch(
     if (start) {
       isTouching.value = true
       dialogVisible.value = true
-      message.value = t('chat.inputPlaceholder.touchChatMessage')
+      message.value = t('aiChat.inputPlaceholder.touchChatMessage')
       if (time === 60) {
         dialogVisible.value = false
         emit('TouchEnd', isTouching.value)
@@ -89,7 +89,7 @@ watch(
     if (val) {
       isTouching.value = true
       dialogVisible.value = true
-      message.value = t('chat.inputPlaceholder.touchChatMessage')
+      message.value = t('aiChat.inputPlaceholder.touchChatMessage')
     } else {
       dialogVisible.value = false
       isTouching.value = false
@@ -115,7 +115,7 @@ function onTouchMove(event: any) {
   // 判断是否上滑
   if (deltaY < -50) {
     // -50 是一个阈值，可以根据需要调整
-    message.value = t('chat.inputPlaceholder.cancelTouchChat')
+    message.value = t('aiChat.inputPlaceholder.cancelTouchChat')
     isTouching.value = false
   }
 }

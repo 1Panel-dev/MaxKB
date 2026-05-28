@@ -82,14 +82,14 @@
           </el-text>
         </template>
       </el-table-column>
-      <el-table-column prop="run_time" :label="$t('chat.KnowledgeSource.consumeTime')">
+      <el-table-column prop="run_time" :label="$t('aiChat.KnowledgeSource.consumeTime')">
         <template #default="{ row }">
           {{ row.run_time != undefined ? row.run_time?.toFixed(2) + 's' : '-' }}
         </template>
       </el-table-column>
       <el-table-column
         prop="create_time"
-        :label="$t('chat.executionDetails.createTime')"
+        :label="$t('aiChat.executionDetails.createTime')"
         width="180"
       >
         <template #default="{ row }">
@@ -100,14 +100,14 @@
       <el-table-column :label="$t('common.operation')" width="90">
         <template #default="{ row }">
           <div class="flex">
-            <el-tooltip effect="dark" :content="$t('chat.executionDetails.title')" placement="top">
+            <el-tooltip effect="dark" :content="$t('aiChat.executionDetails.title')" placement="top">
               <el-button type="primary" text @click.stop="toDetails(row)">
                 <AppIcon iconName="app-operate-log"></AppIcon>
               </el-button>
             </el-tooltip>
             <el-tooltip
               effect="dark"
-              :content="$t('chat.executionDetails.cancel')"
+              :content="$t('aiChat.executionDetails.cancel')"
               placement="top"
               v-if="['PADDING', 'STARTED'].includes(row.state)"
             >
@@ -178,7 +178,7 @@ const toDetails = (row: any) => {
 }
 
 const cancelExecution = (row: any) => {
-  MsgConfirm(t('common.tip'), t('chat.executionDetails.cancelExecutionTip'), {
+  MsgConfirm(t('common.tip'), t('aiChat.executionDetails.cancelExecutionTip'), {
     confirmButtonText: t('common.confirm'),
     confirmButtonClass: 'danger',
   }).then(() => {

@@ -24,7 +24,7 @@ const {
   params: { link },
 } = route as any
 
-const currentChatName = ref(t('chat.createChat'))
+const currentChatName = ref(t('aiChat.createChat'))
 const currentRecordList = ref<any>([])
 
 function getShareChat() {

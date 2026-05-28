@@ -18,10 +18,10 @@
         v-if="chatRecord.is_stop && !chatRecord.write_ed"
         @click="startChat(chatRecord)"
         link
-        >{{ $t('chat.operation.continue') }}
+        >{{ $t('aiChat.operation.continue') }}
       </el-button>
       <!-- <el-button type="primary" v-else-if="!chatRecord.write_ed" @click="stopChat(chatRecord)" link
-        >{{ $t('chat.operation.stopChat') }}
+        >{{ $t('aiChat.operation.stopChat') }}
       </el-button> -->
     </div>
 

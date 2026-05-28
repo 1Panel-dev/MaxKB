@@ -36,7 +36,7 @@
               size="small"
               style="width: 85px"
             >
-              <el-option :label="$t('chat.quote')" value="reference" />
+              <el-option :label="$t('aiChat.quote')" value="reference" />
               <el-option :label="$t('common.custom')" value="custom" />
             </el-select>
           </div>
@@ -85,7 +85,7 @@
               size="small"
               style="width: 85px"
             >
-              <el-option :label="$t('chat.quote')" value="reference" />
+              <el-option :label="$t('aiChat.quote')" value="reference" />
               <el-option :label="$t('common.custom')" value="custom" />
             </el-select>
           </div>
@@ -130,7 +130,7 @@
               size="small"
               style="width: 85px"
             >
-              <el-option :label="$t('chat.quote')" value="reference" />
+              <el-option :label="$t('aiChat.quote')" value="reference" />
               <el-option :label="$t('common.custom')" value="custom" />
             </el-select>
           </div>

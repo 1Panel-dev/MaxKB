@@ -55,7 +55,7 @@
 
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
-                  <span class="color-secondary"> {{ $t('chat.paragraphSource.question') }}:</span>
+                  <span class="color-secondary"> {{ $t('aiChat.paragraphSource.question') }}:</span>
 
                   {{ data.question || '-' }}
                 </div>
@@ -95,7 +95,7 @@
                   </el-space>
                 </div>
                 <div v-if="data.audio_list?.length > 0">
-                  <p class="mb-8 color-secondary">{{ $t('chat.executionDetails.audioFile') }}:</p>
+                  <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
 
                   <el-space wrap>
                     <template v-for="(f, i) in data.audio_list" :key="i">
@@ -146,13 +146,13 @@
           <template v-if="data.type == WorkflowType.SearchKnowledge">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.searchContent') }}
+                {{ $t('aiChat.executionDetails.searchContent') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">{{ data.question || '-' }}</div>
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.searchResult') }}
+                {{ $t('aiChat.executionDetails.searchResult') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.paragraph_list?.length > 0">
@@ -179,7 +179,7 @@
           <template v-if="data.type == WorkflowType.Condition">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.conditionResult') }}
+                {{ $t('aiChat.executionDetails.conditionResult') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 {{ data.branch_name || '-' }}
@@ -198,7 +198,7 @@
               </div>
             </div>
             <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
-              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
                   <p
@@ -218,7 +218,7 @@
                 {{
                   isKnowLedge
                     ? $t('views.application.form.prompt.label')
-                    : $t('chat.executionDetails.currentChat')
+                    : $t('aiChat.executionDetails.currentChat')
                 }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
@@ -235,7 +235,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdRenderer v-if="data.answer" :source="data.answer" noImgZoomIn></MdRenderer>
@@ -261,7 +261,7 @@
               </div>
             </div>
             <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
-              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
                   <p
@@ -278,7 +278,7 @@
             </div>
             <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{ $t('aiChat.executionDetails.currentChat') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.question || '-' }}
@@ -289,7 +289,7 @@
                 {{
                   data.type == WorkflowType.Application
                     ? $t('common.param.outputParam')
-                    : $t('chat.executionDetails.answer')
+                    : $t('aiChat.executionDetails.answer')
                 }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
@@ -310,7 +310,7 @@
           <template v-if="data.type === WorkflowType.Reply">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.replyContent') }}
+                {{ $t('aiChat.executionDetails.replyContent') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <el-scrollbar height="150">
@@ -336,7 +336,7 @@
 
                 <el-tooltip
                   effect="dark"
-                  :content="$t('chat.executionDetails.paramOutputTooltip')"
+                  :content="$t('aiChat.executionDetails.paramOutputTooltip')"
                   placement="right"
                 >
                   <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
@@ -374,7 +374,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <div v-if="data.audio_list?.length > 0">
-                    <p class="mb-8 color-secondary">{{ $t('chat.executionDetails.audioFile') }}:</p>
+                    <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
 
                     <el-space wrap>
                       <template v-for="(f, i) in data.audio_list" :key="i">
@@ -423,7 +423,7 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="p-8-12 border-t-dashed lighter">
-                  <p class="mb-8 color-secondary">{{ $t('chat.executionDetails.textContent') }}:</p>
+                  <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.textContent') }}:</p>
                   <div v-if="data.content">
                     <MdPreview
                       ref="editorRef"
@@ -441,7 +441,7 @@
                 {{ $t('common.param.outputParam') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                <p class="mb-8 color-secondary">{{ $t('chat.executionDetails.audioFile') }}:</p>
+                <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
                 <div v-if="data.answer" v-html="data.answer"></div>
               </div>
             </div>
@@ -452,13 +452,13 @@
             v-if="data.type === WorkflowType.ToolLib || data.type === WorkflowType.ToolLibCustom"
           >
             <div class="card-never border-r-6 mt-8" v-if="data.index != 0">
-              <h5 class="p-8-12">{{ $t('chat.executionDetails.input') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.executionDetails.input') }}</h5>
               <div class="p-8-12 border-t-dashed lighter break-all">
                 {{ data.params || '-' }}
               </div>
             </div>
             <div class="card-never border-r-6 mt-8">
-              <h5 class="p-8-12">{{ $t('chat.executionDetails.output') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.executionDetails.output') }}</h5>
               <div class="p-8-12 border-t-dashed lighter break-all">
                 {{ data.result || '-' }}
               </div>
@@ -468,13 +468,13 @@
           <template v-if="data.type == WorkflowType.RerankerNode">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.searchContent') }}
+                {{ $t('aiChat.executionDetails.searchContent') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">{{ data.question || '-' }}</div>
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.rerankerContent') }}
+                {{ $t('aiChat.executionDetails.rerankerContent') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.document_list?.length > 0">
@@ -494,7 +494,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.rerankerResult') }}
+                {{ $t('aiChat.executionDetails.rerankerResult') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.result_list?.length > 0">
@@ -522,7 +522,7 @@
                 {{
                   $t('common.param.outputParam')
                 }}<span style="color: #f54a45">{{
-                  data.is_submit ? '' : `(${$t('chat.executionDetails.noSubmit')})`
+                  data.is_submit ? '' : `(${$t('aiChat.executionDetails.noSubmit')})`
                 }}</span>
               </h5>
 
@@ -551,7 +551,7 @@
               </div>
             </div>
             <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
-              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
                   <p
@@ -587,7 +587,7 @@
                 {{
                   isKnowLedge
                     ? $t('views.application.form.prompt.label')
-                    : $t('chat.executionDetails.currentChat')
+                    : $t('aiChat.executionDetails.currentChat')
                 }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
@@ -627,7 +627,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -653,7 +653,7 @@
               </div>
             </div>
             <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
-              <h5 class="p-8-12">{{ $t('chat.history') }}</h5>
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-if="data.history_message?.length > 0">
                   <p
@@ -687,7 +687,7 @@
                 {{
                   isKnowLedge
                     ? $t('views.application.form.prompt.label')
-                    : $t('chat.executionDetails.currentChat')
+                    : $t('aiChat.executionDetails.currentChat')
                 }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
@@ -727,7 +727,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -746,7 +746,7 @@
           <template v-if="data.type == WorkflowType.ImageGenerateNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{ $t('aiChat.executionDetails.currentChat') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.question || '-' }}
@@ -762,7 +762,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -780,7 +780,7 @@
           <template v-if="data.type == WorkflowType.TextToVideoGenerateNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{ $t('aiChat.executionDetails.currentChat') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.question || '-' }}
@@ -796,7 +796,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -815,7 +815,7 @@
           <template v-if="data.type == WorkflowType.ImageToVideoGenerateNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.currentChat') }}
+                {{ $t('aiChat.executionDetails.currentChat') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
                 {{ data.question || '-' }}
@@ -891,7 +891,7 @@
 
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.answer') }}
+                {{ $t('aiChat.executionDetails.answer') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <MdPreview
@@ -1185,7 +1185,7 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary"
-                  >{{ $t('chat.executionDetails.paragraphRules') }}:</span
+                  >{{ $t('aiChat.executionDetails.paragraphRules') }}:</span
                   >
                   {{ data.split_strategy }}
                 </div>
@@ -1205,7 +1205,7 @@
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
                 {{ $t('common.param.outputParam') }}（{{
-                  $t('chat.executionDetails.documentSplitTip')
+                  $t('aiChat.executionDetails.documentSplitTip')
                 }}）
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
@@ -1237,8 +1237,8 @@
           <template v-if="data.type === WorkflowType.KnowledgeWriteNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.writeContent') }}（{{
-                  $t('chat.executionDetails.documentSplitTip')
+                {{ $t('aiChat.executionDetails.writeContent') }}（{{
+                  $t('aiChat.executionDetails.documentSplitTip')
                 }}）
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
@@ -1349,7 +1349,7 @@
             </div>
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
-                {{ $t('chat.executionDetails.title') }}
+                {{ $t('aiChat.executionDetails.title') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <template v-for="(cLoop, cIndex) in data.details" :key="cIndex">
@@ -1362,7 +1362,7 @@
         </template>
         <template v-else>
           <div class="card-never border-r-6">
-            <h5 class="p-8-12">{{ $t('chat.executionDetails.errMessage') }}</h5>
+            <h5 class="p-8-12">{{ $t('aiChat.executionDetails.errMessage') }}</h5>
             <div class="p-8-12 border-t-dashed lighter">{{ data.err_message || '-' }}</div>
           </div>
         </template>

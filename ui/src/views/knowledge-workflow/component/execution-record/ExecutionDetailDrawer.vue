@@ -16,7 +16,7 @@
             <Back />
           </el-icon>
         </el-button>
-        <h4>{{ $t('chat.executionDetails.title') }}</h4>
+        <h4>{{ $t('aiChat.executionDetails.title') }}</h4>
       </div>
     </template>
     <div>
@@ -68,7 +68,7 @@
               </p>
             </el-col>
             <el-col :span="6">
-              <p class="color-secondary mb-4">{{ $t('chat.KnowledgeSource.consumeTime') }}</p>
+              <p class="color-secondary mb-4">{{ $t('aiChat.KnowledgeSource.consumeTime') }}</p>
               <p>
                 {{
                   props.currentContent?.run_time != undefined
@@ -78,7 +78,7 @@
               </p>
             </el-col>
             <el-col :span="6">
-              <p class="color-secondary mb-4">{{ $t('chat.executionDetails.createTime') }}</p>
+              <p class="color-secondary mb-4">{{ $t('aiChat.executionDetails.createTime') }}</p>
               <p>{{ datetimeFormat(props.currentContent?.create_time) }}</p>
             </el-col>
           </el-row>

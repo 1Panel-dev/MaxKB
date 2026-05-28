@@ -10,7 +10,7 @@
         <el-tooltip
           v-if="audioManage?.isPlaying()"
           effect="dark"
-          :content="$t('chat.operation.pause')"
+          :content="$t('aiChat.operation.pause')"
           placement="top"
         >
           <el-button
@@ -22,7 +22,7 @@
             <AppIcon class="color-secondary" iconName="app-video-pause"></AppIcon>
           </el-button>
         </el-tooltip>
-        <el-tooltip effect="dark" :content="$t('chat.operation.play')" placement="top" v-else>
+        <el-tooltip effect="dark" :content="$t('aiChat.operation.play')" placement="top" v-else>
           <el-button
             text
             :disabled="!data?.write_ed"
@@ -46,14 +46,14 @@
           </el-tooltip>
         </span>
         <span class="ml-8">
-          <el-tooltip effect="dark" :content="$t('chat.operation.regeneration')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.operation.regeneration')" placement="top">
             <el-button :disabled="chat_loading" text @click="regeneration">
               <AppIcon iconName="app-refresh" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
         </span>
         <span class="ml-8" v-if="buttonData?.vote_status === '-1' && mode === 'mobile'">
-          <el-tooltip effect="dark" :content="$t('chat.operation.like')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.operation.like')" placement="top">
             <el-button text :disabled="loading" @click="mobileVoteReasonHandler('0')">
               <AppIcon class="color-secondary" iconName="app-like"></AppIcon>
             </el-button>
@@ -71,7 +71,7 @@
         >
           <template #reference>
             <span class="ml-8">
-              <el-tooltip effect="dark" :content="$t('chat.operation.like')" placement="top">
+              <el-tooltip effect="dark" :content="$t('aiChat.operation.like')" placement="top">
                 <el-button text :disabled="loading">
                   <AppIcon class="color-secondary" iconName="app-like"></AppIcon>
                 </el-button>
@@ -88,14 +88,14 @@
           </VoteReasonContent>
         </el-popover>
         <span v-if="buttonData?.vote_status === '0'" class="ml-8">
-          <el-tooltip effect="dark" :content="$t('chat.operation.cancelLike')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.operation.cancelLike')" placement="top">
             <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
               <AppIcon class="color-secondary" iconName="app-like-color"></AppIcon>
             </el-button>
           </el-tooltip>
         </span>
         <span v-if="buttonData?.vote_status === '-1' && mode === 'mobile'" class="ml-8">
-          <el-tooltip effect="dark" :content="$t('chat.operation.oppose')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.operation.oppose')" placement="top">
             <el-button text :disabled="loading" @click="mobileVoteReasonHandler('1')">
               <AppIcon class="color-secondary" iconName="app-oppose"></AppIcon>
             </el-button>
@@ -113,7 +113,7 @@
         >
           <template #reference>
             <span class="ml-8">
-              <el-tooltip effect="dark" :content="$t('chat.operation.oppose')" placement="top">
+              <el-tooltip effect="dark" :content="$t('aiChat.operation.oppose')" placement="top">
                 <el-button text :disabled="loading">
                   <AppIcon class="color-secondary" iconName="app-oppose"></AppIcon>
                 </el-button>
@@ -130,14 +130,14 @@
           </VoteReasonContent>
         </el-popover>
         <span class="ml-8" v-if="buttonData?.vote_status === '1'">
-          <el-tooltip effect="dark" :content="$t('chat.operation.cancelOppose')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.operation.cancelOppose')" placement="top">
             <el-button text @click="cancelVoteHandle('-1')" :disabled="loading">
               <AppIcon class="color-secondary" iconName="app-oppose-color"></AppIcon>
             </el-button>
           </el-tooltip>
         </span>
         <span class="ml-8">
-          <el-tooltip effect="dark" :content="$t('chat.share')" placement="top">
+          <el-tooltip effect="dark" :content="$t('aiChat.share')" placement="top">
             <el-button text @click.stop="clickShareHandle(props.data.record_id)" :disabled="chat_loading">
               <AppIcon class="color-secondary" iconName="app-share"></AppIcon>
             </el-button>

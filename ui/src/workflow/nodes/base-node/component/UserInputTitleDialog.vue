@@ -16,7 +16,7 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="$t('chat.userInputSetting')">
+      <el-form-item :label="$t('aiChat.userInputSetting')">
         <el-select v-model="form.exposed_fields" multiple style="width: 100%">
           <el-option
             v-for="item in fieldOptions"

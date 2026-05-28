@@ -155,9 +155,9 @@ const execute = (toolId: string, data: any) => {
     .debugToolWorkflow(toolId, data)
     .then((response: any) => {
       if (response.status === 460) {
-        return Promise.reject(t('chat.tip.errorIdentifyMessage'))
+        return Promise.reject(t('aiChat.tip.errorIdentifyMessage'))
       } else if (response.status === 461) {
-        return Promise.reject(t('chat.tip.errorLimitMessage'))
+        return Promise.reject(t('aiChat.tip.errorLimitMessage'))
       } else {
         const reader = response.body.getReader()
         // 处理流数据
@@ -197,9 +197,9 @@ const sendMessage = (val: string, other_params_data?: any, chat?: chatType) => {
     .debugToolWorkflow(currentToolId.value, { ...other_params_data, ...currentData.value })
     .then((response: any) => {
       if (response.status === 460) {
-        return Promise.reject(t('chat.tip.errorIdentifyMessage'))
+        return Promise.reject(t('aiChat.tip.errorIdentifyMessage'))
       } else if (response.status === 461) {
-        return Promise.reject(t('chat.tip.errorLimitMessage'))
+        return Promise.reject(t('aiChat.tip.errorLimitMessage'))
       } else {
         const reader = response.body.getReader()
         // 处理流数据

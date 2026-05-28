@@ -131,7 +131,7 @@
           </el-text>
         </template>
       </el-table-column>
-      <el-table-column prop="run_time" :label="$t('chat.KnowledgeSource.consumeTime')">
+      <el-table-column prop="run_time" :label="$t('aiChat.KnowledgeSource.consumeTime')">
         <template #default="{ row }">
           {{ row.run_time != undefined ? row.run_time?.toFixed(2) + 's' : '-' }}
         </template>
@@ -148,7 +148,7 @@
       <el-table-column
         sortable
         prop="create_time"
-        :label="$t('chat.executionDetails.createTime')"
+        :label="$t('aiChat.executionDetails.createTime')"
         width="180"
       >
         <template #default="{ row }">
@@ -159,7 +159,7 @@
       <el-table-column :label="$t('common.operation')" width="90">
         <template #default="{ row }">
           <div class="flex">
-            <el-tooltip effect="dark" :content="$t('chat.executionDetails.title')" placement="top">
+            <el-tooltip effect="dark" :content="$t('aiChat.executionDetails.title')" placement="top">
               <el-button type="primary" text @click.stop="toDetails(row)">
                 <AppIcon iconName="app-operate-log"></AppIcon>
               </el-button>

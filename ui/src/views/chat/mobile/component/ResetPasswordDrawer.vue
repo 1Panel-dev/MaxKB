@@ -30,7 +30,7 @@
       </el-form-item>
     </el-form>
     <el-button type="primary" size="large" class="w-full" @click="resetPassword">{{
-      $t('chat.confirmModification')
+      $t('aiChat.confirmModification')
     }}</el-button>
   </el-drawer>
 </template>

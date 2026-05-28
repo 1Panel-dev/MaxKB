@@ -86,7 +86,7 @@ const menus = ref([
     },
   },
   {
-    label: t('chat.quote'),
+    label: t('aiChat.quote'),
     icon: 'app-quote',
     click: () => {
       bus.emit('chat-input', getSelection())

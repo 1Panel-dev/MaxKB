@@ -12,7 +12,7 @@
                     <el-icon class="mr-4">
                       <Download />
                     </el-icon>
-                    {{ $t('chat.download') }}
+                    {{ $t('aiChat.download') }}
                   </div>
                   <div class="show flex align-center">
                     <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
@@ -81,7 +81,7 @@
                     <el-icon class="mr-4">
                       <Download />
                     </el-icon>
-                    {{ $t('chat.download') }}
+                    {{ $t('aiChat.download') }}
                   </div>
                   <div class="show flex align-center">
                     <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
@@ -103,7 +103,7 @@
             v-model="editText"
             :autosize="{ minRows: 1, maxRows: 10 }"
             type="textarea"
-            :placeholder="$t('chat.inputPlaceholder.default')"
+            :placeholder="$t('aiChat.inputPlaceholder.default')"
             :maxlength="100000"
             @keydown.enter="sendReQuestionMessage"
             class="chat-operate-textarea"

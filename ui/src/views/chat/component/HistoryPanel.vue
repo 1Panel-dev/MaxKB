@@ -38,15 +38,15 @@
           @click="newChat"
         >
           <AppIcon iconName="app-create-chat"></AppIcon>
-          <span class="ml-4">{{ $t('chat.createChat') }}</span>
+          <span class="ml-4">{{ $t('aiChat.createChat') }}</span>
         </el-button>
         <div
           v-show="!isPcCollapse"
           class="flex-between p-8 pb-0 color-secondary mt-8"
           v-if="showHistory"
         >
-          <span>{{ $t('chat.history') }}</span>
-          <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
+          <span>{{ $t('aiChat.history') }}</span>
+          <el-tooltip effect="dark" :content="$t('aiChat.clearChat')" placement="right">
             <el-button text @click.stop="clearChat">
               <AppIcon iconName="app-delete"></AppIcon>
             </el-button>
@@ -91,7 +91,7 @@
                               :disabled="currentChatId !== row.id || chat_loading"
                             >
                               <AppIcon iconName="app-share" class="color-secondary"></AppIcon>
-                              {{ $t('chat.share') }}
+                              {{ $t('aiChat.share') }}
                             </el-dropdown-item>
                             <el-dropdown-item @click.stop="editLogTitle(row)">
                               <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
@@ -110,20 +110,20 @@
 
                 <template #empty>
                   <div class="text-center">
-                    <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+                    <el-text type="info">{{ $t('aiChat.noHistory') }}</el-text>
                   </div>
                 </template>
               </common-list>
             </div>
           </InfiniteScroll>
           <!-- <div v-if="chatLogData?.length" class="text-center lighter color-secondary">
-            <span>{{ $t('chat.only20history') }}</span>
+            <span>{{ $t('aiChat.only20history') }}</span>
           </div> -->
         </el-scrollbar>
       </div>
       <el-menu-item index="1" v-show="isPcCollapse" @click="newChat">
         <AppIcon iconName="app-create-chat"></AppIcon>
-        <template #title>{{ $t('chat.createChat') }}</template>
+        <template #title>{{ $t('aiChat.createChat') }}</template>
       </el-menu-item>
 
       <el-sub-menu v-show="isPcCollapse" index="2" v-if="showHistory" :teleported="false">
@@ -131,8 +131,8 @@
           <AppIcon iconName="app-history-outlined" />
         </template>
         <div class="flex-between p-8 ml-8">
-          <span>{{ $t('chat.history') }}</span>
-          <el-tooltip effect="dark" :content="$t('chat.clearChat')" placement="right">
+          <span>{{ $t('aiChat.history') }}</span>
+          <el-tooltip effect="dark" :content="$t('aiChat.clearChat')" placement="right">
             <el-button text @click.stop="clearChat">
               <AppIcon
                 iconName="app-delete"
@@ -201,7 +201,7 @@
           </el-scrollbar>
         </div>
         <div v-if="!chatLogData?.length" class="text-center">
-          <el-text type="info">{{ $t('chat.noHistory') }}</el-text>
+          <el-text type="info">{{ $t('aiChat.noHistory') }}</el-text>
         </div>
       </el-sub-menu>
     </el-menu>

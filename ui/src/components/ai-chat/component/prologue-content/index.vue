@@ -49,7 +49,7 @@ const toQuickQuestion = (match: string, offset: number, input: string) => {
   return `<quick_question>${match.replace('- ', '')}</quick_question>`
 }
 const prologue = computed(() => {
-  const temp = props.available ? props.application?.prologue : t('chat.tip.prologueMessage')
+  const temp = props.available ? props.application?.prologue : t('aiChat.tip.prologueMessage')
   if (temp) {
     const tag_list = [
       /<html_rander>.*?<\/html_rander>/gs,

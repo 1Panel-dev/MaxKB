@@ -103,7 +103,7 @@
           </el-checkbox-group>
           <TransitionContent
             v-if="transcribing"
-            :text="t('chat.inputPlaceholder.recorderLoading')"
+            :text="t('aiChat.inputPlaceholder.recorderLoading')"
             :type="type"
             :application="applicationDetails"
           >
@@ -131,7 +131,7 @@
                 @click="shareChatHandle"
                 :disabled="shareLoading || multipleSelectionChat.length === 0"
               >
-                {{ $t('chat.copyLinkText') }}
+                {{ $t('aiChat.copyLinkText') }}
               </el-button>
             </div>
           </div>
@@ -575,7 +575,7 @@ function getChartOpenId(chat?: any, problem?: string, re_chat?: boolean, other_p
 const errorWrite = (chat: any, message?: string) => {
   ChatManagement.addChatRecord(chat, 50, loading)
   ChatManagement.write(chat.id)
-  ChatManagement.append(chat.id, message || t('chat.tip.error500Message'))
+  ChatManagement.append(chat.id, message || t('aiChat.tip.error500Message'))
   ChatManagement.updateStatus(chat.id, 500)
   ChatManagement.close(chat.id)
 }
@@ -646,9 +646,9 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
     getChatMessageAPI()(chartOpenId.value, obj)
       .then((response) => {
         if (response.status === 460) {
-          return Promise.reject(t('chat.tip.errorIdentifyMessage'))
+          return Promise.reject(t('aiChat.tip.errorIdentifyMessage'))
         } else if (response.status === 461) {
-          return Promise.reject(t('chat.tip.errorLimitMessage'))
+          return Promise.reject(t('aiChat.tip.errorLimitMessage'))
         } else {
           nextTick(() => {
             // 将滚动条滚动到最下面

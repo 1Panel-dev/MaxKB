@@ -11,7 +11,7 @@
         <span v-if="tts">
           <el-tooltip
             effect="dark"
-            :content="$t('chat.operation.play')"
+            :content="$t('aiChat.operation.play')"
             placement="top"
             v-if="!audioPlayerStatus"
           >
@@ -19,7 +19,7 @@
               <AppIcon iconName="app-video-play" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
-          <el-tooltip v-else effect="dark" :content="$t('chat.operation.pause')" placement="top">
+          <el-tooltip v-else effect="dark" :content="$t('aiChat.operation.pause')" placement="top">
             <el-button type="primary" text @click="pausePlayAnswerText()">
               <AppIcon iconName="app-video-pause" class="color-secondary"></AppIcon>
             </el-button>
@@ -185,7 +185,7 @@ function removeFormRander(text: string) {
 
 const playAnswerText = (text: string) => {
   if (!text) {
-    text = t('chat.tip.answerMessage')
+    text = t('aiChat.tip.answerMessage')
   }
   // 移除表单渲染器
   text = removeFormRander(text)

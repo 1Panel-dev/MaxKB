@@ -3,7 +3,7 @@
     <div class="text-center mb-8" v-if="loading">
       <el-button class="border-primary video-stop-button" @click="stopChat">
         <app-icon iconName="app-video-stop" class="mr-8"></app-icon>
-        {{ $t('chat.operation.stopChat') }}
+        {{ $t('aiChat.operation.stopChat') }}
       </el-button>
     </div>
 
@@ -285,11 +285,11 @@
                 >
                   <template #content>
                     <div class="break-all pre-wrap">
-                      {{ $t('chat.uploadFile.label') }}：{{ $t('chat.uploadFile.most')
+                      {{ $t('aiChat.uploadFile.label') }}：{{ $t('aiChat.uploadFile.most')
                       }}{{ props.applicationDetails.file_upload_setting.maxFiles
-                      }}{{ $t('chat.uploadFile.limit') }}
+                      }}{{ $t('aiChat.uploadFile.limit') }}
                       {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
-                        $t('chat.uploadFile.fileType')
+                        $t('aiChat.uploadFile.fileType')
                       }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
                     </div>
                   </template>
@@ -344,7 +344,7 @@
           <el-form-item>
             <template #label>
               <div class="flex-between">
-                <span>{{ $t('chat.uploadFile.urlTitle') }}</span>
+                <span>{{ $t('aiChat.uploadFile.urlTitle') }}</span>
                 <el-select
                   :teleported="false"
                   v-model="urlForm.type"
@@ -363,7 +363,7 @@
             </template>
             <el-input
               v-model="urlForm.source_url"
-              :placeholder="$t('chat.uploadFile.urlPlaceholder')"
+              :placeholder="$t('aiChat.uploadFile.urlPlaceholder')"
               :rows="5"
               type="textarea"
             />
@@ -386,7 +386,7 @@
             class="import-button"
           >
             <el-button class="w-full url-upload-button"
-              >{{ $t('chat.uploadFile.localUpload') }}
+              >{{ $t('aiChat.uploadFile.localUpload') }}
             </el-button>
           </el-upload>
         </div>
@@ -467,10 +467,10 @@ const uploadLoading = computed(() => {
 
 const inputPlaceholder = computed(() => {
   return recorderStatus.value === 'START'
-    ? `${t('chat.inputPlaceholder.speaking')}...`
+    ? `${t('aiChat.inputPlaceholder.speaking')}...`
     : recorderStatus.value === 'TRANSCRIBING'
-      ? `${t('chat.inputPlaceholder.recorderLoading')}...`
-      : `${t('chat.inputPlaceholder.default')}`
+      ? `${t('aiChat.inputPlaceholder.recorderLoading')}...`
+      : `${t('aiChat.inputPlaceholder.default')}`
 })
 
 const upload = ref()
@@ -503,7 +503,7 @@ const getAcceptList = () => {
   }
 
   if (accepts.length === 0) {
-    return `.${t('chat.uploadFile.tipMessage')}`
+    return `.${t('aiChat.uploadFile.tipMessage')}`
   }
   return accepts.map((ext: any) => '.' + ext).join(',')
 }
@@ -529,20 +529,20 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadVideoList.value.length +
     uploadOtherList.value.length
   if (file_limit_once >= maxFiles) {
-    MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
+    MsgWarning(t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'))
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
   if (fileList.filter((f: any) => f.size == 0).length > 0) {
     // MB
-    MsgWarning(t('chat.uploadFile.sizeLimit2'))
+    MsgWarning(t('aiChat.uploadFile.sizeLimit2'))
     // 空文件上传过滤
     fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }
   if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
     // MB
-    MsgWarning(t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
+    MsgWarning(t('aiChat.uploadFile.sizeLimit') + fileLimit + 'MB')
     // 只保留未超出大小限制的文件
     fileList.splice(
       0,
@@ -742,7 +742,7 @@ class RecorderManage {
         },
         (err: any) => {
           MsgAlert(t('common.tip'), err, {
-            confirmButtonText: t('chat.tip.confirm'),
+            confirmButtonText: t('aiChat.tip.confirm'),
             dangerouslyUseHTMLString: true,
             customClass: 'record-tip-confirm',
           })
@@ -761,7 +761,7 @@ class RecorderManage {
   private errorCallBack(err: any, isUserNotAllow: boolean) {
     if (isUserNotAllow) {
       MsgAlert(t('common.tip'), err, {
-        confirmButtonText: t('chat.tip.confirm'),
+        confirmButtonText: t('aiChat.tip.confirm'),
         dangerouslyUseHTMLString: true,
         customClass: 'record-tip-confirm',
       })
@@ -770,10 +770,10 @@ class RecorderManage {
         t('common.tip'),
         `${err}
         <div style="width: 100%;height:1px;border-top:1px var(--el-border-color) var(--el-border-style);margin:10px 0;"></div>
-        ${t('chat.tip.recorderTip')}
+        ${t('aiChat.tip.recorderTip')}
     <img src="${new URL(`/tipIMG.jpg`, import.meta.url).href}" style="width: 100%;" />`,
         {
-          confirmButtonText: t('chat.tip.confirm'),
+          confirmButtonText: t('aiChat.tip.confirm'),
           dangerouslyUseHTMLString: true,
           customClass: 'record-tip-confirm',
         },
@@ -818,7 +818,7 @@ const uploadRecording = async (audioBlob: Blob) => {
         }
       })
       .catch((error) => {
-        console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
+        console.error(`${t('aiChat.uploadFile.errorMessage')}:`, error)
       })
       .finally(() => {
         recorderStatus.value = 'STOP'
@@ -826,7 +826,7 @@ const uploadRecording = async (audioBlob: Blob) => {
       })
   } catch (error) {
     recorderStatus.value = 'STOP'
-    console.error(`${t('chat.uploadFile.errorMessage')}:`, error)
+    console.error(`${t('aiChat.uploadFile.errorMessage')}:`, error)
   }
 }
 const recorderManage = new RecorderManage(uploadRecording)
@@ -883,17 +883,17 @@ const getQuestion = () => {
       uploadOtherList.value.length > 0,
     ]
     if (fileLength.filter((f) => f).length > 1) {
-      return t('chat.uploadFile.otherMessage')
+      return t('aiChat.uploadFile.otherMessage')
     } else if (fileLength[0]) {
-      return t('chat.uploadFile.imageMessage')
+      return t('aiChat.uploadFile.imageMessage')
     } else if (fileLength[1]) {
-      return t('chat.uploadFile.documentMessage')
+      return t('aiChat.uploadFile.documentMessage')
     } else if (fileLength[2]) {
-      return t('chat.uploadFile.audioMessage')
+      return t('aiChat.uploadFile.audioMessage')
     } else if (fileLength[3]) {
-      return t('chat.uploadFile.videoMessage')
+      return t('aiChat.uploadFile.videoMessage')
     } else if (fileLength[4]) {
-      return t('chat.uploadFile.otherMessage')
+      return t('aiChat.uploadFile.otherMessage')
     }
   }
 
@@ -1176,7 +1176,7 @@ function openUrlSetting() {
 async function saveUrl() {
   const urls = urlForm.source_url.split('\n')
   if (urls.length === 0) {
-    MsgWarning(t('chat.uploadFile.invalidUrl'))
+    MsgWarning(t('aiChat.uploadFile.invalidUrl'))
     return
   }
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
@@ -1191,7 +1191,7 @@ async function saveUrl() {
     urls.length + file_limit_once >= fileLimit ||
     urls.length > fileLimit
   ) {
-    MsgWarning(t('chat.uploadFile.limitMessage1') + maxFiles + t('chat.uploadFile.limitMessage2'))
+    MsgWarning(t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'))
     return
   }
   // 允许的 MIME 类型
@@ -1226,7 +1226,7 @@ async function saveUrl() {
     })
 
   if (validUrls.length === 0) {
-    MsgWarning(t('chat.uploadFile.invalidUrl'))
+    MsgWarning(t('aiChat.uploadFile.invalidUrl'))
     return
   }
 
@@ -1244,7 +1244,7 @@ async function saveUrl() {
           : await chatAPI.getFile(appId, { url })
 
       if (res.data['status_code'] !== 200) {
-        MsgWarning(url + ' ' + t('chat.uploadFile.invalidUrl'))
+        MsgWarning(url + ' ' + t('aiChat.uploadFile.invalidUrl'))
         return
       }
 
@@ -1254,12 +1254,12 @@ async function saveUrl() {
 
       // 类型校验
       if (expectedTypes.length > 0 && !expectedTypes.some((type) => contentType.includes(type))) {
-        MsgWarning(url + ' ' + t('chat.uploadFile.urlErrorMessage'))
+        MsgWarning(url + ' ' + t('aiChat.uploadFile.urlErrorMessage'))
         return
       }
 
       if (fileSize > fileLimit * 1024 * 1024) {
-        MsgWarning(url + ' ' + t('chat.uploadFile.sizeLimit') + fileLimit + 'MB')
+        MsgWarning(url + ' ' + t('aiChat.uploadFile.sizeLimit') + fileLimit + 'MB')
         return
       }
 

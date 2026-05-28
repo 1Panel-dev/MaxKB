@@ -46,7 +46,7 @@ const fieldFormRef = ref()
 const loading = ref<boolean>(false)
 
 const form = ref<any>({
-  title: t('chat.userOutput', '输出参数'),
+  title: t('aiChat.userOutput', '输出参数'),
 })
 
 const rules = reactive({

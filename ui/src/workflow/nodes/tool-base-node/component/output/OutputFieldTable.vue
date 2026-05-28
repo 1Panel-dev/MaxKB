@@ -53,7 +53,7 @@ const tableRef = ref()
 const inputFieldFormDialogRef = ref<InstanceType<typeof InputFieldFormDialog>>()
 const outputTitleDialogRef = ref<InstanceType<typeof OutputTitleDialog>>()
 const inputFieldList = ref<any[]>([])
-const outputFieldConfig = ref({ title: t('chat.userOutput', '输出参数') })
+const outputFieldConfig = ref({ title: t('aiChat.userOutput', '输出参数') })
 
 function openAddDialog(data?: any, index?: any) {
   if (index !== undefined) {

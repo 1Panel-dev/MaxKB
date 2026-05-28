@@ -39,7 +39,7 @@
       <div class="text-left ml-8">
         <el-button type="primary" class="w-full" v-if="first" @click="confirmHandle">
           <AppIcon iconName="app-chat" class="mr-4"></AppIcon>
-          {{ $t('chat.operation.startChat') }}</el-button
+          {{ $t('aiChat.operation.startChat') }}</el-button
         >
         <el-button type="primary" v-if="!first" @click="confirmHandle">{{
           $t('common.confirm')
@@ -73,7 +73,7 @@ const props = defineProps<{
 const dynamicsFormRefresh = ref(0)
 const inputFieldList = ref<FormField[]>([])
 const apiInputFieldList = ref<FormField[]>([])
-const inputFieldConfig = ref({ title: t('chat.userInput') })
+const inputFieldConfig = ref({ title: t('aiChat.userInput') })
 const firstMounted = ref(false)
 
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
@@ -283,7 +283,7 @@ function handleInputFieldList() {
       //
       inputFieldConfig.value = v.properties.user_input_config?.title
         ? v.properties.user_input_config
-        : { title: t('chat.userInput') }
+        : { title: t('aiChat.userInput') }
     })
 }
 const getRouteQueryValue = (field: string) => {
@@ -326,7 +326,7 @@ const validate_query = () => {
   }
   if (msg.length > 0) {
     MsgWarning(
-      `${t('chat.tip.inputParamMessage1')} ${msg.join('、')}${t('chat.tip.inputParamMessage2')}`,
+      `${t('aiChat.tip.inputParamMessage1')} ${msg.join('、')}${t('aiChat.tip.inputParamMessage2')}`,
     )
     return Promise.reject(false)
   }
