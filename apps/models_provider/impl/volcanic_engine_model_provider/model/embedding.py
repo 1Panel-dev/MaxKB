@@ -39,38 +39,25 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
     def embed_documents(
             self, texts: List[str]
     ) -> List[List[float]]:
-        if self.model_name.startswith("doubao-embedding-vision-"):
-            embeddings = []
-            for text in texts:
-                multimodal_input = {"type": "text", "text": text}
-                resp = self.client.multimodal_embeddings.create(
-                    model=self.model_name,
-                    input=[multimodal_input],
-                    encoding_format="float",
-                    **(self.params or {})
-                )
-                embedding = self._extract_embedding(resp.data)
-                if embedding is not None:
-                    embeddings.append(embedding)
-            return embeddings
-        else:
-            resp = self.client.embeddings.create(
+        embeddings = []
+        for text in texts:
+            multimodal_input = {"type": "text", "text": text}
+            resp = self.client.multimodal_embeddings.create(
                 model=self.model_name,
-                input=texts,
+                input=[multimodal_input],
+                encoding_format="float",
                 **(self.params or {})
             )
-            return [e.embedding for e in resp.data]
+            embedding = self._extract_embedding(resp.data)
+            if embedding is not None:
+                embeddings.append(embedding)
+        return embeddings
 
     def _extract_embedding(self, data):
-        if isinstance(data, list) and len(data) > 0:
-            item = data[0]
-        else:
-            item = data
-
-        if hasattr(item, 'embedding'):
-            return item.embedding
-        elif isinstance(item, dict):
-            return item.get('embedding')
-        elif isinstance(item, list):
-            return item
+        if hasattr(data, 'embedding'):
+            return data.embedding
+        elif isinstance(data, dict):
+            return data.get('embedding')
+        elif isinstance(data, list) and len(data) > 0:
+            return self._extract_embedding(data[0])
         return None
