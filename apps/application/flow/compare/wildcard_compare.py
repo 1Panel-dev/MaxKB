@@ -12,12 +12,11 @@ import re
 from .compare import Compare
 from common.cache.mem_cache import MemCache
 
-
 match_cache = MemCache('wildcard_to_regex', {
-    'TIMEOUT': 3600, # 缓存有效期为 1 小时
+    'TIMEOUT': 3600,  # 缓存有效期为 1 小时
     'OPTIONS': {
-        'MAX_ENTRIES': 500, # 最多缓存 500 个条目
-        'CULL_FREQUENCY': 10, # 达到上限时，删除约 1/10 的缓存
+        'MAX_ENTRIES': 500,  # 最多缓存 500 个条目
+        'CULL_FREQUENCY': 10,  # 达到上限时，删除约 1/10 的缓存
     },
 })
 
@@ -26,9 +25,10 @@ def translate_and_compile_and_cache(wildcard):
     match = match_cache.get(wildcard)
     if not match:
         regex = fnmatch.translate(wildcard)
-        match = re.compile(regex).match
+        match = re.compile(regex, flags=re.DOTALL).fullmatch
         match_cache.set(wildcard, match)
     return match
+
 
 class WildcardCompare(Compare):
 

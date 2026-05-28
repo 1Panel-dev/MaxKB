@@ -4,15 +4,20 @@
     @Author：虎
     @file： lt_compare.py
     @date：2024/6/11 9:52
-    @desc: 大于比较器
+    @desc: 长度大于等于比较器
 """
 from .compare import Compare
+from .len_equal_compare import compute_length
 
 
 class LenGECompare(Compare):
 
     def compare(self, source_value, compare, target_value):
         try:
-            return len(source_value) >= int(target_value)
+            # 计算长度
+            source_length, target_length = compute_length(source_value, target_value)
+
+            # 长度大于等于 比较
+            return source_length >= target_length
         except Exception:
             return False

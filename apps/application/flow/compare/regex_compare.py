@@ -23,7 +23,7 @@ match_cache = MemCache('regex', {
 def compile_and_cache(regex):
     match = match_cache.get(regex)
     if not match:
-        match = re.compile(regex).fullmatch
+        match = re.compile(regex, flags=re.DOTALL).fullmatch
         match_cache.set(regex, match)
     return match
 
