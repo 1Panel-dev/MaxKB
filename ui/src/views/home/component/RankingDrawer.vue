@@ -192,7 +192,11 @@
             align="right"
           >
             <template #default="{ row }">
-              {{ numberFormat(row.chat_record_count) }}
+              {{
+                numberFormat(
+                  Number((row?.chat_record_count / row?.chat_user_count || 0).toFixed(1)),
+                )
+              }}
             </template>
           </el-table-column>
         </app-table>
@@ -261,15 +265,15 @@
             align="right"
           >
             <template #default="{ row }">
-              {{ numberFormat(Number(((row.total_tokens / row.chat_record_count) || 0).toFixed(1))) }}
+              {{ numberFormat(Number((row.total_tokens / row.chat_record_count || 0).toFixed(1))) }}
             </template>
           </el-table-column>
-          <el-table-column
+          <!-- <el-table-column
             prop="name"
             min-width="100"
             show-overflow-tooltip
             :label="$t('layout.home.commonlyAgents')"
-          />
+          /> -->
         </app-table>
       </el-tab-pane>
     </el-tabs>

@@ -160,8 +160,8 @@
                       {{ $t('layout.home.questions') }}
                       {{ numberFormat(item?.chat_record_count || 0) }}
                       {{ $t('views.system.time') }}
-                      <el-divider direction="vertical" />
-                      {{ '-' }}
+                      <!-- <el-divider direction="vertical" />
+                      {{ '-' }} -->
                     </p>
                   </div>
                 </div>
