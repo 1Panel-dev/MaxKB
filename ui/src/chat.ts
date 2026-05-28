@@ -8,7 +8,7 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from '@/router/chat'
-import i18n from '@/locales'
+import i18n, {initExternalLocales} from '@/locales'
 import Components from '@/components'
 import directives from '@/directives'
 import { supPopover } from '@/utils/supPopover'
@@ -109,5 +109,8 @@ app.use(directives)
 app.use(router)
 app.use(i18n)
 app.use(Components)
+// 初始化外置语言包后挂载应用
+initExternalLocales().finally(() => {
+})
 app.mount('#app')
 export { app }

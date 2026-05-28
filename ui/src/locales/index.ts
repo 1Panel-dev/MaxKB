@@ -1,5 +1,5 @@
 import {useLocalStorage, usePreferredLanguages} from '@vueuse/core'
-import {computed, ref, watch, customRef} from 'vue'
+import {computed} from 'vue'
 import {createI18n} from 'vue-i18n'
 
 // 导入语言文件
