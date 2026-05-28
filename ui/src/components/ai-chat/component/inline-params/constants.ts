@@ -15,6 +15,4 @@ export const ALLOWED_EXPOSED_TYPES = [
   'TreeSelect',
   'SingleSelect',
   'MultiSelect',
-  'RadioCard',
-  'RadioRow',
 ] as const
