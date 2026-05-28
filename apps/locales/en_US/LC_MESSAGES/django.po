@@ -9355,3 +9355,27 @@ msgstr ""
 
 msgid "Copy"
 msgstr "Copy"
+
+msgid "ranking"
+msgstr "ranking"
+
+msgid "Token consumption"
+msgstr "Token consumption"
+
+msgid "proportion"
+msgstr "proportion"
+
+msgid "number of questions"
+msgstr "number of questions"
+
+msgid "active users"
+msgstr "active users"
+
+msgid "Average tokens per request"
+msgstr "Average tokens per request"
+
+msgid "Average Number of Conversation Turns per Person"
+msgstr "Average Number of Conversation Turns per Person"
+
+msgid "User Name"
+msgstr "User Name"
