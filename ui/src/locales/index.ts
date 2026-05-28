@@ -1,9 +1,9 @@
-import { useLocalStorage, usePreferredLanguages } from '@vueuse/core'
-import { computed } from 'vue'
-import { createI18n } from 'vue-i18n'
+import {useLocalStorage, usePreferredLanguages} from '@vueuse/core'
+import {computed, ref, watch, customRef} from 'vue'
+import {createI18n} from 'vue-i18n'
 
 // 导入语言文件
-const langModules = import.meta.glob('./lang/*/index.ts', { eager: true }) as Record<
+const langModules = import.meta.glob('./lang/*/index.ts', {eager: true}) as Record<
   string,
   { default: Record<string, any> }
 >
@@ -136,6 +136,52 @@ export const langList = computed(() => {
   return list
 })
 
-export const { t } = i18n.global
+// typescript
+class ReactiveTranslationString {
+  private _key: string
+  private _params?: Record<string, any>
+  private _ref: import('vue').ComputedRef<string>
+
+  constructor(key: string, params?: Record<string, any>) {
+    this._key = key
+    this._params = params
+    this._ref = computed(() =>
+      this._params ? (i18n.global.t(this._key, this._params) as string) : (i18n.global.t(this._key) as string)
+    )
+  }
+
+  toString(): string {
+    return this._ref.value
+  }
+
+  toJSON(): string {
+    return this.toString()
+  }
+
+  valueOf(): string {
+    return this.toString()
+  }
+
+  get value(): string {
+    return this.toString()
+  }
+
+  [Symbol.toPrimitive](_hint: string): string {
+    return this.toString()
+  }
+}
+
+// typescript
+export type ReactiveTranslation = ReactiveTranslationString
+
+export function t(key: string, params?: Record<string, any>): ReactiveTranslation {
+  return new ReactiveTranslationString(key, params)
+}
+
+export function unwrapT(v: ReactiveTranslation | string): string {
+  return typeof v === 'string' ? v : v.value
+}
+
+
 
 export default i18n
