@@ -60,7 +60,7 @@
                 </div>
                 <div class="text-right" style="width: 100px">
                   <el-progress
-                    :percentage="TokenTotal ? (item?.total_tokens / TokenTotal) * 100 : 0"
+                    :percentage="TokenTotal ? Number(((item?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
                     :show-text="false"
                   />
                   <p class="color-secondary mt-4">{{ numberFormat(item?.total_tokens || 0) }}</p>
@@ -110,7 +110,7 @@
                 <div class="text-right" style="width: 100px">
                   <el-progress
                     :percentage="
-                      ChatRecordTotal ? (item?.chat_record_count / ChatRecordTotal) * 100 : 0
+                      ChatRecordTotal ? Number(((item?.chat_record_count || 0) / ChatRecordTotal * 100).toFixed(1)) : 0
                     "
                     :show-text="false"
                   />
@@ -159,7 +159,7 @@
                 </div>
                 <div class="text-right" style="width: 100px">
                   <el-progress
-                    :percentage="TokenTotal ? (item?.total_tokens / TokenTotal) * 100 : 0"
+                    :percentage="TokenTotal ? Number(((item?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
                     :show-text="false"
                   />
                   <p class="color-secondary mt-4">

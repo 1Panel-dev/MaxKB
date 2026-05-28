@@ -82,7 +82,7 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress :percentage="TokenTotal ? (row?.total_tokens / TokenTotal) * 100 : 0" />
+              <el-progress :percentage="TokenTotal ? Number(((row?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0" />
             </template>
           </el-table-column>
           <el-table-column
@@ -154,7 +154,7 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="ChatRecordTotal ? (row?.chat_record_count / ChatRecordTotal) * 100 : 0"
+                :percentage="ChatRecordTotal ? Number(((row?.chat_record_count || 0) / ChatRecordTotal * 100).toFixed(1)) : 0"
               />
             </template>
           </el-table-column>
@@ -222,7 +222,7 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="TokenTotal ? (row.total_tokens / TokenTotal) * 100 : 0"
+                :percentage="TokenTotal ? Number(((row.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
                 :show-text="false"
               />
             </template>
@@ -290,6 +290,7 @@ function handleClick(tab: any) {
   activeName.value = tab
   search_text.value = ''
   paginationConfig.current_page = 1
+  changeDayHandle(history_day.value)
 }
 
 const dayOptions = [
