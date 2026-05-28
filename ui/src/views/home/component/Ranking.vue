@@ -60,7 +60,11 @@
                 </div>
                 <div class="text-right" style="width: 100px">
                   <el-progress
-                    :percentage="TokenTotal ? Number(((item?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
+                    :percentage="
+                      TokenTotal
+                        ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
+                        : 0
+                    "
                     :show-text="false"
                   />
                   <p class="color-secondary mt-4">{{ numberFormat(item?.total_tokens || 0) }}</p>
@@ -99,9 +103,9 @@
                       {{ numberFormat(item?.chat_user_count || 0) }}
                       <el-divider direction="vertical" />{{ $t('layout.home.average‌') }}
                       {{
-                        item?.chat_record_count / item?.chat_user_count > 1
-                          ? numberFormat(item?.chat_record_count / item?.chat_user_count || 0)
-                          : (item?.chat_record_count / item?.chat_user_count).toFixed(1)
+                        numberFormat(
+                          Number((item?.chat_record_count / item?.chat_user_count || 0).toFixed(1)),
+                        )
                       }}
                       {{ $t('layout.home.wheel') }}/{{ $t('layout.home.person') }}
                     </p>
@@ -110,7 +114,11 @@
                 <div class="text-right" style="width: 100px">
                   <el-progress
                     :percentage="
-                      ChatRecordTotal ? Number(((item?.chat_record_count || 0) / ChatRecordTotal * 100).toFixed(1)) : 0
+                      ChatRecordTotal
+                        ? Number(
+                            (((item?.chat_record_count || 0) / ChatRecordTotal) * 100).toFixed(1),
+                          )
+                        : 0
                     "
                     :show-text="false"
                   />
@@ -159,7 +167,11 @@
                 </div>
                 <div class="text-right" style="width: 100px">
                   <el-progress
-                    :percentage="TokenTotal ? Number(((item?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
+                    :percentage="
+                      TokenTotal
+                        ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
+                        : 0
+                    "
                     :show-text="false"
                   />
                   <p class="color-secondary mt-4">

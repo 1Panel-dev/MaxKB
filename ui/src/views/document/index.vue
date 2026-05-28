@@ -62,13 +62,6 @@
                   v-if="permissionPrecise.doc_generate(id)"
                   >{{ $t('views.document.generateQuestion.title') }}
                 </el-button>
-                <el-button
-                  @click="openBatchEditDocument"
-                  :disabled="multipleSelection.length === 0"
-                  v-if="permissionPrecise.doc_edit(id)"
-                >
-                  {{ $t('common.setting') }}
-                </el-button>
 
                 <el-dropdown v-if="MoreFilledPermission0(id)">
                   <el-button class="ml-12 mr-12">
@@ -76,6 +69,13 @@
                   </el-button>
                   <template #dropdown>
                     <el-dropdown-menu>
+                      <el-dropdown-item
+                        @click="openBatchEditDocument()"
+                        :disabled="multipleSelection.length === 0"
+                        v-if="permissionPrecise.doc_edit(id)"
+                      >
+                        {{ $t('common.setting') }}
+                      </el-dropdown-item>
                       <el-dropdown-item
                         @click="openknowledgeDialog()"
                         :disabled="multipleSelection.length === 0"
@@ -501,7 +501,7 @@
             <el-table-column
               :label="$t('common.operation')"
               align="left"
-              width="180"
+              width="160"
               fixed="right"
               v-if="!isShared"
             >
@@ -579,22 +579,11 @@
                   >
                     <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
-                        <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
+                        <AppIcon iconName="app-document-wordIndexing" style="font-size: 16px"></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
-                  <el-tooltip
-                    effect="dark"
-                    :content="$t('common.setting')"
-                    placement="top"
-                    v-if="permissionPrecise.doc_edit(id)"
-                  >
-                    <span class="mr-4">
-                      <el-button type="primary" text @click.stop="settingDoc(row)">
-                        <AppIcon iconName="app-setting"></AppIcon>
-                      </el-button>
-                    </span>
-                  </el-tooltip>
+
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="MoreFilledPermission1(id)">
                       <el-button text type="primary">
@@ -602,6 +591,13 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
+                          <el-dropdown-item
+                            v-if="permissionPrecise.doc_edit(id)"
+                            @click="settingDoc(row)"
+                          >
+                            <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                            {{ $t('common.setting') }}
+                          </el-dropdown-item>
                           <el-dropdown-item
                             v-if="
                               ([State.STARTED, State.PENDING] as Array<string>).includes(
@@ -1229,7 +1225,7 @@ function refreshDocument(row: any) {
 
 function tokenizeDocument(row: any) {
   const stateList = ['0', '1', '2', '3', '4', '5', 'n']
-  loadSharedApi({type: 'document', systemType: apiType.value})
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .putDocumentTokenize(row.knowledge_id, row.id, stateList)
     .then(() => {
       getList()
@@ -1372,7 +1368,7 @@ function batchRefresh() {
 function batchTokenize() {
   const arr: string[] = multipleSelection.value.map((v) => v.id)
   const stateList = ['0', '1', '2', '3', '4', '5', 'n']
-  loadSharedApi({type: 'document', systemType: apiType.value})
+  loadSharedApi({ type: 'document', systemType: apiType.value })
     .putBatchTokenize(id, arr, stateList, loading)
     .then(() => {
       multipleTableRef.value?.clearSelection()

@@ -64,7 +64,7 @@ const input_type_list = [
     value: 'Knowledge',
   },
   {
-    label: t('dynamicsForm.input_type_list.TreeSelect'),
+    label: t('dynamicsForm.TreeSelect.label'),
     value: 'TreeSelect',
   },
 ]

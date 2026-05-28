@@ -82,7 +82,13 @@
           </el-table-column>
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
-              <el-progress :percentage="TokenTotal ? Number(((row?.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0" />
+              <el-progress
+                :percentage="
+                  TokenTotal
+                    ? Number((((row?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
+                    : 0
+                "
+              />
             </template>
           </el-table-column>
           <el-table-column
@@ -142,6 +148,12 @@
           </el-table-column>
 
           <el-table-column
+            prop="name"
+            min-width="100"
+            show-overflow-tooltip
+            :label="$t('views.application.form.appName.label')"
+          />
+          <el-table-column
             min-width="80"
             show-overflow-tooltip
             :label="$t('views.applicationOverview.monitor.charts.queryCount')"
@@ -154,7 +166,11 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="ChatRecordTotal ? Number(((row?.chat_record_count || 0) / ChatRecordTotal * 100).toFixed(1)) : 0"
+                :percentage="
+                  ChatRecordTotal
+                    ? Number((((row?.chat_record_count || 0) / ChatRecordTotal) * 100).toFixed(1))
+                    : 0
+                "
               />
             </template>
           </el-table-column>
@@ -222,8 +238,9 @@
           <el-table-column width="200" :label="$t('layout.home.proportion')">
             <template #default="{ row }">
               <el-progress
-                :percentage="TokenTotal ? Number(((row.total_tokens || 0) / TokenTotal * 100).toFixed(1)) : 0"
-                :show-text="false"
+                :percentage="
+                  TokenTotal ? Number((((row.total_tokens || 0) / TokenTotal) * 100).toFixed(1)) : 0
+                "
               />
             </template>
           </el-table-column>
@@ -244,7 +261,7 @@
             align="right"
           >
             <template #default="{ row }">
-              {{ numberFormat(row.total_tokens / row.chat_record_count || 0) }}
+              {{ numberFormat(Number(((row.total_tokens / row.chat_record_count) || 0).toFixed(1))) }}
             </template>
           </el-table-column>
           <el-table-column
