@@ -1,5 +1,5 @@
-import { ElMessageBox, ElMessage } from 'element-plus'
-import { t } from '@/locales'
+import {ElMessageBox, ElMessage} from 'element-plus'
+import {t} from '@/locales'
 
 export const MsgSuccess = (message: string) => {
   ElMessage.success({
@@ -47,7 +47,9 @@ export const MsgAlert = (title: string, description: string, options?: any) => {
 
 /**
  * 删除知识库
- * @param 参数 message: {title, description,type}
+ * @param title
+ * @param description
+ * @param options
  */
 
 export const MsgConfirm = (title: string, description: string, options?: any) => {

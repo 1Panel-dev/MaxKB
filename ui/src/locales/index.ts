@@ -146,7 +146,6 @@ export const langList = computed(() => {
  * - 零侵入: 无需修改现有代码,直接替换 t 函数即可
  */
 // typescript
-// typescript
 class ReactiveTranslationString {
   private _key: string
   private _params?: Record<string, any> | string
@@ -157,10 +156,8 @@ class ReactiveTranslationString {
   }
 
   toString(): string {
-    // 通过断言 i18n.global 为 any 来避免 TS 对 vue-i18n 的复杂泛型做过深推断
     const globalAny = (i18n.global as unknown) as any
 
-    // 如果传入的是字符串，视为 fallback 文本
     if (typeof this._params === 'string') {
       try {
         return globalAny.te(this._key)
@@ -171,7 +168,6 @@ class ReactiveTranslationString {
       }
     }
 
-    // 参数对象或未传参数，按原逻辑处理
     if (this._params && typeof this._params === 'object') {
       try {
         return String(globalAny.t(this._key, this._params))
@@ -202,11 +198,80 @@ class ReactiveTranslationString {
   [Symbol.toPrimitive](hint: string): string {
     return this.toString()
   }
+
+  [Symbol.iterator]() {
+    return this.toString()[Symbol.iterator]()
+  }
+
+  charAt(pos: number): string {
+    return this.toString().charAt(pos)
+  }
+
+  charCodeAt(index: number): number {
+    return this.toString().charCodeAt(index)
+  }
+
+  concat(...strings: string[]): string {
+    return this.toString().concat(...strings)
+  }
+
+  indexOf(searchString: string, position?: number): number {
+    return this.toString().indexOf(searchString, position)
+  }
+
+  lastIndexOf(searchString: string, position?: number): number {
+    return this.toString().lastIndexOf(searchString, position)
+  }
+
+  localeCompare(that: string): number {
+    return this.toString().localeCompare(that)
+  }
+
+  match(regexp: string | RegExp): RegExpMatchArray | null {
+    return this.toString().match(regexp)
+  }
+
+  replace(searchValue: string | RegExp, replaceValue: string): string {
+    return this.toString().replace(searchValue, replaceValue)
+  }
+
+  search(regexp: string | RegExp): number {
+    return this.toString().search(regexp)
+  }
+
+  slice(start?: number, end?: number): string {
+    return this.toString().slice(start, end)
+  }
+
+  split(separator: string | RegExp, limit?: number): string[] {
+    return this.toString().split(separator, limit)
+  }
+
+  substring(start: number, end?: number): string {
+    return this.toString().substring(start, end)
+  }
+
+  toLowerCase(): string {
+    return this.toString().toLowerCase()
+  }
+
+  toUpperCase(): string {
+    return this.toString().toUpperCase()
+  }
+
+  trim(): string {
+    return this.toString().trim()
+  }
+
+  length: number = 0
+
+  get [0]() { return this.toString()[0] }
 }
 
 function t(key: string, params?: Record<string, any> | string): any {
   return new ReactiveTranslationString(key, params)
 }
+
 
 export {t}
 
