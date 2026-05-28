@@ -24,7 +24,7 @@
 import { ref, watch, computed, onMounted } from 'vue'
 import type { FormField } from '@/components/dynamics-form/type'
 import type { Dict } from '@/api/type/common'
-import { evaluateVisibility } from '@/components/dynamics-form/visibility'
+import { computeVisibilityMap } from '@/components/dynamics-form/visibility'
 import InlineFormItem from './InlineFormItem.vue'
 import { t } from '@/locales'
 import _ from 'lodash'
@@ -169,6 +169,8 @@ const dialogFields = computed(() => {
   return fieldList.value.filter((f) => !setting.value.exposed_fields.includes(f.field))
 })
 
+const visibilityMap = computed(() => computeVisibilityMap(fieldList.value, formValue.value))
+
 const show = (field: FormField) => {
   if (field.relation_show_field_dict) {
     const keys = Object.keys(field.relation_show_field_dict)
@@ -188,11 +190,7 @@ const show = (field: FormField) => {
     }
   }
   if (field.visibility_rules?.node_id) {
-    return evaluateVisibility(field.visibility_rules, {
-      formValue: formValue.value,
-      currentNodeId: field.visibility_rules.node_id,
-      currentNodeName: field.visibility_rules.node_name || '',
-    })
+    return visibilityMap.value[field.field] ?? true
   }
   return true
 }

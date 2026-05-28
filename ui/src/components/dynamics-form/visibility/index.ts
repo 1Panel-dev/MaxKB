@@ -154,3 +154,35 @@ export function evaluateVisibility(
 
   return rules.action === 'show' ? matched : !matched
 }
+
+/**
+ * 单向扫描计算整个字段列表的显隐表。
+ * @param fields
+ * @param formValue
+ * @returns { 字段名: 是否可见 } 的 map
+ */
+export function computeVisibilityMap(
+  fields: Array<{ field: string; visibility_rules?: VisibilityRules }>,
+  formValue: Record<string, any>,
+): Record<string, boolean> {
+  const copy: Record<string, any> = { ...formValue }
+  const map: Record<string, boolean> = {}
+
+  for (const f of fields) {
+    if (!f.visibility_rules?.node_id) {
+      map[f.field] = true
+      continue
+    }
+
+    const visible = evaluateVisibility(f.visibility_rules, {
+      formValue: copy,
+      currentNodeId: f.visibility_rules.node_id,
+      currentNodeName: f.visibility_rules.node_name || '',
+    })
+    map[f.field] = visible
+    if (!visible) {
+      copy[f.field] = null
+    }
+  }
+  return map
+}
