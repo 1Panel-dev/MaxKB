@@ -47,6 +47,16 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
+        # 向量数据库配置
+        "VECTOR_STORE_NAME": "pg_vector",
+        # Qdrant 配置
+        "QDRANT_HOST": "localhost",
+        "QDRANT_PORT": 6333,
+        "QDRANT_GRPC_PORT": 6334,
+        "QDRANT_API_KEY": None,
+        "QDRANT_PREFER_GRPC": True,
+        "QDRANT_COLLECTION_PREFIX": "maxkb_",
+        "QDRANT_DISTANCE_METRIC": "Cosine",
     }
 
     def get_debug(self) -> bool:

@@ -40,6 +40,18 @@
         showFooter
       ></ModelSelect>
     </el-form-item>
+    <el-form-item :label="$t('views.knowledge.form.vectorStoreType.label')" prop="vector_store_type">
+      <el-radio-group v-model="form.vector_store_type">
+        <el-radio label="pg_vector">
+          <span>PgVector (PostgreSQL)</span>
+          <el-tag size="small" type="info" style="margin-left: 4px">默认</el-tag>
+        </el-radio>
+        <el-radio label="qdrant">
+          <span>Qdrant</span>
+          <el-tag size="small" type="success" style="margin-left: 4px">高性能</el-tag>
+        </el-radio>
+      </el-radio-group>
+    </el-form-item>
   </el-form>
 </template>
 <script setup lang="ts">
@@ -59,6 +71,7 @@ const form = ref<knowledgeData>({
   name: '',
   desc: '',
   embedding_model_id: '',
+  vector_store_type: 'pg_vector',
 })
 const workspace_id = ref('')
 
@@ -97,6 +110,7 @@ watch(
       form.value.name = value.name
       form.value.desc = value.desc
       form.value.embedding_model_id = value.embedding_model_id
+      form.value.vector_store_type = value.vector_store_type || 'pg_vector'
       workspace_id.value = value.workspace_id || ''
       // 重新刷新模型列表
       getSelectModel()

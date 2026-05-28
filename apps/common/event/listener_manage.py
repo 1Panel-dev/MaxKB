@@ -90,7 +90,7 @@ class UpdateEmbeddingDocumentIdArgs:
 class ListenerManagement:
     @staticmethod
     def embedding_by_problem(args, embedding_model: Embeddings):
-        VectorStore.get_embedding_vector().save(**args, embedding=embedding_model)
+        VectorStore.get_embedding_vector(knowledge_id=args.get("knowledge_id")).save(**args, embedding=embedding_model)
 
     @staticmethod
     def embedding_by_paragraph_list(paragraph_id_list, embedding_model: Embeddings):
@@ -445,7 +445,7 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_knowledge(knowledge_id):
-        VectorStore.get_embedding_vector().delete_by_knowledge_id(knowledge_id)
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_knowledge_id(knowledge_id)
 
     @staticmethod
     def delete_embedding_by_paragraph(paragraph_id):
@@ -499,7 +499,8 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_knowledge_id_list(source_ids: List[str]):
-        VectorStore.get_embedding_vector().delete_by_knowledge_id_list(source_ids)
+        knowledge_id = source_ids[0] if source_ids else None
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_knowledge_id_list(source_ids)
 
     @staticmethod
     def hit_test(

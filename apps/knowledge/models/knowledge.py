@@ -134,6 +134,12 @@ class Knowledge(AppModelMixin):
     file_size_limit = models.IntegerField(verbose_name="文件大小限制", default=100)
     file_count_limit = models.IntegerField(verbose_name="文件数量限制", default=50)
     meta = models.JSONField(verbose_name="元数据", default=dict)
+    vector_store_type = models.CharField(
+        max_length=20,
+        choices=[('pg_vector', 'PgVector'), ('qdrant', 'Qdrant')],
+        default='pg_vector',
+        verbose_name='向量存储类型',
+    )
 
     class Meta:
         db_table = "knowledge"

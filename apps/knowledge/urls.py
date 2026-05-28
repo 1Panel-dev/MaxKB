@@ -100,4 +100,5 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version', views.KnowledgeWorkflowVersionView.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version/<int:current_page>/<int:page_size>', views.KnowledgeWorkflowVersionView.Page.as_view()),
     path('workspace/<str:workspace_id>/knowledge/<str:knowledge_id>/knowledge_version/<str:knowledge_version_id>', views.KnowledgeWorkflowVersionView.Operate.as_view()),
+    path('vector_store/health', views.VectorStoreView.as_view()),
 ]

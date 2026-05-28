@@ -67,7 +67,7 @@ class BaseSearchDatasetStep(ISearchDatasetStep):
         default_params = get_model_default_params(model)
         embedding_model = ModelManage.get_model(model_id, lambda _id: get_model(model, **{**default_params}))
         embedding_value = embedding_model.embed_query(exec_problem_text)
-        vector = VectorStore.get_embedding_vector()
+        vector = VectorStore.get_embedding_vector(knowledge_id=knowledge_id_list[0] if knowledge_id_list else None)
         embedding_list = vector.query(exec_problem_text, embedding_value, knowledge_id_list, None,
                                       exclude_document_id_list,
                                       exclude_paragraph_id_list, True, top_n, similarity, SearchMode(search_mode))

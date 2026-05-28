@@ -105,7 +105,7 @@ class BaseSearchKnowledgeNode(ISearchKnowledgeStepNode):
         model_id = get_embedding_id(knowledge_id_list)
         embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
         embedding_value = embedding_model.embed_query(question)
-        vector = VectorStore.get_embedding_vector()
+        vector = VectorStore.get_embedding_vector(knowledge_id=knowledge_id_list[0] if knowledge_id_list else None)
         exclude_document_id_list = [str(document.id) for document in
                                     QuerySet(Document).filter(
                                         knowledge_id__in=knowledge_id_list,

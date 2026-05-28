@@ -65,18 +65,46 @@ class ModelManage:
 
 class VectorStore:
     from knowledge.vector.pg_vector import PGVector
+    from knowledge.vector.qdrant_store import QdrantVectorStore
     from knowledge.vector.base_vector import BaseVectorStore
     instance_map = {
         'pg_vector': PGVector,
+        'qdrant': QdrantVectorStore,
     }
     instance = None
+    _qdrant_instance = None
 
     @staticmethod
-    def get_embedding_vector() -> BaseVectorStore:
+    def get_embedding_vector(knowledge_id=None) -> BaseVectorStore:
         from knowledge.vector.pg_vector import PGVector
+        from maxkb.const import CONFIG
+
+        # Per-knowledge vector store selection
+        if knowledge_id is not None:
+            store_type = VectorStore._get_knowledge_store_type(knowledge_id)
+            if store_type == 'qdrant':
+                if VectorStore._qdrant_instance is None:
+                    VectorStore._qdrant_instance = VectorStore.instance_map['qdrant']()
+                return VectorStore._qdrant_instance
+
+        # Global default
         if VectorStore.instance is None:
-            from maxkb.const import CONFIG
-            vector_store_class = VectorStore.instance_map.get(CONFIG.get("VECTOR_STORE_NAME"),
-                                                              PGVector)
+            vector_store_class = VectorStore.instance_map.get(
+                CONFIG.get("VECTOR_STORE_NAME"), PGVector
+            )
             VectorStore.instance = vector_store_class()
         return VectorStore.instance
+
+    @staticmethod
+    def _get_knowledge_store_type(knowledge_id: str) -> str:
+        """Look up the vector_store_type for a given knowledge base."""
+        try:
+            from knowledge.models import Knowledge
+            from django.db.models import QuerySet
+            knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
+            if knowledge and hasattr(knowledge, 'vector_store_type'):
+                return knowledge.vector_store_type
+        except Exception:
+            pass
+        from maxkb.const import CONFIG
+        return CONFIG.get("VECTOR_STORE_NAME", "pg_vector")

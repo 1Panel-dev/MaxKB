@@ -642,3 +642,40 @@ class KnowledgeWebView(APIView):
         return result.success(KnowledgeSerializer.Create(
             data={'user_id': request.user.id, 'workspace_id': workspace_id}
         ).save_web(request.data))
+
+
+class VectorStoreView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_('Vector store health check'),
+        summary=_('Vector store health check'),
+        operation_id=_('Vector store health check'),
+        tags=[_('System Settings')],
+    )
+    def get(self, request: Request):
+        from common.config.embedding_config import VectorStore
+        from maxkb.const import CONFIG
+
+        store_type = CONFIG.get("VECTOR_STORE_NAME", "pg_vector")
+        health = {"store_type": store_type, "status": "healthy"}
+
+        if store_type == "qdrant":
+            try:
+                from qdrant_client import QdrantClient
+                client = QdrantClient(
+                    host=CONFIG.get("QDRANT_HOST", "localhost"),
+                    port=int(CONFIG.get("QDRANT_PORT", 6333)),
+                    grpc_port=int(CONFIG.get("QDRANT_GRPC_PORT", 6334)),
+                    api_key=CONFIG.get("QDRANT_API_KEY") or None,
+                    timeout=10,
+                )
+                collections = client.get_collections()
+                health["collections_count"] = len(collections.collections)
+            except Exception as e:
+                health["status"] = "unhealthy"
+                health["error"] = str(e)
+
+        return result.success(health)
+

@@ -102,6 +102,7 @@ class KnowledgeModelSerializer(serializers.ModelSerializer):
             "file_size_limit",
             "file_count_limit",
             "embedding_model_id",
+            "vector_store_type",
         ]
 
 
@@ -110,6 +111,7 @@ class KnowledgeBaseCreateRequest(serializers.Serializer):
     folder_id = serializers.CharField(required=True, label=_("folder id"))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("knowledge description"))
     embedding_model_id = serializers.CharField(required=True, label=_("knowledge embedding"))
+    vector_store_type = serializers.CharField(required=False, default="pg_vector", label=_("vector store type"))
 
 
 class KnowledgeImportRequest(serializers.Serializer):
@@ -123,6 +125,7 @@ class KnowledgeWebCreateRequest(serializers.Serializer):
     embedding_model_id = serializers.CharField(required=True, label=_("knowledge embedding"))
     source_url = serializers.CharField(required=True, label=_("source url"))
     selector = serializers.CharField(required=False, label=_("knowledge selector"), allow_null=True, allow_blank=True)
+    vector_store_type = serializers.CharField(required=False, default="pg_vector", label=_("vector store type"))
 
 
 class KnowledgeEditRequest(serializers.Serializer):
@@ -136,6 +139,7 @@ class KnowledgeEditRequest(serializers.Serializer):
     )
     file_size_limit = serializers.IntegerField(required=False, label=_("file size limit"))
     file_count_limit = serializers.IntegerField(required=False, label=_("file count limit"))
+    vector_store_type = serializers.CharField(required=False, label=_("vector store type"))
 
     @staticmethod
     def get_knowledge_meta_valid_map():
@@ -477,6 +481,8 @@ class KnowledgeSerializer(serializers.Serializer):
                 knowledge.file_size_limit = instance.get("file_size_limit")
             if "file_count_limit" in instance:
                 knowledge.file_count_limit = instance.get("file_count_limit")
+            if "vector_store_type" in instance:
+                knowledge.vector_store_type = instance.get("vector_store_type")
             knowledge.save()
             update_resource_mapping_by_knowledge(str(knowledge.id))
             if select_one:
@@ -822,6 +828,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 user_id=user_id,
                 workspace_id=workspace_id,
                 folder_id=folder_id,
+                vector_store_type=knowledge_data.get("vector_store_type", "pg_vector"),
             )
             knowledge.save()
 
@@ -1034,6 +1041,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 folder_id=folder_id,
                 embedding_model_id=instance.get("embedding_model_id"),
                 meta=instance.get("meta", {}),
+                vector_store_type=instance.get("vector_store_type", "pg_vector"),
             )
 
             document_model_list = []
@@ -1100,6 +1108,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 folder_id=folder_id,
                 workspace_id=self.data.get("workspace_id"),
                 embedding_model_id=instance.get("embedding_model_id"),
+                vector_store_type=instance.get("vector_store_type", "pg_vector"),
                 meta={
                     "source_url": instance.get("source_url"),
                     "selector": instance.get("selector", "body"),
@@ -1255,7 +1264,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
         def hit_test(self):
             self.is_valid()
-            vector = VectorStore.get_embedding_vector()
+            vector = VectorStore.get_embedding_vector(knowledge_id=self.data.get("knowledge_id"))
             exclude_document_id_list = [
                 str(document.id)
                 for document in QuerySet(Document).filter(knowledge_id=self.data.get("knowledge_id"), is_active=False)
