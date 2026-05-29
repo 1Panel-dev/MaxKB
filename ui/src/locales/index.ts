@@ -204,8 +204,8 @@ class ReactiveTranslationString {
   }
 }
 
-function t(key: string, params?: Record<string, any> | string): string & ReactiveTranslationString {
-  return new ReactiveTranslationString(key, params) as unknown as string & ReactiveTranslationString
+function t(key: string, params?: Record<string, any> | string): ReactiveTranslationString {
+  return new ReactiveTranslationString(key, params)
 }
 
 export {t}

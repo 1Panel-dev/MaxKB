@@ -152,23 +152,23 @@ import { t } from '@/locales'
 const dayOptions = [
   {
     value: 7,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'),
+    label: String(t('views.applicationOverview.monitor.pastDayOptions.past7Days')),
   },
   {
     value: 30,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past30Days'),
+    label: String(t('views.applicationOverview.monitor.pastDayOptions.past30Days')),
   },
   {
     value: 90,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past90Days'),
+    label: String(t('views.applicationOverview.monitor.pastDayOptions.past90Days')),
   },
   {
     value: 183,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past183Days'),
+    label: String(t('views.applicationOverview.monitor.pastDayOptions.past183Days')),
   },
   {
     value: 'other',
-    label: t('common.custom'),
+    label: String(t('common.custom')),
   },
 ]
 
@@ -209,16 +209,16 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(data.value, 'customer_added_count') || 0),
     ],
     option: {
-      title: t('views.applicationOverview.monitor.charts.customerTotal'),
+      title: String(t('views.applicationOverview.monitor.charts.customerTotal')),
       xData: getAttrsArray(data.value, 'day'),
       yData: [
         {
-          name: t('views.applicationOverview.monitor.charts.customerTotal'),
+          name: String(t('views.applicationOverview.monitor.charts.customerTotal')),
           area: true,
           data: getAttrsArray(data.value, 'customer_num'),
         },
         {
-          name: t('views.applicationOverview.monitor.charts.customerNew'),
+          name: String(t('views.applicationOverview.monitor.charts.customerNew')),
           area: true,
           data: getAttrsArray(data.value, 'customer_added_count'),
         },
@@ -227,13 +227,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'chatRecordCharts',
-    name: t('views.applicationOverview.monitor.charts.queryCount'),
+    name: String(t('views.applicationOverview.monitor.charts.queryCount')),
     icon: 'app-question',
     background: '#FFF3E5',
     color: '#FF8800',
     sum: [getSum(getAttrsArray(data.value, 'chat_record_count') || 0)],
     option: {
-      title: t('views.applicationOverview.monitor.charts.queryCount'),
+      title: String(t('views.applicationOverview.monitor.charts.queryCount')),
       xData: getAttrsArray(data.value, 'day'),
       yData: [
         {
@@ -244,13 +244,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'tokensCharts',
-    name: t('views.applicationOverview.monitor.charts.tokensTotal'),
+    name: String(t('views.applicationOverview.monitor.charts.tokensTotal')),
     icon: 'app-tokens',
     background: '#E5FBF8',
     color: '#00D6B9',
     sum: [getSum(getAttrsArray(data.value, 'tokens_num') || 0)],
     option: {
-      title: t('views.applicationOverview.monitor.charts.tokensTotal'),
+      title: String(t('views.applicationOverview.monitor.charts.tokensTotal')),
       xData: getAttrsArray(data.value, 'day'),
       yData: [
         {
@@ -261,7 +261,7 @@ const statisticsType = computed(() => [
   },
   {
     id: 'starCharts',
-    name: t('views.applicationOverview.monitor.charts.userSatisfaction'),
+    name: String(t('views.applicationOverview.monitor.charts.userSatisfaction')),
     icon: 'app-user-stars',
     background: '#FEEDEC',
     color: '#F54A45',
@@ -270,15 +270,15 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(data.value, 'trample_num') || 0),
     ],
     option: {
-      title: t('views.applicationOverview.monitor.charts.userSatisfaction'),
+      title: String(t('views.applicationOverview.monitor.charts.userSatisfaction')),
       xData: getAttrsArray(data.value, 'day'),
       yData: [
         {
-          name: t('views.applicationOverview.monitor.charts.approval'),
+          name: String(t('views.applicationOverview.monitor.charts.approval')),
           data: getAttrsArray(data.value, 'star_num'),
         },
         {
-          name: t('views.applicationOverview.monitor.charts.disapproval'),
+          name: String(t('views.applicationOverview.monitor.charts.disapproval')),
           data: getAttrsArray(data.value, 'trample_num'),
         },
       ],
