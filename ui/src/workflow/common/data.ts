@@ -1558,7 +1558,7 @@ export function isLastNode(nodeModel: any) {
 export const fileTooltip = JSON.stringify(
   [
     {
-      name: '上传文件的名称',
+      name: 'File Name',
       url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
       file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
     },
