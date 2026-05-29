@@ -236,6 +236,7 @@ defineExpose({ reSearch })
   top: 72px;
   left: 24px;
   z-index: 2;
+  box-shadow: 0px 4px 8px 0px rgba(31, 35, 41, 0.1);
 }
 .workflow-search {
   position: absolute;

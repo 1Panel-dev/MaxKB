@@ -26,7 +26,7 @@ const props = defineProps({
 
 const color = ['rgba(82, 133, 255, 1)', 'rgba(255, 207, 47, 1)']
 
-const areaColor = ['rgba(82, 133, 255, 0.2)', 'rgba(255, 207, 47, 0.2)']
+const areaColor = ['rgba(82, 133, 255, 0.15)', 'rgba(255, 207, 47, 0.15)']
 
 function initChart() {
   let myChart = echarts?.getInstanceByDom(document.getElementById(props.id)!)

@@ -166,6 +166,7 @@ const statisticsType = computed(() => [
       yData: [
         {
           data: getAttrsArray(props.data, 'chat_record_count'),
+          area: true,
         },
       ],
     },
@@ -183,6 +184,7 @@ const statisticsType = computed(() => [
       yData: [
         {
           data: getAttrsArray(props.data, 'tokens_num'),
+          area: true,
         },
       ],
     },
@@ -204,10 +206,12 @@ const statisticsType = computed(() => [
         {
           name: t('views.applicationOverview.monitor.charts.approval'),
           data: getAttrsArray(props.data, 'star_num'),
+          area: true,
         },
         {
           name: t('views.applicationOverview.monitor.charts.disapproval'),
           data: getAttrsArray(props.data, 'trample_num'),
+          area: true,
         },
       ],
     },
@@ -229,6 +233,7 @@ const tokenUsageOption = computed(() => {
     yData: [
       {
         data: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'token_usage'),
+        area: true,
       },
     ],
     dataZoom: props.tokenUsage.length > 20,
@@ -244,6 +249,7 @@ const topQuestionsOption = computed(() => {
           props.topQuestions?.slice(0, topQuestionsCount.value),
           'chat_record_count',
         ),
+        area: true,
       },
     ],
     dataZoom: props.topQuestions.length > 20,

@@ -239,6 +239,7 @@ const statisticsType = computed(() => [
       yData: [
         {
           data: getAttrsArray(data.value, 'chat_record_count'),
+          area: true,
         },
       ],
     },
@@ -256,6 +257,7 @@ const statisticsType = computed(() => [
       yData: [
         {
           data: getAttrsArray(data.value, 'tokens_num'),
+          area: true,
         },
       ],
     },
@@ -277,10 +279,12 @@ const statisticsType = computed(() => [
         {
           name: t('views.applicationOverview.monitor.charts.approval'),
           data: getAttrsArray(data.value, 'star_num'),
+          area: true,
         },
         {
           name: t('views.applicationOverview.monitor.charts.disapproval'),
           data: getAttrsArray(data.value, 'trample_num'),
+          area: true,
         },
       ],
     },

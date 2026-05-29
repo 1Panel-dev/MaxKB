@@ -54,7 +54,12 @@
                       {{ $t('views.system.time') }} <el-divider direction="vertical" />{{
                         $t('layout.home.average‌')
                       }}
-                      {{ numberFormat(item?.total_tokens / item?.chat_record_count || 0) }} tokens
+                      {{
+                        numberFormat(
+                          Number((item?.total_tokens / item?.chat_record_count || 0).toFixed(1)),
+                        )
+                      }}
+                      tokens
                     </p>
                   </div>
                 </div>

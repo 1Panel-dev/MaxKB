@@ -118,7 +118,9 @@
             align="right"
           >
             <template #default="{ row }">
-              {{ numberFormat(row.total_tokens / row.chat_record_count || 0) }}
+              {{
+                numberFormat(Number((row?.total_tokens / row?.chat_record_count || 0).toFixed(1)))
+              }}
             </template>
           </el-table-column>
         </app-table>
