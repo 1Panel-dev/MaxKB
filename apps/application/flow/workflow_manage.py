@@ -477,22 +477,23 @@ class WorkflowManage:
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
-                    chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
-                                                                           self.params.get('chat_record_id'),
-                                                                           current_node.id,
-                                                                           current_node.up_node_id_list,
-                                                                           '', False, 0, 0,
-                                                                           {'node_type': current_node.type,
-                                                                            'runtime_node_id': runtime_node_id,
-                                                                            'node_name': current_node.node.properties.get(
-                                                                                'stepName'),
-                                                                            'view_type': view_type,
-                                                                            'child_node': child_node,
-                                                                            'node_is_end': True,
-                                                                            'real_node_id': real_node_id,
-                                                                            'reasoning_content': '',
-                                                                            'node_status': "SUCCESS"})
-                    current_node.node_chunk.add_chunk(chunk)
+                    if 'form-node' != current_node.type:
+                        chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                               self.params.get('chat_record_id'),
+                                                                               current_node.id,
+                                                                               current_node.up_node_id_list,
+                                                                               '', False, 0, 0,
+                                                                               {'node_type': current_node.type,
+                                                                                'runtime_node_id': runtime_node_id,
+                                                                                'node_name': current_node.node.properties.get(
+                                                                                    'stepName'),
+                                                                                'view_type': view_type,
+                                                                                'child_node': child_node,
+                                                                                'node_is_end': True,
+                                                                                'real_node_id': real_node_id,
+                                                                                'reasoning_content': '',
+                                                                                'node_status': "SUCCESS"})
+                        current_node.node_chunk.add_chunk(chunk)
             if current_node.status == 500:
                 enableException = current_node.node.properties.get('enableException')
                 if not enableException:
