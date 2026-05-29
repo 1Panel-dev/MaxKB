@@ -22,12 +22,12 @@
             clearable
           />
 
-          <el-button type="primary" @click="submitHandle" :disabled="loading">{{
-            $t('common.create')
-          }}</el-button>
-          <el-button @click="showInput = false" :disabled="loading">{{
-            $t('common.cancel')
-          }}</el-button>
+          <el-button type="primary" @click="submitHandle" :disabled="loading"
+            >{{ $t('common.create') }}
+          </el-button>
+          <el-button @click="showInput = false" :disabled="loading"
+            >{{ $t('common.cancel') }}
+          </el-button>
         </div>
         <div v-else @click="quickCreateHandle" class="w-full">
           <el-button type="primary" link class="quich-button">
@@ -57,9 +57,11 @@
 import { ref, nextTick, watch, computed, onMounted } from 'vue'
 import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
+
 defineOptions({ name: 'AppTable' })
 
 import useStore from '@/stores'
+
 const { common } = useStore()
 
 const props = defineProps({
@@ -73,11 +75,11 @@ const props = defineProps({
   },
   quickCreateName: {
     type: String,
-    default: t('components.quickCreateName'),
+    default: () => t('components.quickCreateName'),
   },
   quickCreatePlaceholder: {
     type: String,
-    default: t('components.quickCreatePlaceholder'),
+    default: () => t('components.quickCreatePlaceholder'),
   },
   quickCreateMaxlength: {
     type: Number,
@@ -134,6 +136,7 @@ function handleSizeChange() {
     common.savePage(props.storeKey, props.paginationConfig)
   }
 }
+
 function handleCurrentChange() {
   emit('changePage')
   if (props.storeKey) {
@@ -144,12 +147,15 @@ function handleCurrentChange() {
 function clearSelection() {
   appTableRef.value?.clearSelection()
 }
+
 function toggleRowSelection(row: any, selected?: boolean, ignoreSelectable = true) {
   appTableRef.value?.toggleRowSelection(row, selected, ignoreSelectable)
 }
+
 function getSelectionRows() {
   return appTableRef.value?.getSelectionRows()
 }
+
 defineExpose({
   clearSelection,
   toggleRowSelection,
@@ -172,6 +178,7 @@ onMounted(() => {
     display: flex;
     justify-content: flex-end;
   }
+
   .quich-button {
     &:hover {
       color: var(--el-button-text-color);
