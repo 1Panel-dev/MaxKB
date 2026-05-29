@@ -15,8 +15,8 @@
         :formfield-list="fieldList"
       />
     </template>
-    <el-button link v-if="dialogFields.length > 0" @click="emit('openDialog')">
-      <AppIcon iconName="app-setting"></AppIcon>
+    <el-button style="padding: 8px" v-if="dialogFields.length > 0" @click="emit('openDialog')">
+      <AppIcon iconName="app-all-menu"></AppIcon>
     </el-button>
   </div>
 </template>

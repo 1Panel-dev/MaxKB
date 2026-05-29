@@ -21,7 +21,7 @@
         height: 32px;
       "
     >
-      <span style="font-size: 13px; color: #606266; white-space: nowrap">{{ switchLabel }}</span>
+      <span style="font-size: 13px; color: #606266; white-space: nowrap" :title="switchLabel">{{ switchLabel }}</span>
       <component
         ref="componentFormRef"
         :view="view"
