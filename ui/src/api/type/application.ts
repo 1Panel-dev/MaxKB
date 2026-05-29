@@ -60,6 +60,7 @@ interface Chunk {
   view_type: string
   runtime_node_id: string
   child_node: any
+  [propName: string]: any
 }
 
 interface chatType {
@@ -97,6 +98,7 @@ interface chatType {
     video_list: Array<any>
     other_list: Array<any>
   }
+  currentChunk?: Chunk
 }
 
 interface Node {
@@ -396,6 +398,10 @@ export class ChatRecordManage {
   }
 
   appendChunk(chunk: Chunk) {
+    if (chunk.node_name) {
+      this.chat.currentChunk = chunk
+    }
+
     let n = this.node_list.find((item) => item.real_node_id == chunk.real_node_id)
     if (n) {
       for (const ch of chunk.content) {
