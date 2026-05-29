@@ -1,9 +1,9 @@
-import {useLocalStorage, usePreferredLanguages} from '@vueuse/core'
-import {computed} from 'vue'
-import {createI18n} from 'vue-i18n'
+import { useLocalStorage, usePreferredLanguages } from '@vueuse/core'
+import { computed } from 'vue'
+import { createI18n } from 'vue-i18n'
 
 // 导入语言文件
-const langModules = import.meta.glob('./lang/*/index.ts', {eager: true}) as Record<
+const langModules = import.meta.glob('./lang/*/index.ts', { eager: true }) as Record<
   string,
   { default: Record<string, any> }
 >
@@ -58,7 +58,7 @@ export const i18n = createI18n({
   locale: useLocalStorage(localeConfigKey, getBrowserLang()).value || getBrowserLang(),
   fallbackLocale: getBrowserLang(),
   messages: importMessages.value,
-  globalInjection: true
+  globalInjection: true,
 })
 
 // 外置语言包目录（相对于 public 目录）
@@ -120,7 +120,7 @@ export const langList = computed(() => {
   langModuleMap.forEach((value, key) => {
     list.push({
       label: value.lang || key,
-      value: key
+      value: key,
     })
   })
 
@@ -129,85 +129,13 @@ export const langList = computed(() => {
     const messages = i18n.global.getLocaleMessage(locale) as Record<string, any>
     list.push({
       label: messages?.lang || locale,
-      value: locale
+      value: locale,
     })
   })
 
   return list
 })
 
-/**
- * 响应式翻译字符串类
- * 使用 Proxy 包装,在任何上下文使用时都会自动获取最新翻译
- *
- * 核心特性:
- * - 透明兼容: 所有字符串操作(拼接、比较、模板插值)都正常工作
- * - 自动更新: 切换语言后,使用该对象的地方自动显示新翻译
- * - 零侵入: 无需修改现有代码,直接替换 t 函数即可
- */
-// typescript
-class ReactiveTranslationString {
-  private _key: string
-  private _params?: Record<string, any> | string
-
-  constructor(key: string, params?: Record<string, any> | string) {
-    this._key = key
-    this._params = params
-  }
-
-  toString(): string {
-    const globalAny = (i18n.global as unknown) as any
-
-    if (typeof this._params === 'string') {
-      try {
-        return globalAny.te(this._key)
-          ? String(globalAny.t(this._key))
-          : String(this._params)
-      } catch {
-        return String(this._params)
-      }
-    }
-
-    if (this._params && typeof this._params === 'object') {
-      try {
-        return String(globalAny.t(this._key, this._params))
-      } catch {
-        return String(this._key)
-      }
-    }
-
-    try {
-      return String(globalAny.t(this._key))
-    } catch {
-      return String(this._key)
-    }
-  }
-
-  toJSON(): string {
-    return this.toString()
-  }
-
-  valueOf(): string {
-    return this.toString()
-  }
-
-  get value(): string {
-    return this.toString()
-  }
-
-  [Symbol.toPrimitive](hint: string): string {
-    return this.toString()
-  }
-
-  [Symbol.iterator]() {
-    return this.toString()[Symbol.iterator]()
-  }
-}
-
-function t(key: string, params?: Record<string, any> | string): ReactiveTranslationString {
-  return new ReactiveTranslationString(key, params)
-}
-
-export {t}
+export const { t } = i18n.global
 
 export default i18n

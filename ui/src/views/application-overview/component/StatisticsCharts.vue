@@ -128,7 +128,7 @@ const props = defineProps({
 const statisticsType = computed(() => [
   {
     id: 'customerCharts',
-    name: String(t('views.applicationOverview.monitor.charts.customerTotal')),
+    name: t('views.applicationOverview.monitor.charts.customerTotal'),
     icon: 'app-user',
     background: '#EBF1FF',
     color: '#3370FF',
@@ -137,16 +137,16 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'customer_added_count') || 0),
     ],
     option: {
-      title: String(t('views.applicationOverview.monitor.charts.customerTotal')),
+      title: t('views.applicationOverview.monitor.charts.customerTotal'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: String(t('views.applicationOverview.monitor.charts.customerTotal')),
+          name: t('views.applicationOverview.monitor.charts.customerTotal'),
           area: true,
           data: getAttrsArray(props.data, 'customer_num'),
         },
         {
-          name: String(t('views.applicationOverview.monitor.charts.customerNew')),
+          name: t('views.applicationOverview.monitor.charts.customerNew'),
           area: true,
           data: getAttrsArray(props.data, 'customer_added_count'),
         },
@@ -155,13 +155,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'chatRecordCharts',
-    name: String(t('views.applicationOverview.monitor.charts.queryCount')),
+    name: t('views.applicationOverview.monitor.charts.queryCount'),
     icon: 'app-question',
     background: '#FFF3E5',
     color: '#FF8800',
     sum: [getSum(getAttrsArray(props.data, 'chat_record_count') || 0)],
     option: {
-      title: String(t('views.applicationOverview.monitor.charts.queryCount')),
+      title: t('views.applicationOverview.monitor.charts.queryCount'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -172,13 +172,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'tokensCharts',
-    name: String(t('views.applicationOverview.monitor.charts.tokensTotal')),
+    name: t('views.applicationOverview.monitor.charts.tokensTotal'),
     icon: 'app-tokens',
     background: '#E5FBF8',
     color: '#00D6B9',
     sum: [getSum(getAttrsArray(props.data, 'tokens_num') || 0)],
     option: {
-      title: String(t('views.applicationOverview.monitor.charts.tokensTotal')),
+      title: t('views.applicationOverview.monitor.charts.tokensTotal'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -189,7 +189,7 @@ const statisticsType = computed(() => [
   },
   {
     id: 'starCharts',
-    name: String(t('views.applicationOverview.monitor.charts.userSatisfaction')),
+    name: t('views.applicationOverview.monitor.charts.userSatisfaction'),
     icon: 'app-user-stars',
     background: '#FEEDEC',
     color: '#F54A45',
@@ -198,15 +198,15 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'trample_num') || 0),
     ],
     option: {
-      title: String(t('views.applicationOverview.monitor.charts.userSatisfaction')),
+      title: t('views.applicationOverview.monitor.charts.userSatisfaction'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: String(t('views.applicationOverview.monitor.charts.approval')),
+          name: t('views.applicationOverview.monitor.charts.approval'),
           data: getAttrsArray(props.data, 'star_num'),
         },
         {
-          name: String(t('views.applicationOverview.monitor.charts.disapproval')),
+          name: t('views.applicationOverview.monitor.charts.disapproval'),
           data: getAttrsArray(props.data, 'trample_num'),
         },
       ],
@@ -224,7 +224,7 @@ const tokenUsageCount = ref(10)
 const topQuestionsCount = ref(10)
 const tokenUsageOption = computed(() => {
   return {
-    title: String(t('views.applicationOverview.monitor.charts.tokenUsage')),
+    title: t('views.applicationOverview.monitor.charts.tokenUsage'),
     xData: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'username'),
     yData: [
       {
@@ -236,7 +236,7 @@ const tokenUsageOption = computed(() => {
 })
 const topQuestionsOption = computed(() => {
   return {
-    title: String(t('views.applicationOverview.monitor.charts.topQuestions')),
+    title: t('views.applicationOverview.monitor.charts.topQuestions'),
     xData: getAttrsArray(props.topQuestions?.slice(0, topQuestionsCount.value), 'username'),
     yData: [
       {
