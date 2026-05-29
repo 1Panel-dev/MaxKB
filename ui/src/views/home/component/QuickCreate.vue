@@ -10,11 +10,11 @@
       v-if="permissionPrecise.application.workspace.create()"
     >
       <el-dropdown
-        trigger="click"
+        trigger="hover"
         class="w-full"
         @visible-change="(visible: boolean) => handleVisibleChange('application', visible)"
       >
-        <el-card shadow="never" class="cursor w-full">
+        <el-card shadow="never" class="cursor w-full quick-create-card">
           <div class="flex-between">
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-agent.svg" alt="" />
@@ -108,11 +108,11 @@
       v-if="permissionPrecise.knowledge.workspace.create()"
     >
       <el-dropdown
-        trigger="click"
+        trigger="hover"
         class="w-full"
         @visible-change="(visible: boolean) => handleVisibleChange('knowledge', visible)"
       >
-        <el-card shadow="never" class="cursor w-full">
+        <el-card shadow="never" class="cursor w-full quick-create-card">
           <div class="flex-between">
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-knowledge.svg" alt="" />
@@ -235,11 +235,11 @@
       v-if="permissionPrecise.tool.workspace.create()"
     >
       <el-dropdown
-        trigger="click"
+        trigger="hover"
         class="w-full"
         @visible-change="(visible: boolean) => handleVisibleChange('tool', visible)"
       >
-        <el-card shadow="never" class="cursor w-full">
+        <el-card shadow="never" class="cursor w-full quick-create-card">
           <div class="flex-between">
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-tool.svg" alt="" />
@@ -343,7 +343,11 @@
       class="mb-16"
       v-if="permissionPrecise.model.workspace.create()"
     >
-      <el-card shadow="never" class="cursor w-full" @click="openCreateModel(allObj)">
+      <el-card
+        shadow="never"
+        class="cursor w-full quick-create-card"
+        @click="openCreateModel(allObj)"
+      >
         <div class="flex-between">
           <div class="flex align-center">
             <img src="@/assets/home/icon_create-model.svg" alt="" />
@@ -603,4 +607,10 @@ function modelRefresh() {
   router.push({ path: `/model` })
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.quick-create-card {
+  &:hover {
+    background: rgba(31, 35, 41, 0.1);
+  }
+}
+</style>

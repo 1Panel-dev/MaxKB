@@ -1,7 +1,7 @@
 <template>
-  <div class="home p-16">
+  <div class="home">
     <el-scrollbar>
-      <div class="home-calc-height p-8 pt-0">
+      <div class="home-calc-height p-16">
         <el-card style="--el-card-padding: 24px">
           <h4 class="mb-16">
             {{ $t('layout.home.quickCreate') }}
@@ -39,17 +39,14 @@ const {
   params: { id },
 } = route as any
 
-
-onMounted(() => {
-
-})
+onMounted(() => {})
 </script>
 <style lang="scss" scoped>
 .home {
   max-width: 1280px;
   margin: 0 auto;
   .home-calc-height {
-    height: calc(var(--app-main-height) + 52px);
+    height: calc(var(--app-main-height) + 74px);
     box-sizing: border-box;
   }
 }

@@ -2,7 +2,7 @@
   <el-skeleton :loading="loading" animated>
     <el-row :gutter="16">
       <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
-        <el-card shadow="never" class="cursor" @click="router.push('/application')">
+        <el-card class="resource-card cursor" shadow="never" @click="router.push('/application')">
           <div class="flex-between">
             <div>
               <p class="color-secondary lighter mb-4">{{ $t('views.application.title') }}</p>
@@ -28,7 +28,7 @@
         </el-card>
       </el-col>
       <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
-        <el-card shadow="never" class="cursor" @click="router.push('/knowledge')">
+        <el-card class="resource-card cursor" shadow="never" @click="router.push('/knowledge')">
           <div class="flex-between">
             <div>
               <p class="color-secondary lighter mb-4">{{ $t('views.knowledge.title') }}</p>
@@ -54,7 +54,7 @@
         </el-card>
       </el-col>
       <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
-        <el-card shadow="never" class="cursor" @click="router.push('/tool')">
+        <el-card class="resource-card cursor" shadow="never" @click="router.push('/tool')">
           <div class="flex-between">
             <div>
               <p class="color-secondary lighter mb-4">{{ $t('views.tool.title') }}</p>
@@ -89,7 +89,7 @@
         </el-card>
       </el-col>
       <el-col :xs="12" :sm="12" :md="12" :lg="6" :xl="6" class="mb-16">
-        <el-card shadow="never" class="cursor" @click="router.push('/model')">
+        <el-card class="resource-card cursor" shadow="never" @click="router.push('/model')">
           <div class="flex-between">
             <div>
               <p class="color-secondary lighter mb-4">{{ $t('views.model.title') }}</p>
@@ -163,5 +163,10 @@ onMounted(() => {
 .large-number {
   font-size: 32px;
   font-weight: 500;
+}
+.resource-card {
+  &:hover {
+    border-color: var(--el-color-primary) !important;
+  }
 }
 </style>
