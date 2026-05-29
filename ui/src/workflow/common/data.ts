@@ -25,8 +25,8 @@ export const startNode = {
           value: 'history_context',
         },
         {
-          label: t('chat.chatId'),
-          value: 'chat_id',
+          label: t('aiChat.chatId'),
+          value: 'aiChat_id',
         },
       ],
     },
@@ -53,7 +53,7 @@ export const baseNode = {
     },
     config: {},
     showNode: true,
-    user_input_config: { title: t('chat.userInput') },
+    user_input_config: { title: t('aiChat.userInput') },
     user_input_field_list: [],
   },
 }
@@ -75,7 +75,7 @@ export const knowledgeBaseNode = {
     },
     config: {},
     showNode: true,
-    user_input_config: { title: t('chat.userInput') },
+    user_input_config: { title: t('aiChat.userInput') },
     user_input_field_list: [],
   },
 }
@@ -93,7 +93,7 @@ export const toolBaseNode = {
     node_data: {},
     config: {},
     showNode: true,
-    user_input_config: { title: t('chat.userInput') },
+    user_input_config: { title: t('aiChat.userInput') },
     user_input_field_list: [],
   },
 }
@@ -110,7 +110,7 @@ export const toolStartNode = {
     node_data: {},
     config: {},
     showNode: true,
-    user_input_config: { title: t('chat.userInput') },
+    user_input_config: { title: t('aiChat.userInput') },
     user_input_field_list: [],
   },
 }
@@ -1221,19 +1221,19 @@ bindFieldLabels(startNode.properties.config.fields, ['workflow.nodes.startNode.q
 bindFieldLabels(startNode.properties.config.globalFields, [
   'workflow.nodes.startNode.currentTime',
   'views.application.form.historyRecord.label',
-  'chat.chatId',
+  'aiChat.chatId',
 ])
 bindFieldLabels(startNode.properties.fields, ['workflow.nodes.startNode.question'])
 bindFieldLabels(startNode.properties.globalFields, ['workflow.nodes.startNode.currentTime'])
 ;[baseNode, knowledgeBaseNode].forEach((node) => {
   bindLocale(node, 'properties.stepName', 'common.info')
   bindLocale(node, 'properties.node_data.prologue', 'views.application.form.defaultPrologue')
-  bindLocale(node, 'properties.user_input_config.title', 'chat.userInput')
+  bindLocale(node, 'properties.user_input_config.title', 'aiChat.userInput')
 })
 bindLocale(toolBaseNode, 'properties.stepName', 'common.info')
-bindLocale(toolBaseNode, 'properties.user_input_config.title', 'chat.userInput')
+bindLocale(toolBaseNode, 'properties.user_input_config.title', 'aiChat.userInput')
 bindLocale(toolStartNode, 'properties.stepName', 'workflow.nodes.startNode.label')
-bindLocale(toolStartNode, 'properties.user_input_config.title', 'chat.userInput')
+bindLocale(toolStartNode, 'properties.user_input_config.title', 'aiChat.userInput')
 const nodeLocaleBindings: Array<[any, string, string]> = [
   [
     dataSourceLocalNode,

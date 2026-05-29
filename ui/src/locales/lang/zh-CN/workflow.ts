@@ -128,8 +128,8 @@ export default {
     baseNode: {
       visibilitySetting: {
         label: '显隐设置',
-        showCondition‌: '显示条件',
-        hideCondition‌: '隐藏条件',
+        showCondition: '显示条件',
+        hideCondition: '隐藏条件',
       },
       fileUpload: {
         label: '文件上传',
