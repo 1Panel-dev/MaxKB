@@ -2,10 +2,10 @@
   <div>
     <el-radio-group v-model="formData.action" class="mb-8">
       <el-radio value="show">{{
-        $t('workflow.nodes.baseNode.visibilitySetting.showCondition‌')
+        $t('workflow.nodes.baseNode.visibilitySetting.showCondition')
       }}</el-radio>
       <el-radio value="hide">{{
-        $t('workflow.nodes.baseNode.visibilitySetting.hideCondition‌')
+        $t('workflow.nodes.baseNode.visibilitySetting.hideCondition')
       }}</el-radio>
     </el-radio-group>
 
