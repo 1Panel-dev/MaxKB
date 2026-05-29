@@ -419,6 +419,7 @@ class WorkflowManage:
         child_node = {}
         view_type = current_node.view_type
         try:
+            self.send_progress(current_node)
             current_result = node_result_future.result()
             result = current_result.write_context(current_node, self)
             if result is not None:
@@ -477,23 +478,6 @@ class WorkflowManage:
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
-                    if 'form-node' != current_node.type:
-                        chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
-                                                                               self.params.get('chat_record_id'),
-                                                                               current_node.id,
-                                                                               current_node.up_node_id_list,
-                                                                               '', False, 0, 0,
-                                                                               {'node_type': current_node.type,
-                                                                                'runtime_node_id': runtime_node_id,
-                                                                                'node_name': current_node.node.properties.get(
-                                                                                    'stepName'),
-                                                                                'view_type': view_type,
-                                                                                'child_node': child_node,
-                                                                                'node_is_end': True,
-                                                                                'real_node_id': real_node_id,
-                                                                                'reasoning_content': '',
-                                                                                'node_status': "SUCCESS"})
-                        current_node.node_chunk.add_chunk(chunk)
             if current_node.status == 500:
                 enableException = current_node.node.properties.get('enableException')
                 if not enableException:
@@ -541,6 +525,29 @@ class WorkflowManage:
             current_node.node_chunk.end()
             # 归还链接到连接池
             connection.close()
+
+    def send_progress(self, current_node):
+        runtime_node_id = current_node.runtime_node_id
+        real_node_id = current_node.runtime_node_id
+        child_node = {}
+        view_type = current_node.view_type
+        if 'form-node' != current_node.type:
+            chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                   self.params.get('chat_record_id'),
+                                                                   current_node.id,
+                                                                   current_node.up_node_id_list,
+                                                                   '', False, 0, 0,
+                                                                   {'node_type': current_node.type,
+                                                                    'runtime_node_id': runtime_node_id,
+                                                                    'node_name': current_node.node.properties.get(
+                                                                        'stepName'),
+                                                                    'view_type': view_type,
+                                                                    'child_node': child_node,
+                                                                    'node_is_end': True,
+                                                                    'real_node_id': real_node_id,
+                                                                    'reasoning_content': '',
+                                                                    'node_status': "SUCCESS"})
+            current_node.node_chunk.add_chunk(chunk)
 
     def run_node_async(self, node):
         future = executor.submit(self.run_node, node)
