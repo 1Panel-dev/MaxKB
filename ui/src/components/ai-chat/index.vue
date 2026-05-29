@@ -590,6 +590,7 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
       problem_text: problem ? problem : inputValue.value.trim(),
       answer_text: '',
       answer_text_list: [[]],
+      currentNodeName: '',
       buffer: [],
       reasoning_content: '',
       reasoning_content_buffer: [],

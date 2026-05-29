@@ -430,6 +430,7 @@ class WorkflowManage:
                         node_is_end = False
                         view_type = current_node.view_type
                         node_type = current_node.type
+                        node_name = current_node.node.properties.get('stepName')
                         if isinstance(r, dict):
                             content = r.get('content')
                             child_node = {'runtime_node_id': r.get('runtime_node_id'),
@@ -441,6 +442,8 @@ class WorkflowManage:
                                 node_is_end = r.get('node_is_end')
                             if r.__contains__('node_type'):
                                 node_type = r.get("node_type")
+                            if r.__contains__('node_name'):
+                                node_name = r.get('node_name')
                             view_type = r.get('view_type')
                             reasoning_content = r.get('reasoning_content')
                         chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
@@ -450,6 +453,7 @@ class WorkflowManage:
                                                                                content, False, 0, 0,
                                                                                {'node_type': node_type,
                                                                                 'runtime_node_id': runtime_node_id,
+                                                                                'node_name': node_name,
                                                                                 'view_type': view_type,
                                                                                 'child_node': child_node,
                                                                                 'node_is_end': node_is_end,
@@ -473,6 +477,22 @@ class WorkflowManage:
                     current_node.node_chunk.add_chunk(chunk)
                 else:
                     list(result)
+                    chunk = self.base_to_response.to_stream_chunk_response(self.params.get('chat_id'),
+                                                                           self.params.get('chat_record_id'),
+                                                                           current_node.id,
+                                                                           current_node.up_node_id_list,
+                                                                           '', False, 0, 0,
+                                                                           {'node_type': current_node.type,
+                                                                            'runtime_node_id': runtime_node_id,
+                                                                            'node_name': current_node.node.properties.get(
+                                                                                'stepName'),
+                                                                            'view_type': view_type,
+                                                                            'child_node': child_node,
+                                                                            'node_is_end': True,
+                                                                            'real_node_id': real_node_id,
+                                                                            'reasoning_content': '',
+                                                                            'node_status': "SUCCESS"})
+                    current_node.node_chunk.add_chunk(chunk)
             if current_node.status == 500:
                 enableException = current_node.node.properties.get('enableException')
                 if not enableException:
