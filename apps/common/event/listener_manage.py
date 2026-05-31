@@ -122,14 +122,15 @@ class ListenerManagement:
             _("Start--->Embedding paragraph: {paragraph_id_list}").format(paragraph_id_list=paragraph_id_list)
         )
         try:
+            knowledge_id = data_list[0].get('knowledge_id') if data_list else None
             # 删除段落
-            VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_id_list)
+            VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_paragraph_ids(paragraph_id_list)
 
             def is_save_function():
                 return QuerySet(Paragraph).filter(id__in=paragraph_id_list).exists()
 
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
+            VectorStore.get_embedding_vector(knowledge_id=knowledge_id).batch_save(data_list, embedding_model, is_save_function)
             ListenerManagement.update_status(
                 QuerySet(Paragraph).filter(id__in=paragraph_id_list), TaskType.EMBEDDING, State.SUCCESS
             )
@@ -169,8 +170,9 @@ class ListenerManagement:
                     os.path.join(PROJECT_DIR, "apps", "common", "sql", "list_embedding_text.sql")
                 ),
             )
+            knowledge_id = data_list[0].get('knowledge_id') if data_list else None
             # 删除段落
-            VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
+            VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_paragraph_id(paragraph_id)
 
             def is_the_task_interrupted():
                 _paragraph = QuerySet(Paragraph).filter(id=paragraph_id).first()
@@ -179,7 +181,7 @@ class ListenerManagement:
                 return False
 
             # 批量向量化
-            VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_the_task_interrupted)
+            VectorStore.get_embedding_vector(knowledge_id=knowledge_id).batch_save(data_list, embedding_model, is_the_task_interrupted)
             # 更新到开始状态
             ListenerManagement.update_status(
                 QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.SUCCESS
@@ -198,8 +200,9 @@ class ListenerManagement:
 
     @staticmethod
     def embedding_by_data_list(data_list: List, embedding_model: Embeddings):
+        knowledge_id = data_list[0].get('knowledge_id') if data_list else None
         # 批量向量化
-        VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: False)
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).batch_save(data_list, embedding_model, lambda: False)
 
     @staticmethod
     def get_embedding_paragraph_apply(embedding_model, is_the_task_interrupted, post_apply=lambda: None):
@@ -437,11 +440,17 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_document(document_id):
-        VectorStore.get_embedding_vector().delete_by_document_id(document_id)
+        doc = QuerySet(Document).filter(id=document_id).values('knowledge_id').first()
+        VectorStore.get_embedding_vector(knowledge_id=doc['knowledge_id'] if doc else None).delete_by_document_id(document_id)
 
     @staticmethod
     def delete_embedding_by_document_list(document_id_list: List[str]):
-        VectorStore.get_embedding_vector().delete_by_document_id_list(document_id_list)
+        if document_id_list:
+            doc = QuerySet(Document).filter(id=document_id_list[0]).values('knowledge_id').first()
+            knowledge_id = doc['knowledge_id'] if doc else None
+        else:
+            knowledge_id = None
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_document_id_list(document_id_list)
 
     @staticmethod
     def delete_embedding_by_knowledge(knowledge_id):
@@ -449,38 +458,43 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_paragraph(paragraph_id):
-        VectorStore.get_embedding_vector().delete_by_paragraph_id(paragraph_id)
+        para = QuerySet(Paragraph).filter(id=paragraph_id).values('knowledge_id').first()
+        VectorStore.get_embedding_vector(knowledge_id=para['knowledge_id'] if para else None).delete_by_paragraph_id(paragraph_id)
 
     @staticmethod
     def delete_embedding_by_source(source_id):
-        VectorStore.get_embedding_vector().delete_by_source_id(source_id, SourceType.PROBLEM)
+        mapping = QuerySet(ProblemParagraphMapping).filter(id=source_id).values('knowledge_id').first()
+        VectorStore.get_embedding_vector(knowledge_id=mapping['knowledge_id'] if mapping else None).delete_by_source_id(source_id, SourceType.PROBLEM)
 
     @staticmethod
     def disable_embedding_by_paragraph(paragraph_id):
-        VectorStore.get_embedding_vector().update_by_paragraph_id(paragraph_id, {"is_active": False})
+        para = QuerySet(Paragraph).filter(id=paragraph_id).values('knowledge_id').first()
+        VectorStore.get_embedding_vector(knowledge_id=para['knowledge_id'] if para else None).update_by_paragraph_id(paragraph_id, {"is_active": False})
 
     @staticmethod
     def enable_embedding_by_paragraph(paragraph_id):
-        VectorStore.get_embedding_vector().update_by_paragraph_id(paragraph_id, {"is_active": True})
+        para = QuerySet(Paragraph).filter(id=paragraph_id).values('knowledge_id').first()
+        VectorStore.get_embedding_vector(knowledge_id=para['knowledge_id'] if para else None).update_by_paragraph_id(paragraph_id, {"is_active": True})
 
     @staticmethod
     def update_problem(args: UpdateProblemArgs):
         problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(problem_id=args.problem_id)
         embed_value = args.embedding_model.embed_query(args.problem_content)
-        VectorStore.get_embedding_vector().update_by_source_ids(
+        knowledge_id = str(problem_paragraph_mapping_list.first().knowledge_id) if problem_paragraph_mapping_list.exists() else None
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).update_by_source_ids(
             [v.id for v in problem_paragraph_mapping_list], {"embedding": embed_value}
         )
 
     @staticmethod
     def update_embedding_knowledge_id(args: UpdateEmbeddingKnowledgeIdArgs):
-        VectorStore.get_embedding_vector().update_by_paragraph_ids(
+        VectorStore.get_embedding_vector(knowledge_id=args.target_knowledge_id).update_by_paragraph_ids(
             args.paragraph_id_list, {"knowledge_id": args.target_knowledge_id}
         )
 
     @staticmethod
     def update_embedding_document_id(args: UpdateEmbeddingDocumentIdArgs):
         if args.target_embedding_model is None:
-            VectorStore.get_embedding_vector().update_by_paragraph_ids(
+            VectorStore.get_embedding_vector(knowledge_id=args.target_knowledge_id).update_by_paragraph_ids(
                 args.paragraph_id_list,
                 {"document_id": args.target_document_id, "knowledge_id": args.target_knowledge_id},
             )
@@ -491,11 +505,21 @@ class ListenerManagement:
 
     @staticmethod
     def delete_embedding_by_source_ids(source_ids: List[str]):
-        VectorStore.get_embedding_vector().delete_by_source_ids(source_ids, SourceType.PROBLEM)
+        if source_ids:
+            mapping = QuerySet(ProblemParagraphMapping).filter(id=source_ids[0]).values('knowledge_id').first()
+            knowledge_id = mapping['knowledge_id'] if mapping else None
+        else:
+            knowledge_id = None
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_source_ids(source_ids, SourceType.PROBLEM)
 
     @staticmethod
     def delete_embedding_by_paragraph_ids(paragraph_ids: List[str]):
-        VectorStore.get_embedding_vector().delete_by_paragraph_ids(paragraph_ids)
+        if paragraph_ids:
+            para = QuerySet(Paragraph).filter(id=paragraph_ids[0]).values('knowledge_id').first()
+            knowledge_id = para['knowledge_id'] if para else None
+        else:
+            knowledge_id = None
+        VectorStore.get_embedding_vector(knowledge_id=knowledge_id).delete_by_paragraph_ids(paragraph_ids)
 
     @staticmethod
     def delete_embedding_by_knowledge_id_list(source_ids: List[str]):
@@ -512,7 +536,7 @@ class ListenerManagement:
         search_mode: SearchMode,
         embedding: Embeddings,
     ):
-        return VectorStore.get_embedding_vector().hit_test(
+        return VectorStore.get_embedding_vector(knowledge_id=knowledge_id[0] if knowledge_id else None).hit_test(
             query_text, knowledge_id, exclude_document_id_list, top_number, similarity, search_mode, embedding
         )
 

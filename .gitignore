@@ -134,6 +134,9 @@ celerybeat.pid
 # SageMath parsed files
 *.sage.py
 
+# Local dev logs
+logs/
+
 # Environments
 .env
 .venv
@@ -194,3 +197,4 @@ copilot-instructions.md
 
 CLAUDE.md
 dev-tasks
+.nvmrc

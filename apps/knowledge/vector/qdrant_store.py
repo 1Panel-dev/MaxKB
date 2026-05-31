@@ -16,6 +16,7 @@ from qdrant_client.http.models import (
     FieldCondition,
     Filter,
     HnswConfigDiff,
+    MatchAny,
     MatchValue,
     PayloadSchemaType,
     PointStruct,
@@ -35,9 +36,9 @@ DISTANCE_MAP = {
 }
 
 
-def _build_embedding_id(source_id, source_type) -> str:
-    """Generate a stable UUID for a point from its source_id and source_type."""
-    hash_input = f"{source_id}:{source_type}"
+def _build_embedding_id(source_id, source_type, chunk_index=0) -> str:
+    """Generate a stable UUID for a point from its source_id, source_type and chunk_index."""
+    hash_input = f"{source_id}:{source_type}:{chunk_index}"
     return str(uuid_lib.UUID(hashlib.md5(hash_input.encode()).hexdigest()))
 
 
@@ -142,16 +143,18 @@ class QdrantVectorStore(BaseVectorStore):
 
         data_list = []
         for index, row in enumerate(text_list):
-            knowledge_id = row.get("knowledge_id")
+            knowledge_id = str(row.get("knowledge_id")) if row.get("knowledge_id") else None
             data_list.append({
                 "text": texts[index],
                 "embedding": [float(x) for x in embeddings[index]],
                 "source_type": row.get("source_type"),
                 "knowledge_id": knowledge_id,
-                "document_id": row.get("document_id"),
-                "paragraph_id": row.get("paragraph_id"),
-                "source_id": row.get("source_id"),
+                "document_id": str(row.get("document_id")) if row.get("document_id") else None,
+                "paragraph_id": str(row.get("paragraph_id")) if row.get("paragraph_id") else None,
+                "source_id": str(row.get("source_id")) if row.get("source_id") else None,
                 "is_active": row.get("is_active", True),
+                "chunk_index": row.get("chunk_index", 0),
+                "title": row.get("title", "") or "",
             })
 
         # Group by knowledge_id
@@ -174,7 +177,8 @@ class QdrantVectorStore(BaseVectorStore):
         collection_name = _make_collection_name(knowledge_id)
         points = []
         for d in data_list:
-            point_id = _build_embedding_id(d["source_id"], str(d["source_type"]))
+            chunk_index = d.get("chunk_index", 0)
+            point_id = _build_embedding_id(d["source_id"], str(d["source_type"]), chunk_index)
             points.append(PointStruct(
                 id=point_id,
                 vector=d["embedding"],
@@ -186,6 +190,7 @@ class QdrantVectorStore(BaseVectorStore):
                     "source_type": str(d["source_type"]),
                     "is_active": d.get("is_active", True),
                     "content": d.get("text", ""),
+                    "title": d.get("title", "") or "",
                 },
             ))
 
@@ -280,14 +285,14 @@ class QdrantVectorStore(BaseVectorStore):
             document_id_list, exclude_document_id_list, exclude_paragraph_list
         )
 
-        qdrant_results = self.client.search(
+        qdrant_response = self.client.query_points(
             collection_name=collection_name,
-            query_vector=query_embedding,
+            query=query_embedding,
             limit=top_n * 2,
             query_filter=q_filter,
             with_payload=True,
-            score_threshold=similarity,
         )
+        qdrant_results = qdrant_response.points
 
         results = []
         for r in qdrant_results:
@@ -302,6 +307,7 @@ class QdrantVectorStore(BaseVectorStore):
                 "source_id": payload.get("source_id", ""),
                 "source_type": payload.get("source_type", ""),
                 "content": payload.get("content", ""),
+                "title": payload.get("title", ""),
             })
         return results
 
@@ -355,10 +361,10 @@ class QdrantVectorStore(BaseVectorStore):
         if document_id_list:
             must.append(FieldCondition(
                 key="document_id",
-                match=MatchValue(value=doc_id),
+                match=MatchValue(value=document_id_list[0]),
             ) if len(document_id_list) == 1 else FieldCondition(
                 key="document_id",
-                match=MatchValue(value=document_id_list),
+                match=MatchAny(any=document_id_list),
             ))
         if exclude_document_id_list:
             must_not.append(FieldCondition(
@@ -366,7 +372,7 @@ class QdrantVectorStore(BaseVectorStore):
                 match=MatchValue(value=exclude_document_id_list[0]),
             ) if len(exclude_document_id_list) == 1 else FieldCondition(
                 key="document_id",
-                match=MatchValue(value=exclude_document_id_list),
+                match=MatchAny(any=exclude_document_id_list),
             ))
         if exclude_paragraph_list:
             must_not.append(FieldCondition(
@@ -374,7 +380,7 @@ class QdrantVectorStore(BaseVectorStore):
                 match=MatchValue(value=exclude_paragraph_list[0]),
             ) if len(exclude_paragraph_list) == 1 else FieldCondition(
                 key="paragraph_id",
-                match=MatchValue(value=exclude_paragraph_list),
+                match=MatchAny(any=exclude_paragraph_list),
             ))
 
         if not must and not must_not:
@@ -391,29 +397,56 @@ class QdrantVectorStore(BaseVectorStore):
     # ------------------------------------------------------------------
 
     def update_by_source_id(self, source_id: str, instance: Dict):
-        for source_type_val in [0, 1, 2]:
-            point_id = _build_embedding_id(source_id, str(source_type_val))
-            # Try updating across all collections
-            for c in self.client.get_collections().collections:
-                try:
-                    self.client.set_payload(
-                        collection_name=c.name,
-                        payload=instance,
-                        points=[point_id],
-                    )
-                except Exception:
-                    pass
+        for c in self.client.get_collections().collections:
+            try:
+                self.client.set_payload(
+                    collection_name=c.name,
+                    payload=instance,
+                    points=Filter(
+                        must=[FieldCondition(key="source_id", match=MatchValue(value=source_id))]
+                    ),
+                )
+            except Exception:
+                pass
 
     def update_by_source_ids(self, source_ids: List[str], instance: Dict):
-        for sid in source_ids:
-            self.update_by_source_id(sid, instance)
+        for c in self.client.get_collections().collections:
+            try:
+                self.client.set_payload(
+                    collection_name=c.name,
+                    payload=instance,
+                    points=Filter(
+                        must=[FieldCondition(key="source_id", match=MatchAny(any=source_ids))]
+                    ),
+                )
+            except Exception:
+                pass
 
     def update_by_paragraph_id(self, paragraph_id: str, instance: Dict):
-        self.update_by_source_id(paragraph_id, instance)
+        for c in self.client.get_collections().collections:
+            try:
+                self.client.set_payload(
+                    collection_name=c.name,
+                    payload=instance,
+                    points=Filter(
+                        must=[FieldCondition(key="paragraph_id", match=MatchValue(value=paragraph_id))]
+                    ),
+                )
+            except Exception:
+                pass
 
     def update_by_paragraph_ids(self, paragraph_ids: List[str], instance: Dict):
-        for pid in paragraph_ids:
-            self.update_by_paragraph_id(pid, instance)
+        for c in self.client.get_collections().collections:
+            try:
+                self.client.set_payload(
+                    collection_name=c.name,
+                    payload=instance,
+                    points=Filter(
+                        must=[FieldCondition(key="paragraph_id", match=MatchAny(any=paragraph_ids))]
+                    ),
+                )
+            except Exception:
+                pass
 
     # ------------------------------------------------------------------
     # 删除

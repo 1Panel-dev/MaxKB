@@ -43,6 +43,14 @@ export default defineConfig((conf: any) => {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,
   }
+  proxyConf['/admin/locales'] = {
+    target: 'http://127.0.0.1:8080',
+    changeOrigin: true,
+  }
+  proxyConf['/chat/locales'] = {
+    target: 'http://127.0.0.1:8080',
+    changeOrigin: true,
+  }
   proxyConf['/doc'] = {
     target: 'http://127.0.0.1:8080',
     changeOrigin: true,

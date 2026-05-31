@@ -43,12 +43,12 @@
     <el-form-item :label="$t('views.knowledge.form.vectorStoreType.label')" prop="vector_store_type">
       <el-radio-group v-model="form.vector_store_type">
         <el-radio label="pg_vector">
-          <span>PgVector (PostgreSQL)</span>
-          <el-tag size="small" type="info" style="margin-left: 4px">默认</el-tag>
+          <span>{{ $t('views.knowledge.form.vectorStoreType.pgVector') }}</span>
+          <el-tag size="small" type="info" style="margin-left: 4px">{{ $t('views.knowledge.form.vectorStoreType.default') }}</el-tag>
         </el-radio>
         <el-radio label="qdrant">
-          <span>Qdrant</span>
-          <el-tag size="small" type="success" style="margin-left: 4px">高性能</el-tag>
+          <span>{{ $t('views.knowledge.form.vectorStoreType.qdrant') }}</span>
+          <el-tag size="small" type="success" style="margin-left: 4px">{{ $t('views.knowledge.form.vectorStoreType.highPerformance') }}</el-tag>
         </el-radio>
       </el-radio-group>
     </el-form-item>

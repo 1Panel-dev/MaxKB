@@ -927,7 +927,7 @@ class KnowledgeSerializer(serializers.Serializer):
                         content=content,
                         is_active=str(para_is_active) == "1",
                         position=row_idx + 1,
-                        chunks=text_to_chunk(content),
+                        chunks=text_to_chunk((title + "\n" + content) if title else content),
                     )
                     paragraph_model_list.append(paragraph)
 
@@ -1280,13 +1280,14 @@ class KnowledgeSerializer(serializers.Serializer):
                 SearchMode(self.data.get("search_mode")),
                 model,
             )
-            hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get("paragraph_id"): hit} for hit in hit_list], {})
+            hit_dict = reduce(lambda x, y: {**x, **y}, [{str(hit.get("paragraph_id")): hit} for hit in hit_list], {})
             p_list = list_paragraph([h.get("paragraph_id") for h in hit_list])
             return [
                 {
                     **p,
-                    "similarity": hit_dict.get(p.get("id")).get("similarity"),
-                    "comprehensive_score": hit_dict.get(p.get("id")).get("comprehensive_score"),
+                    "similarity": hit_dict.get(str(p.get("id")), {}).get("similarity"),
+                    "comprehensive_score": hit_dict.get(str(p.get("id")), {}).get("comprehensive_score"),
+                    "title": hit_dict.get(str(p.get("id")), {}).get("title") or p.get("title", ""),
                 }
                 for p in p_list
             ]

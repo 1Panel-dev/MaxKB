@@ -26,8 +26,8 @@ def chunk_data(data: Dict):
     if str(data.get("source_type")) == str(SourceType.PARAGRAPH.value):
         text = data.get("text")
         chunk_list = data.get("chunks") if data.get("chunks") else text_to_chunk(text)
-        return [{**data, "text": chunk} for chunk in chunk_list]
-    return [data]
+        return [{**data, "text": chunk, "chunk_index": i} for i, chunk in enumerate(chunk_list)]
+    return [{**data, "chunk_index": 0}]
 
 
 def chunk_data_list(data_list: List[Dict]):

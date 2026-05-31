@@ -39,6 +39,15 @@ class LocaleManager:
             os.path.join(self.PROJECT_DIR, "apps", "static", "chat", "locales"),
         ]
 
+    def ensure_static_locales_dirs(self):
+        """确保静态语言包目录存在并包含空的 index.json，避免前端 fetch 404"""
+        for static_dir in self.static_locales_dirs:
+            os.makedirs(static_dir, exist_ok=True)
+            index_file = os.path.join(static_dir, "index.json")
+            if not os.path.exists(index_file):
+                with open(index_file, "w", encoding="utf-8") as f:
+                    json.dump({"locales": []}, f, ensure_ascii=False)
+
     def deploy_all(self) -> bool:
         """
         部署所有外置语言包
@@ -46,14 +55,13 @@ class LocaleManager:
         Returns:
             bool: 是否成功部署
         """
+        # 确保静态目录始终存在，避免前端 fetch 404
+        self.ensure_static_locales_dirs()
+        os.makedirs(self.internal_locales_dir, exist_ok=True)
+
         if not self.external_locale_path or not os.path.exists(self.external_locale_path):
             logger.debug(f"External locale path not found: {self.external_locale_path}")
             return False
-
-        # 确保目录存在
-        os.makedirs(self.internal_locales_dir, exist_ok=True)
-        for static_dir in self.static_locales_dirs:
-            os.makedirs(static_dir, exist_ok=True)
 
         logger.info(f"Scanning external locales from: {self.external_locale_path}")
 

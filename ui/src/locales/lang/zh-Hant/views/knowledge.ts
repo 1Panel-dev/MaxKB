@@ -51,6 +51,13 @@ export default {
       placeholder: '請選擇向量模型',
       requiredMessage: '請選擇向量模型',
     },
+    vectorStoreType: {
+      label: '向量存儲類型',
+      pgVector: 'PgVector (PostgreSQL)',
+      qdrant: 'Qdrant',
+      default: '默認',
+      highPerformance: '高性能',
+    },
 
     source_url: {
       label: 'Web 根位址',

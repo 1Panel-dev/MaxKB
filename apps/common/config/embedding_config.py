@@ -78,13 +78,16 @@ class VectorStore:
     def get_embedding_vector(knowledge_id=None) -> BaseVectorStore:
         from knowledge.vector.pg_vector import PGVector
         from maxkb.const import CONFIG
+        from common.utils.logger import maxkb_logger
 
         # Per-knowledge vector store selection
         if knowledge_id is not None:
             store_type = VectorStore._get_knowledge_store_type(knowledge_id)
+            maxkb_logger.info(f"VectorStore routing: knowledge_id={knowledge_id}, store_type={store_type}")
             if store_type == 'qdrant':
                 if VectorStore._qdrant_instance is None:
                     VectorStore._qdrant_instance = VectorStore.instance_map['qdrant']()
+                    maxkb_logger.info("VectorStore: Created QdrantVectorStore instance")
                 return VectorStore._qdrant_instance
 
         # Global default
@@ -104,7 +107,8 @@ class VectorStore:
             knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
             if knowledge and hasattr(knowledge, 'vector_store_type'):
                 return knowledge.vector_store_type
-        except Exception:
-            pass
+        except Exception as e:
+            from common.utils.logger import maxkb_logger
+            maxkb_logger.error(f"VectorStore: Failed to get store_type for knowledge_id={knowledge_id}: {e}")
         from maxkb.const import CONFIG
         return CONFIG.get("VECTOR_STORE_NAME", "pg_vector")

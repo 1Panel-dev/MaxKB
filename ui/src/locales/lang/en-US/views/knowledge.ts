@@ -58,6 +58,13 @@ export default {
       placeholder: 'Please select a embedding model',
       requiredMessage: 'Please select the embedding model',
     },
+    vectorStoreType: {
+      label: 'Vector Store Type',
+      pgVector: 'PgVector (PostgreSQL)',
+      qdrant: 'Qdrant',
+      default: 'Default',
+      highPerformance: 'High Performance',
+    },
 
     source_url: {
       label: 'Web Root URL',

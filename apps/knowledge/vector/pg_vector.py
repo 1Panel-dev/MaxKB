@@ -72,6 +72,7 @@ class PGVector(BaseVectorStore):
             embedding=text_embedding,
             source_type=source_type,
             search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms))),
+            meta={'title': ''},
         )
         embedding.save()
         return True
@@ -101,6 +102,7 @@ class PGVector(BaseVectorStore):
                         )
                     )
                 ),
+                meta={'title': text_list[index].get('title', '') or ''},
             )
             for index in range(0, len(texts))
         ]
@@ -131,7 +133,7 @@ class PGVector(BaseVectorStore):
                 # (WHERE knowledge_id = '{k_id}'), which won't be used with knowledge_id__in
                 if len(knowledge_id_list) == 1:
                     query_set = QuerySet(Embedding).filter(knowledge_id=knowledge_id_list[0], is_active=True).exclude(**exclude_dict)
-                    return search_handle.handle(
+                    results = search_handle.handle(
                         query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
                     )
                 else:
@@ -143,7 +145,21 @@ class PGVector(BaseVectorStore):
                         )
                         all_results.extend(results)
                     all_results.sort(key=lambda x: x.get("similarity", x.get("comprehensive_score", 0)), reverse=True)
-                    return all_results[:top_number]
+                    results = all_results[:top_number]
+                # Enrich results with title from Embedding.meta
+                if results:
+                    paragraph_ids = [r.get("paragraph_id") for r in results]
+                    meta_rows = QuerySet(Embedding).filter(
+                        paragraph_id__in=paragraph_ids, is_active=True
+                    ).values("paragraph_id", "meta")
+                    title_map = {}
+                    for row in meta_rows:
+                        title = (row.get("meta") or {}).get("title", "")
+                        if title:
+                            title_map[str(row["paragraph_id"])] = title
+                    for r in results:
+                        r["title"] = title_map.get(str(r.get("paragraph_id")), "")
+                return results
 
     def query(
         self,

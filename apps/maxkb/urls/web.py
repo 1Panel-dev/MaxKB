@@ -33,7 +33,14 @@ admin_api_prefix = CONFIG.get_admin_path()[1:] + '/api/'
 admin_ui_prefix = CONFIG.get_admin_path()
 chat_api_prefix = CONFIG.get_chat_path()[1:] + '/api/'
 chat_ui_prefix = CONFIG.get_chat_path()
+static_admin_dir = os.path.join(PROJECT_DIR, 'apps', "static", 'admin')
+static_chat_dir = os.path.join(PROJECT_DIR, 'apps', "static", 'chat')
 urlpatterns = [
+    # 语言包静态资源（在 DEBUG 和 production 模式下都可用）
+    re_path(rf'^{CONFIG.get_admin_path()[1:]}/locales/(?P<path>.*)$', static.serve,
+            {'document_root': os.path.join(static_admin_dir, 'locales')}),
+    re_path(rf'^{CONFIG.get_chat_path()[1:]}/locales/(?P<path>.*)$', static.serve,
+            {'document_root': os.path.join(static_chat_dir, 'locales')}),
     path(admin_api_prefix, include("users.urls")),
     path(admin_api_prefix, include("tools.urls")),
     path(admin_api_prefix, include("models_provider.urls")),
@@ -44,6 +51,7 @@ urlpatterns = [
     path(admin_api_prefix, include("trigger.urls")),
     path(admin_api_prefix, include("oss.urls")),
     path(admin_api_prefix, include("homepage.urls")),
+    path(admin_api_prefix, include("rerank_api.urls")),
     path(chat_api_prefix, include("oss.urls")),
     path(chat_api_prefix, include("chat.urls")),
     path(f'{admin_ui_prefix[1:]}/', include('oss.retrieval_urls')),

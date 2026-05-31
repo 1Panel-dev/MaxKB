@@ -394,13 +394,15 @@ class ParagraphSerializers(serializers.Serializer):
 
         @staticmethod
         def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
+            content = instance.get("content") or ""
+            title = instance.get("title") if "title" in instance else ""
             paragraph = Paragraph(
                 id=uuid.uuid7(),
                 document_id=document_id,
-                content=instance.get("content"),
+                content=content,
                 knowledge_id=knowledge_id,
-                title=instance.get("title") if "title" in instance else "",
-                chunks=text_to_chunk(instance.get("content", "")),
+                title=title,
+                chunks=text_to_chunk((title + "\n" + content) if title else content),
             )
             problem_paragraph_object_list = [
                 ProblemParagraphObject(knowledge_id, document_id, str(paragraph.id), problem.get("content"))
