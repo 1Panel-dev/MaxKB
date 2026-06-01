@@ -894,7 +894,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed, reactive } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-import type { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SelectKnowledgeDialog from './component/SelectKnowledgeDialog.vue'
 import { numberFormat } from '@/utils/common'
@@ -1020,7 +1020,7 @@ const paginationConfig = ref({
 })
 
 const ImportDocumentDialogRef = ref()
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
 

@@ -119,7 +119,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import CreateTermBaseDialog from './component/CreateTermbaseDialog.vue'
 import { datetimeFormat } from '@/utils/time'
 import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
@@ -171,7 +171,7 @@ const paginationConfig = reactive({
 const filterText = ref('')
 const termbaseData = ref<any[]>([])
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 
 function exportMulTermbase(row?: any) {

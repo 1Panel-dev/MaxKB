@@ -287,7 +287,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import { beforeDay, datetimeFormat, nowDate } from '@/utils/time'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
-import { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import permissionMap from '@/permission'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { Permission } from '@/utils/permission/type'
@@ -378,7 +378,7 @@ const daterange = ref({
   end_time: '',
 })
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 
 const ChatRecordRef = ref()

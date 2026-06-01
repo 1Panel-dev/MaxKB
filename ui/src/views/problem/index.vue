@@ -157,7 +157,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import CreateProblemDialog from './component/CreateProblemDialog.vue'
 import DetailProblemDrawer from './component/DetailProblemDrawer.vue'
 import RelateProblemDialog from './component/RelateProblemDialog.vue'
@@ -220,7 +220,7 @@ const problemIndexMap = computed<Dict<number>>(() => {
     .reduce((pre, next) => ({ ...pre, ...next }), {})
 })
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 
 function relateProblem(row?: any) {

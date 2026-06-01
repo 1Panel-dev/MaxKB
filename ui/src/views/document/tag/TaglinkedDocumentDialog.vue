@@ -163,7 +163,7 @@ import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
 import { cloneDeep } from 'lodash'
-import type { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import { datetimeFormat } from '@/utils/time'
 import { getImgUrl } from '@/utils/common'
 import { MsgSuccess } from '@/utils/message'
@@ -219,7 +219,7 @@ const filterText = ref<string>('')
 const currentTag = ref<any>({})
 const tableData = ref<Array<any>>([])
 const multipleSelection = ref<any[]>([])
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 
 const filterMethod = ref<any>({})
 const orderBy = ref<string>('')
