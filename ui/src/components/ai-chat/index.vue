@@ -14,10 +14,7 @@
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
-        :excludeFields="
-          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
-            ?.user_input_field_list_setting?.exposed_fields || []
-        "
+        :excludeFields="inlineExposedFields"
         :title="
           applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
             ?.user_input_field_list_setting?.menu_title ||
@@ -154,7 +151,7 @@
             <InlineParams
               ref="inlineParamsRef"
               :application="applicationDetails"
-              :maxExposed="isMobile ? 1 : 3"
+              :maxExposed="maxExposed"
               v-model:form-data="form_data"
               @openDialog="handleOpenDialog"
             >
@@ -263,6 +260,13 @@ const { application, common, chatUser } = useStore()
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
+const maxExposed = computed(() => (isMobile.value ? 1 : 3))
+const inlineExposedFields = computed<string[]>(() =>
+  (
+    props.applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')
+      ?.properties?.user_input_field_list_setting?.exposed_fields || []
+  ).slice(0, maxExposed.value),
+)
 const aiChatRef = ref()
 const scrollDiv = ref()
 const dialogScrollbar = ref()
