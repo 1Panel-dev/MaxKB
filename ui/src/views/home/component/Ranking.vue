@@ -1,7 +1,7 @@
 <template>
   <el-card style="--el-card-padding: 24px" class="mt-16">
     <div class="flex-between mb-16">
-      <h4>{{ $t('layout.home.rank') }} TOP5</h4>
+      <h4>{{ $t('home.rank') }} TOP5</h4>
       <div>
         <el-select v-model="history_day" class="w-180" @change="changeDayHandle">
           <el-option
@@ -16,8 +16,8 @@
           v-if="history_day === 'other'"
           v-model="daterangeValue"
           type="daterange"
-          :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
-          :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
+          :start-placeholder="$t('home.startDatePlaceholder')"
+          :end-placeholder="$t('home.endDatePlaceholder')"
           format="YYYY-MM-DD"
           value-format="YYYY-MM-DD"
           @change="changeDayRangeHandle"
@@ -32,8 +32,8 @@
             <div class="flex-between">
               <h4>
                 Tokens
-                {{ $t('layout.home.consume') }}
-                Top
+                {{ $t('home.usage') }}
+                · Top
                 {{ $t('views.application.title') }}
               </h4>
               <el-button link class="flex align-center lighter" @click="openDrawer('tokens_agent')">
@@ -50,9 +50,9 @@
                   <div class="ml-12">
                     <p>{{ item?.name }}</p>
                     <p class="color-secondary font-small lighter">
-                      {{ $t('layout.home.chat') }} {{ numberFormat(item?.chat_record_count || 0) }}
+                      {{ $t('home.chats') }} {{ numberFormat(item?.chat_record_count || 0) }}
                       {{ $t('views.system.time') }} <el-divider direction="vertical" />{{
-                        $t('layout.home.average‌')
+                        $t('home.average‌')
                       }}
                       {{
                         numberFormat(
@@ -82,8 +82,8 @@
           <el-card shadow="never" style="--el-card-padding: 24px">
             <div class="flex-between">
               <h4>
-                {{ $t('views.applicationOverview.monitor.charts.queryCount') }}
-                Top
+                {{ $t('home.chatCount') }}
+                · Top
                 {{ $t('views.application.title') }}
               </h4>
               <el-button
@@ -104,15 +104,15 @@
                   <div class="ml-12">
                     <p>{{ item?.name }}</p>
                     <p class="color-secondary font-small lighter">
-                      {{ $t('layout.home.activeUsers') }}
+                      {{ $t('home.activeUsers') }}
                       {{ numberFormat(item?.chat_user_count || 0) }}
-                      <el-divider direction="vertical" />{{ $t('layout.home.average‌') }}
+                      <el-divider direction="vertical" />{{ $t('home.average‌') }}
                       {{
                         numberFormat(
                           Number((item?.chat_record_count / item?.chat_user_count || 0).toFixed(1)),
                         )
                       }}
-                      {{ $t('layout.home.wheel') }}/{{ $t('layout.home.person') }}
+                      {{ $t('home.wheel') }}/{{ $t('home.person') }}
                     </p>
                   </div>
                 </div>
@@ -140,8 +140,8 @@
             <div class="flex-between">
               <h4>
                 Tokens
-                {{ $t('layout.home.consume') }}
-                Top
+                {{ $t('home.usage') }}
+                · Top
                 {{ $t('views.chatLog.table.user') }}
               </h4>
               <el-button
@@ -162,7 +162,7 @@
                   <div class="ml-12">
                     <p>{{ item?.asker?.username }}</p>
                     <p class="color-secondary font-small lighter">
-                      {{ $t('layout.home.questions') }}
+                      {{ $t('home.chats') }}
                       {{ numberFormat(item?.chat_record_count || 0) }}
                       {{ $t('views.system.time') }}
                       <!-- <el-divider direction="vertical" />
@@ -212,19 +212,19 @@ const paginationConfig = reactive({
 const dayOptions = [
   {
     value: 7,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'),
+    label: t('home.pastDayOptions.past7Days'),
   },
   {
     value: 30,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past30Days'),
+    label: t('home.pastDayOptions.past30Days'),
   },
   {
     value: 90,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past90Days'),
+    label: t('home.pastDayOptions.past90Days'),
   },
   {
     value: 183,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past183Days'),
+    label: t('home.pastDayOptions.past183Days'),
   },
   {
     value: 'other',

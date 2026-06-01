@@ -143,7 +143,7 @@
         </el-card>
         <el-card style="--el-card-padding: 24px" class="mt-16">
           <h4 class="title-decoration-1 mb-16">
-            {{ $t('views.applicationOverview.monitor.monitoringStatistics') }}
+            {{ $t('home.monitoringStatistics') }}
           </h4>
           <div class="mb-16">
             <el-select v-model="history_day" class="mr-12 w-180" @change="changeDayHandle">
@@ -158,8 +158,8 @@
               v-if="history_day === 'other'"
               v-model="daterangeValue"
               type="daterange"
-              :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
-              :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
+              :start-placeholder="$t('home.startDatePlaceholder')"
+              :end-placeholder="$t('home.endDatePlaceholder')"
               format="YYYY-MM-DD"
               value-format="YYYY-MM-DD"
               @change="changeDayRangeHandle"
@@ -252,19 +252,19 @@ const shareUrl = computed(
 const dayOptions = [
   {
     value: 7,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'),
+    label: t('home.pastDayOptions.past7Days'),
   },
   {
     value: 30,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past30Days'),
+    label: t('home.pastDayOptions.past30Days'),
   },
   {
     value: 90,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past90Days'),
+    label: t('home.pastDayOptions.past90Days'),
   },
   {
     value: 183,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past183Days'),
+    label: t('home.pastDayOptions.past183Days'),
   },
   {
     value: 'other',

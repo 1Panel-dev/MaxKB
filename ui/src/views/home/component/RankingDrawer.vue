@@ -1,7 +1,7 @@
 <template>
   <el-drawer
     v-model="drawerVisible"
-    :title="$t('layout.home.rankDetail')"
+    :title="$t('home.rankDetail')"
     size="1000"
     :append-to-body="true"
   >
@@ -33,8 +33,8 @@
             v-if="history_day === 'other'"
             v-model="daterangeValue"
             type="daterange"
-            :start-placeholder="$t('views.applicationOverview.monitor.startDatePlaceholder')"
-            :end-placeholder="$t('views.applicationOverview.monitor.endDatePlaceholder')"
+            :start-placeholder="$t('home.startDatePlaceholder')"
+            :end-placeholder="$t('home.endDatePlaceholder')"
             format="YYYY-MM-DD"
             value-format="YYYY-MM-DD"
             @change="changeDayRangeHandle"
@@ -46,7 +46,7 @@
       </div>
 
       <el-tab-pane
-        :label="'Tokens ' + $t('layout.home.consume') + ' Top ' + $t('views.application.title')"
+        :label="'Tokens ' + $t('home.usage') + ' · Top ' + $t('views.application.title')"
         name="tokens_agent"
       >
         <app-table
@@ -59,7 +59,7 @@
           :row-key="(row: any) => row.id"
           v-loading="loading"
         >
-          <el-table-column :label="$t('layout.home.rank')" width="80">
+          <el-table-column :label="$t('home.rank')" width="80">
             <template #default="{ row, $index }">
               <span class="rank" :class="'rank-' + ($index + 1)">{{ $index + 1 }}</span>
             </template>
@@ -73,14 +73,14 @@
           />
           <el-table-column
             min-width="100"
-            :label="'Tokens ' + $t('layout.home.consume')"
+            :label="'Tokens ' + $t('home.usage')"
             align="right"
           >
             <template #default="{ row }">
               {{ numberFormat(row.total_tokens) }}
             </template>
           </el-table-column>
-          <el-table-column width="200" :label="$t('layout.home.proportion')">
+          <el-table-column width="200" :label="$t('home.proportion')">
             <template #default="{ row }">
               <el-progress
                 :percentage="
@@ -94,7 +94,7 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('views.applicationOverview.monitor.charts.queryCount')"
+            :label="$t('home.chatCount')"
             align="right"
           >
             <template #default="{ row }">
@@ -104,7 +104,7 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('layout.home.activeUsers')"
+            :label="$t('home.activeUsers')"
             align="right"
           >
             <template #default="{ row }">
@@ -114,7 +114,7 @@
           <el-table-column
             min-width="100"
             show-overflow-tooltip
-            :label="$t('layout.home.average‌') + ' tokens/' + $t('views.system.time')"
+            :label="$t('home.average‌') + ' tokens/' + $t('views.system.time')"
             align="right"
           >
             <template #default="{ row }">
@@ -127,8 +127,8 @@
       </el-tab-pane>
       <el-tab-pane
         :label="
-          $t('views.applicationOverview.monitor.charts.queryCount') +
-          ' Top ' +
+          $t('home.chatCount') +
+          ' · Top ' +
           $t('views.application.title')
         "
         name="questions_agent"
@@ -143,7 +143,7 @@
           :row-key="(row: any) => row.id"
           v-loading="loading"
         >
-          <el-table-column :label="$t('layout.home.rank')" width="80">
+          <el-table-column :label="$t('home.rank')" width="80">
             <template #default="{ row, $index }">
               <span class="rank" :class="'rank-' + ($index + 1)">{{ $index + 1 }}</span>
             </template>
@@ -158,14 +158,14 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('views.applicationOverview.monitor.charts.queryCount')"
+            :label="$t('home.chatCount')"
             align="right"
           >
             <template #default="{ row }">
               {{ numberFormat(row.chat_record_count) }}
             </template>
           </el-table-column>
-          <el-table-column width="200" :label="$t('layout.home.proportion')">
+          <el-table-column width="200" :label="$t('home.proportion')">
             <template #default="{ row }">
               <el-progress
                 :percentage="
@@ -179,7 +179,7 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('layout.home.activeUsers')"
+            :label="$t('home.activeUsers')"
             align="right"
           >
             <template #default="{ row }">
@@ -190,7 +190,7 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('layout.home.perDialogueRounds')"
+            :label="$t('home.perDialogueRounds')"
             align="right"
           >
             <template #default="{ row }">
@@ -204,7 +204,7 @@
         </app-table>
       </el-tab-pane>
       <el-tab-pane
-        :label="'Tokens ' + $t('layout.home.consume') + ' Top ' + $t('views.chatLog.table.user')"
+        :label="'Tokens ' + $t('home.usage') + ' · Top ' + $t('views.chatLog.table.user')"
         name="user_tokens_agent"
       >
         <app-table
@@ -217,7 +217,7 @@
           :row-key="(row: any) => row.id"
           v-loading="loading"
         >
-          <el-table-column :label="$t('layout.home.rank')" width="80">
+          <el-table-column :label="$t('home.rank')" width="80">
             <template #default="{ row, $index }">
               <span class="rank" :class="'rank-' + ($index + 1)">{{ $index + 1 }}</span>
             </template>
@@ -234,14 +234,14 @@
           </el-table-column>
           <el-table-column
             min-width="100"
-            :label="'Tokens ' + $t('layout.home.consume')"
+            :label="'Tokens ' + $t('home.usage')"
             align="right"
           >
             <template #default="{ row }">
               {{ numberFormat(row.total_tokens) }}
             </template>
           </el-table-column>
-          <el-table-column width="200" :label="$t('layout.home.proportion')">
+          <el-table-column width="200" :label="$t('home.proportion')">
             <template #default="{ row }">
               <el-progress
                 :percentage="
@@ -253,7 +253,7 @@
           <el-table-column
             min-width="80"
             show-overflow-tooltip
-            :label="$t('views.applicationOverview.monitor.charts.queryCount')"
+            :label="$t('home.chatCount')"
             align="right"
           >
             <template #default="{ row }">
@@ -263,7 +263,7 @@
           <el-table-column
             min-width="100"
             show-overflow-tooltip
-            :label="$t('layout.home.average‌') + ' tokens/' + $t('views.system.time')"
+            :label="$t('home.average‌') + ' tokens/' + $t('views.system.time')"
             align="right"
           >
             <template #default="{ row }">
@@ -274,7 +274,7 @@
             prop="name"
             min-width="100"
             show-overflow-tooltip
-            :label="$t('layout.home.commonlyAgents')"
+            :label="$t('home.commonlyAgents')"
           /> -->
         </app-table>
       </el-tab-pane>
@@ -319,19 +319,19 @@ function handleClick(tab: any) {
 const dayOptions = [
   {
     value: 7,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past7Days'),
+    label: t('home.pastDayOptions.past7Days'),
   },
   {
     value: 30,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past30Days'),
+    label: t('home.pastDayOptions.past30Days'),
   },
   {
     value: 90,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past90Days'),
+    label: t('home.pastDayOptions.past90Days'),
   },
   {
     value: 183,
-    label: t('views.applicationOverview.monitor.pastDayOptions.past183Days'),
+    label: t('home.pastDayOptions.past183Days'),
   },
   {
     value: 'other',

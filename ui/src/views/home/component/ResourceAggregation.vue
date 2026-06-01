@@ -104,11 +104,11 @@
           </div>
           <el-row class="mt-12">
             <el-col :span="8">
-              <p class="color-secondary lighter mb-4">{{ $t('layout.home.llm') }}</p>
+              <p class="color-secondary lighter mb-4">{{ $t('home.llm') }}</p>
               <h2>{{ numberFormat(modelAggregation?.llm_count || 0) }}</h2>
             </el-col>
             <el-col :span="8">
-              <p class="color-secondary lighter mb-4">{{ $t('layout.home.embedding') }}</p>
+              <p class="color-secondary lighter mb-4">{{ $t('home.embedding') }}</p>
               <h2>{{ numberFormat(modelAggregation?.embedding_count || 0) }}</h2>
             </el-col>
             <el-col :span="8">

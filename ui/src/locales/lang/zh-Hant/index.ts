@@ -7,6 +7,7 @@ import common from './common'
 import dynamicsForm from './dynamics-form'
 import aiChat from './ai-chat'
 import workflow from './workflow'
+import home from './home'
 export default {
   lang: '繁體中文',
   layout,
@@ -17,5 +18,6 @@ export default {
   zhTw,
   dynamicsForm,
   aiChat,
-  workflow
+  workflow,
+  home,
 }

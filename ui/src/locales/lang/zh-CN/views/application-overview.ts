@@ -77,27 +77,4 @@ export default {
     chatBackground: '聊天背景',
     chatBackgroundMessage: '支持 JPG、PNG、GIF，大小不超过 10 MB',
   },
-  monitor: {
-    monitoringStatistics: '监控统计',
-    customRange: '自定义范围',
-    startDatePlaceholder: '开始时间',
-    endDatePlaceholder: '结束时间',
-    pastDayOptions: {
-      past7Days: '过去7天',
-      past30Days: '过去30天',
-      past90Days: '过去90天',
-      past183Days: '过去半年',
-    },
-    charts: {
-      customerTotal: '用户总数',
-      customerNew: '用户新增数',
-      queryCount: '提问次数',
-      tokensTotal: 'Tokens 总数',
-      userSatisfaction: '用户满意度',
-      approval: '赞同',
-      disapproval: '反对',
-      tokenUsage: '用户消耗 Tokens',
-      topQuestions: '用户提问次数',
-    },
-  },
 }

@@ -16,7 +16,7 @@ export const routes: Array<RouteRecordRaw> = [
         name: 'home',
         redirect: '/home',
         meta: {
-          title: 'layout.home.title',
+          title: 'home.title',
           menu: true,
           order: 1,
           icon: 'app-home',
@@ -28,7 +28,7 @@ export const routes: Array<RouteRecordRaw> = [
             path: '/home',
             name: 'home-index',
             meta: {
-              title: 'layout.home.title',
+              title: 'home.title',
               activeMenu: '/home',
               sameRoute: 'home',
             },

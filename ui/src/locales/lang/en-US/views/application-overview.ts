@@ -79,27 +79,4 @@ export default {
     chatBackground: 'Chat Background',
     chatBackgroundMessage: 'Supported formats: JPG, PNG, GIF. Max size: 10MB.',
   },
-  monitor: {
-    monitoringStatistics: 'Monitoring Statistics',
-    customRange: 'Custom Range',
-    startDatePlaceholder: 'Start Date',
-    endDatePlaceholder: 'End Date',
-    pastDayOptions: {
-      past7Days: 'Last 7 Days',
-      past30Days: 'Last 30 Days',
-      past90Days: 'Last 90 Days',
-      past183Days: 'Last 6 Months',
-    },
-    charts: {
-      customerTotal: 'Total Users',
-      customerNew: 'New Users',
-      queryCount: 'Total Queries',
-      tokensTotal: 'Total Tokens Used',
-      userSatisfaction: 'User Feedback Metrics',
-      approval: 'Like',
-      disapproval: 'Dislike',
-      tokenUsage: 'User used Tokens',
-      topQuestions: 'Number of user question',
-    },
-  },
 }

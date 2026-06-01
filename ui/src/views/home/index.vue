@@ -4,14 +4,14 @@
       <div class="home-calc-height p-16">
         <el-card style="--el-card-padding: 24px">
           <h4 class="mb-16">
-            {{ $t('layout.home.quickCreate') }}
+            {{ $t('home.quickCreate') }}
           </h4>
           <QuickCreate />
         </el-card>
 
         <el-card style="--el-card-padding: 24px" class="mt-16">
           <h4 class="mb-16">
-            {{ $t('layout.home.resource') }}
+            {{ $t('home.resource') }}
           </h4>
           <ResourceAggregation />
         </el-card>

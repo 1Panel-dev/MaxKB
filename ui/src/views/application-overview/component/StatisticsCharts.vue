@@ -128,7 +128,7 @@ const props = defineProps({
 const statisticsType = computed(() => [
   {
     id: 'customerCharts',
-    name: t('views.applicationOverview.monitor.charts.customerTotal'),
+    name: t('home.activeUsers'),
     icon: 'app-user',
     background: '#EBF1FF',
     color: '#3370FF',
@@ -137,16 +137,16 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'customer_added_count') || 0),
     ],
     option: {
-      title: t('views.applicationOverview.monitor.charts.customerTotal'),
+      title: t('home.activeUsers'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: t('views.applicationOverview.monitor.charts.customerTotal'),
+          name: t('home.activeUsers'),
           area: true,
           data: getAttrsArray(props.data, 'customer_num'),
         },
         {
-          name: t('views.applicationOverview.monitor.charts.customerNew'),
+          name: t('home.newUsers'),
           area: true,
           data: getAttrsArray(props.data, 'customer_added_count'),
         },
@@ -155,13 +155,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'chatRecordCharts',
-    name: t('views.applicationOverview.monitor.charts.queryCount'),
+    name: t('home.chatCount'),
     icon: 'app-question',
     background: '#FFF3E5',
     color: '#FF8800',
     sum: [getSum(getAttrsArray(props.data, 'chat_record_count') || 0)],
     option: {
-      title: t('views.applicationOverview.monitor.charts.queryCount'),
+      title: t('home.chatCount'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -173,13 +173,13 @@ const statisticsType = computed(() => [
   },
   {
     id: 'tokensCharts',
-    name: t('views.applicationOverview.monitor.charts.tokensTotal'),
+    name: t('home.charts.tokensTotal'),
     icon: 'app-tokens',
     background: '#E5FBF8',
     color: '#00D6B9',
     sum: [getSum(getAttrsArray(props.data, 'tokens_num') || 0)],
     option: {
-      title: t('views.applicationOverview.monitor.charts.tokensTotal'),
+      title: t('home.charts.tokensTotal'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
@@ -191,7 +191,7 @@ const statisticsType = computed(() => [
   },
   {
     id: 'starCharts',
-    name: t('views.applicationOverview.monitor.charts.userSatisfaction'),
+    name: t('home.charts.userSatisfaction'),
     icon: 'app-user-stars',
     background: '#FEEDEC',
     color: '#F54A45',
@@ -200,16 +200,16 @@ const statisticsType = computed(() => [
       getSum(getAttrsArray(props.data, 'trample_num') || 0),
     ],
     option: {
-      title: t('views.applicationOverview.monitor.charts.userSatisfaction'),
+      title: t('home.charts.userSatisfaction'),
       xData: getAttrsArray(props.data, 'day'),
       yData: [
         {
-          name: t('views.applicationOverview.monitor.charts.approval'),
+          name: t('home.charts.approval'),
           data: getAttrsArray(props.data, 'star_num'),
           area: true,
         },
         {
-          name: t('views.applicationOverview.monitor.charts.disapproval'),
+          name: t('home.charts.disapproval'),
           data: getAttrsArray(props.data, 'trample_num'),
           area: true,
         },
@@ -228,7 +228,7 @@ const tokenUsageCount = ref(10)
 const topQuestionsCount = ref(10)
 const tokenUsageOption = computed(() => {
   return {
-    title: t('views.applicationOverview.monitor.charts.tokenUsage'),
+    title: t('home.charts.tokenUsage'),
     xData: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'username'),
     yData: [
       {
@@ -241,7 +241,7 @@ const tokenUsageOption = computed(() => {
 })
 const topQuestionsOption = computed(() => {
   return {
-    title: t('views.applicationOverview.monitor.charts.topQuestions'),
+    title: t('home.charts.topQuestions'),
     xData: getAttrsArray(props.topQuestions?.slice(0, topQuestionsCount.value), 'username'),
     yData: [
       {

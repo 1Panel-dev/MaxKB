@@ -19,9 +19,9 @@
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-agent.svg" alt="" />
               <div class="ml-8">
-                <p>{{ $t('layout.home.createAgent') }}</p>
+                <p>{{ $t('home.createAgent') }}</p>
                 <p class="color-secondary font-small mt-8 lighter">
-                  {{ $t('layout.home.createAgentDescribe') }}
+                  {{ $t('home.createAgentDescribe') }}
                 </p>
               </div>
             </div>
@@ -117,9 +117,9 @@
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-knowledge.svg" alt="" />
               <div class="ml-8">
-                <p>{{ $t('layout.home.createKnowledge') }}</p>
+                <p>{{ $t('home.createKnowledge') }}</p>
                 <p class="color-secondary font-small mt-8 lighter">
-                  {{ $t('layout.home.createKnowledgeDescribe') }}
+                  {{ $t('home.createKnowledgeDescribe') }}
                 </p>
               </div>
             </div>
@@ -244,9 +244,9 @@
             <div class="flex align-center">
               <img src="@/assets/home/icon_create-tool.svg" alt="" />
               <div class="ml-8">
-                <p>{{ $t('layout.home.createTool') }}</p>
+                <p>{{ $t('home.createTool') }}</p>
                 <p class="color-secondary font-small mt-8 lighter">
-                  {{ $t('layout.home.createToolDescribe') }}
+                  {{ $t('home.createToolDescribe') }}
                 </p>
               </div>
             </div>
@@ -352,9 +352,9 @@
           <div class="flex align-center">
             <img src="@/assets/home/icon_create-model.svg" alt="" />
             <div class="ml-8">
-              <p style="line-height: 15px">{{ $t('layout.home.createModel') }}</p>
+              <p style="line-height: 15px">{{ $t('home.createModel') }}</p>
               <p class="color-secondary font-small lighter mt-4" style="line-height: 15px">
-                {{ $t('layout.home.createModelDescribe') }}
+                {{ $t('home.createModelDescribe') }}
               </p>
             </div>
           </div>
