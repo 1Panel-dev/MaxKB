@@ -64,6 +64,16 @@
   .el-button.is-text:not(.is-disabled):hover {
     background: none;
   }
+  .mul-operation {
+    margin-left: 0!important;
+    width: 100%!important;
+  }
+}
+.chat-embed {
+  .mul-operation {
+    margin-left: 0!important;
+    width: 100%!important;
+  }
 }
 .chat-pc {
   &.openLeft {
