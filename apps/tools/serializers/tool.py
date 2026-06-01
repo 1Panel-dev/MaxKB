@@ -15,69 +15,65 @@ from typing import Dict
 
 import requests
 import uuid_utils.compat as uuid
-from django.core import validators
-from django.core.cache import cache
-from django.db import transaction
-from django.db.models import QuerySet, Q, Subquery, OuterRef, CharField, Value, When, Case
-from django.http import HttpResponse
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from langchain_core.messages import HumanMessage, AIMessage
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from rest_framework import serializers, status
-
 from application.models import Application
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import page_search, native_page_search, native_search
+from common.db.search import native_page_search, native_search, page_search
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedImageField
 from common.result import result
-from common.utils.common import get_file_content, generate_uuid, bytes_to_uploaded_file, common_convert_value
+from common.utils.common import bytes_to_uploaded_file, common_convert_value, generate_uuid, get_file_content
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
+from django.core import validators
+from django.core.cache import cache
+from django.db import transaction
+from django.db.models import Case, CharField, OuterRef, Q, QuerySet, Subquery, Value, When
+from django.http import HttpResponse
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 from knowledge.models import File, FileSourceType, Knowledge
-from maxkb.const import PROJECT_DIR, CONFIG
+from langchain_core.messages import AIMessage, HumanMessage
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from maxkb.const import CONFIG, PROJECT_DIR
 from models_provider.models import Model
+from rest_framework import serializers, status
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from tools.models import Tool, ToolScope, ToolFolder, ToolType, ToolRecord
-from tools.models.tool_workflow import ToolWorkflow
-from trigger.models import TriggerTask, Trigger
+from trigger.models import Trigger, TriggerTask
 from users.serializers.user import is_workspace_manage
+
+from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
+from tools.models.tool_workflow import ToolWorkflow
 
 tool_executor = ToolExecutor()
 
 
 def hand_node(node, update_tool_map):
-    if node.get('type') == 'tool-lib-node':
-        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
-        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id, tool_lib_id)
+    if node.get("type") == "tool-lib-node":
+        tool_lib_id = node.get("properties", {}).get("node_data", {}).get("tool_lib_id") or ""
+        node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
 
-    if node.get('type') == 'tool-workflow-lib-node':
-        tool_lib_id = (node.get('properties', {}).get('node_data', {}).get('tool_lib_id') or '')
-        node.get('properties', {}).get('node_data', {})['tool_lib_id'] = update_tool_map.get(tool_lib_id, tool_lib_id)
+    if node.get("type") == "tool-workflow-lib-node":
+        tool_lib_id = node.get("properties", {}).get("node_data", {}).get("tool_lib_id") or ""
+        node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
 
-    if node.get('type') == 'search-knowledge-node':
-        node.get('properties', {}).get('node_data', {})['knowledge_id_list'] = []
-    if node.get('type') == 'ai-chat-node':
-        node_data = node.get('properties', {}).get('node_data', {})
-        mcp_tool_ids = node_data.get('mcp_tool_ids') or []
-        node_data['mcp_tool_ids'] = [update_tool_map.get(tool_id,
-                                                         tool_id) for tool_id in mcp_tool_ids]
-        tool_ids = node_data.get('tool_ids') or []
-        node_data['tool_ids'] = [update_tool_map.get(tool_id,
-                                                     tool_id) for tool_id in tool_ids]
-        skill_tool_ids = node_data.get('skill_tool_ids') or []
-        node_data['skill_tool_ids'] = [update_tool_map.get(tool_id,
-                                                           tool_id) for tool_id in skill_tool_ids]
-    if node.get('type') == 'mcp-node':
-        mcp_tool_id = (node.get('properties', {}).get('node_data', {}).get('mcp_tool_id') or '')
-        node.get('properties', {}).get('node_data', {})['mcp_tool_id'] = update_tool_map.get(mcp_tool_id,
-                                                                                             mcp_tool_id)
+    if node.get("type") == "search-knowledge-node":
+        node.get("properties", {}).get("node_data", {})["knowledge_id_list"] = []
+    if node.get("type") == "ai-chat-node":
+        node_data = node.get("properties", {}).get("node_data", {})
+        mcp_tool_ids = node_data.get("mcp_tool_ids") or []
+        node_data["mcp_tool_ids"] = [update_tool_map.get(tool_id, tool_id) for tool_id in mcp_tool_ids]
+        tool_ids = node_data.get("tool_ids") or []
+        node_data["tool_ids"] = [update_tool_map.get(tool_id, tool_id) for tool_id in tool_ids]
+        skill_tool_ids = node_data.get("skill_tool_ids") or []
+        node_data["skill_tool_ids"] = [update_tool_map.get(tool_id, tool_id) for tool_id in skill_tool_ids]
+    if node.get("type") == "mcp-node":
+        mcp_tool_id = node.get("properties", {}).get("node_data", {}).get("mcp_tool_id") or ""
+        node.get("properties", {}).get("node_data", {})["mcp_tool_id"] = update_tool_map.get(mcp_tool_id, mcp_tool_id)
 
 
 class ToolInstance:
@@ -86,11 +82,7 @@ class ToolInstance:
         self.version = version
 
 
-ALLOWED_CLASSES = {
-    ("builtins", "dict"),
-    ('uuid', 'UUID'),
-    ("tools.serializers.tool", "ToolInstance")
-}
+ALLOWED_CLASSES = {("builtins", "dict"), ("uuid", "UUID"), ("tools.serializers.tool", "ToolInstance")}
 
 
 class NewUUID:
@@ -108,18 +100,18 @@ class NewUUID:
 
 def to_dict(message, file_name):
     return {
-        'line': message.line,
-        'column': message.column,
-        'endLine': message.end_line,
-        'endColumn': message.end_column,
-        'message': (message.msg or "").replace(file_name, 'code'),
-        'type': message.category
+        "line": message.line,
+        "column": message.column,
+        "endLine": message.end_line,
+        "endColumn": message.end_column,
+        "message": (message.msg or "").replace(file_name, "code"),
+        "type": message.category,
     }
 
 
 def get_file_name():
     file_name = f"{uuid.uuid7()}"
-    pylint_dir = os.path.join(PROJECT_DIR, 'data', 'pylint')
+    pylint_dir = os.path.join(PROJECT_DIR, "data", "pylint")
     if not os.path.exists(pylint_dir):
         os.makedirs(pylint_dir, 0o700, exist_ok=True)
         os.chmod(os.path.dirname(pylint_dir), 0o700)
@@ -127,12 +119,10 @@ def get_file_name():
 
 
 class RestrictedUnpickler(pickle.Unpickler):
-
     def find_class(self, folder, name):
         if (folder, name) in ALLOWED_CLASSES:
             return super().find_class(folder, name)
-        raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
-                                     (folder, name))
+        raise pickle.UnpicklingError("global '%s.%s' is forbidden" % (folder, name))
 
 
 def encryption(message: str):
@@ -150,14 +140,18 @@ def encryption(message: str):
     message_len = len(message)
     pre_len = int(message_len / 5 * 2)
     post_len = int(message_len / 5 * 1)
-    pre_str = "".join([message[index] for index in
-                       range(0,
-                             max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(
-                                 pre_len))])
+    pre_str = "".join(
+        [
+            message[index]
+            for index in range(0, max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(pre_len))
+        ]
+    )
     end_str = "".join(
-        [message[index] for index in
-         range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len),
-               message_len)])
+        [
+            message[index]
+            for index in range(message_len - (int(post_len) if pre_len < max_post_len else max_post_len), message_len)
+        ]
+    )
     content = "***************"
     return pre_str + content + end_str
 
@@ -171,30 +165,74 @@ def validate_mcp_config(servers: Dict):
         asyncio.run(validate())
     except Exception as e:
         maxkb_logger.error(f"validate mcp config error: {e}, servers: {servers}")
-        raise serializers.ValidationError(_('MCP configuration is invalid'))
+        raise serializers.ValidationError(_("MCP configuration is invalid"))
 
 
 class ToolModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
-        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list', 'init_params',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type', 'label',
-                  'version', 'create_time', 'update_time']
+        fields = [
+            "id",
+            "name",
+            "icon",
+            "desc",
+            "code",
+            "input_field_list",
+            "init_field_list",
+            "init_params",
+            "scope",
+            "is_active",
+            "user_id",
+            "template_id",
+            "workspace_id",
+            "folder_id",
+            "tool_type",
+            "label",
+            "version",
+            "create_time",
+            "update_time",
+        ]
 
 
 class ToolRecordModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = ToolRecord
-        fields = ['id', 'workspace_id', 'tool_id', 'source_type', 'source_id', 'meta', 'state', 'run_time',
-                  'create_time', 'update_time']
+        fields = [
+            "id",
+            "workspace_id",
+            "tool_id",
+            "source_type",
+            "source_id",
+            "meta",
+            "state",
+            "run_time",
+            "create_time",
+            "update_time",
+        ]
 
 
 class ToolExportModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tool
-        fields = ['id', 'name', 'icon', 'desc', 'code', 'input_field_list', 'init_field_list',
-                  'scope', 'is_active', 'user_id', 'template_id', 'workspace_id', 'folder_id', 'tool_type', 'label',
-                  'create_time', 'update_time']
+        fields = [
+            "id",
+            "name",
+            "icon",
+            "desc",
+            "code",
+            "input_field_list",
+            "init_field_list",
+            "scope",
+            "is_active",
+            "user_id",
+            "template_id",
+            "workspace_id",
+            "folder_id",
+            "tool_type",
+            "label",
+            "create_time",
+            "update_time",
+        ]
 
 
 class UploadedFileField(serializers.FileField):
@@ -206,23 +244,35 @@ class UploadedFileField(serializers.FileField):
 
 
 class ToolInputField(serializers.Serializer):
-    name = serializers.CharField(required=True, label=_('variable name'))
-    is_required = serializers.BooleanField(required=True, label=_('required'))
-    type = serializers.CharField(required=True, label=_('type'), validators=[
-        validators.RegexValidator(regex=re.compile("^string|int|dict|array|float$"),
-                                  message=_('fields only support string|int|dict|array|float'), code=500)
-    ])
-    source = serializers.CharField(required=True, label=_('source'), validators=[
-        validators.RegexValidator(regex=re.compile("^custom|reference$"),
-                                  message=_('The field only supports custom|reference'), code=500)
-    ])
+    name = serializers.CharField(required=True, label=_("variable name"))
+    is_required = serializers.BooleanField(required=True, label=_("required"))
+    type = serializers.CharField(
+        required=True,
+        label=_("type"),
+        validators=[
+            validators.RegexValidator(
+                regex=re.compile("^string|int|dict|array|float$"),
+                message=_("fields only support string|int|dict|array|float"),
+                code=500,
+            )
+        ],
+    )
+    source = serializers.CharField(
+        required=True,
+        label=_("source"),
+        validators=[
+            validators.RegexValidator(
+                regex=re.compile("^custom|reference$"), message=_("The field only supports custom|reference"), code=500
+            )
+        ],
+    )
 
 
 class InitField(serializers.Serializer):
-    field = serializers.CharField(required=True, label=_('field name'))
-    label = serializers.CharField(required=True, label=_('field label'))
-    required = serializers.BooleanField(required=True, label=_('required'))
-    input_type = serializers.CharField(required=True, label=_('input type'))
+    field = serializers.CharField(required=True, label=_("field name"))
+    label = serializers.CharField(required=True, label=_("field label"))
+    required = serializers.BooleanField(required=True, label=_("required"))
+    input_type = serializers.CharField(required=True, label=_("input type"))
     default_value = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     show_default_value = serializers.BooleanField(required=False, default=False)
     props_info = serializers.DictField(required=False, default=dict)
@@ -230,29 +280,37 @@ class InitField(serializers.Serializer):
 
 
 class ToolCreateRequest(serializers.Serializer):
-    name = serializers.CharField(required=True, label=_('tool name'))
+    name = serializers.CharField(required=True, label=_("tool name"))
 
-    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool description'))
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("tool description"))
 
-    code = serializers.CharField(required=True, label=_('tool content'))
+    code = serializers.CharField(required=True, label=_("tool content"))
 
-    input_field_list = serializers.ListField(required=False, default=list, label=_('input field list'))
+    input_field_list = serializers.ListField(required=False, default=list, label=_("input field list"))
 
-    init_field_list = serializers.ListField(required=False, default=list, label=_('init field list'))
+    init_field_list = serializers.ListField(required=False, default=list, label=_("init field list"))
 
-    is_active = serializers.BooleanField(required=False, label=_('Is active'))
+    is_active = serializers.BooleanField(required=False, label=_("Is active"))
 
     folder_id = serializers.CharField(required=False, allow_null=True)
 
 
 class ToolEditRequest(serializers.Serializer):
-    name = serializers.CharField(required=False, label=_('tool name'), allow_null=True)
-    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool description'))
-    code = serializers.CharField(required=False, label=_('tool content'), allow_null=True, )
-    input_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_('input field list'))
-    init_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_('init field list'))
-    init_params = serializers.DictField(required=False, default=dict, allow_null=True, label=_('init params'))
-    is_active = serializers.BooleanField(required=False, label=_('Is active'), allow_null=True, )
+    name = serializers.CharField(required=False, label=_("tool name"), allow_null=True)
+    desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("tool description"))
+    code = serializers.CharField(
+        required=False,
+        label=_("tool content"),
+        allow_null=True,
+    )
+    input_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_("input field list"))
+    init_field_list = serializers.ListField(required=False, default=list, allow_null=True, label=_("init field list"))
+    init_params = serializers.DictField(required=False, default=dict, allow_null=True, label=_("init params"))
+    is_active = serializers.BooleanField(
+        required=False,
+        label=_("Is active"),
+        allow_null=True,
+    )
     folder_id = serializers.CharField(required=False, allow_null=True)
 
 
@@ -262,45 +320,45 @@ class AddInternalToolRequest(serializers.Serializer):
 
 
 class DebugField(serializers.Serializer):
-    name = serializers.CharField(required=True, label=_('variable name'))
-    value = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('variable value'))
+    name = serializers.CharField(required=True, label=_("variable name"))
+    value = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("variable value"))
 
 
 class ToolDebugRequest(serializers.Serializer):
-    code = serializers.CharField(required=True, label=_('tool content'))
-    input_field_list = serializers.ListField(required=False, default=list, label=_('input field list'))
-    init_field_list = serializers.ListField(required=False, default=list, label=_('init field list'))
-    init_params = serializers.DictField(required=False, default=dict, label=_('init params'))
+    code = serializers.CharField(required=True, label=_("tool content"))
+    input_field_list = serializers.ListField(required=False, default=list, label=_("input field list"))
+    init_field_list = serializers.ListField(required=False, default=list, label=_("init field list"))
+    init_params = serializers.DictField(required=False, default=dict, label=_("init params"))
     debug_field_list = DebugField(required=True, many=True)
 
 
 class PylintInstance(serializers.Serializer):
-    code = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_('function content'))
+    code = serializers.CharField(required=True, allow_null=True, allow_blank=True, label=_("function content"))
 
 
 class ToolSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-        folder_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_('folder id'))
-        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
-        user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
-        scope = serializers.CharField(required=True, label=_('scope'))
-        tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
-        create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        folder_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("folder id"))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("tool name"))
+        user_id = serializers.UUIDField(required=False, allow_null=True, label=_("user id"))
+        scope = serializers.CharField(required=True, label=_("scope"))
+        tool_type = serializers.CharField(required=False, label=_("tool type"), allow_null=True, allow_blank=True)
+        create_user = serializers.UUIDField(required=False, label=_("create user"), allow_null=True)
 
         def get_query_set(self, workspace_manage, is_x_pack_ee):
-            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'))
+            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get("workspace_id"))
             folder_query_set = QuerySet(ToolFolder)
             default_query_set = QuerySet(Tool)
 
-            workspace_id = self.data.get('workspace_id')
-            user_id = self.data.get('user_id')
-            scope = self.data.get('scope')
-            tool_type = self.data.get('tool_type')
-            desc = self.data.get('desc')
-            name = self.data.get('name')
-            folder_id = self.data.get('folder_id')
-            create_user = self.data.get('create_user')
+            workspace_id = self.data.get("workspace_id")
+            user_id = self.data.get("user_id")
+            scope = self.data.get("scope")
+            tool_type = self.data.get("tool_type")
+            desc = self.data.get("desc")
+            name = self.data.get("name")
+            folder_id = self.data.get("folder_id")
+            create_user = self.data.get("create_user")
 
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
@@ -326,26 +384,23 @@ class ToolSerializer(serializers.Serializer):
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {
-                'tool_query_set': tool_query_set,
-                'default_query_set': default_query_set,
+                "tool_query_set": tool_query_set,
+                "default_query_set": default_query_set,
             }
             if not workspace_manage:
-                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
-                    WorkspaceUserResourcePermission).filter(
-                    auth_target_type="TOOL",
-                    workspace_id=workspace_id,
-                    user_id=user_id
-                )
+                query_set_dict["workspace_user_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserResourcePermission
+                ).filter(auth_target_type="TOOL", workspace_id=workspace_id, user_id=user_id)
             return query_set_dict
 
         def get_authorized_query_set(self):
             default_query_set = QuerySet(Tool)
-            tool_type = self.data.get('tool_type')
-            desc = self.data.get('desc')
-            name = self.data.get('name')
-            create_user = self.data.get('create_user')
+            tool_type = self.data.get("tool_type")
+            desc = self.data.get("desc")
+            name = self.data.get("name")
+            create_user = self.data.get("create_user")
 
-            default_query_set = default_query_set.filter(workspace_id='None')
+            default_query_set = default_query_set.filter(workspace_id="None")
             default_query_set = default_query_set.filter(scope=ToolScope.SHARED)
             if name is not None:
                 default_query_set = default_query_set.filter(name__icontains=name)
@@ -369,17 +424,19 @@ class ToolSerializer(serializers.Serializer):
         def get_tools(self):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
             is_x_pack_ee = self.is_x_pack_ee()
             results = native_search(
                 self.get_query_set(workspace_manage, is_x_pack_ee),
                 get_file_content(
                     os.path.join(
                         PROJECT_DIR,
-                        "apps", "tools", 'sql',
-                        'list_tool.sql' if workspace_manage else (
-                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
-                        )
+                        "apps",
+                        "tools",
+                        "sql",
+                        "list_tool.sql"
+                        if workspace_manage
+                        else ("list_tool_user_ee.sql" if is_x_pack_ee else "list_tool_user.sql"),
                     )
                 ),
             )
@@ -388,24 +445,24 @@ class ToolSerializer(serializers.Serializer):
             shared_queryset = QuerySet(Tool).none()
             if get_authorized_tool is not None:
                 shared_queryset = self.get_authorized_query_set()
-                shared_queryset = get_authorized_tool(shared_queryset, self.data.get('workspace_id'))
+                shared_queryset = get_authorized_tool(shared_queryset, self.data.get("workspace_id"))
 
             return {
-                'shared_tools': [
-                    ToolModelSerializer(data).data for data in shared_queryset
-                ],
-                'tools': [
+                "shared_tools": [ToolModelSerializer(data).data for data in shared_queryset],
+                "tools": [
                     {
                         **tool,
-                        'input_field_list': json.loads(tool.get('input_field_list', '[]')),
-                        'init_field_list': json.loads(tool.get('init_field_list', '[]')),
-                    } for tool in results if tool['resource_type'] == 'tool'
+                        "input_field_list": json.loads(tool.get("input_field_list", "[]")),
+                        "init_field_list": json.loads(tool.get("init_field_list", "[]")),
+                    }
+                    for tool in results
+                    if tool["resource_type"] == "tool"
                 ],
             }
 
     class Create(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        user_id = serializers.UUIDField(required=True, label=_("user id"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
         @transaction.atomic
         def insert(self, instance, with_valid=True):
@@ -413,26 +470,28 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolCreateRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                if instance.get('tool_type') == ToolType.MCP:
-                    ToolExecutor().validate_mcp_transport(instance.get('code', ''))
+                if instance.get("tool_type") == ToolType.MCP:
+                    ToolExecutor().validate_mcp_transport(instance.get("code", ""))
 
             # 处理 work_flow_template
-            if instance.get('work_flow_template') is not None:
-                template_instance = instance.get('work_flow_template')
-                download_url = template_instance.get('downloadUrl')
-                if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+            if instance.get("work_flow_template") is not None:
+                template_instance = instance.get("work_flow_template")
+                download_url = template_instance.get("downloadUrl")
+                if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5)
-                tool = ToolSerializer.Import(data={
-                    'file': bytes_to_uploaded_file(res.content, 'file.tool'),
-                    'user_id': self.data.get('user_id'),
-                    'workspace_id': self.data.get('workspace_id'),
-                    'folder_id': str(instance.get('folder_id', self.data.get('workspace_id'))),
-                }).import_(name=instance.get('name'), source='template')
+                tool = ToolSerializer.Import(
+                    data={
+                        "file": bytes_to_uploaded_file(res.content, "file.tool"),
+                        "user_id": self.data.get("user_id"),
+                        "workspace_id": self.data.get("workspace_id"),
+                        "folder_id": str(instance.get("folder_id", self.data.get("workspace_id"))),
+                    }
+                ).import_(name=instance.get("name"), source="template")
 
                 try:
-                    requests.get(template_instance.get('downloadCallbackUrl'), timeout=5)
+                    requests.get(template_instance.get("downloadCallbackUrl"), timeout=5)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
                 return tool
@@ -440,30 +499,32 @@ class ToolSerializer(serializers.Serializer):
             tool_id = uuid.uuid7()
             Tool(
                 id=tool_id,
-                name=instance.get('name'),
-                desc=instance.get('desc'),
-                code=instance.get('code'),
-                user_id=self.data.get('user_id'),
-                workspace_id=self.data.get('workspace_id'),
-                input_field_list=instance.get('input_field_list', []),
-                init_field_list=instance.get('init_field_list', []),
-                scope=instance.get('scope', ToolScope.WORKSPACE),
-                tool_type=instance.get('tool_type', ToolType.CUSTOM),
-                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
-                is_active=False
+                name=instance.get("name"),
+                desc=instance.get("desc"),
+                code=instance.get("code"),
+                user_id=self.data.get("user_id"),
+                workspace_id=self.data.get("workspace_id"),
+                input_field_list=instance.get("input_field_list", []),
+                init_field_list=instance.get("init_field_list", []),
+                scope=instance.get("scope", ToolScope.WORKSPACE),
+                tool_type=instance.get("tool_type", ToolType.CUSTOM),
+                folder_id=instance.get("folder_id", self.data.get("workspace_id")),
+                is_active=False,
             ).save()
 
             # 自动授权给创建者
-            UserResourcePermissionSerializer(data={
-                'workspace_id': self.data.get('workspace_id'),
-                'user_id': self.data.get('user_id'),
-                'auth_target_type': AuthTargetType.TOOL.value
-            }).auth_resource(str(tool_id))
-            if instance.get('tool_type') == ToolType.WORKFLOW:
-                ToolWorkflow(id=uuid.uuid7(), tool_id=tool_id, work_flow=instance.get('work_flow', {})).save()
+            UserResourcePermissionSerializer(
+                data={
+                    "workspace_id": self.data.get("workspace_id"),
+                    "user_id": self.data.get("user_id"),
+                    "auth_target_type": AuthTargetType.TOOL.value,
+                }
+            ).auth_resource(str(tool_id))
+            if instance.get("tool_type") == ToolType.WORKFLOW:
+                ToolWorkflow(id=uuid.uuid7(), tool_id=tool_id, work_flow=instance.get("work_flow", {})).save()
             # 如果是SKILL类型的工具，修改file表中对应的记录
-            if instance.get('tool_type') == ToolType.SKILL:
-                file_id = instance.get('code')
+            if instance.get("tool_type") == ToolType.SKILL:
+                file_id = instance.get("code")
                 old_file = QuerySet(File).filter(id=file_id).first()
                 if old_file:
                     # 创建新的文件副本,不复制实际文件内容
@@ -480,40 +541,44 @@ class ToolSerializer(serializers.Serializer):
                     new_file.save(old_file.get_bytes())
                     # 更新工具的code为新的文件id
                     QuerySet(Tool).filter(id=tool_id).update(code=str(new_file_id))
-            return ToolSerializer.Operate(data={
-                'id': tool_id, 'workspace_id': self.data.get('workspace_id')
-            }).one()
+            return ToolSerializer.Operate(data={"id": tool_id, "workspace_id": self.data.get("workspace_id")}).one()
 
     class TestConnection(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-        code = serializers.CharField(required=True, label=_('tool content'))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        code = serializers.CharField(required=True, label=_("tool content"))
 
         def test_connection(self):
             self.is_valid(raise_exception=True)
             # 校验代码是否包括禁止的关键字
-            ToolExecutor().validate_mcp_transport(self.data.get('code', ''))
+            ToolExecutor().validate_mcp_transport(self.data.get("code", ""))
 
             # 校验mcp json
-            validate_mcp_config(json.loads(self.data.get('code')))
+            validate_mcp_config(json.loads(self.data.get("code")))
             return True
 
     class Debug(serializers.Serializer):
-        user_id = serializers.UUIDField(required=True, label=_('user id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        user_id = serializers.UUIDField(required=True, label=_("user id"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
         def debug(self, debug_instance):
             self.is_valid(raise_exception=True)
             ToolDebugRequest(data=debug_instance).is_valid(raise_exception=True)
-            input_field_list = debug_instance.get('input_field_list')
-            code = debug_instance.get('code')
-            debug_field_list = debug_instance.get('debug_field_list')
-            init_params = debug_instance.get('init_params')
-            params = {field.get('name'): self.convert_value(field.get('name'), field.get('value'), field.get('type'),
-                                                            field.get('is_required'))
-                      for field in
-                      [{'value': self.get_field_value(debug_field_list, field.get('name'), field.get('is_required')),
-                        **field} for field in
-                       input_field_list]}
+            input_field_list = debug_instance.get("input_field_list")
+            code = debug_instance.get("code")
+            debug_field_list = debug_instance.get("debug_field_list")
+            init_params = debug_instance.get("init_params")
+            params = {
+                field.get("name"): self.convert_value(
+                    field.get("name"), field.get("value"), field.get("type"), field.get("is_required")
+                )
+                for field in [
+                    {
+                        "value": self.get_field_value(debug_field_list, field.get("name"), field.get("is_required")),
+                        **field,
+                    }
+                    for field in input_field_list
+                ]
+            }
             # 合并初始化参数
             if init_params is not None:
                 all_params = init_params | params
@@ -523,11 +588,11 @@ class ToolSerializer(serializers.Serializer):
 
         @staticmethod
         def get_field_value(debug_field_list, name, is_required):
-            result = [field for field in debug_field_list if field.get('name') == name]
+            result = [field for field in debug_field_list if field.get("name") == name]
             if len(result) > 0:
-                return result[-1].get('value')
+                return result[-1].get("value")
             if is_required:
-                raise AppApiException(500, f"{name}" + _('field has no value set'))
+                raise AppApiException(500, f"{name}" + _("field has no value set"))
             return None
 
         @staticmethod
@@ -537,34 +602,37 @@ class ToolSerializer(serializers.Serializer):
             try:
                 return common_convert_value(_type, value)
             except Exception as e:
-                raise AppApiException(500, _('Field: {name} Type: {type} Value: {value} Type conversion error').format(
-                    name=name, type=_type, value=value
-                ))
+                raise AppApiException(
+                    500,
+                    _("Field: {name} Type: {type} Value: {value} Type conversion error").format(
+                        name=name, type=_type, value=value
+                    ),
+                )
 
     class Operate(serializers.Serializer):
-        id = serializers.UUIDField(required=True, label=_('tool id'))
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+        id = serializers.UUIDField(required=True, label=_("tool id"))
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
         def is_one_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Tool).filter(id=self.data.get("id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                get_authorized_tool = DatabaseModelManage.get_model('get_authorized_tool')
+                get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
                 if get_authorized_tool:
-                    if not get_authorized_tool(QuerySet(Tool).filter(id=self.data.get('id')), workspace_id).exists():
-                        raise AppApiException(500, _('Tool id does not exist'))
+                    if not get_authorized_tool(QuerySet(Tool).filter(id=self.data.get("id")), workspace_id).exists():
+                        raise AppApiException(500, _("Tool id does not exist"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Tool).filter(id=self.data.get("id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _('Tool id does not exist'))
+                raise AppApiException(500, _("Tool id does not exist"))
 
         @transaction.atomic
         def edit(self, instance, with_valid=True):
@@ -572,43 +640,56 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 ToolEditRequest(data=instance).is_valid(raise_exception=True)
                 # 校验代码是否包括禁止的关键字
-                if instance.get('tool_type') == ToolType.MCP:
-                    ToolExecutor().validate_mcp_transport(instance.get('code', ''))
+                if instance.get("tool_type") == ToolType.MCP:
+                    ToolExecutor().validate_mcp_transport(instance.get("code", ""))
 
-            if not QuerySet(Tool).filter(id=self.data.get('id')).exists():
-                raise serializers.ValidationError(_('Tool not found'))
+            if not QuerySet(Tool).filter(id=self.data.get("id")).exists():
+                raise serializers.ValidationError(_("Tool not found"))
 
-            edit_field_list = ['name', 'desc', 'code', 'icon', 'input_field_list', 'init_field_list', 'init_params',
-                               'is_active', 'folder_id']
-            edit_dict = {field: instance.get(field) for field in edit_field_list if (
-                    field in instance and instance.get(field) is not None)}
+            edit_field_list = [
+                "name",
+                "desc",
+                "code",
+                "icon",
+                "input_field_list",
+                "init_field_list",
+                "init_params",
+                "is_active",
+                "folder_id",
+            ]
+            edit_dict = {
+                field: instance.get(field)
+                for field in edit_field_list
+                if (field in instance and instance.get(field) is not None)
+            }
 
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
-            if 'init_params' in edit_dict:
-                if edit_dict['init_field_list'] is not None:
+            tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
+            if "init_params" in edit_dict:
+                if edit_dict["init_field_list"] is not None:
                     rm_key = []
-                    for key in edit_dict['init_params']:
-                        if key not in [field['field'] for field in edit_dict['init_field_list']]:
+                    for key in edit_dict["init_params"]:
+                        if key not in [field["field"] for field in edit_dict["init_field_list"]]:
                             rm_key.append(key)
                     for key in rm_key:
-                        edit_dict['init_params'].pop(key)
+                        edit_dict["init_params"].pop(key)
                 if tool.init_params:
                     old_init_params = json.loads(rsa_long_decrypt(tool.init_params))
-                    for key in edit_dict['init_params']:
-                        if key in old_init_params and edit_dict['init_params'][key] == encryption(old_init_params[key]):
-                            edit_dict['init_params'][key] = old_init_params[key]
-                edit_dict['init_params'] = rsa_long_encrypt(json.dumps(edit_dict['init_params']))
+                    for key in edit_dict["init_params"]:
+                        if key in old_init_params and edit_dict["init_params"][key] == encryption(old_init_params[key]):
+                            edit_dict["init_params"][key] = old_init_params[key]
+                edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
-            edit_dict['update_time'] = timezone.now()
-            QuerySet(Tool).filter(id=self.data.get('id')).update(**edit_dict)
-            if 'is_active' in instance:
-                QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get('id')).update(
-                    is_active=instance.get('is_active'))
+            edit_dict["update_time"] = timezone.now()
+            QuerySet(Tool).filter(id=self.data.get("id")).update(**edit_dict)
+            if "is_active" in instance:
+                QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).update(
+                    is_active=instance.get("is_active")
+                )
 
             # 如果是SKILL类型的工具，修改file表中对应的记录
-            if instance.get('tool_type') == ToolType.SKILL:
+            if instance.get("tool_type") == ToolType.SKILL:
                 old_file_id = tool.code
-                file_id = instance.get('code')
+                file_id = instance.get("code")
                 if old_file_id != file_id:
                     QuerySet(File).filter(id=old_file_id).delete()
                     QuerySet(File).filter(id=file_id).update(source_id=tool.id, source_type=FileSourceType.TOOL)
@@ -621,79 +702,90 @@ class ToolSerializer(serializers.Serializer):
             from trigger.serializers.trigger import TriggerModelSerializer
 
             self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
-            if tool.template_id is None and tool.icon != '':
-                QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
+            tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
+            if tool.template_id is None and tool.icon != "":
+                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
-            QuerySet(Tool).filter(id=self.data.get('id')).delete()
-            ResourceMapping.objects.filter(
-                Q(target_id=self.data.get('id')) | Q(source_id=self.data.get('id'))).delete()
-            QuerySet(ToolRecord).filter(tool_id=self.data.get('id')).delete()
+            QuerySet(Tool).filter(id=self.data.get("id")).delete()
+            ResourceMapping.objects.filter(Q(target_id=self.data.get("id")) | Q(source_id=self.data.get("id"))).delete()
+            QuerySet(ToolRecord).filter(tool_id=self.data.get("id")).delete()
             trigger_ids = list(
-                QuerySet(TriggerTask).filter(
-                    source_type="TOOL", source_id=self.data.get('id')
-                ).values('trigger_id').distinct()
+                QuerySet(TriggerTask)
+                .filter(source_type="TOOL", source_id=self.data.get("id"))
+                .values("trigger_id")
+                .distinct()
             )
-            QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get('id')).delete()
+            QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).delete()
             for trigger_id in trigger_ids:
-                trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
+                trigger = Trigger.objects.filter(id=trigger_id["trigger_id"]).first()
                 if trigger and trigger.is_active:
                     deploy(TriggerModelSerializer(trigger).data, **{})
 
         def one(self):
             self.is_one_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).select_related('user').first()
+            tool = QuerySet(Tool).filter(id=self.data.get("id")).select_related("user").first()
             nick_name = tool.user.nick_name if tool and tool.user else None
             if tool.init_params:
                 tool.init_params = json.loads(rsa_long_decrypt(tool.init_params))
             if tool.init_field_list:
-                password_fields = [i["field"] for i in tool.init_field_list if
-                                   i.get("input_type") == "PasswordInput"]
+                password_fields = [i["field"] for i in tool.init_field_list if i.get("input_type") == "PasswordInput"]
                 if tool.init_params:
                     for k in tool.init_params:
                         if k in password_fields and tool.init_params[k]:
                             tool.init_params[k] = encryption(tool.init_params[k])
-            if tool.tool_type == 'SKILL':
+            if tool.tool_type == "SKILL":
                 skill_file = QuerySet(File).filter(id=tool.code).first()
-                skill_file_dict = {
-                    'id': str(skill_file.id),
-                    'name': skill_file.file_name,
-                    'size': skill_file.file_size,
-                } if skill_file else None
+                skill_file_dict = (
+                    {
+                        "id": str(skill_file.id),
+                        "name": skill_file.file_name,
+                        "size": skill_file.file_size,
+                    }
+                    if skill_file
+                    else None
+                )
             work_flow = {}
             is_publish = False
-            if tool.tool_type == 'WORKFLOW':
+            if tool.tool_type == "WORKFLOW":
                 tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=tool.id).first()
                 if tool_workflow:
                     work_flow = tool_workflow.work_flow
                     is_publish = tool_workflow.is_publish
             return {
                 **ToolModelSerializer(tool).data,
-                'init_params': tool.init_params if tool.init_params else {},
-                'nick_name': nick_name,
-                'fileList': [skill_file_dict] if tool.tool_type == 'SKILL' else [],
-                'work_flow': work_flow,
-                'is_publish': is_publish
+                "init_params": tool.init_params if tool.init_params else {},
+                "nick_name": nick_name,
+                "fileList": [skill_file_dict] if tool.tool_type == "SKILL" else [],
+                "work_flow": work_flow,
+                "is_publish": is_publish,
             }
 
         def get_child_tool_list(self, work_flow, response):
             from application.flow.tools import get_tool_id_list
+
             tool_id_list = get_tool_id_list(work_flow, False)
-            tool_id_list = [tool_id for tool_id in tool_id_list if
-                            len([r for r in response if r.get('id') == tool_id]) == 0]
+            tool_id_list = [
+                tool_id for tool_id in tool_id_list if len([r for r in response if r.get("id") == tool_id]) == 0
+            ]
             tool_list = []
             if len(tool_id_list) > 0:
                 tool_list = QuerySet(Tool).filter(id__in=tool_id_list).exclude(scope=ToolScope.SHARED)
                 work_flow_tools = [tool for tool in tool_list if tool.tool_type == ToolType.WORKFLOW]
                 if len(work_flow_tools) > 0:
-                    work_flow_tool_dict = {tw.tool_id: tw for tw in
-                                           QuerySet(ToolWorkflow).filter(tool_id__in=[t.id for t in work_flow_tools])}
+                    work_flow_tool_dict = {
+                        tw.tool_id: tw
+                        for tw in QuerySet(ToolWorkflow).filter(tool_id__in=[t.id for t in work_flow_tools])
+                    }
                     for tool in tool_list:
                         if tool.tool_type == ToolType.WORKFLOW:
-                            response.append({**ToolExportModelSerializer(tool).data,
-                                             'work_flow': work_flow_tool_dict.get(tool.id).work_flow})
+                            response.append(
+                                {
+                                    **ToolExportModelSerializer(tool).data,
+                                    "work_flow": work_flow_tool_dict.get(tool.id).work_flow,
+                                }
+                            )
                             self.get_child_tool_list(work_flow_tool_dict.get(tool.id).work_flow, response)
                         else:
                             response.append(ToolExportModelSerializer(tool).data)
@@ -704,7 +796,7 @@ class ToolSerializer(serializers.Serializer):
                 for tool in skill_tools:
                     skill_file = QuerySet(File).filter(id=tool.code).first()
                     if skill_file:
-                        tool.code = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
+                        tool.code = base64.b64encode(skill_file.get_bytes()).decode("utf-8")
                         response.append(ToolExportModelSerializer(tool).data)
 
             return response
@@ -712,53 +804,52 @@ class ToolSerializer(serializers.Serializer):
         def export(self):
             try:
                 self.is_valid()
-                id = self.data.get('id')
+                id = self.data.get("id")
                 tool = QuerySet(Tool).filter(id=id).first()
                 tool_dict = ToolExportModelSerializer(tool).data
                 # 如果是SKILL类型的工具，校验文件是否存在
                 if tool.tool_type == ToolType.SKILL:
                     skill_file = QuerySet(File).filter(id=tool.code).first()
                     if skill_file:
-                        tool_dict['code'] = base64.b64encode(skill_file.get_bytes()).decode('utf-8')
+                        tool_dict["code"] = base64.b64encode(skill_file.get_bytes()).decode("utf-8")
                 if tool.tool_type == ToolType.WORKFLOW:
                     workflow = QuerySet(ToolWorkflow).filter(tool_id=tool.id).first()
                     if workflow:
-                        tool_dict['work_flow'] = workflow.work_flow
-                        tool_dict['tool_list'] = self.get_child_tool_list(workflow.work_flow, [])
-                mk_instance = ToolInstance(tool_dict, 'v2')
+                        tool_dict["work_flow"] = workflow.work_flow
+                        tool_dict["tool_list"] = self.get_child_tool_list(workflow.work_flow, [])
+                mk_instance = ToolInstance(tool_dict, "v2")
                 tool_pickle = pickle.dumps(mk_instance)
-                response = HttpResponse(content_type='text/plain', content=tool_pickle)
-                response['Content-Disposition'] = f'attachment; filename="{tool.name}.tool"'
+                response = HttpResponse(content_type="text/plain", content=tool_pickle)
+                response["Content-Disposition"] = f'attachment; filename="{tool.name}.tool"'
                 return response
             except Exception as e:
                 return result.error(str(e), response_status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     class Pylint(serializers.Serializer):
-
         def run(self, instance, is_valid=True):
             if is_valid:
                 self.is_valid(raise_exception=True)
                 PylintInstance(data=instance).is_valid(raise_exception=True)
 
-            code = instance.get('code') or ''
+            code = instance.get("code") or ""
             file_name = get_file_name()
-            if not file_name.endswith('.py'):
-                file_name = file_name + '.py'
+            if not file_name.endswith(".py"):
+                file_name = file_name + ".py"
 
             try:
-                with open(file_name, 'w', encoding='utf-8') as file:
+                with open(file_name, "w", encoding="utf-8") as file:
                     file.write(code)
                 result = subprocess.run(
                     [
                         sys.executable,
-                        '-m',
-                        'ruff',
-                        'check',
+                        "-m",
+                        "ruff",
+                        "check",
                         file_name,
-                        '--output-format=json',
-                        '--ignore=E501',
-                        '--extend-select=PL',
-                        '--no-cache',
+                        "--output-format=json",
+                        "--ignore=E501",
+                        "--extend-select=PL",
+                        "--no-cache",
                     ],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
@@ -776,36 +867,28 @@ class ToolSerializer(serializers.Serializer):
                 base_name = os.path.basename(file_name)
                 return [
                     {
-                        'type': 'error' if (
-                                item.get('code') == 'E999'
-                                or str(item.get('code') or '').startswith('E9')
-                                or item.get('code') in ['F821', 'F822', 'F823']
-                        ) else 'warning',
-                        'module': '',
-                        'obj': '',
-                        'line': item.get('location', {}).get('row', 1),
-
+                        "type": "error"
+                        if (
+                            item.get("code") == "E999"
+                            or str(item.get("code") or "").startswith("E9")
+                            or item.get("code") in ["F821", "F822", "F823"]
+                        )
+                        else "warning",
+                        "module": "",
+                        "obj": "",
+                        "line": item.get("location", {}).get("row", 1),
                         # Ruff column 是 1-based，前端 CodeMirror 用 0-based
-                        'column': max(item.get('location', {}).get('column', 1) - 1, 0),
-
-                        'endLine': item.get('end_location', {}).get(
-                            'row',
-                            item.get('location', {}).get('row', 1)
+                        "column": max(item.get("location", {}).get("column", 1) - 1, 0),
+                        "endLine": item.get("end_location", {}).get("row", item.get("location", {}).get("row", 1)),
+                        "endColumn": max(
+                            item.get("end_location", {}).get("column", item.get("location", {}).get("column", 1) + 1)
+                            - 1,
+                            0,
                         ),
-                        'endColumn': max(
-                            item.get('end_location', {}).get(
-                                'column',
-                                item.get('location', {}).get('column', 1) + 1
-                            ) - 1,
-                            0
-                        ),
-
-                        'path': base_name,
-                        'symbol': item.get('code') or '',
-                        'message': (
-                            f"{item.get('code')}: {item.get('message')}"
-                            if item.get('code')
-                            else item.get('message')
+                        "path": base_name,
+                        "symbol": item.get("code") or "",
+                        "message": (
+                            f"{item.get('code')}: {item.get('message')}" if item.get("code") else item.get("message")
                         ),
                     }
                     for item in messages
@@ -823,41 +906,44 @@ class ToolSerializer(serializers.Serializer):
 
         @staticmethod
         def to_tool_workflow(work_flow, update_tool_map):
-            for node in work_flow.get('nodes', []):
+            for node in work_flow.get("nodes", []):
                 hand_node(node, update_tool_map)
-                if node.get('type') == 'loop-node':
-                    for n in node.get('properties', {}).get('node_data', {}).get('loop_body', {}).get('nodes', []):
+                if node.get("type") == "loop-node":
+                    for n in node.get("properties", {}).get("node_data", {}).get("loop_body", {}).get("nodes", []):
                         hand_node(n, update_tool_map)
             return work_flow
 
         @staticmethod
         def to_tool(tool, workspace_id, user_id, folder_id):
             # 如果是技能类型的工具，需要将code保存为文件
-            code = tool.get('code')
-            if tool.get('tool_type') == ToolType.SKILL:
+            code = tool.get("code")
+            if tool.get("tool_type") == ToolType.SKILL:
                 skill_file_id = uuid.uuid7()
                 skill_file = File(
                     id=skill_file_id,
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
-                    source_id=tool.get('id'),
-                    meta={}
+                    source_id=tool.get("id"),
+                    meta={},
                 )
                 skill_file.save(base64.b64decode(code))
-                tool['code'] = skill_file_id
-            return Tool(id=tool.get('id'),
-                        user_id=user_id,
-                        name=tool.get('name'),
-                        code=tool.get('code'),
-                        template_id=tool.get('template_id'),
-                        input_field_list=tool.get('input_field_list'),
-                        init_field_list=tool.get('init_field_list'),
-                        is_active=False if (len((tool.get('init_field_list') or [])) > 0 or tool.get(
-                            'tool_type') == ToolType.WORKFLOW) else tool.get('is_active'),
-                        tool_type=tool.get('tool_type', 'CUSTOM') or 'CUSTOM',
-                        scope=ToolScope.SHARED if workspace_id == 'None' else ToolScope.WORKSPACE,
-                        folder_id=folder_id if folder_id else 'default' if workspace_id == 'None' else workspace_id,
-                        workspace_id=workspace_id)
+                tool["code"] = skill_file_id
+            return Tool(
+                id=tool.get("id"),
+                user_id=user_id,
+                name=tool.get("name"),
+                code=tool.get("code"),
+                template_id=tool.get("template_id"),
+                input_field_list=tool.get("input_field_list"),
+                init_field_list=tool.get("init_field_list"),
+                is_active=False
+                if (len((tool.get("init_field_list") or [])) > 0 or tool.get("tool_type") == ToolType.WORKFLOW)
+                else tool.get("is_active"),
+                tool_type=tool.get("tool_type", "CUSTOM") or "CUSTOM",
+                scope=ToolScope.SHARED if workspace_id == "None" else ToolScope.WORKSPACE,
+                folder_id=folder_id if folder_id else "default" if workspace_id == "None" else workspace_id,
+                workspace_id=workspace_id,
+            )
 
         def import_workflow_tools(self, tool, workspace_id, user_id, folder_id, new_child_policy):
             """
@@ -875,152 +961,183 @@ class ToolSerializer(serializers.Serializer):
             if new_child_policy == 0:
                 tool_list = []
             else:
-                tool_list = tool.get('tool_list') or []
+                tool_list = tool.get("tool_list") or []
 
-            tool_list = {tool.get('id'): tool for tool in tool_list}.values()
+            tool_list = {tool.get("id"): tool for tool in tool_list}.values()
             update_tool_map = {}
             if len(tool_list) > 0:
                 new_uuid = NewUUID()
-                tool_id_list = reduce(lambda x, y: [*x, *y],
-                                      [[tool.get('id'), new_uuid.generate_uuid(
-                                          tool.get('id')) if new_child_policy == 2 else generate_uuid(
-                                          (tool.get('id') + workspace_id or ''))]
-                                       for tool
-                                       in
-                                       tool_list], [])
+                tool_id_list = reduce(
+                    lambda x, y: [*x, *y],
+                    [
+                        [
+                            tool.get("id"),
+                            new_uuid.generate_uuid(tool.get("id"))
+                            if new_child_policy == 2
+                            else generate_uuid((tool.get("id") + workspace_id or "")),
+                        ]
+                        for tool in tool_list
+                    ],
+                    [],
+                )
                 # 存在的工具列表
-                exits_tool_id_list = [str(tool.id) for tool in
-                                      QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)]
+                exits_tool_id_list = [
+                    str(tool.id) for tool in QuerySet(Tool).filter(id__in=tool_id_list, workspace_id=workspace_id)
+                ]
                 # 需要更新的工具集合
-                update_tool_map = {tool.get('id'): new_uuid.generate_uuid(
-                    tool.get('id')) if new_child_policy == 2 else generate_uuid(
-                    (tool.get('id') + workspace_id or '')) for tool
-                                   in
-                                   tool_list if
-                                   not exits_tool_id_list.__contains__(
-                                       tool.get('id'))}
+                update_tool_map = {
+                    tool.get("id"): new_uuid.generate_uuid(tool.get("id"))
+                    if new_child_policy == 2
+                    else generate_uuid((tool.get("id") + workspace_id or ""))
+                    for tool in tool_list
+                    if not exits_tool_id_list.__contains__(tool.get("id"))
+                }
 
-                tool_list = [{**tool, 'id': update_tool_map.get(tool.get('id'))} for tool in tool_list if
-                             not exits_tool_id_list.__contains__(
-                                 tool.get('id')) and not exits_tool_id_list.__contains__(
-                                 new_uuid.generate_uuid(
-                                     tool.get('id')) if new_child_policy == 2 else generate_uuid(
-                                     (tool.get('id') + workspace_id or '')))]
+                tool_list = [
+                    {**tool, "id": update_tool_map.get(tool.get("id"))}
+                    for tool in tool_list
+                    if not exits_tool_id_list.__contains__(tool.get("id"))
+                    and not exits_tool_id_list.__contains__(
+                        new_uuid.generate_uuid(tool.get("id"))
+                        if new_child_policy == 2
+                        else generate_uuid((tool.get("id") + workspace_id or ""))
+                    )
+                ]
 
             work_flow = self.to_tool_workflow(
-                tool.get('work_flow'),
+                tool.get("work_flow"),
                 update_tool_map,
             )
-            QuerySet(ToolWorkflow).update_or_create(tool_id=tool.get('id'),
-                                                    create_defaults={'id': uuid.uuid7(),
-                                                                     'tool_id': tool.get('id'),
-                                                                     "workspace_id": workspace_id,
-                                                                     'work_flow': work_flow, },
-                                                    defaults={
-                                                        'tool_id': tool.get('id'),
-                                                        'workspace_id': workspace_id,
-                                                        'work_flow': work_flow
-                                                    })
+            QuerySet(ToolWorkflow).update_or_create(
+                tool_id=tool.get("id"),
+                create_defaults={
+                    "id": uuid.uuid7(),
+                    "tool_id": tool.get("id"),
+                    "workspace_id": workspace_id,
+                    "work_flow": work_flow,
+                },
+                defaults={"tool_id": tool.get("id"), "workspace_id": workspace_id, "work_flow": work_flow},
+            )
             tool_model_list = [self.to_tool(tool, workspace_id, user_id, folder_id) for tool in tool_list]
-            workflow_tool_model_list = [{'tool_id': t.get('id'), 'workflow': self.to_tool_workflow(
-                t.get('work_flow'),
-                update_tool_map,
-            )} for t in tool_list if t.get('tool_type') == ToolType.WORKFLOW]
+            workflow_tool_model_list = [
+                {
+                    "tool_id": t.get("id"),
+                    "workflow": self.to_tool_workflow(
+                        t.get("work_flow"),
+                        update_tool_map,
+                    ),
+                }
+                for t in tool_list
+                if t.get("tool_type") == ToolType.WORKFLOW
+            ]
 
             existing_records = QuerySet(ToolWorkflow).filter(
-                tool_id__in=[wt.get('tool_id') for wt in workflow_tool_model_list],
-                workspace_id=workspace_id)
+                tool_id__in=[wt.get("tool_id") for wt in workflow_tool_model_list], workspace_id=workspace_id
+            )
 
-            existing_map = {
-                record.tool_id: record
-                for record in existing_records
-            }
+            existing_map = {record.tool_id: record for record in existing_records}
 
             QuerySet(ToolWorkflow).bulk_create(
-                [ToolWorkflow(work_flow=wt.get('workflow'), workspace_id=workspace_id,
-                              tool_id=wt.get('tool_id')) for wt in
-                 workflow_tool_model_list if wt.get('tool_id') not in existing_map])
+                [
+                    ToolWorkflow(work_flow=wt.get("workflow"), workspace_id=workspace_id, tool_id=wt.get("tool_id"))
+                    for wt in workflow_tool_model_list
+                    if wt.get("tool_id") not in existing_map
+                ]
+            )
 
             if len(tool_model_list) > 0:
                 QuerySet(Tool).bulk_create(tool_model_list)
-                UserResourcePermissionSerializer(data={
-                    'workspace_id': self.data.get('workspace_id'),
-                    'user_id': self.data.get('user_id'),
-                    'auth_target_type': AuthTargetType.TOOL.value
-                }).auth_resource_batch([t.id for t in tool_model_list])
+                UserResourcePermissionSerializer(
+                    data={
+                        "workspace_id": self.data.get("workspace_id"),
+                        "user_id": self.data.get("user_id"),
+                        "auth_target_type": AuthTargetType.TOOL.value,
+                    }
+                ).auth_resource_batch([t.id for t in tool_model_list])
 
         def update_template_workflow(self, tool_id: str):
             self.is_valid(raise_exception=True)
-            tool_instance_bytes = self.data.get('file').read()
+            tool_instance_bytes = self.data.get("file").read()
             try:
                 tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
             tool = tool_instance.tool
-            tool['id'] = tool_id
-            folder_id = self.data.get('folder_id')
-            self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'),
-                                       user_id=self.data.get('user_id'),
-                                       folder_id=folder_id, new_child_policy=2)
+            tool["id"] = tool_id
+            folder_id = self.data.get("folder_id")
+            self.import_workflow_tools(
+                tool,
+                workspace_id=self.data.get("workspace_id"),
+                user_id=self.data.get("user_id"),
+                folder_id=folder_id,
+                new_child_policy=2,
+            )
             return True
 
         @transaction.atomic
         def import_(self, scope=ToolScope.WORKSPACE, name=None, source=None):
             self.is_valid()
 
-            user_id = self.data.get('user_id')
-            tool_instance_bytes = self.data.get('file').read()
+            user_id = self.data.get("user_id")
+            tool_instance_bytes = self.data.get("file").read()
             try:
                 tool_instance = RestrictedUnpickler(io.BytesIO(tool_instance_bytes)).load()
             except Exception as e:
                 raise AppApiException(1001, _("Unsupported file format"))
-            if self.data.get('folder_id') is None:
-                folder_id = self.data.get('workspace_id')
+            if self.data.get("folder_id") is None:
+                folder_id = self.data.get("workspace_id")
             else:
-                folder_id = self.data.get('folder_id')
+                folder_id = self.data.get("folder_id")
             tool = tool_instance.tool
             tool_id = uuid.uuid7()
-            code = tool.get('code')
-            if tool.get('tool_type') == ToolType.SKILL:
+            code = tool.get("code")
+            if tool.get("tool_type") == ToolType.SKILL:
                 skill_file_id = uuid.uuid7()
                 skill_file = File(
                     id=skill_file_id,
                     file_name=f"{tool.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={}
+                    meta={},
                 )
                 skill_file.save(base64.b64decode(code))
                 code = skill_file_id
             tool_model = Tool(
                 id=tool_id,
-                name=name or tool.get('name'),
-                desc=tool.get('desc'),
+                name=name or tool.get("name"),
+                desc=tool.get("desc"),
                 code=code,
                 user_id=user_id,
-                workspace_id=self.data.get('workspace_id'),
-                input_field_list=tool.get('input_field_list'),
-                init_field_list=tool.get('init_field_list', []),
-                tool_type=tool.get('tool_type'),
+                workspace_id=self.data.get("workspace_id"),
+                input_field_list=tool.get("input_field_list"),
+                init_field_list=tool.get("init_field_list", []),
+                tool_type=tool.get("tool_type"),
                 folder_id=folder_id,
                 scope=scope,
-                is_active=False
+                is_active=False,
             )
+            # 校验代码是否包括禁止的关键字
+            ToolExecutor().validate_mcp_transport(code)
             tool_model.save()
-            if tool.get('tool_type') == ToolType.WORKFLOW:
-                tool['id'] = tool_id
-                self.import_workflow_tools(tool, workspace_id=self.data.get('workspace_id'), user_id=user_id,
-                                           folder_id=folder_id, new_child_policy=2 if source == 'template' else 1)
+            if tool.get("tool_type") == ToolType.WORKFLOW:
+                tool["id"] = tool_id
+                self.import_workflow_tools(
+                    tool,
+                    workspace_id=self.data.get("workspace_id"),
+                    user_id=user_id,
+                    folder_id=folder_id,
+                    new_child_policy=2 if source == "template" else 1,
+                )
             # 自动授权给创建者
-            UserResourcePermissionSerializer(data={
-                'workspace_id': self.data.get('workspace_id'),
-                'user_id': self.data.get('user_id'),
-                'auth_target_type': AuthTargetType.TOOL.value
-            }).auth_resource(str(tool_id))
+            UserResourcePermissionSerializer(
+                data={
+                    "workspace_id": self.data.get("workspace_id"),
+                    "user_id": self.data.get("user_id"),
+                    "auth_target_type": AuthTargetType.TOOL.value,
+                }
+            ).auth_resource(str(tool_id))
 
-            return ToolSerializer.Operate(data={
-                'id': tool_id, 'workspace_id': self.data.get('workspace_id')
-            }).one()
+            return ToolSerializer.Operate(data={"id": tool_id, "workspace_id": self.data.get("workspace_id")}).one()
 
     class IconOperate(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("function ID"))
@@ -1030,39 +1147,37 @@ class ToolSerializer(serializers.Serializer):
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            workspace_id = self.data.get('workspace_id')
-            query_set = QuerySet(Tool).filter(id=self.data.get('id'))
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Tool).filter(id=self.data.get("id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
-                raise AppApiException(500, _('Tool id does not exist'))
+                raise AppApiException(500, _("Tool id does not exist"))
 
         def edit(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('id')).first()
+            tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
             if tool is None:
-                raise AppApiException(500, _('Function does not exist'))
+                raise AppApiException(500, _("Function does not exist"))
             # 删除旧的图片
-            if tool.icon != '':
-                QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
-            if self.data.get('image') is None:
-                tool.icon = ''
+            if tool.icon != "":
+                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
+            if self.data.get("image") is None:
+                tool.icon = ""
             else:
-                meta = {
-                    'debug': False
-                }
+                meta = {"debug": False}
                 file_id = uuid.uuid7()
                 file = File(
                     id=file_id,
-                    file_name=self.data.get('image').name,
+                    file_name=self.data.get("image").name,
                     source_type=FileSourceType.TOOL,
                     source_id=tool.id,
-                    meta=meta
+                    meta=meta,
                 )
-                file.save(self.data.get('image').read())
+                file.save(self.data.get("image").read())
 
-                tool.icon = f'./oss/file/{file_id}'
+                tool.icon = f"./oss/file/{file_id}"
             tool.save()
 
             return tool.icon
@@ -1075,16 +1190,12 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             query_set = QuerySet(Tool)
 
-            if self.data.get('name', '') != '':
+            if self.data.get("name", "") != "":
                 query_set = query_set.filter(
-                    Q(name__icontains=self.data.get('name')) |
-                    Q(desc__icontains=self.data.get('name'))
+                    Q(name__icontains=self.data.get("name")) | Q(desc__icontains=self.data.get("name"))
                 )
 
-            query_set = query_set.filter(
-                Q(scope=ToolScope.INTERNAL) &
-                Q(is_active=True)
-            )
+            query_set = query_set.filter(Q(scope=ToolScope.INTERNAL) & Q(is_active=True))
             return ToolModelSerializer(query_set, many=True).data
 
     class AddInternalTool(serializers.Serializer):
@@ -1097,36 +1208,38 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
 
-            internal_tool = QuerySet(Tool).filter(id=self.data.get('tool_id')).first()
+            internal_tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             if internal_tool is None:
-                raise AppApiException(500, _('Tool does not exist'))
+                raise AppApiException(500, _("Tool does not exist"))
 
             tool_id = uuid.uuid7()
             tool = Tool(
                 id=tool_id,
-                name=instance.get('name', internal_tool.name),
+                name=instance.get("name", internal_tool.name),
                 desc=internal_tool.desc,
                 code=internal_tool.code,
-                user_id=self.data.get('user_id'),
+                user_id=self.data.get("user_id"),
                 icon=internal_tool.icon,
-                workspace_id=self.data.get('workspace_id'),
+                workspace_id=self.data.get("workspace_id"),
                 input_field_list=internal_tool.input_field_list,
                 init_field_list=internal_tool.init_field_list,
                 scope=ToolScope.WORKSPACE,
                 tool_type=ToolType.CUSTOM,
-                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
+                folder_id=instance.get("folder_id", self.data.get("workspace_id")),
                 template_id=internal_tool.id,
                 label=internal_tool.label,
-                is_active=False
+                is_active=False,
             )
             tool.save()
 
             # 自动授权给创建者
-            UserResourcePermissionSerializer(data={
-                'workspace_id': self.data.get('workspace_id'),
-                'user_id': self.data.get('user_id'),
-                'auth_target_type': AuthTargetType.TOOL.value
-            }).auth_resource(str(tool_id))
+            UserResourcePermissionSerializer(
+                data={
+                    "workspace_id": self.data.get("workspace_id"),
+                    "user_id": self.data.get("user_id"),
+                    "auth_target_type": AuthTargetType.TOOL.value,
+                }
+            ).auth_resource(str(tool_id))
 
             return ToolModelSerializer(tool).data
 
@@ -1138,47 +1251,50 @@ class ToolSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             # 下载zip文件
             try:
-                appstore_url = CONFIG.get('APPSTORE_URL', 'https://apps-assets.fit2cloud.com/stable/maxkb.json.zip')
+                appstore_url = CONFIG.get("APPSTORE_URL", "https://apps-assets.fit2cloud.com/stable/maxkb.json.zip")
                 res = requests.get(appstore_url, timeout=5)
                 res.raise_for_status()
                 # 创建临时文件保存zip
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.zip') as temp_zip:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".zip") as temp_zip:
                     temp_zip.write(res.content)
                     temp_zip_path = temp_zip.name
 
                 try:
                     # 解压zip文件
-                    with zipfile.ZipFile(temp_zip_path, 'r') as zip_ref:
+                    with zipfile.ZipFile(temp_zip_path, "r") as zip_ref:
                         # 获取zip中的第一个文件（假设只有一个json文件）
                         json_filename = zip_ref.namelist()[0]
                         json_content = zip_ref.read(json_filename)
 
                     # 将json转换为字典
-                    tool_store = json.loads(json_content.decode('utf-8'))
-                    tag_dict = {tag['name']: tag['key'] for tag in tool_store['additionalProperties']['tags']}
+                    tool_store = json.loads(json_content.decode("utf-8"))
+                    tag_dict = {tag["name"]: tag["key"] for tag in tool_store["additionalProperties"]["tags"]}
                     filter_apps = []
-                    for tool in tool_store['apps']:
-                        if self.data.get('name', '') != '':
-                            if self.data.get('name').lower() not in tool.get('name', '').lower():
+                    for tool in tool_store["apps"]:
+                        if self.data.get("name", "") != "":
+                            if self.data.get("name").lower() not in tool.get("name", "").lower():
                                 continue
-                        if not tool['downloadUrl'].endswith('.tool'):
+                        if not tool["downloadUrl"].endswith(".tool"):
                             continue
-                        versions = tool.get('versions', [])
-                        tool['label'] = tag_dict[tool.get('tags')[0]] if tool.get('tags') else ''
-                        tool['version'] = next(
-                            (version.get('name') for version in versions if
-                             version.get('downloadUrl') == tool['downloadUrl']),
+                        versions = tool.get("versions", [])
+                        tool["label"] = tag_dict[tool.get("tags")[0]] if tool.get("tags") else ""
+                        tool["version"] = next(
+                            (
+                                version.get("name")
+                                for version in versions
+                                if version.get("downloadUrl") == tool["downloadUrl"]
+                            ),
                         )
                         filter_apps.append(tool)
 
-                    tool_store['apps'] = filter_apps
+                    tool_store["apps"] = filter_apps
                     return tool_store
                 finally:
                     # 清理临时文件
                     os.unlink(temp_zip_path)
             except Exception as e:
                 maxkb_logger.error(f"fetch appstore tools error: {e}")
-                return {'apps': [], 'additionalProperties': {'tags': []}}
+                return {"apps": [], "additionalProperties": {"tags": []}}
 
     class AddStoreTool(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))
@@ -1190,57 +1306,59 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
 
-            versions = instance.get('versions', [])
-            download_url = instance.get('download_url')
-            if not download_url.startswith('https://apps-assets.fit2cloud.com/'):
+            versions = instance.get("versions", [])
+            download_url = instance.get("download_url")
+            if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
                 raise AppApiException(500, _("Illegal download url"))
             # 查找匹配的版本名称
             version_name = next(
-                (version.get('name') for version in versions if version.get('downloadUrl') == download_url),
+                (version.get("name") for version in versions if version.get("downloadUrl") == download_url),
             )
             res = requests.get(download_url, timeout=5)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
             tool_id = uuid.uuid7()
             # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
-            if tool_data.get('tool_type') == ToolType.SKILL:
+            if tool_data.get("tool_type") == ToolType.SKILL:
                 skill_file_id = uuid.uuid7()
                 skill_file = File(
                     id=skill_file_id,
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool_id,
-                    meta={}
+                    meta={},
                 )
-                skill_file.save(base64.b64decode(tool_data.get('code')))
-                tool_data['code'] = skill_file_id
+                skill_file.save(base64.b64decode(tool_data.get("code")))
+                tool_data["code"] = skill_file_id
             tool = Tool(
                 id=tool_id,
-                name=instance.get('name'),
-                desc=tool_data.get('desc'),
-                code=tool_data.get('code'),
-                user_id=self.data.get('user_id'),
-                icon=instance.get('icon', ''),
-                workspace_id=self.data.get('workspace_id'),
-                input_field_list=tool_data.get('input_field_list', []),
-                init_field_list=tool_data.get('init_field_list', []),
+                name=instance.get("name"),
+                desc=tool_data.get("desc"),
+                code=tool_data.get("code"),
+                user_id=self.data.get("user_id"),
+                icon=instance.get("icon", ""),
+                workspace_id=self.data.get("workspace_id"),
+                input_field_list=tool_data.get("input_field_list", []),
+                init_field_list=tool_data.get("init_field_list", []),
                 scope=ToolScope.WORKSPACE,
-                tool_type=tool_data.get('tool_type', ToolType.CUSTOM),
-                folder_id=instance.get('folder_id', self.data.get('workspace_id')),
-                template_id=self.data.get('tool_id'),
-                label=instance.get('label'),
+                tool_type=tool_data.get("tool_type", ToolType.CUSTOM),
+                folder_id=instance.get("folder_id", self.data.get("workspace_id")),
+                template_id=self.data.get("tool_id"),
+                label=instance.get("label"),
                 version=version_name,
-                is_active=False
+                is_active=False,
             )
             tool.save()
 
             # 自动授权给创建者
-            UserResourcePermissionSerializer(data={
-                'workspace_id': self.data.get('workspace_id'),
-                'user_id': self.data.get('user_id'),
-                'auth_target_type': AuthTargetType.TOOL.value
-            }).auth_resource(str(tool_id))
+            UserResourcePermissionSerializer(
+                data={
+                    "workspace_id": self.data.get("workspace_id"),
+                    "user_id": self.data.get("user_id"),
+                    "auth_target_type": AuthTargetType.TOOL.value,
+                }
+            ).auth_resource(str(tool_id))
             try:
-                requests.get(instance.get('download_callback_url'), timeout=5)
+                requests.get(instance.get("download_callback_url"), timeout=5)
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
@@ -1257,135 +1375,147 @@ class ToolSerializer(serializers.Serializer):
         def update_tool(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get('tool_id')).first()
+            tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             if tool is None:
-                raise AppApiException(500, _('Tool does not exist'))
+                raise AppApiException(500, _("Tool does not exist"))
             # 查找匹配的版本名称
             version_name = next(
-                (version.get('name') for version in self.data.get('versions') if
-                 version.get('downloadUrl') == self.data.get('download_url')),
+                (
+                    version.get("name")
+                    for version in self.data.get("versions")
+                    if version.get("downloadUrl") == self.data.get("download_url")
+                ),
             )
-            res = requests.get(self.data.get('download_url'), timeout=5)
+            res = requests.get(self.data.get("download_url"), timeout=5)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
             # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
-            if tool_data.get('tool_type') == ToolType.SKILL:
+            if tool_data.get("tool_type") == ToolType.SKILL:
                 skill_file_id = uuid.uuid7()
                 skill_file = File(
                     id=skill_file_id,
                     file_name=f"{tool_data.get('name')}.zip",
                     source_type=FileSourceType.TOOL,
                     source_id=tool.id,
-                    meta={}
+                    meta={},
                 )
-                skill_file.save(base64.b64decode(tool_data.get('code')))
-                tool_data['code'] = skill_file_id
-            tool.desc = tool_data.get('desc')
-            tool.code = tool_data.get('code')
-            tool.input_field_list = tool_data.get('input_field_list', [])
-            tool.init_field_list = tool_data.get('init_field_list', [])
-            tool.icon = self.data.get('icon', tool.icon)
+                skill_file.save(base64.b64decode(tool_data.get("code")))
+                tool_data["code"] = skill_file_id
+            tool.desc = tool_data.get("desc")
+            tool.code = tool_data.get("code")
+            tool.input_field_list = tool_data.get("input_field_list", [])
+            tool.init_field_list = tool_data.get("init_field_list", [])
+            tool.icon = self.data.get("icon", tool.icon)
             tool.version = version_name
             # tool.is_active = False
             tool.save()
             try:
-                requests.get(self.data.get('download_callback_url'), timeout=5)
+                requests.get(self.data.get("download_callback_url"), timeout=5)
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
 
     class ToolRecord(serializers.Serializer):
-        workspace_id = serializers.CharField(required=False, allow_null=True, label=_('workspace id'))
-        tool_id = serializers.UUIDField(required=True, label=_('tool id'))
-        record_id = serializers.UUIDField(required=False, allow_null=True, label=_('record id'))
-        source_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('source name'))
-        source_type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('source type'))
-        state = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('state'))
+        workspace_id = serializers.CharField(required=False, allow_null=True, label=_("workspace id"))
+        tool_id = serializers.UUIDField(required=True, label=_("tool id"))
+        record_id = serializers.UUIDField(required=False, allow_null=True, label=_("record id"))
+        source_name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("source name"))
+        source_type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("source type"))
+        state = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("state"))
 
         class Operate(serializers.Serializer):
-            id = serializers.UUIDField(required=False, allow_null=True, label=_('record id'))
-            tool_id = serializers.UUIDField(required=True, label=_('tool id'))
-            workspace_id = serializers.CharField(required=False, allow_null=True, label=_('workspace id'))
+            id = serializers.UUIDField(required=False, allow_null=True, label=_("record id"))
+            tool_id = serializers.UUIDField(required=True, label=_("tool id"))
+            workspace_id = serializers.CharField(required=False, allow_null=True, label=_("workspace id"))
 
             def one(self):
                 self.is_valid(raise_exception=True)
-                tool_record = cache.get(Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.data.get('id')),
-                                        version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version())
+                tool_record = cache.get(
+                    Cache_Version.TOOL_WORKFLOW_EXECUTE.get_key(key=self.data.get("id")),
+                    version=Cache_Version.TOOL_WORKFLOW_EXECUTE.get_version(),
+                )
                 if tool_record:
                     return tool_record
-                tool_record = QuerySet(ToolRecord).filter(id=self.data.get('id'), tool_id=self.data.get('tool_id'),
-                                                          workspace_id=self.data.get('workspace_id')).first()
+                tool_record = (
+                    QuerySet(ToolRecord)
+                    .filter(
+                        id=self.data.get("id"),
+                        tool_id=self.data.get("tool_id"),
+                        workspace_id=self.data.get("workspace_id"),
+                    )
+                    .first()
+                )
                 if tool_record:
-                    return {'id': tool_record.id,
-                            'tool_id': tool_record.tool_id,
-                            'workspace_id': tool_record.workspace_id,
-                            'source_type': tool_record.source_type,
-                            'source_id': tool_record.source_id,
-                            'meta': tool_record.meta,
-                            'state': tool_record.state,
-                            'run_time': tool_record.run_time}
-                raise AppApiException(500, _('Tool record does not exist'))
+                    return {
+                        "id": tool_record.id,
+                        "tool_id": tool_record.tool_id,
+                        "workspace_id": tool_record.workspace_id,
+                        "source_type": tool_record.source_type,
+                        "source_id": tool_record.source_id,
+                        "meta": tool_record.meta,
+                        "state": tool_record.state,
+                        "run_time": tool_record.run_time,
+                    }
+                raise AppApiException(500, _("Tool record does not exist"))
 
         def one(self):
             self.is_valid(raise_exception=True)
-            if self.data.get('record_id'):
+            if self.data.get("record_id"):
                 page = self.get_tool_records(1, 1)
-                return page.get('records')[0]
+                return page.get("records")[0]
 
             return None
 
         def get_tool_records(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
-            application_subquery = Application.objects.filter(id=OuterRef('source_id')).values('name')[:1]
-            knowledge_subquery = Knowledge.objects.filter(id=OuterRef('source_id')).values('name')[:1]
-            trigger_subquery = Trigger.objects.filter(id=OuterRef('source_id')).values('name')[:1]
-            trigger_type_subquery = Trigger.objects.filter(id=OuterRef('source_id')).values('trigger_type')[:1]
+            application_subquery = Application.objects.filter(id=OuterRef("source_id")).values("name")[:1]
+            knowledge_subquery = Knowledge.objects.filter(id=OuterRef("source_id")).values("name")[:1]
+            trigger_subquery = Trigger.objects.filter(id=OuterRef("source_id")).values("name")[:1]
+            trigger_type_subquery = Trigger.objects.filter(id=OuterRef("source_id")).values("trigger_type")[:1]
 
             query_set = QuerySet(ToolRecord)
-            query_set = query_set.filter(
-                tool_id=self.data.get('tool_id')
-            ).annotate(
-                source_name=Case(
-                    When(source_type='APPLICATION', then=Subquery(application_subquery)),
-                    When(source_type='KNOWLEDGE', then=Subquery(knowledge_subquery)),
-                    When(source_type='TRIGGER', then=Subquery(trigger_subquery)),
-                    default=Value(''),
-                    output_field=CharField()
+            query_set = (
+                query_set.filter(tool_id=self.data.get("tool_id"))
+                .annotate(
+                    source_name=Case(
+                        When(source_type="APPLICATION", then=Subquery(application_subquery)),
+                        When(source_type="KNOWLEDGE", then=Subquery(knowledge_subquery)),
+                        When(source_type="TRIGGER", then=Subquery(trigger_subquery)),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
                 )
-            ).annotate(
-                trigger_type=Case(
-                    When(source_type='TRIGGER', then=Subquery(trigger_type_subquery)),
-                    default=Value(''),
-                    output_field=CharField()
+                .annotate(
+                    trigger_type=Case(
+                        When(source_type="TRIGGER", then=Subquery(trigger_type_subquery)),
+                        default=Value(""),
+                        output_field=CharField(),
+                    )
                 )
-            ).annotate(
-                tool_name=Subquery(
-                    Tool.objects.filter(id=OuterRef('tool_id')).values('name')[:1]
-                )
-            ).annotate(
-                tool_icon=Subquery(
-                    Tool.objects.filter(id=OuterRef('tool_id')).values('icon')[:1]
-                )
+                .annotate(tool_name=Subquery(Tool.objects.filter(id=OuterRef("tool_id")).values("name")[:1]))
+                .annotate(tool_icon=Subquery(Tool.objects.filter(id=OuterRef("tool_id")).values("icon")[:1]))
             )
-            if self.data.get('source_type'):
-                query_set = query_set.filter(Q(source_type=self.data.get('source_type', '')))
-            if self.data.get('state'):
-                query_set = query_set.filter(Q(state=self.data.get('state', '')))
-            if self.data.get('source_name'):
-                query_set = query_set.filter(Q(tool_name__icontains=self.data.get('source_name', '')))
-            if self.data.get('record_id'):
-                query_set = query_set.filter(Q(id=self.data.get('record_id')))
-            if self.data.get('workspace_id'):
-                query_set = query_set.filter(Q(workspace_id=self.data.get('workspace_id')))
-            query_set = query_set.order_by('-create_time')
+            if self.data.get("source_type"):
+                query_set = query_set.filter(Q(source_type=self.data.get("source_type", "")))
+            if self.data.get("state"):
+                query_set = query_set.filter(Q(state=self.data.get("state", "")))
+            if self.data.get("source_name"):
+                query_set = query_set.filter(Q(tool_name__icontains=self.data.get("source_name", "")))
+            if self.data.get("record_id"):
+                query_set = query_set.filter(Q(id=self.data.get("record_id")))
+            if self.data.get("workspace_id"):
+                query_set = query_set.filter(Q(workspace_id=self.data.get("workspace_id")))
+            query_set = query_set.order_by("-create_time")
 
             return page_search(
-                current_page, page_size, query_set,
+                current_page,
+                page_size,
+                query_set,
                 lambda record: {
                     **ToolRecordModelSerializer(record).data,
-                    'source_name': record.tool_name,
-                    'tool_icon': record.tool_icon,
-                    'trigger_type': record.trigger_type,
-                }
+                    "source_name": record.tool_name,
+                    "tool_icon": record.tool_icon,
+                    "trigger_type": record.trigger_type,
+                },
             )
 
     class UploadSkillFile(serializers.Serializer):
@@ -1395,16 +1525,12 @@ class ToolSerializer(serializers.Serializer):
 
         def upload(self):
             self.is_valid()
-            file = self.data.get('file')
-            if not file.name.endswith('.zip'):
+            file = self.data.get("file")
+            if not file.name.endswith(".zip"):
                 raise AppApiException(1001, _("Unsupported file format"))
             file_id = uuid.uuid7()
-            file = File(
-                id=file_id,
-                file_name=self.data.get('file').name,
-                meta={}
-            )
-            file.save(self.data.get('file').read())
+            file = File(id=file_id, file_name=self.data.get("file").name, meta={})
+            file.save(self.data.get("file").read())
             return file_id
 
     class DownloadSkillFile(serializers.Serializer):
@@ -1414,58 +1540,57 @@ class ToolSerializer(serializers.Serializer):
 
         def download(self):
             self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(
-                id=self.data.get('tool_id'), workspace_id=self.data.get('workspace_id'), tool_type=ToolType.SKILL
-            ).first()
+            tool = (
+                QuerySet(Tool)
+                .filter(
+                    id=self.data.get("tool_id"), workspace_id=self.data.get("workspace_id"), tool_type=ToolType.SKILL
+                )
+                .first()
+            )
 
             if tool is None:
-                raise AppApiException(500, _('Tool does not exist'))
+                raise AppApiException(500, _("Tool does not exist"))
             skill_file = QuerySet(File).filter(id=tool.code).first()
             if skill_file is None:
-                raise AppApiException(500, _('Skill file does not exist'))
+                raise AppApiException(500, _("Skill file does not exist"))
 
-            response = HttpResponse(content_type='application/zip', content=skill_file.get_bytes())
-            response['Content-Disposition'] = f'attachment; filename="{skill_file.file_name}"'
+            response = HttpResponse(content_type="application/zip", content=skill_file.get_bytes())
+            response["Content-Disposition"] = f'attachment; filename="{skill_file.file_name}"'
             return response
 
     class GenerateCodeSerializer(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('Workspace ID'))
-        model_id = serializers.UUIDField(required=True, label=_('Model ID'))
-        prompt = serializers.CharField(required=True, label=_('Prompt'))
-        messages = serializers.ListField(required=True, label=_('Messages'))
-        model_params_setting = serializers.DictField(required=False, default=dict, label=_('Model Params Setting'))
-        init_field_list = serializers.ListField(required=False, default=list, label=_('Init Field List'))
-        input_field_list = serializers.ListField(required=False, default=list, label=_('Input Field List'))
+        workspace_id = serializers.CharField(required=True, label=_("Workspace ID"))
+        model_id = serializers.UUIDField(required=True, label=_("Model ID"))
+        prompt = serializers.CharField(required=True, label=_("Prompt"))
+        messages = serializers.ListField(required=True, label=_("Messages"))
+        model_params_setting = serializers.DictField(required=False, default=dict, label=_("Model Params Setting"))
+        init_field_list = serializers.ListField(required=False, default=list, label=_("Init Field List"))
+        input_field_list = serializers.ListField(required=False, default=list, label=_("Input Field List"))
 
         def generate_code(self):
-            from models_provider.tools import get_model_instance_by_model_workspace_id
             from application.flow.tools import to_stream_response_simple
+            from models_provider.tools import get_model_instance_by_model_workspace_id
 
             self.is_valid(raise_exception=True)
 
-            workspace_id = self.data.get('workspace_id')
-            model_id = self.data.get('model_id')
-            prompt = self.data.get('prompt')
-            messages = self.data.get('messages')
-            model_params_setting = self.data.get('model_params_setting')
-            init_field_list = self.data.get('init_field_list')
-            input_field_list = self.data.get('input_field_list')
+            workspace_id = self.data.get("workspace_id")
+            model_id = self.data.get("model_id")
+            prompt = self.data.get("prompt")
+            messages = self.data.get("messages")
+            model_params_setting = self.data.get("model_params_setting")
+            init_field_list = self.data.get("init_field_list")
+            input_field_list = self.data.get("input_field_list")
 
-            message = messages[-1]['content']
-            q = prompt.replace(
-                "{userInput}", message
-            ).replace(
-                "{initFieldList}", json.dumps(init_field_list)
-            ).replace(
-                "{inputFieldList}", json.dumps(input_field_list)
+            message = messages[-1]["content"]
+            q = (
+                prompt.replace("{userInput}", message)
+                .replace("{initFieldList}", json.dumps(init_field_list))
+                .replace("{inputFieldList}", json.dumps(input_field_list))
             )
 
-            messages[-1]['content'] = q
+            messages[-1]["content"] = q
             SUPPORTED_MODEL_TYPES = ["LLM"]
-            model_exist = QuerySet(Model).filter(
-                id=model_id,
-                model_type__in=SUPPORTED_MODEL_TYPES
-            ).exists()
+            model_exist = QuerySet(Model).filter(id=model_id, model_type__in=SUPPORTED_MODEL_TYPES).exists()
             if not model_exist:
                 raise Exception(_("Model does not exists or is not an LLM model"))
 
@@ -1474,25 +1599,26 @@ class ToolSerializer(serializers.Serializer):
                     model_id=model_id, workspace_id=workspace_id, **model_params_setting
                 )
                 try:
-                    for r in model.stream([
-                        # SystemMessage(content=SYSTEM_ROLE),
-                        *[
-                            HumanMessage(
-                                content=m.get('content')
-                            ) if m.get('role') == 'user' else AIMessage(
-                                content=m.get('content')
-                            ) for m in messages
+                    for r in model.stream(
+                        [
+                            # SystemMessage(content=SYSTEM_ROLE),
+                            *[
+                                HumanMessage(content=m.get("content"))
+                                if m.get("role") == "user"
+                                else AIMessage(content=m.get("content"))
+                                for m in messages
+                            ]
                         ]
-                    ]):
-                        yield 'data: ' + json.dumps({'content': r.content}) + '\n\n'
+                    ):
+                        yield "data: " + json.dumps({"content": r.content}) + "\n\n"
                 except Exception as e:
-                    yield 'data: ' + json.dumps({'error': str(e)}) + '\n\n'
+                    yield "data: " + json.dumps({"error": str(e)}) + "\n\n"
 
             return to_stream_response_simple(process())
 
 
 class ToolBatchOperateSerializer(serializers.Serializer):
-    workspace_id = serializers.CharField(required=True, label=_('workspace id'))
+    workspace_id = serializers.CharField(required=True, label=_("workspace id"))
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -1506,14 +1632,14 @@ class ToolBatchOperateSerializer(serializers.Serializer):
         if with_valid:
             BatchSerializer(data=instance).is_valid(model=Tool, raise_exception=True)
             self.is_valid(raise_exception=True)
-        id_list = instance.get('id_list')
-        workspace_id = self.data.get('workspace_id')
+        id_list = instance.get("id_list")
+        workspace_id = self.data.get("workspace_id")
 
         tool_query_set = QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id)
 
         for tool in tool_query_set:
-            if tool.template_id is None and tool.icon != '':
-                QuerySet(File).filter(id=tool.icon.split('/')[-1]).delete()
+            if tool.template_id is None and tool.icon != "":
+                QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
 
@@ -1522,14 +1648,12 @@ class ToolBatchOperateSerializer(serializers.Serializer):
         QuerySet(ToolRecord).filter(tool_id__in=id_list).delete()
 
         trigger_ids = list(
-            QuerySet(TriggerTask).filter(
-                source_type="TOOL", source_id__in=id_list
-            ).values('trigger_id').distinct()
+            QuerySet(TriggerTask).filter(source_type="TOOL", source_id__in=id_list).values("trigger_id").distinct()
         )
 
         QuerySet(TriggerTask).filter(source_type="TOOL", source_id__in=id_list).delete()
         for trigger_id in trigger_ids:
-            trigger = Trigger.objects.filter(id=trigger_id['trigger_id']).first()
+            trigger = Trigger.objects.filter(id=trigger_id["trigger_id"]).first()
             if trigger and trigger.is_active:
                 deploy(TriggerModelSerializer(trigger).data, **{})
 
@@ -1538,12 +1662,13 @@ class ToolBatchOperateSerializer(serializers.Serializer):
 
     def batch_move(self, instance: Dict, with_valid=True):
         from knowledge.serializers.common import BatchMoveSerializer
+
         if with_valid:
             BatchMoveSerializer(data=instance).is_valid(model=Tool, raise_exception=True)
             self.is_valid(raise_exception=True)
-        id_list = instance.get('id_list')
-        folder_id = instance.get('folder_id')
-        workspace_id = self.data.get('workspace_id')
+        id_list = instance.get("id_list")
+        folder_id = instance.get("folder_id")
+        workspace_id = self.data.get("workspace_id")
 
         QuerySet(Tool).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True
@@ -1551,54 +1676,55 @@ class ToolBatchOperateSerializer(serializers.Serializer):
 
 class ToolTreeSerializer(serializers.Serializer):
     class Query(serializers.Serializer):
-        workspace_id = serializers.CharField(required=True, label=_('workspace id'))
-        folder_id = serializers.CharField(required=True, label=_('folder id'))
-        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_('tool name'))
-        user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
-        scope = serializers.CharField(required=True, label=_('scope'))
-        tool_type = serializers.CharField(required=False, label=_('tool type'), allow_null=True, allow_blank=True)
-        tool_type_list = serializers.ListField(child=serializers.CharField(), required=False, label=_('tool type list'),
-                                               allow_null=True, allow_empty=True)
-        create_user = serializers.UUIDField(required=False, label=_('create user'), allow_null=True)
+        workspace_id = serializers.CharField(required=True, label=_("workspace id"))
+        folder_id = serializers.CharField(required=True, label=_("folder id"))
+        name = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("tool name"))
+        user_id = serializers.UUIDField(required=False, allow_null=True, label=_("user id"))
+        scope = serializers.CharField(required=True, label=_("scope"))
+        tool_type = serializers.CharField(required=False, label=_("tool type"), allow_null=True, allow_blank=True)
+        tool_type_list = serializers.ListField(
+            child=serializers.CharField(), required=False, label=_("tool type list"), allow_null=True, allow_empty=True
+        )
+        create_user = serializers.UUIDField(required=False, label=_("create user"), allow_null=True)
 
         def page_tool(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            folder_id = self.data.get('folder_id', self.data.get('workspace_id'))
+            folder_id = self.data.get("folder_id", self.data.get("workspace_id"))
             root = ToolFolder.objects.filter(id=folder_id).first()
             if not root:
-                raise serializers.ValidationError(_('Folder not found'))
+                raise serializers.ValidationError(_("Folder not found"))
             # 使用MPTT的get_descendants()方法获取所有相关节点
             all_folders = root.get_descendants(include_self=True)
 
-            if self.data.get('name'):
+            if self.data.get("name"):
                 tools = QuerySet(Tool).filter(
-                    Q(workspace_id=self.data.get('workspace_id')) &
-                    Q(folder_id__in=all_folders) &
-                    Q(user_id=self.data.get('user_id')) &
-                    Q(name__contains=self.data.get('name'))
+                    Q(workspace_id=self.data.get("workspace_id"))
+                    & Q(folder_id__in=all_folders)
+                    & Q(user_id=self.data.get("user_id"))
+                    & Q(name__contains=self.data.get("name"))
                 )
             else:
                 tools = QuerySet(Tool).filter(
-                    Q(workspace_id=self.data.get('workspace_id')) &
-                    Q(folder_id__in=all_folders) &
-                    Q(user_id=self.data.get('user_id'))
+                    Q(workspace_id=self.data.get("workspace_id"))
+                    & Q(folder_id__in=all_folders)
+                    & Q(user_id=self.data.get("user_id"))
                 )
             return page_search(current_page, page_size, tools, lambda record: ToolModelSerializer(record).data)
 
         def get_query_set(self, workspace_manage, is_x_pack_ee):
-            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get('workspace_id'))
+            tool_query_set = QuerySet(Tool).filter(workspace_id=self.data.get("workspace_id"))
             folder_query_set = QuerySet(ToolFolder)
             default_query_set = QuerySet(Tool)
 
-            workspace_id = self.data.get('workspace_id')
-            user_id = self.data.get('user_id')
-            scope = self.data.get('scope')
-            tool_type = self.data.get('tool_type')
-            desc = self.data.get('desc')
-            name = self.data.get('name')
-            folder_id = self.data.get('folder_id')
-            create_user = self.data.get('create_user')
+            workspace_id = self.data.get("workspace_id")
+            user_id = self.data.get("user_id")
+            scope = self.data.get("scope")
+            tool_type = self.data.get("tool_type")
+            desc = self.data.get("desc")
+            name = self.data.get("name")
+            folder_id = self.data.get("folder_id")
+            create_user = self.data.get("create_user")
 
             if workspace_id is not None:
                 folder_query_set = folder_query_set.filter(workspace_id=workspace_id)
@@ -1621,23 +1747,20 @@ class ToolTreeSerializer(serializers.Serializer):
             if scope is not None:
                 tool_query_set = tool_query_set.filter(scope=scope)
 
-            tool_type_list = self.data.get('tool_type_list')
+            tool_type_list = self.data.get("tool_type_list")
             if tool_type_list:
                 tool_query_set = tool_query_set.filter(tool_type__in=tool_type_list)
             elif tool_type:
                 tool_query_set = tool_query_set.filter(tool_type=tool_type)
 
             query_set_dict = {
-                'tool_query_set': tool_query_set,
-                'default_query_set': default_query_set,
+                "tool_query_set": tool_query_set,
+                "default_query_set": default_query_set,
             }
             if not workspace_manage:
-                query_set_dict['workspace_user_resource_permission_query_set'] = QuerySet(
-                    WorkspaceUserResourcePermission).filter(
-                    auth_target_type="TOOL",
-                    workspace_id=workspace_id,
-                    user_id=user_id
-                )
+                query_set_dict["workspace_user_resource_permission_query_set"] = QuerySet(
+                    WorkspaceUserResourcePermission
+                ).filter(auth_target_type="TOOL", workspace_id=workspace_id, user_id=user_id)
             return query_set_dict
 
         @staticmethod
@@ -1649,23 +1772,27 @@ class ToolTreeSerializer(serializers.Serializer):
         def page_tool_with_folders(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_page_search(
-                current_page, page_size, self.get_query_set(workspace_manage, is_x_pack_ee),
+                current_page,
+                page_size,
+                self.get_query_set(workspace_manage, is_x_pack_ee),
                 get_file_content(
                     os.path.join(
                         PROJECT_DIR,
-                        "apps", "tools", 'sql',
-                        'list_tool.sql' if workspace_manage else (
-                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
-                        )
+                        "apps",
+                        "tools",
+                        "sql",
+                        "list_tool.sql"
+                        if workspace_manage
+                        else ("list_tool_user_ee.sql" if is_x_pack_ee else "list_tool_user.sql"),
                     )
                 ),
                 post_records_handler=lambda record: {
                     **record,
-                    'input_field_list': json.loads(record.get('input_field_list', '[]')),
-                    'init_field_list': json.loads(record.get('init_field_list', '[]')),
+                    "input_field_list": json.loads(record.get("input_field_list", "[]")),
+                    "init_field_list": json.loads(record.get("init_field_list", "[]")),
                 },
             )
             return ResourceMappingSerializer().get_resource_count(result)
@@ -1673,32 +1800,33 @@ class ToolTreeSerializer(serializers.Serializer):
         def get_tools(self):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage(self.data.get('user_id'), self.data.get('workspace_id'))
+            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
             is_x_pack_ee = self.is_x_pack_ee()
             results = native_search(
                 self.get_query_set(workspace_manage, is_x_pack_ee),
                 get_file_content(
                     os.path.join(
                         PROJECT_DIR,
-                        "apps", "tools", 'sql',
-                        'list_tool.sql' if workspace_manage else (
-                            'list_tool_user_ee.sql' if is_x_pack_ee else 'list_tool_user.sql'
-                        )
+                        "apps",
+                        "tools",
+                        "sql",
+                        "list_tool.sql"
+                        if workspace_manage
+                        else ("list_tool_user_ee.sql" if is_x_pack_ee else "list_tool_user.sql"),
                     )
                 ),
-
             )
 
             # 返回包含文件夹和工具的结构
             return {
-                'folders': [
-                    folder for folder in results if folder['resource_type'] == 'folder'
-                ],
-                'tools': [
+                "folders": [folder for folder in results if folder["resource_type"] == "folder"],
+                "tools": [
                     {
                         **tool,
-                        'input_field_list': json.loads(tool.get('input_field_list', '[]')),
-                        'init_field_list': json.loads(tool.get('init_field_list', '[]')),
-                    } for tool in results if tool['resource_type'] == 'tool'
+                        "input_field_list": json.loads(tool.get("input_field_list", "[]")),
+                        "init_field_list": json.loads(tool.get("init_field_list", "[]")),
+                    }
+                    for tool in results
+                    if tool["resource_type"] == "tool"
                 ],
             }
