@@ -165,4 +165,5 @@ onBeforeMount(() => {
   formValue.value.showInput = true
 })
 </script>
-<style lang="scss"></style>
+<style lang="scss">
+</style>

@@ -6,7 +6,7 @@
       </div>
     </template>
 
-    <el-row style="width: 100%" :gutter="10">
+    <el-row class="w-full">
       <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
         <el-radio
           :value="item.value"
