@@ -145,7 +145,7 @@
                 </div>
               </el-card>
             </template>
-            <div class="flex">
+            <div class="flex" v-if="isEdit ? permissionPrecise.edit(form?.id as string) : permissionPrecise.create()">
               <el-upload
                 v-model:file-list="form.fileList"
                 action="#"
