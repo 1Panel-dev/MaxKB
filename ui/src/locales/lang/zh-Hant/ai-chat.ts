@@ -143,4 +143,5 @@ export default {
   share: '分享',
   copyLinkText: '複製連結',
   userInputSetting: '外置參數設定（最多可顯示3個）',
+  executing: '正在執行',
 }

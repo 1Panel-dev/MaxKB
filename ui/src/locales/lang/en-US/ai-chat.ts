@@ -145,4 +145,5 @@ export default {
   share: 'Share',
   copyLinkText: 'Copy Link',
   userInputSetting: 'External Parameter Setting (up to 3 can be displayed)',
+  executing: 'Executing',
 }
