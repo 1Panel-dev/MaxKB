@@ -165,8 +165,8 @@ const exposedFields = computed(() => {
 })
 
 const dialogFields = computed(() => {
-  if (setting.value.exposed_fields.length === 0) return fieldList.value
-  return fieldList.value.filter((f) => !setting.value.exposed_fields.includes(f.field))
+  const inlineKeys = new Set(exposedFields.value.map((f) => f.field))
+  return fieldList.value.filter((f) => !inlineKeys.has(f.field))
 })
 
 const visibilityMap = computed(() => computeVisibilityMap(fieldList.value, formValue.value))
