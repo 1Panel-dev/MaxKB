@@ -145,5 +145,10 @@ export default {
   share: 'Share',
   copyLinkText: 'Copy Link',
   userInputSetting: 'External Parameter Setting (up to 3 can be displayed)',
+<<<<<<< Updated upstream
   executing: 'Executing',
+=======
+  userInputSettingTip:
+    'Only Model, Knowledge, Switch, Date, TreeSelect, Single Select, and Multi Select component types are supported',
+>>>>>>> Stashed changes
 }

@@ -143,5 +143,9 @@ export default {
   share: '分享',
   copyLinkText: '复制链接',
   userInputSetting: '外置参数设置（最多可显示3个）',
+<<<<<<< Updated upstream
   executing: '正在执行',
+=======
+  userInputSettingTip: '仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型',
+>>>>>>> Stashed changes
 }
