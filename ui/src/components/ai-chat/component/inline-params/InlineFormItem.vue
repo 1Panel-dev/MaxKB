@@ -21,7 +21,9 @@
         height: 32px;
       "
     >
-      <span style="font-size: 13px; color: #606266; white-space: nowrap" :title="switchLabel">{{ switchLabel }}</span>
+      <span style="font-size: 13px; color: #606266; white-space: nowrap" :title="switchLabel">{{
+        switchLabel
+      }}</span>
       <component
         ref="componentFormRef"
         :view="view"
@@ -90,7 +92,18 @@ const itemValue = computed({
   },
 })
 
-const attrs = computed(() => props.formfield.attrs || {})
+const attrs = computed(() => {
+  const base = props.formfield.attrs || {}
+  if (props.formfield.input_type === 'MultiSelect') {
+    return {
+      ...base,
+      'collapse-tags': true,
+      'collapse-tags-tooltip': true,
+      'max-collapse-tags': 1,
+    }
+  }
+  return base
+})
 
 const switchLabel = computed(() => {
   const label =

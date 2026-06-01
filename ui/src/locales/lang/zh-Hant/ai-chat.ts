@@ -144,4 +144,5 @@ export default {
   copyLinkText: '複製連結',
   userInputSetting: '外置參數設定（最多可顯示3個）',
   executing: '正在執行',
+  userInputSettingTip: '僅支援模型、知識庫、開關、日期、樹形選項卡、單選框、多選框元件類型',
 }

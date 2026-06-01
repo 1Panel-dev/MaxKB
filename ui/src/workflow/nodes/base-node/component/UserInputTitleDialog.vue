@@ -16,17 +16,25 @@
       require-asterisk-position="right"
       @submit.prevent
     >
-      <el-form-item :label="$t('aiChat.userInputSetting')">
+      <el-form-item>
+        <template #label>
+          <div class="flex align-center">
+            <div class="mr-4">
+              <span>{{ $t('aiChat.userInputSetting') }}</span>
+            </div>
+            <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+              <template #content>{{ $t('aiChat.userInputSettingTip') }}</template>
+              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+            </el-tooltip>
+          </div>
+        </template>
         <el-select v-model="form.exposed_fields" multiple style="width: 100%">
           <el-option
-            v-for="item in fieldOptions"
+            v-for="item in selectableFieldOptions"
             :key="item.field"
             :label="getFieldLabel(item)"
             :value="item.field"
-            :disabled="
-              !ALLOWED_EXPOSED_TYPES.includes(item.input_type) ||
-              (form.exposed_fields.length >= 3 && !form.exposed_fields.includes(item.field))
-            "
+            :disabled="form.exposed_fields.length >= 3 && !form.exposed_fields.includes(item.field)"
           />
         </el-select>
       </el-form-item>
@@ -50,7 +58,7 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { t } from '@/locales'
 import { ALLOWED_EXPOSED_TYPES } from '@/components/ai-chat/component/inline-params/constants'
@@ -59,6 +67,10 @@ const emit = defineEmits(['refresh'])
 const fieldFormRef = ref()
 const loading = ref<boolean>(false)
 const fieldOptions = ref<any[]>([])
+
+const selectableFieldOptions = computed(() =>
+  fieldOptions.value.filter((item) => ALLOWED_EXPOSED_TYPES.includes(item.input_type)),
+)
 
 const form = ref<any>({
   exposed_fields: [],
