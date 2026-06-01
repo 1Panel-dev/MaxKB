@@ -311,7 +311,6 @@ function searchHandle() {
 
 function handleClick(tab: any) {
   activeName.value = tab
-  search_text.value = ''
   paginationConfig.current_page = 1
   changeDayHandle(history_day.value)
 }
@@ -457,9 +456,11 @@ watch(drawerVisible, (bool) => {
   }
 })
 
-const open = (name: string) => {
+const open = (name: string, historyDay: number | string, daterangeVal: string, daterange: any) => {
   activeName.value = name
-  changeDayHandle(history_day.value)
+  history_day.value = historyDay
+  daterangeValue.value = daterangeVal
+  daterange.value = daterange
   drawerVisible.value = true
 }
 defineExpose({

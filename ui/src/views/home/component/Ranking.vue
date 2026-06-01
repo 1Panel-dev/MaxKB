@@ -27,8 +27,8 @@
 
     <el-skeleton :loading="loading" animated>
       <el-row :gutter="16">
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8" class="mb-16">
-          <el-card shadow="never" style="--el-card-padding: 24px">
+        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
             <div class="flex-between">
               <h4>
                 Tokens
@@ -43,7 +43,9 @@
                 </el-icon>
               </el-button>
             </div>
-            <template v-for="(item, index) in tokensRankding" :key="index">
+            <el-empty v-if="!tokensRankding || tokensRankding.length === 0" />
+
+            <template v-else v-for="(item, index) in tokensRankding" :key="index">
               <div class="flex-between mt-24">
                 <div class="flex align-center">
                   <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
@@ -78,8 +80,8 @@
             </template>
           </el-card>
         </el-col>
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8" class="mb-16">
-          <el-card shadow="never" style="--el-card-padding: 24px">
+        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
             <div class="flex-between">
               <h4>
                 {{ $t('home.chatCount') }}
@@ -97,6 +99,7 @@
                 </el-icon>
               </el-button>
             </div>
+            <el-empty v-if="!questionRanking || questionRanking.length === 0" />
             <template v-for="(item, index) in questionRanking" :key="index">
               <div class="flex-between mt-24">
                 <div class="flex align-center">
@@ -135,8 +138,8 @@
             </template>
           </el-card>
         </el-col>
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8" class="mb-16">
-          <el-card shadow="never" style="--el-card-padding: 24px">
+        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
             <div class="flex-between">
               <h4>
                 Tokens
@@ -155,6 +158,7 @@
                 </el-icon>
               </el-button>
             </div>
+            <el-empty v-if="!userTokensRanking || userTokensRanking.length === 0" />
             <template v-for="(item, index) in userTokensRanking" :key="index">
               <div class="flex-between mt-24">
                 <div class="flex align-center">
@@ -278,7 +282,7 @@ function getDetail() {
 
 const RankingDrawerRef = ref()
 const openDrawer = (name: string) => {
-  RankingDrawerRef.value.open(name)
+  RankingDrawerRef.value.open(name, history_day.value, daterangeValue.value, daterange.value)
 }
 onMounted(() => {
   changeDayHandle(history_day.value)
