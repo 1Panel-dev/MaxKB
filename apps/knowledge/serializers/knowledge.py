@@ -891,6 +891,18 @@ class KnowledgeSerializer(serializers.Serializer):
                     directly_return_similarity=float(similarity) if similarity else 0.9,
                     meta=doc_meta,
                 )
+                # 处理原文档
+                if "source_file_id" in doc_meta:
+                    old_file = QuerySet(File).filter(id=doc_meta["source_file_id"]).first()
+                    if old_file:
+                        source_file = File(
+                            id=uuid.uuid7(),
+                            file_name=old_file.file_name,
+                            source_type=FileSourceType.DOCUMENT,
+                            source_id=document_id,
+                            meta={},
+                        )
+                        source_file.save(old_file.get_bytes())
 
                 document_model_list.append(document)
                 if tags_str:
