@@ -61,7 +61,7 @@ from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from tools.serializers.tool import ToolExportModelSerializer
 from trigger.models import TriggerTask, Trigger
 from users.models import User
-from users.serializers.user import is_workspace_manage
+from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
 
 def get_base_node_work_flow(work_flow):
@@ -417,7 +417,7 @@ class Query(serializers.Serializer):
         user_id = self.data.get("user_id")
         req_dict = ApplicationQueryRequest(data=instance)
         req_dict.is_valid(raise_exception=True)
-        workspace_manage = is_workspace_manage(user_id, workspace_id)
+        workspace_manage = is_workspace_manage_permission_read(user_id, workspace_id, "APPLICATION:READ")
         is_x_pack_ee = self.is_x_pack_ee()
         return native_search(self.get_query_set(req_dict.data, workspace_manage, is_x_pack_ee),
                              select_string=get_file_content(
@@ -432,7 +432,7 @@ class Query(serializers.Serializer):
         req_dict.is_valid(raise_exception=True)
         workspace_id = self.data.get('workspace_id')
         user_id = self.data.get("user_id")
-        workspace_manage = is_workspace_manage(user_id, workspace_id)
+        workspace_manage = is_workspace_manage_permission_read(user_id, workspace_id, "APPLICATION:READ")
         is_x_pack_ee = self.is_x_pack_ee()
         result = native_page_search(current_page, page_size,
                                     self.get_query_set(req_dict.data, workspace_manage, is_x_pack_ee),
@@ -972,7 +972,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         work_flow_version.save()
         access_token = hashlib.md5(
             str(uuid.uuid7()).encode()).hexdigest()[
-            8:24]
+                       8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(
             application_id=application.id).first()
         if application_access_token is None:
@@ -1276,7 +1276,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             knowledge_list = [available_knowledge_dict.get(knowledge_id) for knowledge_id in knowledge_id_list if
                               available_knowledge_dict.__contains__(knowledge_id)]
             node_data['all_knowledge_id_list'] = knowledge_id_list
-            node_data['no_permission_knowledge_id_list'] = [knowledge_id for knowledge_id in knowledge_id_list if not available_knowledge_dict.__contains__(knowledge_id) ]
+            node_data['no_permission_knowledge_id_list'] = [knowledge_id for knowledge_id in knowledge_id_list if
+                                                            not available_knowledge_dict.__contains__(knowledge_id)]
             node_data['knowledge_id_list'] = [knowledge.get('id') for knowledge in knowledge_list]
             node_data['knowledge_list'] = knowledge_list
 

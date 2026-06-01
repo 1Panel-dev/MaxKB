@@ -29,7 +29,7 @@ from system_manage.models import WorkspaceUserResourcePermission, AuthTargetType
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from users.serializers.user import is_workspace_manage
+from users.serializers.user import is_workspace_manage_permission_read
 
 
 def get_default_model_params_setting(provider, model_type, model_name):
@@ -366,7 +366,7 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
-            workspace_manage = is_workspace_manage(user_id, workspace_id)
+            workspace_manage = is_workspace_manage_permission_read(user_id, workspace_id, 'MODEL:READ')
             query_params = self._build_query_params(workspace_id, workspace_manage, user_id)
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_search(query_params,
@@ -393,7 +393,7 @@ class ModelSerializer(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             user_id = self.data.get("user_id")
-            workspace_manage = is_workspace_manage(user_id, workspace_id)
+            workspace_manage = is_workspace_manage_permission_read(user_id, workspace_id, 'MODEL:READ')
             queryset = self._build_query_params(workspace_id, workspace_manage, user_id)
             get_authorized_model = DatabaseModelManage.get_model("get_authorized_model")
 
