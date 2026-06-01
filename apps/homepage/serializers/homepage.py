@@ -44,6 +44,22 @@ def hasPermission(auth, permission):
     return False
 
 
+def has_extends_workspace_manage_permission(auth, permission, workspace_id):
+    return hasPermission(auth, f"{permission}:/WORKSPACE/{workspace_id}:ROLE/WORKSPACE_MANAGE")
+
+
+def has_user_permission(auth, permission, workspace_id):
+    return hasPermission(auth, f"{permission}:/WORKSPACE/{workspace_id}")
+
+
+def has_all_permission(auth, permission, workspace_id):
+    return (has_user_permission(auth, permission, workspace_id)
+            or has_extends_workspace_manage_permission(auth,
+                                                       permission,
+                                                       workspace_id)
+            or hasPermission(auth, permission))
+
+
 def is_workspace_manage(auth, workspace_id):
     return RoleConstants.WORKSPACE_MANAGE.value.__str__() + ":/WORKSPACE/" + workspace_id in auth.role_list
 
@@ -90,7 +106,7 @@ class HomePageSerializer(serializers.Serializer):
                     chat__application__workspace_id=workspace_id
                 )
             elif extends_workspace_manage:
-                if hasPermission(auth, "APPLICATION:READ"):
+                if hasPermission(auth, f"APPLICATION:READ:/WORKSPACE/{workspace_id}"):
                     query = query.filter(
                         chat__application__workspace_id=workspace_id
                     )
@@ -150,13 +166,11 @@ class HomePageSerializer(serializers.Serializer):
                 query = query.filter(
                     chat__application__workspace_id=workspace_id
                 )
-            elif extends_workspace_manage:
-                if hasPermission(auth, "APPLICATION:READ"):
-                    query = query.filter(
-                        chat__application__workspace_id=workspace_id
-                    )
-                else:
-                    return 0
+            elif extends_workspace_manage and has_extends_workspace_manage_permission(auth, 'APPLICATION:READ',
+                                                                                      workspace_id):
+                query = query.filter(
+                    chat__application__workspace_id=workspace_id
+                )
             else:
                 permission_list = (
                     ["VIEW", "MANAGE", "ROLE"]
@@ -316,10 +330,11 @@ class HomePageSerializer(serializers.Serializer):
             if is_workspace_manage(auth, workspace_id):
                 return queryset.filter(application__workspace_id=workspace_id)
             elif is_extends_workspace_manage(auth, workspace_id):
-                if hasPermission(auth, "APPLICATION:READ"):
+                if hasPermission(auth, f"APPLICATION:READ:/WORKSPACE/{workspace_id}"):
                     return queryset.filter(application__workspace_id=workspace_id)
-                else:
-                    return queryset.filter(application_id__in=[])
+            if not has_all_permission(auth, 'APPLICATION:READ', workspace_id):
+                return queryset.none()
+
             permission_list = (
                 _PERM_WITH_ROLE
                 if hasPermission(auth, "APPLICATION:READ")
@@ -377,14 +392,22 @@ class HomePageSerializer(serializers.Serializer):
             name = self.data.get("name")
             start_time = get_start_time(self.data.get("start_time"))
             end_time = get_end_time(self.data.get("end_time"))
-            queryset = Application.objects.filter(workspace_id=workspace_id)
+            workspace_manage = is_workspace_manage(auth, workspace_id)
+            queryset = QuerySet(Application)
+            is_resource_filter = True
             if name:
                 queryset = queryset.filter(name__contains=name)
-            workspace_manage = is_workspace_manage(auth, workspace_id)
-            if is_extends_workspace_manage(auth, workspace_id):
-                if not hasPermission(auth, "APPLICATION:READ"):
-                    queryset = queryset.filter(workspace_id__in=[])
-            if not workspace_manage:
+                is_resource_filter = False
+            if workspace_manage:
+                queryset = queryset.filter(workspace_id=workspace_id)
+            elif is_extends_workspace_manage(auth, workspace_id):
+                if has_extends_workspace_manage_permission(auth, "APPLICATION:READ", workspace_id):
+                    queryset = queryset.filter(workspace_id=workspace_id)
+                    is_resource_filter = False
+            if not has_all_permission(auth, 'APPLICATION:READ', workspace_id):
+                queryset = queryset.none()
+                is_resource_filter = False
+            if is_resource_filter:
                 permission_list = (
                     ["VIEW", "MANAGE", "ROLE"]
                     if hasPermission(auth, "APPLICATION:READ")
@@ -508,15 +531,26 @@ class HomePageSerializer(serializers.Serializer):
                     & Q(chat__chatrecord__create_time__gte=start_time)
                     & Q(chat__chatrecord__create_time__lte=end_time)
             )
-
-            queryset = Application.objects.filter(workspace_id=workspace_id)
+            is_resource_filter = True
+            workspace_manage = is_workspace_manage(auth, workspace_id)
+            queryset = QuerySet(Application)
             if name:
                 queryset = queryset.filter(name__contains=name)
+            if workspace_manage:
+                queryset = queryset.filter(workspace_id=workspace_id)
+                is_resource_filter = False
+            elif is_extends_workspace_manage(auth, workspace_id):
+                if has_extends_workspace_manage_permission(
+                        auth,
+                        "APPLICATION:READ", workspace_id
+                ):
+                    queryset = queryset.filter(workspace_id=workspace_id)
+                    is_resource_filter = False
+            if not has_all_permission(auth, 'APPLICATION:READ', workspace_id):
+                queryset = queryset.none()
+                is_resource_filter = False
 
-            workspace_manage = is_workspace_manage(auth, workspace_id)
-            if is_extends_workspace_manage(auth, workspace_id):
-                queryset = queryset.filter(workspace_id__in=[])
-            if not workspace_manage:
+            if is_resource_filter:
                 permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(
                     auth,
                     "APPLICATION:READ"
@@ -705,7 +739,10 @@ class HomePageSerializer(serializers.Serializer):
             if workspace_manage:
                 return QuerySet(Application).filter(workspace_id=workspace_id)
             if is_extends_workspace_manage(auth, workspace_id):
-                return QuerySet(Application).filter(workspace_id__in=[])
+                if has_extends_workspace_manage_permission(auth, "APPLICATION:READ", workspace_id):
+                    return QuerySet(Application).filter(workspace_id=workspace_id)
+            if not has_all_permission(auth, 'APPLICATION:READ', workspace_id):
+                return QuerySet(Application).none()
             permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(auth, "APPLICATION:READ") else ['VIEW',
                                                                                                           'MANAGE']
             return QuerySet(Application).filter(
@@ -742,8 +779,9 @@ class HomePageSerializer(serializers.Serializer):
             if is_workspace_manage(auth, workspace_id):
                 return QuerySet(Knowledge).filter(workspace_id=workspace_id)
             if is_extends_workspace_manage(auth, workspace_id):
-                if hasPermission(auth, "KNOWLEDGE:READ"):
+                if has_extends_workspace_manage_permission(auth, "KNOWLEDGE:READ", workspace_id):
                     return QuerySet(Knowledge).filter(workspace_id=workspace_id)
+            if not has_all_permission(auth, 'KNOWLEDGE:READ', workspace_id):
                 return QuerySet(Knowledge).none()
             permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(auth, "KNOWLEDGE:READ") else ['VIEW',
                                                                                                         'MANAGE']
@@ -790,8 +828,9 @@ class HomePageSerializer(serializers.Serializer):
             if is_workspace_manage(auth, workspace_id):
                 return QuerySet(Tool).filter(workspace_id=workspace_id)
             if is_extends_workspace_manage(auth, workspace_id):
-                if hasPermission(auth, "TOOL:READ"):
+                if has_extends_workspace_manage_permission(auth, "TOOL:READ", workspace_id):
                     return QuerySet(Tool).filter(workspace_id=workspace_id)
+            if not has_all_permission(auth, 'TOOL:READ', workspace_id):
                 return QuerySet(Tool).none()
             permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(auth, "TOOL:READ") else ['VIEW',
                                                                                                    'MANAGE']
@@ -835,11 +874,12 @@ class HomePageSerializer(serializers.Serializer):
             if is_workspace_manage(auth, workspace_id):
                 return QuerySet(Model).filter(workspace_id=workspace_id)
             if is_extends_workspace_manage(auth, workspace_id):
-                if hasPermission(auth, 'MODEL:READ'):
+                if has_extends_workspace_manage_permission(auth, "MODEL:READ", workspace_id):
                     return QuerySet(Model).filter(workspace_id=workspace_id)
+            if not has_all_permission(auth, 'MODEL:READ', workspace_id):
                 return QuerySet(Model).none()
             permission_list = ["VIEW", "MANAGE", "ROLE"] if hasPermission(auth, "MODEL:READ") else ['VIEW',
-                                                                                                          'MANAGE']
+                                                                                                    'MANAGE']
             return QuerySet(Model).filter(
                 id__in=QuerySet(WorkspaceUserResourcePermission).filter(workspace_id=workspace_id,
                                                                         user_id=user_id,
