@@ -44,7 +44,7 @@ from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
 from trigger.models import Trigger, TriggerTask
-from users.serializers.user import is_workspace_manage
+from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
 from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
 from tools.models.tool_workflow import ToolWorkflow
@@ -869,9 +869,9 @@ class ToolSerializer(serializers.Serializer):
                     {
                         "type": "error"
                         if (
-                            item.get("code") == "E999"
-                            or str(item.get("code") or "").startswith("E9")
-                            or item.get("code") in ["F821", "F822", "F823"]
+                                item.get("code") == "E999"
+                                or str(item.get("code") or "").startswith("E9")
+                                or item.get("code") in ["F821", "F822", "F823"]
                         )
                         else "warning",
                         "module": "",
@@ -997,7 +997,7 @@ class ToolSerializer(serializers.Serializer):
                     {**tool, "id": update_tool_map.get(tool.get("id"))}
                     for tool in tool_list
                     if not exits_tool_id_list.__contains__(tool.get("id"))
-                    and not exits_tool_id_list.__contains__(
+                       and not exits_tool_id_list.__contains__(
                         new_uuid.generate_uuid(tool.get("id"))
                         if new_child_policy == 2
                         else generate_uuid((tool.get("id") + workspace_id or ""))
@@ -1600,15 +1600,15 @@ class ToolSerializer(serializers.Serializer):
                 )
                 try:
                     for r in model.stream(
-                        [
-                            # SystemMessage(content=SYSTEM_ROLE),
-                            *[
-                                HumanMessage(content=m.get("content"))
-                                if m.get("role") == "user"
-                                else AIMessage(content=m.get("content"))
-                                for m in messages
+                            [
+                                # SystemMessage(content=SYSTEM_ROLE),
+                                *[
+                                    HumanMessage(content=m.get("content"))
+                                    if m.get("role") == "user"
+                                    else AIMessage(content=m.get("content"))
+                                    for m in messages
+                                ]
                             ]
-                        ]
                     ):
                         yield "data: " + json.dumps({"content": r.content}) + "\n\n"
                 except Exception as e:
@@ -1772,7 +1772,8 @@ class ToolTreeSerializer(serializers.Serializer):
         def page_tool_with_folders(self, current_page: int, page_size: int):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
+            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
+                                                                   self.data.get("workspace_id"), 'TOOL:READ')
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_page_search(
                 current_page,
@@ -1800,7 +1801,8 @@ class ToolTreeSerializer(serializers.Serializer):
         def get_tools(self):
             self.is_valid(raise_exception=True)
 
-            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
+            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
+                                                                   self.data.get("workspace_id"), 'TOOL:READ')
             is_x_pack_ee = self.is_x_pack_ee()
             results = native_search(
                 self.get_query_set(workspace_manage, is_x_pack_ee),

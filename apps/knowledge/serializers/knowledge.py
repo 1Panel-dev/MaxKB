@@ -44,7 +44,7 @@ from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from users.serializers.user import is_workspace_manage
+from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
 from knowledge.models import (
     Document,
@@ -226,9 +226,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 query_set = query_set.filter(**{"temp.workspace_id": self.data.get("workspace_id")})
                 folder_query_set = folder_query_set.filter(**{"workspace_id": self.data.get("workspace_id")})
             if (
-                "folder_id" in self.data
-                and self.data.get("folder_id") is not None
-                and self.data.get("workspace_id") != self.data.get("folder_id")
+                    "folder_id" in self.data
+                    and self.data.get("folder_id") is not None
+                    and self.data.get("workspace_id") != self.data.get("folder_id")
             ):
                 query_set = query_set.filter(**{"temp.folder_id": self.data.get("folder_id")})
                 folder_query_set = folder_query_set.filter(**{"parent_id": self.data.get("folder_id")})
@@ -259,7 +259,8 @@ class KnowledgeSerializer(serializers.Serializer):
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_("Folder not found"))
-            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
+            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
+                                                                   self.data.get("workspace_id"), "KNOWLEDGE:READ")
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_page_search(
                 current_page,
@@ -288,7 +289,9 @@ class KnowledgeSerializer(serializers.Serializer):
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_("Folder not found"))
-            workspace_manage = is_workspace_manage(self.data.get("user_id"), self.data.get("workspace_id"))
+            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
+                                                                   self.data.get("workspace_id"), "KNOWLEDGE:READ")
+
             is_x_pack_ee = self.is_x_pack_ee()
             return native_search(
                 self.get_query_set(workspace_manage, is_x_pack_ee),
@@ -449,10 +452,10 @@ class KnowledgeSerializer(serializers.Serializer):
                         [
                             str(application_knowledge_mapping.source_id)
                             for application_knowledge_mapping in QuerySet(ResourceMapping).filter(
-                                source_type="APPLICATION",
-                                target_type="KNOWLEDGE",
-                                target_id=self.data.get("knowledge_id"),
-                            )
+                            source_type="APPLICATION",
+                            target_type="KNOWLEDGE",
+                            target_id=self.data.get("knowledge_id"),
+                        )
                         ],
                     )
                 ),
@@ -687,7 +690,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
         @staticmethod
         def _get_knowledge_workbook(
-            data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict, paragraph_active_map: dict
+                data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict, paragraph_active_map: dict
         ):
             import openpyxl
             from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
