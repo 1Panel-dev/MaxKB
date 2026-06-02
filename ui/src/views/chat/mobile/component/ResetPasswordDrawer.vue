@@ -29,9 +29,9 @@
         </el-input>
       </el-form-item>
     </el-form>
-    <el-button type="primary" size="large" class="w-full" @click="resetPassword">{{
-      $t('aiChat.confirmModification')
-    }}</el-button>
+    <el-button type="primary" size="large" class="w-full" @click="resetPassword"
+      >{{ $t('aiChat.confirmModification') }}
+    </el-button>
   </el-drawer>
 </template>
 
@@ -44,6 +44,7 @@ import useStore from '@/stores'
 import chatAPI from '@/api/chat/chat'
 import { useRouter } from 'vue-router'
 import { MsgSuccess } from '@/utils/message'
+import JSEncrypt from 'jsencrypt'
 
 const router = useRouter()
 const { chatUser } = useStore()
@@ -100,9 +101,14 @@ const rules = ref<FormRules<ResetCurrentUserPasswordRequest>>({
 
 function resetPassword() {
   resetPasswordFormRef.value?.validate().then(() => {
-    chatAPI.resetCurrentPassword(resetPasswordForm.value).then(() => {
+    const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt
+    const js = new (JSEncryptCtor as any)()
+    js.setPublicKey(chatUser?.chat_profile?.rsaKey)
+    const jsonData = JSON.stringify(resetPasswordForm.value)
+    const encryptedBase64 = js.encrypt(jsonData)
+    chatAPI.resetCurrentPassword({ encryptedData: encryptedBase64 }).then(() => {
       MsgSuccess(t('common.modifySuccess'))
-      router.push({name: 'login'})
+      router.push({ name: 'login' })
     })
   })
 }

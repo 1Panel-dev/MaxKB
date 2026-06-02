@@ -98,6 +98,7 @@ import ResetPassword from '@/layout/layout-header/avatar/ResetPassword.vue'
 import type { ResetCurrentUserPasswordRequest } from '@/api/type/user'
 import chatAPI from '@/api/chat/chat'
 import { useRoute, useRouter } from 'vue-router'
+import JSEncrypt from 'jsencrypt'
 
 const router = useRouter()
 const route = useRoute()
@@ -150,7 +151,12 @@ const openResetPassword = () => {
 }
 
 const handleResetPassword = (param: ResetCurrentUserPasswordRequest) => {
-  chatAPI.resetCurrentPassword(param).then(() => {
+  const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt
+  const js = new (JSEncryptCtor as any)()
+  js.setPublicKey(chatUser?.chat_profile?.rsaKey)
+  const jsonData = JSON.stringify(param)
+  const encryptedBase64 = js.encrypt(jsonData)
+  chatAPI.resetCurrentPassword({ encryptedData: encryptedBase64 }).then(() => {
     router.push({ name: 'login' })
   })
 }
