@@ -572,7 +572,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
             document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
             paragraph_list = native_search(
-                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")),
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")).order_by('position'),
                 get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph_document_name.sql")
                 ),
