@@ -3,6 +3,7 @@
     <el-select
       v-model="selectedIds"
       multiple
+      v-bind="$attrs"
       class="w-full"
       :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
     >
@@ -41,6 +42,8 @@ const props = withDefaults(
   }>(),
   { modelValue: () => [] },
 )
+
+defineOptions({ inheritAttrs: false })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
