@@ -156,6 +156,9 @@ export default {
       label: 'AI Chat',
       text: 'Chat with an AI model',
       answer: 'AI Content',
+      vision: {
+        label: 'vision',
+      },
       returnContent: {
         label: 'Return Content',
         tooltip: `If turned off, the content of this node will not be output to the user.

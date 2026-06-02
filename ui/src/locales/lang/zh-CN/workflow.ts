@@ -157,6 +157,9 @@ export default {
       label: 'AI 对话',
       text: '与 AI 大模型进行对话',
       answer: 'AI 回答内容',
+      vision: {
+        label: '视觉',
+      },
       returnContent: {
         label: '返回内容',
         tooltip: `关闭后该节点的内容则不输出给用户。

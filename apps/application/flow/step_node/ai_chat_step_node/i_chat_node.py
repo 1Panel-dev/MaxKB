@@ -53,6 +53,8 @@ class ChatNodeSerializer(serializers.Serializer):
 
     image_list = serializers.ListField(required=False, label=_("picture"))
 
+    vision = serializers.BooleanField(required=False, default=False, label=_("vision"))
+
 
 class IChatNode(INode):
     type = 'ai-chat-node'
