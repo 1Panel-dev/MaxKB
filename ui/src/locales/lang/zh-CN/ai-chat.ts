@@ -145,4 +145,5 @@ export default {
   userInputSetting: '外置参数设置（最多可显示3个）',
   executing: '正在执行',
   userInputSettingTip: '仅支持模型、知识库、开关、日期、树形选项卡、单选框、多选框组件类型',
+  remainingParamsMenuTitle: '其他参数收纳菜单标题',
 }

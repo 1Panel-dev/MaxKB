@@ -38,7 +38,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item :label="$t('common.title')" prop="menu_title">
+      <el-form-item :label="$t('aiChat.remainingParamsMenuTitle')" prop="menu_title">
         <el-input
           v-model="form.menu_title"
           maxlength="64"
