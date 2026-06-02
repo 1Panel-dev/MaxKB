@@ -1120,7 +1120,8 @@ class ToolSerializer(serializers.Serializer):
                 is_active=False,
             )
             # 校验代码是否包括禁止的关键字
-            ToolExecutor().validate_mcp_transport(code)
+            if tool.get("tool_type") == ToolType.MCP:
+                ToolExecutor().validate_mcp_transport(code)
             tool_model.save()
             if tool.get("tool_type") == ToolType.WORKFLOW:
                 tool["id"] = tool_id
