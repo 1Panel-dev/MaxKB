@@ -99,12 +99,9 @@ const form_data_context = computed({
   },
 })
 
-watch(
-  () => props.application,
-  (data) => {
-    handleInputFieldList()
-  },
-)
+watch([() => props.application, () => props.excludeFields], () => {
+  handleInputFieldList()
+})
 
 function handleInputFieldList() {
   dynamicsFormRefresh.value++
