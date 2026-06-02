@@ -94,7 +94,7 @@ const itemValue = computed({
 
 const attrs = computed(() => {
   const base = props.formfield.attrs || {}
-  if (props.formfield.input_type === 'MultiSelect') {
+  if (props.formfield.input_type === 'MultiSelect' || props.formfield.input_type === 'Knowledge') {
     return {
       ...base,
       'collapse-tags': true,
