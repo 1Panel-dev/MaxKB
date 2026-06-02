@@ -3,7 +3,7 @@
     <div class="flex-between cursor" @click="data['show'] = !data['show']">
       <div class="flex align-center">
         <el-icon class="mr-8 arrow-icon" :class="data['show'] ? 'rotate-90' : ''">
-          <CaretRight/>
+          <CaretRight />
         </el-icon>
         <component
           :is="iconComponent(`${data.type}-icon`)"
@@ -25,19 +25,19 @@
             data.type == WorkflowType.IntentNode ||
             data.type === WorkflowType.VideoUnderstandNode
           "
-        >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
+          >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
         >
         <span class="mr-16 color-secondary" v-if="data.status != 202"
-        >{{ data?.run_time?.toFixed(2) || 0.0 }} s</span
+          >{{ data?.run_time?.toFixed(2) || 0.0 }} s</span
         >
         <el-icon class="color-success" :size="16" v-if="data.status === 200">
-          <CircleCheck/>
+          <CircleCheck />
         </el-icon>
         <el-icon class="is-loading" :size="16" v-else-if="data.status === 202">
-          <Loading/>
+          <Loading />
         </el-icon>
         <el-icon class="color-danger" :size="16" v-else>
-          <CircleClose/>
+          <CircleClose />
         </el-icon>
       </div>
     </div>
@@ -70,7 +70,7 @@
                     <template v-for="(f, i) in data.document_list" :key="i">
                       <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                         <div class="flex align-center">
-                          <img :src="getImgUrl(f && f?.name)" alt="" width="24"/>
+                          <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
                           <div class="ml-4 ellipsis" :title="f && f?.name">
                             {{ f && f?.name }}
                           </div>
@@ -130,7 +130,7 @@
                     <template v-for="(f, i) in data.other_list" :key="i">
                       <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
                         <div class="flex align-center">
-                          <img :src="getImgUrl(f && f?.name)" alt="" width="24"/>
+                          <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
                           <div class="ml-4 ellipsis" :title="f && f?.name">
                             {{ f && f?.name }}
                           </div>
@@ -187,8 +187,7 @@
             </div>
           </template>
           <!-- AI 对话 -->
-          <template
-            v-if="data.type == WorkflowType.AiChat">
+          <template v-if="data.type == WorkflowType.AiChat">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
                 {{ $t('views.application.form.roleSettings.label') }}
@@ -222,7 +221,31 @@
                 }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter pre-wrap">
-                {{ data.question || '-' }}
+                <template v-if="Array.isArray(data.question)">
+                  <div v-for="(item, qIndex) in data.question" :key="qIndex">
+                    <el-image
+                      v-if="item.type === 'image_url'"
+                      :src="item.image_url?.url || item.image_url"
+                      alt=""
+                      fit="cover"
+                      style="width: 40px; height: 40px; display: block"
+                      class="border-r-6 mb-8"
+                    />
+                    <video
+                      v-else-if="item.type === 'video_url'"
+                      :src="item.video_url?.url || item.video_url"
+                      style="width: 170px; display: block"
+                      class="border-r-6 mb-8"
+                      autoplay
+                      controls
+                    />
+                    <div v-else-if="item.type === 'text'" class="mb-8">{{ item.text }}</div>
+                    <div v-else class="mb-8">{{ item }}</div>
+                  </div>
+                </template>
+                <template v-else>
+                  {{ data.question || '-' }}
+                </template>
               </div>
             </div>
             <div class="card-never border-r-6 mt-8">
@@ -374,7 +397,9 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <div v-if="data.audio_list?.length > 0">
-                    <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
+                    <p class="mb-8 color-secondary">
+                      {{ $t('aiChat.executionDetails.audioFile') }}:
+                    </p>
 
                     <el-space wrap>
                       <template v-for="(f, i) in data.audio_list" :key="i">
@@ -423,7 +448,9 @@
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="p-8-12 border-t-dashed lighter">
-                  <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.textContent') }}:</p>
+                  <p class="mb-8 color-secondary">
+                    {{ $t('aiChat.executionDetails.textContent') }}:
+                  </p>
                   <div v-if="data.content">
                     <MdPreview
                       ref="editorRef"
@@ -519,8 +546,7 @@
           <template v-if="data.type === WorkflowType.FormNode">
             <div class="card-never border-r-6">
               <h5 class="p-8-12">
-                {{
-                  $t('common.param.outputParam')
+                {{ $t('common.param.outputParam')
                 }}<span style="color: #f54a45">{{
                   data.is_submit ? '' : `(${$t('aiChat.executionDetails.noSubmit')})`
                 }}</span>
@@ -572,7 +598,7 @@
                           class="border-r-6 mr-8"
                         />
 
-                        <span v-else>{{ h.text }}<br/></span>
+                        <span v-else>{{ h.text }}<br /></span>
                       </template>
                     </span>
 
@@ -672,7 +698,7 @@
                           class="border-r-6 mr-8"
                         />
 
-                        <span v-else>{{ h.text }}<br/></span>
+                        <span v-else>{{ h.text }}<br /></span>
                       </template>
                     </span>
 
@@ -1069,7 +1095,7 @@
               <template v-if="data.type === WorkflowType.LoopNode">
                 <el-radio-group v-model="currentLoopNode" class="app-radio-button-group mb-8">
                   <template v-for="(loop, loopIndex) in data.loop_node_data" :key="loopIndex">
-                    <el-radio-button :label="loopIndex" :value="loopIndex"/>
+                    <el-radio-button :label="loopIndex" :value="loopIndex" />
                   </template>
                 </el-radio-group>
                 <template
@@ -1185,13 +1211,13 @@
               <div class="p-8-12 border-t-dashed lighter">
                 <div class="mb-8">
                   <span class="color-secondary"
-                  >{{ $t('aiChat.executionDetails.paragraphRules') }}:</span
+                    >{{ $t('aiChat.executionDetails.paragraphRules') }}:</span
                   >
                   {{ data.split_strategy }}
                 </div>
                 <div class="mb-8">
                   <span class="color-secondary"
-                  >{{ $t('workflow.nodes.documentSplitNode.chunk_length.label') }}:</span
+                    >{{ $t('workflow.nodes.documentSplitNode.chunk_length.label') }}:</span
                   >
                   {{ data.chunk_size }}
                 </div>
@@ -1371,17 +1397,16 @@
   </el-card>
 </template>
 <script setup lang="ts">
-import {ref, computed, type PropType} from 'vue'
-import ParagraphCard
-  from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
+import { ref, computed, type PropType } from 'vue'
+import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
-import {iconComponent} from '@/workflow/icons/utils'
-import {WorkflowType} from '@/enums/application'
-import {getImgUrl} from '@/utils/common'
-import {arraySort} from '@/utils/array'
+import { iconComponent } from '@/workflow/icons/utils'
+import { WorkflowType } from '@/enums/application'
+import { getImgUrl } from '@/utils/common'
+import { arraySort } from '@/utils/array'
 import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
-import {t} from '@/locales'
+import { t } from '@/locales'
 
 const props = defineProps({
   data: {
