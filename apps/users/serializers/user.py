@@ -81,19 +81,26 @@ def is_workspace_manage(user_id: str, workspace_id: str):
             role__type=RoleConstants.WORKSPACE_MANAGE.value.__str__()).exists()
     return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
 
+
 def is_workspace_manage_permission_read(user_id: str, workspace_id: str, permission_id):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
     is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
     if is_x_pack_ee:
         has_permission = QuerySet(role_permission_mapping_model).filter(
-            role__userrolerelation__user_id=user_id,
-            role__userrolerelation__workspace_id=workspace_id,
-            permission_id=permission_id,
-            role__type=RoleConstants.WORKSPACE_MANAGE.value.__str__()
+            Q(role__userrolerelation__user_id=user_id,
+              role__userrolerelation__workspace_id=workspace_id,
+              permission_id=permission_id,
+              role__type=RoleConstants.WORKSPACE_MANAGE.value.__str__()) |
+            Q(role__userrolerelation__user_id=user_id,
+              role__userrolerelation__workspace_id=workspace_id,
+              role__id=RoleConstants.WORKSPACE_MANAGE.value.__str__()
+              )
         ).exists()
         return has_permission
     return True
+
+
 def get_workspace_list_by_user(user_id):
     get_workspace_list = DatabaseModelManage.get_model('get_workspace_list_by_user')
     license_is_valid = DatabaseModelManage.get_model('license_is_valid') or (lambda: False)
@@ -1179,7 +1186,7 @@ class SwitchLanguageSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         language = self.data.get('language')
         support_language_list = CONFIG.get_languages()
-        #这个是一个list 完事是对象 key是语言的key value是语言的value  我只需要提取语言的key就行
+        # 这个是一个list 完事是对象 key是语言的key value是语言的value  我只需要提取语言的key就行
         support_keys = [lang[0] for lang in support_language_list]
         # support_language_list = ['zh-CN', 'zh-Hant', 'en-US'] en_US,ja,zh_CN,zh_Hant
         if not support_keys.__contains__(language):
