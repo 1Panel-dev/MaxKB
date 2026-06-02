@@ -391,14 +391,20 @@ class BaseChatNode(IChatNode):
     def generate_prompt_question(self, prompt, model):
         image = self.get_image()
         video = self.get_video()
+        vision = self.is_vision()
         videos = []
         images = []
-        if image:
+        if image and vision:
             images = self._process_images(image)
-        if video:
+        if video and vision:
             videos = self._process_videos(video, model)
         return HumanMessage(
             content=[*videos, *images, {'type': 'text', 'text': self.workflow_manage.generate_prompt(prompt)}])
+
+    def is_vision(self):
+        if 'vision' in self.node_params_serializer.data:
+            return self.node_params_serializer.data.get('vision')
+        return False
 
     def get_image(self):
         if 'image_list' in self.node_params_serializer.data:

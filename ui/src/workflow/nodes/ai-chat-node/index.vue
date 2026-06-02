@@ -170,60 +170,66 @@
             :step-strictly="true"
           />
         </el-form-item>
-        <el-form-item
-          :rules="{
-            type: 'array',
-            required: true,
-            message: $t('workflow.nodes.imageUnderstandNode.image.requiredMessage'),
-            trigger: 'change',
-          }"
-        >
-          <div class="flex align-center">
-            <div>
-              <span>{{ $t('workflow.nodes.imageUnderstandNode.image.label') }} </span>
+        <div class="flex" style="justify-content: space-between">
+          {{ t('workflow.nodes.aiChatNode.vision.label') }}
+          <el-switch size="small" v-model="vision" />
+        </div>
+        <template v-if="vision">
+          <el-form-item
+            :rules="{
+              type: 'array',
+              required: true,
+              message: $t('workflow.nodes.imageUnderstandNode.image.requiredMessage'),
+              trigger: 'change',
+            }"
+          >
+            <div class="flex align-center">
+              <div>
+                <span>{{ $t('workflow.nodes.imageUnderstandNode.image.label') }} </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
             </div>
-            <el-tooltip effect="dark" placement="right">
-              <template #content>
-                <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
-              </template>
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-          </div>
-          <NodeCascader
-            ref="nodeCascaderRef"
-            :nodeModel="nodeModel"
-            class="w-full"
-            :placeholder="$t('workflow.nodes.imageUnderstandNode.image.requiredMessage')"
-            v-model="chat_data.image_list"
-          />
-        </el-form-item>
-        <el-form-item
-          :rules="{
-            type: 'array',
-            required: false,
-            message: $t('workflow.nodes.videoUnderstandNode.video.requiredMessage'),
-            trigger: 'change',
-          }"
-        >
-          <div class="flex align-center">
-            <div>
-              <span>{{ $t('workflow.nodes.videoUnderstandNode.video.label') }} </span>
+            <NodeCascader
+              ref="nodeCascaderRef"
+              :nodeModel="nodeModel"
+              class="w-full"
+              :placeholder="$t('workflow.nodes.imageUnderstandNode.image.requiredMessage')"
+              v-model="chat_data.image_list"
+            />
+          </el-form-item>
+          <el-form-item
+            :rules="{
+              type: 'array',
+              required: false,
+              message: $t('workflow.nodes.videoUnderstandNode.video.requiredMessage'),
+              trigger: 'change',
+            }"
+          >
+            <div class="flex align-center">
+              <div>
+                <span>{{ $t('workflow.nodes.videoUnderstandNode.video.label') }} </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
             </div>
-            <el-tooltip effect="dark" placement="right">
-              <template #content>
-                <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
-              </template>
-              <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
-            </el-tooltip>
-          </div>
-          <NodeCascader
-            ref="nodeCascaderRef"
-            :nodeModel="nodeModel"
-            class="w-full"
-            :placeholder="$t('workflow.nodes.videoUnderstandNode.video.requiredMessage')"
-            v-model="chat_data.video_list"
-          />
-        </el-form-item>
+            <NodeCascader
+              ref="nodeCascaderRef"
+              :nodeModel="nodeModel"
+              class="w-full"
+              :placeholder="$t('workflow.nodes.videoUnderstandNode.video.requiredMessage')"
+              v-model="chat_data.video_list"
+            /> </el-form-item
+        ></template>
+
         <div class="mb-8 mt-12 flex-between">
           <span class="mr-4 lighter">
             {{ $t('views.tool.skill.title') }}
@@ -616,7 +622,14 @@ const route = useRoute()
 const {
   params: { id },
 } = route as any
-
+const vision = computed({
+  get: () => {
+    return props.nodeModel.properties.node_data.vision
+  },
+  set: (vision: boolean) => {
+    set(props.nodeModel.properties.node_data, 'vision', vision)
+  },
+})
 const apiType = computed(() => {
   if (route.path.includes('resource-management')) {
     return 'systemManage'

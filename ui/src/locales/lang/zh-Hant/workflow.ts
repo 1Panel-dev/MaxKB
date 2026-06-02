@@ -156,6 +156,9 @@ export default {
       label: 'AI 對話',
       text: '與 AI 大模型進行對話',
       answer: 'AI 回答內容',
+      vision: {
+        label: '視覺',
+      },
       returnContent: {
         label: '返回內容',
         tooltip: `關閉後該節點的內容則不輸出給用戶。
