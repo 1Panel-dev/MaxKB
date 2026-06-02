@@ -71,11 +71,7 @@
             show-overflow-tooltip
             :label="$t('views.application.form.appName.label')"
           />
-          <el-table-column
-            min-width="100"
-            :label="'Tokens ' + $t('home.usage')"
-            align="right"
-          >
+          <el-table-column min-width="100" :label="'Tokens ' + $t('home.usage')" align="right">
             <template #default="{ row }">
               {{ numberFormat(row.total_tokens) }}
             </template>
@@ -126,11 +122,7 @@
         </app-table>
       </el-tab-pane>
       <el-tab-pane
-        :label="
-          $t('home.chatCount') +
-          ' · Top ' +
-          $t('views.application.title')
-        "
+        :label="$t('home.chatCount') + ' · Top ' + $t('views.application.title')"
         name="questions_agent"
       >
         <app-table
@@ -232,11 +224,7 @@
               {{ row?.asker?.username || '-' }}
             </template>
           </el-table-column>
-          <el-table-column
-            min-width="100"
-            :label="'Tokens ' + $t('home.usage')"
-            align="right"
-          >
+          <el-table-column min-width="100" :label="'Tokens ' + $t('home.usage')" align="right">
             <template #default="{ row }">
               {{ numberFormat(row.total_tokens) }}
             </template>
@@ -461,6 +449,7 @@ const open = (name: string, historyDay: number | string, daterangeVal: string, d
   history_day.value = historyDay
   daterangeValue.value = daterangeVal
   daterange.value = daterange
+  changeDayHandle(history_day.value)
   drawerVisible.value = true
 }
 defineExpose({
