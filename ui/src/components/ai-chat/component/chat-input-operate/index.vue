@@ -219,8 +219,8 @@
             <span v-if="mode === 'mobile'">
               <el-button text @click="switchMicrophone(!isMicrophone)">
                 <!-- 键盘 -->
-                <AppIcon v-if="isMicrophone" iconName="app-keyboard"></AppIcon>
-                <el-icon v-else>
+                <AppIcon v-if="isMicrophone" iconName="app-keyboard" :size="20"></AppIcon>
+                <el-icon v-else :size="20">
                   <!-- 录音 -->
                   <Microphone />
                 </el-icon>
@@ -233,7 +233,7 @@
                 @click="startRecording"
                 v-if="recorderStatus === 'STOP'"
               >
-                <el-icon>
+                <el-icon :size="20">
                   <Microphone />
                 </el-icon>
               </el-button>
@@ -248,7 +248,7 @@
                   @click="stopRecording"
                   :loading="recorderStatus === 'TRANSCRIBING'"
                 >
-                  <AppIcon iconName="app-video-stop"></AppIcon>
+                  <AppIcon iconName="app-video-stop" :size="20"></AppIcon>
                 </el-button>
               </div>
             </span>
@@ -264,7 +264,7 @@
                 class="mt-4"
                 @click="openUrlSetting"
               >
-                <el-icon><Paperclip /></el-icon>
+                <el-icon :size="20"><Paperclip /></el-icon>
               </el-button>
               <!-- 没有URL地址 -->
               <el-upload
@@ -294,7 +294,7 @@
                     </div>
                   </template>
                   <el-button text :disabled="checkMaxFilesLimit() || loading" class="mt-4">
-                    <el-icon><Paperclip /></el-icon>
+                    <el-icon :size="20"><Paperclip /></el-icon>
                   </el-button>
                 </el-tooltip>
               </el-upload>
@@ -529,7 +529,9 @@ const uploadFile = async (file: any, fileList: any) => {
     uploadVideoList.value.length +
     uploadOtherList.value.length
   if (file_limit_once >= maxFiles) {
-    MsgWarning(t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'))
+    MsgWarning(
+      t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'),
+    )
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
@@ -1191,7 +1193,9 @@ async function saveUrl() {
     urls.length + file_limit_once >= fileLimit ||
     urls.length > fileLimit
   ) {
-    MsgWarning(t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'))
+    MsgWarning(
+      t('aiChat.uploadFile.limitMessage1') + maxFiles + t('aiChat.uploadFile.limitMessage2'),
+    )
     return
   }
   // 允许的 MIME 类型
@@ -1352,10 +1356,6 @@ async function saveUrl() {
 
     .operate {
       padding: 6px 10px;
-
-      .el-icon {
-        font-size: 20px;
-      }
 
       .sent-button {
         max-height: none;

@@ -466,10 +466,6 @@ onMounted(() => {})
       .operate {
         padding: 6px 10px;
 
-        .el-icon {
-          font-size: 20px;
-        }
-
         .sent-button {
           max-height: none;
 

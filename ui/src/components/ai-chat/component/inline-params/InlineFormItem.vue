@@ -11,19 +11,10 @@
   >
     <div
       v-if="formfield.input_type === 'SwitchInput'"
-      style="
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid #dcdfe6;
-        border-radius: 4px;
-        padding: 0 8px;
-        height: 32px;
-      "
+      class="flex align-center border border-r-6"
+      style="padding: 4px 10px;"
     >
-      <span style="font-size: 13px; color: #606266; white-space: nowrap" :title="switchLabel">{{
-        switchLabel
-      }}</span>
+      <span :title="switchLabel" class="mr-4 lighter">{{ switchLabel }}</span>
       <component
         ref="componentFormRef"
         :view="view"
@@ -34,6 +25,7 @@
         :field="formfield.field"
         v-bind="attrs"
         :formfield-list="formfieldList"
+        size="small"
       ></component>
     </div>
     <component

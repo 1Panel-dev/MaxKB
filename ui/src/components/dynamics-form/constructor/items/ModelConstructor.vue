@@ -103,9 +103,7 @@
       </el-select>
       <div class="ml-8">
         <el-button @click="openParamSetting" @refreshForm="handleParamRefresh">
-          <el-icon>
-            <Operation />
-          </el-icon>
+          <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
         </el-button>
       </div>
     </div>

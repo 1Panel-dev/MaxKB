@@ -1,10 +1,12 @@
 <template>
-  <div class="flex-between w-full">
+  <div class="complex-select flex align-center w-full">
     <el-select
+      class="complex-select__left"
       :model-value="model_value?.model_id"
       @change="handleModelChange"
       v-bind="$attrs"
       popper-class="select-model"
+      style="width: 120px"
     >
       <template #header v-if="$attrs.popperHeader">
         <SelectHeader :header="$attrs.popperHeader" />
@@ -44,13 +46,10 @@
         </el-space>
       </template>
     </el-select>
-    <div class="ml-4">
-      <el-button @click="openParamSetting" :disabled="!model_value?.model_id">
-        <el-icon>
-          <Operation />
-        </el-icon>
-      </el-button>
-    </div>
+    <el-divider direction="vertical" />
+    <el-button text @click="openParamSetting" :disabled="!model_value?.model_id" class="mr-4">
+      <AppIcon iconName="app-operation" class="color-secondary" size="16"></AppIcon>
+    </el-button>
   </div>
   <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="handleParamRefresh" />
 </template>
