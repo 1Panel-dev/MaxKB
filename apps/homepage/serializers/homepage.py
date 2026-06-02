@@ -15,6 +15,7 @@ from django.db import models
 from django.db.models import QuerySet, Count, Q, UUIDField, Sum, F, BigIntegerField, Value, ExpressionWrapper, \
     IntegerField, Window
 from django.db.models.functions import Cast, Coalesce, RowNumber
+from django.forms import CharField
 from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, gettext
@@ -57,7 +58,10 @@ def has_all_permission(auth, permission, workspace_id):
             or has_extends_workspace_manage_permission(auth,
                                                        permission,
                                                        workspace_id)
-            or hasPermission(auth, permission))
+            or hasPermission(auth,
+                             permission)
+            or RoleConstants.USER.name + f':/WORKSPACE/{workspace_id}' in auth.role_list
+            or RoleConstants.WORKSPACE_MANAGE.name + f':/WORKSPACE/{workspace_id}' in auth.role_list)
 
 
 def is_workspace_manage(auth, workspace_id):
@@ -125,7 +129,7 @@ class HomePageSerializer(serializers.Serializer):
                         user_id=user_id,
                         auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
-                    )
+                    ).exclude(target='default')
                     .annotate(
                         target_uuid=Cast(
                             "target",
@@ -184,7 +188,7 @@ class HomePageSerializer(serializers.Serializer):
                         user_id=user_id,
                         auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
-                    )
+                    ).exclude(target='default')
                     .annotate(
                         target_uuid=Cast(
                             "target",
@@ -348,7 +352,7 @@ class HomePageSerializer(serializers.Serializer):
                     user_id=user_id,
                     auth_target_type="APPLICATION",
                     permission_list__overlap=permission_list,
-                )
+                ).exclude(target='default')
                 .annotate(target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True)
             )
@@ -421,7 +425,7 @@ class HomePageSerializer(serializers.Serializer):
                         user_id=user_id,
                         auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list,
-                    )
+                    ).exclude(target='default')
                     .annotate(
                         target_uuid=Cast("target", output_field=UUIDField())
                     )
@@ -563,7 +567,7 @@ class HomePageSerializer(serializers.Serializer):
                         user_id=user_id,
                         auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
-                    )
+                    ).exclude(target='default')
                     .annotate(target_uuid=Cast("target", output_field=UUIDField()))
                     .values_list("target_uuid", flat=True)
                 )
@@ -751,7 +755,7 @@ class HomePageSerializer(serializers.Serializer):
                         user_id=user_id,
                         auth_target_type="APPLICATION",
                         permission_list__overlap=permission_list
-                        ).annotate(target_uuid=Cast("target", output_field=UUIDField()))
+                        ).exclude(target='default').annotate(target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True))
 
         def aggregation(self, auth, with_valid=True):
@@ -790,7 +794,7 @@ class HomePageSerializer(serializers.Serializer):
                                                                         user_id=user_id,
                                                                         auth_target_type="KNOWLEDGE",
                                                                         permission_list__overlap=permission_list
-                                                                        ).annotate(
+                                                                        ).exclude(target='default').annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True))
 
@@ -839,7 +843,8 @@ class HomePageSerializer(serializers.Serializer):
                                                                         user_id=user_id,
                                                                         auth_target_type="TOOL",
                                                                         permission_list__overlap=permission_list
-                                                                        ).annotate(
+                                                                        )
+                .exclude(target='default').annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True))
 
@@ -885,7 +890,7 @@ class HomePageSerializer(serializers.Serializer):
                                                                         user_id=user_id,
                                                                         auth_target_type="MODEL",
                                                                         permission_list__overlap=permission_list
-                                                                        ).annotate(
+                                                                        ).exclude(target='default').annotate(
                     target_uuid=Cast("target", output_field=UUIDField()))
                 .values_list("target_uuid", flat=True))
 
