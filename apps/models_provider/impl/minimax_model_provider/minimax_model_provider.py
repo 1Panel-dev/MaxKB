@@ -28,9 +28,17 @@ minimax_tti_model_credential = MiniMaxTextToImageModelCredential()
 minimax_ttv_model_credential = TextToVideoModelCredential()
 minimax_itv_model_credential = ImageToVideoModelCredential()
 
+minimax_m3 = ModelInfo(
+    "MiniMax-M3",
+    _("Latest flagship model with 512K context window, 128K max output, and image input support"),
+    ModelTypeConst.LLM,
+    minimax_llm_model_credential,
+    MiniMaxChatModel,
+)
+
 minimax_m2_7 = ModelInfo(
     "MiniMax-M2.7",
-    _("Latest flagship model with enhanced reasoning and coding. 204K context window"),
+    _("Previous generation model with enhanced reasoning and coding. 204K context window"),
     ModelTypeConst.LLM,
     minimax_llm_model_credential,
     MiniMaxChatModel,
@@ -39,22 +47,6 @@ minimax_m2_7 = ModelInfo(
 minimax_m2_7_highspeed = ModelInfo(
     "MiniMax-M2.7-highspeed",
     _("High-speed version of M2.7 for low-latency scenarios. 204K context window"),
-    ModelTypeConst.LLM,
-    minimax_llm_model_credential,
-    MiniMaxChatModel,
-)
-
-minimax_m2_5 = ModelInfo(
-    "MiniMax-M2.5",
-    _("Peak Performance. Ultimate Value. 204K context window"),
-    ModelTypeConst.LLM,
-    minimax_llm_model_credential,
-    MiniMaxChatModel,
-)
-
-minimax_m2_5_highspeed = ModelInfo(
-    "MiniMax-M2.5-highspeed",
-    _("Same performance, faster and more agile. 204K context window"),
     ModelTypeConst.LLM,
     minimax_llm_model_credential,
     MiniMaxChatModel,
@@ -88,11 +80,10 @@ model_info_itv_list = [
 ]
 model_info_manage = (
     ModelInfoManage.builder()
+    .append_model_info(minimax_m3)
     .append_model_info(minimax_m2_7)
     .append_model_info(minimax_m2_7_highspeed)
-    .append_model_info(minimax_m2_5)
-    .append_model_info(minimax_m2_5_highspeed)
-    .append_default_model_info(minimax_m2_7)
+    .append_default_model_info(minimax_m3)
     .append_model_info(minimax_tts_hd)
     .append_model_info(minimax_tts_turbo)
     .append_default_model_info(minimax_tts_hd)
