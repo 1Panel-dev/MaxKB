@@ -579,7 +579,10 @@
                   >
                     <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
-                        <AppIcon iconName="app-document-wordIndexing" style="font-size: 16px"></AppIcon>
+                        <AppIcon
+                          iconName="app-document-wordIndexing"
+                          style="font-size: 16px"
+                        ></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
@@ -708,7 +711,7 @@
                     placement="top"
                     v-else
                   >
-                    <span class="mr-4"  v-if="permissionPrecise.vector(id)">
+                    <span class="mr-4" v-if="permissionPrecise.vector(id)">
                       <el-button type="primary" text @click.stop="refreshDocument(row)">
                         <AppIcon iconName="app-document-refresh" style="font-size: 16px"></AppIcon>
                       </el-button>
@@ -743,22 +746,14 @@
                   >
                     <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
-                        <AppIcon iconName="app-document-wordIndexing" style="font-size: 16px"></AppIcon>
+                        <AppIcon
+                          iconName="app-document-wordIndexing"
+                          style="font-size: 16px"
+                        ></AppIcon>
                       </el-button>
                     </span>
                   </el-tooltip>
-                  <el-tooltip
-                    effect="dark"
-                    :content="$t('common.setting')"
-                    placement="top"
-                    v-if="permissionPrecise.doc_edit(id)"
-                  >
-                    <span class="mr-4">
-                      <el-button type="primary" text @click.stop="settingDoc(row)">
-                        <AppIcon iconName="app-setting"></AppIcon>
-                      </el-button>
-                    </span>
-                  </el-tooltip>
+
                   <span @click.stop>
                     <el-dropdown trigger="click" v-if="MoreFilledPermission2(id)">
                       <el-button text type="primary">
@@ -766,6 +761,13 @@
                       </el-button>
                       <template #dropdown>
                         <el-dropdown-menu>
+                          <el-dropdown-item
+                            @click="settingDoc(row)"
+                            v-if="permissionPrecise.doc_edit(id)"
+                          >
+                            <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                            {{ $t('common.setting') }}</el-dropdown-item
+                          >
                           <el-dropdown-item
                             @click="syncDocument(row)"
                             v-if="permissionPrecise.sync(id)"
