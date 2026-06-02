@@ -120,7 +120,7 @@ export default {
     comfirm: '确定转换为工作流知识库？转换后无法回退，请谨慎操作。',
   },
   customSegmentation: {
-    title: '自定义分段',
+    title: '自定义分词',
     tip: '避免专业术语被拆分，提升全文检索的精准度与召回率',
     create: '创建词语',
     quickCreate: '快速创建词语',

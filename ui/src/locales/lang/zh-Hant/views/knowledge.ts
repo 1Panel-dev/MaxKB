@@ -109,7 +109,7 @@ export default {
     comfirm: '確定轉換為工作流知識庫？轉換後無法回退，請謹慎操作。',
   },
   customSegmentation: {
-    title: '自定義分段',
+    title: '自定義分詞',
     tip: '避免專業術語被拆分，提升全文檢索的精准度與召回率',
     create: '創建詞語',
     quickCreate: '快速創建詞語',

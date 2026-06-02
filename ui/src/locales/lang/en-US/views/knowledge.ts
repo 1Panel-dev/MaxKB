@@ -118,7 +118,7 @@ export default {
       'Are you sure you want to convert to the workflow knowledge base? This action cannot be undone. Please proceed with caution.',
   },
   customSegmentation: {
-    title: 'Custom Segmentation',
+    title: 'Custom Term',
     tip: 'Avoid professional terms from being split, improve the accuracy and recall rate of full-text search',
     create: 'Create Term',
     quickCreate: 'Quick Create Term',
