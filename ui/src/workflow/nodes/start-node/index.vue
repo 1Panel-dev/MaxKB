@@ -48,35 +48,28 @@
 import { cloneDeep, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import { copyClick } from '@/utils/clipboard'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { t } from '@/locales'
+import { useI18n } from 'vue-i18n'
 const props = defineProps<{ nodeModel: any }>()
+const { locale } = useI18n({ useScope: 'global' })
 
 const showicon = ref(false)
-const globalFields = [
+const getGlobalFields = () => [
   { label: t('workflow.nodes.startNode.currentTime'), value: 'time' },
-  {
-    label: t('views.application.form.historyRecord.label'),
-    value: 'history_context',
-  },
+  { label: t('views.application.form.historyRecord.label'), value: 'history_context' },
   { label: t('aiChat.chatId'), value: 'chat_id' },
-  {
-    label: t('aiChat.chatUserId'),
-    value: 'chat_user_id',
-  },
-  {
-    label: t('aiChat.chatUserType'),
-    value: 'chat_user_type',
-  },
-  {
-    label: t('aiChat.chatUserGroup'),
-    value: 'chat_user_group',
-  },
-  {
-    label: t('views.chatUser.title'),
-    value: 'chat_user',
-  },
+  { label: t('aiChat.chatUserId'), value: 'chat_user_id' },
+  { label: t('aiChat.chatUserType'), value: 'chat_user_type' },
+  { label: t('aiChat.chatUserGroup'), value: 'chat_user_group' },
+  { label: t('views.chatUser.title'), value: 'chat_user' },
 ]
+
+const refreshStartQuestionField = () => {
+  const questionFields = [{ label: t('workflow.nodes.startNode.question'), value: 'question' }]
+  set(props.nodeModel.properties.config, 'fields', questionFields)
+  set(props.nodeModel.properties, 'fields', questionFields)
+}
 
 const getRefreshFieldList = () => {
   const user_input_fields = props.nodeModel.graphModel.nodes
@@ -98,7 +91,7 @@ const getRefreshFieldList = () => {
 }
 const refreshFieldList = () => {
   const refreshFieldList = getRefreshFieldList()
-  set(props.nodeModel.properties.config, 'globalFields', [...globalFields, ...refreshFieldList])
+  set(props.nodeModel.properties.config, 'globalFields', [...getGlobalFields(), ...refreshFieldList])
 }
 
 const refreshChatFieldList = () => {
@@ -179,6 +172,15 @@ const refreshLongTermConfig = () => {
 props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
 
 onMounted(() => {
+  refreshStartQuestionField()
+  refreshChatFieldList()
+  refreshFieldList()
+  refreshFileUploadConfig()
+  refreshLongTermConfig()
+})
+
+watch(locale, () => {
+  refreshStartQuestionField()
   refreshChatFieldList()
   refreshFieldList()
   refreshFileUploadConfig()

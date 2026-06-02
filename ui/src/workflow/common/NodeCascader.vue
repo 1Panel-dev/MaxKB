@@ -23,10 +23,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, inject } from 'vue'
+import { computed, inject, onMounted, ref } from 'vue'
 import { iconComponent } from '../icons/utils'
 import { t } from '@/locales'
 import { WorkflowMode } from '@/enums/application'
+
 const props = defineProps<{
   nodeModel: any
   modelValue: Array<any>
@@ -108,7 +109,7 @@ const getOptionsValue = () => {
         )
       : get_up_node_field_list(false, true).filter((v: any) => v.children && v.children.length > 0)
   } else {
-    const result = props.global
+    return props.global
       ? props.nodeModel
           .get_up_node_field_list(false, true)
           .filter(
@@ -118,7 +119,6 @@ const getOptionsValue = () => {
       : props.nodeModel
           .get_up_node_field_list(false, true)
           .filter((v: any) => v.children && v.children.length > 0)
-    return result
   }
 }
 const initOptions = () => {

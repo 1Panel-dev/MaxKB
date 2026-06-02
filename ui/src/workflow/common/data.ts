@@ -1,6 +1,7 @@
 import { WorkflowKind } from './../../enums/application'
 import { WorkflowType, WorkflowMode } from '@/enums/application'
-import { t } from '@/locales'
+import i18n, { t } from '@/locales'
+import { watch } from 'vue'
 import call$ from 'dingtalk-jsapi/api/biz/telephone/call'
 
 export const startNode = {
@@ -1190,9 +1191,9 @@ function defineLocaleGetter(target: any, prop: string, key: string, fallback?: s
   Object.defineProperty(target, prop, {
     configurable: true,
     enumerable: true,
-    get: () => overrideValue ?? t(key, fallback as any),
+    get: () => overrideValue || t(key, fallback as any),
     set: (value) => {
-      overrideValue = value
+      overrideValue = value || undefined
     },
   })
 }
@@ -1207,7 +1208,15 @@ function bindLocale(target: any, path: string, key: string, fallback?: string) {
 }
 
 function bindFieldLabels(fields: Array<any> | undefined, keys: string[]) {
-  fields?.forEach((field, index) => defineLocaleGetter(field, 'label', keys[index]))
+  const refresh = () => {
+    fields?.forEach((field, index) => {
+      if (keys[index]) {
+        field.label = t(keys[index])
+      }
+    })
+  }
+  refresh()
+  watch(i18n.global.locale, refresh)
 }
 
 function bindNodeLocale(node: any, textKey: string, labelKey: string, stepNameKey = labelKey) {
