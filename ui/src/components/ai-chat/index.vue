@@ -186,6 +186,7 @@ import { ChatManagement, type chatType } from '@/api/type/application'
 import { randomId } from '@/utils/common'
 import useStore from '@/stores'
 import { debounce } from 'lodash'
+import { useElementSize } from '@vueuse/core'
 import AnswerContent from '@/components/ai-chat/component/answer-content/index.vue'
 import QuestionContent from '@/components/ai-chat/component/question-content/index.vue'
 import TransitionContent from '@/components/ai-chat/component/transition-content/index.vue'
@@ -257,17 +258,24 @@ const emit = defineEmits([
   'update:selection',
 ])
 const { application, common, chatUser } = useStore()
+
+const aiChatRef = ref()
+const { width: rootWidth } = useElementSize(aiChatRef)
+
 const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
-const maxExposed = computed(() => (isMobile.value ? 1 : 3))
+
+const isNarrow = computed(() => rootWidth.value > 0 && rootWidth.value < 1040)
+
+const maxExposed = computed(() => (isNarrow.value ? 1 : 3))
 const inlineExposedFields = computed<string[]>(() =>
   (
-    props.applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')
-      ?.properties?.user_input_field_list_setting?.exposed_fields || []
+    props.applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+      ?.user_input_field_list_setting?.exposed_fields || []
   ).slice(0, maxExposed.value),
 )
-const aiChatRef = ref()
+
 const scrollDiv = ref()
 const dialogScrollbar = ref()
 const loading = ref(false)
