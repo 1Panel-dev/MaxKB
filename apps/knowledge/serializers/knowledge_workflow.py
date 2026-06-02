@@ -374,7 +374,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 ).import_({"file": bytes_to_uploaded_file(res.content, "file.kbwf")}, is_import_tool=True)
 
                 try:
-                    requests.get(template_instance.get("downloadCallbackUrl"), timeout=5)
+                    download_callback_url = template_instance.get("downloadCallbackUrl", "")
+                    if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                       raise AppApiException(500, _("Illegal download callback url"))
+                    requests.get(download_callback_url, timeout=5)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
@@ -618,7 +621,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 ).import_({"file": bytes_to_uploaded_file(res.content, "file.kbwf")}, is_import_tool=False)
 
                 try:
-                    requests.get(template_instance.get("downloadCallbackUrl"), timeout=5)
+                    download_callback_url = template_instance.get("downloadCallbackUrl", "")
+                    if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                       raise AppApiException(500, _("Illegal download callback url")) 
+                    requests.get(download_callback_url, timeout=5)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
