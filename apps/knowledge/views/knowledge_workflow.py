@@ -22,13 +22,13 @@ class KnowledgeDatasourceFormListView(APIView):
     authentication_classes = [TokenAuth]
 
     @has_permissions(
-        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_knowledge_permission(),
-        PermissionConstants.KNOWLEDGE_WORKFLOW_READ.get_workspace_permission_workspace_manage_role(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+        PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND
+            CompareConstants.AND,
         ),
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str, type: str, id: str):
