@@ -556,6 +556,7 @@ class WorkflowManage:
     def run_node_future(self, node):
         try:
             node.valid_args(node.node_params, node.workflow_params)
+            self.send_progress(node)
             result = self.run_node(node)
             return NodeResultFuture(result, None, 200)
         except Exception as e:
