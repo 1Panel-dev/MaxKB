@@ -15,9 +15,28 @@ import uuid_utils.compat as uuid
 
 
 class ShareChatRecordModelSerializer(serializers.ModelSerializer):
+
+    execution_details = serializers.SerializerMethodField()
     class Meta:
         model = ChatRecord
-        fields = ['id', 'problem_text', 'answer_text', 'answer_text_list', 'create_time']
+        fields = ['id', 'problem_text', 'answer_text', 'answer_text_list',
+                  'create_time', 'execution_details']
+
+    @staticmethod
+    def get_execution_details(chat_record):
+        details = chat_record.details or {}
+        # 分享是公开链接，只挑 start-node 的上传文件列表，避免泄露其它执行详情
+        return [
+            {
+                'type': 'start-node',
+                'image_list': v.get('image_list', []),
+                'document_list': v.get('document_list', []),
+                'audio_list': v.get('audio_list', []),
+                'video_list': v.get('video_list', []),
+                'other_list': v.get('other_list', []),
+            }
+            for v in details.values() if v.get('type') == 'start-node'
+        ]
 
 class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
     chat_record_ids = serializers.ListSerializer(
