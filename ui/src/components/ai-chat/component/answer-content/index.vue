@@ -13,7 +13,7 @@
         }"
       >
         <el-card
-          v-if="!chatRecord.write_ed && progress"
+          v-if="!chatRecord.write_ed && progress && index >= answer_text_list.length - 1"
           shadow="always"
           class="border-r-8 mb-8"
           style="--el-card-padding: 1px 16px; width: fit-content"

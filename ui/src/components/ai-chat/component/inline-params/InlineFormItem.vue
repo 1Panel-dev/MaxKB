@@ -14,7 +14,9 @@
       class="flex align-center border border-r-6"
       style="padding: 4px 10px;"
     >
-      <span :title="switchLabel" class="mr-4 lighter">{{ switchLabel }}</span>
+      <span :title="switchLabel" class="mr-4 lighter ellipsis" style="max-width: 75px;">
+        {{ switchLabel }}
+      </span>
       <component
         ref="componentFormRef"
         :view="view"
@@ -102,7 +104,7 @@ const switchLabel = computed(() => {
     typeof props.formfield.label === 'string'
       ? props.formfield.label
       : props.formfield.label?.label || props.formfield.field
-  return label.length > 5 ? label.slice(0, 5) + '…' : label
+  return label
 })
 
 const initTrigger = (self: any, trigger_field_dict?: Dict<any>) => {
