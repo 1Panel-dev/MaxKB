@@ -115,11 +115,25 @@
                         trigger: 'blur',
                       }"
                     >
-                      <el-input
+                      <el-select
+                        v-if="['type_is', 'type_not'].includes(condition.compare)"
                         v-model="condition.value"
-                        :placeholder="
-                          $t('workflow.nodes.conditionNode.valueMessage')
-                        "
+                        :placeholder="$t('workflow.nodes.conditionNode.verify_type_compare.requiredMessage')"
+                      >
+                        <el-option label="json" value="json" />
+                        <el-option label="dict" value="dict" />
+                        <el-option label="array" value="list" />
+                        <el-option label="string" value="str" />
+                        <el-option label="num" value="num" />
+                        <el-option label="int" value="int" />
+                        <el-option label="float" value="float" />
+                        <el-option label="boolean" value="bool" />
+                        <el-option label="null" value="NoneType" />
+                      </el-select>
+                      <el-input
+                        v-else
+                        v-model="condition.value"
+                        :placeholder="$t('workflow.nodes.conditionNode.valueMessage')"
                       />
                     </el-form-item>
                   </el-col>

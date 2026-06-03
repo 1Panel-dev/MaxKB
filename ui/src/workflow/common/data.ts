@@ -1125,6 +1125,8 @@ export const compareList = [
   { value: 'is_not_null', label: t('workflow.compare.is_not_null') },
   { value: 'contain', label: t('workflow.compare.contain') },
   { value: 'not_contain', label: t('workflow.compare.not_contain') },
+  { value: 'regex', label: t('workflow.compare.regex') },
+  { value: 'wildcard', label: t('workflow.compare.wildcard') },
   { value: 'eq', label: t('workflow.compare.eq') },
   { value: 'not_eq', label: t('workflow.compare.not_eq') },
   { value: 'ge', label: t('workflow.compare.ge') },
@@ -1138,10 +1140,10 @@ export const compareList = [
   { value: 'len_lt', label: t('workflow.compare.len_lt') },
   { value: 'is_true', label: t('workflow.compare.is_true') },
   { value: 'is_not_true', label: t('workflow.compare.is_not_true') },
+  { value: 'type_is', label: t('workflow.compare.type_is') },
+  { value: 'type_not', label: t('workflow.compare.type_not') },
   { value: 'start_with', label: 'startWith' },
   { value: 'end_with', label: 'endWith' },
-  { value: 'regex', label: t('workflow.compare.regex') },
-  { value: 'wildcard', label: t('workflow.compare.wildcard') },
 ]
 export const nodeDict: any = {
   [WorkflowType.AiChat]: aiChatNode,
@@ -1533,6 +1535,8 @@ ${t('workflow.nodes.formNode.form_content_format2')}`,
   'workflow.compare.is_not_null',
   'workflow.compare.contain',
   'workflow.compare.not_contain',
+  'workflow.compare.regex',
+  'workflow.compare.wildcard',
   'workflow.compare.eq',
   'workflow.compare.not_eq',
   'workflow.compare.ge',
@@ -1546,9 +1550,9 @@ ${t('workflow.nodes.formNode.form_content_format2')}`,
   'workflow.compare.len_lt',
   'workflow.compare.is_true',
   'workflow.compare.is_not_true',
+  'workflow.compare.type_is',
+  'workflow.compare.type_not',
 ].forEach((key, index) => defineLocaleGetter(compareList[index], 'label', key))
-defineLocaleGetter(compareList[19], 'label', 'workflow.compare.regex')
-defineLocaleGetter(compareList[20], 'label', 'workflow.compare.wildcard')
 
 export function isWorkFlow(type: string | undefined) {
   return type === 'WORK_FLOW'
