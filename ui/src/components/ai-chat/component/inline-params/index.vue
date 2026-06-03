@@ -15,7 +15,12 @@
         :formfield-list="fieldList"
       />
     </template>
-    <el-button style="padding: 8px" v-if="dialogFields.length > 0" @click="emit('openDialog')">
+    <el-button
+      ref="triggerBtnRef"
+      style="padding: 8px"
+      v-if="dialogFields.length > 0"
+      @click="emit('openDialog')"
+    >
       <AppIcon iconName="app-all-menu"></AppIcon>
     </el-button>
   </div>
@@ -37,6 +42,8 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:formData', 'openDialog'])
+
+const triggerBtnRef = ref()
 
 const fieldList = ref<FormField[]>([])
 const formValue = ref<Dict<any>>({})
@@ -196,6 +203,7 @@ const show = (field: FormField) => {
 }
 
 defineExpose({
+  triggerBtnRef,
   validate: () => {
     for (const field of fieldList.value) {
       if (!show(field)) {
