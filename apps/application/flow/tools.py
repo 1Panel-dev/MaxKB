@@ -1031,7 +1031,10 @@ def get_workflow_args(tool, qv):
             input_field_list = node.get("properties").get("user_input_field_list")
             return build_schema(
                 {
-                    field.get("field"): (get_type(field.get("type")), Field(..., description=field.get("desc")))
+                    field.get("field"): (
+                        get_type(field.get("type")),
+                        Field(..., required=True, description=field.get("desc")) if field.get("is_required") else Field(default=None, required=False, description=field.get("desc"))
+                    )
                     for field in input_field_list
                 }
             )
