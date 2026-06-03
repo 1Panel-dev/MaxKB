@@ -7,10 +7,7 @@
       height: firsUserInput ? '100%' : undefined,
     }"
   >
-    <div
-      v-show="showUserInputContent"
-      :class="firsUserInput ? 'firstUserInput' : 'popperUserInput'"
-    >
+    <div v-if="showUserInputContent && firsUserInput" class="firstUserInput">
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
@@ -29,6 +26,61 @@
         ref="userFormRef"
       />
     </div>
+    <div v-if="showUserInputContent && !firsUserInput && isNarrow" class="popperUserInput">
+      <UserForm
+        v-model:api_form_data="api_form_data"
+        v-model:form_data="form_data"
+        :excludeFields="inlineExposedFields"
+        :title="
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_field_list_setting?.menu_title ||
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_config?.title
+        "
+        :application="applicationDetails"
+        :type="type"
+        :first="firsUserInput"
+        @confirm="UserFormConfirm"
+        @cancel="UserFormCancel"
+        ref="userFormRef"
+      />
+    </div>
+    <el-popover
+      v-if="!firsUserInput && !isNarrow"
+      v-model:visible="showUserInput"
+      :virtual-ref="triggerEl"
+      virtual-triggering
+      trigger="manual"
+      placement="top-start"
+      :offset="0"
+      :width="400"
+      :show-arrow="false"
+      popper-class="bare-popper"
+      :popper-style="{
+        background: 'transparent',
+        border: 'none',
+        padding: '0',
+        boxShadow: 'none',
+      }"
+    >
+      <UserForm
+        v-model:api_form_data="api_form_data"
+        v-model:form_data="form_data"
+        :excludeFields="inlineExposedFields"
+        :title="
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_field_list_setting?.menu_title ||
+          applicationDetails?.work_flow?.nodes?.find((v: any) => v.id === 'base-node')?.properties
+            ?.user_input_config?.title
+        "
+        :application="applicationDetails"
+        :type="type"
+        :first="firsUserInput"
+        @confirm="UserFormConfirm"
+        @cancel="UserFormCancel"
+        ref="userFormRef"
+      />
+    </el-popover>
     <template v-if="!(isUserInput || isAPIInput) || !firsUserInput || type === 'log'">
       <el-scrollbar ref="scrollDiv" @scroll="handleScrollTop">
         <div
@@ -266,7 +318,7 @@ const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
 
-const isNarrow = computed(() => rootWidth.value > 0 && rootWidth.value < 678)
+const isNarrow = computed(() => rootWidth.value > 0 && rootWidth.value < 768)
 
 const maxExposed = computed(() => (isNarrow.value ? 1 : 3))
 const inlineExposedFields = computed<string[]>(() =>
@@ -275,6 +327,11 @@ const inlineExposedFields = computed<string[]>(() =>
       ?.user_input_field_list_setting?.exposed_fields || []
   ).slice(0, maxExposed.value),
 )
+
+const triggerEl = computed<HTMLElement | undefined>(() => {
+  const btn = inlineParamsRef.value?.triggerBtnRef as any
+  return btn?.$el ?? btn
+})
 
 const scrollDiv = ref()
 const dialogScrollbar = ref()
