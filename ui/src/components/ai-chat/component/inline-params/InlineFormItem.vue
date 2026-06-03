@@ -6,7 +6,7 @@
       width:
         formfield.input_type === 'SwitchInput' || formfield.input_type === 'DatePicker'
           ? 'auto'
-          : '150px',
+          : formfield.input_type === 'Model' ? '165px' : '150px',
     }"
   >
     <div

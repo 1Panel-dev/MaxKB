@@ -6,7 +6,6 @@
       @change="handleModelChange"
       v-bind="$attrs"
       popper-class="select-model"
-      style="min-width: 120px"
     >
       <template #header v-if="$attrs.popperHeader">
         <SelectHeader :header="$attrs.popperHeader" />
