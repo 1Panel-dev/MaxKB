@@ -257,7 +257,6 @@ class BaseChatNode(IChatNode):
         if mcp_tool_id:
             mcp_tool_ids = list(set(mcp_tool_ids + [mcp_tool_id]))
         if mcp_source == 'custom' and mcp_servers:
-            ToolExecutor().validate_mcp_transport(mcp_servers)
             mcp_servers_config = json.loads(mcp_servers)
             mcp_servers_config = self.handle_variables(mcp_servers_config)
         elif mcp_tool_ids:
@@ -266,6 +265,9 @@ class BaseChatNode(IChatNode):
                 if mcp_tool and mcp_tool['is_active']:
                     mcp_servers_config = {**mcp_servers_config, **json.loads(mcp_tool['code'])}
                     mcp_servers_config = self.handle_variables(mcp_servers_config)
+        # 校验代码是否包括禁止的关键字
+        ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
+
         tool_init_params = {}
         tools = get_tools(self.workflow_manage.get_source_type(), self.workflow_manage.get_source_id(), tool_ids,
                           workspace_id)
