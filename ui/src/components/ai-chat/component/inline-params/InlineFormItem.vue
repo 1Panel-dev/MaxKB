@@ -12,7 +12,7 @@
     <div
       v-if="formfield.input_type === 'SwitchInput'"
       class="flex align-center border border-r-6"
-      style="padding: 4px 10px;"
+      style="padding: 4px 10px"
     >
       <span :title="switchLabel" class="mr-4 lighter ellipsis" style="max-width: 75px;">
         {{ switchLabel }}
@@ -88,7 +88,11 @@ const itemValue = computed({
 
 const attrs = computed(() => {
   const base = props.formfield.attrs || {}
-  if (props.formfield.input_type === 'MultiSelect' || props.formfield.input_type === 'Knowledge') {
+  if (
+    props.formfield.input_type === 'MultiSelect' ||
+    props.formfield.input_type === 'Knowledge' ||
+    (props.formfield.input_type === 'TreeSelect' && base.multiple)
+  ) {
     return {
       ...base,
       'collapse-tags': true,
