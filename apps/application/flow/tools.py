@@ -397,8 +397,6 @@ def _extract_tool_id(raw_id):
 
 async def _initialize_skills(mcp_servers, temp_dir):
     skills_dir = os.path.join(temp_dir, "skills")
-    # 校验代码是否包括禁止的关键字
-    ToolExecutor().validate_mcp_transport(mcp_servers)
     mcp_config = json.loads(mcp_servers)
     if "skills" in mcp_config:
         skill_file_items = mcp_config.pop("skills")
