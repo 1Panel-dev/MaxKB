@@ -266,7 +266,7 @@ const isMobile = computed(() => {
   return common.isMobile() || mode === 'embed' || mode === 'mobile'
 })
 
-const isNarrow = computed(() => rootWidth.value > 0 && rootWidth.value < 1040)
+const isNarrow = computed(() => rootWidth.value > 0 && rootWidth.value < 678)
 
 const maxExposed = computed(() => (isNarrow.value ? 1 : 3))
 const inlineExposedFields = computed<string[]>(() =>
