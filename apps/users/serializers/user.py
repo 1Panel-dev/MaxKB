@@ -87,18 +87,23 @@ def is_workspace_manage_permission_read(user_id: str, workspace_id: str, permiss
     role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
     is_x_pack_ee = workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
     if is_x_pack_ee:
+        # 内置工作空间管理员（role_id 固定为 'WORKSPACE_MANAGE'）拥有全量权限，直接放行
+        is_builtin_manage = QuerySet(workspace_user_role_mapping_model).filter(
+            user_id=user_id,
+            workspace_id=workspace_id,
+            role_id=RoleConstants.WORKSPACE_MANAGE.value.__str__()
+        ).exists()
+        if is_builtin_manage:
+            return True
+        # 继承（自定义）工作空间管理员：需被显式授予对应权限
         has_permission = QuerySet(role_permission_mapping_model).filter(
-            Q(role__userrolerelation__user_id=user_id,
-              role__userrolerelation__workspace_id=workspace_id,
-              permission_id=permission_id,
-              role__type=RoleConstants.WORKSPACE_MANAGE.value.__str__()) |
-            Q(role__userrolerelation__user_id=user_id,
-              role__userrolerelation__workspace_id=workspace_id,
-              role__id=RoleConstants.WORKSPACE_MANAGE.value.__str__()
-              )
+            role__userrolerelation__user_id=user_id,
+            role__userrolerelation__workspace_id=workspace_id,
+            permission_id=permission_id,
+            role__type=RoleConstants.WORKSPACE_MANAGE.value.__str__()
         ).exists()
         return has_permission
-    return True
+    return QuerySet(User).filter(id=user_id, role=RoleConstants.ADMIN.value.__str__()).exists()
 
 
 def get_workspace_list_by_user(user_id):
