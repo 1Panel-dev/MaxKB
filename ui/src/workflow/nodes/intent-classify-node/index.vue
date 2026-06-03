@@ -316,7 +316,7 @@ const form = {
     },
     {
       id: randomId(),
-      content: t('workflow.nodes.intentNode.other'),
+      content: t('common.other'),
       isOther: true,
     },
   ],
