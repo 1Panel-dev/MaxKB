@@ -17,12 +17,12 @@ splitter = '\n`-----------------------------------`\n'
 class BaseDocumentExtractNode(IDocumentExtractNode):
     def save_context(self, details, workflow_manage):
         self.context['content'] = details.get('content')
+        self.context['document_list'] = details.get('document_list')
         self.context['exception_message'] = details.get('err_message')
 
     def execute(self, document, chat_id=None, **kwargs):
         get_buffer = FileBufferHandle().get_buffer
 
-        self.context['document_list'] = document
         content = []
         if document is None or not isinstance(document, list):
             return NodeResult({'content': '', 'document_list': []}, {})
