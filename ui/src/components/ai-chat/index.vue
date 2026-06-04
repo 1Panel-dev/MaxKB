@@ -52,10 +52,12 @@
       virtual-triggering
       trigger="manual"
       placement="top-start"
-      :offset="0"
       :width="400"
       :show-arrow="false"
       popper-class="bare-popper"
+      :popper-options="{
+        modifiers: [{ name: 'offset', options: { offset: [-24, -8] } }],
+      }"
       :popper-style="{
         background: 'transparent',
         border: 'none',
