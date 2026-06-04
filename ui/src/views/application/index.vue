@@ -191,6 +191,9 @@
                     @contextmenu.prevent
                     @mousedown.stop="goApp($event, item)"
                     :disabled="isBatch"
+                    :class="{
+                      'border-active': multipleSelection.includes(item.id),
+                    }"
                   >
                     <template #icon>
                       <el-avatar shape="square" :size="32" style="background: none">

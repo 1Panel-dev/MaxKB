@@ -12,9 +12,9 @@
             style="width: 90px"
             @change="search_type_change"
           >
-            <el-option :label="$t('common.creator')" value="create_user"/>
+            <el-option :label="$t('common.creator')" value="create_user" />
 
-            <el-option :label="$t('common.name')" value="name"/>
+            <el-option :label="$t('common.name')" value="name" />
           </el-select>
           <el-input
             v-if="search_type === 'name'"
@@ -34,7 +34,7 @@
             :remote-method="getUserList"
             style="width: 190px"
           >
-            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name"/>
+            <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
           </el-select>
         </div>
         <span
@@ -42,11 +42,11 @@
           v-if="!isShared && (permissionPrecise.batchMove() || permissionPrecise.batchDelete())"
         >
           <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
-            <AppIcon iconName="app-batch-delete" class="mr-4"/>
+            <AppIcon iconName="app-batch-delete" class="mr-4" />
             {{ $t('views.paragraph.setting.batchSelected') }}
           </el-button>
           <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
-            <AppIcon iconName="app-batch-delete" class="mr-4"/>
+            <AppIcon iconName="app-batch-delete" class="mr-4" />
             {{ $t('views.paragraph.setting.cancelSelected') }}
           </el-button>
         </span>
@@ -56,14 +56,14 @@
             v-if="!isShared && permissionPrecise.create()"
             @click="openTemplateStoreDialog()"
           >
-            <AppIcon iconName="app-template-center" class="mr-4"/>
+            <AppIcon iconName="app-template-center" class="mr-4" />
             {{ $t('workflow.setting.templateCenter') }}
           </el-button>
           <el-dropdown trigger="click" v-if="!isShared && permissionPrecise.create()">
             <el-button type="primary" class="ml-8">
               {{ $t('common.create') }}
               <el-icon class="el-icon--right">
-                <arrow-down/>
+                <arrow-down />
               </el-icon>
             </el-button>
             <template #dropdown>
@@ -71,14 +71,14 @@
                 <el-dropdown-item @click="openCreateDialog(CreateKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-blue mt-4" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_document.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.generalKnowledge') }}
                       </div>
                       <el-text type="info" size="small" class="color-secondary"
-                      >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.generalInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -86,14 +86,14 @@
                 <el-dropdown-item @click="openCreateDialog(CreateWebKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-purple mt-4" shape="square" :size="32">
-                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt=""/>
+                      <img src="@/assets/knowledge/icon_web.svg" style="width: 58%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.webKnowledge') }}
                       </div>
                       <el-text type="info" size="small" class="color-secondary"
-                      >{{ $t('views.knowledge.knowledgeType.webInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.webInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -109,14 +109,14 @@
                       :size="32"
                       style="background: none"
                     >
-                      <img src="@/assets/knowledge/logo_lark.svg" alt=""/>
+                      <img src="@/assets/knowledge/logo_lark.svg" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.larkKnowledge') }}
                       </div>
                       <el-text type="info" size="small" class="color-secondary"
-                      >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.larkInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -124,14 +124,14 @@
                 <el-dropdown-item @click="openCreateDialog(CreateWorkflowKnowledgeDialog)">
                   <div class="flex">
                     <el-avatar class="avatar-orange mt-4" shape="square" :size="32">
-                      <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt=""/>
+                      <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
                     </el-avatar>
                     <div class="pre-wrap ml-8">
                       <div class="lighter">
                         {{ $t('views.knowledge.knowledgeType.workflowKnowledge') }}
                       </div>
                       <el-text type="info" size="small" class="color-secondary"
-                      >{{ $t('views.knowledge.knowledgeType.workflowInfo') }}
+                        >{{ $t('views.knowledge.knowledgeType.workflowInfo') }}
                       </el-text>
                     </div>
                   </div>
@@ -151,7 +151,7 @@
                   <el-dropdown-item>
                     <div class="flex align-center w-full">
                       <el-avatar shape="square" :size="32" style="background: none">
-                        <img src="@/assets/icon_import.svg" alt=""/>
+                        <img src="@/assets/icon_import.svg" alt="" />
                       </el-avatar>
                       <div class="pre-wrap ml-8">
                         <div class="lighter">{{ $t('common.importCreate') }}</div>
@@ -198,9 +198,12 @@
                   class="cursor"
                   @click="toDocument(item)"
                   :disabled="isBatch"
+                  :class="{
+                    'border-active': multipleSelection.includes(item.id),
+                  }"
                 >
                   <template #icon>
-                    <KnowledgeIcon :type="item.type"/>
+                    <KnowledgeIcon :type="item.type" />
                   </template>
                   <template #subTitle>
                     <el-text class="color-secondary lighter flex align-center" size="small">
@@ -216,7 +219,7 @@
                     </el-text>
                   </template>
                   <template #tag>
-                    <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)"/>
+                    <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)" />
                     <div v-else>
                       <el-tag
                         v-if="isShared || isSystemShare"
@@ -233,9 +236,9 @@
                       <div>
                         <span class="bold mr-4">{{ item?.document_count || 0 }}</span>
                         <span class="color-secondary">{{
-                            $t('views.knowledge.document_count')
-                          }}</span>
-                        <el-divider direction="vertical"/>
+                          $t('views.knowledge.document_count')
+                        }}</span>
+                        <el-divider direction="vertical" />
                         <span class="bold mr-4">{{ numberFormat(item?.char_length) || 0 }}</span>
                         <span class="color-secondary">{{ $t('common.character') }}</span>
                       </div>
@@ -285,8 +288,7 @@
                             >
                               <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>
                               {{ $t('views.shared.authorized_workspace') }}
-                            </el-dropdown-item
-                            >
+                            </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="openAuthorization(item)"
                               v-if="apiType === 'workspace' && permissionPrecise.auth(item.id)"
@@ -332,22 +334,17 @@
                               @click.stop="exportKnowledge(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
-                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >
+                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
                               {{ $t('views.document.setting.exportDocument') }} Excel
                             </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="exportZipKnowledge(item)"
                               v-if="permissionPrecise.export(item.id)"
                             >
-                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon
-                              >
-                              {{
-                                $t('views.document.setting.exportDocument')
-                              }}
+                              <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                              {{ $t('views.document.setting.exportDocument') }}
                               ZIP
-                            </el-dropdown-item
-                            >
+                            </el-dropdown-item>
                             <el-dropdown-item
                               @click.stop="exportKnowledgeBundle(item)"
                               v-if="permissionPrecise.export(item.id)"
@@ -364,8 +361,7 @@
                             >
                               <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
                               {{ $t('common.delete') }}
-                            </el-dropdown-item
-                            >
+                            </el-dropdown-item>
                           </el-dropdown-menu>
                         </template>
                       </el-dropdown>
@@ -375,7 +371,7 @@
               </el-col>
             </template>
           </el-row>
-          <el-empty :description="$t('common.noData')" v-else/>
+          <el-empty :description="$t('common.noData')" v-else />
         </el-checkbox-group>
       </InfiniteScroll>
     </div>
@@ -415,10 +411,10 @@
     </div>
   </ContentContainer>
 
-  <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared"/>
-  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder"/>
-  <GenerateRelatedDialog ref="GenerateRelatedDialogRef" :apiType="apiType"/>
-  <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared"/>
+  <component :is="currentCreateDialog" ref="CreateKnowledgeDialogRef" v-if="!isShared" />
+  <CreateFolderDialog ref="CreateFolderDialogRef" v-if="!isShared" @refresh="refreshFolder" />
+  <GenerateRelatedDialog ref="GenerateRelatedDialogRef" :apiType="apiType" />
+  <SyncWebDialog ref="SyncWebDialogRef" v-if="!isShared" />
   <AuthorizedWorkspace
     ref="AuthorizedWorkspaceDialogRef"
     v-if="isSystemShare"
@@ -434,22 +430,19 @@
     ref="ResourceAuthorizationDrawerRef"
     v-if="apiType === 'workspace'"
   />
-  <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList"/>
+  <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList" />
   <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
 </template>
 
 <script lang="ts" setup>
-import {onMounted, ref, reactive, shallowRef, nextTick, computed, watch} from 'vue'
-import {useRouter, useRoute, onBeforeRouteLeave} from 'vue-router'
-import {cloneDeep, get} from 'lodash'
-import type {CheckboxValueType} from 'element-plus'
+import { onMounted, ref, reactive, shallowRef, nextTick, computed, watch } from 'vue'
+import { useRouter, useRoute, onBeforeRouteLeave } from 'vue-router'
+import { cloneDeep, get } from 'lodash'
+import type { CheckboxValueType } from 'element-plus'
 import CreateKnowledgeDialog from '@/views/knowledge/create-component/CreateKnowledgeDialog.vue'
-import CreateWebKnowledgeDialog
-  from '@/views/knowledge/create-component/CreateWebKnowledgeDialog.vue'
-import CreateLarkKnowledgeDialog
-  from '@/views/knowledge/create-component/CreateLarkKnowledgeDialog.vue'
-import CreateWorkflowKnowledgeDialog
-  from '@/views/knowledge/create-component/CreateWorkflowKnowledgeDialog.vue'
+import CreateWebKnowledgeDialog from '@/views/knowledge/create-component/CreateWebKnowledgeDialog.vue'
+import CreateLarkKnowledgeDialog from '@/views/knowledge/create-component/CreateLarkKnowledgeDialog.vue'
+import CreateWorkflowKnowledgeDialog from '@/views/knowledge/create-component/CreateWorkflowKnowledgeDialog.vue'
 import SyncWebDialog from '@/views/knowledge/component/SyncWebDialog.vue'
 import CreateFolderDialog from '@/components/folder-virtualized-tree/CreateFolderDialog.vue'
 import MoveToDialog from '@/components/folder-virtualized-tree/MoveToDialog.vue'
@@ -458,14 +451,14 @@ import AuthorizedWorkspace from '@/views/system-shared/AuthorizedWorkspaceDialog
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import TemplateStoreDialog from '@/views/knowledge/template-store/TemplateStoreDialog.vue'
 import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
-import {MsgSuccess, MsgConfirm} from '@/utils/message'
-import {numberFormat, i18n_name} from '@/utils/common'
-import {dateFormat} from '@/utils/time'
-import {SourceTypeEnum} from '@/enums/common'
-import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import { MsgSuccess, MsgConfirm } from '@/utils/message'
+import { numberFormat, i18n_name } from '@/utils/common'
+import { dateFormat } from '@/utils/time'
+import { SourceTypeEnum } from '@/enums/common'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
-import {t} from '@/locales'
+import { t } from '@/locales'
 
 const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
 
@@ -474,7 +467,7 @@ const openResourceMappingDrawer = (knowledge: any) => {
 }
 const router = useRouter()
 const route = useRoute()
-const {folder, user, knowledge} = useStore()
+const { folder, user, knowledge } = useStore()
 onBeforeRouteLeave((to, from) => {
   knowledge.setKnowledgeList([])
 })
@@ -584,7 +577,7 @@ function deleteMulKnowledge() {
     },
   )
     .then(() => {
-      loadSharedApi({type: 'knowledge', systemType: apiType.value})
+      loadSharedApi({ type: 'knowledge', systemType: apiType.value })
         .delMulKnowledge(multipleSelection.value, loading)
         .then(() => {
           batchSelectedHandle(false)
@@ -594,8 +587,7 @@ function deleteMulKnowledge() {
           MsgSuccess(t('views.document.delete.successMessage'))
         })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 function toDocument(item: any) {
@@ -668,7 +660,7 @@ function openCreateDialog(data: any) {
 }
 
 function reEmbeddingKnowledge(row: any) {
-  loadSharedApi({type: 'knowledge', systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .putReEmbeddingKnowledge(row.id)
     .then(() => {
       MsgSuccess(t('common.submitSuccess'))
@@ -682,11 +674,11 @@ function syncKnowledge(row: any) {
 }
 
 const search_type_change = () => {
-  search_form.value = {name: '', create_user: ''}
+  search_form.value = { name: '', create_user: '' }
 }
 
 const exportKnowledgeBundle = (item: any) => {
-  loadSharedApi({type: 'knowledge', systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .exportKnowledgeBundle(item.name, item.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
@@ -701,7 +693,7 @@ function importKnowledgeBundle(file: any) {
   formData.append('folder_id', folder.currentFolder.id || user.getWorkspaceId())
   importKnowledgeUploadRef.value.clearFiles()
 
-  loadSharedApi({type: 'knowledge', systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .importKnowledgeBundle(formData, loading)
     .then(async (res: any) => {
       if (res?.data) {
@@ -711,7 +703,7 @@ function importKnowledgeBundle(file: any) {
         await user.profile()
         router.push({
           path: `/knowledge/${knowledgeId}/${folderId || 'shared'}/${knowledgeType}/document`,
-          query: {imported: 'true'},
+          query: { imported: 'true' },
         })
       }
     })
@@ -736,14 +728,14 @@ function openGenerateDialog(row: any) {
 }
 
 const exportKnowledge = (item: any) => {
-  loadSharedApi({type: 'knowledge', systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .exportKnowledge(item.name, item.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
     })
 }
 const exportZipKnowledge = (item: any) => {
-  loadSharedApi({type: 'knowledge', systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
     .exportZipKnowledge(item.name, item.id, loading)
     .then(() => {
       MsgSuccess(t('common.exportSuccess'))
@@ -762,7 +754,7 @@ function deleteKnowledge(row: any) {
     },
   )
     .then(() => {
-      loadSharedApi({type: 'knowledge', systemType: apiType.value})
+      loadSharedApi({ type: 'knowledge', systemType: apiType.value })
         .delKnowledge(row.id, loading)
         .then(() => {
           const list = cloneDeep(knowledge.knowledgeList)
@@ -773,8 +765,7 @@ function deleteKnowledge(row: any) {
           MsgSuccess(t('common.deleteSuccess'))
         })
     })
-    .catch(() => {
-    })
+    .catch(() => {})
 }
 
 const AuthorizedWorkspaceDialogRef = ref()
@@ -802,7 +793,7 @@ watch(
       getList()
     }
   },
-  {deep: true, immediate: true},
+  { deep: true, immediate: true },
 )
 
 function getList() {
@@ -813,7 +804,7 @@ function getList() {
   if (search_form.value[search_type.value]) {
     params[search_type.value] = search_form.value[search_type.value]
   }
-  loadSharedApi({type: 'knowledge', isShared: isShared.value, systemType: apiType.value})
+  loadSharedApi({ type: 'knowledge', isShared: isShared.value, systemType: apiType.value })
     .getKnowledgeListPage(paginationConfig, params, loading)
     .then((res: any) => {
       paginationConfig.total = res.data?.total
@@ -842,10 +833,10 @@ function getUserList(query: string) {
   if (isSystemShare.value) {
     workspaceId = ''
   }
-  const actualWorkspaceId = workspaceId || (query ? {nick_name: query} : '')
-  const actualQuery = workspaceId ? (query ? {nick_name: query} : '') : undefined
+  const actualWorkspaceId = workspaceId || (query ? { nick_name: query } : '')
+  const actualQuery = workspaceId ? (query ? { nick_name: query } : '') : undefined
 
-  loadSharedApi({type: 'workspace', isShared: isShared.value, systemType: apiType.value})
+  loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
     .getAllMemberList(actualWorkspaceId, actualQuery, loading)
     .then((res: any) => {
       user_options.value = res.data
