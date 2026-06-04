@@ -90,6 +90,11 @@
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"
                         class="border-r-6"
+                        :preview-src-list="data.image_list.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
                       />
                     </template>
                   </el-space>
@@ -109,7 +114,7 @@
                   </el-space>
                 </div>
                 <div v-if="data.video_list?.length > 0">
-                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.image') }}:</p>
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.video') }}:</p>
 
                   <el-space wrap>
                     <template v-for="(f, i) in data.video_list" :key="i">
@@ -124,7 +129,7 @@
                   </el-space>
                 </div>
                 <div v-if="data.other_list?.length > 0">
-                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.document') }}:</p>
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.other') }}:</p>
 
                   <el-space wrap>
                     <template v-for="(f, i) in data.other_list" :key="i">
@@ -230,6 +235,9 @@
                       fit="cover"
                       style="width: 40px; height: 40px; display: block"
                       class="border-r-6 mb-8"
+                      :zoom-rate="1.2"
+                      :max-scale="7"
+                      :min-scale="0.2"
                     />
                     <video
                       v-else-if="item.type === 'video_url'"
@@ -596,6 +604,9 @@
                           fit="cover"
                           style="width: 40px; height: 40px; display: inline-block"
                           class="border-r-6 mr-8"
+                          :zoom-rate="1.2"
+                          :max-scale="7"
+                          :min-scale="0.2"
                         />
 
                         <span v-else>{{ h.text }}<br /></span>
@@ -626,6 +637,11 @@
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"
                         class="border-r-6"
+                        :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
                       />
                     </template>
                   </el-space>
@@ -803,6 +819,7 @@
               </div>
             </div>
           </template>
+          <!-- 文生视频 -->
           <template v-if="data.type == WorkflowType.TextToVideoGenerateNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
@@ -837,7 +854,7 @@
               </div>
             </div>
           </template>
-
+          <!-- 图生视频 -->
           <template v-if="data.type == WorkflowType.ImageToVideoGenerateNode">
             <div class="card-never border-r-6 mt-8">
               <h5 class="p-8-12">
@@ -867,6 +884,9 @@
                     fit="cover"
                     style="width: 40px; height: 40px; display: block"
                     class="border-r-6"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
                   />
                 </div>
                 <div v-else-if="Array.isArray(data.first_frame_url)">
@@ -878,6 +898,11 @@
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"
                         class="border-r-6"
+                        :preview-src-list="data.first_frame_url.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
                       />
                     </template>
                   </el-space>
@@ -896,6 +921,9 @@
                     fit="cover"
                     style="width: 40px; height: 40px; display: block"
                     class="border-r-6"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
                   />
                 </div>
                 <div v-else-if="Array.isArray(data.last_frame_url)">
@@ -907,6 +935,11 @@
                         fit="cover"
                         style="width: 40px; height: 40px; display: block"
                         class="border-r-6"
+                        :preview-src-list="data.last_frame_url.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
                       />
                     </template>
                   </el-space>
