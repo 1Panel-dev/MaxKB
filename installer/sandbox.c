@@ -569,9 +569,9 @@ static int called_from_python_import() {
     return 0;
 }
 static int is_allow_dl(const char *filename) {
+    ensure_config_loaded();
     if (!called_from_python_import()) return 0;
     if (!filename || !*filename) return 1;
-    ensure_config_loaded();
     if (!allow_dl_paths || !*allow_dl_paths) return 0;
     char real_file[PATH_MAX];
     if (strchr(filename, '/') == NULL) {
