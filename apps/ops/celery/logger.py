@@ -210,7 +210,7 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
             f.flush()
 
     def handle_task_start(self, task_id):
-        maxkb_logger.info('handle_task_start')
+        maxkb_logger.debug('handle_task_start')
         log_path = get_celery_task_log_path(task_id)
         thread_id = self.get_current_thread_id()
         self.task_id_thread_id_mapper[task_id] = thread_id
@@ -218,7 +218,7 @@ class CeleryThreadTaskFileHandler(CeleryThreadingLoggerHandler):
         self.thread_id_fd_mapper[thread_id] = f
 
     def handle_task_end(self, task_id):
-        maxkb_logger.info('handle_task_end')
+        maxkb_logger.debug('handle_task_end')
         ident_id = self.task_id_thread_id_mapper.get(task_id, '')
         f = self.thread_id_fd_mapper.pop(ident_id, None)
         if f and not f.closed:
