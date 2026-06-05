@@ -262,6 +262,7 @@ class KnowledgeFlowParamsSerializer(serializers.Serializer):
     knowledge_action_id = serializers.UUIDField(required=True, label="知识库任务执行器id")
     data_source = serializers.DictField(required=True, label="数据源")
     knowledge_base = serializers.DictField(required=False, label="知识库设置")
+    user_id = serializers.UUIDField(required=False, label="创建人")
 
 
 class ToolFlowParamsSerializer(serializers.Serializer):

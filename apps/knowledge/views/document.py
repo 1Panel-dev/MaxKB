@@ -78,7 +78,7 @@ class DocumentView(APIView):
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
             DocumentSerializers.Create(
-                data={"workspace_id": workspace_id, "knowledge_id": knowledge_id},
+                data={"workspace_id": workspace_id, "knowledge_id": knowledge_id, "user_id": request.user.id},
             ).save(request.data)
         )
 
@@ -540,9 +540,9 @@ class DocumentView(APIView):
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
-                DocumentSerializers.Batch(data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}).batch_save(
-                    request.data
-                )
+                DocumentSerializers.Batch(
+                    data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+                ).batch_save(request.data)
             )
 
     class BatchSync(APIView):
@@ -580,9 +580,9 @@ class DocumentView(APIView):
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(
-                DocumentSerializers.Batch(data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}).batch_sync(
-                    request.data
-                )
+                DocumentSerializers.Batch(
+                    data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+                ).batch_sync(request.data)
             )
 
     class BatchDelete(APIView):
@@ -874,6 +874,7 @@ class DocumentView(APIView):
                         "is_active": request.query_params.get("is_active"),
                         "hit_handling_method": request.query_params.get("hit_handling_method"),
                         "order_by": request.query_params.get("order_by"),
+                        "create_user": request.query_params.get("create_user"),
                     }
                 ).page(current_page, page_size)
             )
@@ -1224,9 +1225,9 @@ class WebDocumentView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
-            DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}).save_web(
-                request.data, with_valid=True
-            )
+            DocumentSerializers.Create(
+                data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).save_web(request.data, with_valid=True)
         )
 
 
@@ -1266,9 +1267,9 @@ class QaDocumentView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
-            DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}).save_qa(
-                {"file_list": request.FILES.getlist("file")}, with_valid=True
-            )
+            DocumentSerializers.Create(
+                data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).save_qa({"file_list": request.FILES.getlist("file")}, with_valid=True)
         )
 
 
@@ -1308,9 +1309,9 @@ class TableDocumentView(APIView):
     )
     def post(self, request: Request, workspace_id: str, knowledge_id: str):
         return result.success(
-            DocumentSerializers.Create(data={"knowledge_id": knowledge_id, "workspace_id": workspace_id}).save_table(
-                {"file_list": request.FILES.getlist("file")}, with_valid=True
-            )
+            DocumentSerializers.Create(
+                data={"knowledge_id": knowledge_id, "workspace_id": workspace_id, "user_id": request.user.id}
+            ).save_table({"file_list": request.FILES.getlist("file")}, with_valid=True)
         )
 
 

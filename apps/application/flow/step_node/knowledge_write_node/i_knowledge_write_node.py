@@ -36,7 +36,7 @@ class IKnowledgeWriteNode(INode):
 
         return self.execute(**self.node_params_serializer.data, **self.flow_params_serializer.data, documents=documents)
 
-    def execute(self, documents, **kwargs) -> NodeResult:
+    def execute(self, documents, user_id, **kwargs) -> NodeResult:
         pass
 
     type = 'knowledge-write-node'

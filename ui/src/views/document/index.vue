@@ -139,6 +139,7 @@
                   @change="search_type_change"
                 >
                   <el-option :label="$t('common.name')" value="name" />
+                  <el-option :label="$t('common.creator')" value="create_user" />
                 </el-select>
                 <el-input
                   v-if="search_type === 'name'"
@@ -148,6 +149,18 @@
                   style="width: 220px"
                   clearable
                 />
+                <el-select
+                  v-else-if="search_type === 'create_user'"
+                  v-model="search_form.create_user"
+                  @change="searchHandle"
+                  filterable
+                  clearable
+                  remote
+                  :remote-method="getUserList"
+                  style="width: 190px"
+                >
+                  <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+                </el-select>
               </div>
 
               <el-tooltip
@@ -478,6 +491,7 @@
                 }}
               </template>
             </el-table-column>
+            <el-table-column prop="nick_name" :label="$t('common.creator')" show-overflow-tooltip />
             <el-table-column
               prop="create_time"
               :label="$t('common.createTime')"
@@ -915,13 +929,14 @@ import TagDrawer from './tag/TagDrawer.vue'
 import TagSettingDrawer from './tag/TagSettingDrawer.vue'
 import AddTagDialog from '@/views/document/tag/MulAddTagDialog.vue'
 import ExecutionRecord from '@/views/knowledge-workflow/component/execution-record/ExecutionRecordDrawer.vue'
+import UserApi from "@/api/user/user.ts";
 
 const route = useRoute()
 const router = useRouter()
 const {
   params: { id, folderId, type }, // id为knowledgeID
 } = route as any
-const { common } = useStore()
+const { common, user } = useStore()
 const storeKey = 'documents'
 onBeforeRouteUpdate(() => {
   common.savePage(storeKey, null)
@@ -943,7 +958,9 @@ onBeforeRouteLeave((to: any) => {
 const isShared = computed(() => {
   return folderId === 'share'
 })
-
+const isSystemShare = computed(() => {
+  return apiType.value === 'systemShare'
+})
 const apiType = computed(() => {
   if (route.path.includes('shared')) {
     return 'systemShare'
@@ -1620,6 +1637,35 @@ function addTags(tags: any, rowId?: string) {
       getList()
       clearSelection()
     })
+}
+const user_options = ref<any[]>([])
+function searchHandle() {
+  paginationConfig.value.current_page = 1
+  getList()
+}
+
+function getUserList(query: string) {
+  let workspaceId = user.getWorkspaceId()
+  if (isSystemShare.value) {
+    workspaceId = ''
+  }
+  const actualWorkspaceId = workspaceId || (query ? { nick_name: query } : '')
+  const actualQuery = workspaceId ? (query ? { nick_name: query } : '') : undefined
+  if (apiType.value === 'systemManage') {
+    UserApi.getAllMemberList(query ? {nick_name: query} : '')
+      .then((res: any) => {
+        user_options.value = res.data || []
+      })
+      .catch(() => {
+        user_options.value = []
+      })
+  } else {
+    loadSharedApi({ type: 'workspace', isShared: isShared.value, systemType: apiType.value })
+      .getAllMemberList(actualWorkspaceId, actualQuery, loading)
+      .then((res: any) => {
+        user_options.value = res.data
+      })
+  }
 }
 
 onMounted(() => {

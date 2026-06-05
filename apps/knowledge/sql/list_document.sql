@@ -1,6 +1,7 @@
 SELECT * from (
 SELECT
     "document".*,
+    "user"."nick_name" as nick_name,
     to_json("document"."meta") as meta,
     to_json("document"."status_meta") as status_meta,
     (SELECT "count"("id") FROM "paragraph" WHERE document_id = "document"."id") as "paragraph_count",
@@ -8,6 +9,7 @@ SELECT
     COALESCE(tag_agg.tags, '[]'::json) as "tags"
 FROM
     "document" "document"
+LEFT JOIN "user" "user" ON "user"."id" = "document"."user_id"
 LEFT JOIN LATERAL (
     SELECT
         COUNT(*)::int as tag_count,
@@ -23,6 +25,6 @@ LEFT JOIN LATERAL (
     INNER JOIN "tag" "tag" ON "tag"."id" = "document_tag"."tag_id"
     WHERE "document_tag"."document_id" = "document"."id"
 ) tag_agg ON TRUE
-${document_custom_sql}
 ) temp
+${document_custom_sql}
 ${order_by_query}

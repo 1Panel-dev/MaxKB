@@ -226,9 +226,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 query_set = query_set.filter(**{"temp.workspace_id": self.data.get("workspace_id")})
                 folder_query_set = folder_query_set.filter(**{"workspace_id": self.data.get("workspace_id")})
             if (
-                    "folder_id" in self.data
-                    and self.data.get("folder_id") is not None
-                    and self.data.get("workspace_id") != self.data.get("folder_id")
+                "folder_id" in self.data
+                and self.data.get("folder_id") is not None
+                and self.data.get("workspace_id") != self.data.get("folder_id")
             ):
                 query_set = query_set.filter(**{"temp.folder_id": self.data.get("folder_id")})
                 folder_query_set = folder_query_set.filter(**{"parent_id": self.data.get("folder_id")})
@@ -259,8 +259,9 @@ class KnowledgeSerializer(serializers.Serializer):
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_("Folder not found"))
-            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
-                                                                   self.data.get("workspace_id"), "KNOWLEDGE:READ")
+            workspace_manage = is_workspace_manage_permission_read(
+                self.data.get("user_id"), self.data.get("workspace_id"), "KNOWLEDGE:READ"
+            )
             is_x_pack_ee = self.is_x_pack_ee()
             result = native_page_search(
                 current_page,
@@ -289,8 +290,9 @@ class KnowledgeSerializer(serializers.Serializer):
             root = KnowledgeFolder.objects.filter(id=folder_id).first()
             if not root:
                 raise serializers.ValidationError(_("Folder not found"))
-            workspace_manage = is_workspace_manage_permission_read(self.data.get("user_id"),
-                                                                   self.data.get("workspace_id"), "KNOWLEDGE:READ")
+            workspace_manage = is_workspace_manage_permission_read(
+                self.data.get("user_id"), self.data.get("workspace_id"), "KNOWLEDGE:READ"
+            )
 
             is_x_pack_ee = self.is_x_pack_ee()
             return native_search(
@@ -452,10 +454,10 @@ class KnowledgeSerializer(serializers.Serializer):
                         [
                             str(application_knowledge_mapping.source_id)
                             for application_knowledge_mapping in QuerySet(ResourceMapping).filter(
-                            source_type="APPLICATION",
-                            target_type="KNOWLEDGE",
-                            target_id=self.data.get("knowledge_id"),
-                        )
+                                source_type="APPLICATION",
+                                target_type="KNOWLEDGE",
+                                target_id=self.data.get("knowledge_id"),
+                            )
                         ],
                     )
                 ),
@@ -572,7 +574,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
             document_list = QuerySet(Document).filter(knowledge_id=knowledge_id)
             paragraph_list = native_search(
-                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")).order_by('position'),
+                QuerySet(Paragraph).filter(knowledge_id=self.data.get("knowledge_id")).order_by("position"),
                 get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", "sql", "list_paragraph_document_name.sql")
                 ),
@@ -690,7 +692,7 @@ class KnowledgeSerializer(serializers.Serializer):
 
         @staticmethod
         def _get_knowledge_workbook(
-                data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict, paragraph_active_map: dict
+            data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict, paragraph_active_map: dict
         ):
             import openpyxl
             from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
@@ -1057,7 +1059,7 @@ class KnowledgeSerializer(serializers.Serializer):
             # 插入文档
             for document in instance.get("documents") if "documents" in instance else []:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(
-                    knowledge_id, document
+                    knowledge_id, self.data.get("user_id"), document
                 )
                 document_model_list.append(document_paragraph_dict_model.get("document"))
                 for paragraph in document_paragraph_dict_model.get("paragraph_model_list"):
@@ -1131,14 +1133,16 @@ class KnowledgeSerializer(serializers.Serializer):
                 }
             ).auth_resource(str(knowledge_id))
 
-            sync_web_knowledge.delay(str(knowledge_id), instance.get("source_url"), instance.get("selector"))
+            sync_web_knowledge.delay(
+                str(knowledge_id), self.data.get("user_id"), instance.get("source_url"), instance.get("selector")
+            )
             update_resource_mapping_by_knowledge(str(knowledge_id))
             return {**KnowledgeModelSerializer(knowledge).data, "document_list": []}
 
     class SyncWeb(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.CharField(required=True, label=_("knowledge id"))
-        user_id = serializers.UUIDField(required=False, label=_("user id"))
+        user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
         sync_type = serializers.CharField(
             required=True,
             label=_("sync type"),
@@ -1220,7 +1224,8 @@ class KnowledgeSerializer(serializers.Serializer):
             """
             url = knowledge.meta.get("source_url")
             selector = knowledge.meta.get("selector") if "selector" in knowledge.meta else None
-            sync_replace_web_knowledge.delay(str(knowledge.id), url, selector)
+            user_id = self.data.get("user_id")
+            sync_replace_web_knowledge.delay(str(knowledge.id), user_id, url, selector)
 
         def complete_sync(self, knowledge):
             """
