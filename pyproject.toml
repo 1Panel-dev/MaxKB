@@ -70,7 +70,8 @@ pymysql = "1.1.1"
 accelerate = "1.6.0"
 captcha = "0.7.1"
 setuptools = "^75.0.0"
-volcengine-python-sdk = {extras = ["ark"], version = "4.0.5"}
+volcengine-python-sdk = { extras = ["ark"], version = "4.0.5" }
+pydantic = "2.11.5"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
