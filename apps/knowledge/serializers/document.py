@@ -86,8 +86,8 @@ from knowledge.task.embedding import (
     delete_embedding_by_paragraph_ids,
     embedding_by_document,
     embedding_by_document_list,
-    update_embedding_knowledge_id,
     tokenize_by_document,
+    update_embedding_knowledge_id,
 )
 from knowledge.task.generate import generate_related_by_document_id
 from knowledge.task.sync import sync_web_document
@@ -487,6 +487,7 @@ class DocumentSerializers(serializers.Serializer):
         )
         no_tag = serializers.BooleanField(required=False, default=False, allow_null=True)
         tag_exclude = serializers.BooleanField(required=False, default=False, allow_null=True)
+        create_user = serializers.UUIDField(required=False, allow_null=True)
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -540,6 +541,8 @@ class DocumentSerializers(serializers.Serializer):
                     .values_list("document_id", flat=True)
                 )
                 query_set = query_set.filter(id__in=document_id_list)
+            if "create_user" in self.data and self.data.get("create_user") is not None:
+                query_set = query_set.filter(**{"user_id": self.data.get("create_user")})
             order_by = self.data.get("order_by", "")
             order_by_query_set = QuerySet(
                 model=get_dynamics_model(
@@ -899,8 +902,8 @@ class DocumentSerializers(serializers.Serializer):
                 .annotate(
                     reversed_status=Reverse("status"),
                     task_type_status=Coalesce(
-                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value('')),
-                        Value('n'),
+                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value("")),
+                        Value("n"),
                     ),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)
@@ -996,6 +999,7 @@ class DocumentSerializers(serializers.Serializer):
     class Create(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("workspace id"), allow_null=True)
         knowledge_id = serializers.UUIDField(required=True, label=_("document id"))
+        user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -1015,7 +1019,8 @@ class DocumentSerializers(serializers.Serializer):
                 DocumentInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get("knowledge_id")
-            document_paragraph_model = self.get_document_paragraph_model(knowledge_id, instance)
+            user_id = self.data.get("user_id")
+            document_paragraph_model = self.get_document_paragraph_model(knowledge_id, user_id, instance)
 
             document_model = document_paragraph_model.get("document")
             paragraph_model_list = document_paragraph_model.get("paragraph_model_list")
@@ -1076,7 +1081,7 @@ class DocumentSerializers(serializers.Serializer):
             }
 
         @staticmethod
-        def get_document_paragraph_model(knowledge_id, instance: Dict):
+        def get_document_paragraph_model(knowledge_id, user_id, instance: Dict):
             source_meta = {"source_file_id": instance.get("source_file_id")} if instance.get("source_file_id") else {}
             meta = {**instance.get("meta"), **source_meta} if instance.get("meta") is not None else source_meta
             meta = {**convert_uuid_to_str(meta), "allow_download": True}
@@ -1091,6 +1096,7 @@ class DocumentSerializers(serializers.Serializer):
                     ),
                     "meta": meta,
                     "type": instance.get("type") if instance.get("type") is not None else KnowledgeType.BASE,
+                    "user_id": user_id,
                 }
             )
 
@@ -1103,9 +1109,10 @@ class DocumentSerializers(serializers.Serializer):
                 DocumentWebInstanceSerializer(data=instance).is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
             knowledge_id = self.data.get("knowledge_id")
+            user_id = self.data.get("user_id")
             source_url_list = instance.get("source_url_list")
             selector = instance.get("selector")
-            sync_web_document.delay(knowledge_id, source_url_list, selector)
+            sync_web_document.delay(knowledge_id, user_id, source_url_list, selector)
 
         def save_qa(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -1297,6 +1304,7 @@ class DocumentSerializers(serializers.Serializer):
     class Batch(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
+        user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
@@ -1355,7 +1363,7 @@ class DocumentSerializers(serializers.Serializer):
             # 插入文档
             for document in instance_list:
                 document_paragraph_dict_model = DocumentSerializers.Create.get_document_paragraph_model(
-                    knowledge_id, document
+                    knowledge_id, self.data.get("user_id"), document
                 )
                 # 保存文档和文件的关系
                 document_instance = document_paragraph_dict_model.get("document")

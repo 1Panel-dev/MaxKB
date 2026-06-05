@@ -239,6 +239,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "knowledge_action_id": knowledge_action_id,
                 "stream": True,
                 "workspace_id": self.data.get("workspace_id"),
+                "user_id": str(user.id),
                 **instance,
             },
             KnowledgeWorkflowPostHandler(None, knowledge_action_id),

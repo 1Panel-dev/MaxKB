@@ -7,21 +7,31 @@
     @desc:
 """
 from functools import reduce
-from typing import Dict, List, Any
-import uuid_utils.compat as uuid
-from django.db.models import QuerySet
-from django.db.models.aggregates import Max
+from typing import Any, Dict, List
 
-from rest_framework import serializers
-from django.utils.translation import gettext_lazy as _
-from application.flow.i_step_node import NodeResult
-from application.flow.step_node.knowledge_write_node.i_knowledge_write_node import IKnowledgeWriteNode
+import uuid_utils.compat as uuid
 from common.chunk import text_to_chunk
 from common.utils.common import bulk_create_in_batches, filter_special_character
-from knowledge.models import Document, KnowledgeType, Paragraph, File, FileSourceType, Problem, ProblemParagraphMapping, \
-    Tag, DocumentTag
-from knowledge.serializers.common import ProblemParagraphObject, ProblemParagraphManage
+from django.db.models import QuerySet
+from django.db.models.aggregates import Max
+from django.utils.translation import gettext_lazy as _
+from knowledge.models import (
+    Document,
+    DocumentTag,
+    File,
+    FileSourceType,
+    KnowledgeType,
+    Paragraph,
+    Problem,
+    ProblemParagraphMapping,
+    Tag,
+)
+from knowledge.serializers.common import ProblemParagraphManage, ProblemParagraphObject
 from knowledge.serializers.document import DocumentSerializers
+from rest_framework import serializers
+
+from application.flow.i_step_node import NodeResult
+from application.flow.step_node.knowledge_write_node.i_knowledge_write_node import IKnowledgeWriteNode
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
@@ -46,6 +56,7 @@ class KnowledgeWriteParamSerializer(serializers.Serializer):
     tags = serializers.ListField(required=False, label=_('Tags'), child=TagInstanceSerializer())
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
     source_file_id = serializers.UUIDField(required=False, allow_null=True)
+    user_id = serializers.UUIDField(required=False, allow_null=True)
 
 
 def convert_uuid_to_str(obj):
@@ -137,7 +148,8 @@ def get_document_paragraph_model(knowledge_id: str, instance: Dict):
                 [len(p.get('content')) for p in instance.get('paragraphs', [])],
                 0),
             'meta': meta,
-            'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.WORKFLOW
+            'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.WORKFLOW,
+            "user_id": instance.get("user_id"),
         }
     )
 
@@ -213,7 +225,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
     def save_context(self, details, workflow_manage):
         self.context['exception_message'] = details.get('err_message')
 
-    def save(self, document_list):
+    def save(self, document_list, user_id):
         serializer = KnowledgeWriteParamSerializer(data=document_list, many=True)
         serializer.is_valid(raise_exception=True)
         document_list = serializer.data
@@ -231,6 +243,7 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
         knowledge_tag_dict = {}
 
         for document in document_list:
+            document["user_id"] = user_id
             document_paragraph_dict_model = get_document_paragraph_model(
                 knowledge_id,
                 document
@@ -302,9 +315,9 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
                 'workspace_id': workspace_id
             }).refresh()
 
-    def execute(self, documents, **kwargs) -> NodeResult:
+    def execute(self, documents, user_id, **kwargs) -> NodeResult:
 
-        document_model_list, knowledge_id, workspace_id = self.save(documents)
+        document_model_list, knowledge_id, workspace_id = self.save(documents, user_id)
         self.post_embedding(document_model_list, knowledge_id, workspace_id)
 
         write_content_list = [{
