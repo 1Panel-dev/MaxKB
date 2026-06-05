@@ -285,7 +285,7 @@ const getFormDefaultValue = (fieldList: Array<any>, form_data?: any) => {
       }
       return {}
     })
-    .reduce((x, y) => ({ ...x, ...y }), {})
+    .reduce((x, y) => ({ ...x, ...y }), { ...form_data })
   return value
 }
 /**
