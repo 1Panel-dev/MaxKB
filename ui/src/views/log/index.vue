@@ -297,7 +297,7 @@ import useStore from '@/stores'
 import type { Dict } from '@/api/type/common'
 import { t } from '@/locales'
 import type { FormInstance, FormRules } from 'element-plus'
-import { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 
 const { application, log, document, user } = useStore()
 const route = useRoute()
@@ -338,7 +338,7 @@ const daterange = ref({
   end_time: ''
 })
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 
 const ChatRecordRef = ref()

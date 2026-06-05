@@ -486,7 +486,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useRouter, useRoute, onBeforeRouteLeave, onBeforeRouteUpdate } from 'vue-router'
-import { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import documentApi from '@/api/document'
 import ImportDocumentDialog from './component/ImportDocumentDialog.vue'
 import SyncWebDialog from '@/views/dataset/component/SyncWebDialog.vue'
@@ -549,7 +549,7 @@ const paginationConfig = ref({
 })
 
 const ImportDocumentDialogRef = ref()
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 const multipleSelection = ref<any[]>([])
 const title = ref('')
 

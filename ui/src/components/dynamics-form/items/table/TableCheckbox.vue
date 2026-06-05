@@ -56,7 +56,8 @@
 import type { FormField } from '@/components/dynamics-form/type'
 import { computed, ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import type { ElTable } from 'element-plus'
+import type { TableInstance } from 'element-plus'
+
 
 import _ from 'lodash'
 import TableColumn from '@/components/dynamics-form/items/table/TableColumn.vue'
@@ -78,7 +79,7 @@ const evalF: (text: string, row: any) => string = (text: string, row: any) => {
 }
 const emit = defineEmits(['update:modelValue', 'change'])
 
-const multipleTableRef = ref<InstanceType<typeof ElTable>>()
+const multipleTableRef = ref<TableInstance>()
 
 const _data = computed({
   get() {
