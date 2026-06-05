@@ -26,7 +26,7 @@
         ref="userFormRef"
       />
     </div>
-    <div v-if="showUserInputContent && !firsUserInput && isNarrow" class="popperUserInput">
+    <div v-if="!firsUserInput && isNarrow" v-show="showUserInputContent" class="popperUserInput">
       <UserForm
         v-model:api_form_data="api_form_data"
         v-model:form_data="form_data"
