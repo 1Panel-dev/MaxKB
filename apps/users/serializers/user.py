@@ -1119,7 +1119,7 @@ class SendEmailSerializer(serializers.Serializer):
         # 获取邮件模板
         language = get_language()
         file = open(
-            os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template_{to_locale(language)}.html'), "r",
+            os.path.join(PROJECT_DIR, "apps", "common", 'template', f'email_template_{language}.html'), "r",
             encoding='utf-8')
         content = file.read()
         file.close()
