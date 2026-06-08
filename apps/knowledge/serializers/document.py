@@ -275,7 +275,7 @@ class DocumentSerializers(serializers.Serializer):
             if self.data.get("type") == "csv":
                 file = open(
                     os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"csv_template_{to_locale(language)}.csv"
+                        PROJECT_DIR, "apps", "knowledge", "template", f"csv_template_{language}.csv"
                     ),
                     "rb",
                 )
@@ -292,7 +292,7 @@ class DocumentSerializers(serializers.Serializer):
             elif self.data.get("type") == "excel":
                 file = open(
                     os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"excel_template_{to_locale(language)}.xlsx"
+                        PROJECT_DIR, "apps", "knowledge", "template", f"excel_template_{language}.xlsx"
                     ),
                     "rb",
                 )
