@@ -295,7 +295,13 @@
                         alt=""
                       />
                     </el-avatar>
-                    <ToolIcon v-else type="MCP" class="mr-8" :size="20" />
+                    <ToolIcon
+                      v-else
+                      type="MCP"
+                      class="mr-8"
+                      :size="20"
+                      style="--el-avatar-border-radius: 6px"
+                    />
 
                     <div
                       class="ellipsis"
@@ -384,6 +390,7 @@
                       class="mr-8"
                       :size="20"
                       :type="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.tool_type)"
+                      style="--el-avatar-border-radius: 6px"
                     />
 
                     <div
@@ -454,7 +461,13 @@
                         alt=""
                       />
                     </el-avatar>
-                    <ToolIcon v-else class="mr-8" :size="20" type="SKILL" />
+                    <ToolIcon
+                      v-else
+                      class="mr-8"
+                      :size="20"
+                      type="SKILL"
+                      style="--el-avatar-border-radius: 6px"
+                    />
 
                     <div
                       class="ellipsis"

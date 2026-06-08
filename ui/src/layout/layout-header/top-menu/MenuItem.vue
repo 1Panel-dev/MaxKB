@@ -10,13 +10,14 @@
         style="font-size: 16px"
         class="mr-4"
       />
-      <span> {{ $t(menu.meta?.title as string) }}</span>
+      <span class="title-text"> {{ $t(menu.meta?.title as string) }}</span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { useRouter, useRoute, type RouteRecordRaw } from 'vue-router'
 import { computed } from 'vue'
+
 const router = useRouter()
 const route = useRoute()
 
@@ -52,6 +53,11 @@ const isActive = computed(() => {
 
     .title {
       color: var(--el-color-primary) !important;
+    }
+  }
+  .title-text {
+    @media (max-width: 1200px) {
+      display: none;
     }
   }
 }

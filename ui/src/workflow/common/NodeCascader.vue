@@ -16,6 +16,7 @@
           class="mr-8"
           :size="18"
           :item="data"
+          style="--el-avatar-border-radius: 6px"
         />{{ data.label }}</span
       >
     </template>

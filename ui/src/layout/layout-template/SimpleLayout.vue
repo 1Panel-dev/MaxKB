@@ -16,7 +16,6 @@ const {
 } = route as any
 
 const isShared = computed(() => {
-  console.log(route)
   return (
     (folderId === 'shared' ||
       from === 'systemShare' ||
