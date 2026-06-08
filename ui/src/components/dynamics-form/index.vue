@@ -141,6 +141,17 @@ watch(
   },
   { deep: true },
 )
+
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (!val) return
+    if (_.isEqual(val, formValue.value)) return
+    formValue.value = _.cloneDeep(val)
+  },
+  { deep: true },
+)
+
 function renderTemplate(template: string, data: any) {
   return template.replace(/\$\{(\w+)\}/g, (match, key) => {
     return data[key] !== undefined ? data[key] : match
