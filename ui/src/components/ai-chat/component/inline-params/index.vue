@@ -67,9 +67,9 @@ watch(
       formValue.value = val
       for (const field of fieldList.value) {
         if (
-          field.default_value &&
-          !formValue.value[field.field] &&
-          formValue.value[field.field] !== false &&
+          field.default_value !== undefined &&
+          field.default_value !== null &&
+          (formValue.value[field.field] === undefined || formValue.value[field.field] === null) &&
           (field.show_default_value === true || field.show_default_value === undefined)
         ) {
           formValue.value[field.field] = field.default_value
@@ -249,15 +249,12 @@ const trigger = (
 
 const initDefaultData = (formField: FormField) => {
   if (
-    formField.default_value &&
-    (formValue.value[formField.field] === undefined ||
-      formValue.value[formField.field] === null ||
-      !formValue.value[formField.field]) &&
-    formValue.value[formField.field] != false
+    formField.default_value !== undefined &&
+    formField.default_value !== null &&
+    (formValue.value[formField.field] === undefined || formValue.value[formField.field] === null) &&
+    (formField.show_default_value === true || formField.show_default_value === undefined)
   ) {
-    if (formField.show_default_value === true || formField.show_default_value === undefined) {
-      formValue.value[formField.field] = formField.default_value
-    }
+    formValue.value[formField.field] = formField.default_value
   }
 }
 
