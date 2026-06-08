@@ -47,7 +47,12 @@
     </div>
     <el-popover
       v-if="!firsUserInput && !isNarrow"
-      v-model:visible="showUserInput"
+      :visible="showUserInput"
+      @update:visible="
+        (v: boolean) => {
+          if (v) showUserInput = true
+        }
+      "
       :virtual-ref="triggerEl"
       virtual-triggering
       trigger="manual"
