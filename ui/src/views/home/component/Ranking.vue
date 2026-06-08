@@ -25,174 +25,173 @@
       </div>
     </div>
 
-    <el-skeleton :loading="loading" animated>
-      <el-row :gutter="16">
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
-          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
-            <div class="flex-between">
-              <h4>
-                Tokens
-                {{ $t('home.usage') }}
-                · Top
-                {{ $t('views.application.title') }}
-              </h4>
-              <el-button link class="flex align-center lighter" @click="openDrawer('tokens_agent')">
-                <span class="mr-4"> {{ $t('common.detail') }}</span>
-                <el-icon>
-                  <ArrowRight />
-                </el-icon>
-              </el-button>
-            </div>
-            <el-empty v-if="!tokensRankding || tokensRankding.length === 0" />
+    <el-row :gutter="16" v-loading="loading">
+      <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+        <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
+          <div class="flex-between">
+            <h4>
+              Tokens
+              {{ $t('home.usage') }}
+              · Top
+              {{ $t('views.application.title') }}
+            </h4>
+            <el-button link class="flex align-center lighter" @click="openDrawer('tokens_agent')">
+              <span class="mr-4"> {{ $t('common.detail') }}</span>
+              <el-icon>
+                <ArrowRight />
+              </el-icon>
+            </el-button>
+          </div>
+          <el-empty v-if="!tokensRankding || tokensRankding.length === 0" />
 
-            <template v-else v-for="(item, index) in tokensRankding" :key="index">
-              <div class="flex-between mt-24">
-                <div class="flex align-center">
-                  <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
-                  <div class="ml-12">
-                    <p>{{ item?.name }}</p>
-                    <p class="color-secondary font-small lighter">
-                      {{ $t('home.chats') }} {{ numberFormat(item?.chat_record_count || 0) }}
-                      {{ $t('views.system.time') }} <el-divider direction="vertical" />{{
-                        $t('home.average‌')
-                      }}
-                      {{
-                        numberFormat(
-                          Number((item?.total_tokens / item?.chat_record_count || 0).toFixed(1)),
-                        )
-                      }}
-                      tokens
-                    </p>
-                  </div>
-                </div>
-                <div class="text-right" style="width: 100px">
-                  <el-progress
-                    :percentage="
-                      TokenTotal
-                        ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
-                        : 0
-                    "
-                    :show-text="false"
-                  />
-                  <p class="color-secondary mt-4">{{ numberFormat(item?.total_tokens || 0) }}</p>
+          <template v-else v-for="(item, index) in tokensRankding" :key="index">
+            <div class="flex-between mt-24">
+              <div class="flex align-center">
+                <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
+                <div class="ml-12">
+                  <p>{{ item?.name }}</p>
+                  <p class="color-secondary font-small lighter">
+                    {{ $t('home.chats') }} {{ numberFormat(item?.chat_record_count || 0) }}
+                    {{ $t('views.system.time') }} <el-divider direction="vertical" />{{
+                      $t('home.average‌')
+                    }}
+                    {{
+                      numberFormat(
+                        Number((item?.total_tokens / item?.chat_record_count || 0).toFixed(1)),
+                      )
+                    }}
+                    tokens
+                  </p>
                 </div>
               </div>
-            </template>
-          </el-card>
-        </el-col>
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
-          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
-            <div class="flex-between">
-              <h4>
-                {{ $t('home.chatCount') }}
-                · Top
-                {{ $t('views.application.title') }}
-              </h4>
-              <el-button
-                link
-                class="flex align-center lighter"
-                @click="openDrawer('questions_agent')"
-              >
-                <span class="mr-4"> {{ $t('common.detail') }}</span>
-                <el-icon>
-                  <ArrowRight />
-                </el-icon>
-              </el-button>
+              <div class="text-right" style="width: 100px">
+                <el-progress
+                  :percentage="
+                    TokenTotal
+                      ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
+                      : 0
+                  "
+                  :show-text="false"
+                />
+                <p class="color-secondary mt-4">{{ numberFormat(item?.total_tokens || 0) }}</p>
+              </div>
             </div>
-            <el-empty v-if="!questionRanking || questionRanking.length === 0" />
-            <template v-for="(item, index) in questionRanking" :key="index">
-              <div class="flex-between mt-24">
-                <div class="flex align-center">
-                  <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
-                  <div class="ml-12">
-                    <p>{{ item?.name }}</p>
-                    <p class="color-secondary font-small lighter">
-                      {{ $t('home.activeUsers') }}
-                      {{ numberFormat(item?.chat_user_count || 0) }}
-                      <el-divider direction="vertical" />{{ $t('home.average‌') }}
-                      {{
-                        numberFormat(
-                          Number((item?.chat_record_count / item?.chat_user_count || 0).toFixed(1)),
-                        )
-                      }}
-                      {{ $t('home.wheel') }}/{{ $t('home.person') }}
-                    </p>
-                  </div>
+          </template>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+        <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
+          <div class="flex-between">
+            <h4>
+              {{ $t('home.chatCount') }}
+              · Top
+              {{ $t('views.application.title') }}
+            </h4>
+            <el-button
+              link
+              class="flex align-center lighter"
+              @click="openDrawer('questions_agent')"
+            >
+              <span class="mr-4"> {{ $t('common.detail') }}</span>
+              <el-icon>
+                <ArrowRight />
+              </el-icon>
+            </el-button>
+          </div>
+          <el-empty v-if="!questionRanking || questionRanking.length === 0" />
+          <template v-for="(item, index) in questionRanking" :key="index">
+            <div class="flex-between mt-24">
+              <div class="flex align-center">
+                <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
+                <div class="ml-12">
+                  <p>{{ item?.name }}</p>
+                  <p class="color-secondary font-small lighter">
+                    {{ $t('home.activeUsers') }}
+                    {{ numberFormat(item?.chat_user_count || 0) }}
+                    <el-divider direction="vertical" />{{ $t('home.average‌') }}
+                    {{
+                      numberFormat(
+                        Number((item?.chat_record_count / item?.chat_user_count || 0).toFixed(1)),
+                      )
+                    }}
+                    {{ $t('home.wheel') }}/{{ $t('home.person') }}
+                  </p>
                 </div>
-                <div class="text-right" style="width: 100px">
-                  <el-progress
-                    :percentage="
-                      ChatRecordTotal
-                        ? Number(
-                            (((item?.chat_record_count || 0) / ChatRecordTotal) * 100).toFixed(1),
-                          )
-                        : 0
-                    "
-                    :show-text="false"
-                  />
-                  <p class="color-secondary mt-4">
+              </div>
+              <div class="text-right" style="width: 100px">
+                <el-progress
+                  :percentage="
+                    ChatRecordTotal
+                      ? Number(
+                          (((item?.chat_record_count || 0) / ChatRecordTotal) * 100).toFixed(1),
+                        )
+                      : 0
+                  "
+                  :show-text="false"
+                />
+                <p class="color-secondary mt-4">
+                  {{ numberFormat(item?.chat_record_count || 0) }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </el-card>
+      </el-col>
+      <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
+        <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
+          <div class="flex-between">
+            <h4>
+              Tokens
+              {{ $t('home.usage') }}
+              · Top
+              {{ $t('views.chatLog.table.user') }}
+            </h4>
+            <el-button
+              link
+              class="flex align-center lighter"
+              @click="openDrawer('user_tokens_agent')"
+            >
+              <span class="mr-4"> {{ $t('common.detail') }}</span>
+              <el-icon>
+                <ArrowRight />
+              </el-icon>
+            </el-button>
+          </div>
+          <el-empty v-if="!userTokensRanking || userTokensRanking.length === 0" />
+          <template v-for="(item, index) in userTokensRanking" :key="index">
+            <div class="flex-between mt-24">
+              <div class="flex align-center">
+                <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
+                <div class="ml-12">
+                  <p>{{ item?.asker?.username }}</p>
+                  <p class="color-secondary font-small lighter">
+                    {{ $t('home.chats') }}
                     {{ numberFormat(item?.chat_record_count || 0) }}
-                  </p>
-                </div>
-              </div>
-            </template>
-          </el-card>
-        </el-col>
-        <el-col :xs="12" :sm="12" :md="12" :lg="8" :xl="8">
-          <el-card shadow="never" style="--el-card-padding: 24px; min-height: 375px">
-            <div class="flex-between">
-              <h4>
-                Tokens
-                {{ $t('home.usage') }}
-                · Top
-                {{ $t('views.chatLog.table.user') }}
-              </h4>
-              <el-button
-                link
-                class="flex align-center lighter"
-                @click="openDrawer('user_tokens_agent')"
-              >
-                <span class="mr-4"> {{ $t('common.detail') }}</span>
-                <el-icon>
-                  <ArrowRight />
-                </el-icon>
-              </el-button>
-            </div>
-            <el-empty v-if="!userTokensRanking || userTokensRanking.length === 0" />
-            <template v-for="(item, index) in userTokensRanking" :key="index">
-              <div class="flex-between mt-24">
-                <div class="flex align-center">
-                  <span class="rank" :class="'rank-' + (index + 1)"> {{ index + 1 }}</span>
-                  <div class="ml-12">
-                    <p>{{ item?.asker?.username }}</p>
-                    <p class="color-secondary font-small lighter">
-                      {{ $t('home.chats') }}
-                      {{ numberFormat(item?.chat_record_count || 0) }}
-                      {{ $t('views.system.time') }}
-                      <!-- <el-divider direction="vertical" />
+                    {{ $t('views.system.time') }}
+                    <!-- <el-divider direction="vertical" />
                       {{ '-' }} -->
-                    </p>
-                  </div>
-                </div>
-                <div class="text-right" style="width: 100px">
-                  <el-progress
-                    :percentage="
-                      TokenTotal
-                        ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
-                        : 0
-                    "
-                    :show-text="false"
-                  />
-                  <p class="color-secondary mt-4">
-                    {{ numberFormat(item?.total_tokens || 0) }}
                   </p>
                 </div>
               </div>
-            </template>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-skeleton>
+              <div class="text-right" style="width: 100px">
+                <el-progress
+                  :percentage="
+                    TokenTotal
+                      ? Number((((item?.total_tokens || 0) / TokenTotal) * 100).toFixed(1))
+                      : 0
+                  "
+                  :show-text="false"
+                />
+                <p class="color-secondary mt-4">
+                  {{ numberFormat(item?.total_tokens || 0) }}
+                </p>
+              </div>
+            </div>
+          </template>
+        </el-card>
+      </el-col>
+    </el-row>
+
     <RankingDrawer ref="RankingDrawerRef" />
   </el-card>
 </template>

@@ -263,7 +263,6 @@ import { getFileUrl } from '@/utils/common'
 import PdfExport from '@/components/pdf-export/index.vue'
 import JSEncrypt from 'jsencrypt'
 
-const { user } = useStore()
 useResize()
 
 provide('scrollData', loadInfiniteScroll)

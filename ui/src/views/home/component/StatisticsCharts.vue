@@ -38,7 +38,11 @@
           <el-option :label="$t('home.allAgents')" :value="'all'">
             <el-space :size="8">
               <el-avatar shape="square" :size="24" style="background: none">
-                <AppIcon :iconName="'app-all-menu'" class="color-secondary"></AppIcon>
+                <AppIcon
+                  :iconName="'app-all-menu'"
+                  class="color-secondary"
+                  style="font-size: 20px"
+                ></AppIcon>
               </el-avatar>
               <span>{{ $t('home.allAgents') }}</span>
             </el-space>
@@ -58,6 +62,7 @@
                   v-if="value === 'all'"
                   :iconName="'app-all-menu'"
                   class="color-text-primary"
+                  style="font-size: 20px"
                 ></AppIcon>
                 <img
                   v-else
@@ -76,65 +81,64 @@
         </el-select>
       </div>
     </div>
-    <el-skeleton :loading="loading" animated>
-      <el-row :gutter="16">
-        <el-col
-          :xs="12"
-          :sm="12"
-          :md="12"
-          :lg="6"
-          :xl="6"
-          v-for="(item, index) in statisticsType"
-          :key="index"
-          class="mb-16"
-        >
-          <el-card shadow="never">
-            <div class="flex align-center ml-8 mr-8">
-              <!-- <el-avatar :size="40" shape="square" :style="{ background: item.background }">
+
+    <el-row :gutter="16" v-loading="loading">
+      <el-col
+        :xs="12"
+        :sm="12"
+        :md="12"
+        :lg="6"
+        :xl="6"
+        v-for="(item, index) in statisticsType"
+        :key="index"
+        class="mb-16"
+      >
+        <el-card shadow="never">
+          <div class="flex align-center ml-8 mr-8">
+            <!-- <el-avatar :size="40" shape="square" :style="{ background: item.background }">
                 <appIcon :iconName="item.icon" :style="{ fontSize: '24px', color: item.color }" />
               </el-avatar> -->
-              <div>
-                <p class="color-secondary lighter mb-4">{{ item.name }}</p>
-                <div v-if="item.id !== 'starCharts'" class="flex align-baseline">
-                  <h2>{{ numberFormat(item.sum?.[0]) }}</h2>
-                  <span v-if="item.sum.length > 1" class="ml-12" style="color: #f54a45"
-                    >+{{ numberFormat(item.sum?.[1]) }}</span
-                  >
-                </div>
-                <div v-else class="flex align-center mr-8">
-                  <AppIcon iconName="app-like-color"></AppIcon>
-                  <h2 class="ml-4">{{ item.sum?.[0] }}</h2>
-                  <AppIcon class="ml-12" iconName="app-oppose-color"></AppIcon>
-                  <h2 class="ml-4">{{ item.sum?.[1] }}</h2>
-                </div>
+            <div>
+              <p class="color-secondary lighter mb-4">{{ item.name }}</p>
+              <div v-if="item.id !== 'starCharts'" class="flex align-baseline">
+                <h2>{{ numberFormat(item.sum?.[0]) }}</h2>
+                <span v-if="item.sum.length > 1" class="ml-12" style="color: #f54a45"
+                  >+{{ numberFormat(item.sum?.[1]) }}</span
+                >
+              </div>
+              <div v-else class="flex align-center mr-8">
+                <AppIcon iconName="app-like-color"></AppIcon>
+                <h2 class="ml-4">{{ item.sum?.[0] }}</h2>
+                <AppIcon class="ml-12" iconName="app-oppose-color"></AppIcon>
+                <h2 class="ml-4">{{ item.sum?.[1] }}</h2>
               </div>
             </div>
-          </el-card>
-        </el-col>
-        <el-col
-          :xs="24"
-          :sm="24"
-          :md="24"
-          :lg="12"
-          :xl="12"
-          v-for="(item, index) in statisticsType"
-          :key="index"
-          class="mb-16"
-        >
-          <el-card shadow="never">
-            <div class="p-8">
-              <AppCharts
-                v-if="data.length"
-                height="316px"
-                :id="item.id"
-                type="line"
-                :option="item.option"
-              />
-            </div>
-          </el-card>
-        </el-col>
-      </el-row>
-    </el-skeleton>
+          </div>
+        </el-card>
+      </el-col>
+      <el-col
+        :xs="24"
+        :sm="24"
+        :md="24"
+        :lg="12"
+        :xl="12"
+        v-for="(item, index) in statisticsType"
+        :key="index"
+        class="mb-16"
+      >
+        <el-card shadow="never">
+          <div class="p-8">
+            <AppCharts
+              v-if="data.length"
+              height="316px"
+              :id="item.id"
+              type="line"
+              :option="item.option"
+            />
+          </div>
+        </el-card>
+      </el-col>
+    </el-row>
   </el-card>
 </template>
 <script setup lang="ts">

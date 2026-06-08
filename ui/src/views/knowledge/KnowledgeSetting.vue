@@ -86,7 +86,7 @@
                   v-if="detail?.type === 4"
                 >
                   <div class="flex align-center">
-                    <el-avatar class="mr-8 avatar-orange" shape="square" :size="32">
+                    <el-avatar class="mr-8 avatar-purple" shape="square" :size="32">
                       <img src="@/assets/workflow/logo_workflow.svg" style="width: 60%" alt="" />
                     </el-avatar>
                     <div>
