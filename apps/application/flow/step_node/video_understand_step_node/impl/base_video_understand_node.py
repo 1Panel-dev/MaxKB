@@ -163,6 +163,8 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
         # 执行详情中的历史消息不需要图片内容
         history_message = self.get_history_message_for_details(history_chat_record, dialogue_number)
         self.context['history_message'] = history_message
+        system = self.workflow_manage.generate_prompt(system)
+        self.context['system'] = system
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
         # 生成消息列表, 真实的history_message
@@ -291,7 +293,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
 
         if system is not None and len(system) > 0:
             return [
-                SystemMessage(self.workflow_manage.generate_prompt(system)),
+                SystemMessage(system),
                 *history_message,
                 *messages
             ]
@@ -315,7 +317,7 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
             'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
-            'system': self.node_params.get('system'),
+            'system': self.context.get('system'),
             'history_message': [{'content': message.content, 'role': message.type} for message in
                                 (self.context.get('history_message') if self.context.get(
                                     'history_message') is not None else [])],

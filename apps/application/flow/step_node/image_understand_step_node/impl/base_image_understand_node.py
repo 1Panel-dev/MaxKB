@@ -164,6 +164,8 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
         self.context['history_message'] = history_message
         question = self.generate_prompt_question(prompt)
         self.context['question'] = question.content
+        system = self.workflow_manage.generate_prompt(system)
+        self.context['system'] = system
         # 生成消息列表, 真实的history_message
         message_list = self.generate_message_list(image_model, system, prompt,
                                                   self.get_history_message(history_chat_record, dialogue_number), image)
@@ -296,7 +298,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
 
         if system is not None and len(system) > 0:
             return [
-                SystemMessage(self.workflow_manage.generate_prompt(system)),
+                SystemMessage(system),
                 *history_message,
                 *messages
             ]
@@ -320,7 +322,7 @@ class BaseImageUnderstandNode(IImageUnderstandNode):
             'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
-            'system': self.node_params.get('system'),
+            'system': self.context.get('system'),
             'history_message': [{'content': message.content, 'role': message.type} for message in
                                 (self.context.get('history_message') if self.context.get(
                                     'history_message') is not None else [])],
