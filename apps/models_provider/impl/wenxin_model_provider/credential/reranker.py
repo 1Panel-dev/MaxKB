@@ -4,11 +4,21 @@ from langchain_core.documents import Document
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext_lazy as _
 from common.utils.logger import maxkb_logger
 from models_provider.impl.wenxin_model_provider.model.reranker import QfBgeReranker
+
+
+class QfRerankerModelParams(BaseForm):
+    top_n = forms.SliderField(TooltipLabel(_('Top N'),
+                                           _('Number of top documents to return after reranking')),
+                              required=True, default_value=3,
+                              _min=1,
+                              _max=100,
+                              _step=1,
+                              precision=0)
 
 
 class QfRerankerCredential(BaseForm, BaseModelCredential):
@@ -48,3 +58,6 @@ class QfRerankerCredential(BaseForm, BaseModelCredential):
 
     def encryption_dict(self, model_info: Dict[str, object]):
         return {**model_info, 'api_key': super().encryption(model_info.get('api_key', ''))}
+
+    def get_model_params_setting_form(self, model_name: str) -> QfRerankerModelParams:
+        return QfRerankerModelParams()
