@@ -158,7 +158,9 @@
         </div>
         <el-table
           :data="base_form_data.model_params_form"
-          v-if="base_form_data.model_params_form?.length > 0"
+          v-if="
+            base_form_data.model_params_form?.length > 0 && base_form_data.model_type !== 'RERANKER'
+          "
           class="mb-16"
         >
           <el-table-column
