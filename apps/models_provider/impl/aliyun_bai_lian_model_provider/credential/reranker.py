@@ -7,10 +7,20 @@ from langchain_core.documents import Document
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm, PasswordInputField
+from common.forms import BaseForm, PasswordInputField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from models_provider.impl.aliyun_bai_lian_model_provider.model.reranker import AliyunBaiLianReranker
 from common.utils.logger import maxkb_logger
+
+
+class AliyunRerankerModelParams(BaseForm):
+    top_n = forms.SliderField(TooltipLabel(_('Top N'),
+                                           _('Number of top documents to return after reranking')),
+                              required=True, default_value=3,
+                              _min=1,
+                              _max=100,
+                              _step=1,
+                              precision=0)
 
 
 class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
@@ -86,3 +96,6 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
             **model,
             'dashscope_api_key': super().encryption(model.get('dashscope_api_key', ''))
         }
+
+    def get_model_params_setting_form(self, model_name: str) -> AliyunRerankerModelParams:
+        return AliyunRerankerModelParams()

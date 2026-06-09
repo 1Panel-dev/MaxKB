@@ -4,12 +4,23 @@ from langchain_core.documents import Document
 
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm
+from common.forms import BaseForm, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from django.utils.translation import gettext_lazy as _
 
 from models_provider.impl.vllm_model_provider.model.reranker import VllmBgeReranker
 from common.utils.logger import maxkb_logger
+
+
+class VllmRerankerModelParams(BaseForm):
+    top_n = forms.SliderField(TooltipLabel(_('Top N'),
+                                           _('Number of top documents to return after reranking')),
+                              required=True, default_value=3,
+                              _min=1,
+                              _max=100,
+                              _step=1,
+                              precision=0)
+
 
 class VllmRerankerCredential(BaseForm, BaseModelCredential):
     api_url = forms.TextInputField('API URL', required=True)
@@ -48,3 +59,6 @@ class VllmRerankerCredential(BaseForm, BaseModelCredential):
 
     def encryption_dict(self, model_info: Dict[str, object]):
         return {**model_info, 'api_key': super().encryption(model_info.get('api_key', ''))}
+
+    def get_model_params_setting_form(self, model_name: str) -> VllmRerankerModelParams:
+        return VllmRerankerModelParams()
