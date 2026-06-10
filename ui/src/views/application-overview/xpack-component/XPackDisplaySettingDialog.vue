@@ -173,9 +173,7 @@
             <el-row class="w-full mb-8">
               <el-col :span="12">
                 <h5 class="mb-8">
-                  {{
-                    $t('views.applicationOverview.SettingDisplayDialog.customThemeColor')
-                  }}
+                  {{ $t('views.applicationOverview.SettingDisplayDialog.customThemeColor') }}
                 </h5>
                 <div>
                   <el-color-picker v-model="xpackForm.custom_theme.theme_color" />
@@ -188,11 +186,7 @@
               </el-col>
               <el-col :span="12">
                 <h5 class="mb-8">
-                  {{
-                    $t(
-                      'views.applicationOverview.SettingDisplayDialog.headerTitleFontColor',
-                    )
-                  }}
+                  {{ $t('views.applicationOverview.SettingDisplayDialog.headerTitleFontColor') }}
                 </h5>
                 <el-color-picker v-model="xpackForm.custom_theme.header_font_color" />
               </el-col>
@@ -259,9 +253,7 @@
                 </span>
               </div>
               <el-text type="info" size="small">
-                {{
-                  $t('views.applicationOverview.SettingDisplayDialog.chatBackgroundMessage')
-                }}
+                {{ $t('views.applicationOverview.SettingDisplayDialog.chatBackgroundMessage') }}
               </el-text>
             </el-card>
             <!-- AI回复头像 -->
@@ -301,9 +293,7 @@
                 }}</span>
                 <span class="flex align-center">
                   <el-checkbox v-model="xpackForm.show_user_avatar">
-                    {{
-                      $t('views.applicationOverview.SettingDisplayDialog.display')
-                    }}</el-checkbox
+                    {{ $t('views.applicationOverview.SettingDisplayDialog.display') }}</el-checkbox
                   >
                   <el-upload
                     class="ml-8"
@@ -355,9 +345,7 @@
                   }}</span>
                   <el-checkbox
                     v-model="xpackForm.draggable"
-                    :label="
-                      $t('views.applicationOverview.SettingDisplayDialog.draggablePosition')
-                    "
+                    :label="$t('views.applicationOverview.SettingDisplayDialog.draggablePosition')"
                   />
                 </div>
                 <el-row :gutter="8" class="w-full mb-8">
@@ -366,17 +354,13 @@
                       <el-select v-model="xpackForm.float_location.x.type" style="width: 80px">
                         <el-option
                           :label="
-                            $t(
-                              'views.applicationOverview.SettingDisplayDialog.iconPosition.left',
-                            )
+                            $t('views.applicationOverview.SettingDisplayDialog.iconPosition.left')
                           "
                           value="left"
                         />
                         <el-option
                           :label="
-                            $t(
-                              'views.applicationOverview.SettingDisplayDialog.iconPosition.right',
-                            )
+                            $t('views.applicationOverview.SettingDisplayDialog.iconPosition.right')
                           "
                           value="right"
                         />
@@ -398,17 +382,13 @@
                       <el-select v-model="xpackForm.float_location.y.type" style="width: 80px">
                         <el-option
                           :label="
-                            $t(
-                              'views.applicationOverview.SettingDisplayDialog.iconPosition.top',
-                            )
+                            $t('views.applicationOverview.SettingDisplayDialog.iconPosition.top')
                           "
                           value="top"
                         />
                         <el-option
                           :label="
-                            $t(
-                              'views.applicationOverview.SettingDisplayDialog.iconPosition.bottom',
-                            )
+                            $t('views.applicationOverview.SettingDisplayDialog.iconPosition.bottom')
                           "
                           value="bottom"
                         />
@@ -432,15 +412,11 @@
             <el-space direction="vertical" alignment="start" :size="2">
               <el-checkbox
                 v-model="xpackForm.show_source"
-                :label="
-                  $t('views.applicationOverview.SettingDisplayDialog.showSourceLabel')
-                "
+                :label="$t('views.applicationOverview.SettingDisplayDialog.showSourceLabel')"
               />
               <el-checkbox
                 v-model="xpackForm.show_exec"
-                :label="
-                  $t('views.applicationOverview.SettingDisplayDialog.showExecutionDetail')
-                "
+                :label="$t('views.applicationOverview.SettingDisplayDialog.showExecutionDetail')"
               />
               <el-checkbox
                 v-model="xpackForm.show_history"
@@ -449,6 +425,10 @@
               <el-checkbox
                 v-model="xpackForm.show_guide"
                 :label="$t('views.applicationOverview.SettingDisplayDialog.displayGuide')"
+              />
+              <el-checkbox
+                v-model="xpackForm.show_share"
+                :label="$t('views.applicationOverview.SettingDisplayDialog.share')"
               />
               <el-checkbox
                 v-model="xpackForm.disclaimer"
@@ -512,6 +492,7 @@ const defaultSetting = {
   show_history: true,
   draggable: true,
   show_guide: true,
+  show_share: true,
   icon: '',
   icon_url: '',
   chat_background: '',
@@ -547,6 +528,7 @@ const xpackForm = ref<any>({
   show_history: true,
   draggable: false,
   show_guide: false,
+  show_share: true,
   chat_background: '',
   chat_background_url: '',
   avatar: '',
@@ -621,6 +603,7 @@ const open = (data: any, content: any) => {
   xpackForm.value.language = data.language
   xpackForm.value.draggable = data.draggable
   xpackForm.value.show_guide = data.show_guide
+  xpackForm.value.show_share = data.show_share
   imgUrl.value.avatar = data.avatar
   imgUrl.value.icon = data.icon
   imgUrl.value.chat_background = data.chat_background
@@ -710,6 +693,7 @@ defineExpose({ open })
     overflow: hidden;
     width: 330px;
     height: 520px;
+
     .setting-preview-header {
       background: var(--app-header-bg-color);
       height: var(--app-header-height);

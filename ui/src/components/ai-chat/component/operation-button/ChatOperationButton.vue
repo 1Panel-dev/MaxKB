@@ -136,9 +136,13 @@
             </el-button>
           </el-tooltip>
         </span>
-        <span class="ml-8">
+        <span class="ml-8" v-if="props.application.show_share">
           <el-tooltip effect="dark" :content="$t('aiChat.share')" placement="top">
-            <el-button text @click.stop="clickShareHandle(props.data.record_id)" :disabled="chat_loading">
+            <el-button
+              text
+              @click.stop="clickShareHandle(props.data.record_id)"
+              :disabled="chat_loading"
+            >
               <AppIcon class="color-secondary" iconName="app-share"></AppIcon>
             </el-button>
           </el-tooltip>
@@ -182,6 +186,7 @@ const props = withDefaults(
     tts: boolean
     tts_type: string
     tts_autoplay: boolean
+    application: any
   }>(),
   {
     data: () => ({}),

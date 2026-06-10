@@ -72,6 +72,7 @@ export default {
     draggablePosition: '可拖拽位置',
     showHistory: '显示历史记录',
     displayGuide: '显示引导图(浮窗模式)',
+    share: '允许分享对话记录',
     disclaimer: '免责声明',
     disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」',
     chatBackground: '聊天背景',

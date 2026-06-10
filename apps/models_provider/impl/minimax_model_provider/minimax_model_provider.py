@@ -36,6 +36,13 @@ minimax_m2_7 = ModelInfo(
     MiniMaxChatModel,
 )
 
+minimax_m3 = ModelInfo(
+    "MiniMax-M3",
+    _(""),
+    ModelTypeConst.LLM,
+    minimax_llm_model_credential,
+    MiniMaxChatModel,
+)
 minimax_m2_7_highspeed = ModelInfo(
     "MiniMax-M2.7-highspeed",
     _("High-speed version of M2.7 for low-latency scenarios. 204K context window"),
@@ -88,6 +95,7 @@ model_info_itv_list = [
 ]
 model_info_manage = (
     ModelInfoManage.builder()
+    .append_model_info(minimax_m3)
     .append_model_info(minimax_m2_7)
     .append_model_info(minimax_m2_7_highspeed)
     .append_model_info(minimax_m2_5)

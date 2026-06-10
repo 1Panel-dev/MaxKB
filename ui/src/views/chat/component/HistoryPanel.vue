@@ -89,6 +89,7 @@
                             <el-dropdown-item
                               @click.stop="shareHandle()"
                               :disabled="currentChatId !== row.id || chat_loading"
+                              v-if="applicationDetail?.show_share"
                             >
                               <AppIcon iconName="app-share" class="color-secondary"></AppIcon>
                               {{ $t('aiChat.share') }}

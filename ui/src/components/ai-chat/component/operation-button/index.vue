@@ -35,6 +35,7 @@
       :applicationId="application.id"
       :chatId="chatRecord.chat_id"
       :chat_loading="loading"
+      :application="application"
       @regeneration="regenerationChart(chatRecord)"
     />
   </div>
