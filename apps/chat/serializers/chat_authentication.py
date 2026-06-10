@@ -154,6 +154,7 @@ class ApplicationProfileSerializer(serializers.Serializer):
                                             'custom_theme': application_setting.custom_theme,
                                             'user_avatar': application_setting.user_avatar,
                                             'show_user_avatar': application_setting.show_user_avatar,
+                                            'show_share': application_setting.show_share,
                                             'float_location': application_setting.float_location,
                                             'chat_background': application_setting.chat_background}
         base_node = [node for node in ((application.work_flow or {}).get('nodes', []) or []) if
@@ -171,5 +172,6 @@ class ApplicationProfileSerializer(serializers.Serializer):
                 'work_flow': {'nodes': base_node} if base_node else None,
                 'show_source': application_access_token.show_source,
                 'show_exec': application_access_token.show_exec,
+                'show_share': True,
                 'language': application_access_token.language,
                 **application_setting_dict}
