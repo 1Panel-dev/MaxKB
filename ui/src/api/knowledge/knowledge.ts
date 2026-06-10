@@ -504,11 +504,12 @@ const postTransformWorkflow: (
 const exportKnowledgeBundle: (
   knowledge_name: string,
   knowledge_id: string,
+  with_source_file: boolean,
   loading?: Ref<boolean>
-) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+) => Promise<any> = (knowledge_name, knowledge_id, with_source_file, loading) => {
   return exportFile(
     knowledge_name + '.zip',
-    `${prefix.value}/${knowledge_id}/export_knowledge`,undefined, loading
+    `${prefix.value}/${knowledge_id}/export_knowledge`, {with_source_file: with_source_file}, loading
   )
 }
 

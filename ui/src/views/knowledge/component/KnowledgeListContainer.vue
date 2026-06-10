@@ -432,6 +432,7 @@
   />
   <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList" />
   <ResourceMappingDrawer ref="resourceMappingDrawerRef"></ResourceMappingDrawer>
+  <ExportKnowledgeDialog ref="exportKnowledgeDialogRef" />
 </template>
 
 <script lang="ts" setup>
@@ -459,6 +460,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import permissionMap from '@/permission'
 import useStore from '@/stores'
 import { t } from '@/locales'
+import ExportKnowledgeDialog from '@/views/knowledge/component/ExportKnowledgeDialog.vue'
 
 const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
 
@@ -677,12 +679,17 @@ const search_type_change = () => {
   search_form.value = { name: '', create_user: '' }
 }
 
+const exportKnowledgeDialogRef = ref<InstanceType<typeof ExportKnowledgeDialog>>()
 const exportKnowledgeBundle = (item: any) => {
-  loadSharedApi({ type: 'knowledge', systemType: apiType.value })
-    .exportKnowledgeBundle(item.name, item.id, loading)
-    .then(() => {
-      MsgSuccess(t('common.exportSuccess'))
-    })
+  const exportKnowledge = (with_source_file: boolean) => {
+    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+      .exportKnowledgeBundle(item.name, item.id, with_source_file, loading)
+      .then(() => {
+        MsgSuccess(t('common.exportSuccess'))
+      })
+  }
+
+  exportKnowledgeDialogRef.value?.open(exportKnowledge)
 }
 
 const importKnowledgeUploadRef = ref()

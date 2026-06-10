@@ -433,8 +433,10 @@ class KnowledgeView(APIView):
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return KnowledgeSerializer.Operate(data={
-                'workspace_id': workspace_id, 'knowledge_id': knowledge_id, 'user_id': request.user.id
-            }).export_knowledge()
+                'workspace_id': workspace_id,
+                'knowledge_id': knowledge_id,
+                'user_id': request.user.id,
+            }).export_knowledge(with_source_file=request.query_params.get("with_source_file"))
 
 
     class ImportKnowledge(APIView):
