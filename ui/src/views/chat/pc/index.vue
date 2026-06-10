@@ -130,7 +130,7 @@
                 effect="dark"
                 :content="$t('aiChat.share')"
                 placement="top"
-                v-if="!showSelection"
+                v-if="!showSelection && applicationDetail.show_share"
               >
                 <el-button
                   text

@@ -57,7 +57,7 @@
             effect="dark"
             :content="$t('aiChat.share')"
             placement="top"
-            v-if="!showSelection && currentChatId !== 'new'"
+            v-if="!showSelection && currentChatId !== 'new' && applicationDetail.show_share"
           >
             <el-button class="mr-16" text @click="clickShareHandle" :disabled="AiChatRef?.loading">
               <AppIcon iconName="app-share"></AppIcon>
@@ -172,6 +172,7 @@ function deleteLog(row: any) {
     chatLogData.value = chatLogData.value.filter((item) => item.id !== row.id)
   })
 }
+
 function handleScroll(event: any) {
   if (
     currentChatId.value !== 'new' &&
@@ -190,6 +191,7 @@ const newObj = {
   id: 'new',
   abstract: t('aiChat.createChat'),
 }
+
 function newChat() {
   paginationConfig.current_page = 1
   currentRecordList.value = []
@@ -205,6 +207,7 @@ const chatLogPagination = ref({
   page_size: 20,
   current_page: 1,
 })
+
 function getChatLog(refresh?: boolean) {
   chatAPI
     .pageChat(chatLogPagination.value.current_page, chatLogPagination.value.page_size, left_loading)
@@ -219,6 +222,7 @@ function getChatLog(refresh?: boolean) {
       }
     })
 }
+
 function loadInfiniteScroll() {
   getChatLog(true)
 }
@@ -276,6 +280,7 @@ function refresh(id: string) {
   chatLogData.value = []
   getChatLog(true)
 }
+
 /**
  *初始化历史对话记录
  */
@@ -290,6 +295,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .chat-mobile {
   overflow: hidden;
+
   &__header {
     background: var(--app-header-bg-color);
     position: fixed;
@@ -302,6 +308,7 @@ onMounted(() => {
     box-sizing: border-box;
     border-bottom: 1px solid var(--el-border-color);
   }
+
   &__main {
     padding-top: calc(var(--app-header-height) + 16px);
     height: calc(100vh - var(--app-header-height) - 16px);

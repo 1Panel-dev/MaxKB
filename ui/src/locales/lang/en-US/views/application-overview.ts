@@ -74,6 +74,7 @@ export default {
     draggablePosition: 'Draggable Position',
     showHistory: 'Show Chat History',
     displayGuide: 'Show Guide Image (Floating Mode)',
+    share: 'Allow sharing of chat records',
     disclaimer: 'Disclaimer',
     disclaimerValue: 'This content is AI-generated and for reference only.',
     chatBackground: 'Chat Background',

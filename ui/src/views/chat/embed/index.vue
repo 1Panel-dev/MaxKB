@@ -54,7 +54,7 @@
             <AppIcon iconName="app-create-chat" style="font-size: 20px"></AppIcon>
           </el-button>
           <el-tooltip
-            v-if="!showSelection && currentChatId !== 'new'"
+            v-if="!showSelection && currentChatId !== 'new' && applicationDetail.show_share"
             effect="dark"
             :content="$t('aiChat.share')"
             placement="top"
