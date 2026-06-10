@@ -286,6 +286,13 @@ class KnowledgeExportAPI(APIMixin):
                 location='path',
                 required=True,
             ),
+            OpenApiParameter(
+                name="with_source_file",
+                description="是否导出原始文件",
+                type=OpenApiTypes.BOOL,
+                location='query',
+                required=False,
+            ),
         ]
 
     @staticmethod
@@ -335,4 +342,3 @@ class KnowledgeImportAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
-

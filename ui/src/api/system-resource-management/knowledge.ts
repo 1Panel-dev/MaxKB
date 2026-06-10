@@ -130,20 +130,21 @@ const exportZipKnowledge: (
 
 /**
  * 导出知识库
- * @param knowledge_name 
- * @param knowledge_id 
- * @param loading 
- * @returns 
+ * @param knowledge_name
+ * @param knowledge_id
+ * @param loading
+ * @returns
  */
 const exportKnowledgeBundle: (
   knowledge_name: string,
   knowledge_id: string,
+  with_source_file: boolean,
   loading?: Ref<boolean>,
-) => Promise<any> = (knowledge_name, knowledge_id, loading) => {
+) => Promise<any> = (knowledge_name, knowledge_id, with_source_file, loading) => {
   return exportFile(
     knowledge_name + '.zip',
     `${prefix}/${knowledge_id}/export_knowledge`,
-    undefined,
+    {with_source_file: with_source_file},
     loading
   )
 }

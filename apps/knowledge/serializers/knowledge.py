@@ -315,6 +315,14 @@ class KnowledgeSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
 
+        @staticmethod
+        def _parse_boolean_param(value, field_name):
+            if value in serializers.BooleanField.TRUE_VALUES:
+                return True
+            if value in serializers.BooleanField.FALSE_VALUES or value is None:
+                return False
+            raise AppApiException(500, _("%s must be a boolean") % field_name)
+
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
@@ -566,9 +574,10 @@ class KnowledgeSerializer(serializers.Serializer):
             response.write(zip_buffer.getvalue())
             return response
 
-        def export_knowledge(self, with_valid=True):
+        def export_knowledge(self, with_source_file=False, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
+            with_source_file = self._parse_boolean_param(with_source_file, "with_source_file")
             knowledge_id = self.data.get("knowledge_id")
             knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
 
@@ -587,6 +596,12 @@ class KnowledgeSerializer(serializers.Serializer):
             data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
                 paragraph_list, problem_mapping_list, document_list
             )
+            source_file_list = []
+            if with_source_file:
+                document_id_list = [str(document.id) for document in document_list]
+                source_file_list = list(
+                    QuerySet(File).filter(source_id__in=document_id_list, source_type=FileSourceType.DOCUMENT)
+                )
 
             # 查询标签和文档标签关联
             tag_list = list(QuerySet(Tag).filter(knowledge_id=knowledge_id).values("id", "key", "value"))
@@ -639,6 +654,23 @@ class KnowledgeSerializer(serializers.Serializer):
                 for r in res:
                     write_image(tempdir, r)
 
+                source_file_path_set = set()
+                source_file_export_list = []
+                for source_file in source_file_list:
+                    source_file_zip_path = self._get_source_file_zip_path(source_file.file_name, source_file_path_set)
+                    source_file_export_list.append(
+                        {
+                            "id": str(source_file.id),
+                            "file_name": source_file.file_name,
+                            "source_id": source_file.source_id,
+                            "zip_path": source_file_zip_path,
+                        }
+                    )
+                    source_file_path = os.path.join(tempdir, source_file_zip_path)
+                    os.makedirs(os.path.dirname(source_file_path), exist_ok=True)
+                    with open(source_file_path, "wb") as f:
+                        f.write(source_file.get_bytes())
+
                 knowledge_json = {
                     "name": knowledge.name,
                     "desc": knowledge.desc,
@@ -648,6 +680,7 @@ class KnowledgeSerializer(serializers.Serializer):
                     "file_count_limit": knowledge.file_count_limit,
                     "tags": [{"key": t["key"], "value": t["value"]} for t in tag_list],
                     "termbase": terms,
+                    "source_file_list": source_file_export_list,
                 }
 
                 with open(os.path.join(tempdir, "knowledge.json"), "w", encoding="utf-8") as f:
@@ -754,6 +787,53 @@ class KnowledgeSerializer(serializers.Serializer):
             return workbook
 
         @staticmethod
+        def _get_source_file_zip_path(file_name, source_file_path_set):
+            file_name = file_name.replace("\\", "/") if file_name else ""
+            file_name = os.path.basename(file_name).strip() or "source_file"
+            name, ext = os.path.splitext(file_name)
+            source_file_path = os.path.join("source_file", file_name)
+            index = 1
+            while source_file_path in source_file_path_set:
+                source_file_path = os.path.join("source_file", f"{name}({index}){ext}")
+                index += 1
+            source_file_path_set.add(source_file_path)
+            return source_file_path
+
+        @staticmethod
+        def _restore_source_file(zf, namelist_set, source_file_id, source_file_meta, document_id):
+            source_file_bytes = None
+            source_file_path_list = []
+            if source_file_meta and source_file_meta.get("zip_path"):
+                source_file_path_list.append(source_file_meta.get("zip_path"))
+            source_file_path_list.append(os.path.join("source_file", source_file_id))
+            for source_file_path in source_file_path_list:
+                if source_file_path in namelist_set:
+                    source_file_bytes = zf.read(source_file_path)
+                    break
+            else:
+                old_file = QuerySet(File).filter(id=source_file_id).first()
+                if old_file:
+                    source_file_bytes = old_file.get_bytes()
+                    if source_file_meta is None:
+                        source_file_meta = {"file_name": old_file.file_name}
+            if source_file_bytes is None:
+                return None
+
+            source_file = File(
+                id=uuid.uuid7(),
+                file_name=(
+                    source_file_meta.get("file_name")
+                    if source_file_meta and source_file_meta.get("file_name")
+                    else source_file_id
+                ),
+                source_type=FileSourceType.DOCUMENT,
+                source_id=document_id,
+                meta={},
+            )
+            source_file.save(source_file_bytes)
+            return source_file.id
+
+        @staticmethod
         def merge_problem(paragraph_list: List[Dict], problem_mapping_list: List[Dict]):
             result = {}
             document_dict = {}
@@ -803,6 +883,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 raise AppApiException(500, _("Not a valid zip file"))
 
             namelist = zf.namelist()
+            namelist_set = set(namelist)
             if "knowledge.json" not in namelist:
                 raise AppApiException(500, _("Not a valid KB export file, missing knowledge.json"))
             if "knowledge.xlsx" not in namelist:
@@ -810,6 +891,11 @@ class KnowledgeSerializer(serializers.Serializer):
 
             # knowledge.json -> knowledge
             knowledge_data = json.loads(zf.read("knowledge.json"))
+            source_file_meta_map = {
+                str(source_file.get("id")): source_file
+                for source_file in knowledge_data.get("source_file_list", [])
+                if source_file.get("id")
+            }
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
             knowledge_id = uuid.uuid7()
@@ -885,6 +971,19 @@ class KnowledgeSerializer(serializers.Serializer):
 
                 char_length = sum(len(row[1] or "") for row in rows)
                 document_id = uuid.uuid7()
+                source_file_id = str(doc_meta["source_file_id"]) if doc_meta.get("source_file_id") else None
+                if source_file_id:
+                    new_source_file_id = KnowledgeSerializer.Operate._restore_source_file(
+                        zf,
+                        namelist_set,
+                        source_file_id,
+                        source_file_meta_map.get(source_file_id),
+                        document_id,
+                    )
+                    if new_source_file_id:
+                        doc_meta["source_file_id"] = str(new_source_file_id)
+                    else:
+                        doc_meta.pop("source_file_id", None)
                 document = Document(
                     id=document_id,
                     knowledge_id=knowledge_id,
@@ -896,18 +995,6 @@ class KnowledgeSerializer(serializers.Serializer):
                     directly_return_similarity=float(similarity) if similarity else 0.9,
                     meta=doc_meta,
                 )
-                # 处理原文档
-                if "source_file_id" in doc_meta:
-                    old_file = QuerySet(File).filter(id=doc_meta["source_file_id"]).first()
-                    if old_file:
-                        source_file = File(
-                            id=uuid.uuid7(),
-                            file_name=old_file.file_name,
-                            source_type=FileSourceType.DOCUMENT,
-                            source_id=document_id,
-                            meta={},
-                        )
-                        source_file.save(old_file.get_bytes())
 
                 document_model_list.append(document)
                 if tags_str:
