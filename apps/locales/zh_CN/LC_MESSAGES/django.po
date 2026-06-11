@@ -9502,3 +9502,6 @@ msgstr "人均对话轮次"
 
 msgid "User Name"
 msgstr "用户名称"
+
+msgid "New chat"
+msgstr "已生成新对话，请重新提问！"
