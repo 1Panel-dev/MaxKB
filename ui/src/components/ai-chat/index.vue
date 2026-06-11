@@ -719,6 +719,10 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         ...api_form_data.value,
       },
     }
+
+    if (other_params_data && other_params_data.form_data) {
+      obj.form_data = { ...obj.form_data, ...other_params_data.form_data }
+    }
     // 对话
     getChatMessageAPI()(chartOpenId.value, obj)
       .then((response) => {
