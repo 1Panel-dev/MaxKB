@@ -9379,3 +9379,6 @@ msgstr "Average Number of Conversation Turns per Person"
 
 msgid "User Name"
 msgstr "User Name"
+
+msgid "New chat"
+msgstr "A new conversation has been generated. Please ask your question again！"

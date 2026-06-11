@@ -9499,3 +9499,6 @@ msgstr "人均對話輪次"
 
 msgid "User Name"
 msgstr "用戶名稱"
+
+msgid "New chat"
+msgstr "已生成新對話，請重新提問！"
