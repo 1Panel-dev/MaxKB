@@ -602,6 +602,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 source_file_list = list(
                     QuerySet(File).filter(source_id__in=document_id_list, source_type=FileSourceType.DOCUMENT)
                 )
+            source_file_map = {str(source_file.source_id): source_file for source_file in source_file_list}
 
             # 查询标签和文档标签关联
             tag_list = list(QuerySet(Tag).filter(knowledge_id=knowledge_id).values("id", "key", "value"))
@@ -619,7 +620,15 @@ class KnowledgeSerializer(serializers.Serializer):
                     doc_tag_map[dt["document_id"]].append(f"{tag['key']}:{tag['value']}")
 
             # doc_id -> document_obj
-            doc_obj_map = {doc.id: doc for doc in document_list}
+            doc_obj_map = {}
+            for doc in document_list:
+                doc.meta = {**doc.meta} if doc.meta else {}
+                source_file = source_file_map.get(str(doc.id))
+                if source_file:
+                    doc.meta["source_file_id"] = str(source_file.id)
+                else:
+                    doc.meta.pop("source_file_id", None)
+                doc_obj_map[doc.id] = doc
 
             # termbase
             terms = list(
@@ -656,6 +665,9 @@ class KnowledgeSerializer(serializers.Serializer):
 
                 source_file_path_set = set()
                 source_file_export_list = []
+                document_sheet_name_map = {
+                    str(document_id): sheet_name for document_id, sheet_name in document_dict.items()
+                }
                 for source_file in source_file_list:
                     source_file_zip_path = self._get_source_file_zip_path(source_file.file_name, source_file_path_set)
                     source_file_export_list.append(
@@ -663,6 +675,7 @@ class KnowledgeSerializer(serializers.Serializer):
                             "id": str(source_file.id),
                             "file_name": source_file.file_name,
                             "source_id": source_file.source_id,
+                            "sheet_name": document_sheet_name_map.get(str(source_file.source_id)),
                             "zip_path": source_file_zip_path,
                         }
                     )
@@ -896,6 +909,11 @@ class KnowledgeSerializer(serializers.Serializer):
                 for source_file in knowledge_data.get("source_file_list", [])
                 if source_file.get("id")
             }
+            source_file_sheet_name_map = {
+                source_file.get("sheet_name"): source_file
+                for source_file in knowledge_data.get("source_file_list", [])
+                if source_file.get("sheet_name")
+            }
             workspace_id = self.data.get("workspace_id")
             user_id = self.data.get("user_id")
             knowledge_id = uuid.uuid7()
@@ -972,12 +990,16 @@ class KnowledgeSerializer(serializers.Serializer):
                 char_length = sum(len(row[1] or "") for row in rows)
                 document_id = uuid.uuid7()
                 source_file_id = str(doc_meta["source_file_id"]) if doc_meta.get("source_file_id") else None
+                source_file_meta = source_file_meta_map.get(source_file_id) if source_file_id else None
+                if source_file_meta is None:
+                    source_file_meta = source_file_sheet_name_map.get(doc_name)
+                    source_file_id = str(source_file_meta.get("id")) if source_file_meta else source_file_id
                 if source_file_id:
                     new_source_file_id = KnowledgeSerializer.Operate._restore_source_file(
                         zf,
                         namelist_set,
                         source_file_id,
-                        source_file_meta_map.get(source_file_id),
+                        source_file_meta,
                         document_id,
                     )
                     if new_source_file_id:
