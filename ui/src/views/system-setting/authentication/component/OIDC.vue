@@ -37,10 +37,10 @@
             />
           </el-form-item>
           <el-form-item label="Scope" prop="config.scope">
-            <el-input v-model="form.config.scope" placeholder="openid+profile+email "/>
+            <el-input v-model="form.config.scope" placeholder="openid+profile+email " />
           </el-form-item>
           <el-form-item label="State" prop="config.state">
-            <el-input v-model="form.config.state" placeholder=""/>
+            <el-input v-model="form.config.state" placeholder="" />
           </el-form-item>
           <el-form-item
             :label="$t('views.system.authentication.oidc.clientId')"
@@ -81,18 +81,19 @@
           </el-form-item>
           <el-form-item>
             <el-checkbox v-model="form.is_active"
-            >{{ $t('views.system.authentication.oidc.enableAuthentication') }}
+              >{{ $t('views.system.authentication.oidc.enableAuthentication') }}
             </el-checkbox>
           </el-form-item>
         </el-form>
 
         <div>
-          <el-button @click="submit(authFormRef)" type="primary" :disabled="loading"
-                     v-hasPermission="
-                      new ComplexPermission(
-                        [RoleConst.ADMIN],
-                        [PermissionConst.LOGIN_AUTH_EDIT],
-                        [],'OR',)"
+          <el-button
+            @click="submit(authFormRef)"
+            type="primary"
+            :disabled="loading"
+            v-hasPermission="
+              new ComplexPermission([RoleConst.ADMIN], [PermissionConst.LOGIN_AUTH_EDIT], [], 'OR')
+            "
           >
             {{ $t('common.save') }}
           </el-button>
@@ -102,13 +103,13 @@
   </div>
 </template>
 <script setup lang="ts">
-import {reactive, ref, watch, onMounted} from 'vue'
+import { reactive, ref, watch, onMounted } from 'vue'
 import authApi from '@/api/system-settings/auth-setting'
-import type {FormInstance, FormRules} from 'element-plus'
-import {t} from '@/locales'
-import {MsgSuccess} from '@/utils/message'
-import {PermissionConst, RoleConst} from '@/utils/permission/data'
-import {ComplexPermission} from '@/utils/permission/type'
+import type { FormInstance, FormRules } from 'element-plus'
+import { t } from '@/locales'
+import { MsgSuccess } from '@/utils/message'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { ComplexPermission } from '@/utils/permission/type'
 
 const form = ref<any>({
   id: '',
@@ -122,9 +123,9 @@ const form = ref<any>({
     clientId: '',
     clientSecret: '',
     fieldMapping: '{"username": "preferred_username", "email": "email"}',
-    redirectUrl: ''
+    redirectUrl: '',
   },
-  is_active: true
+  is_active: true,
 })
 
 const authFormRef = ref()
@@ -136,65 +137,65 @@ const rules = reactive<FormRules<any>>({
     {
       required: true,
       message: t('views.system.authentication.oidc.authEndpointPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.tokenEndpoint': [
     {
       required: true,
       message: t('views.system.authentication.oidc.tokenEndpointPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.userInfoEndpoint': [
     {
       required: true,
       message: t('views.system.authentication.oidc.userInfoEndpointPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.scope': [
     {
       required: true,
       message: t('views.system.authentication.oidc.scopePlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.clientId': [
     {
       required: true,
       message: t('views.system.authentication.oidc.clientIdPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.clientSecret': [
     {
       required: true,
       message: t('views.system.authentication.oidc.clientSecretPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.fieldMapping': [
     {
       required: true,
       message: t('views.system.authentication.oauth2.filedMappingPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.redirectUrl': [
     {
       required: true,
       message: t('views.system.authentication.oidc.redirectUrlPlaceholder'),
-      trigger: 'blur'
-    }
+      trigger: 'blur',
+    },
   ],
   'config.logoutEndpoint': [
     {
       required: true,
       message: t('views.system.authentication.oidc.logoutEndpointPlaceholder'),
-      trigger: 'blur'
-    }
-  ]
+      trigger: 'blur',
+    },
+  ],
 })
 
 const submit = async (formEl: FormInstance | undefined, test?: string) => {
@@ -212,16 +213,13 @@ function getDetail() {
   authApi.getAuthSetting(form.value.auth_type, loading).then((res: any) => {
     if (res.data && JSON.stringify(res.data) !== '{}') {
       form.value = res.data
-      if (
-        form.value.config.fieldMapping === '' ||
-        form.value.config.fieldMapping === undefined
-      ) {
+      if (form.value.config.fieldMapping === '' || form.value.config.fieldMapping === undefined) {
         form.value.config.fieldMapping = '{"username": "preferred_username", "email": "email"}'
       }
     }
     if (!form.value.config.redirectUrl) {
-        form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + '/api/oidc'
-      }
+      form.value.config.redirectUrl = window.location.origin + window.MaxKB.prefix + '/api/oidc'
+    }
   })
 }
 

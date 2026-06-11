@@ -17,6 +17,8 @@ export default {
     replace: '替换原文档',
   },
   tip: {
+    exportSimultaneously: '同时导出源文件',
+    exportSimultaneouslyTip:'勾选后将原始文件一并打包至ZIP，导入时可自动恢复文件关联；不勾选则仅导出文本内容。',
     saveMessage: '当前的更改尚未保存，确认退出吗?',
     cancelSuccess: '批量取消成功',
     sendMessage: '发送成功',
