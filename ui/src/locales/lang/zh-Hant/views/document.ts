@@ -16,6 +16,9 @@ export default {
     replace: '替換原文件',
   },
   tip: {
+    exportSimultaneously: '同時匯出源文件',
+    exportSimultaneouslyTip:
+      '勾選後將原始文件一併打包至ZIP，匯入時可自動恢復文件關聯；不勾選則僅匯出文本內容。',
     saveMessage: '當前的更改尚未保存，確認退出嗎?',
     cancelSuccess: '批量取消成功',
     sendMessage: '發送成功',

@@ -17,6 +17,9 @@ export default {
   },
 
   tip: {
+    exportSimultaneously: 'Export Source Files',
+    exportSimultaneouslyTip:
+      'By checking this option, the original files will be packaged together with the ZIP file, allowing automatic restoration of file associations upon import; if unchecked, only the text content will be exported.',
     saveMessage: 'Current changes have not been saved. Confirm exit?',
     cancelSuccess: 'Successful',
     sendMessage: 'Successful',
