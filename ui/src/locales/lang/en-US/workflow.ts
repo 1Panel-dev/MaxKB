@@ -243,6 +243,12 @@ You are a master of problem optimization, adept at accurately inferring user int
       text: 'Specify reply content, referenced variables will be converted to strings for output',
       replyContent: 'Reply Content',
     },
+    emptyNode: {
+      label: 'Empty Node',
+      text: 'No operation, used as a placeholder node in the workflow',
+      description: 'This is an empty node',
+      hint: 'Used when no action is needed',
+    },
     rerankerNode: {
       label: 'Multi-path Recall',
       text: 'Use a re-ranking model to refine retrieval results from multiple knowledge sources',

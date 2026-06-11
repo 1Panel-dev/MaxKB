@@ -194,7 +194,7 @@ export default {
       custom: '手動',
       customTooltip: '手動設置標籤過濾條件',
       auto: '自動',
-      autoTooltip: '根據檢索問題自動匹配文檔標簽',
+      autoTooltip: '根據檢索問題自動匹配文檔標籤',
       documentList: '文檔列表',
       knowledgeList: '知識庫列表',
       result: '檢索結果',
@@ -242,6 +242,12 @@ export default {
       label: '指定回覆',
       text: '指定回覆內容，引用變量會轉換為字符串進行輸出',
       replyContent: '回覆內容',
+    },
+    emptyNode: {
+      label: '空節點',
+      text: '不執行任何操作，僅作爲流程佔位節點使用',
+      description: '這是一個空節點',
+      hint: '當不需要執行任何操作時使用',
     },
     rerankerNode: {
       label: '多路召回',

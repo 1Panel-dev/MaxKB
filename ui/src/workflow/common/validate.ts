@@ -6,6 +6,7 @@ import { t } from '@/locales'
 const end_nodes: Array<string> = [
   WorkflowType.AiChat,
   WorkflowType.Reply,
+  WorkflowType.EmptyNode,
   WorkflowType.ToolLib,
   WorkflowType.ToolLibCustom,
   WorkflowType.ImageUnderstandNode,
@@ -27,6 +28,7 @@ const end_nodes: Array<string> = [
 const loop_end_nodes: Array<string> = [
   WorkflowType.AiChat,
   WorkflowType.Reply,
+  WorkflowType.EmptyNode,
   WorkflowType.ToolLib,
   WorkflowType.ToolLibCustom,
   WorkflowType.ImageUnderstandNode,

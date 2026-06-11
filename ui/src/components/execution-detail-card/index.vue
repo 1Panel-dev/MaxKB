@@ -351,6 +351,18 @@
             </div>
           </template>
 
+          <!-- 空节点 -->
+          <template v-if="data.type === WorkflowType.EmptyNode">
+            <div class="card-never border-r-6">
+              <div class="p-8-12 lighter">
+                <div class="empty-node-info">
+                  <p class="mb-8">{{ $t('workflow.nodes.emptyNode.description') }}</p>
+                  <p class="lighter">{{ $t('workflow.nodes.emptyNode.text') }}</p>
+                </div>
+              </div>
+            </div>
+          </template>
+
           <!-- 文档内容提取 -->
           <template v-if="data.type === WorkflowType.DocumentExtractNode">
             <div class="card-never border-r-6">

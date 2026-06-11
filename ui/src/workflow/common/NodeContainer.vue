@@ -13,7 +13,6 @@
             @drag.prevent
             @dragover.prevent
             @dragend.prevent
-            style="width: 69%"
           >
             <component
               :is="iconComponent(`${nodeModel.type}-icon`)"
@@ -28,7 +27,13 @@
             ></h4>
           </div>
 
-          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div
+            @mousemove.stop
+            @mousedown.stop
+            @keydown.stop
+            @click.stop
+            style="min-width: 85px; text-align: right"
+          >
             <el-button text @click="showNode = !showNode">
               <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
                 ><ArrowDownBold />

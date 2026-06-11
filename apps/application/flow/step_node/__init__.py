@@ -13,6 +13,7 @@ from .data_source_local_node.impl.base_data_source_local_node import BaseDataSou
 from .data_source_web_node.impl.base_data_source_web_node import BaseDataSourceWebNode
 from .direct_reply_node import *
 from .document_extract_node import *
+from .empty_node import BaseEmptyNode
 from .form_node import *
 from .image_generate_step_node import *
 from .image_to_video_step_node import BaseImageToVideoNode
@@ -44,7 +45,7 @@ from .document_split_node import BaseDocumentSplitNode
 from .tool_start_node import BaseToolStartStepNode
 
 node_list = [BaseStartStepNode, BaseChatNode, BaseSearchKnowledgeNode, BaseSearchDocumentNode, BaseQuestionNode,
-             BaseConditionNode, BaseReplyNode,
+             BaseConditionNode, BaseReplyNode, BaseEmptyNode,
              BaseToolNodeNode, BaseToolLibNodeNode, BaseRerankerNode, BaseApplicationNode,
              BaseDocumentExtractNode,
              BaseImageUnderstandNode, BaseFormNode, BaseSpeechToTextNode, BaseTextToSpeechNode,
