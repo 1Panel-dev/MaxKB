@@ -11,6 +11,7 @@ from django.db.models import QuerySet
 
 from common.config.embedding_config import ModelManage
 from common.database_model_manage.database_model_manage import DatabaseModelManage
+from models_provider.base_model_provider import ModelTypeConst
 from models_provider.models import Model
 from django.utils.translation import gettext_lazy as _
 
@@ -149,5 +150,7 @@ def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     """
     model = get_model_by_id(model_id, workspace_id)
     default_model_params = get_model_default_params(model)
+    if model.model_type == ModelTypeConst.RERANKER.name:
+        default_model_params.setdefault('top_n', 3)
     model_params = reset_model_params(default_model_params, **kwargs)
     return ModelManage.get_model(model_id, lambda _id: get_model(model, **model_params))
