@@ -30,7 +30,7 @@
     </div>
     <el-table
       ref="tableRef"
-      :data="pagedTableData"
+      :data="pagedGroups"
       :span-method="spanMethod"
       v-loading="loading"
       :max-height="tableMaxHeight"
@@ -39,14 +39,7 @@
       @cell-mouse-leave="cellMouseLeave"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column
-        prop="key"
-        :label="
-          multipleSelection.length === 0
-            ? $t('views.document.tag.key')
-            : `${$t('common.selected')} ${multipleSelection.length} ${$t('views.document.items')}`
-        "
-      >
+      <el-table-column prop="key" :label="$t('views.document.tag.key')">
         <template #default="{ row }">
           <div class="flex-between">
             {{ row.key }}
@@ -134,8 +127,8 @@
       <el-pagination
         v-model:current-page="pageNum"
         v-model:page-size="pageSize"
-        :total="groupedByKey.length"
-        layout="total, prev, pager, next, sizes"
+        :total="tableData.length"
+        layout="prev, pager, next, sizes"
         :page-sizes="[10, 20, 50, 100]"
       />
     </div>
@@ -228,36 +221,21 @@ const tableData = computed(() => {
   return result
 })
 
-// 2) 按 key 分组（保持 key 的出现顺序）
-const groupedByKey = computed(() => {
-  const map = new Map<string, any[]>()
-  for (const row of tableData.value) {
-    if (!map.has(row.key)) map.set(row.key, [])
-    map.get(row.key)!.push(row)
-  }
-  // 每个元素代表一个 key 分组
-  return Array.from(map.entries()).map(([key, rows]) => ({ key, rows }))
-})
-
-// 3) 按“key 分组”做分页：每页 pageSize 个 key
+// 2) 按“key 分组”做分页：每页 pageSize 个 key
 const pagedGroups = computed(() => {
   const start = (pageNum.value - 1) * pageSize.value
   const end = start + pageSize.value
-  return groupedByKey.value.slice(start, end)
-})
-
-// 4) 当前页表格数据：把当前页的若干个 key 分组展开为行
-const pagedTableData = computed(() => {
-  return pagedGroups.value.flatMap((g) => g.rows)
+  return tableData.value.slice(start, end)
 })
 
 // 5) 合并单元格：只在当前页内合并，同一个 key 的第一行 rowspan=该 key 在当前页的行数
 const spanMethod = ({ row, columnIndex }: any) => {
   // 注意：你现在有 selection 列，所以 key 列索引是 1；如需同时合并 value 列按需调整
   if (columnIndex === 0 || columnIndex === 1) {
-    if (row.keyIndex === 0) {
-      const sameKeyCount = pagedTableData.value.filter((item) => item.key === row.key).length
-      return { rowspan: sameKeyCount, colspan: 1 }
+    const sameKeyItems = pagedGroups.value.filter((item) => item.key === row.key)
+    const isFirstItem = sameKeyItems.length > 0 && sameKeyItems[0].id === row.id
+    if (isFirstItem) {
+      return { rowspan: sameKeyItems.length, colspan: 1 }
     }
     return { rowspan: 0, colspan: 0 }
   }
@@ -285,7 +263,7 @@ const handleSelectionChange = async (val: any[]) => {
   await nextTick()
 
   for (const dr of deselectedRows) {
-    const sameGroupRows = pagedTableData.value.filter((r) => r.key === dr.key)
+    const sameGroupRows = pagedGroups.value.filter((r) => r.key === dr.key)
     for (const r of sameGroupRows) {
       if (!selectedIds.has(r.id)) continue
       tableRef.value?.toggleRowSelection?.(r, false)
@@ -297,7 +275,7 @@ const handleSelectionChange = async (val: any[]) => {
 
   // 以表格最终状态为准更新缓存（这里直接用传入 val 可能已过期）
   // 简化：重新从表格取 selection（Element Plus 有 store，没暴露就用 val\+补丁）
-  multipleSelection.value = pagedTableData.value.filter((r) =>
+  multipleSelection.value = pagedGroups.value.filter((r) =>
     tableRef.value?.getSelectionRows
       ? tableRef.value.getSelectionRows().some((s: any) => s.id === r.id)
       : selectedIds.has(r.id),
