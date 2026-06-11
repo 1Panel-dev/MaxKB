@@ -622,12 +622,13 @@ class KnowledgeSerializer(serializers.Serializer):
             # doc_id -> document_obj
             doc_obj_map = {}
             for doc in document_list:
-                doc.meta = {**doc.meta} if doc.meta else {}
-                source_file = source_file_map.get(str(doc.id))
-                if source_file:
-                    doc.meta["source_file_id"] = str(source_file.id)
-                else:
-                    doc.meta.pop("source_file_id", None)
+                if with_source_file:
+                    doc.meta = {**doc.meta} if doc.meta else {}
+                    source_file = source_file_map.get(str(doc.id))
+                    if source_file:
+                        doc.meta["source_file_id"] = str(source_file.id)
+                    else:
+                        doc.meta.pop("source_file_id", None)
                 doc_obj_map[doc.id] = doc
 
             # termbase
@@ -991,9 +992,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 document_id = uuid.uuid7()
                 source_file_id = str(doc_meta["source_file_id"]) if doc_meta.get("source_file_id") else None
                 source_file_meta = source_file_meta_map.get(source_file_id) if source_file_id else None
-                if source_file_meta is None:
+                if source_file_id is None and source_file_meta is None:
                     source_file_meta = source_file_sheet_name_map.get(doc_name)
-                    source_file_id = str(source_file_meta.get("id")) if source_file_meta else source_file_id
+                    source_file_id = str(source_file_meta.get("id")) if source_file_meta else None
                 if source_file_id:
                     new_source_file_id = KnowledgeSerializer.Operate._restore_source_file(
                         zf,
