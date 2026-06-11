@@ -18,7 +18,10 @@
           class="border-r-8 mb-8"
           style="--el-card-padding: 1px 16px; width: fit-content"
         >
-          <div class="flex align-center">
+          <div
+            class="flex align-center"
+            v-if="type === 'debug-ai-chat' ? true : application.show_source"
+          >
             <component
               :is="iconComponent(`${progress.node_type}-icon`)"
               class="mr-8"
