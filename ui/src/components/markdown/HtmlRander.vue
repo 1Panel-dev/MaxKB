@@ -81,8 +81,8 @@ ${sourceHtml}
 <script>
 const INSTANCE_ID = '${instanceId}';
 
-function sendMessage(message) {
-  parent.postMessage({ type: 'chatMessage', instanceId: INSTANCE_ID, message }, '*');
+function sendMessage(message,other_params_data) {
+  parent.postMessage({ type: 'chatMessage', instanceId: INSTANCE_ID, message,other_params_data }, '*');
 }
 let lastSentHeight = 0;
 let timer = null;
@@ -125,7 +125,7 @@ function onMessage(e: MessageEvent) {
     window.open(e.data.url, '_blank')
   }
   if (e.data.type === 'chatMessage') {
-    props.sendMessage?.(e.data.message, 'new')
+    props.sendMessage?.(e.data.message, 'new', e.data.other_params_data)
   }
   if (e.data?.type === 'chatUserProfile') {
     const iframe = htmlRef.value
