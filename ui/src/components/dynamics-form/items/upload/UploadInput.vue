@@ -12,7 +12,7 @@
   >
     <el-button type="primary">{{ $t('aiChat.uploadFile.label') }}</el-button>
   </el-upload>
-  <el-space wrap class="w-full media-file-width upload_content mt-16">
+  <el-space wrap class="w-full media-file-width upload_content mt-16" v-if="!inputDisabled">
     <template v-for="(file, index) in model_value" :key="index">
       <el-card style="--el-card-padding: 0" shadow="never">
         <div
@@ -37,12 +37,73 @@
       </el-card>
     </template>
   </el-space>
+  <div class="mt-8 w-full" v-else>
+    <div class="mb-8" v-if="download_list.length">
+      <el-space wrap class="w-full media-file-width upload_content">
+        <template v-for="(item, index) in download_list" :key="index">
+          <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
+            <div class="download-button flex align-center" @click="downloadFile(item)">
+              <el-icon class="mr-4">
+                <Download />
+              </el-icon>
+              {{ $t('aiChat.download') }}
+            </div>
+            <div class="show flex align-center">
+              <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+              <div class="ml-4 ellipsis-1" :title="item && item?.name">
+                {{ item && item?.name }}
+              </div>
+            </div>
+          </el-card>
+        </template>
+      </el-space>
+    </div>
+    <div class="mb-8" v-if="image_list.length">
+      <el-space wrap>
+        <template v-for="(item, index) in image_list" :key="index">
+          <div class="file cursor border-r-6" v-if="item.url">
+            <el-image
+              :src="item.url"
+              :zoom-rate="1.2"
+              :max-scale="7"
+              :min-scale="0.2"
+              :preview-src-list="getAttrsArray(image_list, 'url')"
+              :initial-index="index"
+              alt=""
+              fit="cover"
+              style="width: 170px; height: 170px; display: block"
+              class="border-r-6"
+            />
+          </div>
+        </template>
+      </el-space>
+    </div>
+    <div class="mb-8" v-if="audio_list.length">
+      <el-space wrap>
+        <template v-for="(item, index) in audio_list" :key="index">
+          <div class="file cursor border-r-6" v-if="item.url">
+            <audio :src="item.url" controls style="width: 350px; height: 43px" class="border-r-6" />
+          </div>
+        </template>
+      </el-space>
+    </div>
+    <div class="mb-8" v-if="video_list.length">
+      <el-space wrap>
+        <template v-for="(item, index) in video_list" :key="index">
+          <div class="file cursor border-r-6" v-if="item.url">
+            <video :src="item.url" style="width: 170px; display: block" class="border-r-6" controls />
+          </div>
+        </template>
+      </el-space>
+    </div>
+  </div>
 </template>
 <script setup lang="ts">
 import { computed, inject, ref, useAttrs } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormField } from '@/components/dynamics-form/type'
-import { getImgUrl } from '@/utils/common'
+import { getImgUrl, downloadByURL, getFileUrl, fileType } from '@/utils/common'
+import { getAttrsArray } from '@/utils/array'
 import { t } from '@/locales'
 import { useFormDisabled } from 'element-plus'
 const inputDisabled = useFormDisabled()
@@ -86,6 +147,28 @@ const model_value = computed({
 })
 const fileArray = ref<any>([])
 
+const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
+const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
+const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
+const ofType = (exts: string[]) => (f: any) => exts.includes(fileType(f?.name || '').toUpperCase())
+
+const files_with_url = computed(() =>
+  (model_value.value || []).map((f: any) => ({ ...f, url: f.url || getFileUrl(f.file_id) })),
+)
+const image_list = computed(() => files_with_url.value.filter(ofType(imageExtensions)))
+const audio_list = computed(() => files_with_url.value.filter(ofType(audioExtensions)))
+const video_list = computed(() => files_with_url.value.filter(ofType(videoExtensions)))
+// 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
+const download_list = computed(() =>
+  files_with_url.value.filter(
+    (f: any) => !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f),
+  ),
+)
+
+function downloadFile(item: any) {
+  downloadByURL(item.url, item.name)
+}
+
 const loading = ref<boolean>(false)
 
 const uploadFile = async (file: any, fileList: Array<any>) => {
@@ -116,6 +199,30 @@ const uploadFile = async (file: any, fileList: Array<any>) => {
 }
 </script>
 <style lang="scss" scoped>
+/* hover 显示下载按钮，样式照抄 question-content/index.vue */
+.download-file {
+  height: 43px;
+
+  &:hover {
+    color: var(--el-color-primary);
+    border: 1px solid var(--el-color-primary);
+
+    .download-button {
+      display: block;
+      text-align: center;
+      line-height: 26px;
+    }
+
+    .show {
+      display: none;
+    }
+  }
+
+  .download-button {
+    display: none;
+  }
+}
+
 .upload_content {
   .is-disabled {
     background-color: var(--el-fill-color-light);
