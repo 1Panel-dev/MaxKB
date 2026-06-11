@@ -24,7 +24,8 @@
   --el-card-padding: calc(var(--app-base-px) * 2);
   --el-card-border-radius: 6px;
   box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12) !important;
-  --el-border-color-light: var(--el-border-color); overflow: visible;
+  --el-border-color-light: var(--el-border-color);
+  overflow: visible;
   &.is-never-shadow {
     border: 1px solid var(--el-card-border-color);
     box-shadow: none !important;
@@ -222,6 +223,9 @@
   tr.highlight {
     background: var(--el-table-current-row-bg-color);
   }
+}
+.el-table__border-left-patch {
+  display: none !important;
 }
 
 // dialog

@@ -159,7 +159,12 @@
                   :remote-method="getUserList"
                   style="width: 190px"
                 >
-                  <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+                  <el-option
+                    v-for="u in user_options"
+                    :key="u.id"
+                    :value="u.id"
+                    :label="u.nick_name"
+                  />
                 </el-select>
               </div>
 
@@ -198,6 +203,7 @@
             :row-key="(row: any) => row.id"
             :storeKey="storeKey"
             @cell-click="cellClickHandle"
+            border
           >
             <el-table-column
               type="selection"
@@ -929,7 +935,7 @@ import TagDrawer from './tag/TagDrawer.vue'
 import TagSettingDrawer from './tag/TagSettingDrawer.vue'
 import AddTagDialog from '@/views/document/tag/MulAddTagDialog.vue'
 import ExecutionRecord from '@/views/knowledge-workflow/component/execution-record/ExecutionRecordDrawer.vue'
-import UserApi from "@/api/user/user.ts";
+import UserApi from '@/api/user/user.ts'
 
 const route = useRoute()
 const router = useRouter()
@@ -1652,7 +1658,7 @@ function getUserList(query: string) {
   const actualWorkspaceId = workspaceId || (query ? { nick_name: query } : '')
   const actualQuery = workspaceId ? (query ? { nick_name: query } : '') : undefined
   if (apiType.value === 'systemManage') {
-    UserApi.getAllMemberList(query ? {nick_name: query} : '')
+    UserApi.getAllMemberList(query ? { nick_name: query } : '')
       .then((res: any) => {
         user_options.value = res.data || []
       })
