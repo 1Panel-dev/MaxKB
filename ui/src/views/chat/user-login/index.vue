@@ -9,9 +9,9 @@
           class="mr-8"
           style="background: none"
         >
-          <img :src="chatUser.chat_profile?.icon" alt=""/>
+          <img :src="chatUser.chat_profile?.icon" alt="" />
         </el-avatar>
-        <LogoIcon v-else height="32px" class="mr-8"/>
+        <LogoIcon v-else height="32px" class="mr-8" />
         <h1>{{ chatUser.chat_profile?.application_name }}</h1>
       </div>
       <!-- 移动端头部标题-->
@@ -25,9 +25,9 @@
                 :size="32"
                 style="background: none"
               >
-                <img :src="chatUser.chat_profile?.icon" alt=""/>
+                <img :src="chatUser.chat_profile?.icon" alt="" />
               </el-avatar>
-              <LogoIcon v-else height="32px"/>
+              <LogoIcon v-else height="32px" />
             </div>
 
             <h4
@@ -41,7 +41,13 @@
         </div>
       </div>
 
-      <el-card class="login-card" v-if="chatUser.chat_profile?.authentication_type == 'password'">
+      <el-card
+        class="login-card"
+        v-if="
+          chatUser.chat_profile?.authentication &&
+          chatUser.chat_profile?.authentication_type == 'password'
+        "
+      >
         <h2 class="mb-24">
           {{ $t('views.applicationOverview.appInfo.LimitDialog.authenticationValue') }}
         </h2>
@@ -85,7 +91,7 @@
                 </el-input>
               </el-form-item>
             </div>
-            <div class="mb-24" v-if="loginMode !== 'LDAP'&& identifyCode">
+            <div class="mb-24" v-if="loginMode !== 'LDAP' && identifyCode">
               <el-form-item prop="captcha">
                 <div class="flex-between w-full">
                   <el-input
@@ -119,7 +125,7 @@
           </el-button>
         </div>
         <div v-if="showQrCodeTab">
-          <QrCodeTab :tabs="orgOptions"/>
+          <QrCodeTab :tabs="orgOptions" />
         </div>
         <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
           <span>{{ $t('views.login.moreMethod') }}</span>
@@ -138,7 +144,7 @@
                   'font-size': item === 'OAUTH2' ? '8px' : '10px',
                   color: theme.themeInfo?.theme,
                 }"
-              >{{ item }}</span
+                >{{ item }}</span
               >
             </el-button>
             <el-button
@@ -148,7 +154,7 @@
               class="login-button-circle color-secondary"
               @click="changeMode('QR_CODE')"
             >
-              <img src="@/assets/icon_qr_outlined.svg" width="25px"/>
+              <img src="@/assets/icon_qr_outlined.svg" width="25px" />
             </el-button>
             <el-button
               v-if="item === 'LOCAL' && loginMode != 'LOCAL'"
@@ -166,34 +172,34 @@
   </UserLoginLayout>
 </template>
 <script setup lang="ts">
-import {onMounted, ref, onBeforeMount, computed} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import type {LoginRequest} from '@/api/type/login'
+import { onMounted, ref, onBeforeMount, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginRequest } from '@/api/type/login'
 import UserLoginLayout from '@/layout/login-layout/UserLoginLayout.vue'
 import loginApi from '@/api/chat/chat.ts'
-import {t} from '@/locales'
+import { t } from '@/locales'
 import useResize from '@/layout/hooks/useResize'
 import useStore from '@/stores'
-import {useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/chat/user-login/scanCompinents/QrCodeTab.vue'
-import {MsgConfirm, MsgError} from '@/utils/message.ts'
+import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import PasswordAuth from '@/views/chat/auth/component/password.vue'
-import {isAppIcon, loadScript} from '@/utils/common'
-import * as dd from "dingtalk-jsapi";
-import JSEncrypt from "jsencrypt";
+import { isAppIcon, loadScript } from '@/utils/common'
+import * as dd from 'dingtalk-jsapi'
+import JSEncrypt from 'jsencrypt'
 
 useResize()
 const router = useRouter()
 
-const {theme, chatUser, common} = useStore()
-const {locale} = useI18n({useScope: 'global'})
+const { theme, chatUser, common } = useStore()
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const route = useRoute()
 const identifyCode = ref<string>('')
 const {
-  params: {accessToken},
-  query: {mode},
+  params: { accessToken },
+  query: { mode },
 } = route as any
 
 const isPc = computed(() => {
@@ -215,7 +221,7 @@ const loginForm = ref<LoginRequest>({
   captcha: '',
 })
 
-const max_attempts = ref<number>(1)  // 声明为 ref
+const max_attempts = ref<number>(1) // 声明为 ref
 const rules = ref<FormRules<LoginRequest>>({
   username: [
     {
@@ -246,30 +252,33 @@ const loginHandle = () => {
       chatUser.ldapLogin(loginForm.value).then((ok) => {
         router.push({
           name: 'chat',
-          params: {accessToken: chatUser.accessToken},
+          params: { accessToken: chatUser.accessToken },
           query: route.query,
         })
       })
     } else {
       // JSEncrypt 在有些打包环境可能作为 default export 或直接导出，兼容两种情况
-      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
-      const js = new (JSEncryptCtor as any)();
-      js.setPublicKey(chatUser?.chat_profile?.rsaKey as any);
-      const jsonData = JSON.stringify(loginForm.value);
-      const encryptedBase64 = js.encrypt(jsonData);
+      const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt
+      const js = new (JSEncryptCtor as any)()
+      js.setPublicKey(chatUser?.chat_profile?.rsaKey as any)
+      const jsonData = JSON.stringify(loginForm.value)
+      const encryptedBase64 = js.encrypt(jsonData)
 
-      chatUser.login({
-        encryptedData: encryptedBase64,
-        username: loginForm.value.username
-      }).then((ok) => {
-        router.push({
-          name: 'chat',
-          params: {accessToken: chatUser.accessToken},
-          query: route.query,
+      chatUser
+        .login({
+          encryptedData: encryptedBase64,
+          username: loginForm.value.username,
         })
-      }).catch(() => {
-        makeCode(loginForm.value.username)
-      })
+        .then((ok) => {
+          router.push({
+            name: 'chat',
+            params: { accessToken: chatUser.accessToken },
+            query: route.query,
+          })
+        })
+        .catch(() => {
+          makeCode(loginForm.value.username)
+        })
     }
   })
 }
@@ -353,8 +362,7 @@ function redirectAuth(authType: string, needMessage: boolean = false) {
         .then(() => {
           window.location.href = url
         })
-        .catch(() => {
-        })
+        .catch(() => {})
     } else {
       console.log('url', url)
       window.location.href = url
@@ -389,6 +397,9 @@ function handleUsernameBlur(username: string) {
 onBeforeMount(() => {
   if (chatUser.chat_profile?.max_attempts) {
     max_attempts.value = chatUser.chat_profile.max_attempts
+  }
+  if (!chatUser.chat_profile?.authentication) {
+    return
   }
   if (chatUser.chat_profile?.login_value) {
     modeList.value = chatUser.chat_profile.login_value
@@ -440,12 +451,12 @@ onBeforeMount(() => {
   const handleDingTalk = () => {
     const code = params.get('corpId')
     if (code) {
-      dd.runtime.permission.requestAuthCode({corpId: code}).then((res) => {
+      dd.runtime.permission.requestAuthCode({ corpId: code }).then((res) => {
         console.log('DingTalk client request success:', res)
         chatUser.dingOauth2Callback(res.code, accessToken).then(() => {
           router.push({
             name: 'chat',
-            params: {accessToken: accessToken},
+            params: { accessToken: accessToken },
             query: route.query,
           })
         })
@@ -462,7 +473,7 @@ onBeforeMount(() => {
           chatUser.larkCallback(res.code, accessToken).then(() => {
             router.push({
               name: 'chat',
-              params: {accessToken: accessToken},
+              params: { accessToken: accessToken },
               query: route.query,
             })
           })
@@ -486,13 +497,13 @@ onBeforeMount(() => {
               chatUser.larkCallback(res.code, accessToken).then(() => {
                 router.push({
                   name: 'chat',
-                  params: {accessToken: accessToken},
+                  params: { accessToken: accessToken },
                   query: route.query,
                 })
               })
             },
             fail: (error: any) => {
-              const {errno} = error
+              const { errno } = error
               if (errno === 103) {
                 callRequestAuthCode()
               }
