@@ -12,22 +12,24 @@
           'padding-right': showUserAvatar ? 'var(--padding-left)' : '0',
         }"
       >
-        <el-card
-          v-if="!chatRecord.write_ed && progress && index >= answer_text_list.length - 1"
-          shadow="always"
-          class="border-r-8 mb-8"
-          style="--el-card-padding: 1px 16px; width: fit-content"
-        >
-          <div class="flex align-center">
-            <component
-              :is="iconComponent(`${progress.node_type}-icon`)"
-              class="mr-8"
-              :size="16"
-              style="--el-avatar-border-radius: 3px"
-            ></component>
-            <MdRenderer :source="progress.content"></MdRenderer>
-          </div>
-        </el-card>
+        <template v-if="type === 'debug-ai-chat' ? true : application.show_exec">
+          <el-card
+            v-if="!chatRecord.write_ed && progress && index >= answer_text_list.length - 1"
+            shadow="always"
+            class="border-r-8 mb-8"
+            style="--el-card-padding: 1px 16px; width: fit-content"
+          >
+            <div class="flex align-center">
+              <component
+                :is="iconComponent(`${progress.node_type}-icon`)"
+                class="mr-8"
+                :size="16"
+                style="--el-avatar-border-radius: 3px"
+              ></component>
+              <MdRenderer :source="progress.content"></MdRenderer>
+            </div>
+          </el-card>
+        </template>
         <el-card shadow="always" class="border-r-8" style="--el-card-padding: 6px 16px">
           <MdRenderer
             v-if="
