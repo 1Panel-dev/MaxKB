@@ -107,6 +107,7 @@ export default {
     searchContent: '检索内容',
     searchResult: '检索结果',
     conditionResult: '判断结果',
+    branchEvaluationDetails: '分支判断详情',
     currentChat: '本次对话',
     answer: 'AI 回答',
     replyContent: '回复内容',

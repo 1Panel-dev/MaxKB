@@ -109,6 +109,7 @@ export default {
     searchContent: 'Search Query',
     searchResult: 'Search Results',
     conditionResult: 'Condition Evaluation',
+    branchEvaluationDetails: 'Branch Evaluation Details',
     currentChat: 'Current Chat',
     answer: 'AI Response',
     replyContent: 'Reply Content',

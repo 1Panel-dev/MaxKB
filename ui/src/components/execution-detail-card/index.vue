@@ -177,12 +177,50 @@
           </template>
           <!-- 判断器 -->
           <template v-if="data.type == WorkflowType.Condition">
-            <div class="card-never border-r-6">
+            <div class="card-never border-r-6 mb-24">
               <h5 class="p-8-12">
                 {{ $t('aiChat.executionDetails.conditionResult') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                {{ data.branch_name || '-' }}
+                <el-tag type="success" size="small">
+                  {{ data.branch_name || '-' }}
+                </el-tag>
+              </div>
+            </div>
+            <!-- 判断器执行细节 -->
+            <div class="ml-8">{{ $t('aiChat.executionDetails.branchEvaluationDetails') }}:</div>
+            <div class="card-never border-r-6 mt-8" v-if="data.branch_details && data.branch_details.length > 0" v-for="(branch, bIndex) in data.branch_details" :key="bIndex">
+              <h5 class="p-8-12">
+                <span class="w125">
+                  <el-tag :type="branch.is_matched ? 'success' : 'error'" size="small">
+                    {{ branch.type || '-' }}
+                  </el-tag>
+                </span>
+                <span v-if="branch.type !== 'ELSE'">
+                  <span class="color-secondary">{{ $t('workflow.nodes.conditionNode.conditions.info') }}</span>
+                  <el-tag type="warn" size="small" class="ml-4">
+                    {{ branch.condition_logic === 'and' ? $t('workflow.condition.AND') : $t('workflow.condition.OR') }}
+                  </el-tag>
+                  <span class="color-secondary">{{ $t('workflow.nodes.conditionNode.conditions.label') }}</span>
+                </span>
+              </h5>
+              <div v-if="branch.conditions && branch.conditions.length > 0" class="border-t-dashed lighter clean" style="padding: 0 12px 8px 12px">
+                <div v-for="(cond, cIndex) in branch.conditions" :key="cIndex" class="mt-8">
+                  <el-tag type="warn" size="small" class="f_val" :title="formatValue(cond.field_value, cond.field_type)">
+                    {{ formatValue(cond.field_value, cond.field_type) }}
+                  </el-tag>
+                  <el-tag type="primary" size="small" class="ml-8">{{ getCompareLabel(cond.compare) }}</el-tag>
+                  <el-tag type="warn" size="small" class="f_val"
+                    :title="cond.origin_target_value"
+                    v-if="!['is_null', 'is_not_null', 'is_true', 'is_not_true'].includes(cond.compare)"
+                  >
+                    {{ formatValue(cond.target_value, cond.target_type) }}
+                  </el-tag>
+                  <span class="ml-8">=</span>
+                  <el-tag :type="cond.result ? 'success' : 'danger'" size="small" class="ml-8">
+                    {{ cond.result ? 'True' : 'False' }}
+                  </el-tag>
+                </div>
               </div>
             </div>
           </template>
@@ -1400,6 +1438,7 @@
 import { ref, computed, type PropType } from 'vue'
 import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
 import DynamicsForm from '@/components/dynamics-form/index.vue'
+import { compareList } from '@/workflow/common/data'
 import { iconComponent } from '@/workflow/icons/utils'
 import { WorkflowType } from '@/enums/application'
 import { getImgUrl } from '@/utils/common'
@@ -1422,11 +1461,57 @@ const isKnowLedge = computed(() => props.type === 'knowledge')
 const currentLoopNode = ref(0)
 const currentParagraph = ref(0)
 const currentWriteContent = ref(0)
+
+// 格式化值显示
+const formatValue = (value: any, value_type: any): string => {
+  if (value === null || value === undefined) {
+    return 'null'
+  }
+  if (value === '') {
+    return `${value_type}: ""`
+  }
+  if (typeof value === 'string') {
+    return `${value_type}: "${value}"`
+  }
+  if (Array.isArray(value)) {
+    return `${value_type}: ${JSON.stringify(value)}`
+  }
+  if (typeof value === 'object') {
+    return `${value_type}: ${JSON.stringify(value)}`
+  }
+  return `${value_type}: ${value}`
+}
+
+const compareMap: Record<string, string> = compareList.reduce((acc, cur) => {
+  acc[cur.value] = cur.label
+  return acc
+}, {} as Record<string, string>)
+
+// 获取比较操作符标签
+const getCompareLabel = (compare: string): string => {
+  return compareMap[compare] || compare
+}
 </script>
 <style lang="scss" scoped>
 .execution-detail-card {
   :deep(.md-editor-previewOnly) {
     background: none !important;
+  }
+}
+
+.w125 {
+  width: 125px;
+  display: inline-block;
+}
+
+.f_val {
+  margin-left: 4px;
+  max-width: 30%;
+
+  * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 </style>
