@@ -1,6 +1,6 @@
 <template>
   <div class="folder-tree">
-    <div class="flex ml-4 p-8 pb-0">
+    <div class="flex p-16 pb-0 folder-tree__search">
       <el-input
         v-model="filterText"
         :placeholder="$t('common.search')"
