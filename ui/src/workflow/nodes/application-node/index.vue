@@ -254,6 +254,9 @@ const update_field = () => {
   loadSharedApi({type: 'application', systemType: apiType.value})
     .getApplicationDetail(props.nodeModel.properties.node_data.application_id)
     .then((ok: any) => {
+      if (ok.data.name) {
+        set(props.nodeModel.properties.node_data, 'name', ok.data.name)
+      }
       const old_api_input_field_list = cloneDeep(
         props.nodeModel.properties.node_data.api_input_field_list,
       )
