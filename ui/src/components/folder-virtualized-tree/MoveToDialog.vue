@@ -21,7 +21,12 @@
         <el-button @click.prevent="dialogVisible = false" :loading="loading">
           {{ $t('common.cancel') }}
         </el-button>
-        <el-button type="primary" @click="submitHandle" :loading="loading" :disabled="disableConfirm">
+        <el-button
+          type="primary"
+          @click="submitHandle"
+          :loading="loading"
+          :disabled="disableConfirm"
+        >
           {{ $t('common.confirm') }}
         </el-button>
       </span>
@@ -178,7 +183,7 @@ defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .move-to-dialog-tree {
-  :deep(.el-input) {
+  :deep(.folder-tree__search) {
     padding: 0 !important;
     margin-bottom: 8px;
   }
