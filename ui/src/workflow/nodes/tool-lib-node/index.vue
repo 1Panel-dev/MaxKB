@@ -163,6 +163,9 @@ const update_field = () => {
   loadSharedApi({ type: 'tool', systemType: apiType.value })
     .getToolById(props.nodeModel.properties.node_data.tool_lib_id)
     .then((ok: any) => {
+      if (ok.data.name) {
+        set(props.nodeModel.properties.node_data, 'name', ok.data.name)
+      }
       const old_input_field_list = props.nodeModel.properties.node_data.input_field_list
       const merge_input_field_list = ok.data.input_field_list.map((item: any) => {
         const find_field = old_input_field_list.find((old_item: any) => old_item.name == item.name)
