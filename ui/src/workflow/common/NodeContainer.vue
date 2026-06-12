@@ -91,6 +91,10 @@
                   <el-dropdown-item @click="deleteNode" class="border-t p-8">{{
                     $t('common.delete')
                   }}</el-dropdown-item>
+                  <div v-if="sourceName" class="border-t p-8" @click.stop>
+                    <div class="color-secondary font-small">{{ $t('common.source') }}</div>
+                    <div class="lighter mt-4 break-all">{{ sourceName }}</div>
+                  </div>
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
@@ -322,6 +326,13 @@ const node_status = computed(() => {
     return props.nodeModel.properties.status
   }
   return 200
+})
+
+const sourceName = computed(() => {
+  if (['application-node', 'tool-lib-node'].includes(props.nodeModel.type)) {
+    return props.nodeModel.properties.node_data?.name || ''
+  }
+  return ''
 })
 
 function renameNode() {

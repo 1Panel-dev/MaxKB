@@ -91,7 +91,12 @@
       <el-space wrap>
         <template v-for="(item, index) in video_list" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
-            <video :src="item.url" style="width: 170px; display: block" class="border-r-6" controls />
+            <video
+              :src="item.url"
+              style="width: 170px; display: block"
+              class="border-r-6"
+              controls
+            />
           </div>
         </template>
       </el-space>
@@ -199,7 +204,6 @@ const uploadFile = async (file: any, fileList: Array<any>) => {
 }
 </script>
 <style lang="scss" scoped>
-/* hover 显示下载按钮，样式照抄 question-content/index.vue */
 .download-file {
   height: 43px;
 
