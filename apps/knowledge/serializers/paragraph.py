@@ -48,6 +48,13 @@ from knowledge.task.embedding import (
 from knowledge.task.generate import generate_related_by_paragraph_id_list
 
 
+class NullCharacterStrippedCharField(serializers.CharField):
+    def to_internal_value(self, data):
+        if isinstance(data, str):
+            data = data.replace("\x00", "")
+        return super().to_internal_value(data)
+
+
 class ParagraphSerializer(serializers.ModelSerializer):
     class Meta:
         model = Paragraph
@@ -59,10 +66,10 @@ class ParagraphInstanceSerializer(serializers.Serializer):
     段落实例对象
     """
 
-    content = serializers.CharField(
+    content = NullCharacterStrippedCharField(
         required=True, label=_("content"), max_length=102400, min_length=1, allow_null=True, allow_blank=True
     )
-    title = serializers.CharField(
+    title = NullCharacterStrippedCharField(
         required=False, max_length=256, label=_("section title"), allow_null=True, allow_blank=True
     )
     problem_list = ProblemInstanceSerializer(required=False, many=True)
@@ -70,10 +77,10 @@ class ParagraphInstanceSerializer(serializers.Serializer):
 
 
 class EditParagraphSerializers(serializers.Serializer):
-    title = serializers.CharField(
+    title = NullCharacterStrippedCharField(
         required=False, max_length=256, label=_("section title"), allow_null=True, allow_blank=True
     )
-    content = serializers.CharField(
+    content = NullCharacterStrippedCharField(
         required=False, max_length=102400, allow_null=True, allow_blank=True, label=_("section title")
     )
     problem_list = ProblemInstanceSerializer(required=False, many=True)
@@ -91,10 +98,10 @@ class ParagraphBatchGenerateRelatedSerializer(serializers.Serializer):
 
 
 class ParagraphSerializers(serializers.Serializer):
-    title = serializers.CharField(
+    title = NullCharacterStrippedCharField(
         required=False, max_length=256, label=_("section title"), allow_null=True, allow_blank=True
     )
-    content = serializers.CharField(required=True, max_length=102400, label=_("section title"))
+    content = NullCharacterStrippedCharField(required=True, max_length=102400, label=_("section title"))
 
     class Problem(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))

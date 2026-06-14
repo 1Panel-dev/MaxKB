@@ -228,7 +228,7 @@ class PdfSplitHandle(BaseSplitHandle):
                 title = item.get("/Title")
             if title is None:
                 title = str(item)
-            toc.append((level, str(title), page_number))
+            toc.append((level, str(title).replace("\0", ""), page_number))
 
     @staticmethod
     def handle_toc(doc, limit):
@@ -522,7 +522,7 @@ class PdfSplitHandle(BaseSplitHandle):
         except BaseException:
             return ""
 
-        return "".join(text_parts).strip().split("\n")[0].replace(".", "").strip()
+        return "".join(text_parts).replace("\0", "").strip().split("\n")[0].replace(".", "").strip()
 
     @staticmethod
     def extract_first_line(page):
@@ -531,6 +531,7 @@ class PdfSplitHandle(BaseSplitHandle):
 
     @staticmethod
     def handle_chapter_title(title):
+        title = title.replace("\0", "")
         title = re.sub(r"[一二三四五六七八九十\s*]、\s*", "", title)
         title = re.sub(r"第[一二三四五六七八九十]章\s*", "", title)
         return title
