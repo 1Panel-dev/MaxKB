@@ -549,6 +549,18 @@ export class ChatManagement {
   }
 
   /**
+   * 获取指定会话中仍在流式输出(尚未写完)的在途消息
+   * 用于切回会话时, 把后台还在跑的流重新接回列表继续实时显示
+   * @param chatId 会话id (chat.chat_id)
+   * @returns 在途的 chat 对象列表
+   */
+  static getActiveByChatId(chatId: string): chatType[] {
+    return Object.values(this.chatMessageContainer)
+      .filter((record) => record.chat.chat_id === chatId && !record.write_ed)
+      .map((record) => record.chat)
+  }
+
+  /**
    * 清除无用数据 也就是被close掉的和stop的数据
    */
   static clean() {

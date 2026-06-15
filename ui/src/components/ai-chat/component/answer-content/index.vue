@@ -99,7 +99,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import KnowledgeSourceComponent from '@/components/ai-chat/component/knowledge-source-component/index.vue'
 import MdRenderer from '@/components/markdown/MdRenderer.vue'
 import OperationButton from '@/components/ai-chat/component/operation-button/index.vue'
@@ -210,11 +210,5 @@ const stopChat = (chat: chatType) => {
 const startChat = (chat: chatType) => {
   props.chatManagement.write(chat.id)
 }
-
-onMounted(() => {
-  bus.on('chat:stop', () => {
-    stopChat(props.chatRecord)
-  })
-})
 </script>
 <style lang="scss" scoped></style>
