@@ -1,17 +1,24 @@
 <template>
   <div class="common-list">
     <ul v-if="data.length > 0">
-      <template v-for="(item, index) in data" :key="index">
-        <li
-          @click.stop="clickHandle(item, index)"
-          :class="current === item[props.valueKey] ? 'active color-primary-1' : ''"
-          class="cursor"
-          @mouseenter.stop="mouseenter(item)"
-          @mouseleave.stop="mouseleave()"
-        >
-          <slot :row="item" :index="index"> </slot>
-        </li>
-      </template>
+      <InfiniteScroll
+        :size="renderList.length"
+        :total="data.length"
+        :page_size="paginationConfig.page_size"
+        v-model:current_page="paginationConfig.current_page"
+      >
+        <template v-for="(item, index) in renderList" :key="item[props.valueKey] ?? index">
+          <li
+            @click.stop="clickHandle(item, index)"
+            :class="current === item[props.valueKey] ? 'active color-primary-1' : ''"
+            class="cursor"
+            @mouseenter.stop="mouseenter(item)"
+            @mouseleave.stop="mouseleave()"
+          >
+            <slot :row="item" :index="index"> </slot>
+          </li>
+        </template>
+      </InfiniteScroll>
     </ul>
     <slot name="empty" v-else>
       <el-empty :description="$t('common.noData')" />
@@ -19,7 +26,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, reactive, computed } from 'vue'
 
 defineOptions({ name: 'CommonList' })
 
@@ -47,6 +54,25 @@ watch(
 )
 
 const emit = defineEmits(['click', 'mouseenter', 'mouseleave'])
+
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 50,
+  total: 0,
+})
+
+// 前端分页滚动加载：data 为全量数据，仅渲染前 current_page * page_size 条，滚动到底再追加
+const renderList = computed(() =>
+  props.data.slice(0, paginationConfig.current_page * paginationConfig.page_size),
+)
+
+// 数据源变化时重置到第一页，避免切换数据后仍停留在很大的页码
+watch(
+  () => props.data,
+  () => {
+    paginationConfig.current_page = 1
+  },
+)
 
 function mouseenter(row: any) {
   emit('mouseenter', row)
