@@ -63,13 +63,15 @@
                 <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
               </el-button>
               <template #dropdown>
-                <el-dropdown-menu style="min-width: 80px">
-                  <el-dropdown-item @click="renameNode" class="p-8">{{
-                    $t('common.rename')
-                  }}</el-dropdown-item>
-                  <el-dropdown-item @click="copyNode" class="p-8">{{
-                    $t('common.copy')
-                  }}</el-dropdown-item>
+                <el-dropdown-menu style="min-width: 144px">
+                  <el-dropdown-item @click="renameNode" class="p-8">
+                    <AppIcon iconName="app-rename" class="color-secondary"></AppIcon>
+                    {{ $t('common.rename') }}</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="copyNode" class="p-8">
+                    <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                    {{ $t('common.copy') }}</el-dropdown-item
+                  >
                   <template
                     v-if="
                       !(
@@ -80,17 +82,16 @@
                       )
                     "
                   >
-                    <el-dropdown-item v-if="nodeDisabled" @click="enable()" class="p-8">{{
-                      $t('common.status.enable')
-                    }}</el-dropdown-item>
-                    <el-dropdown-item v-else @click="disable()" class="p-8">{{
-                      $t('common.status.disable')
-                    }}</el-dropdown-item></template
-                  >
+                    <div class="flex-between p-8" @click.stop>
+                      <AppIcon iconName="app-active" class="color-secondary"></AppIcon>
+                      <span class="mr-16">{{ $t('common.status.enableStatus') }}</span>
+                      <el-switch v-model="nodeEnabled" size="small" /></div
+                  ></template>
 
-                  <el-dropdown-item @click="deleteNode" class="border-t p-8">{{
-                    $t('common.delete')
-                  }}</el-dropdown-item>
+                  <el-dropdown-item @click="deleteNode" class="border-t p-8">
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                    {{ $t('common.delete') }}</el-dropdown-item
+                  >
                   <div v-if="sourceName" class="border-t p-8" @click.stop>
                     <div class="color-secondary font-small">{{ $t('common.source') }}</div>
                     <div class="lighter mt-4 break-all">{{ sourceName }}</div>
@@ -269,19 +270,18 @@ const dropdownMenuStyle = computed(() => {
       : '0px',
   }
 })
-const disable = () => {
-  nodeDisabled.value = true
-}
-const enable = () => {
-  nodeDisabled.value = false
-}
-
 const nodeDisabled = computed({
   get: () => {
     return props.nodeModel.properties.disabled || false
   },
   set: (v: boolean) => {
     set(props.nodeModel.properties, 'disabled', v)
+  },
+})
+const nodeEnabled = computed({
+  get: () => !nodeDisabled.value,
+  set: (v: boolean) => {
+    nodeDisabled.value = !v
   },
 })
 const titleFormRef = ref()
