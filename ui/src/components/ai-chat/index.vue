@@ -140,7 +140,7 @@
                   <!-- 回答 -->
                   <AnswerContent
                     :application="applicationDetails"
-                    :loading="loading"
+                    :loading="currentChatGenerating"
                     v-model:chat-record="chatList[index]"
                     :type="type"
                     :send-message="sendMessage"
@@ -202,7 +202,7 @@
           :validate="validate"
           :chat-management="ChatManagement"
           v-model:chat-id="chartOpenId"
-          v-model:loading="loading"
+          :loading="currentChatGenerating"
           v-model:show-user-input="showUserInput"
           v-else-if="type !== 'log' && type !== 'share'"
         >
@@ -310,6 +310,7 @@ const props = withDefaults(
 )
 const emit = defineEmits([
   'refresh',
+  'openChat',
   'scroll',
   'openExecutionDetail',
   'openParagraph',
@@ -346,6 +347,12 @@ const loading = ref(false)
 const inputValue = ref<string>('')
 const chartOpenId = ref<string>('')
 const chatList = ref<any[]>([])
+// 当前正在查看的会话是否有在途消息(还在吐字)。
+// 用它驱动"停止回答"按钮、输入禁用、发送拦截, 替代组件级全局 loading,
+// 这样后台其它会话的流式不会把当前会话的输入栏按住。
+const currentChatGenerating = computed(() =>
+  chatList.value.some((c) => c && c.write_ed === false && c.is_stop !== true),
+)
 const form_data = ref<any>({})
 const api_form_data = ref<any>({})
 const userFormRef = ref<InstanceType<typeof UserForm>>()
@@ -531,7 +538,7 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
 
           showUserInput.value = false
 
-          if (!loading.value && props.applicationDetails?.name) {
+          if (!currentChatGenerating.value && props.applicationDetails?.name) {
             handleDebounceClick(val, other_params_data, chat)
             return true
           }
@@ -551,7 +558,7 @@ function sendMessage(val: string, other_params_data?: any, chat?: chatType): Pro
     }
   } else {
     showUserInput.value = false
-    if (!loading.value && props.applicationDetails?.name) {
+    if (!currentChatGenerating.value && props.applicationDetails?.name) {
       handleDebounceClick(val, other_params_data, chat)
       return Promise.resolve(true)
     }
@@ -656,6 +663,16 @@ const errorWrite = (chat: any, message?: string) => {
   ChatManagement.close(chat.id)
 }
 
+// 停止"当前正在查看的会话"里在途的消息。
+// 只动 chatList(当前会话), 不会波及后台其它正在跑的会话。
+const stopGenerating = () => {
+  chatList.value.forEach((c) => {
+    if (c && c.write_ed === false && c.is_stop !== true) {
+      ChatManagement.stop(c.id)
+    }
+  })
+}
+
 // 保存上传文件列表
 
 function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_params_data?: any) {
@@ -731,6 +748,11 @@ function chatMessage(chat?: any, problem?: string, re_chat?: boolean, other_para
         } else if (response.status === 461) {
           return Promise.reject(t('aiChat.tip.errorLimitMessage'))
         } else {
+          // 新建会话: 此刻后端已执行 set_chat 建好 Chat 行(在产出流之前),
+          // 通知父级把新会话加入历史列表, 这样长回答流式期间切走也能切回来继续看
+          if (props.chatId === 'new') {
+            emit('openChat', chartOpenId.value)
+          }
           nextTick(() => {
             // 将滚动条滚动到最下面
             scrollDiv.value.setScrollTop(getMaxHeight())
@@ -907,11 +929,13 @@ onMounted(() => {
     checkAll.value = multipleSelectionChat.value.length === chatList.value.length
     emit('update:selection', true)
   })
+  bus.on('chat:stop', stopGenerating)
 })
 
 onBeforeUnmount(() => {
   window.sendMessage = null
   window.chatUserProfile = null
+  bus.off('chat:stop', stopGenerating)
 })
 
 function setScrollBottom() {

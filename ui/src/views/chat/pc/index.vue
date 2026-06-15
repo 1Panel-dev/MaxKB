@@ -172,6 +172,7 @@
               :chatId="currentChatId"
               executionIsRightPanel
               @refresh="refresh"
+              @openChat="refresh"
               @scroll="handleScroll"
               @open-execution-detail="openExecutionDetail"
               @openParagraph="openKnowledgeSource"
@@ -258,6 +259,7 @@ import ExecutionDetailContent from '@/components/ai-chat/component/knowledge-sou
 import ParagraphSourceContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphSourceContent.vue'
 import ParagraphDocumentContent from '@/components/ai-chat/component/knowledge-source-component/ParagraphDocumentContent.vue'
 import HistoryPanel from '@/views/chat/component/HistoryPanel.vue'
+import { ChatManagement } from '@/api/type/application'
 import { cloneDeep } from 'lodash'
 import { getFileUrl } from '@/utils/common'
 import PdfExport from '@/components/pdf-export/index.vue'
@@ -443,6 +445,26 @@ function loadInfiniteScroll() {
   getChatLog(true)
 }
 
+/**
+ * 切回会话时, 把内存中属于该会话、仍在后台流式输出的在途消息接回列表,
+ * 这样切走时没被打断的流, 切回来能继续实时显示。
+ * - 与 DB 记录 record_id 相同的, 用 live 对象覆盖(否则会显示落库前的空答案)
+ * - DB 里还没有的(尚未落库), 追加到末尾
+ */
+function attachActiveStreams() {
+  const activeChats = ChatManagement.getActiveByChatId(currentChatId.value)
+  if (!activeChats.length) {
+    return
+  }
+  const activeMap = new Map(activeChats.map((chat) => [chat.record_id, chat]))
+  const existIds = new Set(currentRecordList.value.map((v: any) => v.record_id))
+  const merged = currentRecordList.value.map((v: any) =>
+    activeMap.has(v.record_id) ? activeMap.get(v.record_id) : v,
+  )
+  const appendList = activeChats.filter((chat) => !existIds.has(chat.record_id))
+  currentRecordList.value = [...merged, ...appendList]
+}
+
 function getChatRecord() {
   return chatAPI
     .pageChatRecord(
@@ -462,6 +484,7 @@ function getChatRecord() {
         a.create_time.localeCompare(b.create_time),
       )
       if (paginationConfig.value.current_page === 1) {
+        attachActiveStreams()
         nextTick(() => {
           // 将滚动条滚动到最下面
           AiChatRef.value.setScrollBottom()

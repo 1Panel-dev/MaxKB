@@ -446,14 +446,8 @@ const chatId_context = computed({
     emit('update:chatId', v)
   },
 })
-const localLoading = computed({
-  get: () => {
-    return props.loading
-  },
-  set: (v) => {
-    emit('update:loading', v)
-  },
-})
+// 语音转写的请求 spinner, 独立于 loading prop(loading 现在是父级单向传入的"当前会话生成态")
+const speechLoading = ref(false)
 
 const showURLSetting = ref(false)
 const urlForm = reactive({
@@ -807,7 +801,7 @@ const uploadRecording = async (audioBlob: Blob) => {
     if (props.applicationDetails.stt_autosend) {
       bus.emit('on:transcribing', true)
     }
-    speechToTextAPI(props.applicationDetails.id as string, formData, localLoading)
+    speechToTextAPI(props.applicationDetails.id as string, formData, speechLoading)
       .then((response) => {
         inputValue.value = typeof response.data === 'string' ? response.data : ''
         // 自动发送
