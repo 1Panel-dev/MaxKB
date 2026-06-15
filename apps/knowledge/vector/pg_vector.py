@@ -71,7 +71,7 @@ class PGVector(BaseVectorStore):
             source_id=source_id,
             embedding=text_embedding,
             source_type=source_type,
-            search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms))),
+            search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms)), config='simple'),
         )
         embedding.save()
         return True
@@ -99,7 +99,8 @@ class PGVector(BaseVectorStore):
                                 .values_list("content", flat=True)
                             ),
                         )
-                    )
+                    ),
+                    config='simple',
                 ),
             )
             for index in range(0, len(texts))
