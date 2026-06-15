@@ -69,6 +69,7 @@ export default {
     label: '狀態',
     enable: '啟用',
     disable: '停用',
+    enableStatus: '啟用狀態',
     enabled: '已啟用',
     disabled: '已停用',
     enableSuccess: '啟用成功',
