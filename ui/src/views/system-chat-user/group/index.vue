@@ -267,7 +267,6 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch, reactive } from 'vue'
-import SystemGroupApi from '@/api/system/user-group'
 import { t } from '@/locales'
 import { i18n_name } from '@/utils/common'
 import type { ChatUserGroupUserItem } from '@/api/type/systemChatUser'
