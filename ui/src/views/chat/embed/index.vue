@@ -77,6 +77,7 @@
           :chatId="currentChatId"
           type="ai-chat"
           @refresh="refresh"
+          @openChat="refresh"
           @scroll="handleScroll"
           class="AiChat-embed"
           v-model:selection="showSelection"
@@ -107,6 +108,7 @@ import { hexToRgba } from '@/utils/theme'
 import { t } from '@/locales'
 import ChatHistoryDrawer from './component/ChatHistoryDrawer.vue'
 import chatAPI from '@/api/chat/chat'
+import { ChatManagement } from '@/api/type/application'
 
 provide('scrollData', loadInfiniteScroll)
 provide('chatLogPagination', () => chatLogPagination)
@@ -223,6 +225,26 @@ function loadInfiniteScroll() {
   getChatLog(true)
 }
 
+/**
+ * 切回会话时, 把内存中属于该会话、仍在后台流式输出的在途消息接回列表,
+ * 这样切走时没被打断的流, 切回来能继续实时显示。
+ * - 与 DB 记录 record_id 相同的, 用 live 对象覆盖(否则会显示落库前的空答案)
+ * - DB 里还没有的(尚未落库), 追加到末尾
+ */
+function attachActiveStreams() {
+  const activeChats = ChatManagement.getActiveByChatId(currentChatId.value)
+  if (!activeChats.length) {
+    return
+  }
+  const activeMap = new Map(activeChats.map((chat) => [chat.record_id, chat]))
+  const existIds = new Set(currentRecordList.value.map((v: any) => v.record_id))
+  const merged = currentRecordList.value.map((v: any) =>
+    activeMap.has(v.record_id) ? activeMap.get(v.record_id) : v,
+  )
+  const appendList = activeChats.filter((chat) => !existIds.has(chat.record_id))
+  currentRecordList.value = [...merged, ...appendList]
+}
+
 function getChatRecord() {
   return chatAPI
     .pageChatRecord(
@@ -242,6 +264,7 @@ function getChatRecord() {
         a.create_time.localeCompare(b.create_time),
       )
       if (paginationConfig.current_page === 1) {
+        attachActiveStreams()
         nextTick(() => {
           // 将滚动条滚动到最下面
           AiChatRef.value.setScrollBottom()
