@@ -230,7 +230,7 @@ class ListenerManagement:
             )
             data_list = list(QuerySet(Embedding).filter(paragraph_id=paragraph_id))
             for data, chunk in zip(data_list, chunks):
-                data.search_vector = SearchVector(Value(to_ts_vector(chunk, user_words=user_words)))
+                data.search_vector = SearchVector(Value(to_ts_vector(chunk, user_words=user_words)), config='simple')
             # 批量保存，减少数据库写入次数
             QuerySet(Embedding).filter(paragraph_id=paragraph_id).bulk_update(data_list, ["search_vector"])
 
