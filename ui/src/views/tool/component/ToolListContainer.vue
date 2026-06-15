@@ -695,6 +695,9 @@ function openEditDialog(data?: any) {
     checkAll.value = multipleSelection.value.length === tool.toolList.length
     return
   }
+  if (!permissionPrecise.value.edit(data?.id)) {
+    return
+  }
   // 有template_id的不允许编辑，是模板转换来的
   if (data?.template_id) {
     return
