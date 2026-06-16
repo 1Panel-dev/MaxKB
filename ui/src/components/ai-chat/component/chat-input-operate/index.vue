@@ -209,6 +209,7 @@
         @keydown.enter="sendChatHandle($event)"
         @paste="handlePaste"
         class="chat-operate-textarea"
+        clearable
       />
       <div class="operate flex-between">
         <div>
@@ -803,7 +804,8 @@ const uploadRecording = async (audioBlob: Blob) => {
     }
     speechToTextAPI(props.applicationDetails.id as string, formData, speechLoading)
       .then((response) => {
-        inputValue.value = typeof response.data === 'string' ? response.data : ''
+        const newText = typeof response.data === 'string' ? response.data : ''
+        inputValue.value = inputValue.value ? `${inputValue.value} ${newText}` : newText
         // 自动发送
         if (props.applicationDetails.stt_autosend) {
           nextTick(() => {
