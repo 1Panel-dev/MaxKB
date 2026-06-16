@@ -209,6 +209,7 @@
         @keydown.enter="sendChatHandle($event)"
         @paste="handlePaste"
         class="chat-operate-textarea"
+        clearable
       />
       <div class="operate flex-between">
         <div>
