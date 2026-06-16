@@ -12,6 +12,9 @@ from .compare import Compare
 class GTCompare(Compare):
 
     def compare(self, source_value, compare, target_value):
+        if source_value is None:
+            return False
+
         try:
             return float(source_value) > float(target_value)
         except Exception:
