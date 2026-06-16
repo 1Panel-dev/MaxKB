@@ -12,6 +12,9 @@ from .compare import Compare
 class GECompare(Compare):
 
     def compare(self, source_value, compare, target_value):
+        if source_value is None:
+            return target_value is None
+
         try:
             return float(source_value) >= float(target_value)
         except Exception:
