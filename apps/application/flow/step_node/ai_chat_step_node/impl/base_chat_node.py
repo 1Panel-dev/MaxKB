@@ -273,9 +273,11 @@ class BaseChatNode(IChatNode):
                           workspace_id)
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context['tool_ids'] = tool_ids
+            custom_tools_map = {str(t.id): t for t in
+                                QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM, is_active=True)}
             for tool_id in tool_ids:
-                tool = QuerySet(Tool).filter(id=tool_id, tool_type=ToolType.CUSTOM).first()
-                if tool is None or not tool.is_active:
+                tool = custom_tools_map.get(str(tool_id))
+                if tool is None:
                     continue
                 executor = ToolExecutor()
                 if tool.init_params is not None:
@@ -288,16 +290,21 @@ class BaseChatNode(IChatNode):
 
         if application_ids and len(application_ids) > 0:
             self.context['application_ids'] = application_ids
+            apps_map = {str(a.id): a for a in
+                        QuerySet(Application).filter(id__in=application_ids, is_publish=True)}
+            app_keys_map = {str(ak.application_id): ak for ak in
+                            QuerySet(ApplicationApiKey).filter(application_id__in=application_ids, is_active=True)}
+            app_access_tokens_map = {str(at.application_id): at for at in
+                                     QuerySet(ApplicationAccessToken).filter(
+                                         application_id__in=application_ids)}
             for application_id in application_ids:
-                app = QuerySet(Application).filter(id=application_id, is_publish=True).first()
+                app = apps_map.get(str(application_id))
                 if app is None:
                     continue
-                app_key = QuerySet(ApplicationApiKey).filter(application_id=application_id, is_active=True).first()
+                app_key = app_keys_map.get(str(application_id))
                 if app_key is not None:
                     api_key = app_key.secret_key
-                    application_access_token = QuerySet(ApplicationAccessToken).filter(
-                        application_id=app_key.application_id
-                    ).first()
+                    application_access_token = app_access_tokens_map.get(str(app_key.application_id))
                     if application_access_token is not None and application_access_token.authentication:
                         raise AppApiException(
                             500,
@@ -316,10 +323,11 @@ class BaseChatNode(IChatNode):
         if skill_tool_ids and len(skill_tool_ids) > 0:
             self.context['skill_tool_ids'] = skill_tool_ids
             skill_file_items = []
-
+            skill_tools_map = {str(t.id): t for t in
+                               QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True)}
             for tool_id in skill_tool_ids:
-                tool = QuerySet(Tool).filter(id=tool_id, is_active=True).first()
-                if tool is None or tool.is_active is False:
+                tool = skill_tools_map.get(str(tool_id))
+                if tool is None:
                     continue
                 init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
                 if tool.init_params is not None:
