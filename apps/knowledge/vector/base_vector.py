@@ -170,11 +170,14 @@ class BaseVectorStore(ABC):
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
         query_text = normalize_for_embedding(query_text)
-        embedding_query = embedding.embed_query(query_text)
+        query_embedding = embedding.embed_query(query_text)
         result = self.query(
-            embedding_query, knowledge_id_list, exclude_document_id_list, exclude_paragraph_list, is_active, 1, 3, 0.65
+            query_text, query_embedding,
+            knowledge_id_list, None,
+            exclude_document_id_list, exclude_paragraph_list,
+            is_active, 3, 0.65, SearchMode.embedding
         )
-        return result[0]
+        return result[0] if result else None
 
     @abstractmethod
     def query(
