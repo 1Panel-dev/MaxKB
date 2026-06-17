@@ -274,7 +274,7 @@ class BaseChatNode(IChatNode):
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context['tool_ids'] = tool_ids
             custom_tools_map = {str(t.id): t for t in
-                                QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM)}
+                                QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM, is_active=True)}
             for tool_id in tool_ids:
                 tool = custom_tools_map.get(str(tool_id))
                 if tool is None:
