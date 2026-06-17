@@ -57,6 +57,37 @@ class AliyunBaiLianTTSModelGeneralParams(BaseForm):
     )
 
 
+class AliyunBaiLianQwenTTSModelGeneralParams(BaseForm):
+    """
+    Parameters class for the Aliyun BaiLian Qwen TTS model.
+    Defines fields such as voice and speech rate.
+    """
+
+    voice = SingleSelect(
+        TooltipLabel(_('Timbre'), _('Please select a system voice supported by Qwen-TTS')),
+        required=True,
+        default_value='Cherry',
+        text_field='value',
+        value_field='value',
+        option_list=[
+            {'label': 'Cherry', 'value': 'Cherry'},
+            {'label': 'Serena', 'value': 'Serena'},
+            {'label': 'Ethan', 'value': 'Ethan'},
+            {'label': 'Chelsie', 'value': 'Chelsie'},
+        ]
+    )
+
+    speech_rate = SliderField(
+        TooltipLabel(_('Speaking speed'), _('[0.5, 2], the default is 1, usually one decimal place is enough')),
+        required=True,
+        default_value=1,
+        _min=0.5,
+        _max=2,
+        _step=0.1,
+        precision=1
+    )
+
+
 class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
     """
     Credential class for the Aliyun BaiLian TTS (Text-to-Speech) model.
@@ -140,4 +171,6 @@ class AliyunBaiLianTTSModelCredential(BaseForm, BaseModelCredential):
         :param model_name: Name of the model.
         :return: Parameter setting form.
         """
+        if 'qwen' in model_name and 'tts' in model_name:
+            return AliyunBaiLianQwenTTSModelGeneralParams()
         return AliyunBaiLianTTSModelGeneralParams()
