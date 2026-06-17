@@ -435,15 +435,19 @@ class File(AppModelMixin):
         buffer = io.BytesIO()
         for chunk in self.get_bytes_stream():
             buffer.write(chunk)
+        data = buffer.getvalue()
         try:
             # 解压数据
             with zipfile.ZipFile(buffer) as zip_file:
+                names = [name for name in zip_file.namelist() if not name.endswith("/")]
+                if len(names) != 1:
+                    return data
                 # 用 zip 内实际存储的条目名，避免文件名不匹配
-                name = zip_file.namelist()[0]
+                name = names[0]
                 return zip_file.read(name)
-        except Exception as e:
+        except zipfile.BadZipFile:
             # 如果数据不是zip格式，直接返回原始数据
-            return buffer.getvalue()
+            return data
 
     def get_bytes_stream(self, start=0, end=None, chunk_size=64 * 1024):
         def _read_with_offset():
