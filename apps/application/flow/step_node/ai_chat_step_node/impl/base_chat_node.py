@@ -277,7 +277,7 @@ class BaseChatNode(IChatNode):
                                 QuerySet(Tool).filter(id__in=tool_ids, tool_type=ToolType.CUSTOM)}
             for tool_id in tool_ids:
                 tool = custom_tools_map.get(str(tool_id))
-                if tool is None or not tool.is_active:
+                if tool is None:
                     continue
                 executor = ToolExecutor()
                 if tool.init_params is not None:
@@ -327,7 +327,7 @@ class BaseChatNode(IChatNode):
                                QuerySet(Tool).filter(id__in=skill_tool_ids, is_active=True)}
             for tool_id in skill_tool_ids:
                 tool = skill_tools_map.get(str(tool_id))
-                if tool is None or tool.is_active is False:
+                if tool is None:
                     continue
                 init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
                 if tool.init_params is not None:
