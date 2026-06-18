@@ -5,9 +5,7 @@ import getpass
 import gzip
 import json
 import os
-import pwd
 import random
-import resource
 import socket
 import subprocess
 import sys
@@ -21,6 +19,16 @@ from django.utils.translation import gettext_lazy as _
 from maxkb.const import BASE_DIR, CONFIG, PROJECT_DIR
 
 from common.utils.logger import maxkb_logger
+
+try:
+    import pwd
+except ModuleNotFoundError:
+    pwd = None
+
+try:
+    import resource
+except ModuleNotFoundError:
+    resource = None
 
 _enable_sandbox = bool(int(CONFIG.get("SANDBOX", 0)))
 _run_user = "sandbox" if _enable_sandbox else getpass.getuser()
@@ -37,6 +45,12 @@ _process_limit_cpu_cores = (
     else os.cpu_count()
 )  # 只支持linux，window和mac不支持
 _process_limit_mem_mb = int(CONFIG.get("SANDBOX_PYTHON_PROCESS_LIMIT_MEM_MB", "256"))
+
+
+def _get_set_run_user_code():
+    if not _enable_sandbox or pwd is None:
+        return ""
+    return f"os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});"
 
 
 class ToolExecutor:
@@ -103,11 +117,7 @@ class ToolExecutor:
         action_function = (
             f"({function_name!a}, locals_v.get({function_name!a}))" if function_name else "locals_v.popitem()"
         )
-        set_run_user = (
-            f"os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});"
-            if _enable_sandbox
-            else ""
-        )
+        set_run_user = _get_set_run_user_code()
         _exec_code = f"""
 try:
     import os, sys, json
@@ -302,11 +312,7 @@ sys.stdout.flush()
 
     def generate_mcp_server_code(self, code_str, params, name, description, tool_id):
         code = self._generate_mcp_server_code(code_str, params, name, description, tool_id)
-        set_run_user = (
-            f"os.setgid({pwd.getpwnam(_run_user).pw_gid});os.setuid({pwd.getpwnam(_run_user).pw_uid});"
-            if _enable_sandbox
-            else ""
-        )
+        set_run_user = _get_set_run_user_code()
         return f"""
 import os, sys, logging
 logging.basicConfig(level=logging.WARNING)
@@ -358,7 +364,7 @@ exec({dedent(code)!a})
         }
 
         def _set_resource_limit():
-            if not _enable_sandbox or not sys.platform.startswith("linux"):
+            if not _enable_sandbox or not sys.platform.startswith("linux") or resource is None:
                 return
             with suppress(Exception):
                 resource.setrlimit(resource.RLIMIT_AS, (_process_limit_mem_mb * 1024 * 1024,) * 2)
