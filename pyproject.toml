@@ -33,7 +33,7 @@ dependencies = [
     "langchain-aws==1.4.6",
     "langgraph==1.1.10",
     "deepagents==0.5.8",
-    "torch==2.12.0",
+    "torch==2.12.1",
     "numpy==1.26.4",
     "sentence-transformers==5.0.0",
     "qianfan==0.4.12.3",
@@ -63,7 +63,7 @@ dependencies = [
     "jsonpath-ng==1.8.0",
     "markdownify==1.2.2",
     "polib==1.2.0",
-    "cryptography==46.0.7"
+    "cryptography==48.0.1"
 ]
 
 [tool.uv]
