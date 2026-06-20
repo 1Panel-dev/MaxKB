@@ -6,6 +6,7 @@ const systemManage = {
   copy: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_COPY], 'OR'),
   batchDelete: () => false,
   batchMove: () => false,
+  batchCleanStrategy: () => false,
   folderCreate: () => false,
   edit: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_EDIT], 'OR'),
   publish: () =>

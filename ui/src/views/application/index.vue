@@ -65,7 +65,11 @@
           </div>
           <span
             class="ml-8"
-            v-if="permissionPrecise.batchDelete() || permissionPrecise.batchMove()"
+            v-if="
+              permissionPrecise.batchDelete() ||
+              permissionPrecise.batchMove() ||
+              permissionPrecise.batchCleanStrategy()
+            "
           >
             <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
               <AppIcon iconName="app-batch-delete" class="mr-4" />
@@ -365,6 +369,14 @@
 
         <el-button
           :disabled="multipleSelection.length === 0"
+          @click="openBatchClearStrategyDialog"
+          v-if="permissionPrecise.batchCleanStrategy()"
+        >
+          {{ $t('views.chatLog.buttons.clearStrategy') }}
+        </el-button>
+
+        <el-button
+          :disabled="multipleSelection.length === 0"
           @click="deleteMulApplication"
           v-if="permissionPrecise.batchDelete()"
         >
@@ -382,6 +394,7 @@
     <ResourceMappingDrawer ref="resourceMappingDrawerRef" />
     <CreateApplicationDialog ref="CreateApplicationDialogRef" />
     <CopyApplicationDialog ref="CopyApplicationDialogRef" />
+    <BatchClearStrategyDialog ref="BatchClearStrategyDialogRef" @refresh="refreshApplicationList()" />
     <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
     <MoveToDialog
       ref="MoveToDialogRef"
@@ -408,6 +421,7 @@ import type { CheckboxValueType } from 'element-plus'
 import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
 import CreateFolderDialog from '@/components/folder-virtualized-tree/CreateFolderDialog.vue'
 import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
+import BatchClearStrategyDialog from '@/views/application/component/BatchClearStrategyDialog.vue'
 import MoveToDialog from '@/components/folder-virtualized-tree/MoveToDialog.vue'
 import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
 import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
@@ -459,6 +473,7 @@ const paginationConfig = reactive({
 const folderList = ref<any[]>([])
 const applicationList = ref<any[]>([])
 const CopyApplicationDialogRef = ref()
+const BatchClearStrategyDialogRef = ref<InstanceType<typeof BatchClearStrategyDialog>>()
 
 // 批量操作
 const isBatch = ref(false)
@@ -523,6 +538,10 @@ function deleteMulApplication() {
     .catch(() => {})
 }
 
+function openBatchClearStrategyDialog() {
+  BatchClearStrategyDialogRef.value?.open([...multipleSelection.value])
+}
+
 const resourceTriggerDrawerRef = ref<InstanceType<typeof ResourceTriggerDrawer>>()
 const openTriggerDrawer = (data: any) => {
   resourceTriggerDrawerRef.value?.open(data)
@@ -558,7 +577,7 @@ function openMoveToDialog(data?: any) {
   MoveToDialogRef.value?.open(obj)
 }
 
-function refreshApplicationList(row: any) {
+function refreshApplicationList(row?: any) {
   if (row) {
     // 不是根目录才会移除
     if (folder.currentFolder?.parent_id) {

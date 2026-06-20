@@ -384,6 +384,49 @@ class ApplicationAPI(APIView):
 
             return result.success(inner(self,request, workspace_id=workspace_id))
 
+    class BatchCleanTime(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(
+            methods=['PUT'],
+            description=_("Batch update application chat log clear policy"),
+            summary=_("Batch update application chat log clear policy"),
+            operation_id=_("Batch update application chat log clear policy"),
+            parameters=ApplicationBatchOperateAPI.get_parameters(),
+            request=ApplicationBatchOperateAPI.get_clean_time_request(),
+            responses=result.DefaultResultSerializer,
+            tags=[_('Application')]
+        )
+        @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
+                         )
+        def put(self, request: Request, workspace_id: str):
+            id_list = request.data.get('id_list', [])
+            permitted_ids = check_batch_permissions(
+                request, id_list, 'application_id',
+                (PermissionConstants.APPLICATION_CHAT_LOG_CLEAR_POLICY.get_workspace_application_permission(),
+                 PermissionConstants.APPLICATION_CHAT_LOG_CLEAR_POLICY.get_workspace_permission_workspace_manage_role(),
+                 ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                CompareConstants.AND),
+                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()),
+                workspace_id=workspace_id
+            )
+
+            @log(menu='Application', operate='Batch update application chat log clear policy',
+                 get_operation_object=lambda r, k: get_application_operation_object_batch(permitted_ids))
+            def inner(view,r, **kwargs):
+                return ApplicationBatchOperateSerializer(
+                    data={'workspace_id': workspace_id, 'user_id': request.user.id}
+                ).batch_clean_time({
+                    'id_list': permitted_ids,
+                    'clean_time': request.data.get('clean_time'),
+                    'file_clean_time': request.data.get('file_clean_time')
+                })
+
+            return result.success(inner(self,request, workspace_id=workspace_id))
+
 class McpServers(APIView):
     authentication_classes = [TokenAuth]
 

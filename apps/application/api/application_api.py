@@ -12,7 +12,8 @@ from drf_spectacular.utils import OpenApiParameter
 from rest_framework import serializers
 
 from application.serializers.application import ApplicationCreateSerializer, ApplicationListResponse, \
-    ApplicationImportRequest, ApplicationEditSerializer, TextToSpeechRequest, SpeechToTextRequest, PlayDemoTextRequest
+    ApplicationImportRequest, ApplicationEditSerializer, TextToSpeechRequest, SpeechToTextRequest, PlayDemoTextRequest, \
+    BatchCleanTimeSerializer
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, ResultPageSerializer, DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
@@ -180,6 +181,10 @@ class ApplicationBatchOperateAPI(APIMixin):
     @staticmethod
     def get_move_request():
         return BatchMoveSerializer
+
+    @staticmethod
+    def get_clean_time_request():
+        return BatchCleanTimeSerializer
 
 
 class ApplicationExportAPI(APIMixin):
