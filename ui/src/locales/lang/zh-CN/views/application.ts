@@ -4,6 +4,7 @@ export default {
   createWorkFlowApplication: '创建高级智能体',
   importApplication: '导入智能体',
   copyApplication: '复制智能体',
+  batchClearStrategyTip: '该操作会对选中的智能体批量调整对话日志清除策略。',
   simple: '简易',
   senior: '高级',
   simpleAgent: '简易智能体',
