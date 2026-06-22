@@ -37,7 +37,6 @@
           <span>{{ child.title || '-' }}</span>
         </div>
         <div class="lighter mt-12">
-          {{ child.content }}
           <MdPreview
             ref="editorRef"
             editorId="preview-only"
