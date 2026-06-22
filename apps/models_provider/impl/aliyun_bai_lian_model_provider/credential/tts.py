@@ -30,19 +30,6 @@ class AliyunBaiLianTTSModelGeneralParams(BaseForm):
             {'label': _('Long Xiaobai'), 'value': 'longxiaobai'},
             {'label': _('Long Laotie'), 'value': 'longlaotie'},
             {'label': _('Long Shu'), 'value': 'longshu'},
-            {'label': _('Long Shuo'), 'value': 'longshuo'},
-            {'label': _('Long Jing'), 'value': 'longjing'},
-            {'label': _('Long Miao'), 'value': 'longmiao'},
-            {'label': _('Long Yue'), 'value': 'longyue'},
-            {'label': _('Long Yuan'), 'value': 'longyuan'},
-            {'label': _('Long Fei'), 'value': 'longfei'},
-            {'label': _('Long Jielidou'), 'value': 'longjielidou'},
-            {'label': _('Long Tong'), 'value': 'longtong'},
-            {'label': _('Long Xiang'), 'value': 'longxiang'},
-            {'label': 'Stella', 'value': 'loongstella'},
-            {'label': 'Bella', 'value': 'loongbella'},
-            {'label': 'longxiaochun_v2', 'value': 'longxiaochun_v2'},
-            {'label': 'longyingmu_v3', 'value': 'longyingmu_v3'},
         ]
     )
 
