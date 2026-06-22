@@ -1634,3 +1634,36 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
 
         QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).update(folder_id=folder_id)
         return True
+
+    @transaction.atomic
+    def batch_clean_time(self, instance: Dict, with_valid=True):
+        if with_valid:
+            BatchCleanTimeSerializer(data=instance).is_valid(model=Application, raise_exception=True)
+            self.is_valid(raise_exception=True)
+        id_list = instance.get("id_list")
+        workspace_id = self.data.get("workspace_id")
+        clean_time = instance.get("clean_time")
+        file_clean_time = instance.get("file_clean_time")
+        application_count = QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).count()
+        if application_count != len(id_list):
+            raise AppApiException(500, _("Application does not exist"))
+
+        QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).update(
+            clean_time=clean_time,
+            file_clean_time=file_clean_time,
+        )
+        return True
+
+
+class BatchCleanTimeSerializer(BatchSerializer):
+    clean_time = serializers.IntegerField(required=True, min_value=1, max_value=100000, label=_("Clean time"))
+    file_clean_time = serializers.IntegerField(
+        required=True, min_value=1, max_value=100000, label=_("File clean time")
+    )
+
+    def is_valid(self, *, model=None, raise_exception=False):
+        super().is_valid(model=model, raise_exception=True)
+        if not self.data.get("id_list"):
+            raise AppApiException(500, _("id list cannot be empty"))
+        if self.data.get("file_clean_time") > self.data.get("clean_time"):
+            raise AppApiException(500, _("File clean time cannot exceed clean time"))

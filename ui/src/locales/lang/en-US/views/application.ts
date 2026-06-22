@@ -4,6 +4,8 @@ export default {
   createWorkFlowApplication: 'Create Workflow Agent',
   importApplication: 'Import Agent',
   copyApplication: 'Copy Agent',
+  batchClearStrategyTip:
+    'This operation will batch update the chat log clear policy for the selected agents.',
   simple: 'SIMPLE',
   senior: 'WORKFLOW',
   simpleAgent: 'Simple Agent',

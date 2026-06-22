@@ -12,6 +12,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<int:current_page>/<int:page_size>', views.ApplicationAPI.Page.as_view(), name='application_page'),
     path('workspace/<str:workspace_id>/application/batch_delete', views.ApplicationAPI.BatchDelete.as_view()),
     path('workspace/<str:workspace_id>/application/batch_move', views.ApplicationAPI.BatchMove.as_view()),
+    path('workspace/<str:workspace_id>/application/batch_clean_time', views.ApplicationAPI.BatchCleanTime.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>', views.ApplicationAPI.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/publish', views.ApplicationAPI.Publish.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/move/<str:folder_id>', views.ApplicationAPI.Move.as_view()),
