@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： common.py
-    @date：2025/4/14 18:23
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： common.py
+@date：2025/4/14 18:23
+@desc:
 """
+
 import datetime
 import hashlib
 import io
@@ -17,16 +18,17 @@ import re
 import shutil
 import uuid
 from functools import reduce
-from typing import List, Dict
+from typing import Dict, List
+
 import pytz
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
+from maxkb.settings import TIME_ZONE
 from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from pydub import AudioSegment
 
-from maxkb.settings import TIME_ZONE
 from ..database_model_manage.database_model_manage import DatabaseModelManage
 from ..exception.app_exception import AppApiException
 
@@ -106,16 +108,16 @@ def group_by(list_source: List, key):
 
 
 SAFE_CHAR_SET = (
-        [chr(i) for i in range(65, 91) if chr(i) not in {'I', 'O'}] +  # 大写字母 A-H, J-N, P-Z
-        [chr(i) for i in range(97, 123) if chr(i) not in {'i', 'l', 'o'}] +  # 小写字母 a-h, j-n, p-z
-        [str(i) for i in range(10) if str(i) not in {'0', '1', '7'}]  # 数字 2-6, 8-9
+    [chr(i) for i in range(65, 91) if chr(i) not in {"I", "O"}]  # 大写字母 A-H, J-N, P-Z
+    + [chr(i) for i in range(97, 123) if chr(i) not in {"i", "l", "o"}]  # 小写字母 a-h, j-n, p-z
+    + [str(i) for i in range(10) if str(i) not in {"0", "1", "7"}]  # 数字 2-6, 8-9
 )
 
 
 def get_random_chars(number=4):
     if number <= 0:
         return ""
-    return ''.join(random.choices(SAFE_CHAR_SET, k=number))
+    return "".join(random.choices(SAFE_CHAR_SET, k=number))
 
 
 def encryption(message: str):
@@ -131,60 +133,68 @@ def encryption(message: str):
     message_len = len(message)
     pre_len = int(message_len / 5 * 2)
     post_len = int(message_len / 5 * 1)
-    pre_str = "".join([message[index] for index in
-                       range(0, max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(pre_len))])
+    pre_str = "".join(
+        [
+            message[index]
+            for index in range(0, max_pre_len if pre_len > max_pre_len else 1 if pre_len <= 0 else int(pre_len))
+        ]
+    )
     end_str = "".join(
-        [message[index] for index in
-         range(message_len - (post_len if post_len < max_post_len else max_post_len), message_len)])
+        [
+            message[index]
+            for index in range(message_len - (post_len if post_len < max_post_len else max_post_len), message_len)
+        ]
+    )
     content = "***************"
     return pre_str + content + end_str
 
 
 def _remove_empty_lines(text):
     if not isinstance(text, str):
-        raise AppApiException(500, _('Text-to-speech node, the text content must be of string type'))
+        raise AppApiException(500, _("Text-to-speech node, the text content must be of string type"))
     if not text:
-        raise AppApiException(500, _('Text-to-speech node, the text content cannot be empty'))
-    result = '\n'.join(line for line in text.split('\n') if line.strip())
+        raise AppApiException(500, _("Text-to-speech node, the text content cannot be empty"))
+    result = "\n".join(line for line in text.split("\n") if line.strip())
     return markdown_to_plain_text(result)
 
 
 def markdown_to_plain_text(md: str) -> str:
     # 移除图片 ![alt](url)
-    text = re.sub(r'!\[.*?\]\(.*?\)', '', md)
+    text = re.sub(r"!\[.*?\]\(.*?\)", "", md)
     # 移除链接 [text](url)
-    text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)
+    text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     # 移除 Markdown 标题符号 (#, ##, ###)
-    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)
+    text = re.sub(r"^#{1,6}\s+", "", text, flags=re.MULTILINE)
     # 移除加粗 **text** 或 __text__
-    text = re.sub(r'\*\*(.*?)\*\*', r'\1', text)
-    text = re.sub(r'__(.*?)__', r'\1', text)
+    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    text = re.sub(r"__(.*?)__", r"\1", text)
     # 移除斜体 *text* 或 _text_
-    text = re.sub(r'\*(.*?)\*', r'\1', text)
-    text = re.sub(r'_(.*?)_', r'\1', text)
+    text = re.sub(r"\*(.*?)\*", r"\1", text)
+    text = re.sub(r"_(.*?)_", r"\1", text)
     # 移除行内代码 `code`
-    text = re.sub(r'`(.*?)`', r'\1', text)
+    text = re.sub(r"`(.*?)`", r"\1", text)
     # 移除代码块 ```code```
-    text = re.sub(r'```.*?```', '', text, flags=re.DOTALL)
+    text = re.sub(r"```.*?```", "", text, flags=re.DOTALL)
     # 移除多余的换行符
-    text = re.sub(r'\n{2,}', '\n', text)
+    text = re.sub(r"\n{2,}", "\n", text)
     # 使用正则表达式去除所有 HTML 标签
-    text = re.sub(r'<[^>]+>', '', text)
+    text = re.sub(r"<[^>]+>", "", text)
     # 先移除特定媒体标签（优先级高于通用HTML标签移除）
-    text = re.sub(r'<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?', '', text,
-                  flags=re.DOTALL | re.IGNORECASE)
-    text = re.sub(r'<img[^>]*>', '', text)  # 匹配图片标签
+    text = re.sub(
+        r"<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?", "", text, flags=re.DOTALL | re.IGNORECASE
+    )
+    text = re.sub(r"<img[^>]*>", "", text)  # 匹配图片标签
     # 去除多余的空白字符（包括换行符、制表符等）
-    text = re.sub(r'\s+', ' ', text)
+    text = re.sub(r"\s+", " ", text)
     # 去除表单渲染
-    text = re.sub(r'<form_rander>.*?<\/form_rander>', '', text, flags=re.DOTALL)
+    text = re.sub(r"<form_rander>.*?<\/form_rander>", "", text, flags=re.DOTALL)
     # 去除首尾空格
     text = text.strip()
     return text
 
 
 def get_file_content(path):
-    with open(path, "r", encoding='utf-8') as file:
+    with open(path, "r", encoding="utf-8") as file:
         content = file.read()
     return content
 
@@ -282,27 +292,36 @@ def split_and_transcribe(file_path, model, max_segment_length_ms=59000, audio_fo
         text = model.speech_to_text(io.BytesIO(segment.export(format=audio_format).read()))
         if isinstance(text, str):
             full_text.append(text)
-    return ' '.join(full_text)
+    return " ".join(full_text)
 
 
 def query_params_to_single_dict(query_params: Dict):
-    return reduce(lambda x, y: {**x, **y}, list(
-        filter(lambda item: item is not None, [({key: value} if value is not None and len(value) > 0 else None) for
-                                               key, value in
-                                               query_params.items()])), {})
+    return reduce(
+        lambda x, y: {**x, **y},
+        list(
+            filter(
+                lambda item: item is not None,
+                [
+                    ({key: value} if value is not None and len(value) > 0 else None)
+                    for key, value in query_params.items()
+                ],
+            )
+        ),
+        {},
+    )
 
 
 def valid_license(model=None, count=None, message=None):
     def inner(func):
         def run(*args, **kwargs):
-            is_license_valid = DatabaseModelManage.get_model('license_is_valid')
+            is_license_valid = DatabaseModelManage.get_model("license_is_valid")
             is_license_valid = is_license_valid() if is_license_valid() is not None else False
             record_count = QuerySet(model).count()
 
             if not is_license_valid and record_count >= count:
                 error_message = message or _(
-                    'Limit {count} exceeded, please contact us (https://fit2cloud.com/).').format(
-                    count=count)
+                    "Limit {count} exceeded, please contact us (https://fit2cloud.com/)."
+                ).format(count=count)
                 raise AppApiException(400, error_message)
 
             return func(*args, **kwargs)
@@ -329,11 +348,23 @@ def parse_md_image(content: str):
     return image_list
 
 
+def parse_md_file_link(content: str):
+    """Return non-image markdown links like [text](file.mp4) and HTML src/href referencing files."""
+    results = []
+    # Regular markdown links (not images): [text](path)
+    for m in re.finditer(r"(?<!!)\[.*?\]\((.*?)\)", content):
+        results.append(m.group())
+    # HTML tags with src attribute, e.g. <video src="...">
+    for m in re.finditer(r'<\w+[^>]+\bsrc=["\']([^"\']+)["\']', content):
+        results.append(m.group())
+    return results
+
+
 def bulk_create_in_batches(model, data, batch_size=1000):
     if len(data) == 0:
         return
     for i in range(0, len(data), batch_size):
-        batch = data[i:i + batch_size]
+        batch = data[i : i + batch_size]
         model.objects.bulk_create(batch)
 
 
@@ -348,20 +379,18 @@ def get_sha256_hash(_v: str | bytes):
 
 ALLOWED_CLASSES = {
     ("builtins", "dict"),
-    ('uuid', 'UUID'),
+    ("uuid", "UUID"),
     ("application.serializers.application", "MKInstance"),
     ("tools.serializers.tool", "ToolInstance"),
-    ("knowledge.serializers.knowledge_workflow", "KBWFInstance")
+    ("knowledge.serializers.knowledge_workflow", "KBWFInstance"),
 }
 
 
 class RestrictedUnpickler(pickle.Unpickler):
-
     def find_class(self, module, name):
         if (module, name) in ALLOWED_CLASSES:
             return super().find_class(module, name)
-        raise pickle.UnpicklingError("global '%s.%s' is forbidden" %
-                                     (module, name))
+        raise pickle.UnpicklingError("global '%s.%s' is forbidden" % (module, name))
 
 
 def restricted_loads(s):
@@ -401,7 +430,7 @@ def filter_special_character(_str):
     """
     s_list = ["\\u0000"]
     for t in s_list:
-        _str = _str.replace(t, '')
+        _str = _str.replace(t, "")
     return _str
 
 
@@ -418,35 +447,35 @@ def common_convert_value(_type, value):
     if value is None:
         return None
 
-    if _type == 'int':
+    if _type == "int":
         return int(value)
-    if _type == 'boolean':
-        if isinstance(value, str) and value.lower() in ('false', '0', '[]', ''):
+    if _type == "boolean":
+        if isinstance(value, str) and value.lower() in ("false", "0", "[]", ""):
             return False
         return bool(value)
-    if _type == 'float':
+    if _type == "float":
         return float(value)
-    if _type == 'dict':
+    if _type == "dict":
         if isinstance(value, dict):
             return value
         v = json.loads(value)
         if isinstance(v, dict):
             return v
-        raise Exception(_('type error'))
-    if _type == 'array':
+        raise Exception(_("type error"))
+    if _type == "array":
         if isinstance(value, list):
             return value
         v = json.loads(value)
         if isinstance(v, list):
             return v
-        raise Exception(_('type error'))
+        raise Exception(_("type error"))
     return value
 
 
 def reset_value(value):
     if isinstance(value, str):
-        value = re.sub(ILLEGAL_CHARACTERS_RE, '', value)
-        if value.startswith(('=', '+', '-', '@')):
+        value = re.sub(ILLEGAL_CHARACTERS_RE, "", value)
+        if value.startswith(("=", "+", "-", "@")):
             value = "'" + value
     if isinstance(value, datetime.datetime):
         eastern = pytz.timezone(TIME_ZONE)
