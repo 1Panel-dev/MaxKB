@@ -452,6 +452,22 @@ const putMulMoveApplication: (data: any, loading?: Ref<boolean>) => Promise<Resu
   return put(`${prefix.value}/batch_move`, data, undefined, loading)
 }
 
+/**
+ * 批量更新智能体对话日志清除策略
+ * @param 参数
+ * {
+  "id_list": [String],
+  "clean_time": number,
+  "file_clean_time": number
+}
+ */
+const putMulCleanTime: (data: any, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+  data,
+  loading,
+) => {
+  return put(`${prefix.value}/batch_clean_time`, data, undefined, loading)
+}
+
 export default {
   getAllApplication,
   getApplication,
@@ -486,4 +502,5 @@ export default {
   moveApplication,
   delMulApplication,
   putMulMoveApplication,
+  putMulCleanTime,
 }

@@ -33,6 +33,16 @@ const workspace = {
       ],
       'OR',
     ),
+  batchCleanStrategy: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_CHAT_LOG_CLEAR_POLICY.getWorkspacePermission,
+        PermissionConst.APPLICATION_CHAT_LOG_CLEAR_POLICY.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
   copy: (source_id: string) =>
     hasPermission(
       [
