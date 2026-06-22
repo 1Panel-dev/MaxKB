@@ -113,7 +113,11 @@
         <div v-loading="loading">
           <h4 class="title-decoration-1 mb-8">{{ $t('views.document.setRules.title.preview') }}</h4>
 
-          <ParagraphPreview v-model:data="paragraphList" :isConnect="checkedConnect" :knowledge-id="id"/>
+          <ParagraphPreview
+            v-model:data="paragraphList"
+            :isConnect="checkedConnect"
+            :knowledge-id="id"
+          />
         </div>
       </el-col>
     </el-row>
@@ -132,7 +136,7 @@ const documentsFiles = computed(() => knowledge.documentsFiles)
 const splitPatternList = ref<Array<KeyValue<string, string>>>([])
 const route = useRoute()
 const {
-  query: { id}, // id为knowledgeID
+  query: { id }, // id为knowledgeID
 } = route as any
 
 const apiType = computed(() => {
