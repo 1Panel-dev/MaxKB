@@ -6,6 +6,7 @@ from models_provider.impl.aliyun_bai_lian_model_provider.aliyun_bai_lian_model_p
 from models_provider.impl.anthropic_model_provider.anthropic_model_provider import AnthropicModelProvider
 from models_provider.impl.aws_bedrock_model_provider.aws_bedrock_model_provider import BedrockModelProvider
 from models_provider.impl.azure_model_provider.azure_model_provider import AzureModelProvider
+from models_provider.impl.atlascloud_model_provider.atlascloud_model_provider import AtlasCloudModelProvider
 from models_provider.impl.deepseek_model_provider.deepseek_model_provider import DeepSeekModelProvider
 from models_provider.impl.docker_ai_model_provider.docker_ai_model_provider import DockerModelProvider
 from models_provider.impl.gemini_model_provider.gemini_model_provider import GeminiModelProvider
@@ -37,6 +38,7 @@ class ModelProvideConstants(Enum):
     model_zhipu_provider = ZhiPuModelProvider()
     model_xf_provider = XunFeiModelProvider()
     model_deepseek_provider = DeepSeekModelProvider()
+    model_atlascloud_provider = AtlasCloudModelProvider()
     model_gemini_provider = GeminiModelProvider()
     model_volcanic_engine_provider = VolcanicEngineModelProvider()
     model_tencent_provider = TencentModelProvider()
