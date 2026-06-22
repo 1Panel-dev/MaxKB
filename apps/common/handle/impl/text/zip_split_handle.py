@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： text_split_handle.py
-    @date：2024/3/27 18:19
-    @desc:
+@project: maxkb
+@Author：虎
+@file： text_split_handle.py
+@date：2024/3/27 18:19
+@desc:
 """
+
 import io
 import os
 import re
@@ -16,6 +17,7 @@ from urllib.parse import urljoin
 import uuid_utils.compat as uuid
 from charset_normalizer import detect
 from django.utils.translation import gettext_lazy as _
+from knowledge.models import File
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.handle.impl.text.csv_split_handle import CsvSplitHandle
@@ -25,8 +27,7 @@ from common.handle.impl.text.pdf_split_handle import PdfSplitHandle
 from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
-from common.utils.common import parse_md_image
-from knowledge.models import File
+from common.utils.common import parse_md_file_link, parse_md_image
 
 
 class FileBufferHandle:
@@ -46,7 +47,7 @@ split_handles = [
     XlsxSplitHandle(),
     XlsSplitHandle(),
     CsvSplitHandle(),
-    default_split_handle
+    default_split_handle,
 ]
 
 
@@ -55,7 +56,7 @@ def file_to_paragraph(file, pattern_list: List, with_filter: bool, limit: int, s
     for split_handle in split_handles:
         if split_handle.support(file, get_buffer):
             return split_handle.handle(file, pattern_list, with_filter, limit, get_buffer, save_inner_image)
-    raise Exception(_('Unsupported file format'))
+    raise Exception(_("Unsupported file format"))
 
 
 def is_valid_uuid(uuid_str: str):
@@ -66,84 +67,79 @@ def is_valid_uuid(uuid_str: str):
     return True
 
 
+def _collect_file_refs(tokens: list, base_name: str, zip_files: List[str], content: str, update_content):
+    """
+    Process a list of markdown/HTML tokens (image or file-link syntax), resolve paths against
+    zip_files, and return (file_list, updated_content).  update_content is a callable(old, new)
+    used to patch paths in the paragraph text.
+    """
+    file_list = []
+    for token in tokens:
+        # For HTML src tags extract the src value; for markdown extract the (...) part
+        src_match = re.search(r'\bsrc=["\']([^"\']+)["\']', token)
+        paren_match = re.search(r"\(([^)]*)\)", token)
+        if src_match:
+            source_path = src_match.group(1).strip()
+        elif paren_match:
+            source_path = paren_match.group(1).strip().split(" ")[0]
+        else:
+            continue
+        new_id = str(uuid.uuid7())
+        file_path = urljoin(base_name, "." + source_path if source_path.startswith("/") else source_path)
+        if file_path not in zip_files:
+            continue
+        if file_path.startswith("oss/file/") or file_path.startswith("oss/image/"):
+            file_id = file_path.replace("oss/file/", "").replace("oss/image/", "")
+            if is_valid_uuid(file_id):
+                file_list.append({"source_file": file_path, "image_id": file_id})
+            else:
+                file_list.append({"source_file": file_path, "image_id": new_id})
+                content = update_content(content, source_path, f"./oss/file/{new_id}")
+        else:
+            file_list.append({"source_file": file_path, "image_id": new_id})
+            content = update_content(content, source_path, f"./oss/file/{new_id}")
+    return file_list, content
+
+
 def get_image_list(result_list: list, zip_files: List[str]):
     image_file_list = []
     for result in result_list:
-        for p in result.get('content', []):
-            content: str = p.get('content', '')
-            image_list = parse_md_image(content)
-            for image in image_list:
-                search = re.search("\(.*\)", image)
-                if search:
-                    new_image_id = str(uuid.uuid7())
-                    source_image_path = search.group().replace('(', '').replace(')', '')
-                    source_image_path = source_image_path.strip().split(" ")[0]
-                    image_path = urljoin(result.get('name'), '.' + source_image_path if source_image_path.startswith(
-                        '/') else source_image_path)
-                    if not zip_files.__contains__(image_path):
-                        continue
-                    if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
-                        image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
-                        if is_valid_uuid(image_id):
-                            image_file_list.append({'source_file': image_path,
-                                                    'image_id': image_id})
-                        else:
-                            image_file_list.append({'source_file': image_path,
-                                                    'image_id': new_image_id})
-                            content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
-                            p['content'] = content
-                    else:
-                        image_file_list.append({'source_file': image_path,
-                                                'image_id': new_image_id})
-                        content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
-                        p['content'] = content
+        for p in result.get("content", []):
+            content: str = p.get("content", "")
+            tokens = parse_md_image(content) + parse_md_file_link(content)
+
+            def _update(c, old, new):
+                return c.replace(old, new)
+
+            refs, content = _collect_file_refs(tokens, result.get("name"), zip_files, content, _update)
+            image_file_list.extend(refs)
+            p["content"] = content
 
     return image_file_list
 
 
 def get_image_list_by_content(name: str, content: str, zip_files: List[str]):
-    image_file_list = []
-    image_list = parse_md_image(content)
-    for image in image_list:
-        search = re.search("\(.*\)", image)
-        if search:
-            new_image_id = str(uuid.uuid7())
-            source_image_path = search.group().replace('(', '').replace(')', '')
-            source_image_path = source_image_path.strip().split(" ")[0]
-            image_path = urljoin(name, '.' + source_image_path if source_image_path.startswith(
-                '/') else source_image_path)
-            if not zip_files.__contains__(image_path):
-                continue
-            if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
-                image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
-                if is_valid_uuid(image_id):
-                    image_file_list.append({'source_file': image_path,
-                                            'image_id': image_id})
-                else:
-                    image_file_list.append({'source_file': image_path,
-                                            'image_id': new_image_id})
-                    content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
+    tokens = parse_md_image(content) + parse_md_file_link(content)
 
-            else:
-                image_file_list.append({'source_file': image_path,
-                                        'image_id': new_image_id})
-                content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
+    def _update(c, old, new):
+        return c.replace(old, new)
 
-    return image_file_list, content
+    file_list, content = _collect_file_refs(tokens, name, zip_files, content, _update)
+    return file_list, content
 
 
 def get_file_name(file_name):
     try:
-        file_name_code = file_name.encode('cp437')
-        charset = detect(file_name_code)['encoding']
+        file_name_code = file_name.encode("cp437")
+        charset = detect(file_name_code)["encoding"]
         return file_name_code.decode(charset)
     except Exception as e:
         return file_name
 
 
 def filter_image_file(result_list: list, image_list):
-    image_source_file_list = [image.get('source_file') for image in image_list]
-    return [r for r in result_list if not image_source_file_list.__contains__(r.get('name', ''))]
+    image_source_file_list = [image.get("source_file") for image in image_list]
+    return [r for r in result_list if not image_source_file_list.__contains__(r.get("name", ""))]
 
 
 class ZipSplitHandle(BaseSplitHandle):
@@ -151,17 +147,17 @@ class ZipSplitHandle(BaseSplitHandle):
         if type(limit) is str:
             limit = int(limit)
         if type(with_filter) is str:
-            with_filter = with_filter.lower() == 'true'
+            with_filter = with_filter.lower() == "true"
         buffer = get_buffer(file)
         bytes_io = io.BytesIO(buffer)
         result = []
         # 打开zip文件
-        with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
+        with zipfile.ZipFile(bytes_io, "r") as zip_ref:
             # 获取压缩包中的文件名列表
             files = zip_ref.namelist()
             # 读取压缩包中的文件内容
             for file in files:
-                if file.endswith('/') or file.startswith('__MACOSX'):
+                if file.endswith("/") or file.startswith("__MACOSX"):
                     continue
                 with zip_ref.open(file) as f:
                     # 对文件内容进行处理
@@ -179,11 +175,11 @@ class ZipSplitHandle(BaseSplitHandle):
             result = filter_image_file(result, image_list)
             image_mode_list = []
             for image in image_list:
-                with zip_ref.open(image.get('source_file')) as f:
+                with zip_ref.open(image.get("source_file")) as f:
                     i = File(
-                        id=image.get('image_id'),
-                        file_name=os.path.basename(image.get('source_file')),
-                        meta={'debug': False, 'content': f.read()}  # 这里的content是二进制数据
+                        id=image.get("image_id"),
+                        file_name=os.path.basename(image.get("source_file")),
+                        meta={"debug": False, "content": f.read()},  # 这里的content是二进制数据
                     )
                     image_mode_list.append(i)
             save_image(image_mode_list)
@@ -200,16 +196,16 @@ class ZipSplitHandle(BaseSplitHandle):
         从 zip 中提取并返回拼接的 md 文本，同时收集并保存内嵌图片（通过 save_image 回调）。
         使用 posixpath 来正确处理 zip 内部的路径拼接与规范化。
         """
-        buffer = file.read() if hasattr(file, 'read') else None
+        buffer = file.read() if hasattr(file, "read") else None
         bytes_io = io.BytesIO(buffer) if buffer is not None else io.BytesIO(file)
         image_list = []
         content_parts = []
 
-        with zipfile.ZipFile(bytes_io, 'r') as zip_ref:
+        with zipfile.ZipFile(bytes_io, "r") as zip_ref:
             files = zip_ref.namelist()
             file_content_list = []
             for inner_name in files:
-                if inner_name.endswith('/') or inner_name.startswith('__MACOSX'):
+                if inner_name.endswith("/") or inner_name.startswith("__MACOSX"):
                     continue
                 with zip_ref.open(inner_name) as zf:
                     try:
@@ -223,11 +219,12 @@ class ZipSplitHandle(BaseSplitHandle):
                         if split_handle.support(zf, get_buffer):
                             row = get_buffer(zf)
                             md_text = split_handle.get_content(io.BytesIO(row), save_image)
-                            file_content_list.append({'content': md_text, 'name': real_name})
+                            file_content_list.append({"content": md_text, "name": real_name})
                             break
             for file_content in file_content_list:
-                _image_list, content = get_image_list_by_content(file_content.get('name'), file_content.get("content"),
-                                                                 files)
+                _image_list, content = get_image_list_by_content(
+                    file_content.get("name"), file_content.get("content"), files
+                )
                 content_parts.append(content)
                 for image in _image_list:
                     image_list.append(image)
@@ -236,13 +233,13 @@ class ZipSplitHandle(BaseSplitHandle):
             if image_list:
                 image_mode_list = []
                 for image in image_list:
-                    with zip_ref.open(image.get('source_file')) as f:
+                    with zip_ref.open(image.get("source_file")) as f:
                         i = File(
-                            id=image.get('image_id'),
-                            file_name=os.path.basename(image.get('source_file')),
-                            meta={'debug': False, 'content': f.read()}  # 这里的content是二进制数据
+                            id=image.get("image_id"),
+                            file_name=os.path.basename(image.get("source_file")),
+                            meta={"debug": False, "content": f.read()},  # 这里的content是二进制数据
                         )
                         image_mode_list.append(i)
                 save_image(image_mode_list)
 
-        return '\n\n'.join(content_parts)
+        return "\n\n".join(content_parts)
