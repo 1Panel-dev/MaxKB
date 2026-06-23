@@ -80,7 +80,7 @@
         </div>
       </div>
       <div v-if="showQrCodeTab">
-        <QrCodeTab :tabs="orgOptions" :default-tab="defaultQrTab"/>
+        <QrCodeTab :tabs="orgOptions" :default-tab="defaultQrTab" />
       </div>
       <div class="login-gradient-divider lighter mt-24" v-if="modeList.length > 1">
         <span>{{ $t('views.login.moreMethod') }}</span>
@@ -99,7 +99,7 @@
                 'font-size': item === 'OAUTH2' ? '8px' : '10px',
                 color: theme.themeInfo?.theme,
               }"
-            >{{ item }}</span
+              >{{ item }}</span
             >
           </el-button>
           <el-button
@@ -109,7 +109,7 @@
             class="login-button-circle color-secondary"
             @click="changeMode('QR_CODE')"
           >
-            <img src="@/assets/icon_qr_outlined.svg" width="25px"/>
+            <img src="@/assets/icon_qr_outlined.svg" width="25px" />
           </el-button>
           <el-button
             v-if="item === '' && loginMode !== ''"
@@ -126,26 +126,26 @@
   </login-layout>
 </template>
 <script setup lang="ts">
-import {computed, onBeforeMount, onMounted, ref} from 'vue'
-import {useRoute, useRouter} from 'vue-router'
-import type {FormInstance, FormRules} from 'element-plus'
-import type {LoginRequest} from '@/api/type/login'
+import { computed, onBeforeMount, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type { FormInstance, FormRules } from 'element-plus'
+import type { LoginRequest } from '@/api/type/login'
 import LoginContainer from '@/layout/login-layout/LoginContainer.vue'
 import LoginLayout from '@/layout/login-layout/LoginLayout.vue'
 import loginApi from '@/api/user/login'
 import authApi from '@/api/system-settings/auth-setting'
-import {getBrowserLang, t} from '@/locales'
+import { getBrowserLang, t } from '@/locales'
 import useStore from '@/stores'
-import {useI18n} from 'vue-i18n'
+import { useI18n } from 'vue-i18n'
 import QrCodeTab from '@/views/login/scanCompinents/QrCodeTab.vue'
-import {MsgConfirm, MsgError} from '@/utils/message.ts'
+import { MsgConfirm, MsgError } from '@/utils/message.ts'
 import * as dd from 'dingtalk-jsapi'
-import {loadScript} from '@/utils/common'
-import JSEncrypt from 'jsencrypt';
+import { loadScript } from '@/utils/common'
+import JSEncrypt from 'jsencrypt'
 
 const router = useRouter()
-const {login, user, theme} = useStore()
-const {locale} = useI18n({useScope: 'global'})
+const { login, user, theme } = useStore()
+const { locale } = useI18n({ useScope: 'global' })
 const loading = ref<boolean>(false)
 const route = useRoute()
 const identifyCode = ref<string>('')
@@ -194,25 +194,25 @@ const loginHandle = () => {
           .asyncLdapLogin(loginForm.value)
           .then(() => {
             locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
-            router.push({name: 'home'})
+            router.push({ name: 'home' })
           })
           .catch(() => {
             loading.value = false
           })
       } else {
         // JSEncrypt 在有些打包环境可能作为 default export 或直接导出，兼容两种情况
-        const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
-        const js = new (JSEncryptCtor as any)();
-        js.setPublicKey(user.rsaKey);
-        const jsonData = JSON.stringify(loginForm.value);
-        const encryptedBase64 = js.encrypt(jsonData);
+        const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt
+        const js = new (JSEncryptCtor as any)()
+        js.setPublicKey(user.rsaKey)
+        const jsonData = JSON.stringify(loginForm.value)
+        const encryptedBase64 = js.encrypt(jsonData)
 
         login
-          .asyncLogin({encryptedData: encryptedBase64, username: loginForm.value.username})
+          .asyncLogin({ encryptedData: encryptedBase64, username: loginForm.value.username })
           .then(() => {
             locale.value = localStorage.getItem('MaxKB-locale') || getBrowserLang() || 'en-US'
             localStorage.setItem('workspace_id', 'default')
-            router.push({name: 'home'})
+            router.push({ name: 'home' })
           })
           .catch(() => {
             const username = loginForm.value.username
@@ -225,13 +225,16 @@ const loginHandle = () => {
 }
 
 function makeCode(username?: string) {
-  loginApi.getCaptcha(username).then((res: any) => {
-    if (res && res.data && res.data.captcha) {
-      identifyCode.value = res.data.captcha
-    }
-  }).catch((error) => {
-    console.error('Failed to get captcha:', error)
-  })
+  loginApi
+    .getCaptcha(username)
+    .then((res: any) => {
+      if (res && res.data && res.data.captcha) {
+        identifyCode.value = res.data.captcha
+      }
+    })
+    .catch((error) => {
+      console.error('Failed to get captcha:', error)
+    })
 }
 
 function handleUsernameBlur(username: string) {
@@ -239,12 +242,13 @@ function handleUsernameBlur(username: string) {
 }
 
 onBeforeMount(() => {
+  loading.value = true
   user.asyncGetProfile().then((res) => {
     // 企业版和专业版：第三方登录
     if (user.isPE() || user.isEE()) {
       authApi.getLoginAuthSetting().then((res) => {
         if (Object.keys(res.data).length > 0) {
-          authSetting.value = res.data;
+          authSetting.value = res.data
         } else {
           authSetting.value = {
             max_attempts: 1,
@@ -264,7 +268,10 @@ onBeforeMount(() => {
             if (!modeList.value.includes('LOCAL') && !modeList.value.includes('LDAP')) {
               loginMode.value = ''
             }
-            if (modeList.value.length == 1 && ['CAS', 'OIDC', 'OAuth2', 'SAML2'].includes(modeList.value[0])) {
+            if (
+              modeList.value.length == 1 &&
+              ['CAS', 'OIDC', 'OAuth2', 'SAML2'].includes(modeList.value[0])
+            ) {
               redirectAuth(modeList.value[0])
             }
             // 这里的modeList 是oauth2 cas ldap oidc 这四个 还会有 lark wecom dingtalk
@@ -273,7 +280,9 @@ onBeforeMount(() => {
               (item) => !['CAS', 'OIDC', 'OAuth2', 'LOCAL', 'LDAP', 'SAML2'].includes(item),
             )
             // modeList需要去掉lark wecom dingtalk
-            modeList.value = modeList.value.filter((item) => !['lark', 'wecom', 'dingtalk'].includes(item))
+            modeList.value = modeList.value.filter(
+              (item) => !['lark', 'wecom', 'dingtalk'].includes(item),
+            )
             if (QrList.value.length > 0) {
               QrList.value.forEach((item) => {
                 orgOptions.value.push({
@@ -307,6 +316,7 @@ onBeforeMount(() => {
         default_value: 'LOCAL',
       }
     }
+    loading.value = false
   })
 })
 
@@ -386,8 +396,7 @@ function redirectAuth(authType: string, needMessage: boolean = true) {
         .then(() => {
           window.location.href = url
         })
-        .catch(() => {
-        })
+        .catch(() => {})
     } else {
       console.log('url', url)
       window.location.href = url
@@ -465,10 +474,10 @@ onMounted(() => {
   const handleDingTalk = () => {
     const code = params.get('corpId')
     if (code) {
-      dd.runtime.permission.requestAuthCode({corpId: code}).then((res) => {
+      dd.runtime.permission.requestAuthCode({ corpId: code }).then((res) => {
         console.log('DingTalk client request success:', res)
         login.dingOauth2Callback(res.code).then(() => {
-          router.push({name: 'home'})
+          router.push({ name: 'home' })
         })
       })
     }
@@ -481,7 +490,7 @@ onMounted(() => {
         appId: appId,
         success: (res: any) => {
           login.larkCallback(res.code).then(() => {
-            router.push({name: 'home'})
+            router.push({ name: 'home' })
           })
         },
         fail: (error: any) => {
@@ -501,11 +510,11 @@ onMounted(() => {
             scopeList: [],
             success: (res: any) => {
               login.larkCallback(res.code).then(() => {
-                router.push({name: 'home'})
+                router.push({ name: 'home' })
               })
             },
             fail: (error: any) => {
-              const {errno} = error
+              const { errno } = error
               if (errno === 103) {
                 callRequestAuthCode()
               }
