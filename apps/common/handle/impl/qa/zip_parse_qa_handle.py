@@ -20,7 +20,7 @@ from common.handle.base_parse_qa_handle import BaseParseQAHandle
 from common.handle.impl.qa.csv_parse_qa_handle import CsvParseQAHandle
 from common.handle.impl.qa.xls_parse_qa_handle import XlsParseQAHandle
 from common.handle.impl.qa.xlsx_parse_qa_handle import XlsxParseQAHandle
-from common.utils.common import parse_md_image
+from common.utils.common import parse_md_image, parse_md_file_link
 from knowledge.models import File
 
 
@@ -70,42 +70,37 @@ def is_valid_uuid(uuid_str: str):
 
 
 def get_image_list(result_list: list, zip_files: List[str]):
-    """
-    获取图片文件列表
-    @param result_list:
-    @param zip_files:
-    @return:
-    """
     image_file_list = []
     for result in result_list:
         for p in result.get('paragraphs', []):
             content: str = p.get('content', '')
-            image_list = parse_md_image(content)
-            for image in image_list:
-                search = re.search(r"\(.*\)", image)
-                if search:
-                    new_image_id = str(uuid.uuid7())
-                    source_image_path = search.group().replace('(', '').replace(')', '')
-                    image_path = urljoin(result.get('name'), '.' + source_image_path if source_image_path.startswith(
-                        '/') else source_image_path)
-                    if not zip_files.__contains__(image_path):
-                        continue
-                    if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
-                        image_id = image_path.replace('oss/file/', '')
-                        if is_valid_uuid(image_id):
-                            image_file_list.append({'source_file': image_path,
-                                                    'image_id': image_id})
-                        else:
-                            image_file_list.append({'source_file': image_path,
-                                                    'image_id': new_image_id})
-                            content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
-                            p['content'] = content
+            tokens = parse_md_image(content) + parse_md_file_link(content)
+            for token in tokens:
+                src_match = re.search(r'\bsrc=["\']([^"\']+)["\']', token)
+                paren_match = re.search(r'\(([^)]*)\)', token)
+                if src_match:
+                    source_path = src_match.group(1).strip()
+                elif paren_match:
+                    source_path = paren_match.group(1).strip().split(" ")[0]
+                else:
+                    continue
+                new_image_id = str(uuid.uuid7())
+                image_path = urljoin(result.get('name'), '.' + source_path if source_path.startswith(
+                    '/') else source_path)
+                if image_path not in zip_files:
+                    continue
+                if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
+                    image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
+                    if is_valid_uuid(image_id):
+                        image_file_list.append({'source_file': image_path, 'image_id': image_id})
                     else:
-                        image_file_list.append({'source_file': image_path,
-                                                'image_id': new_image_id})
-                        content = content.replace(source_image_path, f'./oss/file/{new_image_id}')
+                        image_file_list.append({'source_file': image_path, 'image_id': new_image_id})
+                        content = content.replace(source_path, f'./oss/file/{new_image_id}')
                         p['content'] = content
-
+                else:
+                    image_file_list.append({'source_file': image_path, 'image_id': new_image_id})
+                    content = content.replace(source_path, f'./oss/file/{new_image_id}')
+                    p['content'] = content
     return image_file_list
 
 
