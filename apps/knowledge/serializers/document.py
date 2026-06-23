@@ -32,7 +32,7 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
-from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, post
+from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, parse_file_link, post
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import flat_map, get_split_model
@@ -741,7 +741,7 @@ class DocumentSerializers(serializers.Serializer):
                 with_table_name=True,
             )
             data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
-            res = [parse_image(paragraph.get("content")) for paragraph in paragraph_list]
+            res = [parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content")) for paragraph in paragraph_list]
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/zip")
@@ -1632,7 +1632,7 @@ class DocumentSerializers(serializers.Serializer):
             data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
                 paragraph_list, problem_mapping_list, document_list
             )
-            res = [parse_image(paragraph.get("content")) for paragraph in paragraph_list]
+            res = [parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content")) for paragraph in paragraph_list]
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/zip")

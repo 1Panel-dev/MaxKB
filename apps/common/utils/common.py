@@ -416,6 +416,18 @@ def parse_image(content: str):
     return image_list
 
 
+def parse_file_link(content: str):
+    """Return non-image markdown links and HTML src refs pointing to ./oss/file/ paths."""
+    results = []
+    # Regular markdown links (not images): [text](./oss/file/...)
+    for m in re.finditer(r'(?<!!)\[.*?\]\(\.\/oss\/(?:image|file)\/[^)]+\)', content):
+        results.append(m.group())
+    # HTML tags with src pointing to oss paths, e.g. <video src="./oss/file/...">
+    for m in re.finditer(r'<\w+[^>]+\bsrc=["\'](\./oss/(?:image|file)/[^"\']+)["\']', content):
+        results.append(m.group())
+    return results
+
+
 def generate_uuid(tag: str):
     return str(uuid.uuid5(uuid.NAMESPACE_DNS, tag))
 

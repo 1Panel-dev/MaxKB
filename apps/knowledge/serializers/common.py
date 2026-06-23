@@ -182,23 +182,27 @@ def is_valid_uuid(s):
 
 def write_image(zip_path: str, image_list: List[str]):
     for image in image_list:
-        search = re.search("\(.*\)", image)
-        if search:
-            text = search.group()
-            if text.startswith('(./oss/file/'):
-                image_id = text.replace('(./oss/file/', '').replace(')', '')
-                image_id = image_id.strip().split(" ")[0]
-                if not is_valid_uuid(image_id):
-                    continue
-                file = QuerySet(File).filter(id=image_id).first()
-                if file is None:
-                    continue
-                zip_inner_path = os.path.join('oss', 'file', image_id)
-                file_path = os.path.join(zip_path, zip_inner_path)
-                if not os.path.exists(os.path.dirname(file_path)):
-                    os.makedirs(os.path.dirname(file_path))
-                with open(os.path.join(zip_path, file_path), 'wb') as f:
-                    f.write(file.get_bytes())
+        # Match (./oss/file/<id>) from both image syntax and regular links/HTML src
+        src_match = re.search(r'\bsrc=["\'](\./oss/(?:file|image)/[^"\']+)["\']', image)
+        paren_match = re.search(r'\(\./oss/(?:file|image)/([^)]+)\)', image)
+        if src_match:
+            oss_path = src_match.group(1)
+            image_id = re.sub(r'^\.\/oss\/(file|image)\/', '', oss_path).strip().split(" ")[0]
+        elif paren_match:
+            image_id = paren_match.group(1).strip().split(" ")[0]
+        else:
+            continue
+        if not is_valid_uuid(image_id):
+            continue
+        file = QuerySet(File).filter(id=image_id).first()
+        if file is None:
+            continue
+        zip_inner_path = os.path.join('oss', 'file', image_id)
+        file_path = os.path.join(zip_path, zip_inner_path)
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        with open(file_path, 'wb') as f:
+            f.write(file.get_bytes())
 
 
 def update_document_char_length(document_id: str):
