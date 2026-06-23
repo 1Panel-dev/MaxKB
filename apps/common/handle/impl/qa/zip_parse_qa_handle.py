@@ -82,7 +82,7 @@ def get_image_list(result_list: list, zip_files: List[str]):
             content: str = p.get('content', '')
             image_list = parse_md_image(content)
             for image in image_list:
-                search = re.search("\(.*\)", image)
+                search = re.search(r"\(.*\)", image)
                 if search:
                     new_image_id = str(uuid.uuid7())
                     source_image_path = search.group().replace('(', '').replace(')', '')

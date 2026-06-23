@@ -11,7 +11,6 @@ import json
 import re
 import time
 from functools import reduce
-from imghdr import what
 from typing import List, Dict
 
 from django.db.models import QuerySet
@@ -24,6 +23,7 @@ from application.flow.step_node.ai_chat_step_node.i_chat_node import IChatNode
 from application.flow.tools import Reasoning, mcp_response_generator, get_tools
 from application.models import Application, ApplicationApiKey, ApplicationAccessToken
 from common.exception.app_exception import AppApiException
+from common.utils.common import guess_image_format
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
@@ -461,7 +461,7 @@ class BaseChatNode(IChatNode):
                     file = QuerySet(File).filter(id=file_id).first()
                     image_bytes = file.get_bytes()
                     base64_image = base64.b64encode(image_bytes).decode("utf-8")
-                    image_format = what(None, image_bytes)
+                    image_format = guess_image_format(image_bytes, file.file_name)
                     images.append(
                         {'type': 'image_url', 'image_url': {'url': f'data:image/{image_format};base64,{base64_image}'}})
                 elif 'url' in img and img['url'].startswith('http'):

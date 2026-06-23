@@ -235,6 +235,33 @@ def bytes_to_uploaded_file(file_bytes, file_name="file.txt"):
     return uploaded_file
 
 
+def guess_image_format(file_bytes: bytes, file_name: str = "") -> str:
+    content_type, _ = mimetypes.guess_type(file_name)
+    if content_type and content_type.startswith("image/"):
+        return content_type.split("/", 1)[1]
+
+    if file_bytes.startswith(b"\xff\xd8\xff"):
+        return "jpeg"
+    if file_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
+        return "png"
+    if file_bytes.startswith((b"GIF87a", b"GIF89a")):
+        return "gif"
+    if file_bytes.startswith(b"RIFF") and file_bytes[8:12] == b"WEBP":
+        return "webp"
+    if file_bytes.startswith(b"BM"):
+        return "bmp"
+    if file_bytes.startswith((b"II*\x00", b"MM\x00*")):
+        return "tiff"
+    if file_bytes.startswith(b"\x00\x00\x01\x00"):
+        return "x-icon"
+
+    stripped = file_bytes.lstrip()
+    if stripped.startswith(b"<svg") or (stripped.startswith(b"<?xml") and b"<svg" in stripped[:512]):
+        return "svg+xml"
+
+    raise AppApiException(500, _("Unsupported file format"))
+
+
 def any_to_amr(any_path, amr_path):
     """
     把任意格式转成amr文件
