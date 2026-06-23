@@ -228,7 +228,7 @@ const tokenUsageCount = ref(10)
 const topQuestionsCount = ref(10)
 const tokenUsageOption = computed(() => {
   return {
-    title: t('home.charts.tokenUsage'),
+    title: 'Tokens ' + t('home.usage') + ' · Top ' + t('views.chatLog.table.user'),
     xData: getAttrsArray(props.tokenUsage?.slice(0, tokenUsageCount.value), 'username'),
     yData: [
       {
@@ -241,7 +241,8 @@ const tokenUsageOption = computed(() => {
 })
 const topQuestionsOption = computed(() => {
   return {
-    title: t('home.charts.topQuestions'),
+    title: t('home.chatCount') + ' · Top ' + t('views.chatLog.table.user'),
+
     xData: getAttrsArray(props.topQuestions?.slice(0, topQuestionsCount.value), 'username'),
     yData: [
       {
