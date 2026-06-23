@@ -27,7 +27,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import File
+from common.utils.logger import maxkb_logger
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool, ToolType
@@ -280,10 +280,12 @@ class BaseChatNode(IChatNode):
                 if tool is None:
                     continue
                 executor = ToolExecutor()
+                init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
                 if tool.init_params is not None:
-                    tool_init_params = json.loads(rsa_long_decrypt(tool.init_params))
+                    tool_init_params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params))
                 else:
-                    tool_init_params = {i["field"]: i.get('default_value') for i in tool.init_field_list}
+                    tool_init_params = init_params_default_value
+
                 tool_config = executor.get_tool_mcp_config(tool, tool_init_params)
 
                 mcp_servers_config[str(tool.id)] = tool_config
@@ -482,6 +484,21 @@ class BaseChatNode(IChatNode):
         return result
 
     def get_details(self, index: int, **kwargs):
+        tool_call_list = []
+        answer = self.context.get('answer', '')
+        if answer:
+            for match in re.finditer(
+                    r'<tool_calls_render>(.*?)</tool_calls_render>', answer, re.DOTALL
+            ):
+                try:
+                    tool_data = json.loads(match.group(1))
+                    tool_call_list.append({
+                        'name': tool_data.get('title', ''),
+                        'input': tool_data.get('content', {}).get('input', ''),
+                        'icon': tool_data.get('icon', ''),
+                    })
+                except (json.JSONDecodeError, Exception) as e:
+                    maxkb_logger.error(f"get_details error {e}")
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -490,6 +507,7 @@ class BaseChatNode(IChatNode):
             'history_message': self.context.get('history_message'),
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
+            'tool_call_list': tool_call_list,
             'reasoning_content': self.context.get('reasoning_content'),
             'enableException': self.node.properties.get('enableException'),
             'type': self.node.type,
