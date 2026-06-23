@@ -7,19 +7,18 @@
     @desc:
 """
 
+import queue
+import threading
+import time
+from typing import Dict, Optional
+
 import base64
 import json
-from typing import Dict, Optional
-from langchain_community.embeddings import SparkLLMTextEmbeddings
+import numpy as np
 from numpy import ndarray
 
 from models_provider.base_model_provider import MaxKBBaseModel
-import time
-import json
-import base64
-import numpy as np
-import threading
-import queue
+from models_provider.langchain_compat.sparkllm import SparkLLMTextEmbeddings
 
 _task_queue = queue.Queue()
 

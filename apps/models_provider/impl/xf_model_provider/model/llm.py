@@ -8,8 +8,11 @@
 """
 from typing import List, Optional, Any, Iterator, Dict
 
-from langchain_community.chat_models.sparkllm import \
-    ChatSparkLLM, convert_message_to_dict, _convert_delta_to_message_chunk
+from models_provider.langchain_compat.sparkllm import (
+    ChatSparkLLM,
+    _convert_delta_to_message_chunk,
+    convert_message_to_dict,
+)
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import BaseMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk

@@ -4,7 +4,7 @@ import os
 from typing import Dict, Any, List, Optional, Iterator
 
 #from docutils.utils import SystemMessage
-from langchain_community.chat_models.sparkllm import ChatSparkLLM, _convert_delta_to_message_chunk
+from models_provider.langchain_compat.sparkllm import ChatSparkLLM, _convert_delta_to_message_chunk
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import BaseMessage, ChatMessage, HumanMessage, AIMessage, AIMessageChunk
 from langchain_core.outputs import ChatGenerationChunk

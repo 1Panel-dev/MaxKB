@@ -1,14 +1,18 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2023/11/10 17:45
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2023/11/10 17:45
+@desc:
 """
+
 from typing import List, Dict, Optional, Any, Iterator
 
-from langchain_community.chat_models.baidu_qianfan_endpoint import _convert_dict_to_message, QianfanChatEndpoint
+from models_provider.langchain_compat.baidu_qianfan_endpoint import (
+    QianfanChatEndpoint,
+    _convert_dict_to_message,
+)
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import (
     AIMessageChunk,
@@ -28,11 +32,13 @@ class QianfanChatModelQianfan(MaxKBBaseModel, QianfanChatEndpoint):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        return QianfanChatModelQianfan(model=model_name,
-                                       qianfan_ak=model_credential.get('api_key'),
-                                       qianfan_sk=model_credential.get('secret_key'),
-                                       streaming=model_kwargs.get('streaming', False),
-                                       init_kwargs=optional_params)
+        return QianfanChatModelQianfan(
+            model=model_name,
+            qianfan_ak=model_credential.get("api_key"),
+            qianfan_sk=model_credential.get("secret_key"),
+            streaming=model_kwargs.get("streaming", False),
+            init_kwargs=optional_params,
+        )
 
     usage_metadata: dict = {}
 
@@ -40,17 +46,17 @@ class QianfanChatModelQianfan(MaxKBBaseModel, QianfanChatEndpoint):
         return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.usage_metadata.get('prompt_tokens', 0)
+        return self.usage_metadata.get("prompt_tokens", 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.usage_metadata.get('completion_tokens', 0)
+        return self.usage_metadata.get("completion_tokens", 0)
 
     def _stream(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         kwargs = {**self.init_kwargs, **kwargs}
         params = self._convert_prompt_msg_params(messages, **kwargs)
@@ -87,16 +93,16 @@ class QianfanChatModelOpenai(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return QianfanChatModelOpenai(
             model=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
-            extra_body=optional_params
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
+            extra_body=optional_params,
         )
 
 
 class QianfanChatModel(MaxKBBaseModel):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        api_version = model_credential.get('api_version', 'v1')
+        api_version = model_credential.get("api_version", "v1")
 
         if api_version == "v1":
             return QianfanChatModelQianfan.new_instance(model_type, model_name, model_credential, **model_kwargs)

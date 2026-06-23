@@ -7,9 +7,11 @@
     @desc:
 """
 from typing import Dict, List
-from langchain_community.embeddings import QianfanEmbeddingsEndpoint
+
 import openai
+
 from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.langchain_compat.baidu_qianfan_endpoint import QianfanEmbeddingsEndpoint
 
 
 class QianfanV1Embeddings(MaxKBBaseModel, QianfanEmbeddingsEndpoint):
@@ -53,13 +55,12 @@ class QianfanV2EmbeddingModel(MaxKBBaseModel):
 
 
 class QianfanEmbeddings(MaxKBBaseModel):
-
-
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        api_version = model_credential.get('api_version', 'v1')
+        api_version = model_credential.get("api_version", "v1")
 
         if api_version == "v1":
             return QianfanV1Embeddings.new_instance(model_type, model_name, model_credential, **model_kwargs)
-        elif api_version == "v2":
+        if api_version == "v2":
             return QianfanV2EmbeddingModel.new_instance(model_type, model_name, model_credential, **model_kwargs)
+        raise ValueError(f"Unsupported qianfan api_version: {api_version}")
