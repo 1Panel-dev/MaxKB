@@ -14,9 +14,9 @@ import time
 import traceback
 from typing import List
 
+from django.utils.translation import gettext_lazy as _
 from pypdf import PdfReader
 from pypdf.generic import Destination
-from django.utils.translation import gettext_lazy as _
 
 from common.handle.base_split_handle import BaseSplitHandle
 from common.utils.logger import maxkb_logger
@@ -76,9 +76,7 @@ class PdfSplitHandle(BaseSplitHandle):
                     return {"name": file.name, "content": result}
 
                 # 没目录但是有链接的pdf
-                result = self.handle_links(
-                    pdf_document, pattern_list, with_filter, limit
-                )
+                result = self.handle_links(pdf_document, pattern_list, with_filter, limit)
                 if result is not None and len(result) > 0:
                     return {"name": file.name, "content": result}
 
@@ -88,13 +86,9 @@ class PdfSplitHandle(BaseSplitHandle):
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
                 else:
-                    split_model = SplitModel(
-                        default_pattern_list, with_filter=with_filter, limit=limit
-                    )
+                    split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
         except BaseException as e:
-            maxkb_logger.error(
-                f"File: {file.name}, error: {e}, {traceback.format_exc()}"
-            )
+            maxkb_logger.error(f"File: {file.name}, error: {e}, {traceback.format_exc()}")
             return {"name": file.name, "content": []}
         finally:
             # 处理完后可以删除临时文件
@@ -147,9 +141,7 @@ class PdfSplitHandle(BaseSplitHandle):
             content = content.replace("\0", "")
 
             elapsed_time = time.time() - start_time
-            maxkb_logger.debug(
-                f"File: {file.name}, Page: {page_num + 1}, Time: {elapsed_time:.3f}s"
-            )
+            maxkb_logger.debug(f"File: {file.name}, Page: {page_num + 1}, Time: {elapsed_time:.3f}s")
 
         return content
 
@@ -284,12 +276,16 @@ class PdfSplitHandle(BaseSplitHandle):
             if 0 < limit < len(chapter_text):
                 split_text = smart_split_paragraph(chapter_text, limit)
                 for text in split_text:
-                    chapters.append({"title": real_chapter_title, "content": text})
+                    chapters.append(
+                        {"title": real_chapter_title, "content": text.encode("utf-8", "ignore").decode("utf-8")}
+                    )
             else:
                 chapters.append(
                     {
                         "title": real_chapter_title,
-                        "content": chapter_text if chapter_text else real_chapter_title,
+                        "content": (chapter_text if chapter_text else real_chapter_title)
+                        .encode("utf-8", "ignore")
+                        .decode("utf-8"),
                     }
                 )
             # 保存章节内容和章节标题
@@ -334,13 +330,9 @@ class PdfSplitHandle(BaseSplitHandle):
                 next_link = links[num + 1] if num + 1 < len(links) else None
                 next_link_title = None
                 if next_link is not None:
-                    next_link_title = PdfSplitHandle.extract_link_title(
-                        page, next_link["from"]
-                    )
+                    next_link_title = PdfSplitHandle.extract_link_title(page, next_link["from"])
                     if not next_link_title:
-                        next_link_title = PdfSplitHandle.extract_first_line(
-                            doc.pages[next_link["page"]]
-                        )
+                        next_link_title = PdfSplitHandle.extract_first_line(doc.pages[next_link["page"]])
                     end_page = next_link["page"]
 
                 # 提取章节内容
@@ -383,24 +375,14 @@ class PdfSplitHandle(BaseSplitHandle):
                     else:
                         pre_toc[-1]["content"] += line
                 for i in range(len(pre_toc)):
-                    pre_toc[i]["content"] = re.sub(
-                        r"(?<!。)\n+", "", pre_toc[i]["content"]
-                    )
-                    pre_toc[i]["content"] = re.sub(
-                        r"(?<!.)\n+", "", pre_toc[i]["content"]
-                    )
+                    pre_toc[i]["content"] = re.sub(r"(?<!。)\n+", "", pre_toc[i]["content"])
+                    pre_toc[i]["content"] = re.sub(r"(?<!.)\n+", "", pre_toc[i]["content"])
             except BaseException as e:
-                maxkb_logger.error(
-                    _(
-                        "This document has no preface and is treated as ordinary text: {e}"
-                    ).format(e=e)
-                )
+                maxkb_logger.error(_("This document has no preface and is treated as ordinary text: {e}").format(e=e))
                 if pattern_list is not None and len(pattern_list) > 0:
                     split_model = SplitModel(pattern_list, with_filter, limit)
                 else:
-                    split_model = SplitModel(
-                        default_pattern_list, with_filter=with_filter, limit=limit
-                    )
+                    split_model = SplitModel(default_pattern_list, with_filter=with_filter, limit=limit)
                 # 插入目录前的部分
                 page_content = re.sub(r"(?<!。)\n+", "", page_content)
                 page_content = re.sub(r"(?<!.)\n+", "", page_content)
@@ -419,15 +401,11 @@ class PdfSplitHandle(BaseSplitHandle):
                 continue
             if annotation.get("/Subtype") != "/Link":
                 continue
-            dest_page = PdfSplitHandle.get_annotation_destination_page_number(
-                doc, annotation
-            )
+            dest_page = PdfSplitHandle.get_annotation_destination_page_number(doc, annotation)
             if dest_page is None or dest_page < 0 or dest_page >= len(doc.pages):
                 continue
             rect = annotation.get("/Rect")
-            links.append(
-                {"page": dest_page, "from": PdfSplitHandle.normalize_rect(rect)}
-            )
+            links.append({"page": dest_page, "from": PdfSplitHandle.normalize_rect(rect)})
         return links
 
     @staticmethod
@@ -465,9 +443,7 @@ class PdfSplitHandle(BaseSplitHandle):
             return PdfSplitHandle.get_page_number_by_reference(doc, destination[0])
 
         if hasattr(destination, "get") and destination.get("/D") is not None:
-            return PdfSplitHandle.get_destination_page_number(
-                doc, destination.get("/D")
-            )
+            return PdfSplitHandle.get_destination_page_number(doc, destination.get("/D"))
 
         return None
 
@@ -511,8 +487,7 @@ class PdfSplitHandle(BaseSplitHandle):
             text_top = y + (float(font_size) if font_size else 0)
             in_horizontal_range = left - tolerance <= x <= right + tolerance
             in_vertical_range = (
-                bottom - tolerance <= y <= top + tolerance
-                or bottom - tolerance <= text_top <= top + tolerance
+                bottom - tolerance <= y <= top + tolerance or bottom - tolerance <= text_top <= top + tolerance
             )
             if in_horizontal_range and in_vertical_range:
                 text_parts.append(text)
