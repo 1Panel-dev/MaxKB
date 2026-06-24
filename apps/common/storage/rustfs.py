@@ -12,9 +12,12 @@ def get_bucket() -> str:
 
 
 def get_s3_client():
+    addr = CONFIG.get("RUSTFS_ADDRESS") or ""
+    if addr and not addr.startswith(("http://", "https://")):
+        addr = f"http://{addr}"
     return boto3.client(
         "s3",
-        endpoint_url=CONFIG.get("RUSTFS_ADDRESS"),
+        endpoint_url=addr,
         aws_access_key_id=CONFIG.get("RUSTFS_ACCESS_KEY"),
         aws_secret_access_key=CONFIG.get("RUSTFS_SECRET_KEY"),
         config=Config(signature_version="s3v4"),

@@ -56,8 +56,8 @@ ENV PATH=/opt/py3/bin:$PATH \
     RUSTFS_ACCESS_KEY=rustfsadmin \
     RUSTFS_SECRET_KEY=rustfsadmin \
     RUSTFS_VOLUMES=/opt/maxkb/data/rustfs \
-    RUSTFS_ADDRESS=0.0.0.0:9000 \
-    RUSTFS_CONSOLE_ADDRESS=0.0.0.0:9001 \
+    RUSTFS_ADDRESS=127.0.0.1:9000 \
+    RUSTFS_CONSOLE_ADDRESS=127.0.0.1:9001 \
     RUSTFS_OBS_LOGGER_LEVEL=warn \
     RUSTFS_OBS_LOG_DIRECTORY=/opt/maxkb/log/rustfs
 
