@@ -1,4 +1,4 @@
-#FROM python:3.11-slim-bookworm AS vector-model
+#FROM python:3.13-slim-bookworm AS vector-model
 #COPY installer/install_model.py install_model.py
 #RUN pip3 install --upgrade pip setuptools && \
 #    pip install pycrawlers && \
@@ -10,7 +10,7 @@
 
 # 不知道为什么用上面的脚本重新拉一遍向量模型比之前的大很多，所以还是用下面的脚本复用原来已经构建好的向量模型
 
-FROM python:3.11-slim-bookworm AS tmp-stage1
+FROM python:3.13-slim-bookworm AS tmp-stage1
 COPY installer/install_model_bert_base_cased.py install_model_bert_base_cased.py
 RUN pip3 install --upgrade pip setuptools && \
     pip install pycrawlers && \

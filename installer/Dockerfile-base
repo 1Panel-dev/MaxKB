@@ -1,4 +1,4 @@
-FROM python:3.11-slim-trixie AS python-stage
+FROM python:3.13-slim-trixie AS python-stage
 RUN python3 -m venv /opt/py3
 
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v2.0.3 AS vector-model
