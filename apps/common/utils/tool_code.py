@@ -112,7 +112,7 @@ class ToolExecutor:
 try:
     import os, sys, json
     from contextlib import redirect_stdout
-    path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+    path_to_exclude = ['/opt/py3/lib/python3.13/site-packages', '/opt/maxkb-app/apps']
     sys.path = [p for p in sys.path if p not in path_to_exclude]
     sys.path += {_sandbox_python_sys_path}
     _id = os.environ.get("_ID")
@@ -312,7 +312,7 @@ import os, sys, logging
 logging.basicConfig(level=logging.WARNING)
 logging.getLogger("mcp").setLevel(logging.ERROR)
 logging.getLogger("mcp.server").setLevel(logging.ERROR)
-path_to_exclude = ['/opt/py3/lib/python3.11/site-packages', '/opt/maxkb-app/apps']
+path_to_exclude = ['/opt/py3/lib/python3.13/site-packages', '/opt/maxkb-app/apps']
 sys.path = [p for p in sys.path if p not in path_to_exclude]
 sys.path += {_sandbox_python_sys_path}
 {set_run_user}
