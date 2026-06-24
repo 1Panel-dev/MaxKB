@@ -1,12 +1,11 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： log.py
-    @date：2025/6/4 14:13
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： log.py
+@date：2025/6/4 14:13
+@desc:
 """
-from qianfan.utils.utils import get_ip_address
 
 from system_manage.models.log_management import Log
 
@@ -17,11 +16,11 @@ def _get_ip_address(request):
     @param request:
     @return:
     """
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
+        ip = x_forwarded_for.split(",")[0]
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        ip = request.META.get("REMOTE_ADDR")
     return ip
 
 
@@ -33,9 +32,7 @@ def _get_user(request):
     """
     user = request.user
     if user is None:
-        return {
-
-        }
+        return {}
     user_info = {
         "id": str(user.id),
         "email": user.email,
@@ -44,8 +41,8 @@ def _get_user(request):
         "username": user.username,
     }
     # 如果是 User 模型且有 role 属性
-    if hasattr(user, 'role'):
-        user_info['role'] = user.role
+    if hasattr(user, "role"):
+        user_info["role"] = user.role
     return user_info
 
 
@@ -53,28 +50,31 @@ def _get_details(request):
     path = request.path
     body = request.data
 
-    sensitive_fields = {'password', 're_password'}
+    sensitive_fields = {"password", "re_password"}
 
-    body_copy = dict(body) if hasattr(body, 'items') else body
+    body_copy = dict(body) if hasattr(body, "items") else body
 
     if isinstance(body_copy, dict):
         for field in sensitive_fields:
             body_copy.pop(field, None)
 
     query = request.query_params
-    return {
-        'path': path,
-        'body': body_copy,
-        'query': query
-    }
+    return {"path": path, "body": body_copy, "query": query}
 
 
 def _get_workspace_id(request, kwargs):
-    return kwargs.get('workspace_id', 'None')
+    return kwargs.get("workspace_id", "None")
 
 
-def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, get_details=_get_details,
-        get_operation_object=None, get_workspace_id=_get_workspace_id):
+def log(
+    menu: str,
+    operate,
+    get_user=_get_user,
+    get_ip_address=_get_ip_address,
+    get_details=_get_details,
+    get_operation_object=None,
+    get_workspace_id=_get_workspace_id,
+):
     """
     记录审计日志
     @param menu: 操作菜单 str
@@ -110,17 +110,33 @@ def log(menu: str, operate, get_user=_get_user, get_ip_address=_get_ip_address, 
                 if callable(operate):
                     _operate = operate(request)
                 # 插入审计日志
-                Log(menu=menu, operate=_operate, user=user, status=status, ip_address=ip, details=details,
-                    operation_object=operation_object, workspace_id=workspace_id).save()
+                Log(
+                    menu=menu,
+                    operate=_operate,
+                    user=user,
+                    status=status,
+                    ip_address=ip,
+                    details=details,
+                    operation_object=operation_object,
+                    workspace_id=workspace_id,
+                ).save()
 
         return run
 
     return inner
 
 
-def record_log(menu: str, operate: str, request, user: dict = None, status: int = 200,
-               get_details=_get_details, get_operation_object=None, workspace_id: str = 'default',
-               operation_object: dict = None):
+def record_log(
+    menu: str,
+    operate: str,
+    request,
+    user: dict = None,
+    status: int = 200,
+    get_details=_get_details,
+    get_operation_object=None,
+    workspace_id: str = "default",
+    operation_object: dict = None,
+):
     """
     手动记录审计日志（适用于无法使用装饰器的场景，如第三方登录回调）
 
@@ -154,7 +170,7 @@ def record_log(menu: str, operate: str, request, user: dict = None, status: int 
             ip_address=ip,
             details=details,
             operation_object=operation_object or {},
-            workspace_id=workspace_id
+            workspace_id=workspace_id,
         ).save()
     except Exception as e:
         # 日志记录失败不应影响主业务流程
