@@ -5,6 +5,7 @@ from enum import Enum
 import uuid_utils.compat as uuid
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
+from common.storage.rustfs import get_bucket, get_s3_client, is_rustfs_enabled
 from common.utils.common import get_sha256_hash
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
@@ -376,7 +377,8 @@ class File(AppModelMixin):
     source_id = models.CharField(
         verbose_name="资源id", default=FileSourceType.TEMPORARY_120_MINUTE.value, db_index=True
     )
-    loid = models.IntegerField(verbose_name="loid")
+    loid = models.IntegerField(verbose_name="loid", null=True, blank=True)
+    storage_type = models.CharField(max_length=16, default="pg", db_index=True)
     meta = models.JSONField(verbose_name="文件关联数据", default=dict)
 
     class Meta:
@@ -392,15 +394,21 @@ class File(AppModelMixin):
         if existing_file:
             self.loid = existing_file.loid
             self.file_size = existing_file.file_size
+            self.storage_type = existing_file.storage_type
             return super().save()
 
-        compressed_data = self._compress_data(bytea)
-        self.file_size = len(compressed_data)
+        if is_rustfs_enabled():
+            self.storage_type = "rustfs"
+            self.file_size = len(bytea)
+            self.loid = None
+            get_s3_client().put_object(Bucket=get_bucket(), Key=f"files/{self.id}", Body=bytea)
+        else:
+            self.storage_type = "pg"
+            compressed_data = self._compress_data(bytea)
+            self.file_size = len(compressed_data)
+            self.loid = self._create_large_object()
+            self._write_compressed_data(compressed_data)
 
-        self.loid = self._create_large_object()
-
-        self._write_compressed_data(compressed_data)
-        # 调用父类保存
         return super().save()
 
     def _compress_data(self, data, compression_level=9):
@@ -432,6 +440,12 @@ class File(AppModelMixin):
             )
 
     def get_bytes(self):
+        if self.storage_type == "rustfs":
+            from common.storage.rustfs import get_bucket, get_s3_client
+
+            resp = get_s3_client().get_object(Bucket=get_bucket(), Key=f"files/{self.id}")
+            return resp["Body"].read()
+
         buffer = io.BytesIO()
         for chunk in self.get_bytes_stream():
             buffer.write(chunk)
@@ -450,6 +464,11 @@ class File(AppModelMixin):
             return data
 
     def get_bytes_stream(self, start=0, end=None, chunk_size=64 * 1024):
+        if self.storage_type == "rustfs":
+            data = self.get_bytes()
+            yield data[start:end] if end else data[start:]
+            return
+
         def _read_with_offset():
             offset = start
             while True:
@@ -472,6 +491,14 @@ class File(AppModelMixin):
 
 @receiver(pre_delete, sender=File)
 def on_delete_file(sender, instance, **kwargs):
-    exist = QuerySet(File).filter(loid=instance.loid).exclude(id=instance.id).exists()
-    if not exist:
-        select_one(f"SELECT lo_unlink({instance.loid})", [])
+    if instance.storage_type == "rustfs":
+        shared = QuerySet(File).filter(sha256_hash=instance.sha256_hash).exclude(id=instance.id).exists()
+        if not shared:
+            try:
+                get_s3_client().delete_object(Bucket=get_bucket(), Key=f"files/{instance.id}")
+            except Exception:
+                pass
+    else:
+        exist = QuerySet(File).filter(loid=instance.loid).exclude(id=instance.id).exists()
+        if not exist:
+            select_one(f"SELECT lo_unlink({instance.loid})", [])

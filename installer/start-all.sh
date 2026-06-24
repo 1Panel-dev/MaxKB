@@ -25,11 +25,13 @@ if [ "$MAXKB_REDIS_HOST" = "127.0.0.1" ]; then
   wait-for-it 127.0.0.1:6379 --timeout=60 --strict -- echo -e "\033[1;32mRedis started.\033[0m"
 fi
 
-echo -e "\033[1;32mRustFS starting...\033[0m"
-/usr/bin/start-rustfs.sh &
-rustfs_pid=$!
-sleep 3
-wait-for-it 127.0.0.1:9000 --timeout=60 --strict -- echo -e "\033[1;32mRustFS started.\033[0m"
+if [ "$MAXKB_RUSTFS_HOST" = "127.0.0.1" ]; then
+  echo -e "\033[1;32mRustFS starting...\033[0m"
+  /usr/bin/start-rustfs.sh &
+  rustfs_pid=$!
+  sleep 3
+  wait-for-it 127.0.0.1:9000 --timeout=60 --strict -- echo -e "\033[1;32mRustFS started.\033[0m"
+fi
 
 echo -e "\033[1;32mMaxKB starting...\033[0m"
 /usr/bin/start-maxkb.sh &
