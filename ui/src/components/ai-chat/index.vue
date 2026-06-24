@@ -212,6 +212,7 @@
               :application="applicationDetails"
               :maxExposed="maxExposed"
               v-model:form-data="form_data"
+              :apiInput="isAPIInput"
               @openDialog="handleOpenDialog"
             >
             </InlineParams>
