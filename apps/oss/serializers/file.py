@@ -244,7 +244,7 @@ def get_url_content(url, application_id: str):
 
     final_host = urlparse(response.url).hostname
     if is_private_ip(final_host):
-        raise ValueError("Blocked unsafe redirect to internal host")
+        raise ValueError(_("Blocked unsafe redirect to internal host"))
     # 判断文件大小
     if int(response.headers.get('Content-Length', 0)) > file_limit:
         raise AppApiException(500, _('File size exceeds limit'))

@@ -41,7 +41,7 @@ model_info_list = [
     ),
     ModelInfo(
         'code-llama-instruct',
-        _('''       
+        _('''
 Code Llama Instruct is a fine-tuned version of Code Llama's instructions, designed to perform specific tasks.
         '''),
         ModelTypeConst.LLM,

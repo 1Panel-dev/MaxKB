@@ -661,7 +661,7 @@ msgstr "欄位僅支持自定義|引用"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:40
 msgid "{field}, this field is required."
-msgstr "{field_label} 欄位是必填項"
+msgstr "{field} 欄位是必填項"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:46
 msgid "function"
@@ -4328,7 +4328,7 @@ msgstr ""
 #: apps/models_provider/impl/openai_model_provider/credential/tti.py:29
 #: apps/models_provider/impl/siliconCloud_model_provider/credential/tti.py:29
 msgid ""
-"       \n"
+"\n"
 "By default, images are produced in standard quality, but with DALL·E 3 you "
 "can set quality: \"hd\" to enhance detail. Square, standard quality images "
 "are generated fastest.\n"
@@ -4896,7 +4896,7 @@ msgstr "Code Llama 是一個專門用於代碼生成的語言模型。"
 
 #: apps/models_provider/impl/xinference_model_provider/xinference_model_provider.py:44
 msgid ""
-"       \n"
+"\n"
 "Code Llama Instruct is a fine-tuned version of Code Llama's instructions, "
 "designed to perform specific tasks.\n"
 "        "
@@ -8628,6 +8628,9 @@ msgstr "API KEY"
 
 msgid "Download"
 msgstr "下載"
+
+msgid "User"
+msgstr "用戶"
 
 msgid "Delete personal system API_KEY"
 msgstr "删除個人系統API KEY"

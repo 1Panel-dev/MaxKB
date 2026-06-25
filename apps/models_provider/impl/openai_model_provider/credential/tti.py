@@ -25,7 +25,7 @@ class OpenAITTIModelParams(BaseForm):
     )
 
     quality = forms.SingleSelect(
-        TooltipLabel(_('Picture quality'), _('''       
+        TooltipLabel(_('Picture quality'), _('''
 By default, images are produced in standard quality, but with DALL·E 3 you can set quality: "hd" to enhance detail. Square, standard quality images are generated fastest.
         ''')),
         required=True,
