@@ -14,6 +14,15 @@ from xinference_client.client.restful.restful_client import RESTfulRerankModelHa
 
 from models_provider.base_model_provider import MaxKBBaseModel
 
+RESTfulClient = None
+try:
+    from xinference.client import RESTfulClient
+except ImportError:
+    try:
+        from xinference_client import RESTfulClient
+    except ImportError as e:
+        pass
+
 
 class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
     server_url: Optional[str]
@@ -31,21 +40,14 @@ class XInferenceReranker(MaxKBBaseModel, BaseDocumentCompressor):
 
     def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
             Sequence[Document]:
-        if documents is None or len(documents) == 0:
+        if not documents:
             return []
-        client: Any
-        if documents is None or len(documents) == 0:
-            return []
-        try:
-            from xinference.client import RESTfulClient
-        except ImportError:
-            try:
-                from xinference_client import RESTfulClient
-            except ImportError as e:
-                raise ImportError(
-                    "Could not import RESTfulClient from xinference. Please install it"
-                    " with `pip install xinference` or `pip install xinference_client`."
-                ) from e
+
+        if RESTfulClient is None:
+            raise ImportError(
+                "Could not import RESTfulClient from xinference. Please install it"
+                " with `pip install xinference` or `pip install xinference_client`."
+            ) from e
 
         client = RESTfulClient(self.server_url, self.api_key)
         model: RESTfulRerankModelHandle = client.get_model(self.model_uid)

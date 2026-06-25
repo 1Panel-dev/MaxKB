@@ -211,9 +211,8 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
     def generate_history_human_message_for_details(self, chat_record):
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'video_list' in data:
-                video_list = data['video_list'] or  []
-                # 增加对 None 和空列表的检查
-                if not video_list or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
+                video_list = data['video_list'] or []
+                if not video_list or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
                 file_id_list = []
                 url_list = []
@@ -242,8 +241,8 @@ class BaseVideoUnderstandNode(IVideoUnderstandNode):
 
         for data in chat_record.details.values():
             if self.node.id == data['node_id'] and 'video_list' in data:
-                video_list = data['video_list'] or  []
-                if video_list is None or len(video_list) == 0 or data['dialogue_type'] == 'WORKFLOW':
+                video_list = data['video_list'] or []
+                if not video_list or data['dialogue_type'] == 'WORKFLOW':
                     return HumanMessage(content=chat_record.problem_text)
                 file_id_list = []
                 url_list = []

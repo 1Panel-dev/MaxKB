@@ -27,10 +27,10 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 
 def get_embedding_id(dataset_id_list):
     dataset_list = QuerySet(Knowledge).filter(id__in=dataset_id_list)
+    if not dataset_list:
+        raise Exception("知识库设置错误,请重新设置知识库")
     if len(set([dataset.embedding_model_id for dataset in dataset_list])) > 1:
         raise Exception("关联知识库的向量模型不一致，无法召回分段。")
-    if len(dataset_list) == 0:
-        raise Exception("知识库设置错误,请重新设置知识库")
     return dataset_list[0].embedding_model_id
 
 
