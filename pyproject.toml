@@ -30,7 +30,7 @@ dependencies = [
     "langchain-ollama==1.1.0",
     "langchain-aws==1.6.0",
     "langgraph==1.2.6",
-    "deepagents==0.6.11",
+    "deepagents==0.6.12",
     "transformers==5.12.1",
     "torch==2.12.1",
     "qianfan==0.4.12.3",
