@@ -55,7 +55,7 @@ dependencies = [
     "pysilk==0.0.1",
     "gunicorn==26.0.0",
     "python-daemon==3.1.2",
-    "websockets==15.0.1",
+    "websockets==16.0",
     "ruff==0.15.19",
     "cohere==7.0.4",
     "jsonpath-ng==1.8.0",
