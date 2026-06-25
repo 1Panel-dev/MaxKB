@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       architecture:
-        description: 'Architecture'
+        description: "Architecture"
         required: true
-        default: 'linux/amd64'
+        default: "linux/amd64"
         type: choice
         options:
           - linux/amd64
@@ -27,13 +27,13 @@ jobs:
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
           TAG_NAME=python3.13-pg17.10-20260624
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
-          echo ::set-output name=docker_image::${DOCKER_IMAGE}
-          echo ::set-output name=version::${TAG_NAME}
-          echo ::set-output name=buildx_args::--platform ${DOCKER_PLATFORMS} --no-cache \
+          echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
+          echo "version=${TAG_NAME}" >> $GITHUB_OUTPUT
+          echo "buildx_args=--platform ${DOCKER_PLATFORMS} --no-cache \
             --build-arg VERSION=${TAG_NAME} \
             --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
             --build-arg VCS_REF=${GITHUB_SHA::8} \
-            ${DOCKER_IMAGE_TAGS} .
+            ${DOCKER_IMAGE_TAGS} ." >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v4
         with:
