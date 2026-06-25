@@ -60,8 +60,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
     @param workflow:           工作流管理器
     """
     response = node_variable.get("result")
-    answer = ""
-    reasoning_content = ""
+    answer_chunks = []
+    reasoning_content_chunks = []
     model_setting = node.context.get(
         "model_setting",
         {"reasoning_content_enable": False, "reasoning_content_end": "</think>", "reasoning_content_start": "<think>"},
@@ -81,10 +81,10 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
             reasoning_content_chunk = chunk.additional_kwargs.get("reasoning_content", "")
         else:
             reasoning_content_chunk = reasoning_chunk.get("reasoning_content")
-        answer += content_chunk
+        answer_chunks.append(content_chunk)
         if reasoning_content_chunk is None:
             reasoning_content_chunk = ""
-        reasoning_content += reasoning_content_chunk
+        reasoning_content_chunks.append(reasoning_content_chunk)
         yield {
             "content": content_chunk,
             "reasoning_content": reasoning_content_chunk
@@ -93,7 +93,7 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         }
 
     reasoning_chunk = reasoning.get_end_reasoning_content()
-    answer += reasoning_chunk.get("content")
+    answer_chunks.append(reasoning_chunk.get("content"))
     reasoning_content_chunk = ""
     if not response_reasoning_content:
         reasoning_content_chunk = reasoning_chunk.get("reasoning_content")
@@ -101,6 +101,8 @@ def write_context_stream(node_variable: Dict, workflow_variable: Dict, node: INo
         "content": reasoning_chunk.get("content"),
         "reasoning_content": reasoning_content_chunk if model_setting.get("reasoning_content_enable", False) else "",
     }
+    answer = "".join(answer_chunks)
+    reasoning_content = "".join(reasoning_content_chunks)
     _write_context(node_variable, workflow_variable, node, workflow, answer, reasoning_content)
 
 
@@ -525,12 +527,20 @@ class BaseChatNode(IChatNode):
         if isinstance(image, str) and image.startswith("http"):
             videos.append({"type": "video_url", "video_url": {"url": image}})
         elif image is not None and len(image) > 0:
+            # 先批量获取数据
+            file_ids = [img["file_id"] for img in image if "file_id" in img]
+            if file_ids:
+                files_map = {str(f.id): f for f in QuerySet(File).filter(id__in=file_ids)}
+            else:
+                files_map = {}
+            # 再循环从map中取数据进行处理
             for img in image:
                 if "file_id" in img:
                     file_id = img["file_id"]
-                    file = QuerySet(File).filter(id=file_id).first()
-                    url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
-                    videos.append({"type": "video_url", "video_url": {"url": url}})
+                    file = files_map.get(str(file_id))
+                    if file:
+                        url = video_model.upload_file_and_get_url(file.get_bytes(), file.file_name)
+                        videos.append({"type": "video_url", "video_url": {"url": url}})
                 elif "url" in img and img["url"].startswith("http"):
                     videos.append({"type": "video_url", "video_url": {"url": img["url"]}})
         return videos
@@ -543,16 +553,24 @@ class BaseChatNode(IChatNode):
         if isinstance(image, str) and image.startswith("http"):
             images.append({"type": "image_url", "image_url": {"url": image}})
         elif image is not None and len(image) > 0:
+            # 先批量获取数据
+            file_ids = [img["file_id"] for img in image if "file_id" in img]
+            if file_ids:
+                files_map = {str(f.id): f for f in QuerySet(File).filter(id__in=file_ids)}
+            else:
+                files_map = {}
+            # 再循环从map中取数据进行处理
             for img in image:
                 if "file_id" in img:
                     file_id = img["file_id"]
-                    file = QuerySet(File).filter(id=file_id).first()
-                    image_bytes = file.get_bytes()
-                    base64_image = base64.b64encode(image_bytes).decode("utf-8")
-                    image_format = what(None, image_bytes)
-                    images.append(
-                        {"type": "image_url", "image_url": {"url": f"data:image/{image_format};base64,{base64_image}"}}
-                    )
+                    file = files_map.get(str(file_id))
+                    if file:
+                        image_bytes = file.get_bytes()
+                        base64_image = base64.b64encode(image_bytes).decode("utf-8")
+                        image_format = what(None, image_bytes)
+                        images.append(
+                            {"type": "image_url", "image_url": {"url": f"data:image/{image_format};base64,{base64_image}"}}
+                        )
                 elif "url" in img and img["url"].startswith("http"):
                     images.append({"type": "image_url", "image_url": {"url": img["url"]}})
         return images

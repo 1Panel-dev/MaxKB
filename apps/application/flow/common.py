@@ -248,33 +248,56 @@ class Workflow:
     def is_valid_model_params(self):
         node_list = [node for node in self.nodes if (
                 node.type == 'ai-chat-node' or node.type == 'question-node' or node.type == 'parameter-extraction-node')]
+
+        model_ids = []
+        nodes_requiring_validation = []
         for node in node_list:
             if (node.properties.get('node_data', {}).get('model_id_type') or 'custom') == 'reference':
                 continue
-            model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
-            if model is None:
-                raise ValidationError(ErrorDetail(
-                    _('The node {node} model does not exist').format(node=node.properties.get("stepName"))))
-            credential = get_model_credential(model.provider, model.model_type, model.model_name)
-            model_params_setting = node.properties.get('node_data', {}).get('model_params_setting')
-            model_params_setting_form = credential.get_model_params_setting_form(
-                model.model_name)
-            if model_params_setting is None:
-                model_params_setting = model_params_setting_form.get_default_form_data()
-                node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
-            if node.properties.get('status', 200) != 200:
-                raise ValidationError(
-                    ErrorDetail(_("Node {node} is unavailable").format(node=node.properties.get("stepName"))))
+            model_id = node.properties.get('node_data', {}).get('model_id')
+            if model_id:
+                model_ids.append(model_id)
+                nodes_requiring_validation.append((node, model_id))
+        if model_ids:
+            # 先批量获取数据
+            models_map = {str(model.id): model for model in QuerySet(Model).filter(id__in=model_ids)}
+            # 再循环从map中取数据进行处理
+            for node, model_id in nodes_requiring_validation:
+                model = models_map.get(str(model_id))
+                if model is None:
+                    raise ValidationError(ErrorDetail(
+                        _('The node {node} model does not exist').format(node=node.properties.get("stepName"))))
+                credential = get_model_credential(model.provider, model.model_type, model.model_name)
+                model_params_setting = node.properties.get('node_data', {}).get('model_params_setting')
+                model_params_setting_form = credential.get_model_params_setting_form(
+                    model.model_name)
+                if model_params_setting is None:
+                    model_params_setting = model_params_setting_form.get_default_form_data()
+                    node.properties.get('node_data', {})['model_params_setting'] = model_params_setting
+                if node.properties.get('status', 200) != 200:
+                    raise ValidationError(
+                        ErrorDetail(_("Node {node} is unavailable").format(node=node.properties.get("stepName"))))
+
         node_list = [node for node in self.nodes if (node.type == 'function-lib-node')]
+
+        function_lib_ids = []
+        nodes_requiring_tool_validation = []
         for node in node_list:
             function_lib_id = node.properties.get('node_data', {}).get('function_lib_id')
             if function_lib_id is None:
                 raise ValidationError(ErrorDetail(
                     _('The library ID of node {node} cannot be empty').format(node=node.properties.get("stepName"))))
-            f_lib = QuerySet(Tool).filter(id=function_lib_id).first()
-            if f_lib is None:
-                raise ValidationError(ErrorDetail(_("The function library for node {node} is not available").format(
-                    node=node.properties.get("stepName"))))
+            function_lib_ids.append(function_lib_id)
+            nodes_requiring_tool_validation.append((node, function_lib_id))
+        if function_lib_ids:
+            # 先批量获取数据
+            tools_map = {str(tool.id): tool for tool in QuerySet(Tool).filter(id__in=function_lib_ids)}
+            # 再循环从map中取数据进行处理
+            for node, function_lib_id in nodes_requiring_tool_validation:
+                f_lib = tools_map.get(str(function_lib_id))
+                if f_lib is None:
+                    raise ValidationError(ErrorDetail(_("The function library for node {node} is not available").format(
+                        node=node.properties.get("stepName"))))
 
     def is_valid_base_node(self):
         base_node_list = [node for node in self.nodes if node.id == 'base-node']
