@@ -37,7 +37,7 @@ dependencies = [
     "zai-sdk==0.2.3",
     "volcengine-python-sdk[ark]==5.0.35",
     "boto3==1.43.36",
-    "tencentcloud-sdk-python==3.1.121",
+    "tencentcloud-sdk-python==3.1.122",
     "xinference-client==2.11.0",
     "anthropic==0.112.0",
     "dashscope==1.25.24",
