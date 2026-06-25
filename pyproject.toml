@@ -10,6 +10,7 @@ dependencies = [
     "drf-spectacular[sidecar]==0.29.0",
     "django-redis==7.0.0",
     "django-mptt==0.18.0",
+    "django-db-connection-pool==1.2.6",
     "djangorestframework==3.17.1",
     "psycopg[binary]==3.3.4",
     "python-dotenv==1.2.2",
