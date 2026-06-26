@@ -27,7 +27,7 @@ from common.utils.common import guess_image_format
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
 from common.utils.tool_code import ToolExecutor
-from knowledge.models import File
+from common.utils.logger import maxkb_logger
 from models_provider.models import Model
 from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
 from tools.models import Tool, ToolType
@@ -280,10 +280,12 @@ class BaseChatNode(IChatNode):
                 if tool is None:
                     continue
                 executor = ToolExecutor()
+                init_params_default_value = {i["field"]: i.get('default_value') for i in tool.init_field_list}
                 if tool.init_params is not None:
-                    tool_init_params = json.loads(rsa_long_decrypt(tool.init_params))
+                    tool_init_params = init_params_default_value | json.loads(rsa_long_decrypt(tool.init_params))
                 else:
-                    tool_init_params = {i["field"]: i.get('default_value') for i in tool.init_field_list}
+                    tool_init_params = init_params_default_value
+
                 tool_config = executor.get_tool_mcp_config(tool, tool_init_params)
 
                 mcp_servers_config[str(tool.id)] = tool_config
