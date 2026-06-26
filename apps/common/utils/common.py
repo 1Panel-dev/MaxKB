@@ -370,7 +370,7 @@ def post(post_function):
 
 
 def parse_md_image(content: str):
-    matches = re.finditer("!\[.*?\]\(.*?\)", content)
+    matches = re.finditer(r"!\[.*?\]\(.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
 
@@ -438,7 +438,7 @@ def flat_map(array: List[List]):
 
 
 def parse_image(content: str):
-    matches = re.finditer("!\[.*?\]\(\.\/oss\/(image|file)\/.*?\)", content)
+    matches = re.finditer(r"!\[.*?\]\(\.\/oss\/(image|file)\/.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
 
@@ -447,7 +447,7 @@ def parse_file_link(content: str):
     """Return non-image markdown links and HTML src refs pointing to ./oss/file/ paths."""
     results = []
     # Regular markdown links (not images): [text](./oss/file/...)
-    for m in re.finditer(r'(?<!!)\[.*?\]\(\.\/oss\/(?:image|file)\/[^)]+\)', content):
+    for m in re.finditer(r"(?<!!)\[.*?\]\(\.\/oss\/(?:image|file)\/[^)]+\)", content):
         results.append(m.group())
     # HTML tags with src pointing to oss paths, e.g. <video src="./oss/file/...">
     for m in re.finditer(r'<\w+[^>]+\bsrc=["\'](\./oss/(?:image|file)/[^"\']+)["\']', content):
