@@ -484,21 +484,6 @@ class BaseChatNode(IChatNode):
         return result
 
     def get_details(self, index: int, **kwargs):
-        tool_call_list = []
-        answer = self.context.get('answer', '')
-        if answer:
-            for match in re.finditer(
-                    r'<tool_calls_render>(.*?)</tool_calls_render>', answer, re.DOTALL
-            ):
-                try:
-                    tool_data = json.loads(match.group(1))
-                    tool_call_list.append({
-                        'name': tool_data.get('title', ''),
-                        'input': tool_data.get('content', {}).get('input', ''),
-                        'icon': tool_data.get('icon', ''),
-                    })
-                except (json.JSONDecodeError, Exception) as e:
-                    maxkb_logger.error(f"get_details error {e}")
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
@@ -507,7 +492,6 @@ class BaseChatNode(IChatNode):
             'history_message': self.context.get('history_message'),
             'question': self.context.get('question'),
             'answer': self.context.get('answer'),
-            'tool_call_list': tool_call_list,
             'reasoning_content': self.context.get('reasoning_content'),
             'enableException': self.node.properties.get('enableException'),
             'type': self.node.type,
