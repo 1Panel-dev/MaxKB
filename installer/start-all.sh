@@ -25,12 +25,12 @@ if [ "$MAXKB_REDIS_HOST" = "127.0.0.1" ]; then
   wait-for-it 127.0.0.1:6379 --timeout=60 --strict -- echo -e "\033[1;32mRedis started.\033[0m"
 fi
 
-if [ "$MAXKB_RUSTFS_ADDRESS" = "http://127.0.0.1:9000" ]; then
-  echo -e "\033[1;32mRustFS starting...\033[0m"
-  /usr/bin/start-rustfs.sh &
-  rustfs_pid=$!
+if [ "$MAXKB_S3_ENDPOINT" = "http://127.0.0.1:8333" ]; then
+  echo -e "\033[1;32mSeaweedFS starting...\033[0m"
+  /usr/bin/start-seaweedfs.sh &
+  seaweedfs_pid=$!
   sleep 3
-  wait-for-it 127.0.0.1:9000 --timeout=60 --strict -- echo -e "\033[1;32mRustFS started.\033[0m"
+  wait-for-it 127.0.0.1:8333 --timeout=60 --strict -- echo -e "\033[1;32mSeaweedFS started.\033[0m"
 fi
 
 echo -e "\033[1;32mMaxKB starting...\033[0m"
@@ -41,5 +41,5 @@ wait-for-it 127.0.0.1:8080 --timeout=180 --strict -- echo -e "\033[1;32mMaxKB st
 
 wait -n
 echo -e "\033[1;31mSystem is shutting down.\033[0m"
-kill $postgres_pid $redis_pid $rustfs_pid $maxkb_pid 2>/dev/null
+kill $postgres_pid $redis_pid $seaweedfs_pid $maxkb_pid 2>/dev/null
 wait

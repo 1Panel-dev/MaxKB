@@ -5,7 +5,7 @@ from enum import Enum
 import uuid_utils.compat as uuid
 from common.db.sql_execute import select_one
 from common.mixins.app_model_mixin import AppModelMixin
-from common.storage.rustfs import get_bucket, get_s3_client, is_rustfs_enabled
+from common.storage.seaweedfs import get_bucket, get_s3_client, is_seaweedfs_enabled
 from common.utils.common import get_sha256_hash
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
@@ -397,8 +397,8 @@ class File(AppModelMixin):
             self.storage_type = existing_file.storage_type
             return super().save()
 
-        if is_rustfs_enabled():
-            self.storage_type = "rustfs"
+        if is_seaweedfs_enabled():
+            self.storage_type = "seaweedfs"
             self.file_size = len(bytea)
             self.loid = None
             get_s3_client().put_object(Bucket=get_bucket(), Key=f"files/{self.id}", Body=bytea)
@@ -440,8 +440,8 @@ class File(AppModelMixin):
             )
 
     def get_bytes(self):
-        if self.storage_type == "rustfs":
-            from common.storage.rustfs import get_bucket, get_s3_client
+        if self.storage_type == "seaweedfs":
+            from common.storage.seaweedfs import get_bucket, get_s3_client
 
             resp = get_s3_client().get_object(Bucket=get_bucket(), Key=f"files/{self.id}")
             return resp["Body"].read()
@@ -464,7 +464,7 @@ class File(AppModelMixin):
             return data
 
     def get_bytes_stream(self, start=0, end=None, chunk_size=64 * 1024):
-        if self.storage_type == "rustfs":
+        if self.storage_type == "seaweedfs":
             data = self.get_bytes()
             yield data[start:end] if end else data[start:]
             return
@@ -491,7 +491,7 @@ class File(AppModelMixin):
 
 @receiver(pre_delete, sender=File)
 def on_delete_file(sender, instance, **kwargs):
-    if instance.storage_type == "rustfs":
+    if instance.storage_type == "seaweedfs":
         shared = QuerySet(File).filter(sha256_hash=instance.sha256_hash).exclude(id=instance.id).exists()
         if not shared:
             try:
