@@ -12,10 +12,10 @@ import json
 import re
 import time
 from functools import reduce
-from imghdr import what
 from typing import Dict, List
 
 from common.exception.app_exception import AppApiException
+from common.utils.common import guess_image_format
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.shared_resource_auth import filter_authorized_ids
@@ -549,7 +549,7 @@ class BaseChatNode(IChatNode):
                     file = QuerySet(File).filter(id=file_id).first()
                     image_bytes = file.get_bytes()
                     base64_image = base64.b64encode(image_bytes).decode("utf-8")
-                    image_format = what(None, image_bytes)
+                    image_format = guess_image_format(image_bytes)
                     images.append(
                         {"type": "image_url", "image_url": {"url": f"data:image/{image_format};base64,{base64_image}"}}
                     )
