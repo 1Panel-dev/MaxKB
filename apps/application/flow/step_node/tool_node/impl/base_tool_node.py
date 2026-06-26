@@ -100,8 +100,19 @@ class BaseToolNodeNode(IToolNode):
         params = {field.get('name'): convert_value(field.get('name'), field.get('value'), field.get('type'),
                                                    field.get('is_required'), field.get('source'), self)
                   for field in input_field_list}
-        result = function_executor.exec_code(code, params)
-        self.context['params'] = params
+        # 合并启动参数默认值（如果有 init_field_list 定义）
+        init_field_list = self.node_params.get('init_field_list', [])
+        if init_field_list:
+            init_params_default_value = {i["field"]: i.get('default_value') for i in init_field_list}
+            init_params = kwargs.get('init_params')
+            if init_params is not None:
+                all_params = init_params_default_value | init_params | params
+            else:
+                all_params = init_params_default_value | params
+        else:
+            all_params = params
+        result = function_executor.exec_code(code, all_params)
+        self.context['params'] = all_params
         return NodeResult({'result': result}, {}, _write_context=write_context)
 
     def get_details(self, index: int, **kwargs):

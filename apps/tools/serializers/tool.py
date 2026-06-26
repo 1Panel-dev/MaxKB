@@ -569,6 +569,7 @@ class ToolSerializer(serializers.Serializer):
             input_field_list = debug_instance.get("input_field_list")
             code = debug_instance.get("code")
             debug_field_list = debug_instance.get("debug_field_list")
+            init_field_list = debug_instance.get("init_field_list", [])
             init_params = debug_instance.get("init_params")
             params = {
                 field.get("name"): self.convert_value(
@@ -582,11 +583,13 @@ class ToolSerializer(serializers.Serializer):
                     for field in input_field_list
                 ]
             }
+            # 合并初始化参数（默认值 → 已保存的启动参数 → 运行时入参）
+            init_params_default_value = {i["field"]: i.get('default_value') for i in init_field_list}
             # 合并初始化参数
             if init_params is not None:
-                all_params = init_params | params
+                all_params = init_params_default_value | init_params | params
             else:
-                all_params = params
+                all_params = init_params_default_value | params
             return tool_executor.exec_code(code, all_params)
 
         @staticmethod
