@@ -354,17 +354,25 @@ function deleteInitField(index: any) {
 }
 
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
+  // 按文件唯一标识精确定位并移除当前文件
+  // 注意：不能使用 splice(-1, 1) 盲删末尾元素，文件夹上传时会误删正常文件而放走超限文件
+  const removeCurrentFile = () => {
+    const index = fileList.findIndex((item: any) => item.uid === file.uid)
+    if (index !== -1) {
+      fileList.splice(index, 1)
+    }
+  }
   //1、判断文件大小是否合法，文件限制不能大于100M
   const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
   if (!isLimit) {
     MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
-    fileList.splice(-1, 1) //移除当前超出大小的文件
+    removeCurrentFile() //移除当前超出大小的文件
     return false
   }
 
   if (file?.size === 0) {
     MsgError(t('views.document.upload.errorMessage3'))
-    fileList.splice(-1, 1)
+    removeCurrentFile()
     return false
   }
   if (fileList.length > 1) {
