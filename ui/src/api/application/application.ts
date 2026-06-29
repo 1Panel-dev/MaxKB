@@ -1,5 +1,15 @@
 import { Result } from '@/request/Result'
-import { get, post, postStream, del, put, request, download, exportFile } from '@/request/index'
+import {
+  get,
+  post,
+  postUpload,
+  postStream,
+  del,
+  put,
+  request,
+  download,
+  exportFile,
+} from '@/request/index'
 import type { pageRequest } from '@/api/type/common'
 import type { ApplicationFormType } from '@/api/type/application'
 import { type Ref } from 'vue'
@@ -417,6 +427,47 @@ const postUploadFile: (
   return post(`/oss/file`, fd, undefined, loading)
 }
 
+/**
+ * 上传文件（支持上传进度回调与中断）
+ * @param file
+ * @param sourceId
+ * @param resourceType
+ * @param onProgress 上传进度回调，参数为百分比(0-100)
+ * @param loading
+ * @returns 返回 { request, abort }，request 为异步 promise 对象，abort 用于中断上传
+ */
+const postUploadFileProgress: (
+  file: any,
+  sourceId: string,
+  resourceType:
+    | 'KNOWLEDGE'
+    | 'APPLICATION'
+    | 'TOOL'
+    | 'DOCUMENT'
+    | 'CHAT'
+    | 'TEMPORARY_30_MINUTE'
+    | 'TEMPORARY_120_MINUTE'
+    | 'TEMPORARY_1_DAY',
+  onProgress?: (percent: number, event: any) => void,
+  loading?: Ref<boolean>,
+) => { request: Promise<Result<any>>; abort: () => void } = (
+  file,
+  sourceId,
+  resourceType,
+  onProgress,
+  loading,
+) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('source_id', sourceId)
+  fd.append('source_type', resourceType)
+  return postUpload(`/oss/file`, fd, onProgress, undefined, loading)
+}
+
+const deleteFile: (file_id: string) => Promise<Result<any>> = (file_id) => {
+  return del(`/oss/file/${file_id}`)
+}
+
 const getFile: (application_id: string, params: any) => Promise<Result<any>> = (
   application_id,
   params,
@@ -495,6 +546,7 @@ export default {
   speechToText,
   getMcpTools,
   postUploadFile,
+  postUploadFileProgress,
   generate_prompt,
   getTokenUsage,
   topQuestions,
@@ -503,4 +555,5 @@ export default {
   delMulApplication,
   putMulMoveApplication,
   putMulCleanTime,
+  deleteFile,
 }

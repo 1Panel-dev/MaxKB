@@ -68,9 +68,18 @@ import { WorkflowType } from '@/enums/application'
 import { ComplexPermission, Permission } from '@/utils/permission/type'
 import { hasPermission } from '@/utils/permission'
 import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
-provide('upload', (file: any, loading?: Ref<boolean>) => {
-  return applicationApi.postUploadFile(file, id as string, 'KNOWLEDGE', loading)
-})
+provide(
+  'upload',
+  (file: any, onProgress?: (percent: number, event: any) => void, loading?: Ref<boolean>) => {
+    return applicationApi.postUploadFileProgress(
+      file,
+      id as string,
+      'KNOWLEDGE',
+      onProgress,
+      loading,
+    )
+  },
+)
 const router = useRouter()
 const route = useRoute()
 const key = ref<number>(0)
