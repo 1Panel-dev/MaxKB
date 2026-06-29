@@ -2,6 +2,7 @@ import { Result } from '@/request/Result'
 import {
   get,
   post,
+  postUpload,
   postStream,
   del,
   put,
@@ -342,6 +343,43 @@ const postUploadFile: (
   return post(`/oss/file`, fd, undefined, loading)
 }
 
+/**
+ * 上传文件（支持上传进度回调与中断）
+ * @param file
+ * @param sourceId  资源id
+ * @param resourceType  资源类型
+ * @param onProgress  上传进度回调，参数为百分比(0-100)
+ * @param loading
+ * @returns 返回 { request, abort }，request 为异步 promise 对象，abort 用于中断上传
+ */
+const postUploadFileProgress: (
+  file: any,
+  sourceId: string,
+  resourceType:
+    | 'KNOWLEDGE'
+    | 'APPLICATION'
+    | 'TOOL'
+    | 'DOCUMENT'
+    | 'CHAT'
+    | 'TEMPORARY_30_MINUTE'
+    | 'TEMPORARY_120_MINUTE'
+    | 'TEMPORARY_1_DAY',
+  onProgress?: (percent: number, event: any) => void,
+  loading?: Ref<boolean>,
+) => { request: Promise<Result<any>>; abort: () => void } = (
+  file,
+  sourceId,
+  sourceType,
+  onProgress,
+  loading,
+) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('source_id', sourceId)
+  fd.append('source_type', sourceType)
+  return postUpload(`/oss/file`, fd, onProgress, undefined, loading)
+}
+
 const getFile: (application_id: string, params: any) => Promise<Result<any>> = (
   application_id,
   params,
@@ -398,6 +436,7 @@ export default {
   clearChat,
   modifyChat,
   postUploadFile,
+  postUploadFileProgress,
   getFile,
   postShareChat,
   getShareLink,
