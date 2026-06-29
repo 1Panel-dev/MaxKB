@@ -8,7 +8,7 @@
       <template #title>
         <AppIcon v-if="menu.meta && menu.meta.icon" :iconName="menuIcon" class="sidebar-icon" />
 
-        <span>{{ $t(menu.meta?.title as string) }}</span>
+        <span class="lighter">{{ $t(menu.meta?.title as string) }}</span>
       </template>
       <sidebar-item
         v-hasPermission="child.meta?.permission"
@@ -81,7 +81,7 @@ const menuIcon = computed(() => {
   }
   .el-menu-item {
     padding: 13px 12px 13px 8px !important;
-    font-weight: 500;
+    font-weight: 400;
     border-radius: 4px;
     &:hover {
       background: rgba(var(--el-text-color-primary-rgb), 0.1);
@@ -103,6 +103,7 @@ const menuIcon = computed(() => {
   .el-menu-item.is-active {
     color: var(--el-color-primary);
     background: var(--el-color-primary-light-9);
+    font-weight: 500;
   }
 }
 </style>
