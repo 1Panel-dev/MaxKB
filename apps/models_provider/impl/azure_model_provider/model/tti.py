@@ -21,11 +21,11 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base')
-        self.api_version = kwargs.get('api_version')
-        self.model = kwargs.get('model')
-        self.params = kwargs.get('params')
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base")
+        self.api_version = kwargs.get("api_version")
+        self.model = kwargs.get("model")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -33,15 +33,15 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'size': '1024x1024', 'quality': 'auto', 'n': 1}}
+        optional_params = {"params": {"size": "1024x1024", "quality": "auto", "n": 1}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
         return AzureOpenAITextToImage(
             model=model_name,
-            api_base=model_credential.get('api_base'),
-            api_key=model_credential.get('api_key'),
-            api_version=model_credential.get('api_version'),
+            api_base=model_credential.get("api_base"),
+            api_key=model_credential.get("api_key"),
+            api_version=model_credential.get("api_version"),
             **optional_params,
         )
 
@@ -66,5 +66,3 @@ class AzureOpenAITextToImage(MaxKBBaseModel, BaseTextToImage):
             return file_urls
         except Exception as e:
             raise e
-
-

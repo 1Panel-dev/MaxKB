@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：
-    @file： default_tts.py
-    @date：2025/12/9
-    @desc: 讯飞 TTS 工厂类，根据 api_version 路由到具体实现
+@project: MaxKB
+@Author：
+@file： default_tts.py
+@date：2025/12/9
+@desc: 讯飞 TTS 工厂类，根据 api_version 路由到具体实现
 """
+
 from typing import Dict
 
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -30,25 +31,28 @@ class XFSparkDefaultTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         from models_provider.impl.xf_model_provider.model.tts import XFSparkTextToSpeech
         from models_provider.impl.xf_model_provider.model.tts.super_humanoid_tts import XFSparkSuperHumanoidTextToSpeech
 
-        api_version = model_credential.get('api_version', 'online')
+        api_version = model_credential.get("api_version", "online")
 
-        if api_version == 'super_humanoid':
+        if api_version == "super_humanoid":
             return XFSparkSuperHumanoidTextToSpeech(
-                spark_app_id=model_credential.get('spark_app_id'),
-                spark_api_key=model_credential.get('spark_api_key'),
-                spark_api_secret=model_credential.get('spark_api_secret'),
-                spark_api_url=model_credential.get('spark_api_url'),
-                params = model_kwargs,
-                **model_kwargs
+                spark_app_id=model_credential.get("spark_app_id"),
+                spark_api_key=model_credential.get("spark_api_key"),
+                spark_api_secret=model_credential.get("spark_api_secret"),
+                spark_api_url=model_credential.get("spark_api_url"),
+                params=model_kwargs,
+                **model_kwargs,
             )
         else:
             # 在线语音：从 credential 获取 vcn_online
             return XFSparkTextToSpeech(
-                spark_app_id=model_credential.get('spark_app_id'),
-                spark_api_key=model_credential.get('spark_api_key'),
-                spark_api_secret=model_credential.get('spark_api_secret'),
-                spark_api_url=model_credential.get('spark_api_url'),
-                params={key: v for key, v in model_kwargs.items() if
-            not ['parameter', 'streaming', 'model_id', 'use_local'].__contains__(key)},
-                **model_kwargs
+                spark_app_id=model_credential.get("spark_app_id"),
+                spark_api_key=model_credential.get("spark_api_key"),
+                spark_api_secret=model_credential.get("spark_api_secret"),
+                spark_api_url=model_credential.get("spark_api_url"),
+                params={
+                    key: v
+                    for key, v in model_kwargs.items()
+                    if not ["parameter", "streaming", "model_id", "use_local"].__contains__(key)
+                },
+                **model_kwargs,
             )

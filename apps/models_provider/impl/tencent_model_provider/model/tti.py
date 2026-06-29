@@ -1,7 +1,6 @@
 # coding=utf-8
 
 import json
-import logging
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -29,31 +28,34 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.hunyuan_secret_id = kwargs.get('hunyuan_secret_id')
-        self.hunyuan_secret_key = kwargs.get('hunyuan_secret_key')
-        self.model = kwargs.get('model_name')
-        self.params = kwargs.get('params')
+        self.hunyuan_secret_id = kwargs.get("hunyuan_secret_id")
+        self.hunyuan_secret_key = kwargs.get("hunyuan_secret_key")
+        self.model = kwargs.get("model_name")
+        self.params = kwargs.get("params")
 
     @staticmethod
-    def new_instance(model_type: str, model_name: str, model_credential: Dict[str, object],
-                     **model_kwargs) -> 'TencentTextToImageModel':
-        optional_params = {'params': {'Style': '201', 'Resolution': '768:768'}}
+    def new_instance(
+        model_type: str, model_name: str, model_credential: Dict[str, object], **model_kwargs
+    ) -> "TencentTextToImageModel":
+        optional_params = {"params": {"Style": "201", "Resolution": "768:768"}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
         return TencentTextToImageModel(
             model=model_name,
-            hunyuan_secret_id=model_credential.get('hunyuan_secret_id'),
-            hunyuan_secret_key=model_credential.get('hunyuan_secret_key'),
-            **optional_params
+            hunyuan_secret_id=model_credential.get("hunyuan_secret_id"),
+            hunyuan_secret_key=model_credential.get("hunyuan_secret_key"),
+            **optional_params,
         )
 
     def check_auth(self):
-        chat = ChatHunyuan(hunyuan_app_id='111111',
-                           hunyuan_secret_id=self.hunyuan_secret_id,
-                           hunyuan_secret_key=self.hunyuan_secret_key,
-                           model="hunyuan-standard")
-        res = chat.invoke(_('Hello'))
+        chat = ChatHunyuan(
+            hunyuan_app_id="111111",
+            hunyuan_secret_id=self.hunyuan_secret_id,
+            hunyuan_secret_key=self.hunyuan_secret_key,
+            model="hunyuan-standard",
+        )
+        res = chat.invoke(_("Hello"))
         # print(res)
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
@@ -74,12 +76,7 @@ class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
             # 实例化一个请求对象,每个接口都会对应一个request对象
             req = models.TextToImageLiteRequest()
-            params = {
-                "Prompt": prompt,
-                "NegativePrompt": negative_prompt,
-                "RspImgType": "url",
-                **self.params
-            }
+            params = {"Prompt": prompt, "NegativePrompt": negative_prompt, "RspImgType": "url", **self.params}
             req.from_json_string(json.dumps(params))
 
             # 返回的resp是一个TextToImageLiteResponse的实例，与请求对象对应

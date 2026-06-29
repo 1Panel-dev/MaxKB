@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 """
-@Project ：MaxKB 
+@Project ：MaxKB
 @File    ：llm.py
 @Author  ：Brian Yang
-@Date    ：5/12/24 7:44 AM 
+@Date    ：5/12/24 7:44 AM
 """
+
 import json
 from typing import Dict, Any
 
@@ -17,7 +18,6 @@ from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -28,18 +28,18 @@ class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
 
         deepseek_chat_open_ai = DeepSeekChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base') or 'https://api.deepseek.com',
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base") or "https://api.deepseek.com",
+            openai_api_key=model_credential.get("api_key"),
             **optional_params,
         )
         return deepseek_chat_open_ai
 
     def _get_request_payload(
-            self,
-            input_: LanguageModelInput,
-            *,
-            stop: list[str] | None = None,
-            **kwargs: Any,
+        self,
+        input_: LanguageModelInput,
+        *,
+        stop: list[str] | None = None,
+        **kwargs: Any,
     ) -> dict:
         # Get original messages to preserve reasoning_content before base conversion
         messages = self._convert_input(input_).to_messages()
@@ -50,9 +50,9 @@ class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
         reasoning_content_map = {}
         for i, msg in enumerate(messages):
             if (
-                    isinstance(msg, AIMessage)
-                    and (msg.tool_calls or msg.invalid_tool_calls)
-                    and (reasoning := msg.additional_kwargs.get("reasoning_content"))
+                isinstance(msg, AIMessage)
+                and (msg.tool_calls or msg.invalid_tool_calls)
+                and (reasoning := msg.additional_kwargs.get("reasoning_content"))
             ):
                 reasoning_content_map[i] = reasoning
 
@@ -62,20 +62,14 @@ class DeepSeekChatModel(MaxKBBaseModel, BaseChatOpenAI):
         # This is required by DeepSeek API - missing it causes 400 error
         if "messages" in payload and reasoning_content_map:
             for i, message in enumerate(payload["messages"]):
-                if (
-                        i in reasoning_content_map
-                        and message.get("role") == "assistant"
-                        and message.get("tool_calls")
-                ):
+                if i in reasoning_content_map and message.get("role") == "assistant" and message.get("tool_calls"):
                     message["reasoning_content"] = reasoning_content_map[i]
 
         # Apply DeepSeek-specific message formatting
         for message in payload["messages"]:
             if message["role"] == "tool" and isinstance(message["content"], list):
                 message["content"] = json.dumps(message["content"])
-            elif message["role"] == "assistant" and isinstance(
-                    message["content"], list
-            ):
+            elif message["role"] == "assistant" and isinstance(message["content"], list):
                 # DeepSeek API expects assistant content to be a string, not a list.
                 # Extract text blocks and join them, or use empty string if none exist.
                 text_parts = [

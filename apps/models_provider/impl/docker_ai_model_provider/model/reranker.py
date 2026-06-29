@@ -1,13 +1,14 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： siliconcloud_reranker.py
-    @date：2024/9/10 9:45
-    @desc: SiliconCloud 文档重排封装
+@project: MaxKB
+@Author：虎
+@file： siliconcloud_reranker.py
+@date：2024/9/10 9:45
+@desc: SiliconCloud 文档重排封装
 """
+
 import json
-from typing import Sequence, Optional, Any, Dict
+from typing import Sequence, Optional, Dict
 import requests
 
 from langchain_core.callbacks import Callbacks
@@ -25,22 +26,19 @@ class DockerAIReranker(MaxKBBaseModel, BaseDocumentCompressor):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return DockerAIReranker(
-            api_base=model_credential.get('api_base'),
-            model=model_name,
-            top_n=model_kwargs.get('top_n', 3)
+            api_base=model_credential.get("api_base"), model=model_name, top_n=model_kwargs.get("top_n", 3)
         )
 
-    def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
-            Sequence[Document]:
+    def compress_documents(
+        self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None
+    ) -> Sequence[Document]:
         if not documents:
             return []
 
         # 预处理文本
         texts = [doc.page_content for doc in documents]
 
-        headers = {
-            "Content-Type": "application/json"
-        }
+        headers = {"Content-Type": "application/json"}
         payload = {
             "model": self.model,
             "query": query,
@@ -58,8 +56,8 @@ class DockerAIReranker(MaxKBBaseModel, BaseDocumentCompressor):
         # 解析返回结果
         return [
             Document(
-                page_content=payload['documents'][item.get('index')],
-                metadata={'relevance_score': item.get('relevance_score')}
+                page_content=payload["documents"][item.get("index")],
+                metadata={"relevance_score": item.get("relevance_score")},
             )
-            for item in res.get('results', [])
+            for item in res.get("results", [])
         ]

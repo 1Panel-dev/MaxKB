@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2023/11/10 17:45
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2023/11/10 17:45
+@desc:
 """
+
 from typing import Dict
 
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -13,7 +14,6 @@ from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 class KimiChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -23,8 +23,8 @@ class KimiChatModel(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
 
         kimi_chat_open_ai = KimiChatModel(
-            openai_api_base=model_credential['api_base'],
-            openai_api_key=model_credential['api_key'],
+            openai_api_base=model_credential["api_base"],
+            openai_api_key=model_credential["api_key"],
             model=model_name,
             **optional_params,
         )

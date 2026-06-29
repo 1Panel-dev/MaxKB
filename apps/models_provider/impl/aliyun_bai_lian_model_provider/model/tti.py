@@ -18,10 +18,10 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base')
-        self.model_name = kwargs.get('model_name')
-        self.params = kwargs.get('params')
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base")
+        self.model_name = kwargs.get("model_name")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -29,17 +29,17 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'size': '1024*1024', 'n': 1}}
+        optional_params = {"params": {"size": "1024*1024", "n": 1}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
-        api_base = model_credential.get('api_base')
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
+        api_base = model_credential.get("api_base")
         if api_base is None:
-            api_base = 'https://dashscope.aliyuncs.com/api/v1'
+            api_base = "https://dashscope.aliyuncs.com/api/v1"
 
         chat_tong_yi = QwenTextToImageModel(
             model_name=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             api_base=api_base,
             **optional_params,
         )
@@ -66,91 +66,90 @@ class QwenTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
         import dashscope
+
         dashscope.base_http_api_url = self.api_base
         if self.model_name.startswith("wan2.6") or self.model_name.startswith("z"):
             from dashscope.api_entities.dashscope_response import Message
+
             # 以下为北京地域url，各地域的base_url不同
-            message = Message(
-                role="user",
-                content=[
-                    {
-                        'text': prompt
-                    }
-                ]
-            )
+            message = Message(role="user", content=[{"text": prompt}])
             rsp = ImageGeneration.call(
                 model=self.model_name,
                 api_key=self.api_key,
                 messages=[message],
                 negative_prompt=negative_prompt,
-                **self.params
+                **self.params,
             )
             file_urls = []
             if rsp.status_code == HTTPStatus.OK:
                 for result in rsp.output.choices:
                     if isinstance(result.message.content, list):
                         for item in result.message.content:
-                            if isinstance(item, dict) and item.get('image'):
-                                file_urls.append(item.get('image'))
+                            if isinstance(item, dict) and item.get("image"):
+                                file_urls.append(item.get("image"))
                     elif isinstance(result.message.content, dict):
-                        if result.message.content.get('image'):
-                            file_urls.append(result.message.content.get('image'))
+                        if result.message.content.get("image"):
+                            file_urls.append(result.message.content.get("image"))
             else:
-                maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                   (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                (rsp.status_code, rsp.code, rsp.message))
+                maxkb_logger.error(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
+                raise Exception(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
             return file_urls
         elif self.model_name.startswith("wan") or self.model_name.startswith("qwen-image-plus"):
-            rsp = ImageSynthesis.call(api_key=self.api_key,
-                                      model=self.model_name,
-                                      prompt=prompt,
-                                      negative_prompt=negative_prompt,
-                                      **self.params)
+            rsp = ImageSynthesis.call(
+                api_key=self.api_key,
+                model=self.model_name,
+                prompt=prompt,
+                negative_prompt=negative_prompt,
+                **self.params,
+            )
             file_urls = []
             if rsp.status_code == HTTPStatus.OK:
                 for result in rsp.output.results:
                     file_urls.append(result.url)
             else:
-                maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                   (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                (rsp.status_code, rsp.code, rsp.message))
+                maxkb_logger.error(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
+                raise Exception(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
             return file_urls
         elif self.model_name.startswith("qwen"):
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
+            messages = [{"role": "user", "content": [{"type": "text", "text": prompt}]}]
             rsp = MultiModalConversation.call(
                 api_key=self.api_key,
                 model=self.model_name,
                 messages=messages,
-                result_format='message',
+                result_format="message",
                 stream=False,
                 negative_prompt=negative_prompt,
-                **self.params
+                **self.params,
             )
             file_urls = []
             if rsp.status_code == HTTPStatus.OK:
                 for result in rsp.output.choices:
                     if isinstance(result.message.content, list):
                         for item in result.message.content:
-                            if isinstance(item, dict) and item.get('image'):
-                                file_urls.append(item.get('image'))
+                            if isinstance(item, dict) and item.get("image"):
+                                file_urls.append(item.get("image"))
                     elif isinstance(result.message.content, dict):
-                        if result.message.content.get('image'):
-                            file_urls.append(result.message.content.get('image'))
+                        if result.message.content.get("image"):
+                            file_urls.append(result.message.content.get("image"))
             else:
-                maxkb_logger.error('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                   (rsp.status_code, rsp.code, rsp.message))
-                raise Exception('sync_call Failed, status_code: %s, code: %s, message: %s' %
-                                (rsp.status_code, rsp.code, rsp.message))
+                maxkb_logger.error(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
+                raise Exception(
+                    "sync_call Failed, status_code: %s, code: %s, message: %s"
+                    % (rsp.status_code, rsp.code, rsp.message)
+                )
             return file_urls

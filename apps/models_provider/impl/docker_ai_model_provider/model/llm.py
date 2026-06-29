@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/4/18 15:28
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2024/4/18 15:28
+@desc:
 """
+
 from typing import List, Dict
 
 from langchain_core.messages import BaseMessage, get_buffer_string
@@ -21,7 +22,6 @@ def custom_get_token_ids(text: str):
 
 
 class DockerAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -29,13 +29,13 @@ class DockerAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        streaming = model_kwargs.get('streaming', True)
-        if 'o1' in model_name:
+        streaming = model_kwargs.get("streaming", True)
+        if "o1" in model_name:
             streaming = False
         chat_open_ai = DockerAIChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
             streaming=streaming,
             custom_get_token_ids=custom_get_token_ids,
             **optional_params,
@@ -45,13 +45,13 @@ class DockerAIChatModel(MaxKBBaseModel, BaseChatOpenAI):
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
             return super().get_num_tokens_from_messages(messages)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
         try:
             return super().get_num_tokens(text)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))

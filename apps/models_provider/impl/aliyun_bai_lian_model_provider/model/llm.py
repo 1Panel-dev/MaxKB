@@ -21,18 +21,18 @@ class BaiLianChatModel(MaxKBBaseModel, BaseChatOpenAI):
         #     optional_params['streaming'] = True
         return BaiLianChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
             streaming=True,
             **optional_params,
         )
 
     def _get_request_payload(
-            self,
-            input_: LanguageModelInput,
-            *,
-            stop: list[str] | None = None,
-            **kwargs: Any,
+        self,
+        input_: LanguageModelInput,
+        *,
+        stop: list[str] | None = None,
+        **kwargs: Any,
     ) -> dict:
         # Collect reasoning_content from AIMessages with tool_calls before base conversion.
         # When enable_thinking=true, Bailian API requires reasoning_content on any assistant
@@ -40,12 +40,8 @@ class BaiLianChatModel(MaxKBBaseModel, BaseChatOpenAI):
         messages = self._convert_input(input_).to_messages()
         reasoning_content_map = {}
         for i, msg in enumerate(messages):
-            if (
-                    isinstance(msg, AIMessage)
-                    and (msg.tool_calls or msg.invalid_tool_calls)
-            ):
-                reasoning_content_map[i] = msg.additional_kwargs.get(
-                    "reasoning_content") or ""
+            if isinstance(msg, AIMessage) and (msg.tool_calls or msg.invalid_tool_calls):
+                reasoning_content_map[i] = msg.additional_kwargs.get("reasoning_content") or ""
 
         payload = super()._get_request_payload(input_, stop=stop, **kwargs)
 
@@ -53,11 +49,7 @@ class BaiLianChatModel(MaxKBBaseModel, BaseChatOpenAI):
         # Bailian deepseek thinking mode does not reject the request with a 400 error.
         if "messages" in payload and reasoning_content_map:
             for i, message in enumerate(payload["messages"]):
-                if (
-                        i in reasoning_content_map
-                        and message.get("role") == "assistant"
-                        and message.get("tool_calls")
-                ):
+                if i in reasoning_content_map and message.get("role") == "assistant" and message.get("tool_calls"):
                     message["reasoning_content"] = reasoning_content_map[i]
 
         return payload

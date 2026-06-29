@@ -6,12 +6,12 @@ requires Python 3.6 or later
 pip install asyncio
 pip install websockets
 """
+
 import asyncio
 import base64
 import gzip
 import hmac
 import json
-import logging
 import os
 import ssl
 import uuid_utils.compat as uuid
@@ -70,13 +70,13 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 
 def generate_header(
-        version=PROTOCOL_VERSION,
-        message_type=CLIENT_FULL_REQUEST,
-        message_type_specific_flags=NO_SEQUENCE,
-        serial_method=JSON,
-        compression_type=GZIP,
-        reserved_data=0x00,
-        extension_header=bytes()
+    version=PROTOCOL_VERSION,
+    message_type=CLIENT_FULL_REQUEST,
+    message_type_specific_flags=NO_SEQUENCE,
+    serial_method=JSON,
+    compression_type=GZIP,
+    reserved_data=0x00,
+    extension_header=bytes(),
 ):
     """
     protocol_version(4 bits), header_size(4 bits),
@@ -100,16 +100,11 @@ def generate_full_default_header():
 
 
 def generate_audio_default_header():
-    return generate_header(
-        message_type=CLIENT_AUDIO_ONLY_REQUEST
-    )
+    return generate_header(message_type=CLIENT_AUDIO_ONLY_REQUEST)
 
 
 def generate_last_audio_default_header():
-    return generate_header(
-        message_type=CLIENT_AUDIO_ONLY_REQUEST,
-        message_type_specific_flags=NEG_SEQUENCE
-    )
+    return generate_header(message_type=CLIENT_AUDIO_ONLY_REQUEST, message_type_specific_flags=NEG_SEQUENCE)
 
 
 def parse_response(res):
@@ -122,14 +117,14 @@ def parse_response(res):
     payload 类似与http 请求体
     """
     protocol_version = res[0] >> 4
-    header_size = res[0] & 0x0f
+    header_size = res[0] & 0x0F
     message_type = res[1] >> 4
-    message_type_specific_flags = res[1] & 0x0f
+    message_type_specific_flags = res[1] & 0x0F
     serialization_method = res[2] >> 4
-    message_compression = res[2] & 0x0f
+    message_compression = res[2] & 0x0F
     reserved = res[3]
-    header_extensions = res[4:header_size * 4]
-    payload = res[header_size * 4:]
+    header_extensions = res[4 : header_size * 4]
+    payload = res[header_size * 4 :]
     result = {}
     payload_msg = None
     payload_size = 0
@@ -138,13 +133,13 @@ def parse_response(res):
         payload_msg = payload[4:]
     elif message_type == SERVER_ACK:
         seq = int.from_bytes(payload[:4], "big", signed=True)
-        result['seq'] = seq
+        result["seq"] = seq
         if len(payload) >= 8:
             payload_size = int.from_bytes(payload[4:8], "big", signed=False)
             payload_msg = payload[8:]
     elif message_type == SERVER_ERROR_RESPONSE:
         code = int.from_bytes(payload[:4], "big", signed=False)
-        result['code'] = code
+        result["code"] = code
         payload_size = int.from_bytes(payload[4:8], "big", signed=False)
         payload_msg = payload[8:]
         maxkb_logger.error(f"Error code: {code}, message: {payload_msg}")
@@ -156,14 +151,14 @@ def parse_response(res):
         payload_msg = json.loads(str(payload_msg, "utf-8"))
     elif serialization_method != NO_SERIALIZATION:
         payload_msg = str(payload_msg, "utf-8")
-    result['payload_msg'] = payload_msg
-    result['payload_size'] = payload_size
+    result["payload_msg"] = payload_msg
+    result["payload_size"] = payload_size
     return result
 
 
 def read_wav_info(data: bytes = None) -> (int, int, int, int, int):
     with BytesIO(data) as _f:
-        wave_fp = wave.open(_f, 'rb')
+        wave_fp = wave.open(_f, "rb")
         nchannels, sampwidth, framerate, nframes = wave_fp.getparams()[:4]
         wave_bytes = wave_fp.readframes(nframes)
     return nchannels, sampwidth, framerate, nframes, len(wave_bytes)
@@ -196,11 +191,11 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.volcanic_api_url = kwargs.get('volcanic_api_url')
-        self.volcanic_token = kwargs.get('volcanic_token')
-        self.volcanic_app_id = kwargs.get('volcanic_app_id')
-        self.volcanic_cluster = kwargs.get('volcanic_cluster')
-        self.params = kwargs.get('params')
+        self.volcanic_api_url = kwargs.get("volcanic_api_url")
+        self.volcanic_token = kwargs.get("volcanic_token")
+        self.volcanic_app_id = kwargs.get("volcanic_app_id")
+        self.volcanic_cluster = kwargs.get("volcanic_cluster")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -209,49 +204,47 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if "max_tokens" in model_kwargs and model_kwargs["max_tokens"] is not None:
+            optional_params["max_tokens"] = model_kwargs["max_tokens"]
+        if "temperature" in model_kwargs and model_kwargs["temperature"] is not None:
+            optional_params["temperature"] = model_kwargs["temperature"]
         return VolcanicEngineSpeechToText(
-            volcanic_api_url=model_credential.get('volcanic_api_url'),
-            volcanic_token=model_credential.get('volcanic_token'),
-            volcanic_app_id=model_credential.get('volcanic_app_id'),
-            volcanic_cluster=model_credential.get('volcanic_cluster'),
+            volcanic_api_url=model_credential.get("volcanic_api_url"),
+            volcanic_token=model_credential.get("volcanic_token"),
+            volcanic_app_id=model_credential.get("volcanic_app_id"),
+            volcanic_cluster=model_credential.get("volcanic_cluster"),
             params=model_kwargs,
             **model_kwargs,
-            **optional_params
+            **optional_params,
         )
 
     def construct_request(self, reqid):
 
         params = self.params or {}
         req = {
-            'app': {
-                'appid': self.volcanic_app_id,
-                'cluster': self.volcanic_cluster,
-                'token': self.volcanic_token,
+            "app": {
+                "appid": self.volcanic_app_id,
+                "cluster": self.volcanic_cluster,
+                "token": self.volcanic_token,
             },
-            'user': {
-                'uid': params.get("uid", "streaming_asr_demo")
+            "user": {"uid": params.get("uid", "streaming_asr_demo")},
+            "request": {
+                "reqid": reqid,
+                "nbest": params.get("nbest", self.nbest),
+                "workflow": params.get("workflow", self.workflow),
+                "show_language": params.get("show_language", self.show_language),
+                "show_utterances": params.get("show_utterances", self.show_utterances),
+                "result_type": params.get("result_type", self.result_type),
+                "sequence": params.get("sequence", 1),
             },
-            'request': {
-                'reqid': reqid,
-                'nbest': params.get('nbest', self.nbest),
-                'workflow': params.get('workflow', self.workflow),
-                'show_language': params.get('show_language', self.show_language),
-                'show_utterances': params.get('show_utterances', self.show_utterances),
-                'result_type': params.get('result_type', self.result_type),
-                'sequence': params.get('sequence', 1)
+            "audio": {
+                "format": params.get("format", self.format),
+                "rate": params.get("rate", self.rate),
+                "language": params.get("language", self.language),
+                "bits": params.get("bits", self.bits),
+                "channel": params.get("channel", self.channel),
+                "codec": params.get("codec", self.codec),
             },
-            'audio': {
-                'format': params.get('format', self.format),
-                'rate': params.get('rate', self.rate),
-                'language': params.get('language', self.language),
-                'bits': params.get('bits', self.bits),
-                'channel': params.get('channel', self.channel),
-                'codec': params.get('codec', self.codec)
-            }
         }
         return req
 
@@ -266,34 +259,33 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         data_len = len(data)
         offset = 0
         while offset + chunk_size < data_len:
-            yield data[offset: offset + chunk_size], False
+            yield data[offset : offset + chunk_size], False
             offset += chunk_size
         else:
-            yield data[offset: data_len], True
+            yield data[offset:data_len], True
 
     def _real_processor(self, request_params: dict) -> dict:
         pass
 
     def token_auth(self):
-        return {'Authorization': 'Bearer; {}'.format(self.volcanic_token)}
+        return {"Authorization": "Bearer; {}".format(self.volcanic_token)}
 
     def signature_auth(self, data):
         header_dicts = {
-            'Custom': 'auth_custom',
+            "Custom": "auth_custom",
         }
 
         url_parse = urlparse(self.volcanic_api_url)
-        input_str = 'GET {} HTTP/1.1\n'.format(url_parse.path)
-        auth_headers = 'Custom'
-        for header in auth_headers.split(','):
-            input_str += '{}\n'.format(header_dicts[header])
-        input_data = bytearray(input_str, 'utf-8')
+        input_str = "GET {} HTTP/1.1\n".format(url_parse.path)
+        auth_headers = "Custom"
+        for header in auth_headers.split(","):
+            input_str += "{}\n".format(header_dicts[header])
+        input_data = bytearray(input_str, "utf-8")
         input_data += data
-        mac = base64.urlsafe_b64encode(
-            hmac.new(self.secret.encode('utf-8'), input_data, digestmod=sha256).digest())
-        header_dicts['Authorization'] = 'HMAC256; access_token="{}"; mac="{}"; h="{}"'.format(self.volcanic_token,
-                                                                                              str(mac, 'utf-8'),
-                                                                                              auth_headers)
+        mac = base64.urlsafe_b64encode(hmac.new(self.secret.encode("utf-8"), input_data, digestmod=sha256).digest())
+        header_dicts["Authorization"] = 'HMAC256; access_token="{}"; mac="{}"; h="{}"'.format(
+            self.volcanic_token, str(mac, "utf-8"), auth_headers
+        )
         return header_dicts
 
     async def segment_data_processor(self, wav_data: bytes, segment_size: int):
@@ -303,41 +295,43 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         payload_bytes = str.encode(json.dumps(request_params))
         payload_bytes = gzip.compress(payload_bytes)
         full_client_request = bytearray(generate_full_default_header())
-        full_client_request.extend((len(payload_bytes)).to_bytes(4, 'big'))  # payload size(4 bytes)
+        full_client_request.extend((len(payload_bytes)).to_bytes(4, "big"))  # payload size(4 bytes)
         full_client_request.extend(payload_bytes)  # payload
         header = None
         if self.auth_method == "token":
             header = self.token_auth()
         elif self.auth_method == "signature":
             header = self.signature_auth(full_client_request)
-        async with websockets.connect(self.volcanic_api_url, additional_headers=header, max_size=1000000000,
-                                      ssl=ssl_context) as ws:
+        async with websockets.connect(
+            self.volcanic_api_url, additional_headers=header, max_size=1000000000, ssl=ssl_context
+        ) as ws:
             # 发送 full client request
             await ws.send(full_client_request)
             res = await ws.recv()
             result = parse_response(res)
-            if 'payload_msg' in result and result['payload_msg']['code'] != self.success_code:
+            if "payload_msg" in result and result["payload_msg"]["code"] != self.success_code:
                 raise Exception(
-                    f"Error code: {result['payload_msg']['code']}, message: {result['payload_msg']['message']}")
+                    f"Error code: {result['payload_msg']['code']}, message: {result['payload_msg']['message']}"
+                )
             for seq, (chunk, last) in enumerate(VolcanicEngineSpeechToText.slice_data(wav_data, segment_size), 1):
                 # if no compression, comment this line
                 payload_bytes = gzip.compress(chunk)
                 audio_only_request = bytearray(generate_audio_default_header())
                 if last:
                     audio_only_request = bytearray(generate_last_audio_default_header())
-                audio_only_request.extend((len(payload_bytes)).to_bytes(4, 'big'))  # payload size(4 bytes)
+                audio_only_request.extend((len(payload_bytes)).to_bytes(4, "big"))  # payload size(4 bytes)
                 audio_only_request.extend(payload_bytes)  # payload
                 # 发送 audio-only client request
                 await ws.send(audio_only_request)
                 res = await ws.recv()
                 result = parse_response(res)
-                if 'payload_msg' in result and result['payload_msg']['code'] != self.success_code:
+                if "payload_msg" in result and result["payload_msg"]["code"] != self.success_code:
                     return result
-        return result['payload_msg']['result'][0]['text']
+        return result["payload_msg"]["result"][0]["text"]
 
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+        with open(f"{cwd}/iat_mp3_16k.mp3", "rb") as f:
             self.speech_to_text(f)
 
     def speech_to_text(self, file):
@@ -348,8 +342,7 @@ class VolcanicEngineSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             return asyncio.run(self.segment_data_processor(audio_data, segment_size))
         if self.format != "wav":
             raise Exception("format should in wav or mp3")
-        nchannels, sampwidth, framerate, nframes, wav_len = read_wav_info(
-            audio_data)
+        nchannels, sampwidth, framerate, nframes, wav_len = read_wav_info(audio_data)
         size_per_sec = nchannels * sampwidth * framerate
         segment_size = int(size_per_sec * self.seg_duration / 1000)
         return asyncio.run(self.segment_data_processor(audio_data, segment_size))

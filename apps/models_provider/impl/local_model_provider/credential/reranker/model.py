@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： model.py
-    @date：2025/11/7 14:23
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： model.py
+@date：2025/11/7 14:23
+@desc:
 """
+
 from typing import Dict
 
 from langchain_core.documents import Document
@@ -20,40 +21,52 @@ from common.utils.logger import maxkb_logger
 
 
 class LocalRerankerModelParams(BaseForm):
-    top_n = forms.SliderField(TooltipLabel(_('Top N'),
-                                           _('Number of top documents to return after reranking')),
-                              required=True, default_value=3,
-                              _min=1,
-                              _max=100,
-                              _step=1,
-                              precision=0)
+    top_n = forms.SliderField(
+        TooltipLabel(_("Top N"), _("Number of top documents to return after reranking")),
+        required=True,
+        default_value=3,
+        _min=1,
+        _max=100,
+        _step=1,
+        precision=0,
+    )
 
 
 class LocalRerankerCredential(BaseForm, BaseModelCredential):
-
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
-                 raise_exception=False):
-        if not model_type == 'RERANKER':
-            raise AppApiException(ValidCode.valid_error.value,
-                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
-        for key in ['cache_dir']:
+    def is_valid(
+        self,
+        model_type: str,
+        model_name,
+        model_credential: Dict[str, object],
+        model_params,
+        provider,
+        raise_exception=False,
+    ):
+        if not model_type == "RERANKER":
+            raise AppApiException(
+                ValidCode.valid_error.value,
+                gettext("{model_type} Model type is not supported").format(model_type=model_type),
+            )
+        for key in ["cache_dir"]:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
                 else:
                     return False
         try:
             model: LocalReranker = provider.get_model(model_type, model_name, model_credential)
-            model.compress_documents([Document(page_content=gettext('Hello'))], gettext('Hello'))
+            model.compress_documents([Document(page_content=gettext("Hello"))], gettext("Hello"))
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      gettext(
-                                          'Verification failed, please check whether the parameters are correct: {error}').format(
-                                          error=str(e)))
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    gettext("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
+                )
             else:
                 return False
         return True
@@ -61,7 +74,7 @@ class LocalRerankerCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return model
 
-    cache_dir = forms.TextInputField(_('Model catalog'), required=True)
+    cache_dir = forms.TextInputField(_("Model catalog"), required=True)
 
     def get_model_params_setting_form(self, model_name: str) -> LocalRerankerModelParams:
         return LocalRerankerModelParams()

@@ -1,4 +1,3 @@
- 
 from typing import Dict, List
 
 from langchain_core.embeddings import Embeddings
@@ -23,16 +22,14 @@ class TencentEmbeddingModel(MaxKBBaseModel, Embeddings):
         self.secret_id = secret_id
         self.secret_key = secret_key
         self.model_name = model_name
-        cred = credential.Credential(
-            secret_id, secret_key
-        )
+        cred = credential.Credential(secret_id, secret_key)
         self.client = HunyuanClient(cred, "")
 
     @staticmethod
     def new_instance(model_type: str, model_name: str, model_credential: Dict[str, str], **model_kwargs):
         return TencentEmbeddingModel(
-            secret_id=model_credential.get('SecretId'),
-            secret_key=model_credential.get('SecretKey'),
+            secret_id=model_credential.get("SecretId"),
+            secret_key=model_credential.get("SecretKey"),
             model_name=model_name,
         )
 

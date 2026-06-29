@@ -14,15 +14,13 @@ class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        return OllamaReranker(
-            model=model_name,
-            base_url=model_credential.get('api_base'),
-            **optional_params
-        )
+        return OllamaReranker(model=model_name, base_url=model_credential.get("api_base"), **optional_params)
 
-    def compress_documents(self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None) -> \
-            Sequence[Document]:
+    def compress_documents(
+        self, documents: Sequence[Document], query: str, callbacks: Optional[Callbacks] = None
+    ) -> Sequence[Document]:
         from sklearn.metrics.pairwise import cosine_similarity
+
         """Rank documents based on their similarity to the query.
 
               Args:
@@ -38,11 +36,11 @@ class OllamaReranker(MaxKBBaseModel, OllamaEmbeddings, BaseModel):
         document_embeddings = self.embed_documents(documents)
         # 计算相似度
         similarities = cosine_similarity([query_embedding], document_embeddings)[0]
-        ranked_docs = [(doc, _) for _, doc in sorted(zip(similarities, documents), reverse=True)][:self.top_n]
+        ranked_docs = [(doc, _) for _, doc in sorted(zip(similarities, documents), reverse=True)][: self.top_n]
         return [
             Document(
                 page_content=doc,  # 第一个值是文档内容
-                metadata={'relevance_score': score}  # 第二个值是相似度分数
+                metadata={"relevance_score": score},  # 第二个值是相似度分数
             )
             for doc, score in ranked_docs
         ]

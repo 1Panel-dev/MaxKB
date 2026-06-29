@@ -18,8 +18,8 @@ class XinferenceEmbedding(MaxKBBaseModel, Embeddings):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return XinferenceEmbedding(
             model_uid=model_name,
-            server_url=model_credential.get('api_base'),
-            api_key=model_credential.get('api_key'),
+            server_url=model_credential.get("api_base"),
+            api_key=model_credential.get("api_key"),
         )
 
     def down_model(self):
@@ -31,8 +31,7 @@ class XinferenceEmbedding(MaxKBBaseModel, Embeddings):
         thread.start()
 
     def __init__(
-            self, server_url: Optional[str] = None, model_uid: Optional[str] = None,
-            api_key: Optional[str] = None
+        self, server_url: Optional[str] = None, model_uid: Optional[str] = None, api_key: Optional[str] = None
     ):
         try:
             from xinference.client import RESTfulClient
@@ -69,9 +68,7 @@ class XinferenceEmbedding(MaxKBBaseModel, Embeddings):
 
         model = self.client.get_model(self.model_uid)
 
-        embeddings = [
-            model.create_embedding(text)["data"][0]["embedding"] for text in texts
-        ]
+        embeddings = [model.create_embedding(text)["data"][0]["embedding"] for text in texts]
         return [list(map(float, e)) for e in embeddings]
 
     def embed_query(self, text: str) -> List[float]:

@@ -1,10 +1,10 @@
-#coding=utf-8
+# coding=utf-8
 """
-    @project: MaxKB
-    @Author：niu
-    @file： __init__.py.py
-    @date：2025/12/5 15:39
-    @desc:
+@project: MaxKB
+@Author：niu
+@file： __init__.py.py
+@date：2025/12/5 15:39
+@desc:
 """
 
 from .asr_stt import AliyunBaiLianAsrSpeechToText

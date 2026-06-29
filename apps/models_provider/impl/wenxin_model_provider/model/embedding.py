@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： embedding.py
-    @date：2024/10/17 16:48
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： embedding.py
+@date：2024/10/17 16:48
+@desc:
 """
+
 from typing import Dict, List
 
 import openai
@@ -19,8 +20,8 @@ class QianfanV1Embeddings(MaxKBBaseModel, QianfanEmbeddingsEndpoint):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return QianfanV1Embeddings(
             model=model_name,
-            qianfan_ak=model_credential.get('qianfan_ak'),
-            qianfan_sk=model_credential.get('qianfan_sk'),
+            qianfan_ak=model_credential.get("qianfan_ak"),
+            qianfan_sk=model_credential.get("qianfan_sk"),
         )
 
 
@@ -38,9 +39,9 @@ class QianfanV2EmbeddingModel(MaxKBBaseModel):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return QianfanV2EmbeddingModel(
-            api_key=model_credential.get('qianfan_ak'),
+            api_key=model_credential.get("qianfan_ak"),
             model_name=model_name,
-            base_url=model_credential.get('api_base'),
+            base_url=model_credential.get("api_base"),
         )
 
     def embed_query(self, text: str):
@@ -48,7 +49,8 @@ class QianfanV2EmbeddingModel(MaxKBBaseModel):
         return res[0]
 
     def embed_documents(
-            self, texts: List[ str],
+        self,
+        texts: List[str],
     ) -> List[List[float]]:
         res = self.client.create(input=texts, model=self.model_name, encoding_format="float")
         return [e.embedding for e in res.data]
