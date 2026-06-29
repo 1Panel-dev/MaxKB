@@ -3,7 +3,7 @@ import { t } from '@/locales'
 export const themeList = [
   {
     label: t('theme.default'),
-    value: '#3370FF',
+    value: '#1A6DFF',
     loginBackground: 'default',
   },
   {
@@ -51,15 +51,55 @@ export const defaultPlatformSetting = {
 }
 
 export function hexToRgba(hex?: string, alpha?: number) {
-  // 将16进制颜色值的两个字符一起转换成十进制
   if (!hex) {
     return ''
   } else {
     const r = parseInt(hex.slice(1, 3), 16)
     const g = parseInt(hex.slice(3, 5), 16)
     const b = parseInt(hex.slice(5, 7), 16)
-
-    // 返回RGBA格式的字符串
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
   }
+}
+
+// ===== 暗色模式 =====
+export type DarkModeType = 'light' | 'dark' | 'system'
+
+const DARK_MODE_KEY = 'MaxKB-dark-mode'
+
+export function getDarkMode(): DarkModeType {
+  return (localStorage.getItem(DARK_MODE_KEY) as DarkModeType) || 'light'
+}
+
+export function setDarkMode(mode: DarkModeType) {
+  localStorage.setItem(DARK_MODE_KEY, mode)
+  applyDarkMode(mode)
+}
+
+export function applyDarkMode(mode?: DarkModeType) {
+  const currentMode = mode || getDarkMode()
+  const root = document.documentElement
+
+  if (currentMode === 'dark') {
+    root.setAttribute('data-theme', 'dark')
+  } else if (currentMode === 'light') {
+    root.removeAttribute('data-theme')
+  } else {
+    // system: follow OS preference
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (prefersDark) {
+      root.setAttribute('data-theme', 'dark')
+    } else {
+      root.removeAttribute('data-theme')
+    }
+  }
+}
+
+export function initDarkMode() {
+  applyDarkMode()
+  // Listen for OS theme changes when in system mode
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if (getDarkMode() === 'system') {
+      applyDarkMode('system')
+    }
+  })
 }
