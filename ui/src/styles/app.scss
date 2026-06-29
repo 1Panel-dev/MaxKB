@@ -28,7 +28,9 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  color: var(--el-text-color-primary);
+  color: var(--text-primary);
+  background-color: var(--bg-content);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #app {
@@ -94,7 +96,7 @@ h1 {
 
 h2 {
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 h3 {
@@ -457,7 +459,7 @@ h5 {
   background: var(--el-color-success);
 }
 .avatar-blue {
-  background: #3370ff;
+  background: #1A6DFF;
 }
 
 .avatar-orange {
@@ -638,4 +640,39 @@ h5 {
   color: #cc710a;
   background: linear-gradient(180deg, #ffe1cf 0%, #f4c5af 100%);
   border-color: #ffe7cc;
+}
+
+// ===== 主题切换全局过渡 =====
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+// 排除不需要过渡的元素
+.no-transition,
+.el-dialog,
+.el-drawer,
+.el-loading-mask,
+.el-popper {
+  transition: none !important;
+}
+
+// ===== 暗色模式全局覆盖 =====
+[data-theme="dark"] {
+  body {
+    background-color: var(--bg-content);
+    color: var(--text-primary);
+  }
+
+  // 暗色滚动条
+  ::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.12);
+  }
+  ::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+// 自定义主题（非默认色时的 header）
+.custom-header {
+  background: var(--primary-50) !important;
 }
