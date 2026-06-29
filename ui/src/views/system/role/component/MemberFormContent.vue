@@ -72,6 +72,10 @@
 import {computed, reactive, ref, watch} from 'vue'
 import type {FormItemModel} from '@/api/type/role'
 
+type FormRow = Record<string, any> & {
+  role_id?: string
+}
+
 const props = withDefaults(defineProps<{
   models: FormItemModel[]
   addText?: string
@@ -85,8 +89,8 @@ const props = withDefaults(defineProps<{
 
 const formRef = ref()
 const formItem: Record<string, any> = {}
-const form = defineModel<Record<string, any>[]>('form', {
-  default: [],
+const form = defineModel<FormRow[]>('form', {
+  required: true,
 })
 
 const loadingStates = reactive<Record<string, boolean>>({})
