@@ -97,6 +97,7 @@ class Group(Enum):
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OTHER = "OTHER"
     OVERVIEW = "OVERVIEW"
+    HOMEPAGE = "HOMEPAGE"
     OPERATION_LOG = "OPERATION_LOG"
 
     APPLICATION_FOLDER = "APPLICATION_FOLDER"
@@ -128,6 +129,7 @@ class SystemGroup(Enum):
 
 class WorkspaceGroup(Enum):
     SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
@@ -138,6 +140,7 @@ class WorkspaceGroup(Enum):
 
 
 class UserGroup(Enum):
+    HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
@@ -403,6 +406,7 @@ Permission_Label = {
     Group.USER_GROUP.value: _("User Group"),
     Group.CHAT_USER_AUTH.value: _("Chat User Auth"),
     Group.OVERVIEW.value: _("Overview"),
+    Group.HOMEPAGE.value: _("Home page"),
     Group.SYSTEM_TOOL.value: _("Tool"),
     Group.SYSTEM_MODEL.value: _("Model"),
     Group.SYSTEM_KNOWLEDGE.value: _("Knowledge"),
@@ -489,6 +493,10 @@ class PermissionConstants(Enum):
     """
      权限枚举
     """
+    HOMEPAGE_READ = Permission(
+        group=Group.HOMEPAGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.HOMEPAGE, UserGroup.HOMEPAGE],
+    )
     KNOWLEDGE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
     )
