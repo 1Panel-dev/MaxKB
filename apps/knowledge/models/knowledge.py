@@ -441,8 +441,6 @@ class File(AppModelMixin):
 
     def get_bytes(self):
         if self.storage_type == "seaweedfs":
-            from common.storage.seaweedfs import get_bucket, get_s3_client
-
             resp = get_s3_client().get_object(Bucket=get_bucket(), Key=f"files/{self.id}")
             return resp["Body"].read()
 
