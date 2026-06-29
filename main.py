@@ -6,13 +6,17 @@ import time
 
 import django
 from django.core import management
+import warnings
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-APP_DIR = os.path.join(BASE_DIR, 'apps')
+APP_DIR = os.path.join(BASE_DIR, "apps")
 
 os.chdir(BASE_DIR)
 sys.path.insert(0, APP_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "maxkb.settings")
+
+# 忽略 pydub 和 jieba 的语法警告, 3.14中已经是Error
+warnings.filterwarnings("ignore", category=SyntaxWarning, module="pydub|jieba")
 
 
 def collect_static():
@@ -23,7 +27,7 @@ def collect_static():
     """
     logging.info("Collect static files")
     try:
-        management.call_command('collectstatic', '--no-input', '-c', verbosity=0, interactive=False)
+        management.call_command("collectstatic", "--no-input", "-c", verbosity=0, interactive=False)
         logging.info("Collect static files done")
     except:
         pass
@@ -41,24 +45,24 @@ def perform_db_migrate():
     retry_interval = 5  # seconds
     for attempt in range(1, max_retries + 1):
         try:
-            management.call_command('migrate')
+            management.call_command("migrate")
             return
         except Exception as e:
             err_msg = str(e)
             # 判断是否为数据库仍在启动中（崩溃恢复场景）
             is_db_starting = (
-                'the database system is starting up' in err_msg
-                or 'starting up' in err_msg
-                or 'Connection refused' in err_msg
+                "the database system is starting up" in err_msg
+                or "starting up" in err_msg
+                or "Connection refused" in err_msg
             )
             if is_db_starting and attempt < max_retries:
                 logging.warning(
-                    f'Database is not ready yet (attempt {attempt}/{max_retries}), '
-                    f'retrying in {retry_interval}s... Error: {err_msg}'
+                    f"Database is not ready yet (attempt {attempt}/{max_retries}), "
+                    f"retrying in {retry_interval}s... Error: {err_msg}"
                 )
                 time.sleep(retry_interval)
             else:
-                logging.error('Perform migrate failed, exit', exc_info=True)
+                logging.error("Perform migrate failed, exit", exc_info=True)
                 sys.exit(11)
 
 
@@ -66,20 +70,20 @@ def start_services():
     services = args.services if isinstance(args.services, list) else [args.services]
     start_args = []
     if args.daemon:
-        start_args.append('--daemon')
+        start_args.append("--daemon")
     if args.force:
-        start_args.append('--force')
+        start_args.append("--force")
     if args.worker:
-        start_args.extend(['--worker', str(args.worker)])
+        start_args.extend(["--worker", str(args.worker)])
     else:
-        worker = os.environ.get('MAXKB_CORE_WORKER')
+        worker = os.environ.get("MAXKB_CORE_WORKER")
         if isinstance(worker, str) and worker.isdigit():
-            start_args.extend(['--worker', worker])
+            start_args.extend(["--worker", worker])
 
     try:
         management.call_command(action, *services, *start_args)
     except KeyboardInterrupt:
-        logging.info('Cancel ...')
+        logging.info("Cancel ...")
         time.sleep(2)
     except Exception as exc:
         logging.error("Start service error {}: {}".format(services, exc))
@@ -88,19 +92,20 @@ def start_services():
 
 def dev():
     services = args.services if isinstance(args.services, list) else args.services
-    if services.__contains__('web'):
-        management.call_command('runserver', "0.0.0.0:8080")
-    elif services.__contains__('celery'):
-        management.call_command('celery', 'celery')
-    elif services.__contains__('local_model'):
+    if services.__contains__("web"):
+        management.call_command("runserver", "0.0.0.0:8080")
+    elif services.__contains__("celery"):
+        management.call_command("celery", "celery")
+    elif services.__contains__("local_model"):
         from maxkb.const import CONFIG
-        bind = f'{CONFIG.get("LOCAL_MODEL_HOST")}:{CONFIG.get("LOCAL_MODEL_PORT")}'
-        management.call_command('runserver', bind)
+
+        bind = f"{CONFIG.get('LOCAL_MODEL_HOST')}:{CONFIG.get('LOCAL_MODEL_PORT')}"
+        management.call_command("runserver", bind)
 
 
-if __name__ == '__main__':
-    os.environ['HF_HOME'] = '/opt/maxkb-app/model/base'
-    os.environ['TMPDIR'] = '/opt/maxkb-app/tmp'
+if __name__ == "__main__":
+    os.environ["HF_HOME"] = "/opt/maxkb-app/model/base"
+    os.environ["TMPDIR"] = "/opt/maxkb-app/tmp"
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;
@@ -111,33 +116,34 @@ if __name__ == '__main__':
            """
     )
     parser.add_argument(
-        'action', type=str,
-        choices=("start", "dev", "upgrade_db", "collect_static"),
-        help="Action to run"
+        "action", type=str, choices=("start", "dev", "upgrade_db", "collect_static"), help="Action to run"
     )
     args, e = parser.parse_known_args()
     parser.add_argument(
-        "services", type=str, default='all' if args.action == 'start' else 'web', nargs="*",
-        choices=("all", "web", "task") if args.action == 'start' else ("web", "celery", 'local_model'),
+        "services",
+        type=str,
+        default="all" if args.action == "start" else "web",
+        nargs="*",
+        choices=("all", "web", "task") if args.action == "start" else ("web", "celery", "local_model"),
         help="The service to start",
     )
 
-    parser.add_argument('-d', '--daemon', nargs="?", const=True)
-    parser.add_argument('-w', '--worker', type=int, nargs="?")
-    parser.add_argument('-f', '--force', nargs="?", const=True)
+    parser.add_argument("-d", "--daemon", nargs="?", const=True)
+    parser.add_argument("-w", "--worker", type=int, nargs="?")
+    parser.add_argument("-f", "--force", nargs="?", const=True)
     args = parser.parse_args()
     action = args.action
     services = args.services if isinstance(args.services, list) else args.services
-    if services.__contains__('web'):
-        os.environ.setdefault('SERVER_NAME', 'web')
-    elif services.__contains__('local_model'):
-        os.environ.setdefault('SERVER_NAME', 'local_model')
+    if services.__contains__("web"):
+        os.environ.setdefault("SERVER_NAME", "web")
+    elif services.__contains__("local_model"):
+        os.environ.setdefault("SERVER_NAME", "local_model")
     django.setup()
     if action == "upgrade_db":
         perform_db_migrate()
     elif action == "collect_static":
         collect_static()
-    elif action == 'dev':
+    elif action == "dev":
         collect_static()
         perform_db_migrate()
         dev()
