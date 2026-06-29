@@ -1,0 +1,91 @@
+// 毛玻璃导航栏
+@mixin glass-nav {
+  background: var(--bg-glass-nav);
+  backdrop-filter: var(--blur-nav);
+  -webkit-backdrop-filter: var(--blur-nav);
+  border-bottom: 1px solid var(--border-color-light);
+}
+
+// 毛玻璃侧边栏
+@mixin glass-sidebar {
+  background: var(--bg-glass-sidebar);
+  backdrop-filter: var(--blur-sidebar);
+  -webkit-backdrop-filter: var(--blur-sidebar);
+}
+
+// 毛玻璃卡片
+@mixin glass-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--blur-card);
+  -webkit-backdrop-filter: var(--blur-card);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: var(--app-border-radius-large);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+// 毛玻璃下拉菜单
+@mixin glass-dropdown {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: var(--blur-dropdown);
+  -webkit-backdrop-filter: var(--blur-dropdown);
+  border-radius: var(--app-border-radius-large);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: var(--shadow-dropdown);
+}
+
+// 卡片 hover 效果
+@mixin card-hover {
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+// 毛玻璃进场动画
+@mixin glass-enter-animation {
+  animation: glass-enter 0.5s ease-out;
+}
+
+@keyframes glass-enter {
+  from {
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+  to {
+    backdrop-filter: var(--blur-nav);
+    -webkit-backdrop-filter: var(--blur-nav);
+  }
+}
+
+// 列表项逐项入场动画
+@mixin list-item-enter($delay-step: 50ms) {
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$delay-step * ($i - 1)};
+    }
+  }
+  animation: list-item-enter 0.3s ease-out both;
+}
+
+@keyframes list-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 暗色模式下的 dropdown 覆盖
+[data-theme="dark"] {
+  .glass-dropdown {
+    background: rgba(44, 44, 46, 0.88);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+}
