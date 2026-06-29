@@ -1,47 +1,131 @@
 :root {
   --app-base-px: 8px;
-  --app-layout-bg-color: #f5f6f7;
-  --app-text-color-secondary: #646a73;
-  --app-text-color-disable: #bbbfc4;
-  --app-input-color-placeholder: #8f959e;
-  --app-view-padding: 24px;
-  --app-view-bg-color: #ffffff;
-  --app-border-color-dark: #bbbfc4;
+
+  /* ===== 主色色阶 ===== */
+  --primary-50: #E8F0FE;
+  --primary-100: #C5D9FC;
+  --primary-200: #93B8F9;
+  --primary-300: #6097F6;
+  --primary-400: #3D7DF3;
+  --primary-500: #1A6DFF;
+  --primary-600: #1558D9;
+  --primary-700: #0F43B3;
+
+  /* ===== 背景色（亮色模式） ===== */
+  --bg-glass-nav: rgba(255, 255, 255, 0.72);
+  --bg-glass-sidebar: rgba(255, 255, 255, 0.56);
+  --bg-content: #F5F7FA;
+  --bg-card: rgba(255, 255, 255, 0.8);
+  --bg-card-solid: #ffffff;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+
+  /* ===== 文字色 ===== */
+  --text-primary: #1D2129;
+  --text-secondary: #4E5969;
+  --text-disabled: #C9CDD4;
+  --text-placeholder: #8F959E;
+
+  /* ===== 边框 ===== */
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-color-light: rgba(0, 0, 0, 0.04);
+
+  /* ===== 毛玻璃参数 ===== */
+  --blur-nav: blur(20px);
+  --blur-sidebar: blur(16px);
+  --blur-card: blur(12px);
+  --blur-dropdown: blur(20px);
+  --blur-overlay: blur(4px);
+
+  /* ===== 阴影 ===== */
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.12);
+  --shadow-dialog: 0 16px 48px rgba(0, 0, 0, 0.16);
+
+  /* ===== 圆角 ===== */
   --app-border-radius-small: 6px;
   --app-border-radius-base: 8px;
-  --app-border-radius-large: 16px;
-  --md-bk-hover-color: var(--el-border-color-hover);
-  /** header 组件 */
-  --app-header-height: 56px;
-  --app-header-padding: 0 20px;
+  --app-border-radius-large: 12px;
+  --app-border-radius-xlarge: 16px;
 
-  --app-header-bg-color: linear-gradient(90deg, #ebf1ff 24.34%, #e5fbf8 56.18%, #f2ebfe 90.18%);
-  --app-logo-color: linear-gradient(180deg, #3370ff 0%, #7f3bf5 100%);
-  --app-avatar-gradient-color: linear-gradient(270deg, #9258f7 0%, #3370ff 100%);
-
-  /* 计算高度 */
+  /* ===== 布局 ===== */
+  --app-layout-bg-color: var(--bg-content);
+  --app-view-bg-color: var(--bg-card-solid);
+  --app-view-padding: 24px;
+  --app-header-height: 64px;
+  --app-header-padding: 0 24px;
+  --sidebar-width: 240px;
   --app-main-height: calc(100vh - var(--app-header-height) - var(--app-view-padding) * 2 - 40px);
 
-  /** sidebar 组件 */
-  --sidebar-width: 240px;
-  /** tag */
-  --tag-default-bg: rgba(51, 112, 255, 0.2);
-  --tag-default-color: #2b5fd9;
-  --tag-success-bg: rgba(52, 199, 36, 0.2);
-  --tag-success-color: #2ca91f;
-  --tag-warning-bg: rgba(255, 136, 0, 0.2);
-  --tag-warning-color: #d97400;
-  --tag-danger-bg: rgba(245, 74, 69, 0.2);
+  /* ===== 文字色（兼容旧变量） ===== */
+  --app-text-color-secondary: var(--text-secondary);
+  --app-text-color-disable: var(--text-disabled);
+  --app-input-color-placeholder: var(--text-placeholder);
+  --app-border-color-dark: var(--text-disabled);
 
-  /** card */
+  /* ===== Tag ===== */
+  --tag-default-bg: rgba(26, 109, 255, 0.12);
+  --tag-default-color: #1A6DFF;
+  --tag-success-bg: rgba(52, 199, 36, 0.12);
+  --tag-success-color: #2CA91F;
+  --tag-warning-bg: rgba(255, 136, 0, 0.12);
+  --tag-warning-color: #D97400;
+  --tag-danger-bg: rgba(245, 74, 69, 0.12);
+
+  /* ===== Card ===== */
   --card-width: 330px;
   --card-min-height: 166px;
   --card-min-width: 220px;
 
-  /** ai-chat */
+  /* ===== AI Chat ===== */
   --dialog-bg-gradient-color:
-    linear-gradient(188deg, rgba(235, 241, 255, 0.2) 39.6%, rgba(231, 249, 255, 0.2) 94.3%), #eff0f1;
+    linear-gradient(188deg, rgba(232, 240, 254, 0.2) 39.6%, rgba(197, 217, 252, 0.2) 94.3%), #eff0f1;
 
-  /** 资源授权 */
+  /* ===== 资源授权 ===== */
   --setting-left-width: 280px;
+
+  /* ===== 过渡 ===== */
+  --transition-base: all 0.2s ease;
+  --transition-slow: all 0.3s ease-out;
+}
+
+/* ===== 暗色模式 ===== */
+[data-theme="dark"] {
+  --primary-50: rgba(26, 109, 255, 0.16);
+  --primary-100: rgba(26, 109, 255, 0.24);
+  --primary-200: rgba(26, 109, 255, 0.32);
+  --primary-300: #5A94F5;
+  --primary-400: #5A94F5;
+  --primary-500: #3D85FF;
+  --primary-600: #5A94F5;
+  --primary-700: #7AAAFF;
+
+  --bg-glass-nav: rgba(30, 30, 30, 0.72);
+  --bg-glass-sidebar: rgba(30, 30, 30, 0.56);
+  --bg-content: #1E1E1E;
+  --bg-card: rgba(44, 44, 46, 0.8);
+  --bg-card-solid: #2C2C2E;
+  --bg-hover: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #E5E6EB;
+  --text-secondary: #A6A6A6;
+  --text-disabled: #4E4E4E;
+  --text-placeholder: #6B6B6B;
+
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-color-light: rgba(255, 255, 255, 0.06);
+
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.2);
+  --shadow-card-hover: 0 4px 20px rgba(0, 0, 0, 0.32);
+  --shadow-dropdown: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-dialog: 0 16px 48px rgba(0, 0, 0, 0.5);
+
+  --app-layout-bg-color: var(--bg-content);
+  --app-view-bg-color: var(--bg-card-solid);
+
+  --tag-default-bg: rgba(61, 133, 255, 0.2);
+  --tag-default-color: #5A94F5;
+
+  --dialog-bg-gradient-color:
+    linear-gradient(188deg, rgba(26, 109, 255, 0.08) 39.6%, rgba(44, 44, 46, 0.8) 94.3%), #2C2C2E;
 }
