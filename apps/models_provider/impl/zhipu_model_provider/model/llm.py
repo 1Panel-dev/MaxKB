@@ -1,10 +1,10 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/4/28 11:42
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2024/4/28 11:42
+@desc:
 """
 
 from typing import Dict, List
@@ -22,7 +22,6 @@ def custom_get_token_ids(text: str):
 
 
 class ZhipuChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -31,10 +30,10 @@ class ZhipuChatModel(MaxKBBaseModel, BaseChatOpenAI):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         zhipuai_chat = ZhipuChatModel(
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             model=model_name,
-            base_url=model_credential.get('api_base') or 'https://open.bigmodel.cn/api/paas/v4',
-            streaming=model_kwargs.get('streaming', False),
+            base_url=model_credential.get("api_base") or "https://open.bigmodel.cn/api/paas/v4",
+            streaming=model_kwargs.get("streaming", False),
             custom_get_token_ids=custom_get_token_ids,
             **optional_params,
         )
@@ -43,13 +42,13 @@ class ZhipuChatModel(MaxKBBaseModel, BaseChatOpenAI):
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
             return super().get_num_tokens_from_messages(messages)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
         try:
             return super().get_num_tokens(text)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))

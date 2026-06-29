@@ -28,14 +28,14 @@ def determine_api_mode(url):
     """
     根据URL判断API模式
     """
-    if '/recognize/flash' in url:
-        return 'sync'
-    elif '/submit' in url:
-        return 'async_submit'
-    elif '/query' in url:
-        return 'async_query'
+    if "/recognize/flash" in url:
+        return "sync"
+    elif "/submit" in url:
+        return "async_submit"
+    elif "/query" in url:
+        return "async_query"
     else:
-        return 'unknown'
+        return "unknown"
 
 
 class VolcanicASRClient:
@@ -52,35 +52,41 @@ class VolcanicASRClient:
             "X-Api-Access-Key": self.token,
         }
 
-        if mode == 'sync':
-            headers.update({
-                "X-Api-Resource-Id": "volc.bigasr.auc_turbo",
-                "X-Api-Request-Id": str(uuid.uuid4()),
-                "X-Api-Sequence": "-1",
-            })
-        elif mode == 'async_submit':
-            headers.update({
-                "X-Api-Resource-Id": "volc.bigasr.auc",
-                "X-Api-Request-Id": task_id or str(uuid.uuid4()),
-                "X-Api-Sequence": "-1",
-            })
-        elif mode == 'async_query':
-            headers.update({
-                "X-Api-Resource-Id": "volc.bigasr.auc",
-                "X-Api-Request-Id": task_id or str(uuid.uuid4()),
-                "X-Tt-Logid": x_tt_logid or "",
-            })
+        if mode == "sync":
+            headers.update(
+                {
+                    "X-Api-Resource-Id": "volc.bigasr.auc_turbo",
+                    "X-Api-Request-Id": str(uuid.uuid4()),
+                    "X-Api-Sequence": "-1",
+                }
+            )
+        elif mode == "async_submit":
+            headers.update(
+                {
+                    "X-Api-Resource-Id": "volc.bigasr.auc",
+                    "X-Api-Request-Id": task_id or str(uuid.uuid4()),
+                    "X-Api-Sequence": "-1",
+                }
+            )
+        elif mode == "async_query":
+            headers.update(
+                {
+                    "X-Api-Resource-Id": "volc.bigasr.auc",
+                    "X-Api-Request-Id": task_id or str(uuid.uuid4()),
+                    "X-Tt-Logid": x_tt_logid or "",
+                }
+            )
 
         return headers
 
-    def _create_request_body(self, audio_data, mode='sync'):
+    def _create_request_body(self, audio_data, mode="sync"):
         """创建请求体"""
         base_request = {
-            "user": {"uid": self.appid if mode == 'sync' else "fake_uid"},
+            "user": {"uid": self.appid if mode == "sync" else "fake_uid"},
             "audio": audio_data,
         }
 
-        if mode == 'sync':
+        if mode == "sync":
             base_request["request"] = {
                 "model_name": "bigmodel",
                 "enable_itn": True,
@@ -95,10 +101,7 @@ class VolcanicASRClient:
                 "enable_speaker_info": True,
                 "enable_punc": True,
                 "enable_itn": True,
-                "corpus": {
-                    "correct_table_name": "",
-                    "context": ""
-                }
+                "corpus": {"correct_table_name": "", "context": ""},
             }
 
         return base_request
@@ -114,9 +117,9 @@ class VolcanicASRClient:
         # 根据URL判断API模式
         mode = determine_api_mode(submit_url)
 
-        if mode == 'sync':
+        if mode == "sync":
             return self._sync_recognize(audio_data, submit_url)
-        elif mode == 'async_submit':
+        elif mode == "async_submit":
             return self._async_process(audio_data, submit_url)
         else:
             raise ValueError(f"Unsupported URL pattern: {submit_url}")
@@ -129,7 +132,7 @@ class VolcanicASRClient:
     def _sync_recognize(self, audio_data, submit_url):
         """同步识别模式"""
         headers = self._build_headers(submit_url)
-        request_body = self._create_request_body(audio_data, mode='sync')
+        request_body = self._create_request_body(audio_data, mode="sync")
 
         response = requests.post(submit_url, json=request_body, headers=headers)
         return self._handle_response(response, "sync_recognize")
@@ -139,7 +142,7 @@ class VolcanicASRClient:
         # 提交任务
         task_id = str(uuid.uuid4())
         headers = self._build_headers(submit_url, task_id=task_id)
-        request_body = self._create_request_body(audio_data, mode='async')
+        request_body = self._create_request_body(audio_data, mode="async")
 
         submit_response = requests.post(submit_url, data=json.dumps(request_body), headers=headers)
 
@@ -157,11 +160,11 @@ class VolcanicASRClient:
 
         while True:
             query_response = self._query_task(task_id, x_tt_logid, query_url)
-            code = query_response.headers.get('X-Api-Status-Code', "")
+            code = query_response.headers.get("X-Api-Status-Code", "")
 
-            if code == '20000000':  # 任务完成
+            if code == "20000000":  # 任务完成
                 return query_response
-            elif code != '20000001' and code != '20000002':  # 任务失败
+            elif code != "20000001" and code != "20000002":  # 任务失败
                 print(f"Async task failed with code: {code}")
                 return None
             time.sleep(1)
@@ -174,18 +177,18 @@ class VolcanicASRClient:
 
     def _handle_response(self, response, operation, silent=False):
         """处理响应"""
-        if 'X-Api-Status-Code' in response.headers:
+        if "X-Api-Status-Code" in response.headers:
             if not silent:
-                print(f'{operation} response header X-Api-Status-Code: {response.headers["X-Api-Status-Code"]}')
-                print(f'{operation} response header X-Api-Message: {response.headers["X-Api-Message"]}')
-                print(f'{operation} response header X-Tt-Logid: {response.headers["X-Tt-Logid"]}')
+                print(f"{operation} response header X-Api-Status-Code: {response.headers['X-Api-Status-Code']}")
+                print(f"{operation} response header X-Api-Message: {response.headers['X-Api-Message']}")
+                print(f"{operation} response header X-Tt-Logid: {response.headers['X-Tt-Logid']}")
 
                 if operation == "sync_recognize":
-                    print(f'sync response content: {response.json()}\n')
+                    print(f"sync response content: {response.json()}\n")
 
             return response
         else:
-            print(f'{operation} failed: {response.headers}\n')
+            print(f"{operation} failed: {response.headers}\n")
             return None
 
 
@@ -197,10 +200,10 @@ class VolcanicEngineBigModelSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.volcanic_api_url = kwargs.get('volcanic_api_url')
-        self.volcanic_token = kwargs.get('volcanic_token')
-        self.volcanic_app_id = kwargs.get('volcanic_app_id')
-        self.params = kwargs.get('params')
+        self.volcanic_api_url = kwargs.get("volcanic_api_url")
+        self.volcanic_token = kwargs.get("volcanic_token")
+        self.volcanic_app_id = kwargs.get("volcanic_app_id")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -209,20 +212,20 @@ class VolcanicEngineBigModelSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if "max_tokens" in model_kwargs and model_kwargs["max_tokens"] is not None:
+            optional_params["max_tokens"] = model_kwargs["max_tokens"]
+        if "temperature" in model_kwargs and model_kwargs["temperature"] is not None:
+            optional_params["temperature"] = model_kwargs["temperature"]
         return VolcanicEngineBigModelSpeechToText(
-            volcanic_api_url=model_credential.get('volcanic_api_url'),
-            volcanic_token=model_credential.get('volcanic_token'),
-            volcanic_app_id=model_credential.get('volcanic_app_id'),
+            volcanic_api_url=model_credential.get("volcanic_api_url"),
+            volcanic_token=model_credential.get("volcanic_token"),
+            volcanic_app_id=model_credential.get("volcanic_app_id"),
             params=model_kwargs,
         )
 
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as audio_file:
+        with open(f"{cwd}/iat_mp3_16k.mp3", "rb") as audio_file:
             self.speech_to_text(audio_file)
 
     def speech_to_text(self, audio_file):
@@ -230,6 +233,6 @@ class VolcanicEngineBigModelSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             client = VolcanicASRClient(self.volcanic_app_id, self.volcanic_token)
             result = client.process_audio(audio_file, self.volcanic_api_url)
             if result.status_code == 200:
-                return result.json().get('result').get('text')
+                return result.json().get("result").get("text")
         except Exception as e:
-            maxkb_logger.error(f'Error getting speech to text: {e}')
+            maxkb_logger.error(f"Error getting speech to text: {e}")

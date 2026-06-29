@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： llm.py
-    @date：2024/7/11 17:08
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： llm.py
+@date：2024/7/11 17:08
+@desc:
 """
+
 from typing import Dict
 
 from django.utils.translation import gettext as _
@@ -16,41 +17,51 @@ from common.forms import BaseForm
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class AzureOpenAIEmbeddingCredential(BaseForm, BaseModelCredential):
-
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
-                 raise_exception=False):
+    def is_valid(
+        self,
+        model_type: str,
+        model_name,
+        model_credential: Dict[str, object],
+        model_params,
+        provider,
+        raise_exception=False,
+    ):
         model_type_list = provider.get_model_type_list()
-        if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value,
-                                  _('{model_type} Model type is not supported').format(model_type=model_type))
+        if not any(list(filter(lambda mt: mt.get("value") == model_type, model_type_list))):
+            raise AppApiException(
+                ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
+            )
 
-        for key in ['api_base', 'api_key', 'api_version']:
+        for key in ["api_base", "api_key", "api_version"]:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, _('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, _("{key}  is required").format(key=key))
                 else:
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential)
-            model.embed_query(_('Hello'))
+            model.embed_query(_("Hello"))
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      _('Verification failed, please check whether the parameters are correct'))
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    _("Verification failed, please check whether the parameters are correct"),
+                )
             else:
                 return False
 
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     api_version = forms.TextInputField("Api Version", required=True)
 
-    api_base = forms.TextInputField('Azure Endpoint', required=True)
+    api_base = forms.TextInputField("Azure Endpoint", required=True)
 
     api_key = forms.PasswordInputField("API Key", required=True)

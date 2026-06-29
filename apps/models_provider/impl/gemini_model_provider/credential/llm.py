@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： llm.py
-    @date：2024/7/11 17:57
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： llm.py
+@date：2024/7/11 17:57
+@desc:
 """
+
 from typing import Dict
 
 from django.utils.translation import gettext_lazy as _, gettext
@@ -19,61 +20,80 @@ from common.utils.logger import maxkb_logger
 
 
 class GeminiLLMModelParams(BaseForm):
-    temperature = forms.SliderField(TooltipLabel(_('Temperature'),
-                                                 _('Higher values make the output more random, while lower values make it more focused and deterministic')),
-                                    required=True, default_value=0.7,
-                                    _min=0.1,
-                                    _max=1.0,
-                                    _step=0.01,
-                                    precision=2)
+    temperature = forms.SliderField(
+        TooltipLabel(
+            _("Temperature"),
+            _("Higher values make the output more random, while lower values make it more focused and deterministic"),
+        ),
+        required=True,
+        default_value=0.7,
+        _min=0.1,
+        _max=1.0,
+        _step=0.01,
+        precision=2,
+    )
 
     max_tokens = forms.SliderField(
-        TooltipLabel(_('Output the maximum Tokens'),
-                     _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
+        TooltipLabel(
+            _("Output the maximum Tokens"), _("Specify the maximum number of tokens that the model can generate")
+        ),
+        required=True,
+        default_value=800,
         _min=1,
         _max=100000,
         _step=1,
-        precision=0)
+        precision=0,
+    )
 
 
 class GeminiLLMModelCredential(BaseForm, BaseModelCredential):
-
-    def is_valid(self, model_type: str, model_name, model_credential: Dict[str, object], model_params, provider,
-                 raise_exception=False):
+    def is_valid(
+        self,
+        model_type: str,
+        model_name,
+        model_credential: Dict[str, object],
+        model_params,
+        provider,
+        raise_exception=False,
+    ):
         model_type_list = provider.get_model_type_list()
-        if not any(list(filter(lambda mt: mt.get('value') == model_type, model_type_list))):
-            raise AppApiException(ValidCode.valid_error.value,
-                                  gettext('{model_type} Model type is not supported').format(model_type=model_type))
+        if not any(list(filter(lambda mt: mt.get("value") == model_type, model_type_list))):
+            raise AppApiException(
+                ValidCode.valid_error.value,
+                gettext("{model_type} Model type is not supported").format(model_type=model_type),
+            )
 
-        for key in ['api_key', 'base_url']:
+        for key in ["api_key", "base_url"]:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(ValidCode.valid_error.value, gettext('{key}  is required').format(key=key))
+                    raise AppApiException(ValidCode.valid_error.value, gettext("{key}  is required").format(key=key))
                 else:
                     return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.invoke([HumanMessage(content=gettext('Hello'))])
+            res = model.invoke([HumanMessage(content=gettext("Hello"))])
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      gettext(
-                                          'Verification failed, please check whether the parameters are correct: {error}').format(
-                                          error=str(e)))
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    gettext("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
+                )
             else:
                 return False
         return True
 
     def encryption_dict(self, model: Dict[str, object]):
-        return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
-    base_url = forms.TextInputField('Base URL', required=True,
-                                    default_value='https://generativelanguage.googleapis.com')
-    api_key = forms.PasswordInputField('API Key', required=True)
+    base_url = forms.TextInputField(
+        "Base URL", required=True, default_value="https://generativelanguage.googleapis.com"
+    )
+    api_key = forms.PasswordInputField("API Key", required=True)
 
     def get_model_params_setting_form(self, model_name):
         return GeminiLLMModelParams()

@@ -5,7 +5,6 @@ from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 class RegoloImage(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -15,8 +14,8 @@ class RegoloImage(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return RegoloImage(
             model_name=model_name,
-            openai_api_base=model_credential.get('api_base') or "https://api.regolo.ai/v1",
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base") or "https://api.regolo.ai/v1",
+            openai_api_key=model_credential.get("api_key"),
             streaming=True,
             stream_usage=True,
             **optional_params,

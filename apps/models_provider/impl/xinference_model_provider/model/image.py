@@ -8,7 +8,6 @@ from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
 class XinferenceImage(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -18,8 +17,8 @@ class XinferenceImage(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return XinferenceImage(
             model_name=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
             # stream_options={"include_usage": True},
             streaming=True,
             stream_usage=True,
@@ -30,10 +29,10 @@ class XinferenceImage(MaxKBBaseModel, BaseChatOpenAI):
         if self.usage_metadata is None or self.usage_metadata == {}:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
-        return self.usage_metadata.get('input_tokens', 0)
+        return self.usage_metadata.get("input_tokens", 0)
 
     def get_num_tokens(self, text: str) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))
-        return self.get_last_generation_info().get('output_tokens', 0)
+        return self.get_last_generation_info().get("output_tokens", 0)

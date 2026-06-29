@@ -20,11 +20,11 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base')
-        self.model_name = kwargs.get('model_name')
-        self.params = kwargs.get('params', {})
-        self.max_retries = kwargs.get('max_retries', 3)
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base")
+        self.model_name = kwargs.get("model_name")
+        self.params = kwargs.get("params", {})
+        self.max_retries = kwargs.get("max_retries", 3)
         self.retry_delay = 5
 
     @staticmethod
@@ -33,16 +33,16 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {"params": {}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
-        api_base = model_credential.get('api_base')
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
+        api_base = model_credential.get("api_base")
         if api_base is None:
-            api_base = 'https://dashscope.aliyuncs.com/api/v1'
+            api_base = "https://dashscope.aliyuncs.com/api/v1"
         return GenerationVideoModel(
             model_name=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             api_base=api_base,
             **optional_params,
         )
@@ -56,9 +56,11 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             try:
                 rsp = func(**kwargs)
                 return rsp
-            except (requests.exceptions.ProxyError,
-                    requests.exceptions.ConnectionError,
-                    requests.exceptions.Timeout) as e:
+            except (
+                requests.exceptions.ProxyError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+            ) as e:
                 maxkb_logger.error(f"⚠️ 网络错误: {e}，正在重试 {attempt + 1}/{self.max_retries}...")
                 time.sleep(self.retry_delay)
         raise RuntimeError("多次重试后仍无法连接到 DashScope API，请检查代理或网络配置")
@@ -66,18 +68,19 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     # --- 通用异步生成函数 ---
     def generate_video(self, prompt, negative_prompt=None, first_frame_url=None, last_frame_url=None, **kwargs):
         """
-            prompt: 文本描述
-            negative_prompt: 反向文本描述
-            first_frame_url: 起始关键帧图片 URL (KF2V 必填)
-            last_frame_url: 结束关键帧图片 URL (KF2V 必填)
-            如果没有提供last_frame_url，则表示只提供了first_frame_url，生成的是单关键帧视频（KFV） 参数是img_url
-            """
+        prompt: 文本描述
+        negative_prompt: 反向文本描述
+        first_frame_url: 起始关键帧图片 URL (KF2V 必填)
+        last_frame_url: 结束关键帧图片 URL (KF2V 必填)
+        如果没有提供last_frame_url，则表示只提供了first_frame_url，生成的是单关键帧视频（KFV） 参数是img_url
+        """
         import dashscope
+
         dashscope.base_http_api_url = self.api_base
 
-        is_kf2v_model = 'kf2v' in self.model_name.lower()
+        is_kf2v_model = "kf2v" in self.model_name.lower()
 
-        is_wan27_model = 'wan2.7' in self.model_name.lower()
+        is_wan27_model = "wan2.7" in self.model_name.lower()
 
         if is_wan27_model:
             # wan2.7 模型使用特殊的 media 参数结构
@@ -85,34 +88,32 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
             # 添加首帧图片
             if first_frame_url:
-                media.append({
-                    "type": "first_frame",
-                    "url": first_frame_url
-                })
+                media.append({"type": "first_frame", "url": first_frame_url})
 
             # 添加尾帧图片（如果存在）
             if last_frame_url:
-                media.append({
-                    "type": "last_frame",
-                    "url": last_frame_url
-                })
+                media.append({"type": "last_frame", "url": last_frame_url})
             params = {
                 "api_key": self.api_key,
                 "model": self.model_name,
                 "prompt": prompt,
                 "media": media,
-                "negative_prompt": negative_prompt
+                "negative_prompt": negative_prompt,
             }
         else:
             # 构建基础参数
-            params = {"api_key": self.api_key, "prompt": prompt, "model": self.model_name,
-                      "negative_prompt": negative_prompt}
+            params = {
+                "api_key": self.api_key,
+                "prompt": prompt,
+                "model": self.model_name,
+                "negative_prompt": negative_prompt,
+            }
 
             if is_kf2v_model:
-                params['first_frame_url'] = first_frame_url
-                params['last_frame_url'] = last_frame_url
+                params["first_frame_url"] = first_frame_url
+                params["last_frame_url"] = last_frame_url
             elif first_frame_url:
-                params['img_url'] = first_frame_url
+                params["img_url"] = first_frame_url
 
         # 合并所有额外参数
         params.update(self.params)
@@ -120,8 +121,10 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         # --- 异步提交任务 ---
         rsp = self._safe_call(VideoSynthesis.async_call, **params)
         if rsp.status_code != HTTPStatus.OK:
-            maxkb_logger.info(f'提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
-            raise RuntimeError(f'提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
+            maxkb_logger.info(f"提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}")
+            raise RuntimeError(
+                f"提交任务失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}"
+            )
 
         maxkb_logger.info("task_id:", rsp.output.task_id)
 
@@ -131,19 +134,21 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
             maxkb_logger.info("当前任务状态:", status.output.task_status)
         else:
             maxkb_logger.error(
-                f'获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}')
+                f"获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}"
+            )
             raise RuntimeError(
-                f'获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}')
+                f"获取任务状态失败，status_code: {status.status_code}, code: {status.code}, message: {status.message}"
+            )
 
         # --- 等待任务完成 ---
         rsp = self._safe_call(VideoSynthesis.wait, task=rsp, api_key=self.api_key)
         if rsp.status_code == HTTPStatus.OK:
             if rsp.output.task_status == "SUCCEEDED":
-                maxkb_logger.info(f'视频生成完成！视频 URL: {rsp.output.video_url}')
+                maxkb_logger.info(f"视频生成完成！视频 URL: {rsp.output.video_url}")
                 return rsp.output.video_url
             else:
-                maxkb_logger.error(f'视频生成失败: {rsp.output.message}')
-                raise RuntimeError(f'视频生成失败, message: {rsp.output.message}')
+                maxkb_logger.error(f"视频生成失败: {rsp.output.message}")
+                raise RuntimeError(f"视频生成失败, message: {rsp.output.message}")
         else:
-            maxkb_logger.error(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
-            raise RuntimeError(f'生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}')
+            maxkb_logger.error(f"生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}")
+            raise RuntimeError(f"生成失败，status_code: {rsp.status_code}, code: {rsp.code}, message: {rsp.message}")

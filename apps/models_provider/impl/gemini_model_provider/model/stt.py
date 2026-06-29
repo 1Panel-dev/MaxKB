@@ -3,7 +3,6 @@ from typing import Dict
 from django.utils.translation import gettext as _
 from langchain_core.messages import HumanMessage
 from langchain_google_genai import ChatGoogleGenerativeAI
-from openai import base_url
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -21,7 +20,7 @@ class GeminiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
+        self.api_key = kwargs.get("api_key")
 
     @staticmethod
     def is_cache_model():
@@ -30,48 +29,43 @@ class GeminiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = {}
-        if 'max_tokens' in model_kwargs and model_kwargs['max_tokens'] is not None:
-            optional_params['max_tokens'] = model_kwargs['max_tokens']
-        if 'temperature' in model_kwargs and model_kwargs['temperature'] is not None:
-            optional_params['temperature'] = model_kwargs['temperature']
+        if "max_tokens" in model_kwargs and model_kwargs["max_tokens"] is not None:
+            optional_params["max_tokens"] = model_kwargs["max_tokens"]
+        if "temperature" in model_kwargs and model_kwargs["temperature"] is not None:
+            optional_params["temperature"] = model_kwargs["temperature"]
         return GeminiSpeechToText(
             model=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             **optional_params,
         )
 
     def check_auth(self):
-        client = ChatGoogleGenerativeAI(
-            model=self.model,
-            google_api_key=self.api_key
-        )
-        response_list = client.invoke(_('Hello'))
+        client = ChatGoogleGenerativeAI(model=self.model, google_api_key=self.api_key)
+        response_list = client.invoke(_("Hello"))
         # print(response_list)
 
     def speech_to_text(self, audio_file):
-        client = ChatGoogleGenerativeAI(
-            model=self.model,
-            google_api_key=self.api_key
-        )
+        client = ChatGoogleGenerativeAI(model=self.model, google_api_key=self.api_key)
         audio_data = audio_file.read()
         system_instruction = """You are a professional speech-to-text assistant. Your task is to:
 1. Transcribe the audio content accurately into text
 2. Output ONLY the transcribed text without any additional comments..."""
 
-        msg = HumanMessage(content=[
-            {'type': 'text', 'text': system_instruction},
-            {"type": "media", 'mime_type': 'audio/mp3', "data": audio_data}
-        ])
+        msg = HumanMessage(
+            content=[
+                {"type": "text", "text": system_instruction},
+                {"type": "media", "mime_type": "audio/mp3", "data": audio_data},
+            ]
+        )
         res = client.invoke([msg])
         if isinstance(res.content, list):
             for item in res.content:
-                if isinstance(item, dict) and 'text' in item:
-                    return item['text'].strip()
-                elif hasattr(item, 'text'):
+                if isinstance(item, dict) and "text" in item:
+                    return item["text"].strip()
+                elif hasattr(item, "text"):
                     return item.text.strip()
-            return ''
+            return ""
         elif isinstance(res.content, dict):
-            return res.content.get('text', '').strip()
+            return res.content.get("text", "").strip()
         else:
-            return str(res.content).strip() if res.content else ''
-
+            return str(res.content).strip() if res.content else ""

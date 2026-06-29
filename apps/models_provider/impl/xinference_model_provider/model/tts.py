@@ -22,10 +22,10 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base')
-        self.model = kwargs.get('model')
-        self.params = kwargs.get('params')
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base")
+        self.model = kwargs.get("model")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -33,30 +33,25 @@ class XInferenceTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {'voice': '中文女'}}
+        optional_params = {"params": {"voice": "中文女"}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
         return XInferenceTextToSpeech(
             model=model_name,
-            api_base=model_credential.get('api_base'),
-            api_key=model_credential.get('api_key'),
+            api_base=model_credential.get("api_base"),
+            api_key=model_credential.get("api_key"),
             **optional_params,
         )
 
     def check_auth(self):
-        self.text_to_speech(_('Hello'))
+        self.text_to_speech(_("Hello"))
 
     def text_to_speech(self, text):
-        client = OpenAI(
-            base_url=self.api_base,
-            api_key=self.api_key
-        )
+        client = OpenAI(base_url=self.api_base, api_key=self.api_key)
         # ['中文女', '中文男', '日语男', '粤语女', '英文女', '英文男', '韩语女']
         text = _remove_empty_lines(text)
         with client.audio.speech.with_streaming_response.create(
-                model=self.model,
-                input=text,
-                **self.params
+            model=self.model, input=text, **self.params
         ) as response:
             return response.read()

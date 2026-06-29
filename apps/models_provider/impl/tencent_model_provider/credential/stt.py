@@ -1,4 +1,3 @@
-
 from common import forms
 from common.exception.app_exception import AppApiException
 from common.forms import BaseForm, TooltipLabel
@@ -7,11 +6,12 @@ from django.utils.translation import gettext_lazy as _, gettext
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class TencentSSTModelParams(BaseForm):
     EngSerViceType = forms.SingleSelect(
-        TooltipLabel(_('Engine model type'), _('If not passed, the default value is 16k_zh (Chinese universal)')),
+        TooltipLabel(_("Engine model type"), _("If not passed, the default value is 16k_zh (Chinese universal)")),
         required=True,
-        default_value='16k_zh',
+        default_value="16k_zh",
         option_list=[
             {"value": "8k_zh", "label": _("Chinese telephone universal")},
             {"value": "8k_en", "label": _("English telephone universal")},
@@ -34,21 +34,24 @@ class TencentSSTModelParams(BaseForm):
             {"value": "16k_hi", "label": _("Hindi")},
             {"value": "16k_fr", "label": _("French")},
             {"value": "16k_de", "label": _("German")},
-            {"value": "16k_zh_dialect", "label": _("Multiple dialects, supporting 23 dialects")}
+            {"value": "16k_zh_dialect", "label": _("Multiple dialects, supporting 23 dialects")},
         ],
-        value_field='value',
-        text_field='label'
+        value_field="value",
+        text_field="label",
     )
+
 
 class TencentSTTModelCredential(BaseForm, BaseModelCredential):
     REQUIRED_FIELDS = ["SecretId", "SecretKey"]
 
     @classmethod
     def _validate_model_type(cls, model_type, provider, raise_exception=False):
-        if not any(mt['value'] == model_type for mt in provider.get_model_type_list()):
+        if not any(mt["value"] == model_type for mt in provider.get_model_type_list()):
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      gettext('{model_type} Model type is not supported').format(model_type=model_type))
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    gettext("{model_type} Model type is not supported").format(model_type=model_type),
+                )
             return False
         return True
 
@@ -57,33 +60,38 @@ class TencentSTTModelCredential(BaseForm, BaseModelCredential):
         missing_keys = [key for key in cls.REQUIRED_FIELDS if key not in model_credential]
         if missing_keys:
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      gettext('{keys} is required').format(keys=", ".join(missing_keys)))
+                raise AppApiException(
+                    ValidCode.valid_error.value, gettext("{keys} is required").format(keys=", ".join(missing_keys))
+                )
             return False
         return True
 
     def is_valid(self, model_type, model_name, model_credential, model_params, provider, raise_exception=False):
-        if not (self._validate_model_type(model_type, provider, raise_exception) and
-                self._validate_credential_fields(model_credential, raise_exception)):
+        if not (
+            self._validate_model_type(model_type, provider, raise_exception)
+            and self._validate_credential_fields(model_credential, raise_exception)
+        ):
             return False
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if raise_exception:
-                raise AppApiException(ValidCode.valid_error.value,
-                                      gettext(
-                                          'Verification failed, please check whether the parameters are correct: {error}').format(
-                                          error=str(e)))
+                raise AppApiException(
+                    ValidCode.valid_error.value,
+                    gettext("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
+                )
             return False
         return True
 
     def encryption_dict(self, model):
-        return {**model, 'SecretKey': super().encryption(model.get('SecretKey', ''))}
+        return {**model, "SecretKey": super().encryption(model.get("SecretKey", ""))}
 
-    SecretId = forms.PasswordInputField('SecretId', required=True)
-    SecretKey = forms.PasswordInputField('SecretKey', required=True)
+    SecretId = forms.PasswordInputField("SecretId", required=True)
+    SecretKey = forms.PasswordInputField("SecretKey", required=True)
 
     def get_model_params_setting_form(self, model_name):
         return TencentSSTModelParams()

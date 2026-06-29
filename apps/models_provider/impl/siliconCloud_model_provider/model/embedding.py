@@ -1,12 +1,13 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： embedding.py
-    @date：2024/10/16 16:34
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： embedding.py
+@date：2024/10/16 16:34
+@desc:
 """
-from typing import Dict, List
+
+from typing import Dict
 from common.utils.logger import maxkb_logger
 import requests
 
@@ -32,27 +33,20 @@ class SiliconCloudEmbeddingModel(MaxKBBaseModel):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return SiliconCloudEmbeddingModel(
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             model_name=model_name,
             optional_params=optional_params,
-            base_url=model_credential.get('api_base'),
+            base_url=model_credential.get("api_base"),
         )
 
     def embed_query(self, text: str) -> list:
-        payload = {
-            "model": self.model_name,
-            "input": text,
-            **self.optional_params
-        }
-        headers = {
-            "Authorization": f"Bearer {self.openai_api_key}",
-            "Content-Type": "application/json"
-        }
+        payload = {"model": self.model_name, "input": text, **self.optional_params}
+        headers = {"Authorization": f"Bearer {self.openai_api_key}", "Content-Type": "application/json"}
 
-        response = requests.post(self.base_url + '/embeddings', json=payload, headers=headers)
+        response = requests.post(self.base_url + "/embeddings", json=payload, headers=headers)
         data = response.json()
         if isinstance(data, dict):
-            if data['data'] is None or 'code' in data:
+            if data["data"] is None or "code" in data:
                 raise ValueError(f"Embedding API returned no data: {data}")
             # 假设返回结构中有 'data[0].embedding'
             return data["data"][0]["embedding"]

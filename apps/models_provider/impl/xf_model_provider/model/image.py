@@ -3,7 +3,7 @@ import base64
 import os
 from typing import Dict, Any, List, Optional, Iterator
 
-#from docutils.utils import SystemMessage
+# from docutils.utils import SystemMessage
 from models_provider.langchain_compat.sparkllm import ChatSparkLLM, _convert_delta_to_message_chunk
 from langchain_core.callbacks import CallbackManagerForLLMRun
 from langchain_core.messages import BaseMessage, ChatMessage, HumanMessage, AIMessage, AIMessageChunk
@@ -54,28 +54,28 @@ class XFSparkImage(MaxKBBaseModel, ChatSparkLLM):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return XFSparkImage(
-            spark_app_id=model_credential.get('spark_app_id'),
-            spark_api_key=model_credential.get('spark_api_key'),
-            spark_api_secret=model_credential.get('spark_api_secret'),
-            spark_api_url=model_credential.get('spark_api_url'),
-            **optional_params
+            spark_app_id=model_credential.get("spark_app_id"),
+            spark_api_key=model_credential.get("spark_api_key"),
+            spark_api_secret=model_credential.get("spark_api_secret"),
+            spark_api_url=model_credential.get("spark_api_url"),
+            **optional_params,
         )
 
     @staticmethod
     def generate_message(prompt: str, image) -> list[BaseMessage]:
         if image is None:
             cwd = os.path.dirname(os.path.abspath(__file__))
-            with open(f'{cwd}/img_1.png', 'rb') as f:
+            with open(f"{cwd}/img_1.png", "rb") as f:
                 base64_image = base64.b64encode(f.read()).decode("utf-8")
-                return [ImageMessage(f'data:image/jpeg;base64,{base64_image}'), HumanMessage(prompt)]
+                return [ImageMessage(f"data:image/jpeg;base64,{base64_image}"), HumanMessage(prompt)]
         return [HumanMessage(prompt)]
 
     def _stream(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         default_chunk_class = AIMessageChunk
 

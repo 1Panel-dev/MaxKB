@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/4/18 15:28
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2024/4/18 15:28
+@desc:
 """
+
 from typing import List, Dict
 
 from langchain_anthropic import ChatAnthropic
@@ -21,7 +22,6 @@ def custom_get_token_ids(text: str):
 
 
 class AnthropicChatModel(MaxKBBaseModel, ChatAnthropic):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -31,23 +31,23 @@ class AnthropicChatModel(MaxKBBaseModel, ChatAnthropic):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         azure_chat_open_ai = AnthropicChatModel(
             model=model_name,
-            anthropic_api_url=model_credential.get('api_base'),
-            anthropic_api_key=model_credential.get('api_key'),
+            anthropic_api_url=model_credential.get("api_base"),
+            anthropic_api_key=model_credential.get("api_key"),
             **optional_params,
-            custom_get_token_ids=custom_get_token_ids
+            custom_get_token_ids=custom_get_token_ids,
         )
         return azure_chat_open_ai
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
             return super().get_num_tokens_from_messages(messages)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
         try:
             return super().get_num_tokens(text)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))

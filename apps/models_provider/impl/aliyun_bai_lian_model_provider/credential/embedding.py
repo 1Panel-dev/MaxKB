@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： embedding.py
-    @date：2024/10/16 17:01
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： embedding.py
+@date：2024/10/16 17:01
+@desc:
 """
+
 from typing import Dict, Any
 
 from django.utils.translation import gettext as _
@@ -20,63 +21,53 @@ from common.utils.logger import maxkb_logger
 
 class BaiLianEmbeddingModelParams(BaseForm):
     dimensions = forms.SingleSelect(
-        TooltipLabel(
-            _('Dimensions'),
-            _('')
-        ),
+        TooltipLabel(_("Dimensions"), _("")),
         required=True,
         default_value=1024,
-        value_field='value',
-        text_field='label',
+        value_field="value",
+        text_field="label",
         option_list=[
-            {'label': '1024', 'value': '1024'},
-            {'label': '768', 'value': '768'},
-            {'label': '512', 'value': '512'},
-        ]
+            {"label": "1024", "value": "1024"},
+            {"label": "768", "value": "768"},
+            {"label": "512", "value": "512"},
+        ],
     )
 
 
 class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
-
     def is_valid(
-            self,
-            model_type: str,
-            model_name: str,
-            model_credential: Dict[str, Any],
-            model_params: Dict[str, Any],
-            provider: Any,
-            raise_exception: bool = False
+        self,
+        model_type: str,
+        model_name: str,
+        model_credential: Dict[str, Any],
+        model_params: Dict[str, Any],
+        provider: Any,
+        raise_exception: bool = False,
     ) -> bool:
         """
         验证模型凭据是否有效
         """
         model_type_list = provider.get_model_type_list()
-        if not any(mt.get('value') == model_type for mt in model_type_list):
-            raise AppApiException(
-                ValidCode.valid_error.value,
-                f"{model_type} Model type is not supported"
-            )
-        required_keys = ['dashscope_api_key', 'api_base']
+        if not any(mt.get("value") == model_type for mt in model_type_list):
+            raise AppApiException(ValidCode.valid_error.value, f"{model_type} Model type is not supported")
+        required_keys = ["dashscope_api_key", "api_base"]
         missing_keys = [key for key in required_keys if key not in model_credential]
         if missing_keys:
             if raise_exception:
-                raise AppApiException(
-                    ValidCode.valid_error.value,
-                    f"{', '.join(missing_keys)} is required"
-                )
+                raise AppApiException(ValidCode.valid_error.value, f"{', '.join(missing_keys)} is required")
             return False
 
         try:
             model: AliyunBaiLianEmbedding = provider.get_model(model_type, model_name, model_credential)
             model.embed_query(_("Hello"))
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    f"Verification failed, please check whether the parameters are correct: {e}"
+                    f"Verification failed, please check whether the parameters are correct: {e}",
                 )
             return False
 
@@ -86,12 +77,13 @@ class AliyunBaiLianEmbeddingCredential(BaseForm, BaseModelCredential):
         """
         加密敏感信息
         """
-        api_key = model.get('dashscope_api_key', '')
-        return {**model, 'dashscope_api_key': super().encryption(api_key)}
+        api_key = model.get("dashscope_api_key", "")
+        return {**model, "dashscope_api_key": super().encryption(api_key)}
 
     def get_model_params_setting_form(self, model_name):
         return BaiLianEmbeddingModelParams()
 
-    api_base = forms.TextInputField(_('API URL'), required=True,
-                                    default_value='https://dashscope.aliyuncs.com/compatible-mode/v1')
-    dashscope_api_key = forms.PasswordInputField('API Key', required=True)
+    api_base = forms.TextInputField(
+        _("API URL"), required=True, default_value="https://dashscope.aliyuncs.com/compatible-mode/v1"
+    )
+    dashscope_api_key = forms.PasswordInputField("API Key", required=True)

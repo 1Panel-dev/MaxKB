@@ -11,14 +11,15 @@ from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
 
-
 class ImageToVideoModelCredential(BaseForm, BaseModelCredential):
     """
     Credential class for the Qwen Image-to-Video model.
     Provides validation and encryption for the model credentials.
     """
 
-    base_url = forms.TextInputField(_("Base Url"), required=True, default_value="https://generativelanguage.googleapis.com")
+    base_url = forms.TextInputField(
+        _("Base Url"), required=True, default_value="https://generativelanguage.googleapis.com"
+    )
     api_key = PasswordInputField("API Key", required=True)
 
     def is_valid(

@@ -18,10 +18,10 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.model = kwargs.get('model')
-        self.params = kwargs.get('params')
-        self.api_url = kwargs.get('api_url')
+        self.api_key = kwargs.get("api_key")
+        self.model = kwargs.get("model")
+        self.params = kwargs.get("params")
+        self.api_url = kwargs.get("api_url")
 
     @staticmethod
     def is_cache_model():
@@ -31,19 +31,16 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return AliyunBaiLianOmiSpeechToText(
             model=model_name,
-            api_key=model_credential.get('api_key'),
-            api_url=model_credential.get('api_url') ,
-            params= model_kwargs,
-            **model_kwargs
+            api_key=model_credential.get("api_key"),
+            api_url=model_credential.get("api_url"),
+            params=model_kwargs,
+            **model_kwargs,
         )
-
 
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as audio_file:
+        with open(f"{cwd}/iat_mp3_16k.mp3", "rb") as audio_file:
             self.speech_to_text(audio_file)
-
-
 
     def speech_to_text(self, audio_file):
         try:
@@ -68,7 +65,7 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                                     "format": "mp3",
                                 },
                             },
-                            {"type": "text", "text": self.params.get('CueWord') or '这段音频在说什么'},
+                            {"type": "text", "text": self.params.get("CueWord") or "这段音频在说什么"},
                         ],
                     },
                 ],
@@ -77,11 +74,11 @@ class AliyunBaiLianOmiSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 # stream 必须设置为 True，否则会报错
                 stream=True,
                 stream_options={"include_usage": True},
-                extra_body = {'enable_thinking': False, **self.params},
+                extra_body={"enable_thinking": False, **self.params},
             )
             result = []
             for chunk in completion:
-                if chunk.choices and hasattr(chunk.choices[0].delta, 'content'):
+                if chunk.choices and hasattr(chunk.choices[0].delta, "content"):
                     content = chunk.choices[0].delta.content
                     result.append(content)
             return "".join(result)

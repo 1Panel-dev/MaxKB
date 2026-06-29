@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： __init__.py.py
-    @date：2024/04/19 15:55
-    @desc:
+@project: maxkb
+@Author：虎
+@file： __init__.py.py
+@date：2024/04/19 15:55
+@desc:
 """
+
 from typing import List, Optional, Any, Iterator, Dict
 
 from models_provider.langchain_compat.sparkllm import (
@@ -29,13 +30,13 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return XFChatSparkLLM(
-            spark_app_id=model_credential.get('spark_app_id'),
-            spark_api_key=model_credential.get('spark_api_key'),
-            spark_api_secret=model_credential.get('spark_api_secret'),
-            spark_api_url=model_credential.get('spark_api_url'),
+            spark_app_id=model_credential.get("spark_app_id"),
+            spark_api_key=model_credential.get("spark_api_key"),
+            spark_api_secret=model_credential.get("spark_api_secret"),
+            spark_api_url=model_credential.get("spark_api_url"),
             spark_llm_domain=model_name,
-            streaming=model_kwargs.get('streaming', False),
-            **optional_params
+            streaming=model_kwargs.get("streaming", False),
+            **optional_params,
         )
 
     usage_metadata: dict = {}
@@ -44,17 +45,17 @@ class XFChatSparkLLM(MaxKBBaseModel, ChatSparkLLM):
         return self.usage_metadata
 
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.usage_metadata.get('prompt_tokens', 0)
+        return self.usage_metadata.get("prompt_tokens", 0)
 
     def get_num_tokens(self, text: str) -> int:
-        return self.usage_metadata.get('completion_tokens', 0)
+        return self.usage_metadata.get("completion_tokens", 0)
 
     def _stream(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         default_chunk_class = AIMessageChunk
 

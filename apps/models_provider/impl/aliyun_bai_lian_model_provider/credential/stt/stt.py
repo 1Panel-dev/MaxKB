@@ -10,13 +10,18 @@ from common.forms import BaseForm, PasswordInputField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
+
 class AliyunBaiLianSTTModelParams(BaseForm):
     sample_rate = forms.SliderField(
-        TooltipLabel(_('Sample Rate'), _('If not passed, the default value is 16000')),
+        TooltipLabel(_("Sample Rate"), _("If not passed, the default value is 16000")),
         required=True,
         default_value=16000,
-        _step=4000, _min=0, _max=20000,precision=0
+        _step=4000,
+        _min=0,
+        _max=20000,
+        precision=0,
     )
+
 
 class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
     """
@@ -33,7 +38,7 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
         model_credential: Dict[str, Any],
         model_params: Dict[str, Any],
         provider,
-        raise_exception: bool = False
+        raise_exception: bool = False,
     ) -> bool:
         """
         Validate the model credentials.
@@ -47,33 +52,31 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
         :return: Boolean indicating whether the credentials are valid.
         """
         model_type_list = provider.get_model_type_list()
-        if not any(mt.get('value') == model_type for mt in model_type_list):
+        if not any(mt.get("value") == model_type for mt in model_type_list):
             raise AppApiException(
-                ValidCode.valid_error.value,
-                _('{model_type} Model type is not supported').format(model_type=model_type)
+                ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
             )
 
-        required_keys = ['api_key']
+        required_keys = ["api_key"]
         for key in required_keys:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(
-                        ValidCode.valid_error.value,
-                        _('{key} is required').format(key=key)
-                    )
+                    raise AppApiException(ValidCode.valid_error.value, _("{key} is required").format(key=key))
                 return False
 
         try:
-            model = provider.get_model(model_type, model_name, model_credential,**model_params)
+            model = provider.get_model(model_type, model_name, model_credential, **model_params)
             model.check_auth()
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    _('Verification failed, please check whether the parameters are correct: {error}').format(error=str(e))
+                    _("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
                 )
             return False
 
@@ -86,10 +89,7 @@ class AliyunBaiLianSTTModelCredential(BaseForm, BaseModelCredential):
         :param model: Dictionary containing model details.
         :return: Dictionary with encrypted sensitive fields.
         """
-        return {
-            **model,
-            'api_key': super().encryption(model.get('api_key', ''))
-        }
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     def get_model_params_setting_form(self, model_name: str):
         """
