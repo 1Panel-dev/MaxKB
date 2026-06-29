@@ -1,5 +1,5 @@
 <template>
-  <div class="sidebar p-8">
+  <div class="sidebar-container">
     <div v-if="showBreadcrumb">
       <AppBreadcrumb />
     </div>
@@ -43,8 +43,15 @@ const activeMenu = computed(() => {
 })
 </script>
 
+<style lang="scss" scoped>
+.sidebar-container {
+  padding: 8px;
+  height: 100%;
+}
+</style>
+
 <style lang="scss">
-.sidebar {
+.sidebar-container {
   .el-menu {
     height: 100%;
     border: none;

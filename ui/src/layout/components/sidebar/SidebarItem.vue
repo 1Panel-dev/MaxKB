@@ -82,10 +82,11 @@ const menuIcon = computed(() => {
   .el-menu-item {
     padding: 13px 12px 13px 8px !important;
     font-weight: 500;
-    border-radius: 4px;
+    border-radius: var(--app-border-radius-base);
+    transition: all 0.15s ease;
     &:hover {
-      background: rgba(var(--el-text-color-primary-rgb), 0.1);
-      color: var(--el-menu-text-color);
+      background: var(--bg-hover);
+      color: var(--text-primary);
     }
   }
   :deep(.el-sub-menu__title) {
@@ -102,7 +103,7 @@ const menuIcon = computed(() => {
   }
   .el-menu-item.is-active {
     color: var(--el-color-primary);
-    background: var(--el-color-primary-light-9);
+    background: var(--primary-50);
   }
 }
 </style>
