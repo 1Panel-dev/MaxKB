@@ -395,18 +395,24 @@ class File(AppModelMixin):
             self.loid = existing_file.loid
             self.file_size = existing_file.file_size
             self.storage_type = existing_file.storage_type
+            if existing_file.storage_type == "seaweedfs":
+                # Point to the canonical S3 key; this file has no object of its own
+                canonical_key = existing_file.meta.get("seaweedfs_key", f"files/{existing_file.id}")
+                self.meta = {**self.meta, "seaweedfs_key": canonical_key}
             return super().save()
 
         if is_seaweedfs_enabled():
             self.storage_type = "seaweedfs"
             self.file_size = len(bytea)
             self.loid = None
+            self.meta = {**self.meta, "seaweedfs_key": f"files/{self.id}"}
             get_s3_client().put_object(Bucket=get_bucket(), Key=f"files/{self.id}", Body=bytea)
         else:
             self.storage_type = "pg"
             compressed_data = self._compress_data(bytea)
             self.file_size = len(compressed_data)
             self.loid = self._create_large_object()
+            self.meta = {**self.meta, "original_size": len(bytea)}
             self._write_compressed_data(compressed_data)
 
         return super().save()
@@ -441,7 +447,8 @@ class File(AppModelMixin):
 
     def get_bytes(self):
         if self.storage_type == "seaweedfs":
-            resp = get_s3_client().get_object(Bucket=get_bucket(), Key=f"files/{self.id}")
+            key = self.meta.get("seaweedfs_key", f"files/{self.id}")
+            resp = get_s3_client().get_object(Bucket=get_bucket(), Key=key)
             return resp["Body"].read()
 
         buffer = io.BytesIO()
@@ -484,16 +491,18 @@ class File(AppModelMixin):
                 if end and offset > end:
                     break
 
-        return _read_with_offset()
+        yield from _read_with_offset()
 
 
 @receiver(pre_delete, sender=File)
 def on_delete_file(sender, instance, **kwargs):
     if instance.storage_type == "seaweedfs":
+        # Deduped references share a key; only delete the S3 object when no other file points to the same key
+        key = instance.meta.get("seaweedfs_key", f"files/{instance.id}")
         shared = QuerySet(File).filter(sha256_hash=instance.sha256_hash).exclude(id=instance.id).exists()
         if not shared:
             try:
-                get_s3_client().delete_object(Bucket=get_bucket(), Key=f"files/{instance.id}")
+                get_s3_client().delete_object(Bucket=get_bucket(), Key=key)
             except Exception:
                 pass
     else:
