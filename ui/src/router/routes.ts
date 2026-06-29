@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const modules: any = import.meta.glob('./modules/*.ts', { eager: true })
 
@@ -22,6 +23,12 @@ export const routes: Array<RouteRecordRaw> = [
           icon: 'app-home',
           iconActive: 'app-home-active',
           group: 'workspace',
+          permission: [
+            RoleConst.USER.getWorkspaceRole,
+            RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+            PermissionConst.HOMEPAGE_READ.getWorkspacePermissionWorkspaceManageRole,
+            PermissionConst.HOMEPAGE_READ.getWorkspacePermission,
+          ],
         },
         children: [
           {

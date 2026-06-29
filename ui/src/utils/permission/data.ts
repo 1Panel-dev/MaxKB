@@ -24,6 +24,7 @@ import { Permission, Role, Edition } from '@/utils/permission/type'
 //     ANNOTATION = "READ+ANNOTATION"  # 标注
 //     CLEAR_POLICY = "READ+CLEAR_POLICY"
 const PermissionConst = {
+  HOMEPAGE_READ: new Permission('HOMEPAGE:READ'),
   APPLICATION: new Permission('APPLICATION'),
   KNOWLEDGE: new Permission('KNOWLEDGE'),
   TOOL: new Permission('TOOL'),
