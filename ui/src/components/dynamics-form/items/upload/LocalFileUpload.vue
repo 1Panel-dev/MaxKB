@@ -233,11 +233,10 @@ function deleteFile(index: any, item?: any) {
   if (item?.status === 'uploading' && typeof item.abort === 'function') {
     item.aborted = true
     item.abort()
+  }else if (item?.status === 'success' && item?.file_id) {
+    applicationApi.deleteFile(item.file_id)
   }
   fileArray.value.splice(index, 1)
-  // if (item?.file_id) {
-  //   applicationApi.deleteFile(item.file_id)
-  // }
   emit('update:modelValue', fileArray.value)
 }
 
