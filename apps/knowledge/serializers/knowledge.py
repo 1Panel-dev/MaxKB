@@ -500,16 +500,18 @@ class KnowledgeSerializer(serializers.Serializer):
         def delete(self):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
-            QuerySet(Document).filter(knowledge=knowledge).delete()
+            document_query_set = QuerySet(Document).filter(knowledge=knowledge)
             QuerySet(ProblemParagraphMapping).filter(knowledge=knowledge).delete()
             QuerySet(Paragraph).filter(knowledge=knowledge).delete()
             QuerySet(Problem).filter(knowledge=knowledge).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
             drop_knowledge_index(knowledge_id=knowledge.id)
             knowledge.delete()
-            File.objects.filter(
-                source_id=knowledge.id,
+            QuerySet(File).filter(source_id=self.data.get("knowledge_id")).delete()
+            QuerySet(File).filter(
+                source_id__in=[str(i) for i in document_query_set.values_list("id", flat=True)]
             ).delete()
+            document_query_set.delete()
             QuerySet(ResourceMapping).filter(
                 Q(target_id=self.data.get("knowledge_id")) | Q(source_id=self.data.get("knowledge_id"))
             ).delete()
@@ -1568,7 +1570,7 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
         knowledge_query_set = QuerySet(Knowledge).filter(id__in=id_list, workspace_id=workspace_id)
 
         # 删除所有关联
-        QuerySet(Document).filter(knowledge__in=knowledge_query_set).delete()
+        document_query_set = QuerySet(Document).filter(knowledge__in=knowledge_query_set)
         QuerySet(ProblemParagraphMapping).filter(knowledge__in=knowledge_query_set).delete()
         QuerySet(Paragraph).filter(knowledge__in=knowledge_query_set).delete()
         QuerySet(Problem).filter(knowledge__in=knowledge_query_set).delete()
@@ -1578,7 +1580,9 @@ class KnowledgeBatchOperateSerializer(serializers.Serializer):
             drop_knowledge_index(knowledge_id=k_id)
             delete_embedding_by_knowledge(k_id)
 
-        File.objects.filter(source_id__in=id_list).delete()
+        QuerySet(File).filter(source_id__in=id_list).delete()
+        QuerySet(File).filter(source_id__in=[str(i) for i in document_query_set.values_list("id", flat=True)]).delete()
+        document_query_set.delete()
         QuerySet(ResourceMapping).filter(Q(target_id__in=id_list) | Q(source_id__in=id_list)).delete()
 
         knowledge_query_set.delete()
