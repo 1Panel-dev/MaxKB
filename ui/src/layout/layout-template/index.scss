@@ -1,15 +1,30 @@
 .app-layout {
-  background-color: var(--app-layout-bg-color);
+  background-color: var(--bg-content);
   height: 100%;
 }
 
 .app-header {
-  background: var(--app-header-bg-color);
+  background: var(--bg-glass-nav);
+  backdrop-filter: var(--blur-nav);
+  -webkit-backdrop-filter: var(--blur-nav);
+  border-bottom: 1px solid var(--border-color-light);
   position: fixed;
   width: 100%;
   left: 0;
   top: 0;
   z-index: 100;
+  animation: glass-header-enter 0.5s ease-out;
+}
+
+@keyframes glass-header-enter {
+  from {
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+  }
+  to {
+    backdrop-filter: var(--blur-nav);
+    -webkit-backdrop-filter: var(--blur-nav);
+  }
 }
 
 .app-main {
@@ -21,4 +36,17 @@
   &.isExpire {
     padding-top: calc(var(--app-header-height) + 40px) !important;
   }
+}
+
+// 暗色模式下导航栏
+[data-theme="dark"] .app-header {
+  background: var(--bg-glass-nav);
+  border-bottom-color: rgba(255, 255, 255, 0.06);
+}
+
+// 非默认主题时
+.custom-header {
+  background: var(--primary-50) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
