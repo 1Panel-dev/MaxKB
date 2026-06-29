@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from application.api.application_stats import ApplicationStatsAPI
 from common import result
 from common.auth import TokenAuth
+from common.auth.authentication import has_permissions
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from homepage.api.home_page_api import ApplicationTokensRankingAPI, ApplicationQuestionRankingAPI, UserTokensRankingAPI, \
     ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI, \
     ApplicationMonitoringAPI, RankingBaseAPI, TokensAggregationAPI, RankingBaseExportAPI
@@ -35,6 +37,9 @@ class HomePageAPI(APIView):
             responses=TokensAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.ChatRecordAggregation(
@@ -57,6 +62,9 @@ class HomePageAPI(APIView):
             responses=TokensAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.TokensAggregation(
@@ -79,6 +87,9 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return HomePageSerializer.ApplicationTokensRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -101,6 +112,9 @@ class HomePageAPI(APIView):
             responses=ApplicationTokensRankingAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationTokensRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -123,6 +137,9 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return HomePageSerializer.ApplicationQuestionRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -145,6 +162,9 @@ class HomePageAPI(APIView):
             responses=ApplicationQuestionRankingAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationQuestionRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -167,6 +187,9 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return HomePageSerializer.ApplicationUserTokenRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -188,6 +211,9 @@ class HomePageAPI(APIView):
             responses=UserTokensRankingAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
             return result.success(HomePageSerializer.ApplicationUserTokenRanking(
                 data={'user_id': request.user.id, 'workspace_id': workspace_id,
@@ -210,6 +236,9 @@ class HomePageAPI(APIView):
             responses=ApplicationMonitoringAPI.get_response(),
             tags=[_('Home page')]  # type: ignore
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.ApplicationMonitoring(
@@ -234,6 +263,9 @@ class HomePageAPI(APIView):
             responses=ApplicationAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.Application(
@@ -252,6 +284,9 @@ class HomePageAPI(APIView):
             responses=KnowledgeAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.Knowledge(
@@ -270,6 +305,9 @@ class HomePageAPI(APIView):
             responses=ToolAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.Tool(
@@ -288,6 +326,9 @@ class HomePageAPI(APIView):
             responses=ModelAggregationAPI.get_response(),
             tags=[_("Home page")],
         )
+        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+                         RoleConstants.USER.get_workspace_role(),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
             return result.success(
                 HomePageSerializer.Model(
