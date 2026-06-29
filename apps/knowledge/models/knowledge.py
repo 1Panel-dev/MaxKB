@@ -470,16 +470,36 @@ class File(AppModelMixin):
 
     def get_bytes_stream(self, start=0, end=None, chunk_size=64 * 1024):
         if self.storage_type == "seaweedfs":
-            data = self.get_bytes()
-            yield data[start:end] if end else data[start:]
+            key = self.meta.get("seaweedfs_key", f"files/{self.id}")
+            kwargs = {}
+            byte_range = []
+            if start:
+                byte_range.append(f"bytes={start}-")
+            if end is not None:
+                byte_range = [f"bytes={start}-{end - 1}"]
+            if byte_range:
+                kwargs["Range"] = byte_range[0]
+            resp = get_s3_client().get_object(Bucket=get_bucket(), Key=key, **kwargs)
+            body = resp["Body"]
+            while True:
+                chunk = body.read(chunk_size)
+                if not chunk:
+                    break
+                yield chunk
             return
 
         def _read_with_offset():
             offset = start
             while True:
+                read_size = chunk_size
+                if end is not None:
+                    remaining = end - offset
+                    if remaining <= 0:
+                        break
+                    read_size = min(chunk_size, remaining)
                 result = select_one(
                     "SELECT lo_get(%s::oid, %s, %s) as chunk",
-                    [self.loid, offset, end - offset if end and (end - offset) < chunk_size else chunk_size],
+                    [self.loid, offset, read_size],
                 )
                 chunk = result["chunk"] if result else None
                 if not chunk:
@@ -487,8 +507,6 @@ class File(AppModelMixin):
                 yield chunk
                 offset += len(chunk)
                 if len(chunk) < chunk_size:
-                    break
-                if end and offset > end:
                     break
 
         yield from _read_with_offset()
