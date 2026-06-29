@@ -65,25 +65,28 @@ class ProvideApi(APIMixin):
     class ModelParamsForm(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                name="model_type",
-                description=_("model type"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="provider",
-                description=_("provider"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="model_name",
-                description=_("model name"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            )
+            return [
+                OpenApiParameter(
+                    name="model_type",
+                    description=_("model type"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="provider",
+                    description=_("provider"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="model_name",
+                    description=_("model name"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    required=True,
+                ),
             ]
 
         @staticmethod
@@ -93,19 +96,21 @@ class ProvideApi(APIMixin):
     class ModelList(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                name="model_type",
-                description=_("model type"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="provider",
-                description=_("provider"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            )
+            return [
+                OpenApiParameter(
+                    name="model_type",
+                    description=_("model type"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="provider",
+                    description=_("provider"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    required=True,
+                ),
             ]
 
         @staticmethod
@@ -119,17 +124,19 @@ class ProvideApi(APIMixin):
     class ModelTypeList(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                # 参数的名称是done
-                name="provider",
-                # 对参数的备注
-                description=_("provider"),
-                # 指定参数的类型
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                # 指定必须给
-                required=True,
-            )]
+            return [
+                OpenApiParameter(
+                    # 参数的名称是done
+                    name="provider",
+                    # 对参数的备注
+                    description=_("provider"),
+                    # 指定参数的类型
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,
+                    # 指定必须给
+                    required=True,
+                )
+            ]
 
         @staticmethod
         def get_response():

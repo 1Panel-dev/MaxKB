@@ -23,10 +23,10 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.hunyuan_secret_id = kwargs.get('hunyuan_secret_id')
-        self.hunyuan_secret_key = kwargs.get('hunyuan_secret_key')
-        self.model = kwargs.get('model')
-        self.params = kwargs.get('params')
+        self.hunyuan_secret_id = kwargs.get("hunyuan_secret_id")
+        self.hunyuan_secret_key = kwargs.get("hunyuan_secret_key")
+        self.model = kwargs.get("model")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -35,16 +35,16 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return TencentSpeechToText(
-            hunyuan_secret_id=model_credential.get('SecretId'),
-            hunyuan_secret_key=model_credential.get('SecretKey'),
+            hunyuan_secret_id=model_credential.get("SecretId"),
+            hunyuan_secret_key=model_credential.get("SecretKey"),
             model=model_name,
             params=model_kwargs,
-            **model_kwargs
+            **model_kwargs,
         )
 
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+        with open(f"{cwd}/iat_mp3_16k.mp3", "rb") as f:
             self.speech_to_text(f)
 
     def speech_to_text(self, audio_file):
@@ -65,11 +65,11 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             # 实例化一个请求对象,每个接口都会对应一个request对象
             req = models.SentenceRecognitionRequest()
             params = {
-                "EngSerViceType": self.params.get('EngSerViceType'),
+                "EngSerViceType": self.params.get("EngSerViceType"),
                 "SourceType": 1,
                 "VoiceFormat": "mp3",
                 "Data": _v.decode(),
-                **self.params
+                **self.params,
             }
             req.from_json_string(json.dumps(params))
 
@@ -77,7 +77,6 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             resp = client.SentenceRecognition(req)
             # 输出json格式的字符串回包
             return resp.Result
-
 
         except TencentCloudSDKException as err:
             maxkb_logger.error(f":Error: {str(err)}: {traceback.format_exc()}")

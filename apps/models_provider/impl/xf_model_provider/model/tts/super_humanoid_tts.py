@@ -28,6 +28,7 @@ ssl_context.verify_mode = ssl.CERT_NONE
 
 class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     """讯飞超拟人语音合成 (Super Humanoid TTS)"""
+
     spark_app_id: str
     spark_api_key: str
     spark_api_secret: str
@@ -36,11 +37,11 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.spark_api_url = kwargs.get('spark_api_url')
-        self.spark_app_id = kwargs.get('spark_app_id')
-        self.spark_api_key = kwargs.get('spark_api_key')
-        self.spark_api_secret = kwargs.get('spark_api_secret')
-        self.params = kwargs.get('params') or {}
+        self.spark_api_url = kwargs.get("spark_api_url")
+        self.spark_app_id = kwargs.get("spark_app_id")
+        self.spark_api_key = kwargs.get("spark_api_key")
+        self.spark_api_secret = kwargs.get("spark_api_secret")
+        self.params = kwargs.get("params") or {}
 
     @staticmethod
     def is_cache_model():
@@ -52,23 +53,23 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
         params = {}
         for k, v in model_kwargs.items():
-            if k not in ['model_id', 'use_local', 'streaming']:
+            if k not in ["model_id", "use_local", "streaming"]:
                 params[k] = v
 
         return XFSparkSuperHumanoidTextToSpeech(
-            spark_app_id=model_credential.get('spark_app_id'),
-            spark_api_key=model_credential.get('spark_api_key'),
-            spark_api_secret=model_credential.get('spark_api_secret'),
-            spark_api_url=model_credential.get('spark_api_url'),
+            spark_app_id=model_credential.get("spark_app_id"),
+            spark_api_key=model_credential.get("spark_api_key"),
+            spark_api_secret=model_credential.get("spark_api_secret"),
+            spark_api_url=model_credential.get("spark_api_url"),
             params=params,
-            **model_kwargs
+            **model_kwargs,
         )
 
     def create_url(self):
         url = self.spark_api_url
         host = urlparse(url).hostname
 
-        gmt_format = '%a, %d %b %Y %H:%M:%S GMT'
+        gmt_format = "%a, %d %b %Y %H:%M:%S GMT"
         date = datetime.now(UTC).strftime(gmt_format)
 
         signature_origin = f"host: {host}\n"
@@ -76,29 +77,22 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         signature_origin += f"GET {urlparse(url).path} HTTP/1.1"
 
         signature_sha = hmac.new(
-            self.spark_api_secret.encode('utf-8'),
-            signature_origin.encode('utf-8'),
-            digestmod=hashlib.sha256
+            self.spark_api_secret.encode("utf-8"), signature_origin.encode("utf-8"), digestmod=hashlib.sha256
         ).digest()
 
-        signature_sha = base64.b64encode(signature_sha).decode('utf-8')
+        signature_sha = base64.b64encode(signature_sha).decode("utf-8")
 
-        authorization_origin = \
-            f'api_key="{self.spark_api_key}", algorithm="hmac-sha256", headers="host date request-line", signature="{signature_sha}"'
+        authorization_origin = f'api_key="{self.spark_api_key}", algorithm="hmac-sha256", headers="host date request-line", signature="{signature_sha}"'
 
-        authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode('utf-8')
+        authorization = base64.b64encode(authorization_origin.encode("utf-8")).decode("utf-8")
 
-        v = {
-            "authorization": authorization,
-            "date": date,
-            "host": host
-        }
+        v = {"authorization": authorization, "date": date, "host": host}
 
-        url = url + '?' + urlencode(v)
+        url = url + "?" + urlencode(v)
         return url
 
     def check_auth(self):
-        self.text_to_speech(_('Hello'))
+        self.text_to_speech(_("Hello"))
 
     def text_to_speech(self, text):
         text = _remove_empty_lines(text)
@@ -111,10 +105,12 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             except websockets.exceptions.InvalidStatus as e:
                 if e.response.status_code == 401:
                     raise Exception(
-                        _("Authentication failed (HTTP 401). Please check: "
-                          "1) API URL is correct for TTS service; "
-                          "2) APP ID, API Key, and API Secret are correct; "
-                          "3) Your iFlytek account has TTS service enabled.")
+                        _(
+                            "Authentication failed (HTTP 401). Please check: "
+                            "1) API URL is correct for TTS service; "
+                            "2) APP ID, API Key, and API Secret are correct; "
+                            "3) Your iFlytek account has TTS service enabled."
+                        )
                     )
                 else:
                     raise Exception(f"WebSocket connection failed: HTTP {e.response.status_code}")
@@ -127,7 +123,7 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
 
     @staticmethod
     async def handle_message(ws):
-        audio_bytes: bytes = b''
+        audio_bytes: bytes = b""
         while True:
             res = await ws.recv()
             message = json.loads(res)
@@ -160,27 +156,30 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
             "sample_rate": self.params.get("sample_rate", 24000),
             "channels": self.params.get("channels", 1),
             "bit_depth": self.params.get("bit_depth", 16),
-            "frame_size": self.params.get("frame_size", 0)
+            "frame_size": self.params.get("frame_size", 0),
         }
 
         tts_params = {
-            **{key: v for key, v in self.params.items() if
-               not ['parameter', 'streaming', 'model_id', 'use_local'].__contains__(key)},
+            **{
+                key: v
+                for key, v in self.params.items()
+                if not ["parameter", "streaming", "model_id", "use_local"].__contains__(key)
+            },
             "vcn": self.params.get("vcn") or "x5_lingxiaoxuan_flow",
             "audio": audio_params,
             "volume": self.params.get("volume", 50),
             "speed": self.params.get("speed", 50),
-            "pitch": self.params.get("pitch", 50)
+            "pitch": self.params.get("pitch", 50),
         }
 
-        encoded_text = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+        encoded_text = base64.b64encode(text.encode("utf-8")).decode("utf-8")
         payload_text_obj = {
             "encoding": "utf8",
             "compress": "raw",
             "format": "plain",
             "status": 2,
             "seq": 0,
-            "text": encoded_text
+            "text": encoded_text,
         }
         s = {"tts": tts_params}
         # "parameter": {"oar":"xxxx"}
@@ -189,7 +188,7 @@ class XFSparkSuperHumanoidTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
         d = {
             "header": {"app_id": self.spark_app_id, "status": 2},
             "parameter": {"tts": tts_params} | parameter,
-            "payload": {"text": payload_text_obj}
+            "payload": {"text": payload_text_obj},
         }
 
         await ws.send(json.dumps(d))

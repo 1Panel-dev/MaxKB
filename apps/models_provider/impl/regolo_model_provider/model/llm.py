@@ -1,15 +1,14 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/4/18 15:28
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2024/4/18 15:28
+@desc:
 """
-from typing import List, Dict
 
-from langchain_core.messages import BaseMessage, get_buffer_string
-from langchain_openai.chat_models import ChatOpenAI
+from typing import Dict
+
 
 from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -22,7 +21,6 @@ def custom_get_token_ids(text: str):
 
 
 class RegoloChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -32,7 +30,7 @@ class RegoloChatModel(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return RegoloChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base') or "https://api.regolo.ai/v1",
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base") or "https://api.regolo.ai/v1",
+            openai_api_key=model_credential.get("api_key"),
             **optional_params,
         )

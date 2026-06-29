@@ -1,10 +1,7 @@
 # coding=utf-8
-from http import HTTPStatus
 from typing import Dict
 
 import requests
-from dashscope import ImageSynthesis, MultiModalConversation
-from dashscope.aigc.image_generation import ImageGeneration
 
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -19,10 +16,10 @@ class MiniMaxTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base')
-        self.model_name = kwargs.get('model_name')
-        self.params = kwargs.get('params')
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base")
+        self.model_name = kwargs.get("model_name")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -30,15 +27,15 @@ class MiniMaxTextToImageModel(MaxKBBaseModel, BaseTextToImage):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {"params": {}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
-        api_base = model_credential.get('api_base', "https://api.minimaxi.com/v1")
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
+        api_base = model_credential.get("api_base", "https://api.minimaxi.com/v1")
 
         minimax_model = MiniMaxTextToImageModel(
             model_name=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             api_base=api_base,
             **optional_params,
         )
@@ -56,7 +53,7 @@ class MiniMaxTextToImageModel(MaxKBBaseModel, BaseTextToImage):
             **self.params,
         }
         try:
-            response = requests.post(f'{self.api_base}/image_generation', headers=headers, json=payload)
+            response = requests.post(f"{self.api_base}/image_generation", headers=headers, json=payload)
             response.raise_for_status()
             file_urls = []
             data = response.json().get("data", {})
@@ -67,5 +64,5 @@ class MiniMaxTextToImageModel(MaxKBBaseModel, BaseTextToImage):
                     file_urls.append(f"data:image/png;base64,{img}")
             return file_urls
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             raise e

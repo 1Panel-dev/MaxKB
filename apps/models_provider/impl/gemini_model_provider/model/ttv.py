@@ -44,6 +44,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     def generate_video(self, prompt, negative_prompt=None, first_frame_url=None, last_frame_url=None, **kwargs):
         from google import genai
         from google.genai import types
+
         client = genai.Client(api_key=self.api_key, http_options={"base_url": self.base_url})
 
         # 1. 动态构建 Config 参数字典

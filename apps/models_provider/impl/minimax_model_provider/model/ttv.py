@@ -1,4 +1,3 @@
-
 import time
 from typing import Dict
 
@@ -19,11 +18,11 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.api_key = kwargs.get('api_key')
-        self.api_base = kwargs.get('api_base', 'https://api.minimaxi.com/v1')
-        self.model_name = kwargs.get('model_name')
-        self.params = kwargs.get('params', {})
-        self.max_retries = kwargs.get('max_retries', 3)
+        self.api_key = kwargs.get("api_key")
+        self.api_base = kwargs.get("api_base", "https://api.minimaxi.com/v1")
+        self.model_name = kwargs.get("model_name")
+        self.params = kwargs.get("params", {})
+        self.max_retries = kwargs.get("max_retries", 3)
         self.retry_delay = 10
 
     @staticmethod
@@ -32,16 +31,16 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = {'params': {}}
+        optional_params = {"params": {}}
         for key, value in model_kwargs.items():
-            if key not in ['model_id', 'use_local', 'streaming']:
-                optional_params['params'][key] = value
+            if key not in ["model_id", "use_local", "streaming"]:
+                optional_params["params"][key] = value
 
-        api_base = model_credential.get('api_base','https://api.minimaxi.com/v1')
+        api_base = model_credential.get("api_base", "https://api.minimaxi.com/v1")
 
         return GenerationVideoModel(
             model_name=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             api_base=api_base,
             **optional_params,
         )
@@ -55,18 +54,20 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         for attempt in range(self.max_retries):
             try:
-                if method.upper() == 'POST':
+                if method.upper() == "POST":
                     response = requests.post(url, headers=headers, **kwargs)
-                elif method.upper() == 'GET':
+                elif method.upper() == "GET":
                     response = requests.get(url, headers=headers, **kwargs)
                 else:
                     raise ValueError(f"Unsupported HTTP method: {method}")
 
                 response.raise_for_status()
                 return response.json()
-            except (requests.exceptions.ProxyError,
-                    requests.exceptions.ConnectionError,
-                    requests.exceptions.Timeout) as e:
+            except (
+                requests.exceptions.ProxyError,
+                requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout,
+            ) as e:
                 maxkb_logger.error(f"⚠️ 网络错误: {e}，正在重试 {attempt + 1}/{self.max_retries}...")
                 time.sleep(self.retry_delay)
             except requests.exceptions.HTTPError as e:
@@ -112,7 +113,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
 
         # --- 步骤 1: 提交任务 ---
         maxkb_logger.info(f"提交视频生成任务，模型: {self.model_name}")
-        response_data = self._safe_call('POST', base_url, json=payload)
+        response_data = self._safe_call("POST", base_url, json=payload)
 
         task_id = response_data.get("task_id")
         if not task_id:
@@ -136,7 +137,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         max_attempts = 60  # 最多轮询 60 次（约 10 分钟）
 
         for attempt in range(max_attempts):
-            response_data = self._safe_call('GET', query_url, params=params)
+            response_data = self._safe_call("GET", query_url, params=params)
             status = response_data.get("status")
 
             maxkb_logger.info(f"当前任务状态 (尝试 {attempt + 1}/{max_attempts}): {status}")
@@ -162,7 +163,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         retrieve_url = f"{self.api_base}/files/retrieve"
         params = {"file_id": file_id}
 
-        response_data = self._safe_call('GET', retrieve_url, params=params)
+        response_data = self._safe_call("GET", retrieve_url, params=params)
 
         file_info = response_data.get("file", {})
         download_url = file_info.get("download_url")

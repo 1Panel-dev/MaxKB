@@ -7,7 +7,7 @@ import ssl
 import traceback
 from typing import Dict
 from urllib.parse import urlencode
-from datetime import datetime, timezone, UTC
+from datetime import datetime, UTC
 import websockets
 import os
 
@@ -44,11 +44,11 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.spark_api_url = kwargs.get('spark_api_url')
-        self.spark_app_id = kwargs.get('spark_app_id')
-        self.spark_api_key = kwargs.get('spark_api_key')
-        self.spark_api_secret = kwargs.get('spark_api_secret')
-        self.params = kwargs.get('params')
+        self.spark_api_url = kwargs.get("spark_api_url")
+        self.spark_app_id = kwargs.get("spark_app_id")
+        self.spark_api_key = kwargs.get("spark_api_key")
+        self.spark_api_secret = kwargs.get("spark_api_secret")
+        self.params = kwargs.get("params")
 
     @staticmethod
     def is_cache_model():
@@ -58,12 +58,12 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
 
         return XFZhEnSparkSpeechToText(
-            spark_app_id=model_credential.get('spark_app_id'),
-            spark_api_key=model_credential.get('spark_api_key'),
-            spark_api_secret=model_credential.get('spark_api_secret'),
-            spark_api_url=model_credential.get('spark_api_url'),
+            spark_app_id=model_credential.get("spark_app_id"),
+            spark_api_key=model_credential.get("spark_api_key"),
+            spark_api_secret=model_credential.get("spark_api_secret"),
+            spark_api_url=model_credential.get("spark_api_url"),
             params=model_kwargs,
-            **model_kwargs
+            **model_kwargs,
         )
 
     # 生成url
@@ -71,7 +71,7 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         url = self.spark_api_url
         host = urlparse(url).hostname
 
-        gmt_format = '%a, %d %b %Y %H:%M:%S GMT'
+        gmt_format = "%a, %d %b %Y %H:%M:%S GMT"
         date = datetime.now(UTC).strftime(gmt_format)
         # 拼接字符串
         signature_origin = "host: " + host + "\n"
@@ -79,29 +79,23 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         signature_origin += "GET " + "/v1 HTTP/1.1"
         # 进行hmac-sha256进行加密
         signature_sha = hmac.new(
-            self.spark_api_secret.encode('utf-8'),
-            signature_origin.encode('utf-8'),
-            hashlib.sha256
+            self.spark_api_secret.encode("utf-8"), signature_origin.encode("utf-8"), hashlib.sha256
         ).digest()
-        signature = base64.b64encode(signature_sha).decode(encoding='utf-8')
+        signature = base64.b64encode(signature_sha).decode(encoding="utf-8")
 
         authorization_origin = (
             f'api_key="{self.spark_api_key}", algorithm="hmac-sha256", '
             f'headers="host date request-line", signature="{signature}"'
         )
-        authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode(encoding='utf-8')
+        authorization = base64.b64encode(authorization_origin.encode("utf-8")).decode(encoding="utf-8")
 
-        params = {
-            'authorization': authorization,
-            'date': date,
-            'host': host
-        }
-        auth_url = url + '?' + urlencode(params)
+        params = {"authorization": authorization, "date": date, "host": host}
+        auth_url = url + "?" + urlencode(params)
         return auth_url
 
     def check_auth(self):
         cwd = os.path.dirname(os.path.abspath(__file__))
-        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+        with open(f"{cwd}/iat_mp3_16k.mp3", "rb") as f:
             self.speech_to_text(f)
 
     def speech_to_text(self, audio_file_path):
@@ -112,13 +106,14 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                 await self.send_audio(ws, audio_file_path)
                 # 接收识别结果
                 return await self.handle_message(ws)
+
         try:
             return asyncio.run(handle())
         except Exception as err:
             maxkb_logger.error(f"语音识别错误: {str(err)}: {traceback.format_exc()}")
             raise
 
-    def merge_params_to_frame(self, frame,params):
+    def merge_params_to_frame(self, frame, params):
 
         return deep_merge_dict(frame, params)
 
@@ -132,7 +127,7 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             if not chunk or seq > max_chunks:
                 break
 
-            chunk_base64 = base64.b64encode(chunk).decode('utf-8')
+            chunk_base64 = base64.b64encode(chunk).decode("utf-8")
             # 第一帧
             if seq == 1:
                 frame = {
@@ -144,18 +139,29 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                             "accent": "mandarin",
                             "eos": 10000,
                             "vinfo": 1,
-                            "result": {"encoding": "utf8", "compress": "raw", "format": "json"}
+                            "result": {"encoding": "utf8", "compress": "raw", "format": "json"},
                         }
                     },
                     "payload": {
                         "audio": {
-                            "encoding": "lame", "sample_rate": 16000, "channels": 1,
-                            "bit_depth": 16, "seq": seq, "status": 0, "audio": chunk_base64
+                            "encoding": "lame",
+                            "sample_rate": 16000,
+                            "channels": 1,
+                            "bit_depth": 16,
+                            "seq": seq,
+                            "status": 0,
+                            "audio": chunk_base64,
                         }
-                    }
+                    },
                 }
-                frame = self.merge_params_to_frame(frame,{key: value for key, value in self.params.items() if
-                                            not ['model_id', 'use_local', 'streaming'].__contains__(key)})
+                frame = self.merge_params_to_frame(
+                    frame,
+                    {
+                        key: value
+                        for key, value in self.params.items()
+                        if not ["model_id", "use_local", "streaming"].__contains__(key)
+                    },
+                )
 
             # 中间帧
             else:
@@ -163,14 +169,25 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
                     "header": {"app_id": self.spark_app_id, "status": 1},
                     "payload": {
                         "audio": {
-                            "encoding": "lame", "sample_rate": 16000, "channels": 1,
-                            "bit_depth": 16, "seq": seq, "status": 1, "audio": chunk_base64
+                            "encoding": "lame",
+                            "sample_rate": 16000,
+                            "channels": 1,
+                            "bit_depth": 16,
+                            "seq": seq,
+                            "status": 1,
+                            "audio": chunk_base64,
                         }
-                    }
+                    },
                 }
 
-                frame = self.merge_params_to_frame(frame,{key: value for key, value in self.params.items() if
-                                            not ['model_id', 'use_local', 'streaming','parameter'].__contains__(key)})
+                frame = self.merge_params_to_frame(
+                    frame,
+                    {
+                        key: value
+                        for key, value in self.params.items()
+                        if not ["model_id", "use_local", "streaming", "parameter"].__contains__(key)
+                    },
+                )
 
             await ws.send(json.dumps(frame))
             seq += 1
@@ -180,14 +197,25 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             "header": {"app_id": self.spark_app_id, "status": 2},
             "payload": {
                 "audio": {
-                    "encoding": "lame", "sample_rate": 16000, "channels": 1,
-                    "bit_depth": 16, "seq": seq, "status": 2, "audio": ""
+                    "encoding": "lame",
+                    "sample_rate": 16000,
+                    "channels": 1,
+                    "bit_depth": 16,
+                    "seq": seq,
+                    "status": 2,
+                    "audio": "",
                 }
-            }
+            },
         }
 
-        end_frame = self.merge_params_to_frame(end_frame,{key: value for key, value in self.params.items() if
-                                            not ['model_id', 'use_local', 'streaming','parameter'].__contains__(key)})
+        end_frame = self.merge_params_to_frame(
+            end_frame,
+            {
+                key: value
+                for key, value in self.params.items()
+                if not ["model_id", "use_local", "streaming", "parameter"].__contains__(key)
+            },
+        )
 
         await ws.send(json.dumps(end_frame))
 
@@ -198,20 +226,20 @@ class XFZhEnSparkSpeechToText(MaxKBBaseModel, BaseSpeechToText):
             try:
                 message = await asyncio.wait_for(ws.recv(), timeout=30.0)
                 data = json.loads(message)
-                if data['header']['code'] != 0:
+                if data["header"]["code"] != 0:
                     raise Exception("")
 
-                if 'payload' in data and 'result' in data['payload']:
-                    result = data['payload']['result']
-                    text = result.get('text', '')
+                if "payload" in data and "result" in data["payload"]:
+                    result = data["payload"]["result"]
+                    text = result.get("text", "")
                     if text:
-                        text_data = json.loads(base64.b64decode(text).decode('utf-8'))
-                        for ws_item in text_data.get('ws', []):
-                            for cw in ws_item.get('cw', []):
-                                for sw in cw.get('w', []):
+                        text_data = json.loads(base64.b64decode(text).decode("utf-8"))
+                        for ws_item in text_data.get("ws", []):
+                            for cw in ws_item.get("cw", []):
+                                for sw in cw.get("w", []):
                                     result_text += sw
 
-                if data['header'].get('status') == 2:
+                if data["header"].get("status") == 2:
                     break
             except asyncio.TimeoutError:
                 break

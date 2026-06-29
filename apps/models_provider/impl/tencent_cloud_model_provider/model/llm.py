@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： llm.py
-    @date：2024/4/18 15:28
-    @desc:
+@project: maxkb
+@Author：虎
+@file： llm.py
+@date：2024/4/18 15:28
+@desc:
 """
+
 from typing import Dict
 
 from common.config.tokenizer_manage_config import TokenizerManage
@@ -19,7 +20,6 @@ def custom_get_token_ids(text: str):
 
 
 class TencentCloudChatModel(MaxKBBaseModel, BaseChatOpenAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -29,10 +29,9 @@ class TencentCloudChatModel(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         azure_chat_open_ai = TencentCloudChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base'),
-            openai_api_key=model_credential.get('api_key'),
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
             custom_get_token_ids=custom_get_token_ids,
             **optional_params,
         )
         return azure_chat_open_ai
-

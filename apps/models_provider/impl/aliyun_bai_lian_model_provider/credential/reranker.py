@@ -14,13 +14,15 @@ from common.utils.logger import maxkb_logger
 
 
 class AliyunRerankerModelParams(BaseForm):
-    top_n = forms.SliderField(TooltipLabel(_('Top N'),
-                                           _('Number of top documents to return after reranking')),
-                              required=True, default_value=3,
-                              _min=1,
-                              _max=100,
-                              _step=1,
-                              precision=0)
+    top_n = forms.SliderField(
+        TooltipLabel(_("Top N"), _("Number of top documents to return after reranking")),
+        required=True,
+        default_value=3,
+        _min=1,
+        _max=100,
+        _step=1,
+        precision=0,
+    )
 
 
 class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
@@ -28,18 +30,18 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
     Credential class for the Aliyun BaiLian Reranker model.
     Provides validation and encryption for the model credentials.
     """
-    api_base = forms.TextInputField(_('API URL'), required=True,
-                                    default_value='https://dashscope.aliyuncs.com/api/v1')
-    dashscope_api_key = PasswordInputField('API Key', required=True)
+
+    api_base = forms.TextInputField(_("API URL"), required=True, default_value="https://dashscope.aliyuncs.com/api/v1")
+    dashscope_api_key = PasswordInputField("API Key", required=True)
 
     def is_valid(
-            self,
-            model_type: str,
-            model_name: str,
-            model_credential: Dict[str, Any],
-            model_params: Dict[str, Any],
-            provider,
-            raise_exception: bool = False
+        self,
+        model_type: str,
+        model_name: str,
+        model_credential: Dict[str, Any],
+        model_params: Dict[str, Any],
+        provider,
+        raise_exception: bool = False,
     ) -> bool:
         """
         Validate the model credentials.
@@ -52,34 +54,31 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
         :param raise_exception: Whether to raise an exception on validation failure.
         :return: Boolean indicating whether the credentials are valid.
         """
-        if model_type != 'RERANKER':
+        if model_type != "RERANKER":
             raise AppApiException(
-                ValidCode.valid_error.value,
-                _('{model_type} Model type is not supported').format(model_type=model_type)
+                ValidCode.valid_error.value, _("{model_type} Model type is not supported").format(model_type=model_type)
             )
 
-        required_keys = ['dashscope_api_key']
+        required_keys = ["dashscope_api_key"]
         for key in required_keys:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(
-                        ValidCode.valid_error.value,
-                        _('{key} is required').format(key=key)
-                    )
+                    raise AppApiException(ValidCode.valid_error.value, _("{key} is required").format(key=key))
                 return False
 
         try:
             model: AliyunBaiLianReranker = provider.get_model(model_type, model_name, model_credential)
-            model.compress_documents([Document(page_content=_('Hello'))], _('Hello'))
+            model.compress_documents([Document(page_content=_("Hello"))], _("Hello"))
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    _('Verification failed, please check whether the parameters are correct: {error}').format(
-                        error=str(e))
+                    _("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
                 )
             return False
 
@@ -92,10 +91,7 @@ class AliyunBaiLianRerankerCredential(BaseForm, BaseModelCredential):
         :param model: Dictionary containing model details.
         :return: Dictionary with encrypted sensitive fields.
         """
-        return {
-            **model,
-            'dashscope_api_key': super().encryption(model.get('dashscope_api_key', ''))
-        }
+        return {**model, "dashscope_api_key": super().encryption(model.get("dashscope_api_key", ""))}
 
     def get_model_params_setting_form(self, model_name: str) -> AliyunRerankerModelParams:
         return AliyunRerankerModelParams()

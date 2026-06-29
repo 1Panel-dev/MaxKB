@@ -15,7 +15,8 @@ from langchain_core.messages import (
     ChatMessage,
     ChatMessageChunk,
     HumanMessage,
-    HumanMessageChunk, SystemMessage,
+    HumanMessageChunk,
+    SystemMessage,
 )
 from langchain_core.outputs import ChatGeneration, ChatGenerationChunk, ChatResult
 from pydantic import Field, SecretStr, root_validator
@@ -56,7 +57,7 @@ def _convert_dict_to_message(_dict: Mapping[str, Any]) -> BaseMessage:
 
 
 def _convert_delta_to_message_chunk(
-        _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
+    _dict: Mapping[str, Any], default_class: Type[BaseMessageChunk]
 ) -> BaseMessageChunk:
     role = _dict.get("Role")
     content = _dict.get("Content") or ""
@@ -200,16 +201,14 @@ class ChatHunyuan(BaseChatModel):
         return {**normal_params, **self.model_kwargs}
 
     def _generate(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
     ) -> ChatResult:
         if self.streaming:
-            stream_iter = self._stream(
-                messages=messages, stop=stop, run_manager=run_manager, **kwargs
-            )
+            stream_iter = self._stream(messages=messages, stop=stop, run_manager=run_manager, **kwargs)
             return generate_from_stream(stream_iter)
 
         res = self._chat(messages, **kwargs)
@@ -218,11 +217,11 @@ class ChatHunyuan(BaseChatModel):
     usage_metadata: dict = {}
 
     def _stream(
-            self,
-            messages: List[BaseMessage],
-            stop: Optional[List[str]] = None,
-            run_manager: Optional[CallbackManagerForLLMRun] = None,
-            **kwargs: Any,
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
     ) -> Iterator[ChatGenerationChunk]:
         res = self._chat(messages, **kwargs)
 
@@ -236,9 +235,7 @@ class ChatHunyuan(BaseChatModel):
                 raise ValueError(f"Error from Hunyuan api response: {response}")
 
             for choice in response["Choices"]:
-                chunk = _convert_delta_to_message_chunk(
-                    choice["Delta"], default_chunk_class
-                )
+                chunk = _convert_delta_to_message_chunk(choice["Delta"], default_chunk_class)
                 default_chunk_class = chunk.__class__
                 # FinishReason === stop
                 if choice.get("FinishReason") == "stop":
@@ -262,9 +259,7 @@ class ChatHunyuan(BaseChatModel):
             )
 
         parameters = {**self._default_params, **kwargs}
-        cred = credential.Credential(
-            self.hunyuan_secret_id, str(self.hunyuan_secret_key.get_secret_value())
-        )
+        cred = credential.Credential(self.hunyuan_secret_id, str(self.hunyuan_secret_key.get_secret_value()))
         client = hunyuan_client.HunyuanClient(cred, "")
         req = models.ChatCompletionsRequest()
         params = {

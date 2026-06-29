@@ -5,7 +5,7 @@ from typing import Dict, Any
 from django.utils.translation import gettext_lazy as _, gettext
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm, PasswordInputField, SingleSelect, SliderField, TooltipLabel
+from common.forms import BaseForm, PasswordInputField, SliderField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
@@ -17,13 +17,13 @@ class MiniMaxModelParams(BaseForm):
     """
 
     n = SliderField(
-        TooltipLabel(_('Number of pictures'), _('Specify the number of generated images')),
+        TooltipLabel(_("Number of pictures"), _("Specify the number of generated images")),
         required=True,
         default_value=1,
         _min=1,
         _max=4,
         _step=1,
-        precision=0
+        precision=0,
     )
 
 
@@ -32,18 +32,18 @@ class MiniMaxTextToImageModelCredential(BaseForm, BaseModelCredential):
     Credential class for the MiniMax Text-to-Image model.
     Provides validation and encryption for the model credentials.
     """
-    api_base = forms.TextInputField('API URL', required=True,
-                                    default_value='https://api.minimaxi.com/v1')
-    api_key = PasswordInputField('API Key', required=True)
+
+    api_base = forms.TextInputField("API URL", required=True, default_value="https://api.minimaxi.com/v1")
+    api_key = PasswordInputField("API Key", required=True)
 
     def is_valid(
-            self,
-            model_type: str,
-            model_name: str,
-            model_credential: Dict[str, Any],
-            model_params: Dict[str, Any],
-            provider,
-            raise_exception: bool = False
+        self,
+        model_type: str,
+        model_name: str,
+        model_credential: Dict[str, Any],
+        model_params: Dict[str, Any],
+        provider,
+        raise_exception: bool = False,
     ) -> bool:
         """
         Validate the model credentials.
@@ -57,35 +57,32 @@ class MiniMaxTextToImageModelCredential(BaseForm, BaseModelCredential):
         :return: Boolean indicating whether the credentials are valid.
         """
         model_type_list = provider.get_model_type_list()
-        if not any(mt.get('value') == model_type for mt in model_type_list):
+        if not any(mt.get("value") == model_type for mt in model_type_list):
             raise AppApiException(
                 ValidCode.valid_error.value,
-                gettext('{model_type} Model type is not supported').format(model_type=model_type)
+                gettext("{model_type} Model type is not supported").format(model_type=model_type),
             )
 
-        required_keys = ['api_key', 'api_base']
+        required_keys = ["api_key", "api_base"]
         for key in required_keys:
             if key not in model_credential:
                 if raise_exception:
-                    raise AppApiException(
-                        ValidCode.valid_error.value,
-                        gettext('{key} is required').format(key=key)
-                    )
+                    raise AppApiException(ValidCode.valid_error.value, gettext("{key} is required").format(key=key))
                 return False
 
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
             res = model.check_auth()
         except Exception as e:
-            maxkb_logger.error(f'Exception: {e}', exc_info=True)
+            maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException):
                 raise e
             if raise_exception:
                 raise AppApiException(
                     ValidCode.valid_error.value,
-                    gettext(
-                        'Verification failed, please check whether the parameters are correct: {error}'
-                    ).format(error=str(e))
+                    gettext("Verification failed, please check whether the parameters are correct: {error}").format(
+                        error=str(e)
+                    ),
                 )
             return False
 
@@ -98,10 +95,7 @@ class MiniMaxTextToImageModelCredential(BaseForm, BaseModelCredential):
         :param model: Dictionary containing model details.
         :return: Dictionary with encrypted sensitive fields.
         """
-        return {
-            **model,
-            'api_key': super().encryption(model.get('api_key', ''))
-        }
+        return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     def get_model_params_setting_form(self, model_name: str):
         """

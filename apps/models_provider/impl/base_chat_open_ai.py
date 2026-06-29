@@ -4,8 +4,16 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, Optional, Any, Iterator, cast, Union, Sequence, Callable, Mapping, AsyncIterator
 
 from langchain_core.language_models import LanguageModelInput
-from langchain_core.messages import BaseMessage, get_buffer_string, BaseMessageChunk, HumanMessageChunk, AIMessageChunk, \
-    SystemMessageChunk, FunctionMessageChunk, ChatMessageChunk
+from langchain_core.messages import (
+    BaseMessage,
+    get_buffer_string,
+    BaseMessageChunk,
+    HumanMessageChunk,
+    AIMessageChunk,
+    SystemMessageChunk,
+    FunctionMessageChunk,
+    ChatMessageChunk,
+)
 from langchain_core.messages.ai import UsageMetadata
 from langchain_core.messages.tool import tool_call_chunk, ToolMessageChunk
 from langchain_core.outputs import ChatGenerationChunk, ChatGeneration
@@ -25,15 +33,15 @@ def custom_get_token_ids(text: str):
 
 
 def _convert_delta_to_message_chunk(
-        _dict: Mapping[str, Any], default_class: type[BaseMessageChunk]
+    _dict: Mapping[str, Any], default_class: type[BaseMessageChunk]
 ) -> BaseMessageChunk:
     """Convert to a LangChain message chunk."""
     id_ = _dict.get("id")
     role = cast(str, _dict.get("role"))
     content = cast(str, _dict.get("content") or "")
     additional_kwargs: dict = {}
-    if reasoning := _dict.get('reasoning_content') or _dict.get('reasoning'):
-        additional_kwargs['reasoning_content'] = reasoning
+    if reasoning := _dict.get("reasoning_content") or _dict.get("reasoning"):
+        additional_kwargs["reasoning_content"] = reasoning
     if _dict.get("function_call"):
         function_call = dict(_dict["function_call"])
         if "name" in function_call and function_call["name"] is None:
@@ -68,15 +76,11 @@ def _convert_delta_to_message_chunk(
             additional_kwargs = {"__openai_role__": "developer"}
         else:
             additional_kwargs = {}
-        return SystemMessageChunk(
-            content=content, id=id_, additional_kwargs=additional_kwargs
-        )
+        return SystemMessageChunk(content=content, id=id_, additional_kwargs=additional_kwargs)
     if role == "function" or default_class == FunctionMessageChunk:
         return FunctionMessageChunk(content=content, name=_dict["name"], id=id_)
     if role == "tool" or default_class == ToolMessageChunk:
-        return ToolMessageChunk(
-            content=content, tool_call_id=_dict["tool_call_id"], id=id_
-        )
+        return ToolMessageChunk(content=content, tool_call_id=_dict["tool_call_id"], id=id_)
     if role or default_class == ChatMessageChunk:
         return ChatMessageChunk(content=content, role=role, id=id_)
     return default_class(content=content, id=id_)  # type: ignore[call-arg]
@@ -90,15 +94,12 @@ class BaseChatOpenAI(ChatOpenAI):
         return self.usage_metadata
 
     def get_num_tokens_from_messages(
-            self,
-            messages: list[BaseMessage],
-            tools: Optional[
-                Sequence[Union[dict[str, Any], type, Callable, BaseTool]]
-            ] = None,
-            timeout: Optional[float] = 0.5,
+        self,
+        messages: list[BaseMessage],
+        tools: Optional[Sequence[Union[dict[str, Any], type, Callable, BaseTool]]] = None,
+        timeout: Optional[float] = 0.5,
     ) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
-
             with ThreadPoolExecutor(max_workers=1) as executor:
                 future = executor.submit(super().get_num_tokens_from_messages, messages, tools)
                 try:
@@ -112,51 +113,50 @@ class BaseChatOpenAI(ChatOpenAI):
                         tokenizer = TokenizerManage.get_tokenizer()
                         return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
-        return self.usage_metadata.get('input_tokens', self.usage_metadata.get('prompt_tokens', 0))
+        return self.usage_metadata.get("input_tokens", self.usage_metadata.get("prompt_tokens", 0))
 
     def get_num_tokens(self, text: str) -> int:
         if self.usage_metadata is None or self.usage_metadata == {}:
             try:
                 return super().get_num_tokens(text)
-            except Exception as e:
+            except Exception:
                 tokenizer = TokenizerManage.get_tokenizer()
                 return len(tokenizer.encode(text))
-        return self.get_last_generation_info().get('output_tokens',
-                                                   self.get_last_generation_info().get('completion_tokens', 0))
+        return self.get_last_generation_info().get(
+            "output_tokens", self.get_last_generation_info().get("completion_tokens", 0)
+        )
 
     def _stream(self, *args: Any, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
-        kwargs['stream_usage'] = True
+        kwargs["stream_usage"] = True
         for chunk in super()._stream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
 
     async def _astream(self, *args: Any, **kwargs: Any) -> AsyncIterator[ChatGenerationChunk]:
-        kwargs['stream_usage'] = True
+        kwargs["stream_usage"] = True
         async for chunk in super()._astream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
 
     def _convert_chunk_to_generation_chunk(
-            self,
-            chunk: dict,
-            default_chunk_class: type,
-            base_generation_info: dict | None,
+        self,
+        chunk: dict,
+        default_chunk_class: type,
+        base_generation_info: dict | None,
     ) -> ChatGenerationChunk | None:
         if chunk.get("type") == "content.delta":  # From beta.chat.completions.stream
             return None
         token_usage = chunk.get("usage")
         choices = (
-                chunk.get("choices", [])
-                # From beta.chat.completions.stream
-                or chunk.get("chunk", {}).get("choices", [])
+            chunk.get("choices", [])
+            # From beta.chat.completions.stream
+            or chunk.get("chunk", {}).get("choices", [])
         )
 
         usage_metadata: UsageMetadata | None = (
-            _create_usage_metadata(token_usage, chunk.get("service_tier"))
-            if token_usage
-            else None
+            _create_usage_metadata(token_usage, chunk.get("service_tier")) if token_usage else None
         )
         if len(choices) == 0:
             # logprobs is implicitly None
@@ -174,9 +174,7 @@ class BaseChatOpenAI(ChatOpenAI):
         if choice["delta"] is None:
             return None
 
-        message_chunk = _convert_delta_to_message_chunk(
-            choice["delta"], default_chunk_class
-        )
+        message_chunk = _convert_delta_to_message_chunk(choice["delta"], default_chunk_class)
         generation_info = {**base_generation_info} if base_generation_info else {}
 
         if finish_reason := choice.get("finish_reason"):
@@ -196,17 +194,15 @@ class BaseChatOpenAI(ChatOpenAI):
             message_chunk.usage_metadata = usage_metadata
 
         message_chunk.response_metadata["model_provider"] = "openai"
-        return ChatGenerationChunk(
-            message=message_chunk, generation_info=generation_info or None
-        )
+        return ChatGenerationChunk(message=message_chunk, generation_info=generation_info or None)
 
     def invoke(
-            self,
-            input: LanguageModelInput,
-            config: Optional[RunnableConfig] = None,
-            *,
-            stop: Optional[list[str]] = None,
-            **kwargs: Any,
+        self,
+        input: LanguageModelInput,
+        config: Optional[RunnableConfig] = None,
+        *,
+        stop: Optional[list[str]] = None,
+        **kwargs: Any,
     ) -> BaseMessage:
         config = ensure_config(config)
         chat_result = cast(
@@ -221,26 +217,23 @@ class BaseChatOpenAI(ChatOpenAI):
                 run_id=config.pop("run_id", None),
                 **kwargs,
             ).generations[0][0],
-
         ).message
 
-        self.usage_metadata = chat_result.response_metadata[
-            'token_usage'] if 'token_usage' in chat_result.response_metadata else chat_result.usage_metadata
+        self.usage_metadata = (
+            chat_result.response_metadata["token_usage"]
+            if "token_usage" in chat_result.response_metadata
+            else chat_result.usage_metadata
+        )
         return chat_result
 
     def upload_file_and_get_url(self, file_stream, file_name):
         """上传文件并获取文件URL"""
         base64_video = base64.b64encode(file_stream).decode("utf-8")
         video_format = get_video_format(file_name)
-        return f'data:{video_format};base64,{base64_video}'
+        return f"data:{video_format};base64,{base64_video}"
 
 
 def get_video_format(file_name):
-    extension = file_name.split('.')[-1].lower()
-    format_map = {
-        'mp4': 'video/mp4',
-        'avi': 'video/avi',
-        'mov': 'video/mov',
-        'wmv': 'video/x-ms-wmv'
-    }
-    return format_map.get(extension, 'video/mp4')
+    extension = file_name.split(".")[-1].lower()
+    format_map = {"mp4": "video/mp4", "avi": "video/avi", "mov": "video/mov", "wmv": "video/x-ms-wmv"}
+    return format_map.get(extension, "video/mp4")

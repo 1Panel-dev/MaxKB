@@ -12,7 +12,6 @@ def custom_get_token_ids(text: str):
 
 
 class GeminiImage(MaxKBBaseModel, ChatGoogleGenerativeAI):
-
     @staticmethod
     def is_cache_model():
         return False
@@ -20,12 +19,12 @@ class GeminiImage(MaxKBBaseModel, ChatGoogleGenerativeAI):
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
-        base_url = model_credential.get('base_url', "https://generativelanguage.googleapis.com")
+        base_url = model_credential.get("base_url", "https://generativelanguage.googleapis.com")
         if base_url:
             optional_params.setdefault("model_kwargs", {})
             optional_params["model_kwargs"]["http_options"] = {"base_url": base_url}
         return GeminiImage(
             model=model_name,
-            api_key=model_credential.get('api_key'),
+            api_key=model_credential.get("api_key"),
             **optional_params,
         )
