@@ -1,8 +1,9 @@
 ·
 <template>
-  <div class="app-top-bar-container border-b flex-center">
-    <div class="logo mt-4">
-      <LogoFull />
+  <div class="app-top-bar-container flex-center">
+    <div class="logo-container flex align-center">
+      <img src="@/assets/logo/logo.png" alt="logo" class="header-logo" />
+      <span class="logo-text">MaxKB</span>
     </div>
 
     <div class="flex-between w-full align-center">
@@ -13,7 +14,7 @@
         <el-button
           link
           @click="goHome"
-          style="color: var(--el-text-color-primary)"
+          style="color: var(--text-primary)"
           v-if="
             hasPermission(
               [
@@ -51,5 +52,24 @@ const goHome = () => {
   height: var(--app-header-height);
   box-sizing: border-box;
   padding: var(--app-header-padding);
+}
+
+.logo-container {
+  gap: 10px;
+}
+
+.header-logo {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1A6DFF 0%, #3D7DF3 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 </style>
