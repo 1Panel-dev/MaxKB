@@ -38,17 +38,35 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
         </el-button>
-        <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
-          <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
-          {{ $t('common.debug') }}
-        </el-button>
-        <el-button @click="saveApplication(true)" v-if="permissionPrecise.edit(id)">
-          <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
-          {{ $t('common.save') }}
-        </el-button>
-        <el-button type="primary" @click="publish" v-if="permissionPrecise.publish(id)">
-          {{ $t('common.publish') }}
-        </el-button>
+        <el-tooltip
+          effect="dark"
+          :content="`${$t('common.debug')} (${modifierKey} + Shift + D)`"
+          placement="top"
+        >
+          <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
+            <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
+            {{ $t('common.debug') }}
+          </el-button>
+        </el-tooltip>
+        <el-tooltip
+          effect="dark"
+          :content="`${$t('common.save')} (${modifierKey} + S)`"
+          placement="top"
+        >
+          <el-button @click="saveApplication(true)" v-if="permissionPrecise.edit(id)">
+            <AppIcon iconName="app-save-outlined" class="mr-4"></AppIcon>
+            {{ $t('common.save') }}
+          </el-button>
+        </el-tooltip>
+        <el-tooltip
+          effect="dark"
+          :content="`${$t('common.publish')} (${modifierKey} + Shift + P)`"
+          placement="top"
+        >
+          <el-button type="primary" @click="publish" v-if="permissionPrecise.publish(id)">
+            {{ $t('common.publish') }}
+          </el-button>
+        </el-tooltip>
 
         <el-dropdown trigger="click">
           <el-button text @click.stop class="ml-8 mt-4">
@@ -74,6 +92,10 @@
                   <el-switch size="small" v-model="isSave" @change="changeSave" />
                 </div>
               </el-dropdown-item>
+              <el-dropdown-item @click="shortcutEditorVisible = true">
+                <AppIcon iconName="app-key" class="color-secondary"></AppIcon>
+                {{ $t('workflow.shortcut.title') }}
+              </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
@@ -92,7 +114,7 @@
     </el-collapse-transition>
     <!-- 主画布 -->
     <div class="workflow-main" ref="workflowMainRef">
-      <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
+      <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" @save="saveApplication(true)" @debug="clickShowDebug" @publish="publish" />
     </div>
     <!-- 调试 -->
     <el-collapse-transition>
@@ -151,6 +173,7 @@
       source="work_flow"
       @refresh="getDetail"
     />
+    <ShortcutEditor v-model:visible="shortcutEditorVisible" />
   </div>
 </template>
 <script setup lang="ts">
@@ -161,6 +184,7 @@ import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
+import ShortcutEditor from '@/workflow/common/ShortcutEditor.vue'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { mapToUrlParams } from '@/utils/application'
@@ -203,6 +227,8 @@ let interval: any
 const workflowRef = ref()
 const workflowMainRef = ref()
 const loading = ref(false)
+const modifierKey = navigator.platform.toUpperCase().indexOf('MAC') >= 0 ? 'Cmd' : 'Ctrl'
+const shortcutEditorVisible = ref(false)
 const detail = ref<any>(null)
 
 const showPopover = ref(false)

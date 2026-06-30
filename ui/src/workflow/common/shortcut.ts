@@ -7,6 +7,18 @@ import { t } from '@/locales'
 import { copyClick } from '@/utils/clipboard'
 import { randomId } from '@/utils/common'
 import { getMenuNodes, workflowModelDict } from './data'
+
+export interface ShortcutOptions {
+  /** Ctrl/Cmd+S 保存回调 */
+  onSave?: () => void
+  /** Ctrl/Cmd+Shift+D 调试回调 */
+  onDebug?: () => void
+  /** Ctrl/Cmd+Shift+P 发布回调 */
+  onPublish?: () => void
+  /** 光标模式 ref，用于与 NodeControl 同步按钮高亮 */
+  isDragMode?: { value: boolean }
+}
+
 let activeCanvasId: string | null = null
 type Point = { x: number; y: number }
 const lastMouse = {
@@ -84,7 +96,7 @@ function translationEdgeData(edgeData: any, distance: any) {
 const TRANSLATION_DISTANCE = 40
 let CHILDREN_TRANSLATION_DISTANCE = 40
 
-export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
+export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel, options?: ShortcutOptions) {
   bindMousePosition(lf)
   bindCanvasActive(lf)
   const { keyboard } = lf
@@ -340,24 +352,113 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
     return false
   }
   graph.eventCenter.on('copy_node', copy_node)
-  // 复制
+  // 复制 — 由 LogicFlow 核心处理
   keyboard.on(['cmd + c', 'ctrl + c'], copy_node)
-  // 粘贴
+  // 粘贴 — 由 LogicFlow 核心处理
   keyboard.on(['cmd + v', 'ctrl + v'], () => {})
-  // undo
-  keyboard.on(['cmd + z', 'ctrl + z'], () => {
-    // if (!keyboardOptions?.enabled) return true
-    // if (graph.textEditElement) return true
-    // lf.undo()
-    // return false
-  })
-  // redo
-  keyboard.on(['cmd + y', 'ctrl + y'], () => {
+  // undo / redo — LogicFlow 核心已内置 cmd+z / ctrl+z 和 cmd+y / ctrl+y
+  // delete
+  keyboard.on(['backspace', 'del', 'delete'], delete_node)
+
+  // ========== 新增快捷键 ==========
+
+  // Ctrl+S / Cmd+S 保存
+  keyboard.on(['cmd + s', 'ctrl + s'], () => {
     if (!keyboardOptions?.enabled) return true
     if (graph.textEditElement) return true
-    lf.redo()
+    options?.onSave?.()
     return false
   })
-  // delete
-  keyboard.on(['backspace'], delete_node)
+
+  // Ctrl+Shift+D / Cmd+Shift+D 调试
+  keyboard.on(['cmd + shift + d', 'ctrl + shift + d'], () => {
+    if (!keyboardOptions?.enabled) return true
+    options?.onDebug?.()
+    return false
+  })
+
+  // Ctrl+Shift+P / Cmd+Shift+P 发布
+  keyboard.on(['cmd + shift + p', 'ctrl + shift + p'], () => {
+    if (!keyboardOptions?.enabled) return true
+    options?.onPublish?.()
+    return false
+  })
+
+  // Ctrl+= / Cmd+= 放大
+  keyboard.on(['ctrl + =', 'cmd + ='], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.zoom(true, [0, 0])
+    return false
+  })
+
+  // Ctrl+- / Cmd+- 缩小
+  keyboard.on(['ctrl + -', 'cmd + -'], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.zoom(false, [0, 0])
+    return false
+  })
+
+  // Ctrl+0 / Cmd+0 适应画布
+  keyboard.on(['ctrl + 0', 'cmd + 0'], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.resetZoom()
+    lf.resetTranslate()
+    lf.fitView()
+    return false
+  })
+
+  // S 切换到缩放/选择模式（框选）
+  keyboard.on(['s', 'S'], () => {
+    if (!keyboardOptions?.enabled) return true
+    if (graph.textEditElement) return true
+    const element = document.querySelector('.lf-drag-able') as HTMLElement | null
+    if (!element) return false
+    element.style.cursor = 'default'
+    lf.openSelectionSelect()
+    lf.extension.selectionSelect?.setSelectionSense(true, false)
+    if (options?.isDragMode) options.isDragMode.value = true
+    return false
+  })
+
+  // H 切换到点击模式（拖拽画布）
+  keyboard.on(['h', 'H'], () => {
+    if (!keyboardOptions?.enabled) return true
+    if (graph.textEditElement) return true
+    const element = document.querySelector('.lf-drag-able') as HTMLElement | null
+    if (!element) return false
+    element.style.cursor = 'pointer'
+    lf.closeSelectionSelect()
+    if (options?.isDragMode) options.isDragMode.value = false
+    return false
+  })
+
+  // Ctrl+[ / Cmd+[ 收起全部节点
+  keyboard.on(['ctrl + [', 'cmd + ['], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.graphModel.nodes.forEach((node: any) => {
+      node.properties.showNode = false
+    })
+    return false
+  })
+
+  // Ctrl+] / Cmd+] 展开全部节点
+  keyboard.on(['ctrl + ]', 'cmd + ]'], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.graphModel.nodes.forEach((node: any) => {
+      node.properties.showNode = true
+    })
+    return false
+  })
+
+  // Ctrl+Shift+L / Cmd+Shift+L 一键美化
+  keyboard.on(['ctrl + shift + l', 'ctrl + shift + L', 'cmd + shift + l', 'cmd + shift + L'], () => {
+    if (!keyboardOptions?.enabled) return true
+    lf.extension.dagre?.layout()
+    lf.graphModel.nodes.forEach((node: any) => {
+      if (node.type === 'loop-body-node') {
+        node?.loopLayout?.()
+      }
+    })
+    return false
+  })
 }

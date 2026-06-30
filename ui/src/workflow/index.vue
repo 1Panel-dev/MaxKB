@@ -7,7 +7,8 @@
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
-import {ref, onMounted, onUnmounted, inject, nextTick} from 'vue'
+import {ref, onMounted, onUnmounted, inject, provide, nextTick} from 'vue'
+import type {ShortcutOptions} from '@/workflow/common/shortcut'
 import AppEdge from './common/edge'
 import loopEdge from './common/loopEdge'
 import Control from './common/NodeControl.vue'
@@ -28,6 +29,15 @@ const nodeSearchRef = ref<InstanceType<typeof NodeSearch>>()
 defineOptions({name: 'WorkFlow'})
 const TeleportContainer = getTeleport()
 const flowId = ref('')
+const emit = defineEmits<{
+  save: []
+  debug: []
+  publish: []
+}>()
+
+/** 光标模式（true=框选 / false=点选），与 NodeControl 共享 */
+const isDragMode = ref(false)
+provide('isDragMode', isDragMode)
 type ShapeItem = {
   type?: string
   text?: string
@@ -91,7 +101,12 @@ const renderGraphData = (data?: any) => {
     lf.value.on('node:delete', () => {
       nodeSearchRef.value?.reSearch()
     })
-    initDefaultShortcut(lf.value, lf.value.graphModel)
+    initDefaultShortcut(lf.value, lf.value.graphModel, {
+      onSave: () => emit('save'),
+      onDebug: () => emit('debug'),
+      onPublish: () => emit('publish'),
+      isDragMode,
+    })
     lf.value.batchRegister([
       ...Object.keys(nodes).map((key) => nodes[key].default),
       AppEdge,

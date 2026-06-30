@@ -46,14 +46,23 @@
       </div>
     </el-card>
     <!-- 开启搜索按钮 -->
-    <el-button v-else @click="openSearch()" circle class="workflow-search-button" size="large">
-      <el-icon :size="20"><Search /></el-icon>
-    </el-button>
+    <el-tooltip
+      v-else
+      effect="dark"
+      :content="`${$t('workflow.tip.searchPlaceholder')} (${isMac ? 'Cmd' : 'Ctrl'} + F)`"
+      placement="right"
+    >
+      <el-button @click="openSearch()" circle class="workflow-search-button" size="large">
+        <el-icon :size="20"><Search /></el-icon>
+      </el-button>
+    </el-tooltip>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick, computed } from 'vue'
+
+const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
 // Props定义
 interface Props {
   lf?: any

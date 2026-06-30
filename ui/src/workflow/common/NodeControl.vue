@@ -1,24 +1,36 @@
 <template>
   <el-card shadow="always" style="--el-card-padding: 8px 12px; --el-card-border-radius: 8px">
-    <el-button
-      @click="changeCursor(true)"
-      style="border: none; padding: 4px; height: 24px"
-      :class="{ 'is-drag-active': isDrag }"
+    <el-tooltip
+      effect="dark"
+      :content="`${$t('workflow.control.dragMode')} (S)`"
+      placement="top"
     >
-      <el-icon :size="16"><Position /></el-icon>
-    </el-button>
-    <el-button
-      @click="changeCursor(false)"
-      style="border: none; padding: 4px; height: 24px; margin-left: 8px"
-      :class="{ 'is-drag-active': !isDrag }"
+      <el-button
+        @click="changeCursor(true)"
+        style="border: none; padding: 4px; height: 24px"
+        :class="{ 'is-drag-active': isDragMode }"
+      >
+        <el-icon :size="16"><Position /></el-icon>
+      </el-button>
+    </el-tooltip>
+    <el-tooltip
+      effect="dark"
+      :content="`${$t('workflow.control.clickMode')} (H)`"
+      placement="top"
     >
-      <AppIcon iconName="app-raisehand" :size="16"></AppIcon>
-    </el-button>
+      <el-button
+        @click="changeCursor(false)"
+        style="border: none; padding: 4px; height: 24px; margin-left: 8px"
+        :class="{ 'is-drag-active': !isDragMode }"
+      >
+        <AppIcon iconName="app-raisehand" :size="16"></AppIcon>
+      </el-button>
+    </el-tooltip>
     <el-divider direction="vertical" />
     <el-button link @click="zoomOut" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.zoomOut')"
+        :content="`${$t('workflow.control.zoomOut')} (${modifierKey} + -)`"
         placement="top"
       >
         <el-icon :size="16" :title="$t('workflow.control.zoomOut')"
@@ -29,7 +41,7 @@
     <el-button link @click="zoomIn" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.zoomIn')"
+        :content="`${$t('workflow.control.zoomIn')} (${modifierKey} + =)`"
         placement="top"
       >
         <el-icon :size="16" :title="$t('workflow.control.zoomIn')"
@@ -40,7 +52,7 @@
     <el-button link @click="fitView" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.fitView')"
+        :content="`${$t('workflow.control.fitView')} (${modifierKey} + 0)`"
         placement="top"
       >
         <AppIcon
@@ -53,7 +65,7 @@
     <el-button link @click="retract" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.retract')"
+        :content="`${$t('workflow.control.retract')} (${modifierKey} + [)`"
         placement="top"
       >
         <AppIcon
@@ -66,7 +78,7 @@
     <el-button link @click="extend" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.extend')"
+        :content="`${$t('workflow.control.extend')} (${modifierKey} + ])`"
         placement="top"
       >
         <AppIcon
@@ -79,7 +91,7 @@
     <el-button link @click="layout" style="border: none">
       <el-tooltip
         effect="dark"
-        :content="$t('workflow.control.beautify')"
+        :content="`${$t('workflow.control.beautify')} (${modifierKey} + Shift + L)`"
         placement="top"
       >
         <AppIcon
@@ -93,12 +105,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { inject, ref } from 'vue'
+
 const props = defineProps({
   lf: Object || String || null,
 })
 
-const isDrag = ref(false)
+const isDragMode = inject('isDragMode', ref(false))
+
+const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0
+const modifierKey = isMac ? 'Cmd' : 'Ctrl'
 
 function zoomIn() {
   props.lf?.zoom(true, [0, 0])
@@ -131,7 +147,7 @@ const extend = () => {
 }
 const changeCursor = (bool: boolean) => {
   const element: HTMLElement = document.querySelector('.lf-drag-able') as HTMLElement
-  isDrag.value = bool
+  isDragMode.value = bool
   if (bool) {
     element.style.cursor = 'default'
     props.lf?.openSelectionSelect()
