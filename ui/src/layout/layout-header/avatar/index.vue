@@ -90,6 +90,38 @@
         <el-dropdown-item
           style="padding: 0"
           @click.stop
+        >
+          <el-dropdown class="w-full" trigger="hover" placement="left-start">
+            <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
+              <span>{{ $t('layout.theme') || '主题' }}</span>
+              <el-icon>
+                <ArrowRight />
+              </el-icon>
+            </div>
+            <template #dropdown>
+              <el-dropdown-menu class="w-180">
+                <el-dropdown-item
+                  v-for="(mode, index) in darkModeList"
+                  :key="index"
+                  :value="mode.value"
+                  @click="changeDarkMode(mode.value)"
+                  class="flex-between"
+                >
+                  <span :class="mode.value === theme.darkMode ? 'primary' : ''">{{ mode.label }}</span>
+                  <el-icon
+                    :class="mode.value === theme.darkMode ? 'primary' : ''"
+                    v-if="mode.value === theme.darkMode"
+                  >
+                    <Check />
+                  </el-icon>
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </el-dropdown-item>
+        <el-dropdown-item
+          style="padding: 0"
+          @click.stop
           v-if="
             hasPermission(
               new ComplexPermission(
@@ -178,7 +210,7 @@ import { hasPermission } from '@/utils/permission'
 import { PermissionConst, RoleConst, EditionConst } from '@/utils/permission/data'
 import { i18n_name } from '@/utils/common'
 
-const { user, login } = useStore()
+const { user, login, theme } = useStore()
 const router = useRouter()
 
 const AboutDialogRef = ref()
@@ -190,6 +222,16 @@ const changeLang = (lang: string) => {
   user.postUserLanguage(lang)
   // changeLocale(lang)
 }
+const darkModeList = [
+  { label: '浅色', value: 'light' as const },
+  { label: '深色', value: 'dark' as const },
+  { label: '跟随系统', value: 'system' as const },
+]
+
+const changeDarkMode = (mode: 'light' | 'dark' | 'system') => {
+  theme.setDarkMode(mode)
+}
+
 const openAbout = () => {
   AboutDialogRef.value?.open()
 }
