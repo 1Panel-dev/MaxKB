@@ -6,7 +6,7 @@
       class="w-full"
       drag
       multiple
-      v-bind:file-list="modelValue"
+      v-bind:file-list="fileArray"
       action="#"
       :auto-upload="false"
       :show-file-list="false"
@@ -62,7 +62,7 @@
       </span>
     </div>
     <el-row :gutter="8" v-if="fileArray?.length" class="mt-8">
-      <template v-for="(item, index) in fileArray" :key="index">
+      <template v-for="(item, index) in sortedFileArray" :key="index">
         <el-col :span="12" class="mb-8">
           <el-card
             shadow="never"
@@ -95,7 +95,7 @@
                 <el-button v-if="item.canRetry" text @click="uploadFile(item)">
                   <AppIcon iconName="app-refresh"></AppIcon>
                 </el-button>
-                <el-button text @click="deleteFile(index, item)">
+                <el-button text @click="deleteFile(item)">
                   <AppIcon iconName="app-delete"></AppIcon>
                 </el-button>
               </div>
@@ -151,6 +151,21 @@ const uploadingCount = computed(
 const retryList = computed(() =>
   fileArray.value.filter((i: any) => i.status === 'error' && i.canRetry),
 )
+const getFileStatusOrder = (item: any) => {
+  if (item.status === 'error' && item.canRetry) return 0
+  if (item.status === 'error') return 1
+  if (item.status === 'uploading') return 2
+  return 3
+}
+const sortedFileArray = computed(() =>
+  fileArray.value
+    .map((item: any, index: number) => ({ item, index }))
+    .sort(
+      (a: any, b: any) =>
+        getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
+    )
+    .map(({ item }: any) => item),
+)
 // 重新上传所有可重试的失败文件
 const retryAll = () => {
   retryList.value.forEach((i: any) => uploadFile(i))
@@ -165,7 +180,13 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
       fileList.splice(index, 1)
     }
   }
+  if (fileArray.value.length >= file_count_limit.value) {
+    onExceed()
+    removeCurrentFile()
+    return false
+  }
   const item = reactive({
+    uid: file.uid,
     name: file.name,
     size: file.size,
     file_id: '',
@@ -186,6 +207,7 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     // MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
     // fileList.splice(-1, 1) //移除当前超出大小的文件
     fileArray.value?.push(item)
+    removeCurrentFile()
     return false
   }
   if (!file_type_list.value.includes(fileType(file.name).toLocaleUpperCase())) {
@@ -203,6 +225,7 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
   }
 
   fileArray.value?.push(item)
+  removeCurrentFile()
   uploadFile(item)
 }
 // 执行上传
@@ -238,7 +261,7 @@ const uploadFile = (item: any) => {
       item.canRetry = true
     })
 }
-function deleteFile(index: any, item?: any) {
+function deleteFile(item: any) {
   // 上传过程中删除则中断上传请求
   if (item?.status === 'uploading' && typeof item.abort === 'function') {
     item.aborted = true
@@ -246,7 +269,10 @@ function deleteFile(index: any, item?: any) {
   } else if (item?.status === 'success' && item?.file_id) {
     applicationApi.deleteFile(item.file_id)
   }
-  fileArray.value.splice(index, 1)
+  const index = fileArray.value.indexOf(item)
+  if (index !== -1) {
+    fileArray.value.splice(index, 1)
+  }
   emit('update:modelValue', fileArray.value)
 }
 

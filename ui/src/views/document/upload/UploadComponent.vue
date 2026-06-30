@@ -209,7 +209,7 @@
     </span>
   </div>
   <el-row :gutter="8" v-if="form.fileList?.length" class="mt-8">
-    <template v-for="(item, index) in form.fileList" :key="index">
+    <template v-for="(item, index) in sortedFileList" :key="index">
       <el-col :span="12" class="mb-8">
         <el-card
           shadow="never"
@@ -242,7 +242,7 @@
               <el-button v-if="item.canRetry" text @click="uploadFile(item)">
                 <AppIcon iconName="app-refresh"></AppIcon>
               </el-button>
-              <el-button text @click="deleteFile(index, item)">
+              <el-button text @click="deleteFile(item)">
                 <AppIcon iconName="app-delete"></AppIcon>
               </el-button>
             </div>
@@ -317,13 +317,30 @@ const uploadingCount = computed(
 const retryList = computed(() =>
   form.value.fileList.filter((i: any) => i.status === 'error' && i.canRetry),
 )
+const getFileStatusOrder = (item: any) => {
+  if (item.status === 'error' && item.canRetry) return 0
+  if (item.status === 'error') return 1
+  if (item.status === 'uploading') return 2
+  return 3
+}
+const sortedFileList = computed(() =>
+  form.value.fileList
+    .map((item: any, index: number) => ({ item, index }))
+    .sort(
+      (a: any, b: any) =>
+        getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
+    )
+    .map(({ item }: any) => item),
+)
 const retryAll = () => {
   retryList.value.forEach((i: any) => uploadFile(i))
 }
-
+const filterSuccessFiles = (data: any): any => {
+  return data?.filter((f: any) => f.status === 'success') || []
+}
 watch(form.value, (value) => {
   knowledge.saveDocumentsType(value.fileType)
-  knowledge.saveDocumentsFile(value.fileList)
+  knowledge.saveDocumentsFile(filterSuccessFiles(value.fileList))
 })
 
 function downloadTemplate(type: string) {
@@ -350,14 +367,17 @@ function radioChange() {
   form.value.fileList = []
 }
 
-function deleteFile(index: number | string, item?: any) {
+function deleteFile(item: any) {
   if (item?.status === 'uploading' && typeof item.abort === 'function') {
     item.aborted = true
     item.abort()
   } else if (item?.status === 'success' && item?.file_id) {
     applicationApi.deleteFile(item.file_id)
   }
-  form.value.fileList.splice(index, 1)
+  const index = form.value.fileList.indexOf(item)
+  if (index !== -1) {
+    form.value.fileList.splice(index, 1)
+  }
 }
 
 // 上传on-change事件
@@ -370,14 +390,36 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
       fileList.splice(index, 1)
     }
   }
+  if (form.value.fileList.length >= file_count_limit.value) {
+    onExceed()
+    removeCurrentFile()
+    return false
+  }
+  const item = reactive({
+    uid: file.uid,
+    name: file.name,
+    size: file.size,
+    file_id: '',
+    source_file_id: '',
+    percentage: 0,
+    status: 'uploading' as 'uploading' | 'success' | 'error',
+    errMsg: '',
+    canRetry: false,
+    raw: file.raw,
+    abort: null as null | (() => void),
+    aborted: false,
+  })
   //1、判断文件大小是否合法，文件限制不能大于100M
   const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
   if (!isLimit) {
-    MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
-    removeCurrentFile() //移除当前超出大小的文件
+    item.status = 'error'
+    item.errMsg = t('dynamicsForm.UploadInput.errorTip.sizeError')
+    // MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
+    // fileList.splice(-1, 1) //移除当前超出大小的文件
+    form.value.fileList?.push(item)
+    removeCurrentFile()
     return false
   }
-
   if (!isRightType(file?.name, form.value.fileType)) {
     if (file?.name !== '.DS_Store') {
       MsgError(t('views.document.upload.errorMessage2'))
@@ -391,20 +433,8 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     return false
   }
 
-  const item = reactive({
-    name: file.name,
-    size: file.size,
-    file_id: '',
-    source_file_id: '',
-    percentage: 0,
-    status: 'uploading' as 'uploading' | 'success' | 'error',
-    errMsg: '',
-    canRetry: false,
-    raw: file.raw,
-    abort: null as null | (() => void),
-    aborted: false,
-  })
   form.value.fileList.push(item)
+  removeCurrentFile()
   uploadFile(item)
 }
 
@@ -464,14 +494,6 @@ const handlePreview = (bool: boolean) => {
 */
 function validate() {
   if (!FormRef.value) return
-  if (uploadingCount.value) {
-    MsgError(t('dynamicsForm.UploadInput.uploading'))
-    return false
-  }
-  if (errorCount.value) {
-    MsgError(t('dynamicsForm.UploadInput.failedStatus', { count: errorCount.value }))
-    return false
-  }
   return FormRef.value.validate((valid: any) => {
     return valid
   })

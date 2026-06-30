@@ -143,8 +143,11 @@ const base_form_data_rule = ref<FormRules>({
 const validate = () => {
   return dynamicsFormRef.value?.validate()
 }
+const filterSuccessFiles = (data: any): any => {
+  return data?.file_list?.filter((f: any) => f.status === 'success') || []
+}
 const get_data = () => {
-  return form_data.value
+  return filterSuccessFiles(form_data.value)
 }
 watch(
   source_node_list,
