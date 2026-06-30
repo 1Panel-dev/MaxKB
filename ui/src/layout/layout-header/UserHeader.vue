@@ -2,8 +2,7 @@
 <template>
   <div class="app-top-bar-container flex-center">
     <div class="logo-container flex align-center">
-      <img src="@/assets/logo/logo.png" alt="logo" class="header-logo" />
-      <span class="logo-text">MaxKB</span>
+      <img src="@/assets/logo/inspur_logo.png" alt="logo" class="header-logo" />
     </div>
 
     <div class="flex-between w-full">
@@ -21,7 +20,6 @@
         />
       </div>
       <TopMenu></TopMenu>
-      <TopAbout class="mr-12"></TopAbout>
     </div>
     <Avatar></Avatar>
   </div>
@@ -31,7 +29,6 @@ import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import TopMenu from './top-menu/index.vue'
 import Avatar from './avatar/index.vue'
-import TopAbout from './top-about/index.vue'
 import { EditionConst } from '@/utils/permission/data'
 import { hasPermission } from '@/utils/permission/index'
 import type { WorkspaceItem } from '@/api/type/workspace'
@@ -74,14 +71,5 @@ function changeWorkspace(item: WorkspaceItem) {
   height: 32px;
   width: auto;
   object-fit: contain;
-}
-
-.logo-text {
-  font-size: 18px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #1A6DFF 0%, #3D7DF3 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 </style>
