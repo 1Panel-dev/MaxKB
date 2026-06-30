@@ -530,17 +530,14 @@ const uploadFile = async (file: any, fileList: any) => {
     fileList.splice(0, fileList.length, ...fileList.slice(0, maxFiles))
     return
   }
-  if (fileList.filter((f: any) => f.size == 0).length > 0) {
-    // MB
+  if (file.size == 0) {
     MsgWarning(t('aiChat.uploadFile.sizeLimit2'))
-    // 空文件上传过滤
     fileList.splice(0, fileList.length, ...fileList.filter((f: any) => f.size > 0))
     return
   }
-  if (fileList.filter((f: any) => f.size > fileLimit * 1024 * 1024).length > 0) {
+  if (file.size > fileLimit * 1024 * 1024) {
     // MB
     MsgWarning(t('aiChat.uploadFile.sizeLimit') + fileLimit + 'MB')
-    // 只保留未超出大小限制的文件
     fileList.splice(
       0,
       fileList.length,
