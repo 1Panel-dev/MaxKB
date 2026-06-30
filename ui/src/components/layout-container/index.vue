@@ -101,6 +101,8 @@ onUnmounted(() => {
     flex-direction: column;
     // transition: width 0.28s;
     width: var(--sidebar-width);
+    background: linear-gradient(180deg, rgba(26, 109, 255, 0.06) 0%, rgba(26, 109, 255, 0.02) 40%, transparent 100%);
+    border-right: 1px solid var(--border-color-light);
     .splitter-bar-line {
       z-index: 1;
       position: absolute;
