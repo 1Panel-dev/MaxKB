@@ -198,13 +198,13 @@
 
 // ===== Tooltip =====
 .el-tooltip__popper {
-  background: #1D2129 !important;
-  border: none !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.16) !important;
-  color: #ffffff !important;
+  background: #ffffff !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  color: var(--el-color-primary) !important;
   .el-popper__arrow::before {
-    background: #1D2129 !important;
-    border-color: #1D2129 !important;
+    background: #ffffff !important;
+    border-color: #ffffff !important;
   }
 }
 
@@ -215,14 +215,6 @@
   .el-popper__arrow::before {
     background: rgba(44, 44, 46, 0.88) !important;
     border-color: rgba(255, 255, 255, 0.08) !important;
-  }
-}
-
-[data-theme="dark"] .el-tooltip__popper {
-  background: #3A3A3C !important;
-  .el-popper__arrow::before {
-    background: #3A3A3C !important;
-    border-color: #3A3A3C !important;
   }
 }
 
