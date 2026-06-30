@@ -157,6 +157,14 @@ const retryAll = () => {
 }
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
+  // 按文件唯一标识精确定位并移除当前文件
+  // 注意：不能使用 splice(-1, 1) 盲删末尾元素，文件夹上传时会误删正常文件而放走超限文件
+  const removeCurrentFile = () => {
+    const index = fileList.findIndex((item: any) => item.uid === file.uid)
+    if (index !== -1) {
+      fileList.splice(index, 1)
+    }
+  }
   const item = reactive({
     name: file.name,
     size: file.size,
@@ -184,11 +192,13 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
     if (file?.name !== '.DS_Store') {
       MsgError(t('views.document.upload.errorMessage2'))
     }
+    removeCurrentFile()
     return false
   }
 
   if (file?.size === 0) {
     MsgError(t('views.document.upload.errorMessage3'))
+    removeCurrentFile()
     return false
   }
 
@@ -233,7 +243,7 @@ function deleteFile(index: any, item?: any) {
   if (item?.status === 'uploading' && typeof item.abort === 'function') {
     item.aborted = true
     item.abort()
-  }else if (item?.status === 'success' && item?.file_id) {
+  } else if (item?.status === 'success' && item?.file_id) {
     applicationApi.deleteFile(item.file_id)
   }
   fileArray.value.splice(index, 1)
