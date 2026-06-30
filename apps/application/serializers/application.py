@@ -173,6 +173,42 @@ def hand_node(node, update_tool_map):
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
 
 
+def update_form_knowledge_fields(workflow):
+    if workflow is None:
+        return
+    for node in workflow.get("nodes", []):
+        if node.get("type") == "form-node":
+            form_field_list = node.get("properties", {}).get("node_data", {}).get("form_field_list", [])
+            for field in form_field_list:
+                if field.get("input_type") != "Knowledge":
+                    continue
+                knowledge_list = field.get("attrs", {}).get("knowledge_list", [])
+                knowledge_id_list = [
+                    str(knowledge.get("id")) for knowledge in knowledge_list if knowledge.get("id") is not None
+                ]
+                current_knowledge_dict = {
+                    str(knowledge.id): knowledge
+                    for knowledge in QuerySet(Knowledge).filter(id__in=list(set(knowledge_id_list)))
+                }
+                refreshed_knowledge_list = []
+                for knowledge in knowledge_list:
+                    current_knowledge = current_knowledge_dict.get(str(knowledge.get("id")))
+                    if current_knowledge is None:
+                        refreshed_knowledge_list.append(knowledge)
+                    else:
+                        refreshed_knowledge_list.append(
+                            {
+                                **knowledge,
+                                "name": current_knowledge.name,
+                                "type": current_knowledge.type,
+                                "embedding_model_id": current_knowledge.embedding_model_id,
+                            }
+                        )
+                field.setdefault("attrs", {})["knowledge_list"] = refreshed_knowledge_list
+        if node.get("type") == "loop-node":
+            update_form_knowledge_fields(node.get("properties", {}).get("node_data", {}).get("loop_body") or {})
+
+
 class MKInstance:
     def __init__(self, application: dict, function_lib_list: List[dict], version: str, tool_list: List[dict]):
         self.application = application
@@ -1495,6 +1531,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             knowledge_id_list = [k.get("id") for k in knowledge_list]
         else:
             self.update_knowledge_node(application.work_flow, available_knowledge_dict)
+            update_form_knowledge_fields(application.work_flow)
 
         return {
             **ApplicationSerializerModel(application).data,
