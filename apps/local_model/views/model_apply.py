@@ -1,42 +1,35 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： model_apply.py
-    @date：2024/8/20 20:38
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： model_apply.py
+@date：2024/8/20 20:38
+@desc:
 """
-from urllib.request import Request
 
-from rest_framework.views import APIView
+from urllib.request import Request
 
 from common.result import result
 from local_model.serializers.model_apply_serializers import ModelApplySerializers, ValidateModelSerializers
+from rest_framework.views import APIView
 
 
 class LocalModelApply(APIView):
     class EmbedDocuments(APIView):
-
         def post(self, request: Request, model_id):
-            return result.success(
-                ModelApplySerializers(data={'model_id': model_id}).embed_documents(request.data))
+            return result.success(ModelApplySerializers(data={"model_id": model_id}).embed_documents(request.data))
 
     class EmbedQuery(APIView):
-
         def post(self, request: Request, model_id):
-            return result.success(
-                ModelApplySerializers(data={'model_id': model_id}).embed_query(request.data))
+            return result.success(ModelApplySerializers(data={"model_id": model_id}).embed_query(request.data))
 
     class CompressDocuments(APIView):
-
         def post(self, request: Request, model_id):
-            return result.success(
-                ModelApplySerializers(data={'model_id': model_id}).compress_documents(request.data))
+            return result.success(ModelApplySerializers(data={"model_id": model_id}).compress_documents(request.data))
 
     class Unload(APIView):
         def post(self, request: Request, model_id):
-            return result.success(
-                ModelApplySerializers(data={'model_id': model_id}).compress_documents(request.data))
+            return result.success(ModelApplySerializers(data={"model_id": model_id}).compress_documents(request.data))
 
     class Validate(APIView):
         def post(self, request: Request):
