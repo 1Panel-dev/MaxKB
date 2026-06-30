@@ -643,14 +643,25 @@ h5 {
 }
 
 // ===== 主题切换全局过渡 =====
-* {
+// 仅对主要布局容器和常用组件添加过渡，避免影响所有 DOM 元素
+body,
+.app-layout,
+.app-header,
+.app-main,
+.sidebar-container,
+.el-card,
+.el-input,
+.el-button,
+.el-table,
+.el-dropdown,
+.el-dialog,
+.el-menu-item,
+.el-sub-menu__title {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 // 排除不需要过渡的元素
 .no-transition,
-.el-dialog,
-.el-drawer,
 .el-loading-mask,
 .el-popper {
   transition: none !important;

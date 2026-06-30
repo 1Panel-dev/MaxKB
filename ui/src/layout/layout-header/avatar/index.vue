@@ -93,7 +93,7 @@
         >
           <el-dropdown class="w-full" trigger="hover" placement="left-start">
             <div class="flex-between w-full" style="line-height: 22px; padding: 12px 11px">
-              <span>{{ $t('layout.theme') || '主题' }}</span>
+              <span>{{ $t('layout.theme') }}</span>
               <el-icon>
                 <ArrowRight />
               </el-icon>
@@ -222,11 +222,11 @@ const changeLang = (lang: string) => {
   user.postUserLanguage(lang)
   // changeLocale(lang)
 }
-const darkModeList = [
-  { label: '浅色', value: 'light' as const },
-  { label: '深色', value: 'dark' as const },
-  { label: '跟随系统', value: 'system' as const },
-]
+const darkModeList = computed(() => [
+  { label: t('layout.themeMode.light'), value: 'light' as const },
+  { label: t('layout.themeMode.dark'), value: 'dark' as const },
+  { label: t('layout.themeMode.system'), value: 'system' as const },
+])
 
 const changeDarkMode = (mode: 'light' | 'dark' | 'system') => {
   theme.setDarkMode(mode)

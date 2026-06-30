@@ -49,6 +49,9 @@ const activeMenu = computed(() => {
   flex-direction: column;
   padding: 8px;
   height: 100%;
+  background: var(--bg-glass-sidebar);
+  backdrop-filter: var(--blur-sidebar);
+  -webkit-backdrop-filter: var(--blur-sidebar);
 }
 </style>
 

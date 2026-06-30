@@ -121,7 +121,7 @@
 
 // radio-button-group
 .app-radio-button-group {
-  background: #ffffff;
+  background: var(--bg-card-solid);
   border: 1px solid var(--el-border-color);
   border-radius: var(--el-border-radius-base);
   .el-radio-button {
@@ -148,7 +148,7 @@
   表格第一行插入自定义行
 */
 .table-quick-append {
-  background: #ffffff;
+  background: var(--bg-card-solid);
   .el-table__append-wrapper {
     position: absolute;
     top: 0;
@@ -159,7 +159,7 @@
     align-items: center;
     display: flex;
     padding: 0 12px;
-    background: #ffffff;
+    background: var(--bg-card-solid);
     cursor: pointer;
     z-index: 2;
     &:hover {
@@ -423,7 +423,7 @@
   width: calc(100% - var(--sidebar-width));
   padding: 16px 24px;
   box-sizing: border-box;
-  background: #ffffff;
+  background: var(--bg-card-solid);
   z-index: 22;
   box-shadow: 0px -2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
 }

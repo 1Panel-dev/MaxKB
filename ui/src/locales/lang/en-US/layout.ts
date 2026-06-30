@@ -6,6 +6,12 @@ export default {
   apiKey: 'API Key',
   apiServiceAddress: 'API Service Address',
   language: 'Language',
+  theme: 'Theme',
+  themeMode: {
+    light: 'Light',
+    dark: 'Dark',
+    system: 'System',
+  },
   isExpire: 'License not uploaded or expired',
   crossSettings: 'Cross-Origin Settings',
   about: {

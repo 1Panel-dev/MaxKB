@@ -1,7 +1,7 @@
 <template>
   <div class="layout-container flex h-full" :class="isCollapse ? 'layout-container__collapse' : ''">
     <div
-      :class="`layout-container__left border-r ${isCollapse ? 'hidden' : ''}`"
+      :class="`layout-container__left ${isCollapse ? 'hidden' : ''}`"
       :style="{ width: isCollapse ? 0 : `${leftWidth}px` }"
       v-if="showLeft"
     >

@@ -6,6 +6,12 @@ export default {
   apiKey: 'API Key 管理',
   apiServiceAddress: 'API 服務地址',
   language: '語言',
+  theme: '主題',
+  themeMode: {
+    light: '淺色',
+    dark: '深色',
+    system: '跟隨系統',
+  },
   isExpire: '未上傳 License 或 License 已過期。',
   crossSettings: '跨域設定',
   about: {
