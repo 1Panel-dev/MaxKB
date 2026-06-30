@@ -182,7 +182,7 @@
 }
 
 // ===== Popper (dropdown container, exclude tooltips) =====
-.el-popper:not(.el-tooltip__popper) {
+.el-popper:not(.is-dark):not(.el-tooltip__popper) {
   --el-popper-border-radius: var(--app-border-radius-large);
   background: rgba(255, 255, 255, 0.88) !important;
   backdrop-filter: var(--blur-dropdown);
@@ -197,18 +197,18 @@
 }
 
 // ===== Tooltip =====
-.el-tooltip__popper {
+.el-popper.is-dark {
   background: #ffffff !important;
+  color: var(--el-color-primary) !important;
   border: 1px solid var(--border-color) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
-  color: var(--el-color-primary) !important;
-  .el-popper__arrow::before {
+  & > .el-popper__arrow::before {
     background: #ffffff !important;
-    border-color: #ffffff !important;
+    border-color: var(--border-color) !important;
   }
 }
 
-[data-theme="dark"] .el-popper:not(.el-tooltip__popper) {
+[data-theme="dark"] .el-popper:not(.is-dark):not(.el-tooltip__popper) {
   background: rgba(44, 44, 46, 0.88) !important;
   border-color: rgba(255, 255, 255, 0.08) !important;
 
