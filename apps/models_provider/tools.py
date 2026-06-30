@@ -1,25 +1,24 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： tools.py
-    @date：2024/7/22 11:18
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： tools.py
+@date：2024/7/22 11:18
+@desc:
 """
-from django.db import connection
-from django.db.models import QuerySet
-
-from common.config.embedding_config import ModelManage
-from common.database_model_manage.database_model_manage import DatabaseModelManage
-from models_provider.base_model_provider import ModelTypeConst
-from models_provider.models import Model
-from django.utils.translation import gettext_lazy as _
 
 import json
 from typing import Dict
 
+from common.config.embedding_config import ModelManage
+from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.rsa_util import rsa_long_decrypt
+from django.db import connection
+from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
+from models_provider.base_model_provider import ModelTypeConst
 from models_provider.constants.model_provider_constants import ModelProvideConstants
+from models_provider.models import Model
 
 
 def get_model_(provider, model_type, model_name, credential, model_id, use_local=False, **kwargs):
@@ -33,12 +32,15 @@ def get_model_(provider, model_type, model_name, credential, model_id, use_local
     @param use_local:  是否调用本地模型 只适用于本地供应商
     @return: 模型实例
     """
-    model = get_provider(provider).get_model(model_type, model_name,
-                                             json.loads(
-                                                 rsa_long_decrypt(credential)),
-                                             model_id=model_id,
-                                             use_local=use_local,
-                                             streaming=True, **kwargs)
+    model = get_provider(provider).get_model(
+        model_type,
+        model_name,
+        json.loads(rsa_long_decrypt(credential)),
+        model_id=model_id,
+        use_local=use_local,
+        streaming=True,
+        **kwargs,
+    )
     return model
 
 
@@ -90,8 +92,9 @@ def get_model_type_list(provider):
     return get_provider(provider).get_model_type_list()
 
 
-def is_valid_credential(provider, model_type, model_name, model_credential: Dict[str, object], model_params,
-                        raise_exception=False):
+def is_valid_credential(
+    provider, model_type, model_name, model_credential: Dict[str, object], model_params, raise_exception=False
+):
     """
     校验模型认证参数
     @param provider:         供应商字符串
@@ -101,8 +104,9 @@ def is_valid_credential(provider, model_type, model_name, model_credential: Dict
     @param raise_exception:  是否抛出错误
     @return: True|False
     """
-    return get_provider(provider).is_valid_credential(model_type, model_name, model_credential, model_params,
-                                                      raise_exception)
+    return get_provider(provider).is_valid_credential(
+        model_type, model_name, model_credential, model_params, raise_exception
+    )
 
 
 def get_model_by_id(_id, workspace_id):
@@ -126,10 +130,7 @@ def get_model_default_params(model):
                 return value
         return value
 
-    return {
-        p.get('field'): convert_to_int(p.get('default_value'))
-        for p in model.model_params_form
-    }
+    return {p.get("field"): convert_to_int(p.get("default_value")) for p in model.model_params_form}
 
 
 def reset_model_params(default_model_params, **kwargs):
@@ -151,6 +152,6 @@ def get_model_instance_by_model_workspace_id(model_id, workspace_id, **kwargs):
     model = get_model_by_id(model_id, workspace_id)
     default_model_params = get_model_default_params(model)
     if model.model_type == ModelTypeConst.RERANKER.name:
-        default_model_params.setdefault('top_n', 3)
+        default_model_params.setdefault("top_n", 3)
     model_params = reset_model_params(default_model_params, **kwargs)
     return ModelManage.get_model(model_id, lambda _id: get_model(model, **model_params))

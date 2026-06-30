@@ -3,14 +3,12 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 from functools import reduce
-from typing import Dict, Iterator, Type, List
-
-from pydantic import BaseModel
+from typing import Dict, Iterator, List, Type
 
 from common.exception.app_exception import AppApiException
-from django.utils.translation import gettext_lazy as _
-
 from common.utils.common import encryption
+from django.utils.translation import gettext_lazy as _
+from pydantic import BaseModel
 
 
 class DownModelChunkStatus(Enum):

@@ -1,11 +1,10 @@
 # coding=utf-8
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import OpenApiParameter
-
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer
-from rest_framework import serializers
 from django.utils.translation import gettext_lazy as _
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 
 class ProvideResponse(ResultSerializer):
@@ -65,25 +64,28 @@ class ProvideApi(APIMixin):
     class ModelParamsForm(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                name="model_type",
-                description=_("model type"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="provider",
-                description=_("provider"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="model_name",
-                description=_("model name"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            )
+            return [
+                OpenApiParameter(
+                    name="model_type",
+                    description=_("model type"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="provider",
+                    description=_("provider"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="model_name",
+                    description=_("model name"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    required=True,
+                ),
             ]
 
         @staticmethod
@@ -93,19 +95,21 @@ class ProvideApi(APIMixin):
     class ModelList(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                name="model_type",
-                description=_("model type"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            ), OpenApiParameter(
-                name="provider",
-                description=_("provider"),
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                required=True,
-            )
+            return [
+                OpenApiParameter(
+                    name="model_type",
+                    description=_("model type"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name="provider",
+                    description=_("provider"),
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    required=True,
+                ),
             ]
 
         @staticmethod
@@ -119,17 +123,19 @@ class ProvideApi(APIMixin):
     class ModelTypeList(APIMixin):
         @staticmethod
         def get_query_params_api():
-            return [OpenApiParameter(
-                # 参数的名称是done
-                name="provider",
-                # 对参数的备注
-                description=_("provider"),
-                # 指定参数的类型
-                type=OpenApiTypes.STR,
-                location=OpenApiParameter.QUERY,
-                # 指定必须给
-                required=True,
-            )]
+            return [
+                OpenApiParameter(
+                    # 参数的名称是done
+                    name="provider",
+                    # 对参数的备注
+                    description=_("provider"),
+                    # 指定参数的类型
+                    type=OpenApiTypes.STR,
+                    location=OpenApiParameter.QUERY,  # type: ignore
+                    # 指定必须给
+                    required=True,
+                )
+            ]
 
         @staticmethod
         def get_response():
