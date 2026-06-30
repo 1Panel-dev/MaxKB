@@ -4,15 +4,15 @@
     :style="{
       '--el-color-primary': applicationDetail?.custom_theme?.theme_color,
       '--el-color-primary-light-9': hexToRgba(
-        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        applicationDetail?.custom_theme?.theme_color || '#1A6DFF',
         0.1,
       ),
       '--el-color-primary-light-6': hexToRgba(
-        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        applicationDetail?.custom_theme?.theme_color || '#1A6DFF',
         0.4,
       ),
       '--el-color-primary-light-06': hexToRgba(
-        applicationDetail?.custom_theme?.theme_color || '#3370FF',
+        applicationDetail?.custom_theme?.theme_color || '#1A6DFF',
         0.04,
       ),
       backgroundImage: `url(${applicationDetail?.chat_background})`,

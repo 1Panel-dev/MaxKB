@@ -131,7 +131,7 @@ const statisticsType = computed(() => [
     name: t('home.activeUsers'),
     icon: 'app-user',
     background: '#EBF1FF',
-    color: '#3370FF',
+    color: '#1A6DFF',
     sum: [
       getSum(getAttrsArray(props.data, 'customer_num') || 0),
       getSum(getAttrsArray(props.data, 'customer_added_count') || 0),

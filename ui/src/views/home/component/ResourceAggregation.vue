@@ -11,7 +11,7 @@
             <el-avatar :size="48" shape="square" style="background: #ebf1ff">
               <appIcon
                 iconName="app-agent-active"
-                :style="{ fontSize: '28px', color: '#3370FF' }"
+                :style="{ fontSize: '28px', color: '#1A6DFF' }"
               />
             </el-avatar>
           </div>

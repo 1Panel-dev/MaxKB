@@ -300,7 +300,7 @@ defineExpose({ open })
 
         &.is-active {
           color: var(--el-color-primary);
-          background-color: #3370ff1a;
+          background-color: #1A6DFF1a;
         }
       }
     }
