@@ -45,6 +45,8 @@ const activeMenu = computed(() => {
 
 <style lang="scss" scoped>
 .sidebar-container {
+  display: flex;
+  flex-direction: column;
   padding: 8px;
   height: 100%;
 }
@@ -52,11 +54,14 @@ const activeMenu = computed(() => {
 
 <style lang="scss">
 .sidebar-container {
+  .el-scrollbar {
+    flex: 1;
+    min-height: 0;
+  }
   .el-menu {
     height: 100%;
     border: none;
     background: none;
-    max-height: calc(100vh - 100px);
   }
 }
 </style>
