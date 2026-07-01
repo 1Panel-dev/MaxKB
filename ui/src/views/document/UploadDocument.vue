@@ -35,12 +35,10 @@
         @click="next"
         type="primary"
         v-if="active === 0"
-        :disabled="SetRulesRef?.loading || loading"
+        :disabled="SetRulesRef?.loading || loading || uploadComponentUploading"
       >
         {{
-          documentsType === 'txt'
-            ? $t('common.steps.next')
-            : $t('views.document.buttons.import')
+          documentsType === 'txt' ? $t('common.steps.next') : $t('views.document.buttons.import')
         }}
       </el-button>
       <el-button
@@ -96,7 +94,9 @@ const loading = ref(false)
 const disabled = ref(false)
 const active = ref(0)
 const successInfo = ref<any>(null)
+const uploadComponentUploading = computed(() =>UploadComponentRef.value?.uploadingCount> 0)
 async function next() {
+  if (uploadComponentUploading.value) return
   disabled.value = true
   if (await UploadComponentRef.value.validate()) {
     if (documentsType.value === 'QA') {

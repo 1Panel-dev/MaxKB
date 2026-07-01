@@ -37,7 +37,7 @@
       >
       <el-button
         v-if="base_form_list.length > 0 && active == 'data_source'"
-        :disabled="loading"
+        :disabled="loading || actionUploading"
         @click="next"
       >
         {{ $t('common.steps.next') }}
@@ -46,7 +46,7 @@
         v-if="base_form_list.length > 0 ? active == 'knowledge_base' : active == 'data_source'"
         @click="upload"
         type="primary"
-        :disabled="loading"
+        :disabled="loading || actionUploading"
       >
         {{ $t('views.document.buttons.import') }}
       </el-button>
@@ -113,6 +113,9 @@ const action_id = ref<string>()
 const form_data = ref<any>({})
 const active = ref<'data_source' | 'knowledge_base' | 'result'>('data_source')
 const _workflow = ref<any>(null)
+const actionUploading = computed(
+  () => active.value === 'data_source' && ActionRef.value?.uploadingCount > 0,
+)
 
 const base_form_list = computed(() => {
   const kBase = _workflow.value?.nodes?.find((n: any) => n.type === WorkflowType.KnowledgeBase)
@@ -122,6 +125,7 @@ const base_form_list = computed(() => {
   return []
 })
 const next = () => {
+  if (actionUploading.value) return
   ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
     active.value = 'knowledge_base'
@@ -133,6 +137,7 @@ const up = () => {
   })
 }
 const upload = () => {
+  if (actionUploading.value) return
   ActionRef.value.validate().then(() => {
     form_data.value[active.value] = ActionRef.value.get_data()
     loadSharedApi({ type: 'knowledge', systemType: apiType.value })
