@@ -11,7 +11,6 @@
       :auto-upload="false"
       :show-file-list="false"
       :accept="accept"
-      :limit="file_count_limit"
       :on-exceed="onExceed"
       :on-change="fileHandleChange"
       @click.prevent="handlePreview(false)"
@@ -59,6 +58,10 @@
           <AppIcon iconName="app-refresh"></AppIcon>
           {{ $t('dynamicsForm.UploadInput.reUpload') }}
         </el-button>
+      </span>
+      <span v-else-if="successCount === fileArray.length" class="flex align-center">
+        <el-icon class="color-success"><WarningFilled /></el-icon>
+        <span class="ml-4">{{ $t('dynamicsForm.UploadInput.allSuccess') }}</span>
       </span>
     </div>
     <el-row :gutter="8" v-if="fileArray?.length" class="mt-8">
@@ -170,6 +173,7 @@ const sortedFileArray = computed(() =>
 const retryAll = () => {
   retryList.value.forEach((i: any) => uploadFile(i))
 }
+
 // 上传on-change事件
 const fileHandleChange = (file: any, fileList: UploadFiles) => {
   // 按文件唯一标识精确定位并移除当前文件

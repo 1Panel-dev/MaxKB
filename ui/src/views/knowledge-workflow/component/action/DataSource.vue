@@ -143,6 +143,10 @@ const base_form_data_rule = ref<FormRules>({
 const validate = () => {
   return dynamicsFormRef.value?.validate()
 }
+const uploadingCount = computed(
+  () =>
+    (form_data.value as any)?.file_list?.filter((f: any) => f.status === 'uploading').length || 0,
+)
 const filterSuccessFiles = (data: any): any => {
   return {
     ...data,
@@ -164,6 +168,6 @@ watch(
   { immediate: true },
 )
 
-defineExpose({ validate, get_data })
+defineExpose({ validate, get_data, uploadingCount })
 </script>
 <style lang="scss" scoped></style>
