@@ -414,7 +414,6 @@ const fileHandleChange = (file: any, fileList: UploadFiles) => {
   if (!isLimit) {
     item.status = 'error'
     item.errMsg = t('dynamicsForm.UploadInput.errorTip.sizeError')
-    // MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
     // fileList.splice(-1, 1) //移除当前超出大小的文件
     form.value.fileList?.push(item)
     removeCurrentFile()
@@ -494,6 +493,11 @@ const handlePreview = (bool: boolean) => {
 */
 function validate() {
   if (!FormRef.value) return
+  const errorFiles = form.value.fileList.filter((i: any) => i.status === 'error')
+  if (errorFiles.length > 0) {
+    MsgError(t('views.document.tip.fileLimitSizeTip1') + file_size_limit.value + 'MB')
+    return Promise.resolve(false)
+  }
   return FormRef.value.validate((valid: any) => {
     return valid
   })
