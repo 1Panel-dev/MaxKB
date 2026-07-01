@@ -92,7 +92,12 @@
     </el-collapse-transition>
     <!-- 主画布 -->
     <div class="workflow-main" ref="workflowMainRef">
-      <workflow ref="workflowRef" v-if="detail" :data="detail?.work_flow" />
+      <workflow
+        ref="workflowRef"
+        v-if="detail"
+        :data="detail?.work_flow"
+        @aiGenerated="onAiGenerated"
+      />
     </div>
     <!-- 调试 -->
     <el-collapse-transition>
@@ -487,6 +492,18 @@ function getDetail() {
             detail.value = { ...detail.value, ...ok.data }
           })
       }
+    })
+}
+
+// AI 生成工作流回调：生成结果已渲染进画布(边几何已补齐)，直接把 getGraphData() 持久化到当前应用，
+// 成功后 getDetail() 从库里重新拉取并渲染 —— 生成即入库可用，页面刷新展示新工作流。
+function onAiGenerated() {
+  loadSharedApi({ type: 'application', systemType: apiType.value })
+    .putApplication(id, { work_flow: getGraphData() })
+    .then(() => {
+      saveTime.value = new Date()
+      MsgSuccess(t('common.saveSuccess'))
+      getDetail()
     })
 }
 

@@ -70,7 +70,6 @@
         placement="top"
       >
         <AppIcon
-          style="font-size: 16px"
           iconName="app-extend"
           :title="$t('workflow.control.extend')"
         ></AppIcon>
@@ -89,14 +88,28 @@
         ></AppIcon>
       </el-tooltip>
     </el-button>
+    <el-divider direction="vertical" />
+    <el-tooltip
+      effect="dark"
+      :content="$t('workflow.control.aiGenerate')"
+      placement="top"
+    >
+      <el-button link @click="showAIGenerate" style="border: none; color: var(--el-color-primary)">
+        <el-icon :size="16"><MagicStick /></el-icon>
+      </el-button>
+    </el-tooltip>
   </el-card>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { MagicStick } from '@element-plus/icons-vue'
+
 const props = defineProps({
   lf: Object || String || null,
 })
+
+const emit = defineEmits(['showAIGenerate'])
 
 const isDrag = ref(false)
 
@@ -140,6 +153,10 @@ const changeCursor = (bool: boolean) => {
     element.style.cursor = 'pointer'
     props.lf?.closeSelectionSelect()
   }
+}
+
+const showAIGenerate = () => {
+  emit('showAIGenerate')
 }
 </script>
 <style scoped lang="scss">

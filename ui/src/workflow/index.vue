@@ -1,9 +1,13 @@
 <template>
   <div className="workflow-app" id="container"></div>
   <!-- 辅助工具栏 -->
-  <Control class="workflow-control" v-if="lf" :lf="lf"></Control>
+  <Control class="workflow-control" v-if="lf" :lf="lf" @showAIGenerate="showAIGenerate"></Control>
   <TeleportContainer :flow-id="flowId"/>
   <NodeSearch :lf="lf" ref="nodeSearchRef"></NodeSearch>
+  <WorkflowGenerate
+    v-model:visible="showGenerateDialog"
+    @generated="handleWorkflowGenerated"
+  />
 </template>
 <script setup lang="ts">
 import LogicFlow from '@logicflow/core'
@@ -20,11 +24,13 @@ import {disconnectAll, getTeleport} from '@/workflow/common/teleport'
 import {WorkflowMode} from '@/enums/application'
 
 import NodeSearch from '@/workflow/common/NodeSearch.vue'
+import WorkflowGenerate from '@/workflow/common/WorkflowGenerate.vue'
 
 const nodes: any = import.meta.glob('./nodes/**/index.ts', {eager: true})
 const workflow_mode = inject('workflowMode') || WorkflowMode.Application
 const loop_workflow_mode = inject('loopWorkflowMode') || WorkflowMode.ApplicationLoop
 const nodeSearchRef = ref<InstanceType<typeof NodeSearch>>()
+const showGenerateDialog = ref(false)
 defineOptions({name: 'WorkFlow'})
 const TeleportContainer = getTeleport()
 const flowId = ref('')
@@ -42,6 +48,8 @@ type ShapeItem = {
 const props = defineProps({
   data: Object || null,
 })
+// AI 生成的工作流渲染进画布后通知父页面：由父页面负责入库 + 刷新展示
+const emit = defineEmits(['aiGenerated'])
 
 const lf = ref()
 onMounted(() => {
@@ -180,6 +188,37 @@ const fitView = () => {
   nextTick(() => {
     lf.value?.fitView()
   })
+}
+
+const showAIGenerate = () => {
+  showGenerateDialog.value = true
+}
+
+const handleWorkflowGenerated = (data: any) => {
+  if (data && data.nodes && data.edges) {
+    // 先只渲染节点；再用 addEdge 按锚点编程式连边，几何路径由 LogicFlow 现算，
+    // 避免后端边缺少 startPoint/endPoint/pointsList 导致连线断开。
+    renderGraphData({ nodes: data.nodes, edges: [] })
+    nextTick(() => {
+      data.edges.forEach((edge: any) => {
+        lf.value?.graphModel.addEdge({
+          type: edge.type || 'app-edge',
+          sourceNodeId: edge.sourceNodeId,
+          sourceAnchorId: edge.sourceAnchorId,
+          targetNodeId: edge.targetNodeId,
+          targetAnchorId: edge.targetAnchorId,
+        })
+      })
+      // 编程式 addEdge 不会触发 anchor:drop，节点的上游字段缓存(up_node_field_dict)不会失效，
+      // 导致选择器仍按"加边前"的空上游渲染 -> 漏值。这里强制清一遍所有节点缓存，让选择器按最新边图重算。
+      lf.value?.graphModel.nodes.forEach((node: any) => {
+        node?.clear_next_node_field?.(true)
+      })
+      lf.value?.fitView()
+      // 画布已渲染完成且边几何已由 addEdge 补齐，此时通知父页面持久化 getGraphData() 并刷新
+      emit('aiGenerated')
+    })
+  }
 }
 
 defineExpose({

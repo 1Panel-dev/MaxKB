@@ -55,7 +55,7 @@ const form = {
 }
 
 const validate = async () => {
-  let ps = [
+  const ps = [
     KnowledgeWriteRef.value?.validate(),
     nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
   ]
