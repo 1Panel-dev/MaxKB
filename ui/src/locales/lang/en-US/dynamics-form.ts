@@ -139,6 +139,7 @@ export default {
     uploadStatus: 'Completed {success} / {total} files',
     failedStatus: '{count} files failed',
     uploading: 'Uploading',
+    allSuccess: 'All successful',
   },
   AssignmentMethod: {
     label: 'Assignment Method',

@@ -53,7 +53,6 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".xlsx, .xls, .csv,.zip"
-        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -111,7 +110,6 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".xlsx, .xls, .csv"
-        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -157,7 +155,6 @@
         :auto-upload="false"
         :show-file-list="false"
         accept=".txt, .md, .log, .docx, .pdf, .html,.zip,.xlsx,.xls,.csv"
-        :limit="file_count_limit"
         :on-exceed="onExceed"
         :on-change="fileHandleChange"
         @click.prevent="handlePreview(false)"
@@ -206,6 +203,10 @@
         <AppIcon iconName="app-refresh"></AppIcon>
         {{ $t('dynamicsForm.UploadInput.reUpload') }}
       </el-button>
+    </span>
+    <span v-else-if="successCount === form.fileList.length" class="flex align-center">
+      <el-icon class="color-success"><WarningFilled /></el-icon>
+      <span class="ml-4">{{ $t('dynamicsForm.UploadInput.allSuccess') }}</span>
     </span>
   </div>
   <el-row :gutter="8" v-if="form.fileList?.length" class="mt-8">
@@ -335,6 +336,7 @@ const sortedFileList = computed(() =>
 const retryAll = () => {
   retryList.value.forEach((i: any) => uploadFile(i))
 }
+
 const filterSuccessFiles = (data: any): any => {
   return data?.filter((f: any) => f.status === 'success') || []
 }
@@ -527,6 +529,7 @@ onUnmounted(() => {
 defineExpose({
   validate,
   form,
+  uploadingCount,
 })
 </script>
 <style scoped lang="scss"></style>

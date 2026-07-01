@@ -139,6 +139,7 @@ export default {
     uploadStatus: '已完成 {success} / {total} 個文件',
     failedStatus: '失敗 {count} 個文件',
     uploading: '上傳中',
+    allSuccess: '全部成功',
   },
   AssignmentMethod: {
     label: '賦值方式',
