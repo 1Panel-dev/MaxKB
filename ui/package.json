@@ -29,7 +29,7 @@
     "cron-validator": "^1.4.0",
     "cropperjs": "^1.6.2",
     "dingtalk-jsapi": "^3.1.0",
-    "echarts": "^5.6.0",
+    "echarts": "^6.1.0",
     "el-table-infinite-scroll": "^3.0.8",
     "element-plus": "^2.13.5",
     "file-saver": "^2.0.5",
