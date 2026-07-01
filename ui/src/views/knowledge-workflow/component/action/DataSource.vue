@@ -144,7 +144,10 @@ const validate = () => {
   return dynamicsFormRef.value?.validate()
 }
 const filterSuccessFiles = (data: any): any => {
-  return data?.file_list?.filter((f: any) => f.status === 'success') || []
+  return {
+    ...data,
+    file_list: data?.file_list?.filter((f: any) => f.status === 'success') || [],
+  }
 }
 const get_data = () => {
   return filterSuccessFiles(form_data.value)
