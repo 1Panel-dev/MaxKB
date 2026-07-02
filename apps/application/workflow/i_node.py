@@ -14,6 +14,7 @@ from rest_framework import serializers
 from application.workflow.common import Node
 from application.workflow.message.struct.content import Content
 from application.workflow.status import Status
+from common.utils.logger import maxkb_logger
 
 
 class INode:
@@ -36,22 +37,37 @@ class INode:
         self.parameters = get_node_parameters(node)
         # 节点运行时产生的数据
         self.data = {}
+        self._completed = False
+        # ---- 锚点构造,全项目唯一的拼接点 ----
 
-    def next_success_nodes(self):
-        edge_node_list = self.workflow_manage.workflow.get_next_edge_nodes(self.node.id)
-        if edge_node_list is None:
-            self.workflow_manage.next_nodes([])
-            return
-        self.workflow_manage.next_nodes(
-            [en.node for en in edge_node_list if en.edge.sourceAnchorId == self.node.id + '_right'])
+    def anchor(self, *parts):
+        """
+        通用锚点: anchor('right') → '{id}_right',
+                anchor(branch_id, 'right') → '{id}_{branch_id}_right'
+        """
+        return '_'.join([self.node.id, *map(str, parts)])
 
-    def next_fail_nodes(self):
-        edge_node_list = self.workflow_manage.workflow.get_next_edge_nodes(self.node.id)
-        if edge_node_list is None:
-            self.workflow_manage.next_nodes([])
-            return
-        self.workflow_manage.next_nodes(
-            [en.node for en in edge_node_list if en.edge.sourceAnchorId == self.node.id + '_exception_right'])
+    def success_anchor(self):
+        """
+        成功锚点
+        @return: 成功锚点
+        """
+        return self.anchor('right')
+
+    def fail_anchor(self):
+        """
+        失败锚点
+        @return: 失败锚点
+        """
+        return self.branch_anchor('exception')
+
+    def branch_anchor(self, branch_id):
+        """
+        自定义锚点
+        @param branch_id: 自定义分支id
+        @return: 自定义锚点
+        """
+        return self.anchor(branch_id, 'right')
 
     def execute(self):
         pass
@@ -61,18 +77,55 @@ class INode:
         运行节点
         @return: 不响应数据
         """
-        start_time = time.time()
+        self.data['start_time'] = time.time()
         self.status = Status.RUNNING
-        self.data['start_time'] = start_time
-        self._run()
-        self.data['run_time'] = time.time() - start_time
+        try:
+            self._run()
+        except Exception as e:
+            self.complete(Status.FAIL, error=e)
 
     def _run(self):
         """
         执行节点
         @return:
         """
-        return self.execute()
+        self.execute()
+        self.complete(Status.SUCCESS)
+
+    def complete(self, status, anchors=None, error=None):
+        """
+        节点结束调用函数
+
+        @param status: 状态
+        @param anchors 锚点信息
+        @param error:  错误信息
+        @return:
+        """
+        if self._completed:
+            return
+        self._completed = True
+        self.status = status
+        if error:
+            self.data['error'] = str(error)
+        self.data['run_time'] = time.time() - self.data['start_time']
+        if anchors is None:
+            anchors = [self.success_anchor() if status == Status.SUCCESS else self.fail_anchor()]
+        self._dispatch(anchors)
+        self.workflow_manage.assertion_end()
+
+    def _dispatch(self, anchors):
+        """
+        根据锚点执行下一个节点
+        @param anchors: 锚点列表
+        @return:不返回
+        """
+        edge_node_list = self.workflow_manage.workflow.get_next_edge_nodes(self.node.id) or []
+        known = {en.edge.sourceAnchorId for en in edge_node_list}
+        unknown = set(anchors) - known
+        if unknown and known:
+            maxkb_logger.warning(f'node {self.node.id}: anchors {unknown} matched no edges, known={known}')
+        self.workflow_manage.next_nodes(
+            [en.node for en in edge_node_list if en.edge.sourceAnchorId in anchors])
 
     def get_node_id(self):
         """
