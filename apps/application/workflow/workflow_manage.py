@@ -13,8 +13,8 @@ from typing import List, Dict, Optional, Callable
 
 from langchain_core.prompts import PromptTemplate
 
-from application.flow.i_step_node import INode
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
+from application.workflow.i_node import INode
 from application.workflow.message.struct.content import Content
 from application.workflow.nodes import get_node_class
 from application.workflow.status import Status
