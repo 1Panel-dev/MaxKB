@@ -47,6 +47,7 @@ class WorkflowManage:
         @param workflow_type: 工作流类型
         @param parameters:    工作流使用到的其他数据
         """
+        self._lock = threading.Lock()
         self.done = False
         self.call_back = call_back
         self.workflow = workflow
@@ -65,10 +66,7 @@ class WorkflowManage:
 
     def _run(self, node):
         self.nodes.append(node)
-        try:
-            node.run()
-        except Exception as e:
-            node.status = Status.FAIL
+        node.run()
 
     def next_nodes(self, nodes: Optional[List[Node]]):
         """
@@ -77,18 +75,26 @@ class WorkflowManage:
         @return:
         """
         if nodes is None or len(nodes) == 0:
-            self.assertion_end()
             return
-        for node in nodes:
-            self._run_async(get_node_class(node.type, self.workflow_type)(node, self, get_node_parameters))
+        with self._lock:
+            instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters)
+                         for n in nodes]
+            self.nodes.extend(instances)
+        for inst in instances:
+            self._run_async(inst)
 
     def assertion_end(self):
         """
         如果节点执行结束没有下一个节点  就结束工作流
         @return:
         """
-        if self.is_end():
-            self.end()
+        with self._lock:
+            if self.done:
+                return
+            if not self.is_end():
+                return
+            self.done = True
+        self.end()
 
     def is_end(self):
         """

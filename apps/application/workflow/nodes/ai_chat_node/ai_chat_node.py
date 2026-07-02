@@ -262,8 +262,6 @@ class AIChatNode(INode):
             answer = self.get_context('answer')
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
             self.write(TextContent(text_content_id, answer, Status.SUCCESS, node_info))
-        self.status = Status.SUCCESS
-        self.next_success_nodes()
 
     def _generate_prompt_question(self, prompt, model, vision, image_list, video_list):
         images = []

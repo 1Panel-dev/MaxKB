@@ -107,5 +107,3 @@ class StarNode(INode):
                 key = field.get('value')
                 if key:
                     self.workflow_manage.context[key] = workflow_variable.get(key, '')
-        self.status = Status.SUCCESS
-        self.next_success_nodes()
