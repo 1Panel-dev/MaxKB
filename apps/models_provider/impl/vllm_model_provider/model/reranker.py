@@ -35,12 +35,14 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
             if model_credential.get("api_url").endswith("/v1")
             else model_credential.get("api_url")
         )
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        top_n = optional_params.pop("top_n", 3)
         return VllmBgeReranker(
             model=model_name,
             api_key=model_credential.get("api_key"),
             api_url=r_url,
-            params=model_kwargs,
-            **model_kwargs,
+            top_n=top_n,
+            params=optional_params,
         )
 
     def compress_documents(
