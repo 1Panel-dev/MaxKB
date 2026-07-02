@@ -39,6 +39,7 @@ export default {
     uploadMessage: '拖拽文件至此上傳或',
     formats: '支持格式：',
     requiredMessage: '請上傳文件',
+    noSuccessFileMessage: '沒有上傳成功的文件，請重新上傳',
     errorMessage1: '文件大小超過 100MB',
     errorMessage2: '文件格式不支持',
     errorMessage3: '文件不能为空',
