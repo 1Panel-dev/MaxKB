@@ -62,10 +62,10 @@ class WorkflowManage:
         工作流执行
         @return: None
         """
+        self.nodes.append(self.start_node)
         self._run_async(self.start_node)
 
     def _run(self, node):
-        self.nodes.append(node)
         node.run()
 
     def next_nodes(self, nodes: Optional[List[Node]]):
@@ -84,16 +84,11 @@ class WorkflowManage:
             self._run_async(inst)
 
     def assertion_end(self):
-        """
-        如果节点执行结束没有下一个节点  就结束工作流
-        @return:
-        """
         with self._lock:
             if self.done:
                 return
             if not self.is_end():
                 return
-            self.done = True
         self.end()
 
     def is_end(self):
