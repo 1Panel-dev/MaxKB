@@ -41,6 +41,7 @@ export default {
     uploadMessage: 'Drag and drop files here to upload or',
     formats: 'Supported formats:',
     requiredMessage: 'Please upload a file',
+    noSuccessFileMessage: 'No files were uploaded successfully. Please upload again.',
     errorMessage1: 'The file size exceeds 100mb',
     errorMessage2: 'Unsupported file format',
     errorMessage3: 'File cannot be empty',

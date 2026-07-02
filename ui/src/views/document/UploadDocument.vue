@@ -59,7 +59,7 @@ import SetRules from './upload/SetRules.vue'
 import ResultSuccess from './upload/ResultSuccess.vue'
 import UploadComponent from './upload/UploadComponent.vue'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import useStore from '@/stores'
 const { knowledge } = useStore()
@@ -94,9 +94,13 @@ const loading = ref(false)
 const disabled = ref(false)
 const active = ref(0)
 const successInfo = ref<any>(null)
-const uploadComponentUploading = computed(() =>UploadComponentRef.value?.uploadingCount> 0)
+const uploadComponentUploading = computed(() => UploadComponentRef.value?.uploadingCount > 0)
 async function next() {
   if (uploadComponentUploading.value) return
+  if (!documentsFiles.value?.length) {
+    MsgError(t('views.document.upload.noSuccessFileMessage'))
+    return
+  }
   disabled.value = true
   if (await UploadComponentRef.value.validate()) {
     if (documentsType.value === 'QA') {
