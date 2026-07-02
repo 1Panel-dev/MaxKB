@@ -19,9 +19,10 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
         super().__init__(**kwargs)
         self.api_key = kwargs.get('api_key')
         self.model = kwargs.get('model')
-        self.params = kwargs.get('params')
+        self.params = dict(kwargs.get('params') or {})
         self.api_url = kwargs.get('api_url')
         self.top_n = kwargs.get('top_n', 3)
+        self.params.pop('top_n', None)
         self.client = cohere.ClientV2(kwargs.get('api_key'), base_url=kwargs.get('api_url'))
 
     @staticmethod
