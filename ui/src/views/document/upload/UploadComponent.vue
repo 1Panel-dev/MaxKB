@@ -448,8 +448,8 @@ const uploadFile = (item: any) => {
   item.aborted = false
   const res: any = applicationApi.postUploadFileProgress(
     item.raw,
-    id as string,
-    'KNOWLEDGE',
+    'TEMPORARY_120_MINUTE',
+    'TEMPORARY_120_MINUTE',
     (percent: number) => {
       item.percentage = percent
     },
