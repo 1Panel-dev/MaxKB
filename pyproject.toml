@@ -35,7 +35,7 @@ dependencies = [
     "xinference-client==2.11.0",
 
     # Model providers & cloud SDKs
-    "anthropic==0.113.0",
+    "anthropic==0.115.1",
     "boto3==1.43.37",
     "cohere==7.0.5",
     "dashscope==1.26.0",
