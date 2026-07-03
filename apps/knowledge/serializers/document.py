@@ -694,7 +694,8 @@ class DocumentSerializers(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
             document_id = self.data.get("document_id")
-            if not QuerySet(Document).filter(id=document_id).exists():
+            knowledge_id = self.data.get("knowledge_id")
+            if not QuerySet(Document).filter(id=document_id, knowledge_id=knowledge_id).exists():
                 raise AppApiException(500, _("document id not exist"))
 
         def export(self, with_valid=True):

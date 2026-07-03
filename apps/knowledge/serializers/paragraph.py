@@ -117,7 +117,11 @@ class ParagraphSerializers(serializers.Serializer):
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            if not QuerySet(Paragraph).filter(id=self.data.get("paragraph_id")).exists():
+            if not QuerySet(Paragraph).filter(
+                id=self.data.get("paragraph_id"),
+                document_id=self.data.get("document_id"),
+                knowledge_id=self.data.get("knowledge_id"),
+            ).exists():
                 raise AppApiException(500, _("Paragraph id does not exist"))
 
         def list(self, with_valid=False):
@@ -209,7 +213,11 @@ class ParagraphSerializers(serializers.Serializer):
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            if not QuerySet(Paragraph).filter(id=self.data.get("paragraph_id")).exists():
+            if not QuerySet(Paragraph).filter(
+                id=self.data.get("paragraph_id"),
+                document_id=self.data.get("document_id"),
+                knowledge_id=self.data.get("knowledge_id"),
+            ).exists():
                 raise AppApiException(500, _("Paragraph id does not exist"))
 
         @staticmethod
