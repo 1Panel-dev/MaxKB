@@ -479,27 +479,38 @@ class ModelSerializer(serializers.Serializer):
 
     class ModelParams(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("model id"))
+        workspace_id = serializers.UUIDField(required=False, label=_("workspace id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
-            model = QuerySet(Model).filter(id=self.data.get("id")).first()
+
+            validated_data = self.validated_data
+            model = (
+                QuerySet(Model)
+                .filter(
+                    id=validated_data.get("id"),
+                    workspace_id=validated_data.get("workspace_id"),
+                )
+                .first()
+            )
+
             if model is None:
                 raise AppApiException(500, _("Model does not exist"))
 
+            return model
+
         def get_model_params(self, with_valid=True):
+            model = None
             if with_valid:
-                self.is_valid(raise_exception=True)
-            model_id = self.data.get("id")
-            model = QuerySet(Model).filter(id=model_id).first()
+                model = self.is_valid(raise_exception=True)
             return model.model_params_form
 
         def save_model_params_form(self, model_params_form, with_valid=True):
+            model = None
             if with_valid:
-                self.is_valid(raise_exception=True)
+                model = self.is_valid(raise_exception=True)
             if model_params_form is None:
                 model_params_form = []
-            model_id = self.data.get("id")
-            model = QuerySet(Model).filter(id=model_id).first()
             if not isinstance(model_params_form, list):
                 raise AppApiException(500, _("model_params_form must be a list"))
             # 还需要校验几个字段：label required default_value
