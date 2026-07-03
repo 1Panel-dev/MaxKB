@@ -195,7 +195,7 @@ class ModelSetting(APIView):
                          RoleConstants.USER.get_workspace_role(),)
         def get(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.ModelParams(data={'id': model_id}).get_model_params())
+                ModelSerializer.ModelParams(data={'id': model_id, 'workspace_id': workspace_id}).get_model_params())
 
         @extend_schema(methods=['PUT'],
                        summary=_('Save model parameter form'),
@@ -217,7 +217,7 @@ class ModelSetting(APIView):
              )
         def put(self, request: Request, workspace_id: str, model_id: str):
             return result.success(
-                ModelSerializer.ModelParams(data={'id': model_id}).save_model_params_form(request.data))
+                ModelSerializer.ModelParams(data={'id': model_id, 'workspace_id': workspace_id}).save_model_params_form(request.data))
 
     class ModelMeta(APIView):
         authentication_classes = [TokenAuth]
