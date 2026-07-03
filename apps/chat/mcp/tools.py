@@ -3,6 +3,7 @@ import re
 
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
+from django.utils import timezone
 
 from application.models import ApplicationApiKey, Application, ChatUserType, ChatSourceChoices
 from chat.serializers.chat import ChatSerializers
@@ -13,6 +14,8 @@ class MCPToolHandler:
         app_key = QuerySet(ApplicationApiKey).filter(secret_key=auth_header, is_active=True).first()
         if not app_key:
             raise PermissionError("Invalid API Key")
+        if app_key.is_permanent is False and app_key.expire_time < timezone.now():
+            raise PermissionError("API Key is expired")
 
         self.application = QuerySet(Application).filter(id=app_key.application_id, is_publish=True).first()
         if not self.application:
