@@ -81,6 +81,11 @@
           </span>
         </template>
       </el-table-column>
+      <el-table-column :label="$t('common.creator')" width="130" show-overflow-tooltip>
+        <template #default="{ row }">
+          {{ row.user?.nick_name || row.user?.username || '-' }}
+        </template>
+      </el-table-column>
       <el-table-column :label="$t('common.createDate')" width="170" prop="create_time" sortable>
         <template #default="{ row }">
           {{ datetimeFormat(row.create_time) }}

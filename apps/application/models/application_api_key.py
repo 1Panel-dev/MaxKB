@@ -20,6 +20,8 @@ class ApplicationApiKey(AppModelMixin):
                                    , default=list)
     expire_time = models.DateTimeField(verbose_name="过期时间", default=timezone.now)
     is_permanent = models.BooleanField(default=True, verbose_name="是否永久")
+    user = models.ForeignKey("users.User", on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True,
+                             verbose_name="创建用户")
 
     class Meta:
         db_table = "application_api_key"

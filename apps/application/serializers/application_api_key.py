@@ -1,6 +1,7 @@
 import hashlib
 
 import uuid_utils.compat as uuid
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -14,9 +15,25 @@ from common.exception.app_exception import AppApiException
 
 
 class ApplicationKeySerializerModel(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
     class Meta:
         model = ApplicationApiKey
         fields = "__all__"
+
+    @staticmethod
+    def get_user(obj):
+        if not obj.user_id:
+            return None
+        try:
+            user = obj.user
+        except ObjectDoesNotExist:
+            return None
+        return {
+            "id": obj.user_id,
+            "username": user.username,
+            "nick_name": user.nick_name,
+        }
 
 
 class EditApplicationKeySerializer(serializers.Serializer):
@@ -36,6 +53,7 @@ class EditApplicationKeySerializer(serializers.Serializer):
 class ApplicationKeySerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
     application_id = serializers.UUIDField(required=True, label=_('application id'))
+    user_id = serializers.UUIDField(required=False, allow_null=True, label=_('user id'))
     order_by = serializers.CharField(required=False, label=_('order by'), allow_null=True, allow_blank=True)
 
     def is_valid(self, *, raise_exception=False):
@@ -51,10 +69,12 @@ class ApplicationKeySerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
+        user_id = self.data.get("user_id")
         secret_key = 'agent-' + hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()
         application_api_key = ApplicationApiKey(id=uuid.uuid7(),
                                                 secret_key=secret_key,
-                                                application_id=application_id)
+                                                application_id=application_id,
+                                                user_id=user_id)
         application_api_key.save()
         return ApplicationKeySerializerModel(application_api_key).data
 
@@ -62,7 +82,7 @@ class ApplicationKeySerializer(serializers.Serializer):
         if with_valid:
             self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
-        query_set = QuerySet(ApplicationApiKey).filter(application_id=application_id)
+        query_set = QuerySet(ApplicationApiKey).filter(application_id=application_id).select_related('user')
         order_by = '-create_time' if self.data.get('order_by') is None or self.data.get(
             'order_by') == '' else self.data.get('order_by')
         query_set = query_set.order_by(order_by)
