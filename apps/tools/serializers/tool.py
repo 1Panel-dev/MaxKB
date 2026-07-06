@@ -1365,7 +1365,10 @@ class ToolSerializer(serializers.Serializer):
                 }
             ).auth_resource(str(tool_id))
             try:
-                requests.get(instance.get("download_callback_url"), timeout=5)
+                download_callback_url = instance.get("download_callback_url")
+                if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                    raise AppApiException(500, _("Illegal download callback url"))
+                requests.get(download_callback_url, timeout=5)
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
