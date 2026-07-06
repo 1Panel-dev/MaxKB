@@ -28,6 +28,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import common_convert_value
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
+from common.utils.shared_resource_auth import get_runtime_user_id, validate_authorized_tool_ids
 from common.utils.tool_code import ToolExecutor
 from knowledge.models import FileSourceType
 from knowledge.models.knowledge_action import State
@@ -113,7 +114,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
                                                                               value=value))
 
 
-def valid_function(tool_lib, workspace_id):
+def valid_function(tool_lib, workspace_id, user_id=None):
     if tool_lib is None:
         raise Exception(_('Tool does not exist'))
     get_authorized_tool = DatabaseModelManage.get_model("get_authorized_tool")
@@ -123,6 +124,7 @@ def valid_function(tool_lib, workspace_id):
         raise Exception(_("Tool does not exist"))
     if not tool_lib.is_active:
         raise Exception(_("Tool is not active"))
+    validate_authorized_tool_ids([str(tool_lib.id)], workspace_id, user_id)
 
 
 def _filter_file_bytes(data):
@@ -177,9 +179,15 @@ class BaseToolLibNodeNode(IToolLibNode):
             self.answer_text = str(details.get('result'))
 
     def execute(self, tool_lib_id, input_field_list, **kwargs) -> NodeResult:
-        workspace_id = self.workflow_manage.get_body().get('workspace_id')
+        body = self.workflow_manage.get_body()
+        workspace_id = body.get('workspace_id')
+        runtime_user_id = get_runtime_user_id(
+            user_id=body.get("user_id"),
+            chat_user_id=body.get("chat_user_id"),
+            chat_user_type=body.get("chat_user_type"),
+        )
         tool_lib = QuerySet(Tool).filter(id=tool_lib_id).first()
-        valid_function(tool_lib, workspace_id)
+        valid_function(tool_lib, workspace_id, runtime_user_id)
         params = {
             field.get('name'): convert_value(
                 field.get('name'), field.get('value'), field.get('type'),

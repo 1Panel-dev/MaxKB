@@ -6,7 +6,6 @@
     @date：2025/6/10 11:00
     @desc:
 """
-import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 
 from django.utils.translation import gettext_lazy as _
@@ -20,7 +19,7 @@ from application.models import ChatUserType, Application
 from application.serializers.application_chat import ApplicationChatQuerySerializers
 from chat.api.chat_api import ChatAPI, PromptGenerateAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
-from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugChatSerializers, PromptGenerateSerializer
+from chat.serializers.chat import OpenChatSerializers, DebugChatSerializers, PromptGenerateSerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
@@ -134,7 +133,7 @@ class OpenView(APIView):
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(OpenChatSerializers(
             data={'workspace_id': workspace_id, 'application_id': application_id,
-                  'chat_user_id': str(uuid.uuid7()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
+                  'chat_user_id': str(request.user.id), 'chat_user_type': ChatUserType.PLATFORM_USER,
                   'debug': True}).open())
 
 

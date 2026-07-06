@@ -16,9 +16,8 @@ from imghdr import what
 from typing import Dict, List
 
 from common.exception.app_exception import AppApiException
-from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
-from common.utils.shared_resource_auth import filter_authorized_ids
+from common.utils.shared_resource_auth import filter_authorized_ids, get_runtime_user_id
 from common.utils.tool_code import ToolExecutor
 from django.db.models import QuerySet
 from django.utils.translation import gettext as _
@@ -229,6 +228,12 @@ class BaseChatNode(IChatNode):
         self.context["system"] = system
         message_list = self.generate_message_list(question, history_message)
         self.context["message_list"] = message_list
+        body = self.workflow_manage.get_body()
+        runtime_user_id = get_runtime_user_id(
+            user_id=body.get("user_id"),
+            chat_user_id=body.get("chat_user_id"),
+            chat_user_type=body.get("chat_user_type"),
+        )
 
         # 过滤tool_id
         all_tool_ids = list(
@@ -239,7 +244,7 @@ class BaseChatNode(IChatNode):
                 + ([mcp_tool_id] if mcp_tool_id else [])
             )
         )
-        authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id))
+        authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id, user_id=runtime_user_id))
 
         mcp_tool_ids = [i for i in (mcp_tool_ids or []) if i in authorized_set]
         tool_ids = [i for i in (tool_ids or []) if i in authorized_set]
@@ -262,6 +267,7 @@ class BaseChatNode(IChatNode):
             question,
             chat_id,
             workspace_id,
+            runtime_user_id,
         )
         if mcp_result:
             return mcp_result
@@ -307,6 +313,7 @@ class BaseChatNode(IChatNode):
         question,
         chat_id,
         workspace_id,
+        runtime_user_id=None,
     ):
 
         mcp_servers_config = {}
@@ -333,7 +340,11 @@ class BaseChatNode(IChatNode):
 
         tool_init_params = {}
         tools = get_tools(
-            self.workflow_manage.get_source_type(), self.workflow_manage.get_source_id(), tool_ids, workspace_id
+            self.workflow_manage.get_source_type(),
+            self.workflow_manage.get_source_id(),
+            tool_ids,
+            workspace_id,
+            runtime_user_id,
         )
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context["tool_ids"] = tool_ids

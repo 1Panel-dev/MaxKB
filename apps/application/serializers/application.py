@@ -35,6 +35,7 @@ from common.utils.common import (
     restricted_loads,
 )
 from common.utils.logger import maxkb_logger
+from common.utils.shared_resource_auth import validate_authorized_tool_ids
 from common.utils.tool_code import ToolExecutor
 from django.core import validators
 from django.db import models, transaction
@@ -60,7 +61,7 @@ from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 from tools.serializers.tool import ToolExportModelSerializer
 from trigger.models import Trigger, TriggerTask
 from users.models import User
-from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
+from users.serializers.user import is_workspace_manage_permission_read
 
 from application.flow.common import Workflow
 from application.long_term_memory import schedule_extract_long_term_memory
@@ -101,6 +102,24 @@ def hand_node(node, update_tool_map):
     if node.get("type") == "tool-workflow-lib-node":
         tool_lib_id = node.get("properties", {}).get("node_data", {}).get("tool_lib_id") or ""
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
+
+
+def get_bound_tool_ids(instance: Dict):
+    tool_id_list = []
+    for field in ("tool_ids", "skill_tool_ids", "mcp_tool_ids"):
+        tool_id_list.extend([str(tool_id) for tool_id in (instance.get(field) or []) if tool_id])
+    work_flow = instance.get("work_flow") or {}
+    if work_flow:
+        from application.flow.tools import get_tool_id_list
+
+        tool_id_list.extend([str(tool_id) for tool_id in get_tool_id_list(work_flow, False) if tool_id])
+    return list(dict.fromkeys(tool_id_list))
+
+
+def validate_bound_tool_ids(instance: Dict, workspace_id: str, user_id: str):
+    tool_id_list = get_bound_tool_ids(instance)
+    if tool_id_list:
+        validate_authorized_tool_ids(tool_id_list, workspace_id, user_id)
 
 
 class MKInstance:
@@ -623,6 +642,7 @@ class ApplicationSerializer(serializers.Serializer):
         workspace_id = self.data.get("workspace_id")
         wq = ApplicationCreateSerializer.WorkflowRequest(data=instance)
         wq.is_valid(raise_exception=True)
+        validate_bound_tool_ids(instance, workspace_id, user_id)
         application_model = wq.to_application_model(user_id, workspace_id, instance)
         application_model.save()
         # 插入认证信息
@@ -1183,6 +1203,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if with_valid:
             self.is_valid()
             ApplicationEditSerializer(data=instance).is_valid(raise_exception=True)
+            validate_bound_tool_ids(instance, self.data.get("workspace_id"), self.data.get("user_id"))
         application_id = self.data.get("application_id")
 
         application = QuerySet(Application).get(id=application_id)

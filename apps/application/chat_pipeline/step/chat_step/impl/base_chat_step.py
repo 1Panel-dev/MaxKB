@@ -29,7 +29,7 @@ from application.models import (
 from common.exception.app_exception import AppApiException
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
-from common.utils.shared_resource_auth import filter_authorized_ids
+from common.utils.shared_resource_auth import filter_authorized_ids, get_runtime_user_id
 from common.utils.tool_code import ToolExecutor
 from django.db.models import QuerySet
 from django.http import StreamingHttpResponse
@@ -355,6 +355,7 @@ class BaseChatStep(IChatStep):
         agent_id,
         chat_id,
         workspace_id,
+        runtime_user_id=None,
     ):
 
         mcp_servers_config = {}
@@ -376,7 +377,7 @@ class BaseChatStep(IChatStep):
         ToolExecutor().validate_mcp_transport(json.dumps(mcp_servers_config))
 
         tool_init_params = {}
-        tools = get_tools("APPLICATION", agent_id, tool_ids, workspace_id)
+        tools = get_tools("APPLICATION", agent_id, tool_ids, workspace_id, runtime_user_id)
         if tool_ids and len(tool_ids) > 0:  # 如果有工具ID，则将其转换为MCP
             self.context["tool_ids"] = tool_ids
             for tool_id in tool_ids:
@@ -526,9 +527,10 @@ class BaseChatStep(IChatStep):
                         user_system_prompt = str(msg.content)
                 else:
                     filtered_message_list.append(msg)
+            runtime_user_id = get_runtime_user_id(chat_user_id=chat_user_id, chat_user_type=chat_user_type)
             # 过滤tool_id
             all_tool_ids = list(set((mcp_tool_ids or []) + (tool_ids or []) + (skill_tool_ids or [])))
-            authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id))
+            authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id, user_id=runtime_user_id))
 
             mcp_tool_ids = [i for i in (mcp_tool_ids or []) if i in authorized_set]
             tool_ids = [i for i in (tool_ids or []) if i in authorized_set]
@@ -548,6 +550,7 @@ class BaseChatStep(IChatStep):
                 agent_id,
                 chat_id,
                 workspace_id,
+                runtime_user_id,
             )
             if mcp_result:
                 return mcp_result, True
@@ -641,6 +644,8 @@ class BaseChatStep(IChatStep):
         mcp_output_enable=True,
         application_id=None,
         chat_id=None,
+        chat_user_id=None,
+        chat_user_type=None,
     ):
         if paragraph_list is None:
             paragraph_list = []
@@ -661,9 +666,10 @@ class BaseChatStep(IChatStep):
                 _("Sorry, the AI model is not configured. Please go to the application to set up the AI model first.")
             ), False
         else:
+            runtime_user_id = get_runtime_user_id(chat_user_id=chat_user_id, chat_user_type=chat_user_type)
             # 过滤tool_id
             all_tool_ids = list(set((mcp_tool_ids or []) + (tool_ids or []) + (skill_tool_ids or [])))
-            authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id))
+            authorized_set = set(filter_authorized_ids("tool", all_tool_ids, workspace_id, user_id=runtime_user_id))
 
             mcp_tool_ids = [i for i in (mcp_tool_ids or []) if i in authorized_set]
             tool_ids = [i for i in (tool_ids or []) if i in authorized_set]
@@ -683,6 +689,7 @@ class BaseChatStep(IChatStep):
                 application_id,
                 chat_id,
                 workspace_id,
+                runtime_user_id,
             )
             if mcp_result:
                 return mcp_result, True
@@ -734,6 +741,8 @@ class BaseChatStep(IChatStep):
                 mcp_output_enable,
                 manage.context.get("application_id"),
                 chat_id,
+                chat_user_id,
+                chat_user_type,
             )
             if is_ai_chat:
                 request_token = chat_model.get_num_tokens_from_messages(message_list)

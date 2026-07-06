@@ -37,7 +37,6 @@ import uuid_utils.compat as uuid
 from asgiref.sync import sync_to_async
 from common.result import result
 from common.utils.logger import maxkb_logger
-from common.utils.tool_code import ToolExecutor
 from deepagents import create_deep_agent
 from django.db.models import OuterRef, QuerySet, Subquery
 from django.http import StreamingHttpResponse
@@ -1042,7 +1041,7 @@ def get_workflow_args(tool, qv):
     return build_schema({})
 
 
-def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
+def get_workflow_func(source_type, source_id, tool, qv, workspace_id, user_id=None):
     tool_id = tool.id
     tool_record_id = str(uuid.uuid7())
     took_execute = ToolExecute(tool_id, tool_record_id, workspace_id, source_type, source_id, False)
@@ -1057,6 +1056,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
                 "tool_id": tool_id,
                 "stream": True,
                 "workspace_id": workspace_id,
+                "user_id": user_id,
                 **kwargs,
             },
             ToolWorkflowPostHandler(took_execute, tool_id),
@@ -1074,7 +1074,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id):
     return inner
 
 
-def get_tools(source_type, source_id, tool_workflow_ids, workspace_id):
+def get_tools(source_type, source_id, tool_workflow_ids, workspace_id, user_id=None):
     tools = QuerySet(Tool).filter(
         id__in=tool_workflow_ids, is_active=True, tool_type=ToolType.WORKFLOW, workspace_id=workspace_id
     )
@@ -1087,7 +1087,7 @@ def get_tools(source_type, source_id, tool_workflow_ids, workspace_id):
     results = []
     for tool in tools:
         qv = qd.get(tool.id)
-        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id)
+        func = get_workflow_func(source_type, source_id, tool, qv, workspace_id, user_id=user_id)
         args = get_workflow_args(tool, qv)
         tool = StructuredTool.from_function(
             func=func,

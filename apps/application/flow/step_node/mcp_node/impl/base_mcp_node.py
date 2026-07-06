@@ -8,6 +8,7 @@ from langchain_mcp_adapters.client import MultiServerMCPClient
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.mcp_node.i_mcp_node import IMcpNode
+from common.utils.shared_resource_auth import get_runtime_user_id, validate_authorized_tool_ids
 from tools.models import Tool
 from common.utils.tool_code import ToolExecutor
 
@@ -28,6 +29,13 @@ class BaseMcpNode(IMcpNode):
                 raise ValueError(f"Tool with ID {mcp_tool_id} not found.")
             if not tool.is_active:
                 raise ValueError(f"Tool with ID {mcp_tool_id} is inactive.")
+            body = self.workflow_manage.get_body()
+            runtime_user_id = get_runtime_user_id(
+                user_id=body.get("user_id"),
+                chat_user_id=body.get("chat_user_id"),
+                chat_user_type=body.get("chat_user_type"),
+            )
+            validate_authorized_tool_ids([str(tool.id)], body.get("workspace_id"), runtime_user_id)
             servers = json.loads(tool.code)
         else:
             servers = json.loads(mcp_servers)
