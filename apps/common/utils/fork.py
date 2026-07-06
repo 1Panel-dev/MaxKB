@@ -1,5 +1,7 @@
+import base64
 import copy
 import re
+import sys
 import traceback
 from functools import reduce
 from typing import List, Set
@@ -10,8 +12,18 @@ import requests
 from bs4 import BeautifulSoup
 
 from common.utils.logger import maxkb_logger
+from maxkb.const import CONFIG
 
 requests.packages.urllib3.disable_warnings()
+_enable_sandbox = bool(int(CONFIG.get("SANDBOX", 0)))
+
+
+class SandboxFetchResponse:
+    def __init__(self, status_code: int, content: bytes, encoding: str | None, apparent_encoding: str | None):
+        self.status_code = status_code
+        self.content = content
+        self.encoding = encoding
+        self.apparent_encoding = apparent_encoding
 
 
 class ChildLink:
@@ -182,6 +194,41 @@ class Fork:
                         charset_list.append(match.group(1))
         return charset_list
 
+    @staticmethod
+    def _sandbox_requests_get(base_fork_url: str, headers: dict):
+        from common.utils.tool_code import ToolExecutor
+
+        response = ToolExecutor().exec_code(
+            """
+def fetch_url(url, headers):
+    import base64
+    import requests
+
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(url, verify=False, headers=headers)
+    return {
+        "status_code": response.status_code,
+        "content": base64.b64encode(response.content).decode("ascii"),
+        "encoding": response.encoding,
+        "apparent_encoding": response.apparent_encoding,
+    }
+""",
+            {"url": base_fork_url, "headers": headers},
+            function_name="fetch_url",
+        )
+        return SandboxFetchResponse(
+            response.get("status_code"),
+            base64.b64decode(response.get("content")),
+            response.get("encoding"),
+            response.get("apparent_encoding"),
+        )
+
+    @staticmethod
+    def requests_get(base_fork_url: str, headers: dict):
+        if _enable_sandbox and sys.platform.startswith("linux"):
+            return Fork._sandbox_requests_get(base_fork_url, headers)
+        return requests.get(base_fork_url, verify=False, headers=headers)
+
     def fork(self):
         try:
 
@@ -190,7 +237,7 @@ class Fork:
             }
 
             maxkb_logger.info(f'fork:{self.base_fork_url}')
-            response = requests.get(self.base_fork_url, verify=False, headers=headers)
+            response = self.requests_get(self.base_fork_url, headers)
             if response.status_code != 200:
                 maxkb_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
