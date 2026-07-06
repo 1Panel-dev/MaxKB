@@ -184,37 +184,51 @@ class Fork:
 
     @staticmethod
     def get_beautiful_soup(response):
-        encoding = (
-            response.encoding
-            if response.encoding is not None and response.encoding != "ISO-8859-1"
-            else response.apparent_encoding
-        )
-        html_content = response.content.decode(encoding)
-        beautiful_soup = BeautifulSoup(html_content, "html.parser")
-        meta_list = beautiful_soup.find_all("meta")
-        charset_list = Fork.get_charset_list(meta_list)
-        if len(charset_list) > 0:
-            charset = charset_list[0]
-            if charset != encoding:
-                try:
-                    html_content = response.content.decode(charset, errors="replace")
-                except Exception as e:
-                    maxkb_logger.error(f"{e}: {traceback.format_exc()}")
-                return BeautifulSoup(html_content, "html.parser")
-        return beautiful_soup
+        encoding_list = Fork.get_encoding_list(response)
+        for encoding in encoding_list:
+            try:
+                return BeautifulSoup(response.content.decode(encoding), "html.parser")
+            except (LookupError, UnicodeDecodeError):
+                continue
+
+        fallback_encoding = encoding_list[0] if len(encoding_list) > 0 else "utf-8"
+        html_content = response.content.decode(fallback_encoding, errors="replace")
+        return BeautifulSoup(html_content, "html.parser")
 
     @staticmethod
-    def get_charset_list(meta_list):
+    def get_encoding_list(response):
+        charset_list = Fork.get_charset_list(response.content)
+        if response.encoding is not None and response.encoding != "ISO-8859-1":
+            charset_list.append(response.encoding)
+        if response.apparent_encoding is not None:
+            charset_list.append(response.apparent_encoding)
+        result = []
+        for charset in charset_list:
+            normalized_charset = Fork.normalize_charset(charset)
+            if normalized_charset is not None and normalized_charset not in result:
+                result.append(normalized_charset)
+        return result
+
+    @staticmethod
+    def get_charset_list(content):
         charset_list = []
-        for meta in meta_list:
-            if meta.attrs is not None:
-                if "charset" in meta.attrs:
-                    charset_list.append(meta.attrs.get("charset"))
-                elif meta.attrs.get("http-equiv", "").lower() == "content-type" and "content" in meta.attrs:
-                    match = re.search(r"charset=([^\s;]+)", meta.attrs["content"], re.I)
-                    if match:
-                        charset_list.append(match.group(1))
-        return charset_list
+        content_head = content[:8192]
+        charset_list.extend(re.findall(rb"<meta[^>]+charset=['\"]?\s*([a-zA-Z0-9._-]+)", content_head, re.I))
+        charset_list.extend(
+            re.findall(rb"<meta[^>]+content=['\"][^'\"]*charset=([a-zA-Z0-9._-]+)", content_head, re.I)
+        )
+        return [
+            charset.decode("ascii", errors="ignore")
+            for charset in charset_list
+            if len(charset) > 0
+        ]
+
+    @staticmethod
+    def normalize_charset(charset):
+        if charset is None:
+            return None
+        normalized_charset = charset.strip().strip("\"'").lower()
+        return normalized_charset if len(normalized_charset) > 0 else None
 
     @staticmethod
     def _sandbox_requests_get(base_fork_url: str, headers: dict):
