@@ -17,7 +17,16 @@ requests.packages.urllib3.disable_warnings()
 
 _BLOCKED_NETWORKS = [
     ipaddress.ip_network("0.0.0.0/8"),
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("100.64.0.0/10"),
     ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("198.18.0.0/15"),
+    ipaddress.ip_network("198.51.100.0/24"),
+    ipaddress.ip_network("203.0.113.0/24"),
+    ipaddress.ip_network("240.0.0.0/4"),
     ipaddress.ip_network("::1/128"),
     ipaddress.ip_network("fc00::/7"),
     ipaddress.ip_network("fe80::/10"),
@@ -248,7 +257,7 @@ class Fork:
             maxkb_logger.info(f"fork:{self.base_fork_url}")
             url = self.base_fork_url
             for _ in range(10):
-                response = requests.get(url, verify=False, headers=headers, allow_redirects=False, timeout=(10, 30))
+                response = requests.get(url, verify=True, headers=headers, allow_redirects=False, timeout=(10, 30))
                 if response.status_code in (301, 302, 303, 307, 308):
                     location = response.headers.get("Location")
                     if not location:
