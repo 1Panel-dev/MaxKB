@@ -16,7 +16,7 @@ from langchain_core.prompts import PromptTemplate
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
 from application.workflow.i_node import INode
 from application.workflow.message.struct.content import Content
-from application.workflow.nodes import get_node_class
+
 from application.workflow.status import Status
 
 
@@ -77,6 +77,7 @@ class WorkflowManage:
         if nodes is None or len(nodes) == 0:
             return
         with self._lock:
+            from application.workflow.nodes import get_node_class
             instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters)
                          for n in nodes]
             self.nodes.extend(instances)
@@ -89,7 +90,8 @@ class WorkflowManage:
                 return
             if not self.is_end():
                 return
-        self.end()
+            self.done = True  # 锁内抢占,保证只有一个线程能往下走
+        self.end()  # 回调放到锁外,避免回调里再触碰本 manage 造成重入/死锁
 
     def is_end(self):
         """
@@ -148,10 +150,7 @@ class WorkflowManage:
         工作流输出结束的时候调用
         @return: None
         """
-        if self.done:
-            return
         self.call_back.on_complete(self, None)
-        self.done = True
 
     def get_parameters(self):
         """
