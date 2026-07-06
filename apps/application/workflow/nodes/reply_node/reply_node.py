@@ -7,7 +7,7 @@
     @desc:
 """
 from typing import List
-
+import uuid_utils.compat as uuid
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -34,7 +34,7 @@ class ReplyNode(INode):
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
-        chat_record_id = workflow_params.get('chat_record_id')
+        chunk_id = uuid.uuid7()
 
         reply_type = node_params.get('reply_type')
         fields = node_params.get('fields')
@@ -50,7 +50,7 @@ class ReplyNode(INode):
 
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(str(chat_record_id), result, Status.SUCCESS, node_info))
+            self.write(TextContent(str(chunk_id), result, Status.SUCCESS, node_info))
 
     def _generate_reply_content(self, prompt):
         if prompt is None:
