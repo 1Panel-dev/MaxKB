@@ -1,12 +1,8 @@
 # coding=utf-8
-import base64
-import ipaddress
 import re
-import socket
 import urllib
-from urllib.parse import urlparse, urlunparse
+from urllib.parse import urlparse
 
-import requests
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.http import HttpResponse
@@ -220,7 +216,7 @@ class FileSerializer(serializers.Serializer):
                 length = end - start + 1
 
                 # 创建部分响应
-                response = HttpResponse(file_bytes[start : start + length], status=206, content_type=content_type)
+                response = HttpResponse(file_bytes[start: start + length], status=206, content_type=content_type)
 
                 # 设置部分内容响应头
                 response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
@@ -238,200 +234,45 @@ class FileSerializer(serializers.Serializer):
             return True
 
 
-from requests.adapters import HTTPAdapter
-
-
-class SafeHTTPAdapter(HTTPAdapter):
-    """
-    安全的 HTTP 适配器，防止 DNS 重绑定攻击
-    在建立连接前验证目标 IP 地址
-    """
-
-    def send(self, request, **kwargs):
-        # 解析 URL 获取主机名
-        parsed_url = urlparse(request.url)
-        host = parsed_url.hostname
-
-        if host:
-            # 验证目标 IP 是否安全
-            self._validate_host_ip(host)
-
-        return super().send(request, **kwargs)
-
-    def _validate_host_ip(self, host: str):
-        """验证主机解析的 IP 地址是否安全"""
-        try:
-            # 获取所有 IP 地址（包括 IPv4 和 IPv6）
-            addr_infos = socket.getaddrinfo(host, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
-
-            for addr_info in addr_infos:
-                ip = addr_info[4][0]
-                if self._is_unsafe_ip(ip):
-                    raise AppApiException(500, _("Access to internal IP addresses is blocked"))
-        except AppApiException:
-            raise
-        except Exception as e:
-            raise AppApiException(500, _("Failed to resolve host: {error}").format(error=str(e)))
-
-    def _is_unsafe_ip(self, ip: str) -> bool:
-        """检查 IP 地址是否属于不安全的范围"""
-        try:
-            ip_addr = ipaddress.ip_address(ip)
-            return (
-                ip_addr.is_private
-                or ip_addr.is_loopback
-                or ip_addr.is_reserved
-                or ip_addr.is_link_local
-                or ip_addr.is_multicast
-            )
-        except Exception:
-            return True
-
-
 def get_url_content(url, application_id: str):
     application = Application.objects.filter(id=application_id).first()
     if application is None:
-        raise AppApiException(500, _("Application does not exist"))
+        raise AppApiException(500, _('Application does not exist'))
     if not application.file_upload_enable:
-        raise AppApiException(500, _("File upload is not enabled"))
+        raise AppApiException(500, _('File upload is not enabled'))
     file_limit = 50 * 1024 * 1024
-    if application.file_upload_setting and application.file_upload_setting.get("fileLimit"):
-        file_limit = application.file_upload_setting.get("fileLimit") * 1024 * 1024
-    parsed = validate_url(url)
-
-    # 创建带有安全检查的 session
-    session = requests.Session()
-    safe_adapter = SafeHTTPAdapter()
-    session.mount("http://", safe_adapter)
-    session.mount("https://", safe_adapter)
-
+    if application.file_upload_setting and application.file_upload_setting.get('fileLimit'):
+        file_limit = application.file_upload_setting.get('fileLimit') * 1024 * 1024
     try:
-        response = session.get(url, timeout=3, allow_redirects=False)
-    finally:
-        session.close()
-
-    final_host = urlparse(response.url).hostname
-    if is_private_ip(final_host):
-        raise ValueError("Blocked unsafe redirect to internal host")
-    # 判断文件大小
-    if int(response.headers.get("Content-Length", 0)) > file_limit:
-        raise AppApiException(500, _("File size exceeds limit"))
-    # 返回状态码 响应内容大小  响应的contenttype 还有字节流
-    content_type = response.headers.get("Content-Type", "")
-    # 根据内容类型决定如何处理
-    if "text" in content_type or "json" in content_type:
+        from common.utils.tool_code import ToolExecutor
+        response = ToolExecutor().exec_code(
+        """
+def get_url_content(url):
+    import requests
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(url, verify=False, allow_redirects=False)
+    content_type = response.headers.get('Content-Type', '')
+    if 'text' in content_type or 'json' in content_type:
         content = response.text
     else:
-        # 二进制内容使用Base64编码
-        content = base64.b64encode(response.content).decode("utf-8")
-
+        import base64
+        content = base64.b64encode(response.content).decode('utf-8')
     return {
         "status_code": response.status_code,
-        "Content-Length": response.headers.get("Content-Length", 0),
         "Content-Type": content_type,
+        "Content-Length": response.headers.get('Content-Length', 0),
         "content": content,
     }
-
-
-def is_private_ip(host: str) -> bool:
-    """检测 IP 是否属于内网、环回、云 metadata 的危险地址"""
-    try:
-        ip = ipaddress.ip_address(socket.gethostbyname(host))
-        return ip.is_private or ip.is_loopback or ip.is_reserved or ip.is_link_local or ip.is_multicast
-    except Exception:
-        return True
-
-
-def validate_and_normalize_url(url: str) -> str:
-    """
-    严格验证并规范化 URL，防止 URL 解析绕过攻击
-
-    防御场景：
-    - http://127.0.0.1:6666\\@1.1.1.1/ （反斜杠绕过）
-    - http://127.0.0.1:6666@1.1.1.1/ （认证信息混淆）
-    - http://1.1.1.1#@127.0.0.1:6666/ （片段注入）
-    """
-    if not url:
-        raise ValueError("URL is required")
-
-    # 1. 拒绝包含危险字符的 URL
-    dangerous_patterns = [
-        r"\\",  # 反斜杠
-        r"\s",  # 空白字符
-        r"%00",  # 空字节
-        r"%0a",  # 换行符
-        r"%0d",  # 回车符
-    ]
-
-    url_lower = url.lower()
-    for pattern in dangerous_patterns:
-        if re.search(pattern, url_lower):
-            raise ValueError("URL contains dangerous characters")
-
-    # 2. 解析 URL
-    parsed = urlparse(url)
-
-    # 3. 仅允许 http / https
-    if parsed.scheme not in ("http", "https"):
-        raise ValueError("Only http and https are allowed")
-
-    # 4. 提取主机名（从 netloc 中）
-    netloc = parsed.netloc
-
-    # 5. 如果 netloc 中包含 @，说明有认证信息，需要特别处理
-    if "@" in netloc:
-        # 分离认证信息和主机
-        auth_part, host_part = netloc.rsplit("@", 1)
-
-        # 检查认证部分是否包含危险的 IP 或端口信息
-        # 攻击者可能在认证部分放置内网地址
-        if ":" in auth_part or "." in auth_part:
-            raise ValueError("Authentication part contains suspicious content")
-
-        # 使用真实的主机部分
-        actual_host = host_part.split(":")[0] if ":" in host_part else host_part
-    else:
-        # 没有认证信息，直接提取主机
-        actual_host = parsed.hostname
-
-    # 6. 验证主机名不为空
-    if not actual_host:
-        raise ValueError("Invalid URL: missing hostname")
-
-    # 7. 验证主机不是 IP 地址形式的内网地址
-    # 这样可以防止直接在 URL 中使用内网 IP
-    try:
-        # 尝试解析为 IP 地址
-        ip_addr = ipaddress.ip_address(actual_host)
-        if is_private_ip(actual_host):
-            raise ValueError("Access to internal IP addresses is blocked")
-    except ValueError as e:
-        # 如果不是 IP 地址（是域名），则继续检查
-        if "internal IP" in str(e):
-            raise
-        # 对于域名，检查其解析结果
-        if is_private_ip(actual_host):
-            raise ValueError("Access to internal IP addresses is blocked")
-
-    # 8. 重新构建干净的 URL，移除可能的认证信息
-    clean_netloc = actual_host
-    if parsed.port:
-        clean_netloc = f"{actual_host}:{parsed.port}"
-
-    clean_url = urlunparse(
-        (
-            parsed.scheme,
-            clean_netloc,
-            parsed.path,
-            parsed.params,
-            parsed.query,
-            "",  # 移除 fragment，防止片段注入
+""",
+            {"url": url}
         )
-    )
-
-    return clean_url
-
-
-def validate_url(url: str):
-    """验证 URL 是否安全（保留向后兼容）"""
-    return validate_and_normalize_url(url)
+    except Exception as e:
+        raise AppApiException(500, str(e))
+    if int(response.get('Content-Length')) > file_limit:
+        raise AppApiException(500, _('File size exceeds limit'))
+    return {
+        'status_code': response.get('status_code'),
+        'Content-Type':  response.get('Content-Type'),
+        'Content-Length': response.get('Content-Length'),
+        'content': response.get('content'),
+    }
