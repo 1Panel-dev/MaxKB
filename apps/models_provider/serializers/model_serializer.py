@@ -479,7 +479,7 @@ class ModelSerializer(serializers.Serializer):
 
     class ModelParams(serializers.Serializer):
         id = serializers.UUIDField(required=True, label=_("model id"))
-        workspace_id = serializers.UUIDField(required=False, label=_("workspace id"))
+        workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("workspace id"))
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
