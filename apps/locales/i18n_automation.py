@@ -6,6 +6,7 @@ Django 国际化翻译文件自动化脚本
 2. 扫描所有Python文件中的国际化代码
 3. 合并已有翻译和新发现的内容
 4. 生成排序后的翻译文件
+5. 扫描所有Python文件中未使用国际化功能的代码，并写入 `not_internationalized.txt` 文件中
 """
 
 import re
@@ -38,6 +39,17 @@ KEEP_SAME_TRANSLATION = False
 # 配置4：是否备份原 django.po 文件。
 # 说明：因为有VCS，所以默认不备份。
 BACKUP_PO = False
+
+# 配置5：是否扫描未国际化的代码？
+SCAN_NOT_INTERNATIONALIZED = True
+
+# 配置6：忽略 `未国际化的代码` 数组
+NOT_INTERNATIONALIZED_IGNORE_ARRAYS = frozenset([
+    "Error: ",
+    "data: ",
+    "date: ",
+    "v: ",
+])
 
 
 class I18nAutomation:
@@ -580,6 +592,158 @@ msgstr ""
 
         print("\n所有翻译文件已生成完成！！！")
 
+    def scan_non_i18n_strings(self):
+        """
+        步骤5: 扫描 Python 文件中应该国际化但未国际化的字符串
+
+        Returns:
+            包含未国际化字符串信息的列表
+        """
+        print("\n" + "="*60)
+        print("步骤5: 扫描未国际化的字符串")
+        print("="*60)
+
+        non_i18n_list = []
+        apps_dir = self.base_dir / 'apps'
+
+        # 匹配常见的需要国际化的字符串模式
+        # 1. 用户可见的提示消息、错误消息等
+        patterns = [
+            # 匹配 raise Exception("...") 或 raise ValidationError("...") 等异常消息
+            re.compile(r'\braise\s+\w+[\w\.]*\s*\(\s*r?["\']((?:[^"\'\\]|\\.)*?)["\']', re.MULTILINE | re.DOTALL),
+            # 匹配 logger.error("..."), logger.warning("..."), logger.info("...") 等日志消息
+            re.compile(r'\blogger\.(?:error|warning|info|debug|critical)\s*\(\s*r?["\']((?:[^"\'\\]|\\.)*?)["\']', re.MULTILINE | re.DOTALL),
+            # 匹配 print("...")
+            re.compile(r'\bprint\s*\(\s*r?["\']((?:[^"\'\\]|\\.)*?)["\']', re.MULTILINE | re.DOTALL),
+            # 匹配 return "..." (常见于 API 响应消息)
+            re.compile(r'\breturn\s+r?["\']((?:[^"\'\\]|\\.)*?)["\']', re.MULTILINE | re.DOTALL),
+        ]
+
+        # 排除模式：不应该被国际化的内容
+        exclude_patterns = [
+            re.compile(r'^[a-zA-Z0-9_\-\.\/\:\{\}]+$', re.MULTILINE),  # 纯技术标识符、路径、JSON等
+            re.compile(r'^\s*$'),  # 空字符串
+            re.compile(r'^(?:[{}[\]:,.\-\s*\n<>|│├─]|%s)+$'),  # 纯标点符号
+        ]
+
+        # 递归查找所有 .py 文件
+        py_files = list(apps_dir.rglob('*.py'))
+        print(f"找到 {len(py_files)} 个 Python 文件")
+
+        scanned_count = 0
+        for py_file in py_files:
+            # 跳过 __pycache__、migrations 和 locales 目录
+            if '__pycache__' in str(py_file) or 'migrations' in str(py_file) or 'locales' in str(py_file):
+                continue
+
+            try:
+                with open(py_file, 'r', encoding='utf-8') as f:
+                    content = f.read()
+
+                file_has_non_i18n = False
+                for pattern in patterns:
+                    matches = pattern.finditer(content)
+                    for match in matches:
+                        msgid = match.group(1) if match.lastindex else None
+
+                        if msgid is None:
+                            continue
+
+                        msgid = self._unescape_string(msgid)
+
+                        # 过滤掉不应该国际化的内容
+                        if not msgid or not msgid.strip():
+                            continue
+
+                        should_exclude = False
+                        for exclude_pattern in exclude_patterns:
+                            if exclude_pattern.match(msgid):
+                                should_exclude = True
+                                break
+
+                        if should_exclude:
+                            continue
+
+                        # 检查该字符串是否已经被国际化（在已扫描的 i18n 列表中）
+                        if hasattr(self, 'scanned_i18n') and msgid in self.scanned_i18n:
+                            continue
+
+                        # 记录未国际化的字符串
+                        relative_path = str(py_file.relative_to(self.base_dir)).replace("\\", "/")
+                        line_no = content[:match.start()].count('\n') + 1
+
+                        if msgid not in NOT_INTERNATIONALIZED_IGNORE_ARRAYS:
+                            non_i18n_list.append({
+                                'file': relative_path,
+                                'line_no': line_no,
+                                'msgid': msgid
+                            })
+                            file_has_non_i18n = True
+
+                if file_has_non_i18n:
+                    scanned_count += 1
+
+            except Exception as e:
+                print(f"处理文件 {py_file} 时出错: {e}")
+
+        print(f"扫描了 {scanned_count} 个文件")
+        print(f"发现 {len(non_i18n_list)} 条未国际化的字符串")
+
+        self.non_i18n_strings = non_i18n_list
+        return non_i18n_list
+
+    def write_not_internationalized_file(self):
+        """
+        将未国际化的字符串写入 not_internationalized.txt 文件
+        """
+        print("\n" + "="*60)
+        print("步骤6: 写入 not_internationalized.txt 文件")
+        print("="*60)
+
+        output_file = self.locales_dir / 'not_internationalized.txt'
+
+        if not hasattr(self, 'non_i18n_strings'):
+            self.non_i18n_strings = []
+
+        # 按 msgid 分组，相同 msgid 的合并到一起
+        msgid_groups = {}
+        for item in self.non_i18n_strings:
+            msgid = item['msgid']
+            if msgid not in msgid_groups:
+                msgid_groups[msgid] = []
+            msgid_groups[msgid].append({
+                'file': item['file'],
+                'line_no': item['line_no']
+            })
+
+        # 按 msgid 排序
+        sorted_msgids = sorted(msgid_groups.keys(), key=lambda x: re.sub(r'^\s+', '', x).upper())
+
+        # 生成文件内容
+        lines = []
+        for msgid in sorted_msgids:
+            locations = msgid_groups[msgid]
+
+            # 对同一 msgid 的位置按文件路径和行号排序
+            locations.sort(key=lambda x: (x['file'], x['line_no']))
+
+            # 添加所有位置信息
+            for loc in locations:
+                lines.append(f"#: {loc['file']}:{loc['line_no']}")
+
+            # 添加 msgid
+            escaped_content = self._escape_string(msgid)
+            lines.append(f'msgid "{escaped_content}"')
+            lines.append('')  # 空行分隔
+
+        content = '\n'.join(lines)
+
+        # 写入文件
+        with open(output_file, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        print(f"已写入 {len(sorted_msgids)} 条未国际化字符串到: {output_file}")
+
     def generate_report(self):
         """
         生成翻译报告
@@ -676,6 +840,13 @@ msgstr ""
 
         # 步骤4: 写入文件
         self.write_po_files()
+
+        if SCAN_NOT_INTERNATIONALIZED:
+            # 步骤5: 扫描未国际化的字符串
+            self.scan_non_i18n_strings()
+
+            # 步骤6: 写入 not_internationalized.txt
+            self.write_not_internationalized_file()
 
         # 生成报告
         self.generate_report()

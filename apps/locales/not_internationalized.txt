@@ -1,0 +1,240 @@
+#: apps/common/management/commands/services/services/celery_base.py:16
+msgid "\n- Start Celery as Distributed Task Queue: {}"
+
+#: apps/common/management/commands/services/services/local_model.py:26
+msgid "\n- Start Gunicorn Local Model WSGI HTTP Server"
+
+#: apps/common/management/commands/services/services/gunicorn.py:17
+msgid "\n- Start Gunicorn WSGI HTTP Server"
+
+#: apps/common/management/commands/services/services/scheduler.py:17
+msgid "\n- Start Scheduler Server"
+
+#: apps/models_provider/impl/tencent_model_provider/model/llm.py:24
+msgid "All of "
+
+#: apps/common/db/compiler.py:158
+msgid "annotate() + distinct(fields) is not implemented."
+
+#: apps/chat/mcp/tools.py:18
+msgid "API Key is expired"
+
+#: apps/chat/mcp/tools.py:22
+msgid "Application is not found or not published"
+
+#: apps/oss/serializers/file.py:327
+msgid "Authentication part contains suspicious content"
+
+#: apps/knowledge/models/knowledge.py:387
+msgid "bytea参数不能为空"
+
+#: apps/ops/celery/signal_handler.py:101
+msgid "Clean period tasks: [{}]"
+
+#: apps/common/locale/manager.py:219
+msgid "Copied all locale files from admin to chat directory"
+
+#: apps/models_provider/impl/xinference_model_provider/model/embedding.py:43
+#: apps/models_provider/impl/xinference_model_provider/model/reranker.py:45
+msgid "Could not import RESTfulClient from xinference. Please install it"
+
+#: apps/models_provider/impl/tencent_model_provider/model/hunyuan.py:259
+msgid "Could not import tencentcloud python package. "
+
+#: apps/common/utils/tool_code.py:148
+msgid "Execution interrupted or tampered"
+
+#: apps/maxkb/conf.py:179
+msgid "expected at most 1 positional argument, got %d"
+
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/tts.py:93
+msgid "Failed to generate audio"
+
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/tts.py:87
+msgid "Failed to get audio data from response: "
+
+#: apps/common/db/compiler.py:134
+msgid "FOR NO KEY UPDATE is not supported on this "
+
+#: apps/common/db/compiler.py:130
+msgid "FOR UPDATE OF is not supported on this database backend."
+
+#: apps/models_provider/impl/volcanic_engine_model_provider/model/stt.py:350
+msgid "format should in wav or mp3"
+
+#: apps/common/utils/common.py:393
+#: apps/tools/serializers/tool.py:125
+msgid "global "
+
+#: apps/models_provider/impl/gemini_model_provider/model/ttv.py:100
+msgid "Google API returned empty result."
+
+#: apps/application/long_term_memory/__init__.py:296
+#: apps/trigger/handler/impl/trigger/scheduled_trigger.py:17
+msgid "hour/minute out of range"
+
+#: apps/models_provider/impl/tencent_model_provider/model/hunyuan.py:253
+msgid "Hunyuan secret key is not set."
+
+#: apps/common/utils/common.py:275
+msgid "import pysilk failed, wechaty voice message will not be supported."
+
+#: apps/trigger/handler/impl/task/application_task.py:152
+msgid "Incorrect application workflow information"
+
+#: apps/ops/celery/decorator.py:53
+msgid "Interval and crontab must set one"
+
+#: apps/application/long_term_memory/__init__.py:503
+#: apps/trigger/handler/impl/trigger/scheduled_trigger.py:178
+msgid "interval_value must be positive"
+
+#: apps/chat/mcp/tools.py:16
+msgid "Invalid API Key"
+
+#: apps/application/long_term_memory/__init__.py:437
+#: apps/trigger/handler/impl/trigger/scheduled_trigger.py:115
+msgid "invalid day of month"
+
+#: apps/ops/celery/hmac_signed_serializer.py:22
+msgid "Invalid signed data packet"
+
+#: apps/oss/serializers/file.py:337
+msgid "Invalid URL: missing hostname"
+
+#: apps/application/long_term_memory/__init__.py:305
+#: apps/trigger/handler/impl/trigger/scheduled_trigger.py:25
+msgid "invalid weekday"
+
+#: apps/common/locale/config_helper.py:193
+msgid "Language cache invalidated"
+
+#: apps/common/db/compiler.py:110
+msgid "LIMIT/OFFSET is not supported with "
+
+#: apps/application/flow/step_node/mcp_node/impl/base_mcp_node.py:25
+msgid "MCP tool ID is required when mcp_source is "
+
+#: apps/models_provider/impl/minimax_model_provider/model/tts.py:75
+msgid "MiniMax TTS API returned empty audio data"
+
+#: apps/ops/celery/decorator.py:49
+msgid "Must set crontab or interval one"
+
+#: apps/common/utils/tool_code.py:151
+msgid "No result found."
+
+#: apps/ops/celery/logger.py:202
+msgid "Not found thread task file"
+
+#: apps/common/management/commands/services/hands.py:12
+msgid "Not found __version__: {}"
+
+#: apps/common/utils/common.py:246
+msgid "Not support file type: {}"
+
+#: apps/common/db/compiler.py:122
+msgid "NOWAIT is not supported on this database backend."
+
+#: apps/oss/serializers/file.py:314
+msgid "Only http and https are allowed"
+
+#: apps/ops/celery/signal_handler.py:81
+msgid "Periodic task [{}] is disabled!"
+
+#: apps/models_provider/impl/xinference_model_provider/model/embedding.py:49
+msgid "Please provide server URL"
+
+#: apps/models_provider/impl/xinference_model_provider/model/embedding.py:52
+msgid "Please provide the model UID"
+
+#: apps/common/management/commands/services/hands.py:13
+msgid "Python is: "
+
+#: apps/ops/celery/hmac_signed_serializer.py:29
+msgid "Security Alert: Task signature mismatch! Potential tampering detected."
+
+#: apps/common/db/compiler.py:102
+msgid "select_for_update cannot be used outside of a transaction."
+
+#: apps/models_provider/impl/xf_model_provider/model/stt.py:133
+msgid "sid:%s call success!,data is:%s"
+
+#: apps/common/db/compiler.py:126
+msgid "SKIP LOCKED is not supported on this database backend."
+
+#: apps/ops/celery/signal_handler.py:77
+msgid "Start need start task: [{}]"
+
+#: apps/common/management/commands/services/utils.py:63
+msgid "Start stop services"
+
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/tti.py:101
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/tti.py:117
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/tti.py:154
+msgid "sync_call Failed, status_code: %s, code: %s, message: %s"
+
+#: apps/application/flow/step_node/data_source_web_node/impl/base_data_source_web_node.py:49
+msgid "Task interrupted"
+
+#: apps/oss/serializers/file.py:307
+msgid "URL contains dangerous characters"
+
+#: apps/oss/serializers/file.py:293
+msgid "URL is required"
+
+#: apps/common/locale/config_helper.py:79
+msgid "Using cached languages list"
+
+#: apps/models_provider/impl/gemini_model_provider/model/ttv.py:93
+msgid "Video generation timed out after 20 minutes"
+
+#: apps/models_provider/impl/xf_model_provider/model/stt.py:101
+#: apps/models_provider/impl/xf_model_provider/model/tts/tts.py:99
+msgid "websocket url :"
+
+#: apps/ops/celery/signal_handler.py:76
+msgid "Work ready signal recv"
+
+#: apps/ops/celery/signal_handler.py:100
+msgid "Worker shutdown signal recv"
+
+#: apps/common/management/commands/services/services/base.py:147
+msgid "\\033[31m Error\\033[0m"
+
+#: apps/common/management/commands/services/services/base.py:138
+msgid "\\033[31m No process found\\033[0m"
+
+#: apps/common/management/commands/services/services/base.py:149
+msgid "\\033[32m Ok\\033[0m"
+
+#: apps/common/db/compiler.py:37
+msgid "{} is not supported on this database backend."
+
+#: apps/trigger/handler/simple_tools.py:32
+msgid "不支持的处理器类型"
+
+#: apps/trigger/handler/simple_tools.py:45
+#: apps/trigger/handler/simple_tools.py:57
+msgid "不支持的触发器类型"
+
+#: apps/application/flow/step_node/intent_node/impl/base_intent_node.py:141
+msgid "你是一个专业的意图识别助手，请根据用户输入和意图选项，准确识别用户的真实意图。"
+
+#: apps/application/flow/step_node/search_knowledge_node/impl/base_search_knowledge_node.py:31
+msgid "关联知识库的向量模型不一致，无法召回分段。"
+
+#: apps/models_provider/impl/aliyun_bai_lian_model_provider/model/ttv.py:64
+msgid "多次重试后仍无法连接到 DashScope API，请检查代理或网络配置"
+
+#: apps/models_provider/impl/minimax_model_provider/model/ttv.py:76
+msgid "多次重试后仍无法连接到 MiniMax API，请检查代理或网络配置"
+
+#: apps/common/log/log.py:81
+msgid "操作菜单"
+
+#: apps/application/flow/step_node/search_knowledge_node/impl/base_search_knowledge_node.py:33
+msgid "知识库设置错误,请重新设置知识库"
+
+#: apps/models_provider/impl/xf_model_provider/model/zh_en_stt.py:110
+msgid "连接成功"
