@@ -55,6 +55,7 @@ class WorkflowManage:
         self.parameters = parameters
         self.context = {}
         self.nodes = []
+        self.signal = None
         self.start_node = get_start_node(workflow, self)
 
     def run(self):

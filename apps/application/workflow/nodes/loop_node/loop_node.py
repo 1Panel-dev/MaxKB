@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.workflow.common import WorkflowType, new_instance
-from application.workflow.i_node import INode
+from application.workflow.i_node import INode, Signal
 
 from application.workflow.message.struct.content import NodeInfo
 from application.workflow.message.struct.text_content import TextContent
@@ -120,6 +120,16 @@ class LoopNode(INode):
             self.write_context('loop_answer_data', self._loop_answer_data)
             self.write_context('index', index)
             self.write_context('item', item)
+
+            if wf_manage.signal == Signal.BREAK:
+                self.write_context('answer', self._answer_text)
+                self.write_context('run_time', time.time() - self.data.get('start_time', time.time()))
+                self.complete(Status.SUCCESS)
+                return
+
+            if wf_manage.signal == Signal.CONTINUE:
+                self._run_next()
+                return
 
             if error:
                 self.write_context('error_message', str(error))
