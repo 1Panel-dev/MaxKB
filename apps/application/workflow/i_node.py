@@ -7,6 +7,7 @@
     @desc:
 """
 import time
+from enum import Enum
 from typing import Optional, Type, Callable
 
 from rest_framework import serializers
@@ -15,6 +16,12 @@ from application.workflow.common import Node
 from application.workflow.message.struct.content import Content
 from application.workflow.status import Status
 from common.utils.logger import maxkb_logger
+
+
+class Signal(str, Enum):
+    BREAK = 'BREAK'
+    CONTINUE = 'CONTINUE'
+    FORM = 'FORM'
 
 
 class INode:
@@ -92,13 +99,14 @@ class INode:
         self.execute()
         self.complete(Status.SUCCESS)
 
-    def complete(self, status, anchors=None, error=None):
+    def complete(self, status, anchors=None, error=None, signal: Optional[Signal] = None):
         """
         节点结束调用函数
 
         @param status: 状态
         @param anchors 锚点信息
         @param error:  错误信息
+        @param signal: 信号
         @return:
         """
         if self._completed:
@@ -108,6 +116,9 @@ class INode:
         if error:
             self.data['error'] = str(error)
         self.data['run_time'] = time.time() - self.data['start_time']
+        if signal:
+            self.workflow_manage.signal = signal
+            anchors = []
         if anchors is None:
             anchors = [self.success_anchor() if status == Status.SUCCESS else self.fail_anchor()]
         self._dispatch(anchors)
