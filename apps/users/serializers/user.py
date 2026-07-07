@@ -231,15 +231,12 @@ class UserManageSerializer(serializers.Serializer):
         def _check_unique_username_and_email(self):
             username = self.data.get("username")
             email = self.data.get("email")
-            nick_name = self.data.get("nick_name")
-            user = User.objects.filter(Q(username=username) | Q(email=email) | Q(nick_name=nick_name)).first()
+            user = User.objects.filter(Q(username=username) | Q(email=email)).first()
             if user:
                 if user.email == email:
                     raise ExceptionCodeConstants.EMAIL_IS_EXIST.value.to_app_api_exception()
                 if user.username == username:
                     raise ExceptionCodeConstants.USERNAME_IS_EXIST.value.to_app_api_exception()
-                if user.nick_name == nick_name:
-                    raise ExceptionCodeConstants.NICKNAME_IS_EXIST.value.to_app_api_exception()
 
     class Query(serializers.Serializer):
         username = serializers.CharField(required=False, label=_("Username"), max_length=64, allow_blank=True)
@@ -415,12 +412,6 @@ class UserManageSerializer(serializers.Serializer):
         def is_valid(self, *, user_id=None, raise_exception=False):
             super().is_valid(raise_exception=True)
             self._check_unique_email(user_id)
-            self._check_unique_nick_name(user_id)
-
-        def _check_unique_nick_name(self, user_id):
-            nick_name = self.data.get("nick_name")
-            if nick_name and User.objects.filter(nick_name=nick_name).exclude(id=user_id).exists():
-                raise AppApiException(1008, _("Nickname is already in use"))
 
         def _check_unique_email(self, user_id):
             email = self.data.get("email")
