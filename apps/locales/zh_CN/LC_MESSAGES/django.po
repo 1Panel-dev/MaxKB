@@ -661,7 +661,7 @@ msgstr "字段仅支持自定义|引用"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:40
 msgid "{field}, this field is required."
-msgstr "{field_label} 字段是必填项"
+msgstr "{field} 字段是必填项"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:46
 msgid "function"
