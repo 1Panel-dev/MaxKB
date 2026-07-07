@@ -31,7 +31,10 @@ on:
         options:
           - fit2cloud-registry
           - dockerhub
-          - dockerhub, fit2cloud-registry
+          - dockerhub, fit2cloud-registry      
+      permissions:
+        contents: read
+        packages: write    
 
 jobs:
   build-and-push-to-fit2cloud-registry:
@@ -72,7 +75,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Login to FIT2CLOUD Registry
         uses: docker/login-action@v4
         with:
