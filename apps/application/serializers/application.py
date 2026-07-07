@@ -716,7 +716,7 @@ class ApplicationSerializer(serializers.Serializer):
         )
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                 raise AppApiException(500, _("Illegal download callback url"))
             requests.get(download_callback_url, timeout=5)
         except Exception as e:
@@ -1486,7 +1486,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ).auth_resource_batch([t.id for t in tool_model_list])
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                 raise AppApiException(500, _("Illegal download callback url"))
             requests.get(download_callback_url, timeout=5)
         except Exception as e:
