@@ -4,12 +4,15 @@ on:
       - 'pr@**'
       - 'repr@**'
 
-name: 针对特定分支名自动创建 PR
+name: Automatically create PRs for specific branch names
 
 jobs:
   generic_handler:
-    name: 自动创建 PR
+    name: Auto create PR
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     steps:
       - name: Create pull request
         uses: jumpserver/action-generic-handler@master

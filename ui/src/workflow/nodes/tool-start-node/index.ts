@@ -21,7 +21,7 @@ class ToolBaseNode extends AppNode {
 
     result.push({
       value: 'output',
-      label: '参数输出',
+      label: 'Output Parameters',
       type: 'output',
       children: output || [],
     })

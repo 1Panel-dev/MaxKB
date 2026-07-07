@@ -1,34 +1,34 @@
 export default {
-  title: '问题',
-  createProblem: '创建问题',
-  detailProblem: '问题详情',
-  quickCreateProblem: '快速创建问题',
-  quickCreateName: '问题',
+  title: 'Questions',
+  createProblem: 'Create Question',
+  detailProblem: 'Question Details',
+  quickCreateProblem: 'Quick Create',
+  quickCreateName: 'question',
   tip: {
-    placeholder: '请输入问题，支持输入多个，一行一个。',
-    errorMessage: '问题不能为空！',
-    requiredMessage: '请输入问题',
-    relatedSuccess:'批量关联分段成功'
+    placeholder: 'Enter the question, support multiple entries, one per line.',
+    errorMessage: 'Question cannot be empty!',
+    requiredMessage: 'Please enter a question',
+    relatedSuccess: 'Successful'
   },
 
   setting: {
-    batchDelete: '批量删除',
-    cancelRelated: '取消关联'
+    batchDelete: 'Bulk Delete',
+    cancelRelated: 'Cancel Association'
   },
   table: {
-    paragraph_count: '关联分段数',
-    updateTime: '更新时间'
+    paragraph_count: 'Related Segments',
+    updateTime: 'Update Time'
   },
   delete: {
-    confirmTitle: '是否删除问题：',
-    confirmMessage1: '删除问题关联的',
-    confirmMessage2: '个分段会被取消关联，请谨慎操作。'
+    confirmTitle: 'Confirm deletion of question:',
+    confirmMessage1: 'Deleting this question will cancel the association of',
+    confirmMessage2: 'segments. Please proceed with caution.'
   },
   relateParagraph: {
-    title: '关联分段',
-    selectDocument: '选择文档',
-    placeholder: '按 文档名称 搜索',
-    selectedParagraph: '已选分段',
-    count: '个'
-  },
+    title: 'Relate to Segment',
+    selectDocument: 'Select a Document',
+    placeholder: 'Search document by name',
+    selectedParagraph: 'Selected Segments',
+    count: 'Count'
+  }
 }

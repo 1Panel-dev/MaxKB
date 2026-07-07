@@ -1,6 +1,6 @@
 name: build-and-push
 
-run-name: 构建镜像并推送仓库 ${{ github.event.inputs.dockerImageTag }} (${{ github.event.inputs.registry }}) (${{ github.event.inputs.architecture }})
+run-name: Build and push image ${{ github.event.inputs.dockerImageTag }} (${{ github.event.inputs.registry }}) (${{ github.event.inputs.architecture }})
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
         default: 'v2.10.0-dev'
         required: true
       dockerImageTagWithLatest:
-        description: '是否发布latest tag（正式发版时选择，测试版本切勿选择）'
+        description: 'Publish latest tag (enable only for official releases, not test builds)'
         default: false
         required: true
         type: boolean

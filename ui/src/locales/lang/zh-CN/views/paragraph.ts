@@ -1,33 +1,33 @@
 export default {
-  title: '段落',
-  paragraph_count: '段落',
-  editParagraph: '编辑分段',
-  addParagraph: '添加分段',
-  prevAddParagraph:'上方插入分段',
-  paragraphDetail: '分段详情',
-  character_count: '个字符',
+  title: 'Segment',
+  paragraph_count: 'Segments',
+  editParagraph: 'Edit Segment',
+  addParagraph: 'Add Segment',
+  prevAddParagraph: 'Insert Segment Above',
+  paragraphDetail: 'Segment Details',
+  character_count: 'characters',
   setting: {
-    batchSelected: '批量选择',
-    cancelSelected: '取消选择'
+    batchSelected: 'Batch Select',
+    cancelSelected: 'Cancel Selection',
   },
   delete: {
-    confirmTitle: '是否删除段落：',
-    confirmMessage: '删除后无法恢复，请谨慎操作。'
+    confirmTitle: 'Confirm deletion of segment:',
+    confirmMessage: 'Deletion cannot be undone. Please proceed with caution.',
   },
   relatedProblem: {
-    title: '关联问题',
-    placeholder: '请选择问题'
+    title: 'Related Questions',
+    placeholder: 'Please select a question',
   },
   form: {
     paragraphTitle: {
-      label: '分段标题',
-      placeholder: '请输入分段标题'
+      label: 'Title',
+      placeholder: 'Please enter the segment title',
     },
     content: {
-      label: '分段内容',
-      placeholder: '请输入分段内容',
-      requiredMessage1: '请输入分段内容',
-      requiredMessage2: '内容最多不超过 100000 个字'
-    }
-  }
+      label: 'Content',
+      placeholder: 'Please enter the segment content',
+      requiredMessage1: 'Please enter the segment content',
+      requiredMessage2: 'Content must not exceed 100,000 words',
+    },
+  },
 }

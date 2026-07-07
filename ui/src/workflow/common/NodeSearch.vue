@@ -28,7 +28,7 @@
               style="width: 42px"
               v-else-if="searchText.length > 0"
             >
-              无结果
+              No results
             </span>
             <el-divider direction="vertical" />
 

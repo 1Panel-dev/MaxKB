@@ -54,7 +54,7 @@ const onIframeLoad = () => {
   }
 }
 
-let evalSeq = 0
+const evalSeq = 0
 const EVAL_TIMEOUT_MS = 5000
 
 const evalInSandbox = (option_json: any): Promise<{ option: any; style: any }> => {

@@ -1,11 +1,11 @@
 export default {
-  title: '操作日誌',
+  title: 'Operate Logs',
   table: {
-    menu: '操作菜單',
-    detail: '操作詳情',
-    user: '操作用戶',
-    ip_address: 'IP 地址',
-    opt: 'API 詳情',
-    operateTime: '操作時間',
+    menu: 'Operate Menu',
+    detail: 'Operate Details',
+    user: 'Operate User',
+    ip_address: 'IP Address',
+    opt: 'API Details',
+    operateTime: 'Operate Time',
   },
 }

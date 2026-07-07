@@ -47,7 +47,7 @@ const props = defineProps<{ nodeModel: any }>()
 const UserInputFieldTableFef = ref()
 const default_fields = [
   {
-    label: '知识库',
+    label: 'Knowledge Base',
     value: 'knowledge',
     globeLabel: `{{global.knowledge}}`,
     globeValue: `{{context['global'].knowledge}}`,

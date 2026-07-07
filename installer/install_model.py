@@ -1,7 +1,7 @@
 # coding=utf-8
 """
     @project: maxkb
-    @Author：虎
+    @Author: Hu
     @file： install_model.py
     @date：2023/12/18 14:02
     @desc:

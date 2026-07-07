@@ -1,14 +1,12 @@
-## 概述
+## Overview
 
-PostgreSQL查询是一个连接PostgreSQL数据库执行SQL查询的工具。
+PostgreSQL Query is a tool that connects to a PostgreSQL database and runs SQL queries.
 
+## Configuration
 
-## 配置
- 
-1. 在函数库中配置启动参数
-在函数库的PostgreSQL函数面板中，点击 … > 启动参数，填写数据库连接参数，并启用该函数。   
-![启动参数](/admin/tool/img/PostgreSQL_setting.jpg)
-2. 在应用中使用
-在高级编排应用中，点击添加组件->函数库->PostgreSQL查询，设置查询内容。
-![应用中使用](/admin/tool/img/PostgreSQL_app_used.jpg)
- 
+1. Configure startup parameters in the Function Library.
+   Open the PostgreSQL function panel, click **... -> Startup Parameters**, fill in database connection settings, and enable the function.
+   ![Startup parameters](/admin/tool/img/PostgreSQL_setting.jpg)
+2. Use in an application.
+   In an advanced orchestration app, go to **Add Component -> Function Library -> PostgreSQL Query** and set the query content.
+   ![Use in app](/admin/tool/img/PostgreSQL_app_used.jpg)

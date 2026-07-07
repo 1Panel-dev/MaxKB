@@ -30,7 +30,7 @@ const postChatLogAddKnowledge: (
  }
  */
 const getChatLog: (
-  application_id: String,
+  application_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
@@ -48,8 +48,8 @@ const getChatLog: (
  * application_id, chart_id,order_asc
  */
 const getChatRecordLog: (
-  application_id: String,
-  chart_id: String,
+  application_id: string,
+  chart_id: string,
   page: pageRequest,
   loading?: Ref<boolean>,
   order_asc?: boolean,
@@ -90,11 +90,11 @@ const getMarkChatRecord: (
  }
  */
 const putChatRecordLog: (
-  application_id: String,
-  chart_id: String,
-  chart_record_id: String,
-  knowledge_id: String,
-  document_id: String,
+  application_id: string,
+  chart_id: string,
+  chart_record_id: string,
+  knowledge_id: string,
+  document_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
@@ -120,12 +120,12 @@ const putChatRecordLog: (
  * application_id, chart_id,  chart_record_id, knowledge_id, document_id,paragraph_id
  */
 const delMarkChatRecord: (
-  application_id: String,
-  chart_id: String,
-  chart_record_id: String,
-  knowledge_id: String,
-  document_id: String,
-  paragraph_id: String,
+  application_id: string,
+  chart_id: string,
+  chart_record_id: string,
+  knowledge_id: string,
+  document_id: string,
+  paragraph_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
   application_id,
