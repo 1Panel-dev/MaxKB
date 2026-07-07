@@ -1,29 +1,29 @@
 export default {
-  title: '角色管理',
-  internalRole: '系统内置角色',
-  customRole: '自定义角色',
-  systemAdmin: '系统管理员',
-  workspaceAdmin: '工作空间管理员',
-  user: '普通用户',
-  roleName: '角色名称',
-  inheritingRole: '继承角色',
+  title: 'Role Management',
+  internalRole: 'System built-in roles',
+  customRole: 'Custom roles',
+  systemAdmin: 'System admin',
+  workspaceAdmin: 'Workspace admin',
+  user: 'Regular user',
+  roleName: 'Role name',
+  inheritingRole: 'Inherited role',
   delete: {
-    confirmTitle: '是否删除角色：',
-    confirmMessage: '删除后，该角色下的成员都会被移除，请谨慎操作。',
+    confirmTitle: 'Confirm to delete role:',
+    confirmMessage: 'After deletion, all members under this role will be removed. Please proceed with caution.',
   },
   permission: {
-    title: '权限配置',
-    operationTarget: '操作对象',
-    moduleName: '模块名称'
+    title: 'Permission configuration',
+    operationTarget: 'Operation target',
+    moduleName: 'Module name'
   },
   member: {
-    title: '成员',
-    add: '添加成员',
-    workspace: '工作空间',
-    role: '角色',
+    title: 'Members',
+    add: 'Add Member',
+    workspace: 'workspace',
+    role: 'role',
     delete: {
-      button: '移除',
-      confirmTitle: '是否删除成员：',
-    }
+      button: 'remove',
+      confirmTitle: 'Whether to remove the member:',
   }
+}
 }

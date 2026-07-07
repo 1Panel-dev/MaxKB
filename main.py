@@ -17,8 +17,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "maxkb.settings")
 
 def collect_static():
     """
-     收集静态文件到指定目录
-     本项目主要是将前端vue/dist的前端项目放到静态目录下面
+     Collect static files into the target directory.
+     This project places the frontend vue/dist output under the static directory.
     :return:
     """
     logging.info("Collect static files")
@@ -31,9 +31,9 @@ def collect_static():
 
 def perform_db_migrate():
     """
-    初始化数据库表
-    wait-for-it 仅检测 TCP 端口，PostgreSQL 崩溃恢复期间端口已开放但拒绝查询，
-    因此在此处增加重试逻辑，等待数据库真正就绪后再执行 migrate。
+    Initialize database tables.
+    wait-for-it only checks TCP port availability. During PostgreSQL crash recovery,
+    the port may be open while queries are still rejected, so retry until DB is ready.
     """
     logging.info("Check database structure change ...")
     logging.info("Migrate model change to database ...")
@@ -45,7 +45,7 @@ def perform_db_migrate():
             return
         except Exception as e:
             err_msg = str(e)
-            # 判断是否为数据库仍在启动中（崩溃恢复场景）
+            # Check whether the database is still starting up (crash recovery scenario)
             is_db_starting = (
                 'the database system is starting up' in err_msg
                 or 'starting up' in err_msg

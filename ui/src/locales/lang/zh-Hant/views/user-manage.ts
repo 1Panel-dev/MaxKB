@@ -1,42 +1,42 @@
 export default {
-  title: '用戶管理',
-  createUser: '建立用戶',
-  editUser: '編輯用戶',
-  roleSetting: '角色設定',
-  addRole: '添加角色',
+  title: 'User',
+  createUser: 'Create User',
+  editUser: 'Edit User',
+  roleSetting: 'Role Setting',
+  addRole: 'Add role',
   setting: {
-    updatePwd: '修改用戶密碼',
+    updatePwd: 'Change Password',
   },
   tip: {
-    professionalMessage: '社群版最多支援 2 個使用者，如需擁有更多使用者，請升級為專業版。',
-    updatePwdSuccess: '使用者密碼修改成功',
+    professionalMessage:
+      'The community edition supports up to 2 users. For more users, please upgrade to the professional edition.',
+    updatePwdSuccess: 'User password updated successfully',
   },
   delete: {
-    confirmTitle: '是否刪除該用戶？',
+    confirmTitle: 'Confirm deletion of user:',
     confirmMessage:
-      '刪除該用戶後，該使用者建立的所有資源（智能體、知識庫、模型）都不會被刪除，請謹慎操作。',
+      'Deleting this user will also not delete all resources (agent, knowledge, models) created by this user. Please proceed with caution.',
   },
   userForm: {
     nick_name: {
-      label: '姓名',
-      placeholder: '請輸入姓名',
-      lengthMessage: '長度須介於 2 到 20 個字元之間',
+      label: 'Name',
+      placeholder: 'Please enter name',
+      lengthMessage: 'Length must be between 2 and 20 characters',
     },
-
     phone: {
-      label: '手機號碼',
-      placeholder: '請輸入手機號碼',
-      invalidMessage: '手機號碼格式不正確',
+      label: 'Phone',
+      placeholder: 'Please enter phone',
+      invalidMessage: 'Invalid phone format',
     },
   },
   source: {
-    label: '用戶來源',
-    local: '系統用戶',
-    localCreate: '本地建立',
-    wecom: '企業微信',
-    lark: '飛書',
-    dingtalk: '釘釘',
+    label: 'Source',
+    local: 'System User',
+    localCreate: 'Local Create',
+    wecom: 'WeCom',
+    lark: 'Lark',
+    dingtalk: 'DingTalk',
   },
-  settingRole: '設定角色',
-  defaultPassword: '預設密碼',
+  settingRole: 'Set Role',
+  defaultPassword: 'Default Password',
 }

@@ -1,17 +1,7 @@
-# 安全说明
+# Security Notice
 
-如果您发现安全问题，请直接联系我们：
+If you discover a security issue, please contact us directly:
 
-- support@fit2cloud.com
-- 400-052-0755
+- Email: security@fit2cloud.com
 
-感谢您的支持！
-
-# Security Policy
-
-All security bugs should be reported to the contact as below:
-
-- support@fit2cloud.com
-- 400-052-0755
-
-Thanks for your support!
+Thank you for your support!

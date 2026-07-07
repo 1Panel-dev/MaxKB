@@ -1,4 +1,4 @@
-import zhTw from 'element-plus/es/locale/lang/zh-tw'
+import en from 'element-plus/es/locale/lang/en'
 import components from './components'
 import layout from './layout'
 import views from './views'
@@ -7,15 +7,15 @@ import common from './common'
 import dynamicsForm from './dynamics-form'
 import aiChat from './ai-chat'
 import workflow from './workflow'
-import home from './home'
+import home from './home.ts'
 export default {
-  lang: '繁體中文',
+  lang: 'English',
   layout,
   views,
   theme,
-  common,
   components,
-  zhTw,
+  en,
+  common,
   dynamicsForm,
   aiChat,
   workflow,
