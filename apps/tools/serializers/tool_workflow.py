@@ -24,7 +24,11 @@ from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import ToolWorkflowPostHandler
 from application.flow.tool_workflow_manage import ToolWorkflowManage
 from application.models import ChatRecord
-from application.serializers.application import McpServersSerializer, get_mcp_tools
+from application.serializers.application import (
+    McpServersSerializer,
+    get_mcp_tools,
+    validate_bound_tool_permissions,
+)
 from application.serializers.common import ToolExecute
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
@@ -162,15 +166,20 @@ class ToolWorkflowSerializer(serializers.Serializer):
             tool_record_id = instance.get("chat_record_id") or str(uuid.uuid7())
             took_execute = ToolExecute(self.data.get("tool_id"), tool_record_id, workspace_id, None, None, True)
             record = took_execute.get_record()
+            # 运行身份取自认证上下文(DB 工作空间 + 登录用户),请求体不得覆盖,
+            # 防止低权限用户伪造 workspace_id/user_id 绕过工具引用授权
+            identity_keys = {"workspace_id", "user_id", "chat_user_id", "chat_user_type"}
+            run_params = {
+                "chat_record_id": tool_record_id,
+                "tool_id": self.data.get("tool_id"),
+                "stream": True,
+                "workspace_id": workspace_id,
+                "user_id": self.data.get("user_id"),
+                **{k: v for k, v in instance.items() if k not in identity_keys},
+            }
             work_flow_manage = ToolWorkflowManage(
                 Workflow.new_instance(tool_workflow.work_flow, WorkflowMode.TOOL),
-                {
-                    "chat_record_id": tool_record_id,
-                    "tool_id": self.data.get("tool_id"),
-                    "stream": True,
-                    "workspace_id": workspace_id,
-                    **instance,
-                },
+                run_params,
                 ToolWorkflowPostHandler(took_execute, self.data.get("tool_id")),
                 is_the_task_interrupted=lambda: False,
                 child_node=instance.get("child_node"),
@@ -280,6 +289,9 @@ class ToolWorkflowSerializer(serializers.Serializer):
             tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
             workflow_id = tool.workspace_id
             if instance.get("work_flow"):
+                # 校验工作流中引用的工具(mcp-node 的 mcp_tool_id 等)当前用户是否有权使用,
+                # 防止低权限用户绑定他人工具并通过工作流执行绕过工具的单独授权控制
+                validate_bound_tool_permissions(self.data.get("user_id"), workflow_id, instance)
                 dependency = is_valid_tool_workflow_circular_dependency(
                     workflow=instance.get("work_flow"), _id=str(tool.id)
                 )
