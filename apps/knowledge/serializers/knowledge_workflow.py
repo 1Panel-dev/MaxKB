@@ -377,7 +377,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                        raise AppApiException(500, _("Illegal download callback url"))
                     requests.get(download_callback_url, timeout=5)
                 except Exception as e:
@@ -624,7 +624,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                        raise AppApiException(500, _("Illegal download callback url")) 
                     requests.get(download_callback_url, timeout=5)
                 except Exception as e:

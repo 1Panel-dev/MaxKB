@@ -492,7 +492,7 @@ class ToolSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                        raise AppApiException(500, _("Illegal download callback url"))
                     requests.get(download_callback_url, timeout=5)
                 except Exception as e:
@@ -1366,7 +1366,7 @@ class ToolSerializer(serializers.Serializer):
             ).auth_resource(str(tool_id))
             try:
                 download_callback_url = instance.get("download_callback_url")
-                if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+                if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                     raise AppApiException(500, _("Illegal download callback url"))
                 requests.get(download_callback_url, timeout=5)
             except Exception as e:
