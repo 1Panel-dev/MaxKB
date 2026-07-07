@@ -1,109 +1,182 @@
-import {fileURLToPath, URL} from 'node:url'
-import type {ProxyOptions} from 'vite'
-import {defineConfig, loadEnv} from 'vite'
+import { fileURLToPath, URL } from 'node:url'
+import fs from 'node:fs'
+import path from 'node:path'
+import type { Plugin, ProxyOptions, ViteDevServer } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import DefineOptions from 'unplugin-vue-define-options/vite'
-import path from 'path'
-import {createHtmlPlugin} from 'vite-plugin-html'
-import fs from 'fs'
-// import vueDevTools from 'vite-plugin-vue-devtools'
+import tailwindcss from '@tailwindcss/vite'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
 const envDir = './env'
-// 自定义插件：重命名入口文件
+const defaultBackendTarget = 'http://127.0.0.1:8080'
+const projectRoot = fileURLToPath(new URL('.', import.meta.url))
+
 const renameHtmlPlugin = (outDir: string, entry: string) => {
   return {
     name: 'rename-html',
     closeBundle: () => {
-      const buildDir = path.resolve(__dirname, outDir)
+      if (entry === 'index.html') {
+        return
+      }
+
+      const buildDir = path.resolve(projectRoot, outDir)
       const oldFile = path.join(buildDir, entry)
       const newFile = path.join(buildDir, 'index.html')
 
-      // 检查文件是否存在
-      if (fs.existsSync(oldFile)) {
-        // 删除已存在的 index.html
-        if (fs.existsSync(newFile)) {
-          fs.unlinkSync(newFile)
-        }
-        // 重命名文件
-        fs.renameSync(oldFile, newFile)
+      if (!fs.existsSync(oldFile)) {
+        return
       }
+
+      if (fs.existsSync(newFile)) {
+        fs.unlinkSync(newFile)
+      }
+
+      fs.renameSync(oldFile, newFile)
     },
   }
 }
-// https://vite.dev/config/
-export default defineConfig((conf: any) => {
-  const mode = conf.mode
-  const ENV = loadEnv(mode, envDir)
-  const proxyConf: Record<string, string | ProxyOptions> = {}
-  proxyConf['/admin/api'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
+
+const devEntryFallbackPlugin = (entry: string, basePath?: string): Plugin => {
+  return {
+    name: 'dev-entry-fallback',
+    configureServer(server: ViteDevServer) {
+      const normalizedBasePath = normalizeBasePath(basePath)
+
+      server.middlewares.use((req, _res, next) => {
+        if (entry !== 'index.html' && (req.url === '/' || req.url === normalizedBasePath)) {
+          req.url = `/${entry}`
+        }
+
+        next()
+      })
+    },
   }
-  proxyConf['/chat/api'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-  }
-  proxyConf['/doc'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
-  }
-  proxyConf['/schema'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
-  }
-  proxyConf['/static'] = {
-    target: 'http://127.0.0.1:8080',
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+}
+
+const normalizeBasePath = (basePath?: string) => {
+  if (!basePath || basePath === './') {
+    return ''
   }
 
-  // 前端静态资源转发到本身
-  proxyConf[`^${ENV.VITE_BASE_PATH}.+\/oss\/file\/.*$`] = {
-    target: `http://127.0.0.1:8080`,
-    changeOrigin: true,
+  return basePath.startsWith('/') ? basePath : `/${basePath}`
+}
+
+const stripBasePath = (urlPath: string, basePath: string) => {
+  const normalizedBasePath = normalizeBasePath(basePath)
+
+  if (!normalizedBasePath) {
+    return urlPath
   }
-  // 前端静态资源转发到本身
-  proxyConf[`^${ENV.VITE_BASE_PATH}oss\/file\/.*$`] = {
-    target: `http://127.0.0.1:8080`,
-    changeOrigin: true,
+
+  return urlPath.replace(normalizedBasePath, '/')
+}
+
+const createProxyConfig = (env: Record<string, string>) => {
+  const backendTarget = env.VITE_API_TARGET || defaultBackendTarget
+  const basePath = normalizeBasePath(env.VITE_BASE_PATH)
+  const appPort = Number(env.VITE_APP_PORT || 5173)
+  const proxy: Record<string, string | ProxyOptions> = {
+    '/admin/api': {
+      target: backendTarget,
+      changeOrigin: true,
+    },
+    '/chat/api': {
+      target: backendTarget,
+      changeOrigin: true,
+    },
+    '/doc': {
+      target: backendTarget,
+      changeOrigin: true,
+      rewrite: (path) => stripBasePath(path, basePath),
+    },
+    '/schema': {
+      target: backendTarget,
+      changeOrigin: true,
+      rewrite: (path) => stripBasePath(path, basePath),
+    },
+    '/static': {
+      target: backendTarget,
+      changeOrigin: true,
+      rewrite: (path) => stripBasePath(path, basePath),
+    },
   }
-  proxyConf[`^${ENV.VITE_BASE_PATH}oss\/get_url\/.*$`] = {
-    target: `http://127.0.0.1:8080`,
-    changeOrigin: true,
+
+  if (basePath) {
+    proxy[`^${basePath}.+/oss/file/.*$`] = {
+      target: backendTarget,
+      changeOrigin: true,
+    }
+    proxy[`^${basePath}oss/file/.*$`] = {
+      target: backendTarget,
+      changeOrigin: true,
+    }
+    proxy[`^${basePath}oss/get_url/.*$`] = {
+      target: backendTarget,
+      changeOrigin: true,
+    }
   }
-  // 前端静态资源转发到本身
-  proxyConf[ENV.VITE_BASE_PATH] = {
-    target: `http://127.0.0.1:${ENV.VITE_APP_PORT}`,
-    changeOrigin: true,
-    rewrite: (path: string) => path.replace(ENV.VITE_BASE_PATH, '/'),
+
+  return proxy
+}
+
+const createOutDir = (basePath?: string) => {
+  const normalizedBasePath = normalizeBasePath(basePath)
+
+  if (!normalizedBasePath) {
+    return 'dist'
   }
+
+  return `dist${normalizedBasePath}`
+}
+
+// https://vite.dev/config/
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, envDir, '')
+  const entry = env.VITE_ENTRY || 'index.html'
+  const port = Number(env.VITE_APP_PORT || 5173)
 
   return {
-    preflight: false,
-    lintOnSave: false,
     base: './',
-    envDir: envDir,
+    envDir,
     plugins: [
+      tailwindcss(),
+      AutoImport({
+        imports: ['vue', 'vue-router', 'pinia'],
+        dts: 'src/auto-imports.d.ts',
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: false,
+          }),
+        ],
+      }),
+      Components({
+        dts: 'src/components.d.ts',
+        resolvers: [
+          ElementPlusResolver({
+            importStyle: false,
+          }),
+        ],
+      }),
       vue(),
       vueJsx(),
-      DefineOptions(),
-      createHtmlPlugin({template: ENV.VITE_ENTRY}),
-      renameHtmlPlugin(`dist${ENV.VITE_BASE_PATH}`, ENV.VITE_ENTRY),
+      devEntryFallbackPlugin(entry, env.VITE_BASE_PATH),
+      renameHtmlPlugin(createOutDir(env.VITE_BASE_PATH), entry),
     ],
     server: {
       cors: true,
       host: '0.0.0.0',
-      port: Number(ENV.VITE_APP_PORT),
+      port,
       strictPort: true,
-      proxy: proxyConf,
+      proxy: createProxyConfig(env),
     },
     build: {
-      outDir: `dist${ENV.VITE_BASE_PATH}`,
+      outDir: createOutDir(env.VITE_BASE_PATH),
       target: 'es2022',
       rollupOptions: {
-        input: ENV.VITE_ENTRY,
+        input: entry,
       },
     },
     resolve: {
