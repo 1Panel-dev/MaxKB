@@ -64,7 +64,7 @@ def _compare(source_value, compare, target_value):
 
 def _assertion(workflow_manage, field_list: List[str], compare: str, value):
     try:
-        value = workflow_manage.generate_prompt(value)
+        value = workflow_manage.generate_field_value(value)
     except Exception:
         pass
     field_value = None

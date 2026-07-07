@@ -775,16 +775,65 @@ class WorkflowManage:
 
         return prompt
 
-    def generate_prompt(self, prompt: str):
+    def generate_prompt(self, prompt: str) -> str:
         """
         格式化生成提示词
         @param prompt: 提示词信息
         @return: 格式化后的提示词
         """
+        if prompt is None:
+            return ''
+        if prompt == '':
+            return ''
+        if "{{" not in prompt or "}}" not in prompt:
+            return prompt
+
         context = self.get_workflow_content()
         prompt = self.reset_prompt(prompt)
         prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
         value = prompt_template.format(context=context)
+        return value
+
+    def reset_field_value(self, prompt: str):
+        placeholder = "{}"
+        for field in self.field_list:
+            globeLabel = f"{field.get('node_name')}.{field.get('value')}"
+            globeValue = f"context.get('{field.get('node_id')}',{placeholder}).get('{field.get('value', '')}')"
+            prompt = prompt.replace(globeLabel, globeValue)
+        for field in self.global_field_list:
+            globeLabel = f"全局变量.{field.get('value')}"
+            globeLabelNew = f"global.{field.get('value')}"
+            globeValue = f"context.get('global').get('{field.get('value', '')}')"
+            prompt = prompt.replace(globeLabel, globeValue).replace(globeLabelNew, globeValue)
+        for field in self.chat_field_list:
+            chatLabel = f"chat.{field.get('value')}"
+            chatValue = f"context.get('chat').get('{field.get('value', '')}')"
+            prompt = prompt.replace(chatLabel, chatValue)
+
+        return prompt
+
+    def generate_field_value(self, field_value: str):
+        """
+        格式化生成参数值
+        @param field_value: 参数信息
+        @return: 格式化后的参数值
+        """
+        if field_value is None:
+            return None
+        if not field_value:
+            return ''
+        if "{{" not in field_value or "}}" not in field_value:
+            return field_value
+
+        context = self.get_workflow_content()
+        field_value = self.reset_field_value(field_value)
+        field_value_template = PromptTemplate.from_template(field_value, template_format='jinja2')
+        value = field_value_template.format(context=context)
+        maxkb_logger.info(f"context: {json.dumps(context, ensure_ascii=False)}")
+        maxkb_logger.info(f"value: {value}, type: {type(value)}")
+        maxkb_logger.info(field_value)
+        if value == 'None':
+            return None
         return value
 
     def get_start_node(self):

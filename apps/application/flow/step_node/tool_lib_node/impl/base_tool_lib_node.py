@@ -106,7 +106,7 @@ def convert_value(name: str, value, _type, is_required, source, node):
             return float(value)
         return value
     try:
-        value = node.workflow_manage.generate_prompt(value)
+        value = node.workflow_manage.generate_field_value(value)
         return common_convert_value(_type, value)
     except Exception as e:
         raise Exception(

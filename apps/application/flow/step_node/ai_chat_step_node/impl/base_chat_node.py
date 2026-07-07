@@ -468,7 +468,7 @@ class BaseChatNode(IChatNode):
         # 处理参数中的变量
         for k, v in tool_params.items():
             if type(v) == str:
-                tool_params[k] = self.workflow_manage.generate_prompt(tool_params[k])
+                tool_params[k] = self.workflow_manage.generate_field_value(v)
             elif type(v) == dict:
                 self.handle_variables(v)
             elif (type(v) == list) and len(v) > 0 and (type(v[0]) == str):

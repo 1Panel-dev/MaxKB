@@ -53,7 +53,7 @@ class BaseVariableAssignNode(IVariableAssignNode):
                 result['output_value'] = variable['value'] = val
             elif variable['type'] == 'string':
                 # 变量解析 例如：{{global.xxx}}
-                val = self.workflow_manage.generate_prompt(variable['value'])
+                val = self.workflow_manage.generate_field_value(variable['value'])
                 evaluation(variable, val)
                 result['output_value'] = val
             else:
