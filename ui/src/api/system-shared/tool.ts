@@ -96,7 +96,7 @@ const getToolById: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<a
  * 删除工具
  * @param 参数 tool_id
  */
-const delTool: (tool_id: String, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
+const delTool: (tool_id: string, loading?: Ref<boolean>) => Promise<Result<boolean>> = (
   tool_id,
   loading,
 ) => {
