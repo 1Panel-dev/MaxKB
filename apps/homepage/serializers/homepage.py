@@ -401,7 +401,6 @@ class HomePageSerializer(serializers.Serializer):
             is_resource_filter = True
             if name:
                 queryset = queryset.filter(name__contains=name)
-                is_resource_filter = False
             if workspace_manage:
                 queryset = queryset.filter(workspace_id=workspace_id)
             elif is_extends_workspace_manage(auth, workspace_id):
