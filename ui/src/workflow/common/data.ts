@@ -671,7 +671,7 @@ export const loopNode = {
             fields: [],
             height: 361.333,
             showNode: true,
-            stepName: '开始',
+            stepName: 'Start',
             globalFields: [],
           },
         },
@@ -1091,11 +1091,11 @@ export const toolLibNode = {
  */
 export const toolWorkflowLibNode = {
   type: WorkflowType.ToolWorkflowLib,
-  text: t('workflow.nodes.toolWorlflowNode.text', '工作流工具'),
-  label: t('workflow.nodes.toolWorlflowNode.label', '工作流工具'),
+  text: t('workflow.nodes.toolWorlflowNode.text', 'Workflow Tool'),
+  label: t('workflow.nodes.toolWorlflowNode.label', 'Workflow Tool'),
   height: 170,
   properties: {
-    stepName: t('workflow.nodes.toolWorlflowNode.label', '工作流工具'),
+    stepName: t('workflow.nodes.toolWorlflowNode.label', 'Workflow Tool'),
     config: {
       fields: [],
     },
@@ -1360,19 +1360,19 @@ defineLocaleGetter(
   toolWorkflowLibNode,
   'text',
   'workflow.nodes.toolWorlflowNode.text',
-  '工作流工具',
+  'Workflow Tool',
 )
 defineLocaleGetter(
   toolWorkflowLibNode,
   'label',
   'workflow.nodes.toolWorlflowNode.label',
-  '工作流工具',
+  'Workflow Tool',
 )
 bindLocale(
   toolWorkflowLibNode,
   'properties.stepName',
   'workflow.nodes.toolWorlflowNode.label',
-  '工作流工具',
+  'Workflow Tool',
 )
 
 bindLocale(loopStartNode, 'properties.stepName', 'workflow.nodes.loopStartNode.label')

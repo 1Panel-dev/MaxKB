@@ -15,17 +15,17 @@ export const applicationTemplate: any = {
           config: {},
           height: 734.766,
           showNode: true,
-          stepName: '基本信息',
+          stepName: 'Basic Info',
           node_data: {
-            desc: '模板',
-            name: '知识库问答助手',
+            desc: 'Template',
+            name: 'Knowledge Base Q&A Assistant',
             prologue:
-              '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
+              'Hello, I am the XXX assistant. You can ask me questions about using XXX.\n- What are the main features of XXX?\n- How is XXX priced?\n- I need to transfer to human support',
             tts_type: 'BROWSER',
           },
           input_field_list: [],
           user_input_config: {
-            title: '用户输入',
+            title: 'User Input',
           },
           api_input_field_list: [],
           user_input_field_list: [],
@@ -40,37 +40,37 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: '用户问题',
+                label: 'User Question',
                 value: 'question',
               },
             ],
             globalFields: [
               {
-                label: '当前时间',
+                label: 'Current Time',
                 value: 'time',
               },
               {
-                label: '历史聊天记录',
+                label: 'Chat History',
                 value: 'history_context',
               },
               {
-                label: '对话 ID',
+                label: 'Chat ID',
                 value: 'chat_id',
               },
             ],
           },
           fields: [
             {
-              label: '用户问题',
+              label: 'User Question',
               value: 'question',
             },
           ],
           height: 364,
           showNode: true,
-          stepName: '开始',
+          stepName: 'Start',
           globalFields: [
             {
-              label: '当前时间',
+              label: 'Current Time',
               value: 'time',
             },
           ],
@@ -85,26 +85,26 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: '检索结果的分段列表',
+                label: 'Retrieved Segment List',
                 value: 'paragraph_list',
               },
               {
-                label: '满足直接回答的分段列表',
+                label: 'Direct-Answer Segment List',
                 value: 'is_hit_handling_method_list',
               },
               {
-                label: '检索结果',
+                label: 'Retrieval Result',
                 value: 'data',
               },
               {
-                label: '满足直接回答的分段内容',
+                label: 'Direct-Answer Segment Content',
                 value: 'directly_return',
               },
             ],
           },
           height: 794,
           showNode: true,
-          stepName: '知识库检索',
+          stepName: 'Knowledge Base Search',
           condition: 'AND',
           node_data: {
             knowledge_id_list: [],
@@ -130,14 +130,14 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: '分支名称',
+                label: 'Branch Name',
                 value: 'branch_name',
               },
             ],
           },
           height: 544.148,
           showNode: true,
-          stepName: '判断器',
+          stepName: 'Condition',
           condition: 'AND',
           node_data: {
             branch: [
@@ -201,14 +201,14 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: '内容',
+                label: 'Content',
                 value: 'answer',
               },
             ],
           },
           height: 386,
           showNode: true,
-          stepName: '指定回复',
+          stepName: 'Custom Reply',
           condition: 'AND',
           node_data: {
             fields: ['fd0324fc-f5e4-4fa6-a2d9-cb251b467605', 'directly_return'],
@@ -227,21 +227,21 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: 'AI 回答内容',
+                label: 'AI Response',
                 value: 'answer',
               },
               {
-                label: '思考过程',
+                label: 'Reasoning Process',
                 value: 'reasoning_content',
               },
             ],
           },
           height: 993.383,
           showNode: true,
-          stepName: 'AI 对话',
+          stepName: 'AI Chat',
           condition: 'AND',
           node_data: {
-            prompt: '已知信息：\n{{知识库检索.data}}\n问题：\n{{开始.question}}',
+            prompt: 'Known information:\n{{Knowledge Base Search.data}}\nQuestion:\n{{Start.question}}',
             system: '',
             model_id: '',
             is_result: true,
@@ -266,18 +266,19 @@ export const applicationTemplate: any = {
           config: {
             fields: [
               {
-                label: '内容',
+                label: 'Content',
                 value: 'answer',
               },
             ],
           },
           height: 504,
           showNode: true,
-          stepName: '指定回复1',
+          stepName: 'Custom Reply 1',
           condition: 'AND',
           node_data: {
             fields: [],
-            content: '抱歉，没有在知识库查询到相关内容，请提供更详细的信息。',
+            content:
+              'Sorry, no relevant content was found in the knowledge base. Please provide more detailed information.',
             is_result: true,
             reply_type: 'content',
           },
