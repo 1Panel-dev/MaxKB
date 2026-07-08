@@ -17,6 +17,9 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from django.utils.translation import gettext
 
 
+GENERATED_MEDIA_DOWNLOAD_TIMEOUT = 30
+
+
 class BaseImageToVideoNode(IImageToVideoNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -65,7 +68,9 @@ class BaseImageToVideoNode(IImageToVideoNode):
             return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
-            video_urls = requests.get(video_urls).content
+            response = requests.get(video_urls, timeout=GENERATED_MEDIA_DOWNLOAD_TIMEOUT)
+            response.raise_for_status()
+            video_urls = response.content
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto; max-height: 60vh;"></video>'
@@ -150,7 +155,10 @@ class BaseImageToVideoNode(IImageToVideoNode):
                     return chat_record.get_ai_message()
                 image_list = val['image_list']
                 return AIMessage(content=[
-                    *[{'type': 'image_url', 'image_url': {'url': f'{file_url}'}} for file_url in image_list]
+                    *[
+                        {'type': 'image_url', 'image_url': {'url': image_url}}
+                        for image_url in self.get_image_url_list(image_list)
+                    ]
                 ])
         return chat_record.get_ai_message()
 
@@ -181,6 +189,20 @@ class BaseImageToVideoNode(IImageToVideoNode):
             *history_message,
             question
         ]
+
+    @staticmethod
+    def get_image_url_list(image_list):
+        image_url_list = []
+        for image in image_list or []:
+            if isinstance(image, dict):
+                image_url = image.get('url') or (
+                    f"./oss/file/{image.get('file_id')}" if image.get('file_id') else None
+                )
+            else:
+                image_url = image
+            if image_url:
+                image_url_list.append(image_url)
+        return image_url_list
 
     @staticmethod
     def reset_message_list(message_list: List[BaseMessage], answer_text):

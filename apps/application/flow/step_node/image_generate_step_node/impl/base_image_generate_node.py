@@ -14,6 +14,9 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
 
 
+GENERATED_MEDIA_DOWNLOAD_TIMEOUT = 30
+
+
 class BaseImageGenerateNode(IImageGenerateNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -59,7 +62,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if isinstance(image_url, str):
                 if image_url.startswith('http'):
                     # HTTP URL 情况
-                    image_url = requests.get(image_url).content
+                    response = requests.get(image_url, timeout=GENERATED_MEDIA_DOWNLOAD_TIMEOUT)
+                    response.raise_for_status()
+                    image_url = response.content
                 elif image_url.startswith('data:image'):
                     # Data URL 格式 (data:image/png;base64,...)
                     import base64
@@ -84,7 +89,10 @@ class BaseImageGenerateNode(IImageGenerateNode):
                     return chat_record.get_ai_message()
                 image_list = val['image_list']
                 return AIMessage(content=[
-                    *[{'type': 'image_url', 'image_url': {'url': f'{file_url}'}} for file_url in image_list]
+                    *[
+                        {'type': 'image_url', 'image_url': {'url': image_url}}
+                        for image_url in self.get_image_url_list(image_list)
+                    ]
                 ])
         return chat_record.get_ai_message()
 
@@ -115,6 +123,20 @@ class BaseImageGenerateNode(IImageGenerateNode):
             *history_message,
             question
         ]
+
+    @staticmethod
+    def get_image_url_list(image_list):
+        image_url_list = []
+        for image in image_list or []:
+            if isinstance(image, dict):
+                image_url = image.get('url') or (
+                    f"./oss/file/{image.get('file_id')}" if image.get('file_id') else None
+                )
+            else:
+                image_url = image
+            if image_url:
+                image_url_list.append(image_url)
+        return image_url_list
 
     def upload_file(self, file):
         if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
