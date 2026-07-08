@@ -20,8 +20,7 @@ from common.utils.common import post
 from django.db import transaction
 from django.db.models import QuerySet
 from django.db.models.aggregates import Max, Min
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from knowledge.models import Document, Knowledge, Paragraph, Problem, ProblemParagraphMapping
 from knowledge.serializers.common import get_embedding_model_id_by_knowledge_id, update_document_char_length
 from knowledge.serializers.paragraph import ParagraphSerializers

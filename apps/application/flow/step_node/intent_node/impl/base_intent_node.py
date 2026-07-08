@@ -6,6 +6,7 @@ from typing import List, Dict, Any
 from functools import reduce
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from application.flow.i_step_node import INode, NodeResult
