@@ -1,0 +1,269 @@
+<template>
+  <div class="upload-document p-12-24">
+    <div class="flex align-center mb-16">
+      <back-button to="-1" style="margin-left: -4px"></back-button>
+      <h3 style="display: inline-block">{{ $t('views.document.importDocument') }}</h3>
+    </div>
+    <el-card style="--el-card-padding: 0">
+      <div class="upload-document__main flex" v-loading="loading">
+        <div class="upload-document__component main-calc-height">
+          <div class="upload-component p-24" style="min-width: 850px">
+            <h4 class="title-decoration-1 mb-8">
+              {{ $t('views.document.feishu.selectDocument') }}
+            </h4>
+            <el-form
+              ref="FormRef"
+              :model="form"
+              :rules="rules"
+              label-position="top"
+              require-asterisk-position="right"
+            >
+              <div class="mt-16 mb-16">
+                <el-radio-group v-model="form.fileType" class="app-radio-button-group">
+                  <el-radio-button value="txt"
+                    >{{ $t('views.document.fileType.txt.label') }}
+                  </el-radio-button>
+                </el-radio-group>
+              </div>
+              <div class="update-info flex p-8-12 border-r-6 mb-16">
+                <div class="mt-4">
+                  <AppIcon iconName="app-warning-colorful" style="font-size: 16px"></AppIcon>
+                </div>
+                <div class="ml-16 lighter">
+                  <p>{{ $t('views.document.feishu.tip1') }}</p>
+                  <p>{{ $t('views.document.feishu.tip2') }}</p>
+                </div>
+              </div>
+              <div class="card-never border-r-6 mb-16">
+                <el-checkbox
+                  v-model="allCheck"
+                  :label="$t('common.allCheck')"
+                  size="large"
+                  class="ml-24"
+                  @change="handleAllCheckChange"
+                />
+              </div>
+              <div style="height: calc(100vh - 450px)">
+                <el-scrollbar>
+                  <el-tree
+                    :props="props"
+                    :load="loadNode"
+                    lazy
+                    show-checkbox
+                    node-key="token"
+                    ref="treeRef"
+                  >
+                    <template #default="{ node, data }">
+                      <div class="flex align-center lighter">
+                        <img
+                          src="@/assets/fileType/file-icon.svg"
+                          alt=""
+                          height="20"
+                          v-if="data.type === 'folder'"
+                        />
+                        <img
+                          src="@/assets/fileType/docx-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.type === 'docx' || data.name.endsWith('.docx')"
+                        />
+                        <img
+                          src="@/assets/fileType/xlsx-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.type === 'sheet' || data.name.endsWith('.xlsx')"
+                        />
+                        <img
+                          src="@/assets/fileType/xls-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('xls')"
+                        />
+                        <img
+                          src="@/assets/fileType/csv-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('csv')"
+                        />
+                        <img
+                          src="@/assets/fileType/pdf-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('.pdf')"
+                        />
+                        <img
+                          src="@/assets/fileType/html-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('.html')"
+                        />
+                        <img
+                          src="@/assets/fileType/txt-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('.txt')"
+                        />
+                        <img
+                          src="@/assets/fileType/zip-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('.zip')"
+                        />
+                        <img
+                          src="@/assets/fileType/md-icon.svg"
+                          alt=""
+                          height="22"
+                          v-else-if="data.name.endsWith('.md')"
+                        />
+
+                        <span class="ml-4">{{ node.label }}</span>
+                      </div>
+                    </template>
+                  </el-tree>
+                </el-scrollbar>
+              </div>
+            </el-form>
+          </div>
+        </div>
+      </div>
+    </el-card>
+    <div class="upload-document__footer text-right border-t">
+      <el-button @click="back">{{ $t('common.cancel') }}</el-button>
+
+      <el-button @click="submit" type="primary" :disabled="disabled">
+        {{ $t('views.document.buttons.import') }}
+      </el-button>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, reactive, computed, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { MsgConfirm, MsgSuccess, MsgWarning } from '@/utils/message'
+import { t } from '@/locales'
+import type { LoadFunction } from 'element-plus'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
+const router = useRouter()
+const route = useRoute()
+const {
+  params: { folderId },
+  query: { id, folder_token }, // id为knowledgeID，有id的是上传文档 folder_token为飞书文件夹token
+} = route
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
+const loading = ref(false)
+const disabled = ref(false)
+const allCheck = ref(false)
+const treeRef = ref<any>(null)
+
+interface Tree {
+  name: string
+  leaf?: boolean
+  type: string
+  token: string
+  is_exist: boolean
+}
+
+const form = ref({
+  fileType: 'txt',
+  fileList: [] as any,
+})
+
+const rules = reactive({
+  fileList: [
+    { required: true, message: t('views.document.upload.requiredMessage'), trigger: 'change' },
+  ],
+})
+
+const props = {
+  label: 'name',
+  children: 'zones',
+  isLeaf: (data: any) => data.type !== 'folder',
+  disabled: (data: any) => data.is_exist,
+}
+
+const loadNode: LoadFunction = (node, resolve) => {
+  const token = node.level === 0 ? folder_token : node.data.token // 根节点使用 folder_token，其他节点使用 node.data.token
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .getLarkDocumentList(id, token, {}, loading)
+    .then((res: any) => {
+      const nodes = res.data.files as Tree[]
+      resolve(nodes)
+      nodes.forEach((childNode) => {
+        if (childNode.is_exist) {
+          treeRef.value?.setChecked(childNode.token, true, false)
+        }
+      })
+    })
+
+    .catch((err: any) => {
+      console.error('Failed to load tree nodes:', err)
+    })
+}
+
+const handleAllCheckChange = (checked: boolean) => {
+  if (checked) {
+    // 获取所有已加载的节点
+    const nodes = Object.values(treeRef.value?.store.nodesMap || {}) as any[]
+    nodes.forEach((node) => {
+      // 只选择未禁用且是文件的节点
+      if (!node.disabled) {
+        treeRef.value?.setChecked(node.data, true, false)
+      }
+    })
+  } else {
+    treeRef.value?.setCheckedKeys([])
+  }
+}
+
+function submit() {
+  loading.value = true
+  disabled.value = true
+  // 选中的节点的token
+  const checkedNodes = treeRef.value?.getCheckedNodes() || []
+  const filteredNodes = checkedNodes.filter((node: any) => !node.is_exist)
+  const newList = filteredNodes.map((node: any) => {
+    return {
+      name: node.name,
+      token: node.token,
+      type: node.type,
+    }
+  })
+  if (newList.length === 0) {
+    disabled.value = false
+    MsgWarning(t('views.document.feishu.errorMessage1'))
+    loading.value = false
+    return
+  }
+  loadSharedApi({ type: 'document', systemType: apiType.value })
+    .importLarkDocument(id, newList, loading)
+    .then(() => {
+      MsgSuccess(t('views.document.tip.importMessage'))
+      disabled.value = false
+      back()
+    })
+    .catch((err: any) => {
+      console.error('Failed to load tree nodes:', err)
+    })
+    .finally(() => {
+      disabled.value = false
+    })
+  loading.value = false
+}
+
+function back() {
+  router.go(-1)
+}
+</script>
+<style lang="scss">
+@use './index.scss';
+</style>

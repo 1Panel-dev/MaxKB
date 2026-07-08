@@ -1,0 +1,284 @@
+<template>
+  <NodeContainer :node-model="nodeModel">
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
+    <el-card shadow="never" class="card-never">
+      <el-form
+        @submit.prevent
+        :model="form_data"
+        label-position="top"
+        require-asterisk-position="right"
+        label-width="auto"
+        ref="aiChatNodeFormRef"
+        hide-required-asterisk
+      >
+        <el-form-item
+          :label="$t('workflow.nodes.speechToTextNode.stt_model.label')"
+          :prop="
+            form_data.stt_model_id_type === 'reference' ? 'stt_model_id_reference' : 'stt_model_id'
+          "
+          :rules="{
+            required: true,
+            message:
+              form_data.stt_model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.voiceInput.placeholder'),
+            trigger: 'change',
+          }"
+        >
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span
+                >{{
+                    $t('workflow.nodes.speechToTextNode.stt_model.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-select
+                v-model="form_data.stt_model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="form_data.stt_model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference"/>
+                <el-option :label="$t('common.custom')" value="custom"/>
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="form_data.stt_model_id_type !== 'reference'">
+            <ModelSelect
+              @wheel="wheel"
+              :teleported="false"
+              @change="sttModelChange"
+              v-model="form_data.stt_model_id"
+              :placeholder="$t('views.application.form.voiceInput.placeholder')"
+              :options="modelOptions"
+              showFooter
+              :model-type="'STT'"
+            ></ModelSelect>
+            <div class="ml-8">
+              <el-button @click="openSTTParamSettingDialog" :disabled="!form_data.stt_model_id">
+                <el-icon>
+                  <Operation/>
+                </el-icon>
+              </el-button>
+            </div>
+          </div>
+          <NodeCascader
+            v-else
+            ref="modelCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="form_data.stt_model_id_reference"
+          />
+        </el-form-item>
+        <el-form-item
+          :label="$t('workflow.nodes.speechToTextNode.audio.label')"
+          prop="audio_list"
+          :rules="{
+            message: $t('workflow.nodes.speechToTextNode.audio.label'),
+            trigger: 'change',
+            required: true,
+          }"
+        >
+          <template #label>
+            <div class="flex align-center">
+              <div>
+                <span
+                >{{
+                    $t('workflow.nodes.speechToTextNode.audio.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-tooltip effect="dark" placement="right" >
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace;">{{
+                      fileTooltip
+                    }}
+                  </div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <NodeCascader
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.nodes.speechToTextNode.audio.placeholder')"
+            v-model="form_data.audio_list"
+          />
+        </el-form-item>
+
+        <el-form-item
+          :label="$t('workflow.nodes.aiChatNode.returnContent.label')"
+          @click.prevent
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
+        >
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-switch size="small" v-model="form_data.is_result"/>
+        </el-form-item>
+      </el-form>
+    </el-card>
+    <STTModeParamSettingDialog ref="STTModeParamSettingDialogRef" @refresh="refreshSTTForm"/>
+  </NodeContainer>
+</template>
+
+<script setup lang="ts">
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import {computed, onMounted, ref, inject} from 'vue'
+import {groupBy, set} from 'lodash'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import type {FormInstance} from 'element-plus'
+import {MsgSuccess} from '@/utils/message'
+import {t} from '@/locales'
+import {useRoute} from 'vue-router'
+import {loadSharedApi} from '@/utils/dynamics-api/shared-api'
+import STTModeParamSettingDialog from '@/views/application/component/STTModelParamSettingDialog.vue'
+import {WorkflowMode} from '@/enums/application'
+import {fileTooltip} from "@/workflow/common/data.ts";
+
+const getResourceDetail = inject('getResourceDetail') as any
+const route = useRoute()
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
+
+const {
+  params: {id},
+} = route as any
+
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else {
+    return 'workspace'
+  }
+})
+
+const props = defineProps<{ nodeModel: any }>()
+const modelOptions = ref<any>(null)
+const STTModeParamSettingDialogRef = ref<InstanceType<typeof STTModeParamSettingDialog>>()
+
+const aiChatNodeFormRef = ref<FormInstance>()
+const modelCascaderRef = ref()
+
+const nodeCascaderRef = ref()
+const validate = () => {
+  return Promise.all([
+    nodeCascaderRef.value ? nodeCascaderRef.value.validate() : Promise.resolve(''),
+    modelCascaderRef.value ? modelCascaderRef.value.validate() : Promise.resolve(''),
+    aiChatNodeFormRef.value?.validate(),
+  ]).catch((err: any) => {
+    return Promise.reject({node: props.nodeModel, errMessage: err})
+  })
+}
+
+const wheel = (e: any) => {
+  if (e.ctrlKey === true) {
+    e.preventDefault()
+    return true
+  } else {
+    e.stopPropagation()
+    return true
+  }
+}
+
+const form = {
+  stt_model_id: '',
+  stt_model_id_type: 'custom',
+  stt_model_id_reference: [],
+  is_result: true,
+  audio_list: [],
+  model_params_setting: {},
+}
+
+const form_data = computed({
+  get: () => {
+    if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.stt_model_id_type) {
+        set(props.nodeModel.properties.node_data, 'stt_model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.stt_model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'stt_model_id_reference', [])
+      }
+      return props.nodeModel.properties.node_data
+    } else {
+      set(props.nodeModel.properties, 'node_data', form)
+    }
+    return props.nodeModel.properties.node_data
+  },
+  set: (value) => {
+    set(props.nodeModel.properties, 'node_data', value)
+  },
+})
+
+const openSTTParamSettingDialog = () => {
+  const model_id = form_data.value.stt_model_id
+  if (!model_id) {
+    MsgSuccess(t('views.application.form.voiceInput.requiredMessage'))
+    return
+  }
+  STTModeParamSettingDialogRef.value?.open(model_id, id, form_data.value.model_params_setting)
+}
+
+const refreshSTTForm = (data: any) => {
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
+}
+
+function sttModelChange(model_id: string) {
+  if (model_id) {
+    STTModeParamSettingDialogRef.value?.reset_default(model_id, id)
+  } else {
+    refreshSTTForm({})
+  }
+}
+
+const resource = getResourceDetail()
+
+function getSelectModel() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+        model_type: 'STT',
+        workspace_id: resource.value?.workspace_id,
+      }
+      : {
+        model_type: 'STT',
+      }
+  loadSharedApi({type: 'model', systemType: apiType.value})
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
+}
+
+onMounted(() => {
+  getSelectModel()
+
+  set(props.nodeModel, 'validate', validate)
+})
+</script>
+
+<style scoped lang="scss"></style>

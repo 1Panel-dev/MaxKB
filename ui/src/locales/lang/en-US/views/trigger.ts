@@ -1,0 +1,56 @@
+export default {
+  title: 'Trigger',
+  tip: 'When triggered, the system will automatically call task execution based on the input parameters settings',
+  task: 'Task',
+  nextTime: 'Next Execution Time',
+  triggerTask: 'Trigger Task',
+  taskExecution: 'Task Execution',
+  triggerSource: 'Trigger Source',
+  delete: {
+    confirmTitle: 'Confirm deleting trigger:',
+    confirmTitle2: 'triggers?',
+  },
+  triggerCycle: {
+    title: 'Trigger Cycle',
+    days: 'Days',
+    daily: 'Daily Trigger',
+    weekly: 'Weekly Trigger',
+    monthly: 'Monthly Trigger',
+    interval: 'Interval Trigger',
+    monday: 'Monday',
+    tuesday: 'Tuesday',
+    wednesday: 'Wednesday',
+    thursday: 'Thursday',
+    friday: 'Friday',
+    saturday: 'Saturday',
+    sunday: 'Sunday',
+    hours: 'Hours',
+    minutes: 'Minutes',
+    cronExpression: 'Cron expression',
+    switchCycle: 'Switch to Trigger Cycle',
+    switchCron: 'Switch to Cron expression',
+    placeholder: 'Please enter a Cron expression (e.g. 0 0 1 * *)'
+
+  },
+  type: {
+    scheduled: 'Scheduled Trigger',
+    scheduledDesc: 'Execute tasks monthly, weekly, daily, or at intervals',
+    event: 'Event Trigger',
+    eventDesc: 'Execute tasks when a certain event is sent',
+  },
+  createTrigger: 'Create Trigger',
+  editTrigger: 'Edit Trigger',
+  from: {
+    triggerName: {
+      label: 'Trigger Name',
+      placeholder: 'Please enter the trigger name',
+      requiredMessage: 'Please enter the trigger name',
+    },
+    event_url: {
+      label: 'Copy URL to your application',
+    },
+  },
+  requestParameter: 'Request Parameters',
+  triggerParam: 'Trigger Input Parameters',
+  errorMsg: 'Error Message',
+}

@@ -1,0 +1,964 @@
+<template>
+  <LayoutContainer showCollapse resizable class="application-manage">
+    <template #left>
+      <h4 class="p-12-16 pb-0 mt-12">{{ $t('views.application.title') }}</h4>
+
+      <FolderVirtualizedTree
+        :source="SourceTypeEnum.APPLICATION"
+        :data="folderList"
+        :currentNodeKey="folder.currentFolder?.id"
+        @handleNodeClick="folderClickHandle"
+        @refreshTree="refreshFolder"
+        :draggable="true"
+      />
+    </template>
+    <ContentContainer>
+      <template #header>
+        <FolderBreadcrumb :folderList="folderList" @click="folderClickHandle" />
+      </template>
+      <template #search>
+        <div class="flex">
+          <div class="flex-between complex-search">
+            <el-select
+              class="complex-search__left"
+              v-model="search_type"
+              style="width: 100px"
+              @change="search_type_change"
+            >
+              <el-option :label="$t('common.creator')" value="create_user" />
+
+              <el-option :label="$t('common.name')" value="name" />
+
+              <el-option :label="$t('views.application.publishStatus')" value="publish_status" />
+            </el-select>
+            <el-input
+              v-if="search_type === 'name'"
+              v-model="search_form.name"
+              @change="searchHandle"
+              :placeholder="$t('common.searchBar.placeholder')"
+              style="width: 190px"
+              clearable
+            />
+            <el-select
+              v-else-if="search_type === 'create_user'"
+              v-model="search_form.create_user"
+              @change="searchHandle"
+              filterable
+              clearable
+              remote
+              :remote-method="getUserList"
+              style="width: 190px"
+            >
+              <el-option v-for="u in user_options" :key="u.id" :value="u.id" :label="u.nick_name" />
+            </el-select>
+            <el-select
+              v-else-if="search_type === 'publish_status'"
+              v-model="search_form.publish_status"
+              @change="searchHandle"
+              filterable
+              clearable
+              style="width: 190px"
+            >
+              <el-option :label="$t('common.status.published')" value="published" />
+              <el-option :label="$t('common.status.unpublished')" value="unpublished" />
+            </el-select>
+          </div>
+          <span
+            class="ml-8"
+            v-if="
+              permissionPrecise.batchDelete() ||
+              permissionPrecise.batchMove() ||
+              permissionPrecise.batchCleanStrategy()
+            "
+          >
+            <el-button @click="batchSelectedHandle(true)" v-if="isBatch === false">
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
+              {{ $t('views.paragraph.setting.batchSelected') }}
+            </el-button>
+            <el-button @click="batchSelectedHandle(false)" v-if="isBatch === true">
+              <AppIcon iconName="app-batch-delete" class="mr-4" />
+              {{ $t('views.paragraph.setting.cancelSelected') }}
+            </el-button>
+          </span>
+          <div v-if="isBatch === false">
+            <el-button
+              class="ml-8"
+              v-if="permissionPrecise.create()"
+              @click="openTemplateStoreDialog()"
+            >
+              <AppIcon iconName="app-template-center" class="mr-4" />
+              {{ $t('workflow.setting.templateCenter') }}
+            </el-button>
+            <el-dropdown trigger="click" v-if="permissionPrecise.create()">
+              <el-button type="primary" class="ml-8">
+                {{ $t('common.create') }}
+                <el-icon class="el-icon--right">
+                  <arrow-down />
+                </el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu class="create-dropdown">
+                  <el-dropdown-item @click="openCreateDialog('SIMPLE')">
+                    <div class="flex">
+                      <el-avatar shape="square" class="avatar-blue mt-4" :size="32">
+                        <img
+                          src="@/assets/application/icon_simple_application.svg"
+                          style="width: 65%"
+                          alt=""
+                        />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">
+                          {{ $t('views.application.simpleAgent') }}
+                        </div>
+                        <el-text type="info" size="small" class="color-secondary"
+                          >{{ $t('views.application.simplePlaceholder') }}
+                        </el-text>
+                      </div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="openCreateDialog('WORK_FLOW')">
+                    <div class="flex">
+                      <el-avatar shape="square" class="avatar-orange mt-4" :size="32">
+                        <img
+                          src="@/assets/application/icon_workflow_application.svg"
+                          style="width: 65%"
+                          alt=""
+                        />
+                      </el-avatar>
+                      <div class="pre-wrap ml-8">
+                        <div class="lighter">{{ $t('views.application.AdvancedAgent') }}</div>
+                        <el-text type="info" size="small" class="color-secondary"
+                          >{{ $t('views.application.advancedPlaceholder') }}
+                        </el-text>
+                      </div>
+                    </div>
+                  </el-dropdown-item>
+                  <el-upload
+                    class="import-button"
+                    ref="elUploadRef"
+                    :file-list="[]"
+                    action="#"
+                    multiple
+                    :auto-upload="false"
+                    :show-file-list="false"
+                    :limit="1"
+                    :on-change="(file: any, fileList: any) => importApplication(file)"
+                  >
+                    <el-dropdown-item>
+                      <div class="flex align-center w-full">
+                        <el-avatar shape="square" :size="32" style="background: none">
+                          <img src="@/assets/icon_import.svg" alt="" />
+                        </el-avatar>
+                        <div class="pre-wrap ml-8">
+                          <div class="lighter">{{ $t('views.application.importApplication') }}</div>
+                        </div>
+                      </div>
+                    </el-dropdown-item>
+                  </el-upload>
+                  <el-dropdown-item @click="openCreateFolder" divided>
+                    <div class="flex align-center">
+                      <AppIcon iconName="app-folder" style="font-size: 32px"></AppIcon>
+                      <div class="pre-wrap ml-4">
+                        <div class="lighter">
+                          {{ $t('components.folder.addFolder') }}
+                        </div>
+                      </div>
+                    </div>
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+      </template>
+      <div
+        v-loading.fullscreen.lock="paginationConfig.current_page === 1 && loading"
+        style="max-height: calc(100vh - 120px)"
+      >
+        <InfiniteScroll
+          :size="applicationList.length"
+          :total="paginationConfig.total"
+          :page_size="paginationConfig.page_size"
+          v-model:current_page="paginationConfig.current_page"
+          @load="getList"
+          :loading="loading"
+        >
+          <el-checkbox-group v-model="multipleSelection" @change="handleCheckedChatChange">
+            <el-row v-if="applicationList.length > 0" :gutter="15" class="w-full">
+              <template v-for="(item, index) in applicationList" :key="index">
+                <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="6" class="mb-16">
+                  <CardBox
+                    :title="item.name"
+                    :description="item.desc"
+                    class="cursor"
+                    @contextmenu.prevent
+                    @mousedown.stop="goApp($event, item)"
+                    :disabled="isBatch"
+                    :class="{
+                      'border-active': multipleSelection.includes(item.id),
+                    }"
+                  >
+                    <template #icon>
+                      <el-avatar shape="square" :size="32" style="background: none">
+                        <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                      </el-avatar>
+                    </template>
+                    <template #subTitle>
+                      <el-text class="color-secondary lighter flex align-center" size="small">
+                        <span
+                          :title="i18n_name(item.nick_name)"
+                          class="ellipsis"
+                          style="max-width: 90px"
+                        >
+                          {{ i18n_name(item.nick_name) }}
+                        </span>
+                        <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                        <span> {{ dateFormat(item.create_time) }}</span>
+                      </el-text>
+                    </template>
+                    <template #tag>
+                      <el-checkbox :value="item.id" v-if="isBatch" @change="checkboxChange(item)" />
+                      <div v-else>
+                        <el-tag size="small" v-if="isWorkFlow(item.type)" class="warning-tag">
+                          {{ $t('views.application.senior') }}
+                        </el-tag>
+                        <el-tag size="small" class="blue-tag" v-else>
+                          {{ $t('views.application.simple') }}
+                        </el-tag>
+                      </div>
+                    </template>
+
+                    <template #footer>
+                      <div v-if="item.is_publish" class="flex align-center">
+                        <el-icon class="color-success mr-8" style="font-size: 16px">
+                          <SuccessFilled />
+                        </el-icon>
+                        <span class="color-secondary">
+                          {{ $t('common.status.published') }}
+                        </span>
+                        <el-divider direction="vertical" />
+                        <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
+
+                        <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
+                      </div>
+                      <div v-else class="flex align-center">
+                        <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                        <span class="color-secondary">
+                          {{ $t('common.status.unpublished') }}
+                        </span>
+                      </div>
+                    </template>
+                    <template #mouseEnter>
+                      <div @click.stop @mousedown.stop>
+                        <el-tooltip
+                          effect="dark"
+                          :content="$t('views.application.operation.toChat')"
+                          placement="top"
+                        >
+                          <el-button text @click.stop="toChat(item)">
+                            <AppIcon iconName="app-create-chat" class="color-secondary"></AppIcon>
+                          </el-button>
+                        </el-tooltip>
+                        <el-divider direction="vertical" />
+                        <el-dropdown trigger="click">
+                          <el-button text @click.stop>
+                            <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
+                          </el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item
+                                @mousedown.stop="settingApplication($event, item)"
+                                v-if="permissionPrecise.edit(item.id)"
+                                @click.stop
+                              >
+                                <AppIcon iconName="app-setting" class="color-secondary"></AppIcon>
+                                {{ $t('common.setting') }}
+                              </el-dropdown-item>
+
+                              <el-dropdown-item
+                                @click.stop="openAuthorization(item)"
+                                v-if="permissionPrecise.auth(item.id)"
+                              >
+                                <AppIcon
+                                  iconName="app-resource-authorization"
+                                  class="color-secondary"
+                                ></AppIcon>
+                                {{ $t('views.system.resourceAuthorization.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="openResourceMappingDrawer(item)"
+                                v-if="permissionPrecise.relate_map(item.id)"
+                              >
+                                <AppIcon
+                                  iconName="app-resource-mapping"
+                                  class="color-secondary"
+                                ></AppIcon>
+                                {{ $t('views.system.resourceMapping.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="openTriggerDrawer(item)"
+                                :disabled="!item.is_publish"
+                                v-if="
+                                  apiType === 'workspace' && permissionPrecise.trigger_read(item.id)
+                                "
+                              >
+                                <AppIcon iconName="app-trigger" class="color-secondary"></AppIcon>
+                                {{ $t('views.trigger.title') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click.stop="openMoveToDialog(item)"
+                                v-if="permissionPrecise.edit(item.id) && apiType === 'workspace'"
+                              >
+                                <AppIcon iconName="app-migrate" class="color-secondary"></AppIcon>
+                                {{ $t('common.moveTo') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                @click="copyApplication(item)"
+                                v-if="permissionPrecise.copy(item.id)"
+                              >
+                                <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                                {{ $t('common.copy') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                divided
+                                @click.stop="exportApplication(item)"
+                                v-if="permissionPrecise.export(item.id)"
+                              >
+                                <AppIcon iconName="app-export" class="color-secondary"></AppIcon>
+                                {{ $t('common.export') }}
+                              </el-dropdown-item>
+                              <el-dropdown-item
+                                divided
+                                @click.stop="deleteApplication(item)"
+                                v-if="permissionPrecise.delete(item.id)"
+                              >
+                                <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                                {{ $t('common.delete') }}
+                              </el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </template>
+                  </CardBox>
+                </el-col>
+              </template>
+            </el-row>
+            <el-empty :description="$t('common.noData')" v-else />
+          </el-checkbox-group>
+        </InfiniteScroll>
+      </div>
+      <!-- 批量操作拦 -->
+      <div class="mul-operation border-t w-full flex align-center" v-if="isBatch">
+        <el-checkbox
+          v-model="checkAll"
+          :indeterminate="isIndeterminate"
+          @change="handleCheckAllChange"
+        >
+          {{ $t('common.allCheck') }}
+        </el-checkbox>
+        <el-button
+          class="ml-16"
+          :disabled="multipleSelection.length === 0"
+          @click="openMoveToDialog()"
+          v-if="permissionPrecise.batchMove()"
+        >
+          {{ $t('common.moveTo') }}
+        </el-button>
+
+        <el-button
+          :disabled="multipleSelection.length === 0"
+          @click="openBatchClearStrategyDialog"
+          v-if="permissionPrecise.batchCleanStrategy()"
+        >
+          {{ $t('views.chatLog.buttons.clearStrategy') }}
+        </el-button>
+
+        <el-button
+          :disabled="multipleSelection.length === 0"
+          @click="deleteMulApplication"
+          v-if="permissionPrecise.batchDelete()"
+        >
+          {{ $t('common.delete') }}
+        </el-button>
+        <span class="color-secondary ml-24 mr-16">
+          {{ $t('common.selected') }} {{ multipleSelection.length }} / {{ paginationConfig.total }}
+          {{ $t('views.document.items') }}
+        </span>
+        <el-button link type="primary" @click="batchSelectedHandle(false)">
+          {{ $t('views.paragraph.setting.cancelSelected') }}
+        </el-button>
+      </div>
+    </ContentContainer>
+    <ResourceMappingDrawer ref="resourceMappingDrawerRef" />
+    <CreateApplicationDialog ref="CreateApplicationDialogRef" />
+    <CopyApplicationDialog ref="CopyApplicationDialogRef" />
+    <BatchClearStrategyDialog ref="BatchClearStrategyDialogRef" @refresh="refreshApplicationList()" />
+    <CreateFolderDialog ref="CreateFolderDialogRef" @refresh="refreshFolder" />
+    <MoveToDialog
+      ref="MoveToDialogRef"
+      :source="SourceTypeEnum.APPLICATION"
+      @refresh="refreshApplicationList"
+      v-if="apiType === 'workspace'"
+    />
+    <ResourceAuthorizationDrawer
+      :type="SourceTypeEnum.APPLICATION"
+      ref="ResourceAuthorizationDrawerRef"
+    />
+    <TemplateStoreDialog ref="templateStoreDialogRef" :api-type="apiType" @refresh="getList" />
+    <ResourceTriggerDrawer
+      ref="resourceTriggerDrawerRef"
+      :source="SourceTypeEnum.APPLICATION"
+    ></ResourceTriggerDrawer>
+  </LayoutContainer>
+</template>
+
+<script lang="ts" setup>
+import { onMounted, ref, reactive, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import type { CheckboxValueType } from 'element-plus'
+import CreateApplicationDialog from '@/views/application/component/CreateApplicationDialog.vue'
+import CreateFolderDialog from '@/components/folder-virtualized-tree/CreateFolderDialog.vue'
+import CopyApplicationDialog from '@/views/application/component/CopyApplicationDialog.vue'
+import BatchClearStrategyDialog from '@/views/application/component/BatchClearStrategyDialog.vue'
+import MoveToDialog from '@/components/folder-virtualized-tree/MoveToDialog.vue'
+import ResourceAuthorizationDrawer from '@/components/resource-authorization-drawer/index.vue'
+import ResourceTriggerDrawer from '@/views/trigger/ResourceTriggerDrawer.vue'
+import TemplateStoreDialog from '@/views/application/template-store/TemplateStoreDialog.vue'
+import ApplicationApi from '@/api/application/application'
+import WorkspaceApi from '@/api/workspace/workspace'
+import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { i18n_name, resetUrl } from '@/utils/common'
+import { isWorkFlow } from '@/utils/application'
+import { dateFormat } from '@/utils/time'
+import { SourceTypeEnum } from '@/enums/common'
+import permissionMap from '@/permission'
+import { hasPermission } from '@/utils/permission'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+import ResourceMappingDrawer from '@/components/resource_mapping/index.vue'
+import useStore from '@/stores'
+import { t } from '@/locales'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api.ts'
+
+const router = useRouter()
+
+const apiType = computed<'workspace'>(() => {
+  return 'workspace'
+})
+const permissionPrecise = computed(() => {
+  return permissionMap['application'][apiType.value]
+})
+
+const { folder, application, user } = useStore()
+
+const loading = ref(false)
+
+const search_type = ref('name')
+const search_form = ref<any>({
+  name: '',
+  create_user: '',
+  publish_status: undefined,
+})
+
+const user_options = ref<any[]>([])
+
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 30,
+  total: 0,
+})
+
+const folderList = ref<any[]>([])
+const applicationList = ref<any[]>([])
+const CopyApplicationDialogRef = ref()
+const BatchClearStrategyDialogRef = ref<InstanceType<typeof BatchClearStrategyDialog>>()
+
+// 批量操作
+const isBatch = ref(false)
+const multipleSelection = ref<any[]>([])
+const checkAll = ref(false)
+const isIndeterminate = computed(() => {
+  return (
+    multipleSelection.value.length > 0 &&
+    multipleSelection.value.length < applicationList.value.length
+  )
+})
+
+function batchSelectedHandle(bool: boolean) {
+  isBatch.value = bool
+  multipleSelection.value = []
+  checkAll.value = false
+}
+
+const handleCheckAllChange = (val: CheckboxValueType) => {
+  let bool
+  if (isIndeterminate.value) {
+    bool = true
+  } else {
+    bool = val as boolean
+  }
+  multipleSelection.value = bool ? applicationList.value.map((v) => v.id) : []
+  checkAll.value = bool as boolean
+}
+const handleCheckedChatChange = (value: CheckboxValueType[]) => {
+  const checkedCount = value.length
+  checkAll.value = checkedCount === applicationList.value.length
+}
+
+const checkboxChange = (data?: any) => {
+  const index = multipleSelection.value.indexOf(data?.id)
+  if (index === -1) {
+    multipleSelection.value.push(data?.id)
+  } else {
+    multipleSelection.value.splice(index, 1)
+  }
+  checkAll.value = multipleSelection.value.length === applicationList.value.length
+}
+
+function deleteMulApplication() {
+  MsgConfirm(
+    `${t('views.document.delete.confirmTitle1')} ${multipleSelection.value.length} ${t('views.application.delete.confirmTitle2')}`,
+    t('views.paragraph.delete.confirmMessage'),
+    {
+      confirmButtonText: t('common.confirm'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ApplicationApi.delMulApplication(multipleSelection.value, loading).then(() => {
+        batchSelectedHandle(false)
+        paginationConfig.current_page = 1
+        applicationList.value = []
+        getList()
+        MsgSuccess(t('views.document.delete.successMessage'))
+      })
+    })
+    .catch(() => {})
+}
+
+function openBatchClearStrategyDialog() {
+  BatchClearStrategyDialogRef.value?.open([...multipleSelection.value])
+}
+
+const resourceTriggerDrawerRef = ref<InstanceType<typeof ResourceTriggerDrawer>>()
+const openTriggerDrawer = (data: any) => {
+  resourceTriggerDrawerRef.value?.open(data)
+}
+
+const resourceMappingDrawerRef = ref<InstanceType<typeof ResourceMappingDrawer>>()
+const openResourceMappingDrawer = (data: any) => {
+  resourceMappingDrawerRef.value?.open('APPLICATION', data)
+}
+
+const ResourceAuthorizationDrawerRef = ref()
+
+function openAuthorization(item: any) {
+  ResourceAuthorizationDrawerRef.value.open(item.id)
+}
+
+const MoveToDialogRef = ref()
+
+function openMoveToDialog(data?: any) {
+  let obj
+  if (isBatch.value) {
+    obj = {
+      id_list: multipleSelection.value,
+    }
+  } else {
+    // 仅2个参数就行
+    obj = {
+      id: data.id,
+      folder_id: data.folder,
+    }
+  }
+
+  MoveToDialogRef.value?.open(obj)
+}
+
+function refreshApplicationList(row?: any) {
+  if (row) {
+    // 不是根目录才会移除
+    if (folder.currentFolder?.parent_id) {
+      const index = applicationList.value.findIndex((v) => v.id === row.id)
+      applicationList.value.splice(index, 1)
+    }
+  } else {
+    batchSelectedHandle(false)
+    paginationConfig.current_page = 1
+    applicationList.value = []
+    getList()
+  }
+}
+
+const goApp = (event: any, item: any) => {
+  if (isBatch.value) {
+    const index = multipleSelection.value.indexOf(item?.id)
+    if (index === -1) {
+      multipleSelection.value.push(item?.id)
+    } else {
+      multipleSelection.value.splice(index, 1)
+    }
+    checkAll.value = multipleSelection.value.length === applicationList.value.length
+    return
+  }
+
+  if (event?.ctrlKey) {
+    event?.preventDefault()
+    event.stopPropagation()
+    const newUrl = router.resolve({
+      path: get_route(item),
+    }).href
+    window.open(newUrl)
+  } else {
+    router.push({ path: get_route(item) })
+  }
+}
+
+const get_route = (item: any) => {
+  if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_OVERVIEW_READ.getApplicationWorkspaceResourcePermission(
+          item.id,
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/workspace/${item.id}/${item.type}/overview`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_EDIT.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_EDIT.getApplicationWorkspaceResourcePermission(item.id),
+      ],
+      'OR',
+    )
+  ) {
+    if (item.type == 'WORK_FLOW') {
+      return `/application/workspace/${item.id}/workflow`
+    } else {
+      return `/application/workspace/${item.id}/${item.type}/setting`
+    }
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_ACCESS_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [
+            PermissionConst.APPLICATION_ACCESS_READ.getApplicationWorkspaceResourcePermission(
+              item.id,
+            ),
+          ],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/workspace/${item.id}/${item.type}/access`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'AND',
+        ),
+        new ComplexPermission(
+          [RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+          [PermissionConst.APPLICATION_CHAT_USER_READ.getWorkspacePermissionWorkspaceManageRole],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+        new ComplexPermission(
+          [],
+          [
+            PermissionConst.APPLICATION_CHAT_USER_READ.getApplicationWorkspaceResourcePermission(
+              item.id,
+            ),
+          ],
+          [EditionConst.IS_EE, EditionConst.IS_PE],
+          'OR',
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application/workspace/${item.id}/${item.type}/chat-user`
+  } else if (
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(item.id)],
+          [],
+          'AND',
+        ),
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_CHAT_LOG_READ.getApplicationWorkspaceResourcePermission(
+          item.id,
+        ),
+      ],
+      'OR',
+    )
+  ) {
+    return `/application//workspace${item.id}/${item.type}/chat-log`
+  } else return `/application/`
+}
+
+const CreateApplicationDialogRef = ref()
+
+function openCreateDialog(type?: string) {
+  CreateApplicationDialogRef.value.open(folder.currentFolder?.id || 'default', type)
+}
+
+const search_type_change = () => {
+  search_form.value = { name: '', create_user: '' }
+}
+
+function toChat(row: any) {
+  const api =
+    row.type == 'WORK_FLOW'
+      ? (id: string) => ApplicationApi.getApplicationDetail(id)
+      : (id: string) => Promise.resolve({ data: row })
+  api(row.id).then((ok) => {
+    let aips = ok.data?.work_flow?.nodes
+      ?.filter((v: any) => v.id === 'base-node')
+      .map((v: any) => {
+        return v.properties.api_input_field_list
+          ? v.properties.api_input_field_list.map((v: any) => {
+              return {
+                name: v.variable,
+                value: v.default_value,
+              }
+            })
+          : v.properties.input_field_list
+            ? v.properties.input_field_list
+                .filter((v: any) => v.assignment_method === 'api_input')
+                .map((v: any) => {
+                  return {
+                    name: v.variable,
+                    value: v.default_value,
+                  }
+                })
+            : []
+      })
+      .reduce((x: Array<any>, y: Array<any>) => [...x, ...y])
+    aips = aips ? aips : []
+    const apiParams = mapToUrlParams(aips) ? '?' + mapToUrlParams(aips) : ''
+    ApplicationApi.getAccessToken(row.id, loading).then((res: any) => {
+      const newUrl = application.location + res?.data?.access_token + apiParams
+      window.open(newUrl)
+    })
+  })
+}
+
+function mapToUrlParams(map: any[]) {
+  const params = new URLSearchParams()
+
+  map.forEach((item: any) => {
+    params.append(encodeURIComponent(item.name), encodeURIComponent(item.value))
+  })
+
+  return params.toString() // 返回 URL 查询字符串
+}
+
+function copyApplication(row: any) {
+  ApplicationApi.getApplicationDetail(row.id, loading).then((res: any) => {
+    if (res?.data) {
+      CopyApplicationDialogRef.value.open(
+        { ...res.data, model_id: res.data.model },
+        folder.currentFolder?.id || 'default',
+      )
+    }
+  })
+}
+
+function settingApplication(event: any, row: any) {
+  if (isWorkFlow(row.type)) {
+    if (event?.ctrlKey) {
+      event?.preventDefault()
+      event.stopPropagation()
+      const newUrl = router.resolve({
+        path: `/application/workspace/${row.id}/workflow`,
+      }).href
+      window.open(newUrl)
+    } else {
+      router.push({ path: `/application/workspace/${row.id}/workflow` })
+    }
+  } else {
+    router.push({ path: `/application/workspace/${row.id}/${row.type}/setting` })
+  }
+}
+
+function deleteApplication(row: any) {
+  MsgConfirm(
+    `${t('views.application.delete.confirmTitle')}${row.name} ?`,
+    row.resource_count > 0
+      ? t('views.application.delete.resourceCountMessage', row.resource_count)
+      : '',
+    {
+      confirmButtonText: t('common.confirm'),
+      cancelButtonText: t('common.cancel'),
+      confirmButtonClass: 'danger',
+    },
+  )
+    .then(() => {
+      ApplicationApi.delApplication(row.id, loading).then(() => {
+        const index = applicationList.value.findIndex((v) => v.id === row.id)
+        applicationList.value.splice(index, 1)
+        MsgSuccess(t('common.deleteSuccess'))
+      })
+    })
+    .catch(() => {})
+}
+
+const exportApplication = (application: any) => {
+  ApplicationApi.exportApplication(application.id, application.name, loading).catch((e) => {
+    if (e.response.status !== 403) {
+      e.response.data.text().then((res: string) => {
+        MsgError(`${t('views.application.tip.ExportError')}:${JSON.parse(res).message}`)
+      })
+    }
+  })
+}
+
+const elUploadRef = ref()
+const importApplication = (file: any) => {
+  const formData = new FormData()
+  formData.append('file', file.raw, file.name)
+  elUploadRef.value.clearFiles()
+  ApplicationApi.importApplication(folder.currentFolder.id, formData, loading)
+    .then(async (res: any) => {
+      if (res?.data) {
+        applicationList.value = []
+        user.profile()
+      }
+    })
+    .then(() => {
+      getList()
+    })
+    .catch((e) => {
+      if (e.code === 400) {
+        MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
+          cancelButtonText: t('common.confirm'),
+          confirmButtonText: t('common.professional'),
+        }).then(() => {
+          window.open('https://maxkb.cn/pricing.html', '_blank')
+        })
+      }
+    })
+}
+
+// 文件夹相关
+const CreateFolderDialogRef = ref()
+
+function openCreateFolder() {
+  CreateFolderDialogRef.value.open(SourceTypeEnum.APPLICATION, folder.currentFolder.id)
+}
+
+function getFolder(bool?: boolean) {
+  const params = {}
+  folder
+    .asyncGetFolder(SourceTypeEnum.APPLICATION, params, apiType.value, loading)
+    .then((res: any) => {
+      folderList.value = res.data
+
+      if (bool) {
+        // 初始化刷新
+        folder.setCurrentFolder(res.data?.[0] || {})
+      }
+      getList()
+    })
+}
+
+function folderClickHandle(row: any) {
+  if (row.id === folder.currentFolder?.id) {
+    return
+  }
+  batchSelectedHandle(false)
+  folder.setCurrentFolder(row)
+  paginationConfig.current_page = 1
+  applicationList.value = []
+  getList()
+}
+
+function refreshFolder() {
+  paginationConfig.current_page = 1
+  applicationList.value = []
+  getFolder()
+}
+
+function searchHandle() {
+  paginationConfig.current_page = 1
+  applicationList.value = []
+  getList()
+}
+
+const templateStoreDialogRef = ref()
+
+function openTemplateStoreDialog() {
+  templateStoreDialogRef.value?.open(folder.currentFolder.id)
+}
+
+function getList() {
+  const params: any = {
+    folder_id: folder.currentFolder?.id || 'default',
+  }
+  if (search_form.value[search_type.value]) {
+    params[search_type.value] = search_form.value[search_type.value]
+  }
+  ApplicationApi.getApplication(paginationConfig, params, loading).then((res) => {
+    paginationConfig.total = res.data.total
+    applicationList.value = [...applicationList.value, ...res.data.records]
+  })
+}
+
+function getUserList(query: string) {
+  WorkspaceApi.getAllMemberList(
+    user.getWorkspaceId(),
+    query ? { nick_name: query } : '',
+    loading,
+  ).then((res) => {
+    user_options.value = res.data
+  })
+}
+
+onMounted(() => {
+  getFolder(folder.currentFolder?.id ? false : true)
+})
+</script>
+
+<style lang="scss" scoped></style>

@@ -1,0 +1,83 @@
+export default {
+  title: 'Overview',
+  appInfo: {
+    publicAccessLink: 'Public URL',
+    openText: 'On',
+    closeText: 'Off',
+    demo: 'Preview',
+    embedInWebsite: 'Get Embed Code',
+    accessControl: 'Access Control',
+    displaySetting: 'Display Settings',
+    apiAccessCredentials: 'API Access Credentials',
+    apiKey: 'API Key',
+    refreshToken: {
+      msgConfirm1: 'Are you sure you want to regenerate the public URL?',
+      msgConfirm2:
+        'Regenerating the Public URL will affect any existing embedded codes on third-party sites. You will need to update the embed code and re-integrate it into those sites. Proceed with caution!',
+      refreshSuccess: 'Successfully Refreshed',
+    },
+    APIKeyDialog: {
+      saveSettings: 'Save Settings',
+      msgConfirm1: 'Are you sure you want to delete the API Key',
+      msgConfirm2:
+        'This action is irreversible. Once deleted, the API Key cannot be recovered. Do you still want to proceed?',
+    },
+    EmbedDialog: {
+      fullscreenModeTitle: 'Fullscreen Mode',
+      copyInstructions: 'Copy the code below to embed',
+      floatingModeTitle: 'Floating Mode',
+      mobileModeTitle: 'Mobile Mode',
+    },
+    LimitDialog: {
+      clientQueryLimitLabel: 'Query Limit per Client',
+      authentication: 'Authentication',
+      authenticationValue: 'Password Access',
+      timesDays: 'queries per day',
+      whitelistLabel: 'Allowed Domains',
+      whitelistPlaceholder:
+        'Enter allowed third-party domains, one per line. For example:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+      loginMethod: 'Login Method',
+      loginMethodRequired: 'Please select login method',
+      toSettingChatUser: 'Go to configure chat user',
+      displayCodeRequired: 'Please enter the number of failed attempts',
+      authenticationTooltip:
+        'Enabling login authentication requires chat users to have authorization configured for both the agent and its associated knowledge bases. Without proper authorization, users will not be able to log in or access knowledge base retrieval features.',
+    },
+    SettingAPIKeyDialog: {
+      allowCrossDomainLabel: 'Allow Cross-Domain Access',
+      crossDomainPlaceholder:
+        'Enter allowed cross-domain addresses. If enabled but left blank, no restrictions will apply.\nEnter one per line, e.g.:\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+    },
+  },
+  SettingDisplayDialog: {
+    showSourceLabel: 'Show Knowledge Source',
+    showExecutionDetail: 'Show Execution Details',
+    restoreDefault: 'Restore Default',
+    customThemeColor: 'Custom Theme Color',
+    headerTitleFontColor: 'Header Title Font Color',
+    default: 'Default',
+    askUserAvatar: 'User Avatar (Asking)',
+    replace: 'Replace',
+
+    imageMessage:
+      'Recommended size: 32×32 pixels. Supports JPG, PNG, and GIF formats. Max size: 10 MB',
+    AIAvatar: 'AI Avatar',
+    display: 'Display',
+    floatIcon: 'Floating Icon',
+    iconDefaultPosition: 'Default Icon Position',
+    iconPosition: {
+      left: 'Left',
+      right: 'Right',
+      bottom: 'Bottom',
+      top: 'Top',
+    },
+    draggablePosition: 'Draggable Position',
+    showHistory: 'Show Chat History',
+    displayGuide: 'Show Guide Image (Floating Mode)',
+    share: 'Allow sharing of chat records',
+    disclaimer: 'Disclaimer',
+    disclaimerValue: 'This content is AI-generated and for reference only.',
+    chatBackground: 'Chat Background',
+    chatBackgroundMessage: 'Supported formats: JPG, PNG, GIF. Max size: 10MB.',
+  },
+}

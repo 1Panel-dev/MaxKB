@@ -1,0 +1,61 @@
+export default {
+  title: 'Login',
+  loginForm: {
+    username: {
+      label: 'Username',
+      placeholder: 'Please enter username',
+      requiredMessage: 'Please enter username',
+      lengthMessage: 'Length must be between 4 and 20 words',
+    },
+    password: {
+      label: 'Login Password',
+      placeholder: 'Please enter password',
+      requiredMessage: 'Please enter password',
+      lengthMessage: 'Length must be between 6 and 20 words',
+    },
+    captcha: {
+      label: 'Verification Code',
+      placeholder: 'Please enter verification code',
+      requiredMessage: 'Please enter verification code',
+      validatorMessage: 'Verification code is incorrect',
+    },
+    new_password: {
+      label: 'New Password',
+      placeholder: 'Please enter new password',
+      requiredMessage: 'Please enter new password',
+    },
+    re_password: {
+      label: 'Confirm Password',
+      placeholder: 'Please enter confirm password',
+      requiredMessage: 'Please enter confirm password',
+      validatorMessage: 'Password does not match',
+    },
+    email: {
+      label: 'Email',
+      placeholder: 'Please enter email',
+      requiredMessage: 'Please enter email',
+      validatorEmail: 'Please enter a valid email format!',
+    },
+  },
+  jump_tip: 'You will be redirected to the authentication source page for authentication',
+  jump: 'Redirect',
+  resetPassword: 'Change Password',
+  forgotPassword: 'Forgot Password',
+  userRegister: 'User Registration',
+  buttons: {
+    login: 'Login',
+    register: 'Register',
+    backLogin: 'Back to Login',
+    checkCode: 'Verify Now',
+  },
+  newPassword: 'New Password',
+  enterPassword: 'Please enter your new password',
+  useEmail: 'Use Email',
+  moreMethod: 'More Login Methods',
+  verificationCode: {
+    placeholder: 'Please enter the verification code',
+    getVerificationCode: 'Get Verification Code',
+    successMessage: 'If the email address is already registered, we will send an email. Please check your inbox',
+    resend: 'Resend',
+  },
+}

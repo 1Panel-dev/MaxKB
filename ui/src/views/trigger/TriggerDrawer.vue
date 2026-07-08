@@ -1,0 +1,899 @@
+<template>
+  <el-drawer
+    v-model="drawer"
+    :title="is_edit ? $t('views.trigger.editTrigger') : $t('views.trigger.createTrigger')"
+    size="600"
+    append-to-body
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+    :destroy-on-close="true"
+    :before-close="close"
+  >
+    <el-form
+      :model="form"
+      label-width="auto"
+      ref="triggerFormRef"
+      label-position="top"
+      require-asterisk-position="right"
+      class="mb-24"
+    >
+      <el-form-item
+        :label="$t('views.trigger.from.triggerName.label')"
+        prop="name"
+        :rules="{
+          message: $t('views.trigger.from.triggerName.requiredMessage'),
+          trigger: 'blur',
+          required: true,
+        }"
+      >
+        <el-input
+          v-model="form.name"
+          maxlength="64"
+          :placeholder="$t('views.trigger.from.triggerName.placeholder')"
+          show-word-limit
+          @blur="form.name = form.name?.trim()"
+        />
+      </el-form-item>
+      <el-form-item :label="$t('common.desc')" prop="desc">
+        <el-input
+          v-model="form.desc"
+          type="textarea"
+          :placeholder="$t('common.inputPlaceholder')"
+          :rows="3"
+          maxlength="256"
+          show-word-limit
+        />
+      </el-form-item>
+      <el-form-item
+        :label="$t('common.type')"
+        prop="trigger_type"
+        :rules="{
+          message: $t('common.selectPlaceholder'),
+          trigger: 'blur',
+          required: true,
+        }"
+      >
+        <el-card
+          shadow="never"
+          class="mb-16 w-full cursor"
+          :class="form.trigger_type === 'SCHEDULED' ? 'border-active' : ''"
+          @click="changeTriggerType('SCHEDULED')"
+        >
+          <div class="flex align-center line-height-22">
+            <el-avatar shape="square" :size="32">
+              <img src="@/assets/trigger/icon_scheduled.svg" style="width: 58%" alt="" />
+            </el-avatar>
+            <div class="ml-12">
+              <h5>{{ $t('views.trigger.type.scheduled') }}</h5>
+              <el-text type="info" class="color-secondary font-small">{{
+                $t('views.trigger.type.scheduledDesc')
+              }}</el-text>
+            </div>
+          </div>
+
+          <el-card
+            v-if="form.trigger_type === 'SCHEDULED'"
+            shadow="never"
+            class="card-never mt-16 w-full"
+          >
+            <div class="flex-between">
+              <p style="margin-top: -8px">
+                {{
+                  form.trigger_setting.schedule_type === 'cron'
+                    ? $t('views.trigger.triggerCycle.cronExpression')
+                    : $t('views.trigger.triggerCycle.title')
+                }}
+              </p>
+              <el-tooltip
+                :content="
+                  form.trigger_setting.schedule_type === 'cron'
+                    ? $t('views.trigger.triggerCycle.switchCycle')
+                    : $t('views.trigger.triggerCycle.switchCron')
+                "
+                placement="top"
+                effect="light"
+              >
+                <el-button text @click.stop="switchScheduleType">
+                  <el-icon><Switch /></el-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
+
+            <el-cascader
+              v-if="form.trigger_setting.schedule_type !== 'cron'"
+              v-model="scheduled"
+              :options="triggerCycleOptions"
+              @change="handleChangeScheduled"
+              style="width: 100%"
+            />
+            <el-input
+              v-else
+              v-model="form.trigger_setting.cron_expression"
+              :placeholder="t('views.trigger.triggerCycle.placeholder')"
+              clearable
+              @blur="validateCron"
+              @input="validateCron"
+            />
+            <div v-if="cronError" class="el-form-item__error">{{ cronError }}</div>
+          </el-card>
+        </el-card>
+        <el-card
+          shadow="never"
+          class="w-full cursor"
+          :class="form.trigger_type === 'EVENT' ? 'border-active' : ''"
+          @click="changeTriggerType('EVENT')"
+        >
+          <div class="flex align-center line-height-22">
+            <el-avatar shape="square" class="avatar-orange" :size="32">
+              <img src="@/assets/trigger/icon_event.svg" style="width: 58%" alt="" />
+            </el-avatar>
+            <div class="ml-12">
+              <h5>{{ $t('views.trigger.type.event') }}</h5>
+              <el-text type="info" class="color-secondary font-small">{{
+                $t('views.trigger.type.eventDesc')
+              }}</el-text>
+            </div>
+          </div>
+          <el-card v-if="form.trigger_type === 'EVENT'" shadow="never" class="card-never mt-16">
+            <el-form-item :label="$t('views.trigger.from.event_url.label')">
+              <div
+                class="complex-input flex-between align-center w-full"
+                style="background-color: #ffffff"
+              >
+                <el-input
+                  class="complex-input__left"
+                  v-bind:modelValue="event_url"
+                  readonly
+                ></el-input>
+
+                <el-tooltip :content="$t('common.copy')" placement="top">
+                  <el-button text @click="copyClick(event_url)" class="mr-4">
+                    <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                  </el-button>
+                </el-tooltip>
+              </div>
+            </el-form-item>
+            <el-form-item label="Bearer Token">
+              <div class="complex-input flex-between w-full" style="background-color: #ffffff">
+                <el-input
+                  class="complex-input__left"
+                  :placeholder="$t('common.inputPlaceholder')"
+                  v-model="form.trigger_setting.token"
+                  readonly
+                  style="width: 80%"
+                >
+                </el-input>
+                <div>
+                  <el-tooltip :content="$t('common.copy')" placement="top">
+                    <el-button text @click="copyClick(form.trigger_setting.token)">
+                      <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                  <el-tooltip :content="$t('common.refresh')" placement="top">
+                    <el-button @click="refreshToken" text style="margin: 0 4px 0 0 !important">
+                      <AppIcon iconName="app-refresh" class="color-secondary"></AppIcon>
+                    </el-button>
+                  </el-tooltip>
+                </div>
+              </div>
+            </el-form-item>
+            <el-form-item>
+              <template #label>
+                <div class="flex-between">
+                  {{ $t('views.trigger.requestParameter') }}
+                  <el-button link type="primary" @click.stop="addParameter()">
+                    <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                  </el-button>
+                </div>
+              </template>
+              <el-card
+                class="w-full border-none"
+                shadow="never"
+                style="--el-card-padding: 8px 16px 16px"
+              >
+                <el-row style="width: 100%" :gutter="10">
+                  <el-col :span="7">
+                    {{ $t('views.tool.form.paramName.label') }}
+                  </el-col>
+                  <el-col :span="7">
+                    {{ $t('common.type') }}
+                  </el-col>
+                  <el-col :span="7">
+                    {{ $t('common.desc') }}
+                  </el-col>
+                  <el-col :span="3">
+                    {{ $t('common.required') }}
+                  </el-col>
+                </el-row>
+                <el-row
+                  style="width: 99%"
+                  v-for="(option, $index) in form.trigger_setting.body"
+                  :key="$index"
+                  :gutter="8"
+                >
+                  <el-col :span="7" class="mb-8">
+                    <el-input
+                      v-model="form.trigger_setting.body[$index].field"
+                      :placeholder="$t('common.inputPlaceholder')"
+                    />
+                  </el-col>
+                  <el-col :span="7">
+                    <el-select
+                      v-model="form.trigger_setting.body[$index].type"
+                      :placeholder="$t('common.selectPlaceholder')"
+                    >
+                      <el-option label="string" value="string" />
+                      <el-option label="int" value="int" />
+                      <el-option label="dict" value="dict" />
+                      <el-option label="array" value="array" />
+                      <el-option label="float" value="float" />
+                      <el-option label="boolean" value="boolean" />
+                    </el-select>
+                  </el-col>
+                  <el-col :span="7">
+                    <el-input
+                      v-model="form.trigger_setting.body[$index].desc"
+                      :placeholder="$t('common.inputPlaceholder')"
+                    />
+                  </el-col>
+                  <el-col :span="2">
+                    <el-switch v-model="form.trigger_setting.body[$index].required" size="small" />
+                  </el-col>
+                  <el-col :span="1">
+                    <el-button text class="ml-8" @click.stop="delParameter($index)">
+                      <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                    </el-button>
+                  </el-col>
+                </el-row>
+              </el-card>
+            </el-form-item>
+          </el-card>
+        </el-card>
+      </el-form-item>
+      <el-form-item
+        :label="$t('views.trigger.taskExecution')"
+        prop="trigger_task"
+        :rules="{
+          type: 'array',
+          message: $t('common.selectPlaceholder'),
+          trigger: 'change',
+          required: true,
+        }"
+      >
+        <template v-if="['APPLICATION', 'TOOL'].includes(resourceType)">
+          <!-- 资源端智能体 -->
+          <div class="w-full" v-if="resourceType === 'APPLICATION'">
+            <template v-for="(item, index) in applicationTask" :key="index">
+              <div class="border border-r-6 white-bg mb-8" style="padding: 2px 8px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="applicationDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="resetUrl(applicationDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <AppIcon v-else class="mr-8" :size="20" />
+
+                    <div class="ellipsis-1" :title="applicationDetailsDict[item.source_id]?.name">
+                      {{ applicationDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'agent' + index ? '' : 'agent' + index"
+                      >
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'agent' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
+                  </div>
+                </div>
+                <ApplicationParameter
+                  class="mt-8 mb-8"
+                  ref="applicationParameterRef"
+                  v-if="showTast === 'agent' + index && applicationDetailsDict[item.source_id]"
+                  :application="applicationDetailsDict[item.source_id]"
+                  :trigger="form"
+                  v-model="item.parameter"
+                ></ApplicationParameter>
+              </div>
+            </template>
+          </div>
+          <!-- 资源端工具 -->
+          <div class="w-full" v-if="resourceType === 'TOOL'">
+            <template v-for="(item, index) in toolTask" :key="index">
+              <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px 5px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="toolDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="resetUrl(toolDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <ToolIcon v-else class="mr-8" :size="20" />
+
+                    <div class="ellipsis-1" :title="toolDetailsDict[item.source_id]?.name">
+                      {{ toolDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'tool' + index ? '' : 'tool' + index"
+                      >
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'tool' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
+                  </div>
+                </div>
+                <ToolParameter
+                  class="mt-8 mb-8"
+                  ref="toolParameterRef"
+                  v-if="showTast === 'tool' + index && toolDetailsDict[item.source_id]"
+                  :tool="toolDetailsDict[item.source_id]"
+                  :trigger="form"
+                  v-model="item.parameter"
+                ></ToolParameter>
+              </div>
+            </template>
+          </div>
+        </template>
+        <!-- 触发器 -->
+        <el-card
+          shadow="never"
+          class="card-never w-full"
+          style="--el-card-padding: 8px 12px"
+          v-else
+        >
+          <!-- 智能体    -->
+          <div class="flex-between" @click="collapseData.agent = !collapseData.agent">
+            <div class="flex align-center lighter cursor">
+              <el-icon class="mr-8 arrow-icon" :class="collapseData.agent ? 'rotate-90' : ''">
+                <CaretRight />
+              </el-icon>
+              {{ $t('views.application.title') }}
+              <span class="ml-4" v-if="applicationTask?.length">
+                ({{ applicationTask?.length }})</span
+              >
+            </div>
+            <div class="flex">
+              <el-button type="primary" link @click.stop="openApplicationDialog()">
+                <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+              </el-button>
+            </div>
+          </div>
+          <div class="w-full" v-if="collapseData.agent">
+            <template v-for="(item, index) in applicationTask" :key="index">
+              <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="applicationDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="resetUrl(applicationDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <AppIcon v-else class="mr-8" :size="20" />
+
+                    <div class="ellipsis-1" :title="applicationDetailsDict[item.source_id]?.name">
+                      {{ applicationDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'agent' + index ? '' : 'agent' + index"
+                      >
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'agent' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
+                    <span class="mr-4">
+                      <el-button text @click="deleteTask(item)">
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </div>
+                </div>
+                <ApplicationParameter
+                  class="mt-8 mb-8"
+                  ref="applicationParameterRef"
+                  v-if="showTast === 'agent' + index && applicationDetailsDict[item.source_id]"
+                  :application="applicationDetailsDict[item.source_id]"
+                  :trigger="form"
+                  v-model="item.parameter"
+                ></ApplicationParameter>
+              </div>
+            </template>
+          </div>
+          <!-- 工具    -->
+          <div class="flex-between" @click="collapseData.tool = !collapseData.tool">
+            <div class="flex align-center lighter cursor">
+              <el-icon class="mr-8 arrow-icon" :class="collapseData.tool ? 'rotate-90' : ''">
+                <CaretRight />
+              </el-icon>
+              {{ $t('views.tool.title') }}
+              <span class="ml-4" v-if="toolTask?.length"> ({{ toolTask?.length }})</span>
+            </div>
+            <div class="flex">
+              <el-button type="primary" link @click.stop="openToolDialog()">
+                <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+              </el-button>
+            </div>
+          </div>
+          <div class="w-full" v-if="collapseData.tool">
+            <template v-for="(item, index) in toolTask" :key="index">
+              <div class="border border-r-6 white-bg mb-4" style="padding: 2px 8px 5px">
+                <div class="flex-between">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="toolDetailsDict[item.source_id]?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img :src="resetUrl(toolDetailsDict[item.source_id]?.icon)" alt="" />
+                    </el-avatar>
+                    <ToolIcon v-else class="mr-8" :size="20" />
+
+                    <div class="ellipsis-1" :title="toolDetailsDict[item.source_id]?.name">
+                      {{ toolDetailsDict[item.source_id]?.name }}
+                    </div>
+                  </div>
+                  <div style="margin-top: -2px">
+                    <span class="mr-4">
+                      <el-button
+                        text
+                        @click="showTast = showTast === 'tool' + index ? '' : 'tool' + index"
+                      >
+                        <el-icon
+                          class="arrow-icon"
+                          :class="showTast === 'tool' + index ? 'rotate-180' : ''"
+                        >
+                          <ArrowDown />
+                        </el-icon>
+                      </el-button>
+                    </span>
+                    <span class="mr-4">
+                      <el-button text @click="deleteTask(item)">
+                        <el-icon><Close /></el-icon>
+                      </el-button>
+                    </span>
+                  </div>
+                </div>
+                <ToolParameter
+                  class="mt-8 mb-8"
+                  ref="toolParameterRef"
+                  v-if="showTast === 'tool' + index && toolDetailsDict[item.source_id]"
+                  :tool="toolDetailsDict[item.source_id]"
+                  :trigger="form"
+                  v-model="item.parameter"
+                ></ToolParameter>
+              </div>
+            </template>
+          </div>
+        </el-card>
+      </el-form-item>
+    </el-form>
+    <ApplicationDialog @refresh="applicationRefresh" ref="applicationDialogRef"></ApplicationDialog>
+    <ToolDialog @refresh="toolRefresh" ref="toolDialogRef" tool_type="CUSTOM,WORKFLOW"></ToolDialog>
+    <template #footer>
+      <el-button @click="close">{{ $t('common.cancel') }}</el-button>
+      <el-button v-if="!is_edit || editPermission" type="primary" @click="submit">{{
+        is_edit ? $t('common.save') : $t('common.create')
+      }}</el-button>
+    </template>
+  </el-drawer>
+</template>
+<script setup lang="ts">
+import { v4 as uuidv4 } from 'uuid'
+import { ref, computed, onMounted, reactive } from 'vue'
+import { copyClick } from '@/utils/clipboard'
+import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
+import ToolDialog from '@/views/application/component/ToolDialog.vue'
+import triggerAPI from '@/api/trigger/trigger'
+import systemManageTriggerAPI from '@/api/system-resource-management/trigger'
+import ToolParameter from '@/views/trigger/component/ToolParameter.vue'
+import ApplicationParameter from '@/views/trigger/component/ApplicationParameter.vue'
+import { resetUrl } from '@/utils/common.ts'
+import { triggerCycleOptions } from '@/utils/trigger.ts'
+import { t } from '@/locales'
+import { type FormInstance } from 'element-plus'
+import { useRoute } from 'vue-router'
+import { cloneDeep } from 'lodash'
+import { isValidCron } from 'cron-validator'
+import Result from '@/request/Result'
+import { hasPermission } from '@/utils/permission'
+import permissionMap from '@/permission'
+import { PermissionConst, RoleConst } from '@/utils/permission/data'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+
+const emit = defineEmits(['refresh'])
+const props = withDefaults(
+  defineProps<{
+    createTrigger?: (trigger: any) => Promise<Result<any>>
+    editTrigger?: (trigger_id: string, trigger: any) => Promise<Result<any>>
+    resourceType?: string
+  }>(),
+  {
+    createTrigger: triggerAPI.postTrigger,
+    editTrigger: triggerAPI.putTrigger,
+    resourceType: '',
+  },
+)
+
+const collapseData = reactive({
+  tool: true,
+  agent: true,
+})
+const showTast = ref<string>('')
+
+const route = useRoute()
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
+const permissionPrecise = computed(() => {
+  return permissionMap[current_source_type.value?.toLocaleLowerCase() as 'application' | 'tool'][
+    apiType.value as 'workspace' | 'systemManage'
+  ]
+})
+
+const editPermission = computed(() => {
+  if (current_source_id.value && current_source_type.value) {
+    return permissionPrecise.value.trigger_edit(current_source_id.value)
+  } else {
+    return hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    )
+  }
+})
+
+const triggerFormRef = ref<FormInstance>()
+
+const getDefaultValue = () => {
+  return {
+    id: uuidv4(),
+    name: '',
+    desc: '',
+    trigger_task: [],
+    trigger_type: 'SCHEDULED',
+    trigger_setting: {
+      token: uuidv4().replace(/-/g, ''),
+      body: [],
+    },
+  }
+}
+
+const form = ref<any>(getDefaultValue())
+const is_edit = ref<boolean>(false)
+const event_url = computed(() => {
+  return `${window.origin}${window.MaxKB.prefix}/api/trigger/v1/webhook/${form.value.id}`
+})
+
+const lastPresetSetting = ref<any>(null)
+const cronError = ref('')
+
+const validateCron = () => {
+  const cron = form.value.trigger_setting.cron_expression?.trim()
+  if (!cron) {
+    cronError.value = ''
+    return
+  }
+  const fields = cron.split(/\s+/)
+  if (fields.length !== 5 || !isValidCron(cron)) {
+    cronError.value = t('views.application.longTermMemory.cronExpressionInvalid')
+  } else {
+    cronError.value = ''
+  }
+}
+
+function switchScheduleType() {
+  const currentType = form.value.trigger_setting.schedule_type || 'daily'
+  const isCron = currentType === 'cron'
+
+  if (!isCron) {
+    lastPresetSetting.value = cloneDeep({
+      schedule_type: form.value.trigger_setting.schedule_type,
+      interval_unit: form.value.trigger_setting.interval_unit,
+      interval_value: form.value.trigger_setting.interval_value,
+      days: form.value.trigger_setting.days,
+      time: form.value.trigger_setting.time,
+    })
+
+    form.value.trigger_setting.schedule_type = 'cron'
+    form.value.trigger_setting.interval_unit = undefined
+    form.value.trigger_setting.interval_value = undefined
+    form.value.trigger_setting.days = undefined
+    form.value.trigger_setting.time = undefined
+    return
+  }
+  cronError.value = ''
+  const backup = lastPresetSetting.value
+  form.value.trigger_setting.schedule_type = backup?.schedule_type || 'daily'
+  form.value.trigger_setting.interval_unit = backup?.interval_unit
+  form.value.trigger_setting.interval_value = backup?.interval_value
+  form.value.trigger_setting.days = backup?.days
+  form.value.trigger_setting.time = backup?.time
+}
+
+const addParameter = () => {
+  form.value.trigger_setting.body.push({ field: '', type: '' })
+}
+const delParameter = (index: number | string) => {
+  form.value.trigger_setting.body.splice(index, 1)
+}
+const handleChangeScheduled = (v: Array<any>) => {
+  scheduled.value = v
+}
+
+const changeTriggerType = (type: string) => {
+  form.value.trigger_type = type
+}
+const applicationDetailsDict = ref<any>({})
+const toolDetailsDict = ref<any>({})
+const applicationRefresh = (application_selected: any) => {
+  const application_list: Array<any> = application_selected.application_ids
+  const existApplicationIds = Object.keys(applicationDetailsDict)
+  application_list
+    .filter((id) => !existApplicationIds.includes(id))
+    .map((id) => {
+      return loadSharedApi({ type: 'application', systemType: apiType.value })
+        .getApplicationDetail(id)
+        .then((ok: any) => {
+          applicationDetailsDict.value[ok.data.id] = ok.data
+        })
+    })
+  const task_source_id_list = form.value.trigger_task
+    .filter((task: any) => task.source_type === 'APPLICATION')
+    .map((task: any) => task.source_id)
+
+  application_list
+    .filter((id) => !task_source_id_list.includes(id))
+    .forEach((id) => {
+      form.value.trigger_task.push({
+        source_type: 'APPLICATION',
+        source_id: id,
+        is_active: false,
+        parameter: {},
+      })
+    })
+  showTast.value = 'agent0'
+}
+const applicationTask = computed(() => {
+  return form.value.trigger_task.filter((task: any) => task.source_type === 'APPLICATION')
+})
+const toolTask = computed(() => {
+  return form.value.trigger_task.filter((task: any) => task.source_type === 'TOOL')
+})
+const deleteTask = (task: any) => {
+  form.value.trigger_task = form.value.trigger_task.filter(
+    (t: any) => !(t.source_type === task.source_type && t.source_id === task.source_id),
+  )
+}
+const applicationParameterRef = ref<Array<InstanceType<typeof ApplicationParameter>>>()
+const toolParameterRef = ref<Array<InstanceType<typeof ToolParameter>>>()
+const toolRefresh = (tool_selected: any) => {
+  const tool_ids: Array<any> = tool_selected.tool_ids
+
+  const existToolIds = Object.keys(toolDetailsDict)
+  tool_ids
+    .filter((id) => !existToolIds.includes(id))
+    .map((id) => {
+      loadSharedApi({ type: 'tool', systemType: apiType.value })
+        .getToolById(id)
+        .then((ok: any) => {
+          toolDetailsDict.value[ok.data.id] = ok.data
+        })
+    })
+  const task_source_id_list = form.value.trigger_task
+    .filter((task: any) => task.source_type === 'TOOL')
+    .map((task: any) => task.source_id)
+  tool_ids
+    .filter((id) => !task_source_id_list.includes(id))
+    .forEach((id) => {
+      form.value.trigger_task.push({
+        source_type: 'TOOL',
+        source_id: id,
+        is_active: false,
+        parameter: {},
+      })
+    })
+  showTast.value = 'tool0'
+}
+
+const applicationDialogRef = ref<InstanceType<typeof ApplicationDialog>>()
+const toolDialogRef = ref<InstanceType<typeof ToolDialog>>()
+const openApplicationDialog = () => {
+  const application_id_list = form.value.trigger_task
+    .filter((task: any) => task.source_type === 'APPLICATION')
+    .map((task: any) => task.source_id)
+  applicationDialogRef.value?.open(application_id_list)
+}
+const openToolDialog = () => {
+  const tool_id_list = form.value.trigger_task
+    .filter((task: any) => task.source_type === 'TOOL')
+    .map((task: any) => task.source_id)
+  toolDialogRef.value?.open(tool_id_list)
+}
+const drawer = ref<boolean>(false)
+
+const scheduled = computed({
+  get: () => {
+    const schedule_type = form.value.trigger_setting.schedule_type
+    if (schedule_type) {
+      if (schedule_type === 'interval') {
+        const interval_value = form.value.trigger_setting.interval_value
+        const interval_unit = form.value.trigger_setting.interval_unit
+        return [schedule_type, interval_unit, interval_value].filter((item) => item !== undefined)
+      } else {
+        const days = form.value.trigger_setting.days
+          ? form.value.trigger_setting.days[0]
+          : undefined
+        const time = form.value.trigger_setting.time
+          ? form.value.trigger_setting.time[0]
+          : undefined
+        if (schedule_type == 'daily') {
+          return [schedule_type, time].filter((item) => item !== undefined)
+        }
+        return [schedule_type, days, time].filter((item) => item !== undefined)
+      }
+    }
+    return []
+  },
+  set: (value) => {
+    const schedule_type = value[0]
+    form.value.trigger_setting.schedule_type = schedule_type
+    if (schedule_type == 'interval') {
+      form.value.trigger_setting.interval_unit = value[1]
+      form.value.trigger_setting.interval_value = value[2]
+    } else {
+      if (schedule_type == 'daily') {
+        form.value.trigger_setting.time = [value[1]]
+      } else {
+        form.value.trigger_setting.days = [value[1]]
+        form.value.trigger_setting.time = [value[2]]
+      }
+    }
+  },
+})
+
+const init = (trigger_id: string) => {
+  if (current_source_id.value && current_source_type.value) {
+    let api
+    if (apiType.value === 'workspace') {
+      api = triggerAPI.getResourceTriggerDetail(
+        current_source_type.value,
+        current_source_id.value,
+        trigger_id,
+      )
+    } else {
+      api = systemManageTriggerAPI.getResourceTriggerDetail(
+        current_source_type.value,
+        current_source_id.value,
+        trigger_id,
+      )
+    }
+    api.then((ok) => {
+      form.value = { ...ok.data, trigger_task: [ok.data.trigger_task] }
+      applicationDetailsDict.value = { [ok.data.application_task.id]: ok.data.application_task }
+      toolDetailsDict.value = { [ok.data.tool_task.id]: ok.data.tool_task }
+    })
+  } else {
+    triggerAPI.getTriggerDetail(trigger_id).then((ok) => {
+      form.value = ok.data
+      applicationDetailsDict.value = (ok.data.application_task_list || [])
+        .map((item: any) => ({ [item.id]: item }))
+        .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+      toolDetailsDict.value = (ok.data.tool_task_list || [])
+        .map((item: any) => ({ [item.id]: item }))
+        .reduce((x: any, y: any) => ({ ...x, ...y }), {})
+    })
+  }
+}
+
+function refreshToken() {
+  form.value.trigger_setting.token = uuidv4().replace(/-/g, '')
+}
+const current_trigger_id = ref<string>()
+const current_source_id = ref<string>()
+const current_source_type = ref<string>()
+
+const open = (trigger_id?: string, source_type?: string, source_id?: string) => {
+  is_edit.value = trigger_id ? true : false
+  current_trigger_id.value = trigger_id
+  drawer.value = true
+  if (source_type && source_id) {
+    current_source_type.value = source_type
+    current_source_id.value = source_id
+    if (source_type == 'APPLICATION') {
+      applicationRefresh({ application_ids: [source_id] })
+    }
+    if (source_type == 'TOOL') {
+      toolRefresh({ tool_ids: [source_id] })
+    }
+  }
+  if (trigger_id) {
+    init(trigger_id)
+  }
+}
+
+const close = () => {
+  cronError.value = ''
+  current_source_id.value = undefined
+  current_source_type.value = undefined
+  drawer.value = false
+  form.value = getDefaultValue()
+}
+const submit = () => {
+  if (
+    form.value.trigger_type === 'SCHEDULED' &&
+    form.value.trigger_setting.schedule_type === 'cron'
+  ) {
+    validateCron()
+    if (cronError.value) return
+  }
+
+  Promise.all([
+    ...(toolParameterRef.value ? toolParameterRef.value.map((item) => item.validate()) : []),
+    ...(applicationParameterRef.value
+      ? applicationParameterRef.value.map((item) => item.validate())
+      : []),
+    triggerFormRef.value?.validate(),
+  ]).then((ok) => {
+    if (is_edit.value) {
+      if (current_trigger_id.value) {
+        props.editTrigger(current_trigger_id.value, form.value).then((ok) => {
+          close()
+          emit('refresh')
+        })
+      }
+    } else {
+      props.createTrigger(form.value).then((ok) => {
+        close()
+        emit('refresh')
+      })
+    }
+  })
+}
+onMounted(() => {})
+defineExpose({ open, close })
+</script>
+<style lang="scss" scoped></style>

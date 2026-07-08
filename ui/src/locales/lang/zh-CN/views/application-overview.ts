@@ -1,0 +1,81 @@
+export default {
+  title: '概览',
+  appInfo: {
+    publicAccessLink: '公开访问链接',
+    openText: '开',
+    closeText: '关',
+    demo: '演示',
+    embedInWebsite: '嵌入第三方',
+    accessControl: '访问限制',
+    displaySetting: '显示设置',
+    apiAccessCredentials: 'API 访问凭据',
+    apiKey: 'API Key',
+    refreshToken: {
+      msgConfirm1: '是否重新生成公开访问链接?',
+      msgConfirm2:
+        '重新生成公开访问链接会影响嵌入第三方脚本变更，需要将新脚本重新嵌入第三方，请谨慎操作！',
+      refreshSuccess: '刷新成功',
+    },
+
+    APIKeyDialog: {
+      saveSettings: '保存设置',
+      msgConfirm1: '是否删除 API Key',
+      msgConfirm2: '删除 API Key 后将无法恢复，请确认是否删除？',
+    },
+    EmbedDialog: {
+      fullscreenModeTitle: '全屏模式',
+      copyInstructions: '复制以下代码进行嵌入',
+      floatingModeTitle: '浮窗模式',
+      mobileModeTitle: '移动端模式',
+    },
+    LimitDialog: {
+      clientQueryLimitLabel: '每个客户端提问限制',
+      timesDays: '次/天',
+      authentication: '身份验证',
+      authenticationValue: '密码验证',
+      whitelistLabel: '白名单',
+      whitelistPlaceholder:
+        '请输入允许嵌入第三方的源地址，一行一个，如：\nhttp://127.0.0.1:5678\nhttps://dataease.io',
+      loginMethod: '登录方式',
+      loginMethodRequired: '请选择登录方式',
+      displayCodeRequired: '请输入失败次数',
+      toSettingChatUser: '去配置对话用户',
+      authenticationTooltip:
+        '开启登录认证后，智能体和关联的知识库均需要对话用户授权配置，否则用户无权限登录和知识库检索',
+    },
+    SettingAPIKeyDialog: {
+      allowCrossDomainLabel: '允许跨域地址',
+      crossDomainPlaceholder:
+        '请输入允许的跨域地址，开启后不输入跨域地址则不限制。\n跨域地址一行一个，如：\nhttp://127.0.0.1:5678 \nhttps://dataease.io',
+    },
+  },
+  SettingDisplayDialog: {
+    showSourceLabel: '显示知识来源',
+    showExecutionDetail: '显示执行详情',
+    restoreDefault: '恢复默认',
+    customThemeColor: '自定义主题色',
+    headerTitleFontColor: '头部标题字体颜色',
+    default: '默认',
+    askUserAvatar: '提问用户头像',
+    replace: '替换',
+    imageMessage: '建议尺寸 32*32，支持 JPG、PNG、GIF，大小不超过 10 MB',
+    AIAvatar: 'AI 回复头像',
+    display: '显示',
+    floatIcon: '浮窗入口图标',
+    iconDefaultPosition: '图标默认位置',
+    iconPosition: {
+      left: '左',
+      right: '右',
+      bottom: '下',
+      top: '上',
+    },
+    draggablePosition: '可拖拽位置',
+    showHistory: '显示历史记录',
+    displayGuide: '显示引导图(浮窗模式)',
+    share: '允许分享对话记录',
+    disclaimer: '免责声明',
+    disclaimerValue: '「以上内容均由 AI 生成，仅供参考和借鉴」',
+    chatBackground: '聊天背景',
+    chatBackgroundMessage: '支持 JPG、PNG、GIF，大小不超过 10 MB',
+  },
+}

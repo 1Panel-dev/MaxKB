@@ -1,0 +1,48 @@
+export default {
+  title: '对话日志',
+  delete: {
+    confirmTitle: '是否删除问题：',
+    confirmMessage1: '删除问题关联的',
+    confirmMessage2: '个分段会被取消关联，请谨慎操作。'
+  },
+  buttons: {
+    clearStrategy: '清除策略',
+  },
+  table: {
+    abstract: '摘要',
+    chat_record_count: '对话提问数',
+    user: '用户',
+    feedback: {
+      label: '用户反馈',
+      star: '赞同',
+      trample: '反对'
+    },
+    mark: '改进标注',
+    recenTimes: '最近对话时间'
+  },
+  addToKnowledge: '添加至知识库',
+  daysText: '天之前的对话记录',
+  fileDaysText: '天之前的对话上传的附件',
+  selectKnowledge: '选择知识库',
+  selectKnowledgePlaceholder: '请选择知识库',
+  saveToDocument: '保存至文档',
+  documentPlaceholder: '请选择文档',
+  editContent: '修改内容',
+  editMark: '修改标注',
+  form: {
+    content: {
+      placeholder: '请输入内容'
+    },
+    title: {
+      placeholder: '请给当前内容设置一个标题，以便管理查看'
+    }
+  },
+  online: '在线使用',
+  apiCall: 'API 调用',
+  enterpriseWeChat: '企业微信应用',
+  wechatPublicAccount: '微信公众号',
+  lark: '飞书应用',
+  dingtalk: '钉钉应用',
+  enterpriseWeChatRobot: '企业微信机器人',
+  slack: 'Slack 机器人',
+}

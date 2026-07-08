@@ -1,0 +1,146 @@
+<template>
+  <div class="complex-select flex align-center w-full">
+    <el-select
+      class="complex-select__left"
+      :model-value="model_value?.model_id"
+      @change="handleModelChange"
+      v-bind="$attrs"
+      popper-class="select-model"
+    >
+      <template #header v-if="$attrs.popperHeader">
+        <SelectHeader :header="$attrs.popperHeader" />
+      </template>
+      <el-option-group
+        v-for="(modelList, providerName) in groupedOptions"
+        :key="providerName"
+        :label="relatedObject(providerList, providerName, 'provider')?.name"
+      >
+        <el-option
+          v-for="item in modelList"
+          :key="item.model_id"
+          :label="item.model_name"
+          :value="item.model_id"
+        >
+          <el-space :size="8">
+            <span
+              :innerHTML="relatedObject(providerList, providerName, 'provider')?.icon"
+              class="select-model-icon"
+              style="margin-top: -7px"
+            >
+            </span>
+            <span>{{ item.model_name }}</span>
+          </el-space>
+        </el-option>
+      </el-option-group>
+      <template #label="{ label, value }">
+        <el-space :size="8" v-if="value">
+          <span
+            class="select-model-icon"
+            :innerHTML="relatedObject(providerList, getModelProvider(value), 'provider')?.icon"
+          >
+          </span>
+          <span>
+            <span>{{ label }}</span>
+          </span>
+        </el-space>
+      </template>
+    </el-select>
+    <el-divider direction="vertical" />
+    <el-button text @click="openParamSetting" :disabled="!model_value?.model_id" class="mr-4">
+      <AppIcon iconName="app-operation" class="color-secondary" size="16"></AppIcon>
+    </el-button>
+  </div>
+  <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="handleParamRefresh" />
+</template>
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { groupBy, flatMap } from 'lodash'
+import SelectHeader from '@/components/dynamics-form/items/common/SelectHeader.vue'
+import { relatedObject } from '@/utils/array'
+import type { FormField } from '../../type'
+import { providerList } from './provider-data'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+
+const props = withDefaults(
+  defineProps<{
+    modelValue?: { model_id: string; model_params_setting: Record<string, any> } | null
+    formField: FormField
+  }>(),
+  {
+    modelValue: null,
+  },
+)
+
+const emit = defineEmits(['update:modelValue', 'change'])
+
+const model_value = computed({
+  get: () => props.modelValue,
+  set: (value) => {
+    emit('update:modelValue', value)
+    emit('change', props.formField)
+  },
+})
+
+const groupedOptions = computed(() => {
+  const list = (props.formField.attrs?.provider_list as any[]) || []
+  return groupBy(list, 'provider')
+})
+
+const getModelProvider = computed(() => {
+  return (id: string) => {
+    const item = flatMap(groupedOptions.value)?.find((item: any) => item.model_id === id)
+    return (item as any)?.provider || ''
+  }
+})
+
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+
+function openParamSetting() {
+  if (!model_value.value?.model_id) return
+
+  const model_form_field =
+    props.formField.attrs?.provider_list.find(
+      (p: any) => p.model_id === model_value.value?.model_id,
+    ).model_form_field || []
+
+  AIModeParamSettingDialogRef.value?.open(
+    model_value.value.model_id,
+    undefined,
+    model_value.value.model_params_setting,
+    model_form_field,
+  )
+}
+
+function handleParamRefresh(paramData: any) {
+  if (model_value.value) {
+    model_value.value = {
+      ...model_value.value,
+      model_params_setting: paramData,
+    }
+  }
+}
+
+const handleModelChange = (selectedId: string) => {
+  const list = (props.formField.attrs?.provider_list as any[]) || []
+  const selectedItem = list.find((p) => p.model_id === selectedId)
+  model_value.value = {
+    model_id: selectedId,
+    model_params_setting: selectedItem?.model_params_setting || {},
+  }
+}
+</script>
+<style lang="scss" scoped>
+// AI模型选择：添加模型hover样式
+.select-model {
+  .el-select-dropdown__footer {
+    &:hover {
+      background-color: var(--el-fill-color-light);
+    }
+  }
+
+  .check-icon {
+    position: absolute;
+    right: 10px;
+  }
+}
+</style>

@@ -1,0 +1,173 @@
+<template>
+  <div class="execution-details">
+    <div v-if="isWorkFlow(props.appType)">
+      <template v-for="(item, index) in arraySort(props.detail ?? [], 'index')" :key="index">
+        <ExecutionDetailCard :data="item"> </ExecutionDetailCard>
+      </template>
+    </div>
+
+    <template v-else>
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.paragraphSource.question') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">user: {{ problem }}</span>
+        </div>
+      </div>
+      <div v-if="paddedProblem" class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.paragraphSource.questionPadded') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">user: {{ paddedProblem }}</span>
+        </div>
+      </div>
+      <div v-if="system" class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('views.application.form.roleSettings.label') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <span class="mb-8">{{ system }}</span>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.history') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div v-for="(msg, index) in historyRecord" :key="index">
+            <span>{{ msg.role }}: </span>
+            <span>{{ msg.content }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.executionDetails.currentChat') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div class="mb-8">{{ $t('aiChat.executionDetails.knowedMessage') }}:</div>
+          <div v-for="(msg, index) in currentChat" :key="index">
+            <span>{{ msg.content }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.executionDetails.answer') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div v-for="(msg, index) in AiResponse" :key="index">
+            <MdRenderer v-if="msg.content" :source="msg.content" noImgZoomIn></MdRenderer>
+            <template v-else> -</template>
+          </div>
+        </div>
+      </div>
+      <div v-if="errStepMsg" class="card-never border-r-6 mb-12">
+        <h5 class="p-8-12">
+          {{ $t('aiChat.executionDetails.errLog') }}
+        </h5>
+        <div class="p-8-12 border-t-dashed lighter">
+          <div>
+            <span>{{ errStepMsg }}</span>
+          </div>
+        </div>
+      </div>
+    </template>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import { arraySort } from '@/utils/array'
+import { isWorkFlow } from '@/utils/application'
+import MdRenderer from '@/components/markdown/MdRenderer.vue'
+
+const props = defineProps<{
+  detail?: any[]
+  appType?: string
+}>()
+
+const errStepMsg = computed(() => {
+  const err_step = props.detail?.find((item) => item.status === 500)
+  if (err_step) {
+    return `${err_step.step_type}: ${err_step.err_message}`
+  }
+  return undefined
+})
+
+const messageList = computed(() => {
+  const chat_step = props.detail?.find((item) => item.step_type == 'chat_step')
+  if (chat_step) {
+    return chat_step.message_list
+  }
+  return []
+})
+const get_padding_problem = () => {
+  return props.detail?.find((item) => item.step_type == 'problem_padding')
+}
+
+const get_padded_problem = () => {
+  return props.detail?.find((item) => item.step_type == 'problem_padding')
+}
+
+const paddedProblem = computed(() => {
+  const problem_padded = get_padded_problem()
+  if (problem_padded) {
+    return problem_padded.padding_problem_text
+  } else {
+    return ''
+  }
+})
+
+const problem = computed(() => {
+  const problem_padding = get_padding_problem()
+  if (problem_padding) {
+    return problem_padding.problem_text
+  }
+  const user_list = messageList.value.filter((item: any) => item.role == 'user')
+  if (user_list.length > 0) {
+    return user_list[user_list.length - 1].content
+  } else {
+    return ''
+  }
+})
+
+const system = computed(() => {
+  const user_list = messageList.value.filter((item: any) => item.role == 'system')
+  if (user_list.length > 0) {
+    return user_list[user_list.length - 1].content
+  } else {
+    return ''
+  }
+})
+
+const historyRecord = computed<any>(() => {
+  const messages = messageList.value.filter((item: any) => item.role != 'system')
+  if (messages.length > 2) {
+    return messages.slice(0, messages.length - 2)
+  }
+  return []
+})
+
+const currentChat = computed(() => {
+  const messages = messageList.value.filter((item: any) => item.role != 'system')
+  return messages.slice(messages.length - 2, messages.length - 1)
+})
+
+const AiResponse = computed(() => {
+  const messages = messageList.value?.filter((item: any) => item.role != 'system')
+  return messages.slice(messages.length - 1, messages.length)
+})
+</script>
+<style lang="scss" scoped>
+.execution-details {
+  :deep(.md-editor-previewOnly) {
+    background: none !important;
+  }
+}
+</style>

@@ -1,0 +1,293 @@
+<template>
+  <el-drawer
+    v-model="drawer"
+    :title="$t('common.ExecutionRecord.title')"
+    direction="rtl"
+    size="800px"
+    :before-close="close"
+    destroy-on-close
+  >
+    <div class="flex mb-16">
+      <div class="flex-between complex-search">
+        <el-select
+          v-model="filter_type"
+          class="complex-search__left"
+          @change="changeFilterHandle"
+          style="width: 120px"
+        >
+          <el-option :label="$t('workflow.initiator')" value="user_name" />
+          <el-option :label="$t('common.status.label')" value="state" />
+        </el-select>
+        <el-select
+          v-if="filter_type === 'state'"
+          v-model="query.state"
+          @change="getList(true)"
+          style="width: 220px"
+          clearable
+        >
+          <el-option :label="$t('common.status.success')" value="SUCCESS" />
+          <el-option :label="$t('common.status.fail')" value="FAILURE" />
+          <el-option :label="$t('common.status.STARTED')" value="STARTED" />
+          <el-option :label="$t('common.status.REVOKED')" value="REVOKED" />
+        </el-select>
+        <el-input
+          v-else
+          v-model="query.user_name"
+          @change="getList(true)"
+          :placeholder="$t('common.search')"
+          prefix-icon="Search"
+          style="width: 220px"
+          clearable
+        />
+      </div>
+    </div>
+
+    <app-table
+      ref="multipleTableRef"
+      class="mt-16 document-table"
+      :data="tableData"
+      :maxTableHeight="200"
+      :pagination-config="paginationConfig"
+      @sizeChange="changeSize"
+      @changePage="getList(true)"
+      v-loading="loading"
+      :row-key="(row: any) => row.id"
+    >
+      <el-table-column prop="user_name" :label="$t('workflow.initiator')">
+        <template #default="{ row }">
+          {{ row.meta.user_name }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="state" :label="$t('common.status.label')" width="180">
+        <template #default="{ row }">
+          <el-text class="color-text-primary" v-if="row.state === 'SUCCESS'">
+            <el-icon class="color-success"><SuccessFilled /></el-icon>
+            {{ $t('common.status.success') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'FAILURE'">
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+            {{ $t('common.status.fail') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKED'">
+            <el-icon class="color-danger"><CircleCloseFilled /></el-icon>
+            {{ $t('common.status.REVOKED') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else-if="row.state === 'REVOKE'">
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
+            {{ $t('common.status.REVOKE') }}
+          </el-text>
+          <el-text class="color-text-primary" v-else>
+            <el-icon class="is-loading color-primary"><Loading /></el-icon>
+            {{ $t('common.status.STARTED') }}
+          </el-text>
+        </template>
+      </el-table-column>
+      <el-table-column prop="run_time" :label="$t('aiChat.KnowledgeSource.consumeTime')">
+        <template #default="{ row }">
+          {{ row.run_time != undefined ? row.run_time?.toFixed(2) + 's' : '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="create_time"
+        :label="$t('aiChat.executionDetails.createTime')"
+        width="180"
+      >
+        <template #default="{ row }">
+          {{ datetimeFormat(row.create_time) }}
+        </template>
+      </el-table-column>
+
+      <el-table-column :label="$t('common.operation')" width="90">
+        <template #default="{ row }">
+          <div class="flex">
+            <el-tooltip effect="dark" :content="$t('aiChat.executionDetails.title')" placement="top">
+              <el-button type="primary" text @click.stop="toDetails(row)">
+                <AppIcon iconName="app-operate-log"></AppIcon>
+              </el-button>
+            </el-tooltip>
+            <el-tooltip
+              effect="dark"
+              :content="$t('aiChat.executionDetails.cancel')"
+              placement="top"
+              v-if="['PADDING', 'STARTED'].includes(row.state)"
+            >
+              <el-button type="danger" text @click.stop="cancelExecution(row)">
+                <el-icon><CircleCloseFilled /></el-icon>
+              </el-button>
+            </el-tooltip>
+          </div>
+        </template>
+      </el-table-column>
+    </app-table>
+
+    <ExecutionDetailDrawer
+      ref="ExecutionDetailDrawerRef"
+      v-model:currentId="currentId"
+      v-model:currentContent="currentContent"
+      :next="nextRecord"
+      :pre="preRecord"
+      :pre_disable="pre_disable"
+      :next_disable="next_disable"
+    />
+  </el-drawer>
+</template>
+<script setup lang="ts">
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import ExecutionDetailDrawer from './ExecutionDetailDrawer.vue'
+import { computed, ref, reactive, onBeforeUnmount } from 'vue'
+import { useRoute } from 'vue-router'
+import { datetimeFormat } from '@/utils/time'
+import type { Dict } from '@/api/type/common'
+import { MsgError, MsgConfirm } from '@/utils/message'
+import { t } from '@/locales'
+const drawer = ref<boolean>(false)
+const route = useRoute()
+
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+const paginationConfig = reactive({
+  current_page: 1,
+  page_size: 10,
+  total: 0,
+})
+const query = ref<any>({
+  user_name: '',
+  state: '',
+})
+const loading = ref(false)
+const filter_type = ref<string>('user_name')
+const active_knowledge_id = ref<string>('')
+const tableData = ref<Array<any>>([])
+
+const ExecutionDetailDrawerRef = ref<any>()
+const currentId = ref<string>('')
+const currentContent = ref<string>('')
+
+const toDetails = (row: any) => {
+  currentContent.value = row
+  currentId.value = row.id
+
+  ExecutionDetailDrawerRef.value?.open()
+}
+
+const cancelExecution = (row: any) => {
+  MsgConfirm(t('common.tip'), t('aiChat.executionDetails.cancelExecutionTip'), {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  }).then(() => {
+    loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+      .cancelWorkflowAction(active_knowledge_id.value, row.id, loading)
+      .then((ok: any) => {})
+  })
+}
+const changeFilterHandle = () => {
+  query.value = { user_name: '', status: '' }
+}
+const changeSize = () => {
+  paginationConfig.current_page = 1
+  getList()
+}
+
+const getList = (isLoading?: boolean) => {
+  return loadSharedApi({ type: 'knowledge', systemType: apiType.value })
+    .getWorkflowActionPage(
+      active_knowledge_id.value,
+      paginationConfig,
+      query.value,
+      isLoading ? loading : undefined,
+    )
+    .then((ok: any) => {
+      paginationConfig.total = ok.data?.total
+      tableData.value = ok.data.records
+    })
+}
+
+
+const pre_disable = computed(() => {
+  const index = tableData.value.findIndex((item) => item.id === currentId.value)
+  return index === 0 && paginationConfig.current_page === 1
+})
+
+const next_disable = computed(() => {
+  const index = tableData.value.findIndex((item) => item.id === currentId.value) + 1
+  return (
+    index >= tableData.value.length &&
+    index + (paginationConfig.current_page - 1) * paginationConfig.page_size >=
+      paginationConfig.total - 1
+  )
+})
+
+
+const interval = ref<any>()
+/**
+ * 下一页
+ */
+const nextRecord = () => {
+  const index = tableData.value.findIndex((item) => item.id === currentId.value) + 1
+  if (index >= tableData.value.length) {
+    if (paginationConfig.current_page * paginationConfig.page_size >= paginationConfig.total) {
+      return
+    }
+    paginationConfig.current_page = paginationConfig.current_page + 1
+    getList(true).then(() => {
+      currentId.value = tableData.value[index].id
+      currentContent.value = tableData.value[index]
+    })
+    return
+  } else {
+    currentId.value = tableData.value[index].id
+    currentContent.value = tableData.value[index]
+  }
+}
+/**
+ * 上一页
+ */
+const preRecord = () => {
+  const index = tableData.value.findIndex((item) => item.id === currentId.value) - 1
+  if (index < 0 && 1) {
+    if (paginationConfig.current_page === 1) {
+      return
+    }
+    paginationConfig.current_page = paginationConfig.current_page - 1
+    getList(true).then(() => {
+      currentId.value = tableData.value[tableData.value.length - 1].id
+      currentContent.value = tableData.value[tableData.value.length - 1]
+    })
+  } else {
+    currentId.value = tableData.value[index].id
+    currentContent.value = tableData.value[index]
+  }
+}
+
+const open = (knowledge_id: string) => {
+  interval.value = setInterval(() => {
+    getList(false)
+  }, 6000)
+  active_knowledge_id.value = knowledge_id
+  getList(true)
+  drawer.value = true
+}
+const close = () => {
+  paginationConfig.current_page = 1
+  paginationConfig.total = 0
+  tableData.value = []
+  drawer.value = false
+  if (interval.value) {
+    clearInterval(interval.value)
+  }
+}
+onBeforeUnmount(() => {
+  if (interval.value) {
+    clearInterval(interval.value)
+  }
+})
+defineExpose({ open, close })
+</script>
+<style lang="scss" scoped></style>

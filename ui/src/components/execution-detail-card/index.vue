@@ -1,0 +1,1465 @@
+<template>
+  <el-card class="mb-8 execution-detail-card" shadow="never" style="--el-card-padding: 12px 16px">
+    <div class="flex-between cursor" @click="data['show'] = !data['show']">
+      <div class="flex align-center">
+        <el-icon class="mr-8 arrow-icon" :class="data['show'] ? 'rotate-90' : ''">
+          <CaretRight />
+        </el-icon>
+        <component
+          :is="iconComponent(`${data.type}-icon`)"
+          class="mr-8"
+          :size="24"
+          :item="data.info"
+        />
+        <h4>{{ data.name }}</h4>
+      </div>
+      <div class="flex align-center">
+        <span
+          class="mr-16 color-secondary"
+          v-if="
+            data.type === WorkflowType.Question ||
+            data.type === WorkflowType.AiChat ||
+            data.type === WorkflowType.ImageUnderstandNode ||
+            data.type === WorkflowType.ImageGenerateNode ||
+            data.type === WorkflowType.Application ||
+            data.type == WorkflowType.IntentNode ||
+            data.type === WorkflowType.VideoUnderstandNode
+          "
+          >{{ data?.message_tokens + data?.answer_tokens }} tokens</span
+        >
+        <span class="mr-16 color-secondary" v-if="data.status != 202"
+          >{{ data?.run_time?.toFixed(2) || 0.0 }} s</span
+        >
+        <el-icon class="color-success" :size="16" v-if="data.status === 200">
+          <CircleCheck />
+        </el-icon>
+        <el-icon class="is-loading" :size="16" v-else-if="data.status === 202">
+          <Loading />
+        </el-icon>
+        <el-icon class="color-danger" :size="16" v-else>
+          <CircleClose />
+        </el-icon>
+      </div>
+    </div>
+    <el-collapse-transition>
+      <div class="mt-12" v-if="data['show']">
+        <template v-if="data.status === 200 || data.type == WorkflowType.LoopNode">
+          <!-- 开始 -->
+          <template
+            v-if="data.type === WorkflowType.Start || data.type === WorkflowType.Application"
+          >
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"> {{ $t('aiChat.paragraphSource.question') }}:</span>
+
+                  {{ data.question || '-' }}
+                </div>
+
+                <div v-for="(f, i) in data.global_fields" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
+                </div>
+                <div v-if="data.document_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.document') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.document_list" :key="i">
+                      <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
+                        <div class="flex align-center">
+                          <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                          <div class="ml-4 ellipsis" :title="f && f?.name">
+                            {{ f && f?.name }}
+                          </div>
+                        </div>
+                      </el-card>
+                    </template>
+                  </el-space>
+                </div>
+                <div v-if="data.image_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.image') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.image_list" :key="i">
+                      <el-image
+                        :src="f.url"
+                        alt=""
+                        fit="cover"
+                        style="width: 40px; height: 40px; display: block"
+                        class="border-r-6"
+                        :preview-src-list="data.image_list.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div v-if="data.audio_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.audio_list" :key="i">
+                      <audio
+                        :src="f.url"
+                        controls
+                        style="width: 300px; height: 43px"
+                        class="border-r-6"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div v-if="data.video_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.video') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.video_list" :key="i">
+                      <video
+                        :src="f.url"
+                        style="width: 170px; display: block"
+                        controls
+                        autoplay
+                        class="border-r-6"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div v-if="data.other_list?.length > 0">
+                  <p class="mb-8 color-secondary">{{ $t('common.fileUpload.other') }}:</p>
+
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.other_list" :key="i">
+                      <el-card shadow="never" style="--el-card-padding: 8px" class="file cursor">
+                        <div class="flex align-center">
+                          <img :src="getImgUrl(f && f?.name)" alt="" width="24" />
+                          <div class="ml-4 ellipsis" :title="f && f?.name">
+                            {{ f && f?.name }}
+                          </div>
+                        </div>
+                      </el-card>
+                    </template>
+                  </el-space>
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 知识库检索 -->
+          <template v-if="data.type == WorkflowType.SearchKnowledge">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.searchContent') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">{{ data.question || '-' }}</div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.searchResult') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.paragraph_list?.length > 0">
+                  <template
+                    v-for="(paragraph, paragraphIndex) in arraySort(
+                      data.paragraph_list,
+                      'similarity',
+                      true,
+                    )"
+                    :key="paragraphIndex"
+                  >
+                    <ParagraphCard
+                      :data="paragraph"
+                      :content="paragraph.content"
+                      :index="paragraphIndex"
+                    />
+                  </template>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 判断器 -->
+          <template v-if="data.type == WorkflowType.Condition">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.conditionResult') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.branch_name || '-' }}
+              </div>
+            </div>
+          </template>
+          <!-- AI 对话 -->
+          <template v-if="data.type == WorkflowType.AiChat">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span
+                    ><span>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('aiChat.executionDetails.currentChat')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <template v-if="Array.isArray(data.question)">
+                  <div v-for="(item, qIndex) in data.question" :key="qIndex">
+                    <el-image
+                      v-if="item.type === 'image_url'"
+                      :src="item.image_url?.url || item.image_url"
+                      alt=""
+                      fit="cover"
+                      style="width: 40px; height: 40px; display: block"
+                      class="border-r-6 mb-8"
+                      :zoom-rate="1.2"
+                      :max-scale="7"
+                      :min-scale="0.2"
+                    />
+                    <video
+                      v-else-if="item.type === 'video_url'"
+                      :src="item.video_url?.url || item.video_url"
+                      style="width: 170px; display: block"
+                      class="border-r-6 mb-8"
+                      autoplay
+                      controls
+                    />
+                    <div v-else-if="item.type === 'text'" class="mb-8">{{ item.text }}</div>
+                    <div v-else class="mb-8">{{ item }}</div>
+                  </div>
+                </template>
+                <template v-else>
+                  {{ data.question || '-' }}
+                </template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.reasoning_content || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdRenderer v-if="data.answer" :source="data.answer" noImgZoomIn></MdRenderer>
+
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 问题优化 / 意图识别-->
+          <template
+            v-if="
+              data.type == WorkflowType.Question ||
+              data.type == WorkflowType.Application ||
+              data.type == WorkflowType.IntentNode
+            "
+          >
+            <div class="card-never border-r-6" v-if="data.type !== WorkflowType.Application">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span
+                    ><span>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="data.type !== WorkflowType.Application">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.currentChat') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.question || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  data.type == WorkflowType.Application
+                    ? $t('common.param.outputParam')
+                    : $t('aiChat.executionDetails.answer')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+
+          <!-- 指定回复 -->
+          <template v-if="data.type === WorkflowType.Reply">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.replyContent') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-scrollbar height="150">
+                  <MdPreview
+                    v-if="data.answer"
+                    ref="editorRef"
+                    editorId="preview-only"
+                    :modelValue="data.answer"
+                    style="background: none"
+                    noImgZoomIn
+                  />
+                  <template v-else> -</template>
+                </el-scrollbar>
+              </div>
+            </div>
+          </template>
+
+          <!-- 文档内容提取 -->
+          <template v-if="data.type === WorkflowType.DocumentExtractNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12 flex align-center">
+                <span class="mr-4"> {{ $t('common.param.outputParam') }}</span>
+
+                <el-tooltip
+                  effect="dark"
+                  :content="$t('aiChat.executionDetails.paramOutputTooltip')"
+                  placement="right"
+                >
+                  <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                </el-tooltip>
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-scrollbar height="200">
+                  <el-card
+                    shadow="never"
+                    style="--el-card-padding: 8px"
+                    v-for="(file_content, index) in data.content"
+                    :key="index"
+                    class="mb-8"
+                  >
+                    <MdPreview
+                      v-if="file_content"
+                      ref="editorRef"
+                      editorId="preview-only"
+                      :modelValue="file_content"
+                      style="background: none"
+                      noImgZoomIn
+                    />
+
+                    <template v-else> -</template>
+                  </el-card>
+                </el-scrollbar>
+              </div>
+            </div>
+          </template>
+          <template v-if="data.type === WorkflowType.SpeechToTextNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <div v-if="data.audio_list?.length > 0">
+                    <p class="mb-8 color-secondary">
+                      {{ $t('aiChat.executionDetails.audioFile') }}:
+                    </p>
+
+                    <el-space wrap>
+                      <template v-for="(f, i) in data.audio_list" :key="i">
+                        <audio
+                          :src="f.url"
+                          controls
+                          style="width: 300px; height: 43px"
+                          class="border-r-6"
+                        />
+                      </template>
+                    </el-space>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-card
+                  shadow="never"
+                  style="--el-card-padding: 8px"
+                  v-for="(file_content, index) in data.content"
+                  :key="index"
+                  class="mb-8"
+                >
+                  <MdPreview
+                    v-if="file_content"
+                    ref="editorRef"
+                    editorId="preview-only"
+                    :modelValue="file_content"
+                    style="background: none"
+                    noImgZoomIn
+                  />
+                  <template v-else> -</template>
+                </el-card>
+              </div>
+            </div>
+          </template>
+
+          <template v-if="data.type === WorkflowType.TextToSpeechNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="p-8-12 border-t-dashed lighter">
+                  <p class="mb-8 color-secondary">
+                    {{ $t('aiChat.executionDetails.textContent') }}:
+                  </p>
+                  <div v-if="data.content">
+                    <MdPreview
+                      ref="editorRef"
+                      editorId="preview-only"
+                      :modelValue="data.content"
+                      style="background: none"
+                      noImgZoomIn
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <p class="mb-8 color-secondary">{{ $t('aiChat.executionDetails.audioFile') }}:</p>
+                <div v-if="data.answer" v-html="data.answer"></div>
+              </div>
+            </div>
+          </template>
+
+          <!-- 工具库 -->
+          <template
+            v-if="data.type === WorkflowType.ToolLib || data.type === WorkflowType.ToolLibCustom"
+          >
+            <div class="card-never border-r-6 mt-8" v-if="data.index != 0">
+              <h5 class="p-8-12">{{ $t('aiChat.executionDetails.input') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter break-all">
+                {{ data.params || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">{{ $t('aiChat.executionDetails.output') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter break-all">
+                {{ data.result || '-' }}
+              </div>
+            </div>
+          </template>
+          <!-- 多路召回 -->
+          <template v-if="data.type == WorkflowType.RerankerNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.searchContent') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">{{ data.question || '-' }}</div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.rerankerContent') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.document_list?.length > 0">
+                  <template
+                    v-for="(paragraph, paragraphIndex) in data.document_list"
+                    :key="paragraphIndex"
+                  >
+                    <ParagraphCard
+                      :data="paragraph.metadata"
+                      :content="paragraph.page_content"
+                      :index="paragraphIndex"
+                    />
+                  </template>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.rerankerResult') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.result_list?.length > 0">
+                  <template
+                    v-for="(paragraph, paragraphIndex) in data.result_list"
+                    :key="paragraphIndex"
+                  >
+                    <ParagraphCard
+                      :data="paragraph.metadata"
+                      :content="paragraph.page_content"
+                      :index="paragraphIndex"
+                      :score="paragraph.metadata?.relevance_score"
+                    />
+                  </template>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+
+          <!-- 表单收集 -->
+          <template v-if="data.type === WorkflowType.FormNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam')
+                }}<span style="color: #f54a45">{{
+                  data.is_submit ? '' : `(${$t('aiChat.executionDetails.noSubmit')})`
+                }}</span>
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <DynamicsForm
+                  :disabled="true"
+                  label-position="top"
+                  require-asterisk-position="right"
+                  ref="dynamicsFormRef"
+                  :render_data="data.form_field_list"
+                  label-suffix=":"
+                  v-model="data.form_data"
+                  :model="data.form_data"
+                ></DynamicsForm>
+              </div>
+            </div>
+          </template>
+          <!-- 图片理解 -->
+          <template v-if="data.type == WorkflowType.ImageUnderstandNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span>
+
+                    <span v-if="Array.isArray(history.content)">
+                      <template v-for="(h, i) in history.content" :key="i">
+                        <el-image
+                          v-if="h.type === 'image_url'"
+                          :src="h.image_url.url"
+                          alt=""
+                          fit="cover"
+                          style="width: 40px; height: 40px; display: inline-block"
+                          class="border-r-6 mr-8"
+                          :zoom-rate="1.2"
+                          :max-scale="7"
+                          :min-scale="0.2"
+                        />
+
+                        <span v-else>{{ h.text }}<br /></span>
+                      </template>
+                    </span>
+
+                    <span v-else>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('aiChat.executionDetails.currentChat')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-if="data.image_list?.length > 0">
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.image_list" :key="i">
+                      <el-image
+                        :src="f.url || (f.file_id ? `./oss/file/${f.file_id}` : '')"
+                        alt=""
+                        fit="cover"
+                        style="width: 40px; height: 40px; display: block"
+                        class="border-r-6"
+                        :preview-src-list="data.image_list.map((img: any) => img.url || (img.file_id ? `./oss/file/${img.file_id}` : ''))"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div>
+                  {{ data.question || '-' }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.reasoning_content"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.reasoning_content"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 视频理解 -->
+          <template v-if="data.type == WorkflowType.VideoUnderstandNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.application.form.roleSettings.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                {{ data.system || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8" v-if="!isKnowLedge">
+              <h5 class="p-8-12">{{ $t('aiChat.history') }}</h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-if="data.history_message?.length > 0">
+                  <p
+                    class="mt-4 mb-4"
+                    v-for="(history, historyIndex) in data.history_message"
+                    :key="historyIndex"
+                  >
+                    <span class="color-secondary mr-4">{{ history.role }}:</span>
+
+                    <span v-if="Array.isArray(history.content)">
+                      <template v-for="(h, i) in history.content" :key="i">
+                        <video
+                          v-if="h.type === 'video_url'"
+                          :src="h.video_url.url"
+                          style="width: 40px; height: 40px; display: inline-block"
+                          class="border-r-6 mr-8"
+                        />
+
+                        <span v-else>{{ h.text }}<br /></span>
+                      </template>
+                    </span>
+
+                    <span v-else>{{ history.content }}</span>
+                  </p>
+                </template>
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{
+                  isKnowLedge
+                    ? $t('views.application.form.prompt.label')
+                    : $t('aiChat.executionDetails.currentChat')
+                }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-if="data.video_list?.length > 0">
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.video_list" :key="i">
+                      <video
+                        :src="f.url"
+                        style="width: 100px; display: block"
+                        class="border-r-6"
+                        autoplay
+                        controls
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div>
+                  {{ data.question || '-' }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.aiChatNode.think') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.reasoning_content"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.reasoning_content"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 图片生成 -->
+          <template v-if="data.type == WorkflowType.ImageGenerateNode">
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.currentChat') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.question || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.negative_prompt || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 文生视频 -->
+          <template v-if="data.type == WorkflowType.TextToVideoGenerateNode">
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.currentChat') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.question || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.negative_prompt || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 图生视频 -->
+          <template v-if="data.type == WorkflowType.ImageToVideoGenerateNode">
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.currentChat') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.question || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.imageGenerateNode.negative_prompt.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.negative_prompt || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.imageToVideoGenerate.first_frame.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-if="typeof data.first_frame_url === 'string'">
+                  <el-image
+                    :src="data.first_frame_url"
+                    alt=""
+                    fit="cover"
+                    style="width: 40px; height: 40px; display: block"
+                    class="border-r-6"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
+                  />
+                </div>
+                <div v-else-if="Array.isArray(data.first_frame_url)">
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.first_frame_url" :key="i">
+                      <el-image
+                        :src="f.url"
+                        alt=""
+                        fit="cover"
+                        style="width: 40px; height: 40px; display: block"
+                        class="border-r-6"
+                        :preview-src-list="data.first_frame_url.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.imageToVideoGenerate.last_frame.label') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-if="typeof data.last_frame_url === 'string'">
+                  <el-image
+                    :src="data.last_frame_url"
+                    alt=""
+                    fit="cover"
+                    style="width: 40px; height: 40px; display: block"
+                    class="border-r-6"
+                    :zoom-rate="1.2"
+                    :max-scale="7"
+                    :min-scale="0.2"
+                  />
+                </div>
+                <div v-else-if="Array.isArray(data.last_frame_url)">
+                  <el-space wrap>
+                    <template v-for="(f, i) in data.last_frame_url" :key="i">
+                      <el-image
+                        :src="f.url"
+                        alt=""
+                        fit="cover"
+                        style="width: 40px; height: 40px; display: block"
+                        class="border-r-6"
+                        :preview-src-list="data.last_frame_url.map((img: any) => img.url)"
+                        :initial-index="i"
+                        :zoom-rate="1.2"
+                        :max-scale="7"
+                        :min-scale="0.2"
+                      />
+                    </template>
+                  </el-space>
+                </div>
+                <div v-else>-</div>
+              </div>
+            </div>
+
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.answer') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <MdPreview
+                  v-if="data.answer"
+                  ref="editorRef"
+                  editorId="preview-only"
+                  :modelValue="data.answer"
+                  style="background: none"
+                  noImgZoomIn
+                />
+                <template v-else> -</template>
+              </div>
+            </div>
+          </template>
+          <!-- 变量赋值 -->
+          <template v-if="data.type === WorkflowType.VariableAssignNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ f.name }} ({{ f.input_type }}):</span>
+                  {{ f.input_value }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.result_list" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ f.name }} ({{ f.output_type }}):</span>
+                  {{ f.output_value }}
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <!-- 变量拆分 -->
+          <template
+            v-if="
+              data.type === WorkflowType.VariableSplittingNode ||
+              data.type == WorkflowType.ParameterExtractionNode
+            "
+          >
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{ data.request || '-' }}
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 变量聚合 -->
+          <template v-if="data.type === WorkflowType.VariableAggregationNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.variableAggregationNode.Strategy') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                {{
+                  data.strategy === 'first_non_null'
+                    ? t('workflow.nodes.variableAggregationNode.placeholder')
+                    : data.strategy === 'variable_to_dict'
+                      ? t('workflow.nodes.variableAggregationNode.placeholder2')
+                      : t('workflow.nodes.variableAggregationNode.placeholder1')
+                }}
+              </div>
+            </div>
+            <div
+              class="card-never border-r-6 mt-8"
+              v-for="(group, groupI) in data.group_list"
+              :key="groupI"
+            >
+              <h5 class="p-8-12">
+                {{ group.label + ' ' + $t('common.param.inputParam') }}
+              </h5>
+              <el-scrollbar height="200">
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in group.variable_list" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ `${f.node_name}.${f.field}` }}:</span>
+                    {{ f.value }}
+                  </div>
+                </div>
+              </el-scrollbar>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <el-scrollbar height="200">
+                <div class="p-8-12 border-t-dashed lighter">
+                  <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                    <span class="color-secondary">{{ i }}:</span> {{ f }}
+                  </div>
+                </div>
+              </el-scrollbar>
+            </div>
+          </template>
+          <!-- MCP 节点 -->
+          <template v-if="data.type === WorkflowType.McpNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('views.tool.title') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"> {{ $t('views.tool.title') }}: </span>
+                  {{ data.mcp_tool }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('workflow.nodes.mcpNode.toolParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(value, name) in data.tool_params" :key="name" class="mb-8">
+                  <span class="color-secondary">{{ name }}:</span> {{ value }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter break-all">
+                <div v-for="(f, i) in data.result" :key="i" class="mb-8">
+                  <span class="color-secondary">result:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 循环 节点 -->
+          <div class="card-never border-r-6" v-if="data.type === WorkflowType.LoopNode">
+            <h5 class="p-8-12">
+              {{ $t('workflow.nodes.loopNode.loopSetting') }}
+            </h5>
+
+            <div class="p-8-12 border-t-dashed lighter">
+              <div class="mb-8">
+                <span class="color-secondary">
+                  {{ $t('workflow.nodes.loopNode.loopType.label') }}:</span
+                >
+                {{ data.loop_type || '-' }}
+              </div>
+              <div>
+                <span class="color-secondary">
+                  {{ $t('workflow.nodes.loopNode.loopArray.label') }}:</span
+                >
+                {{
+                  data.loop_type === 'NUMBER'
+                    ? data.number
+                    : Object.keys(data.loop_node_data) || '-'
+                }}
+              </div>
+            </div>
+            <h5 class="p-8-12">
+              {{ $t('workflow.nodes.loopNode.loopDetail') }}
+            </h5>
+            <div class="p-8-12 border-t-dashed lighter">
+              <template v-if="data.type === WorkflowType.LoopNode">
+                <el-radio-group v-model="currentLoopNode" class="app-radio-button-group mb-8">
+                  <template v-for="(loop, loopIndex) in data.loop_node_data" :key="loopIndex">
+                    <el-radio-button :label="loopIndex" :value="loopIndex" />
+                  </template>
+                </el-radio-group>
+                <template
+                  v-for="(cLoop, cIndex) in Object.values(
+                    data.loop_node_data?.[currentLoopNode] || [],
+                  ).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))"
+                  :key="cIndex"
+                >
+                  <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
+                </template>
+              </template>
+            </div>
+          </div>
+          <!-- 循环开始 节点-->
+          <template v-if="data.type === WorkflowType.LoopStartNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary">
+                    {{ $t('workflow.nodes.loopStartNode.loopItem') }}:</span
+                  >
+
+                  {{ data.current_item }}
+                </div>
+                <div class="mb-8">
+                  <span class="color-secondary">
+                    {{ $t('workflow.nodes.loopStartNode.loopIndex') }}:</span
+                  >
+
+                  {{ data.current_index }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 循环跳过 节点-->
+          <template v-if="data.type === WorkflowType.LoopContinueNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary">
+                    {{ $t('workflow.nodes.loopContinueNode.isContinue') }}:</span
+                  >
+
+                  {{ data.is_continue }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 循环退出 节点-->
+          <template v-if="data.type === WorkflowType.LoopBreakNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary">
+                    {{ $t('workflow.nodes.loopBreakNode.isBreak') }}:</span
+                  >
+
+                  {{ data.is_break }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 文档检索 -->
+          <template v-if="data.type === WorkflowType.SearchDocument">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12 flex align-center">
+                <span class="mr-4"> {{ $t('common.param.outputParam') }}</span>
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"> knowledge_list:</span>
+                  {{ data.knowledge_items?.map((v: any) => v.name).join(',') }}
+                </div>
+                <div class="mb-8">
+                  <span class="color-secondary"> document_list:</span>
+                  {{ data.document_items?.map((v: any) => v.name).join(',') }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 文本文件 -->
+          <template v-if="data.type === WorkflowType.DataSourceLocalNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  {{ data.file_list || '-' }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 文档分段 -->
+          <template v-if="data.type === WorkflowType.DocumentSplitNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div class="mb-8">
+                  <span class="color-secondary"
+                    >{{ $t('aiChat.executionDetails.paragraphRules') }}:</span
+                  >
+                  {{ data.split_strategy }}
+                </div>
+                <div class="mb-8">
+                  <span class="color-secondary"
+                    >{{ $t('workflow.nodes.documentSplitNode.chunk_length.label') }}:</span
+                  >
+                  {{ data.chunk_size }}
+                </div>
+                {{ data.size }}
+                <div class="mb-8">
+                  <span class="color-secondary">{{ $t('common.inputContent') }}:</span>
+                  {{ data.document_list?.map((v: any) => v.name).join(',') }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}（{{
+                  $t('aiChat.executionDetails.documentSplitTip')
+                }}）
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-tabs v-model="currentParagraph" class="paragraph-tabs">
+                  <template v-for="(item, index) in data.paragraph_list" :key="index">
+                    <el-tab-pane :label="item.name" :name="index">
+                      <template #label>
+                        <div class="flex-center">
+                          <span class="ml-4">{{ item?.name }}</span>
+                        </div>
+                      </template>
+
+                      <template v-for="(paragraph, pId) in item?.paragraphs" :key="pId">
+                        <ParagraphCard :data="paragraph" :content="paragraph.content" :index="pId">
+                          <template #footer>
+                            <span class="color-secondary">
+                              {{ $t('common.character') }}：{{ paragraph.content.length }}</span
+                            >
+                          </template>
+                        </ParagraphCard>
+                      </template>
+                    </el-tab-pane>
+                  </template>
+                </el-tabs>
+              </div>
+            </div>
+          </template>
+          <!-- 知识库写入 -->
+          <template v-if="data.type === WorkflowType.KnowledgeWriteNode">
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.writeContent') }}（{{
+                  $t('aiChat.executionDetails.documentSplitTip')
+                }}）
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-tabs v-model="currentWriteContent" class="paragraph-tabs">
+                  <template v-for="(item, index) in data.write_content" :key="index">
+                    <el-tab-pane :label="item.name" :name="index">
+                      <template #label>
+                        <div class="flex-center">
+                          <span class="ml-4">{{ item?.name }}</span>
+                        </div>
+                      </template>
+
+                      <template v-for="(paragraph, pId) in item?.paragraphs" :key="pId">
+                        <ParagraphCard :data="paragraph" :content="paragraph.content" :index="pId">
+                          <template #footer>
+                            <span class="color-secondary">
+                              {{ $t('common.character') }}：{{ paragraph.content.length }}</span
+                            >
+                          </template>
+                        </ParagraphCard>
+                      </template>
+                    </el-tab-pane>
+                  </template>
+                </el-tabs>
+              </div>
+            </div>
+          </template>
+          <!-- Web站点 -->
+          <template v-if="data.type === WorkflowType.DataSourceWebNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <p class="mb-8 color-secondary">
+                  {{ $t('views.document.form.selector.label') }}: {{ data.input_params.selector }}
+                </p>
+                <p class="mb-8 color-secondary">
+                  {{ $t('views.document.form.source_url.label') }}:
+                  {{ data.input_params.source_url }}
+                </p>
+              </div>
+            </div>
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <el-scrollbar height="200">
+                  <el-card
+                    shadow="never"
+                    style="--el-card-padding: 8px"
+                    v-for="(file_content, index) in data.output_params"
+                    :key="index"
+                    class="mb-8"
+                  >
+                    <h4>{{ file_content.name }}</h4>
+                    <MdPreview
+                      v-if="file_content"
+                      ref="editorRef"
+                      editorId="preview-only"
+                      :modelValue="file_content.content"
+                      style="background: none"
+                      noImgZoomIn
+                    />
+                    <template v-else> -</template>
+                  </el-card>
+                </el-scrollbar>
+              </div>
+            </div>
+          </template>
+
+          <!-- 工作流开始 节点-->
+          <template v-if="data.type === WorkflowType.ToolStartNode">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.global_fields" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ f.label }}:</span> {{ f.value }}
+                </div>
+              </div>
+            </div>
+          </template>
+          <!-- 工作流 节点 -->
+          <div class="card-never border-r-6" v-if="data.type === WorkflowType.ToolWorkflowLib">
+            <div class="card-never border-r-6">
+              <h5 class="p-8-12">
+                {{ $t('common.param.inputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter pre-wrap">
+                <div v-for="(f, i) in data.input" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('common.param.outputParam') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <div v-for="(f, i) in data.output" :key="i" class="mb-8">
+                  <span class="color-secondary">{{ i }}:</span> {{ f }}
+                </div>
+              </div>
+            </div>
+            <div class="card-never border-r-6 mt-8">
+              <h5 class="p-8-12">
+                {{ $t('aiChat.executionDetails.title') }}
+              </h5>
+              <div class="p-8-12 border-t-dashed lighter">
+                <template v-for="(cLoop, cIndex) in data.details" :key="cIndex">
+                  <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
+                </template>
+              </div>
+            </div>
+          </div>
+          <slot></slot>
+        </template>
+        <template v-else>
+          <div class="card-never border-r-6">
+            <h5 class="p-8-12">{{ $t('aiChat.executionDetails.errMessage') }}</h5>
+            <div class="p-8-12 border-t-dashed lighter">{{ data.err_message || '-' }}</div>
+          </div>
+        </template>
+      </div>
+    </el-collapse-transition>
+  </el-card>
+</template>
+<script setup lang="ts">
+import { ref, computed, type PropType } from 'vue'
+import ParagraphCard from '@/components/ai-chat/component/knowledge-source-component/ParagraphCard.vue'
+import DynamicsForm from '@/components/dynamics-form/index.vue'
+import { iconComponent } from '@/workflow/icons/utils'
+import { WorkflowType } from '@/enums/application'
+import { getImgUrl } from '@/utils/common'
+import { arraySort } from '@/utils/array'
+import ExecutionDetailCard from '@/components/execution-detail-card/index.vue'
+import MdRenderer from '@/components/markdown/MdRenderer.vue'
+import { t } from '@/locales'
+
+const props = defineProps({
+  data: {
+    type: Object as PropType<any>,
+    default: null,
+  },
+  type: {
+    type: String as PropType<'application' | 'knowledge'>,
+    default: 'application',
+  },
+})
+const isKnowLedge = computed(() => props.type === 'knowledge')
+const currentLoopNode = ref(0)
+const currentParagraph = ref(0)
+const currentWriteContent = ref(0)
+</script>
+<style lang="scss" scoped>
+.execution-detail-card {
+  :deep(.md-editor-previewOnly) {
+    background: none !important;
+  }
+}
+</style>

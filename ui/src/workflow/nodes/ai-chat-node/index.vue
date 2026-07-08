@@ -1,0 +1,989 @@
+<template>
+  <NodeContainer :nodeModel="nodeModel">
+    <h5 class="title-decoration-1 mb-8">{{ $t('workflow.nodeSetting') }}</h5>
+    <el-card shadow="never" class="card-never" style="--el-card-padding: 12px">
+      <el-form
+        @submit.prevent
+        :model="chat_data"
+        label-position="top"
+        require-asterisk-position="right"
+        label-width="auto"
+        ref="aiChatNodeFormRef"
+        hide-required-asterisk
+      >
+        <el-form-item
+          :label="$t('views.application.form.aiModel.label')"
+          :prop="chat_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
+          :rules="{
+            required: true,
+            message:
+              chat_data.model_id_type === 'reference'
+                ? $t('workflow.variable.placeholder')
+                : $t('views.application.form.aiModel.placeholder'),
+            trigger: 'change',
+          }"
+        >
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span
+                  >{{ $t('views.application.form.aiModel.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-select
+                v-model="chat_data.model_id_type"
+                :teleported="false"
+                size="small"
+                style="width: 85px"
+                @change="chat_data.model_id_reference = []"
+              >
+                <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
+                <el-option :label="$t('common.custom')" value="custom" />
+              </el-select>
+            </div>
+          </template>
+          <div class="flex-between w-full" v-if="chat_data.model_id_type !== 'reference'">
+            <ModelSelect
+              @change="model_change"
+              @wheel="wheel"
+              :teleported="false"
+              v-model="chat_data.model_id"
+              :placeholder="$t('views.application.form.aiModel.placeholder')"
+              :options="modelOptions"
+              @submitModel="getSelectModel"
+              showFooter
+              :model-type="'LLM'"
+            ></ModelSelect>
+            <div class="ml-8">
+              <el-button
+                :disabled="!chat_data.model_id"
+                @click="openAIParamSettingDialog(chat_data.model_id)"
+                @refreshForm="refreshParam"
+              >
+                <el-icon>
+                  <Operation />
+                </el-icon>
+              </el-button>
+            </div>
+          </div>
+          <NodeCascader
+            v-else
+            ref="nodeCascaderRef"
+            :nodeModel="nodeModel"
+            class="w-full"
+            :placeholder="$t('workflow.variable.placeholder')"
+            v-model="chat_data.model_id_reference"
+          />
+        </el-form-item>
+
+        <el-form-item>
+          <template #label>
+            <div class="flex-between">
+              <div class="flex align-center">
+                <span>{{ $t('views.application.form.roleSettings.label') }}</span>
+                <el-tooltip
+                  effect="dark"
+                  :content="$t('views.application.form.roleSettings.tooltip')"
+                  placement="right"
+                >
+                  <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+                </el-tooltip>
+              </div>
+
+              <el-button
+                type="primary"
+                link
+                @click="openGeneratePromptDialog(chat_data.model_id)"
+                :disabled="chat_data.model_id_type === 'reference' || !chat_data.model_id"
+              >
+                <AppIcon iconName="app-generate-star"></AppIcon>
+              </el-button>
+            </div>
+          </template>
+          <MdEditorMagnify
+            :title="$t('views.application.form.roleSettings.label')"
+            v-model="chat_data.system"
+            style="height: 100px"
+            @submitDialog="submitSystemDialog"
+            :placeholder="`${t('workflow.SystemPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
+          />
+        </el-form-item>
+        <el-form-item
+          :label="$t('views.application.form.prompt.label')"
+          prop="prompt"
+          :rules="{
+            required: true,
+            message: $t('views.application.form.prompt.requiredMessage'),
+            trigger: 'blur',
+          }"
+        >
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span
+                  >{{ $t('views.application.form.prompt.label')
+                  }}<span class="color-danger">*</span></span
+                >
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>{{ $t('views.application.form.prompt.tooltip') }} </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <MdEditorMagnify
+            @wheel="wheel"
+            :title="$t('views.application.form.prompt.label')"
+            v-model="chat_data.prompt"
+            style="height: 150px"
+            @submitDialog="submitDialog"
+            :placeholder="`${t('workflow.UserPromptPlaceholder')}{{${t('workflow.nodes.startNode.label')}.question}}`"
+          />
+        </el-form-item>
+        <el-form-item
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
+        >
+          <template #label>
+            <div class="flex-between">
+              <div>{{ $t('views.application.form.historyRecord.label') }}</div>
+              <el-select v-model="chat_data.dialogue_type" type="small" style="width: 100px">
+                <el-option :label="$t('workflow.node')" value="NODE" />
+                <el-option :label="$t('workflow.workflow')" value="WORKFLOW" />
+              </el-select>
+            </div>
+          </template>
+          <el-input-number
+            v-model="chat_data.dialogue_number"
+            :min="0"
+            :value-on-clear="0"
+            controls-position="right"
+            class="w-full"
+            :step="1"
+            :step-strictly="true"
+          />
+        </el-form-item>
+        <div class="flex" style="justify-content: space-between">
+          {{ t('workflow.nodes.aiChatNode.vision.label') }}
+          <el-switch size="small" v-model="vision" />
+        </div>
+        <template v-if="vision">
+          <el-form-item
+            :rules="{
+              type: 'array',
+              required: true,
+              message: $t('workflow.nodes.imageUnderstandNode.image.requiredMessage'),
+              trigger: 'change',
+            }"
+          >
+            <div class="flex align-center">
+              <div>
+                <span>{{ $t('workflow.nodes.imageUnderstandNode.image.label') }} </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <NodeCascader
+              ref="nodeCascaderRef"
+              :nodeModel="nodeModel"
+              class="w-full"
+              :placeholder="$t('workflow.nodes.imageUnderstandNode.image.requiredMessage')"
+              v-model="chat_data.image_list"
+            />
+          </el-form-item>
+          <el-form-item
+            :rules="{
+              type: 'array',
+              required: false,
+              message: $t('workflow.nodes.videoUnderstandNode.video.requiredMessage'),
+              trigger: 'change',
+            }"
+          >
+            <div class="flex align-center">
+              <div>
+                <span>{{ $t('workflow.nodes.videoUnderstandNode.video.label') }} </span>
+              </div>
+              <el-tooltip effect="dark" placement="right">
+                <template #content>
+                  <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+            <NodeCascader
+              ref="nodeCascaderRef"
+              :nodeModel="nodeModel"
+              class="w-full"
+              :placeholder="$t('workflow.nodes.videoUnderstandNode.video.requiredMessage')"
+              v-model="chat_data.video_list"
+            /> </el-form-item
+        ></template>
+
+        <div class="mb-8 mt-12 flex-between">
+          <span class="mr-4 lighter">
+            {{ $t('views.tool.skill.title') }}
+          </span>
+          <div class="flex">
+            <el-checkbox
+              v-model="chat_data.mcp_output_enable"
+              :label="$t('views.application.form.mcp_output_enable')"
+            />
+          </div>
+        </div>
+        <el-card shadow="never" style="--el-card-padding: 12px" class="mb-12">
+          <!-- MCP-->
+          <div>
+            <div class="flex-between mb-8" @click="collapseData.MCP = !collapseData.MCP">
+              <div class="flex align-center lighter cursor">
+                <el-icon class="mr-8 arrow-icon" :class="collapseData.MCP ? 'rotate-90' : ''">
+                  <CaretRight /> </el-icon
+                >MCP
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.mcp_tool_ids?.filter((id: any) =>
+                      relatedObject(mcpToolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.mcp_tool_ids?.filter((id: any) =>
+                      relatedObject(mcpToolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
+                </span>
+              </div>
+              <div class="flex">
+                <el-button
+                  type="primary"
+                  link
+                  @click="openMcpServersDialog"
+                  @refreshForm="refreshParam"
+                >
+                  <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                </el-button>
+              </div>
+            </div>
+            <div class="w-full mb-16" v-if="chat_data.mcp_tool_ids?.length > 0 && collapseData.MCP">
+              <template v-for="(item, index) in chat_data.mcp_tool_ids" :key="index">
+                <div
+                  class="flex-between border border-r-6 white-bg mb-4"
+                  style="padding: 5px 8px"
+                  v-if="relatedObject(mcpToolSelectOptions, item, 'id')"
+                >
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="relatedObject(mcpToolSelectOptions, item, 'id')?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img
+                        :src="resetUrl(relatedObject(mcpToolSelectOptions, item, 'id')?.icon)"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <ToolIcon
+                      v-else
+                      type="MCP"
+                      class="mr-8"
+                      :size="20"
+                      style="--el-avatar-border-radius: 6px"
+                    />
+
+                    <div
+                      class="ellipsis"
+                      :title="relatedObject(mcpToolSelectOptions, item, 'id')?.name"
+                    >
+                      {{
+                        relatedObject(mcpToolSelectOptions, item, 'id')?.name ||
+                        $t('common.custom') + ' MCP'
+                      }}
+                    </div>
+                  </div>
+                  <el-button text @click="removeMcpTool(item)">
+                    <el-icon><Close /></el-icon>
+                  </el-button>
+                </div>
+              </template>
+            </div>
+            <div
+              v-if="chat_data.mcp_servers && chat_data.mcp_servers.length > 0 && collapseData.MCP"
+              class="flex-between border border-r-6 white-bg mb-16"
+              style="padding: 5px 8px"
+            >
+              <div class="flex align-center" style="line-height: 20px">
+                <ToolIcon type="MCP" class="mr-8" :size="20" />
+                <div class="ellipsis">
+                  {{ $t('common.custom') + ' MCP' }}
+                </div>
+              </div>
+              <el-button text @click="chat_data.mcp_servers = ''">
+                <el-icon><Close /></el-icon>
+              </el-button>
+            </div>
+          </div>
+
+          <!-- 工具       -->
+          <div>
+            <div class="flex-between mb-8" @click="collapseData.tool = !collapseData.tool">
+              <div class="flex align-center lighter cursor">
+                <el-icon class="mr-8 arrow-icon" :class="collapseData.tool ? 'rotate-90' : ''">
+                  <CaretRight />
+                </el-icon>
+                {{ $t('views.tool.title') }}
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.tool_ids?.filter((id: any) =>
+                      relatedObject(toolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.tool_ids?.filter((id: any) =>
+                      relatedObject(toolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
+                </span>
+              </div>
+              <div class="flex">
+                <el-button type="primary" link @click="openToolDialog" @refreshForm="refreshParam">
+                  <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                </el-button>
+              </div>
+            </div>
+            <div class="w-full mb-16" v-if="chat_data.tool_ids?.length > 0 && collapseData.tool">
+              <template v-for="(item, index) in chat_data.tool_ids" :key="index">
+                <div
+                  class="flex-between border border-r-6 white-bg mb-4"
+                  style="padding: 5px 8px"
+                  v-if="relatedObject(toolSelectOptions, item, 'id')"
+                >
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="relatedObject(toolSelectOptions, item, 'id')?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img
+                        :src="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.icon)"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <ToolIcon
+                      v-else
+                      class="mr-8"
+                      :size="20"
+                      :type="resetUrl(relatedObject(toolSelectOptions, item, 'id')?.tool_type)"
+                      style="--el-avatar-border-radius: 6px"
+                    />
+
+                    <div
+                      class="ellipsis"
+                      :title="relatedObject(toolSelectOptions, item, 'id')?.name"
+                    >
+                      {{ relatedObject(toolSelectOptions, item, 'id')?.name }}
+                    </div>
+                  </div>
+                  <el-button text @click="removeTool(item)">
+                    <el-icon><Close /></el-icon>
+                  </el-button>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- 技能       -->
+          <div>
+            <div class="flex-between mb-8" @click="collapseData.skill = !collapseData.skill">
+              <div class="flex align-center lighter cursor">
+                <el-icon class="mr-8 arrow-icon" :class="collapseData.skill ? 'rotate-90' : ''">
+                  <CaretRight />
+                </el-icon>
+                Skills
+                <span
+                  class="ml-4"
+                  v-if="
+                    chat_data.skill_tool_ids?.filter((id: any) =>
+                      relatedObject(skillToolSelectOptions, id, 'id'),
+                    )?.length
+                  "
+                >
+                  ({{
+                    chat_data.skill_tool_ids?.filter((id: any) =>
+                      relatedObject(skillToolSelectOptions, id, 'id'),
+                    )?.length
+                  }})
+                </span>
+              </div>
+              <div class="flex">
+                <el-button
+                  type="primary"
+                  link
+                  @click="openSkillToolDialog"
+                  @refreshForm="refreshParam"
+                >
+                  <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                </el-button>
+              </div>
+            </div>
+            <div
+              class="w-full mb-16"
+              v-if="chat_data.skill_tool_ids?.length > 0 && collapseData.skill"
+            >
+              <template v-for="(item, index) in chat_data.skill_tool_ids" :key="index">
+                <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="relatedObject(skillToolSelectOptions, item, 'id')?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img
+                        :src="resetUrl(relatedObject(skillToolSelectOptions, item, 'id')?.icon)"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <ToolIcon
+                      v-else
+                      class="mr-8"
+                      :size="20"
+                      type="SKILL"
+                      style="--el-avatar-border-radius: 6px"
+                    />
+
+                    <div
+                      class="ellipsis"
+                      :title="relatedObject(skillToolSelectOptions, item, 'id')?.name"
+                    >
+                      {{ relatedObject(skillToolSelectOptions, item, 'id')?.name }}
+                    </div>
+                  </div>
+                  <el-button text @click="removeSkillTool(item)">
+                    <el-icon><Close /></el-icon>
+                  </el-button>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- 应用 没有共享应用，在共享知识库工作流不显示这个      -->
+          <div v-if="apiType !== 'systemShare'">
+            <div class="flex-between" @click="collapseData.agent = !collapseData.agent">
+              <div class="flex align-center lighter cursor">
+                <el-icon class="mr-8 arrow-icon" :class="collapseData.agent ? 'rotate-90' : ''">
+                  <CaretRight />
+                </el-icon>
+                {{ $t('views.application.title') }}
+                <span class="ml-4" v-if="chat_data.application_ids?.length">
+                  ({{ chat_data.application_ids?.length }})</span
+                >
+              </div>
+              <div class="flex">
+                <el-button
+                  type="primary"
+                  link
+                  @click="openApplicationDialog"
+                  @refreshForm="refreshParam"
+                >
+                  <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+                </el-button>
+              </div>
+            </div>
+            <div class="w-full mt-8" v-if="chat_data.application_ids?.length && collapseData.agent">
+              <template v-for="(item, index) in chat_data.application_ids" :key="index">
+                <div class="flex-between border border-r-6 white-bg mb-4" style="padding: 5px 8px">
+                  <div class="flex align-center" style="line-height: 20px">
+                    <el-avatar
+                      v-if="relatedObject(applicationSelectOptions, item, 'id')?.icon"
+                      shape="square"
+                      :size="20"
+                      style="background: none"
+                      class="mr-8"
+                    >
+                      <img
+                        :src="resetUrl(relatedObject(applicationSelectOptions, item, 'id')?.icon)"
+                        alt=""
+                      />
+                    </el-avatar>
+                    <AppIcon v-else class="mr-8" :size="20" />
+
+                    <div
+                      class="ellipsis"
+                      :title="relatedObject(applicationSelectOptions, item, 'id')?.name"
+                    >
+                      {{ relatedObject(applicationSelectOptions, item, 'id')?.name }}
+                    </div>
+                  </div>
+                  <el-button text @click="removeApplication(item)">
+                    <el-icon><Close /></el-icon>
+                  </el-button>
+                </div>
+              </template>
+            </div>
+          </div>
+        </el-card>
+
+        <el-form-item @click.prevent>
+          <template #label>
+            <div class="flex-between w-full">
+              <div>
+                <span>{{ $t('views.application.form.reasoningContent.label') }}</span>
+              </div>
+              <div>
+                <el-button
+                  type="primary"
+                  link
+                  @click="openReasoningParamSettingDialog"
+                  @refreshForm="refreshParam"
+                  class="mr-4"
+                  v-if="chat_data.model_setting.reasoning_content_enable"
+                >
+                  <AppIcon iconName="app-setting"></AppIcon>
+                </el-button>
+                <el-switch
+                  size="small"
+                  v-model="chat_data.model_setting.reasoning_content_enable"
+                />
+              </div>
+            </div>
+          </template>
+        </el-form-item>
+        <el-form-item
+          @click.prevent
+          v-if="
+            [
+              WorkflowMode.Application,
+              WorkflowMode.ApplicationLoop,
+              WorkflowMode.Tool,
+              WorkflowMode.ToolLoop,
+            ].includes(workflowMode)
+          "
+        >
+          <template #label>
+            <div class="flex align-center">
+              <div class="mr-4">
+                <span>{{ $t('workflow.nodes.aiChatNode.returnContent.label') }}</span>
+              </div>
+              <el-tooltip effect="dark" placement="right" popper-class="max-w-200">
+                <template #content>
+                  {{ $t('workflow.nodes.aiChatNode.returnContent.tooltip') }}
+                </template>
+                <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+              </el-tooltip>
+            </div>
+          </template>
+          <el-switch size="small" v-model="chat_data.is_result" />
+        </el-form-item>
+      </el-form>
+    </el-card>
+
+    <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="refreshParam" />
+    <GeneratePromptDialog @replace="replace" ref="GeneratePromptDialogRef" />
+    <ReasoningParamSettingDialog
+      ref="ReasoningParamSettingDialogRef"
+      @refresh="submitReasoningDialog"
+    />
+    <McpServersDialog ref="mcpServersDialogRef" @refresh="submitMcpServersDialog" />
+    <ToolDialog ref="toolDialogRef" @refresh="submitToolDialog" tool_type="CUSTOM,WORKFLOW" />
+    <ToolDialog ref="skillToolDialogRef" @refresh="submitSkillToolDialog" tool_type="SKILL" />
+    <ApplicationDialog ref="applicationDialogRef" @refresh="submitApplicationDialog" />
+  </NodeContainer>
+</template>
+<script setup lang="ts">
+import { cloneDeep, set, groupBy } from 'lodash'
+import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import NodeCascader from '@/workflow/common/NodeCascader.vue'
+import type { FormInstance } from 'element-plus'
+import { ref, computed, onMounted, inject, reactive } from 'vue'
+import { isLastNode } from '@/workflow/common/data'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
+import { t } from '@/locales'
+import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
+import ToolDialog from '@/views/application/component/ToolDialog.vue'
+import McpServersDialog from '@/views/application/component/McpServersDialog.vue'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { useRoute } from 'vue-router'
+
+import { resetUrl } from '@/utils/common'
+import { relatedObject } from '@/utils/array.ts'
+import { WorkflowMode } from '@/enums/application'
+import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
+import { fileTooltip } from '@/workflow/common/data.ts'
+const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
+const getResourceDetail = inject('getResourceDetail') as any
+const route = useRoute()
+
+const {
+  params: { id },
+} = route as any
+const vision = computed({
+  get: () => {
+    return props.nodeModel.properties.node_data.vision
+  },
+  set: (vision: boolean) => {
+    set(props.nodeModel.properties.node_data, 'vision', vision)
+  },
+})
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else {
+    return 'workspace'
+  }
+})
+
+const wheel = (e: any) => {
+  if (e.ctrlKey === true) {
+    e.preventDefault()
+    return true
+  } else {
+    e.stopPropagation()
+    return true
+  }
+}
+
+function submitSystemDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'system', val)
+}
+
+function submitDialog(val: string) {
+  set(props.nodeModel.properties.node_data, 'prompt', val)
+}
+
+const model_change = (model_id?: string) => {
+  if (model_id) {
+    AIModeParamSettingDialogRef.value?.reset_default(model_id, id)
+  } else {
+    refreshParam({})
+  }
+}
+
+const defaultPrompt = `${t('workflow.nodes.aiChatNode.defaultPrompt')}：
+{{${t('workflow.nodes.searchKnowledgeNode.label')}.data}}
+${t('views.problem.title')}：
+{{${t('workflow.nodes.startNode.label')}.question}}`
+
+const collapseData = reactive({
+  MCP: true,
+  tool: true,
+  skill: true,
+  agent: true,
+})
+
+const form = {
+  model_id: '',
+  model_id_type: 'custom',
+  model_id_reference: [],
+  system: '',
+  prompt: defaultPrompt,
+  dialogue_number: 1,
+  is_result: true,
+  temperature: null,
+  max_tokens: null,
+  dialogue_type: 'WORKFLOW',
+  model_setting: {
+    reasoning_content_start: '<think>',
+    reasoning_content_end: '</think>',
+    reasoning_content_enable: false,
+  },
+}
+
+const chat_data = computed({
+  get: () => {
+    if (props.nodeModel.properties.node_data) {
+      if (!props.nodeModel.properties.node_data.model_setting) {
+        set(props.nodeModel.properties.node_data, 'model_setting', {
+          reasoning_content_start: '<think>',
+          reasoning_content_end: '</think>',
+          reasoning_content_enable: false,
+        })
+      }
+      if (!props.nodeModel.properties.node_data.model_id_type) {
+        set(props.nodeModel.properties.node_data, 'model_id_type', 'custom')
+      }
+      if (!props.nodeModel.properties.node_data.model_id_reference) {
+        set(props.nodeModel.properties.node_data, 'model_id_reference', [])
+      }
+      return props.nodeModel.properties.node_data
+    } else {
+      set(props.nodeModel.properties, 'node_data', form)
+    }
+
+    return props.nodeModel.properties.node_data
+  },
+  set: (value) => {
+    set(props.nodeModel.properties, 'node_data', value)
+  },
+})
+const props = defineProps<{ nodeModel: any }>()
+
+const aiChatNodeFormRef = ref<FormInstance>()
+
+const modelOptions = ref<any>(null)
+const AIModeParamSettingDialogRef = ref<InstanceType<typeof AIModeParamSettingDialog>>()
+const nodeCascaderRef = ref()
+const ReasoningParamSettingDialogRef = ref<InstanceType<typeof ReasoningParamSettingDialog>>()
+const validate = () => {
+  return aiChatNodeFormRef.value?.validate().catch((err) => {
+    return Promise.reject({ node: props.nodeModel, errMessage: err })
+  })
+}
+
+const resource = getResourceDetail()
+
+function getSelectModel() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          workspace_id: resource.value?.workspace_id,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
+}
+
+const openAIParamSettingDialog = (modelId: string) => {
+  if (modelId) {
+    AIModeParamSettingDialogRef.value?.open(modelId, id, chat_data.value.model_params_setting)
+  }
+}
+
+const GeneratePromptDialogRef = ref<InstanceType<typeof GeneratePromptDialog>>()
+const openGeneratePromptDialog = (modelId: string) => {
+  if (modelId) {
+    GeneratePromptDialogRef.value?.open(modelId, id)
+  }
+}
+const replace = (v: any) => {
+  set(props.nodeModel.properties.node_data, 'system', v)
+}
+const openReasoningParamSettingDialog = () => {
+  ReasoningParamSettingDialogRef.value?.open(chat_data.value.model_setting)
+}
+
+function refreshParam(data: any) {
+  set(props.nodeModel.properties.node_data, 'model_params_setting', data)
+}
+
+function submitReasoningDialog(val: any) {
+  let model_setting = cloneDeep(props.nodeModel.properties.node_data.model_setting)
+  model_setting = {
+    ...model_setting,
+    ...val,
+  }
+
+  set(props.nodeModel.properties.node_data, 'model_setting', model_setting)
+}
+
+const mcpServersDialogRef = ref()
+function openMcpServersDialog() {
+  const config = {
+    mcp_servers: chat_data.value.mcp_servers,
+    mcp_tool_ids: chat_data.value.mcp_tool_ids,
+    mcp_source: chat_data.value.mcp_source,
+  }
+  mcpServersDialogRef.value.open(config, mcpToolSelectOptions.value)
+}
+
+function submitMcpServersDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'mcp_servers', config.mcp_servers)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', config.mcp_tool_ids)
+  set(props.nodeModel.properties.node_data, 'mcp_source', config.mcp_source)
+  collapseData.MCP = true
+}
+
+const toolDialogRef = ref()
+function openToolDialog() {
+  toolDialogRef.value.open(chat_data.value.tool_ids)
+}
+function submitToolDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'tool_ids', config.tool_ids)
+  collapseData.tool = true
+}
+function removeTool(id: any) {
+  const list = props.nodeModel.properties.node_data.tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'tool_ids', list)
+}
+function removeMcpTool(id: any) {
+  const list = props.nodeModel.properties.node_data.mcp_tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'mcp_tool_ids', list)
+}
+function removeSkillTool(id: any) {
+  const list = props.nodeModel.properties.node_data.skill_tool_ids.filter((v: any) => v !== id)
+  set(props.nodeModel.properties.node_data, 'skill_tool_ids', list)
+}
+
+const toolSelectOptions = ref<any[]>([])
+function getToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          scope: 'WORKSPACE',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
+          workspace_id: resource.value?.workspace_id,
+        }
+      : {
+          scope: 'WORKSPACE',
+          tool_type_list: ['CUSTOM', 'WORKFLOW'],
+        }
+
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getAllToolList(obj)
+    .then((res: any) => {
+      toolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
+    })
+}
+
+const mcpToolSelectOptions = ref<any[]>([])
+function getMcpToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+          workspace_id: resource.value?.workspace_id,
+        }
+      : {
+          scope: 'WORKSPACE',
+          tool_type: 'MCP',
+        }
+
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getAllToolList(obj)
+    .then((res: any) => {
+      mcpToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
+    })
+}
+
+const applicationSelectOptions = ref<any[]>([])
+function getApplicationSelectOptions() {
+  ;(apiType.value === 'systemShare'
+    ? Promise.resolve({ data: [] })
+    : loadSharedApi({ type: 'application', systemType: apiType.value }).getAllApplication({
+        folder_id: resource.value?.workspace_id,
+      })
+  ).then((res: any) => {
+    applicationSelectOptions.value = res.data.filter((item: any) => item.is_publish)
+  })
+}
+
+const applicationDialogRef = ref()
+function openApplicationDialog() {
+  applicationDialogRef.value.open(props.nodeModel.properties.node_data.application_ids)
+}
+
+function submitApplicationDialog(config: any) {
+  set(props.nodeModel.properties.node_data, 'application_ids', config.application_ids)
+  collapseData.agent = true
+}
+function removeApplication(id: any) {
+  if (chat_data.value.application_ids) {
+    chat_data.value.application_ids = chat_data.value.application_ids.filter((v: any) => v !== id)
+  }
+}
+
+const skillToolDialogRef = ref()
+function openSkillToolDialog() {
+  skillToolDialogRef.value.open(chat_data.value.skill_tool_ids)
+}
+
+function submitSkillToolDialog(config: any) {
+  chat_data.value.skill_tool_ids = config.tool_ids
+  collapseData.skill = true
+}
+
+const skillToolSelectOptions = ref<any[]>([])
+function getSkillToolSelectOptions() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          scope: 'WORKSPACE',
+          tool_type: 'SKILL',
+          workspace_id: chat_data.value?.workspace_id,
+        }
+      : {
+          scope: 'WORKSPACE',
+          tool_type: 'SKILL',
+        }
+
+  loadSharedApi({ type: 'tool', systemType: apiType.value })
+    .getAllToolList(obj)
+    .then((res: any) => {
+      skillToolSelectOptions.value = [...res.data.shared_tools, ...res.data.tools].filter(
+        (item: any) => item.is_active,
+      )
+    })
+}
+
+function refreshLongTermConfig() {
+  const form_data = props.nodeModel.graphModel.nodes
+    .filter((v: any) => v.id === 'base-node')
+    .filter((v: any) => v.properties.node_data.long_term_enable)
+    .filter((v: any) => v)
+
+  if (form_data.length > 0) {
+    chat_data.value.system = chat_data.value.system
+  }
+}
+props.nodeModel.graphModel.eventCenter.on('refreshLongTermConfig', refreshLongTermConfig)
+
+onMounted(() => {
+  getSelectModel()
+  if (typeof props.nodeModel.properties.node_data?.is_result === 'undefined') {
+    if (isLastNode(props.nodeModel)) {
+      set(props.nodeModel.properties.node_data, 'is_result', true)
+    }
+  }
+  set(props.nodeModel, 'validate', validate)
+  if (!chat_data.value.dialogue_type) {
+    chat_data.value.dialogue_type = 'WORKFLOW'
+  }
+
+  if (props.nodeModel.properties.node_data?.mcp_tool_id) {
+    set(props.nodeModel.properties.node_data, 'mcp_tool_ids', [
+      props.nodeModel.properties.node_data?.mcp_tool_id,
+    ])
+    set(props.nodeModel.properties.node_data, 'mcp_tool_id', undefined)
+  }
+  if (props.nodeModel.properties.node_data?.mcp_output_enable === undefined) {
+    set(props.nodeModel.properties.node_data, 'mcp_output_enable', true)
+  }
+
+  getToolSelectOptions()
+  getMcpToolSelectOptions()
+  getApplicationSelectOptions()
+  getSkillToolSelectOptions()
+})
+</script>
+<style lang="scss" scoped></style>

@@ -1,0 +1,603 @@
+<template>
+  <div @mousedown="mousedown" class="workflow-node-container p-16" style="overflow: visible">
+    <div
+      class="step-container white-bg border-r-8 p-16"
+      :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
+      style="overflow: visible"
+    >
+      <div v-resize="resizeStepContainer">
+        <div class="flex-between">
+          <div
+            class="flex align-center"
+            @dragstart.prevent
+            @drag.prevent
+            @dragover.prevent
+            @dragend.prevent
+            style="width: 69%"
+          >
+            <component
+              :is="iconComponent(`${nodeModel.type}-icon`)"
+              class="mr-8"
+              :size="24"
+              :item="nodeModel?.properties.node_data"
+              style="--el-avatar-border-radius: 6px"
+            />
+            <h4
+              class="ellipsis-1 break-all"
+              v-html="highlightedStepName(nodeModel.properties.stepName)"
+            ></h4>
+          </div>
+
+          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+            <el-button text @click="showNode = !showNode">
+              <el-icon class="arrow-icon color-secondary" :class="showNode ? 'rotate-180' : ''"
+                ><ArrowDownBold />
+              </el-icon>
+            </el-button>
+            <el-dropdown
+              v-if="showConditionOperate(nodeModel.type)"
+              :teleported="false"
+              trigger="click"
+              placement="bottom-start"
+            >
+              <el-button text>
+                <img src="@/assets/workflow/icon_or.svg" alt="" v-if="condition === 'OR'" />
+                <img src="@/assets/workflow/icon_and.svg" alt="" v-if="condition === 'AND'" />
+              </el-button>
+              <template #dropdown>
+                <div style="width: 280px" class="p-12-16">
+                  <h5>{{ $t('workflow.condition.title') }}</h5>
+                  <p class="mt-8 lighter">
+                    <span>{{ $t('workflow.condition.front') }}</span>
+                    <el-select v-model="condition" size="small" style="width: 60px; margin: 0 8px">
+                      <el-option :label="$t('workflow.condition.AND')" value="AND" />
+                      <el-option :label="$t('workflow.condition.OR')" value="OR" />
+                    </el-select>
+                    <span>{{ $t('workflow.condition.text') }}</span>
+                  </p>
+                </div>
+              </template>
+            </el-dropdown>
+            <el-dropdown v-if="showOperate(nodeModel.type)" :teleported="false" trigger="click">
+              <el-button text>
+                <AppIcon iconName="app-more" class="color-secondary"></AppIcon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu style="min-width: 144px">
+                  <el-dropdown-item @click="renameNode" class="p-8">
+                    <AppIcon iconName="app-rename" class="color-secondary"></AppIcon>
+                    {{ $t('common.rename') }}</el-dropdown-item
+                  >
+                  <el-dropdown-item @click="copyNode" class="p-8">
+                    <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
+                    {{ $t('common.copy') }}</el-dropdown-item
+                  >
+                  <template
+                    v-if="
+                      !(
+                        (nodeModel.type == 'tool-lib-node' &&
+                          nodeModel['properties'].kind == WorkflowKind.DataSource) ||
+                        nodeModel.type == 'data-source-local-node' ||
+                        nodeModel.type == 'data-source-web-node'
+                      )
+                    "
+                  >
+                    <div class="flex-between p-8" @click.stop>
+                      <AppIcon iconName="app-active" class="color-secondary"></AppIcon>
+                      <span class="mr-16">{{ $t('common.status.enableStatus') }}</span>
+                      <el-switch v-model="nodeEnabled" size="small" /></div
+                  ></template>
+
+                  <el-dropdown-item @click="deleteNode" class="border-t p-8">
+                    <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                    {{ $t('common.delete') }}</el-dropdown-item
+                  >
+                  <div v-if="sourceName" class="border-t p-8" @click.stop>
+                    <div class="color-secondary font-small">{{ $t('common.source') }}</div>
+                    <div class="lighter mt-4 break-all">{{ sourceName }}</div>
+                  </div>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
+        </div>
+        <el-collapse-transition>
+          <div @mousedown.stop @keydown.stop @click.stop v-show="showNode" class="mt-16">
+            <el-alert
+              v-if="nodeDisabled"
+              class="mb-16"
+              :title="$t('workflow.tip.disabled')"
+              type="error"
+              show-icon
+              :closable="false"
+            />
+            <el-alert
+              v-if="node_status != 200"
+              class="mb-16"
+              :title="
+                props.nodeModel.type === 'application-node'
+                  ? $t('workflow.tip.applicationNodeError')
+                  : $t('workflow.tip.toolNodeError')
+              "
+              type="error"
+              show-icon
+              :closable="false"
+            />
+            <slot></slot>
+            <template v-if="nodeFields.length > 0">
+              <div class="flex-between">
+                <h5 class="title-decoration-1 mb-8 mt-8">
+                  {{ output_title }}
+                </h5>
+                <div v-if="exceptionNodeList.includes(nodeModel.type)" class="text-right">
+                  <span class="mt-8 mr-8 lighter">{{ $t('common.param.exception') }}</span>
+                  <el-switch v-model="enable_exception" size="small" />
+                </div>
+              </div>
+              <div class="border-r-6 p-4-12 layout-bg lighter">
+                <template v-for="(item, index) in nodeFields" :key="index">
+                  <div
+                    class="flex-between mb-8 mt-8"
+                    @mouseenter="showicon = index"
+                    @mouseleave="showicon = null"
+                  >
+                    <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('workflow.setting.copyParam')"
+                      placement="top"
+                      v-if="showicon === index"
+                    >
+                      <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                        <AppIcon iconName="app-copy"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                </template>
+              </div>
+
+              <div class="border-r-6 p-4-12 layout-bg lighter mt-8" v-if="enable_exception">
+                <template v-for="(item, index) in abnormalNodeFields" :key="index">
+                  <div
+                    class="flex-between mb-8 mt-8"
+                    @mouseenter="showicon = 'abnormal' + index"
+                    @mouseleave="showicon = null"
+                  >
+                    <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
+                    <el-tooltip
+                      effect="dark"
+                      :content="$t('workflow.setting.copyParam')"
+                      placement="top"
+                      v-if="showicon === 'abnormal' + index"
+                    >
+                      <el-button link @click="copyClick(item.globeLabel)" style="padding: 0">
+                        <AppIcon iconName="app-copy"></AppIcon>
+                      </el-button>
+                    </el-tooltip>
+                  </div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </el-collapse-transition>
+      </div>
+    </div>
+
+    <el-collapse-transition>
+      <DropdownMenu
+        v-if="showAnchor"
+        @mousemove.stop
+        @mousedown.stop
+        @click.stop
+        @wheel="handleWheel"
+        :show="showAnchor"
+        :inner="true"
+        :id="id"
+        style="left: 100%; transform: translate(0, -50%)"
+        :style="dropdownMenuStyle"
+        @clickNodes="clickNodes"
+      />
+    </el-collapse-transition>
+
+    <el-dialog
+      :title="$t('workflow.nodeName')"
+      v-model="nodeNameDialogVisible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :destroy-on-close="true"
+      append-to-body
+      @submit.prevent
+    >
+      <el-form label-position="top" ref="titleFormRef" :model="form">
+        <el-form-item
+          prop="title"
+          :rules="[
+            {
+              required: true,
+              message: $t('common.inputPlaceholder'),
+              trigger: 'blur',
+            },
+          ]"
+        >
+          <el-input v-model="form.title" @blur="form.title = form.title.trim()" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click.prevent="nodeNameDialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="editName(titleFormRef)">
+            {{ $t('common.save') }}
+          </el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
+</template>
+<script setup lang="ts">
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
+import { set } from 'lodash'
+import { iconComponent } from '../icons/utils'
+import { copyClick } from '@/utils/clipboard'
+import { WorkflowType, WorkflowKind } from '@/enums/application'
+import { MsgError, MsgConfirm } from '@/utils/message'
+import type { FormInstance } from 'element-plus'
+import { t } from '@/locales'
+import { useRoute } from 'vue-router'
+import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
+
+const route = useRoute()
+const {
+  params: { id },
+} = route as any
+
+const height = ref<{
+  stepContainerHeight: number
+  inputContainerHeight: number
+  outputContainerHeight: number
+}>({
+  stepContainerHeight: 0,
+  inputContainerHeight: 0,
+  outputContainerHeight: 0,
+})
+const showAnchor = ref<boolean>(false)
+const anchorData = ref<any>()
+const dropdownMenuStyle = computed(() => {
+  return {
+    top: anchorData.value
+      ? anchorData.value.y - props.nodeModel.y + props.nodeModel.height / 2 + 'px'
+      : '0px',
+  }
+})
+const nodeDisabled = computed({
+  get: () => {
+    return props.nodeModel.properties.disabled || false
+  },
+  set: (v: boolean) => {
+    set(props.nodeModel.properties, 'disabled', v)
+  },
+})
+const nodeEnabled = computed({
+  get: () => !nodeDisabled.value,
+  set: (v: boolean) => {
+    nodeDisabled.value = !v
+  },
+})
+const titleFormRef = ref()
+const nodeNameDialogVisible = ref<boolean>(false)
+const form = ref<any>({
+  title: '',
+})
+
+const condition = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'condition', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.condition) {
+      return props.nodeModel.properties.condition
+    }
+    set(props.nodeModel.properties, 'condition', 'AND')
+    return true
+  },
+})
+const showNode = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'showNode', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.showNode !== undefined) {
+      return props.nodeModel.properties.showNode
+    }
+    set(props.nodeModel.properties, 'showNode', true)
+    return true
+  },
+})
+
+const handleWheel = (event: any) => {
+  const isCombinationKeyPressed = event.ctrlKey || event.metaKey
+  if (!isCombinationKeyPressed) {
+    event.stopPropagation()
+  }
+}
+const node_status = computed(() => {
+  if (props.nodeModel.properties.status) {
+    return props.nodeModel.properties.status
+  }
+  return 200
+})
+
+const sourceName = computed(() => {
+  if (['application-node', 'tool-lib-node'].includes(props.nodeModel.type)) {
+    return props.nodeModel.properties.node_data?.name || ''
+  }
+  return ''
+})
+
+function renameNode() {
+  form.value.title = props.nodeModel.properties.stepName
+  nodeNameDialogVisible.value = true
+}
+const editName = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid) => {
+    if (valid) {
+      if (
+        !props.nodeModel.graphModel.nodes
+          .filter((node: any) => node.id !== props.nodeModel.id)
+          ?.some((node: any) => node.properties.stepName === form.value.title)
+      ) {
+        set(props.nodeModel.properties, 'stepName', form.value.title)
+        props.nodeModel.clear_next_node_field(true)
+        nodeNameDialogVisible.value = false
+        formEl.resetFields()
+      } else {
+        MsgError(t('workflow.tip.repeatedNodeError'))
+      }
+    }
+  })
+}
+
+const mousedown = (event?: any) => {
+  if (!event?.shiftKey) {
+    props.nodeModel.graphModel.clearSelectElements()
+  }
+  set(props.nodeModel, 'isSelected', !props.nodeModel.isSelected)
+  set(props.nodeModel, 'isHovered', !props.nodeModel.isSelected)
+  props.nodeModel.graphModel.toFront(props.nodeModel.id)
+}
+const showicon = ref<number | string | null>(null)
+const copyNode = () => {
+  props.nodeModel.graphModel.clearSelectElements()
+  const cloneNode = props.nodeModel.graphModel.cloneNode(props.nodeModel.id)
+  set(cloneNode, 'isSelected', true)
+  set(cloneNode, 'isHovered', true)
+  props.nodeModel.graphModel.toFront(cloneNode.id)
+}
+const deleteNode = () => {
+  MsgConfirm(t('common.tip'), t('workflow.delete.confirmTitle'), {
+    confirmButtonText: t('common.confirm'),
+    confirmButtonClass: 'danger',
+  }).then(() => {
+    if (props.nodeModel.type === WorkflowType.LoopNode) {
+      const next = props.nodeModel.graphModel.getNodeOutgoingNode(props.nodeModel.id)
+      next.forEach((n: any) => {
+        if (n.type === 'loop-body-node') {
+          props.nodeModel.graphModel.deleteNode(n.id)
+        }
+      })
+    }
+    props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
+  })
+  props.nodeModel.graphModel.eventCenter.emit('delete_node')
+}
+const resizeStepContainer = (wh: any) => {
+  if (wh.height) {
+    if (!props.nodeModel.virtual) {
+      height.value.stepContainerHeight = wh.height
+      props.nodeModel.setHeight(height.value.stepContainerHeight)
+    }
+  }
+}
+
+function clickNodes(item: any) {
+  const width = item.properties.width ? item.properties.width : 214
+  const nodeModel = props.nodeModel.graphModel.addNode({
+    type: item.type,
+    properties: item.properties,
+    x: anchorData.value?.x + width / 2 + 200,
+    y: anchorData.value?.y - item.height,
+  })
+  props.nodeModel.graphModel.addEdge({
+    type: 'app-edge',
+    sourceNodeId: props.nodeModel.id,
+    sourceAnchorId: anchorData.value?.id,
+    targetNodeId: nodeModel.id,
+    targetAnchorId: nodeModel.id + '_left',
+  })
+
+  closeNodeMenu()
+}
+const enable_exception = computed({
+  set: (v) => {
+    set(props.nodeModel.properties, 'enableException', v)
+  },
+  get: () => {
+    if (props.nodeModel.properties.enableException !== undefined) {
+      return props.nodeModel.properties.enableException
+    }
+    set(props.nodeModel.properties, 'enableException', false)
+    return false
+  },
+})
+const props = withDefaults(
+  defineProps<{
+    nodeModel: any
+    exceptionNodeList?: string[]
+  }>(),
+  {
+    exceptionNodeList: () => [
+      'ai-chat-node',
+      'video-understand-node',
+      'image-generate-node',
+      'image-understand-node',
+    ],
+  },
+)
+
+const nodeFields = computed(() => {
+  if (props.nodeModel.properties.config.fields) {
+    const fields = props.nodeModel.properties.config.fields?.map((field: any) => {
+      return {
+        label: field.label,
+        value: field.value,
+        globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
+        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
+      }
+    })
+    return fields
+  }
+  return []
+})
+
+const output_title = computed(() => {
+  return props.nodeModel.properties.config.output_title ?? t('common.param.outputParam')
+})
+
+const abnormalNodeFields = computed(() => {
+  return [
+    {
+      label: t('workflow.abnormalInformation'),
+      value: 'exception_message',
+      globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
+      globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
+    },
+  ]
+})
+watch(enable_exception, () => {
+  props.nodeModel.graphModel.eventCenter.emit(
+    'delete_edge',
+    props.nodeModel.outgoing.edges
+      .filter((item: any) =>
+        [`${props.nodeModel.id}_exception_right`].includes(item.sourceAnchorId),
+      )
+      .map((item: any) => item.id),
+  )
+})
+
+function showOperate(type: string) {
+  return ![
+    WorkflowType.Start,
+    WorkflowType.Base,
+    WorkflowType.KnowledgeBase,
+    WorkflowType.LoopStartNode.toString(),
+    WorkflowType.ToolBaseNode,
+    WorkflowType.ToolStartNode,
+  ].includes(type)
+}
+
+function showConditionOperate(type: string) {
+  return (
+    ![
+      WorkflowType.Start,
+      WorkflowType.Base,
+      WorkflowType.ToolBaseNode,
+      WorkflowType.ToolStartNode,
+      WorkflowType.KnowledgeBase,
+      WorkflowType.LoopStartNode.toString(),
+      WorkflowType.DataSourceLocalNode,
+      WorkflowType.DataSourceWebNode,
+    ].includes(type) && props.nodeModel.properties.kind != WorkflowKind.DataSource
+  )
+}
+const openNodeMenu = (anchorValue: any) => {
+  showAnchor.value = true
+  anchorData.value = anchorValue
+}
+const closeNodeMenu = () => {
+  showAnchor.value = false
+  anchorData.value = undefined
+}
+/**
+ * 检索选中时候触发
+ * @param kw
+ */
+
+const keyWord = ref('')
+const currentKeyWord = ref(false)
+const selectOn = (kw: string) => {
+  keyWord.value = kw
+  props.nodeModel.isSelected = false
+  currentKeyWord.value = false
+}
+/**
+ * 定位时触发
+ * @param kw
+ */
+const focusOn = (kw: string) => {
+  props.nodeModel.setSelected(true)
+  currentKeyWord.value = true
+}
+/**
+ * 清除时触发
+ */
+const clearSelectOn = () => {
+  keyWord.value = ''
+  currentKeyWord.value = false
+}
+
+// 高亮选中关键字
+
+const highlightedStepName = (contentText: string) => {
+  let res = contentText
+  if (keyWord.value === '') {
+    return res
+  } else {
+    const wordsArray = contentText.split('')
+    for (let i = 0; i < wordsArray.length; i++) {
+      if (keyWord.value.includes(wordsArray[i])) {
+        wordsArray[i] = currentKeyWord.value
+          ? `<span style='background: #FF8800;'>${wordsArray[i]}</span>`
+          : `<span style='background: #FFC60A;'>${wordsArray[i]}</span>`
+      }
+    }
+    res = wordsArray.join('')
+    return res
+  }
+}
+onMounted(() => {
+  set(props.nodeModel, 'openNodeMenu', (anchorData: any) => {
+    showAnchor.value ? closeNodeMenu() : openNodeMenu(anchorData)
+  })
+  set(props.nodeModel, 'selectOn', selectOn)
+  set(props.nodeModel, 'focusOn', focusOn)
+  set(props.nodeModel, 'clearSelectOn', clearSelectOn)
+})
+</script>
+<style lang="scss" scoped>
+.workflow-node-container {
+  .step-container {
+    border: 2px solid #ffffff !important;
+    box-sizing: border-box;
+    box-shadow: 0px 2px 4px 0px rgba(var(--el-text-color-primary-rgb), 0.12);
+    &:hover {
+      box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
+    }
+    &.isSelected {
+      border: 2px solid var(--el-color-primary) !important;
+    }
+    &.error {
+      border: 1px solid #f54a45 !important;
+    }
+  }
+}
+:deep(.el-card) {
+  overflow: visible;
+}
+.app-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0px 2px 4px 0px rgba(31, 35, 41, 0.12);
+}
+</style>

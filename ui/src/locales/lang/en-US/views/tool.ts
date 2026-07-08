@@ -1,0 +1,123 @@
+export default {
+  title: 'Tool',
+  all: 'All',
+  createTool: 'Create Tool',
+  editTool: 'Edit Tool',
+  copyTool: 'Copy Tool',
+  importTool: 'Import Tool',
+  settingTool: 'Set Tool',
+  updatedVersion: 'Updated Version',
+  generateCodeDialog: {
+    generatePrompt: 'Generate Python Code',
+    placeholder: 'Please enter the topic',
+    title: 'Python code will be displayed here',
+  },
+  toolWorkflow: {
+    title: 'Workflow',
+    copyToolWorkflow: 'Copy Workflow',
+    creatToolWorkflow: 'Create Workflow',
+    toActiveTip: 'Unable to enable. Please publish the workflow first.',
+    debugResult: 'Debug results',
+  },
+  dataSource: {
+    title: 'Data Source',
+    createDataSource: 'Create Data Source',
+    editDataSource: 'Edit Data Source',
+    copyDataSource: 'Copy Data Source',
+    selectDataSource: 'Select Data Source',
+    requiredMessage: 'Please select data source',
+  },
+  toolStore: {
+    title: 'Tool Store',
+    createFromToolStore: 'Create from Tool Store',
+    internal: 'Built in system',
+    recommend: 'Recommended',
+    webSearch: 'Web Search',
+    databaseQuery: 'Database Query',
+    image: 'Image',
+    developer: 'Developer',
+    communication: 'Communication',
+    searchResult: '{count} search results for',
+    confirmTip: 'Are you sure to update tool: ',
+    updateStoreToolMessage: 'Updating tools may affect resources in use, so proceed with caution.',
+  },
+  mcp: {
+    title: 'MCP Service',
+    label: 'MCP Server Config',
+    placeholder: 'Please enter MCP Server config',
+    tip: 'Only supports SSE and Streamable HTTP calling methods',
+    requiredMessage: 'Please enter MCP Server Config',
+    createMcpTool: 'Create MCP',
+    editMcpTool: 'Edit MCP',
+    copyMcpTool: 'Copy MCP',
+    mcpConfig: 'MCP Service Config',
+  },
+  skill: {
+    title: 'Capabilities',
+    copySkillTool: 'Copy Skills',
+    createSkillTool: 'Create Skills',
+    editSkillTool: 'Edit Skills',
+    initParamPlaceholder: 'Parameters required to configure when enabling the skill',
+    skillFile: 'Skills File',
+    reUpload: 'Re-upload',
+  },
+  tip: {
+    saveMessage: 'Unsaved changes will be lost. Are you sure you want to exit?',
+  },
+  delete: {
+    confirmTitle: 'Confirm deletion of tool:',
+    confirmTitle2: 'tools?',
+    confirmMessage:
+      'Deleting this tool will cause errors in agent that reference it when they are queried. Please proceed with caution.',
+    resourceCountMessage:
+      'This tool is associated with {count} resources, and will be unavailable after deletion. Please proceed with caution.',
+  },
+  disabled: {
+    confirmTitle: 'Confirm disable tool:',
+    confirmMessage:
+      'Disabling this tool will cause errors in resources that reference it when they are executed. Please proceed with caution.',
+  },
+
+  form: {
+    toolName: {
+      label: 'Tool Name',
+      placeholder: 'Please enter the tool name',
+      requiredMessage: 'Please enter the tool name',
+    },
+    mcpName: {
+      placeholder: 'Please enter the MCP name',
+      requiredMessage: 'Please enter the MCP name',
+    },
+    workflowName: {
+      label: 'Workflow Name',
+      placeholder: 'Please enter the Workflow name',
+      requiredMessage: 'Please enter the Workflow name',
+    },
+    paramName: {
+      label: 'Parameter Name',
+      placeholder: 'Please enter the parameter name',
+      requiredMessage: 'Please enter the parameter name',
+    },
+    dataType: {
+      label: 'Data Type',
+    },
+    source: {
+      label: 'Source',
+      reference: 'Reference Parameter',
+    },
+    param: {
+      paramInfo1: 'Displayed when using the tool',
+      paramInfo2: 'Not displayed when using the tool',
+      code: 'Content (Python)',
+      selectPlaceholder: 'Please select parameter',
+      inputPlaceholder: 'Please enter parameter values',
+    },
+    debug: {
+      run: 'Run',
+      output: 'Output',
+      runResult: 'Run Result',
+      runSuccess: 'Successful',
+      runFailed: 'Run Failed',
+    },
+  },
+}

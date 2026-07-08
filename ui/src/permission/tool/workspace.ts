@@ -1,0 +1,356 @@
+import { hasPermission } from '@/utils/permission/index'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
+const workspace = {
+  read: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.TOOL_READ.getWorkspacePermission,
+        PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  jump_read: () => false,
+  is_share: () =>
+    hasPermission(
+      new ComplexPermission(
+        [
+          RoleConst.ADMIN,
+          RoleConst.USER.getWorkspaceRole,
+          RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        ],
+        [
+          PermissionConst.TOOL_READ.getWorkspacePermission,
+          PermissionConst.TOOL_READ.getWorkspacePermissionWorkspaceManageRole,
+        ],
+        [EditionConst.IS_EE],
+        'OR',
+      ),
+      'OR',
+    ),
+  create: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.TOOL_CREATE.getWorkspacePermission,
+        PermissionConst.TOOL_CREATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  batchDelete: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_BATCH_DELETE.getWorkspacePermission,
+        PermissionConst.TOOL_BATCH_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  batchMove: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_BATCH_MOVE.getWorkspacePermission,
+        PermissionConst.TOOL_BATCH_MOVE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  import: () =>
+    hasPermission(
+      [
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        RoleConst.USER.getWorkspaceRole,
+        PermissionConst.TOOL_IMPORT.getWorkspacePermission,
+        PermissionConst.TOOL_IMPORT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderCreate: (folder_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_FOLDER_CREATE.getToolWorkspaceResourcePermission(folder_id),
+        PermissionConst.TOOL_FOLDER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderRead: (folder_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_FOLDER_READ.getToolWorkspaceResourcePermission(folder_id),
+        PermissionConst.TOOL_FOLDER_READ.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderEdit: (folder_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_FOLDER_EDIT.getToolWorkspaceResourcePermission(folder_id),
+        PermissionConst.TOOL_FOLDER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderAuth: (folder_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_FOLDER_AUTH.getToolWorkspaceResourcePermission(folder_id),
+        PermissionConst.TOOL_FOLDER_AUTH.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderDelete: (folder_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(folder_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_FOLDER_DELETE.getToolWorkspaceResourcePermission(folder_id),
+        PermissionConst.TOOL_FOLDER_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  folderManage: () => true,
+  delete: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_DELETE.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_DELETE.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  record: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EXECUTE_RECORD.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EXECUTE_RECORD.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  trigger_read: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_TRIGGER_READ.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.TOOL_TRIGGER_READ.getToolWorkspaceResourcePermission(source_id),
+      ],
+      'OR',
+    ),
+  trigger_create: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_TRIGGER_CREATE.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.TOOL_TRIGGER_CREATE.getToolWorkspaceResourcePermission(source_id),
+      ],
+      'OR',
+    ),
+  trigger_edit: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_TRIGGER_EDIT.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.TOOL_TRIGGER_EDIT.getToolWorkspaceResourcePermission(source_id),
+      ],
+      'OR',
+    ),
+  trigger_delete: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_TRIGGER_DELETE.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.TOOL_TRIGGER_DELETE.getToolWorkspaceResourcePermission(source_id),
+      ],
+      'OR',
+    ),
+  switch: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  edit: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  copy: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  publish: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_PUBLISH.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_PUBLISH.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  export: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EXPORT.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_EXPORT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  auth: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_RESOURCE_AUTHORIZATION.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  relate_map: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.TOOL.getToolWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_RELATE_RESOURCE_VIEW.getToolWorkspaceResourcePermission(source_id),
+        PermissionConst.TOOL_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  debug: () =>
+    hasPermission(
+      [
+        RoleConst.USER.getWorkspaceRole,
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.TOOL_EDIT.getWorkspacePermission,
+        PermissionConst.TOOL_EDIT.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+}
+
+export default workspace

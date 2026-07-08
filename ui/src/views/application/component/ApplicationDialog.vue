@@ -1,0 +1,301 @@
+<template>
+  <el-dialog
+    v-model="dialogVisible"
+    width="1000"
+    append-to-body
+    class="addTool-dialog"
+    align-center
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
+    <template #header="{ titleId, titleClass }">
+      <div class="flex-between mb-8">
+        <div class="flex">
+          <h4 :id="titleId" :class="titleClass" class="mr-8">
+            {{ $t('views.application.title') }}
+          </h4>
+        </div>
+
+        <el-button link class="mr-24" @click="refresh">
+          <el-icon :size="18" class="color-secondary"><Refresh /></el-icon>
+        </el-button>
+      </div>
+    </template>
+    <LayoutContainer class="application-manage">
+      <template #left>
+
+        <FolderVirtualizedTree
+          :data="folderList"
+          :currentNodeKey="currentFolder?.id"
+          @handleNodeClick="folderClickHandle"
+          v-loading="folderLoading"
+          :canOperation="false"
+          :treeStyle="{ height: 'calc(100vh - 240px)' }"
+        />
+      </template>
+      <div class="layout-bg">
+        <div class="flex-between p-16 ml-8">
+          <h4>{{ currentFolder?.name }}</h4>
+          <el-input
+            v-model="searchValue"
+            :placeholder="$t('common.search')"
+            prefix-icon="Search"
+            class="w-240 mr-8"
+            clearable
+          />
+        </div>
+
+        <el-scrollbar>
+          <div class="p-16-24 pt-0" style="height: calc(100vh - 268px)">
+            <el-row :gutter="12" v-loading="apiLoading" v-if="searchData.length">
+              <el-col :span="12" v-for="(item, index) in searchData" :key="index" class="mb-16">
+                <el-popover
+                  placement="bottom-start"
+                  :width="400"
+                  popper-style="--el-popover-border-radius:8px;--el-popover-padding:16px 16px 0"
+                  :persistent="false"
+                  :show-after="500"
+                >
+                  <template #reference>
+                    <CardCheckbox
+                      value-field="id"
+                      :data="item"
+                      v-model="checkList"
+                      @change="changeHandle"
+                    >
+                      <template #icon>
+                        <el-avatar
+                          v-if="item?.icon"
+                          shape="square"
+                          :size="32"
+                          style="background: none"
+                          class="mr-8"
+                        >
+                          <img :src="resetUrl(item?.icon)" alt="" />
+                        </el-avatar>
+                        <ToolIcon v-else :size="32" :type="item?.tool_type" />
+                      </template>
+                      <span class="ellipsis cursor ml-12" :title="item.name"> {{ item.name }}</span>
+                    </CardCheckbox>
+                  </template>
+                  <template #default>
+                    <CardBox
+                      :title="item.name"
+                      :description="item.desc"
+                      class="cursor border-none popover-card-box"
+                      shadow="never"
+                      style="--el-card-padding: 0px; --card-min-height: 148px"
+                    >
+                      <template #icon>
+                        <el-avatar shape="square" :size="32" style="background: none">
+                          <img :src="resetUrl(item?.icon, resetUrl('./favicon.ico'))" alt="" />
+                        </el-avatar>
+                      </template>
+                      <template #subTitle>
+                        <el-text class="color-secondary lighter flex align-center" size="small">
+                          <span
+                            :title="i18n_name(item.nick_name)"
+                            class="ellipsis"
+                            style="max-width: 90px"
+                          >
+                            {{ i18n_name(item.nick_name) }}
+                          </span>
+                          <span class="ml-4 mr-4"> {{ $t('common.createdIn') }}</span>
+                          <span> {{ dateFormat(item.create_time) }}</span>
+                        </el-text>
+                      </template>
+                      <template #tag>
+                        <el-tag v-if="isWorkFlow(item.type)" size="small" class="warning-tag">
+                          {{ $t('views.application.senior') }}
+                        </el-tag>
+                        <el-tag size="small" class="blue-tag" v-else>
+                          {{ $t('views.application.simple') }}
+                        </el-tag>
+                      </template>
+
+                      <template #footer>
+                        <div v-if="item.is_publish" class="flex align-center">
+                          <el-icon class="color-success mr-8" style="font-size: 16px">
+                            <SuccessFilled />
+                          </el-icon>
+                          <span class="color-secondary">
+                            {{ $t('common.status.published') }}
+                          </span>
+                          <el-divider direction="vertical" />
+                          <AppIcon iconName="app-clock" class="color-secondary mr-8"></AppIcon>
+
+                          <span class="color-secondary">{{ dateFormat(item.update_time) }}</span>
+                        </div>
+                        <div v-else class="flex align-center">
+                          <AppIcon iconName="app-disabled" class="color-secondary mr-8"></AppIcon>
+                          <span class="color-secondary">
+                            {{ $t('common.status.unpublished') }}
+                          </span>
+                        </div>
+                      </template>
+                    </CardBox>
+                  </template>
+                </el-popover>
+              </el-col>
+            </el-row>
+            <el-empty :description="$t('common.noData')" v-else />
+          </div>
+        </el-scrollbar>
+      </div>
+    </LayoutContainer>
+
+    <template #footer>
+      <div class="flex-between">
+        <div class="flex">
+          <el-text type="info" class="color-secondary mr-8" v-if="checkList.length > 0">
+            {{ $t('common.selected') }} {{ checkList.length }}
+          </el-text>
+          <el-button link type="primary" v-if="checkList.length > 0" @click="clearCheck">
+            {{ $t('common.clear') }}
+          </el-button>
+        </div>
+        <span>
+          <el-button @click.prevent="dialogVisible = false">
+            {{ $t('common.cancel') }}
+          </el-button>
+          <el-button type="primary" @click="submitHandle">
+            {{ $t('common.add') }}
+          </el-button>
+        </span>
+      </div>
+    </template>
+  </el-dialog>
+</template>
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import useStore from '@/stores'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import { i18n_name, resetUrl } from '@/utils/common'
+import { isWorkFlow } from '@/utils/application'
+import { dateFormat } from '@/utils/time'
+const route = useRoute()
+
+const emit = defineEmits(['refresh'])
+const { folder, user } = useStore()
+const apiType = computed(() => {
+  if (route.path.includes('shared')) {
+    return 'systemShare'
+  } else if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
+
+const dialogVisible = ref<boolean>(false)
+const checkList = ref<Array<string>>([])
+const searchValue = ref('')
+const searchData = ref<Array<any>>([])
+const applicationList = ref<Array<any>>([])
+const apiLoading = ref(false)
+
+watch(dialogVisible, (bool) => {
+  if (!bool) {
+    checkList.value = []
+    searchValue.value = ''
+    searchData.value = []
+    applicationList.value = []
+  }
+})
+
+watch(searchValue, (val) => {
+  if (val) {
+    searchData.value = applicationList.value.filter((v) => v.name.includes(val))
+  } else {
+    searchData.value = applicationList.value
+  }
+})
+
+function changeHandle() {}
+function clearCheck() {
+  checkList.value = []
+}
+
+const open = (checked: any) => {
+  checkList.value = checked || []
+  getFolder()
+  dialogVisible.value = true
+}
+
+const submitHandle = () => {
+  emit('refresh', {
+    application_ids: checkList.value,
+  })
+  dialogVisible.value = false
+}
+
+const refresh = () => {
+  searchValue.value = ''
+  applicationList.value = []
+  getList()
+}
+
+const folderList = ref<any[]>([])
+const currentFolder = ref<any>({})
+const folderLoading = ref(false)
+// 文件
+function folderClickHandle(row: any) {
+  if (row.id === currentFolder.value?.id) {
+    return
+  }
+  currentFolder.value = row
+  getList()
+}
+
+function getFolder() {
+  const params = {}
+  folder.asyncGetFolder('APPLICATION', params, apiType.value, folderLoading).then((res: any) => {
+    folderList.value = res.data
+    currentFolder.value = res.data?.[0] || {}
+    getList()
+  })
+}
+
+function getList() {
+  const folder_id = currentFolder.value?.id || user.getWorkspaceId()
+  loadSharedApi({
+    type: 'application',
+    isShared: folder_id === 'share',
+    systemType: 'workspace',
+  })
+    .getAllApplication({
+      folder_id: folder_id,
+    })
+    .then((res: any) => {
+      applicationList.value = res.data
+      applicationList.value = applicationList.value?.filter(
+        (item: any) => item.is_publish && item.id !== route.params.id,
+      )
+      searchData.value = res.data
+      searchData.value = searchData.value?.filter(
+        (item: any) => item.is_publish && item.id !== route.params.id,
+      )
+    })
+}
+
+defineExpose({ open })
+</script>
+<style lang="scss">
+.addTool-dialog {
+  padding: 0;
+  .el-dialog__header {
+    padding: 12px 20px 4px 24px;
+    border-bottom: 1px solid var(--el-border-color-light);
+  }
+  .el-dialog__footer {
+    padding: 12px 24px 12px 24px;
+    border-top: 1px solid var(--el-border-color-light);
+  }
+
+  .el-dialog__headerbtn {
+    top: 2px;
+    right: 6px;
+  }
+}
+</style>
