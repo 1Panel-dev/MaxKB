@@ -12,7 +12,7 @@ from common.utils.common import bytes_to_uploaded_file
 from knowledge.models import FileSourceType
 from oss.serializers.file import FileSerializer
 from models_provider.tools import get_model_instance_by_model_workspace_id
-from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _, gettext
 
 
 class BaseTextToVideoNode(ITextToVideoNode):
@@ -37,8 +37,6 @@ class BaseTextToVideoNode(ITextToVideoNode):
             if reference_data and isinstance(reference_data, dict):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
-
-        from django.utils.translation import gettext_lazy as _
 
         if model_id is None or model_id == '':
             raise Exception(_('Model is not allowed to be empty'))

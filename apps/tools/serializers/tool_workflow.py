@@ -41,8 +41,7 @@ from django.db import transaction
 from django.db.models import Q, QuerySet
 from django.http import HttpResponse
 from django.utils import timezone
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from knowledge.models import Knowledge, KnowledgeScope, KnowledgeWorkflow
 from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeSerializer
 from maxkb.const import CONFIG
