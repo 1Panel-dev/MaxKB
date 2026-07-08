@@ -1,28 +1,38 @@
+from common import result
+from common.auth import TokenAuth
+from common.auth.authentication import check_batch_permissions, has_permissions
+from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.log.log import log
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
-
-from common import result
-from common.auth import TokenAuth
-from common.auth.authentication import has_permissions, check_batch_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
-from common.log.log import log
-from tools.api.tool import ToolCreateAPI, ToolEditAPI, ToolReadAPI, ToolDeleteAPI, ToolTreeReadAPI, ToolDebugApi, \
-    ToolExportAPI, ToolImportAPI, ToolPageAPI, PylintAPI, EditIconAPI, GetInternalToolAPI, AddInternalToolAPI, \
-    ToolBatchOperateAPI
-from tools.models import ToolScope, Tool
-from tools.serializers.tool import ToolSerializer, ToolTreeSerializer, ToolBatchOperateSerializer
+from tools.api.tool import (
+    AddInternalToolAPI,
+    EditIconAPI,
+    GetInternalToolAPI,
+    PylintAPI,
+    ToolBatchOperateAPI,
+    ToolCreateAPI,
+    ToolDebugApi,
+    ToolDeleteAPI,
+    ToolEditAPI,
+    ToolExportAPI,
+    ToolImportAPI,
+    ToolPageAPI,
+    ToolReadAPI,
+    ToolTreeReadAPI,
+)
+from tools.models import Tool, ToolScope
+from tools.serializers.tool import ToolBatchOperateSerializer, ToolSerializer, ToolTreeSerializer
 
 
 def get_tool_operation_object(tool_id):
     tool_model = QuerySet(model=Tool).filter(id=tool_id).first()
     if tool_model is not None:
-        return {
-            "name": tool_model.name
-        }
+        return {"name": tool_model.name}
     return {}
 
 
@@ -30,8 +40,8 @@ def get_tool_operation_object_batch(tool_id_list):
     tool_model_list = QuerySet(model=Tool).filter(id__in=tool_id_list)
     if tool_model_list is not None:
         return {
-            "name": f'[{",".join([t.name for t in tool_model_list])}]',
-            'tool_list': [{'name': t.name} for t in tool_model_list]
+            "name": f"[{','.join([t.name for t in tool_model_list])}]",
+            "tool_list": [{"name": t.name} for t in tool_model_list],
         }
     return {}
 
@@ -40,198 +50,218 @@ class ToolView(APIView):
     authentication_classes = [TokenAuth]
 
     @extend_schema(
-        methods=['POST'],
-        description=_('Create tool'),
-        summary=_('Create tool'),
-        operation_id=_('Create tool'),  # type: ignore
+        methods=["POST"],
+        description=_("Create tool"),
+        summary=_("Create tool"),
+        operation_id=_("Create tool"),  # type: ignore
         parameters=ToolCreateAPI.get_parameters(),
         request=ToolCreateAPI.get_request(),
         responses=ToolCreateAPI.get_response(),
-        tags=[_('Tool')]  # type: ignore
+        tags=[_("Tool")],  # type: ignore
     )
     @has_permissions(
         PermissionConstants.TOOL_CREATE.get_workspace_permission(),
         PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role(),
     )
     @log(
-        menu="Tool", operate="Create tool",
-        get_operation_object=lambda r, k: r.data.get('name'),
+        menu="Tool",
+        operate="Create tool",
+        get_operation_object=lambda r, k: r.data.get("name"),
     )
     def post(self, request: Request, workspace_id: str):
-        return result.success(ToolSerializer.Create(
-            data={'user_id': request.user.id, 'workspace_id': workspace_id}
-        ).insert({**request.data, 'scope': ToolScope.WORKSPACE}))
+        return result.success(
+            ToolSerializer.Create(data={"user_id": request.user.id, "workspace_id": workspace_id}).insert(
+                {**request.data, "scope": ToolScope.WORKSPACE}
+            )
+        )
 
     @extend_schema(
-        methods=['GET'],
-        description=_('Get tool by folder'),
-        summary=_('Get tool by folder'),
-        operation_id=_('Get tool by folder'),  # type: ignore
+        methods=["GET"],
+        description=_("Get tool by folder"),
+        summary=_("Get tool by folder"),
+        operation_id=_("Get tool by folder"),  # type: ignore
         parameters=ToolTreeReadAPI.get_parameters(),
         responses=ToolTreeReadAPI.get_response(),
-        tags=[_('Tool')]  # type: ignore
+        tags=[_("Tool")],  # type: ignore
     )
     @has_permissions(
         PermissionConstants.TOOL_READ.get_workspace_permission(),
         PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+        RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        RoleConstants.USER.get_workspace_role(),
     )
     def get(self, request: Request, workspace_id: str):
-        return result.success(ToolTreeSerializer.Query(
-            data={
-                'workspace_id': workspace_id,
-                'folder_id': request.query_params.get('folder_id'),
-                'name': request.query_params.get('name'),
-                'scope': request.query_params.get('scope', ToolScope.WORKSPACE),
-                'tool_type': request.query_params.get('tool_type'),
-                'tool_type_list': request.query_params.getlist('tool_type_list[]'),
-                'user_id': request.user.id,
-                'create_user': request.query_params.get('create_user'),
-            }
-        ).get_tools())
+        return result.success(
+            ToolTreeSerializer.Query(
+                data={
+                    "workspace_id": workspace_id,
+                    "folder_id": request.query_params.get("folder_id"),
+                    "name": request.query_params.get("name"),
+                    "scope": request.query_params.get("scope", ToolScope.WORKSPACE),
+                    "tool_type": request.query_params.get("tool_type"),
+                    "tool_type_list": request.query_params.getlist("tool_type_list[]"),
+                    "user_id": request.user.id,
+                    "create_user": request.query_params.get("create_user"),
+                }
+            ).get_tools()
+        )
 
     class Debug(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
-            description=_('Debug Tool'),
-            summary=_('Debug Tool'),
-            operation_id=_('Debug Tool'),  # type: ignore
+            methods=["POST"],
+            description=_("Debug Tool"),
+            summary=_("Debug Tool"),
+            operation_id=_("Debug Tool"),  # type: ignore
             request=ToolDebugApi.get_request(),
             responses=ToolDebugApi.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EDIT.get_workspace_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.Debug(
-                data={'workspace_id': workspace_id, 'user_id': request.user.id}
-            ).debug(request.data))
+            return result.success(
+                ToolSerializer.Debug(data={"workspace_id": workspace_id, "user_id": request.user.id}).debug(
+                    request.data
+                )
+            )
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
-            description=_('Update tool'),
-            summary=_('Update tool'),
-            operation_id=_('Update tool'),  # type: ignore
+            methods=["PUT"],
+            description=_("Update tool"),
+            summary=_("Update tool"),
+            operation_id=_("Update tool"),  # type: ignore
             parameters=ToolEditAPI.get_parameters(),
             request=ToolEditAPI.get_request(),
             responses=ToolEditAPI.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         @log(
-            menu='Tool', operate='Update tool',
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-
+            menu="Tool",
+            operate="Update tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def put(self, request: Request, workspace_id: str, tool_id: str):
-            return result.success(ToolSerializer.Operate(
-                data={'id': tool_id, 'workspace_id': workspace_id}
-            ).edit(request.data))
+            return result.success(
+                ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).edit(request.data)
+            )
 
         @extend_schema(
-            methods=['GET'],
-            description=_('Get tool'),
-            summary=_('Get tool'),
-            operation_id=_('Get tool'),  # type: ignore
+            methods=["GET"],
+            description=_("Get tool"),
+            summary=_("Get tool"),
+            operation_id=_("Get tool"),  # type: ignore
             parameters=ToolReadAPI.get_parameters(),
             responses=ToolReadAPI.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_tool_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            PermissionConstants.APPLICATION_READ.get_workspace_permission(),
-            PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.USER.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
-        @log(menu='Tool', operate='Get tool')
+        @log(menu="Tool", operate="Get tool")
         def get(self, request: Request, workspace_id: str, tool_id: str):
-            return result.success(ToolSerializer.Operate(
-                data={'id': tool_id, 'workspace_id': workspace_id}
-            ).one())
+            return result.success(ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).one())
 
         @extend_schema(
-            methods=['DELETE'],
-            description=_('Delete tool'),
-            summary=_('Delete tool'),
-            operation_id=_('Delete tool'),  # type: ignore
+            methods=["DELETE"],
+            description=_("Delete tool"),
+            summary=_("Delete tool"),
+            operation_id=_("Delete tool"),  # type: ignore
             parameters=ToolDeleteAPI.get_parameters(),
             responses=ToolDeleteAPI.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
             PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         @log(
-            menu='Tool', operate="Delete tool",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
-
+            menu="Tool",
+            operate="Delete tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def delete(self, request: Request, workspace_id: str, tool_id: str):
-            return result.success(ToolSerializer.Operate(
-                data={'id': tool_id, 'workspace_id': workspace_id}
-            ).delete())
+            return result.success(ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).delete())
 
     class BatchDelete(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=["PUT"],
             description=_("Batch delete tools"),
             summary=_("Batch delete tools"),
             operation_id=_("Batch delete tools"),
             parameters=ToolBatchOperateAPI.get_parameters(),
             request=ToolBatchOperateAPI.get_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_('Tool')]
+            tags=[_("Tool")],
         )
-        @has_permissions(PermissionConstants.TOOL_BATCH_DELETE.get_workspace_permission(),
-                         RoleConstants.USER.get_workspace_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
-                         )
+        @has_permissions(
+            PermissionConstants.TOOL_BATCH_DELETE.get_workspace_permission(),
+            RoleConstants.USER.get_workspace_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
         def put(self, request: Request, workspace_id: str):
-            id_list = request.data.get('id_list', [])
+            id_list = request.data.get("id_list", [])
             permitted_ids = check_batch_permissions(
-                request, id_list, 'tool_id',
-                (PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
-                 PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
-                 ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                CompareConstants.AND),
-                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()), workspace_id=workspace_id
+                request,
+                id_list,
+                "tool_id",
+                (
+                    PermissionConstants.TOOL_DELETE.get_workspace_tool_permission(),
+                    PermissionConstants.TOOL_DELETE.get_workspace_permission_workspace_manage_role(),
+                    ViewPermission(
+                        [RoleConstants.USER.get_workspace_role()],
+                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                        CompareConstants.AND,
+                    ),
+                    RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ),
+                workspace_id=workspace_id,
             )
 
-            @log(menu='Tool', operate='Batch delete tools',
-                 get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids))
+            @log(
+                menu="Tool",
+                operate="Batch delete tools",
+                get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids),
+            )
             def inner(view, r, **kwargs):
-                return ToolBatchOperateSerializer(
-                    data={'workspace_id': workspace_id}
-                ).batch_delete({'id_list': permitted_ids})
+                return ToolBatchOperateSerializer(data={"workspace_id": workspace_id}).batch_delete(
+                    {"id_list": permitted_ids}
+                )
 
             return result.success(inner(self, request, workspace_id=workspace_id))
 
@@ -239,38 +269,48 @@ class ToolView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=["PUT"],
             description=_("Batch move tools"),
             summary=_("Batch move tools"),
             operation_id=_("Batch move tools"),
             parameters=ToolBatchOperateAPI.get_parameters(),
             request=ToolBatchOperateAPI.get_move_request(),
             responses=result.DefaultResultSerializer,
-            tags=[_('Tool')]
+            tags=[_("Tool")],
         )
-        @has_permissions(PermissionConstants.TOOL_BATCH_MOVE.get_workspace_permission(),
-                         RoleConstants.USER.get_workspace_role(),
-                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
-                         )
+        @has_permissions(
+            PermissionConstants.TOOL_BATCH_MOVE.get_workspace_permission(),
+            RoleConstants.USER.get_workspace_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+        )
         def put(self, request: Request, workspace_id: str):
-            id_list = request.data.get('id_list', [])
+            id_list = request.data.get("id_list", [])
             permitted_ids = check_batch_permissions(
-                request, id_list, 'tool_id',
-                (PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
-                 PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-                 ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                CompareConstants.AND),
-                 RoleConstants.WORKSPACE_MANAGE.get_workspace_role()),
-                workspace_id=workspace_id
+                request,
+                id_list,
+                "tool_id",
+                (
+                    PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
+                    PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
+                    ViewPermission(
+                        [RoleConstants.USER.get_workspace_role()],
+                        [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                        CompareConstants.AND,
+                    ),
+                    RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                ),
+                workspace_id=workspace_id,
             )
 
-            @log(menu='Tool', operate='Batch move tools',
-                 get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids))
+            @log(
+                menu="Tool",
+                operate="Batch move tools",
+                get_operation_object=lambda r, k: get_tool_operation_object_batch(permitted_ids),
+            )
             def inner(view, r, **kwargs):
-                return ToolBatchOperateSerializer(
-                    data={'workspace_id': workspace_id}
-                ).batch_move({'id_list': permitted_ids, 'folder_id': request.data.get('folder_id')})
+                return ToolBatchOperateSerializer(data={"workspace_id": workspace_id}).batch_move(
+                    {"id_list": permitted_ids, "folder_id": request.data.get("folder_id")}
+                )
 
             return result.success(inner(self, request, workspace_id=workspace_id))
 
@@ -278,232 +318,258 @@ class ToolView(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
-            description=_('Get tool list by pagination'),
-            summary=_('Get tool list by pagination'),
-            operation_id=_('Get tool list by pagination'),  # type: ignore
+            methods=["GET"],
+            description=_("Get tool list by pagination"),
+            summary=_("Get tool list by pagination"),
+            operation_id=_("Get tool list by pagination"),  # type: ignore
             parameters=ToolPageAPI.get_parameters(),
             responses=ToolPageAPI.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
-        @log(menu='Tool', operate='Get tool list')
+        @log(menu="Tool", operate="Get tool list")
         def get(self, request: Request, workspace_id: str, current_page: int, page_size: int):
-            return result.success(ToolTreeSerializer.Query(
-                data={
-                    'workspace_id': workspace_id,
-                    'folder_id': request.query_params.get('folder_id'),
-                    'name': request.query_params.get('name'),
-                    'scope': request.query_params.get('scope'),
-                    'tool_type': request.query_params.get('tool_type'),
-                    'user_id': request.user.id,
-                    'create_user': request.query_params.get('create_user'),
-                }
-            ).page_tool_with_folders(current_page, page_size))
+            return result.success(
+                ToolTreeSerializer.Query(
+                    data={
+                        "workspace_id": workspace_id,
+                        "folder_id": request.query_params.get("folder_id"),
+                        "name": request.query_params.get("name"),
+                        "scope": request.query_params.get("scope"),
+                        "tool_type": request.query_params.get("tool_type"),
+                        "user_id": request.user.id,
+                        "create_user": request.query_params.get("create_user"),
+                    }
+                ).page_tool_with_folders(current_page, page_size)
+            )
 
     class Query(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
-            description=_('Get tool list '),
-            summary=_('Get tool list'),
-            operation_id=_('Get tool list'),  # type: ignore
+            methods=["GET"],
+            description=_("Get tool list "),
+            summary=_("Get tool list"),
+            operation_id=_("Get tool list"),  # type: ignore
             parameters=ToolReadAPI.get_parameters(),
             responses=ToolReadAPI.get_response(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
-        @log(menu='Tool', operate='Get tool list')
+        @log(menu="Tool", operate="Get tool list")
         def get(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.Query(
-                data={
-                    'workspace_id': workspace_id,
-                    'folder_id': request.query_params.get('folder_id'),
-                    'name': request.query_params.get('name'),
-                    'scope': request.query_params.get('scope'),
-                    'tool_type': request.query_params.get('tool_type'),
-                    'user_id': request.user.id,
-                    'create_user': request.query_params.get('create_user'),
-                }
-            ).get_tools())
+            return result.success(
+                ToolSerializer.Query(
+                    data={
+                        "workspace_id": workspace_id,
+                        "folder_id": request.query_params.get("folder_id"),
+                        "name": request.query_params.get("name"),
+                        "scope": request.query_params.get("scope"),
+                        "tool_type": request.query_params.get("tool_type"),
+                        "user_id": request.user.id,
+                        "create_user": request.query_params.get("create_user"),
+                    }
+                ).get_tools()
+            )
 
     class Import(APIView):
         authentication_classes = [TokenAuth]
         parser_classes = [MultiPartParser]
 
         @extend_schema(
-            methods=['POST'],
+            methods=["POST"],
             description=_("Import tool"),
             summary=_("Import tool"),
             operation_id=_("Import tool"),  # type: ignore
             parameters=ToolImportAPI.get_parameters(),
             request=ToolImportAPI.get_request(),
             responses=ToolImportAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_IMPORT.get_workspace_permission(),
             PermissionConstants.TOOL_IMPORT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
-        @log(menu='Tool', operate='Import tool', )
+        @log(
+            menu="Tool",
+            operate="Import tool",
+        )
         def post(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.Import(
-                data={
-                    'workspace_id': workspace_id,
-                    'file': request.FILES.get('file'),
-                    'user_id': request.user.id,
-                    'folder_id': request.data.get('folder_id')
-                }
-            ).import_(ToolScope.WORKSPACE))
+            return result.success(
+                ToolSerializer.Import(
+                    data={
+                        "workspace_id": workspace_id,
+                        "file": request.FILES.get("file"),
+                        "user_id": request.user.id,
+                        "folder_id": request.data.get("folder_id"),
+                    }
+                ).import_(ToolScope.WORKSPACE)
+            )
 
     class Export(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=["GET"],
             description=_("Export tool"),
             summary=_("Export tool"),
             operation_id=_("Export tool"),  # type: ignore
             parameters=ToolExportAPI.get_parameters(),
             responses=ToolExportAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EXPORT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         @log(
-            menu='Tool', operate="Export tool",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+            menu="Tool",
+            operate="Export tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str):
-            return ToolSerializer.Operate(
-                data={'id': tool_id, 'workspace_id': workspace_id}
-            ).export()
+            return ToolSerializer.Operate(data={"id": tool_id, "workspace_id": workspace_id}).export()
 
     class Pylint(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
-            summary=_('Check code'),
-            operation_id=_('Check code'),  # type: ignore
-            description=_('Check code'),
+            methods=["POST"],
+            summary=_("Check code"),
+            operation_id=_("Check code"),  # type: ignore
+            description=_("Check code"),
             request=PylintAPI.get_request(),
             responses=PylintAPI.get_response(),
             parameters=PylintAPI.get_parameters(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_READ.get_workspace_permission(),
             PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            RoleConstants.USER.get_workspace_role()
+            RoleConstants.USER.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.Pylint(
-                data={'workspace_id': workspace_id}
-            ).run(request.data))
+            return result.success(ToolSerializer.Pylint(data={"workspace_id": workspace_id}).run(request.data))
 
     class EditIcon(APIView):
         authentication_classes = [TokenAuth]
         parser_classes = [MultiPartParser]
 
         @extend_schema(
-            methods=['PUT'],
-            summary=_('Edit tool icon'),
-            operation_id=_('Edit tool icon'),  # type: ignore
-            description=_('Edit tool icon'),
+            methods=["PUT"],
+            summary=_("Edit tool icon"),
+            operation_id=_("Edit tool icon"),  # type: ignore
+            description=_("Edit tool icon"),
             request=EditIconAPI.get_request(),
             responses=EditIconAPI.get_response(),
             parameters=EditIconAPI.get_parameters(),
-            tags=[_('Tool')]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         def put(self, request: Request, tool_id: str, workspace_id: str):
-            return result.success(ToolSerializer.IconOperate(data={
-                'id': tool_id,
-                'workspace_id': workspace_id,
-                'user_id': request.user.id,
-                'image': request.FILES.get('file')
-            }).edit(request.data))
+            return result.success(
+                ToolSerializer.IconOperate(
+                    data={
+                        "id": tool_id,
+                        "workspace_id": workspace_id,
+                        "user_id": request.user.id,
+                        "image": request.FILES.get("file"),
+                    }
+                ).edit(request.data)
+            )
 
     class TestConnection(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
+            methods=["POST"],
             description=_("Test tool connection"),
             summary=_("Test tool connection"),
             operation_id=_("Test tool connection"),  # type: ignore
             request=ToolReadAPI.get_request(),
             responses=ToolReadAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_CREATE.get_workspace_permission(),
             PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.TestConnection(data={
-                'workspace_id': workspace_id,
-                'code': request.data.get('code'),
-            }).test_connection())
+            return result.success(
+                ToolSerializer.TestConnection(
+                    data={
+                        "workspace_id": workspace_id,
+                        "code": request.data.get("code"),
+                    }
+                ).test_connection()
+            )
 
     class InternalTool(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=["GET"],
             description=_("Get internal tool"),
             summary=_("Get internal tool"),
             operation_id=_("Get internal tool"),  # type: ignore
             parameters=GetInternalToolAPI.get_parameters(),
             responses=GetInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         def get(self, request: Request):
-            return result.success(ToolSerializer.InternalTool(data={
-                'user_id': request.user.id,
-                'name': request.query_params.get('name', ''),
-            }).get_internal_tools())
+            return result.success(
+                ToolSerializer.InternalTool(
+                    data={
+                        "user_id": request.user.id,
+                        "name": request.query_params.get("name", ""),
+                    }
+                ).get_internal_tools()
+            )
 
     class AddInternalTool(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
+            methods=["POST"],
             description=_("Add internal tool"),
             summary=_("Add internal tool"),
             operation_id=_("Add internal tool"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             request=AddInternalToolAPI.get_request(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_CREATE.get_workspace_permission(),
@@ -512,45 +578,50 @@ class ToolView(APIView):
             RoleConstants.USER.get_workspace_role(),
         )
         @log(
-            menu='Tool', operate="Add internal tool",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+            menu="Tool",
+            operate="Add internal tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def post(self, request: Request, tool_id: str, workspace_id: str):
-            return result.success(ToolSerializer.AddInternalTool(data={
-                'tool_id': tool_id,
-                'user_id': request.user.id,
-                'workspace_id': workspace_id
-            }).add(request.data))
+            return result.success(
+                ToolSerializer.AddInternalTool(
+                    data={"tool_id": tool_id, "user_id": request.user.id, "workspace_id": workspace_id}
+                ).add(request.data)
+            )
 
     class StoreTool(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=["GET"],
             description=_("Get Appstore tools"),
             summary=_("Get Appstore tools"),
             operation_id=_("Get Appstore tools"),  # type: ignore
             responses=GetInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         def get(self, request: Request):
-            return result.success(ToolSerializer.StoreTool(data={
-                'user_id': request.user.id,
-                'name': request.query_params.get('name', ''),
-            }).get_appstore_tools())
+            return result.success(
+                ToolSerializer.StoreTool(
+                    data={
+                        "user_id": request.user.id,
+                        "name": request.query_params.get("name", ""),
+                    }
+                ).get_appstore_tools()
+            )
 
     class AddStoreTool(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
+            methods=["POST"],
             description=_("Add Appstore tool"),
             summary=_("Add Appstore tool"),
             operation_id=_("Add Appstore tool"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             request=AddInternalToolAPI.get_request(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_CREATE.get_workspace_permission(),
@@ -559,28 +630,33 @@ class ToolView(APIView):
             RoleConstants.USER.get_workspace_role(),
         )
         @log(
-            menu='Tool', operate="Add Appstore tool",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+            menu="Tool",
+            operate="Add Appstore tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def post(self, request: Request, tool_id: str, workspace_id: str):
-            return result.success(ToolSerializer.AddStoreTool(data={
-                'tool_id': tool_id,
-                'user_id': request.user.id,
-                'workspace_id': workspace_id,
-            }).add(request.data))
+            return result.success(
+                ToolSerializer.AddStoreTool(
+                    data={
+                        "tool_id": tool_id,
+                        "user_id": request.user.id,
+                        "workspace_id": workspace_id,
+                    }
+                ).add(request.data)
+            )
 
     class UpdateStoreTool(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['POST'],
+            methods=["POST"],
             description=_("Update Appstore tool"),
             summary=_("Update Appstore tool"),
             operation_id=_("Update Appstore tool"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             request=AddInternalToolAPI.get_request(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_CREATE.get_workspace_permission(),
@@ -589,119 +665,147 @@ class ToolView(APIView):
             RoleConstants.USER.get_workspace_role(),
         )
         @log(
-            menu='Tool', operate="Update Appstore tool",
-            get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),
+            menu="Tool",
+            operate="Update Appstore tool",
+            get_operation_object=lambda r, k: get_tool_operation_object(k.get("tool_id")),
         )
         def post(self, request: Request, tool_id: str, workspace_id: str):
-            return result.success(ToolSerializer.UpdateStoreTool(data={
-                'tool_id': tool_id,
-                'user_id': request.user.id,
-                'workspace_id': workspace_id,
-                'download_url': request.data.get('download_url'),
-                'download_callback_url': request.data.get('download_callback_url'),
-                'icon': request.data.get('icon'),
-                'versions': request.data.get('versions'),
-            }).update_tool(request.data))
+            return result.success(
+                ToolSerializer.UpdateStoreTool(
+                    data={
+                        "tool_id": tool_id,
+                        "user_id": request.user.id,
+                        "workspace_id": workspace_id,
+                        "download_url": request.data.get("download_url"),
+                        "download_callback_url": request.data.get("download_callback_url"),
+                        "icon": request.data.get("icon"),
+                        "versions": request.data.get("versions"),
+                    }
+                ).update_tool(request.data)
+            )
 
     class PageToolRecord(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=["GET"],
             description=_("Get tool records"),
             summary=_("Get tool records"),
             operation_id=_("Get tool records"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, current_page: int, page_size: int):
-            return result.success(ToolSerializer.ToolRecord(data={
-                'tool_id': tool_id,
-                'workspace_id': workspace_id,
-                'source_name': request.query_params.get('source_name'),
-                'source_type': request.query_params.get('source_type'),
-                'state': request.query_params.get('state'),
-            }).get_tool_records(current_page, page_size))
+            return result.success(
+                ToolSerializer.ToolRecord(
+                    data={
+                        "tool_id": tool_id,
+                        "workspace_id": workspace_id,
+                        "source_name": request.query_params.get("source_name"),
+                        "source_type": request.query_params.get("source_type"),
+                        "state": request.query_params.get("state"),
+                    }
+                ).get_tool_records(current_page, page_size)
+            )
 
     class ToolRecord(APIView):
         authentication_classes = [TokenAuth]
 
         @extend_schema(
-            methods=['GET'],
+            methods=["GET"],
             description=_("Get tool record"),
             summary=_("Get tool record"),
             operation_id=_("Get tool record"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EXECUTE_RECORD.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                           CompareConstants.AND),
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, record_id: str):
-            return result.success(ToolSerializer.ToolRecord.Operate(data={
-                'tool_id': tool_id,
-                'workspace_id': workspace_id,
-                'id': record_id,
-            }).one())
+            return result.success(
+                ToolSerializer.ToolRecord.Operate(
+                    data={
+                        "tool_id": tool_id,
+                        "workspace_id": workspace_id,
+                        "id": record_id,
+                    }
+                ).one()
+            )
 
     class UploadSkillFile(APIView):
         authentication_classes = [TokenAuth]
         parser_classes = [MultiPartParser]
 
         @extend_schema(
-            methods=['PUT'],
+            methods=["PUT"],
             description=_("Upload skill file"),
             summary=_("Upload skill file"),
             operation_id=_("Upload skill file"),  # type: ignore
             parameters=AddInternalToolAPI.get_parameters(),
             request=AddInternalToolAPI.get_request(),
             responses=AddInternalToolAPI.get_response(),
-            tags=[_("Tool")]  # type: ignore
+            tags=[_("Tool")],  # type: ignore
         )
         @has_permissions(
             PermissionConstants.TOOL_CREATE.get_workspace_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             PermissionConstants.TOOL_CREATE.get_workspace_permission_workspace_manage_role(),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(), RoleConstants.USER.get_workspace_role()
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            RoleConstants.USER.get_workspace_role(),
         )
         def put(self, request: Request, workspace_id: str):
-            return result.success(ToolSerializer.UploadSkillFile(data={
-                'workspace_id': workspace_id,
-                'user_id': request.user.id,
-                'file': request.FILES.get('file'),
-            }).upload())
+            return result.success(
+                ToolSerializer.UploadSkillFile(
+                    data={
+                        "workspace_id": workspace_id,
+                        "user_id": request.user.id,
+                        "file": request.FILES.get("file"),
+                    }
+                ).upload()
+            )
 
     class DownloadSkillFile(APIView):
         authentication_classes = [TokenAuth]
 
         @has_permissions(
-            PermissionConstants.TOOL_EDIT.get_workspace_permission(),
+            PermissionConstants.TOOL_EDIT.get_workspace_tool_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            RoleConstants.USER.get_workspace_role()
+            ViewPermission(
+                [RoleConstants.USER.get_workspace_role()],
+                [PermissionConstants.TOOL.get_workspace_tool_permission()],
+                CompareConstants.AND,
+            ),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str):
-            return ToolSerializer.DownloadSkillFile(data={
-                'workspace_id': workspace_id,
-                'user_id': request.user.id,
-                'tool_id': tool_id,
-            }).download()
+            return ToolSerializer.DownloadSkillFile(
+                data={
+                    "workspace_id": workspace_id,
+                    "user_id": request.user.id,
+                    "tool_id": tool_id,
+                }
+            ).download()
 
     class GenerateCode(APIView):
         authentication_classes = [TokenAuth]
@@ -712,10 +816,9 @@ class ToolView(APIView):
             PermissionConstants.TOOL_EDIT.get_workspace_permission(),
             PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-            RoleConstants.USER.get_workspace_role()
+            RoleConstants.USER.get_workspace_role(),
         )
         def post(self, request: Request, workspace_id: str):
-            return ToolSerializer.GenerateCodeSerializer(data={
-                'workspace_id': workspace_id,
-                **request.data
-            }).generate_code()
+            return ToolSerializer.GenerateCodeSerializer(
+                data={"workspace_id": workspace_id, **request.data}
+            ).generate_code()
