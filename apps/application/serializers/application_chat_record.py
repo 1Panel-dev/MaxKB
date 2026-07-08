@@ -71,7 +71,10 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
             raise AppApiException(500, _("Application id does not exist"))
-        if not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists():
+        if (
+            not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists()
+            and ChatRecord.objects.filter(id=self.data.get("chat_record_id")).exists()
+        ):
             raise AppApiException(500, _("Chat records for the application do not exist"))
         application_access_token = (
             QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
@@ -89,11 +92,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             ]
             if chat_record_list is not None and len(chat_record_list):
                 return chat_record_list[-1]
-        return (
-            QuerySet(ChatRecord)
-            .filter(id=chat_record_id, chat_id=chat_id)
-            .first()
-        )
+        return QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_id).first()
 
     def one(self, debug):
         self.is_valid(debug=debug, raise_exception=True)
@@ -127,22 +126,20 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             query_set = query_set.filter(workspace_id=workspace_id)
         if not query_set.exists():
             raise AppApiException(500, _("Application id does not exist"))
-        if not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists():
+        if (
+            not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists()
+            and ChatRecord.objects.filter(id=self.data.get("chat_record_id")).exists()
+        ):
             raise AppApiException(500, _("Chat records for the application do not exist"))
-
 
     def list(self, with_valid=True):
         if with_valid:
             self.is_valid(raise_exception=True)
-        QuerySet(ChatRecord).filter(
-            chat_id=self.data.get("chat_id")
-        )
+        QuerySet(ChatRecord).filter(chat_id=self.data.get("chat_id"))
         order_by = "create_time" if self.data.get("order_asc") is None or self.data.get("order_asc") else "-create_time"
         return [
             ChatRecordSerializerModel(chat_record).data
-            for chat_record in QuerySet(ChatRecord)
-            .filter(chat_id=self.data.get("chat_id"))
-            .order_by(order_by)
+            for chat_record in QuerySet(ChatRecord).filter(chat_id=self.data.get("chat_id")).order_by(order_by)
         ]
 
     @staticmethod
@@ -237,9 +234,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
         page = page_search(
             current_page,
             page_size,
-            QuerySet(ChatRecord)
-            .filter(chat_id=self.data.get("chat_id"))
-            .order_by(order_by),
+            QuerySet(ChatRecord).filter(chat_id=self.data.get("chat_id")).order_by(order_by),
             post_records_handler=lambda chat_record: self.reset_chat_record(chat_record, show_source, show_exec),
         )
         return page
