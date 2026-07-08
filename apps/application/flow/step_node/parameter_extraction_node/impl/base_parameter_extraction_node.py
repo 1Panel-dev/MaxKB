@@ -10,6 +10,7 @@ import json
 import re
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import PromptTemplate
 
