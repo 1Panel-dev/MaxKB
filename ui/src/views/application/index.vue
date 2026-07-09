@@ -734,7 +734,7 @@ const get_route = (item: any) => {
       'OR',
     )
   ) {
-    return `/application//workspace${item.id}/${item.type}/chat-log`
+    return `/application/workspace/${item.id}/${item.type}/chat-log`
   } else return `/application/`
 }
 
