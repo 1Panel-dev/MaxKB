@@ -22,7 +22,7 @@ class MiniMaxChatModel(MaxKBBaseModel, BaseChatOpenAI):
         optional_params['extra_body'] = extra_body
         return MiniMaxChatModel(
             model=model_name,
-            openai_api_base=model_credential.get('api_base') or 'https://api.minimaxi.com/v1',
+            openai_api_base=model_credential.get('api_base') or 'https://api.minimax.io/v1',
             openai_api_key=model_credential.get('api_key'),
             **optional_params,
         )

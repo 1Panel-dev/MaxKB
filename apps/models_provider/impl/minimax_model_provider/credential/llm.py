@@ -64,9 +64,9 @@ class MiniMaxLLMModelCredential(BaseForm, BaseModelCredential):
     def encryption_dict(self, model: Dict[str, object]):
         return {**model, 'api_key': super().encryption(model.get('api_key', ''))}
 
-    api_base = forms.TextInputField('API URL', required=True,
-                                    default_value='https://api.minimaxi.com/v1')
-    api_key = forms.PasswordInputField('API Key', required=True)
+    api_base = forms.TextInputField(_('API URL'), required=True,
+                                    default_value='https://api.minimax.io/v1')
+    api_key = forms.PasswordInputField(_('API Key'), required=True)
 
     def get_model_params_setting_form(self, model_name):
         return MiniMaxLLMModelParams()

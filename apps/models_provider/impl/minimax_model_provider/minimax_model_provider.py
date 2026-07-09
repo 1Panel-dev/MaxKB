@@ -28,9 +28,23 @@ minimax_tti_model_credential = MiniMaxTextToImageModelCredential()
 minimax_ttv_model_credential = TextToVideoModelCredential()
 minimax_itv_model_credential = ImageToVideoModelCredential()
 
+MINIMAX_ENDPOINTS = {
+    "global_en": {
+        "openai_base_url": "https://api.minimax.io/v1",
+        "anthropic_base_url": "https://api.minimax.io/anthropic/v1",
+    },
+    "cn_zh": {
+        "openai_base_url": "https://api.minimaxi.com/v1",
+        "anthropic_base_url": "https://api.minimaxi.com/anthropic/v1",
+    },
+}
+
 minimax_m2_7 = ModelInfo(
     "MiniMax-M2.7",
-    _("Latest flagship model with enhanced reasoning and coding. 204K context window"),
+    _(
+        "Reasoning model with always-on thinking, 204,800-token context window, "
+        "$0.30/M input, $1.20/M output, $0.06/M cache read, and $0.375/M cache write"
+    ),
     ModelTypeConst.LLM,
     minimax_llm_model_credential,
     MiniMaxChatModel,
@@ -38,7 +52,10 @@ minimax_m2_7 = ModelInfo(
 
 minimax_m3 = ModelInfo(
     "MiniMax-M3",
-    _(""),
+    _(
+        "Adaptive-thinking multimodal model with text, image, and video inputs, "
+        "1,000,000-token context window, $0.60/M input, $2.40/M output, and $0.12/M cache read"
+    ),
     ModelTypeConst.LLM,
     minimax_llm_model_credential,
     MiniMaxChatModel,
@@ -100,7 +117,7 @@ model_info_manage = (
     .append_model_info(minimax_m2_7_highspeed)
     .append_model_info(minimax_m2_5)
     .append_model_info(minimax_m2_5_highspeed)
-    .append_default_model_info(minimax_m2_7)
+    .append_default_model_info(minimax_m3)
     .append_model_info(minimax_tts_hd)
     .append_model_info(minimax_tts_turbo)
     .append_default_model_info(minimax_tts_hd)
