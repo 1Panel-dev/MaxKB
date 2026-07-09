@@ -15,6 +15,9 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from django.utils.translation import gettext_lazy as _, gettext
 
 
+GENERATED_MEDIA_DOWNLOAD_TIMEOUT = 30
+
+
 class BaseTextToVideoNode(ITextToVideoNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -57,7 +60,9 @@ class BaseTextToVideoNode(ITextToVideoNode):
             return NodeResult({'answer': gettext('Failed to generate video')}, {})
         file_name = 'generated_video.mp4'
         if isinstance(video_urls, str) and video_urls.startswith('http'):
-            video_urls = requests.get(video_urls).content
+            response = requests.get(video_urls, timeout=GENERATED_MEDIA_DOWNLOAD_TIMEOUT)
+            response.raise_for_status()
+            video_urls = response.content
         file = bytes_to_uploaded_file(video_urls, file_name)
         file_url = self.upload_file(file)
         video_label = f'<video src="{file_url}" controls style="max-width: 100%; width: 100%; height: auto;"></video>'

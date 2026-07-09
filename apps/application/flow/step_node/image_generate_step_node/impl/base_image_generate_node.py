@@ -14,6 +14,9 @@ from models_provider.tools import get_model_instance_by_model_workspace_id
 from oss.serializers.file import FileSerializer
 
 
+GENERATED_MEDIA_DOWNLOAD_TIMEOUT = 30
+
+
 class BaseImageGenerateNode(IImageGenerateNode):
     def save_context(self, details, workflow_manage):
         self.context['answer'] = details.get('answer')
@@ -59,7 +62,9 @@ class BaseImageGenerateNode(IImageGenerateNode):
             if isinstance(image_url, str):
                 if image_url.startswith('http'):
                     # HTTP URL 情况
-                    image_url = requests.get(image_url).content
+                    response = requests.get(image_url, timeout=GENERATED_MEDIA_DOWNLOAD_TIMEOUT)
+                    response.raise_for_status()
+                    image_url = response.content
                 elif image_url.startswith('data:image'):
                     # Data URL 格式 (data:image/png;base64,...)
                     import base64
