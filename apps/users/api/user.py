@@ -59,13 +59,22 @@ class UserProfileAPI(APIMixin):
 class WorkspaceUserAPI(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name="workspace_id",
-            description=_('Workspace ID'),
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.PATH,
-            required=True,
-        )]
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description=_('Workspace ID'),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
+            ),
+            OpenApiParameter(
+                name="nick_name",
+                description=_('Nick name'),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            )
+        ]
 
     @staticmethod
     def get_response():
@@ -165,16 +174,10 @@ class UserPageApi(APIMixin):
 class UserListApi(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name="workspace_id",
-            description=_('Workspace ID'),
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.PATH,
-            required=False,
-        ),
+        return [
             OpenApiParameter(
                 name="nick_name",
-                description=_('Nickname'),
+                description=_('Nick name'),
                 type=OpenApiTypes.STR,
                 location=OpenApiParameter.QUERY,
                 required=False,
