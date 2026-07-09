@@ -11,8 +11,7 @@ import json
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.types import OpenApiTypes
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
@@ -131,13 +130,7 @@ class UserList(APIView):
                    description=_("Get all user"),
                    operation_id=_("Get all user"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
-                   parameters=[OpenApiParameter(
-                       name="nick_name",
-                       description=_('Nickname'),
-                       type=OpenApiTypes.STR,
-                       location=OpenApiParameter.QUERY,  # type: ignore
-                       required=False,
-                   )],
+                   parameters=UserListApi.get_parameters(),
                    responses=UserListApi.get_response())
     @has_permissions(RoleConstants.WORKSPACE_MANAGE, RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN,
                      RoleConstants.EXTENDS_WORKSPACE_MANAGE, RoleConstants.USER, RoleConstants.EXTENDS_USER)
