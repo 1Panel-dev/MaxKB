@@ -809,7 +809,11 @@ class ParagraphSerializers(serializers.Serializer):
             except (TypeError, ValueError):
                 raise serializers.ValidationError(_("new_position must be an integer"))
             # 获取当前段落
-            paragraph = Paragraph.objects.get(id=self.data.get("paragraph_id"))
+            paragraph = Paragraph.objects.get(
+                id=self.data.get("paragraph_id"),
+                knowledge_id=self.data.get("knowledge_id"),
+                document_id=self.data.get("document_id")
+            )
             old_position = paragraph.position
 
             if old_position < new_position:
