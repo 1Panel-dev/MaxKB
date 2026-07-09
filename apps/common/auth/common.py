@@ -54,6 +54,26 @@ class ChatAuthentication:
         return ChatAuthentication(**auth)
 
 
+class FileToken:
+    def __init__(self, user_id, _type):
+        self.user_id = user_id
+        self.type = _type
+
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'type': self.type
+        }
+
+    def to_token(self):
+        return signing.dumps(self.to_dict())
+
+    @staticmethod
+    def new_instance(token):
+        token_dict = signing.loads(token)
+        return FileToken(token_dict.get('user_id'), token_dict.get('type'))
+
+
 class ChatUserToken:
     def __init__(self, application_id, user_id, access_token, _type, chat_user_type, chat_user_id,
                  authentication: ChatAuthentication):

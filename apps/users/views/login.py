@@ -45,8 +45,19 @@ class LoginView(APIView):
          get_details=_get_details,
          get_operation_object=lambda r, k: {'name': r.data.get('username')})
     def post(self, request: Request):
-        return result.success(LoginSerializer().login(request.data))
-
+        token, f_token = LoginSerializer().login(request.data)
+        response = result.success(token)
+        response.set_cookie(
+            'mk_file_auth',
+            value=f_token,
+            max_age=7 * 24 * 3600,
+            path='/',
+            domain=None,
+            secure=True,
+            httponly=True,
+            samesite='Lax',
+        )
+        return response
 
 class Logout(APIView):
     authentication_classes = [TokenAuth]

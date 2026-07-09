@@ -15,7 +15,7 @@ from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationVersion
 from application.serializers.application import ApplicationSerializerModel
-from common.auth.common import ChatUserToken, ChatAuthentication
+from common.auth.common import ChatUserToken, ChatAuthentication, FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -44,7 +44,8 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
             _type = AuthenticationType.CHAT_ANONYMOUS_USER
             return ChatUserToken(application_access_token.application_id, None, access_token, _type,
                                  ChatUserType.ANONYMOUS_USER,
-                                 chat_user_id, ChatAuthentication(None)).to_token()
+                                 chat_user_id, ChatAuthentication(None)).to_token(), FileToken(chat_user_id,
+                                                                                               AuthenticationType.CHAT_ANONYMOUS_USER.value).to_token()
         else:
             raise NotFound404(404, _("Invalid access_token"))
 
@@ -84,7 +85,7 @@ class AuthProfileSerializer(serializers.Serializer):
                         'type', 'password'),
                     'max_attempts': max_attempts,
                     'login_value': final_login_value,
-                    'rsaKey' : get_key_pair_by_sql().get('key')
+                    'rsaKey': get_key_pair_by_sql().get('key')
                 }
         return profile
 
