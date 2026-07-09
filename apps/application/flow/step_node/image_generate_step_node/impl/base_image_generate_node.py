@@ -84,7 +84,10 @@ class BaseImageGenerateNode(IImageGenerateNode):
                     return chat_record.get_ai_message()
                 image_list = val['image_list']
                 return AIMessage(content=[
-                    *[{'type': 'image_url', 'image_url': {'url': f'{file_url}'}} for file_url in image_list]
+                    *[
+                        {'type': 'image_url', 'image_url': {'url': image_url}}
+                        for image_url in self.get_image_url_list(image_list)
+                    ]
                 ])
         return chat_record.get_ai_message()
 
@@ -115,6 +118,20 @@ class BaseImageGenerateNode(IImageGenerateNode):
             *history_message,
             question
         ]
+
+    @staticmethod
+    def get_image_url_list(image_list):
+        image_url_list = []
+        for image in image_list or []:
+            if isinstance(image, dict):
+                image_url = image.get('url') or (
+                    f"./oss/file/{image.get('file_id')}" if image.get('file_id') else None
+                )
+            else:
+                image_url = image
+            if image_url:
+                image_url_list.append(image_url)
+        return image_url_list
 
     def upload_file(self, file):
         if [WorkflowMode.KNOWLEDGE, WorkflowMode.KNOWLEDGE_LOOP].__contains__(
