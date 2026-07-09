@@ -82,7 +82,7 @@ explicit = true
 [tool.uv.sources]
 torch = [
     { index = "pytorch", marker = "sys_platform == 'linux'" },
-    { index = "pytorch", marker = "sys_platform == 'win'" },
+    { index = "pytorch", marker = "sys_platform == 'win32'" },
     { index = "macpytorch", marker = "sys_platform == 'darwin'" },
 ]
 
