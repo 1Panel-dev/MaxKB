@@ -11,14 +11,15 @@ import json
 from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import PermissionConstants, Permission, Group, Operate, RoleConstants
+from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.exception.app_exception import AppApiException
 from common.log.log import log
 from common.result import result
@@ -26,7 +27,6 @@ from common.utils.common import query_params_to_single_dict
 from common.utils.rsa_util import decrypt
 from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
-from tools.serializers.tool import encryption
 from users.api.user import UserProfileAPI, TestWorkspacePermissionUserApi, DeleteUserApi, EditUserApi, \
     ChangeUserPasswordApi, UserPageApi, UserListApi, UserPasswordResponse, WorkspaceUserAPI, ResetPasswordAPI, \
     SendEmailAPI, CheckCodeAPI, SwitchUserLanguageAPI
@@ -131,6 +131,13 @@ class UserList(APIView):
                    description=_("Get all user"),
                    operation_id=_("Get all user"),  # type: ignore
                    tags=[_("User Management")],  # type: ignore
+                   parameters=[OpenApiParameter(
+                       name="nick_name",
+                       description=_('Nickname'),
+                       type=OpenApiTypes.STR,
+                       location=OpenApiParameter.QUERY,  # type: ignore
+                       required=False,
+                   )],
                    responses=UserListApi.get_response())
     @has_permissions(RoleConstants.WORKSPACE_MANAGE, RoleConstants.ADMIN, RoleConstants.EXTENDS_ADMIN,
                      RoleConstants.EXTENDS_WORKSPACE_MANAGE, RoleConstants.USER, RoleConstants.EXTENDS_USER)
