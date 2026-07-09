@@ -20,6 +20,20 @@ jsonpath_expr_cache = MemCache('parse_path', {
         'CULL_FREQUENCY': 10, # 达到上限时，删除约 1/10 的缓存
     },
 })
+_OUTPUT_RESULT_KEY = '_variable_splitting_result'
+
+
+def restore_result_context(context, result):
+    if not isinstance(result, dict):
+        context['result'] = result
+        return
+
+    context[_OUTPUT_RESULT_KEY] = result
+    for key, value in result.items():
+        context[key] = value
+    if 'result' not in result:
+        context['result'] = result
+
 
 def parse_and_cache(path):
     jsonpath_expr = jsonpath_expr_cache.get(path)
@@ -49,9 +63,7 @@ def smart_jsonpath_search(data: dict, path: str):
 
 class BaseVariableSplittingNode(IVariableSplittingNode):
     def save_context(self, details, workflow_manage):
-        for key, value in details.get('result').items():
-            self.context[key] = value
-        self.context['result'] = details.get('result')
+        restore_result_context(self.context, details.get('result'))
         self.context['request'] = details.get('request')
         self.context['exception_message'] = details.get('err_message')
 
@@ -64,16 +76,19 @@ class BaseVariableSplittingNode(IVariableSplittingNode):
 
         self.context['request'] = input_variable
         response = {v['field']: smart_jsonpath_search(input_variable, v['expression']) for v in variable_list}
-        return NodeResult({'result': response, **response}, {})
+        return NodeResult({'result': response, _OUTPUT_RESULT_KEY: response, **response}, {})
 
     def get_details(self, index: int, **kwargs):
+        result = self.context.get(_OUTPUT_RESULT_KEY)
+        if result is None:
+            result = self.context.get('result')
         return {
             'name': self.node.properties.get('stepName'),
             "index": index,
             'run_time': self.context.get('run_time'),
             'type': self.node.type,
             'request': self.context.get('request'),
-            'result': self.context.get('result'),
+            'result': result,
             'status': self.status,
             'err_message': self.err_message,
             'enableException': self.node.properties.get('enableException'),
