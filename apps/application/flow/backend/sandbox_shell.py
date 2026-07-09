@@ -307,5 +307,5 @@ class SandboxShellBackend(LocalShellBackend):
                 return ExecuteResponse(output=f"Invalid command: {e}", exit_code=1)
             # command = f"runuser -u {_run_user} -- env -i PATH=${{PATH}} {command}"
 
-        maxkb_logger.info(f"Executing command in sandbox: {command}")
+        maxkb_logger.debug(f"Executing command in sandbox: {command}")
         return super().execute(command=command, timeout=timeout)
