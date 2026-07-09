@@ -106,13 +106,26 @@ class AnonymousAuthentication(APIView):
         tags=[_('Chat')]  # type: ignore
     )
     def post(self, request: Request):
-        return result.success(
-            AnonymousAuthenticationSerializer(data={'access_token': request.data.get("access_token")}).auth(
-                request),
+        token, f_token = AnonymousAuthenticationSerializer(
+            data={'access_token': request.data.get("access_token")}).auth(
+            request)
+        response = result.success(
+            token,
             headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
                      "Access-Control-Allow-Methods": "POST",
                      "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
         )
+        response.set_cookie(
+            'mk_file_auth',
+            value=f_token,
+            max_age=7 * 24 * 3600,
+            path='/',
+            domain=None,
+            secure=True,
+            httponly=True,
+            samesite='Lax',
+        )
+        return response
 
 
 class ApplicationProfile(APIView):
@@ -269,6 +282,7 @@ class UploadFile(APIView):
         meta = {}
         for file in files:
             file_url = FileSerializer(
-                data={'file': file, 'meta': meta, 'source_id': chat_id, 'source_type': FileSourceType.CHAT, }).upload()
+                data={'file': file, 'meta': meta, 'source_id': chat_id, 'source_type': FileSourceType.CHAT, }).upload(
+                request.auth.chat_user_id)
             file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
         return result.success(file_ids)
