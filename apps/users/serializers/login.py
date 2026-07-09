@@ -17,6 +17,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken
+from common.auth.common import FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -173,7 +174,7 @@ class LoginSerializer(serializers.Serializer):
         timeout = CONFIG.get_session_timeout()
         cache.set(get_key(token), user, timeout=timeout, version=version)
 
-        return {"token": token}
+        return {"token": token}, FileToken(str(user.id), AuthenticationType.SYSTEM_USER.value).to_token()
 
     @staticmethod
     def _is_account_locked(username: str, failed_attempts: int) -> bool:

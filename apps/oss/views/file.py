@@ -26,7 +26,7 @@ class FileRetrievalView(APIView):
         return FileSerializer.Operate(data={
             'id': file_id,
             'http_range': request.headers.get('Range', ''),
-        }).get()
+        }).get(mk_file_auth=request.COOKIES.get('mk_file_auth'))
 
 
 class FileView(APIView):
@@ -49,7 +49,7 @@ class FileView(APIView):
             'file': request.FILES.get('file'),
             'source_id': request.data.get('source_id'),
             'source_type': request.data.get('source_type'),
-        }).upload())
+        }).upload(user_id=(request.user.id if request.user else request.auth.chat_user_id)))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]
