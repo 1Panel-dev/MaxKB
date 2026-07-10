@@ -28,6 +28,7 @@ from common.exception.app_exception import AppAuthenticationFailed
 from common.log.log import _get_ip_address
 from common.result import result
 from knowledge.models import FileSourceType
+from maxkb.const import CONFIG
 from oss.serializers.file import FileSerializer
 from users.api import CaptchaAPI
 from users.serializers.login import CaptchaSerializer
@@ -119,7 +120,7 @@ class AnonymousAuthentication(APIView):
             'mk_file_auth',
             value=f_token,
             max_age=7 * 24 * 3600,
-            path='/',
+            path=f'/{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
             domain=None,
             secure=True,
             httponly=True,
