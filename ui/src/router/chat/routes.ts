@@ -4,6 +4,12 @@ export const routes: Array<RouteRecordRaw> = [
   // 对话
   {
     path: '/:accessToken',
+    redirect: (to) => {
+      return `/${to.params.accessToken}/`
+    },
+  },
+  {
+    path: '/:accessToken/',
     name: 'chat',
     component: () => import('@/views/chat/index.vue'),
   },

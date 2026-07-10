@@ -17,6 +17,7 @@ from common.auth import TokenAuth
 from common.constants.cache_version import Cache_Version
 from common.log.log import log
 from common.utils.common import encryption
+from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from users.api.login import LoginAPI, CaptchaAPI
 from users.serializers.login import LoginSerializer, CaptchaSerializer
@@ -51,13 +52,14 @@ class LoginView(APIView):
             'mk_file_auth',
             value=f_token,
             max_age=7 * 24 * 3600,
-            path='/',
+            path=f'{CONFIG.get_admin_path()}',
             domain=None,
             secure=True,
             httponly=True,
             samesite='Lax',
         )
         return response
+
 
 class Logout(APIView):
     authentication_classes = [TokenAuth]
