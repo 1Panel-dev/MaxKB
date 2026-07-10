@@ -55,12 +55,17 @@ class ChatAuthentication:
 
 
 class FileToken:
-    def __init__(self, user_id, _type):
+    def __init__(self, user_id, _type, application_id: str = None):
         self.user_id = user_id
         self.type = _type
+        self.application_id = application_id
 
     def to_dict(self):
         return {
+            'user_id': self.user_id,
+            'type': self.type,
+            'application_id': self.application_id
+        } if self.application_id else {
             'user_id': self.user_id,
             'type': self.type
         }
@@ -71,7 +76,7 @@ class FileToken:
     @staticmethod
     def new_instance(token):
         token_dict = signing.loads(token)
-        return FileToken(token_dict.get('user_id'), token_dict.get('type'))
+        return FileToken(token_dict.get('user_id'), token_dict.get('type'), token_dict.get('application_id'))
 
 
 class ChatUserToken:
