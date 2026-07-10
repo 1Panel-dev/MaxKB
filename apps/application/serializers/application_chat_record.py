@@ -72,7 +72,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _("Application id does not exist"))
         if (
             not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists()
-            and ChatRecord.objects.filter(id=self.data.get("chat_record_id")).exists()
+            and ChatRecord.objects.filter(chat_id=self.data.get("chat_id")).exists()
         ):
             raise AppApiException(500, _("Chat records for the application do not exist"))
         application_access_token = (
@@ -127,7 +127,7 @@ class ApplicationChatRecordQuerySerializers(serializers.Serializer):
             raise AppApiException(500, _("Application id does not exist"))
         if (
             not ChatRecord.objects.filter(chat__application_id=self.data.get("application_id")).exists()
-            and ChatRecord.objects.filter(id=self.data.get("chat_record_id")).exists()
+            and ChatRecord.objects.filter(chat_id=self.data.get("chat_id")).exists()
         ):
             raise AppApiException(500, _("Chat records for the application do not exist"))
 
@@ -313,7 +313,7 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
         if not Document.objects.filter(id=self.data["document_id"], knowledge_id=self.data["knowledge_id"]).exists():
             raise AppApiException(500, gettext("The document id is incorrect"))
         if not ChatRecord.objects.filter(
-            id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
+            chat_id__in=self.data["chat_ids"], chat__application_id=self.data["application_id"]
         ).exists():
             raise AppApiException(500, gettext("The chat id is incorrect"))
 
