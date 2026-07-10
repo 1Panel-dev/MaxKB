@@ -131,12 +131,7 @@ def _auth_chat(file, token, user_type):
         return
 
     if user_type == AuthenticationType.CHAT_ANONYMOUS_USER:
-        # 匿名用户:知识库必须关联到 token 对应的应用
-        application_id = (QuerySet(Application)
-                          .filter(chat__id=token.chat_id)
-                          .values_list('id', flat=True)
-                          .first())
-        _check_knowledge_mapped_to_application(application_id, knowledge_id)
+        _check_knowledge_mapped_to_application(token.application_id, knowledge_id)
         return
 
     get_authorized = DatabaseModelManage.get_model('get_knowledge_list_of_authorized')
