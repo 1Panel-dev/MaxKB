@@ -120,7 +120,7 @@ class AnonymousAuthentication(APIView):
             'mk_file_auth',
             value=f_token,
             max_age=7 * 24 * 3600,
-            path=f'/{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
+            path=f'{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
             domain=None,
             secure=True,
             httponly=True,
