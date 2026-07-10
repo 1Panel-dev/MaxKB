@@ -61,14 +61,14 @@ class FileToken:
         self.application_id = application_id
 
     def to_dict(self):
-        return {
-            'user_id': self.user_id,
-            'type': self.type,
-            'application_id': self.application_id
-        } if self.application_id else {
+        return ({
+                    'user_id': self.user_id,
+                    'type': self.type,
+                    'application_id': self.application_id
+                } if self.application_id else {
             'user_id': self.user_id,
             'type': self.type
-        }
+        })
 
     def to_token(self):
         return signing.dumps(self.to_dict())
