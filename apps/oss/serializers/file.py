@@ -17,7 +17,7 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.exception.app_exception import NotFound404, AppApiException, AppUnauthorizedFailed
 from homepage.serializers.homepage import is_workspace_manage, is_extends_workspace_manage, \
     has_extends_workspace_manage_permission, hasPermission
-from knowledge.models import File, FileSourceType, Document, Knowledge
+from knowledge.models import File, FileSourceType, Document, Knowledge, PublicFileAccess
 from system_manage.models import WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
@@ -167,6 +167,9 @@ def auth(file, mk_file_auth):
     if file.source_type == FileSourceType.CHAT:
         if QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
             return
+    # PublicFileAccess 中记录的文件允许公开访问
+    if QuerySet(PublicFileAccess).filter(source_type='FILE', source_id=str(file.id)).exists():
+        return
     # 非公共文件,直接拒绝
     if mk_file_auth is None:
         _deny()

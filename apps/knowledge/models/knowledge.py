@@ -527,3 +527,39 @@ def on_delete_file(sender, instance, **kwargs):
         exist = QuerySet(File).filter(loid=instance.loid).exclude(id=instance.id).exists()
         if not exist:
             select_one(f"SELECT lo_unlink({instance.loid})", [])
+
+
+class PublicFileAccess(AppModelMixin):
+    """
+    公共文件访问控制表
+    记录哪些文件允许公开访问
+    """
+    id = models.UUIDField(
+        primary_key=True,
+        max_length=128,
+        default=uuid.uuid7,
+        editable=False,
+        verbose_name="主键id"
+    )
+
+    source_type = models.CharField(
+        max_length=20,
+        choices=[
+            ('FILE', '文件'),
+            ('APPLICATION', '应用'),
+            ('KNOWLEDGE', '知识库'),
+        ],
+        db_index=True,
+        verbose_name="资源类型"
+    )
+    source_id = models.CharField(
+        max_length=128,
+        db_index=True,
+        verbose_name="资源ID"
+    )
+
+    class Meta:
+        db_table = 'public_file_access'
+        indexes = [
+            models.Index(fields=['source_type', 'source_id']),
+        ]
