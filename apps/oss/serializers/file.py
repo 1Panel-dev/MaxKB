@@ -85,10 +85,11 @@ def auth(file, mk_file_auth):
     # 公共/临时文件无需鉴权
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
-    # 非公共文件必须携带凭证
+    # 非公共文件,如果是分享资源就不需要携带凭证
     if mk_file_auth is None:
-        _deny()
-
+        if not QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
+            _deny()
+        return
     token = FileToken.new_instance(mk_file_auth)
     user_type = AuthenticationType(token.type)
 
