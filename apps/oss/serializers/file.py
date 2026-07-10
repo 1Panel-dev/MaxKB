@@ -109,6 +109,8 @@ def _auth_chat(file, token, user_type):
     if file.source_type == FileSourceType.APPLICATION:
         if not token.application_id == file.source_id:
             _deny()
+        else:
+            return
     if file.source_type == FileSourceType.CHAT:
         if file.meta.get('user_id') == user_id:
             return
