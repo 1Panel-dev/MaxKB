@@ -32,7 +32,7 @@ from common.handle.impl.text.text_split_handle import TextSplitHandle
 from common.handle.impl.text.xls_split_handle import XlsSplitHandle
 from common.handle.impl.text.xlsx_split_handle import XlsxSplitHandle
 from common.handle.impl.text.zip_split_handle import ZipSplitHandle
-from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, parse_file_link, post
+from common.utils.common import bulk_create_in_batches, get_file_content, parse_file_link, parse_image, post
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
 from common.utils.split_model import flat_map, get_split_model
@@ -274,9 +274,7 @@ class DocumentSerializers(serializers.Serializer):
             language = get_language()
             if self.data.get("type") == "csv":
                 file = open(
-                    os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"csv_template_{language}.csv"
-                    ),
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", "template", f"csv_template_{language}.csv"),
                     "rb",
                 )
                 content = file.read()
@@ -291,9 +289,7 @@ class DocumentSerializers(serializers.Serializer):
                 )
             elif self.data.get("type") == "excel":
                 file = open(
-                    os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"excel_template_{language}.xlsx"
-                    ),
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", "template", f"excel_template_{language}.xlsx"),
                     "rb",
                 )
                 content = file.read()
@@ -315,9 +311,7 @@ class DocumentSerializers(serializers.Serializer):
             language = get_language()
             if self.data.get("type") == "csv":
                 file = open(
-                    os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"table_template_{language}.csv"
-                    ),
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", "template", f"table_template_{language}.csv"),
                     "rb",
                 )
                 content = file.read()
@@ -332,9 +326,7 @@ class DocumentSerializers(serializers.Serializer):
                 )
             elif self.data.get("type") == "excel":
                 file = open(
-                    os.path.join(
-                        PROJECT_DIR, "apps", "knowledge", "template", f"table_template_{language}.xlsx"
-                    ),
+                    os.path.join(PROJECT_DIR, "apps", "knowledge", "template", f"table_template_{language}.xlsx"),
                     "rb",
                 )
                 content = file.read()
@@ -596,7 +588,7 @@ class DocumentSerializers(serializers.Serializer):
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
             document_id = self.data.get("document_id")
-            first = QuerySet(Document).filter(id=document_id).first()
+            first = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
             if first is None:
                 raise AppApiException(500, _("document id not exist"))
             if first.type != KnowledgeType.WEB:
@@ -607,7 +599,7 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             document_id = self.data.get("document_id")
-            document = QuerySet(Document).filter(id=document_id).first()
+            document = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
             state = State.SUCCESS
             if document.type != KnowledgeType.WEB:
                 return True
@@ -742,7 +734,10 @@ class DocumentSerializers(serializers.Serializer):
                 with_table_name=True,
             )
             data_dict, document_dict = self.merge_problem(paragraph_list, problem_mapping_list, [document])
-            res = [parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content")) for paragraph in paragraph_list]
+            res = [
+                parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content"))
+                for paragraph in paragraph_list
+            ]
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/zip")
@@ -1633,7 +1628,10 @@ class DocumentSerializers(serializers.Serializer):
             data_dict, document_dict = DocumentSerializers.Operate.merge_problem(
                 paragraph_list, problem_mapping_list, document_list
             )
-            res = [parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content")) for paragraph in paragraph_list]
+            res = [
+                parse_image(paragraph.get("content")) + parse_file_link(paragraph.get("content"))
+                for paragraph in paragraph_list
+            ]
 
             workbook = DocumentSerializers.Operate.get_workbook(data_dict, document_dict)
             response = HttpResponse(content_type="application/zip")
