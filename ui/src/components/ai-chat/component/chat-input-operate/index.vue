@@ -291,7 +291,7 @@
                       }}{{ $t('aiChat.uploadFile.limit') }}
                       {{ props.applicationDetails.file_upload_setting.fileLimit }}MB<br />{{
                         $t('aiChat.uploadFile.fileType')
-                      }}：{{ getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase() }}
+                      }}：{{ supportedExtensions }}
                     </div>
                   </template>
                   <el-button text :disabled="checkMaxFilesLimit() || loading" class="mt-4">
@@ -300,6 +300,7 @@
                 </el-tooltip>
               </el-upload>
             </span>
+
             <el-divider
               direction="vertical"
               v-if="
@@ -514,7 +515,21 @@ const checkMaxFilesLimit = () => {
   )
 }
 const filePromisionDict: any = ref<any>({})
+const checkFileTypeSupported = (fileName: string): boolean => {
+  const capabilities = props.applicationDetails.model_capabilities
+  if (!capabilities || capabilities.length === 0) return true
+  const ext = fileName.split('.').pop()?.toLowerCase()
+  if (!ext) return false
+  // 文档类型始终支持
+  if (documentExtensions.some(e => e.toLowerCase() === ext)) return true
+  return capabilities.some((c: string) => c.toLowerCase() === ext)
+}
 const uploadFile = async (file: any, fileList: any) => {
+  if (!checkFileTypeSupported(file.name)) {
+    MsgWarning(`当前模型不支持 .${file.name.split('.').pop()} 文件类型`)
+    fileList.splice(fileList.indexOf(file), 1)
+    return
+  }
   const { maxFiles, fileLimit } = props.applicationDetails.file_upload_setting
   // 单次上传文件数量限制
   const file_limit_once =
@@ -562,7 +577,6 @@ const uploadFile = async (file: any, fileList: any) => {
     inner.file_id = split_path[split_path.length - 1]
     delete filePromisionDict.value[file.uid]
   })
-  showURLSetting.value = false
 }
 // 粘贴处理
 const handlePaste = (event: ClipboardEvent) => {
@@ -638,6 +652,14 @@ const uploadOtherList = computed(() =>
     otherExtensions.value.map((item) => item.toUpperCase()),
   ),
 )
+
+const supportedExtensions = computed(() => {
+  const caps = props.applicationDetails.model_capabilities
+  if (caps && caps.length > 0) {
+    return caps.join('、').toUpperCase()
+  }
+  return getAcceptList().replace(/\./g, '').replace(/,/g, '、').toUpperCase()
+})
 
 const showDelete = ref('')
 
@@ -1318,6 +1340,7 @@ async function saveUrl() {
   urlForm.source_url = ''
   urlForm.type = ''
 }
+
 </script>
 <style lang="scss" scoped>
 .ai-chat__operate {

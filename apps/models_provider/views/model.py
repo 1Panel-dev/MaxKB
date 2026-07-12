@@ -243,6 +243,30 @@ class ModelSetting(APIView):
             return result.success(
                 ModelSerializer.Operate(data={'id': model_id, 'workspace_id': workspace_id}).one_meta(with_valid=True))
 
+    class Probe(APIView):
+        authentication_classes = [TokenAuth]
+
+        @extend_schema(methods=['POST'],
+                       summary=_('Probe model capabilities'),
+                       description=_('Send a probe message to the model to detect its multimodal capabilities'),
+                       operation_id=_('Probe model capabilities'),
+                       parameters=GetModelApi.get_parameters(),
+                       tags=[_('Model')])
+        @has_permissions(
+            PermissionConstants.MODEL_READ.get_workspace_model_permission(),
+            PermissionConstants.MODEL_READ.get_workspace_permission_workspace_manage_role(),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [PermissionConstants.MODEL.get_workspace_model_permission()],
+                           CompareConstants.AND),
+        )
+        def post(self, request: Request, workspace_id: str, model_id: str):
+            return result.success(
+                ModelSerializer.Operate(
+                    data={'id': model_id, 'workspace_id': workspace_id}
+                ).probe(with_valid=True)
+            )
+
     class PauseDownload(APIView):
         authentication_classes = [TokenAuth]
 

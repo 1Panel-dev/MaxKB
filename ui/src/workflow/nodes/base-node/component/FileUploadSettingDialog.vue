@@ -73,9 +73,12 @@
             <el-card
               shadow="hover"
               class="card-checkbox cursor w-full mb-8"
-              :class="form_data.image ? 'border-active' : ''"
+              :class="[
+                form_data.image ? 'border-active' : '',
+                !isImageSupported ? 'card-disabled' : ''
+              ]"
               style="--el-card-padding: 8px 16px"
-              @click.stop="form_data.image = !form_data.image"
+              @click.stop="isImageSupported && (form_data.image = !form_data.image)"
             >
               <div class="flex-between">
                 <div class="flex align-center">
@@ -102,9 +105,12 @@
             <el-card
               shadow="hover"
               class="card-checkbox cursor w-full mb-8"
-              :class="form_data.audio ? 'border-active' : ''"
+              :class="[
+                form_data.audio ? 'border-active' : '',
+                !isAudioSupported ? 'card-disabled' : ''
+              ]"
               style="--el-card-padding: 8px 16px"
-              @click.stop="form_data.audio = !form_data.audio"
+              @click.stop="isAudioSupported && (form_data.audio = !form_data.audio)"
             >
               <div class="flex-between">
                 <div class="flex align-center">
@@ -130,9 +136,12 @@
             <el-card
               shadow="hover"
               class="card-checkbox cursor w-full mb-8"
-              :class="form_data.video ? 'border-active' : ''"
+              :class="[
+                form_data.video ? 'border-active' : '',
+                !isVideoSupported ? 'card-disabled' : ''
+              ]"
               style="--el-card-padding: 8px 16px"
-              @click.stop="form_data.video = !form_data.video"
+              @click.stop="isVideoSupported && (form_data.video = !form_data.video)"
             >
               <div class="flex-between">
                 <div class="flex align-center">
@@ -215,24 +224,24 @@
                 />
               </div>
             </el-card>
-            <el-form-item
-              :label="$t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')"
-            >
-              <template #label>
-                <span>
-                  {{ $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')
-                  }}<span class="color-danger">*</span>
-                </span>
-              </template>
-              <div class="flex align-center">
-                <el-checkbox v-model="form_data.local_upload" class="mr-16">
-                  {{ $t('common.fileUpload.localUpload') }}
-                </el-checkbox>
-                <el-checkbox v-model="form_data.url_upload">
-                  {{ $t('common.fileUpload.urlUpload') }}
-                </el-checkbox>
-              </div>
-            </el-form-item>
+          </el-form-item>
+          <el-form-item
+            :label="$t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')"
+          >
+            <template #label>
+              <span>
+                {{ $t('workflow.nodes.baseNode.FileUploadSetting.fileUploadType.uploadMethod')
+                }}<span class="color-danger">*</span>
+              </span>
+            </template>
+            <div class="flex align-center">
+              <el-checkbox v-model="form_data.local_upload" class="mr-16">
+                {{ $t('common.fileUpload.localUpload') }}
+              </el-checkbox>
+              <el-checkbox v-model="form_data.url_upload">
+                {{ $t('common.fileUpload.urlUpload') }}
+              </el-checkbox>
+            </div>
           </el-form-item>
         </el-form>
       </div>
@@ -250,14 +259,14 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import type { InputInstance } from 'element-plus'
 import { cloneDeep } from 'lodash'
 import { MsgWarning } from '@/utils/message'
 import { t } from '@/locales'
 
 const emit = defineEmits(['refresh'])
-const props = defineProps<{ nodeModel: any }>()
+const props = defineProps<{ nodeModel: any; modelCapabilities?: string[] }>()
 
 const dialogVisible = ref(false)
 const inputVisible = ref(false)
@@ -270,6 +279,16 @@ const documentExtensions = ['TXT', 'MD', 'DOCX', 'HTML', 'CSV', 'XLSX', 'XLS', '
 const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'ACC', 'M4A']
 const videoExtensions: any = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
+
+const isImageSupported = computed(() => {
+  return props.modelCapabilities?.some(c => imageExtensions.includes(c.toUpperCase())) ?? true
+})
+const isAudioSupported = computed(() => {
+  return props.modelCapabilities?.some(c => audioExtensions.includes(c.toUpperCase())) ?? true
+})
+const isVideoSupported = computed(() => {
+  return props.modelCapabilities?.some(c => videoExtensions.includes(c.toUpperCase())) ?? true
+})
 
 const form_data = ref({
   maxFiles: 3,
@@ -288,6 +307,14 @@ function open(data: any) {
   dialogVisible.value = true
   nextTick(() => {
     form_data.value = { ...form_data.value, ...data }
+    const caps = props.modelCapabilities
+    if (caps && caps.length > 0) {
+      const lowerCaps = caps.map((c: string) => c.toLowerCase())
+      form_data.value.document = documentExtensions.some((ext: string) => lowerCaps.includes(ext.toLowerCase()))
+      form_data.value.image = imageExtensions.some((ext: string) => lowerCaps.includes(ext.toLowerCase()))
+      form_data.value.audio = audioExtensions.some((ext: string) => lowerCaps.includes(ext.toLowerCase()))
+      form_data.value.video = videoExtensions.some((ext: string) => lowerCaps.includes(ext.toLowerCase()))
+    }
   })
 }
 
@@ -336,7 +363,7 @@ async function submit() {
     const formattedData = cloneDeep(form_data.value)
     emit('refresh', formattedData)
     // emit('refresh', form_data.value)
-    props.nodeModel.graphModel.eventCenter.emit('refreshFileUploadConfig')
+    props.nodeModel?.graphModel?.eventCenter?.emit('refreshFileUploadConfig')
     dialogVisible.value = false
   })
 }
@@ -346,4 +373,13 @@ defineExpose({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.card-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: auto;
+  &:hover {
+    box-shadow: none;
+  }
+}
+</style>

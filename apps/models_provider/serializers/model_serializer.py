@@ -22,7 +22,8 @@ from maxkb.conf import PROJECT_DIR
 from models_provider.base_model_provider import DownModelChunkStatus, ValidCode
 from models_provider.constants.model_provider_constants import ModelProvideConstants
 from models_provider.models import Model, Status
-from models_provider.tools import get_model_credential
+from models_provider.tools import get_model_credential, get_model_instance_by_model_workspace_id
+from common.utils.logger import maxkb_logger
 from rest_framework import serializers
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
@@ -168,6 +169,57 @@ class ModelSerializer(serializers.Serializer):
                 "meta": model.meta,
                 "workspace_id": model.workspace_id,
             }
+
+        def probe(self, with_valid=False):
+            if with_valid:
+                self.is_valid()
+            model_id = self.data.get('id')
+            workspace_id = self.data.get('workspace_id')
+            model = QuerySet(Model).filter(id=model_id, workspace_id=workspace_id).first()
+            if not model:
+                raise AppApiException(500, _('Model not found'))
+
+            # 如果已有缓存结果，直接返回
+            if model.meta and model.meta.get('file_capabilities') is not None:
+                return {'file_capabilities': model.meta['file_capabilities']}
+
+            # 获取模型实例
+            try:
+                model_instance = get_model_instance_by_model_workspace_id(
+                    model_id, workspace_id
+                )
+                from langchain_core.messages import HumanMessage
+
+                probe_prompt = (
+                    "You are a capability detection assistant. "
+                    "Return ONLY a comma-separated list of file extensions you can process "
+                    "as non-text input (images, audio, video, documents). "
+                    "Examples: jpg,png,mp4,mp3,pdf,docx,txt "
+                    "If you cannot process any non-text input, return only: none "
+                    "Do not include any other text."
+                )
+
+                response = model_instance.invoke([HumanMessage(content=probe_prompt)])
+                content = response.content.strip()
+
+                if content.lower() == 'none':
+                    capabilities = []
+                else:
+                    capabilities = [
+                        ext.strip().lower()
+                        for ext in content.split(',')
+                        if ext.strip()
+                    ]
+
+                # 缓存到 model.meta
+                meta = model.meta or {}
+                meta['file_capabilities'] = capabilities
+                QuerySet(Model).filter(id=model_id).update(meta=meta)
+
+                return {'file_capabilities': capabilities}
+            except Exception as e:
+                maxkb_logger.error(f'Probe model failed: {e}')
+                raise AppApiException(500, _('Model probe failed: {msg}').format(msg=str(e)))
 
         def pause_download(self, with_valid=True):
             if with_valid:

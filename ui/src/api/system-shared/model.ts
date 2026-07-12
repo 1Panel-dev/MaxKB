@@ -130,6 +130,19 @@ const deleteModel: (model_id: string, loading?: Ref<boolean>) => Promise<Result<
   return del(`${prefix}/${model_id}`, undefined, {}, loading)
 }
 
+/**
+ * 探针模型能力 — 检测模型支持的非文本文件类型
+ * @param model_id 模型id
+ * @param loading  加载器
+ * @returns
+ */
+const probeModelCapability: (
+  model_id: string,
+  loading?: Ref<boolean>,
+) => Promise<Result<{ file_capabilities: string[] }>> = (model_id, loading) => {
+  return post(`${prefix}/${model_id}/probe`, {}, {}, loading)
+}
+
 export default {
   getModelList,
   createModel,
@@ -141,4 +154,5 @@ export default {
   getModelParamsForm,
   updateModelParamsForm,
   getSelectModelList,
+  probeModelCapability,
 }

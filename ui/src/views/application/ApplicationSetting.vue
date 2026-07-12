@@ -897,6 +897,36 @@
                     </el-button>
                   </div>
                 </el-form-item>
+                <el-form-item>
+                  <template #label>
+                    <div class="flex-between">
+                      <div class="flex align-center">
+                        <span class="mr-4">{{ $t('workflow.nodes.baseNode.fileUpload.label') }}</span>
+                        <el-tooltip effect="dark" :content="$t('workflow.nodes.baseNode.fileUpload.tooltip')" placement="right">
+                          <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
+                        </el-tooltip>
+                      </div>
+                      <div>
+                        <el-button
+                          v-if="applicationForm.file_upload_enable"
+                          type="primary"
+                          link
+                          @click="openFileUploadSettingDialog"
+                          class="mr-4"
+                        >
+                          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+                        </el-button>
+                        <el-switch size="small" v-model="applicationForm.file_upload_enable" @change="switchFileUpload" />
+                      </div>
+                    </div>
+                  </template>
+                </el-form-item>
+                <FileUploadSettingDialog
+                  ref="FileUploadSettingDialogRef"
+                  :node-model="{ properties: { node_data: applicationForm } }"
+                  :model-capabilities="applicationForm.model_capabilities"
+                  @refresh="refreshFileUploadForm"
+                />
               </el-form>
             </el-scrollbar>
           </div>
@@ -968,6 +998,7 @@ import ToolDialog from '@/views/application/component/ToolDialog.vue'
 import ApplicationDialog from '@/views/application/component/ApplicationDialog.vue'
 import useStore from '@/stores'
 import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
+import FileUploadSettingDialog from '@/workflow/nodes/base-node/component/FileUploadSettingDialog.vue'
 const route = useRoute()
 const router = useRouter()
 const {
@@ -1025,6 +1056,7 @@ const GeneratePromptDialogRef = ref<InstanceType<typeof GeneratePromptDialog>>()
 
 const applicationFormRef = ref<FormInstance>()
 const AddKnowledgeDialogRef = ref()
+const FileUploadSettingDialogRef = ref()
 
 const loading = ref(false)
 const knowledgeLoading = ref(false)
@@ -1076,6 +1108,20 @@ const applicationForm = ref<ApplicationFormType>({
   long_term_model_params_setting: {},
   long_term_trigger_setting: { rounds: 10 },
   long_term_trigger_type: 'ROUND',
+  file_upload_enable: false,
+  file_upload_setting: {
+    maxFiles: 3,
+    fileLimit: 50,
+    document: true,
+    image: false,
+    audio: false,
+    video: false,
+    other: false,
+    otherExtensions: ['PPT', 'DOC'],
+    local_upload: true,
+    url_upload: false,
+  },
+  model_capabilities: [],
 })
 
 const rules = reactive<FormRules<ApplicationFormType>>({
@@ -1143,9 +1189,49 @@ const model_change = (model_id?: string) => {
   applicationForm.value.model_id = model_id
   if (model_id) {
     AIModeParamSettingDialogRef.value?.reset_default(model_id, id)
+    // 模型探针
+    probeAfterModelSelect(model_id)
   } else {
     refreshForm({})
   }
+}
+
+const probeAfterModelSelect = async (model_id: string) => {
+  try {
+    const res = await loadSharedApi({ type: 'model', systemType: apiType.value })
+      .probeModelCapability(model_id)
+    applicationForm.value.model_capabilities = res.data.file_capabilities || []
+  } catch (e) {
+    console.error('Model probe failed:', e)
+    applicationForm.value.model_capabilities = []
+  }
+}
+
+const switchFileUpload = () => {
+  const default_upload_setting = {
+    maxFiles: 3,
+    fileLimit: 50,
+    document: true,
+    image: false,
+    audio: false,
+    video: false,
+    other: false,
+    otherExtensions: ['PPT', 'DOC'],
+    local_upload: true,
+    url_upload: false,
+  }
+  if (applicationForm.value.file_upload_enable) {
+    applicationForm.value.file_upload_setting =
+      applicationForm.value.file_upload_setting || default_upload_setting
+  }
+}
+
+const openFileUploadSettingDialog = () => {
+  FileUploadSettingDialogRef.value?.open(applicationForm.value.file_upload_setting)
+}
+
+const refreshFileUploadForm = (data: any) => {
+  applicationForm.value.file_upload_setting = data
 }
 
 const long_term_model_change = (model_id?: string) => {
@@ -1447,6 +1533,9 @@ function getDetail() {
           .then((ok: any) => {
             applicationForm.value = { ...applicationForm.value, ...ok.data }
           })
+      }
+      if (applicationForm.value.model_id) {
+        probeAfterModelSelect(applicationForm.value.model_id)
       }
     })
 }

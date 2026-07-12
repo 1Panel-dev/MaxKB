@@ -16,6 +16,7 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from rest_framework import serializers
+from common.utils.logger import maxkb_logger
 
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
@@ -38,7 +39,7 @@ from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
 from common.utils.common import flat_map, get_file_content, is_valid_uuid
-from knowledge.models import Document, Paragraph
+from knowledge.models import Document, Paragraph, File
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_instance_by_model_workspace_id
@@ -282,6 +283,147 @@ class OpenAIChatSerializer(serializers.Serializer):
                base_to_response=OpenaiToResponse())
 
 
+
+
+def _extract_file_id(file_item):
+    """从文件对象中提取 file_id（支持 url 或 file_id 字段）"""
+    file_id = file_item.get('file_id', '')
+    if not file_id:
+        url = file_item.get('url', '')
+        import re
+        match = re.search(r'oss/file/([^/]+)', url)
+        if match:
+            file_id = match.group(1)
+    return file_id
+
+
+def _load_file_record(file_id):
+    """从数据库加载文件记录"""
+    if not file_id:
+        return None
+    from knowledge.models import File
+    try:
+        return QuerySet(File).filter(id=file_id).first()
+    except Exception as e:
+        maxkb_logger.exception(f"Failed to load file record: {e}")
+        return None
+
+
+def _process_documents(document_list):
+    """处理文档文件，提取文本内容"""
+    document_text = ''
+    if not document_list:
+        return document_text
+    for doc in document_list:
+        file_record = _load_file_record(_extract_file_id(doc))
+        if not file_record:
+            continue
+        try:
+            file_bytes = file_record.get_bytes()
+            file_name = file_record.file_name.lower()
+            text_content = None
+            if any(ext in file_name for ext in ['.txt', '.md', '.csv', '.html', '.xml', '.json']):
+                text_content = file_bytes.decode('utf-8', errors='ignore')[:50000]
+            elif any(ext in file_name for ext in ['.pdf', '.docx', '.doc']):
+                text_content = f"[Document: {file_record.file_name}, {len(file_bytes)} bytes]"
+            else:
+                text_content = f"[File: {file_record.file_name}, {len(file_bytes)} bytes]"
+            if text_content:
+                document_text += f"\n<data>{text_content}</data>"
+        except Exception as e:
+            maxkb_logger.exception(f"Failed to process document: {e}")
+            pass
+    return document_text
+
+
+def _process_images(image_list):
+    """处理图片文件，转换为多模态格式"""
+    import base64
+    from imghdr import what
+    processed = []
+    if not image_list:
+        return processed
+    for img in image_list:
+        file_record = _load_file_record(_extract_file_id(img))
+        if not file_record:
+            continue
+        try:
+            image_bytes = file_record.get_bytes()
+            base64_image = base64.b64encode(image_bytes).decode('utf-8')
+            image_format = what(None, image_bytes) or 'jpeg'
+            processed.append({
+                "type": "image_url",
+                "image_url": {"url": f"data:image/{image_format};base64,{base64_image}"}
+            })
+        except Exception as e:
+            maxkb_logger.exception(f"Failed to process file: {e}")
+            pass
+    return processed
+
+
+def _process_videos(video_list):
+    """处理视频文件，转换为多模态格式"""
+    import base64
+    processed = []
+    if not video_list:
+        return processed
+    for vid in video_list:
+        file_record = _load_file_record(_extract_file_id(vid))
+        if not file_record:
+            continue
+        try:
+            video_bytes = file_record.get_bytes()
+            base64_video = base64.b64encode(video_bytes).decode('utf-8')
+            file_name = file_record.file_name.lower()
+            video_format = 'mp4'
+            if file_name.endswith('.webm'):
+                video_format = 'webm'
+            elif file_name.endswith('.avi'):
+                video_format = 'avi'
+            elif file_name.endswith('.mov'):
+                video_format = 'mov'
+            processed.append({
+                "type": "video_url",
+                "video_url": {"url": f"data:video/{video_format};base64,{base64_video}"}
+            })
+        except Exception as e:
+            maxkb_logger.exception(f"Failed to process file: {e}")
+            pass
+    return processed
+
+
+def _process_audio(audio_list):
+    """处理音频文件，转换为多模态格式"""
+    import base64
+    processed = []
+    if not audio_list:
+        return processed
+    for aud in audio_list:
+        file_record = _load_file_record(_extract_file_id(aud))
+        if not file_record:
+            continue
+        try:
+            audio_bytes = file_record.get_bytes()
+            base64_audio = base64.b64encode(audio_bytes).decode('utf-8')
+            file_name = file_record.file_name.lower()
+            audio_format = 'mp3'
+            if file_name.endswith('.wav'):
+                audio_format = 'wav'
+            elif file_name.endswith('.ogg'):
+                audio_format = 'ogg'
+            elif file_name.endswith('.aac'):
+                audio_format = 'aac'
+            elif file_name.endswith('.m4a'):
+                audio_format = 'mp4'
+            processed.append({
+                "type": "audio_url",
+                "audio_url": {"url": f"data:audio/{audio_format};base64,{base64_audio}"}
+            })
+        except Exception as e:
+            maxkb_logger.exception(f"Failed to process file: {e}")
+            pass
+    return processed
+
 class ChatSerializers(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
     chat_user_id = serializers.CharField(required=True, label=_("Client id"))
@@ -343,7 +485,13 @@ class ChatSerializers(serializers.Serializer):
         ip_address = self.data.get('ip_address')
         source = self.data.get('source')
         form_data = instance.get("form_data")
+        image_list = instance.get('image_list') or []
+        video_list = instance.get('video_list') or []
+        document_list = instance.get('document_list') or []
+        audio_list = instance.get('audio_list') or []
+        other_list = instance.get('other_list') or []
         chat_record_id = instance.get('chat_record_id')
+        maxkb_logger.info(f"document_list:{document_list}")
         pipeline_manage_builder = PipelineManage.builder()
         # 如果开启了问题优化,则添加上问题优化步骤
         if chat_info.application.problem_optimization:
@@ -370,24 +518,21 @@ class ChatSerializers(serializers.Serializer):
                                                      form_data)
         if chat_record_id:
             params['chat_record_id'] = chat_record_id
+        # 处理上传文件
+        params['document_text'] = _process_documents(document_list)
+        processed_images = _process_images(image_list)
+        if processed_images:
+            params['processed_images'] = processed_images
+        processed_videos = _process_videos(video_list)
+        if processed_videos:
+            params['processed_videos'] = processed_videos
+        processed_audio = _process_audio(audio_list)
+        if processed_audio:
+            params['processed_audio'] = processed_audio
         chat_info.set_chat(message)
-        # 运行流水线作业
         pipeline_message.run(params)
         return pipeline_message.context['chat_result']
 
-    @staticmethod
-    def get_chat_record(chat_info, chat_record_id):
-        if chat_info is not None:
-            chat_record_list = [chat_record for chat_record in chat_info.chat_record_list if
-                                str(chat_record.id) == str(chat_record_id)]
-            if chat_record_list is not None and len(chat_record_list):
-                return chat_record_list[-1]
-            chat_record = QuerySet(ChatRecord).filter(id=chat_record_id, chat_id=chat_info.chat_id).first()
-            if chat_record is None:
-                if not is_valid_uuid(chat_record_id):
-                    raise ChatException(500, _("Conversation record does not exist"))
-        chat_record = QuerySet(ChatRecord).filter(id=chat_record_id).first()
-        return chat_record
 
     def chat_work_flow(self, chat_info: ChatInfo, instance: dict, base_to_response):
         message = instance.get('message')
