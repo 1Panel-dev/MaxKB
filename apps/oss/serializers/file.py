@@ -85,10 +85,6 @@ def auth(file, mk_file_auth):
     # 公共/临时文件无需鉴权
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
-    # 如果需要访问的数据类型是对话文件,并且数据已经分析出去就直接放行
-    if file.source_type == FileSourceType.CHAT:
-        if QuerySet(ChatShareLink).filter(chat_id=file.source_id).exists():
-            return
     # PublicFileAccess 中记录的文件允许公开访问
     if QuerySet(PublicFileAccess).filter(source_type='FILE', source_id=str(file.id)).exists():
         return
