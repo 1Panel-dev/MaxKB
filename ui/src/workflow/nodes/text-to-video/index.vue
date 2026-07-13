@@ -52,6 +52,7 @@
               v-model="form_data.model_id"
               :placeholder="$t('workflow.nodes.textToVideoGenerate.model.requiredMessage')"
               :options="modelOptions"
+              @submitModel="getSelectModel"
               showFooter
               :model-type="'TTV'"
             ></ModelSelect>
