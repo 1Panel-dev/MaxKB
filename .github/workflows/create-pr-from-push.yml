@@ -12,6 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create pull request
-        uses: jumpserver/action-generic-handler@master
+        uses: jumpserver/action-generic-handler@60f2d663e639907248d5baf7b1b5c2cbf2ac9e60 # master
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
