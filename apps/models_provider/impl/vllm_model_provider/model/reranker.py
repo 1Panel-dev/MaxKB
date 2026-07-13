@@ -48,6 +48,6 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
             return []
 
         ds = [d.page_content for d in documents]
-        result = self.client.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n, **self.params)
+        result = self.client.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n)
         return [Document(page_content=d.document.get('text'), metadata={'relevance_score': d.relevance_score}) for d in
                 result.results]
