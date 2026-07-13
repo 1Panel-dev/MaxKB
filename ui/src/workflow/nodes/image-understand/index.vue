@@ -50,6 +50,7 @@
               v-model="form_data.model_id"
               :placeholder="$t('workflow.nodes.imageUnderstandNode.model.requiredMessage')"
               :options="modelOptions"
+              @submitModel="getSelectModel"
               showFooter
               :model-type="'IMAGE'"
             ></ModelSelect>
@@ -180,20 +181,16 @@
             trigger: 'change',
           }"
         >
-           <div class="flex align-center">
+          <div class="flex align-center">
             <div>
-                <span
-                >{{
-                    $t('workflow.nodes.imageUnderstandNode.image.label')
-                  }}<span class="color-danger">*</span></span
-                >
+              <span
+                >{{ $t('workflow.nodes.imageUnderstandNode.image.label')
+                }}<span class="color-danger">*</span></span
+              >
             </div>
-            <el-tooltip effect="dark" placement="right" >
+            <el-tooltip effect="dark" placement="right">
               <template #content>
-                <div style="white-space: pre-wrap; font-family: monospace;">{{
-                    fileTooltip
-                  }}
-                </div>
+                <div style="white-space: pre-wrap; font-family: monospace">{{ fileTooltip }}</div>
               </template>
               <AppIcon iconName="app-warning" class="app-warning-icon"></AppIcon>
             </el-tooltip>
@@ -282,7 +279,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import GeneratePromptDialog from '@/views/application/component/GeneratePromptDialog.vue'
 import { WorkflowMode } from '@/enums/application'
 import ReasoningParamSettingDialog from '@/views/application/component/ReasoningParamSettingDialog.vue'
-import {fileTooltip} from "@/workflow/common/data.ts";
+import { fileTooltip } from '@/workflow/common/data.ts'
 
 const workflowMode = (inject('workflowMode') as WorkflowMode) || WorkflowMode.Application
 const getResourceDetail = inject('getResourceDetail') as any
