@@ -30,7 +30,7 @@ class AzureLLMModelParams(BaseForm):
     max_tokens = forms.SliderField(
         TooltipLabel(_('Output the maximum Tokens'),
                      _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
+        required=True, default_value=8192,
         _min=1,
         _max=100000,
         _step=1,
@@ -41,7 +41,7 @@ class o3MiniLLMModelParams(BaseForm):
     max_completion_tokens = forms.SliderField(
         TooltipLabel(_('Output the maximum Tokens'),
                      _('Specify the maximum number of tokens that the model can generate')),
-        required=True, default_value=800,
+        required=True, default_value=8192,
         _min=1,
         _max=5000,
         _step=1,
