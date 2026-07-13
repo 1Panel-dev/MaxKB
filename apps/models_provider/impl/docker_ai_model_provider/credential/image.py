@@ -30,7 +30,7 @@ class DockerAIImageModelParams(BaseForm):
             _("Output the maximum Tokens"), _("Specify the maximum number of tokens that the model can generate")
         ),
         required=True,
-        default_value=800,
+        default_value=8192,
         _min=1,
         _max=100000,
         _step=1,
