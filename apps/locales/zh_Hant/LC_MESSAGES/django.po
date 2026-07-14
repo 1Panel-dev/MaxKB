@@ -6935,7 +6935,7 @@ msgstr "獲取當前用戶信息"
 #: apps/users/views/user.py:120 apps/users/views/user.py:121
 #: apps/users/views/user.py:122
 msgid "Get all user"
-msgstr "獲取所有用戶"
+msgstr "根據姓名獲取用戶(最多獲取200個)"
 
 #: apps/users/views/user.py:133 apps/users/views/user.py:134
 #: apps/users/views/user.py:135
