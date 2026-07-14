@@ -752,12 +752,12 @@ class DocumentSerializers(serializers.Serializer):
             response.write(zip_buffer.getvalue())
             return response
 
-        def download_source_file(self):
+        def download_source_file(self,mk_file_auth=None):
             self.is_valid(raise_exception=True)
             file = QuerySet(File).filter(source_id=self.data.get("document_id")).first()
             if not file:
                 raise AppApiException(500, _("File not exist. Only manually uploaded documents are supported"))
-            return FileSerializer.Operate(data={"id": file.id}).get(with_valid=True)
+            return FileSerializer.Operate(data={"id": file.id}).get(mk_file_auth=mk_file_auth, with_valid=True)
 
         def one(self, with_valid=False):
             self.is_valid(raise_exception=True)

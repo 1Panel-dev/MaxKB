@@ -968,7 +968,7 @@ class DocumentView(APIView):
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(
                 data={"workspace_id": workspace_id, "document_id": document_id, "knowledge_id": knowledge_id}
-            ).download_source_file()
+            ).download_source_file(mk_file_auth=request.COOKIES.get('mk_file_auth'))
 
     class ReplaceSourceFile(APIView):
         authentication_classes = [TokenAuth]
