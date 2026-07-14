@@ -299,24 +299,28 @@ function sendReQuestionMessage(event?: any) {
 
       props.chatRecord.problem_text = editText.value
       reset_answer_text_list(props.chatRecord.answer_text_list)
-      props.chatRecord.write_ed = false
-
       isReQuestion.value = false
-      props.sendMessage(
-        editText.value,
-        {
-          re_chat: true,
-          image_list: container?.image_list || [],
-          document_list: container?.document_list || [],
-          audio_list: container?.audio_list || [],
-          video_list: container?.video_list || [],
-          other_list: container?.other_list || [],
-          chat_record_id: props.chatRecord.record_id
-            ? props.chatRecord.record_id
-            : props.chatRecord.id,
-        },
-        props.chatRecord,
-      )
+      props
+        .sendMessage(
+          editText.value,
+          {
+            re_chat: true,
+            image_list: container?.image_list || [],
+            document_list: container?.document_list || [],
+            audio_list: container?.audio_list || [],
+            video_list: container?.video_list || [],
+            other_list: container?.other_list || [],
+            chat_record_id: props.chatRecord.record_id
+              ? props.chatRecord.record_id
+              : props.chatRecord.id,
+          },
+          props.chatRecord,
+        )
+        .then(() => {
+          // 发送校验通过后再标记为"生成中"，否则会提前触发 currentChatGenerating 拦截本次发送
+          props.chatRecord.write_ed = false
+        })
+        .catch(() => {})
     }
   } else {
     // 如果同时按下ctrl/shift/cmd/opt +enter，则会换行
