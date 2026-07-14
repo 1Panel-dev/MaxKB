@@ -158,6 +158,7 @@
           v-model="form_data.stt_model_id"
           :placeholder="$t('views.application.form.voiceInput.placeholder')"
           :options="sttModelOptions"
+          @submitModel="getSTTModel"
           showFooter
           :model-type="'STT'"
         ></ModelSelect>
@@ -193,6 +194,7 @@
             :placeholder="$t('views.application.form.voicePlay.placeholder')"
             :options="ttsModelOptions"
             @change="ttsModelChange()"
+            @submitModel="getTTSModel"
             showFooter
             :model-type="'TTS'"
           ></ModelSelect>
@@ -227,8 +229,8 @@
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted, nextTick, inject, provide } from 'vue'
-import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message'
+import { computed, inject, nextTick, onMounted, provide, ref } from 'vue'
+import { MsgSuccess } from '@/utils/message'
 import { t } from '@/locales'
 import TTSModeParamSettingDialog from '@/views/application/component/TTSModeParamSettingDialog.vue'
 import ApiInputFieldTable from './component/ApiInputFieldTable.vue'
@@ -240,6 +242,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import AppIcon from '@/components/app-icon/AppIcon.vue'
 import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
+
 const getResourceDetail = inject('getResourceDetail') as any
 const route = useRoute()
 
