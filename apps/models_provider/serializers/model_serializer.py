@@ -485,16 +485,17 @@ class ModelSerializer(serializers.Serializer):
             super().is_valid(raise_exception=True)
 
             validated_data = self.validated_data
-            model = (
-                QuerySet(Model)
-                .filter(
-                    id=validated_data.get("id"),
-                    workspace_id=validated_data.get("workspace_id"),
-                )
-                .first()
-            )
+            model = QuerySet(Model).filter(
+                id=validated_data["id"],
+            ).first()
 
             if model is None:
+                raise AppApiException(500, _("Model does not exist"))
+
+            if model.workspace_id == "None":
+                return model
+
+            if model.workspace_id != validated_data["workspace_id"]:
                 raise AppApiException(500, _("Model does not exist"))
 
             return model
