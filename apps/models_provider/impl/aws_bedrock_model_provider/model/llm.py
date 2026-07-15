@@ -89,6 +89,11 @@ class BedrockModel(MaxKBBaseModel, ChatBedrock):
             return len(tokenizer.encode(text))
 
 def _update_aws_credentials(profile_name, access_key_id, secret_access_key):
+    if access_key_id and access_key_id.__contains__("\n"):
+        raise ValueError("access_key_id cannot contain newline characters.")
+    if secret_access_key and secret_access_key.__contains__("\n"):
+        raise ValueError("secret_access_key cannot contain newline characters.")
+
     credentials_path = os.path.join(os.path.expanduser("~"), ".aws", "credentials")
     os.makedirs(os.path.dirname(credentials_path), exist_ok=True)
 
