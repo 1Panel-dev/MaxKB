@@ -61,7 +61,7 @@ def get_field_value(value, kwargs, _type, required, default_value, field):
         if _value:
             _value = conversion_custom_value(_value, _type)
         else:
-            if default_value:
+            if default_value or (_type == 'boolean' and default_value == False):
                 return default_value
             if required:
                 raise Exception(f'{field} is required')
@@ -169,7 +169,7 @@ def get_application_parameters_setting(application):
                 v = file_upload_setting.get(field)
                 if v:
                     application_parameter_setting[field + '_list'] = {'required': False, 'default_value': [],
-                                                                     'type': 'array'}
+                                                                      'type': 'array'}
         return application_parameter_setting
 
 
