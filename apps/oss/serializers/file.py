@@ -266,6 +266,9 @@ def _auth_system(file, user_id):
         application = QuerySet(Application).filter(id=file.source_id).first()
         if application is None:
             _deny()
+        # 如果是应用的高级设置的文件
+        if file.meta.get('chat_id') is None:
+            return
         _check_workspace_resource_permission(
             user_auth, user_id,
             workspace_id=application.workspace_id,
