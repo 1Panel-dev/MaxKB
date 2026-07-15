@@ -13,7 +13,7 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo
+from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 
@@ -33,7 +33,6 @@ class ReplyNode(INode):
 
     def execute(self):
         node_params = self.get_parameters()
-        workflow_params = self.get_workflow_parameters()
         chunk_id = uuid.uuid7()
 
         reply_type = node_params.get('reply_type')
@@ -50,7 +49,7 @@ class ReplyNode(INode):
 
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(str(chunk_id), result, Status.SUCCESS, node_info))
+            self.write(TextContent(str(chunk_id), result, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def _generate_reply_content(self, prompt):
         if prompt is None:

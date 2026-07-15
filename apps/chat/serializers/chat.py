@@ -24,10 +24,15 @@ from application.chat_pipeline.step.generate_human_message_step.impl.base_genera
     BaseGenerateHumanMessageStep
 from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_step import BaseResetProblemStep
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
-from application.flow.common import Answer, Workflow
-from application.flow.i_step_node import WorkFlowPostHandler
+from application.flow.common import Answer
 from application.flow.tools import to_stream_response_simple
-from application.flow.workflow_manage import WorkflowManage
+from application.workflow.common import WorkflowType, new_instance
+from application.workflow.workflow_manage import WorkflowManage, CallBack
+from application.workflow.nodes import get_start_node
+from application.workflow.message.struct.text_content import TextContent
+from application.workflow.message.struct.reasoning_content import ReasoningContent
+from application.workflow.message.struct.tool_content import ToolContent
+from application.workflow.message.struct.form_content import FormContent
 from application.models import Application, ApplicationTypeChoices, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
@@ -390,6 +395,8 @@ class ChatSerializers(serializers.Serializer):
         return chat_record
 
     def chat_work_flow(self, chat_info: ChatInfo, instance: dict, base_to_response):
+        import queue
+
         message = instance.get('message')
         re_chat = instance.get('re_chat')
         stream = instance.get('stream')
@@ -405,38 +412,204 @@ class ChatSerializers(serializers.Serializer):
         other_list = instance.get('other_list')
         workspace_id = chat_info.application.workspace_id
         chat_record_id = instance.get('chat_record_id')
+        position = instance.get('position')
+        chunk_id = instance.get('chunk_id')
         debug = self.data.get('debug', False)
-        chat_record = None
         history_chat_record = chat_info.chat_record_list
         if chat_record_id is not None:
             chat_record = self.get_chat_record(chat_info, chat_record_id)
             if chat_record:
                 history_chat_record = [r for r in chat_info.chat_record_list if str(r.id) != chat_record_id]
+
         work_flow = chat_info.application.work_flow
-        work_flow_manage = WorkflowManage(Workflow.new_instance(work_flow),
-                                          {'history_chat_record': history_chat_record, 'question': message,
-                                           'chat_id': chat_info.chat_id, 'chat_record_id': str(
-                                              uuid.uuid7()) if chat_record_id is None else str(chat_record_id),
-                                           'stream': stream,
-                                           're_chat': re_chat,
-                                           'chat_user_id': chat_user_id,
-                                           'chat_user_type': chat_user_type,
-                                           'ip_address': ip_address,
-                                           'source': source,
-                                           'workspace_id': workspace_id,
-                                           'debug': debug,
-                                           'chat_user': chat_info.get_chat_user(),
-                                           'chat_user_group': chat_info.get_chat_user_group(),
-                                           'application_id': str(chat_info.application_id)},
-                                          WorkFlowPostHandler(chat_info),
-                                          base_to_response, form_data, image_list, document_list, audio_list,
-                                          video_list,
-                                          other_list,
-                                          instance.get('runtime_node_id'),
-                                          instance.get('node_data'), chat_record, instance.get('child_node'))
+        workflow = new_instance(work_flow, WorkflowType.APPLICATION)
+
+        chat_record_id_str = str(uuid.uuid7()) if chat_record_id is None else str(chat_record_id)
+
+        parameters = {
+            'history_chat_record': history_chat_record,
+            'question': message,
+            'chat_id': chat_info.chat_id,
+            'chat_record_id': chat_record_id_str,
+            'stream': stream,
+            're_chat': re_chat,
+            'chat_user_id': chat_user_id,
+            'chat_user_type': chat_user_type,
+            'ip_address': ip_address,
+            'source': source,
+            'workspace_id': workspace_id,
+            'debug': debug,
+            'chat_user': chat_info.get_chat_user(),
+            'chat_user_group': chat_info.get_chat_user_group(),
+            'application_id': str(chat_info.application_id),
+            'form_data': form_data or {},
+            'position': position,
+            'chunk_id': chunk_id,
+            'image_list': image_list or [],
+            'document_list': document_list or [],
+            'audio_list': audio_list or [],
+            'video_list': video_list or [],
+            'other_list': other_list or [],
+        }
+
+        result_queue = queue.Queue()
+        answer_text = ''
+        reasoning_text = ''
+
+        def on_next(wf_manage, content):
+            nonlocal answer_text, reasoning_text
+            if isinstance(content, TextContent):
+                answer_text += content.content
+                result_queue.put(('chunk', {
+                    'content': [{
+                        'id': content.id,
+                        'type': 'TEXT',
+                        'content': content.content,
+                    }]
+                }))
+            elif isinstance(content, ReasoningContent):
+                reasoning_text += content.content
+                result_queue.put(('chunk', {
+                    'content': [{
+                        'id': content.id,
+                        'type': 'REASONING',
+                        'content': content.content,
+                        'status': content.status.value if content.status else None,
+                    }]
+                }))
+            elif isinstance(content, ToolContent):
+                result_queue.put(('chunk', {
+                    'content': [{
+                        'id': content.id,
+                        'type': 'TOOL',
+                        'content': content.content,
+                        'arguments': content.arguments,
+                        'result': content.result,
+                        'status': content.status.value if content.status else None,
+                    }]
+                }))
+            elif isinstance(content, FormContent):
+                def position_to_dict(pos):
+                    if pos is None:
+                        return None
+                    return {
+                        'id': pos.id,
+                        'index': pos.index,
+                        'children': position_to_dict(pos.children)
+                    }
+
+                result_queue.put(('chunk', {
+                    'content': [{
+                        'id': content.id,
+                        'type': 'FORM',
+                        'form_field_list': content.form_field_list,
+                        'form_content_format': content.form_content_format,
+                        'is_submit': content.is_submit,
+                        'form_data': content.form_data,
+                        'status': content.status.value if content.status else None,
+                        'position': position_to_dict(content.position),
+                        'chat_record_id': chat_record_id_str,
+                    }]
+                }))
+
+        def on_complete(wf_manage, error):
+            if error:
+                result_queue.put(('error', error))
+            else:
+                self._save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
+                                       message, answer_text, reasoning_text, wf_manage)
+            result_queue.put(('done', None))
+
+        call_back = CallBack(on_next, on_complete)
+
+        def get_start_node_fn(wf, wm):
+            return get_start_node(wf, wm, WorkflowType.APPLICATION, position)
+
+        # 判断是否是 Form 提交（有 position 和 chat_record_id）
+        if position and chat_record_id:
+            # 从历史 context 恢复
+            work_flow_manage = WorkflowManage.from_context(
+                chat_record_id=chat_record_id,
+                workflow=workflow,
+                parameters=parameters,
+                workflow_type=WorkflowType.APPLICATION,
+                call_back=call_back,
+                get_start_node=get_start_node_fn
+            )
+            if work_flow_manage is None:
+                # 恢复失败，回退到正常流程
+                work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.APPLICATION,
+                                                  call_back, get_start_node_fn)
+        else:
+            # 正常创建新的 WorkflowManage
+            work_flow_manage = WorkflowManage(workflow, parameters, WorkflowType.APPLICATION,
+                                              call_back, get_start_node_fn)
+
+        work_flow_manage.start_node.workflow_manage = work_flow_manage
+
         chat_info.set_chat(message)
-        r = work_flow_manage.run()
-        return r
+
+        if stream:
+            def generate():
+                work_flow_manage.run()
+                while True:
+                    msg_type, data = result_queue.get()
+                    if msg_type == 'done':
+                        yield 'data: [DONE]\n\n'
+                        break
+                    if msg_type == 'error':
+                        yield 'data: ' + json.dumps({
+                            'chat_id': str(chat_info.chat_id),
+                            'chat_record_id': chat_record_id_str,
+                            'content': [{'type': 'FAILURE', 'content': str(data)}]
+                        }, ensure_ascii=False) + '\n\n'
+                        yield 'data: [DONE]\n\n'
+                        break
+                    if msg_type == 'chunk':
+                        data['chat_id'] = str(chat_info.chat_id)
+                        data['chat_record_id'] = chat_record_id_str
+                        yield 'data: ' + json.dumps(data, ensure_ascii=False) + '\n\n'
+
+            return to_stream_response_simple(generate())
+        else:
+            work_flow_manage.run()
+            while True:
+                msg_type, data = result_queue.get()
+                if msg_type == 'done':
+                    break
+                if msg_type == 'error':
+                    raise data
+            return base_to_response.to_block_response(
+                chat_info.chat_id, chat_record_id_str, answer_text, True, 0, 0)
+
+    def _save_chat_record(self, chat_info, chat_id, chat_record_id, question, answer,
+                          reasoning_content, wf_manage):
+        context = wf_manage.context
+        message_tokens = sum(
+            v.get('message_tokens', 0) for v in context.values() if isinstance(v, dict) and 'message_tokens' in v)
+        answer_tokens = sum(
+            v.get('answer_tokens', 0) for v in context.values() if isinstance(v, dict) and 'answer_tokens' in v)
+
+        answer_text_list = [[Answer(answer, 'ai-chat-node', 'ai-chat-node', 'ai-chat-node', {},
+                                    'ai-chat-node', reasoning_content).to_dict()]]
+
+        chat_record = ChatRecord(
+            id=chat_record_id,
+            chat_id=chat_id,
+            problem_text=question,
+            answer_text=answer,
+            details={},
+            message_tokens=message_tokens,
+            answer_tokens=answer_tokens,
+            answer_text_list=answer_text_list,
+            run_time=0,
+            index=len(chat_info.chat_record_list) + 1,
+            ip_address=chat_info.ip_address,
+            source=chat_info.source,
+            workflow_context=dict(context) if context else None
+        )
+        chat_info.append_chat_record(chat_record)
+        chat_info.set_cache()
 
     def is_valid_chat_user(self):
         chat_user_id = self.data.get('chat_user_id')

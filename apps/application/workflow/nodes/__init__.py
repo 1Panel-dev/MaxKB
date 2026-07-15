@@ -47,14 +47,26 @@ def get_node_class(_type, workflow_type):
     return node_class
 
 
-def get_start_node(workflow, workflow_manage, workflow_type):
+def get_start_node(workflow, workflow_manage, workflow_type, position=None):
     """
     获取开始节点实例
     @param workflow:       工作流对象
     @param workflow_manage 工作流管理器
     @param workflow_type:  工作流类型
+    @param position:       位置信息（可选）
     @return: 开始节点实例
     """
+    # 如果有 position，根据 position 确定开始节点
+    if position and position.get('id'):
+        node_id = position.get('id')
+        node = workflow.get_node(node_id)
+        if node:
+            node_class = get_node_class(node.type, workflow_type)
+            def get_node_parameters(n):
+                return n.properties.get('node_data', {})
+            return node_class(node, workflow_manage, get_node_parameters)
+    
+    # 默认返回开始节点
     start_node = workflow.get_node('start-node')
     if start_node is None:
         raise ValueError("开始节点不存在")

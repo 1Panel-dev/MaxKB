@@ -108,6 +108,7 @@ class ChatRecord(AppModelMixin):
     index = models.IntegerField(verbose_name="对话下标")
     source = models.JSONField(verbose_name="来源", default=dict)
     ip_address = models.CharField(max_length=128, verbose_name="ip地址", default='')
+    workflow_context = models.JSONField(verbose_name="工作流上下文", default=dict, null=True, blank=True)
 
     def get_human_message(self):
         if 'problem_padding' in self.details:
