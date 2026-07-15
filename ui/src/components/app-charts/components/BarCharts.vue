@@ -64,6 +64,7 @@ function initChart() {
       valueFormatter: (value: any) => numberFormat(value),
     },
     legend: {
+      top: 0,
       right: 0,
       itemWidth: 8,
       textStyle: {

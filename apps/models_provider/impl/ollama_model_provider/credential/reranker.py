@@ -9,7 +9,6 @@
 
 from typing import Dict
 
-from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy as _, gettext
 from langchain_core.documents import Document
 

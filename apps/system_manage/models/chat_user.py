@@ -16,7 +16,7 @@ class ChatUser(models.Model):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     email = models.EmailField(null=True, blank=True, verbose_name="邮箱", db_index=True)
     phone = models.CharField(max_length=20, verbose_name="电话", default="")
-    nick_name = models.CharField(max_length=150, verbose_name="昵称", unique=True, db_index=True)
+    nick_name = models.CharField(max_length=150, verbose_name="昵称", db_index=True)
     username = models.CharField(max_length=150, unique=True, verbose_name="用户名", db_index=True)
     password = models.CharField(max_length=150, verbose_name="密码")
     source = models.CharField(max_length=10, verbose_name="来源", default="LOCAL", db_index=True)

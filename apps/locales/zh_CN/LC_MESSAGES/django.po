@@ -661,7 +661,7 @@ msgstr "字段仅支持自定义|引用"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:40
 msgid "{field}, this field is required."
-msgstr "{field_label} 字段是必填项"
+msgstr "{field} 字段是必填项"
 
 #: apps/application/flow/step_node/function_node/i_function_node.py:46
 msgid "function"
@@ -6935,7 +6935,7 @@ msgstr "获取当前用户信息"
 #: apps/users/views/user.py:120 apps/users/views/user.py:121
 #: apps/users/views/user.py:122
 msgid "Get all user"
-msgstr "获取所有用户"
+msgstr "根据姓名获取用户(最多获取200个)"
 
 #: apps/users/views/user.py:133 apps/users/views/user.py:134
 #: apps/users/views/user.py:135

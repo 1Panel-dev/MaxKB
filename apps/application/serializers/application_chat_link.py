@@ -5,18 +5,21 @@
     @date: 2026/2/9 10:50
     @desc:
 """
+import re
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import Chat, ChatShareLink, ShareLinkType, ChatRecord
 from common.exception.app_exception import AppApiException
 from common.utils.chat_link_code import UUIDEncoder
+from knowledge.models import PublicFileAccess
 import uuid_utils.compat as uuid
 
 
 class ShareChatRecordModelSerializer(serializers.ModelSerializer):
-
     execution_details = serializers.SerializerMethodField()
+
     class Meta:
         model = ChatRecord
         fields = ['id', 'problem_text', 'answer_text', 'answer_text_list',
@@ -38,6 +41,7 @@ class ShareChatRecordModelSerializer(serializers.ModelSerializer):
             for v in details.values() if v.get('type') == 'start-node'
         ]
 
+
 class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
     chat_record_ids = serializers.ListSerializer(
         child=serializers.UUIDField(),
@@ -51,6 +55,53 @@ class ChatRecordShareLinkRequestSerializer(serializers.Serializer):
         if not attrs.get('is_current_all') and not attrs.get('chat_record_ids'):
             raise serializers.ValidationError(_('Chat record ids can not be empty'))
         return attrs
+
+
+def extract_oss_file_urls(answer_text_list):
+    """从 answer_text_list 中提取所有 ./oss/file/ 开头的链接"""
+    file_urls = []
+    for answer_group in answer_text_list:
+        if not isinstance(answer_group, list):
+            answer_group = [answer_group]
+        for item in answer_group:
+            content = item.get('content', '')
+            urls = re.findall(r'\./oss/file/[\w-]+', content)
+            file_urls.extend(urls)
+    return file_urls
+
+
+def save_public_file_access(chat_record_list):
+    """提取聊天记录中的所有文件ID并入库 PublicFileAccess"""
+    file_ids = set()
+    for chat_record in chat_record_list:
+        urls = extract_oss_file_urls(chat_record.answer_text_list)
+        for url in urls:
+            file_id = url.replace('./oss/file/', '')
+            if file_id:
+                file_ids.add(file_id)
+
+    if not file_ids:
+        return
+
+    existing = set(
+        PublicFileAccess.objects.filter(
+            source_type='FILE',
+            source_id__in=list(file_ids)
+        ).values_list('source_id', flat=True)
+    )
+
+    new_records = [
+        PublicFileAccess(
+            id=uuid.uuid7(),
+            source_type='FILE',
+            source_id=file_id
+        )
+        for file_id in file_ids if file_id not in existing
+    ]
+
+    if new_records:
+        PublicFileAccess.objects.bulk_create(new_records)
+
 
 class ChatRecordShareLinkSerializer(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
@@ -74,7 +125,8 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
             if not instance.get('is_current_all', False):
                 chat_record_ids: list[str] = instance.get('chat_record_ids')
 
-                record_count = ChatRecord.objects.filter(id__in=chat_record_ids, chat_id=self.data.get('chat_id')).count()
+                record_count = ChatRecord.objects.filter(id__in=chat_record_ids,
+                                                         chat_id=self.data.get('chat_id')).count()
                 if record_count != len(chat_record_ids):
                     raise AppApiException(500, _('Invalid chat record ids'))
         chat_id = self.data.get('chat_id')
@@ -99,7 +151,8 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
 
         if existing:
             return {'link': UUIDEncoder.encode(existing.id)}
-
+        chat_record_list = ChatRecord.objects.filter(id__in=sorted_ids)
+        save_public_file_access(chat_record_list)
         chat_share_link_model = ChatShareLink(
             id=uuid.uuid7(),
             chat_id=chat_id,

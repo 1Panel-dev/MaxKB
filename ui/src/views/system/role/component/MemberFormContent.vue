@@ -5,7 +5,7 @@
         <el-form-item
           v-for="model of props.models"
           :key="model.path"
-          :prop="`[${index}].${model.path}`"
+          :prop="`[${String(index)}].${model.path}`"
           :rules="model.rules"
           :label="index === 0 && model.label ? model.label : ''"
           class="mr-8"
@@ -13,7 +13,7 @@
         >
           <el-select
             v-if="!model?.hidden?.(element)"
-            v-model="element[model.path]"
+            v-model="(element as Record<string, any>)[model.path]"
             :placeholder="model.selectProps?.placeholder ?? $t('common.selectPlaceholder')"
             :clearable="
               model.selectProps?.clearableFunction
@@ -24,7 +24,7 @@
             remote
             :remote-method="(query: any) => handleRemoteSearch(query, element, model)"
             :filter-method="!model.selectProps?.remoteMethod ? (query: any) => filterLocalOptions(query, element, model) : undefined"
-            :loading="loadingStates[`${index}-${model.path}`]"
+            :loading="loadingStates[`${String(index)}-${model.path}`]"
             multiple
             :reserve-keyword="false"
             style="width: 100%"
@@ -48,9 +48,9 @@
         <!-- 删除按钮 -->
         <el-button
           :disabled="
-            (props.keepOneLine && form.length === 1) || props.deleteButtonDisabled?.(element)
+            (props.keepOneLine && (form as Record<string, any>[]).length === 1) || props.deleteButtonDisabled?.(element)
           "
-          @click="handleDelete(index)"
+          @click="handleDelete(index as number)"
           text
           :style="{
             'margin-top': index === 0 && props.models.some((item) => item.label) ? '32px' : '2px',
@@ -86,7 +86,7 @@ const props = withDefaults(defineProps<{
 const formRef = ref()
 const formItem: Record<string, any> = {}
 const form = defineModel<Record<string, any>[]>('form', {
-  default: [],
+  default: () => [],
 })
 
 const loadingStates = reactive<Record<string, boolean>>({})

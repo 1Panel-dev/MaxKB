@@ -4,6 +4,8 @@
 
 # VS Code
 .vscode
+.claude/
+.codex/
 *.project
 *.factorypath
 

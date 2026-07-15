@@ -21,6 +21,11 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
+from application.flow.common import Workflow
+from application.long_term_memory import schedule_extract_long_term_memory
+from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
+from application.models.application_access_token import ApplicationAccessToken
+from application.serializers.common import update_resource_mapping_by_application
 from common import result
 from common.cache_data.application_access_token_cache import del_application_access_token
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -62,11 +67,131 @@ from trigger.models import Trigger, TriggerTask
 from users.models import User
 from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
-from application.flow.common import Workflow
-from application.long_term_memory import schedule_extract_long_term_memory
-from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
-from application.models.application_access_token import ApplicationAccessToken
-from application.serializers.common import update_resource_mapping_by_application
+
+def _walk_workflow_nodes(work_flow, collector):
+    """遍历工作流节点(含 loop-node 嵌套),对每个节点的 node_data 调用 collector。"""
+    if not work_flow:
+        return
+    for node in work_flow.get("nodes", []) or []:
+        node_data = (node.get("properties") or {}).get("node_data") or {}
+        collector(node_data)
+        if node.get("type") == "loop-node":
+            _walk_workflow_nodes(node_data.get("loop_body"), collector)
+
+
+def get_bound_tool_ids(instance: Dict) -> List[str]:
+    """
+    收集应用配置(含工作流节点)中引用的所有工具id,用于绑定前的权限校验
+    """
+    tool_ids = set()
+    for key in ("tool_ids", "skill_tool_ids", "mcp_tool_ids"):
+        for tool_id in (instance.get(key) or []):
+            tool_ids.add(str(tool_id))
+    if instance.get("mcp_tool_id"):
+        tool_ids.add(str(instance.get("mcp_tool_id")))
+
+    def collect(node_data):
+        for key in ("tool_lib_id", "mcp_tool_id"):
+            if node_data.get(key):
+                tool_ids.add(str(node_data.get(key)))
+        for key in ("mcp_tool_ids", "tool_ids", "skill_tool_ids"):
+            for tool_id in (node_data.get(key) or []):
+                tool_ids.add(str(tool_id))
+
+    _walk_workflow_nodes(instance.get("work_flow"), collect)
+    return list(tool_ids)
+
+
+def get_bound_application_ids(instance: Dict) -> List[str]:
+    """
+    收集应用配置(含工作流节点)中引用的所有 application_id,用于绑定前的权限校验。
+    ai-chat-node 的 node_data 包含 application_ids 列表。
+    """
+    application_ids = set()
+    for app_id in (instance.get("application_ids") or []):
+        application_ids.add(str(app_id))
+
+    def collect(node_data):
+        for app_id in (node_data.get("application_ids") or []):
+            application_ids.add(str(app_id))
+
+    _walk_workflow_nodes(instance.get("work_flow"), collect)
+    return list(application_ids)
+
+
+def get_authorized_tool_ids(user_id: str, workspace_id: str, tool_ids: List[str]) -> List[str]:
+    """
+    返回 tool_ids 中当前用户被授权绑定/使用的工具id。
+    工作空间管理员默认拥有全部工具权限;其他用户必须在 workspace_user_resource_permission
+    中存在针对该工具的显式授权记录(默认拒绝)。
+    """
+    if not tool_ids:
+        return []
+    tool_ids = list({str(t) for t in tool_ids})
+    if is_workspace_manage(user_id, workspace_id):
+        return tool_ids
+    granted_tool_ids = {
+        str(permission.target)
+        for permission in QuerySet(WorkspaceUserResourcePermission).filter(
+            workspace_id=workspace_id,
+            user_id=user_id,
+            auth_target_type=AuthTargetType.TOOL.value,
+            target__in=tool_ids,
+        )
+        if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
+    }
+    return [tool_id for tool_id in tool_ids if tool_id in granted_tool_ids]
+
+
+def get_authorized_application_ids(user_id: str, workspace_id: str, application_ids: List[str]) -> List[str]:
+    """
+    返回 application_ids 中当前用户被授权绑定/使用的应用id。
+    工作空间管理员默认拥有全部应用权限;其他用户必须在 workspace_user_resource_permission
+    中存在针对该应用的显式授权记录(默认拒绝)。
+    """
+    if not application_ids:
+        return []
+    application_ids = list({str(a) for a in application_ids})
+    if is_workspace_manage(user_id, workspace_id):
+        return application_ids
+    granted_application_ids = {
+        str(permission.target)
+        for permission in QuerySet(WorkspaceUserResourcePermission).filter(
+            workspace_id=workspace_id,
+            user_id=user_id,
+            auth_target_type=AuthTargetType.APPLICATION.value,
+            target__in=application_ids,
+        )
+        if "VIEW" in permission.permission_list or "ROLE" in permission.permission_list
+    }
+    return [app_id for app_id in application_ids if app_id in granted_application_ids]
+
+
+def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: Dict):
+    """
+    校验应用/工作流中绑定的工具和子应用,当前用户是否都有权限使用,防止低权限成员
+    绑定自己被禁止访问的资源,并通过应用/工作流执行绕过单独授权控制。
+    """
+    tool_ids = get_bound_tool_ids(instance)
+    if tool_ids:
+        authorized_tool_ids = set(get_authorized_tool_ids(user_id, workspace_id, tool_ids))
+        unauthorized_tool_ids = [tool_id for tool_id in tool_ids if tool_id not in authorized_tool_ids]
+        if unauthorized_tool_ids:
+            message = lazy_format(
+                _("No permission to use tool(s): {tool_ids}"), tool_ids=", ".join(unauthorized_tool_ids)
+            )
+            raise AppApiException(403, str(message))
+
+    application_ids = get_bound_application_ids(instance)
+    if application_ids:
+        authorized_application_ids = set(get_authorized_application_ids(user_id, workspace_id, application_ids))
+        unauthorized_application_ids = [app_id for app_id in application_ids if app_id not in authorized_application_ids]
+        if unauthorized_application_ids:
+            message = lazy_format(
+                _("No permission to use application(s): {application_ids}"),
+                application_ids=", ".join(unauthorized_application_ids),
+            )
+            raise AppApiException(403, str(message))
 
 
 def get_base_node_work_flow(work_flow):
@@ -101,6 +226,42 @@ def hand_node(node, update_tool_map):
     if node.get("type") == "tool-workflow-lib-node":
         tool_lib_id = node.get("properties", {}).get("node_data", {}).get("tool_lib_id") or ""
         node.get("properties", {}).get("node_data", {})["tool_lib_id"] = update_tool_map.get(tool_lib_id, tool_lib_id)
+
+
+def update_form_knowledge_fields(workflow):
+    if workflow is None:
+        return
+    for node in workflow.get("nodes", []):
+        if node.get("type") == "form-node":
+            form_field_list = node.get("properties", {}).get("node_data", {}).get("form_field_list", [])
+            for field in form_field_list:
+                if field.get("input_type") != "Knowledge":
+                    continue
+                knowledge_list = field.get("attrs", {}).get("knowledge_list", [])
+                knowledge_id_list = [
+                    str(knowledge.get("id")) for knowledge in knowledge_list if knowledge.get("id") is not None
+                ]
+                current_knowledge_dict = {
+                    str(knowledge.id): knowledge
+                    for knowledge in QuerySet(Knowledge).filter(id__in=list(set(knowledge_id_list)))
+                }
+                refreshed_knowledge_list = []
+                for knowledge in knowledge_list:
+                    current_knowledge = current_knowledge_dict.get(str(knowledge.get("id")))
+                    if current_knowledge is None:
+                        refreshed_knowledge_list.append(knowledge)
+                    else:
+                        refreshed_knowledge_list.append(
+                            {
+                                **knowledge,
+                                "name": current_knowledge.name,
+                                "type": current_knowledge.type,
+                                "embedding_model_id": current_knowledge.embedding_model_id,
+                            }
+                        )
+                field.setdefault("attrs", {})["knowledge_list"] = refreshed_knowledge_list
+        if node.get("type") == "loop-node":
+            update_form_knowledge_fields(node.get("properties", {}).get("node_data", {}).get("loop_body") or {})
 
 
 class MKInstance:
@@ -610,7 +771,7 @@ class ApplicationSerializer(serializers.Serializer):
         )
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                 raise AppApiException(500, _("Illegal download callback url"))
             requests.get(download_callback_url, timeout=5)
         except Exception as e:
@@ -623,6 +784,7 @@ class ApplicationSerializer(serializers.Serializer):
         workspace_id = self.data.get("workspace_id")
         wq = ApplicationCreateSerializer.WorkflowRequest(data=instance)
         wq.is_valid(raise_exception=True)
+        validate_bound_tool_permissions(user_id, workspace_id, instance)
         application_model = wq.to_application_model(user_id, workspace_id, instance)
         application_model.save()
         # 插入认证信息
@@ -703,6 +865,20 @@ class ApplicationSerializer(serializers.Serializer):
                 if not exits_tool_id_list.__contains__(tool.get("id"))
                 and not exits_tool_id_list.__contains__(generate_uuid((tool.get("id") + workspace_id or "")))
             ]
+        # 导入包内新建的工具由导入者本人持有,无需校验;仅需校验绑定到已存在工具的引用
+        existing_bound_tool_ids = [
+            tool_id for tool_id in get_bound_tool_ids(application) if tool_id not in update_tool_map
+        ]
+        if existing_bound_tool_ids:
+            authorized_tool_ids = set(get_authorized_tool_ids(user_id, workspace_id, existing_bound_tool_ids))
+            unauthorized_tool_ids = [
+                tool_id for tool_id in existing_bound_tool_ids if tool_id not in authorized_tool_ids
+            ]
+            if unauthorized_tool_ids:
+                message = lazy_format(
+                    _("No permission to use tool(s): {tool_ids}"), tool_ids=", ".join(unauthorized_tool_ids)
+                )
+                raise AppApiException(403, str(message))
         application_model = self.to_application(application, workspace_id, user_id, update_tool_map, folder_id)
         tool_model_list = [self.to_tool(f, workspace_id, user_id) for f in tool_list]
         application_model.save()
@@ -1190,6 +1366,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
         if "work_flow_template" in instance:
             return self.update_template_workflow(instance, application)
 
+        validate_bound_tool_permissions(self.data.get("user_id"), self.data.get("workspace_id"), instance)
+
         if instance.get("model_id") is None or len(instance.get("model_id")) == 0:
             application.model_id = None
         else:
@@ -1363,7 +1541,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ).auth_resource_batch([t.id for t in tool_model_list])
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com"):
+            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
                 raise AppApiException(500, _("Illegal download callback url"))
             requests.get(download_callback_url, timeout=5)
         except Exception as e:
@@ -1408,6 +1586,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             knowledge_id_list = [k.get("id") for k in knowledge_list]
         else:
             self.update_knowledge_node(application.work_flow, available_knowledge_dict)
+            update_form_knowledge_fields(application.work_flow)
 
         return {
             **ApplicationSerializerModel(application).data,

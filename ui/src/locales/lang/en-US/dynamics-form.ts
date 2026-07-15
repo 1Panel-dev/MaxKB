@@ -131,6 +131,15 @@ export default {
       label: 'File type',
       required: 'File type is required',
     },
+    errorTip: {
+      sizeError: 'File size exceeds the limit',
+      networkError: 'Network failed',
+    },
+    reUpload: 'Retry',
+    uploadStatus: 'Completed {success} / {total} files',
+    failedStatus: '{count} files failed',
+    uploading: 'Uploading',
+    allSuccess: 'All successful',
   },
   AssignmentMethod: {
     label: 'Assignment Method',

@@ -131,6 +131,15 @@ export default {
       label: '文件類型',
       required: '文件類型必填',
     },
+    errorTip: {
+      sizeError: '大小超限',
+      networkError: '網路失敗',
+    },
+    reUpload: '重試',
+    uploadStatus: '已完成 {success} / {total} 個文件',
+    failedStatus: '失敗 {count} 個文件',
+    uploading: '上傳中',
+    allSuccess: '全部成功',
   },
   AssignmentMethod: {
     label: '賦值方式',

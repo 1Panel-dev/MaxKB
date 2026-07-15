@@ -34,8 +34,7 @@ from django.db.models import QuerySet
 from django.db.models.functions import Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, gettext
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from models_provider.models import Model

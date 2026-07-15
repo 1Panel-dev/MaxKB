@@ -130,6 +130,55 @@ export const post: (
   return promise(request({ url: url, method: 'post', data, params, timeout }), loading)
 }
 
+/**
+ * 上传文件的 post 请求，支持上传进度回调与中断
+ * @param url        资源url
+ * @param data       上传数据（一般为 FormData）
+ * @param onProgress 上传进度回调，参数为百分比(0-100)
+ * @param params     查询参数
+ * @param loading    loading
+ * @param timeout    超时时间
+ * @returns 返回 { request, abort }，request 为异步 promise 对象，abort 用于中断上传
+ */
+export const postUpload: (
+  url: string,
+  data?: unknown,
+  onProgress?: (percent: number, event: any) => void,
+  params?: unknown,
+  loading?: NProgress | Ref<boolean>,
+  timeout?: number,
+) => { request: Promise<Result<any> | any>; abort: () => void } = (
+  url,
+  data,
+  onProgress,
+  params,
+  loading,
+  timeout,
+) => {
+  const controller = new AbortController()
+  const request = promise(
+    instance({
+      url: url,
+      method: 'post',
+      data,
+      params,
+      timeout,
+      signal: controller.signal,
+      onUploadProgress: (event) => {
+        if (onProgress) {
+          const percent = event.total ? Math.round((event.loaded * 100) / event.total) : 0
+          onProgress(percent, event)
+        }
+      },
+    }),
+    loading,
+  )
+  return {
+    request,
+    abort: () => controller.abort(),
+  }
+}
+
 /**|
  * 发送put请求 用于修改服务器资源
  * @param url     资源地址

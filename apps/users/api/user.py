@@ -6,15 +6,15 @@
     @date：2025/4/14 19:23
     @desc:
 """
+from django.utils.translation import gettext_lazy as _
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
+from rest_framework import serializers
 
 from common.mixins.api_mixin import APIMixin
 from common.result import ResultSerializer, DefaultResultSerializer
 from users.serializers.user import UserProfileResponse, CreateUserSerializer, UserManageSerializer, \
     UserInstanceSerializer, RePasswordSerializer, CheckCodeSerializer, SendEmailSerializer
-from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 
 class ApiUserProfileResponse(ResultSerializer):
@@ -59,13 +59,22 @@ class UserProfileAPI(APIMixin):
 class WorkspaceUserAPI(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name="workspace_id",
-            description=_('Workspace ID'),
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.PATH,
-            required=True,
-        )]
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description=_('Workspace ID'),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.PATH,
+                required=True,
+            ),
+            OpenApiParameter(
+                name="nick_name",
+                description=_('Nick name'),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            )
+        ]
 
     @staticmethod
     def get_response():
@@ -165,13 +174,15 @@ class UserPageApi(APIMixin):
 class UserListApi(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name="workspace_id",
-            description=_('Workspace ID'),
-            type=OpenApiTypes.STR,
-            location=OpenApiParameter.PATH,
-            required=False,
-        )]
+        return [
+            OpenApiParameter(
+                name="nick_name",
+                description=_('Nick name'),
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+            )
+        ]
 
     @staticmethod
     def get_response():

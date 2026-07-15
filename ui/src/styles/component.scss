@@ -414,6 +414,15 @@
   }
 }
 
+// card中的progress样式
+.card-progress {
+  position: absolute;
+  bottom: 0px;
+  left: 0;
+  width: 100%;
+
+}
+
 // 批量操作拦
 .mul-operation {
   position: fixed;

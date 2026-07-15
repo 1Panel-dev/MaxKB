@@ -1,5 +1,5 @@
 <template>
-  <div class="inline-params" v-if="fieldList.length > 0">
+  <div class="inline-params" v-if="fieldList.length > 0 || apiInput">
     <template v-for="item in exposedFields" :key="item.field">
       <InlineFormItem
         v-if="show(item)"
@@ -18,7 +18,7 @@
     <el-button
       ref="triggerBtnRef"
       style="padding: 8px"
-      v-if="dialogFields.length > 0"
+      v-if="dialogFields.length > 0 || apiInput"
       @click="emit('openDialog')"
     >
       <AppIcon iconName="app-all-menu"></AppIcon>
@@ -39,6 +39,7 @@ const props = defineProps<{
   application: any
   formData: any
   maxExposed?: number
+  apiInput?: boolean
 }>()
 
 const emit = defineEmits(['update:formData', 'openDialog'])
@@ -77,7 +78,7 @@ watch(
       }
     }
   },
-  { immediate: true },
+  { immediate: true, deep: true },
 )
 
 watch(

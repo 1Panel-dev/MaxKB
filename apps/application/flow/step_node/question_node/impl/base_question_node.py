@@ -12,6 +12,7 @@ from functools import reduce
 from typing import List, Dict
 
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 
 from application.flow.i_step_node import NodeResult, INode

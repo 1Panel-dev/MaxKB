@@ -18,7 +18,8 @@ export default {
   },
   tip: {
     exportSimultaneously: '同时导出源文件',
-    exportSimultaneouslyTip:'勾选后将原始文件一并打包至ZIP，导入时可自动恢复文件关联；不勾选则仅导出文本内容。',
+    exportSimultaneouslyTip:
+      '勾选后将原始文件一并打包至ZIP，导入时可自动恢复文件关联；不勾选则仅导出文本内容。',
     saveMessage: '当前的更改尚未保存，确认退出吗?',
     cancelSuccess: '批量取消成功',
     sendMessage: '发送成功',
@@ -38,6 +39,7 @@ export default {
     uploadMessage: '拖拽文件至此上传或',
     formats: '支持格式：',
     requiredMessage: '请上传文件',
+    noSuccessFileMessage: '没有上传成功的文件，请重新上传',
     errorMessage2: '文件格式不支持',
     errorMessage3: '文件不能为空',
     // errorMessage4: '每次最多上传50个文件',

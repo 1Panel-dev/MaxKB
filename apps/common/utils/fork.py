@@ -1,17 +1,26 @@
+import base64
 import copy
 import re
 import traceback
 from functools import reduce
 from typing import List, Set
-from urllib.parse import urljoin, urlparse, ParseResult, urlsplit, urlunparse
+from urllib.parse import ParseResult, urljoin, urlparse, urlsplit, urlunparse
 
-from markdownify import markdownify
 import requests
 from bs4 import BeautifulSoup
+from markdownify import markdownify
 
 from common.utils.logger import maxkb_logger
 
 requests.packages.urllib3.disable_warnings()
+
+
+class SandboxFetchResponse:
+    def __init__(self, status_code: int, content: bytes, encoding: str | None, apparent_encoding: str | None):
+        self.status_code = status_code
+        self.content = content
+        self.encoding = encoding
+        self.apparent_encoding = apparent_encoding
 
 
 class ChildLink:
@@ -29,27 +38,34 @@ class ForkManage:
         self.fork_child(ChildLink(self.base_url, None), self.selector_list, level, exclude_link_url, fork_handler)
 
     @staticmethod
-    def fork_child(child_link: ChildLink, selector_list: List[str], level: int, exclude_link_url: Set[str],
-                   fork_handler):
+    def fork_child(
+        child_link: ChildLink, selector_list: List[str], level: int, exclude_link_url: Set[str], fork_handler
+    ):
         if level < 0:
             return
         else:
             child_link.url = remove_fragment(child_link.url)
-            child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+            child_url = child_link.url[:-1] if child_link.url.endswith("/") else child_link.url
         if not exclude_link_url.__contains__(child_url):
             exclude_link_url.add(child_url)
             response = Fork(child_link.url, selector_list).fork()
             fork_handler(child_link, response)
             for child_link in response.child_link_list:
-                child_url = child_link.url[:-1] if child_link.url.endswith('/') else child_link.url
+                child_url = child_link.url[:-1] if child_link.url.endswith("/") else child_link.url
                 if not exclude_link_url.__contains__(child_url):
                     ForkManage.fork_child(child_link, selector_list, level - 1, exclude_link_url, fork_handler)
 
 
 def remove_fragment(url: str) -> str:
     parsed_url = urlparse(url)
-    modified_url = ParseResult(scheme=parsed_url.scheme, netloc=parsed_url.netloc, path=parsed_url.path,
-                               params=parsed_url.params, query=parsed_url.query, fragment=None)
+    modified_url = ParseResult(
+        scheme=parsed_url.scheme,
+        netloc=parsed_url.netloc,
+        path=parsed_url.path,
+        params=parsed_url.params,
+        query=parsed_url.query,
+        fragment=None,
+    )
     return urlunparse(modified_url)
 
 
@@ -63,54 +79,67 @@ class Fork:
 
         @staticmethod
         def success(html_content: str, child_link_list: List[ChildLink]):
-            return Fork.Response(html_content, child_link_list, 200, '')
+            return Fork.Response(html_content, child_link_list, 200, "")
 
         @staticmethod
         def error(message: str):
-            return Fork.Response('', [], 500, message)
+            return Fork.Response("", [], 500, message)
 
     def __init__(self, base_fork_url: str, selector_list: List[str]):
         base_fork_url = remove_fragment(base_fork_url)
         parsed = urlparse(base_fork_url)
-        path = parsed.path.rstrip('/')
-        self.base_fork_url = urlunparse((
-            parsed.scheme,
-            parsed.netloc,
-            path,
-            None,
-            None,
-            None  # fragment
-        ))
+        path = parsed.path.rstrip("/")
+        self.base_fork_url = urlunparse(
+            (
+                parsed.scheme,
+                parsed.netloc,
+                path,
+                None,
+                None,
+                None,  # fragment
+            )
+        )
         parsed = urlsplit(base_fork_url)
         query = parsed.query
         if query is not None and len(query) > 0:
-            self.base_fork_url = self.base_fork_url + '?' + query
+            self.base_fork_url = self.base_fork_url + "?" + query
         self.selector_list = [selector for selector in selector_list if selector is not None and len(selector) > 0]
         self.urlparse = urlparse(self.base_fork_url)
-        self.base_url = ParseResult(scheme=self.urlparse.scheme, netloc=self.urlparse.netloc, path='', params='',
-                                    query='',
-                                    fragment='').geturl()
+        self.base_url = ParseResult(
+            scheme=self.urlparse.scheme, netloc=self.urlparse.netloc, path="", params="", query="", fragment=""
+        ).geturl()
 
     def get_child_link_list(self, bf: BeautifulSoup):
         # Compute the crawl prefix: parent directory when base_fork_url is an HTML file
         crawl_prefix = self.base_fork_url
-        if crawl_prefix.endswith(('.html', '.htm')):
-            crawl_prefix = crawl_prefix.rsplit('/', 1)[0]
+        if crawl_prefix.endswith((".html", ".htm")):
+            crawl_prefix = crawl_prefix.rsplit("/", 1)[0]
         pattern = "^((?!(http:|https:|tel:/|#|mailto:|javascript:))|" + crawl_prefix + "|/).*"
-        link_list = bf.find_all(name='a', href=re.compile(pattern))
-        result = [ChildLink(link.get('href'), link) if link.get('href').startswith(self.base_url) else ChildLink(
-            self.base_url + link.get('href'), link) for link in link_list]
+        link_list = bf.find_all(name="a", href=re.compile(pattern))
+        result = [
+            ChildLink(link.get("href"), link)
+            if link.get("href").startswith(self.base_url)
+            else ChildLink(self.base_url + link.get("href"), link)
+            for link in link_list
+        ]
         result = [row for row in result if row.url.startswith(crawl_prefix)]
         return result
 
     def get_content_html(self, bf: BeautifulSoup):
         if self.selector_list is None or len(self.selector_list) == 0:
             return str(bf)
-        params = reduce(lambda x, y: {**x, **y},
-                        [{'class_': selector.replace('.', '')} if selector.startswith('.') else
-                         {'id': selector.replace("#", "")} if selector.startswith("#") else {'name': selector} for
-                         selector in
-                         self.selector_list], {})
+        params = reduce(
+            lambda x, y: {**x, **y},
+            [
+                {"class_": selector.replace(".", "")}
+                if selector.startswith(".")
+                else {"id": selector.replace("#", "")}
+                if selector.startswith("#")
+                else {"name": selector}
+                for selector in self.selector_list
+            ],
+            {},
+        )
         f = bf.find_all(**params)
         return "\n".join([str(row) for row in f])
 
@@ -119,94 +148,146 @@ class Fork:
         field_value: str = tag[field]
         if field_value.startswith("/"):
             result = urlparse(base_fork_url)
-            result_url = ParseResult(scheme=result.scheme, netloc=result.netloc, path=field_value, params='', query='',
-                                     fragment='').geturl()
+            result_url = ParseResult(
+                scheme=result.scheme, netloc=result.netloc, path=field_value, params="", query="", fragment=""
+            ).geturl()
         else:
             # When base_fork_url is an HTML file (not a directory), resolve relative
             # links against its parent directory to avoid broken paths like
             # /en/index.html/about_dolphindb.html
-            if base_fork_url.endswith(('.html', '.htm')):
-                base = base_fork_url.rsplit('/', 1)[0] + '/'
+            if base_fork_url.endswith((".html", ".htm")):
+                base = base_fork_url.rsplit("/", 1)[0] + "/"
             else:
-                base = base_fork_url + '/'
+                base = base_fork_url + "/"
             result_url = urljoin(base, field_value)
-        result_url = result_url[:-1] if result_url.endswith('/') else result_url
+        result_url = result_url[:-1] if result_url.endswith("/") else result_url
         tag[field] = result_url
 
     def reset_beautiful_soup(self, bf: BeautifulSoup):
         reset_config_list = [
             {
-                'field': 'href',
+                "field": "href",
             },
             {
-                'field': 'src',
-            }
+                "field": "src",
+            },
         ]
         for reset_config in reset_config_list:
-            field = reset_config.get('field')
-            tag_list = bf.find_all(**{field: re.compile('^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*')})
+            field = reset_config.get("field")
+            tag_list = bf.find_all(**{field: re.compile("^(?!(http:|https:|tel:/|#|mailto:|javascript:)).*")})
             for tag in tag_list:
                 self.reset_url(tag, field, self.base_fork_url)
             # 去掉 href 以 # 开头的锚点链接，保留文字
-        for a in bf.find_all('a', href=re.compile('^#')):
+        for a in bf.find_all("a", href=re.compile("^#")):
             a.unwrap()
         return bf
 
     @staticmethod
     def get_beautiful_soup(response):
-        encoding = response.encoding if response.encoding is not None and response.encoding != 'ISO-8859-1' else response.apparent_encoding
-        html_content = response.content.decode(encoding)
-        beautiful_soup = BeautifulSoup(html_content, "html.parser")
-        meta_list = beautiful_soup.find_all('meta')
-        charset_list = Fork.get_charset_list(meta_list)
-        if len(charset_list) > 0:
-            charset = charset_list[0]
-            if charset != encoding:
-                try:
-                    html_content = response.content.decode(charset, errors='replace')
-                except Exception as e:
-                    maxkb_logger.error(f'{e}: {traceback.format_exc()}')
-                return BeautifulSoup(html_content, "html.parser")
-        return beautiful_soup
+        encoding_list = Fork.get_encoding_list(response)
+        for encoding in encoding_list:
+            try:
+                return BeautifulSoup(response.content.decode(encoding), "html.parser")
+            except (LookupError, UnicodeDecodeError):
+                continue
+
+        fallback_encoding = encoding_list[0] if len(encoding_list) > 0 else "utf-8"
+        html_content = response.content.decode(fallback_encoding, errors="replace")
+        return BeautifulSoup(html_content, "html.parser")
 
     @staticmethod
-    def get_charset_list(meta_list):
+    def get_encoding_list(response):
+        charset_list = Fork.get_charset_list(response.content)
+        if response.encoding is not None and response.encoding != "ISO-8859-1":
+            charset_list.append(response.encoding)
+        if response.apparent_encoding is not None:
+            charset_list.append(response.apparent_encoding)
+        result = []
+        for charset in charset_list:
+            normalized_charset = Fork.normalize_charset(charset)
+            if normalized_charset is not None and normalized_charset not in result:
+                result.append(normalized_charset)
+        return result
+
+    @staticmethod
+    def get_charset_list(content):
         charset_list = []
-        for meta in meta_list:
-            if meta.attrs is not None:
-                if 'charset' in meta.attrs:
-                    charset_list.append(meta.attrs.get('charset'))
-                elif meta.attrs.get('http-equiv', '').lower() == 'content-type' and 'content' in meta.attrs:
-                    match = re.search(r'charset=([^\s;]+)', meta.attrs['content'], re.I)
-                    if match:
-                        charset_list.append(match.group(1))
-        return charset_list
+        content_head = content[:8192]
+        charset_list.extend(re.findall(rb"<meta[^>]+charset=['\"]?\s*([a-zA-Z0-9._-]+)", content_head, re.I))
+        charset_list.extend(
+            re.findall(rb"<meta[^>]+content=['\"][^'\"]*charset=([a-zA-Z0-9._-]+)", content_head, re.I)
+        )
+        return [
+            charset.decode("ascii", errors="ignore")
+            for charset in charset_list
+            if len(charset) > 0
+        ]
+
+    @staticmethod
+    def normalize_charset(charset):
+        if charset is None:
+            return None
+        normalized_charset = charset.strip().strip("\"'").lower()
+        return normalized_charset if len(normalized_charset) > 0 else None
+
+    @staticmethod
+    def _sandbox_requests_get(base_fork_url: str, headers: dict):
+        from common.utils.tool_code import ToolExecutor
+
+        response = ToolExecutor().exec_code(
+            """
+def fetch_url(url, headers):
+    import base64
+    import requests
+
+    requests.packages.urllib3.disable_warnings()
+    response = requests.get(url, verify=False, headers=headers)
+    return {
+        "status_code": response.status_code,
+        "content": base64.b64encode(response.content).decode("ascii"),
+        "encoding": response.encoding,
+        "apparent_encoding": response.apparent_encoding,
+    }
+""",
+            {"url": base_fork_url, "headers": headers},
+            function_name="fetch_url",
+        )
+        return SandboxFetchResponse(
+            response.get("status_code"),
+            base64.b64decode(response.get("content")),
+            response.get("encoding"),
+            response.get("apparent_encoding"),
+        )
+
+    @staticmethod
+    def requests_get(base_fork_url: str, headers: dict):
+        return Fork._sandbox_requests_get(base_fork_url, headers)
 
     def fork(self):
         try:
-
             headers = {
-                'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36"
             }
 
-            maxkb_logger.info(f'fork:{self.base_fork_url}')
-            response = requests.get(self.base_fork_url, verify=False, headers=headers)
+            maxkb_logger.info(f"fork:{self.base_fork_url}")
+            response = self.requests_get(self.base_fork_url, headers)
             if response.status_code != 200:
                 maxkb_logger.error(f"url: {self.base_fork_url} code:{response.status_code}")
                 return Fork.Response.error(f"url: {self.base_fork_url} code:{response.status_code}")
             bf = self.get_beautiful_soup(response)
         except Exception as e:
-            maxkb_logger.error(f'{str(e)}:{traceback.format_exc()}')
+            maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
             return Fork.Response.error(str(e))
         bf = self.reset_beautiful_soup(bf)
         link_list = self.get_child_link_list(bf)
         content = self.get_content_html(bf)
 
-        r = markdownify(content, heading_style='ATX')
+        r = markdownify(content, heading_style="ATX")
         return Fork.Response.success(r, link_list)
 
 
 def handler(base_url, response: Fork.Response):
     maxkb_logger.info(base_url.url, base_url.tag.text if base_url.tag else None, response.content)
+
 
 # ForkManage('https://bbs.fit2cloud.com/c/de/6', ['.md-content']).fork(3, set(), handler)

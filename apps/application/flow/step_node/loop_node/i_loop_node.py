@@ -30,12 +30,12 @@ class ILoopNodeSerializer(serializers.Serializer):
         if loop_type == 'ARRAY':
             array = self.data.get('array')
             if array is None or len(array) == 0:
-                message = _('{field}, this field is required.', field='array')
+                message = _('{field}, this field is required.').format(field='array')
                 raise AppApiException(500, message)
         elif loop_type == 'NUMBER':
             number = self.data.get('number')
             if number is None:
-                message = _('{field}, this field is required.', field='number')
+                message = _('{field}, this field is required.').format(field='number')
                 raise AppApiException(500, message)
 
 

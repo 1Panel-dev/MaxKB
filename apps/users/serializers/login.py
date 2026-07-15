@@ -11,6 +11,7 @@ import base64
 import json
 
 from application.models import ApplicationAccessToken
+from common.auth.common import FileToken
 from captcha.image import ImageCaptcha
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
@@ -175,7 +176,7 @@ class LoginSerializer(serializers.Serializer):
         timeout = CONFIG.get_session_timeout()
         cache.set(get_key(token), user, timeout=timeout, version=version)
 
-        return {"token": token}
+        return {"token": token}, FileToken(str(user.id), AuthenticationType.SYSTEM_USER.value).to_token()
 
     @staticmethod
     def _is_account_locked(username: str, failed_attempts: int) -> bool:

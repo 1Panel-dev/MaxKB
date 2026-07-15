@@ -53,6 +53,7 @@
               :options="modelOptions"
               showFooter
               @focus="getSelectModel"
+              @submitModel="getSelectModel"
               :model-type="'TTI'"
             ></ModelSelect>
             <div class="ml-8">
