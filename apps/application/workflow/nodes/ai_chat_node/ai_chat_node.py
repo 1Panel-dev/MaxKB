@@ -21,7 +21,7 @@ from application.flow.tools import get_tools, mcp_response_generator
 from application.models import Application, ApplicationAccessToken, ApplicationApiKey
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from application.workflow.message.struct.content import NodeInfo
+from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.reasoning_content import ReasoningContent
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.tool_content import ToolContent
@@ -261,7 +261,7 @@ class AIChatNode(INode):
         if is_result:
             answer = self.get_context('answer')
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(text_content_id, answer, Status.SUCCESS, node_info))
+            self.write(TextContent(text_content_id, answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def _generate_prompt_question(self, prompt, model, vision, image_list, video_list):
         images = []
@@ -301,11 +301,17 @@ class AIChatNode(INode):
             if reasoning_content_chunk is None:
                 reasoning_content_chunk = ''
             reasoning_content += reasoning_content_chunk
-
+            reasoning_end = False
             if content_chunk:
-                self.write(TextContent(text_content_id, content_chunk, Status.RUNNING, node_info))
+                if not reasoning_end:
+                    self.write(
+                        ReasoningContent(reasoning_content_id, '', Status.SUCCESS, node_info,
+                                         Position(self.get_node_id())))
+                self.write(TextContent(text_content_id, content_chunk, Status.RUNNING, node_info,
+                                       Position(self.get_node_id())))
             if reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
-                self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info))
+                self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info,
+                                            Position(self.get_node_id())))
 
         reasoning_end = reasoning.get_end_reasoning_content()
         answer += reasoning_end.get('content')
@@ -313,9 +319,11 @@ class AIChatNode(INode):
         if not response_reasoning_content:
             reasoning_content_chunk = reasoning_end.get('reasoning_content')
         if reasoning_end.get('content'):
-            self.write(TextContent(text_content_id, reasoning_end.get('content'), Status.RUNNING, node_info))
+            self.write(TextContent(text_content_id, reasoning_end.get('content'), Status.RUNNING, node_info,
+                                   Position(self.get_node_id())))
         if reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
-            self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info))
+            self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info,
+                                        Position(self.get_node_id())))
 
         self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
 
@@ -475,6 +483,7 @@ class AIChatNode(INode):
                         chunk.content,
                         Status.RUNNING,
                         node_info,
+                        Position(self.get_node_id())
                     ))
                     continue
 
@@ -484,7 +493,8 @@ class AIChatNode(INode):
 
                 answer += chunk.content if hasattr(chunk, 'content') else str(chunk)
                 if chunk.content:
-                    self.write(TextContent(text_content_id, chunk.content, Status.RUNNING, node_info))
+                    self.write(TextContent(text_content_id, chunk.content, Status.RUNNING, node_info,
+                                           Position(self.get_node_id())))
             self._write_final_context(chat_model, message_list, question.content, answer, '')
             return True
 

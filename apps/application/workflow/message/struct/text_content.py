@@ -7,11 +7,11 @@
     @desc:
 """
 from application.workflow.content_type import ContentType
-from application.workflow.message.struct.content import Content, NodeInfo
+from application.workflow.message.struct.content import Content, NodeInfo, Position
 from application.workflow.status import Status
 
 
 class TextContent(Content):
-    def __init__(self, _id, content: str, status: Status, node_info: NodeInfo, **kwargs):
+    def __init__(self, _id, content: str, status: Status, node_info: NodeInfo, position: Position, **kwargs):
         self.content = content
-        super().__init__(_id, status, ContentType.TEXT, node_info, **kwargs)
+        super().__init__(_id, status, ContentType.TEXT, node_info, position, **kwargs)

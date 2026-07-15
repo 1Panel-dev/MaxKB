@@ -55,6 +55,7 @@ class WorkflowManage:
         self.parameters = parameters
         self.context = {}
         self.nodes = []
+        self.node_dict = {}
         self.signal = None
         self.start_node = get_start_node(workflow, self)
 
@@ -64,6 +65,7 @@ class WorkflowManage:
         @return: None
         """
         self.nodes.append(self.start_node)
+        self.node_dict = {node.node.id: node for node in self.nodes}
         self._run_async(self.start_node)
 
     def _run(self, node):
@@ -77,11 +79,26 @@ class WorkflowManage:
         """
         if nodes is None or len(nodes) == 0:
             return
+        # 需要校验是否可执行
+        for n in nodes:
+            condition = n.properties.get("condition")
+            if condition == 'AND':
+                up_nodes = self.workflow.get_up_nodes(n.id)
+                # 如果是AND就是前面所有节点都执行结束
+                unfinished = {Status.BEFORE_RUNNING, Status.RUNNING}
+                end = all(
+                    [self.node_dict.get(node.id) and self.node_dict.get(node.id).status not in unfinished for node in
+                     up_nodes])
+                if not end:
+                    return
+
         with self._lock:
             from application.workflow.nodes import get_node_class
             instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters)
                          for n in nodes]
             self.nodes.extend(instances)
+            for node in instances:
+                self.node_dict[node.node.id] = node
         for inst in instances:
             self._run_async(inst)
 
@@ -124,7 +141,10 @@ class WorkflowManage:
         @param key:      key
         @return: 数据
         """
-        return self.context.setdefault(node_id).get(key)
+        node_context = self.context.get(node_id)
+        if node_context is None:
+            return None
+        return node_context.get(key)
 
     def _run_async(self, node):
         t = threading.Thread(target=lambda: self._run(node))
@@ -187,3 +207,43 @@ class WorkflowManage:
             else:
                 return None
         return obj
+
+    @classmethod
+    def from_context(cls, chat_record_id, workflow, parameters, workflow_type,
+                     call_back, get_start_node):
+        """从历史 context 恢复 WorkflowManage"""
+        from application.models import ChatRecord
+        from django.core.cache import cache
+        from common.constants.cache_version import Cache_Version
+
+        try:
+            context_data = None
+
+            # 先从 Redis 查（调试模式）
+            cache_key = Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(chat_record_id))
+            context_data = cache.get(cache_key)
+
+            # Redis 没有，从数据库查
+            if not context_data:
+                chat_record = ChatRecord.objects.filter(id=chat_record_id).first()
+                if not chat_record or not chat_record.workflow_context:
+                    return None
+                context_data = chat_record.workflow_context
+
+            # 创建 WorkflowManage 实例
+            instance = cls(
+                workflow=workflow,
+                parameters=parameters,
+                workflow_type=workflow_type,
+                call_back=call_back,
+                get_start_node=get_start_node
+            )
+
+            # 恢复全局 context
+            instance.context = context_data
+
+            return instance
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            return None

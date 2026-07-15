@@ -14,7 +14,7 @@ from rest_framework import serializers
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.i_node import INode, Signal
 
-from application.workflow.message.struct.content import NodeInfo
+from application.workflow.message.struct.content import NodeInfo, Position
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.status import Status
 
@@ -44,16 +44,16 @@ class LoopNodeSerializer(serializers.Serializer):
                 raise AppApiException(500, message)
 
 
-def _generate_loop_number(number):
-    return iter([(i, i) for i in range(number)])
+def _generate_loop_number(number, start_index=0):
+    return iter([(i, i) for i in range(start_index, number)])
 
 
-def _generate_loop_array(array):
-    return iter([(item, i) for i, item in enumerate(array)])
+def _generate_loop_array(array, start_index=0):
+    return iter([(item, i) for i, item in enumerate(array) if i >= start_index])
 
 
-def _generate_while_loop(number):
-    return iter([(i, i) for i in range(number)])
+def _generate_while_loop(number, start_index=0):
+    return iter([(i, i) for i in range(start_index, number)])
 
 
 class LoopNode(INode):
@@ -73,21 +73,26 @@ class LoopNode(INode):
         number = node_params.get('number')
         loop_body = node_params.get('loop_body')
 
+        # 从 position 获取 start_index
+        position = workflow_params.get('position') or {}
+        start_index = position.get('index') or 0 if position.get('id') == self.node.id else 0
+
         if loop_type == 'ARRAY' and isinstance(array, list) and len(array) >= 2:
             array = self.workflow_manage.get_reference_field(array[0], array[1:])
 
         self.write_context('params', {'loop_type': loop_type, 'array': array, 'number': number})
 
+        # 根据 start_index 构建迭代器
         if loop_type == 'ARRAY':
-            iterator = _generate_loop_array(array)
+            iterator = _generate_loop_array(array, start_index=start_index)
         elif loop_type == 'LOOP':
-            iterator = _generate_while_loop(number or MAX_LOOP_COUNT)
+            iterator = _generate_while_loop(number or MAX_LOOP_COUNT, start_index=start_index)
         else:
-            iterator = _generate_loop_number(number)
+            iterator = _generate_loop_number(number, start_index=start_index)
 
-        self._loop_node_data = []
-        self._loop_answer_data = []
-        self._answer_text = ''
+        self._loop_node_data = self.get_context('loop_node_data') or []
+        self._loop_answer_data = self.get_context('loop_answer_data') or []
+        self._answer_text = self.get_context('answer') or ''
         self._workflow_params = workflow_params
         self._loop_body = loop_body
         self._iterator = iterator
@@ -111,7 +116,8 @@ class LoopNode(INode):
             chunk_list.append(content)
             if hasattr(content, 'content'):
                 self._answer_text += content.content
-                self.write(content)
+            content.position = Position(self.get_node_id(), index, content.position)
+            self.write(content)
 
         def on_complete(wf_manage, error):
             self._loop_node_data.append(wf_manage.context)
@@ -121,7 +127,7 @@ class LoopNode(INode):
             self.write_context('index', index)
             self.write_context('item', item)
 
-            if wf_manage.signal == Signal.BREAK:
+            if wf_manage.signal == Signal.BREAK or wf_manage.signal == Signal.FORM:
                 self.write_context('answer', self._answer_text)
                 self.write_context('run_time', time.time() - self.data.get('start_time', time.time()))
                 self.complete(Status.SUCCESS)
@@ -144,13 +150,35 @@ class LoopNode(INode):
 
         loop_start_class = get_node_class('loop-start-node', self.get_workflow_type())
 
+        # 获取 position，当前 index 和 position.index 一致时传入 children
+        position = self._workflow_params.get('position') or {}
+        child_position = None
+        if position.get('id') == self.node.id and position.get('index') == index:
+            child_position = position.get('children')
+
         def get_start_node_fn(wf, wf_manage):
+            # 如果有 child_position，从指定节点开始
+            if child_position and child_position.get('id'):
+                node_id = child_position.get('id')
+                node = wf.get_node(node_id)
+                if node:
+                    node_class = get_node_class(node.type, self.get_workflow_type())
+                    return node_class(node, wf_manage, lambda n: n.properties.get('node_data', {}))
+            
+            # 默认从 loop-start-node 开始
             start_node = wf.get_node('loop-start-node')
             return loop_start_class(start_node, wf_manage, lambda n: n.properties.get('node_data', {}))
 
+        # 构建子工作流参数，第一次迭代传入 child_position
+        loop_workflow_params = dict(self._workflow_params)
+        if child_position:
+            loop_workflow_params['position'] = child_position
+        else:
+            loop_workflow_params.pop('position', None)
+
         loop_manage = LoopWorkFlowManage(
             workflow=workflow,
-            parameters=self._workflow_params,
+            parameters=loop_workflow_params,
             workflow_type=self.get_workflow_type(),
             call_back=call_back,
             get_start_node=get_start_node_fn,

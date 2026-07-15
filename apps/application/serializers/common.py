@@ -312,6 +312,14 @@ class ChatInfo:
                 break
         if is_save:
             self.chat_record_list.append(chat_record)
+        
+        # 调试模式：把 workflow_context 存到 Redis
+        if self.debug and chat_record.workflow_context:
+            from django.core.cache import cache
+            from common.constants.cache_version import Cache_Version
+            cache_key = Cache_Version.DEBUG_WORKFLOW_CONTEXT.get_key(chat_record_id=str(chat_record.id))
+            cache.set(cache_key, chat_record.workflow_context, timeout=3600)
+        
         if not self.debug:
             if not QuerySet(Chat).filter(id=self.chat_id).exists():
                 Chat(id=self.chat_id, application_id=self.application_id, abstract=chat_record.problem_text[0:1024],

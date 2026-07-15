@@ -41,6 +41,8 @@ class Cache_Version(Enum):
 
     TOOL_WORKFLOW_EXECUTE = "TOOL_WORKFLOW_EXECUTE", lambda key: key
 
+    DEBUG_WORKFLOW_CONTEXT = "DEBUG_WORKFLOW_CONTEXT", lambda chat_record_id: chat_record_id
+
     def get_version(self):
         return self.value[0]
 
