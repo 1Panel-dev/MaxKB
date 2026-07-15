@@ -1,8 +1,8 @@
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
 
 import uuid_utils.compat as uuid
-from django.db.models import Count, QuerySet
+from django.db.models import QuerySet
 from django.utils import timezone
 from langchain_core.messages import HumanMessage
 
@@ -20,6 +20,9 @@ long_term_prompt = '''
 
 【本轮新增对话】：
 {{new_conversation}}
+
+【当前时间】
+{{time}}
 
 ---
 
@@ -48,12 +51,12 @@ long_term_prompt = '''
 融合规则：
 - 同维度出现新偏好 → **覆盖**旧值，条目末标注 `※已更新`
 - 新维度 → 直接追加
-- 旧偏好无新证据但未被否定 → **保留**
+- 旧偏好无新证据且未被否定 → **保留**
 
 ---
 
 ### 【背景】用户背景
-用户的客观身份与环境信息，稳定性强，用户未明确更正则不主动变动。
+用户的客观身份、环境、能力信息，稳定性强，用户未明确更正则不主动变动。
 
 常见维度：职业/角色 / 所在行业 / 技术栈与熟练度 / 使用产品或系统 / 团队规模 / 所在地区
 
@@ -92,7 +95,7 @@ long_term_prompt = '''
 
 1. **只输出记忆内容本身**，不含任何开头语、解释、总结或分隔说明
 2. 四个章节**全部输出**，确无内容写「暂无」，不可省略章节
-3. 每条格式：`- [维度标签] 内容`，标签 2~5 字，精准简洁
+3. 每条格式：`- [维度标签] [记忆时间，格式：yyyy-MM-dd HH:mm] 内容`，标签 2~5 字，精准简洁
 4. 有变更标记（`※已更新` / `※待确认`）的条目置于各章节**最前**
 5. 每条记忆控制在 **60 字以内**，信息密度优先，超出则拆为两条
 6. 输出语言与【本轮新增对话】主要语言保持一致
@@ -102,22 +105,22 @@ long_term_prompt = '''
 ## 输出格式
 
 ### 【偏好】交互偏好
-- [维度标签] 内容
+- [维度标签] [记忆时间] 内容
 （暂无则写：暂无）
 
 ### 【背景】用户背景
-- [维度标签] 内容
+- [维度标签] [记忆时间] 内容
 （暂无则写：暂无）
 
 ### 【约定】明确约定
-- [维度标签] 内容
+- [维度标签] [记忆时间] 内容
 （暂无则写：暂无）
 
 ### 【目标】当前目标
-- [维度标签] 内容
+- [维度标签] [记忆时间] 内容
 （暂无则写：暂无）
 
-'''
+'''.strip()
 
 
 def _get_long_term_config(application, chat_user_id):
@@ -260,12 +263,16 @@ def _run_extract(workspace_id, application_id, chat_user_id, config, history_lim
         for line in (f"用户：{record.problem_text}", f"AI：{record.answer_text}")
     )
 
+    # 当前时间，格式：yyyy-MM-dd HH:mm
+    time = datetime.now().strftime("%Y-%m-%d %H:%M")
+
     content = ''
     for chunk in chat_model.stream([
         HumanMessage(
             content=long_term_prompt
                     .replace('{{existing_memory}}', existing_memory)
                     .replace('{{new_conversation}}', new_conversation)
+                    .replace('{{time}}', time)
         )
     ]):
         content += chunk.content
