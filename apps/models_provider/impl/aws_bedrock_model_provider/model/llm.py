@@ -1,3 +1,4 @@
+import configparser
 import os
 import re
 from typing import Dict, List
@@ -77,27 +78,53 @@ class BedrockModel(MaxKBBaseModel, ChatBedrock):
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
         try:
             return super().get_num_tokens_from_messages(messages)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
         try:
             return super().get_num_tokens(text)
-        except Exception as e:
+        except Exception:
             tokenizer = TokenizerManage.get_tokenizer()
             return len(tokenizer.encode(text))
 
+def _validate_aws_profile_name(profile_name: str):
+    if not profile_name:
+        raise ValueError("profile_name can not be empty")
+    if profile_name != profile_name.strip():
+        raise ValueError("profile_name can not contain leading or trailing spaces")
+    if re.search(r'[\x00-\x1f\x7f\[\]]', profile_name):
+        raise ValueError("profile_name contains invalid characters")
+
+
+def _validate_aws_credential_value(field_name: str, value: str):
+    if not value:
+        raise ValueError(f"{field_name} can not be empty")
+    if value.strip() != value:
+        raise ValueError(f"{field_name} can not contain leading or trailing spaces")
+    if re.search(r'[\x00-\x1f\x7f]', value):
+        raise ValueError(f"{field_name} contains invalid characters")
+
+
 def _update_aws_credentials(profile_name, access_key_id, secret_access_key):
+    _validate_aws_profile_name(profile_name)
+    _validate_aws_credential_value("access_key_id", access_key_id)
+    _validate_aws_credential_value("secret_access_key", secret_access_key)
+
     credentials_path = os.path.join(os.path.expanduser("~"), ".aws", "credentials")
     os.makedirs(os.path.dirname(credentials_path), exist_ok=True)
+    config = configparser.RawConfigParser(strict=False)
+    config.optionxform = str
+    if os.path.exists(credentials_path):
+        config.read(credentials_path, encoding='utf-8')
 
-    content = open(credentials_path, 'r').read() if os.path.exists(credentials_path) else ''
-    pattern = rf'\n*\[{profile_name}\]\n*(aws_access_key_id = .*)\n*(aws_secret_access_key = .*)\n*'
-    content = re.sub(pattern, '', content, flags=re.DOTALL)
+    if config.has_section(profile_name):
+        config.remove_section(profile_name)
 
-    if not re.search(rf'\[{profile_name}\]', content):
-        content += f"\n[{profile_name}]\naws_access_key_id = {access_key_id}\naws_secret_access_key = {secret_access_key}\n"
+    config.add_section(profile_name)
+    config.set(profile_name, "aws_access_key_id", access_key_id)
+    config.set(profile_name, "aws_secret_access_key", secret_access_key)
 
-    with open(credentials_path, 'w') as file:
-        file.write(content)
+    with open(credentials_path, 'w', encoding='utf-8') as file:
+        config.write(file)
