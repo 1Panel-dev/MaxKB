@@ -301,6 +301,10 @@ onBeforeMount(() => {
               modeList.value = ['QR_CODE', ...modeList.value]
             }
           }
+          // 如果modeList 只包含了LOCAL 就可以置空
+          if (modeList.value.length === 1 && modeList.value[0] === 'LOCAL') {
+            modeList.value = []
+          }
           const defaultMode = authSetting.value.default_value
           if (['lark', 'wecom', 'dingtalk'].includes(defaultMode)) {
             changeMode('QR_CODE', false)
