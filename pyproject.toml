@@ -74,7 +74,7 @@ dependencies = [
     "python-dotenv==1.2.2",
     "pytz==2026.2",
     "uuid-utils==0.17.0",
-    "websockets==15.0.1",
+    "websockets==16.1",
 
     # Server & development tools
     "gunicorn==26.0.0",
