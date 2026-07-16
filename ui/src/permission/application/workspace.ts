@@ -408,6 +408,23 @@ const workspace = {
       ],
       'OR',
     ),
+  overview_export: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.APPLICATION.getApplicationWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getWorkspacePermissionWorkspaceManageRole,
+        PermissionConst.APPLICATION_CHAT_LOG_EXPORT.getApplicationWorkspaceResourcePermission(
+          source_id,
+        ),
+      ],
+      'OR',
+    ),
   access_edit: (source_id: string) =>
     hasPermission(
       [

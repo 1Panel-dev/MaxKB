@@ -41,6 +41,8 @@ const systemManage = {
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_OVERVIEW_DISPLAY], 'OR'),
   overview_api_key: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_OVERVIEW_API_KEY], 'OR'),
+  overview_export: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_CHAT_LOG_EXPORT], 'OR'),
   access_edit: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_APPLICATION_ACCESS_EDIT], 'OR'),
   application_chat_user_edit: () =>

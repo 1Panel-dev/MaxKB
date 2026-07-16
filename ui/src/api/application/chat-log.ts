@@ -3,6 +3,7 @@ import {
   get,
   post,
   exportExcelPost,
+  exportFilePost,
   del,
   put,
 } from '@/request/index'
@@ -43,7 +44,7 @@ const postChatLogAddKnowledge: (
  }
  */
 const getChatLog: (
-  application_id: String,
+  application_id: string,
   page: pageRequest,
   param: any,
   loading?: Ref<boolean>,
@@ -61,8 +62,8 @@ const getChatLog: (
  * application_id, chart_id,order_asc
  */
 const getChatRecordLog: (
-  application_id: String,
-  chart_id: String,
+  application_id: string,
+  chart_id: string,
   page: pageRequest,
   loading?: Ref<boolean>,
   order_asc?: boolean,
@@ -108,11 +109,11 @@ const getMarkChatRecord: (
  }
  */
 const putChatRecordLog: (
-  application_id: String,
-  chart_id: String,
-  chart_record_id: String,
-  knowledge_id: String,
-  document_id: String,
+  application_id: string,
+  chart_id: string,
+  chart_record_id: string,
+  knowledge_id: string,
+  document_id: string,
   data: any,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
@@ -138,12 +139,12 @@ const putChatRecordLog: (
  * application_id, chart_id,  chart_record_id, knowledge_id, document_id,paragraph_id
  */
 const delMarkChatRecord: (
-  application_id: String,
-  chart_id: String,
-  chart_record_id: String,
-  knowledge_id: String,
-  document_id: String,
-  paragraph_id: String,
+  application_id: string,
+  chart_id: string,
+  chart_record_id: string,
+  knowledge_id: string,
+  document_id: string,
+  paragraph_id: string,
   loading?: Ref<boolean>,
 ) => Promise<Result<any>> = (
   application_id,
@@ -186,6 +187,28 @@ const postExportChatLog: (
     loading,
   )
 }
+
+/**
+ * 导出对话日志 CSV
+ * @param application_id
+ * @param param  { start_time, end_time }
+ * @param data  { fields: string[] }
+ * @param loading
+ */
+const postExportChatLogCsv: (
+  application_id: string,
+  param: { start_time: string; end_time: string },
+  data: { fields: string[] },
+  loading?: Ref<boolean>,
+) => Promise<any> = (application_id, param, data, loading) => {
+  return exportFilePost(
+    'chat_log.csv',
+    `${prefix.value}/${application_id}/chat/export_csv`,
+    param,
+    data,
+    loading,
+  )
+}
 const getChatRecordDetails: (
   application_id: string,
   chat_id: string,
@@ -206,5 +229,6 @@ export default {
   putChatRecordLog,
   delMarkChatRecord,
   postExportChatLog,
+  postExportChatLogCsv,
   getChatRecordDetails,
 }

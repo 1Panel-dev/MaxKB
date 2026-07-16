@@ -136,6 +136,15 @@
                     </el-icon>
                     {{ $t('views.applicationOverview.appInfo.apiKey') }}
                   </el-button>
+                  <el-button
+                    @click="openExportLogDialog"
+                    v-if="permissionPrecise.overview_export(id)"
+                  >
+                    <el-icon class="mr-4">
+                      <Download />
+                    </el-icon>
+                    {{ $t('views.applicationOverview.appInfo.exportLog') }}
+                  </el-button>
                 </div>
               </el-col>
             </el-row>
@@ -183,6 +192,7 @@
       :api-input-params="mapToUrlParams(apiInputParams)"
     />
     <APIKeyDialog ref="APIKeyDialogRef" />
+    <ExportLogDialog ref="ExportLogDialogRef" :id="id" :api-type="apiType" @refresh="refresh" />
 
     <!-- 社区版访问限制 -->
     <component :is="currentLimitDialog" ref="LimitDialogRef" @refresh="refresh" />
@@ -195,6 +205,7 @@ import { ref, computed, onMounted, shallowRef, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import EmbedDialog from './component/EmbedDialog.vue'
 import APIKeyDialog from './component/APIKeyDialog.vue'
+import ExportLogDialog from './component/ExportLogDialog.vue'
 import LimitDialog from './component/LimitDialog.vue'
 import XPackLimitDrawer from './xpack-component/XPackLimitDrawer.vue'
 import DisplaySettingDialog from './component/DisplaySettingDialog.vue'
@@ -233,6 +244,7 @@ const baseUrl = window.location.origin + `${window.MaxKB.chatPrefix}/api/`
 
 const APIKeyDialogRef = ref()
 const EmbedDialogRef = ref()
+const ExportLogDialogRef = ref()
 
 const accessToken = ref<any>({})
 const detail = ref<any>(null)
@@ -414,6 +426,10 @@ async function updateAccessToken(obj: any, str: string) {
 
 function openAPIKeyDialog() {
   APIKeyDialogRef.value.open()
+}
+
+function openExportLogDialog() {
+  ExportLogDialogRef.value?.open()
 }
 
 function openDialog() {
