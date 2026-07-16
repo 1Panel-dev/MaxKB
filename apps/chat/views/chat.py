@@ -116,13 +116,14 @@ class AnonymousAuthentication(APIView):
                      "Access-Control-Allow-Methods": "POST",
                      "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
         )
+        secure = request.is_secure()
         response.set_cookie(
             'mk_file_auth',
             value=f_token,
             max_age=7 * 24 * 3600,
             path=f'{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
             domain=None,
-            secure=True,
+            secure=secure,
             httponly=True,
             samesite='Lax',
         )
