@@ -96,45 +96,22 @@
     </div>
     <!-- 调试 -->
     <el-collapse-transition>
-      <div class="workflow-debug-container" :class="enlarge ? 'enlarge' : ''" v-if="showDebug">
-        <div class="workflow-debug-header" :class="!isDefaultTheme ? 'custom-header' : ''">
-          <div class="flex-between">
-            <div class="flex align-center">
-              <div class="mr-12 ml-24 flex">
-                <el-avatar
-                  v-if="isAppIcon(detail?.icon)"
-                  shape="square"
-                  :size="32"
-                  style="background: none"
-                >
-                  <img :src="resetUrl(detail?.icon)" alt="" />
-                </el-avatar>
-                <LogoIcon v-else height="32px" />
-              </div>
-
-              <h4 class="ellipsis" style="max-width: 270px" :title="detail?.name">
-                {{ detail?.name || $t('common.name') }}
-              </h4>
-            </div>
-            <div class="mr-16">
-              <el-button link @click="enlarge = !enlarge">
-                <AppIcon
-                  :iconName="enlarge ? 'app-minify' : 'app-magnify'"
-                  class="color-secondary"
-                  style="font-size: 20px"
-                >
-                </AppIcon>
-              </el-button>
+      <div class="workflow-debug-container" v-if="showDebug">
+        <div class="scrollbar-height">
+          <Conversation 
+            :application-details="detail" 
+            :type="'DEBUG'"
+            :default-open="false"
+            :default-mode="'auto'"
+          >
+            <template #header>
               <el-button link @click="showDebug = false">
                 <el-icon :size="20" class="color-secondary">
                   <Close />
                 </el-icon>
               </el-button>
-            </div>
-          </div>
-        </div>
-        <div class="scrollbar-height">
-          <AiChat :application-details="detail" :type="'debug-ai-chat'"></AiChat>
+            </template>
+          </Conversation>
         </div>
       </div>
     </el-collapse-transition>
@@ -160,6 +137,7 @@ import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
+import Conversation from '@/components/conversation/index.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
@@ -207,7 +185,6 @@ const detail = ref<any>(null)
 
 const showPopover = ref(false)
 const showDebug = ref(false)
-const enlarge = ref(false)
 const saveTime = ref<any>('')
 const isSave = ref(false)
 const showHistory = ref(false)
@@ -711,15 +688,7 @@ onBeforeUnmount(() => {
   }
 
   .scrollbar-height {
-    height: calc(100% - var(--app-header-height) - 24px);
-    padding-top: 24px;
-  }
-
-  &.enlarge {
-    width: 50% !important;
-    height: 100% !important;
-    bottom: 0 !important;
-    right: 0 !important;
+    height: 100%;
   }
 
   .chat-width {
