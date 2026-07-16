@@ -43,7 +43,7 @@ dependencies = [
     "tencentcloud-sdk-python-common==3.1.134",
     "tencentcloud-sdk-python-hunyuan==3.1.56",
     "tencentcloud-sdk-python-asr==3.1.130",
-    "volcengine-python-sdk[ark]==5.0.40",
+    "volcengine-python-sdk[ark]==5.0.41",
     "zai-sdk==0.2.3",
 
     # Database, cache & async task queue
