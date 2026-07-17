@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('knowledge', '0009_document_user'),
+        ('knowledge', '0010_file_storage_type'),
     ]
 
     operations = [
