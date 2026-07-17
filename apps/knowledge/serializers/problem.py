@@ -81,7 +81,7 @@ class ProblemSerializers(serializers.Serializer):
                 problem_id__in=problem_id_list)
             source_ids = [row.id for row in problem_paragraph_mapping_list]
             problem_paragraph_mapping_list.delete()
-            QuerySet(Problem).filter(id__in=problem_id_list).delete()
+            QuerySet(Problem).filter(id__in=problem_id_list, knowledge_id=knowledge_id).delete()
             delete_embedding_by_source_ids(source_ids)
             return True
 
@@ -164,7 +164,8 @@ class ProblemSerializers(serializers.Serializer):
         def one(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            return ProblemInstanceSerializer(QuerySet(Problem).get(**{'id': self.data.get('problem_id')})).data
+            return ProblemInstanceSerializer(QuerySet(Problem).get(
+                id=self.data.get('problem_id'), knowledge_id=self.data.get('knowledge_id'))).data
 
         @transaction.atomic
         def delete(self, with_valid=True):
@@ -175,7 +176,9 @@ class ProblemSerializers(serializers.Serializer):
                 problem_id=self.data.get('problem_id'))
             source_ids = [row.id for row in problem_paragraph_mapping_list]
             problem_paragraph_mapping_list.delete()
-            QuerySet(Problem).filter(id=self.data.get('problem_id')).delete()
+            QuerySet(Problem).filter(
+                id=self.data.get('problem_id'), knowledge_id=self.data.get('knowledge_id')
+            ).delete()
             delete_embedding_by_source_ids(source_ids)
             return True
 

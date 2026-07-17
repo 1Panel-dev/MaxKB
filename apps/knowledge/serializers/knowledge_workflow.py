@@ -113,6 +113,15 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
     workspace_id = serializers.CharField(required=True, label=_("workspace id"))
     knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
 
+    def is_valid(self, *, raise_exception=False):
+        super().is_valid(raise_exception=True)
+        workspace_id = self.data.get("workspace_id")
+        query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
+        if workspace_id:
+            query_set = query_set.filter(workspace_id=workspace_id)
+        if not query_set.exists():
+            raise AppApiException(500, _("Knowledge id does not exist"))
+
     def get_query_set(self, instance: Dict):
         query_set = (
             QuerySet(KnowledgeAction)
@@ -266,11 +275,26 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
         id = serializers.UUIDField(required=True, label=_("knowledge action id"))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            workspace_id = self.data.get("workspace_id")
+            query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
+            if workspace_id:
+                query_set = query_set.filter(workspace_id=workspace_id)
+            if not query_set.exists():
+                raise AppApiException(500, _("Knowledge id does not exist"))
+            if not QuerySet(KnowledgeAction).filter(
+                id=self.data.get("id"), knowledge_id=self.data.get("knowledge_id")
+            ).exists():
+                raise AppApiException(500, _("Knowledge action does not exist"))
+
         def one(self, is_valid=True):
             if is_valid:
                 self.is_valid(raise_exception=True)
             knowledge_action_id = self.data.get("id")
-            knowledge_action = QuerySet(KnowledgeAction).filter(id=knowledge_action_id).first()
+            knowledge_action = QuerySet(KnowledgeAction).filter(
+                id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id")
+            ).first()
             return {
                 "id": knowledge_action_id,
                 "knowledge_id": knowledge_action.knowledge_id,
@@ -288,9 +312,11 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 True,
                 version=Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_version(),
             )
-            QuerySet(KnowledgeAction).filter(id=knowledge_action_id, state__in=[State.STARTED, State.PENDING]).update(
-                state=State.REVOKE
-            )
+            QuerySet(KnowledgeAction).filter(
+                id=knowledge_action_id,
+                knowledge_id=self.data.get("knowledge_id"),
+                state__in=[State.STARTED, State.PENDING],
+            ).update(state=State.REVOKE)
             return True
 
 

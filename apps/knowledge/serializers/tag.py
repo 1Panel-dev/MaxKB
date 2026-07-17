@@ -106,7 +106,7 @@ class TagSerializers(serializers.Serializer):
         @transaction.atomic
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
-            tag = QuerySet(Tag).get(id=self.data.get('tag_id'))
+            tag = QuerySet(Tag).filter(id=self.data.get('tag_id'), knowledge_id=self.data.get('knowledge_id')).first()
             if tag is None:
                 raise AppApiException(500, _('Tag id does not exist'))
 
@@ -150,7 +150,9 @@ class TagSerializers(serializers.Serializer):
             self.is_valid(raise_exception=True)
             if delete_type == 'key':
                 # 删除同一knowledge_id下相同key的所有标签
-                tag = QuerySet(Tag).get(id=self.data.get('tag_id'))
+                tag = QuerySet(Tag).filter(
+                    id=self.data.get('tag_id'), knowledge_id=self.data.get('knowledge_id')
+                ).first()
                 if tag is None:
                     raise AppApiException(500, _('Tag id does not exist'))
                 QuerySet(Tag).filter(
@@ -160,7 +162,7 @@ class TagSerializers(serializers.Serializer):
                 QuerySet(DocumentTag).filter(tag_id=tag.id).delete()
             else:
                 # 仅删除当前标签
-                QuerySet(Tag).filter(id=self.data.get('tag_id')).delete()
+                QuerySet(Tag).filter(id=self.data.get('tag_id'), knowledge_id=self.data.get('knowledge_id')).delete()
                 QuerySet(DocumentTag).filter(tag_id=self.data.get('tag_id')).delete()
 
     class BatchDelete(serializers.Serializer):
@@ -185,7 +187,7 @@ class TagSerializers(serializers.Serializer):
                 return
 
             # 获取要删除的标签的key
-            tags_to_delete = QuerySet(Tag).filter(id__in=tag_ids)
+            tags_to_delete = QuerySet(Tag).filter(id__in=tag_ids, knowledge_id=self.data.get('knowledge_id'))
             keys_to_delete = set(tags_to_delete.values_list('key', flat=True))
 
             # 删除具有相同key的所有标签
