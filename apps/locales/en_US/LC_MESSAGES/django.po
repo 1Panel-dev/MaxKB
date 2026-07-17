@@ -9382,3 +9382,33 @@ msgstr "User Name"
 
 msgid "New chat"
 msgstr "A new conversation has been generated. Please ask your question again！"
+
+msgid "IAM"
+msgstr "IAM"
+
+msgid "Chat Client"
+msgstr "Chat Client"
+
+msgid "Shared"
+msgstr ""
+
+msgid "IAM/User Group"
+msgstr ""
+
+msgid "Create or update System User Group"
+msgstr ""
+
+msgid "Get System User Group list by workspace id"
+msgstr ""
+
+msgid "Delete System User Group"
+msgstr ""
+
+msgid "Add members to System User Group"
+msgstr ""
+
+msgid "Unauthorized users are present"
+msgstr ""
+
+msgid "Remove members from System User Group"
+msgstr ""

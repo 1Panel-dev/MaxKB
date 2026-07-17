@@ -102,6 +102,9 @@ class Group(Enum):
     APPLICATION_FOLDER = "APPLICATION_FOLDER"
     KNOWLEDGE_FOLDER = "KNOWLEDGE_FOLDER"
     TOOL_FOLDER = "TOOL_FOLDER"
+    # 身份与权限 Identity & Access Management
+    IAM = "IAM"
+
 
 
 class SystemGroup(Enum):
@@ -124,6 +127,7 @@ class SystemGroup(Enum):
     SYSTEM_SETTING = "SYSTEM_SETTING"
     OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
+    USER_GROUP = "USER_GROUP"
 
 
 class WorkspaceGroup(Enum):
@@ -142,6 +146,24 @@ class UserGroup(Enum):
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
     TOOL = "TOOL"
+    OTHER = "OTHER"
+
+
+class TopLevelGroup(Enum):
+    """
+    一级目录（最顶层分类），用于在 parent_group 之上再加一层分类
+    """
+    # 身份与权限
+    IAM = "IAM"
+    # 资源管理
+    RESOURCE = "RESOURCE"
+    # 共享资源
+    SHARED = "SHARED"
+    CHAT_CLIENT = "CHAT_CLIENT"
+    # 系统设置
+    SYSTEM_SETTING = "SYSTEM_SETTING"
+    #操作日志
+    OPERATION_LOG = "OPERATION_LOG"
     OTHER = "OTHER"
 
 
@@ -323,14 +345,14 @@ Permission_Label = {
     SystemGroup.USER_MANAGEMENT.value: _("User Management"),
     SystemGroup.ROLE.value: _("Role"),
     SystemGroup.WORKSPACE.value: _("Workspace"),
-    SystemGroup.RESOURCE_APPLICATION.value: _("Resource Application"),
-    SystemGroup.RESOURCE_KNOWLEDGE.value: _("Resource Knowledge"),
-    SystemGroup.RESOURCE_TOOL.value: _("Resource Tool"),
-    SystemGroup.RESOURCE_MODEL.value: _("Resource Model"),
+    SystemGroup.RESOURCE_APPLICATION.value: _("Application"),
+    SystemGroup.RESOURCE_KNOWLEDGE.value: _("Knowledge"),
+    SystemGroup.RESOURCE_TOOL.value: _("Tool"),
+    SystemGroup.RESOURCE_MODEL.value: _("Model"),
     SystemGroup.RESOURCE_PERMISSION.value: _("Resource Permission"),
-    SystemGroup.SHARED_KNOWLEDGE.value: _("Shared Knowledge"),
-    SystemGroup.SHARED_MODEL.value: _("Shared Model"),
-    SystemGroup.SHARED_TOOL.value: _("Shared Tool"),
+    SystemGroup.SHARED_KNOWLEDGE.value: _("Knowledge"),
+    SystemGroup.SHARED_MODEL.value: _("Model"),
+    SystemGroup.SHARED_TOOL.value: _("Tool"),
     SystemGroup.OPERATION_LOG.value: _("Operation Log"),
     SystemGroup.OTHER.value: _("Other"),
     WorkspaceGroup.SYSTEM_MANAGEMENT.value: _("System Management"),
@@ -439,9 +461,48 @@ Permission_Label = {
     Group.APPLICATION_FOLDER.value: _("Folder"),
     Group.KNOWLEDGE_FOLDER.value: _("Folder"),
     Group.TOOL_FOLDER.value: _("Folder"),
-    # SystemGroup.RESOURCE.value: _("Resource"),
+    TopLevelGroup.IAM.value: _("IAM"),
+    TopLevelGroup.RESOURCE.value: _("Resource"),
+    TopLevelGroup.SHARED.value: _("Shared"),
+    TopLevelGroup.CHAT_CLIENT.value: _("Chat Client"),
 }
-
+GROUPS = {
+    TopLevelGroup.IAM: (
+        SystemGroup.USER_MANAGEMENT,
+        SystemGroup.ROLE,
+        SystemGroup.WORKSPACE,
+        SystemGroup.USER_GROUP,
+        SystemGroup.RESOURCE_PERMISSION,
+    ),
+    TopLevelGroup.RESOURCE: (
+        SystemGroup.RESOURCE_APPLICATION,
+        SystemGroup.RESOURCE_KNOWLEDGE,
+        SystemGroup.RESOURCE_TOOL,
+        SystemGroup.RESOURCE_MODEL,
+    ),
+    TopLevelGroup.SHARED: (
+        SystemGroup.SHARED_KNOWLEDGE,
+        SystemGroup.SHARED_MODEL,
+        SystemGroup.SHARED_TOOL,
+    ),
+    TopLevelGroup.CHAT_CLIENT: (
+        SystemGroup.CHAT_USER,
+    ),
+    TopLevelGroup.SYSTEM_SETTING: (
+        SystemGroup.SYSTEM_SETTING,
+    ),
+    TopLevelGroup.OPERATION_LOG: (
+        SystemGroup.OPERATION_LOG,
+    ),
+    TopLevelGroup.OTHER: (
+        SystemGroup.OTHER,
+    )
+}
+TOP_LEVEL_GROUP_MAP = {
+    group: top_level
+    for top_level, groups in GROUPS.items()
+    for group in groups
+}
 
 class Permission:
     """
@@ -449,7 +510,8 @@ class Permission:
     """
 
     def __init__(self, group: Group, operate: Operate, resource_path=None, role_list=None,
-                 resource_permission_group_list=None, parent_group=None, label=None, is_ee=True):
+                 resource_permission_group_list=None, parent_group=None, label=None, is_ee=True,
+                 top_group=None):
         if role_list is None:
             role_list = []
         if resource_permission_group_list is None:
@@ -464,6 +526,7 @@ class Permission:
         self.parent_group = parent_group  # 新增字段：父级组
         self.label = label
         self.is_ee = is_ee  # 是否是企业版权限
+        self.top_group = top_group  # 一级目录分类
 
     @staticmethod
     def new_instance(permission_str: str):
@@ -520,6 +583,31 @@ class PermissionConstants(Enum):
         group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.USER_MANAGEMENT]
     )
+
+    SYSTEM_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
+                                role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                parent_group=[SystemGroup.USER_GROUP]
+                                )
+    SYSTEM_USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
+                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                   parent_group=[SystemGroup.USER_GROUP]
+                                   )
+    SYSTEM_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
+                                 role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                 parent_group=[SystemGroup.USER_GROUP]
+                                 )
+    SYSTEM_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
+                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                   parent_group=[SystemGroup.USER_GROUP]
+                                   )
+    SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
+                                       role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                       parent_group=[SystemGroup.USER_GROUP]
+                                       )
+    SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                          parent_group=[SystemGroup.USER_GROUP]
+                                          )
 
     MODEL_READ = Permission(
         group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
