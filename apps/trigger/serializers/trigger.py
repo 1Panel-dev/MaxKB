@@ -463,6 +463,11 @@ class TriggerSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             trigger_id_list = instance.get("id_list")
+            trigger_id_list = list(
+                QuerySet(Trigger)
+                .filter(id__in=trigger_id_list, workspace_id=workspace_id)
+                .values_list("id", flat=True)
+            )
             for trigger_id in trigger_id_list:
                 trigger = QuerySet(Trigger).filter(id=trigger_id).first()
                 undeploy(TriggerModelSerializer(trigger).data, **{})

@@ -178,12 +178,20 @@ class FolderSerializer(serializers.Serializer):
         source = serializers.CharField(required=True, label=_('source'))
         user_id = serializers.UUIDField(required=True, label=_('user id'))
 
+        def is_valid(self, *, raise_exception=False):
+            super().is_valid(raise_exception=True)
+            Folder = get_folder_type(self.data.get('source'))  # noqa
+            if Folder is None or not QuerySet(Folder).filter(
+                    id=self.data.get('id'), workspace_id=self.data.get('workspace_id')
+            ).exists():
+                raise serializers.ValidationError(_('Folder does not exist'))
+
         @transaction.atomic
         def edit(self, instance):
             self.is_valid(raise_exception=True)
             Folder = get_folder_type(self.data.get('source'))  # noqa
             current_id = self.data.get('id')
-            current_node = Folder.objects.get(id=current_id)
+            current_node = Folder.objects.get(id=current_id, workspace_id=self.data.get('workspace_id'))
             if current_node is None:
                 raise serializers.ValidationError(_('Folder does not exist'))
             # 模块间的移动
@@ -232,7 +240,7 @@ class FolderSerializer(serializers.Serializer):
         def one(self):
             self.is_valid(raise_exception=True)
             Folder = get_folder_type(self.data.get('source'))  # noqa
-            folder = QuerySet(Folder).filter(id=self.data.get('id')).first()
+            folder = QuerySet(Folder).filter(id=self.data.get('id'), workspace_id=self.data.get('workspace_id')).first()
             return FolderSerializer(folder).data
 
         @transaction.atomic
@@ -240,7 +248,7 @@ class FolderSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
             Folder = get_folder_type(self.data.get('source'))  # noqa
             Source = get_source_type(self.data.get('source'))  # noqa
-            folder = Folder.objects.filter(id=self.data.get('id')).first()
+            folder = Folder.objects.filter(id=self.data.get('id'), workspace_id=self.data.get('workspace_id')).first()
             if not folder:
                 raise serializers.ValidationError(_('Folder does not exist'))
             if folder.id == folder.workspace_id:

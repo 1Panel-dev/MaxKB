@@ -43,11 +43,10 @@ from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
-from trigger.models import Trigger, TriggerTask
-from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
-
 from tools.models import Tool, ToolFolder, ToolRecord, ToolScope, ToolType
 from tools.models.tool_workflow import ToolWorkflow
+from trigger.models import Trigger, TriggerTask
+from users.serializers.user import is_workspace_manage, is_workspace_manage_permission_read
 
 tool_executor = ToolExecutor()
 
@@ -649,7 +648,9 @@ class ToolSerializer(serializers.Serializer):
                 if instance.get("tool_type") == ToolType.MCP:
                     ToolExecutor().validate_mcp_transport(instance.get("code", ""))
 
-            if not QuerySet(Tool).filter(id=self.data.get("id")).exists():
+            if not QuerySet(Tool).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).exists():
                 raise serializers.ValidationError(_("Tool not found"))
 
             edit_field_list = [
@@ -669,7 +670,9 @@ class ToolSerializer(serializers.Serializer):
                 if (field in instance and instance.get(field) is not None)
             }
 
-            tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
+            tool = QuerySet(Tool).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).first()
             if "init_params" in edit_dict:
                 if edit_dict["init_field_list"] is not None:
                     rm_key = []
@@ -686,7 +689,9 @@ class ToolSerializer(serializers.Serializer):
                 edit_dict["init_params"] = rsa_long_encrypt(json.dumps(edit_dict["init_params"]))
 
             edit_dict["update_time"] = timezone.now()
-            QuerySet(Tool).filter(id=self.data.get("id")).update(**edit_dict)
+            QuerySet(Tool).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).update(**edit_dict)
             if "is_active" in instance:
                 QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).update(
                     is_active=instance.get("is_active")
@@ -708,13 +713,19 @@ class ToolSerializer(serializers.Serializer):
             from trigger.serializers.trigger import TriggerModelSerializer
 
             self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get("id")).first()
+            tool = QuerySet(Tool).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).first()
+            if tool is None:
+                raise serializers.ValidationError(_("Tool not found"))
             if tool.template_id is None and tool.icon != "":
                 QuerySet(File).filter(id=tool.icon.split("/")[-1]).delete()
             if tool.tool_type == ToolType.SKILL:
                 QuerySet(File).filter(id=tool.code).delete()
             QuerySet(WorkspaceUserResourcePermission).filter(target=tool.id).delete()
-            QuerySet(Tool).filter(id=self.data.get("id")).delete()
+            QuerySet(Tool).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).delete()
             ResourceMapping.objects.filter(Q(target_id=self.data.get("id")) | Q(source_id=self.data.get("id"))).delete()
             QuerySet(ToolRecord).filter(tool_id=self.data.get("id")).delete()
             trigger_ids = list(
@@ -723,7 +734,9 @@ class ToolSerializer(serializers.Serializer):
                 .values("trigger_id")
                 .distinct()
             )
-            QuerySet(TriggerTask).filter(source_type="TOOL", source_id=self.data.get("id")).delete()
+            QuerySet(TriggerTask).filter(
+                source_type="TOOL", source_id=self.data.get("id")
+            ).delete()
             for trigger_id in trigger_ids:
                 trigger = Trigger.objects.filter(id=trigger_id["trigger_id"]).first()
                 if trigger and trigger.is_active:
@@ -1215,7 +1228,9 @@ class ToolSerializer(serializers.Serializer):
                 self.is_valid(raise_exception=True)
                 AddInternalToolRequest(data=instance).is_valid(raise_exception=True)
 
-            internal_tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
+            internal_tool = QuerySet(Tool).filter(
+                id=self.data.get("tool_id"), scope=ToolScope.INTERNAL
+            ).first()
             if internal_tool is None:
                 raise AppApiException(500, _("Tool does not exist"))
 
@@ -1385,7 +1400,11 @@ class ToolSerializer(serializers.Serializer):
         def update_tool(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
+            if not self.data.get("download_url").startswith("https://apps-assets.fit2cloud.com/"):
+                raise AppApiException(500, _("Illegal download url"))
+            tool = QuerySet(Tool).filter(
+                id=self.data.get("tool_id"), workspace_id=self.data.get("workspace_id")
+            ).first()
             if tool is None:
                 raise AppApiException(500, _("Tool does not exist"))
             # 查找匹配的版本名称

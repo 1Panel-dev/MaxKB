@@ -47,7 +47,7 @@ class TermbaseSerializers(serializers.Serializer):
         def delete(self, problem_id_list: List, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            QuerySet(Termbase).filter(id__in=problem_id_list).delete()
+            QuerySet(Termbase).filter(id__in=problem_id_list, knowledge_id=self.data.get("knowledge_id")).delete()
             return True
 
         def export(self, problem_id_list: List, with_valid=True):
@@ -55,7 +55,7 @@ class TermbaseSerializers(serializers.Serializer):
                 self.is_valid(raise_exception=True)
             terms = (
                 QuerySet(Termbase)
-                .filter(id__in=problem_id_list)
+                .filter(id__in=problem_id_list, knowledge_id=self.data.get("knowledge_id"))
                 .order_by("-create_time")
                 .values_list("content", flat=True)
             )
@@ -78,13 +78,16 @@ class TermbaseSerializers(serializers.Serializer):
         def one(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            return TermbaseInstanceSerializer(QuerySet(Termbase).get(**{"id": self.data.get("termbase_id")})).data
+            return TermbaseInstanceSerializer(QuerySet(Termbase).get(
+                id=self.data.get("termbase_id"), knowledge_id=self.data.get("knowledge_id"))).data
 
         @transaction.atomic
         def delete(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            QuerySet(Termbase).filter(id=self.data.get("termbase_id")).delete()
+            QuerySet(Termbase).filter(
+                id=self.data.get("termbase_id"), knowledge_id=self.data.get("knowledge_id")
+            ).delete()
             return True
 
         @transaction.atomic
