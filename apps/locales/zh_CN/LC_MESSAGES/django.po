@@ -9505,3 +9505,33 @@ msgstr "用户名称"
 
 msgid "New chat"
 msgstr "已生成新对话，请重新提问！"
+
+msgid "IAM"
+msgstr "身份与权限"
+
+msgid "Chat Client"
+msgstr "对话端管理"
+
+msgid "Shared"
+msgstr "共享资源"
+
+msgid "IAM/User Group"
+msgstr "身份与权限/用户组"
+
+msgid "Create or update System User Group"
+msgstr "创建或更新系统用户组"
+
+msgid "Get System User Group list by workspace id"
+msgstr "通过工作空间 ID 获取系统用户组列表"
+
+msgid "Delete System User Group"
+msgstr "删除系统用户组"
+
+msgid "Add members to System User Group"
+msgstr "添加成员到系统用户组"
+
+msgid "Unauthorized users are present"
+msgstr "存在未授权的用户"
+
+msgid "Remove members from System User Group"
+msgstr "从系统用户组中移除成员"
