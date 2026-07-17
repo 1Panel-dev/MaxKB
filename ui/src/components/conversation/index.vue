@@ -17,15 +17,8 @@
 
     <ChatPanel
       ref="panelRef"
-      :messages="messages"
-      :loading="msgLoading"
-      :stream-loading="streamLoading"
       :title="currentConversation?.name"
       :icon="appInfo?.icon"
-      @send="handleSend"
-      @stop="stopStream"
-      @toggle="open = !open"
-      @scroll="handleScroll"
     >
       <template #header>
         <slot name="header" />
@@ -125,18 +118,31 @@ const {
   deleteChat,
   renameChat,
   sendMessage,
-  stopStream
+  pushMessage,
+  stopStream,
+  chatRequest,
+  startStream,
 } = useChat(props.type, resolvedAppId)
 
 const panelRef = ref()
 
 provide('chat', {
+  messages,
+  msgLoading,
+  streamLoading,
   currentChatId,
-  sendMessage,
+  currentConversation,
+  conversations,
   openChat,
   switchChat,
   deleteChat,
   renameChat,
+  sendMessage,
+  pushMessage,
+  stopStream,
+  chat: chatRequest,
+  startStream,
+  toggleSidebar: () => { open.value = !open.value },
   scrollToBottom: () => nextTick(() => panelRef.value?.scrollToBottom())
 })
 
