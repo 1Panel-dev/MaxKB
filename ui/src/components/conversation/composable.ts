@@ -294,6 +294,40 @@ export function useChat(type: ChatType, applicationId?: string | Ref<string>) {
     streamLoading.value = false
   }
 
+  const chatRequest = (chatId: string, data: any) => {
+    return api.chat(chatId, data)
+  }
+
+  const startStream = (opts: {
+    cid: string
+    request: () => Promise<any>
+    onStream: (chunk: any) => void
+    onFinish?: () => void
+    onFailure?: (e: any) => void
+  }) => {
+    streamLoading.value = true
+    opts.request().then((response: any) => {
+      activeStream = new ConversationStream(
+        response,
+        opts.onStream,
+        () => {
+          streamLoading.value = false
+          activeStream = null
+          opts.onFinish?.()
+        },
+        (e: any) => {
+          streamLoading.value = false
+          activeStream = null
+          opts.onFailure?.(e)
+        },
+      )
+      activeStream.start()
+    }).catch((e: any) => {
+      streamLoading.value = false
+      opts.onFailure?.(e)
+    })
+  }
+
   return {
     appInfo,
     conversations,
@@ -312,6 +346,8 @@ export function useChat(type: ChatType, applicationId?: string | Ref<string>) {
     createAnswerMessage,
     getOrCreateLastAnswerMessage,
     sendMessage,
-    stopStream
+    stopStream,
+    chatRequest,
+    startStream,
   }
 }

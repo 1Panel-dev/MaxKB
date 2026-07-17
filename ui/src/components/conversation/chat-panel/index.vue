@@ -1,14 +1,9 @@
 <template>
   <main class="chat-panel">
     <header class="panel-header">
-      <button class="header-btn" @click="$emit('toggle')">
+      <button class="header-btn" @click="chat.toggleSidebar?.()">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path
-            d="M2 4h12M2 8h12M2 12h12"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-          />
+          <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
       </button>
       <div class="header-info">
@@ -19,21 +14,21 @@
     </header>
 
     <div ref="msgBoxRef" class="panel-messages" @scroll="onScroll">
-      <div v-if="messages.length === 0 && !loading" class="welcome">
+      <div v-if="chat.messages.value.length === 0 && !chat.msgLoading.value" class="welcome">
         <p class="welcome-title">AI 助手</p>
         <p class="welcome-sub">有什么可以帮你的？</p>
       </div>
 
       <template v-else>
         <div
-          v-for="(msg, i) in messages"
+          v-for="(msg, i) in chat.messages.value"
           :key="msg.id || i"
           :class="['msg-row', msg.role === 'USER' ? 'user' : 'assistant']"
         >
           <ContentList :content-list="msg.content" />
         </div>
 
-        <div v-if="streamLoading" class="msg-row assistant">
+        <div v-if="chat.streamLoading.value" class="msg-row assistant">
           <Loading :size="18" />
         </div>
       </template>
@@ -43,34 +38,28 @@
       <div class="input-wrapper" :class="{ focused }">
         <textarea
           ref="inputRef"
-          v-model="inputText"
-          :disabled="streamLoading"
-          :placeholder="streamLoading ? '正在回复中...' : '输入消息...'"
+          v-model="question.content"
+          :disabled="chat.streamLoading.value"
+          :placeholder="chat.streamLoading.value ? '正在回复中...' : '输入消息...'"
           @keydown="onKeydown"
           @focus="focused = true"
           @blur="focused = false"
           rows="1"
         />
         <button
-          v-if="!streamLoading"
+          v-if="!chat.streamLoading.value"
           class="send-btn"
-          :class="{ active: canSend }"
-          :disabled="!canSend"
-          @click="send"
+          :class="{ active: hasContent }"
+          :disabled="!hasContent"
+          @click="conversation(question)"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path
-              d="M8 14V2M3 7l5-5 5 5"
-              stroke="currentColor"
-              stroke-width="1.8"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            />
+            <path d="M8 14V2M3 7l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         </button>
-        <button v-else class="send-btn stop" @click="$emit('stop')">
+        <button v-else class="send-btn stop" @click="chat.stopStream()">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor" />
+            <rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor"/>
           </svg>
         </button>
       </div>
@@ -79,41 +68,129 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, inject, reactive } from 'vue'
 import ContentList from '../content-list/index.vue'
 import Loading from '../loading/index.vue'
-import { Scroll } from '../index'
+import { Scroll, aggregators } from '../index'
 
-const props = withDefaults(
-  defineProps<{
-    messages?: any[]
-    loading?: boolean
-    streamLoading?: boolean
-    title?: string
-    icon?: string
-  }>(),
-  {
-    messages: () => [],
-    loading: false,
-    streamLoading: false,
-  },
-)
-
-const emit = defineEmits<{
-  send: [text: string]
-  stop: []
-  toggle: []
-  scroll: []
+const props = defineProps<{
+  icon?: string
+  title?: string
 }>()
 
+const chat = inject<any>('chat')
+
 const focused = ref(false)
-const inputText = ref('')
+const question = ref<any>({ content: '' })
 const inputRef = ref<HTMLTextAreaElement | null>(null)
 const msgBoxRef = ref<HTMLElement | null>(null)
 
 let scroll: InstanceType<typeof Scroll> | null = null
 
-const canSend = computed(() => inputText.value.trim() && !props.streamLoading)
+const hasContent = computed(() => question.value.content.trim())
+
+// ── 创建 AI 占位消息 ──────────────────────────────────
+const createAnswerMessage = () => reactive({
+  role: 'ASSISTANT' as const,
+  content: reactive([] as any[]),
+  id: '',
+  write_ed: false,
+})
+
+// ── 流式聚合 ──────────────────────────────────────────
+const getOnStream = (message: any) => {
+  const indexList: string[] = Array.isArray(message.content)
+    ? message.content.map((c: any) => c.id + '_' + c.type)
+    : []
+
+  return (chunk: any) => {
+    console.log('[onStream] chunk:', chunk)
+    console.log('[onStream] message.content before:', JSON.stringify(message.content))
+
+    if (!Array.isArray(chunk.content)) {
+      console.log('[onStream] chunk.content is not array:', chunk.content)
+      return
+    }
+
+    chunk.content.forEach((content: any) => {
+      const id = content.id + '_' + content.type
+      let i = indexList.indexOf(id)
+
+      if (i < 0) {
+        i = indexList.length
+        indexList.push(id)
+      }
+
+      if (i < message.content.length) {
+        const aggregated = aggregators[content.type]?.(message.content[i], content)
+        console.log('[onStream] aggregated:', aggregated)
+        if (aggregated) {
+          message.content[i] = aggregated
+        }
+      } else {
+        const newItem = aggregators[content.type]?.({}, content) || content
+        console.log('[onStream] new item:', newItem)
+        message.content.push(newItem)
+      }
+    })
+
+    console.log('[onStream] message.content after:', JSON.stringify(message.content))
+    scroll?.scrollBottom()
+  }
+}
+
+// ── 主发送函数 ────────────────────────────────────────
+const conversation = async (q: any) => {
+  if (!q.content?.trim() && !hasContent.value) return
+  if (chat.streamLoading.value) return
+
+  if (!chat.currentConversation.value) {
+    await chat.openChat()
+    await nextTick()
+  }
+
+  chat.pushMessage({
+    role: 'USER',
+    content: [{ type: 'QUESTION', content: q.content }],
+    id: '',
+  })
+
+  chat.pushMessage(createAnswerMessage())
+  const aiMsg = chat.messages.value[chat.messages.value.length - 1]
+
+  chat.startStream({
+    cid: chat.currentChatId.value,
+    request: () => chat.chat(chat.currentChatId.value, {
+      message: q.content,
+      stream: true,
+      re_chat: false,
+    }),
+    onStream: getOnStream(aiMsg),
+    onFinish: () => {},
+  })
+
+  question.value.content = ''
+}
+
+// ── 键盘 ──────────────────────────────────────────────
+const onKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault()
+    conversation(question.value)
+  }
+}
+
+// ── 滚动 ──────────────────────────────────────────────
+const onScroll = async () => {
+  const el = msgBoxRef.value
+  if (!el || el.scrollTop > 60) return
+  if (!chat.hasMoreMsg?.value || chat.msgLoading.value) return
+  await chat.loadMoreMessages?.()
+}
+
+const scrollToBottom = () => {
+  scroll?.forceBottom()
+}
 
 onMounted(() => {
   if (msgBoxRef.value) {
@@ -121,36 +198,11 @@ onMounted(() => {
   }
 })
 
-const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault()
-    send()
-  }
-}
+watch(() => chat?.messages?.value?.length, () => {
+  nextTick(() => scroll?.scrollBottom())
+})
 
-const send = () => {
-  if (!canSend.value) return
-  emit('send', inputText.value.trim())
-  inputText.value = ''
-  nextTick(() => {
-    if (inputRef.value) {
-      inputRef.value.style.height = 'auto'
-    }
-  })
-}
-
-const onScroll = () => {
-  const el = msgBoxRef.value
-  if (!el || el.scrollTop > 60) return
-  emit('scroll')
-}
-
-const scrollToBottom = () => {
-  console.log('scrollToBottom')
-  scroll?.forceBottom()
-}
-
-defineExpose({ scrollToBottom })
+defineExpose({ scrollToBottom, conversation })
 </script>
 
 <style scoped>
@@ -267,13 +319,8 @@ defineExpose({ scrollToBottom })
   overflow: hidden;
 }
 
-.msg-row.user {
-  align-items: flex-end;
-}
-
-.msg-row.assistant {
-  align-items: flex-start;
-}
+.msg-row.user { align-items: flex-end; }
+.msg-row.assistant { align-items: flex-start; }
 
 .panel-input {
   flex-shrink: 0;
@@ -293,9 +340,7 @@ defineExpose({ scrollToBottom })
   border: 1px solid var(--bd, #dcdfe6);
   border-radius: 16px;
   padding: 8px 8px 8px 16px;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .input-wrapper.focused {
@@ -335,10 +380,7 @@ defineExpose({ scrollToBottom })
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition:
-    background 0.2s,
-    color 0.2s,
-    transform 0.1s;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
 }
 
 .send-btn.active {
@@ -347,13 +389,8 @@ defineExpose({ scrollToBottom })
   cursor: pointer;
 }
 
-.send-btn.active:hover {
-  opacity: 0.85;
-}
-
-.send-btn.active:active {
-  transform: scale(0.92);
-}
+.send-btn.active:hover { opacity: 0.85; }
+.send-btn.active:active { transform: scale(0.92); }
 
 .send-btn.stop {
   background: #ef4444;
@@ -361,11 +398,6 @@ defineExpose({ scrollToBottom })
   cursor: pointer;
 }
 
-.send-btn.stop:hover {
-  background: #dc2626;
-}
-
-.send-btn.stop:active {
-  transform: scale(0.92);
-}
+.send-btn.stop:hover { background: #dc2626; }
+.send-btn.stop:active { transform: scale(0.92); }
 </style>
