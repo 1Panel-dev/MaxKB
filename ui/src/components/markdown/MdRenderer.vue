@@ -15,7 +15,7 @@
       <div
         v-else-if="item.type === 'question'"
         class="problem-button mt-4 mb-4"
-        :class="sendMessage && type !== 'log' ? 'cursor' : 'disabled'"
+        :class="resolvedSendMessage && type !== 'log' ? 'cursor' : 'disabled'"
         @click="handleQuestionClick(item.content)"
       >
         <el-space :size="8" alignment="flex-start">
@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, inject } from 'vue'
 import { config } from 'md-editor-v3'
 import HtmlRander from './HtmlRander.vue'
 import EchartsRander from './EchartsRander.vue'
@@ -62,6 +62,8 @@ config({
   },
 })
 
+const chat = inject<any>('chat', null)
+
 const props = withDefaults(
   defineProps<{
     source?: string
@@ -78,6 +80,8 @@ const props = withDefaults(
     disabled: false,
   },
 )
+
+const resolvedSendMessage = computed(() => props.sendMessage || chat?.sendMessage)
 
 type RenderNode = {
   type: string
@@ -208,16 +212,16 @@ function getComponentProps(item: RenderNode) {
         runtime_node_id: props.runtime_node_id,
         child_node: props.child_node,
         disabled: props.disabled,
-        sendMessage: props.sendMessage,
+        sendMessage: resolvedSendMessage.value,
         form_setting: item.content,
       }
 
     case 'echarts_rander':
       return { option: item.content }
     case 'html_rander':
-      return { source: item.content, sendMessage: props.sendMessage }
+      return { source: item.content, sendMessage: resolvedSendMessage.value }
     case 'iframe_render':
-      return { source: item.content, sendMessage: props.sendMessage }
+      return { source: item.content, sendMessage: resolvedSendMessage.value }
     case 'tool_calls_render':
       return { content: item.content }
 
@@ -227,9 +231,9 @@ function getComponentProps(item: RenderNode) {
 }
 
 function handleQuestionClick(content: string) {
-  if (!props.sendMessage) return
+  if (!resolvedSendMessage.value) return
   if (props.type === 'log') return
-  props.sendMessage(content, 'new')
+  resolvedSendMessage.value(content, 'new')
 }
 </script>
 
