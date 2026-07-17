@@ -42,6 +42,7 @@ class HistoryChatModel(serializers.ModelSerializer):
 
 
 class VoteSerializer(serializers.Serializer):
+    application_id = serializers.UUIDField(required=True, label=_("Application ID"))
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
 
     chat_record_id = serializers.UUIDField(required=True,
@@ -59,7 +60,8 @@ class VoteSerializer(serializers.Serializer):
                                       "Voting on the current session minutes, please do not send repeated requests"))
         try:
             chat_record_details_model = QuerySet(ChatRecord).get(id=self.data.get('chat_record_id'),
-                                                                 chat_id=self.data.get('chat_id'))
+                                                                 chat_id=self.data.get('chat_id'),
+                                                                 chat__application_id=self.data.get('application_id'))
             if chat_record_details_model is None:
                 raise AppApiException(500, gettext("Non-existent conversation chat_record_id"))
             vote_status = instance.get("vote_status")

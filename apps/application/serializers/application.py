@@ -1779,6 +1779,11 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         id_list = instance.get("id_list")
         workspace_id = self.data.get("workspace_id")
+        id_list = list(
+            QuerySet(Application)
+            .filter(id__in=id_list, workspace_id=workspace_id)
+            .values_list("id", flat=True)
+        )
 
         QuerySet(ApplicationVersion).filter(application_id__in=id_list).delete()
         QuerySet(ResourceMapping).filter(Q(target_id__in=id_list) | Q(source_id__in=id_list)).delete()

@@ -172,15 +172,17 @@ class ModelSerializer(serializers.Serializer):
         def pause_download(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            QuerySet(Model).filter(id=self.data.get("id")).update(status=Status.PAUSE_DOWNLOAD)
+            QuerySet(Model).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).update(status=Status.PAUSE_DOWNLOAD)
             return True
 
         @transaction.atomic
         def delete(self, with_valid=True):
             if with_valid:
-                super().is_valid(raise_exception=True)
+                self.is_valid(raise_exception=True)
             model_id = self.data.get("id")
-            model = Model.objects.filter(id=model_id).first()
+            model = Model.objects.filter(id=model_id, workspace_id=self.data.get("workspace_id")).first()
             if model is None:
                 return True
             QuerySet(WorkspaceUserResourcePermission).filter(target=model_id).delete()
@@ -207,8 +209,10 @@ class ModelSerializer(serializers.Serializer):
 
         def edit(self, instance: Dict, user_id: str, with_valid=True):
             if with_valid:
-                super().is_valid(raise_exception=True)
-            model = QuerySet(Model).filter(id=self.data.get("id")).first()
+                self.is_valid(raise_exception=True)
+            model = QuerySet(Model).filter(
+                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
+            ).first()
 
             credential, model_credential, provider_handler = ModelSerializer.Edit(data={**instance}).is_valid(
                 model=model
