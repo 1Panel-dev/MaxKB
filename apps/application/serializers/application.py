@@ -16,6 +16,7 @@ import pickle
 import re
 import tempfile
 import zipfile
+from urllib.parse import urlparse
 from functools import reduce
 from typing import Dict, List
 
@@ -262,6 +263,34 @@ def update_form_knowledge_fields(workflow):
                 field.setdefault("attrs", {})["knowledge_list"] = refreshed_knowledge_list
         if node.get("type") == "loop-node":
             update_form_knowledge_fields(node.get("properties", {}).get("node_data", {}).get("loop_body") or {})
+
+
+
+_ALLOWED_TEMPLATE_DOWNLOAD_HOSTS = {"apps-assets.fit2cloud.com"}
+_ALLOWED_TEMPLATE_CALLBACK_HOSTS = {"apps.fit2cloud.com"}
+
+
+def _validate_trusted_url(url, allowed_hosts):
+    """
+    Validate a URL against an allowlist of trusted hosts to prevent SSRF.
+    Requires https scheme, an exact host match against ``allowed_hosts``, and
+    rejects URLs carrying userinfo or explicit ports which could be abused to
+    smuggle a different origin past a naive startswith() check.
+    """
+    if not url or not isinstance(url, str):
+        return False
+    try:
+        parsed = urlparse(url)
+    except (ValueError, TypeError):
+        return False
+    if parsed.scheme != "https":
+        return False
+    if parsed.username or parsed.password:
+        return False
+    if parsed.port is not None:
+        return False
+    hostname = (parsed.hostname or "").lower()
+    return hostname in allowed_hosts
 
 
 class MKInstance:
@@ -747,10 +776,10 @@ class ApplicationSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get("work_flow_template")
         download_url = work_flow_template.get("downloadUrl")
-        if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+        if not _validate_trusted_url(download_url, _ALLOWED_TEMPLATE_DOWNLOAD_HOSTS):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
-        res = requests.get(download_url, timeout=5)
+        res = requests.get(download_url, timeout=5, allow_redirects=False)
         app = ApplicationSerializer(
             data={"user_id": self.data.get("user_id"), "workspace_id": self.data.get("workspace_id")}
         ).import_(
@@ -771,9 +800,9 @@ class ApplicationSerializer(serializers.Serializer):
         )
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+            if not _validate_trusted_url(download_callback_url, _ALLOWED_TEMPLATE_CALLBACK_HOSTS):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5, allow_redirects=False)
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
         return app
@@ -1482,10 +1511,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get("work_flow_template")
         download_url = work_flow_template.get("downloadUrl")
-        if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+        if not _validate_trusted_url(download_url, _ALLOWED_TEMPLATE_DOWNLOAD_HOSTS):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
-        res = requests.get(download_url, timeout=5)
+        res = requests.get(download_url, timeout=5, allow_redirects=False)
         try:
             mk_instance = restricted_loads(res.content)
         except Exception as e:
@@ -1541,9 +1570,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ).auth_resource_batch([t.id for t in tool_model_list])
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+            if not _validate_trusted_url(download_callback_url, _ALLOWED_TEMPLATE_CALLBACK_HOSTS):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5, allow_redirects=False)
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
 
