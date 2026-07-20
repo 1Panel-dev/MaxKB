@@ -34,10 +34,3 @@ urlpatterns = [
     path('system/workspace/<str:workspace_id>/user_group/<str:user_group_id>/user_list/<int:current_page>/<int:page_size>', views.SystemUserGroupView.UserList.as_view()),
 ]
 
-'''
-用户组需要的接口 未完成的
-1.用户组添加成员
-2。用户组移除成员 还有批量删除
-3 根据空间id 用户组id  展示用户组下的成员 需要是分页的  还需要过滤
-
-'''

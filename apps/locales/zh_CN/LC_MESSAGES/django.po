@@ -9535,3 +9535,6 @@ msgstr "存在未授权的用户"
 
 msgid "Remove members from System User Group"
 msgstr "从系统用户组中移除成员"
+
+msgid "One or more user groups do not exist"
+msgstr "一个或多个用户组不存在"
