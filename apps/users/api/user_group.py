@@ -56,7 +56,8 @@ class UserGroupListApi(APIMixin):
     def get_response():
         return UserGroupListResponse
 
-    def get_parameters(self):
+    @staticmethod
+    def get_parameters():
         return [
             OpenApiParameter(
                 name='workspace_id',

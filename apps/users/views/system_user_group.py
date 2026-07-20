@@ -20,7 +20,7 @@ from users.serializers.user_group import (
     SystemUserGroupCreateSerializer,
     UserGroupAddMemberSerializer,
     UserGroupRemoveMemberSerializer,
-    UserGroupListPageSerializer
+    UserGroupListPageSerializer, SystemUserGroupModelSerializer
 )
 
 
