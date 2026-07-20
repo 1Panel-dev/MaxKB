@@ -1503,6 +1503,31 @@ class PermissionConstants(Enum):
                                                     parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                                     )
 
+    WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.READ,
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                        parent_group=[SystemGroup.USER_GROUP]
+                                        )
+    WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.CREATE,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                          parent_group=[SystemGroup.USER_GROUP]
+                                          )
+    WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.EDIT,
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                        parent_group=[SystemGroup.USER_GROUP]
+                                        )
+    WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.DELETE,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                          parent_group=[SystemGroup.USER_GROUP]
+                                          )
+    WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.ADD_MEMBER,
+                                              role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                              parent_group=[SystemGroup.USER_GROUP]
+                                              )
+    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.REMOVE_MEMBER,
+                                                 role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                 parent_group=[SystemGroup.USER_GROUP]
+                                                 )
+
     SHARED_TOOL_READ = Permission(group=Group.SYSTEM_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
                                   parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"
                                   )

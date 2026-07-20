@@ -9412,3 +9412,6 @@ msgstr ""
 
 msgid "Remove members from System User Group"
 msgstr ""
+
+msgid "One or more user groups do not exist"
+msgstr ""
