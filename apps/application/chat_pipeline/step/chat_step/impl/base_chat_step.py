@@ -456,6 +456,41 @@ class BaseChatStep(IChatStep):
 
         return None
 
+    @staticmethod
+    def _handle_memory_placeholder(message_list, chat_user_id, application_id):
+        user_system_prompt = None
+        filtered_message_list = []
+
+        for msg in message_list:
+            if isinstance(msg, SystemMessage):
+                if msg.content and isinstance(msg.content, str):
+                    if "{memory}" in msg.content:
+                        # 读取长期记忆数据
+                        long_term_memory = (
+                            QuerySet(ApplicationLongTermMemory).filter(chat_user_id=chat_user_id,
+                                                                       application_id=application_id).first()
+                        )
+                        if long_term_memory is not None:
+                            memory = long_term_memory.memory
+                        else:
+                            memory = ""
+
+                        # 替换占位符
+                        user_system_prompt = msg.content.replace("{memory}", memory)
+                        msg.content = user_system_prompt
+                    else:
+                        user_system_prompt = msg.content
+                elif msg.content and isinstance(msg.content, list):
+                    user_system_prompt = "".join(
+                        item.get("text", "") if isinstance(item, dict) else str(item) for item in msg.content
+                    )
+                else:
+                    user_system_prompt = str(msg.content) if msg.content else ""
+            else:
+                filtered_message_list.append(msg)
+
+        return user_system_prompt, filtered_message_list
+
     def get_stream_result(
         self,
         message_list: List[BaseMessage],
@@ -496,37 +531,15 @@ class BaseChatStep(IChatStep):
             return iter(
                 [
                     AIMessageChunk(
-                        _(
-                            "Sorry, the AI model is not configured. Please go to the application to set up the AI model first."
-                        )
+                        _("Sorry, the AI model is not configured. Please go to the application to set up the AI model first.")
                     )
                 ]
             ), False
         else:
-            user_system_prompt = None
-            filtered_message_list = []
-            long_term_memory = (
-                QuerySet(ApplicationLongTermMemory).filter(chat_user_id=chat_user_id, application_id=agent_id).first()
+            # 读取长期记忆数据，替换占位符：{memory}
+            user_system_prompt, filtered_message_list = self._handle_memory_placeholder(
+                message_list, chat_user_id, agent_id
             )
-            if long_term_memory is not None:
-                memory = long_term_memory.memory
-            else:
-                memory = ""
-
-            # print(chat_user_id, chat_user_type)
-            for msg in message_list:
-                if isinstance(msg, SystemMessage):
-                    if isinstance(msg.content, str):
-                        user_system_prompt = msg.content.replace("{memory}", memory)
-                        msg.content = user_system_prompt
-                    elif isinstance(msg.content, list):
-                        user_system_prompt = "".join(
-                            item.get("text", "") if isinstance(item, dict) else str(item) for item in msg.content
-                        )
-                    else:
-                        user_system_prompt = str(msg.content)
-                else:
-                    filtered_message_list.append(msg)
             runtime_user_id = get_runtime_user_id(chat_user_id=chat_user_id, chat_user_type=chat_user_type)
             # 过滤tool_id
             all_tool_ids = list(set((mcp_tool_ids or []) + (tool_ids or []) + (skill_tool_ids or [])))
@@ -554,7 +567,9 @@ class BaseChatStep(IChatStep):
             )
             if mcp_result:
                 return mcp_result, True
-            return chat_model.stream(message_list), True
+            if user_system_prompt:
+                filtered_message_list.insert(0, SystemMessage(content=user_system_prompt))
+            return chat_model.stream(filtered_message_list), True
 
     def execute_stream(
         self,
@@ -666,6 +681,10 @@ class BaseChatStep(IChatStep):
                 _("Sorry, the AI model is not configured. Please go to the application to set up the AI model first.")
             ), False
         else:
+            # 读取长期记忆数据，替换占位符：{memory}
+            user_system_prompt, filtered_message_list = self._handle_memory_placeholder(
+                message_list, chat_user_id, application_id
+            )
             runtime_user_id = get_runtime_user_id(chat_user_id=chat_user_id, chat_user_type=chat_user_type)
             # 过滤tool_id
             all_tool_ids = list(set((mcp_tool_ids or []) + (tool_ids or []) + (skill_tool_ids or [])))
@@ -684,8 +703,8 @@ class BaseChatStep(IChatStep):
                 skill_tool_ids,
                 mcp_output_enable,
                 chat_model,
-                "",
-                message_list,
+                user_system_prompt,
+                filtered_message_list,
                 application_id,
                 chat_id,
                 workspace_id,
@@ -693,7 +712,9 @@ class BaseChatStep(IChatStep):
             )
             if mcp_result:
                 return mcp_result, True
-            return chat_model.invoke(message_list), True
+            if user_system_prompt:
+                filtered_message_list.insert(0, SystemMessage(content=user_system_prompt))
+            return chat_model.invoke(filtered_message_list), True
 
     def execute_block(
         self,
