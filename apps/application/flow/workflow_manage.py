@@ -65,28 +65,29 @@ class NodeChunkManage:
         return self.node_chunk_list.__contains__(node_chunk)
 
     def pop(self):
-        if self.current_node_chunk is None:
-            try:
-                current_node_chunk = self.node_chunk_list.pop(0)
-                self.current_node_chunk = current_node_chunk
-            except IndexError as e:
-                pass
-        if self.current_node_chunk is not None:
-            try:
-                chunk = self.current_node_chunk.chunk_list.pop(0)
-                return chunk
-            except IndexError as e:
-                if self.current_node_chunk.is_end():
-                    self.current_node_chunk = None
-                    if self.work_flow.answer_is_not_empty():
-                        chunk = self.work_flow.base_to_response.to_stream_chunk_response(
-                            self.work_flow.params['chat_id'],
-                            self.work_flow.params['chat_record_id'],
-                            '\n\n', False, 0, 0)
-                        self.work_flow.append_answer('\n\n')
-                        return chunk
-                    return self.pop()
-        return None
+        while True:
+            if self.current_node_chunk is None:
+                try:
+                    current_node_chunk = self.node_chunk_list.pop(0)
+                    self.current_node_chunk = current_node_chunk
+                except IndexError as e:
+                    pass
+            if self.current_node_chunk is not None:
+                try:
+                    chunk = self.current_node_chunk.chunk_list.pop(0)
+                    return chunk
+                except IndexError as e:
+                    if self.current_node_chunk.is_end():
+                        self.current_node_chunk = None
+                        if self.work_flow.answer_is_not_empty():
+                            chunk = self.work_flow.base_to_response.to_stream_chunk_response(
+                                self.work_flow.params['chat_id'],
+                                self.work_flow.params['chat_record_id'],
+                                '\n\n', False, 0, 0)
+                            self.work_flow.append_answer('\n\n')
+                            return chunk
+                        continue
+            return None
 
 
 class WorkflowManage:
