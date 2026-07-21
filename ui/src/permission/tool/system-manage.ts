@@ -46,6 +46,7 @@ const systemManage = {
   folderEdit: () => false,
   folderAuth: () => false,
   folderDelete: () => false,
+  auth_to_workspace: () => false,
 }
 
 export default systemManage

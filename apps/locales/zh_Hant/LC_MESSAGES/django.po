@@ -9508,3 +9508,6 @@ msgstr "已生成新對話，請重新提問！"
 
 msgid "Token Index"
 msgstr "分詞索引"
+
+msgid "Authorize to Workspace"
+msgstr "授權工作空間"
