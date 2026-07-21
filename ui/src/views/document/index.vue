@@ -53,7 +53,7 @@
                 <el-button
                   @click="batchTokenize"
                   :disabled="multipleSelection.length === 0"
-                  v-if="permissionPrecise.doc_vector(id)"
+                  v-if="permissionPrecise.doc_token(id)"
                   >{{ $t('views.knowledge.customSegmentation.wordIndexing') }}
                 </el-button>
                 <el-button
@@ -585,7 +585,7 @@
                         type="primary"
                         text
                         @click.stop="cancelTask(row, TaskType.TOKENIZE)"
-                        v-if="permissionPrecise.doc_vector(id)"
+                        v-if="permissionPrecise.doc_token(id)"
                       >
                         <el-icon><Close /></el-icon>
                       </el-button>
@@ -597,7 +597,7 @@
                     placement="top"
                     v-else
                   >
-                    <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
+                    <span class="mr-4" v-if="permissionPrecise.doc_token(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
                         <AppIcon
                           iconName="app-document-wordIndexing"
@@ -752,7 +752,7 @@
                         type="primary"
                         text
                         @click.stop="cancelTask(row, TaskType.TOKENIZE)"
-                        v-if="permissionPrecise.doc_vector(id)"
+                        v-if="permissionPrecise.doc_token(id)"
                       >
                         <el-icon><Close /></el-icon>
                       </el-button>
@@ -764,7 +764,7 @@
                     placement="top"
                     v-else
                   >
-                    <span class="mr-4" v-if="permissionPrecise.doc_vector(id)">
+                    <span class="mr-4" v-if="permissionPrecise.doc_token(id)">
                       <el-button type="primary" text @click.stop="tokenizeDocument(row)">
                         <AppIcon
                           iconName="app-document-wordIndexing"

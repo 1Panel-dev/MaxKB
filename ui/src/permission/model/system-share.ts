@@ -1,51 +1,19 @@
-import {hasPermission} from '@/utils/permission/index'
-import {ComplexPermission} from '@/utils/permission/type'
-import {EditionConst, PermissionConst, RoleConst} from '@/utils/permission/data'
+import { hasPermission } from '@/utils/permission/index'
+import { ComplexPermission } from '@/utils/permission/type'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data'
 
 const share = {
   is_share: () => false,
   jump_read: () => false,
-  create: () =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        PermissionConst.SHARED_MODEL_CREATE,
-      ],
-      'OR',
-    ),
-  modify: () =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        PermissionConst.SHARED_MODEL_EDIT,
-      ],
-      'OR',
-    ),
-  paramSetting: () =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        PermissionConst.SHARED_MODEL_EDIT,
-      ],
-      'OR',
-    ),
-  delete: () =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        PermissionConst.SHARED_MODEL_DELETE,
-      ],
-      'OR',
-    ),
+  create: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_CREATE], 'OR'),
+  modify: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_EDIT], 'OR'),
+  paramSetting: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_EDIT], 'OR'),
+  delete: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_DELETE], 'OR'),
   auth: () => false,
   relate_map: () =>
-    hasPermission(
-      [
-        RoleConst.ADMIN,
-        PermissionConst.SHARED_MODEL_RELATE_RESOURCE_VIEW,
-      ],
-      'OR',
-    ),
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_RELATE_RESOURCE_VIEW], 'OR'),
+  auth_to_workspace: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_MODEL_TO_WORKSPACE], 'OR'),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

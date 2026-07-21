@@ -20,6 +20,7 @@ const workspaceShare = {
   jump_read: () => false,
   doc_create: () => false,
   doc_vector: () => false,
+  doc_token: () => false,
   doc_generate: () => false,
   doc_migrate: () => false,
   doc_edit: () => false,
@@ -60,6 +61,7 @@ const workspaceShare = {
   debug: () => false,
   workflow_edit: () => false,
   workflow_export: () => false,
+  auth_to_workspace: () => false,
 }
 
 export default workspaceShare
