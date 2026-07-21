@@ -9506,6 +9506,9 @@ msgstr "用户名称"
 msgid "New chat"
 msgstr "已生成新对话，请重新提问！"
 
+msgid "Token Index"
+msgstr "分词索引"
+
 msgid "IAM"
 msgstr "身份与权限"
 
