@@ -15,7 +15,7 @@
       <el-card shadow="always" class="border-r-8" style="--el-card-padding: 10px 16px 12px">
         <MdRenderer
           :source="prologue"
-          :send-message="sendMessage"
+          :send-message="chatMessage"
           reasoning_content=""
           :type="type"
           :selection="selection"
@@ -37,6 +37,9 @@ const props = defineProps<{
   sendMessage: (question: string, other_params_data?: any, chat?: chatType) => void
   selection?: boolean
 }>()
+const chatMessage = (question: string, type: 'old' | 'new', other_params_data?: any) => {
+  props.sendMessage(question, other_params_data)
+}
 
 const showAvatar = computed(() => {
   return props.application.show_avatar == undefined ? true : props.application.show_avatar
