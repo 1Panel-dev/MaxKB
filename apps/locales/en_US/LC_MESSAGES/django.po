@@ -9421,3 +9421,12 @@ msgstr ""
 
 msgid "One or more user groups do not exist"
 msgstr ""
+
+msgid "Role Management"
+msgstr ""
+
+msgid "Chat User Group"
+msgstr ""
+
+msgid "Chat User Auth"
+msgstr ""
