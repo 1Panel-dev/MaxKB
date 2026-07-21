@@ -97,6 +97,7 @@ class Group(Enum):
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OTHER = "OTHER"
     OVERVIEW = "OVERVIEW"
+    HOMEPAGE = "HOMEPAGE"
     OPERATION_LOG = "OPERATION_LOG"
 
     APPLICATION_FOLDER = "APPLICATION_FOLDER"
@@ -132,6 +133,7 @@ class SystemGroup(Enum):
 
 class WorkspaceGroup(Enum):
     SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
@@ -142,6 +144,7 @@ class WorkspaceGroup(Enum):
 
 
 class UserGroup(Enum):
+    HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
     MODEL = "MODEL"
@@ -220,6 +223,7 @@ class Operate(Enum):
     TRIGGER_DELETE = "READ+TRIGGER_DELETE"
     BATCH_DELETE = "READ+BATCH_DELETE"
     BATCH_MOVE = "READ+BATCH_MOVE"
+    TOKEN = "READ+TOKEN" # 分词索引
 
 
 class RoleGroup(Enum):
@@ -425,6 +429,7 @@ Permission_Label = {
     Group.USER_GROUP.value: _("User Group"),
     Group.CHAT_USER_AUTH.value: _("Chat User Auth"),
     Group.OVERVIEW.value: _("Overview"),
+    Group.HOMEPAGE.value: _("Home page"),
     Group.SYSTEM_TOOL.value: _("Tool"),
     Group.SYSTEM_MODEL.value: _("Model"),
     Group.SYSTEM_KNOWLEDGE.value: _("Knowledge"),
@@ -461,6 +466,8 @@ Permission_Label = {
     Group.APPLICATION_FOLDER.value: _("Folder"),
     Group.KNOWLEDGE_FOLDER.value: _("Folder"),
     Group.TOOL_FOLDER.value: _("Folder"),
+    # SystemGroup.RESOURCE.value: _("Resource"),
+    Operate.TOKEN.value: _("Token Index"),
     TopLevelGroup.IAM.value: _("IAM"),
     TopLevelGroup.RESOURCE.value: _("Resource"),
     TopLevelGroup.SHARED.value: _("Shared"),
@@ -552,6 +559,10 @@ class PermissionConstants(Enum):
     """
      权限枚举
     """
+    HOMEPAGE_READ = Permission(
+        group=Group.HOMEPAGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.HOMEPAGE, UserGroup.HOMEPAGE],
+    )
     KNOWLEDGE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
     )
@@ -942,6 +953,12 @@ class PermissionConstants(Enum):
         group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.REPLACE,
         role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
+        parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
+    )
+    KNOWLEDGE_DOCUMENT_TOKEN = Permission(
+        group=Group.KNOWLEDGE_DOCUMENT, operate=Operate.TOKEN,
+        role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
     KNOWLEDGE_HIT_TEST = Permission(
@@ -1665,6 +1682,10 @@ class PermissionConstants(Enum):
         group=Group.SYSTEM_KNOWLEDGE_DOCUMENT, operate=Operate.REPLACE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE], is_ee=settings.edition == "EE"
     )
+    SHARED_KNOWLEDGE_DOCUMENT_TOKEN = Permission(
+        group=Group.SYSTEM_KNOWLEDGE_DOCUMENT, operate=Operate.TOKEN, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.SHARED_KNOWLEDGE], is_ee=settings.edition == "EE"
+    )
     SHARED_KNOWLEDGE_TAG_READ = Permission(
         group=Group.SYSTEM_KNOWLEDGE_TAG, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.SHARED_KNOWLEDGE], is_ee=settings.edition == "EE"
@@ -1968,6 +1989,10 @@ class PermissionConstants(Enum):
     )
     RESOURCE_KNOWLEDGE_DOCUMENT_REPLACE = Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE_DOCUMENT, operate=Operate.REPLACE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
+    )
+    RESOURCE_KNOWLEDGE_DOCUMENT_TOKEN = Permission(
+        group=Group.SYSTEM_RES_KNOWLEDGE_DOCUMENT, operate=Operate.TOKEN, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.RESOURCE_KNOWLEDGE], is_ee=settings.edition == "EE"
     )
     RESOURCE_KNOWLEDGE_HIT_TEST = Permission(
