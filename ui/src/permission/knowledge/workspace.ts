@@ -215,6 +215,7 @@ const workspace = {
       ],
       'OR',
     ),
+  auth_to_workspace: () => false,
   export: (source_id: string) =>
     hasPermission(
       [
@@ -309,6 +310,21 @@ const workspace = {
           source_id,
         ),
         PermissionConst.KNOWLEDGE_DOCUMENT_VECTOR.getWorkspacePermissionWorkspaceManageRole,
+      ],
+      'OR',
+    ),
+  doc_token: (source_id: string) =>
+    hasPermission(
+      [
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.KNOWLEDGE.getKnowledgeWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
+        RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
+        PermissionConst.KNOWLEDGE_DOCUMENT_TOKEN.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_DOCUMENT_TOKEN.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
     ),
@@ -576,7 +592,9 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_TERMBASE_CREATE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_TERMBASE_CREATE.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
         PermissionConst.KNOWLEDGE_TERMBASE_CREATE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',
@@ -591,7 +609,9 @@ const workspace = {
           'AND',
         ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
-        PermissionConst.KNOWLEDGE_TERMBASE_DELETE.getKnowledgeWorkspaceResourcePermission(source_id),
+        PermissionConst.KNOWLEDGE_TERMBASE_DELETE.getKnowledgeWorkspaceResourcePermission(
+          source_id,
+        ),
         PermissionConst.KNOWLEDGE_TERMBASE_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
       'OR',

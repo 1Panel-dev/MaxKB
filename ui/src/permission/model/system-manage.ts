@@ -14,22 +14,14 @@ const systemManage = {
     ),
   create: () => false,
   jump_read: () => false,
-  modify: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_EDIT], 'OR'),
-  paramSetting: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_EDIT], 'OR'),
-  delete: () =>
-    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_DELETE], 'OR'),
+  modify: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_EDIT], 'OR'),
+  paramSetting: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_EDIT], 'OR'),
+  delete: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_DELETE], 'OR'),
 
-  auth: () => 
-    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_AUTH], 'OR'),
-  relate_map: () => 
-    hasPermission([
-      RoleConst.ADMIN,
-      PermissionConst.RESOURCE_MODEL_RELATE_RESOURCE_VIEW
-    ],'OR'
-    ),
-  
+  auth: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_AUTH], 'OR'),
+  relate_map: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_MODEL_RELATE_RESOURCE_VIEW], 'OR'),
+
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,
@@ -37,7 +29,7 @@ const systemManage = {
   folderAuth: () => false,
   folderDelete: () => false,
   debug: () => false,
-  
+  auth_to_workspace: () => false,
 }
 
 export default systemManage

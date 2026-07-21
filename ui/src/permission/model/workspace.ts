@@ -5,9 +5,14 @@ const workspace = {
   is_share: () =>
     hasPermission(
       new ComplexPermission(
-        [RoleConst.USER.getWorkspaceRole,RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
-        [PermissionConst.MODEL_READ.getWorkspacePermission,PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole],
-        [EditionConst.IS_EE],'OR'),
+        [RoleConst.USER.getWorkspaceRole, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+        [
+          PermissionConst.MODEL_READ.getWorkspacePermission,
+          PermissionConst.MODEL_READ.getWorkspacePermissionWorkspaceManageRole,
+        ],
+        [EditionConst.IS_EE],
+        'OR',
+      ),
       'OR',
     ),
   jump_read: () => false,
@@ -17,9 +22,9 @@ const workspace = {
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
         PermissionConst.MODEL_CREATE.getWorkspacePermission,
-        PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
   folderRead: () => true,
   folderManage: () => true,
@@ -30,39 +35,54 @@ const workspace = {
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
         PermissionConst.MODEL_CREATE.getWorkspacePermission,
-        PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_CREATE.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
-  modify: (source_id:string) =>
+  modify: (source_id: string) =>
     hasPermission(
       [
-        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
-        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
-  auth: (source_id:string) =>
+  auth: (source_id: string) =>
     hasPermission(
       [
-        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_RESOURCE_AUTHORIZATION.getModelWorkspaceResourcePermission(source_id),
-        PermissionConst.MODEL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_RESOURCE_AUTHORIZATION.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
-  relate_map: (source_id:string) =>
+  relate_map: (source_id: string) =>
     hasPermission(
       [
-        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_RELATE_RESOURCE_VIEW.getModelWorkspaceResourcePermission(source_id),
-        PermissionConst.MODEL_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_RELATE_RESOURCE_VIEW.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
   folderEdit: () =>
     hasPermission(
@@ -70,29 +90,39 @@ const workspace = {
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
         PermissionConst.MODEL_EDIT.getWorkspacePermission,
-        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
-  paramSetting: (source_id:string) =>
+  paramSetting: (source_id: string) =>
     hasPermission(
       [
-        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_EDIT.getModelWorkspaceResourcePermission(source_id),
-        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_EDIT.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
-  delete: (source_id:string) =>
+  delete: (source_id: string) =>
     hasPermission(
       [
-        new ComplexPermission([RoleConst.USER],[PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],[],'AND'),
+        new ComplexPermission(
+          [RoleConst.USER],
+          [PermissionConst.MODEL.getModelWorkspaceResourcePermission(source_id)],
+          [],
+          'AND',
+        ),
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         PermissionConst.MODEL_DELETE.getModelWorkspaceResourcePermission(source_id),
-        PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
   folderDelete: () =>
     hasPermission(
@@ -100,10 +130,11 @@ const workspace = {
         RoleConst.WORKSPACE_MANAGE.getWorkspaceRole,
         RoleConst.USER.getWorkspaceRole,
         PermissionConst.MODEL_DELETE.getWorkspacePermission,
-        PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole
+        PermissionConst.MODEL_DELETE.getWorkspacePermissionWorkspaceManageRole,
       ],
-      'OR'
+      'OR',
     ),
+  auth_to_workspace: () => false,
   debug: () => false,
 }
 

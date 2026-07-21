@@ -28,6 +28,8 @@ const share = {
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_CREATE], 'OR'),
   doc_vector: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_VECTOR], 'OR'),
+  doc_token: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_TOKEN], 'OR'),
   doc_generate: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_DOCUMENT_GENERATE], 'OR'),
   doc_migrate: () =>
@@ -87,6 +89,8 @@ const share = {
   auth: () => false,
   relate_map: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
+  auth_to_workspace: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_KNOWLEDGE_TO_WORKSPACE], 'OR'),
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,
