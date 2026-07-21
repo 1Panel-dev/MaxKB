@@ -1,239 +1,231 @@
 <template>
-  <div class="conversation-plus">
-    <div v-if="open && mode === 'drawer'" class="mask" @click="open = false" />
+  <div class="conversation-plus" :class="{ 'sidebar-open': sidebarOpen }">
+    <div class="conv-sidebar" :class="{ open: sidebarOpen }">
+      <Sidebar
+        :conversations="store.conversations.value"
+        :current-id="currentChatId"
+        :mode="sidebarMode"
+        :open="sidebarOpen"
+        @open="handleOpen"
+        @create="handleNewChat"
+        @delete="handleDelete"
+        @rename="handleRename"
+      />
+    </div>
 
-    <Sidebar
-      :open="open"
-      :mode="mode"
-      :conversations="conversations"
-      :current-id="currentChatId"
-      @update:open="open = $event"
-      @update:mode="mode = $event"
-      @switch="handleSwitch"
-      @delete="handleDelete"
-      @rename="handleRename"
-      @new="handleNewChat"
-    />
+    <div v-if="sidebarOpen && isMobile" class="conv-mask" @click="sidebarOpen = false" />
 
-    <ChatPanel
-      ref="panelRef"
-      :title="currentConversation?.name"
-      :icon="appInfo?.icon"
-    >
-      <template #header>
-        <slot name="header" />
-      </template>
-    </ChatPanel>
+    <div class="conv-main">
+      <ChatPanel
+        ref="panelRef"
+        :store="store"
+        :current-chat-id="currentChatId"
+        :app-info="store.appInfo.value"
+        @toggle="sidebarOpen = !sidebarOpen"
+        @send="handleSend"
+        @stop="store.cancelStream(currentChatId)"
+        @chat-opened="(id: string) => { currentChatId = id }"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick, provide } from 'vue'
-import Sidebar from './sidebar/index.vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
+import { useRoute } from 'vue-router'
+import { useChatStoreByType } from './common/use-chat-store'
+import type { ChatType } from './common/types'
 import ChatPanel from './chat-panel/index.vue'
-import { useChat } from './composable'
+import Sidebar from './sidebar/index.vue'
 
 type OpenMode = boolean | 'auto'
 type LayoutMode = 'push' | 'drawer' | 'auto'
 
 const props = withDefaults(
   defineProps<{
-    type?: 'CHAT' | 'DEBUG'
-    applicationId?: string
-    applicationDetails?: any
+    type?: ChatType
     defaultOpen?: OpenMode
     defaultMode?: LayoutMode
   }>(),
   {
     type: 'CHAT',
     defaultOpen: 'auto',
-    defaultMode: 'auto'
-  }
+    defaultMode: 'auto',
+  },
 )
 
 const emit = defineEmits<{
   openChat: [chatId: string]
   refresh: [chatId: string]
-  close: []
 }>()
+
+const route = useRoute()
+const applicationId = computed(() => route.params.id as string || route.params.applicationId as string || '')
+
+const store = useChatStoreByType(props.type, applicationId.value)
+provide('chat', store)
 
 const BREAKPOINT = 768
 const isMobile = ref(window.innerWidth < BREAKPOINT)
-
-// 计算初始 open 状态
-const getInitialOpen = (): boolean => {
-  if (props.defaultOpen === 'auto') {
-    return !isMobile.value
-  }
-  return props.defaultOpen as boolean
-}
-
-// 计算初始 mode 状态
-const getInitialMode = (): 'push' | 'drawer' => {
-  if (props.defaultMode === 'auto') {
-    return isMobile.value ? 'drawer' : 'push'
-  }
-  return props.defaultMode as 'push' | 'drawer'
-}
-
-const open = ref(getInitialOpen())
-const mode = ref<'push' | 'drawer'>(getInitialMode())
-
-const updateMobile = () => {
-  const wasMobile = isMobile.value
-  isMobile.value = window.innerWidth < BREAKPOINT
-  
-  // 只有 auto 模式才自动切换
-  if (props.defaultOpen === 'auto') {
-    // 移动端 -> 桌面端：展开
-    if (wasMobile && !isMobile.value) {
-      open.value = true
-    }
-    // 桌面端 -> 移动端：收起
-    if (!wasMobile && isMobile.value) {
-      open.value = false
-    }
-  }
-  
-  if (props.defaultMode === 'auto') {
-    mode.value = isMobile.value ? 'drawer' : 'push'
-  }
-}
-
+const updateMobile = () => { isMobile.value = window.innerWidth < BREAKPOINT }
 onMounted(() => window.addEventListener('resize', updateMobile))
-onUnmounted(() => window.removeEventListener('resize', updateMobile))
+onBeforeUnmount(() => window.removeEventListener('resize', updateMobile))
 
-const resolvedAppId = computed(() => props.applicationId || props.applicationDetails?.id)
-const {
-  appInfo,
-  conversations,
-  currentChatId,
-  currentConversation,
-  messages,
-  msgLoading,
-  streamLoading,
-  loadConversations,
-  openChat,
-  switchChat,
-  deleteChat,
-  renameChat,
-  sendMessage,
-  pushMessage,
-  stopStream,
-  chatRequest,
-  startStream,
-} = useChat(props.type, resolvedAppId)
+const sidebarMode = ref<'push' | 'drawer'>(
+  props.defaultMode === 'auto'
+    ? isMobile.value ? 'drawer' : 'push'
+    : props.defaultMode
+)
+
+const sidebarOpen = ref(
+  props.defaultOpen === 'auto' ? !isMobile.value : props.defaultOpen
+)
 
 const panelRef = ref()
+const currentChatId = ref('')
 
-provide('chat', {
-  messages,
-  msgLoading,
-  streamLoading,
-  currentChatId,
-  currentConversation,
-  conversations,
-  openChat,
-  switchChat,
-  deleteChat,
-  renameChat,
-  sendMessage,
-  pushMessage,
-  stopStream,
-  chat: chatRequest,
-  startStream,
-  toggleSidebar: () => { open.value = !open.value },
-  scrollToBottom: () => nextTick(() => panelRef.value?.scrollToBottom())
-})
+if (props.defaultOpen === 'auto') {
+  watch(isMobile, (mobile) => {
+    sidebarOpen.value = !mobile
+  })
+}
+
+if (props.defaultMode === 'auto') {
+  watch(isMobile, (mobile) => {
+    sidebarMode.value = mobile ? 'drawer' : 'push'
+  })
+}
 
 const handleNewChat = async () => {
-  const chatId = await openChat()
-  emit('openChat', chatId)
+  const id = await store.openChat(applicationId.value)
+  currentChatId.value = id
+  sidebarOpen.value = false
+  emit('openChat', id)
 }
 
-const handleSwitch = (id: string) => {
-  switchChat(id)
+const handleOpen = async (id: string) => {
+  currentChatId.value = id
+  await store.loadMessages(id)
+  sidebarOpen.value = false
 }
 
-const handleDelete = (id: string) => {
-  deleteChat(id)
+const handleDelete = async (id: string) => {
+  await store.deleteChat(id)
+  if (currentChatId.value === id) {
+    currentChatId.value = store.conversations.value[0]?.id || ''
+  }
 }
 
 const handleRename = (id: string, name: string) => {
-  renameChat(id, name)
+  store.renameChat(id, name)
 }
 
-const handleSend = async (text: string) => {
-  if (!text.trim() || streamLoading.value) return
-
+const handleSend = async (text: string, files?: any[]) => {
   if (!currentChatId.value) {
     await handleNewChat()
   }
 
-  messages.value.push({
+  const cid = currentChatId.value
+
+  store.pushMessage({
     role: 'USER',
-    content: [{ type: 'TEXT', content: text }],
-    id: ''
+    content: [{ type: 'QUESTION', content: text }],
+    id: '',
   })
 
-  try {
-    await sendMessage(text, {
-      onScroll: () => nextTick(() => panelRef.value?.scrollToBottom())
-    })
-    emit('refresh', currentChatId.value)
-  } catch {}
+  store.pushMessage(store.createAnswerMessage())
+  const aiMsg = store.messages.value[store.messages.value.length - 1]
+
+  const payload: any = { message: text, stream: true, re_chat: false }
+  if (files?.length) {
+    payload.image_list = files.filter((f: any) => /\.(jpg|jpeg|png|gif|bmp)$/i.test(f.name))
+    payload.document_list = files.filter((f: any) => /\.(pdf|docx|txt|xls|xlsx|md|html|csv)$/i.test(f.name))
+    payload.audio_list = files.filter((f: any) => /\.(mp3|wav|ogg|aac|m4a)$/i.test(f.name))
+    payload.video_list = files.filter((f: any) => /\.(mp4|avi|mkv|mov|flv|wmv)$/i.test(f.name))
+  }
+
+  store.startStream({
+    cid,
+    request: () => store.chat(cid, payload),
+    onStream: (chunk: any) => store.appendChunk(aiMsg, chunk),
+    onFinish: () => {
+      aiMsg.write_ed = true
+      emit('refresh', cid)
+    },
+    onFailure: () => {
+      aiMsg.write_ed = true
+    },
+  })
 }
 
-const handleScroll = () => {
-  // Load more messages if needed
-}
+const onResize = () => { isMobile.value = window.innerWidth < 768 }
 
 onMounted(() => {
-  if (props.type === 'CHAT') {
-    loadConversations()
-  }
+  window.addEventListener('resize', onResize)
+  store.loadConversations()
+  store.fetchAppInfo(applicationId.value)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', onResize)
+  store.cancelStream(currentChatId.value)
 })
 </script>
 
 <style scoped>
 .conversation-plus {
-  --sb-w: 260px;
-  --bg: #fff;
-  --bg2: #fafafa;
-  --bd: #dcdfe6;
-  --t1: #303133;
-  --t2: #606266;
-  --t3: #909399;
-  --hv: #f5f7fa;
-  --ac: #ecf5ff;
-  --ub: #d6e2ff;
-  --ab: #f5f7fa;
-  --mask: rgba(0, 0, 0, 0.4);
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --danger-bg: rgba(239, 68, 68, 0.15);
-  --danger-text: #ef4444;
-  --focus-border: #3370ff;
-
-  position: relative;
   display: flex;
-  width: 100%;
   height: 100%;
+  position: relative;
   overflow: hidden;
-  font-family: 'PingFang SC', 'Noto Sans SC', system-ui, sans-serif;
-  background: var(--bg);
-  color: var(--t1);
 }
 
-.mask {
+.conv-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--bd, #dcdfe6);
+  overflow-y: auto;
+  transition: width 0.25s ease, transform 0.25s ease;
+}
+
+.conv-sidebar:not(.open) {
+  width: 0;
+  overflow: hidden;
+  border-right: none;
+}
+
+.conv-mask {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 30;
-  background: var(--mask);
+  background: rgba(0, 0, 0, 0.4);
 }
 
-@media (max-width: 768px) {
-  .mask {
+.conv-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media only screen and (max-width: 768px) {
+  .conv-sidebar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 40;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+
+  .conv-sidebar.open {
+    transform: translateX(0);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .conversation-plus.sidebar-open .conv-mask {
     display: block;
   }
 }

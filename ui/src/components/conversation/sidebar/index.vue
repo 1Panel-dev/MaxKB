@@ -25,9 +25,6 @@
       <button @click="handleNew">
         <span>+</span> 新对话
       </button>
-      <button @click="toggleMode">
-        {{ mode === 'push' ? '抽屉模式' : '侧边模式' }}
-      </button>
     </div>
   </aside>
 </template>

@@ -99,10 +99,8 @@
       <div class="workflow-debug-container" v-if="showDebug">
         <div class="scrollbar-height">
           <Conversation 
-            :application-details="detail" 
             :type="'DEBUG'"
             :default-open="false"
-            :default-mode="'auto'"
           >
             <template #header>
               <el-button link @click="showDebug = false">
