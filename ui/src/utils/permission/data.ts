@@ -25,6 +25,7 @@ import { Permission, Role, Edition } from '@/utils/permission/type'
 //     CLEAR_POLICY = "READ+CLEAR_POLICY"
 const PermissionConst = {
   HOMEPAGE_READ: new Permission('HOMEPAGE:READ'),
+  HOMEPAGE_EXPORT: new Permission('HOMEPAGE:READ+EXPORT'),
   APPLICATION: new Permission('APPLICATION'),
   KNOWLEDGE: new Permission('KNOWLEDGE'),
   TOOL: new Permission('TOOL'),
