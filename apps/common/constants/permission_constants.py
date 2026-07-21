@@ -62,6 +62,7 @@ class Group(Enum):
 
     MODEL = "MODEL"
     SYSTEM_MODEL = "SYSTEM_MODEL"
+    # 资源管理
     SYSTEM_RES_MODEL = "SYSTEM_RESOURCE_MODEL"
     SYSTEM_RES_APPLICATION = "SYSTEM_RESOURCE_APPLICATION"
     SYSTEM_RES_APPLICATION_OVERVIEW = "SYSTEM_RESOURCE_APPLICATION_OVERVIEW"
@@ -103,9 +104,7 @@ class Group(Enum):
     APPLICATION_FOLDER = "APPLICATION_FOLDER"
     KNOWLEDGE_FOLDER = "KNOWLEDGE_FOLDER"
     TOOL_FOLDER = "TOOL_FOLDER"
-    # 身份与权限 Identity & Access Management
-    IAM = "IAM"
-
+    CHAT_USER_GROUP = "CHAT_USER_GROUP"
 
 
 class SystemGroup(Enum):
@@ -115,20 +114,26 @@ class SystemGroup(Enum):
     USER_MANAGEMENT = "USER_MANAGEMENT"
     ROLE = "ROLE"
     WORKSPACE = "WORKSPACE"
-    # RESOURCE = "RESOURCE"
+    USER_GROUP = "USER_GROUP"
+    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
+    # 资源管理
     RESOURCE_APPLICATION = "RESOURCE_APPLICATION"
     RESOURCE_KNOWLEDGE = "RESOURCE_KNOWLEDGE"
     RESOURCE_TOOL = "RESOURCE_TOOL"
     RESOURCE_MODEL = "RESOURCE_MODEL"
-    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
+    # 共享资源
     SHARED_KNOWLEDGE = "SHARED_KNOWLEDGE"
-    SHARED_MODEL = "SHARED_MODEL"
     SHARED_TOOL = "SHARED_TOOL"
+    SHARED_MODEL = "SHARED_MODEL"
     CHAT_USER = "CHAT_USER"
-    SYSTEM_SETTING = "SYSTEM_SETTING"
+    CHAT_USER_GROUP = "CHAT_USER_GROUP"
+    CHAT_USER_AUTH = "CHAT_USER_AUTH"
     OPERATION_LOG = "OPERATION_LOG"
+    APPEARANCE_SETTINGS = "APPEARANCE_SETTINGS"
+    LOGIN_AUTH = "LOGIN_AUTH"
+    EMAIL_SETTING = "EMAIL_SETTING"
+
     OTHER = "OTHER"
-    USER_GROUP = "USER_GROUP"
 
 
 class WorkspaceGroup(Enum):
@@ -163,11 +168,11 @@ class TopLevelGroup(Enum):
     # 共享资源
     SHARED = "SHARED"
     CHAT_CLIENT = "CHAT_CLIENT"
+    # 操作日志
+    OPERATION_LOG = "OPERATION_LOG"
     # 系统设置
     SYSTEM_SETTING = "SYSTEM_SETTING"
-    #操作日志
-    OPERATION_LOG = "OPERATION_LOG"
-    OTHER = "OTHER"
+
 
 
 class Operate(Enum):
@@ -223,8 +228,9 @@ class Operate(Enum):
     TRIGGER_DELETE = "READ+TRIGGER_DELETE"
     BATCH_DELETE = "READ+BATCH_DELETE"
     BATCH_MOVE = "READ+BATCH_MOVE"
-    TOKEN = "READ+TOKEN" # 分词索引
-    TO_WORKSPACE= "READ+TO_WORKSPACE" # 授权到空间
+    TOKEN = "READ+TOKEN"  # 分词索引
+    TO_WORKSPACE = "READ+TO_WORKSPACE"  # 授权到空间
+    SET_ROLE = "READ+SET_ROLE"  # 设置角色
 
 
 class RoleGroup(Enum):
@@ -346,9 +352,9 @@ class RoleConstants(Enum):
 
 
 Permission_Label = {
-    SystemGroup.SYSTEM_SETTING.value: _("System Setting"),
+    TopLevelGroup.SYSTEM_SETTING.value: _("System Setting"),
     SystemGroup.USER_MANAGEMENT.value: _("User Management"),
-    SystemGroup.ROLE.value: _("Role"),
+    SystemGroup.ROLE.value: _("Role Management"),
     SystemGroup.WORKSPACE.value: _("Workspace"),
     SystemGroup.RESOURCE_APPLICATION.value: _("Application"),
     SystemGroup.RESOURCE_KNOWLEDGE.value: _("Knowledge"),
@@ -474,6 +480,8 @@ Permission_Label = {
     TopLevelGroup.RESOURCE.value: _("Resource"),
     TopLevelGroup.SHARED.value: _("Shared"),
     TopLevelGroup.CHAT_CLIENT.value: _("Chat Client"),
+    SystemGroup.CHAT_USER_GROUP: _("Chat User Group"),
+    SystemGroup.CHAT_USER_AUTH: _("Chat User Auth"),
 }
 GROUPS = {
     TopLevelGroup.IAM: (
@@ -496,22 +504,25 @@ GROUPS = {
     ),
     TopLevelGroup.CHAT_CLIENT: (
         SystemGroup.CHAT_USER,
-    ),
-    TopLevelGroup.SYSTEM_SETTING: (
-        SystemGroup.SYSTEM_SETTING,
+        SystemGroup.CHAT_USER_GROUP,
+        SystemGroup.CHAT_USER_AUTH
     ),
     TopLevelGroup.OPERATION_LOG: (
         SystemGroup.OPERATION_LOG,
     ),
-    TopLevelGroup.OTHER: (
-        SystemGroup.OTHER,
-    )
+    TopLevelGroup.SYSTEM_SETTING: (
+        SystemGroup.APPEARANCE_SETTINGS,
+        SystemGroup.LOGIN_AUTH,
+        SystemGroup.EMAIL_SETTING,
+        SystemGroup.OTHER
+    ),
 }
 TOP_LEVEL_GROUP_MAP = {
     group: top_level
     for top_level, groups in GROUPS.items()
     for group in groups
 }
+
 
 class Permission:
     """
@@ -581,6 +592,7 @@ class PermissionConstants(Enum):
     TOOL = Permission(
         group=Group.TOOL, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
     )
+    # 用户管理
     USER_READ = Permission(
         group=Group.USER, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.USER_MANAGEMENT]
@@ -600,31 +612,39 @@ class PermissionConstants(Enum):
         group=Group.USER, operate=Operate.DELETE, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.USER_MANAGEMENT]
     )
-
+    USER_SET_ROLE = Permission(
+        group=Group.USER, operate=Operate.SET_ROLE, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.USER_MANAGEMENT], is_ee=settings.edition == "EE"
+    )
+    USER_IMPORT = Permission(
+        group=Group.USER, operate=Operate.IMPORT, role_list=[RoleConstants.ADMIN],
+        parent_group=[SystemGroup.USER_MANAGEMENT]
+    )
+    # 系统-用户组
     SYSTEM_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
-                                role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                parent_group=[SystemGroup.USER_GROUP]
-                                )
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                        parent_group=[SystemGroup.USER_GROUP]
+                                        )
     SYSTEM_USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
-                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                   parent_group=[SystemGroup.USER_GROUP]
-                                   )
-    SYSTEM_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
-                                 role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                 parent_group=[SystemGroup.USER_GROUP]
-                                 )
-    SYSTEM_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
-                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                   parent_group=[SystemGroup.USER_GROUP]
-                                   )
-    SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
-                                       role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                       parent_group=[SystemGroup.USER_GROUP]
-                                       )
-    SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
                                           role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                           parent_group=[SystemGroup.USER_GROUP]
                                           )
+    SYSTEM_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
+                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                        parent_group=[SystemGroup.USER_GROUP]
+                                        )
+    SYSTEM_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
+                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                          parent_group=[SystemGroup.USER_GROUP]
+                                          )
+    SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
+                                              role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                              parent_group=[SystemGroup.USER_GROUP]
+                                              )
+    SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
+                                                 role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                 parent_group=[SystemGroup.USER_GROUP]
+                                                 )
 
     MODEL_READ = Permission(
         group=Group.MODEL, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1045,6 +1065,7 @@ class PermissionConstants(Enum):
         resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANGE],
         parent_group=[WorkspaceGroup.KNOWLEDGE, UserGroup.KNOWLEDGE]
     )
+    # 资源授权
     APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION_READ = Permission(
         group=Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION, operate=Operate.READ,
         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
@@ -1089,13 +1110,13 @@ class PermissionConstants(Enum):
 
     EMAIL_SETTING_READ = Permission(
         group=Group.EMAIL_SETTING, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.SYSTEM_SETTING]
+        parent_group=[SystemGroup.EMAIL_SETTING]
     )
     EMAIL_SETTING_EDIT = Permission(
         group=Group.EMAIL_SETTING, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.SYSTEM_SETTING]
+        parent_group=[SystemGroup.EMAIL_SETTING]
     )
-
+    # 角色管理
     ROLE_READ = Permission(
         group=Group.ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[SystemGroup.ROLE]
@@ -1120,6 +1141,7 @@ class PermissionConstants(Enum):
         group=Group.ROLE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
         parent_group=[SystemGroup.ROLE]
     )
+    # 空间-角色管理
     WORKSPACE_ROLE_READ = Permission(
         group=Group.WORKSPACE_ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
         parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
@@ -1171,11 +1193,11 @@ class PermissionConstants(Enum):
     )
     LOGIN_AUTH_READ = Permission(
         group=Group.LOGIN_AUTH, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.SYSTEM_SETTING]
+        parent_group=[SystemGroup.LOGIN_AUTH]
     )
     LOGIN_AUTH_EDIT = Permission(
         group=Group.LOGIN_AUTH, operate=Operate.EDIT, role_list=[RoleConstants.ADMIN],
-        parent_group=[SystemGroup.SYSTEM_SETTING]
+        parent_group=[SystemGroup.LOGIN_AUTH]
     )
     APPLICATION_READ = Permission(group=Group.APPLICATION, operate=Operate.READ,
                                   role_list=[RoleConstants.ADMIN, RoleConstants.USER],
@@ -1213,10 +1235,10 @@ class PermissionConstants(Enum):
                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
                                     )
     APPLICATION_PUBLISH = Permission(group=Group.APPLICATION, operate=Operate.PUBLISH,
-                                    role_list=[RoleConstants.ADMIN, RoleConstants.USER],
-                                    resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
-                                    parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
-                                    )
+                                     role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+                                     resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
+                                     parent_group=[WorkspaceGroup.APPLICATION, UserGroup.APPLICATION],
+                                     )
     APPLICATION_BATCH_DELETE = Permission(group=Group.APPLICATION, operate=Operate.BATCH_DELETE,
                                           role_list=[RoleConstants.ADMIN, RoleConstants.USER],
                                           resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANGE],
@@ -1417,12 +1439,13 @@ class PermissionConstants(Enum):
 
     APPEARANCE_SETTINGS_READ = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.READ,
                                           role_list=[RoleConstants.ADMIN],
-                                          parent_group=[SystemGroup.SYSTEM_SETTING]
+                                          parent_group=[SystemGroup.APPEARANCE_SETTINGS]
                                           )
     APPEARANCE_SETTINGS_EDIT = Permission(group=Group.APPEARANCE_SETTINGS, operate=Operate.EDIT,
                                           role_list=[RoleConstants.ADMIN],
-                                          parent_group=[SystemGroup.SYSTEM_SETTING]
+                                          parent_group=[SystemGroup.APPEARANCE_SETTINGS]
                                           )
+    # 对话用户
     CHAT_USER_READ = Permission(group=Group.CHAT_USER, operate=Operate.READ,
                                 role_list=[RoleConstants.ADMIN],
                                 parent_group=[SystemGroup.CHAT_USER],
@@ -1448,37 +1471,37 @@ class PermissionConstants(Enum):
                                  parent_group=[SystemGroup.CHAT_USER],
                                  label=_('Set up user groups')
                                  )
-    USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
+    USER_GROUP_READ = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.READ,
                                  role_list=[RoleConstants.ADMIN],
-                                 parent_group=[SystemGroup.CHAT_USER]
+                                 parent_group=[SystemGroup.CHAT_USER_GROUP]
                                  )
-    USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
+    USER_GROUP_CREATE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.CREATE,
                                    role_list=[RoleConstants.ADMIN],
-                                   parent_group=[SystemGroup.CHAT_USER]
+                                   parent_group=[SystemGroup.CHAT_USER_GROUP]
                                    )
-    USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
+    USER_GROUP_EDIT = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.EDIT,
                                  role_list=[RoleConstants.ADMIN],
-                                 parent_group=[SystemGroup.CHAT_USER]
+                                 parent_group=[SystemGroup.CHAT_USER_GROUP]
                                  )
-    USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
+    USER_GROUP_DELETE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.DELETE,
                                    role_list=[RoleConstants.ADMIN],
-                                   parent_group=[SystemGroup.CHAT_USER]
+                                   parent_group=[SystemGroup.CHAT_USER_GROUP]
                                    )
-    USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
+    USER_GROUP_ADD_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.ADD_MEMBER,
                                        role_list=[RoleConstants.ADMIN],
-                                       parent_group=[SystemGroup.CHAT_USER]
+                                       parent_group=[SystemGroup.CHAT_USER_GROUP]
                                        )
-    USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.REMOVE_MEMBER,
+    USER_GROUP_REMOVE_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.REMOVE_MEMBER,
                                           role_list=[RoleConstants.ADMIN],
-                                          parent_group=[SystemGroup.CHAT_USER]
+                                          parent_group=[SystemGroup.CHAT_USER_GROUP]
                                           )
-    CHAT_USER_AUTH_READ = Permission(group=Group.CHAT_USER_AUTH, operate=Operate.READ,
+    CHAT_USER_AUTH_READ = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.READ,
                                      role_list=[RoleConstants.ADMIN],
-                                     parent_group=[SystemGroup.CHAT_USER]
+                                     parent_group=[SystemGroup.CHAT_USER_AUTH]
                                      )
     CHAT_USER_AUTH_EDIT = Permission(group=Group.CHAT_USER_AUTH, operate=Operate.EDIT,
                                      role_list=[RoleConstants.ADMIN],
-                                     parent_group=[SystemGroup.CHAT_USER]
+                                     parent_group=[SystemGroup.CHAT_USER_AUTH]
                                      )
     WORKSPACE_CHAT_USER_READ = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.READ,
                                           role_list=[RoleConstants.ADMIN],
@@ -1527,29 +1550,31 @@ class PermissionConstants(Enum):
                                                     )
 
     WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.READ,
-                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                        parent_group=[SystemGroup.USER_GROUP]
-                                        )
+                                                  role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                  parent_group=[SystemGroup.USER_GROUP]
+                                                  )
     WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.CREATE,
-                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                          parent_group=[SystemGroup.USER_GROUP]
-                                          )
+                                                    role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                    parent_group=[SystemGroup.USER_GROUP]
+                                                    )
     WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.EDIT,
-                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                        parent_group=[SystemGroup.USER_GROUP]
-                                        )
+                                                  role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                  parent_group=[SystemGroup.USER_GROUP]
+                                                  )
     WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.DELETE,
-                                          role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                          parent_group=[SystemGroup.USER_GROUP]
-                                          )
+                                                    role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                    parent_group=[SystemGroup.USER_GROUP]
+                                                    )
     WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.ADD_MEMBER,
-                                              role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                              parent_group=[SystemGroup.USER_GROUP]
-                                              )
-    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.REMOVE_MEMBER,
-                                                 role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                 parent_group=[SystemGroup.USER_GROUP]
-                                                 )
+                                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+                                                        parent_group=[SystemGroup.USER_GROUP]
+                                                        )
+    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP,
+                                                           operate=Operate.REMOVE_MEMBER,
+                                                           role_list=[RoleConstants.ADMIN,
+                                                                      RoleConstants.WORKSPACE_MANAGE],
+                                                           parent_group=[SystemGroup.USER_GROUP]
+                                                           )
 
     SHARED_TOOL_READ = Permission(group=Group.SYSTEM_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
                                   parent_group=[SystemGroup.SHARED_TOOL], is_ee=settings.edition == "EE"

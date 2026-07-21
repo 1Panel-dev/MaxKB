@@ -9544,3 +9544,12 @@ msgstr "从系统用户组中移除成员"
 
 msgid "One or more user groups do not exist"
 msgstr "一个或多个用户组不存在"
+
+msgid "Role Management"
+msgstr "角色管理"
+
+msgid "Chat User Group"
+msgstr "对话用户组"
+
+msgid "Chat User Auth"
+msgstr "对话用户认证"
