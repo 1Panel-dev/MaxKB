@@ -40,7 +40,20 @@
             @change="changeDayRangeHandle"
           />
         </div>
-        <el-button @click="exportHandle">
+        <el-button
+          @click="exportHandle"
+          v-hasPermission="
+            new ComplexPermission(
+              [RoleConst.USER.getWorkspaceRole, RoleConst.WORKSPACE_MANAGE.getWorkspaceRole],
+              [
+                PermissionConst.HOMEPAGE_EXPORT.getWorkspacePermissionWorkspaceManageRole,
+                PermissionConst.HOMEPAGE_EXPORT.getWorkspacePermission,
+              ],
+              [],
+              'OR',
+            )
+          "
+        >
           {{ $t('common.export') }}
         </el-button>
       </div>
@@ -270,13 +283,17 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch, computed, reactive } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import useStore from '@/stores'
 import { numberFormat } from '@/utils/common'
 import homeApi from '@/api/home-page/home'
-import { nowDate, beforeDay } from '@/utils/time'
-import { MsgSuccess, MsgConfirm, MsgError } from '@/utils/message'
+import { beforeDay, nowDate } from '@/utils/time'
+import { MsgError } from '@/utils/message'
 import { t } from '@/locales'
+import { EditionConst, PermissionConst, RoleConst } from '@/utils/permission/data.ts'
+import { hasPermission } from '@/utils/permission'
+import { ComplexPermission } from '@/utils/permission/type.ts'
+
 const { user } = useStore()
 const drawerVisible = ref(false)
 const activeName = ref('tokens_agent')
@@ -399,7 +416,6 @@ function handleSizeChange() {
 }
 
 function exportHandle() {
-  console.log('sss')
   if (activeName.value === 'tokens_agent') {
     homeApi
       .exportTokensRankings({ name: search_text.value, ...daterange.value }, loading)

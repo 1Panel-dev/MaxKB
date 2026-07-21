@@ -565,6 +565,10 @@ class PermissionConstants(Enum):
         group=Group.HOMEPAGE, operate=Operate.READ, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
         parent_group=[WorkspaceGroup.HOMEPAGE, UserGroup.HOMEPAGE],
     )
+    HOMEPAGE_EXPORT = Permission(
+        group=Group.HOMEPAGE, operate=Operate.EXPORT, role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+        parent_group=[WorkspaceGroup.HOMEPAGE, UserGroup.HOMEPAGE],
+    )
     KNOWLEDGE = Permission(
         group=Group.KNOWLEDGE, operate=Operate.SELF, role_list=[RoleConstants.ADMIN, RoleConstants.USER]
     )
