@@ -9382,3 +9382,6 @@ msgstr "User Name"
 
 msgid "New chat"
 msgstr "A new conversation has been generated. Please ask your question again！"
+
+msgid "Token Index"
+msgstr "Token Index"
