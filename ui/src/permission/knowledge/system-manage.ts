@@ -39,6 +39,8 @@ const systemManage = {
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_CREATE], 'OR'),
   doc_vector: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_VECTOR], 'OR'),
+  doc_token: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_TOKEN], 'OR'),
   doc_generate: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_DOCUMENT_GENERATE], 'OR'),
   doc_migrate: () =>
@@ -102,6 +104,7 @@ const systemManage = {
   auth: () => hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_AUTH], 'OR'),
   relate_map: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.RESOURCE_KNOWLEDGE_RELATE_RESOURCE_VIEW], 'OR'),
+  auth_to_workspace: () => false,
   folderRead: () => false,
   folderManage: () => false,
   folderCreate: () => false,

@@ -351,6 +351,7 @@ const workspace = {
       ],
       'OR',
     ),
+  auth_to_workspace: () => false,
 }
 
 export default workspace

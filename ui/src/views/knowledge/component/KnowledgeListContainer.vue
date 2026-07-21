@@ -283,7 +283,7 @@
                               {{ $t('views.document.generateQuestion.title') }}
                             </el-dropdown-item>
                             <el-dropdown-item
-                              v-if="isSystemShare"
+                              v-if="isSystemShare && permissionPrecise.auth_to_workspace()"
                               @click.stop="openAuthorizedWorkspaceDialog(item)"
                             >
                               <AppIcon iconName="app-lock" class="color-secondary"></AppIcon>

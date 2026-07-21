@@ -9509,6 +9509,9 @@ msgstr "已生成新对话，请重新提问！"
 msgid "Token Index"
 msgstr "分词索引"
 
+msgid "Authorize to Workspace"
+msgstr "授权工作空间"
+
 msgid "IAM"
 msgstr "身份与权限"
 

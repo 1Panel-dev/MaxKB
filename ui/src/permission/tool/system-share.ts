@@ -25,6 +25,8 @@ const share = {
   auth: () => false,
   relate_map: () =>
     hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_TOOL_RELATE_RESOURCE_VIEW], 'OR'),
+  auth_to_workspace: () =>
+    hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_TOOL_TO_WORKSPACE], 'OR'),
   record: () => hasPermission([RoleConst.ADMIN, PermissionConst.SHARED_TOOL_EXECUTE_RECORD], 'OR'),
   folderRead: () => false,
   folderManage: () => false,

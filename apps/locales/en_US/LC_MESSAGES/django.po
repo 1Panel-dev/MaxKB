@@ -9386,6 +9386,9 @@ msgstr "A new conversation has been generated. Please ask your question again！
 msgid "Token Index"
 msgstr "Token Index"
 
+msgid "Authorize to Workspace"
+msgstr ""
+
 msgid "IAM"
 msgstr "IAM"
 
