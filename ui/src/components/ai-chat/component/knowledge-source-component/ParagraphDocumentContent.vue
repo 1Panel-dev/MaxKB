@@ -66,7 +66,7 @@ const isPdf = computed(() => !!props.detail?.meta?.source_file_id)
 
 const pdfSrc = computed(() => {
   const fileId = props.detail?.meta?.source_file_id
-  return fileId ? `${window.MaxKB.prefix}/oss/file/${fileId}` : ''
+  return fileId ? `./oss/file/${fileId}` : ''
 })
 
 const overlayText = computed(() => {
