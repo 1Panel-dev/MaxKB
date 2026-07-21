@@ -87,7 +87,7 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
-        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+        @has_permissions(PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
@@ -137,7 +137,7 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
-        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+        @has_permissions(PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
@@ -187,7 +187,7 @@ class HomePageAPI(APIView):
             responses=RankingBaseExportAPI.get_response(),
             tags=[_("Home page")],
         )
-        @has_permissions(PermissionConstants.HOMEPAGE_READ.get_workspace_permission(),
+        @has_permissions(PermissionConstants.HOMEPAGE_EXPORT.get_workspace_permission(),
                          RoleConstants.USER.get_workspace_role(),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str):
