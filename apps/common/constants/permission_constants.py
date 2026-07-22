@@ -587,6 +587,14 @@ class Permission:
             (":" + self.resource_path) if self.resource_path is not None else '')
 
     def __eq__(self, other):
+        if isinstance(other, Permission):
+            return (
+                self.group == other.group
+                and self.operate == other.operate
+                and self.resource_path == other.resource_path
+                and self.parent_group == other.parent_group
+                and self.is_ee == other.is_ee
+            )
         return str(self) == str(other)
 
 
