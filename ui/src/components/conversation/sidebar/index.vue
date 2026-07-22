@@ -1,70 +1,137 @@
 <template>
   <aside class="sidebar" :class="[mode, { open }]">
-    <div class="sidebar-header">
-      <span class="sidebar-title">对话历史</span>
-    </div>
-
-    <div class="sidebar-nav">
-      <div v-if="conversations.length === 0" class="nav-empty">暂无对话</div>
-      <div
-        v-for="item in conversations"
-        :key="item.id"
-        class="nav-item"
-        :class="{ active: currentId === item.id }"
-        @click="handleSwitch(item.id)"
-      >
-        <span class="nav-item-text">{{ item.name || '新对话' }}</span>
-        <span class="nav-item-actions">
-          <button @click.stop="startRename(item)">重命名</button>
-          <button class="delete" @click.stop="handleDelete(item.id)">删除</button>
-        </span>
+    <div class="sidebar-content">
+      <!-- 应用信息 -->
+      <div class="sidebar-header">
+        <div class="app-info">
+          <el-avatar
+            v-if="store.appInfo.value?.icon"
+            shape="square"
+            :size="32"
+            style="background: none"
+          >
+            <img :src="store.appInfo.value.icon" alt="" />
+          </el-avatar>
+          <div v-else class="app-icon-placeholder">
+            <el-icon :size="20"><ChatDotRound /></el-icon>
+          </div>
+          <h4 class="app-name" :title="store.appInfo.value?.name || 'AI 助手'">
+            {{ store.appInfo.value?.name || 'AI 助手' }}
+          </h4>
+        </div>
       </div>
-    </div>
 
-    <div class="sidebar-footer">
-      <button @click="handleNew">
-        <span>+</span> 新对话
-      </button>
-      <button @click="toggleMode">
-        {{ mode === 'push' ? '抽屉模式' : '侧边模式' }}
-      </button>
+      <!-- 新建对话按钮 -->
+      <div class="sidebar-action">
+        <el-button type="primary" plain class="add-button" @click="handleNew">
+          <el-icon><Plus /></el-icon>
+          <span>新建对话</span>
+        </el-button>
+      </div>
+
+      <!-- 历史记录标题 -->
+      <div class="sidebar-title">
+        <span>对话历史</span>
+      </div>
+
+      <!-- 对话列表 -->
+      <div class="sidebar-nav">
+        <div v-if="store.conversations.value.length === 0" class="nav-empty">
+          <el-text type="info">暂无对话</el-text>
+        </div>
+        <div
+          v-for="item in store.conversations.value"
+          :key="item.id"
+          class="nav-item"
+          :class="{ active: store.currentChatId.value === item.id }"
+          @click="handleSwitch(item.id)"
+        >
+          <template v-if="renamingId === item.id">
+            <el-input
+              v-model="renameValue"
+              size="small"
+              class="rename-input"
+              @blur="confirmRename"
+              @keyup.enter="confirmRename"
+              @click.stop
+            />
+          </template>
+          <template v-else>
+            <span class="nav-item-text" :title="item.abstract || '新对话'">
+              {{ item.abstract || '新对话' }}
+            </span>
+            <div class="nav-item-actions" @click.stop>
+              <el-dropdown trigger="click">
+                <el-button text class="action-btn">
+                  <el-icon><MoreFilled /></el-icon>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click.stop="startRename(item)">
+                      <el-icon><Edit /></el-icon>
+                      重命名
+                    </el-dropdown-item>
+                    <el-dropdown-item @click.stop="handleDelete(item.id)">
+                      <el-icon><Delete /></el-icon>
+                      删除
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </template>
+        </div>
+      </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
 import { ref, nextTick } from 'vue'
+import { Plus, MoreFilled, Edit, Delete, ChatDotRound } from '@element-plus/icons-vue'
+import { useChatStoreByType } from '../common/use-chat-store'
+import type { ChatType } from '../common/types'
 
-const props = defineProps<{
-  open: boolean
-  mode: 'push' | 'drawer'
-  conversations: any[]
-  currentId: string
-}>()
+const props = withDefaults(
+  defineProps<{
+    type?: ChatType
+    open: boolean
+    mode: 'push' | 'drawer'
+  }>(),
+  { type: 'CHAT' },
+)
 
 const emit = defineEmits<{
   'update:open': [val: boolean]
   'update:mode': [val: 'push' | 'drawer']
-  switch: [id: string]
-  delete: [id: string]
-  rename: [id: string, name: string]
-  new: []
 }>()
+
+const store = useChatStoreByType(props.type)
 
 const renamingId = ref<string | null>(null)
 const renameValue = ref('')
 
-const handleSwitch = (id: string) => {
-  emit('switch', id)
+const handleSwitch = async (id: string) => {
+  store.currentChatId.value = id
+  await store.loadMessages(id)
   if (props.mode === 'drawer') emit('update:open', false)
 }
 
-const handleDelete = (id: string) => {
-  emit('delete', id)
+const handleDelete = async (id: string) => {
+  await store.deleteChat(id)
+  if (store.currentChatId.value === id) {
+    store.currentChatId.value = store.conversations.value[0]?.id || ''
+    if (store.currentChatId.value) {
+      await store.loadMessages(store.currentChatId.value)
+    }
+  }
 }
 
-const handleNew = () => {
-  emit('new')
+const handleNew = async () => {
+  const id = await store.openChat(store.applicationId.value)
+  store.currentChatId.value = id
+  await store.loadConversations()
+  await store.loadMessages(id)
 }
 
 const toggleMode = () => {
@@ -73,7 +140,7 @@ const toggleMode = () => {
 
 const startRename = (item: any) => {
   renamingId.value = item.id
-  renameValue.value = item.name || ''
+  renameValue.value = item.abstract || ''
   nextTick(() => {
     const input = document.querySelector('.rename-input') as HTMLInputElement
     input?.focus()
@@ -83,7 +150,7 @@ const startRename = (item: any) => {
 
 const confirmRename = () => {
   if (renamingId.value) {
-    emit('rename', renamingId.value, renameValue.value)
+    store.renameChat(renamingId.value, renameValue.value)
   }
   renamingId.value = null
 }
@@ -114,8 +181,9 @@ const confirmRename = () => {
 }
 
 .sidebar.push.open {
-  width: 260px;
-  min-width: 260px;
+  width: auto;
+  min-width: 200px;
+  max-width: 280px;
   border-right-width: 1px;
   pointer-events: auto;
 }
@@ -125,7 +193,7 @@ const confirmRename = () => {
   top: 0;
   left: 0;
   bottom: 0;
-  width: 260px;
+  width: 280px;
   z-index: 40;
   transform: translateX(-100%);
   transition:
@@ -138,28 +206,95 @@ const confirmRename = () => {
   box-shadow: 4px 0 16px rgba(0, 0, 0, 0.2);
 }
 
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
 .sidebar-header {
+  margin-bottom: 16px;
+}
+
+.app-info {
   display: flex;
   align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid var(--bd, #dcdfe6);
+  gap: 8px;
+}
+
+.app-icon-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  background: var(--el-color-primary-light-9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--el-color-primary);
+}
+
+.app-name {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 185px;
+}
+
+.sidebar-action {
+  margin-bottom: 16px;
+}
+
+.add-button {
+  width: 100%;
+  border: 1px solid var(--el-color-primary-light-5);
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+
+.add-button:hover {
+  background-color: var(--el-color-primary-light-8);
+  border-color: var(--el-color-primary-light-4);
+  color: var(--el-color-primary);
+}
+
+:deep(.el-button--primary.is-plain) {
+  border-color: var(--el-color-primary-light-5);
+  background-color: var(--el-color-primary-light-9);
+  color: var(--el-color-primary);
+}
+
+:deep(.el-button--primary.is-plain:hover) {
+  background-color: var(--el-color-primary-light-8);
+  border-color: var(--el-color-primary-light-4);
+  color: var(--el-color-primary);
 }
 
 .sidebar-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  margin-bottom: 8px;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--t1, #303133);
+  font-weight: 500;
+  color: var(--el-text-color-secondary);
 }
 
 .sidebar-nav {
   flex: 1;
   overflow-y: auto;
-  padding: 8px;
+  overflow-x: hidden;
 }
 
 .nav-empty {
-  font-size: 12px;
-  color: var(--t3, #909399);
   text-align: center;
   padding: 20px;
 }
@@ -172,6 +307,10 @@ const confirmRename = () => {
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.15s;
+  margin-bottom: 2px;
+  overflow: hidden;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .nav-item:hover {
@@ -180,86 +319,56 @@ const confirmRename = () => {
 
 .nav-item.active {
   background: rgba(0, 0, 0, 0.06);
+  font-weight: 500;
+  color: var(--el-text-color-primary);
+}
+
+.nav-item.active:hover {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .nav-item-text {
   flex: 1;
   min-width: 0;
-  font-size: 13px;
-  color: var(--t2, #606266);
+  font-size: 14px;
+  color: var(--el-text-color-regular);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .nav-item.active .nav-item-text {
-  color: var(--t1, #303133);
+  color: var(--el-text-color-primary);
   font-weight: 500;
 }
 
 .nav-item-actions {
-  display: none;
-  gap: 2px;
   flex-shrink: 0;
+  visibility: hidden;
 }
 
 .nav-item:hover .nav-item-actions,
-.nav-item.active .nav-item-actions {
-  display: flex;
+.nav-item:focus-within .nav-item-actions {
+  visibility: visible;
 }
 
-.nav-item-actions button {
-  width: 24px;
+.action-btn {
+  padding: 1px !important;
   height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--t3, #909399);
-  cursor: pointer;
-  font-size: 11px;
-  transition: background 0.12s, color 0.12s;
+  width: 24px;
 }
 
-.nav-item-actions button:hover {
-  background: rgba(0, 0, 0, 0.06);
-  color: var(--t2, #606266);
+.action-btn .el-icon {
+  font-size: 16px;
+  color: var(--el-text-color-secondary);
 }
 
-.nav-item-actions button.delete:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+.action-btn:hover .el-icon {
+  color: var(--el-text-color-primary);
 }
 
 .sidebar-footer {
-  padding: 8px;
-  border-top: 1px solid var(--bd, #dcdfe6);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.sidebar-footer button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 6px;
-  border: none;
-  background: transparent;
-  color: var(--t3, #909399);
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: background 0.12s, color 0.12s;
-}
-
-.sidebar-footer button:hover {
-  background: rgba(0, 0, 0, 0.04);
-  color: var(--t2, #606266);
+  padding-top: 8px;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 </style>

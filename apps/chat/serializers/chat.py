@@ -745,9 +745,11 @@ class OpenChatSerializers(serializers.Serializer):
         source = self.data.get("source")
         debug = self.data.get("debug")
         chat_id = str(uuid.uuid7())
-        ChatInfo(chat_id, chat_user_id, chat_user_type, ip_address, source, [],
-                 [],
-                 application_id, debug).set_cache()
+        chat_info = ChatInfo(chat_id, chat_user_id, chat_user_type, ip_address, source, [],
+                             [],
+                             application_id, debug)
+        chat_info.save_chat()
+        chat_info.set_cache()
         return chat_id
 
     def open_simple(self, application):
@@ -763,13 +765,15 @@ class OpenChatSerializers(serializers.Serializer):
                                                               target_type='KNOWLEDGE')]
 
         chat_id = str(uuid.uuid7())
-        ChatInfo(chat_id, chat_user_id, chat_user_type, ip_address, source, knowledge_id_list,
-                 [str(document.id) for document in
-                  QuerySet(Document).filter(
-                      knowledge_id__in=knowledge_id_list,
-                      is_active=False)],
-                 application_id,
-                 debug=debug).set_cache()
+        chat_info = ChatInfo(chat_id, chat_user_id, chat_user_type, ip_address, source, knowledge_id_list,
+                             [str(document.id) for document in
+                              QuerySet(Document).filter(
+                                  knowledge_id__in=knowledge_id_list,
+                                  is_active=False)],
+                             application_id,
+                             debug=debug)
+        chat_info.save_chat()
+        chat_info.set_cache()
         return chat_id
 
 

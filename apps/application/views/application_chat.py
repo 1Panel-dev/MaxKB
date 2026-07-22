@@ -16,7 +16,7 @@ from rest_framework.views import APIView
 
 from application.api.application_chat import ApplicationChatQueryAPI, ApplicationChatQueryPageAPI, \
     ApplicationChatExportAPI
-from application.models import ChatUserType, Application
+from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
 from chat.api.chat_api import ChatAPI, PromptGenerateAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
@@ -24,9 +24,10 @@ from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugCha
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
-from common.log.log import log
+from common.log.log import log, _get_ip_address
 from common.result import result
 from common.utils.common import query_params_to_single_dict
+
 
 def get_application_operation_object(application_id):
     application_model = QuerySet(model=Application).filter(id=application_id).first()
@@ -35,6 +36,7 @@ def get_application_operation_object(application_id):
             'name': application_model.name
         }
     return {}
+
 
 class ApplicationChat(APIView):
     authentication_classes = [TokenAuth]
@@ -132,9 +134,14 @@ class OpenView(APIView):
                                     CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
+        ip_address = _get_ip_address(request)
         return result.success(OpenChatSerializers(
             data={'workspace_id': workspace_id, 'application_id': application_id,
                   'chat_user_id': str(uuid.uuid7()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
+                  'ip_address': ip_address,
+                  'source': {
+                      'type': ChatSourceChoices.ONLINE.value}
+                ,
                   'debug': True}).open())
 
 
@@ -153,6 +160,7 @@ class ChatView(APIView):
     )
     def post(self, request: Request, chat_id: str):
         return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)
+
 
 class PromptGenerateView(APIView):
     authentication_classes = [TokenAuth]
@@ -175,5 +183,73 @@ class PromptGenerateView(APIView):
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     @log(menu='Application', operate='Generate prompt',
          get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')))
-    def post(self, request: Request, workspace_id: str, model_id:str, application_id: str):
-        return PromptGenerateSerializer(data={'workspace_id': workspace_id, 'model_id': model_id, 'application_id': application_id}).generate_prompt(instance=request.data)
+    def post(self, request: Request, workspace_id: str, model_id: str, application_id: str):
+        return PromptGenerateSerializer(data={'workspace_id': workspace_id, 'model_id': model_id,
+                                              'application_id': application_id}).generate_prompt(instance=request.data)
+
+
+class DebugHistoricalConversation(APIView):
+    authentication_classes = [TokenAuth]
+
+    class PageView(APIView):
+        authentication_classes = [TokenAuth]
+
+        def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
+            from chat.serializers.chat_record import HistoricalConversationSerializer, page_search, HistoryChatModel
+            from django.db.models import QuerySet
+            from application.models import Chat
+
+            queryset = QuerySet(Chat).filter(
+                application_id=application_id,
+                is_deleted=False
+            ).order_by('-update_time', 'id')
+
+            return result.success(
+                page_search(current_page, page_size, queryset, lambda r: HistoryChatModel(r).data)
+            )
+
+    class RecordPageView(APIView):
+        authentication_classes = [TokenAuth]
+
+        def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, current_page: int,
+                page_size: int):
+            from chat.serializers.chat_record import HistoricalConversationRecordSerializer
+
+            serializer = HistoricalConversationRecordSerializer(
+                data={
+                    'application_id': application_id,
+                    'chat_id': chat_id,
+                    'chat_user_id': str(uuid.uuid7()),
+                }
+            )
+            try:
+                return result.success(serializer.page(current_page, page_size))
+            except Exception:
+                from django.db.models import QuerySet
+                from application.models import ChatRecord
+                from common.db.search import page_search
+                from application.serializers.application_chat_record import ChatRecordSerializerModel
+
+                queryset = QuerySet(ChatRecord).filter(
+                    chat_id=chat_id,
+                ).order_by('create_time', 'id')
+
+                return result.success(
+                    page_search(current_page, page_size, queryset, lambda r: ChatRecordSerializerModel(r).data)
+                )
+
+    class Operate(APIView):
+        authentication_classes = [TokenAuth]
+
+        def delete(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
+            from django.db.models import QuerySet
+            from application.models import Chat
+            QuerySet(Chat).filter(id=chat_id, application_id=application_id).update(is_deleted=True)
+            return result.success(True)
+
+        def put(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
+            from django.db.models import QuerySet
+            from application.models import Chat
+            abstract = request.data.get('abstract', '')
+            QuerySet(Chat).filter(id=chat_id, application_id=application_id).update(abstract=abstract)
+            return result.success(True)

@@ -9,13 +9,15 @@ import ReasoningItem from './items/reasoning.vue'
 import ToolItem from './items/tool.vue'
 import FormItem from './items/form.vue'
 import FailureItem from './items/failure.vue'
+import QuestionItem from './items/question.vue'
 
 const typeRenderers: Record<string, any> = {
   TEXT: TextItem,
   REASONING: ReasoningItem,
   TOOL: ToolItem,
   FORM: FormItem,
-  FAILURE: FailureItem
+  FAILURE: FailureItem,
+  QUESTION: QuestionItem,
 }
 
 defineProps<{ content: any }>()
