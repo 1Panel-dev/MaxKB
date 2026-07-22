@@ -6,7 +6,6 @@
     @desc: 权限,角色 常量
 """
 from enum import Enum
-from functools import reduce
 from typing import List
 
 from django.db import models
@@ -137,11 +136,12 @@ class SystemGroup(Enum):
 
 
 class WorkspaceGroup(Enum):
-    SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
     ROLE = "ROLE"
     WORKSPACE = "WORKSPACE"
     USER_GROUP = "USER_GROUP"
     RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
+    CHAT_USER = "CHAT_USER"
+    CHAT_USER_GROUP = "CHAT_USER_GROUP"
     HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
@@ -373,7 +373,6 @@ Permission_Label = {
     SystemGroup.SHARED_TOOL.value: _("Tool"),
     SystemGroup.OPERATION_LOG.value: _("Operation Log"),
     SystemGroup.OTHER.value: _("Other"),
-    WorkspaceGroup.SYSTEM_MANAGEMENT.value: _("System Management"),
     WorkspaceGroup.APPLICATION.value: _("Application"),
     WorkspaceGroup.KNOWLEDGE.value: _("Knowledge"),
     WorkspaceGroup.MODEL.value: _("Model"),
@@ -467,7 +466,7 @@ Permission_Label = {
     Group.WORKSPACE_USER_GROUP.value: _("User Group"),
     Group.WORKSPACE_CHAT_USER.value: _("Chat User"),
     Group.WORKSPACE_WORKSPACE.value: _("Workspace"),
-    Group.WORKSPACE_ROLE.value: _("Role"),
+    Group.WORKSPACE_ROLE.value: _("Role Management"),
     Group.APPLICATION_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Application"),
     Group.KNOWLEDGE_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Knowledge"),
     Group.MODEL_WORKSPACE_USER_RESOURCE_PERMISSION.value: _("Model"),
@@ -480,15 +479,14 @@ Permission_Label = {
     Group.APPLICATION_FOLDER.value: _("Folder"),
     Group.KNOWLEDGE_FOLDER.value: _("Folder"),
     Group.TOOL_FOLDER.value: _("Folder"),
-    # SystemGroup.RESOURCE.value: _("Resource"),
     Operate.TOKEN.value: _("Token Index"),
     Operate.TO_WORKSPACE.value: _("Authorize to Workspace"),
     TopLevelGroup.IAM.value: _("IAM"),
     TopLevelGroup.RESOURCE.value: _("Resource"),
     TopLevelGroup.SHARED.value: _("Shared"),
     TopLevelGroup.CHAT_CLIENT.value: _("Chat Client"),
-    SystemGroup.CHAT_USER_GROUP: _("Chat User Group"),
-    SystemGroup.CHAT_USER_AUTH: _("Chat User Auth"),
+    SystemGroup.CHAT_USER_GROUP.value: _("Chat User Group"),
+    SystemGroup.CHAT_USER_AUTH.value: _("Chat User Auth"),
 }
 GROUPS = {
     TopLevelGroup.IAM: (
@@ -516,7 +514,9 @@ GROUPS = {
     TopLevelGroup.CHAT_CLIENT: (
         SystemGroup.CHAT_USER,
         SystemGroup.CHAT_USER_GROUP,
-        SystemGroup.CHAT_USER_AUTH
+        SystemGroup.CHAT_USER_AUTH,
+        WorkspaceGroup.CHAT_USER,
+        WorkspaceGroup.CHAT_USER_GROUP,
     ),
     TopLevelGroup.OPERATION_LOG: (
         SystemGroup.OPERATION_LOG,
@@ -1166,15 +1166,15 @@ class PermissionConstants(Enum):
     # 空间-角色管理
     WORKSPACE_ROLE_READ = Permission(
         group=Group.WORKSPACE_ROLE, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.ROLE]
     )
     WORKSPACE_ROLE_ADD_MEMBER = Permission(
         group=Group.WORKSPACE_ROLE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.ROLE]
     )
     WORKSPACE_ROLE_REMOVE_MEMBER = Permission(
         group=Group.WORKSPACE_ROLE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+        parent_group=[WorkspaceGroup.ROLE]
     )
 
     WORKSPACE_READ = Permission(
@@ -1203,15 +1203,15 @@ class PermissionConstants(Enum):
     )
     WORKSPACE_WORKSPACE_READ = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
+        parent_group=[WorkspaceGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_WORKSPACE_ADD_MEMBER = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.ADD_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
+        parent_group=[WorkspaceGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     WORKSPACE_WORKSPACE_REMOVE_MEMBER = Permission(
         group=Group.WORKSPACE_WORKSPACE, operate=Operate.REMOVE_MEMBER, role_list=[RoleConstants.ADMIN],
-        parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT], is_ee=settings.edition == "EE"
+        parent_group=[WorkspaceGroup.WORKSPACE], is_ee=settings.edition == "EE"
     )
     LOGIN_AUTH_READ = Permission(
         group=Group.LOGIN_AUTH, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
@@ -1527,75 +1527,74 @@ class PermissionConstants(Enum):
                                      )
     WORKSPACE_CHAT_USER_READ = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.READ,
                                           role_list=[RoleConstants.ADMIN],
-                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                          parent_group=[WorkspaceGroup.CHAT_USER]
                                           )
     WORKSPACE_CHAT_USER_CREATE = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.CREATE,
                                             role_list=[RoleConstants.ADMIN],
-                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                            parent_group=[WorkspaceGroup.CHAT_USER]
                                             )
     WORKSPACE_CHAT_USER_EDIT = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.EDIT,
                                           role_list=[RoleConstants.ADMIN],
-                                          parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                          parent_group=[WorkspaceGroup.CHAT_USER]
                                           )
     WORKSPACE_CHAT_USER_DELETE = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.DELETE,
                                             role_list=[RoleConstants.ADMIN],
-                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                            parent_group=[WorkspaceGroup.CHAT_USER]
                                             )
     WORKSPACE_CHAT_USER_GROUP = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.USER_GROUP,
                                            role_list=[RoleConstants.ADMIN],
-                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
+                                           parent_group=[WorkspaceGroup.CHAT_USER],
                                            label=_('Set up user groups')
                                            )
     WORKSPACE_USER_GROUP_READ = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN],
-                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                           parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                            )
     WORKSPACE_USER_GROUP_CREATE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.CREATE,
                                              role_list=[RoleConstants.ADMIN],
-                                             parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                             parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                              )
     WORKSPACE_USER_GROUP_EDIT = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.EDIT,
                                            role_list=[RoleConstants.ADMIN],
-                                           parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                           parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                            )
     WORKSPACE_USER_GROUP_DELETE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.DELETE,
                                              role_list=[RoleConstants.ADMIN],
-                                             parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                             parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                              )
     WORKSPACE_USER_GROUP_ADD_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.ADD_MEMBER,
                                                  role_list=[RoleConstants.ADMIN],
-                                                 parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                                 parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                                  )
     WORKSPACE_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.REMOVE_MEMBER,
                                                     role_list=[RoleConstants.ADMIN],
-                                                    parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
+                                                    parent_group=[WorkspaceGroup.CHAT_USER_GROUP]
                                                     )
-
-    WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
-                                                  role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                  parent_group=[SystemGroup.USER_GROUP]
+    # 空间-用户组
+    WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.READ,
+                                                  role_list=[RoleConstants.ADMIN],
+                                                  parent_group=[WorkspaceGroup.USER_GROUP]
                                                   )
-    WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
-                                                    role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                    parent_group=[SystemGroup.USER_GROUP]
+    WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.CREATE,
+                                                    role_list=[RoleConstants.ADMIN],
+                                                    parent_group=[WorkspaceGroup.USER_GROUP]
                                                     )
-    WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
-                                                  role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                  parent_group=[SystemGroup.USER_GROUP]
+    WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.EDIT,
+                                                  role_list=[RoleConstants.ADMIN],
+                                                  parent_group=[WorkspaceGroup.USER_GROUP]
                                                   )
-    WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
-                                                    role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                    parent_group=[SystemGroup.USER_GROUP]
+    WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.DELETE,
+                                                    role_list=[RoleConstants.ADMIN],
+                                                    parent_group=[WorkspaceGroup.USER_GROUP]
                                                     )
-    WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
-                                                        role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
-                                                        parent_group=[SystemGroup.USER_GROUP]
+    WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.ADD_MEMBER,
+                                                        role_list=[RoleConstants.ADMIN],
+                                                        parent_group=[WorkspaceGroup.USER_GROUP]
                                                         )
-    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP,
+    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP,
                                                            operate=Operate.REMOVE_MEMBER,
-                                                           role_list=[RoleConstants.ADMIN,
-                                                                      RoleConstants.WORKSPACE_MANAGE],
-                                                           parent_group=[SystemGroup.USER_GROUP]
+                                                           role_list=[RoleConstants.ADMIN],
+                                                           parent_group=[WorkspaceGroup.USER_GROUP]
                                                            )
 
     SHARED_TOOL_READ = Permission(group=Group.SYSTEM_TOOL, operate=Operate.READ, role_list=[RoleConstants.ADMIN],
@@ -2209,30 +2208,29 @@ class PermissionConstants(Enum):
         parent_group=[SystemGroup.OPERATION_LOG]
     )
 
+    def _build_workspace_permission(self, resource_name=None, resource_id_key=None):
+        def permission_factory(_, kwargs):
+            resource_path = f"/WORKSPACE/{kwargs.get('workspace_id')}"
+            if resource_name is not None and resource_id_key is not None:
+                resource_path = f"{resource_path}/{resource_name}/{kwargs.get(resource_id_key)}"
+            return Permission(group=self.value.group, operate=self.value.operate, resource_path=resource_path)
+
+        return permission_factory
+
     def get_workspace_application_permission(self):
-        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
-                                            resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/APPLICATION/{kwargs.get('application_id')}")
+        return self._build_workspace_permission(resource_name="APPLICATION", resource_id_key="application_id")
 
     def get_workspace_knowledge_permission(self):
-        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
-                                            resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/KNOWLEDGE/{kwargs.get('knowledge_id')}")
+        return self._build_workspace_permission(resource_name="KNOWLEDGE", resource_id_key="knowledge_id")
 
     def get_workspace_model_permission(self):
-        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
-                                            resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/MODEL/{kwargs.get('model_id')}")
+        return self._build_workspace_permission(resource_name="MODEL", resource_id_key="model_id")
 
     def get_workspace_tool_permission(self):
-        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
-                                            resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}/TOOL/{kwargs.get('tool_id')}")
+        return self._build_workspace_permission(resource_name="TOOL", resource_id_key="tool_id")
 
     def get_workspace_permission(self):
-        return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
-                                            resource_path=
-                                            f"/WORKSPACE/{kwargs.get('workspace_id')}")
+        return self._build_workspace_permission()
 
     def get_workspace_permission_workspace_manage_role(self):
         return lambda r, kwargs: Permission(group=self.value.group, operate=self.value.operate,
@@ -2252,9 +2250,7 @@ def get_default_permission_list_by_role(role: RoleConstants):
     :param role: 角色
     :return: 权限
     """
-    return list(map(lambda k: PermissionConstants[k],
-                    list(filter(lambda k: PermissionConstants[k].value.role_list.__contains__(role),
-                                PermissionConstants.__members__))))
+    return [permission for permission in PermissionConstants if role in permission.value.role_list]
 
 
 class RolePermissionMapping:
@@ -2271,10 +2267,11 @@ class WorkspaceUserRoleMapping:
 
 
 def get_default_role_permission_mapping_list():
-    role_permission_mapping_list = [
-        [RolePermissionMapping(role.value.name, PermissionConstants[k].value.__str__()) for role in
-         PermissionConstants[k].value.role_list] for k in PermissionConstants.__members__]
-    return reduce(lambda x, y: [*x, *y], role_permission_mapping_list, [])
+    return [
+        RolePermissionMapping(role.value.name, str(permission.value))
+        for permission in PermissionConstants
+        for role in permission.value.role_list
+    ]
 
 
 def get_default_workspace_user_role_mapping_list(user_role_list: list):
@@ -2286,8 +2283,8 @@ def get_permission_list_by_resource_group(resource_group: ResourcePermissionGrou
     """
     根据资源组获取权限
     """
-    return [PermissionConstants[k].value for k in PermissionConstants.__members__ if
-            PermissionConstants[k].value.resource_permission_group_list.__contains__(resource_group)]
+    return [permission.value for permission in PermissionConstants
+            if resource_group in permission.value.resource_permission_group_list]
 
 
 class ChatAuth:
