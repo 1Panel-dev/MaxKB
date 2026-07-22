@@ -137,7 +137,7 @@ class SystemGroup(Enum):
 
 
 class WorkspaceGroup(Enum):
-    #SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
     ROLE = "ROLE"
     WORKSPACE = "WORKSPACE"
     USER_GROUP = "USER_GROUP"
@@ -148,7 +148,6 @@ class WorkspaceGroup(Enum):
     MODEL = "MODEL"
     TOOL = "TOOL"
     TRIGGER = "TRIGGER"
-    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
     OTHER = "OTHER"
 
 
