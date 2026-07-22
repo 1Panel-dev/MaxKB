@@ -2,14 +2,11 @@
   <div class="conversation-plus" :class="{ 'sidebar-open': sidebarOpen }">
     <div class="conv-sidebar" :class="{ open: sidebarOpen }">
       <Sidebar
-        :conversations="store.conversations.value"
-        :current-id="currentChatId"
+        :type="type"
         :mode="sidebarMode"
         :open="sidebarOpen"
-        @open="handleOpen"
-        @create="handleNewChat"
-        @delete="handleDelete"
-        @rename="handleRename"
+        @update:open="sidebarOpen = $event"
+        @update:mode="sidebarMode = $event"
       />
     </div>
 
@@ -18,13 +15,11 @@
     <div class="conv-main">
       <ChatPanel
         ref="panelRef"
-        :store="store"
-        :current-chat-id="currentChatId"
+        :type="type"
         :app-info="store.appInfo.value"
         @toggle="sidebarOpen = !sidebarOpen"
         @send="handleSend"
-        @stop="store.cancelStream(currentChatId)"
-        @chat-opened="(id: string) => { currentChatId = id }"
+        @stop="store.cancelStream(store.currentChatId.value)"
       />
     </div>
   </div>
@@ -32,7 +27,6 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount, provide } from 'vue'
-import { useRoute } from 'vue-router'
 import { useChatStoreByType } from './common/use-chat-store'
 import type { ChatType } from './common/types'
 import ChatPanel from './chat-panel/index.vue'
@@ -59,10 +53,7 @@ const emit = defineEmits<{
   refresh: [chatId: string]
 }>()
 
-const route = useRoute()
-const applicationId = computed(() => route.params.id as string || route.params.applicationId as string || '')
-
-const store = useChatStoreByType(props.type, applicationId.value)
+const store = useChatStoreByType(props.type)
 provide('chat', store)
 
 const BREAKPOINT = 768
@@ -82,7 +73,6 @@ const sidebarOpen = ref(
 )
 
 const panelRef = ref()
-const currentChatId = ref('')
 
 if (props.defaultOpen === 'auto') {
   watch(isMobile, (mobile) => {
@@ -96,53 +86,61 @@ if (props.defaultMode === 'auto') {
   })
 }
 
-const handleNewChat = async () => {
-  const id = await store.openChat(applicationId.value)
-  currentChatId.value = id
-  sidebarOpen.value = false
-  emit('openChat', id)
-}
-
-const handleOpen = async (id: string) => {
-  currentChatId.value = id
-  await store.loadMessages(id)
-  sidebarOpen.value = false
-}
-
-const handleDelete = async (id: string) => {
-  await store.deleteChat(id)
-  if (currentChatId.value === id) {
-    currentChatId.value = store.conversations.value[0]?.id || ''
-  }
-}
-
-const handleRename = (id: string, name: string) => {
-  store.renameChat(id, name)
-}
-
 const handleSend = async (text: string, files?: any[]) => {
-  if (!currentChatId.value) {
-    await handleNewChat()
+  if (!store.currentChatId.value) {
+    const id = await store.openChat(store.applicationId.value)
+    store.currentChatId.value = id
+    await store.loadConversations()
   }
 
-  const cid = currentChatId.value
+  const cid = store.currentChatId.value
+
+  // 判断是否是第一条消息，如果是则更新对话的 abstract
+  const isFirstMessage = store.messages.value.length === 0
+  if (isFirstMessage && text.trim()) {
+    const abstract = text.trim().substring(0, 256)
+    await store.renameChat(cid, abstract)
+  }
+
+  // 分类文件
+  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
+  const docExts = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
+  const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
+  const videoExts = ['mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv']
+  const getExt = (name: string) => name.split('.').pop()?.toLowerCase() || ''
+  const byExt = (exts: string[]) => (f: any) => exts.includes(getExt(f.name))
+
+  const images = files?.filter(byExt(imageExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
+  const documents = files?.filter(byExt(docExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
+  const audio = files?.filter(byExt(audioExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
+  const video = files?.filter(byExt(videoExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
+  const other = files?.filter((f: any) => ![...imageExts, ...docExts, ...audioExts, ...videoExts].includes(getExt(f.name)))
+    .map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
+
+  // 构建 question content
+  const questionContent: any = { type: 'QUESTION', content: text }
+  if (images.length) questionContent.images = images
+  if (documents.length) questionContent.documents = documents
+  if (audio.length) questionContent.audio = audio
+  if (video.length) questionContent.video = video
+  if (other.length) questionContent.files = other
 
   store.pushMessage({
     role: 'USER',
-    content: [{ type: 'QUESTION', content: text }],
+    content: [questionContent],
     id: '',
   })
 
   store.pushMessage(store.createAnswerMessage())
   const aiMsg = store.messages.value[store.messages.value.length - 1]
 
+  // 构建 API payload
   const payload: any = { message: text, stream: true, re_chat: false }
-  if (files?.length) {
-    payload.image_list = files.filter((f: any) => /\.(jpg|jpeg|png|gif|bmp)$/i.test(f.name))
-    payload.document_list = files.filter((f: any) => /\.(pdf|docx|txt|xls|xlsx|md|html|csv)$/i.test(f.name))
-    payload.audio_list = files.filter((f: any) => /\.(mp3|wav|ogg|aac|m4a)$/i.test(f.name))
-    payload.video_list = files.filter((f: any) => /\.(mp4|avi|mkv|mov|flv|wmv)$/i.test(f.name))
-  }
+  if (images.length) payload.image_list = images
+  if (documents.length) payload.document_list = documents
+  if (audio.length) payload.audio_list = audio
+  if (video.length) payload.video_list = video
+  if (other.length) payload.other_list = other
 
   store.startStream({
     cid,
@@ -163,12 +161,12 @@ const onResize = () => { isMobile.value = window.innerWidth < 768 }
 onMounted(() => {
   window.addEventListener('resize', onResize)
   store.loadConversations()
-  store.fetchAppInfo(applicationId.value)
+  store.fetchAppInfo(store.applicationId.value)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', onResize)
-  store.cancelStream(currentChatId.value)
+  store.cancelStream(store.currentChatId.value)
 })
 </script>
 

@@ -1,8 +1,9 @@
 export interface Conversation {
   id: string
-  name: string
-  createTime?: string
-  updateTime?: string
+  abstract: string
+  application_id?: string
+  create_time?: string
+  update_time?: string
 }
 
 export interface ChatMessage {

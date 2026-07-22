@@ -10,19 +10,19 @@
       <div v-if="content.images?.length" class="q-section">
         <div class="q-images">
           <template v-for="(img, i) in content.images" :key="'img-'+i">
-            <img v-if="img.url" :src="img.url" class="q-img" />
+            <img v-if="img.url" :src="resetUrl(img.url)" class="q-img" />
           </template>
         </div>
       </div>
       <div v-if="content.audio?.length" class="q-section">
         <div v-for="(a, i) in content.audio" :key="'aud-'+i" class="q-audio-wrap">
-          <audio :src="a.url" controls />
+          <audio :src="resetUrl(a.url)" controls />
         </div>
       </div>
       <div v-if="content.video?.length" class="q-section">
         <div class="q-videos">
           <div v-for="(v, i) in content.video" :key="'vid-'+i" class="q-video-wrap">
-            <video :src="v.url" controls />
+            <video :src="resetUrl(v.url)" controls />
           </div>
         </div>
       </div>
@@ -39,6 +39,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { resetUrl } from '@/utils/common'
 
 const props = defineProps<{ content: any }>()
 
@@ -50,7 +51,7 @@ const bubbleClass = computed(() => {
 })
 
 const download = (file: any) => {
-  if (file.url) window.open(file.url, '_blank')
+  if (file.url) window.open(resetUrl(file.url), '_blank')
 }
 </script>
 

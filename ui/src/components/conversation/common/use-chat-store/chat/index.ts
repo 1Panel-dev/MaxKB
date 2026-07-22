@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { chatApi } from '../../../api'
 import { useStreamManager } from '../shared/use-stream-manager'
 import { useMessagePagination } from '../shared/use-message-pagination'
@@ -6,9 +7,38 @@ import { useConversationCrud } from '../shared/use-conversation-crud'
 import { aggregators } from '../../../index'
 import type { ChatMessage } from '../../types'
 
+// ── 共享状态（单例） ─────────────────────────────────────
+const appInfo = ref<{ name: string; icon: string } | null>(null)
+const currentChatId = ref('')
+
+// ── 会话 CRUD ─────────────────────────────────────────
+const { conversations, loadConversations, loadMore } = useConversationCrud({
+  pageConversationAPI: (query: any) => chatApi.history(query.currentPage, query.pageSize),
+})
+
+// ── 消息分页 ─────────────────────────────────────────
+const {
+  messages,
+  msgLoading,
+  hasMore,
+  loadMessages,
+  loadMoreMessages,
+  pushMessage,
+  resetMsgState,
+} = useMessagePagination({
+  pageConversationMessage: (cid: string, query: any) =>
+    chatApi.records(cid, query.currentPage, query.pageSize),
+})
+
+// ── 流式管理 ─────────────────────────────────────────
+const streamManager = useStreamManager()
+
+// ── 计算属性 ─────────────────────────────────────────
+const currentConversation = computed(() => conversations.value.find(c => c.id === currentChatId.value) || null)
+
 export function useChatStore() {
-  const appInfo = ref<{ name: string; icon: string } | null>(null)
-  const currentChatId = computed(() => '')
+  const route = useRoute()
+  const applicationId = computed(() => route.params.id as string || route.params.applicationId as string || '')
 
   const fetchAppInfo = async (applicationId?: string) => {
     try {
@@ -18,28 +48,6 @@ export function useChatStore() {
       // 静默处理
     }
   }
-
-  // ── 会话 CRUD ─────────────────────────────────────────
-  const { conversations, loadConversations, loadMore } = useConversationCrud({
-    pageConversationAPI: (query: any) => chatApi.history(query.currentPage, query.pageSize),
-  })
-
-  // ── 消息分页 ─────────────────────────────────────────
-  const {
-    messages,
-    msgLoading,
-    hasMore,
-    loadMessages,
-    loadMoreMessages,
-    pushMessage,
-    resetMsgState,
-  } = useMessagePagination({
-    pageConversationMessage: (cid: string, query: any) =>
-      chatApi.records(cid, query.currentPage, query.pageSize),
-  })
-
-  // ── 流式管理 ─────────────────────────────────────────
-  const streamManager = useStreamManager()
 
   // ── 流式聚合（内部） ─────────────────────────────────
   const appendChunk = (message: ChatMessage, chunk: any) => {
@@ -72,7 +80,7 @@ export function useChatStore() {
   })
 
   // ── 会话操作 ─────────────────────────────────────────
-  const openChat = async () => {
+  const openChat = async (appId?: string) => {
     const res = await chatApi.open()
     return res.data
   }
@@ -84,9 +92,9 @@ export function useChatStore() {
   }
 
   const renameChat = async (id: string, name: string) => {
-    await chatApi.modifyChat(id, { name })
+    await chatApi.modifyChat(id, { abstract: name })
     const c = conversations.value.find((x) => x.id === id)
-    if (c) c.name = name
+    if (c) c.abstract = name
   }
 
   const chat = (chatId: string, data: any) => chatApi.chat(chatId, data)
@@ -100,11 +108,15 @@ export function useChatStore() {
   return {
     // 状态
     appInfo,
+    currentChatId,
+    currentConversation,
     conversations,
     messages,
     msgLoading,
     hasMore,
-    streamLoading: computed(() => false),
+    streamLoading: computed(() => streamManager.getStreamLoading(currentChatId.value)),
+    // 路由
+    applicationId,
     // 会话
     loadConversations,
     loadMore,

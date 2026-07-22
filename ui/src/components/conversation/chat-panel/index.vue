@@ -10,7 +10,7 @@
         <img v-if="appInfo?.icon" :src="appInfo.icon" class="header-icon" />
         <div class="header-text">
           <span v-if="appInfo?.name" class="header-app-name">{{ appInfo.name }}</span>
-          <span class="header-title">{{ currentConversation?.name || '新对话' }}</span>
+          <span class="header-title">{{ currentConversation?.abstract || '新对话' }}</span>
         </div>
       </div>
       <slot name="header" />
@@ -38,60 +38,214 @@
     </div>
 
     <footer class="panel-input">
-      <div v-if="fileList.length" class="file-thumbs">
-        <div v-for="(f, i) in fileList" :key="f.uid" class="file-thumb">
-          <img v-if="f.previewUrl" :src="f.previewUrl" class="thumb-img" />
-          <span v-else class="thumb-icon">📎</span>
-          <span class="thumb-name">{{ f.name }}</span>
-          <button class="thumb-rm" @click="removeFile(i)">✕</button>
-        </div>
-      </div>
+      <div class="operate-textarea">
+        <!-- 文件预览区域 -->
+        <div v-if="fileList.length" class="file-preview-list">
+          <!-- 图片预览 -->
+          <el-space wrap>
+            <template v-for="(f, i) in imageFiles" :key="f.uid">
+              <div
+                class="file-item file-image"
+                @mouseenter="showDelete = f.url || ''"
+                @mouseleave="showDelete = ''"
+              >
+                <div
+                  v-if="showDelete === f.url"
+                  class="delete-icon"
+                  @click="removeFile(i)"
+                >
+                  <el-icon style="font-size: 16px; top: 2px">
+                    <CircleCloseFilled />
+                  </el-icon>
+                </div>
+                <el-image
+                  v-if="f.url"
+                  :src="f.url"
+                  fit="cover"
+                  style="width: 40px; height: 40px; display: block"
+                  class="border-r-6"
+                />
+                <el-image
+                  v-else-if="f.previewUrl"
+                  :src="f.previewUrl"
+                  fit="cover"
+                  style="width: 40px; height: 40px; display: block"
+                  class="border-r-6"
+                />
+              </div>
+            </template>
+          </el-space>
 
-      <div class="input-wrapper" :class="{ focused }">
-        <input
-          ref="fileInputRef"
-          type="file"
-          multiple
-          :accept="acceptList"
-          style="display: none"
-          @change="handleFileSelect"
-        />
-        <textarea
+          <!-- 文档预览 -->
+          <el-row :gutter="10">
+            <el-col
+              v-for="(f, i) in documentFiles"
+              :key="f.uid"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+            >
+              <el-card
+                shadow="never"
+                style="--el-card-padding: 8px; max-width: 100%"
+                class="file-card"
+              >
+                <div
+                  class="flex-between align-center"
+                  @mouseenter="showDelete = f.url || ''"
+                  @mouseleave="showDelete = ''"
+                >
+                  <div class="flex align-center">
+                    <img :src="getFileIcon(f.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="f.name">
+                      {{ f.name }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="showDelete === f.url"
+                    class="delete-icon"
+                    @click="removeFile(i)"
+                  >
+                    <el-icon style="font-size: 16px; top: 2px">
+                      <CircleCloseFilled />
+                    </el-icon>
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <!-- 音频预览 -->
+          <el-row :gutter="10">
+            <el-col
+              v-for="(f, i) in audioFiles"
+              :key="f.uid"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb-8"
+            >
+              <el-card shadow="never" style="--el-card-padding: 8px" class="file-card">
+                <div
+                  class="flex-between align-center"
+                  @mouseenter="showDelete = f.url || ''"
+                  @mouseleave="showDelete = ''"
+                >
+                  <div class="flex align-center">
+                    <img :src="getFileIcon(f.name)" alt="" width="24" />
+                    <div class="ml-4 ellipsis-1" :title="f.name">
+                      {{ f.name }}
+                    </div>
+                  </div>
+                  <div
+                    v-if="showDelete === f.url"
+                    class="delete-icon"
+                    @click="removeFile(i)"
+                  >
+                    <el-icon style="font-size: 16px; top: 2px">
+                      <CircleCloseFilled />
+                    </el-icon>
+                  </div>
+                </div>
+              </el-card>
+            </el-col>
+          </el-row>
+
+          <!-- 视频预览 -->
+          <el-space wrap>
+            <template v-for="(f, i) in videoFiles" :key="f.uid">
+              <div
+                class="file-item file-image"
+                @mouseenter="showDelete = f.url || ''"
+                @mouseleave="showDelete = ''"
+              >
+                <div
+                  v-if="showDelete === f.url"
+                  class="delete-icon"
+                  @click="removeFile(i)"
+                >
+                  <el-icon style="font-size: 16px; top: 2px">
+                    <CircleCloseFilled />
+                  </el-icon>
+                </div>
+                <video
+                  v-if="f.url"
+                  :src="f.url"
+                  controls
+                  style="width: 100px; display: block"
+                  class="border-r-6"
+                  autoplay
+                />
+              </div>
+            </template>
+          </el-space>
+        </div>
+
+        <!-- 输入框 -->
+        <el-input
           ref="inputRef"
           v-model="question.content"
-          :disabled="streamLoading"
+          :autosize="{ minRows: 1, maxRows: 10 }"
+          type="textarea"
           :placeholder="placeholder"
-          @keydown="onKeydown"
+          :maxlength="100000"
+          @keydown.enter="handleKeydown"
           @paste="handlePaste"
-          @focus="focused = true"
-          @blur="focused = false"
-          rows="1"
+          class="chat-operate-textarea"
+          clearable
         />
-        <button
-          class="upload-btn"
-          :disabled="streamLoading"
-          @click="fileInputRef?.click()"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M14 10v2.5a1.5 1.5 0 01-1.5 1.5h-9A1.5 1.5 0 012 12.5V10M8 2v8.5M5 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button
-          v-if="!streamLoading"
-          class="send-btn"
-          :class="{ active: canSend }"
-          :disabled="!canSend"
-          @click="send"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M8 14V2M3 7l5-5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-        <button v-else class="send-btn stop" @click="$emit('stop')">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-            <rect x="2" y="2" width="10" height="10" rx="2" fill="currentColor"/>
-          </svg>
-        </button>
+
+        <!-- 操作栏 -->
+        <div class="operate flex-between">
+          <div></div>
+          <div class="flex align-center">
+            <input
+              ref="fileInputRef"
+              type="file"
+              multiple
+              :accept="acceptList"
+              style="display: none"
+              @change="handleFileSelect"
+            />
+            <el-tooltip
+              effect="dark"
+              placement="top"
+              popper-class="upload-tooltip-width"
+            >
+              <template #content>
+                <div class="break-all pre-wrap">
+                  支持上传图片、文档、音频、视频文件，最多{{ maxFiles }}个，单个文件最大{{ maxSizeMB }}MB
+                </div>
+              </template>
+              <el-button
+                text
+                :disabled="streamLoading || fileList.length >= maxFiles"
+                @click="fileInputRef?.click()"
+              >
+                <el-icon :size="20"><Paperclip /></el-icon>
+              </el-button>
+            </el-tooltip>
+            <el-divider direction="vertical" />
+            <el-button
+              text
+              class="sent-button"
+              :disabled="!canSend"
+              @click="send"
+            >
+              <el-icon v-if="!streamLoading" :size="20">
+                <Promotion />
+              </el-icon>
+              <el-icon v-else :size="20" @click.stop="$emit('stop')">
+                <VideoPause />
+              </el-icon>
+            </el-button>
+          </div>
+        </div>
       </div>
     </footer>
   </main>
@@ -99,33 +253,33 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, watch, onMounted, reactive } from 'vue'
+import { CircleCloseFilled, Paperclip, Promotion, VideoPause } from '@element-plus/icons-vue'
 import ContentList from '../content-list/index.vue'
 import Loading from '../loading/index.vue'
 import { Scroll } from '../index'
-import type { ChatMessage } from '../common/types'
+import { useChatStoreByType } from '../common/use-chat-store'
+import type { ChatType } from '../common/types'
 
 const props = withDefaults(
   defineProps<{
-    store: any
-    currentChatId?: string
+    type?: ChatType
     appInfo?: { name: string; icon: string } | null
     showHeader?: boolean
   }>(),
-  { showHeader: true },
+  { type: 'CHAT', showHeader: true },
 )
 
 const emit = defineEmits<{
   toggle: []
   send: [text: string, files?: any[]]
   stop: []
-  chatOpened: [chatId: string]
 }>()
 
-const { messages, msgLoading, streamLoading, currentConversation } = props.store
+const store = useChatStoreByType(props.type)
+const { messages, msgLoading, streamLoading, currentConversation, currentChatId } = store
 
-const focused = ref(false)
 const question = ref<any>({ content: '' })
-const inputRef = ref<HTMLTextAreaElement | null>(null)
+const inputRef = ref<any>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const msgBoxRef = ref<HTMLElement | null>(null)
 let scroll: InstanceType<typeof Scroll> | null = null
@@ -138,6 +292,9 @@ const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
 const acceptList = [...imageExts, ...documentExts, ...videoExts, ...audioExts].map(e => `.${e}`).join(',')
 const getExt = (name: string) => name.split('.').pop()?.toLowerCase() || ''
 const isImage = (name: string) => imageExts.includes(getExt(name))
+const isDocument = (name: string) => documentExts.includes(getExt(name))
+const isAudio = (name: string) => audioExts.includes(getExt(name))
+const isVideo = (name: string) => videoExts.includes(getExt(name))
 
 interface FileItem {
   uid: number; name: string; size: number; raw: File
@@ -148,13 +305,41 @@ const fileList = ref<FileItem[]>([])
 const uploadPromises = ref<Promise<any>[]>([])
 const maxFiles = 10
 const maxSizeMB = 50
+const showDelete = ref('')
 
 const placeholder = computed(() => {
   if (streamLoading.value) return '正在回复中...'
   return '输入消息...'
 })
 
-const canSend = computed(() => question.value.content.trim() && !streamLoading.value)
+const canSend = computed(() => (question.value.content.trim() || fileList.value.length > 0) && !streamLoading.value)
+
+// 分类文件列表
+const imageFiles = computed(() => fileList.value.filter(f => isImage(f.name)))
+const documentFiles = computed(() => fileList.value.filter(f => isDocument(f.name)))
+const audioFiles = computed(() => fileList.value.filter(f => isAudio(f.name)))
+const videoFiles = computed(() => fileList.value.filter(f => isVideo(f.name)))
+
+const getFileIcon = (name: string) => {
+  const ext = getExt(name)
+  const iconMap: Record<string, string> = {
+    pdf: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    doc: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    docx: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    xls: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    xlsx: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    txt: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    md: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    html: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    csv: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg',
+    mp3: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
+    wav: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
+    ogg: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
+    aac: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
+    m4a: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
+  }
+  return iconMap[ext] || 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg'
+}
 
 const validateFile = (file: File): boolean => {
   if (fileList.value.length >= maxFiles) return false
@@ -177,12 +362,12 @@ const addFile = (file: File) => {
 
   const uploadPromise = (async () => {
     try {
-      let cid = props.currentChatId
+      let cid = currentChatId.value
       if (!cid) {
-        cid = await props.store.openChat()
-        emit('chatOpened', cid)
+        cid = await store.openChat(store.applicationId.value)
+        currentChatId.value = cid
       }
-      const result = await props.store.uploadFile(file, cid)
+      const result = await store.uploadFile(file, cid)
       item.url = result.url
       const parts = result.url.split('/')
       item.file_id = parts[parts.length - 1]
@@ -234,7 +419,7 @@ const categorize = () => {
   const images: any[] = []; const documents: any[] = []
   const audio: any[] = []; const video: any[] = []; const files: any[] = []
   fileList.value.forEach(f => {
-    const entry = { url: f.url || '', name: f.name }
+    const entry = { url: f.url || '', file_id: f.file_id || '', name: f.name }
     if (isImage(f.name)) images.push(entry)
     else if (documentExts.includes(getExt(f.name))) documents.push(entry)
     else if (audioExts.includes(getExt(f.name))) audio.push(entry)
@@ -267,8 +452,32 @@ const send = async () => {
 }
 
 // ── 键盘 ────────────────────────────────────────────────
-const onKeydown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send() }
+const handleKeydown = (e: KeyboardEvent) => {
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+    navigator.userAgent,
+  )
+  // 如果是移动端，且按下回车键，不直接发送
+  if (isMobile && e.key === 'Enter') {
+    return
+  }
+  if (!e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+    e.preventDefault()
+    if (canSend.value && !e.isComposing) {
+      send()
+    }
+  } else {
+    // 如果同时按下ctrl/shift/cmd/opt +enter，则会换行
+    const textarea = inputRef.value?.$el?.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+    if (textarea) {
+      const startPos = textarea.selectionStart
+      const endPos = textarea.selectionEnd
+      e.preventDefault()
+      question.value.content = question.value.content.slice(0, startPos) + '\n' + question.value.content.slice(endPos)
+      nextTick(() => {
+        textarea.setSelectionRange(startPos + 1, startPos + 1)
+      })
+    }
+  }
 }
 
 // ── 滚动 ────────────────────────────────────────────────
@@ -348,65 +557,129 @@ defineExpose({ scrollToBottom })
 .msg-row.assistant { align-items: flex-start; }
 
 .panel-input {
-  flex-shrink: 0; padding: 12px 16px 16px; background: var(--bg, #fff);
-  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0;
+  padding: 12px 16px 16px;
+  background: var(--bg, #fff);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.file-thumbs {
-  display: flex; gap: 8px; padding: 0 0 8px; flex-wrap: wrap; width: 100%; max-width: 680px;
-}
-.file-thumb {
-  position: relative; display: flex; align-items: center; gap: 6px;
-  padding: 4px 8px; border-radius: 6px; border: 1px solid var(--bd, #dcdfe6);
-  font-size: 12px;
-}
-.thumb-img { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; }
-.thumb-name { max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--t2, #606266); }
-.thumb-rm {
-  position: absolute; top: -4px; right: -4px; width: 16px; height: 16px;
-  border-radius: 50%; border: none; background: rgba(0, 0, 0, 0.5); color: #fff;
-  font-size: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.15s;
-}
-.file-thumb:hover .thumb-rm { opacity: 1; }
-
-.input-wrapper {
-  width: 100%; max-width: 680px; display: flex; align-items: flex-end; gap: 8px;
-  background: #fff; border: 1px solid var(--bd, #dcdfe6); border-radius: 16px;
-  padding: 8px 8px 8px 16px; transition: border-color 0.2s, box-shadow 0.2s;
-}
-.input-wrapper.focused {
-  border-color: var(--el-color-primary, #3370ff);
-  box-shadow: 0 0 0 2px rgba(51, 112, 255, 0.1);
+.operate-textarea {
+  width: 100%;
+  max-width: 680px;
+  box-shadow: 0px 6px 24px 0px rgba(var(--el-text-color-primary-rgb), 0.08);
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #ffffff;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.input-wrapper textarea {
-  flex: 1; border: none; outline: none; resize: none; font-family: inherit;
-  font-size: 14px; line-height: 1.5; background: transparent;
-  color: var(--t1, #303133); min-height: 24px; max-height: 160px;
-  padding: 4px 0; word-break: break-word;
+.operate-textarea:focus-within {
+  border: 1px solid var(--el-color-primary);
 }
-.input-wrapper textarea::placeholder { color: var(--t3, #909399); }
 
-.upload-btn {
-  width: 32px; height: 32px; border-radius: 8px; border: none;
-  background: transparent; color: var(--t3, #909399); cursor: pointer;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  transition: background 0.15s, color 0.15s;
+.operate-textarea :deep(.el-textarea__inner) {
+  border-radius: 8px !important;
+  box-shadow: none;
+  resize: none;
+  padding: 13px 16px;
+  box-sizing: border-box;
+  min-height: 47px !important;
 }
-.upload-btn:hover { background: rgba(0, 0, 0, 0.05); color: var(--t2, #606266); }
-.upload-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-.send-btn {
-  width: 36px; height: 36px; border-radius: 10px; border: none;
-  background: var(--bd, #dcdfe6); color: var(--t3, #909399); cursor: not-allowed;
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-  transition: background 0.2s, color 0.2s, transform 0.1s;
+.file-preview-list {
+  padding: 8px 12px;
 }
-.send-btn.active { background: var(--t1, #303133); color: #fff; cursor: pointer; }
-.send-btn.active:hover { opacity: 0.85; }
-.send-btn.active:active { transform: scale(0.92); }
-.send-btn.stop { background: #ef4444; color: #fff; cursor: pointer; }
-.send-btn.stop:hover { background: #dc2626; }
-.send-btn.stop:active { transform: scale(0.92); }
+
+.file-item {
+  position: relative;
+  overflow: inherit;
+}
+
+.file-image .delete-icon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  z-index: 1;
+}
+
+.delete-icon {
+  cursor: pointer;
+  color: var(--el-color-info);
+}
+
+.delete-icon:hover {
+  color: var(--el-color-danger);
+}
+
+.file-card {
+  cursor: pointer;
+}
+
+.operate {
+  padding: 6px 10px;
+}
+
+.sent-button {
+  max-height: none;
+}
+
+.sent-button .el-icon {
+  font-size: 24px;
+}
+
+.mb-8 {
+  margin-bottom: 8px;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+}
+
+.align-center {
+  align-items: center;
+}
+
+.flex {
+  display: flex;
+}
+
+.ellipsis-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.border-r-6 {
+  border-radius: 6px;
+}
+
+.break-all {
+  word-break: break-all;
+}
+
+.pre-wrap {
+  white-space: pre-wrap;
+}
+
+.ml-4 {
+  margin-left: 4px;
+}
+
+@media only screen and (max-width: 768px) {
+  .panel-input {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+}
+
+.upload-tooltip-width {
+  width: 300px;
+}
 </style>

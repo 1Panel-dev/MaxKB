@@ -20,7 +20,7 @@ export const debugApi = {
     if (applicationId) {
       return adminGet(`/workspace/${wsId}/application/${applicationId}/historical_conversation/${page}/${size}`)
     }
-    return adminGet(`/historical_conversation/${page}/${size}`)
+    return adminGet(`/workspace/${wsId}/historical_conversation/${page}/${size}`)
   },
 
   records: (chatId: string, page: number, size: number, applicationId?: string) => {
@@ -29,7 +29,7 @@ export const debugApi = {
     if (applicationId) {
       return adminGet(`/workspace/${wsId}/application/${applicationId}/historical_conversation_record/${chatId}/${page}/${size}`)
     }
-    return adminGet(`/historical_conversation_record/${chatId}/${page}/${size}`)
+    return adminGet(`/workspace/${wsId}/historical_conversation_record/${chatId}/${page}/${size}`)
   },
 
   deleteChat: (chatId: string, applicationId?: string) => {
@@ -38,7 +38,7 @@ export const debugApi = {
     if (applicationId) {
       return adminDel(`/workspace/${wsId}/application/${applicationId}/historical_conversation/${chatId}`)
     }
-    return adminDel(`/historical_conversation/${chatId}`)
+    return adminDel(`/workspace/${wsId}/historical_conversation/${chatId}`)
   },
 
   modifyChat: (chatId: string, data: any, applicationId?: string) => {
@@ -47,7 +47,7 @@ export const debugApi = {
     if (applicationId) {
       return adminPut(`/workspace/${wsId}/application/${applicationId}/historical_conversation/${chatId}`, data)
     }
-    return adminPut(`/historical_conversation/${chatId}`, data)
+    return adminPut(`/workspace/${wsId}/historical_conversation/${chatId}`, data)
   },
 
   uploadFile: (file: File, chatId: string) => {
