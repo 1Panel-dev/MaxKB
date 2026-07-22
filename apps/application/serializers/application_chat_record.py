@@ -53,6 +53,9 @@ class ChatRecordSerializerModel(serializers.ModelSerializer):
             "answer_text_list",
             "create_time",
             "update_time",
+            "version",
+            "question",
+            "messages"
         ]
 
 

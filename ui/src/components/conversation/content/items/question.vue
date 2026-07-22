@@ -1,33 +1,33 @@
 <template>
   <div class="question-content">
     <div class="question-bubble" :class="bubbleClass">
-      <div v-if="content.documents?.length" class="q-section">
-        <div v-for="(f, i) in content.documents" :key="'doc-'+i" class="q-file-card" @click="download(f)">
+      <div v-if="content.document_list?.length" class="q-section">
+        <div v-for="(f, i) in content.document_list" :key="'doc-'+i" class="q-file-card" @click="download(f)">
           <span class="q-file-icon">📄</span>
           <span class="q-file-name" :title="f.name">{{ f.name }}</span>
         </div>
       </div>
-      <div v-if="content.images?.length" class="q-section">
+      <div v-if="content.image_list?.length" class="q-section">
         <div class="q-images">
-          <template v-for="(img, i) in content.images" :key="'img-'+i">
+          <template v-for="(img, i) in content.image_list" :key="'img-'+i">
             <img v-if="img.url" :src="resetUrl(img.url)" class="q-img" />
           </template>
         </div>
       </div>
-      <div v-if="content.audio?.length" class="q-section">
-        <div v-for="(a, i) in content.audio" :key="'aud-'+i" class="q-audio-wrap">
+      <div v-if="content.audio_list?.length" class="q-section">
+        <div v-for="(a, i) in content.audio_list" :key="'aud-'+i" class="q-audio-wrap">
           <audio :src="resetUrl(a.url)" controls />
         </div>
       </div>
-      <div v-if="content.video?.length" class="q-section">
+      <div v-if="content.video_list?.length" class="q-section">
         <div class="q-videos">
-          <div v-for="(v, i) in content.video" :key="'vid-'+i" class="q-video-wrap">
+          <div v-for="(v, i) in content.video_list" :key="'vid-'+i" class="q-video-wrap">
             <video :src="resetUrl(v.url)" controls />
           </div>
         </div>
       </div>
-      <div v-if="content.files?.length" class="q-section">
-        <div v-for="(f, i) in content.files" :key="'file-'+i" class="q-file-card" @click="download(f)">
+      <div v-if="content.other_list?.length" class="q-section">
+        <div v-for="(f, i) in content.other_list" :key="'file-'+i" class="q-file-card" @click="download(f)">
           <span class="q-file-icon">📎</span>
           <span class="q-file-name" :title="f.name">{{ f.name }}</span>
         </div>
@@ -45,7 +45,7 @@ const props = defineProps<{ content: any }>()
 
 const bubbleClass = computed(() => {
   const c = props.content
-  const count = [c.documents?.length, c.images?.length, c.audio?.length, c.video?.length, c.files?.length]
+  const count = [c.document_list?.length, c.image_list?.length, c.audio_list?.length, c.video_list?.length, c.other_list?.length]
     .filter((n: number) => n > 0).length
   return count >= 2 ? 'multi-media' : ''
 })

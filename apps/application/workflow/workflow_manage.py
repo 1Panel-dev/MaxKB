@@ -102,14 +102,14 @@ class WorkflowManage:
         for inst in instances:
             self._run_async(inst)
 
-    def assertion_end(self):
+    def assertion_end(self, error=None):
         with self._lock:
             if self.done:
                 return
             if not self.is_end():
                 return
             self.done = True  # 锁内抢占,保证只有一个线程能往下走
-        self.end()  # 回调放到锁外,避免回调里再触碰本 manage 造成重入/死锁
+        self.end(error)  # 回调放到锁外,避免回调里再触碰本 manage 造成重入/死锁
 
     def is_end(self):
         """
@@ -166,12 +166,12 @@ class WorkflowManage:
         """
         self.call_back.on_next(self, message)
 
-    def end(self):
+    def end(self, error=None):
         """
         工作流输出结束的时候调用
         @return: None
         """
-        self.call_back.on_complete(self, None)
+        self.call_back.on_complete(self, error)
 
     def get_parameters(self):
         """

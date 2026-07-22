@@ -122,7 +122,7 @@ class INode:
         if anchors is None:
             anchors = [self.success_anchor() if status == Status.SUCCESS else self.fail_anchor()]
         self._dispatch(anchors)
-        self.workflow_manage.assertion_end()
+        self.workflow_manage.assertion_end(error)
 
     def _dispatch(self, anchors):
         """

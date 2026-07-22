@@ -3,7 +3,12 @@
     <header v-if="showHeader" class="panel-header">
       <button class="header-btn" @click="$emit('toggle')">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path
+            d="M2 4h12M2 8h12M2 12h12"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
         </svg>
       </button>
       <div class="header-info">
@@ -49,11 +54,7 @@
                 @mouseenter="showDelete = f.url || ''"
                 @mouseleave="showDelete = ''"
               >
-                <div
-                  v-if="showDelete === f.url"
-                  class="delete-icon"
-                  @click="removeFile(i)"
-                >
+                <div v-if="showDelete === f.url" class="delete-icon" @click="removeFile(i)">
                   <el-icon style="font-size: 16px; top: 2px">
                     <CircleCloseFilled />
                   </el-icon>
@@ -104,11 +105,7 @@
                       {{ f.name }}
                     </div>
                   </div>
-                  <div
-                    v-if="showDelete === f.url"
-                    class="delete-icon"
-                    @click="removeFile(i)"
-                  >
+                  <div v-if="showDelete === f.url" class="delete-icon" @click="removeFile(i)">
                     <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
@@ -142,11 +139,7 @@
                       {{ f.name }}
                     </div>
                   </div>
-                  <div
-                    v-if="showDelete === f.url"
-                    class="delete-icon"
-                    @click="removeFile(i)"
-                  >
+                  <div v-if="showDelete === f.url" class="delete-icon" @click="removeFile(i)">
                     <el-icon style="font-size: 16px; top: 2px">
                       <CircleCloseFilled />
                     </el-icon>
@@ -164,11 +157,7 @@
                 @mouseenter="showDelete = f.url || ''"
                 @mouseleave="showDelete = ''"
               >
-                <div
-                  v-if="showDelete === f.url"
-                  class="delete-icon"
-                  @click="removeFile(i)"
-                >
+                <div v-if="showDelete === f.url" class="delete-icon" @click="removeFile(i)">
                   <el-icon style="font-size: 16px; top: 2px">
                     <CircleCloseFilled />
                   </el-icon>
@@ -212,14 +201,12 @@
               style="display: none"
               @change="handleFileSelect"
             />
-            <el-tooltip
-              effect="dark"
-              placement="top"
-              popper-class="upload-tooltip-width"
-            >
+            <el-tooltip effect="dark" placement="top" popper-class="upload-tooltip-width">
               <template #content>
                 <div class="break-all pre-wrap">
-                  支持上传图片、文档、音频、视频文件，最多{{ maxFiles }}个，单个文件最大{{ maxSizeMB }}MB
+                  支持上传图片、文档、音频、视频文件，最多{{ maxFiles }}个，单个文件最大{{
+                    maxSizeMB
+                  }}MB
                 </div>
               </template>
               <el-button
@@ -231,12 +218,7 @@
               </el-button>
             </el-tooltip>
             <el-divider direction="vertical" />
-            <el-button
-              text
-              class="sent-button"
-              :disabled="!canSend"
-              @click="send"
-            >
+            <el-button text class="sent-button" :disabled="!canSend" @click="send">
               <el-icon v-if="!streamLoading" :size="20">
                 <Promotion />
               </el-icon>
@@ -271,7 +253,7 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   toggle: []
-  send: [text: string, files?: any[]]
+  refresh: [chatId: string]
   stop: []
 }>()
 
@@ -289,7 +271,9 @@ const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
 const documentExts = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
 const videoExts = ['mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv']
 const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
-const acceptList = [...imageExts, ...documentExts, ...videoExts, ...audioExts].map(e => `.${e}`).join(',')
+const acceptList = [...imageExts, ...documentExts, ...videoExts, ...audioExts]
+  .map((e) => `.${e}`)
+  .join(',')
 const getExt = (name: string) => name.split('.').pop()?.toLowerCase() || ''
 const isImage = (name: string) => imageExts.includes(getExt(name))
 const isDocument = (name: string) => documentExts.includes(getExt(name))
@@ -297,8 +281,14 @@ const isAudio = (name: string) => audioExts.includes(getExt(name))
 const isVideo = (name: string) => videoExts.includes(getExt(name))
 
 interface FileItem {
-  uid: number; name: string; size: number; raw: File
-  url?: string; file_id?: string; previewUrl?: string; uploading?: boolean
+  uid: number
+  name: string
+  size: number
+  raw: File
+  url?: string
+  file_id?: string
+  previewUrl?: string
+  uploading?: boolean
 }
 
 const fileList = ref<FileItem[]>([])
@@ -312,13 +302,15 @@ const placeholder = computed(() => {
   return '输入消息...'
 })
 
-const canSend = computed(() => (question.value.content.trim() || fileList.value.length > 0) && !streamLoading.value)
+const canSend = computed(
+  () => (question.value.content.trim() || fileList.value.length > 0) && !streamLoading.value,
+)
 
 // 分类文件列表
-const imageFiles = computed(() => fileList.value.filter(f => isImage(f.name)))
-const documentFiles = computed(() => fileList.value.filter(f => isDocument(f.name)))
-const audioFiles = computed(() => fileList.value.filter(f => isAudio(f.name)))
-const videoFiles = computed(() => fileList.value.filter(f => isVideo(f.name)))
+const imageFiles = computed(() => fileList.value.filter((f) => isImage(f.name)))
+const documentFiles = computed(() => fileList.value.filter((f) => isDocument(f.name)))
+const audioFiles = computed(() => fileList.value.filter((f) => isAudio(f.name)))
+const videoFiles = computed(() => fileList.value.filter((f) => isVideo(f.name)))
 
 const getFileIcon = (name: string) => {
   const ext = getExt(name)
@@ -338,7 +330,10 @@ const getFileIcon = (name: string) => {
     aac: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
     m4a: 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/headset.svg',
   }
-  return iconMap[ext] || 'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg'
+  return (
+    iconMap[ext] ||
+    'https://cdn.jsdelivr.net/npm/@element-plus/icons-vue@2.3.1/dist/svg/document.svg'
+  )
 }
 
 const validateFile = (file: File): boolean => {
@@ -380,7 +375,7 @@ const addFile = (file: File) => {
 
   uploadPromises.value.push(uploadPromise)
   uploadPromise.finally(() => {
-    uploadPromises.value = uploadPromises.value.filter(p => p !== uploadPromise)
+    uploadPromises.value = uploadPromises.value.filter((p) => p !== uploadPromise)
   })
 }
 
@@ -391,7 +386,9 @@ const removeFile = (index: number) => {
 }
 
 const clearFiles = () => {
-  fileList.value.forEach(f => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl) })
+  fileList.value.forEach((f) => {
+    if (f.previewUrl) URL.revokeObjectURL(f.previewUrl)
+  })
   fileList.value = []
 }
 
@@ -416,9 +413,12 @@ const handleDrop = (e: DragEvent) => {
 }
 
 const categorize = () => {
-  const images: any[] = []; const documents: any[] = []
-  const audio: any[] = []; const video: any[] = []; const files: any[] = []
-  fileList.value.forEach(f => {
+  const images: any[] = []
+  const documents: any[] = []
+  const audio: any[] = []
+  const video: any[] = []
+  const files: any[] = []
+  fileList.value.forEach((f) => {
     const entry = { url: f.url || '', file_id: f.file_id || '', name: f.name }
     if (isImage(f.name)) images.push(entry)
     else if (documentExts.includes(getExt(f.name))) documents.push(entry)
@@ -435,18 +435,83 @@ const send = async () => {
   if (uploadPromises.value.length) await Promise.all(uploadPromises.value)
 
   const text = question.value.content.trim()
-  const media = categorize()
 
-  let content = text
-  if (!content) {
-    const types = [
-      media.images.length && '图片', media.documents.length && '文档',
-      media.audio.length && '音频', media.video.length && '视频', media.files.length && '文件',
-    ].filter(Boolean)
-    content = types.length > 1 ? '文件消息' : `${types[0]}消息`
+  // 如果没有当前对话，创建新对话
+  if (!currentChatId.value) {
+    const id = await store.openChat(store.applicationId.value)
+    currentChatId.value = id
+    await store.loadConversations()
   }
 
-  emit('send', content, fileList.value.length ? fileList.value : undefined)
+  const cid = currentChatId.value
+
+  // 判断是否是第一条消息，如果是则更新对话的 abstract
+  const isFirstMessage = messages.value.length === 0
+  if (isFirstMessage && text) {
+    const abstract = text.substring(0, 256)
+    await store.renameChat(cid, abstract)
+  }
+
+  // 分类文件
+  const images = fileList.value
+    .filter((f) => isImage(f.name))
+    .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+  const documents = fileList.value
+    .filter((f) => isDocument(f.name))
+    .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+  const audio = fileList.value
+    .filter((f) => isAudio(f.name))
+    .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+  const video = fileList.value
+    .filter((f) => isVideo(f.name))
+    .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+  const other = fileList.value
+    .filter((f) => !isImage(f.name) && !isDocument(f.name) && !isAudio(f.name) && !isVideo(f.name))
+    .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
+
+  // 构建 question content
+  const questionContent: any = { type: 'QUESTION', content: text }
+  if (images.length) questionContent.image_list = images
+  if (documents.length) questionContent.document_list = documents
+  if (audio.length) questionContent.audio_list = audio
+  if (video.length) questionContent.video_list = video
+  if (other.length) questionContent.other_list = other
+
+  store.pushMessage({
+    role: 'USER',
+    content: [questionContent],
+    id: '',
+  })
+
+  store.pushMessage(store.createAnswerMessage())
+  const aiMsg = messages.value[messages.value.length - 1]
+
+  // 构建 API payload
+  const message: any = { content: text, type: 'QUESTION' }
+  if (images.length) message.image_list = images
+  if (documents.length) message.document_list = documents
+  if (audio.length) message.audio_list = audio
+  if (video.length) message.video_list = video
+  if (other.length) message.other_list = other
+
+  const payload: any = { message, stream: true, re_chat: false }
+
+  store.startStream({
+    cid,
+    request: () => store.chat(cid, payload),
+    onStream: (chunk: any) => {
+      store.appendChunk(aiMsg, chunk)
+      scrollToBottom()
+    },
+    onFinish: () => {
+      aiMsg.write_ed = true
+      emit('refresh', cid)
+    },
+    onFailure: () => {
+      aiMsg.write_ed = true
+    },
+  })
+
   question.value.content = ''
   clearFiles()
 }
@@ -467,12 +532,15 @@ const handleKeydown = (e: KeyboardEvent) => {
     }
   } else {
     // 如果同时按下ctrl/shift/cmd/opt +enter，则会换行
-    const textarea = inputRef.value?.$el?.querySelector('.el-textarea__inner') as HTMLTextAreaElement
+    const textarea = inputRef.value?.$el?.querySelector(
+      '.el-textarea__inner',
+    ) as HTMLTextAreaElement
     if (textarea) {
       const startPos = textarea.selectionStart
       const endPos = textarea.selectionEnd
       e.preventDefault()
-      question.value.content = question.value.content.slice(0, startPos) + '\n' + question.value.content.slice(endPos)
+      question.value.content =
+        question.value.content.slice(0, startPos) + '\n' + question.value.content.slice(endPos)
       nextTick(() => {
         textarea.setSelectionRange(startPos + 1, startPos + 1)
       })
@@ -486,15 +554,20 @@ const onScroll = () => {
   if (!el || el.scrollTop > 60) return
 }
 
-const scrollToBottom = () => { scroll?.forceBottom() }
+const scrollToBottom = () => {
+  scroll?.forceBottom()
+}
 
 onMounted(() => {
   if (msgBoxRef.value) scroll = new Scroll(msgBoxRef.value)
 })
 
-watch(() => messages.value.length, () => {
-  nextTick(() => scroll?.scrollBottom())
-})
+watch(
+  () => messages.value.length,
+  () => {
+    nextTick(() => scroll?.scrollBottom())
+  },
+)
 
 defineExpose({ scrollToBottom })
 </script>
@@ -523,38 +596,103 @@ defineExpose({ scrollToBottom })
 }
 
 .header-btn {
-  width: 32px; height: 32px; border: none; background: transparent;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  border-radius: 6px; color: var(--t2, #606266); flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  color: var(--t2, #606266);
+  flex-shrink: 0;
 }
-.header-btn:hover { background: rgba(0, 0, 0, 0.05); }
+.header-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
 
 .header-info {
-  display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
-.header-icon { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
-.header-text { display: flex; flex-direction: column; min-width: 0; }
-.header-app-name { font-size: 11px; font-weight: 400; color: var(--t3, #909399); line-height: 1.2; }
-.header-title { font-size: 13px; font-weight: 500; color: var(--t1, #303133); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.header-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.header-app-name {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--t3, #909399);
+  line-height: 1.2;
+}
+.header-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1, #303133);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .panel-messages {
-  flex: 1; min-height: 0; overflow-y: auto; padding: 14px 12px;
-  scrollbar-width: thin; display: flex; flex-direction: column; align-items: center;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 14px 12px;
+  scrollbar-width: thin;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .welcome {
-  flex: 1; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center; padding: 32px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 16px;
 }
-.welcome-title { font-size: 18px; font-weight: 600; color: var(--t1, #303133); margin-bottom: 8px; }
-.welcome-sub { font-size: 14px; color: var(--t3, #909399); }
+.welcome-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--t1, #303133);
+  margin-bottom: 8px;
+}
+.welcome-sub {
+  font-size: 14px;
+  color: var(--t3, #909399);
+}
 
 .msg-row {
-  display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;
-  max-width: 680px; width: 100%; box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+  max-width: 680px;
+  width: 100%;
+  box-sizing: border-box;
 }
-.msg-row.user { align-items: flex-end; flex-direction: row-reverse; }
-.msg-row.assistant { align-items: flex-start; }
+.msg-row.user {
+  align-items: flex-end;
+  flex-direction: row-reverse;
+}
+.msg-row.assistant {
+  align-items: flex-start;
+}
 
 .panel-input {
   flex-shrink: 0;
@@ -573,7 +711,9 @@ defineExpose({ scrollToBottom })
   border-radius: 8px;
   border: 1px solid #ffffff;
   box-sizing: border-box;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .operate-textarea:focus-within {
