@@ -137,7 +137,11 @@ class SystemGroup(Enum):
 
 
 class WorkspaceGroup(Enum):
-    SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    #SYSTEM_MANAGEMENT = "SYSTEM_MANAGEMENT"
+    ROLE = "ROLE"
+    WORKSPACE = "WORKSPACE"
+    USER_GROUP = "USER_GROUP"
+    RESOURCE_PERMISSION = "RESOURCE_PERMISSION"
     HOMEPAGE = "HOMEPAGE"
     APPLICATION = "APPLICATION"
     KNOWLEDGE = "KNOWLEDGE"
@@ -172,6 +176,10 @@ class TopLevelGroup(Enum):
     OPERATION_LOG = "OPERATION_LOG"
     # 系统设置
     SYSTEM_SETTING = "SYSTEM_SETTING"
+    # 工作空间
+    WORKSPACE = "WORKSPACE"
+    #
+    OTHER = "OTHER"
 
 
 
@@ -490,6 +498,10 @@ GROUPS = {
         SystemGroup.WORKSPACE,
         SystemGroup.USER_GROUP,
         SystemGroup.RESOURCE_PERMISSION,
+        WorkspaceGroup.ROLE,
+        WorkspaceGroup.WORKSPACE,
+        WorkspaceGroup.USER_GROUP,
+        WorkspaceGroup.RESOURCE_PERMISSION,
     ),
     TopLevelGroup.RESOURCE: (
         SystemGroup.RESOURCE_APPLICATION,
@@ -516,6 +528,17 @@ GROUPS = {
         SystemGroup.EMAIL_SETTING,
         SystemGroup.OTHER
     ),
+    TopLevelGroup.WORKSPACE: (
+        WorkspaceGroup.HOMEPAGE,
+        WorkspaceGroup.APPLICATION,
+        WorkspaceGroup.KNOWLEDGE,
+        WorkspaceGroup.TOOL,
+        WorkspaceGroup.MODEL,
+        WorkspaceGroup.TRIGGER
+    ),
+    TopLevelGroup.OTHER: (
+        WorkspaceGroup.OTHER,
+    )
 }
 TOP_LEVEL_GROUP_MAP = {
     group: top_level
@@ -1524,52 +1547,52 @@ class PermissionConstants(Enum):
                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT],
                                            label=_('Set up user groups')
                                            )
-    WORKSPACE_USER_GROUP_READ = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.READ,
+    WORKSPACE_USER_GROUP_READ = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.READ,
                                            role_list=[RoleConstants.ADMIN],
                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                            )
-    WORKSPACE_USER_GROUP_CREATE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.CREATE,
+    WORKSPACE_USER_GROUP_CREATE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.CREATE,
                                              role_list=[RoleConstants.ADMIN],
                                              parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                              )
-    WORKSPACE_USER_GROUP_EDIT = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.EDIT,
+    WORKSPACE_USER_GROUP_EDIT = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.EDIT,
                                            role_list=[RoleConstants.ADMIN],
                                            parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                            )
-    WORKSPACE_USER_GROUP_DELETE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.DELETE,
+    WORKSPACE_USER_GROUP_DELETE = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.DELETE,
                                              role_list=[RoleConstants.ADMIN],
                                              parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                              )
-    WORKSPACE_USER_GROUP_ADD_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.ADD_MEMBER,
+    WORKSPACE_USER_GROUP_ADD_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.ADD_MEMBER,
                                                  role_list=[RoleConstants.ADMIN],
                                                  parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                                  )
-    WORKSPACE_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.REMOVE_MEMBER,
+    WORKSPACE_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.CHAT_USER_GROUP, operate=Operate.REMOVE_MEMBER,
                                                     role_list=[RoleConstants.ADMIN],
                                                     parent_group=[WorkspaceGroup.SYSTEM_MANAGEMENT]
                                                     )
 
-    WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.READ,
+    WORKSPACE_SYSTEM_USER_GROUP_READ = Permission(group=Group.USER_GROUP, operate=Operate.READ,
                                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                                   parent_group=[SystemGroup.USER_GROUP]
                                                   )
-    WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.CREATE,
+    WORKSPACE_SYSTEM_USER_GROUP_CREATE = Permission(group=Group.USER_GROUP, operate=Operate.CREATE,
                                                     role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                                     parent_group=[SystemGroup.USER_GROUP]
                                                     )
-    WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.EDIT,
+    WORKSPACE_SYSTEM_USER_GROUP_EDIT = Permission(group=Group.USER_GROUP, operate=Operate.EDIT,
                                                   role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                                   parent_group=[SystemGroup.USER_GROUP]
                                                   )
-    WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.DELETE,
+    WORKSPACE_SYSTEM_USER_GROUP_DELETE = Permission(group=Group.USER_GROUP, operate=Operate.DELETE,
                                                     role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                                     parent_group=[SystemGroup.USER_GROUP]
                                                     )
-    WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP, operate=Operate.ADD_MEMBER,
+    WORKSPACE_SYSTEM_USER_GROUP_ADD_MEMBER = Permission(group=Group.USER_GROUP, operate=Operate.ADD_MEMBER,
                                                         role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
                                                         parent_group=[SystemGroup.USER_GROUP]
                                                         )
-    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.WORKSPACE_USER_GROUP,
+    WORKSPACE_SYSTEM_USER_GROUP_REMOVE_MEMBER = Permission(group=Group.USER_GROUP,
                                                            operate=Operate.REMOVE_MEMBER,
                                                            role_list=[RoleConstants.ADMIN,
                                                                       RoleConstants.WORKSPACE_MANAGE],
