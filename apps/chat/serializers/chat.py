@@ -27,6 +27,7 @@ from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset
 from application.flow.common import Answer
 from application.flow.tools import to_stream_response_simple
 from application.workflow.common import WorkflowType, new_instance
+from application.workflow.message.aggregator import AggregationManager
 from application.workflow.workflow_manage import WorkflowManage, CallBack
 from application.workflow.nodes import get_start_node
 from application.workflow.message.struct.text_content import TextContent
@@ -77,7 +78,7 @@ class GeneratePromptSerializers(serializers.Serializer):
 
 
 class ChatMessageSerializers(serializers.Serializer):
-    message = serializers.CharField(required=True, label=_("User Questions"))
+    message = serializers.DictField(required=True, label=_("User Questions"))
     stream = serializers.BooleanField(required=True,
                                       label=_("Is the answer in streaming mode"))
     re_chat = serializers.BooleanField(required=True, label=_("Do you want to reply again"))
@@ -94,10 +95,6 @@ class ChatMessageSerializers(serializers.Serializer):
                                       label=_("Node parameters"))
 
     form_data = serializers.DictField(required=False, label=_("Global variables"))
-    image_list = serializers.ListField(required=False, label=_("picture"))
-    document_list = serializers.ListField(required=False, label=_("document"))
-    audio_list = serializers.ListField(required=False, label=_("Audio"))
-    other_list = serializers.ListField(required=False, label=_("Other"))
     child_node = serializers.DictField(required=False, allow_null=True,
                                        label=_("Child Nodes"))
 
@@ -340,7 +337,8 @@ class ChatSerializers(serializers.Serializer):
         return chat_info
 
     def chat_simple(self, chat_info: ChatInfo, instance, base_to_response):
-        message = instance.get('message')
+        message_dict = instance.get('message')
+        message = message_dict.get('content', '') if isinstance(message_dict, dict) else message_dict
         re_chat = instance.get('re_chat')
         stream = instance.get('stream')
         chat_user_id = self.data.get('chat_user_id')
@@ -397,7 +395,8 @@ class ChatSerializers(serializers.Serializer):
     def chat_work_flow(self, chat_info: ChatInfo, instance: dict, base_to_response):
         import queue
 
-        message = instance.get('message')
+        message_dict = instance.get('message')
+        message = message_dict.get('content', '') if isinstance(message_dict, dict) else message_dict
         re_chat = instance.get('re_chat')
         stream = instance.get('stream')
         chat_user_id = self.data.get("chat_user_id")
@@ -405,11 +404,11 @@ class ChatSerializers(serializers.Serializer):
         ip_address = self.data.get('ip_address')
         source = self.data.get('source')
         form_data = instance.get('form_data')
-        image_list = instance.get('image_list')
-        video_list = instance.get('video_list')
-        document_list = instance.get('document_list')
-        audio_list = instance.get('audio_list')
-        other_list = instance.get('other_list')
+        image_list = message_dict.get('image_list', []) if isinstance(message_dict, dict) else []
+        video_list = message_dict.get('video_list', []) if isinstance(message_dict, dict) else []
+        document_list = message_dict.get('document_list', []) if isinstance(message_dict, dict) else []
+        audio_list = message_dict.get('audio_list', []) if isinstance(message_dict, dict) else []
+        other_list = message_dict.get('other_list', []) if isinstance(message_dict, dict) else []
         workspace_id = chat_info.application.workspace_id
         chat_record_id = instance.get('chat_record_id')
         position = instance.get('position')
@@ -453,13 +452,12 @@ class ChatSerializers(serializers.Serializer):
         }
 
         result_queue = queue.Queue()
-        answer_text = ''
-        reasoning_text = ''
+
+        aggregation = AggregationManager()
 
         def on_next(wf_manage, content):
-            nonlocal answer_text, reasoning_text
+            aggregation.aggregate(content)
             if isinstance(content, TextContent):
-                answer_text += content.content
                 result_queue.put(('chunk', {
                     'content': [{
                         'id': content.id,
@@ -468,7 +466,6 @@ class ChatSerializers(serializers.Serializer):
                     }]
                 }))
             elif isinstance(content, ReasoningContent):
-                reasoning_text += content.content
                 result_queue.put(('chunk', {
                     'content': [{
                         'id': content.id,
@@ -515,9 +512,8 @@ class ChatSerializers(serializers.Serializer):
         def on_complete(wf_manage, error):
             if error:
                 result_queue.put(('error', error))
-            else:
-                self._save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
-                                       message, answer_text, reasoning_text, wf_manage)
+            self._save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
+                                   message, '', '', wf_manage, message_dict, aggregation.get_contents())
             result_queue.put(('done', None))
 
         call_back = CallBack(on_next, on_complete)
@@ -580,10 +576,10 @@ class ChatSerializers(serializers.Serializer):
                 if msg_type == 'error':
                     raise data
             return base_to_response.to_block_response(
-                chat_info.chat_id, chat_record_id_str, answer_text, True, 0, 0)
+                chat_info.chat_id, chat_record_id_str, '', True, 0, 0)
 
     def _save_chat_record(self, chat_info, chat_id, chat_record_id, question, answer,
-                          reasoning_content, wf_manage):
+                          reasoning_content, wf_manage, question_data=None, messages=None):
         context = wf_manage.context
         message_tokens = sum(
             v.get('message_tokens', 0) for v in context.values() if isinstance(v, dict) and 'message_tokens' in v)
@@ -606,7 +602,9 @@ class ChatSerializers(serializers.Serializer):
             index=len(chat_info.chat_record_list) + 1,
             ip_address=chat_info.ip_address,
             source=chat_info.source,
-            workflow_context=dict(context) if context else None
+            workflow_context=dict(context) if context else None,
+            question=question_data if question_data else {},
+            messages=messages
         )
         chat_info.append_chat_record(chat_record)
         chat_info.set_cache()

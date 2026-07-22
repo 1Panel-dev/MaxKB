@@ -18,7 +18,7 @@
         :type="type"
         :app-info="store.appInfo.value"
         @toggle="sidebarOpen = !sidebarOpen"
-        @send="handleSend"
+        @refresh="(cid: string) => emit('refresh', cid)"
         @stop="store.cancelStream(store.currentChatId.value)"
       />
     </div>
@@ -83,76 +83,6 @@ if (props.defaultOpen === 'auto') {
 if (props.defaultMode === 'auto') {
   watch(isMobile, (mobile) => {
     sidebarMode.value = mobile ? 'drawer' : 'push'
-  })
-}
-
-const handleSend = async (text: string, files?: any[]) => {
-  if (!store.currentChatId.value) {
-    const id = await store.openChat(store.applicationId.value)
-    store.currentChatId.value = id
-    await store.loadConversations()
-  }
-
-  const cid = store.currentChatId.value
-
-  // 判断是否是第一条消息，如果是则更新对话的 abstract
-  const isFirstMessage = store.messages.value.length === 0
-  if (isFirstMessage && text.trim()) {
-    const abstract = text.trim().substring(0, 256)
-    await store.renameChat(cid, abstract)
-  }
-
-  // 分类文件
-  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'bmp']
-  const docExts = ['pdf', 'docx', 'txt', 'xls', 'xlsx', 'md', 'html', 'csv']
-  const audioExts = ['mp3', 'wav', 'ogg', 'aac', 'm4a']
-  const videoExts = ['mp4', 'avi', 'mkv', 'mov', 'flv', 'wmv']
-  const getExt = (name: string) => name.split('.').pop()?.toLowerCase() || ''
-  const byExt = (exts: string[]) => (f: any) => exts.includes(getExt(f.name))
-
-  const images = files?.filter(byExt(imageExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
-  const documents = files?.filter(byExt(docExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
-  const audio = files?.filter(byExt(audioExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
-  const video = files?.filter(byExt(videoExts)).map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
-  const other = files?.filter((f: any) => ![...imageExts, ...docExts, ...audioExts, ...videoExts].includes(getExt(f.name)))
-    .map((f: any) => ({ url: f.url, file_id: f.file_id, name: f.name })) || []
-
-  // 构建 question content
-  const questionContent: any = { type: 'QUESTION', content: text }
-  if (images.length) questionContent.images = images
-  if (documents.length) questionContent.documents = documents
-  if (audio.length) questionContent.audio = audio
-  if (video.length) questionContent.video = video
-  if (other.length) questionContent.files = other
-
-  store.pushMessage({
-    role: 'USER',
-    content: [questionContent],
-    id: '',
-  })
-
-  store.pushMessage(store.createAnswerMessage())
-  const aiMsg = store.messages.value[store.messages.value.length - 1]
-
-  // 构建 API payload
-  const payload: any = { message: text, stream: true, re_chat: false }
-  if (images.length) payload.image_list = images
-  if (documents.length) payload.document_list = documents
-  if (audio.length) payload.audio_list = audio
-  if (video.length) payload.video_list = video
-  if (other.length) payload.other_list = other
-
-  store.startStream({
-    cid,
-    request: () => store.chat(cid, payload),
-    onStream: (chunk: any) => store.appendChunk(aiMsg, chunk),
-    onFinish: () => {
-      aiMsg.write_ed = true
-      emit('refresh', cid)
-    },
-    onFailure: () => {
-      aiMsg.write_ed = true
-    },
   })
 }
 

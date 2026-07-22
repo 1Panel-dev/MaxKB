@@ -347,6 +347,8 @@ class ChatInfo:
                                                                'run_time': chat_record.run_time,
                                                                'source': chat_record.source,
                                                                'ip_address': chat_record.ip_address or '',
+                                                               'question': chat_record.question,
+                                                               'messages': chat_record.messages,
                                                                'index': chat_record.index},
                                               defaults={
                                                   "vote_status": chat_record.vote_status,
@@ -361,6 +363,8 @@ class ChatInfo:
                                                   'run_time': chat_record.run_time,
                                                   'index': chat_record.index,
                                                   'source': chat_record.source,
+                                                  'question': chat_record.question,
+                                                  'messages': chat_record.messages,
                                                   'ip_address': chat_record.ip_address or '',
                                               })
         ChatCountSerializer(data={'chat_id': self.chat_id}).update_chat()

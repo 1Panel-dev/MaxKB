@@ -245,7 +245,7 @@ class AIChatNode(INode):
             mcp_source, mcp_servers, mcp_tool_id, mcp_tool_ids,
             tool_ids, application_ids, skill_tool_ids, mcp_output_enable,
             chat_model, SystemMessage(system), message_list, history_message,
-            question, chat_id, workspace_id, workflow_type, reasoning_content_id, text_content_id,
+            question, chat_id, workspace_id, workflow_type, reasoning_content_id, text_content_id, is_result,
         )
         if not mcp_handled:
             message_list_with_system = [SystemMessage(system)] + message_list
@@ -256,12 +256,7 @@ class AIChatNode(INode):
                                       reasoning_content_id, text_content_id)
             else:
                 r = chat_model.invoke(message_list_with_system)
-                self._invoke_response(r, chat_model, message_list_with_system, question.content)
-
-        if is_result:
-            answer = self.get_context('answer')
-            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
-            self.write(TextContent(text_content_id, answer, Status.SUCCESS, node_info, Position(self.get_node_id())))
+                self._invoke_response(r, chat_model, message_list_with_system, question.content, is_result, text_content_id)
 
     def _generate_prompt_question(self, prompt, model, vision, image_list, video_list):
         images = []
@@ -327,7 +322,7 @@ class AIChatNode(INode):
 
         self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
 
-    def _invoke_response(self, response, chat_model, message_list, question):
+    def _invoke_response(self, response, chat_model, message_list, question, is_result=False, text_content_id=None):
         model_setting = self.get_context('model_setting') or {}
         reasoning = Reasoning(
             model_setting.get('reasoning_content_start', '<think>'),
@@ -344,6 +339,9 @@ class AIChatNode(INode):
                     reasoning_result_end.get('reasoning_content') or ''
             )
         self._write_final_context(chat_model, message_list, question, content, reasoning_content)
+        if is_result:
+            node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
+            self.write(TextContent(text_content_id, content, Status.SUCCESS, node_info, Position(self.get_node_id())))
 
     def _write_final_context(self, chat_model, message_list, question, answer, reasoning_content):
         message_tokens = chat_model.get_num_tokens_from_messages(message_list)
@@ -359,7 +357,7 @@ class AIChatNode(INode):
             tool_ids, application_ids, skill_tool_ids, mcp_output_enable,
             chat_model, system_prompt, message_list, history_message,
             question, chat_id, workspace_id, workflow_type,
-            reasoning_content_id, text_content_id,
+            reasoning_content_id, text_content_id, is_result=False,
     ):
         mcp_servers_config = {}
 

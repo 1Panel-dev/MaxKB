@@ -15,3 +15,8 @@ class ReasoningContent(Content):
     def __init__(self, _id, content: str, status: Status, node_info: NodeInfo, position: Position, **kwargs):
         self.content = content
         super().__init__(_id, status, ContentType.REASONING, node_info, position, **kwargs)
+
+    def to_dict(self):
+        result = super().to_dict()
+        result['content'] = self.content
+        return result

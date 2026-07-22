@@ -1,7 +1,9 @@
 <template>
-  <template v-for="(content, index) in contents" :key="index">
-    <Content class="w-full" :type="content.type" :content="content" />
-  </template>
+  <div class="content-list">
+    <div v-for="(content, index) in contents" :key="index" class="content-item">
+      <Content :type="content.type" :content="content" />
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -26,3 +28,15 @@ const contents = computed(() => {
     .filter((item) => !(item.type === 'TEXT' && !item.content))
 })
 </script>
+
+<style scoped>
+.content-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.content-item {
+  width: 100%;
+}
+</style>

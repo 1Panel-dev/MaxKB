@@ -22,3 +22,11 @@ class FormContent(Content):
         self.is_submit = is_submit
         self.form_data = form_data or {}
         super().__init__(_id, status, ContentType.FORM, node_info, position, **kwargs)
+
+    def to_dict(self):
+        result = super().to_dict()
+        result['form_field_list'] = self.form_field_list
+        result['form_content_format'] = self.form_content_format
+        result['is_submit'] = self.is_submit
+        result['form_data'] = self.form_data
+        return result

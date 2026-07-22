@@ -18,3 +18,10 @@ class ToolContent(Content):
         self.arguments = arguments
         self.result = result
         super().__init__(_id, status, ContentType.TOOL, node_info, position, **kwargs)
+
+    def to_dict(self):
+        result = super().to_dict()
+        result['content'] = self.content
+        result['arguments'] = self.arguments
+        result['result'] = self.result
+        return result
