@@ -148,34 +148,36 @@ class ImageUnderstandNode(INode):
                 reasoning_content_chunk = ''
             reasoning_content += reasoning_content_chunk
 
-            if isinstance(chunk.content, list):
-                for chunk_item in chunk.content:
-                    text = chunk_item.get('text', '')
-                    if text and is_result:
-                        self.write(TextContent(text_content_id, text, Status.RUNNING, node_info,
+            if is_result:
+                if isinstance(chunk.content, list):
+                    for chunk_item in chunk.content:
+                        text = chunk_item.get('text', '')
+                        if text:
+                            self.write(TextContent(text_content_id, text, Status.RUNNING, node_info,
+                                                   Position(self.get_node_id())))
+                        if reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
+                            self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING,
+                                                        node_info, Position(self.get_node_id())))
+                else:
+                    if content_chunk:
+                        self.write(TextContent(text_content_id, content_chunk, Status.RUNNING, node_info,
                                                Position(self.get_node_id())))
-                    if is_result and reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
+                    if reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
                         self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING,
                                                     node_info, Position(self.get_node_id())))
-            else:
-                if content_chunk and is_result:
-                    self.write(TextContent(text_content_id, content_chunk, Status.RUNNING, node_info,
-                                           Position(self.get_node_id())))
-                if is_result and reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
-                    self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING,
-                                                node_info, Position(self.get_node_id())))
 
         reasoning_end = reasoning.get_end_reasoning_content()
         answer += reasoning_end.get('content')
         reasoning_content_chunk = ''
         if not response_reasoning_content:
             reasoning_content_chunk = reasoning_end.get('reasoning_content')
-        if reasoning_end.get('content') and is_result:
-            self.write(TextContent(text_content_id, reasoning_end.get('content'), Status.RUNNING, node_info,
-                                   Position(self.get_node_id())))
-        if is_result and reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
-            self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info,
-                                        Position(self.get_node_id())))
+        if is_result:
+            if reasoning_end.get('content'):
+                self.write(TextContent(text_content_id, reasoning_end.get('content'), Status.RUNNING, node_info,
+                                       Position(self.get_node_id())))
+            if reasoning_content_chunk and model_setting.get('reasoning_content_enable', False):
+                self.write(ReasoningContent(reasoning_content_id, reasoning_content_chunk, Status.RUNNING, node_info,
+                                            Position(self.get_node_id())))
 
         self._write_final_context(chat_model, message_list, question, answer, reasoning_content)
 
