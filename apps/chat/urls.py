@@ -29,4 +29,8 @@ urlpatterns = [
     path('historical_conversation_record/<str:chat_id>/<int:current_page>/<int:page_size>', views.HistoricalConversationRecordView.PageView.as_view(), name='historical_conversation_record'),
     path('share/<str:link>', ChatRecordDetailView.as_view()),
     path('<str:application_id>/chat/<str:chat_id>/share_chat', ChatRecordLinkView.as_view()),
+    path("chat_user/current/reset_password", views.ResetCurrentUserPasswordView.as_view(), name="reset_password_current"),
+    path('auth/login/<str:access_token>', views.LocalLoginView.as_view()),
+    path('auth/logout', views.Logout.as_view(), name='logout'),
+    path('chat_user/profile', views.ChatUserProfileView.as_view(), name="chat_user_profile"),
 ]

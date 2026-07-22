@@ -6,7 +6,10 @@
     @date：2025/6/6 11:18
     @desc:
 """
+import json
+
 import requests
+from django.core.cache import cache
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -23,15 +26,24 @@ from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechTo
 from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
     AuthProfileSerializer
 from common.auth import ChatTokenAuth
+from common.auth.common import FileToken
+from common.constants.authentication_type import AuthenticationType
+from common.constants.cache_version import Cache_Version
 from common.constants.permission_constants import ChatAuth
-from common.exception.app_exception import AppAuthenticationFailed
-from common.log.log import _get_ip_address
+from common.exception.app_exception import AppAuthenticationFailed, AppApiException
+from common.log.log import _get_ip_address, log
 from common.result import result
+from common.utils.rsa_util import decrypt
 from knowledge.models import FileSourceType
 from maxkb.const import CONFIG
+from models_provider.api.model import DefaultModelResponse
 from oss.serializers.file import FileSerializer
-from users.api import CaptchaAPI
+from system_manage.serializers.chat_user import RePasswordSerializer, ChatUserProfileSerializer
+from system_manage.serializers.chat_user_serializer import ChatUserAccessTokenSerializer
+from users.api import CaptchaAPI, LoginAPI
+from users.api.user import ResetPasswordAPI, UserProfileAPI
 from users.serializers.login import CaptchaSerializer
+from users.views import get_re_password_details
 
 
 def stream_image(response):
@@ -288,3 +300,120 @@ class UploadFile(APIView):
                 request.auth.chat_user_id)
             file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
         return result.success(file_ids)
+
+
+class ResetCurrentUserPasswordView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        summary=_("Modify current user password"),
+        description=_("Modify current user password"),
+        operation_id=_("Modify current user password"),  # type: ignore
+        tags=[_("Chat User")],  # type: ignore
+        request=ResetPasswordAPI.get_request(),
+        responses=DefaultModelResponse.get_response(),
+    )
+    @log(
+        menu="Chat User",
+        operate="Modify current user password",
+        get_operation_object=lambda r, k: {"name": r.user.username},
+        get_details=get_re_password_details,
+    )
+    def post(self, request: Request):
+        request_data = request.data
+        encrypted_data = request_data.get("encryptedData", "")
+        if encrypted_data:
+            try:
+                decrypted_raw = decrypt(encrypted_data)
+                # decrypt 可能返回非 JSON 字符串，防护解析异常
+                decrypted_data = json.loads(decrypted_raw) if decrypted_raw else {}
+                if isinstance(decrypted_data, dict):
+                    request_data = decrypted_data
+            except Exception as e:
+                raise AppApiException(500, _("Invalid encrypted data"))
+        serializer_obj = RePasswordSerializer(data=request_data)
+        if serializer_obj.reset_password(request.user.id):
+            version, get_key = Cache_Version.CHAT_USER_TOKEN.value
+            auth = request.META.get("HTTP_AUTHORIZATION")
+            cache.delete(get_key(token=auth), version=version)
+            return result.success(True)
+        return result.error(_("Failed to change password"))
+
+
+
+class ChatUserProfileView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["GET"],
+        summary=_("Get current user information"),
+        description=_("Get current user information"),
+        operation_id=_("Get current user information"),  # type: ignore
+        tags=[_("Chat User")],  # type: ignore
+        responses=UserProfileAPI.get_response(),
+    )
+    def get(self, request: Request):
+        return result.success(ChatUserProfileSerializer().profile(request.user))
+
+
+class BaseAuthView(APIView):
+    @staticmethod
+    def create_token_and_cache(access_token, user, request):
+        token = ChatUserAccessTokenSerializer.create_token_and_cache(access_token, user, request)
+        version, get_key = Cache_Version.CHAT_USER_TOKEN.value
+        cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
+        return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
+
+    @classmethod
+    def generate(self, request, f_token: str, response: HttpResponse, path: str = '/chat'):
+        secure = request.is_secure()
+        response.set_cookie(
+            "mk_file_auth",
+            value=f_token,
+            max_age=7 * 24 * 3600,
+            path=path,
+            domain=None,
+            secure=secure,
+            httponly=True,
+            samesite="Lax",
+        )
+        return response
+
+
+class LocalLoginView(BaseAuthView):
+    @extend_schema(
+        methods=["POST"],
+        description=_("Log in"),
+        summary=_("Log in"),
+        operation_id=_("Log in"),  # type: ignore
+        tags=[_("Chat User/login")],  # type: ignore
+        request=LoginAPI.get_request(),
+        responses=LoginAPI.get_response(),
+    )
+    def post(self, request: Request, access_token: str = None):
+        user = ChatUserAccessTokenSerializer.local_login(request.data, access_token)
+        user.source = "LOCAL"
+        token, f_token = self.create_token_and_cache(access_token, user, request)
+        response = result.success({'token': token})
+        return self.generate(request, f_token, response, path=f'/chat/{access_token}/')
+
+
+class Logout(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=["POST"],
+        summary=_("Sign out"),
+        description=_("Sign out"),
+        operation_id=_("Sign out"),  # type: ignore
+        tags=[_("Chat User")],  # type: ignore
+        responses=DefaultModelResponse.get_response(),
+    )
+    @log(menu="Chat User/logout", operate="Sign out", get_operation_object=lambda r, k: {"name": r.user.username})
+    def post(self, request: Request):
+        version, get_key = Cache_Version.CHAT_USER_TOKEN.value
+        auth = request.META.get("HTTP_AUTHORIZATION")
+        cache.delete(get_key(token=auth[7:]), version=version)
+        return result.success(True)
+
