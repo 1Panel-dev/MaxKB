@@ -9550,6 +9550,3 @@ msgstr "角色管理"
 
 msgid "Chat User Group"
 msgstr "對話用戶組"
-
-msgid "Chat User Auth"
-msgstr "對話用戶認證"

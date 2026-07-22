@@ -9427,6 +9427,3 @@ msgstr ""
 
 msgid "Chat User Group"
 msgstr ""
-
-msgid "Chat User Auth"
-msgstr ""
