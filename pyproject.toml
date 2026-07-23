@@ -32,7 +32,7 @@ dependencies = [
     "langgraph==1.2.9",
     "torch==2.13.0",
     "sentence-transformers==5.6.0",
-    "xinference-client==2.12.0",
+    "xinference-client==3.0.0",
 
     # Model providers & cloud SDKs
     "anthropic==0.116.0",
