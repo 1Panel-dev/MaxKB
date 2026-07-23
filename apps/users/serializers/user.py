@@ -78,6 +78,48 @@ class CreateUserSerializer(serializers.Serializer):
     )
 
 
+def _get_workspace_name_mapping():
+    workspace_model = DatabaseModelManage.get_model("workspace_model")
+    if not workspace_model:
+        return {}
+    return {str(workspace.id): workspace.name for workspace in workspace_model.objects.all()}
+
+
+def _get_user_group_workspace_mapping(user_ids):
+    user_group_relations = (
+        SystemUserGroupRelation.objects.filter(user_id__in=user_ids)
+        .select_related("group")
+    )
+    workspace_mapping = _get_workspace_name_mapping()
+    user_group_mapping = defaultdict(
+        lambda: {
+            "user_group_ids": [],
+            "user_group_names": [],
+            "user_group_workspace": defaultdict(list),
+        }
+    )
+
+    for relation in user_group_relations:
+        user_id = str(relation.user_id)
+        group_name = relation.group.name
+        workspace_name = workspace_mapping.get(relation.group.workspace_id, relation.group.workspace_id)
+        user_group_mapping[user_id]["user_group_ids"].append(str(relation.group_id))
+        user_group_mapping[user_id]["user_group_names"].append(group_name)
+        user_group_mapping[user_id]["user_group_workspace"][workspace_name].append(group_name)
+
+    return {
+        user_id: {
+            "user_group_ids": data["user_group_ids"],
+            "user_group_names": data["user_group_names"],
+            "user_group_workspace": [
+                {"workspace": workspace_name, "user_group_names": group_names}
+                for workspace_name, group_names in data["user_group_workspace"].items()
+            ],
+        }
+        for user_id, data in user_group_mapping.items()
+    }
+
+
 def is_workspace_manage(user_id: str, workspace_id: str):
     workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
     role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
@@ -298,6 +340,20 @@ class UserManageSerializer(serializers.Serializer):
                 self.get_query_set(),
                 post_records_handler=lambda u: UserInstanceSerializer(u).data,
             )
+            user_group_mapping = _get_user_group_workspace_mapping([user["id"] for user in result["records"]])
+
+            for user in result["records"]:
+                user_group_data = user_group_mapping.get(
+                    str(user["id"]),
+                    {
+                        "user_group_ids": [],
+                        "user_group_names": [],
+                        "user_group_workspace": [],
+                    },
+                )
+                user["user_group_ids"] = user_group_data["user_group_ids"]
+                user["user_group_names"] = user_group_data["user_group_names"]
+                user["user_group_workspace"] = user_group_data["user_group_workspace"]
             role_model = DatabaseModelManage.get_model("role_model")
             user_role_relation_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
 
@@ -368,6 +424,8 @@ class UserManageSerializer(serializers.Serializer):
                     user["role_name"] = user_role_mapping.get(user_id, [])
                     user["role_setting"] = user_role_setting_mapping.get(user_id, [])
                     user["role_workspace"] = user_role_workspace_mapping.get(user_id, [])
+
+            # 用户设置用户组
             return result
 
     @transaction.atomic
