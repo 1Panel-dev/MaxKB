@@ -1,116 +1,17 @@
-import '@/styles/index.scss'
-import ElementPlus from 'element-plus'
-import * as ElementPlusIcons from '@element-plus/icons-vue'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
-import enUs from 'element-plus/es/locale/lang/en'
-import zhTW from 'element-plus/es/locale/lang/zh-tw'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import ElementPlus from 'element-plus'
+
 import App from './App.vue'
 import router from '@/router/chat'
-import i18n, {initExternalLocales} from '@/locales'
-import Components from '@/components'
-import directives from '@/directives'
-import { supPopover } from '@/utils/supPopover'
-import { getDefaultWhiteList } from 'xss'
-import { config, XSSPlugin } from 'md-editor-v3'
-import screenfull from 'screenfull'
+import 'element-plus/dist/index.css'
+import '@/styles/tailwind.css'
+import '@/styles/index.scss'
 
-import katex from 'katex'
-import 'katex/dist/katex.min.css'
-
-import Cropper from 'cropperjs'
-
-import mermaid from 'mermaid'
-
-import highlight from 'highlight.js'
-import 'highlight.js/styles/atom-one-dark.css'
-
-config({
-  editorExtensions: {
-    highlight: {
-      instance: highlight,
-    },
-    screenfull: {
-      instance: screenfull,
-    },
-    katex: {
-      instance: katex,
-    },
-    cropper: {
-      instance: Cropper,
-    },
-    mermaid: {
-      instance: mermaid,
-    },
-  },
-  markdownItPlugins(plugins) {
-    return [
-      ...plugins,
-      {
-        type: 'xss',
-        plugin: XSSPlugin,
-        options: {
-          xss() {
-            return {
-              whiteList: Object.assign({}, getDefaultWhiteList(), {
-                video: ['src', 'controls', 'width', 'height', 'preload', 'playsinline'],
-                source: ['src', 'type'],
-                a: ['href', 'style'],
-                input: ['class', 'disabled', 'type', 'checked'],
-                sup: ['data-title'],
-                iframe: [
-                  'class',
-                  'width',
-                  'height',
-                  'src',
-                  'title',
-                  'border',
-                  'frameborder',
-                  'framespacing',
-                  'allow',
-                  'allowfullscreen',
-                ],
-              }),
-              onTagAttr: (tag: string, name: any, value: any) => {
-                if (tag === 'video') {
-                  // 禁止自动播放
-                  if (name === 'autoplay') return ''
-
-                  // 限制 preload
-                  if (name === 'preload' && !['none', 'metadata'].includes(value)) {
-                    return 'preload="metadata"'
-                  }
-                }
-                return undefined
-              },
-            }
-          },
-        },
-      },
-    ]
-  },
-})
-supPopover.init()
 const app = createApp(App)
+
 app.use(createPinia())
-for (const [key, component] of Object.entries(ElementPlusIcons)) {
-  app.component(key, component)
-}
-const locale_map: any = {
-  'zh-CN': zhCn,
-  'zh-Hant': zhTW,
-  'en-US': enUs,
-}
-app.use(ElementPlus, {
-  locale: locale_map[localStorage.getItem('MaxKB-locale') || navigator.language || 'en-US'],
-})
-app.use(directives)
 app.use(router)
-app.use(i18n)
-app.use(Components)
-// 初始化外置语言包后挂载应用
-initExternalLocales().finally(() => {
-})
+app.use(ElementPlus)
+
 app.mount('#app')
-export { app }

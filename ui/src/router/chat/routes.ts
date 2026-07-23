@@ -1,39 +1,11 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-export const routes: Array<RouteRecordRaw> = [
-  // 对话
+/** Chat 独立路由，后续的登录、对话分享页等统一在这里扩展。 */
+export const chatRoutes: RouteRecordRaw[] = [
   {
-    path: '/:accessToken',
-    redirect: (to) => {
-      return `/${to.params.accessToken}/`
-    },
-  },
-  {
-    path: '/:accessToken/',
-    name: 'chat',
-    component: () => import('@/views/chat/index.vue'),
-  },
-  // 对话用户登录
-  {
-    path: '/login/:accessToken',
-    name: 'login',
-    component: () => import('@/views/chat/user-login/index.vue'),
-  },
-  // 对话用户登录
-  {
-    path: '/404',
-    name: '404',
-    component: () => import('@/views/error/404.vue'),
-  },
-  {
-    path: '/no-service',
-    name: 'NoService',
-    component: () => import('@/views/error/NoService.vue'),
-  },
-  // 对话
-  {
-    path: '/share/:link',
-    name: 'Share',
-    component: () => import('@/views/chat/Share.vue'),
+    path: '/',
+    name: 'chat-home',
+    component: () => import('@/views/chat/ChatView.vue'),
+    meta: { title: '对话' },
   },
 ]
