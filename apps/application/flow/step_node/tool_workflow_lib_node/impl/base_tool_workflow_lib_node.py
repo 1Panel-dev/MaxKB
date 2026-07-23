@@ -14,7 +14,7 @@ import uuid_utils.compat as uuid
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 
-from application.flow.common import WorkflowMode, Workflow
+from application.flow.common import WorkflowMode, Workflow, Answer
 from application.flow.i_step_node import NodeResult, ToolWorkflowPostHandler, INode
 from application.flow.step_node.tool_workflow_lib_node.i_tool_workflow_lib_node import IToolWorkflowLibNode
 from application.models import ChatRecord
@@ -147,6 +147,17 @@ def valid_function(tool_lib, workspace_id, user_id=None):
 
 
 class BaseToolWorkflowLibNodeNode(IToolWorkflowLibNode):
+    def get_answer_list(self):
+        try:
+            child_answer_data = self.context.get('child_answer_data') or []
+            return [
+                Answer(item.get('content'), item.get('view_type'), item.get('runtime_node_id'),
+                       item.get('chat_record_id'),
+                       item.get('child_node'), item.get('real_node_id'), item.get('reasoning_content')) for item in
+                child_answer_data]
+        except Exception as e:
+            return []
+
     def get_parameters(self, input_field_list):
         result = {}
         for input in input_field_list:
