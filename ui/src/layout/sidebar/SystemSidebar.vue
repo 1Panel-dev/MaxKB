@@ -1,55 +1,84 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowDown } from '@element-plus/icons-vue'
 import { getChildRouteList } from '@/router/admin/utils'
+import type { RouteLocationRaw } from 'vue-router'
 
-defineProps<{
+const props = defineProps<{
   collapsed?: boolean
+}>()
+
+const emit = defineEmits<{
+  toggle: []
 }>()
 
 const route = useRoute()
 const router = useRouter()
 const items = getChildRouteList('system')
-const activeKeys = computed(
-  () => new Set(route.matched.flatMap((item) => (item.name ? [String(item.name)] : []))),
-)
+const menuRoutes = new Map<string, RouteLocationRaw>()
+
+const activeKey = computed(() => {
+  const matchedMenu = [...route.matched]
+    .reverse()
+    .find((item) => item.name && menuRoutes.has(String(item.name)))
+
+  return matchedMenu?.name ? String(matchedMenu.name) : ''
+})
+
+const defaultOpeneds = items.filter((item) => item.children?.length).map((item) => item.key)
+
+function handleSelect(index: string) {
+  const targetRoute = menuRoutes.get(index)
+  if (targetRoute) router.push(targetRoute)
+}
 </script>
 
 <template>
-  <nav :class="collapsed ? 'px-2.5 pt-3.5' : 'px-5 pt-3.5 max-md:px-2.5'">
-    <template v-for="item in items" :key="item.key">
+  <div class="mk-sidebar-system flex h-full flex-col">
+    <el-scrollbar class="min-h-0 flex-1">
+      <el-menu
+        :class="props.collapsed ? 'w-12!' : 'w-full!'"
+        :collapse="props.collapsed"
+        :collapse-transition="false"
+        :default-active="activeKey"
+        :default-openeds="defaultOpeneds"
+        @select="handleSelect"
+      >
+        <template v-for="item in items" :key="item.key">
+          <el-sub-menu v-if="item.children?.length" :index="item.key">
+            <template #title>
+              <MkIcon v-if="item.icon" :name="item.icon" />
+              <span>{{ item.label }}</span>
+            </template>
+
+            <el-menu-item v-for="child in item.children" :key="child.key" :index="child.key">
+              {{ child.label }}
+            </el-menu-item>
+          </el-sub-menu>
+
+          <el-menu-item v-else :index="item.key">
+            <MkIcon v-if="item.icon" :name="item.icon" />
+            <template #title>{{ item.label }}</template>
+          </el-menu-item>
+        </template>
+      </el-menu>
+    </el-scrollbar>
+
+    <div :class="props.collapsed ? 'px-2.5 pb-[18px]' : 'px-5 pb-[18px] max-md:px-2.5'">
       <button
         type="button"
-        class="flex w-full cursor-pointer items-center gap-2.5 rounded-lg border-0 bg-transparent font-[inherit] text-[15px] text-[#303846] hover:bg-white/70"
-        :class="[
-          collapsed
-            ? 'min-h-11 justify-center p-0'
-            : 'min-h-11 px-3 text-left max-md:justify-center max-md:p-0',
-          activeKeys.has(item.key) || item.children?.some((child) => activeKeys.has(child.key)),
-        ]"
+        class="flex h-[46px] w-full cursor-pointer items-center gap-2.5 px-1"
+        @click="emit('toggle')"
       >
-        <MkIcon v-if="item.icon" :name="item.icon" />
-        <span class="max-md:hidden">{{ item.label }}</span>
-        <MkIcon
-          v-if="item.children?.length && !collapsed"
-          :icon="ArrowDown"
-          class="ml-auto max-md:hidden"
-        />
+        <MkIcon name="icon_left_outlined" />
+        <span :class="props.collapsed && 'hidden'" class="max-md:hidden">收起导航</span>
       </button>
-
-      <div v-if="item.children?.length && !collapsed" class="pb-2 pt-0.5 max-md:hidden">
-        <button
-          v-for="child in item.children"
-          :key="child.key"
-          type="button"
-          class="flex min-h-11 w-full cursor-pointer items-center rounded-lg border-0 pl-[42px] text-left"
-          :class="activeKeys.has(child.key) && 'bg-white font-semibold'"
-          @click="child.route && router.push(child.route)"
-        >
-          {{ child.label }}
-        </button>
-      </div>
-    </template>
-  </nav>
+    </div>
+  </div>
 </template>
+
+<style scoped lang="scss">
+.mk-sidebar-system {
+
+}
+</style>

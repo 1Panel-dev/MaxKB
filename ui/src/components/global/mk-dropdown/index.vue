@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import type { DropdownInstance } from 'element-plus'
 import type { Options } from '@popperjs/core'
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ name: 'MkDropdown', inheritAttrs: false })
 
 const props = withDefaults(
   defineProps<{

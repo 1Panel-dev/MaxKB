@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
 
+defineOptions({ name: 'AvatarDropdown' })
+
 type Language = 'en' | 'zh-CN' | 'zh-TW'
 
 const currentLanguage = ref<Language>('zh-CN')

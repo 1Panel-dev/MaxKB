@@ -59,6 +59,7 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 - Element Plus 组件可通过 `class`、`popper-class` 等属性直接传入 Tailwind 工具类；覆盖组件默认样式时按需使用 Tailwind 的 `!` important 修饰符。
 - 仅在 Tailwind 无法清晰表达、必须使用复杂选择器、需要深层穿透，或样式确实会被多处共享时编写 Sass/CSS。此时 class 应使用有业务含义的名称，组件样式默认保持 `scoped`。
 - 运行时主题颜色仍以 `variables.scss` 的 `--mk-*` 变量为唯一数据源，并优先使用已映射的 `text-N900`、`text-N600`、`bg-primary` 等语义工具类。
+- 只添加会实际改变当前布局、样式或交互的 class。不要习惯性追加无效或重复的工具类；添加前应结合元素默认样式、父级布局和现有 class 判断其是否必要。
 
 CSS、SCSS 同一声明块内的属性统一按属性名字母顺序排列。CSS 自定义属性同样按变量名排序；
 嵌套选择器、伪类和媒体查询放在普通属性声明之后。

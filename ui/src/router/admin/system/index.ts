@@ -14,7 +14,7 @@ export const systemRoutes: RouteRecordRaw = {
       redirect: { name: 'system-users' },
       meta: {
         title: '身份与权限',
-        icon: 'icon_user_outlined',
+        icon: 'icon-setting',
         order: 10,
       },
       children: [
@@ -48,7 +48,7 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'resource',
       name: 'system-resource',
       redirect: { name: 'system-resource-list' },
-      meta: { title: '资源管理', icon: 'icon_folder_outlined', order: 20 },
+      meta: { title: '资源管理', icon: 'icon-setting', order: 20 },
       children: [
         {
           path: '',
@@ -64,31 +64,31 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'share',
       name: 'system-share',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '共享资源', icon: 'icon_folder_outlined', order: 30 },
+      meta: { title: '共享资源', icon: 'icon-setting', order: 30 },
     },
     {
       path: 'authorization',
       name: 'system-authorization',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '资源授权', icon: 'icon_lock_outlined', order: 40 },
+      meta: { title: '资源授权', icon: 'icon-setting', order: 40 },
     },
     {
       path: 'chat',
       name: 'system-chat',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '对话端管理', icon: 'icon_chat_outlined', order: 50 },
+      meta: { title: '对话端管理', icon: 'icon-setting', order: 50 },
     },
     {
       path: 'settings',
       name: 'system-settings',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '系统设置', icon: 'icon_setting_outlined', order: 60 },
+      meta: { title: '系统设置', icon: 'icon-setting', order: 60 },
     },
     {
       path: 'logs',
       name: 'system-logs',
       component: () => import('@/views/system/SystemView.vue'),
-      meta: { title: '操作日志', icon: 'icon_document_outlined', order: 70 },
+      meta: { title: '操作日志', icon: 'icon-setting', order: 70 },
     },
   ],
 }

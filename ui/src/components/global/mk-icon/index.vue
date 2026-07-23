@@ -2,6 +2,8 @@
 import { computed, type Component } from 'vue'
 import '@/assets/iconfont.js'
 
+defineOptions({ name: 'MkIcon' })
+
 /**
  * MkIcon 使用说明
  *

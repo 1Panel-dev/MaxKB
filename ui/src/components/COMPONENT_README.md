@@ -16,6 +16,11 @@ Element Plus 已在 `src/main.ts` 和 `src/chat.ts` 中全局注册，Vue 模板
 
 Element Plus 图标不是全局组件。需要作为属性传递或在脚本中使用时，仍须从 `@element-plus/icons-vue` 显式导入。
 
+页面实现应尽量优先使用项目已有的 Mk 公共组件；没有对应 Mk 组件时，优先使用 Element Plus
+现成组件。视觉样式不符合设计稿时，应基于现有组件通过 Props、Slots、Tailwind class 或
+必要的样式覆盖进行改造，不要重复手写 Element Plus 已经提供的结构、状态和交互。只有现有
+组件无法满足必要的结构或行为时，才新增自定义组件。
+
 ## 自动注册
 
 Vite 使用 `unplugin-vue-components`，但只扫描 `src/components/global`。该目录中的组件可以直接在 Vue 模板中使用，无需手动 `import`：
@@ -52,6 +57,7 @@ src/components/
 - 一个公共组件使用一个 kebab-case 目录。
 - 组件入口统一使用 `index.vue`。
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应 `mk-icon/index.vue`。
+- 使用 `index.vue` 作为入口时，必须通过 `defineOptions({ name: 'ComponentName' })` 显式声明多单词组件名，避免 ESLint 将组件名推断为 `index`。
 - 组件内部实现、Props 和事件保持类型化。
 - 组件样式默认使用 `scoped`；只有明确的全局规则才放入 `src/styles`。
 - `global` 组件不要创建只用于二次导出的 `components/index.ts`，模板组件由自动注册插件解析。

@@ -2,6 +2,8 @@
 import { computed, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 
+defineOptions({ name: 'MkFilterableDropdown' })
+
 type DropdownValue = string | number
 
 interface DropdownOption {
