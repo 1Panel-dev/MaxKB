@@ -409,6 +409,7 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return RoleConst.ADMIN
             } else if (to.params.folderId == 'resource-management') {
+            } else if (to.params.folderId == 'share') {
             } else {
               return new ComplexPermission(
                 [RoleConst.USER],
@@ -427,6 +428,7 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return RoleConst.ADMIN
             } else if (to.params.folderId == 'resource-management') {
+            } else if (to.params.folderId == 'share') {
             } else {
               return RoleConst.WORKSPACE_MANAGE.getWorkspaceRole()
             }
@@ -436,6 +438,7 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return PermissionConst.SHARED_KNOWLEDGE_HIT_TEST_READ
             } else if (to.params.folderId == 'resource-management') {
+            } else if (to.params.folderId == 'share') {
             } else {
               return PermissionConst.KNOWLEDGE_HIT_TEST_READ.getKnowledgeWorkspaceResourcePermission(
                 to ? to.params.id : '',
@@ -447,25 +450,9 @@ const DocumentRouter = {
             if (to.params.folderId == 'shared') {
               return RoleConst.ADMIN
             } else if (to.params.folderId == 'resource-management') {
+            } else if (to.params.folderId == 'share') {
             } else {
               return PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermissionWorkspaceManageRole()
-            }
-          },
-          () => {
-            const to: any = get_next_route()
-            if (to.params.folderId == 'share') {
-              return new ComplexPermission(
-                [RoleConst.EXTENDS_USER.getWorkspaceRole()],
-                [PermissionConst.KNOWLEDGE_HIT_TEST_READ.getWorkspacePermission()],
-                [],
-                'AND',
-              )
-            }
-          },
-          () => {
-            const to: any = get_next_route()
-            if (to.params.folderId == 'share') {
-              return RoleConst.USER.getWorkspaceRole()
             }
           },
           () => {
