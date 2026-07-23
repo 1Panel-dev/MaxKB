@@ -6,7 +6,7 @@ from django.db import transaction
 from django.db.models import Q, Max
 from django.utils import timezone
 
-from application.models import Application, Chat, ChatRecord
+from application.models import Application, Chat, ChatRecord, ApplicationChatUserStats
 from common.job.scheduler import scheduler
 from common.utils.lock import lock, RedisLock
 from common.utils.logger import maxkb_logger
@@ -88,7 +88,16 @@ def clean_method(query_conditions, clean_log=True):
                     Chat.objects.filter(id=chat_id).update(chat_record_count=count)
 
                 # 删除没有关联 ChatRecord 的 Chat
-                Chat.objects.filter(chatrecord__isnull=True, id__in=chat_ids).delete()
+                chats = Chat.objects.filter(
+                    chatrecord__isnull=True,
+                    id__in=chat_ids,
+                )
+
+                user_ids = list(chats.values_list("user_id", flat=True).distinct())
+
+                ApplicationChatUserStats.objects.filter(chat_user_id__in=user_ids).delete()
+
+                chats.delete()
             File.objects.filter(loid__in=[file.loid for file in files_to_delete]).delete()
 
             if deleted_count < batch_size:
