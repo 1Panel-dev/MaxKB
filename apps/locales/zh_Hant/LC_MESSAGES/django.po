@@ -9550,3 +9550,18 @@ msgstr "角色管理"
 
 msgid "Chat User Group"
 msgstr "對話用戶組"
+
+msgid "Create or update Workspace User Group"
+msgstr "創建或更新工作空間用戶組"
+
+msgid "Get Workspace User Group list by workspace id"
+msgstr "通過工作空間 ID 獲取工作空間用戶組列表"
+
+msgid "Delete Workspace User Group"
+msgstr "刪除工作空間用戶組"
+
+msgid "Add members to Workspace User Group"
+msgstr "添加成員到工作空間用戶組"
+
+msgid "Remove members from Workspace User Group"
+msgstr "從工作空間用戶組中移除成員"

@@ -9427,3 +9427,18 @@ msgstr ""
 
 msgid "Chat User Group"
 msgstr ""
+
+msgid "Create or update System User Group"
+msgstr ""
+
+msgid "Get System User Group list by workspace id"
+msgstr ""
+
+msgid "Delete System User Group"
+msgstr ""
+
+msgid "Add members to System User Group"
+msgstr ""
+
+msgid "Remove members from System User Group"
+msgstr ""
