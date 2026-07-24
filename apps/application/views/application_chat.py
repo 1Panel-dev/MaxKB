@@ -18,7 +18,7 @@ from application.api.application_chat import ApplicationChatQueryAPI, Applicatio
     ApplicationChatExportAPI
 from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
-from chat.api.chat_api import ChatAPI, PromptGenerateAPI
+from chat.api.chat_api import ChatAPI, PromptGenerateAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
 from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugChatSerializers, PromptGenerateSerializer
 from common.auth import TokenAuth
@@ -137,11 +137,10 @@ class OpenView(APIView):
         ip_address = _get_ip_address(request)
         return result.success(OpenChatSerializers(
             data={'workspace_id': workspace_id, 'application_id': application_id,
-                  'chat_user_id': str(uuid.uuid7()), 'chat_user_type': ChatUserType.ANONYMOUS_USER,
+                  'chat_user_id': str(request.user.id), 'chat_user_type': ChatUserType.SYSTEM_USER,
                   'ip_address': ip_address,
                   'source': {
-                      'type': ChatSourceChoices.ONLINE.value}
-                ,
+                      'type': ChatSourceChoices.ONLINE.value},
                   'debug': True}).open())
 
 
@@ -160,6 +159,27 @@ class ChatView(APIView):
     )
     def post(self, request: Request, chat_id: str):
         return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)
+
+
+class CancelWorkflowView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("Cancel running workflow"),
+        summary=_("Cancel running workflow"),
+        operation_id=_("Cancel running workflow"),  # type: ignore
+        tags=[_('Application')]  # type: ignore
+    )
+    def post(self, request: Request, chat_id: str):
+        from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
+        result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
+        if result_enum == CancelResult.CANCELLED:
+            return result.success({'status': 'cancelled', 'chat_id': chat_id})
+        elif result_enum == CancelResult.NOT_FOUND:
+            return result.success({'status': 'not_found', 'chat_id': chat_id})
+        else:
+            return result.fail(500, _('Failed to cancel workflow'))
 
 
 class PromptGenerateView(APIView):
@@ -194,23 +214,47 @@ class DebugHistoricalConversation(APIView):
     class PageView(APIView):
         authentication_classes = [TokenAuth]
 
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get historical conversation by page"),
+            summary=_("Get historical conversation by page"),
+            operation_id=_("Get historical conversation by page"),  # type: ignore
+            parameters=PageHistoricalConversationAPI.get_parameters(),
+            responses=PageHistoricalConversationAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
-            from chat.serializers.chat_record import HistoricalConversationSerializer, page_search, HistoryChatModel
-            from django.db.models import QuerySet
-            from application.models import Chat
-
-            queryset = QuerySet(Chat).filter(
-                application_id=application_id,
-                is_deleted=False
-            ).order_by('-update_time', 'id')
-
-            return result.success(
-                page_search(current_page, page_size, queryset, lambda r: HistoryChatModel(r).data)
-            )
+            from chat.serializers.chat_record import HistoricalConversationSerializer
+            return result.success(HistoricalConversationSerializer(
+                data={
+                    'application_id': application_id,
+                    'chat_user_id': str(request.user.id),
+                }).page(current_page, page_size))
 
     class RecordPageView(APIView):
         authentication_classes = [TokenAuth]
 
+        @extend_schema(
+            methods=['GET'],
+            description=_("Get historical conversation records"),
+            summary=_("Get historical conversation records"),
+            operation_id=_("Get historical conversation records"),  # type: ignore
+            parameters=HistoricalConversationRecordAPI.get_parameters(),
+            responses=HistoricalConversationRecordAPI.get_response(),
+            tags=[_('Chat')]  # type: ignore
+        )
+        @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                         PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                         ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                        [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                        CompareConstants.AND),
+                         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, chat_id: str, current_page: int,
                 page_size: int):
             from chat.serializers.chat_record import HistoricalConversationRecordSerializer
@@ -219,24 +263,10 @@ class DebugHistoricalConversation(APIView):
                 data={
                     'application_id': application_id,
                     'chat_id': chat_id,
-                    'chat_user_id': str(uuid.uuid7()),
+                    'chat_user_id': str(request.user.id),
                 }
             )
-            try:
-                return result.success(serializer.page(current_page, page_size))
-            except Exception:
-                from django.db.models import QuerySet
-                from application.models import ChatRecord
-                from common.db.search import page_search
-                from application.serializers.application_chat_record import ChatRecordSerializerModel
-
-                queryset = QuerySet(ChatRecord).filter(
-                    chat_id=chat_id,
-                ).order_by('create_time', 'id')
-
-                return result.success(
-                    page_search(current_page, page_size, queryset, lambda r: ChatRecordSerializerModel(r).data)
-                )
+            return result.success(serializer.page(current_page, page_size))
 
     class Operate(APIView):
         authentication_classes = [TokenAuth]

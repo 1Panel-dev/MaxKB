@@ -29,6 +29,7 @@ from application.flow.tools import to_stream_response_simple
 from application.workflow.common import WorkflowType, new_instance
 from application.workflow.message.aggregator import AggregationManager
 from application.workflow.workflow_manage import WorkflowManage, CallBack
+from application.workflow.workflow_run_registry import WorkflowRunRegistry
 from application.workflow.nodes import get_start_node
 from application.workflow.message.struct.text_content import TextContent
 from application.workflow.message.struct.reasoning_content import ReasoningContent
@@ -510,6 +511,8 @@ class ChatSerializers(serializers.Serializer):
                 }))
 
         def on_complete(wf_manage, error):
+            # 注销工作流实例
+            WorkflowRunRegistry.unregister(chat_record_id_str, str(chat_info.chat_id))
             if error:
                 result_queue.put(('error', error))
             self._save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
@@ -542,6 +545,9 @@ class ChatSerializers(serializers.Serializer):
                                               call_back, get_start_node_fn)
 
         work_flow_manage.start_node.workflow_manage = work_flow_manage
+
+        # 注册工作流实例到注册表
+        WorkflowRunRegistry.register(chat_record_id_str, str(chat_info.chat_id), work_flow_manage)
 
         chat_info.set_chat(message)
 

@@ -143,6 +143,7 @@ class RerankerNode(INode):
         workspace_id = workflow_params.get('workspace_id')
         reranker_model = get_model_instance_by_model_workspace_id(reranker_model_id, workspace_id, top_n=top_n)
 
+        self._check_cancelled()
         result = reranker_model.compress_documents(documents, question)
 
         similarity = reranker_setting.get('similarity', 0.6)

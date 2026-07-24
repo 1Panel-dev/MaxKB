@@ -285,6 +285,7 @@ class AIChatNode(INode):
         response_reasoning_content = False
 
         for chunk in response:
+            self._check_cancelled()
             reasoning_chunk = reasoning.get_reasoning_content(chunk)
             content_chunk = reasoning_chunk.get('content')
             if 'reasoning_content' in chunk.additional_kwargs:
@@ -472,6 +473,7 @@ class AIChatNode(INode):
             answer = ''
             tool_calls_map = {}
             for chunk in r:
+                self._check_cancelled()
                 if isinstance(chunk, ToolMessage):
                     tool_call = tool_calls_map.get(chunk.tool_call_id, {})
                     self.write(ToolContent(

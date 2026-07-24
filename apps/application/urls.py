@@ -44,6 +44,7 @@ urlpatterns = [
     path('workspace/<str:workspace_id>/application/<str:application_id>/mcp_tools', views.McpServers.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/model/<str:model_id>/prompt_generate', views.PromptGenerateView.as_view()),
     path('chat_message/<str:chat_id>', views.ChatView.as_view()),
+    path('chat_message/<str:chat_id>/cancel', views.CancelWorkflowView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/historical_conversation/<int:current_page>/<int:page_size>', views.DebugHistoricalConversation.PageView.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/historical_conversation/<str:chat_id>', views.DebugHistoricalConversation.Operate.as_view()),
     path('workspace/<str:workspace_id>/application/<str:application_id>/historical_conversation_record/<str:chat_id>/<int:current_page>/<int:page_size>', views.DebugHistoricalConversation.RecordPageView.as_view()),

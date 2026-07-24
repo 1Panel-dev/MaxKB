@@ -18,10 +18,16 @@ from application.workflow.status import Status
 from common.utils.logger import maxkb_logger
 
 
+class CancelledException(Exception):
+    """工作流取消异常"""
+    pass
+
+
 class Signal(str, Enum):
     BREAK = 'BREAK'
     CONTINUE = 'CONTINUE'
     FORM = 'FORM'
+    CANCELLED = "CANCELLED"
 
 
 class INode:
@@ -88,6 +94,8 @@ class INode:
         self.status = Status.RUNNING
         try:
             self._run()
+        except CancelledException:
+            self.complete(Status.CANCELLED)
         except Exception as e:
             self.complete(Status.FAIL, error=e)
 
@@ -120,7 +128,8 @@ class INode:
             self.workflow_manage.signal = signal
             anchors = []
         if anchors is None:
-            anchors = [self.success_anchor() if status == Status.SUCCESS else self.fail_anchor()]
+            anchors = [self.success_anchor() if [Status.SUCCESS, Status.CANCELLED].__contains__(
+                status) else self.fail_anchor()]
         self._dispatch(anchors)
         self.workflow_manage.assertion_end(error)
 
@@ -201,3 +210,18 @@ class INode:
 
     def write(self, message: Content):
         self.workflow_manage.write(message)
+
+    def cancel(self):
+        """
+        取消运行
+        @return:
+        """
+        self.status = Status.CANCELLED
+
+    def _check_cancelled(self):
+        """
+        检查是否已取消，如果已取消则抛出 CancelledException
+        @return:
+        """
+        if self.status == Status.CANCELLED or self.workflow_manage.signal == Signal.CANCELLED:
+            raise CancelledException()

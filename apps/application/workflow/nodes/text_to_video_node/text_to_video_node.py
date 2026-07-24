@@ -98,6 +98,7 @@ class TextToVideoNode(INode):
         self.write_context('dialogue_type', dialogue_type)
         self.write_context('negative_prompt', self.workflow_manage.generate_prompt(negative_prompt))
 
+        self._check_cancelled()
         video_urls = ttv_model.generate_video(question, negative_prompt)
         maxkb_logger.info(f'[TextToVideoNode] generate_video result: {video_urls is not None}, node_id={self.get_node_id()}')
 

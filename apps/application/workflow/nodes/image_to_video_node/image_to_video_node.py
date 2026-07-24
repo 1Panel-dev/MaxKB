@@ -120,6 +120,7 @@ class ImageToVideoNode(INode):
         first_frame_url = self._get_file_base64(first_frame_url)
         last_frame_url = self._get_file_base64(last_frame_url)
 
+        self._check_cancelled()
         video_urls = ttv_model.generate_video(question, negative_prompt, first_frame_url, last_frame_url)
         maxkb_logger.info(f'[ImageToVideoNode] generate_video result: {video_urls is not None}, node_id={self.get_node_id()}')
 

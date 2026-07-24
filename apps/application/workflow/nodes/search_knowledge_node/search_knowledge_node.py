@@ -180,6 +180,7 @@ class SearchKnowledgeNode(INode):
             return
 
         model_id = _get_embedding_id(knowledge_id_list)
+        self._check_cancelled()
         embedding_model = get_model_instance_by_model_workspace_id(model_id, workspace_id)
         embedding_value = embedding_model.embed_query(question)
         vector = VectorStore.get_embedding_vector()
@@ -187,6 +188,7 @@ class SearchKnowledgeNode(INode):
         exclude_document_id_list = [str(document.id) for document in
                                     QuerySet(Document).filter(knowledge_id__in=knowledge_id_list, is_active=False)]
 
+        self._check_cancelled()
         embedding_list = vector.query(question, embedding_value, knowledge_id_list, document_id_list,
                                       exclude_document_id_list, exclude_paragraph_id_list, True,
                                       knowledge_setting.get('top_n'), knowledge_setting.get('similarity'),

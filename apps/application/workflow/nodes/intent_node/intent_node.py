@@ -100,6 +100,7 @@ class IntentNode(INode):
         self.write_context('message_list', message_list)
 
         try:
+            self._check_cancelled()
             r = chat_model.invoke(message_list)
             classification_result = r.content.strip()
             matched_branch = self._parse_classification_result(classification_result, branch)
