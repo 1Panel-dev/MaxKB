@@ -93,6 +93,7 @@ class ImageGenerateNode(INode):
         self.write_context('negative_prompt', self.workflow_manage.generate_prompt(negative_prompt or ''))
         self.write_context('dialogue_type', dialogue_type)
 
+        self._check_cancelled()
         image_urls = tti_model.generate_image(question, negative_prompt)
 
         file_urls = []

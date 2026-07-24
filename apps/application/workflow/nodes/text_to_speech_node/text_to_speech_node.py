@@ -88,6 +88,7 @@ class TextToSpeechNode(INode):
         temp_files = []
 
         for chunk in content_chunks:
+            self._check_cancelled()
             self.write_context('content', chunk)
             workspace_id = workflow_params.get('workspace_id')
             model = get_model_instance_by_model_workspace_id(

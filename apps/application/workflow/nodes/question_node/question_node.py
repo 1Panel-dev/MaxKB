@@ -116,6 +116,7 @@ class QuestionNode(INode):
         answer = ''
 
         for chunk in response:
+            self._check_cancelled()
             answer += chunk.content
 
         message_tokens = chat_model.get_num_tokens_from_messages(message_list)

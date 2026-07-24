@@ -57,6 +57,8 @@ class McpNode(INode):
         params = json.loads(json.dumps(tool_params))
         params = self._handle_variables(params)
 
+        self._check_cancelled()
+
         async def call_tool(t, a):
             client = MultiServerMCPClient(servers)
             async with client.session(mcp_server) as s:

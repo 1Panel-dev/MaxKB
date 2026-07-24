@@ -136,6 +136,7 @@ class ImageUnderstandNode(INode):
         response_reasoning_content = False
 
         for chunk in response:
+            self._check_cancelled()
             reasoning_chunk = reasoning.get_reasoning_content(chunk)
             content_chunk = reasoning_chunk.get('content')
             if 'reasoning_content' in chunk.additional_kwargs:

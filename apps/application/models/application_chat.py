@@ -24,6 +24,7 @@ class ChatUserType(models.TextChoices):
     SYSTEM_API_KEY = "SYSTEM_API_KEY", "系统API_KEY"
     APPLICATION_API_KEY = "APPLICATION_API_KEY", "应用API_KEY"
     PLATFORM_USER = "PLATFORM_USER", "平台用户"
+    SYSTEM_USER = "SYSTEM_USER", '系统用户'
 
 
 class ExecuteType(models.TextChoices):

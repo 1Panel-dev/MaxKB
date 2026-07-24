@@ -14,7 +14,7 @@ from typing import List, Dict, Optional, Callable
 from langchain_core.prompts import PromptTemplate
 
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
-from application.workflow.i_node import INode
+from application.workflow.i_node import INode, Signal
 from application.workflow.message.struct.content import Content
 
 from application.workflow.status import Status
@@ -77,6 +77,8 @@ class WorkflowManage:
         @param nodes: 执行下面要执行的节点
         @return:
         """
+        if [Signal.FORM, Signal.CANCELLED].__contains__(self.signal):
+            return
         if nodes is None or len(nodes) == 0:
             return
         # 需要校验是否可执行
@@ -247,3 +249,8 @@ class WorkflowManage:
             import traceback
             traceback.print_exc()
             return None
+
+    def cancel(self):
+        self.signal = Signal.CANCELLED
+        for node in self.nodes:
+            node.cancel()

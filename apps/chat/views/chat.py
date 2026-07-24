@@ -13,6 +13,8 @@ from django.core.cache import cache
 from django.http import HttpResponse, StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
 from rest_framework.parsers import MultiPartParser
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -224,6 +226,32 @@ class OpenView(APIView):
                   'source': {
                       'type': ChatSourceChoices.API_CALL.value if request.auth.chat_user_type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value},
                   'debug': False}).open())
+
+
+class CancelWorkflowView(APIView):
+    authentication_classes = [ChatTokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("Cancel running workflow"),
+        summary=_("Cancel running workflow"),
+        operation_id=_("Cancel running workflow"),  # type: ignore
+        parameters=[
+            OpenApiParameter(name='chat_id', type=OpenApiTypes.UUID, location=OpenApiParameter.PATH,
+                             description=_('Chat ID')),
+        ],
+        responses=None,
+        tags=[_('Chat')]  # type: ignore
+    )
+    def post(self, request: Request, chat_id: str):
+        from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
+        result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
+        if result_enum == CancelResult.CANCELLED:
+            return result.success({'status': 'cancelled', 'chat_id': chat_id})
+        elif result_enum == CancelResult.NOT_FOUND:
+            return result.success({'status': 'not_found', 'chat_id': chat_id})
+        else:
+            return result.fail(500, _('Failed to cancel workflow'))
 
 
 class CaptchaView(APIView):

@@ -94,6 +94,7 @@ class SpeechToTextNode(INode):
 
         self.write_context('audio_list', audio_list)
 
+        self._check_cancelled()
         result = _process_audio_items(audio_list, stt_model)
         content = []
         result_content = []

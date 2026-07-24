@@ -131,6 +131,7 @@ class ParameterExtractionNode(INode):
         self.write_context('request', input_variable_str)
 
         content = _generate_content(input_variable_str, variable_list)
+        self._check_cancelled()
         response = chat_model.invoke([HumanMessage(content=content)])
         result = _json_loads(response.content, variable_list)
 
