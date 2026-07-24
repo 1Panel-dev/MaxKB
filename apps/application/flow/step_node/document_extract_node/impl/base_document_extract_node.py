@@ -35,7 +35,7 @@ class BaseDocumentExtractNode(IDocumentExtractNode):
             knowledge_id = self.workflow_params.get('knowledge_id')
         elif [WorkflowMode.APPLICATION, WorkflowMode.APPLICATION_LOOP].__contains__(
                 self.workflow_manage.flow.workflow_mode):
-            application_id = self.workflow_manage.work_flow_post_handler.chat_info.application.id
+            application_id = self.workflow_manage.work_flow_post_handler.chat_info.application_id
         elif [WorkflowMode.TOOL, WorkflowMode.TOOL_LOOP].__contains__(self.workflow_manage.flow.workflow_mode):
             tool_id = self.workflow_params.get('tool_id')
 
