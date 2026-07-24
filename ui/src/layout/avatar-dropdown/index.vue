@@ -40,11 +40,11 @@ function handleLogout() {}
             <MkDropdown class="w-full" trigger="hover" placement="left-start" :persistent="true">
               <div class="flex w-full items-center justify-between gap-2 p-2">
                 <div class="flex items-center gap-2">
-                  <MkIcon :icon="Setting" />
+                  <MkIcon :icon="Setting" class="text-N600!" />
                   <span>语言</span>
                 </div>
 
-                <MkIcon name="icon_right_outlined" />
+                <MkIcon name="icon_right_outlined" class="text-N500!" />
               </div>
               <template #dropdown>
                 <MkDropdownMenu class="w-52">

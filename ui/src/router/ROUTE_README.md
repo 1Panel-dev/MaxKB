@@ -94,7 +94,8 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 路由导航图标统一使用 `src/assets/iconfont.js` 中的完整 Symbol ID 字符串，并由
 `MkIcon` 的 `name` 属性渲染。Router 目录禁止导入或传入 Element Plus 图标组件。
 
-进入设置了 `hidden: true` 的详情页时，侧栏通过 `route.matched` 判断并高亮其可见父级导航。
+侧栏使用当前页面的 `route.path` 匹配菜单激活项。设置了 `hidden: true` 的详情、创建和编辑
+页面没有对应菜单项，因此进入这些页面时不额外回溯高亮可见父级导航。
 
 ## Scope 来源判断
 

@@ -11,6 +11,8 @@ Before making changes, determine which areas the task touches and read the corre
 - Styles: `src/styles/STYLE_README.md` is the source of truth for styling rules.
 - Router: `src/router/ROUTE_README.md` is the source of truth for routing rules.
 - Components: `src/components/COMPONENT_README.md` is the source of truth for component rules.
+- Constants: `src/constants/CONSTANT_README.md` is the source of truth for shared constant rules.
+- Utilities: `src/utils/UTILS_README.md` is the source of truth for shared utility rules.
 
 Follow this maintenance flow:
 
@@ -52,6 +54,8 @@ ui/
 │   │   ├── global/            # Frequently used components auto-registered by Vite
 │   │   │   └── mk-icon/       # Unified SVG Symbol and Element Plus icon component
 │   │   └── <component-name>/   # Less-frequent shared components imported explicitly
+│   ├── constants/             # Cross-feature constants grouped by domain
+│   │   └── CONSTANT_README.md # Shared constant placement and naming rules
 │   ├── layout/                # Shared application shells, headers, sidebars, and layout types
 │   ├── locales/               # Reserved for internationalization messages and locale setup
 │   ├── router/                # Vue Router routes and router instance
@@ -65,6 +69,8 @@ ui/
 │   │   ├── app.scss          # Fonts, base element styles, and app-wide defaults
 │   │   ├── index.scss        # Sass entry that aggregates global Sass modules
 │   │   └── STYLE_README.md    # Local UI conventions and color-variable usage examples
+│   ├── utils/                 # Cross-feature utilities grouped by domain or capability
+│   │   └── UTILS_README.md    # Shared utility placement and naming rules
 │   ├── views/                 # Route-level page components grouped by feature
 │   │   ├── home/             # Workspace home page
 │   │   ├── system/           # System-management pages
@@ -82,8 +88,10 @@ Directories marked as reserved may be empty while their feature is being introdu
 Structural responsibilities:
 
 - Put reusable application chrome in `layout/`, not in individual route views.
+- Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
 - Put route-level screens in `views/<feature>/`; keep reusable feature components below their owning feature when they are not globally shared.
 - Put shared client state in `stores/`; component-local state should remain in the component.
+- Put functions shared by most pages or multiple business modules in `utils/`; detailed placement, file organization, and naming rules are maintained in `src/utils/UTILS_README.md`.
 - Import source assets through `src/assets/`; use `public/` only when a file must retain its original filename and URL.
 
 ## Entry Points
@@ -146,3 +154,5 @@ Keep these behaviors:
 
 - Prefer existing project structure and naming.
 - Keep UI code typed and data-driven.
+- Name business variables after their domain and purpose. Avoid context-free collection names such as
+  `items` or `list` when a name such as `systemMenuItems` makes the contents clear.

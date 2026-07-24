@@ -1,21 +1,25 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="Option extends { label: string; value: string | number }">
 import { computed, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
 
+/**
+ * 带搜索过滤和滚动列表的下拉选择组件。
+ * 使用 v-model 传入当前选中值，使用 options 传入菜单数据；
+ * 触发器由默认插槽定义，菜单项内容由 option 插槽定义。
+ */
 defineOptions({ name: 'MkFilterableDropdown' })
 
 type DropdownValue = string | number
 
-interface DropdownOption {
-  label: string
-  value: DropdownValue
-}
-
 const props = withDefaults(
   defineProps<{
-    options: DropdownOption[]
+    /** 下拉菜单数据 */
+    options: Option[]
+    /** 未选中数据时触发器显示的文字 */
     placeholder?: string
+    /** 搜索输入框的占位文字 */
     searchPlaceholder?: string
+    /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
   {
@@ -25,13 +29,16 @@ const props = withDefaults(
   },
 )
 
-const model = defineModel<DropdownValue>({ required: true })
-const keyword = ref('')
+/** 当前选中菜单项的 value */
+const selectedValue = defineModel<DropdownValue>({ required: true })
+const searchKeyword = ref('')
 
-const selectedOption = computed(() => props.options.find((option) => option.value === model.value))
+const selectedOption = computed(() =>
+  props.options.find((option) => option.value === selectedValue.value),
+)
 
 const filteredOptions = computed(() => {
-  const normalizedKeyword = keyword.value.trim().toLocaleLowerCase()
+  const normalizedKeyword = searchKeyword.value.trim().toLocaleLowerCase()
   if (!normalizedKeyword) return props.options
 
   return props.options.filter((option) =>
@@ -41,13 +48,13 @@ const filteredOptions = computed(() => {
 
 defineSlots<{
   /** 下拉框触发器，由使用方决定按钮结构和样式 */
-  default(props: { selectedOption?: DropdownOption; text: string }): unknown
-  /** 菜单项左侧图标 */
-  itemIcon?(props: { option: DropdownOption }): unknown
+  default(props: { selectedOption?: Option; text: string }): unknown
+  /** 菜单项内容，接收当前 option；未传入时显示 option.label */
+  option?(props: { option: Option }): unknown
 }>()
 
 function handleVisibleChange(visible: boolean) {
-  if (!visible) keyword.value = ''
+  if (!visible) searchKeyword.value = ''
 }
 </script>
 
@@ -61,29 +68,28 @@ function handleVisibleChange(visible: boolean) {
     <slot :selected-option="selectedOption" :text="selectedOption?.label ?? placeholder" />
 
     <template #dropdown>
-      <div class="w-70">
+      <div class="w-70 overflow-hidden rounded-md">
         <div class="p-2 pb-1" @click.stop @keydown.stop>
           <el-input
-            v-model="keyword"
+            v-model="searchKeyword"
             :prefix-icon="Search"
             :placeholder="searchPlaceholder"
             clearable
           />
         </div>
 
-        <el-scrollbar max-height="160px">
+        <el-scrollbar max-height="200px">
           <MkDropdownMenu>
             <MkDropdownItem
               v-for="option in filteredOptions"
               :key="option.value"
               selectable
-              :selected="option.value === model"
-              @click="model = option.value"
+              :selected="option.value === selectedValue"
+              @click="selectedValue = option.value"
             >
-              <template v-if="$slots.itemIcon" #icon>
-                <slot name="itemIcon" :option="option" />
-              </template>
-              {{ option.label }}
+              <slot name="option" :option="option">
+                <span class="block truncate">{{ option.label }}</span>
+              </slot>
             </MkDropdownItem>
 
             <MkDropdownItem v-if="filteredOptions.length === 0" disabled>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineOptions({ inheritAttrs: false })
+defineOptions({ name: 'MkDropdownMenu', inheritAttrs: false })
 
 defineSlots<{
   /** 菜单项，仅使用 MkDropdownItem */

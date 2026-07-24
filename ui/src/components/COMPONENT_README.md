@@ -21,6 +21,10 @@ Element Plus 图标不是全局组件。需要作为属性传递或在脚本中�
 必要的样式覆盖进行改造，不要重复手写 Element Plus 已经提供的结构、状态和交互。只有现有
 组件无法满足必要的结构或行为时，才新增自定义组件。
 
+使用 Element Plus 组件时，应先检查并优先使用组件原生提供的 Props、事件、插槽、公开方法
+和交互模式，不要自行重复实现已有能力。例如菜单跳转优先使用 `el-menu` 的 `router` 属性，
+而不是监听 `select` 后手动调用路由。只有原生 API 无法满足需求时，才补充自定义逻辑。
+
 ## 自动注册
 
 Vite 使用 `unplugin-vue-components`，但只扫描 `src/components/global`。该目录中的组件可以直接在 Vue 模板中使用，无需手动 `import`：
@@ -45,7 +49,7 @@ src/components/
 │   │   └── mk-dropdown-item.vue  # 统一菜单项图标、内容和选中状态布局
 │   └── mk-icon/
 │       └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
-├── filterable-dropdown/      # 带搜索过滤和滚动列表的下拉框，使用方手动导入
+├── mk-filterable-dropdown/   # 带搜索过滤和滚动列表的下拉框，使用方手动导入
 │   └── index.vue
 └── user-selector/            # 低频共享组件示例，使用方手动引入
     └── index.vue
@@ -62,6 +66,31 @@ src/components/
 - 组件样式默认使用 `scoped`；只有明确的全局规则才放入 `src/styles`。
 - `global` 组件不要创建只用于二次导出的 `components/index.ts`，模板组件由自动注册插件解析。
 - 除 `global` 外的共享组件必须从具体路径手动导入，让依赖关系在使用文件中可见。
+
+## MkFilterableDropdown
+
+`MkFilterableDropdown` 是带搜索过滤和滚动列表的低频共享下拉框，需要从
+`@/components/mk-filterable-dropdown/index.vue` 手动导入。触发器通过默认插槽传入；菜单项
+需要自定义图片、图标或其他业务内容时，使用 `option` 作用域插槽并通过当前 `option` 渲染。
+未传入 `option` 插槽时默认显示 `option.label`。
+
+```vue
+<MkFilterableDropdown v-model="selectedValue" :options="options">
+  <template #default="{ text }">
+    <button type="button">{{ text }}</button>
+  </template>
+  <template #option="{ option }">
+    <div class="flex items-center gap-2">
+      <img :src="option.logoUrl" class="size-4 shrink-0 rounded-sm object-cover" />
+      <span class="min-w-0 flex-1 truncate">{{ option.label }}</span>
+    </div>
+  </template>
+</MkFilterableDropdown>
+```
+
+```ts
+const options = [{ label: '工作空间', logoUrl: '/workspace.png', value: 'workspace' }]
+```
 
 ## MkDropdown
 
@@ -95,12 +124,13 @@ Mk 组件的内部实现中。
 
 ### 菜单项布局
 
-需要左侧图标、右侧内容或选中勾的菜单项使用 `MkDropdownItem`。左侧为 Element Plus
-图标时，可以直接使用透传给 `el-dropdown-item` 的 `icon` 属性；使用 `MkIcon` 或需要
-自定义结构时，通过 `icon` 插槽传入。普通菜单不传
+需要左侧图标或选中勾的菜单项使用 `MkDropdownItem`。左侧为 Element Plus
+图标时，通过 `icon` 属性传入；使用 `MkIcon` 或需要自定义结构时，通过 `icon` 插槽传入。
+两种方式都会由 `MkDropdownItem` 放入统一的左侧图标区域并使用 `N600` 颜色，不影响菜单项
+其他位置的图标。普通菜单不传
 `selectable`；可选中菜单传入 `selectable`，并通过 `selected` 控制当前项。开启
-`selectable` 后，未选中的菜单项也会预留勾选位，保证同组文字对齐。没有选中状态时，
-右侧的图标、辅助文字或其他内容统一使用 `suffix` 插槽。
+`selectable` 后，未选中的菜单项也会预留勾选位，保证同组文字对齐。默认插槽是可自定义的
+中间内容区域，不会强制添加文字省略；需要省略时由插槽内容自行添加 `truncate`。
 
 ```vue
 <MkDropdownItem :icon="Setting">设置</MkDropdownItem>
@@ -109,12 +139,6 @@ Mk 组件的内部实现中。
     <MkIcon name="icon_setting_outlined" />
   </template>
   设置
-</MkDropdownItem>
-<MkDropdownItem>
-  更多
-  <template #suffix>
-    <MkIcon name="icon_right_outlined" />
-  </template>
 </MkDropdownItem>
 <MkDropdownItem selectable :selected="item.value === selectedValue">
   {{ item.label }}

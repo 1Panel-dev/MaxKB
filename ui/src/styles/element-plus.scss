@@ -10,19 +10,20 @@
   --el-color-primary-light-7: color-mix(in srgb, var(--mk-primary) 30%, white);
   --el-color-primary-light-8: color-mix(in srgb, var(--mk-primary) 20%, white);
   --el-color-primary-light-9: color-mix(in srgb, var(--mk-primary) 10%, white);
+  --el-menu-icon-width: auto;
 }
 
 /* button */
 .el-button {
   --el-button-font-weight: 400 !important;
   height: auto;
-  padding: 7px 12px;
+  padding: 7px calc(var(--spacing) * 3);
   &.is-round {
-    padding: 7px 12px;
+    padding: 7px calc(var(--spacing) * 3);
   }
   &.is-text {
     line-height: 18px;
-    padding: 4px;
+    padding: calc(var(--spacing) * 1);
   }
   &.is-text:not(.is-disabled):hover {
     background: rgb(var(--mk-N900-rgb) / 10%);
@@ -33,11 +34,11 @@
     --el-button-hover-text-color: white !important;
     --el-button-text-color: white !important;
     border: none;
-    padding: 8px 12px !important;
+    padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3) !important;
   }
 }
 .el-button [class*='el-icon'] + span {
-  margin-left: 4px;
+  margin-left: calc(var(--spacing) * 1);
 }
 
 /* divider */
@@ -49,21 +50,16 @@
 .el-dropdown {
   color: currentColor;
 }
-.el-dropdown__popper {
-  --el-dropdown-menu-box-shadow: 0px 4px 8px 0px var(--mk-N900-transparent-10);
-  --el-popper-border-radius: 6px;
-  border: 1px solid var(--mk-N300) !important;
-  font-size: var(--mk-font-size-base);
-}
-.el-dropdown-menu {
-  padding: 4px;
-}
 
+.el-dropdown-menu {
+  padding: calc(var(--spacing) * 1);
+}
 .el-dropdown-menu__item {
   border-radius: var(--el-border-radius-small);
+  color: var(--mk-N900);
   gap: calc(var(--spacing) * 2);
-  min-width: 80px;
-  padding: 5px 8px;
+  min-width: calc(var(--spacing) * 20);
+  padding: 5px calc(var(--spacing) * 2);
   i {
     font-size: var(--mk-font-size-lg);
     margin-right: 0;
@@ -82,8 +78,9 @@
     display: none;
   }
 }
-/* menu */
-.el-menu {
-  background: none !important;
-  border: none !important;
+.el-dropdown__popper {
+  --el-dropdown-menu-box-shadow: 0 4px 8px 0 var(--mk-N900-transparent-10);
+  --el-popper-border-radius: var(--el-border-radius-base);
+  border: 1px solid var(--mk-N300) !important;
+  font-size: var(--mk-font-size-base);
 }
