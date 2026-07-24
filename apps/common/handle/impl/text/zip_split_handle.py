@@ -91,7 +91,8 @@ def _collect_file_refs(tokens: list, base_name: str, zip_files: List[str], conte
         if file_path.startswith("oss/file/") or file_path.startswith("oss/image/"):
             file_id = file_path.replace("oss/file/", "").replace("oss/image/", "")
             if is_valid_uuid(file_id):
-                file_list.append({"source_file": file_path, "image_id": file_id})
+                file_list.append({"source_file": file_path, "image_id": new_id})
+                content = update_content(content, source_path, f"./oss/file/{new_id}")
             else:
                 file_list.append({"source_file": file_path, "image_id": new_id})
                 content = update_content(content, source_path, f"./oss/file/{new_id}")
