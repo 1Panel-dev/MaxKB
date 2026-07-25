@@ -1,3 +1,5 @@
+[![MCP Toplist](https://mcptoplist.com/badge/mcp.so%2FMaxKB%2F1Panel-dev.svg)](https://mcptoplist.com/server/mcp.so%2FMaxKB%2F1Panel-dev)
+
 <p align="center"><img src= "https://github.com/1Panel-dev/maxkb/assets/52996290/c0694996-0eed-40d8-b369-322bf2a380bf" alt="MaxKB" width="300" /></p>
 <h3 align="center">Open-source platform for building enterprise-grade agents</h3>
 <h3 align="center">强大易用的企业级智能体平台</h3>
