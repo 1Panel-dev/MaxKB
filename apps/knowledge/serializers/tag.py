@@ -162,8 +162,13 @@ class TagSerializers(serializers.Serializer):
                 QuerySet(DocumentTag).filter(tag_id=tag.id).delete()
             else:
                 # 仅删除当前标签
-                QuerySet(Tag).filter(id=self.data.get('tag_id'), knowledge_id=self.data.get('knowledge_id')).delete()
-                QuerySet(DocumentTag).filter(tag_id=self.data.get('tag_id')).delete()
+                tag = QuerySet(Tag).filter(
+                    id=self.data.get('tag_id'), knowledge_id=self.data.get('knowledge_id')
+                ).first()
+                if tag is None:
+                    raise AppApiException(500, _('Tag id does not exist'))
+                QuerySet(Tag).filter(id=tag.id).delete()
+                QuerySet(DocumentTag).filter(tag_id=tag.id).delete()
 
     class BatchDelete(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_('Workspace ID'))
