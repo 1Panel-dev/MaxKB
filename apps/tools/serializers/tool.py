@@ -26,6 +26,7 @@ from common.utils.common import bytes_to_uploaded_file, common_convert_value, ge
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt, rsa_long_encrypt
 from common.utils.tool_code import ToolExecutor
+from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.core import validators
 from django.core.cache import cache
 from django.db import transaction
@@ -476,11 +477,10 @@ class ToolSerializer(serializers.Serializer):
             if instance.get("work_flow_template") is not None:
                 template_instance = instance.get("work_flow_template")
                 download_url = template_instance.get("downloadUrl")
-                if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+                if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
-                res = requests.get(download_url, timeout=5)
-                tool = ToolSerializer.Import(
+                res = requests.get(download_url, timeout=5, allow_redirects=False)
                     data={
                         "file": bytes_to_uploaded_file(res.content, "file.tool"),
                         "user_id": self.data.get("user_id"),
@@ -491,9 +491,9 @@ class ToolSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+                    if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
                        raise AppApiException(500, _("Illegal download callback url"))
-                    requests.get(download_callback_url, timeout=5)
+                    requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
                 return tool
@@ -1330,13 +1330,13 @@ class ToolSerializer(serializers.Serializer):
 
             versions = instance.get("versions", [])
             download_url = instance.get("download_url")
-            if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+            if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
                 raise AppApiException(500, _("Illegal download url"))
             # 查找匹配的版本名称
             version_name = next(
                 (version.get("name") for version in versions if version.get("downloadUrl") == download_url),
             )
-            res = requests.get(download_url, timeout=5)
+            res = requests.get(download_url, timeout=5, allow_redirects=False)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
             tool_id = uuid.uuid7()
             # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
@@ -1381,9 +1381,9 @@ class ToolSerializer(serializers.Serializer):
             ).auth_resource(str(tool_id))
             try:
                 download_callback_url = instance.get("download_callback_url")
-                if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+                if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
                     raise AppApiException(500, _("Illegal download callback url"))
-                requests.get(download_callback_url, timeout=5)
+                requests.get(download_callback_url, timeout=5, allow_redirects=False)
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data
@@ -1400,7 +1400,7 @@ class ToolSerializer(serializers.Serializer):
         def update_tool(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            if not self.data.get("download_url").startswith("https://apps-assets.fit2cloud.com/"):
+            if not validate_trusted_url(self.data.get("download_url"), ALLOWED_DOWNLOAD_HOSTS):
                 raise AppApiException(500, _("Illegal download url"))
             tool = QuerySet(Tool).filter(
                 id=self.data.get("tool_id"), workspace_id=self.data.get("workspace_id")
@@ -1415,7 +1415,7 @@ class ToolSerializer(serializers.Serializer):
                     if version.get("downloadUrl") == self.data.get("download_url")
                 ),
             )
-            res = requests.get(self.data.get("download_url"), timeout=5)
+            res = requests.get(self.data.get("download_url"), timeout=5, allow_redirects=False)
             tool_data = RestrictedUnpickler(io.BytesIO(res.content)).load().tool
             # 如果是SKILL类型的工具，保存文件内容到file表，并将code替换为file_id
             if tool_data.get("tool_type") == ToolType.SKILL:
@@ -1438,7 +1438,10 @@ class ToolSerializer(serializers.Serializer):
             # tool.is_active = False
             tool.save()
             try:
-                requests.get(self.data.get("download_callback_url"), timeout=5)
+                download_callback_url = self.data.get("download_callback_url")
+                if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
+                    raise AppApiException(500, _("Illegal download callback url"))
+                requests.get(download_callback_url, timeout=5, allow_redirects=False)
             except Exception as e:
                 maxkb_logger.error(f"callback appstore tool download error: {e}")
             return ToolModelSerializer(tool).data

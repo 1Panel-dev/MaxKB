@@ -41,6 +41,7 @@ from common.utils.common import (
 )
 from common.utils.logger import maxkb_logger
 from common.utils.tool_code import ToolExecutor
+from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from django.core import validators
 from django.db import models, transaction
 from django.db.models import Q, QuerySet
@@ -747,11 +748,10 @@ class ApplicationSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get("work_flow_template")
         download_url = work_flow_template.get("downloadUrl")
-        if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+        if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
-        res = requests.get(download_url, timeout=5)
-        app = ApplicationSerializer(
+        res = requests.get(download_url, timeout=5, allow_redirects=False)
             data={"user_id": self.data.get("user_id"), "workspace_id": self.data.get("workspace_id")}
         ).import_(
             {
@@ -771,9 +771,9 @@ class ApplicationSerializer(serializers.Serializer):
         )
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+            if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5, allow_redirects=False)
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
         return app
@@ -1482,12 +1482,10 @@ class ApplicationOperateSerializer(serializers.Serializer):
         self.is_valid(raise_exception=True)
         work_flow_template = instance.get("work_flow_template")
         download_url = work_flow_template.get("downloadUrl")
-        if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+        if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
-        res = requests.get(download_url, timeout=5)
-        try:
-            mk_instance = restricted_loads(res.content)
+        res = requests.get(download_url, timeout=5, allow_redirects=False)
         except Exception as e:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
@@ -1541,9 +1539,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ).auth_resource_batch([t.id for t in tool_model_list])
         try:
             download_callback_url = work_flow_template.get("downloadCallbackUrl", "")
-            if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+            if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
                 raise AppApiException(500, _("Illegal download callback url"))
-            requests.get(download_callback_url, timeout=5)
+            requests.get(download_callback_url, timeout=5, allow_redirects=False)
         except Exception as e:
             maxkb_logger.error(f"callback appstore tool download error: {e}")
 
