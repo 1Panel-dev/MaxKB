@@ -32,7 +32,7 @@ class ImageToVideoNodeSerializer(serializers.Serializer):
     model_params_setting = serializers.JSONField(required=False, default=dict,
                                                  label=_("Model parameter settings"))
 
-    first_frame_url = serializers.ListField(required=True, label=_("First frame url"))
+    first_frame_url = serializers.ListField(required=True, allow_empty=False, label=_("First frame url"))
     last_frame_url = serializers.ListField(required=False, label=_("Last frame url"))
 
 
@@ -48,7 +48,7 @@ class IImageToVideoNode(INode):
         first_frame_url = self.workflow_manage.get_reference_field(
             self.node_params_serializer.data.get('first_frame_url')[0],
             self.node_params_serializer.data.get('first_frame_url')[1:])
-        if first_frame_url is []:
+        if not first_frame_url:
             raise ValueError(
                 _("First frame url cannot be empty"))
         last_frame_url = None
