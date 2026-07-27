@@ -33,7 +33,7 @@ dependencies = [
     "langchain-aws==1.6.0",
     "langgraph==1.2.6",
     "deepagents==0.6.11",
-    "torch==2.12.1",
+    "torch==2.13.0",
     "numpy==1.26.4",
     "sentence-transformers==5.0.0",
     "qianfan==0.4.12.3",
