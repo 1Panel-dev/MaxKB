@@ -1,8 +1,9 @@
 import type { RouteLocationRaw } from 'vue-router'
 
 export interface LayoutMenuItem {
-  key: string
+  name: string
   label: string
+  activeIcon?: string
   icon?: string
   route?: RouteLocationRaw
   children?: LayoutMenuItem[]

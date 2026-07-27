@@ -28,8 +28,9 @@ export function getChildRouteList(scope: RouteScope): LayoutMenuItem[] {
         const children = route.children ? createMenuItems(route.children) : []
 
         return {
-          key: String(route.name),
+          name: String(route.name),
           label: route.meta!.title!,
+          activeIcon: route.meta?.activeIcon,
           icon: route.meta?.icon,
           route: { name: route.name! },
           children: children.length ? children : undefined,

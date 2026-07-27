@@ -5,6 +5,6 @@ export const triggerRoutes: RouteRecordRaw[] = [
     path: 'trigger',
     name: 'workspace-trigger',
     component: () => import('@/views/home/HomeView.vue'),
-    meta: { title: '触发器', icon: 'icon_grid_outlined', order: 60 },
+    meta: { title: '触发器', icon: 'icon-laser', activeIcon: 'icon_laser_filled', order: 60 },
   },
 ]

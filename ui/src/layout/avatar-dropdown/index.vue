@@ -38,7 +38,7 @@ function handleLogout() {}
           <MkDropdownItem :icon="Setting">修改密码</MkDropdownItem>
           <MkDropdownItem @click.stop class="p-0!">
             <MkDropdown class="w-full" trigger="hover" placement="left-start" :persistent="true">
-              <div class="flex w-full items-center justify-between gap-2 p-2">
+              <div class="flex-between w-full gap-2 p-2">
                 <div class="flex items-center gap-2">
                   <MkIcon :icon="Setting" class="text-N600!" />
                   <span>语言</span>

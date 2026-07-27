@@ -2,27 +2,39 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChildRouteList } from '@/router/admin/utils'
+import type { LayoutMenuItem } from '@/layout/types'
 
 const route = useRoute()
 const router = useRouter()
-const items = getChildRouteList('workspace')
-const activeKeys = computed(
-  () => new Set(route.matched.flatMap((item) => (item.name ? [String(item.name)] : []))),
-)
+const workspaceMenuItems = getChildRouteList('workspace')
+const workspaceActiveMenuPath = computed(() => route.meta.activeMenu ?? route.path)
+
+const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) =>
+  Boolean(
+    workspaceMenuItem.route &&
+    router.resolve(workspaceMenuItem.route).path === workspaceActiveMenuPath.value,
+  )
 </script>
 
 <template>
-  <nav class="px-1.5 py-2">
-    <button
-      v-for="item in items"
-      :key="item.key"
-      type="button"
-      class="flex min-h-[55px] w-full cursor-pointer flex-col items-center justify-center gap-[3px] rounded-lg border-0 bg-transparent px-0.5 py-[7px] hover:bg-white/70"
-      :class="activeKeys.has(item.key) && 'bg-white font-semibold'"
-      @click="item.route && router.push(item.route)"
+  <div class="flex flex-col gap-1 p-1">
+    <div
+      v-for="workspaceMenuItem in workspaceMenuItems"
+      :key="workspaceMenuItem.name"
+      class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600"
+      :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
+      @click="workspaceMenuItem.route && router.push(workspaceMenuItem.route)"
     >
-      <MkIcon v-if="item.icon" :name="item.icon" />
-      <span>{{ item.label }}</span>
-    </button>
-  </nav>
+      <MkIcon
+        v-if="workspaceMenuItem.icon"
+        :name="
+          isWorkspaceMenuActive(workspaceMenuItem)
+            ? (workspaceMenuItem.activeIcon ?? workspaceMenuItem.icon)
+            : workspaceMenuItem.icon
+        "
+        :gradient="isWorkspaceMenuActive(workspaceMenuItem)"
+      />
+      <span class="mt-[2px]">{{ workspaceMenuItem.label }}</span>
+    </div>
+  </div>
 </template>

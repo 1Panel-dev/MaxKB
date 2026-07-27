@@ -19,9 +19,9 @@ function switchMode() {
 </script>
 
 <template>
-  <header class="flex h-header items-center justify-between px-6">
+  <header class="flex-between h-header px-6">
     <div class="flex items-center">
-      <img src="@/assets/logo/MaxKB-logo.svg" class="h-9" />
+      <img src="@/assets/logo/MaxKB-logo.svg" class="h-9 max-w-none shrink-0" />
       <div class="flex items-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->

@@ -1,24 +1,49 @@
 @import 'tailwindcss';
 
 @theme {
-  --background-image-layout-gradient: var(--mk-layout-gradient);
-  --background-image-primary-gradient: var(--mk-primary-gradient);
+  /* colors */
+  --color-primary: var(--mk-primary);
   --color-N300: var(--mk-N300);
   --color-N350: var(--mk-N350);
   --color-N500: var(--mk-N500);
   --color-N600: var(--mk-N600);
   --color-N900: var(--mk-N900);
-  --color-primary: var(--mk-primary);
+
+  /* background images */
+  --background-image-layout-gradient: var(--mk-layout-gradient);
+  --background-image-primary-gradient: var(--mk-primary-gradient);
+
+  /* spacing */
   --spacing-header: var(--mk-header-height);
   --spacing-layout-content: calc(100vh - var(--mk-header-height));
   --spacing-sidebar: var(--mk-sidebar-width);
   --spacing-sidebar-expanded: var(--mk-sidebar-expanded-width);
+
+  /* typography */
+  --text-xs: 10px;
+  --text-xs--line-height: 14px;
+  --text-sm: 12px;
+  --text-sm--line-height: 20px;
   --text-base: var(--mk-font-size-base);
   --text-base--line-height: var(--mk-line-height-base);
   --text-lg: var(--mk-font-size-lg);
   --text-lg--line-height: 24px;
-  --text-sm: 12px;
-  --text-sm--line-height: 20px;
   --text-xl: 18px;
   --text-xl--line-height: 26px;
+}
+
+/* flex layout utilities */
+/* 横向排列，两侧贴边并垂直居中 */
+@utility flex-between {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* 纵向排列，水平和垂直方向居中 */
+@utility flex-col-center {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

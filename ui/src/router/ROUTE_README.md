@@ -71,13 +71,15 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段     | 类型                      | 说明                                         |
-| -------- | ------------------------- | -------------------------------------------- |
-| `scope`  | `'workspace' \| 'system'` | 标记生成哪一套框架导航，只配置在布局根路由上 |
-| `title`  | `string`                  | 页面标题，同时作为导航名称                   |
-| `icon`   | `string`                  | iconfont Symbol ID，子目录通常可以不配置     |
-| `order`  | `number`                  | 同级导航排序，数字越小越靠前                 |
-| `hidden` | `boolean`                 | 设置为 `true` 时不显示在导航中               |
+| 字段         | 类型                      | 说明                                         |
+| ------------ | ------------------------- | -------------------------------------------- |
+| `scope`      | `'workspace' \| 'system'` | 标记生成哪一套框架导航，只配置在布局根路由上 |
+| `activeIcon` | `string`                  | 菜单激活状态的 iconfont Symbol ID            |
+| `activeMenu` | `string`                  | 进入子页面时需要保持激活的侧栏菜单路径       |
+| `title`      | `string`                  | 页面标题，同时作为导航名称                   |
+| `icon`       | `string`                  | iconfont Symbol ID，子目录通常可以不配置     |
+| `order`      | `number`                  | 同级导航排序，数字越小越靠前                 |
+| `hidden`     | `boolean`                 | 设置为 `true` 时不显示在导航中               |
 
 ## 导航生成
 
@@ -85,17 +87,21 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 1. 根据 `scope` 找到 Workspace 或 System 根路由。
 2. 读取根路由的 `children`。
-3. 使用 `title`、`icon` 和 `order` 生成导航项。
+3. 使用路由 `name` 作为导航项标识，并根据 `title`、`icon`、`activeIcon` 和 `order` 生成导航项。
 4. 递归读取 `children` 生成子目录。
 5. 排除没有名称、没有标题或设置了 `hidden: true` 的路由。
 
 `WorkspaceSidebar` 和 `SystemSidebar` 分别调用该方法，不需要在页面组件中维护菜单数组。
 
 路由导航图标统一使用 `src/assets/iconfont.js` 中的完整 Symbol ID 字符串，并由
-`MkIcon` 的 `name` 属性渲染。Router 目录禁止导入或传入 Element Plus 图标组件。
+`MkIcon` 的 `name` 属性渲染。需要在菜单激活后切换图标时，通过 `activeIcon` 配置激活状态
+的 Symbol ID；未配置时继续使用 `icon`。Router 目录禁止导入或传入 Element Plus 图标组件。
 
-侧栏使用当前页面的 `route.path` 匹配菜单激活项。设置了 `hidden: true` 的详情、创建和编辑
-页面没有对应菜单项，因此进入这些页面时不额外回溯高亮可见父级导航。
+侧栏默认使用当前页面的 `route.path` 匹配菜单激活项。详情、创建和编辑等子页面需要继续高亮
+所属一级菜单时，在一级父路由中配置该菜单的绝对路径 `activeMenu`，由 Vue Router 合并到
+所有后代路由的 `meta`。侧栏统一使用 `route.meta.activeMenu ?? route.path` 进行匹配，不在
+组件中截取 URL 或回溯路由层级。个别子页面需要激活其他菜单时，可在子路由中覆盖
+`activeMenu`。
 
 ## Scope 来源判断
 

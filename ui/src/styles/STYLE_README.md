@@ -12,6 +12,10 @@
 - `element-plus.scss`：配置 Element Plus Sass，并将其 CSS 变量映射到项目主题变量。
 - `app.scss`：定义字体、基础元素样式和应用级默认样式。
 
+`tailwind.css` 内部按照 `@import`、`@theme`、`@custom-variant`、`@layer base`、
+`@layer components`、`@utility` 的顺序组织；不存在的部分直接省略。`@theme` 内部按照颜色、
+背景图片、间距、排版分组，每组通过注释标明职责，不将不同类型的 Token 混合排序。
+
 `src/main.ts` 和 `src/chat.ts` 应按以下顺序加载样式：
 
 ```ts
@@ -76,6 +80,30 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
   菜单项
 </div>
 ```
+
+## 常用 Flex 布局工具类
+
+稳定重复使用的 Flex 布局组合统一定义在 `tailwind.css`。当前提供：
+
+| 工具类            | 作用                                 |
+| ----------------- | ------------------------------------ |
+| `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中 |
+| `flex-col-center` | 纵向排列，在水平和垂直两个方向居中   |
+
+```vue
+<div class="flex-between">
+  <span>左侧</span>
+  <span>右侧</span>
+</div>
+
+<div class="flex-col-center">
+  <MkIcon name="icon_home_filled" />
+  <span>首页</span>
+</div>
+```
+
+仅在布局语义与工具类完全一致时使用。需要覆盖排列方向或对齐方式的响应式布局继续组合 Tailwind
+原子类，不为少量差异继续增加相似工具类。
 
 ## Tailwind 中的 `p`（padding）
 
@@ -146,11 +174,13 @@ Tailwind 类。
 ```scss
 :root {
   --mk-primary: #3370ff;
+  --mk-primary-gradient-end: #7f3bf5;
   --mk-primary-rgb: 51 112 255;
 }
 ```
 
 修改主题色时，修改 `--mk-primary`。如果代码使用了 RGB 通道变量，也要同步修改 `--mk-primary-rgb`：
+`--mk-primary-gradient-end` 是默认主题渐变的终点颜色，供 CSS 背景和 SVG 渐变共同使用。
 
 普通 CSS 中直接使用：
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
+import { computed, type Component, useId } from 'vue'
 import '@/assets/iconfont.js'
 
 defineOptions({ name: 'MkIcon' })
@@ -17,12 +17,16 @@ defineOptions({ name: 'MkIcon' })
  * import { Setting } from '@element-plus/icons-vue'
  * <MkIcon :icon="Setting" :size="20" />
  *
- * name 和 icon 二选一；size 默认 16，size、color 的行为与 el-icon 一致。
+ * name 和 icon 二选一；均未传入时显示 icon-404。
+ * gradient 仅用于 SVG Symbol，启用后使用项目主题渐变填充。
+ * size 默认 16，size、color 的行为与 el-icon 一致。
  */
 const props = withDefaults(
   defineProps<{
     /** Element Plus 图标组件 */
     icon?: Component
+    /** 是否使用项目主题渐变填充 SVG Symbol */
+    gradient?: boolean
     /** MaxKB SVG Symbol 名称，如 icon-left-outlined */
     name?: string
     /** 图标尺寸，默认 16px */
@@ -34,12 +38,21 @@ const props = withDefaults(
   },
 )
 
-const symbolHref = computed(() => `#${props.name}`)
+const gradientId = useId()
+const iconName = computed(() => props.name || (!props.icon ? 'icon-404' : undefined))
+const symbolFill = computed(() => (props.gradient ? `url(#${gradientId})` : undefined))
+const symbolHref = computed(() => `#${iconName.value}`)
 </script>
 
 <template>
-  <el-icon class="mk-icon" :size="size" :color="color">
-    <svg v-if="name" aria-hidden="true" focusable="false">
+  <el-icon class="mk-icon shrink-0" :size="size" :color="color">
+    <svg v-if="iconName" aria-hidden="true" focusable="false" :fill="symbolFill">
+      <defs v-if="gradient">
+        <linearGradient :id="gradientId" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stop-color="var(--mk-primary)" />
+          <stop offset="100%" stop-color="var(--mk-primary-gradient-end)" />
+        </linearGradient>
+      </defs>
       <use :href="symbolHref" />
     </svg>
     <component :is="icon" v-else-if="icon" />

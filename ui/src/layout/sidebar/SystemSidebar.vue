@@ -26,7 +26,7 @@ const systemMenuItems = getChildRouteList('system')
         :default-active="route.path"
         router
       >
-        <template v-for="item in systemMenuItems" :key="item.key">
+        <template v-for="item in systemMenuItems" :key="item.name">
           <!-- 有子菜单 -->
           <el-sub-menu
             v-if="item.children?.length && item.route"
@@ -40,14 +40,14 @@ const systemMenuItems = getChildRouteList('system')
 
             <el-menu-item
               v-for="child in item.children"
-              :key="child.key"
-              :index="child.route ? router.resolve(child.route).path : child.key"
+              :key="child.name"
+              :index="child.route ? router.resolve(child.route).path : child.name"
             >
               {{ child.label }}
             </el-menu-item>
           </el-sub-menu>
           <!-- 无子菜单 -->
-          <el-menu-item v-else :index="item.route ? router.resolve(item.route).path : item.key">
+          <el-menu-item v-else :index="item.route ? router.resolve(item.route).path : item.name">
             <MkIcon v-if="item.icon" :name="item.icon" :size="18" />
             <template #title>{{ item.label }}</template>
           </el-menu-item>
@@ -55,15 +55,28 @@ const systemMenuItems = getChildRouteList('system')
       </el-menu>
     </el-scrollbar>
 
+    <div class="px-4 pt-2">
+      <el-divider />
+    </div>
     <!-- 收起导航按钮 -->
-    <div>
+    <div :class="props.collapsed ? 'px-3.5' : 'px-4'" class="py-2">
       <button
         type="button"
-        class="flex h-[46px] w-full cursor-pointer items-center gap-2.5 px-1"
+        :class="props.collapsed ? 'p-2.75' : 'px-2 p-2.75'"
+        class="mk-system-sidebar-toggle flex w-full cursor-pointer items-center gap-2 rounded-md"
         @click="emit('toggle')"
       >
-        <MkIcon name="icon_left_outlined" />
-        <span :class="props.collapsed && 'hidden'">收起导航</span>
+        <MkIcon
+          name="icon_side-fold_outlined"
+          :size="18"
+          :class="props.collapsed && 'rotate-180'"
+        />
+        <span
+          class="whitespace-nowrap transition-opacity duration-100"
+          :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'"
+        >
+          收起导航
+        </span>
       </button>
     </div>
   </div>
@@ -164,6 +177,12 @@ const systemMenuItems = getChildRouteList('system')
   }
   .el-menu-item {
     padding: 9px calc(var(--spacing) * 4) !important;
+  }
+}
+
+.mk-system-sidebar-toggle {
+  &:hover {
+    background-color: var(--mk-N900-transparent-10);
   }
 }
 </style>

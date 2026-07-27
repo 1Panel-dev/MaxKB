@@ -147,7 +147,9 @@ Mk 组件的内部实现中。
 
 ## MkIcon
 
-`MkIcon` 统一承载 MaxKB SVG Symbol 和 Element Plus 图标。未传入 `size` 时默认使用 `16px`；传入 `size` 时覆盖默认值。`size`、`color` 的其他行为与 `el-icon` 保持一致。
+`MkIcon` 统一承载 MaxKB SVG Symbol 和 Element Plus 图标。`name` 和 `icon` 均未传入时默认显示
+`icon-404`。未传入 `size` 时默认使用 `16px`；传入 `size` 时覆盖默认值。`gradient` 仅用于
+SVG Symbol，启用后使用项目主题渐变填充。`size`、`color` 的其他行为与 `el-icon` 保持一致。
 
 ### MaxKB SVG Symbol
 
@@ -156,6 +158,7 @@ Mk 组件的内部实现中。
 ```vue
 <MkIcon name="icon_left_outlined" />
 <MkIcon name="icon_start_outlined" :size="20" color="#3370ff" />
+<MkIcon name="icon_home_filled" gradient />
 ```
 
 SVG Symbol 由 `src/assets/iconfont.js` 提供。该文件由 iconfont 平台定期生成，只允许整体替换，不要手动修改。
@@ -177,6 +180,8 @@ import { Setting } from '@element-plus/icons-vue'
 ### 使用约定
 
 - `name` 和 `icon` 二选一。
+- `name` 和 `icon` 均未传入时使用 `icon-404`。
+- `gradient` 仅用于 SVG Symbol；是否启用由调用方根据组件状态和主题状态决定。
 - `size` 默认为 `16px`，仅在需要其他尺寸时显式传入。
 - MaxKB 图标使用 `name`，Element Plus 图标组件使用 `icon`。
 - 不直接使用 Unicode、Font Class 或裸 `<svg><use>`。

@@ -34,7 +34,7 @@ const workspaceOptions = [
   >
     <template #default="{ text }">
       <button type="button" class="flex max-w-50 items-center gap-1 rounded-md px-2 py-1">
-        <MkIcon :icon="Collection" class="shrink-0" />
+        <MkIcon :icon="Collection" />
         <span class="min-w-0 flex-1 truncate">{{ text }}</span>
         <MkIcon :icon="ArrowDown" class="shrink-0" />
       </button>
@@ -42,7 +42,7 @@ const workspaceOptions = [
 
     <template #option="{ option }">
       <div class="flex items-center gap-2">
-        <MkIcon :icon="Collection" class="shrink-0" />
+        <MkIcon :icon="Collection" />
         <span class="min-w-0 flex-1 truncate">{{ option.label }}</span>
       </div>
     </template>
