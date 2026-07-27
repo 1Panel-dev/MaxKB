@@ -12,6 +12,14 @@ from django.db.models import QuerySet
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from knowledge.models import Knowledge
 from tools.models import Tool
+from users.serializers.user import is_workspace_manage
+
+
+def get_runtime_user_id(user_id=None, chat_user_id=None, chat_user_type=None):
+    if user_id:
+        return str(user_id)
+    return None
+
 
 
 def filter_authorized_ids(resource_type: str, ids: List[str], workspace_id: str) -> List[str]:
