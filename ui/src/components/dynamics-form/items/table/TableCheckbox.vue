@@ -35,11 +35,8 @@
           <template v-if="column.type === 'component'">
             <TableColumn :column="column" :row="scope.row"></TableColumn>
           </template>
-          <template v-else-if="column.type === 'eval'">
-            <span v-html="evalF(column.property, scope.row)"></span
-          ></template>
           <template v-else>
-            <span>{{ scope.row[column.property] }}</span></template
+            <span>{{ formatTableValue(column, scope.row) }}</span></template
           >
         </template>
       </el-table-column>
@@ -60,6 +57,7 @@ import type { TableInstance } from 'element-plus'
 
 import _ from 'lodash'
 import TableColumn from '@/components/dynamics-form/items/table/TableColumn.vue'
+import { formatTableValue } from '@/components/dynamics-form/items/table/valueFormatter'
 const filterText = ref<string>('')
 const props = defineProps<{
   formValue?: any
@@ -71,11 +69,6 @@ const props = defineProps<{
   // 选中的值
   modelValue?: Array<any>
 }>()
-const rowTemp = ref<any>()
-const evalF: (text: string, row: any) => string = (text: string, row: any) => {
-  rowTemp.value = row
-  return eval(text)
-}
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const multipleTableRef = ref<TableInstance>()
@@ -124,15 +117,10 @@ const tableData = computed(() => {
     if (filterText.value) {
       return option_list.value.filter((item: any) =>
         tableColumns.value.some((c: any) => {
-          let v = ''
-          if (c.type === 'eval') {
-            v = evalF(c.property, item)
-          } else if (c.type === 'component') {
+          if (c.type === 'component') {
             return false
-          } else {
-            v = item[c.property]
           }
-          return typeof v == 'string' ? v.indexOf(filterText.value) >= 0 : false
+          return formatTableValue(c, item).includes(filterText.value)
         })
       )
     } else {

@@ -112,10 +112,7 @@ const getData = () => {
       rules: [
         {
           required: formValue.value.required,
-          validator: `validator = (rule, value, callback) => {
-            return componentFormRef.value?.validate_rules(rule, value, callback);
-
-}`,
+          validator: 'component',
           trigger: 'blur',
         },
       ],

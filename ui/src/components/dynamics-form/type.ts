@@ -1,23 +1,49 @@
 import type { Dict } from '@/api/type/common'
 
-interface ViewCardItem {
+interface TriggerSetting {
+  values?: Array<any>
+  url?: string
+  request_action?: 'get' | 'set_children_loader'
+  response_type?: 'data' | 'model_options'
+  change_field?: string
   /**
-   * 类型
+   * 旧版动态脚本，仅用于识别并迁移已知配置，不会执行
    */
-  type: 'eval' | 'default'
+  request?: string
+  change?: string
+}
+
+interface ValueFormat {
+  /**
+   * 字段拼接或数字格式化
+   */
+  type: 'default' | 'concat' | 'number'
+  /**
+   * 拼接时使用的字段
+   */
+  value_fields?: Array<string>
+  separator?: string
+  locale?: string
+  minimum_fraction_digits?: number
+  maximum_fraction_digits?: number
+  prefix?: string
+  suffix?: string
+}
+
+interface ViewCardItem extends ValueFormat {
   /**
    * 标题
    */
   title: string
   /**
-   * 值 根据类型不一样 取值也不一样 default= row[value_field] eval `${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`
+   * 数据字段
    */
   value_field: string
 }
 
-interface TableColumn {
+interface TableColumn extends Omit<ValueFormat, 'type'> {
   /**
-   * 字段|组件名称|可计算的模板字符串
+   * 字段或组件名称
    */
   property: string
   /**
@@ -33,7 +59,7 @@ interface TableColumn {
   /**
    * 类型
    */
-  type: 'eval' | 'component' | 'default'
+  type: 'concat' | 'number' | 'component' | 'default'
 
   props_info?: PropsInfo
 }
@@ -137,7 +163,7 @@ interface FormField {
   /**
    * {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
    */
-  relation_trigger_field_dict?: Dict<any>
+  relation_trigger_field_dict?: Dict<TriggerSetting>
   /**
    * 执行器类型  OPTION_LIST请求Option_list数据 CHILD_FORMS请求子表单
    */
@@ -175,4 +201,4 @@ interface FormField {
   required_asterisk?: boolean
   [propName: string]: any
 }
-export type { FormField }
+export type { FormField, TriggerSetting }

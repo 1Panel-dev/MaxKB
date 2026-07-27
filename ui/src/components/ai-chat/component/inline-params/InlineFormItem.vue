@@ -46,7 +46,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, type Ref } from 'vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import type { FormField, TriggerSetting } from '@/components/dynamics-form/type'
 import type { Dict } from '@/api/type/common'
 import bus from '@/utils/bus'
 import { get } from 'lodash'
@@ -59,7 +59,7 @@ const props = defineProps<{
   trigger: (
     trigger_field: string,
     trigger_value: any,
-    trigger_setting: any,
+    trigger_setting: TriggerSetting,
     self: any,
     loading: Ref<boolean>,
   ) => void

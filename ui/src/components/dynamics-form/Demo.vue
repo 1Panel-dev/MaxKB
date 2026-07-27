@@ -56,8 +56,7 @@ const damo_data: Array<FormField> = [
       relation_trigger_field_dict: {
         name: {
           values: ['01993837-5b09-7f20-9360-801d11d43d28'],
-          request:
-            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
+          request_action: 'set_children_loader',
           url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
         },
       },
@@ -140,8 +139,7 @@ const damo_data: Array<FormField> = [
       relation_trigger_field_dict: {
         single_select_field: {
           values: [],
-          request:
-            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
+          request_action: 'set_children_loader',
           url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
         },
       },
@@ -152,6 +150,7 @@ const damo_data: Array<FormField> = [
         values: [],
         url: '/workspace/${current_workspace_id}/model_list?model_type=LLM',
         change_field: 'option_list',
+        response_type: 'model_options',
       },
     },
   },
@@ -237,9 +236,10 @@ const damo_data: Array<FormField> = [
       active_msg: '当前选中',
       table_columns: [
         {
-          property: '`${row.key}${row.number}`',
+          property: 'key',
+          value_fields: ['key', 'number'],
           label: '名称',
-          type: 'eval',
+          type: 'concat',
         },
         {
           property: 'ProgressTableItem',
@@ -258,15 +258,17 @@ const damo_data: Array<FormField> = [
           props_info: {
             view_card: [
               {
-                type: 'eval',
+                type: 'number',
                 title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
+                value_field: 'number',
+                locale: 'zh-CN',
+                maximum_fraction_digits: 1,
+                suffix: '%',
               },
               {
-                type: 'eval',
+                type: 'default',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+                value_field: 'key',
               },
             ],
           },
@@ -297,9 +299,10 @@ const damo_data: Array<FormField> = [
       active_msg: '当前选中',
       table_columns: [
         {
-          property: '`${row.key}${row.number}`',
+          property: 'key',
+          value_fields: ['key', 'number'],
           label: '名称',
-          type: 'eval',
+          type: 'concat',
         },
         {
           property: 'ProgressTableItem',
@@ -318,15 +321,17 @@ const damo_data: Array<FormField> = [
           props_info: {
             view_card: [
               {
-                type: 'eval',
+                type: 'number',
                 title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
+                value_field: 'number',
+                locale: 'zh-CN',
+                maximum_fraction_digits: 1,
+                suffix: '%',
               },
               {
-                type: 'eval',
+                type: 'default',
                 title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
+                value_field: 'key',
               },
             ],
           },

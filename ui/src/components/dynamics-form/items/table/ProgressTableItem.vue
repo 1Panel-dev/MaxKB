@@ -13,14 +13,17 @@
       <div>
         <el-row v-for="(item, index) in view_card" :key="index">
           <el-col :span="6">{{ item.title }}</el-col>
-          <el-col :span="18"> <span class="value" :innerHTML="value_html(item)"> </span></el-col>
+          <el-col :span="18">
+            <span class="value">{{ formatTableValue(item, row) }}</span>
+          </el-col>
         </el-row>
       </div>
     </el-popover>
   </div>
 </template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { formatTableValue } from '@/components/dynamics-form/items/table/valueFormatter'
 const props = defineProps<{
   /**
    *表单渲染Item column
@@ -31,12 +34,6 @@ const props = defineProps<{
    */
   row: any
 }>()
-const rowRef = ref<any>()
-
-function evalF(text: string, row: any) {
-  rowRef.value = row
-  return eval(text)
-}
 const props_info = computed(() => {
   return props.column.props_info ? props.column.props_info : {}
 })
@@ -46,14 +43,6 @@ const text_field = computed(() => {
 const value_field = computed(() => {
   return props.column.value_field ? props.column.value_field : 'value'
 })
-
-const value_html = (view_card_item: any) => {
-  if (view_card_item.type === 'eval') {
-    return evalF(view_card_item.value_field, props.row)
-  } else {
-    return props.row[view_card_item.value_field]
-  }
-}
 
 const view_card = computed(() => {
   return props_info.value.view_card ? props_info.value.view_card : []

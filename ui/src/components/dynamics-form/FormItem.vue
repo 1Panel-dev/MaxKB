@@ -34,7 +34,7 @@
 </template>
 <script setup lang="ts">
 import { ref, computed, onMounted, type Ref } from 'vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import type { FormField, TriggerSetting } from '@/components/dynamics-form/type'
 import FormItemLabel from './FormItemLabel.vue'
 import type { Dict } from '@/api/type/common'
 import bus from '@/utils/bus'
@@ -54,7 +54,7 @@ const props = defineProps<{
   trigger: (
     trigger_field: string,
     trigger_value: any,
-    trigger_setting: any,
+    trigger_setting: TriggerSetting,
     self: any,
     loading: Ref<boolean>,
   ) => void
@@ -100,6 +100,17 @@ const itemValue = computed({
   },
 })
 const componentFormRef = ref<any>()
+const componentValidator = (rule: any, value: string, callback: any) => {
+  return componentFormRef.value?.validate_rules(rule, value, callback)
+}
+
+const isComponentValidator = (validator: unknown) => {
+  return (
+    validator === 'component' ||
+    (typeof validator === 'string' &&
+      validator.includes('componentFormRef.value?.validate_rules(rule, value, callback)'))
+  )
+}
 const label_attrs = computed(() => {
   return props.formfield.label &&
     typeof props.formfield.label !== 'string' &&
@@ -132,13 +143,16 @@ const errMsg = computed(() => {
  * @param rule
  */
 const to_rule = (rule: any) => {
-  if (rule.validator) {
-    // eslint-disable-next-line prefer-const, @typescript-eslint/no-unused-vars
-    let validator = (rule: any, value: string, callback: any) => {}
-    eval(rule.validator)
-    return { ...rule, validator }
+  if (typeof rule.validator === 'function' || !rule.validator) {
+    return rule
   }
-  return rule
+
+  if (isComponentValidator(rule.validator)) {
+    return { ...rule, validator: componentValidator }
+  }
+
+  const { validator: _validator, ...safeRule } = rule
+  return safeRule
 }
 
 /**
@@ -187,9 +201,9 @@ onMounted(() => {
   props.initDefaultData(props.formfield)
   initTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
   initTrigger(props.formfield.label, props.formfield.label?.relation_trigger_field_dict)
-  isString(props.formfield.label)
-    ? undefined
-    : onTrigger(props.formfield.label, props.formfield.label.relation_trigger_field_dict)
+  if (!isString(props.formfield.label)) {
+    onTrigger(props.formfield.label, props.formfield.label.relation_trigger_field_dict)
+  }
   onTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
 })
 const onTrigger = (self: any, trigger_field_dict?: Dict<any>) => {

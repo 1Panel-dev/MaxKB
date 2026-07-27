@@ -35,19 +35,14 @@
 <script lang="ts" setup>
 import type { Dict } from '@/api/type/common'
 import FormItem from '@/components/dynamics-form/FormItem.vue'
-import type { FormField } from '@/components/dynamics-form/type'
+import type { FormField, TriggerSetting } from '@/components/dynamics-form/type'
 import { ref, onBeforeMount, watch, type Ref, nextTick, computed } from 'vue'
 import type { FormInstance } from 'element-plus'
 import type Result from '@/request/Result'
 import _ from 'lodash'
-import { get, post, put, del } from '@/request/index'
+import { get } from '@/request/index'
 import { computeVisibilityMap } from './visibility'
-const request = {
-  get,
-  post,
-  put,
-  del,
-}
+import { runTrigger } from './trigger'
 defineOptions({ name: 'dynamicsForm' })
 
 const props = withDefaults(
@@ -152,59 +147,23 @@ watch(
   { deep: true },
 )
 
-function renderTemplate(template: string, data: any) {
-  return template.replace(/\$\{(\w+)\}/g, (match, key) => {
-    return data[key] !== undefined ? data[key] : match
-  })
-}
 /**
  * 触发器,用户获取子表单 或者 下拉选项
  * @param field
  * @param loading
  */
 const trigger = (
-  trigger_field: string,
+  _trigger_field: string,
   trigger_value: any,
-  trigger_setting: any,
+  trigger_setting: TriggerSetting,
   self: any,
   loading: Ref<boolean>,
 ) => {
-  const request_call = new Function(
-    'self',
-    'trigger_setting',
-    'request',
-    'extra',
-    trigger_setting.request
-      ? trigger_setting.request
-      : 'return  request.get(extra.renderTemplate(trigger_setting.url));',
-  )(self, trigger_setting, request, {
-    renderTemplate: (url: string) =>
-      renderTemplate(url, {
-        trigger_value: trigger_value,
-        ...props.otherParams,
-      }),
-  })
-
-  if (!trigger_setting.change && !trigger_setting.change_field) {
-    return
-  }
-  request_call.then((ok: any) => {
-    new Function(
-      'self',
-      'trigger_setting',
-      'response',
-      'extra',
-      trigger_setting.change
-        ? trigger_setting.change
-        : `self[trigger_setting.change_field]=[
-        ...response.data.shared_model.map((m) => {
-          return { ...m, type: 'share' }
-        }),
-        ...response.data.model.map((m) => {
-          return { ...m, type: 'workspace' }
-        })
-      ];`,
-    )(self, trigger_setting, ok, { form_data: formValue, getDefault: getFormDefaultValue })
+  return runTrigger(trigger_setting, self, {
+    triggerValue: trigger_value,
+    otherParams: props.otherParams,
+    loading,
+    get,
   })
 }
 /**
