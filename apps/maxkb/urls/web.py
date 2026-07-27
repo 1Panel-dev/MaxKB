@@ -42,13 +42,13 @@ urlpatterns = [
     path(admin_api_prefix, include("system_manage.urls")),
     path(admin_api_prefix, include("application.urls")),
     path(admin_api_prefix, include("trigger.urls")),
-    path(admin_api_prefix, include("oss.urls")),
+    path(admin_api_prefix, include("oss.urls", namespace="admin_oss")),
     path(admin_api_prefix, include("homepage.urls")),
     path(admin_api_prefix, include("portal.urls")),
-    path(chat_api_prefix, include("oss.urls")),
+    path(chat_api_prefix, include("oss.urls", namespace="chat_oss")),
     path(chat_api_prefix, include("chat.urls")),
-    path(f'{admin_ui_prefix[1:]}/', include('oss.retrieval_urls')),
-    path(f'{chat_ui_prefix[1:]}/', include('oss.retrieval_urls')),
+    path(f'{admin_ui_prefix[1:]}/', include('oss.retrieval_urls', namespace='admin_oss_retrieval')),
+    path(f'{chat_ui_prefix[1:]}/', include('oss.retrieval_urls', namespace='chat_oss_retrieval')),
 ]
 init_doc(urlpatterns, chat_urlpatterns)
 
