@@ -13,11 +13,11 @@ from . import views
 app_name = 'oss'
 
 urlpatterns = [
-    re_path(rf'^(.*)/oss/file/(?P<file_id>[\w-]+)/?$',
+    re_path(r'^(.*)/oss/file/(?P<file_id>[\w-]+)/?$',
             views.FileRetrievalView.as_view()),
-    re_path(rf'oss/file/(?P<file_id>[\w-]+)/?$',
+    re_path(r'oss/file/(?P<file_id>[\w-]+)/?$',
             views.FileRetrievalView.as_view()),
-    re_path(rf'^/oss/get_url/(?P<url>[\w-]+)?$',
+    re_path(r'^oss/get_url/(?P<application_id>[\w-]+)/?$',
             views.GetUrlView.as_view()),
 
 ]
