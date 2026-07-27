@@ -20,8 +20,6 @@ from users.serializers.user import is_workspace_manage
 def get_runtime_user_id(user_id=None, chat_user_id=None, chat_user_type=None):
     if user_id:
         return str(user_id)
-    if chat_user_type == "PLATFORM_USER" and chat_user_id:
-        return str(chat_user_id)
     return None
 
 
