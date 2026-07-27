@@ -32,6 +32,7 @@ from common.utils.common import restricted_loads, generate_uuid
 from common.utils.logger import maxkb_logger
 from common.utils.rsa_util import rsa_long_decrypt
 from common.utils.tool_code import ToolExecutor
+from common.utils.url_validator import ALLOWED_CALLBACK_HOSTS, ALLOWED_DOWNLOAD_HOSTS, validate_trusted_url
 from knowledge.models import (
     KnowledgeScope,
     Knowledge,
@@ -389,10 +390,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             if instance.get("work_flow_template") is not None:
                 template_instance = instance.get("work_flow_template")
                 download_url = template_instance.get("downloadUrl")
-                if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+                if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
-                res = requests.get(download_url, timeout=5)
+                res = requests.get(download_url, timeout=5, allow_redirects=False)
                 KnowledgeWorkflowSerializer.Import(
                     data={
                         "user_id": self.data.get("user_id"),
@@ -403,9 +404,9 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
+                    if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
                        raise AppApiException(500, _("Illegal download callback url"))
-                    requests.get(download_callback_url, timeout=5)
+                    requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
@@ -636,10 +637,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             if instance.get("work_flow_template"):
                 template_instance = instance.get("work_flow_template")
                 download_url = template_instance.get("downloadUrl")
-                if not download_url.startswith("https://apps-assets.fit2cloud.com/"):
+                if not validate_trusted_url(download_url, ALLOWED_DOWNLOAD_HOSTS):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
-                res = requests.get(download_url, timeout=5)
+                res = requests.get(download_url, timeout=5, allow_redirects=False)
                 KnowledgeWorkflowSerializer.Import(
                     data={
                         "user_id": self.data.get("user_id"),
@@ -650,9 +651,9 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
 
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
-                    if not download_callback_url.startswith("https://apps.fit2cloud.com/"):
-                       raise AppApiException(500, _("Illegal download callback url")) 
-                    requests.get(download_callback_url, timeout=5)
+                    if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
+                       raise AppApiException(500, _("Illegal download callback url"))
+                    requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
 
