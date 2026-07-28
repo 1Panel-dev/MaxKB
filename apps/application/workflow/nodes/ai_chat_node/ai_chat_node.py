@@ -227,7 +227,6 @@ class AIChatNode(INode):
         self.write_context('system', system)
 
         message_list = [*history_message, question]
-        self.write_context('message_list', message_list)
 
         all_tool_ids = list(set(
             (mcp_tool_ids or [])
@@ -256,7 +255,8 @@ class AIChatNode(INode):
                                       reasoning_content_id, text_content_id)
             else:
                 r = chat_model.invoke(message_list_with_system)
-                self._invoke_response(r, chat_model, message_list_with_system, question.content, is_result, text_content_id)
+                self._invoke_response(r, chat_model, message_list_with_system, question.content, is_result,
+                                      text_content_id)
 
     def _generate_prompt_question(self, prompt, model, vision, image_list, video_list):
         images = []

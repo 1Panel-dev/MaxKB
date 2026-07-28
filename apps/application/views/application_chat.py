@@ -6,9 +6,8 @@
     @date：2025/6/10 11:00
     @desc:
 """
-import uuid_utils.compat as uuid
-from django.db.models import QuerySet
 
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
@@ -20,7 +19,7 @@ from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
 from chat.api.chat_api import ChatAPI, PromptGenerateAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
-from chat.serializers.chat import OpenChatSerializers, ChatSerializers, DebugChatSerializers, PromptGenerateSerializer
+from chat.serializers.chat import OpenChatSerializers, DebugChatSerializers, PromptGenerateSerializer, ResumeSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
@@ -157,7 +156,13 @@ class ChatView(APIView):
         responses=None,
         tags=[_('Application')]  # type: ignore
     )
-    def post(self, request: Request, chat_id: str):
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
         return DebugChatSerializers(data={'chat_id': chat_id}).chat(request.data)
 
 
@@ -171,7 +176,13 @@ class CancelWorkflowView(APIView):
         operation_id=_("Cancel running workflow"),  # type: ignore
         tags=[_('Application')]  # type: ignore
     )
-    def post(self, request: Request, chat_id: str):
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str):
         from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
         result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
         if result_enum == CancelResult.CANCELLED:
@@ -179,7 +190,27 @@ class CancelWorkflowView(APIView):
         elif result_enum == CancelResult.NOT_FOUND:
             return result.success({'status': 'not_found', 'chat_id': chat_id})
         else:
-            return result.fail(500, _('Failed to cancel workflow'))
+            return result.error(_('Failed to cancel workflow'))
+
+
+class ResumeStreamView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['POST'],
+        description=_("Resume stream for workflow"),
+        summary=_("Resume stream for workflow"),
+        operation_id=_("Resume stream for workflow"),  # type: ignore
+        tags=[_('Application')]  # type: ignore
+    )
+    @has_permissions(PermissionConstants.APPLICATION_READ.get_workspace_application_permission(),
+                     PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
+                     ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    CompareConstants.AND),
+                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
+    def post(self, request: Request, workspace_id: str, application_id: str, chat_id: str, chat_record_id: str):
+        return ResumeSerializers(data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).resume(request)
 
 
 class PromptGenerateView(APIView):

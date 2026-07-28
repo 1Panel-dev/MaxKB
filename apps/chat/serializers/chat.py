@@ -8,14 +8,19 @@
 """
 import json
 import os
+import queue as thread_queue
+import threading
 from gettext import gettext
 from typing import List, Dict
 
+import uuid_utils
 import uuid_utils.compat as uuid
 from django.db.models import QuerySet
+from django.http import StreamingHttpResponse
 from django.utils.translation import gettext_lazy as _
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from rest_framework import serializers
+from rest_framework.request import Request
 
 from application.chat_pipeline.pipeline_manage import PipelineManage
 from application.chat_pipeline.step.chat_step.i_chat_step import PostResponseHandler
@@ -26,25 +31,29 @@ from application.chat_pipeline.step.reset_problem_step.impl.base_reset_problem_s
 from application.chat_pipeline.step.search_dataset_step.impl.base_search_dataset_step import BaseSearchDatasetStep
 from application.flow.common import Answer
 from application.flow.tools import to_stream_response_simple
-from application.workflow.common import WorkflowType, new_instance
-from application.workflow.message.aggregator import AggregationManager
-from application.workflow.workflow_manage import WorkflowManage, CallBack
-from application.workflow.workflow_run_registry import WorkflowRunRegistry
-from application.workflow.nodes import get_start_node
-from application.workflow.message.struct.text_content import TextContent
-from application.workflow.message.struct.reasoning_content import ReasoningContent
-from application.workflow.message.struct.tool_content import ToolContent
-from application.workflow.message.struct.form_content import FormContent
 from application.models import Application, ApplicationTypeChoices, \
     ChatUserType, ApplicationChatUserStats, ApplicationAccessToken, ChatRecord, Chat, ApplicationVersion
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.common import ChatInfo
+from application.workflow.common import WorkflowType, new_instance
+from application.workflow.message.aggregator import AggregationManager
+from application.workflow.message.struct.failure_content import FailureContent
+from application.workflow.message.struct.form_content import FormContent
+from application.workflow.message.struct.reasoning_content import ReasoningContent
+from application.workflow.message.struct.text_content import TextContent
+from application.workflow.message.struct.tool_content import ToolContent
+from application.workflow.message_queue import get_message_queue
+from application.workflow.nodes import get_start_node
+from application.workflow.workflow_manage import WorkflowManage, CallBack
+from application.workflow.workflow_run_registry import WorkflowRunRegistry
+from common import result
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException, AppChatNumOutOfBoundsFailed, ChatException
 from common.handle.base_to_response import BaseToResponse
 from common.handle.impl.response.openai_to_response import OpenaiToResponse
 from common.handle.impl.response.system_to_response import SystemToResponse
 from common.utils.common import flat_map, get_file_content, is_valid_uuid
+from common.utils.logger import maxkb_logger
 from knowledge.models import Document, Paragraph
 from maxkb.conf import PROJECT_DIR
 from models_provider.models import Model, Status
@@ -455,9 +464,13 @@ class ChatSerializers(serializers.Serializer):
         result_queue = queue.Queue()
 
         aggregation = AggregationManager()
+        self.save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
+                              message_dict)
 
         def on_next(wf_manage, content):
             aggregation.aggregate(content)
+            message_queue = get_message_queue()
+            message_queue.produce(chat_record_id_str, content.to_dict())
             if isinstance(content, TextContent):
                 result_queue.put(('chunk', {
                     'content': [{
@@ -513,11 +526,17 @@ class ChatSerializers(serializers.Serializer):
         def on_complete(wf_manage, error):
             # 注销工作流实例
             WorkflowRunRegistry.unregister(chat_record_id_str, str(chat_info.chat_id))
+            message_queue = get_message_queue()
             if error:
                 result_queue.put(('error', error))
-            self._save_chat_record(chat_info, chat_info.chat_id, chat_record_id_str,
-                                   message, '', '', wf_manage, message_dict, aggregation.get_contents())
+                message_queue.produce(chat_record_id_str,
+                                      FailureContent(str(uuid_utils.uuid7()), str(error), Status.SUCCESS,
+                                                     None, None).to_dict())
+            QuerySet(ChatRecord).filter(id=chat_record_id).update()
+            self.update_chat_record(chat_info, chat_info.chat_id, chat_record_id_str, wf_manage.context,
+                                    aggregation.get_contents())
             result_queue.put(('done', None))
+            message_queue.produce_done(chat_record_id_str)
 
         call_back = CallBack(on_next, on_complete)
 
@@ -584,36 +603,42 @@ class ChatSerializers(serializers.Serializer):
             return base_to_response.to_block_response(
                 chat_info.chat_id, chat_record_id_str, '', True, 0, 0)
 
-    def _save_chat_record(self, chat_info, chat_id, chat_record_id, question, answer,
-                          reasoning_content, wf_manage, question_data=None, messages=None):
-        context = wf_manage.context
-        message_tokens = sum(
-            v.get('message_tokens', 0) for v in context.values() if isinstance(v, dict) and 'message_tokens' in v)
-        answer_tokens = sum(
-            v.get('answer_tokens', 0) for v in context.values() if isinstance(v, dict) and 'answer_tokens' in v)
-
-        answer_text_list = [[Answer(answer, 'ai-chat-node', 'ai-chat-node', 'ai-chat-node', {},
-                                    'ai-chat-node', reasoning_content).to_dict()]]
-
+    @staticmethod
+    def save_chat_record(chat_info, chat_id, chat_record_id, question):
         chat_record = ChatRecord(
             id=chat_record_id,
             chat_id=chat_id,
-            problem_text=question,
-            answer_text=answer,
+            problem_text="",
+            answer_text="",
             details={},
-            message_tokens=message_tokens,
-            answer_tokens=answer_tokens,
-            answer_text_list=answer_text_list,
+            message_tokens=0,
+            answer_tokens=0,
+            answer_text_list=[[]],
             run_time=0,
             index=len(chat_info.chat_record_list) + 1,
             ip_address=chat_info.ip_address,
             source=chat_info.source,
-            workflow_context=dict(context) if context else None,
-            question=question_data if question_data else {},
-            messages=messages
+            workflow_context={},
+            question=question,
+            messages=[]
         )
         chat_info.append_chat_record(chat_record)
         chat_info.set_cache()
+
+    @staticmethod
+    def update_chat_record(chat_info, chat_id, chat_record_id, workflow_context, messages):
+        message_tokens = sum(
+            v.get('message_tokens', 0) for v in workflow_context.values() if
+            isinstance(v, dict) and 'message_tokens' in v)
+        answer_tokens = sum(
+            v.get('answer_tokens', 0) for v in workflow_context.values() if
+            isinstance(v, dict) and 'answer_tokens' in v)
+        QuerySet(ChatRecord).filter(id=chat_record_id).update(
+            workflow_context=workflow_context,
+            messages=messages,
+            message_tokens=message_tokens,
+            answer_tokens=answer_tokens
+        )
 
     def is_valid_chat_user(self):
         chat_user_id = self.data.get('chat_user_id')
@@ -703,6 +728,148 @@ class ChatSerializers(serializers.Serializer):
         for chat_record in chat_record_list:
             chat_info.chat_record_list.append(chat_record)
         return chat_info
+
+
+# consume 桥接队列的上限：满了会反压 pump 线程，防止慢客户端把消息全堆进内存
+_BRIDGE_MAXSIZE = 1000
+# 消费上限（秒），与桥接 get 的超时保持一致的量级
+_CONSUME_TIMEOUT = 300
+
+
+class ResumeSerializers(serializers.Serializer):
+    chat_id = serializers.UUIDField(required=True)
+    chat_record_id = serializers.UUIDField(required=True)
+
+    def resume(self, request):
+        self.is_valid(raise_exception=True)
+        from application.workflow.message_queue import get_message_queue
+        from application.models import ChatRecord
+        chat_record_id = self.data.get('chat_record_id')
+        mq = get_message_queue()
+
+        start_id = self._resolve_start_id(request)
+
+        is_running = mq.exists(chat_record_id) and not mq.is_done(chat_record_id)
+
+        if is_running:
+            generator = self._stream_from_queue(mq, chat_record_id, start_id)
+        else:
+            chat_record = ChatRecord.objects.filter(id=chat_record_id).first()
+            if not chat_record:
+                return result.error(_('Chat record not found'))
+            generator = self._stream_from_db(chat_record, start_id)
+
+        response = StreamingHttpResponse(
+            generator,
+            content_type='text/event-stream;charset=utf-8',
+        )
+        response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no'
+        return response
+
+    @staticmethod
+    def _resolve_start_id(request: Request) -> str:
+        """
+        优先取 SSE 标准的 Last-Event-ID 头（浏览器 EventSource 断线重连会自动带上），
+        兼容 body / query 里显式传的 last_event_id。取不到则从头开始。
+        """
+        candidate = (
+                request.META.get('HTTP_LAST_EVENT_ID')
+                or (request.data.get('last_event_id') if hasattr(request, 'data') else None)
+                or request.query_params.get('last_event_id')
+        )
+        candidate = (candidate or '').strip()
+        return candidate or '0'
+
+    @staticmethod
+    def _sse(msg_id: str, msg_data: str) -> str:
+        """
+        带 id 字段的 SSE 帧：浏览器会把最后收到的 id 存进 Last-Event-ID，
+        下次重连自动回传，从而实现断点续传。
+        """
+        return f'id: {msg_id}\ndata: {msg_data}\n\n'
+
+    def _stream_from_queue(self, mq, chat_record_id: str, start_id: str):
+        """
+        用后台线程跑阻塞式 consume，把回调桥接成 generator。
+        复用 consume 已经处理好的 done 标记 / 尾部残留竞态，视图层不再重写收尾。
+        """
+        bridge: thread_queue.Queue = thread_queue.Queue(maxsize=_BRIDGE_MAXSIZE)
+        done_sentinel = object()
+        stop_event = threading.Event()
+
+        def pump():
+            try:
+                mq.consume(
+                    queue_id=chat_record_id,
+                    start_id=start_id,
+                    # bridge.put 无 timeout：队列满时在此反压，等 generator 消费腾位
+                    on_message=lambda mid, data: bridge.put((mid, data)),
+                    on_done=lambda: bridge.put(done_sentinel),  # 契约保证有且仅一次
+                    timeout=_CONSUME_TIMEOUT,
+                    should_stop=stop_event.is_set,  # 客户端断开时提前结束，省掉空转
+                )
+            except Exception as e:
+                maxkb_logger.error(f"ResumeStream pump error [{chat_record_id}]: {e}")
+                # 兜底：即使 consume 内部异常也要放哨兵，避免 generator 永久阻塞
+                try:
+                    bridge.put_nowait(done_sentinel)
+                except thread_queue.Full:
+                    pass
+
+        worker = threading.Thread(
+            target=pump, name=f"resume-{chat_record_id}", daemon=True
+        )
+        worker.start()
+
+        try:
+            while True:
+                try:
+                    # 略大于 consume timeout：正常情况下哨兵会先到，这里只防线程异常挂死
+                    item = bridge.get(timeout=_CONSUME_TIMEOUT + 5)
+                except thread_queue.Empty:
+                    maxkb_logger.warning(
+                        f"ResumeStream bridge idle timeout [{chat_record_id}]"
+                    )
+                    break
+                if item is done_sentinel:
+                    break
+                msg_id, msg_data = item
+                yield self._sse(msg_id, msg_data)
+            yield 'data: [DONE]\n\n'
+        finally:
+            # 客户端提前关闭连接会在 yield 处抛 GeneratorExit，落到这里；
+            # 通知 consume 线程停止，不必再等到 300s 超时
+            stop_event.set()
+
+    def _stream_from_db(self, chat_record, start_id: str):
+        """
+        已完成 / 不存在于队列：从库里读。
+        若带了 Last-Event-ID，则跳过已发送过的部分（按落库时的消息 id 对齐）。
+        """
+        try:
+            messages = chat_record.messages or []
+            resuming = start_id and start_id != '0'
+            passed = not resuming  # 无续传点则全部下发
+
+            for msg in messages:
+                msg_id = str(msg.get('id', '')) if isinstance(msg, dict) else ''
+
+                if not passed:
+                    # 尚未越过续传点：命中该 id 后，从下一条开始发
+                    if msg_id and msg_id == start_id:
+                        passed = True
+                    continue
+
+                yield self._sse(msg_id, json.dumps(msg, ensure_ascii=False))
+
+            # 续传点在库里没匹配到（比如 id 体系不一致）：退化为整段重放，别让客户端收到空流
+            if not passed:
+                for msg in messages:
+                    msg_id = str(msg.get('id', '')) if isinstance(msg, dict) else ''
+                    yield self._sse(msg_id, json.dumps(msg, ensure_ascii=False))
+        finally:
+            yield 'data: [DONE]\n\n'
 
 
 class OpenChatSerializers(serializers.Serializer):
