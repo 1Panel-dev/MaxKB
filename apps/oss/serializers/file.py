@@ -411,11 +411,12 @@ class FileSerializer(serializers.Serializer):
                 response["Content-Disposition"] = f"inline; filename={encoded_filename}"
                 return response
 
-        def delete(self):
+        def delete(self, mk_file_auth=None):
             self.is_valid(raise_exception=True)
             file_id = self.data.get("id")
             file = QuerySet(File).filter(id=file_id).first()
             if file is not None:
+                auth(file, mk_file_auth)
                 file.delete()
             return True
 
