@@ -1133,9 +1133,10 @@
                 </el-radio-group>
                 <template
                   v-for="(cLoop, cIndex) in Object.values(
-                    data.loop_node_data?.[currentLoopNode] || [],
-                  ).sort((x: any, y: any) => (x.index || 0) - (y.index || 0))"
-                  :key="cIndex"
+                    data.loop_node_data?.[currentLoopNode] || []).sort(
+                      (x: any, y: any) => (x?.index || 0) - (y?.index || 0)
+                  )"
+                  :key="cLoop?.index ?? cIndex"
                 >
                   <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
                 </template>
@@ -1411,7 +1412,12 @@
                 {{ $t('aiChat.executionDetails.title') }}
               </h5>
               <div class="p-8-12 border-t-dashed lighter">
-                <template v-for="(cLoop, cIndex) in data.details" :key="cIndex">
+                <template
+                  v-for="(cLoop, cIndex) in Object.values(data.details ?? {}).sort(
+                    (a: any, b: any) => (a?.index || 0) - (b?.index || 0)
+                  )"
+                  :key="cLoop?.index ?? cIndex"
+                >
                   <ExecutionDetailCard :data="cLoop" :type="type"></ExecutionDetailCard>
                 </template>
               </div>
