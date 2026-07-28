@@ -92,7 +92,9 @@ def get_image_list(result_list: list, zip_files: List[str]):
                 if image_path.startswith('oss/file/') or image_path.startswith('oss/image/'):
                     image_id = image_path.replace('oss/file/', '').replace('oss/image/', '')
                     if is_valid_uuid(image_id):
-                        image_file_list.append({'source_file': image_path, 'image_id': image_id})
+                        image_file_list.append({"source_file": image_path, "image_id": new_image_id})
+                        content = content.replace(source_path, f"./oss/file/{new_image_id}")
+                        p['content'] = content
                     else:
                         image_file_list.append({'source_file': image_path, 'image_id': new_image_id})
                         content = content.replace(source_path, f'./oss/file/{new_image_id}')
