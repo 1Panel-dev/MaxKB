@@ -23,7 +23,7 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
         self.api_url = kwargs.get('api_url')
         self.top_n = kwargs.get('top_n', 3)
         self.params.pop('top_n', None)
-        self.client = cohere.ClientV2(kwargs.get('api_key'), base_url=kwargs.get('api_url'))
+        self.client = cohere.Client(kwargs.get('api_key'), base_url=kwargs.get('api_url'))
 
     @staticmethod
     def is_cache_model():
@@ -48,6 +48,20 @@ class VllmBgeReranker(MaxKBBaseModel, BaseDocumentCompressor):
             return []
 
         ds = [d.page_content for d in documents]
-        result = self.client.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n)
-        return [Document(page_content=d.document.get('text'), metadata={'relevance_score': d.relevance_score}) for d in
-                result.results]
+        try:
+            result = self.client.v2.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n)
+        except cohere.NotFoundError:
+            result = self.client.rerank(model=self.model, query=query, documents=ds, top_n=self.top_n)
+
+        reranked_documents = []
+        for item in result.results:
+            if item.index < 0 or item.index >= len(documents):
+                raise ValueError(f'Rerank result index {item.index} is out of range')
+            source = documents[item.index]
+            reranked_documents.append(
+                Document(
+                    page_content=source.page_content,
+                    metadata={**source.metadata, 'relevance_score': item.relevance_score},
+                )
+            )
+        return reranked_documents
