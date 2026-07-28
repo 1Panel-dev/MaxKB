@@ -9,11 +9,13 @@ from models_provider.base_model_provider import (
     ModelTypeConst,
     ModelInfoManage,
 )
+from models_provider.impl.minimax_model_provider.credential.image import MiniMaxImageModelCredential
 from models_provider.impl.minimax_model_provider.credential.itv import ImageToVideoModelCredential
 from models_provider.impl.minimax_model_provider.credential.llm import MiniMaxLLMModelCredential
 from models_provider.impl.minimax_model_provider.credential.tti import MiniMaxTextToImageModelCredential
 from models_provider.impl.minimax_model_provider.credential.tts import MiniMaxTTSModelCredential
 from models_provider.impl.minimax_model_provider.credential.ttv import TextToVideoModelCredential
+from models_provider.impl.minimax_model_provider.model.image import MiniMaxImageModel
 from models_provider.impl.minimax_model_provider.model.llm import MiniMaxChatModel
 from models_provider.impl.minimax_model_provider.model.tti import MiniMaxTextToImageModel
 from models_provider.impl.minimax_model_provider.model.tts import MiniMaxTextToSpeech
@@ -23,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from models_provider.impl.minimax_model_provider.model.ttv import GenerationVideoModel
 
 minimax_llm_model_credential = MiniMaxLLMModelCredential()
+minimax_image_model_credential = MiniMaxImageModelCredential()
 minimax_tts_model_credential = MiniMaxTTSModelCredential()
 minimax_tti_model_credential = MiniMaxTextToImageModelCredential()
 minimax_ttv_model_credential = TextToVideoModelCredential()
@@ -86,6 +89,13 @@ minimax_tts_turbo = ModelInfo(
 minimax_tti_list = [
     ModelInfo("image-01", _(""), ModelTypeConst.TTI, minimax_tti_model_credential, MiniMaxTextToImageModel),
 ]
+
+# MiniMax-M3 accepts image and video inputs alongside text, so it is also
+# registered as a vision model so existing image/video input workflows can
+# select it.
+minimax_image_list = [
+    ModelInfo("MiniMax-M3", _(""), ModelTypeConst.IMAGE, minimax_image_model_credential, MiniMaxImageModel),
+]
 minimax_ttv_list = [
     ModelInfo("MiniMax-Hailuo-2.3", _(""), ModelTypeConst.TTV, minimax_ttv_model_credential, GenerationVideoModel),
 ]
@@ -106,6 +116,8 @@ model_info_manage = (
     .append_default_model_info(minimax_tts_hd)
     .append_model_info_list(minimax_tti_list)
     .append_default_model_info(minimax_tti_list[0])
+    .append_model_info_list(minimax_image_list)
+    .append_default_model_info(minimax_image_list[0])
     .append_model_info_list(minimax_ttv_list)
     .append_default_model_info(minimax_ttv_list[0])
     .append_model_info_list(model_info_itv_list)
