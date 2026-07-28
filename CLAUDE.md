@@ -6,7 +6,7 @@ MaxKB (Max Knowledge Brain) is an open-source platform for building enterprise A
 
 **Backend:** Python 3.13, Django 6.0, Django REST Framework, LangChain 1.3, LangGraph 1.2, Celery 5.6, uv (package manager)
 
-**Frontend:** Vue 3.5, TypeScript, Vite 6, Element Plus, Pinia, Vue Router
+**Frontend:** Vue 3.5, TypeScript, Vite 8, Element Plus, Pinia, Vue Router
 
 **Infrastructure:** PostgreSQL 17.10 + pgvector, Redis 7
 
