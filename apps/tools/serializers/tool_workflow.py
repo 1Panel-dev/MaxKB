@@ -358,6 +358,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5, allow_redirects=False)
+                tool = QuerySet(Tool).filter(id=self.data.get("tool_id")).first()
                 ToolSerializer.Import(
                     data={
                         "user_id": self.data.get("user_id"),

@@ -481,6 +481,7 @@ class ToolSerializer(serializers.Serializer):
                     raise AppApiException(500, _("Illegal download url"))
                 # 查找匹配的版本名称
                 res = requests.get(download_url, timeout=5, allow_redirects=False)
+                tool = ToolSerializer.Import(
                     data={
                         "file": bytes_to_uploaded_file(res.content, "file.tool"),
                         "user_id": self.data.get("user_id"),

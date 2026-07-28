@@ -752,6 +752,7 @@ class ApplicationSerializer(serializers.Serializer):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5, allow_redirects=False)
+        app = ApplicationSerializer(
             data={"user_id": self.data.get("user_id"), "workspace_id": self.data.get("workspace_id")}
         ).import_(
             {
@@ -1486,6 +1487,8 @@ class ApplicationOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _("Illegal download url"))
         # 查找匹配的版本名称
         res = requests.get(download_url, timeout=5, allow_redirects=False)
+        try:
+            mk_instance = restricted_loads(res.content)
         except Exception as e:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
