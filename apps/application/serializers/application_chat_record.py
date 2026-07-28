@@ -75,7 +75,7 @@ class ChatRecordOperateSerializer(serializers.Serializer):
             raise AppApiException(500, _("Application id does not exist"))
         if not ChatRecord.objects.filter(
             chat_id=self.data.get("chat_id"), chat__application_id=self.data.get("application_id")
-        ).exists():
+        ).exists() and not debug:
             raise AppApiException(500, _("Chat records for the application do not exist"))
         application_access_token = (
             QuerySet(ApplicationAccessToken).filter(application_id=self.data.get("application_id")).first()
