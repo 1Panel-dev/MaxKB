@@ -261,6 +261,11 @@ Tailwind 类。
 
 Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-mix()` 根据主题色生成。业务代码通常不需要直接修改 `--el-color-primary-*`。
 
+项目内所有 Select 下拉弹层统一隐藏 Popper 箭头，并将 Element Plus 默认的 `12px` 偏移回收
+`8px`，使触发器与弹层保持 `4px` 间距。该规则由 `element-plus.scss` 中的
+`.el-select__popper` 统一维护，业务组件不需要重复传入 `show-arrow`、`offset` 或
+`popper-class`。
+
 ### 普通 CSS 中叠加透明度
 
 使用 `color-mix()`，只依赖一个主题色变量：
@@ -277,7 +282,6 @@ Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-
 ```scss
 .selected {
   background: rgb(var(--mk-primary-rgb) / 10%);
-  box-shadow: 0 4px 12px rgb(var(--mk-primary-rgb) / 20%);
 }
 ```
 

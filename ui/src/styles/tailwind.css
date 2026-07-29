@@ -3,8 +3,10 @@
 @theme {
   /* colors */
   --color-primary: var(--mk-primary);
+  --color-N100: var(--mk-N100);
   --color-N300: var(--mk-N300);
   --color-N350: var(--mk-N350);
+  --color-N400: var(--mk-N400);
   --color-N500: var(--mk-N500);
   --color-N600: var(--mk-N600);
   --color-N900: var(--mk-N900);

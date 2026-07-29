@@ -24,6 +24,7 @@ const systemMenuItems = getChildRouteList('system')
         :collapse="props.collapsed"
         :collapse-transition="false"
         :default-active="route.path"
+        :persistent="false"
         router
       >
         <template v-for="item in systemMenuItems" :key="item.name">

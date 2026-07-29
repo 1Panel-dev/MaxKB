@@ -179,7 +179,7 @@ System 复用页面（仅替换根前缀）：
     {
       path: 'users',
       name: 'system-users',
-      component: () => import('@/views/system/SystemView.vue'),
+      component: () => import('@/views/system/identity/users/UserListView.vue'),
       meta: {
         title: '用户管理',
         order: 10,

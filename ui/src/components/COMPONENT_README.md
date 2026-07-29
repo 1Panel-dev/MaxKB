@@ -47,8 +47,10 @@ src/components/
 │   │   ├── index.vue             # 统一下拉菜单箭头和弹层间距
 │   │   ├── mk-dropdown-menu.vue  # 统一下拉菜单容器
 │   │   └── mk-dropdown-item.vue  # 统一菜单项图标、内容和选中状态布局
-│   └── mk-icon/
-│       └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
+│   ├── mk-icon/
+│   │   └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
+│   └── mk-table/
+│       └── index.vue         # 统一表格样式与分页布局
 ├── mk-filterable-dropdown/   # 带搜索过滤和滚动列表的下拉框，使用方手动导入
 │   └── index.vue
 └── user-selector/            # 低频共享组件示例，使用方手动引入
@@ -187,6 +189,43 @@ import { Setting } from '@element-plus/icons-vue'
 - 不直接使用 Unicode、Font Class 或裸 `<svg><use>`。
 - 更新图标时直接覆盖 `src/assets/iconfont.js`。
 - 保持 Symbol ID 稳定；ID 变化时必须同步修改所有对应的 `MkIcon name`。
+
+## MkTable
+
+项目内带分页的标准表格使用全局自动注册的 `MkTable`。组件内部组合 `el-table` 和
+`el-pagination`。默认不开启列宽拖拽；传入 `resizable` 后，组件内部启用 `border`，但视觉
+上隐藏表格外框和纵向列线，仅保留横向行分隔线，并为可拖拽的表头分隔线提供悬停、拖动高亮
+效果。
+
+`data` 和 `paginationConfig` 由 `MkTable` 直接接收；其余 Element Plus Table
+属性与事件通过 `$attrs` 透传。列继续使用`el-table-column` 声明。
+
+```vue
+<MkTable
+  v-model:pagination-config="paginationConfig"
+  :data="currentPageUsers"
+  resizable
+  row-key="id"
+>
+  <el-table-column prop="name" label="姓名" />
+</MkTable>
+```
+
+分页参数统一放入 `paginationConfig`：
+
+```ts
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 10,
+  pageSizes: [10, 20, 50, 100],
+  total: 0,
+})
+```
+
+`pageSizes` 可省略，默认使用 `[10, 20, 50, 100]`。
+
+`MkTable` 固定包含分页；不需要分页的场景直接使用 `el-table`。通过组件暴露的 `tableRef` 可以调用内部 Element Plus
+Table 方法。
 
 ## 新增公共组件
 
