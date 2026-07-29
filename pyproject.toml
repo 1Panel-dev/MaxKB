@@ -28,6 +28,7 @@ dependencies = [
     "langchain-deepseek==1.1.0",
     "langchain-google-genai==4.2.5",
     "langchain-mcp-adapters==0.3.0",
+    "mcp==1.28.1",
     "langchain-huggingface==1.2.2",
     "langchain-ollama==1.1.0",
     "langchain-aws==1.6.0",
