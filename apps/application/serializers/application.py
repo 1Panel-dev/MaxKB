@@ -86,7 +86,7 @@ def get_bound_tool_ids(instance: Dict) -> List[str]:
     """
     tool_ids = set()
     for key in ("tool_ids", "skill_tool_ids", "mcp_tool_ids"):
-        for tool_id in (instance.get(key) or []):
+        for tool_id in instance.get(key) or []:
             tool_ids.add(str(tool_id))
     if instance.get("mcp_tool_id"):
         tool_ids.add(str(instance.get("mcp_tool_id")))
@@ -96,7 +96,7 @@ def get_bound_tool_ids(instance: Dict) -> List[str]:
             if node_data.get(key):
                 tool_ids.add(str(node_data.get(key)))
         for key in ("mcp_tool_ids", "tool_ids", "skill_tool_ids"):
-            for tool_id in (node_data.get(key) or []):
+            for tool_id in node_data.get(key) or []:
                 tool_ids.add(str(tool_id))
 
     _walk_workflow_nodes(instance.get("work_flow"), collect)
@@ -109,11 +109,11 @@ def get_bound_application_ids(instance: Dict) -> List[str]:
     ai-chat-node 的 node_data 包含 application_ids 列表。
     """
     application_ids = set()
-    for app_id in (instance.get("application_ids") or []):
+    for app_id in instance.get("application_ids") or []:
         application_ids.add(str(app_id))
 
     def collect(node_data):
-        for app_id in (node_data.get("application_ids") or []):
+        for app_id in node_data.get("application_ids") or []:
             application_ids.add(str(app_id))
 
     _walk_workflow_nodes(instance.get("work_flow"), collect)
@@ -186,7 +186,9 @@ def validate_bound_tool_permissions(user_id: str, workspace_id: str, instance: D
     application_ids = get_bound_application_ids(instance)
     if application_ids:
         authorized_application_ids = set(get_authorized_application_ids(user_id, workspace_id, application_ids))
-        unauthorized_application_ids = [app_id for app_id in application_ids if app_id not in authorized_application_ids]
+        unauthorized_application_ids = [
+            app_id for app_id in application_ids if app_id not in authorized_application_ids
+        ]
         if unauthorized_application_ids:
             message = lazy_format(
                 _("No permission to use application(s): {application_ids}"),
@@ -1268,6 +1270,14 @@ class ApplicationOperateSerializer(serializers.Serializer):
             workspace_id=workspace_id,
         )
         self.reset_application_version(work_flow_version, application)
+        # 如果是简易应用 需要存入 knowledge_ids
+        if application.type == ApplicationTypeChoices.SIMPLE:
+            work_flow_version.knowledge_ids = [
+                str(row.target_id)
+                for row in QuerySet(ResourceMapping).filter(
+                    source_id=str(application.id), source_type="APPLICATION", target_type="KNOWLEDGE"
+                )
+            ]
         work_flow_version.save()
         access_token = hashlib.md5(str(uuid.uuid7()).encode()).hexdigest()[8:24]
         application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application.id).first()
@@ -1781,9 +1791,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
         id_list = instance.get("id_list")
         workspace_id = self.data.get("workspace_id")
         id_list = list(
-            QuerySet(Application)
-            .filter(id__in=id_list, workspace_id=workspace_id)
-            .values_list("id", flat=True)
+            QuerySet(Application).filter(id__in=id_list, workspace_id=workspace_id).values_list("id", flat=True)
         )
 
         QuerySet(ApplicationVersion).filter(application_id__in=id_list).delete()
@@ -1842,9 +1850,7 @@ class ApplicationBatchOperateSerializer(serializers.Serializer):
 
 class BatchCleanTimeSerializer(BatchSerializer):
     clean_time = serializers.IntegerField(required=True, min_value=1, max_value=100000, label=_("Clean time"))
-    file_clean_time = serializers.IntegerField(
-        required=True, min_value=1, max_value=100000, label=_("File clean time")
-    )
+    file_clean_time = serializers.IntegerField(required=True, min_value=1, max_value=100000, label=_("File clean time"))
 
     def is_valid(self, *, model=None, raise_exception=False):
         super().is_valid(model=model, raise_exception=True)
