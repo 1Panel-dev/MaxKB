@@ -495,7 +495,7 @@ class ChatSerializers(serializers.Serializer):
             return self.re_open_chat_work_flow(chat_id, application)
 
     def re_open_chat_simple(self, chat_id, application):
-        if self.debug:
+        if self.data.get('debug'):
             # 数据集id列表
             knowledge_id_list = [str(row.target_id) for row in
                                  QuerySet(ResourceMapping).filter(source_id=str(application.id),
