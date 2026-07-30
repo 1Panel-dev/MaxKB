@@ -153,12 +153,12 @@ class BaseImageGenerateNode(IImageGenerateNode):
         return file_url
 
     def upload_application_file(self, file):
-        application = self.workflow_manage.work_flow_post_handler.chat_info.application
+        application_id = self.workflow_manage.work_flow_post_handler.chat_info.application_id
         chat_id = self.workflow_params.get('chat_id')
         meta = {
-            'debug': False if application.id else True,
+            'debug': False if application_id else True,
             'chat_id': chat_id,
-            'application_id': str(application.id) if application.id else None,
+            'application_id': str(application_id) if application_id else None,
         }
         file_url = FileSerializer(data={
             'file': file,
