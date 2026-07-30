@@ -42,7 +42,7 @@ dependencies = [
     "qianfan==0.4.12.3",
     "tencentcloud-sdk-python-common==3.1.134",
     "tencentcloud-sdk-python-hunyuan==3.1.56",
-    "tencentcloud-sdk-python-asr==3.1.130",
+    "tencentcloud-sdk-python-asr==3.1.137",
     "volcengine-python-sdk[ark]==5.0.41",
     "zai-sdk==0.2.3",
 
