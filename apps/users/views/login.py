@@ -48,14 +48,13 @@ class LoginView(APIView):
     def post(self, request: Request):
         token, f_token = LoginSerializer().login(request.data)
         response = result.success(token)
-        secure = request.is_secure()
         response.set_cookie(
             'mk_file_auth',
             value=f_token,
             max_age=7 * 24 * 3600,
             path=f'{CONFIG.get_admin_path()}',
             domain=None,
-            secure=secure,
+            secure=request.scheme == "https",
             httponly=True,
             samesite="None",
         )
