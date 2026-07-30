@@ -109,9 +109,9 @@ class DeletedDocumentEmbeddingTests(SimpleTestCase):
             ListenerManagement.embedding_by_document("deleted", MagicMock())
         self.lock.un_lock.assert_called_once_with("embedding:deleted")
 
-    @patch("knowledge.serializers.common.sql_execute")
+    @patch("knowledge.serializers.common.VectorStore.get_embedding_vector")
     @patch("knowledge.serializers.common.QuerySet")
-    def test_document_deleted_before_index_lookup_skips_index_sql(self, query_set, execute_sql):
+    def test_document_deleted_before_index_lookup_skips_vector_store(self, query_set, get_vector_store):
         query_set.return_value.filter.return_value.first.return_value = None
         create_knowledge_index(document_id="deleted")
-        execute_sql.assert_not_called()
+        get_vector_store.assert_not_called()

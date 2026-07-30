@@ -53,6 +53,13 @@ class Config(dict):
         "S3_SECRET_KEY": "seaweedfsadmin",
         "S3_ENDPOINT": "http://127.0.0.1:8333",
         "S3_BUCKET_NAME": "maxkb",
+        # 向量库：VECTOR_STORE_NAME 显式指定优先；未指定时按 MILVUS_URI 有无自动判断
+        # （配了 MILVUS_URI 用 milvus，否则 pg_vector，保证老用户零改动）
+        "VECTOR_STORE_NAME": "",
+        # Milvus 连接 URI（host:port 统一在 URI 中，例如 http://127.0.0.1:19530）；配置后自动启用 milvus
+        "MILVUS_URI": "",
+        # Milvus 鉴权 token（可选，留空表示无鉴权）；可为 API key 或 user:password 形式
+        "MILVUS_TOKEN": "",
     }
 
     def get_debug(self) -> bool:
