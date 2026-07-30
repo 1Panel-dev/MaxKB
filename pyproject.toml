@@ -28,7 +28,7 @@ dependencies = [
     "langchain-huggingface==1.2.2",
     "langchain-mcp-adapters==0.3.0",
     "langchain-ollama==1.1.0",
-    "langchain-openai==1.4.0",
+    "langchain-openai==1.4.1",
     "langgraph==1.2.9",
     "torch==2.13.0",
     "sentence-transformers==5.6.0",
