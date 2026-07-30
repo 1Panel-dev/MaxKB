@@ -14,7 +14,7 @@ const route = useRoute()
 const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
 </script>
-
+<!-- :persistent="false" -->
 <template>
   <div class="mk-system-sidebar flex h-full flex-col">
     <el-scrollbar class="min-h-0 flex-1">
@@ -24,7 +24,6 @@ const systemMenuItems = getChildRouteList('system')
         :collapse="props.collapsed"
         :collapse-transition="false"
         :default-active="route.path"
-        :persistent="false"
         router
       >
         <template v-for="item in systemMenuItems" :key="item.name">
@@ -38,14 +37,18 @@ const systemMenuItems = getChildRouteList('system')
               <MkIcon v-if="item.icon" :name="item.icon" :size="18" />
               <span>{{ item.label }}</span>
             </template>
-
-            <el-menu-item
-              v-for="child in item.children"
-              :key="child.name"
-              :index="child.route ? router.resolve(child.route).path : child.name"
-            >
-              {{ child.label }}
-            </el-menu-item>
+            <el-menu-item-group>
+              <template #title v-if="props.collapsed"
+                ><span>{{ item.label }}</span></template
+              >
+              <el-menu-item
+                v-for="child in item.children"
+                :key="child.name"
+                :index="child.route ? router.resolve(child.route).path : child.name"
+              >
+                {{ child.label }}
+              </el-menu-item>
+            </el-menu-item-group>
           </el-sub-menu>
           <!-- 无子菜单 -->
           <el-menu-item v-else :index="item.route ? router.resolve(item.route).path : item.name">
@@ -146,7 +149,18 @@ const systemMenuItems = getChildRouteList('system')
       right: 0;
     }
   }
-
+  .el-menu-item-group {
+    > ul {
+      display: flex;
+      flex-direction: column;
+      gap: calc(var(--spacing) * 1);
+    }
+    &__title {
+      padding: 9px calc(var(--spacing) * 4) !important;
+      font-size: var(--mk-font-size-base);
+      color: var(--mk-N600);
+    }
+  }
   // 菜单收起
   .el-menu--collapse {
     > .el-menu-item {
@@ -165,6 +179,12 @@ const systemMenuItems = getChildRouteList('system')
         background-color: white;
       }
     }
+  }
+}
+
+.mk-system-sidebar {
+  .el-menu-item-group__title {
+    display: none;
   }
 }
 

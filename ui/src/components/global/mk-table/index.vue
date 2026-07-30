@@ -42,7 +42,7 @@ const paginationPageSizes = computed(() => props.paginationConfig.pageSizes ?? D
 
 /**
  * 列宽拖拽
- * resizable 开启 Element Plus border 和拖拽交互，并补充固定在列边界的 Hover 提示线。
+ * resizable 借用 Element Plus border 开启拖拽交互，并补充固定在列边界的 Hover 提示线。
  */
 const tableRootRef = ref<HTMLElement>()
 const resizeHoverStyle = ref<{ height: string; left: string; top: string }>()
@@ -112,7 +112,13 @@ defineExpose({ tableRef })
     @mouseleave="clearResizeHover"
     @mousemove="handleTableMouseMove"
   >
-    <el-table ref="tableRef" :data="props.data" v-bind="$attrs" :border="props.resizable">
+    <el-table
+      ref="tableRef"
+      :class="{ 'mk-table__resizable--borderless': props.resizable }"
+      :data="props.data"
+      v-bind="$attrs"
+      :border="props.resizable"
+    >
       <slot />
     </el-table>
     <div
@@ -138,12 +144,19 @@ defineExpose({ tableRef })
 </template>
 
 <style scoped lang="scss">
-// :deep(.el-table__column-resize-proxy) {
-//   background-color: var(--mk-primary);
-//   border-left: 0;
-//   transform: translateX(-1px);
-//   width: 2px;
-// }
+:deep(.mk-table__resizable--borderless) {
+  &,
+  &::after,
+  &::before,
+  td,
+  th {
+    border-right: none !important;
+  }
+
+  .el-table__border-left-patch {
+    display: none;
+  }
+}
 
 .mk-table__resize-hover-indicator {
   background-color: color-mix(in srgb, var(--mk-primary) 20%, transparent);

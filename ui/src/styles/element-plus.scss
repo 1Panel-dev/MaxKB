@@ -22,16 +22,23 @@
 .el-button {
   --el-button-font-weight: 400 !important;
   height: auto;
-  padding: 7px calc(var(--spacing) * 3);
+  padding: 7px 11px;
   &.is-round {
-    padding: 7px calc(var(--spacing) * 3);
+    padding: 7px 11px;
   }
   &.is-text {
     line-height: 18px;
     padding: calc(var(--spacing) * 1);
+    &:not(.is-disabled):hover {
+      background: rgb(var(--mk-N900-rgb) / 10%);
+    }
   }
-  &.is-text:not(.is-disabled):hover {
-    background: rgb(var(--mk-N900-rgb) / 10%);
+  &--primary {
+    &.is-text {
+      &:not(.is-disabled):hover {
+        background: rgb(var(--mk-primary-rgb) / 10%);
+      }
+    }
   }
   // 自定义maxkb渐变色按钮
   &.bg-primary-gradient {
@@ -40,6 +47,9 @@
     --el-button-text-color: white !important;
     border: none;
     padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3) !important;
+  }
+  .el-icon {
+    font-size: 16px !important;
   }
 }
 .el-button [class*='el-icon'] + span {
@@ -92,6 +102,16 @@
   --el-popper-border-radius: var(--el-border-radius-base);
   border: 1px solid var(--mk-N300) !important;
   font-size: var(--mk-font-size-base);
+}
+
+/* input */
+.el-input {
+  --el-input-text-color: var(--el-text-color-primary);
+  --el-input-placeholder-color: var(--mk-N500);
+  --el-input-icon-color: var(--mk-N600);
+}
+.el-input__prefix-inner {
+  color: var(--mk-N600);
 }
 
 /* pagination */
@@ -195,7 +215,7 @@
   .el-switch__core {
     min-width: 28px;
     .el-switch__action {
-      box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);;
+      box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
     }
   }
 }
@@ -209,9 +229,12 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 
   thead th {
-    border: none !important;
-    font-weight: 500;
     color: var(--mk-N600);
+    font-weight: 500;
+  }
+
+  &:not(.el-table--border) thead th {
+    border: none !important;
   }
   .el-table__cell {
     padding: 0;
@@ -221,16 +244,19 @@
     padding: calc(var(--spacing) * 3);
   }
 }
-.el-table--border,
-.el-table--border::before,
-.el-table--border::after,
-.el-table--border td,
-.el-table--border th {
-  border-right: none !important;
-  background-color: #ffffff;
-}
-.el-table__border-left-patch {
-  display: none !important;
+.el-table--border {
+  border: 1px solid var(--el-table-border-color);
+  border-bottom: 0;
+
+  &::after,
+  &::before,
+  > .el-table__inner-wrapper::after {
+    display: none;
+  }
+
+  .el-table__border-left-patch {
+    display: none;
+  }
 }
 
 /* popper */

@@ -222,7 +222,7 @@ const systemUsers = ref<SystemUser[]>([
 <template>
   <div class="system-identity-users px-6">
     <header class="flex-between py-4">
-      <h1 class="text-lg font-medium">{{ route.meta.title }}</h1>
+      <h4>{{ route.meta.title }}</h4>
     </header>
 
     <MkTable

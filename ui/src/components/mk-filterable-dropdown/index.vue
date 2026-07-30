@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="Option extends { label: string; value: string | number }">
-import { computed, ref } from 'vue'
+import { computed, h, ref } from 'vue'
 import { Search } from '@element-plus/icons-vue'
+import MkIcon from '@/components/global/mk-icon/index.vue'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。

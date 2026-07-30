@@ -17,9 +17,45 @@ body,
 body {
   background: var(--mk-layout);
   color: var(--mk-N900);
-  font-weight: 400;
   font-family: 'PingFang SC', AlibabaPuHuiTi, Inter, 'Microsoft YaHei', Arial, sans-serif;
   font-size: var(--mk-font-size-base);
+  font-weight: 400;
   line-height: var(--mk-line-height-base);
   margin: 0;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 32px;
+}
+
+h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 26px;
+}
+
+h4 {
+  font-size: var(--mk-font-size-lg);
+  font-weight: 500;
+  line-height: 24px;
+}
+
+h5 {
+  font-size: var(--mk-font-size-lg);
+  font-weight: 400;
+  line-height: 24px;
+}
+
+h6 {
+  font-size: var(--mk-font-size-base);
+  font-weight: 500;
+  line-height: var(--mk-line-height-base);
 }

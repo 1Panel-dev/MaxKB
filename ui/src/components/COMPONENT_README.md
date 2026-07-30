@@ -193,9 +193,9 @@ import { Setting } from '@element-plus/icons-vue'
 ## MkTable
 
 项目内带分页的标准表格使用全局自动注册的 `MkTable`。组件内部组合 `el-table` 和
-`el-pagination`。默认不开启列宽拖拽；传入 `resizable` 后，组件内部启用 `border`，但视觉
-上隐藏表格外框和纵向列线，仅保留横向行分隔线，并为可拖拽的表头分隔线提供悬停、拖动高亮
-效果。
+`el-pagination`。`MkTable` 不提供 `border`；需要原生边框的场景直接使用 `el-table`。
+默认不开启列宽拖拽；传入 `resizable` 后，组件内部借用 `border` 开启拖拽，但视觉上隐藏
+表格外框和纵向列线，并为可拖拽的表头分隔线提供悬停、拖动高亮效果。
 
 `data` 和 `paginationConfig` 由 `MkTable` 直接接收；其余 Element Plus Table
 属性与事件通过 `$attrs` 透传。列继续使用`el-table-column` 声明。

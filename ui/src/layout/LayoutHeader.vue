@@ -32,7 +32,7 @@ function switchMode() {
 
     <div class="flex items-center gap-5">
       <el-button class="bg-primary-gradient" round>
-        <MkIcon name="icon_start_outlined" :size="16" />
+        <MkIcon name="icon_start_outlined"/>
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />
@@ -41,7 +41,7 @@ function switchMode() {
         <span>系统管理</span>
       </el-button>
       <el-button v-if="isSystem(mode)" class="-mx-1" text @click="switchMode">
-        <MkIcon name="icon_left_outlined" :size="16" />
+        <MkIcon name="icon_left_outlined" />
         <span>返回工作空间</span>
       </el-button>
       <AvatarDropdown> <!-- 头像  --> </AvatarDropdown>

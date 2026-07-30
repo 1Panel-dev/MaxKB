@@ -27,13 +27,13 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'workspace',
           name: 'system-workspace',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/identity/workspaces/WorkspaceListView.vue'),
           meta: { title: '工作空间', order: 20 },
         },
         {
           path: 'roles',
           name: 'system-roles',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/identity/roles/RoleListView.vue'),
           meta: { title: '角色管理', order: 30 },
         },
         {

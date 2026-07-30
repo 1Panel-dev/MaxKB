@@ -34,6 +34,17 @@
   --text-xl--line-height: 26px;
 }
 
+/* default border color */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--el-border-color);
+  }
+}
+
 /* flex layout utilities */
 /* 横向排列，两侧贴边并垂直居中 */
 @utility flex-between {
