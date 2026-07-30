@@ -187,7 +187,7 @@ def write_image(zip_path: str, image_list: List[str]):
         paren_match = re.search(r'\(\./oss/(?:file|image)/([^)]+)\)', image)
         if src_match:
             oss_path = src_match.group(1)
-            image_id = re.sub(r'^\.\/oss\/(file|image)\/', '', oss_path).strip().split(" ")[0]
+            image_id = re.sub(r"^\./oss/(file|image)/", "", oss_path).strip().split(" ")[0]
         elif paren_match:
             image_id = paren_match.group(1).strip().split(" ")[0]
         else:

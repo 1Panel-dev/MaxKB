@@ -187,7 +187,7 @@ def markdown_to_plain_text(md: str) -> str:
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r"\s+", " ", text)
     # 去除表单渲染
-    text = re.sub(r"<form_rander>.*?<\/form_rander>", "", text, flags=re.DOTALL)
+    text = re.sub(r"<form_rander>.*?</form_rander>", "", text, flags=re.DOTALL)
     # 去除首尾空格
     text = text.strip()
     return text
@@ -438,7 +438,7 @@ def flat_map(array: List[List]):
 
 
 def parse_image(content: str):
-    matches = re.finditer(r"!\[.*?\]\(\.\/oss\/(image|file)\/.*?\)", content)
+    matches = re.finditer(r"!\[.*?\]\(\./oss/(image|file)/.*?\)", content)
     image_list = [match.group() for match in matches]
     return image_list
 
@@ -447,7 +447,7 @@ def parse_file_link(content: str):
     """Return non-image markdown links and HTML src refs pointing to ./oss/file/ paths."""
     results = []
     # Regular markdown links (not images): [text](./oss/file/...)
-    for m in re.finditer(r"(?<!!)\[.*?\]\(\.\/oss\/(?:image|file)\/[^)]+\)", content):
+    for m in re.finditer(r"(?<!!)\[.*?\]\(\./oss/(?:image|file)/[^)]+\)", content):
         results.append(m.group())
     # HTML tags with src pointing to oss paths, e.g. <video src="./oss/file/...">
     for m in re.finditer(r'<\w+[^>]+\bsrc=["\'](\./oss/(?:image|file)/[^"\']+)["\']', content):

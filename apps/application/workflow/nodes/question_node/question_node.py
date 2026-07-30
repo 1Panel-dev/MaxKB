@@ -47,7 +47,7 @@ def _get_history_message(history_chat_record, dialogue_number):
         for index in range(start_index if start_index > 0 else 0, len(history_chat_record))], [])
     for message in history_message:
         if isinstance(message.content, str):
-            message.content = re.sub(r'<form_rander>.*?<\/form_rander>', '', message.content, flags=re.DOTALL)
+            message.content = re.sub(r'<form_rander>.*?</form_rander>', '', message.content, flags=re.DOTALL)
     return history_message
 
 
