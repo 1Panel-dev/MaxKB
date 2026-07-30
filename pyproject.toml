@@ -77,7 +77,7 @@ dependencies = [
 
     # Server & development tools
     "gunicorn==26.0.0",
-    "ruff==0.15.21",
+    "ruff==0.16.0",
 ]
 
 [tool.uv]
