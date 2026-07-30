@@ -125,7 +125,7 @@ class AnonymousAuthentication(APIView):
             domain=None,
             secure=secure,
             httponly=True,
-            samesite='Lax',
+            samesite="None",
         )
         return response
 
