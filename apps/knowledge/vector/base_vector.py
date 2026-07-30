@@ -74,6 +74,24 @@ class BaseVectorStore(ABC):
         """
         pass
 
+    def ensure_knowledge_index(self, knowledge_id: str, dim: int = None):
+        """
+        创建知识库向量索引。默认空实现，由具体向量库按需覆盖
+        （PGVector 建 HNSW，Milvus 建 collection）。
+        :param knowledge_id: 知识库id
+        :param dim: 向量维度（部分向量库建索引时需要）
+        :return:
+        """
+        return None
+
+    def drop_knowledge_index(self, knowledge_id: str):
+        """
+        删除知识库向量索引。默认空实现。
+        :param knowledge_id: 知识库id
+        :return:
+        """
+        return None
+
     def save_pre_handler(self):
         """
         插入前置处理器 主要是判断向量库是否创建

@@ -19,9 +19,10 @@ from django.utils.translation import gettext_lazy as _
 from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 from common.db.search import generate_sql_by_query_dict
-from common.db.sql_execute import select_list
+from common.db.sql_execute import select_list, sql_execute, update_execute
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
+from common.utils.logger import maxkb_logger
 from common.utils.ts_vecto_util import to_ts_vector, to_query
 from knowledge.models import Embedding, SearchMode, SourceType, Termbase
 from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
@@ -56,6 +57,30 @@ class PGVector(BaseVectorStore):
 
     def vector_create(self):
         return True
+
+    def ensure_knowledge_index(self, knowledge_id: str, dim: int = None):
+        # pgvector 按 knowledge_id 建局部 HNSW 索引，超过 2000 维不建
+        sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{knowledge_id}'"
+        index = sql_execute(sql, [])
+        if not index:
+            sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE knowledge_id = '{knowledge_id}' LIMIT 1"
+            result = sql_execute(sql, [])
+            if len(result) == 0:
+                return
+            dims = result[0]["dims"]
+            # 超过2000维度不创建索引，pgvector hnsw索引不支持超过2000维度
+            if dims < 2000:
+                sql = f"""CREATE INDEX "embedding_hnsw_idx_{knowledge_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{knowledge_id}'"""
+                update_execute(sql, [])
+                maxkb_logger.info(f"Created index for knowledge ID: {knowledge_id}")
+
+    def drop_knowledge_index(self, knowledge_id: str):
+        sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{knowledge_id}'"
+        index = sql_execute(sql, [])
+        if index:
+            sql = f'DROP INDEX "embedding_hnsw_idx_{knowledge_id}"'
+            update_execute(sql, [])
+            maxkb_logger.info(f"Dropped index for knowledge ID: {knowledge_id}")
 
     def _save(
         self,

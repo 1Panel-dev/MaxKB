@@ -1,0 +1,5 @@
+simulation: milvus-write-regression
+routing: path
+mocks:
+  - routeKey: milvus
+    path: ./milvus/config.yaml

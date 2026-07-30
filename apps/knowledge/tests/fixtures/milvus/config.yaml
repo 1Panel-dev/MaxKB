@@ -1,0 +1,8 @@
+version: 1
+name: milvus-write-regression
+protocol: http
+interceptRequests: true
+scenarios:
+  - name: default
+    path: ./default.js
+    default: true

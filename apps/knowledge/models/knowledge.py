@@ -560,7 +560,7 @@ class Embedding(models.Model):
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, verbose_name="文档关联", db_constraint=False)
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, verbose_name="段落关联", db_constraint=False)
-    embedding = VectorField(verbose_name="向量")
+    embedding = VectorField(verbose_name="向量", null=True)
     search_vector = SearchVectorField(verbose_name="分词", default="")
     meta = models.JSONField(verbose_name="元数据", default=dict)
 

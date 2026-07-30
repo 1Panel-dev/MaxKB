@@ -13,29 +13,36 @@ import zipfile
 from typing import List
 
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
-from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
-
-from system_manage.services.resource_mapping import (
-    save_workflow_mapping,
-    get_instance_resource,
-    knowledge_instance_field_call_dict,
-)
-from common.config.embedding_config import ModelManage
+from common.config.embedding_config import ModelManage, VectorStore
 from common.db.search import native_search
-from common.db.sql_execute import sql_execute, update_execute
+from common.db.sql_execute import update_execute
 from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.fork import Fork
-from common.utils.logger import maxkb_logger
-from knowledge.models import Document, DocumentResourceType, KnowledgeWorkflow, KnowledgeType
-from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
+from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
+from knowledge.models import (
+    Document,
+    DocumentResourceType,
+    File,
+    Knowledge,
+    KnowledgeType,
+    KnowledgeWorkflow,
+    Paragraph,
+    Problem,
+    ProblemParagraphMapping,
+)
 from knowledge.serializers.document_strategy import DocumentStrategySerializer
 from knowledge.services.multimodal_retrieval import enrich_paragraph_sources
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model, get_model_default_params
+from rest_framework import serializers
 from system_manage.models.resource_mapping import ResourceType
+from system_manage.services.resource_mapping import (
+    get_instance_resource,
+    knowledge_instance_field_call_dict,
+    save_workflow_mapping,
+)
 
 
 class MetaSerializer(serializers.Serializer):
@@ -281,45 +288,22 @@ def create_knowledge_index(knowledge_id=None, document_id=None):
     if knowledge_id is None and document_id is None:
         raise AppApiException(500, _("Knowledge ID or Document ID must be provided"))
 
-    if knowledge_id is not None:
-        k_id = knowledge_id
-    else:
+    if knowledge_id is None:
         document = QuerySet(Document).filter(id=document_id).first()
         if document is None:
             return
-        k_id = document.knowledge_id
-
-    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
-    index = sql_execute(sql, [])
-    if not index:
-        sql = f"SELECT vector_dims(embedding) AS dims FROM embedding WHERE knowledge_id = '{k_id}' LIMIT 1"
-        result = sql_execute(sql, [])
-        if len(result) == 0:
-            return
-        dims = result[0]["dims"]
-        # 超过2000维度不创建索引，pgvector hnsw索引不支持超过2000维度
-        if dims < 2000:
-            sql = f"""CREATE INDEX "embedding_hnsw_idx_{k_id}" ON embedding USING hnsw ((embedding::vector({dims})) vector_cosine_ops) WHERE knowledge_id = '{k_id}'"""
-            update_execute(sql, [])
-            maxkb_logger.info(f"Created index for knowledge ID: {k_id}")
+        knowledge_id = document.knowledge_id
+    VectorStore.get_embedding_vector().ensure_knowledge_index(knowledge_id)
 
 
 def drop_knowledge_index(knowledge_id=None, document_id=None):
     if knowledge_id is None and document_id is None:
         raise AppApiException(500, _("Knowledge ID or Document ID must be provided"))
 
-    if knowledge_id is not None:
-        k_id = knowledge_id
-    else:
+    if knowledge_id is None:
         document = QuerySet(Document).filter(id=document_id).first()
-        k_id = document.knowledge_id
-
-    sql = f"SELECT indexname, indexdef FROM pg_indexes WHERE tablename = 'embedding' AND indexname = 'embedding_hnsw_idx_{k_id}'"
-    index = sql_execute(sql, [])
-    if index:
-        sql = f'DROP INDEX "embedding_hnsw_idx_{k_id}"'
-        update_execute(sql, [])
-        maxkb_logger.info(f"Dropped index for knowledge ID: {k_id}")
+        knowledge_id = document.knowledge_id
+    VectorStore.get_embedding_vector().drop_knowledge_index(knowledge_id)
 
 
 def update_resource_mapping_by_knowledge(knowledge_id: str):

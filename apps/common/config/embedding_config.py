@@ -90,10 +90,12 @@ class ModelManage:
 
 class VectorStore:
     from knowledge.vector.pg_vector import PGVector
+    from knowledge.vector.milvus_vector import MilvusVector
     from knowledge.vector.base_vector import BaseVectorStore
 
     instance_map = {
         "pg_vector": PGVector,
+        "milvus": MilvusVector,
     }
     instance = None
 
@@ -104,6 +106,11 @@ class VectorStore:
         if VectorStore.instance is None:
             from maxkb.const import CONFIG
 
-            vector_store_class = VectorStore.instance_map.get(CONFIG.get("VECTOR_STORE_NAME"), PGVector)
+            # VECTOR_STORE_NAME 显式指定优先；未指定时按 MILVUS_URI 有无自动判断
+            # （配了 MILVUS_URI 用 milvus，否则 pg_vector，保证老用户零改动）
+            name = CONFIG.get("VECTOR_STORE_NAME")
+            if not name:
+                name = "milvus" if CONFIG.get("MILVUS_URI") else "pg_vector"
+            vector_store_class = VectorStore.instance_map.get(name, PGVector)
             VectorStore.instance = vector_store_class()
         return VectorStore.instance
