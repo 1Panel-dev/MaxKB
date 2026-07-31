@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from django.utils.translation import gettext_lazy as _
+from django.db.models import Count
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -60,7 +61,12 @@ class SystemUserGroupView(APIView):
         get_operation_object=_get_operation_object,
     )
     def post(self, request: Request, workspace_id: str):
-        serializer = SystemUserGroupCreateSerializer(request.data)
+        serializer = SystemUserGroupCreateSerializer(
+            data={
+                **request.data,
+                "workspace_id": workspace_id,
+            }
+        )
         data = serializer.create_or_update_group(with_valid=True)
         return result.success(data)
 
@@ -75,8 +81,7 @@ class SystemUserGroupView(APIView):
     )
     @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN)
     def get(self, request: Request, workspace_id: str):
-        groups = SystemUserGroup.objects.filter(workspace_id=workspace_id).order_by("name")
-        return result.success(SystemUserGroupModelSerializer(groups, many=True).data)
+        return result.success(SystemUserGroupCreateSerializer.UserGroupListSerializer().get_user_groups(workspace_id))
 
     class Delete(APIView):
         authentication_classes = [TokenAuth]
@@ -150,7 +155,7 @@ class SystemUserGroupView(APIView):
             return result.success(
                 UserGroupRemoveMemberSerializer(
                     data={"id": user_group_id, "workspace_id": workspace_id,
-                          "user_ids": request.data.get("user_ids", [])}
+                          "group_relation_ids": request.data.get("group_relation_ids", [])}
                 ).remove_member()
             )
 
