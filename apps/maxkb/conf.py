@@ -47,6 +47,7 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
+        "FILE_AUTH": True
     }
 
     def get_debug(self) -> bool:
@@ -167,7 +168,7 @@ class ConfigManager:
         """Updates the config like :meth:`update` ignoring items with non-upper
         keys.
 
-        .. versionadded:: 0.11
+        ... versionadded:: 0.11
         """
         mappings = []
         if len(mapping) == 1:
