@@ -1,6 +1,7 @@
 SELECT
     u.id,
     u.name,
+    COALESCE(ugr."count", 0) AS "count",
     case
 		when
 	      wurp."permission" is null then 'NOT_AUTH'
@@ -26,4 +27,15 @@ LEFT JOIN (
         ) wurp
 ON
     u.id = wurp.user_group_id
+LEFT JOIN (
+    SELECT
+        group_id,
+        COUNT(*) AS "count"
+    FROM
+        public."system_user_group_relation"
+    GROUP BY
+        group_id
+) ugr
+ON
+    u.id = ugr.group_id
 ${user_query_set}

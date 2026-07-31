@@ -2,6 +2,7 @@
 
 import uuid_utils.compat as uuid
 from django.db import transaction
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -32,7 +33,8 @@ def add_or_edit_user_group_relation(user, user_group_ids):
 class SystemUserGroupModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUserGroup
-        fields = ['id', 'name', 'workspace_id']
+        fields = ['id', 'name', 'workspace_id', 'count']
+
 
 
 class SystemUserGroupCreateSerializer(serializers.Serializer):
@@ -61,7 +63,7 @@ class SystemUserGroupCreateSerializer(serializers.Serializer):
         data = self.validated_data
         group_id = data.get('id')
         name = data['name']
-        workspace_id = data.get('workspace_id', 'default')
+        workspace_id = data['workspace_id']
 
         if group_id:
             SystemUserGroup.objects.filter(id=group_id, workspace_id=workspace_id).update(name=name)
@@ -98,6 +100,21 @@ class SystemUserGroupCreateSerializer(serializers.Serializer):
 
             self.group.delete()
             return True
+
+    class UserGroupListSerializer(serializers.ModelSerializer):
+        workspace_id = serializers.CharField(required=True, label='Workspace ID')
+
+        def get_user_groups(self, workspace_id: str):
+
+            groups = (
+                SystemUserGroup.objects
+                .filter(workspace_id=workspace_id)
+                .annotate(
+                    count=Count("systemusergrouprelation_set__user", distinct=True)
+                )
+                .order_by("name")
+            )
+            return SystemUserGroupModelSerializer(groups, many=True).data
 
 
 class UserGroupAddMemberSerializer(serializers.Serializer):
@@ -181,8 +198,9 @@ class UserGroupRemoveMemberSerializer(serializers.Serializer):
 
     def validate(self, data):
         group_id = data.get('id')
+        workspace_id = data.get('workspace_id')
         relation_ids = data.get('group_relation_ids')
-        if not SystemUserGroup.objects.filter(id=group_id).exists():
+        if not SystemUserGroup.objects.filter(id=group_id, workspace_id=workspace_id).exists():
             raise AppApiException(500, _("User group does not exist"))
         if not relation_ids:
             raise AppApiException(500, _("User group relation IDs cannot be empty"))
@@ -193,7 +211,11 @@ class UserGroupRemoveMemberSerializer(serializers.Serializer):
             self.is_valid(raise_exception=True)
         data = self.validated_data
         relation_ids = data['group_relation_ids']
-        SystemUserGroupRelation.objects.filter(id__in=relation_ids).delete()
+        SystemUserGroupRelation.objects.filter(
+            id__in=relation_ids,
+            group_id=data['id'],
+            group__workspace_id=data['workspace_id'],
+        ).delete()
         return True
 
 
