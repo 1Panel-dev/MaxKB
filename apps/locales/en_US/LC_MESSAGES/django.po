@@ -9442,3 +9442,12 @@ msgstr ""
 
 msgid "Remove members from System User Group"
 msgstr ""
+
+msgid "Get user group authorization status of resource"
+msgstr ""
+
+msgid "Edit user group authorization status of resource"
+msgstr ""
+
+msgid "Get user group authorization status of resource by page"
+msgstr ""

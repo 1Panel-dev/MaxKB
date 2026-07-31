@@ -9565,3 +9565,12 @@ msgstr "添加成員到工作空間用戶組"
 
 msgid "Remove members from Workspace User Group"
 msgstr "從工作空間用戶組中移除成員"
+
+msgid "Get user group authorization status of resource"
+msgstr "獲取用戶組對資源的授權狀態"
+
+msgid "Edit user group authorization status of resource"
+msgstr "編輯用戶組對資源的授權狀態"
+
+msgid "Get user group authorization status of resource by page"
+msgstr "分頁獲取用戶組對資源的授權狀態"
