@@ -50,11 +50,7 @@ class LoginView(APIView):
     def post(self, request: Request):
         token, f_token = LoginSerializer().login(request.data)
         response = result.success(token)
-        from common.utils.logger import maxkb_logger
 
-        maxkb_logger.info(
-            f"LoginView.post: request.scheme={request.scheme}, request.is_secure()={request.is_secure()}, request.META['wsgi.url_scheme']={request.META.get('wsgi.url_scheme')}, request.META['HTTPS']={request.META.get('HTTPS')}"
-        )
         response.set_cookie(
             "mk_file_auth",
             value=f_token,
