@@ -3,21 +3,26 @@ import re
 import urllib
 
 import uuid_utils.compat as uuid
-from django.db.models import QuerySet
-from django.http import HttpResponse
-from django.utils.translation import gettext_lazy as _, gettext
-from rest_framework import serializers
-
-from application.models import Application, ChatShareLink, ApplicationAccessToken
+from application.models import Application, ApplicationAccessToken, ChatShareLink
 from common.auth.common import FileToken
 from common.auth.handle.impl.user_token import get_auth
 from common.constants.authentication_type import AuthenticationType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.exception.app_exception import NotFound404, AppApiException, AppUnauthorizedFailed
-from homepage.serializers.homepage import is_workspace_manage, is_extends_workspace_manage, \
-    has_extends_workspace_manage_permission, hasPermission
-from knowledge.models import File, FileSourceType, Document, Knowledge, PublicFileAccess
+from common.exception.app_exception import AppApiException, AppUnauthorizedFailed, NotFound404
+from common.utils.common import common_convert_value
+from django.db.models import QuerySet
+from django.http import HttpResponse
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
+from homepage.serializers.homepage import (
+    has_extends_workspace_manage_permission,
+    hasPermission,
+    is_extends_workspace_manage,
+    is_workspace_manage,
+)
+from knowledge.models import Document, File, FileSourceType, Knowledge, PublicFileAccess
 from maxkb.const import CONFIG
+from rest_framework import serializers
 from system_manage.models import WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
@@ -83,7 +88,7 @@ def _deny():
 
 
 def auth(file, mk_file_auth):
-    if not CONFIG.get("FILE_AUTH", True):
+    if CONFIG.get("FILE_AUTH", "1") != "1":
         return
     # 公共/临时文件无需鉴权
     if file.source_type in _PUBLIC_SOURCE_TYPES:

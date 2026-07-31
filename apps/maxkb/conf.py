@@ -47,7 +47,7 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "FILE_AUTH": True
+        "FILE_AUTH": "1"
     }
 
     def get_debug(self) -> bool:
