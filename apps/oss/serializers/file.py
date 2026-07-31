@@ -17,6 +17,7 @@ from common.exception.app_exception import NotFound404, AppApiException, AppUnau
 from homepage.serializers.homepage import is_workspace_manage, is_extends_workspace_manage, \
     has_extends_workspace_manage_permission, hasPermission
 from knowledge.models import File, FileSourceType, Document, Knowledge, PublicFileAccess
+from maxkb.const import CONFIG
 from system_manage.models import WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping, ResourceType
 from tools.serializers.tool import UploadedFileField
@@ -82,6 +83,8 @@ def _deny():
 
 
 def auth(file, mk_file_auth):
+    if not CONFIG.get("FILE_AUTH", True):
+        return
     # 公共/临时文件无需鉴权
     if file.source_type in _PUBLIC_SOURCE_TYPES:
         return
