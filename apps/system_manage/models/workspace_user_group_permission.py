@@ -11,28 +11,22 @@ import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from common.constants.permission_constants import Group, ResourceAuthType, ResourcePermissionRole, ResourcePermission
-from users.models import User
+from common.constants.permission_constants import ResourceAuthType, ResourcePermissionRole, ResourcePermission
+from users.models.user_group import SystemUserGroup
+
+from .workspace_user_permission import AuthTargetType
 
 
-class AuthTargetType(models.TextChoices):
-    """授权目标"""
-    KNOWLEDGE = Group.KNOWLEDGE.value, '知识库'
-    APPLICATION = Group.APPLICATION.value, '应用'
-    TOOL = Group.TOOL.value, '工具'
-    MODEL = Group.MODEL.value, '模型'
-
-
-class WorkspaceUserResourcePermission(models.Model):
+class WorkspaceUserGroupResourcePermission(models.Model):
     """
-    工作空间用户资源权限表
-    用于管理当前工作空间是否有权限操作 某一个应用或者知识库
+    工作空间用户组资源权限表
+    用于管理当前工作空间下用户组对某一个应用或者知识库的操作权限
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
 
     workspace_id = models.CharField(max_length=128, verbose_name="工作空间id", default="default", db_index=True)
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="工作空间下的用户")
+    user_group = models.ForeignKey(SystemUserGroup, on_delete=models.CASCADE, verbose_name="用户组id", db_index=True)
 
     auth_target_type = models.CharField(verbose_name='授权目标', max_length=128, choices=AuthTargetType.choices,
                                         default=AuthTargetType.KNOWLEDGE, db_index=True)
@@ -55,5 +49,5 @@ class WorkspaceUserResourcePermission(models.Model):
     update_time = models.DateTimeField(verbose_name="修改时间", auto_now=True, db_index=True)
 
     class Meta:
-        db_table = "workspace_user_resource_permission"
-        unique_together = ('workspace_id', 'user', 'auth_target_type', 'target')
+        db_table = "workspace_user_group_resource_permission"
+        unique_together = ('workspace_id', 'user_group', 'auth_target_type', 'target')

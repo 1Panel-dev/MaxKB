@@ -8,8 +8,12 @@ app_name = "system_manage"
 urlpatterns = [
     path('workspace/<str:workspace_id>/user_resource_permission/user/<str:user_id>/resource/<str:resource>', views.WorkSpaceUserResourcePermissionView.as_view()),
     path('workspace/<str:workspace_id>/user_resource_permission/user/<str:user_id>/resource/<str:resource>/<int:current_page>/<int:page_size>', views.WorkSpaceUserResourcePermissionView.Page.as_view()),
+    path('workspace/<str:workspace_id>/user_group_resource_permission/user_group/<str:user_group_id>/resource/<str:resource>', views.WorkSpaceUserGroupResourcePermissionView.as_view()),
+    path('workspace/<str:workspace_id>/user_group_resource_permission/user_group/<str:user_group_id>/resource/<str:resource>/<int:current_page>/<int:page_size>', views.WorkSpaceUserGroupResourcePermissionView.Page.as_view()),
     path('workspace/<str:workspace_id>/resource_user_permission/resource/<str:target>/resource/<str:resource>', views.WorkspaceResourceUserPermissionView.as_view()),
     path('workspace/<str:workspace_id>/resource_user_permission/resource/<str:target>/resource/<str:resource>/<int:current_page>/<int:page_size>', views.WorkspaceResourceUserPermissionView.Page.as_view()),
+    path('workspace/<str:workspace_id>/resource_user_group_permission/resource/<str:target>/resource/<str:resource>', views.WorkspaceResourceUserGroupPermissionView.as_view()),
+    path('workspace/<str:workspace_id>/resource_user_group_permission/resource/<str:target>/resource/<str:resource>/<int:current_page>/<int:page_size>', views.WorkspaceResourceUserGroupPermissionView.Page.as_view()),
     path('workspace/<str:workspace_id>/resource_mapping/<str:resource>/<str:resource_id>/<int:current_page>/<int:page_size>', views.ResourceMappingView.as_view()),
     path('workspace/<str:workspace_id>/mapping_resource/<str:resource>/<str:resource_id>/<int:current_page>/<int:page_size>', views.MappingResourceView.as_view()),
     path('email_setting', views.SystemSetting.Email.as_view()),
