@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, h, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { Delete, EditPen, MoreFilled, Plus, Search, UserFilled } from '@element-plus/icons-vue'
+import { Delete, EditPen, MoreFilled, Plus, UserFilled } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import MkIcon from '@/components/global/mk-icon/index.vue'
 
@@ -63,6 +63,53 @@ const filteredWorkspaces = computed(() => {
 const selectedWorkspace = computed(() => {
   return systemWorkspaces.value.find((workspace) => workspace.id === selectedWorkspaceId.value)
 })
+
+async function handleWorkspaceCommand(command: WorkspaceAction, workspaceId: string) {
+  const workspace = systemWorkspaces.value.find(({ id }) => id === workspaceId)
+
+  if (!workspace) return
+
+  if (command === 'rename') {
+    try {
+      const { value } = await ElMessageBox.prompt('请输入工作空间名称', '重命名', {
+        confirmButtonText: '保存',
+        cancelButtonText: '取消',
+        inputPattern: /\S+/,
+        inputErrorMessage: '请输入工作空间名称',
+        inputValue: workspace.name,
+      })
+
+      workspace.name = value.trim()
+      ElMessage.success('重命名成功')
+    } catch {
+      return
+    }
+
+    return
+  }
+
+  try {
+    await ElMessageBox.confirm(`确认删除“${workspace.name}”吗？`, '删除工作空间', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+
+    systemWorkspaces.value = systemWorkspaces.value.filter(({ id }) => id !== workspaceId)
+
+    if (selectedWorkspaceId.value === workspaceId) {
+      selectedWorkspaceId.value = systemWorkspaces.value[0]?.id ?? ''
+    }
+
+    ElMessage.success('删除成功')
+  } catch {
+    return
+  }
+}
+
+function addMember() {
+  ElMessage.info('添加成员功能待接入')
+}
 </script>
 
 <template>
@@ -74,50 +121,38 @@ const selectedWorkspace = computed(() => {
           <MkIcon name="icon_add_outlined" :size="18" />
         </el-button>
       </header>
-      <div>
-        <el-input
-          v-model="searchKeyword"
-          clearable
-          placeholder="搜索"
-          class="mb-2"
-        >
-          <template #prefix>
-            <MkIcon name="icon_search-outlined" />
-          </template>
-        </el-input>
-        <el-scrollbar>
-          <div class="flex flex-col gap-1">
-            <div
-              v-for="workspace in filteredWorkspaces"
-              :key="workspace.id"
-              class="h-10 flex items-center rounded-md px-2"
-              @click="selectedWorkspaceId = workspace.id"
-              @keydown.enter="selectedWorkspaceId = workspace.id"
-            >
-              <span class="min-w-0 flex-1 truncate">{{ workspace.name }}</span>
+      <MkSearchList v-model="searchKeyword">
+        <div class="flex flex-col gap-1">
+          <div
+            v-for="workspace in filteredWorkspaces"
+            :key="workspace.id"
+            class="h-10 flex items-center rounded-md px-2"
+            @click="selectedWorkspaceId = workspace.id"
+            @keydown.enter="selectedWorkspaceId = workspace.id"
+          >
+            <span class="min-w-0 flex-1 truncate">{{ workspace.name }}</span>
 
-              <MkDropdown
-                class="-mr-1"
-                trigger="click"
-                @command="handleWorkspaceCommand($event, workspace.id)"
-              >
-                <el-button text @click.stop>
-                  <MkIcon :icon="MoreFilled" />
-                </el-button>
-                <template #dropdown>
-                  <MkDropdownMenu>
-                    <MkDropdownItem command="rename" :icon="EditPen">重命名</MkDropdownItem>
-                    <MkDropdownItem command="delete" :icon="Delete">删除</MkDropdownItem>
-                  </MkDropdownMenu>
-                </template>
-              </MkDropdown>
-            </div>
+            <MkDropdown
+              class="-mr-1"
+              trigger="click"
+              @command="handleWorkspaceCommand($event, workspace.id)"
+            >
+              <el-button text @click.stop>
+                <MkIcon :icon="MoreFilled" />
+              </el-button>
+              <template #dropdown>
+                <MkDropdownMenu>
+                  <MkDropdownItem command="rename" :icon="EditPen">重命名</MkDropdownItem>
+                  <MkDropdownItem command="delete" :icon="Delete">删除</MkDropdownItem>
+                </MkDropdownMenu>
+              </template>
+            </MkDropdown>
           </div>
-        </el-scrollbar>
-      </div>
+        </div>
+      </MkSearchList>
     </aside>
 
-    <div class="min-w-0 flex-1 px-6">
+    <div v-if="selectedWorkspace" class="min-w-0 flex-1 px-6">
       <header class="py-4">
         <div class="flex items-center gap-2">
           <h4>{{ selectedWorkspace.name }}</h4>

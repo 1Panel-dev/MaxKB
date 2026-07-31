@@ -7,6 +7,12 @@
     var(--mk-primary) 0%,
     var(--mk-primary-gradient-end) 100%
   );
+  --mk-danger: #f54a45;
+  --mk-danger-rgb: 245 74 69;
+  --mk-success: #34c724;
+  --mk-success-rgb: 52 199 36;
+  --mk-warning: #ff8800;
+  --mk-warning-rgb: 255 136 0;
   --mk-layout: #eff0f1;
   --mk-layout-gradient: linear-gradient(
     187.61deg,
@@ -26,7 +32,7 @@
   --mk-N400: #bbbfc4;
   --mk-N400-rgb: 187 191 196;
   // 通常用于辅助信息。
-  --mk-N500: #8F959E;
+  --mk-N500: #8f959e;
   --mk-N500-rgb: 143 149 158;
   // 通常用于提示、说明和描述文字颜色。
   --mk-N600: #646a73;

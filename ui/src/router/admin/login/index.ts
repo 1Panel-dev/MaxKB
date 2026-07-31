@@ -8,4 +8,10 @@ export const loginRoutes: RouteRecordRaw[] = [
     component: () => import('@/views/login/LoginView.vue'),
     meta: { title: '登录' },
   },
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/views/login/ForgotPasswordView.vue'),
+    meta: { title: '忘记密码' },
+  },
 ]

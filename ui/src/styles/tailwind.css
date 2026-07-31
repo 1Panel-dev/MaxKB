@@ -53,6 +53,13 @@
   justify-content: space-between;
 }
 
+/* 横向排列，水平和垂直方向居中 */
+@utility flex-center {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+}
+
 /* 纵向排列，水平和垂直方向居中 */
 @utility flex-col-center {
   align-items: center;

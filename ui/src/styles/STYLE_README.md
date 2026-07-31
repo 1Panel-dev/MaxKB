@@ -112,12 +112,17 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 | 工具类            | 作用                                 |
 | ----------------- | ------------------------------------ |
 | `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中 |
+| `flex-center`     | 横向排列，在水平和垂直两个方向居中   |
 | `flex-col-center` | 纵向排列，在水平和垂直两个方向居中   |
 
 ```vue
 <div class="flex-between">
   <span>左侧</span>
   <span>右侧</span>
+</div>
+
+<div class="flex-center">
+  <span>居中内容</span>
 </div>
 
 <div class="flex-col-center">

@@ -52,6 +52,10 @@ System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的
 
 System 根地址为 `/admin/system`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
 
+系统外观设置页面地址为 `/admin/system/settings/appearance`，使用
+`views/system/settings/AppearanceSettingsView.vue`，并复用 `views/login/components`
+中的登录外观组件进行实时主题预览。
+
 复用路由按模块放在 `admin/system/modules`，文件名与 `admin/workspace/modules` 保持对应；`system/index.ts` 只负责系统导航路由和模块汇总。
 
 有子目录时直接使用 Vue Router 的 `children`，路由层级就是导航层级，不需要额外的分组字段。
@@ -62,6 +66,8 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 
 - `login`：登录及账户相关独立页面。
 - `workflow`：工作流编排等全屏页面。
+
+登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
 ### Chat
 

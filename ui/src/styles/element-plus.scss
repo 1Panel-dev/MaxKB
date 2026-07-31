@@ -1,12 +1,13 @@
 :root {
   --el-color-primary: var(--mk-primary);
-  --el-color-primary-dark-2: color-mix(in srgb, var(--mk-primary) 80%, black);
   --el-color-primary-light-3: color-mix(in srgb, var(--mk-primary) 70%, white);
   --el-color-primary-light-5: color-mix(in srgb, var(--mk-primary) 50%, white);
   --el-color-primary-light-7: color-mix(in srgb, var(--mk-primary) 30%, white);
   --el-color-primary-light-8: color-mix(in srgb, var(--mk-primary) 20%, white);
   --el-color-primary-light-9: color-mix(in srgb, var(--mk-primary) 10%, white);
-
+  --el-color-danger: var(--mk-danger);
+  --el-color-success: var(--mk-success);
+  --el-color-warning: var(--mk-warning);
   --el-border-color: var(--mk-N350);
   --el-border-radius-base: 6px;
   --el-border-radius-round: 16px;
@@ -23,6 +24,10 @@
   --el-button-font-weight: 400 !important;
   height: auto;
   padding: 7px 11px;
+  &--large {
+    font-size: 16px;
+    padding: 11px;
+  }
   &.is-round {
     padding: 7px 11px;
   }
@@ -54,6 +59,20 @@
 }
 .el-button [class*='el-icon'] + span {
   margin-left: calc(var(--spacing) * 1);
+}
+
+/* card */
+.el-card {
+  --el-card-border-radius: 12px;
+  &.is-always-shadow {
+    border: none;
+  }
+}
+
+.el-card.is-always-shadow,
+.el-card.is-hover-shadow:hover,
+.el-card.is-hover-shadow:focus {
+  box-shadow: 0px 6px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
 }
 
 /* checkbox */
@@ -104,12 +123,28 @@
   font-size: var(--mk-font-size-base);
 }
 
+/* form */
+.el-form-item {
+  margin-bottom: calc(var(--spacing) * 4);
+}
+.el-form-item__error {
+  position: unset;
+  font-size: 14px;
+  line-height: var(--mk-line-height-base);
+}
 /* input */
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
   --el-input-placeholder-color: var(--mk-N500);
   --el-input-icon-color: var(--mk-N600);
+  &--large {
+    font-size: 16px;
+  }
+  &__wrapper {
+    padding: 1px 11px !important;
+  }
 }
+
 .el-input__prefix-inner {
   color: var(--mk-N600);
 }
@@ -256,6 +291,10 @@
 
   .el-table__border-left-patch {
     display: none;
+  }
+
+  .el-table__cell:last-child {
+    border-right: 0;
   }
 }
 

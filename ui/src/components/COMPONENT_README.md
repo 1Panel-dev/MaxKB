@@ -49,6 +49,8 @@ src/components/
 │   │   └── mk-dropdown-item.vue  # 统一菜单项图标、内容和选中状态布局
 │   ├── mk-icon/
 │   │   └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
+│   ├── mk-search-list/
+│   │   └── index.vue         # 统一搜索框与剩余空间滚动列表布局
 │   └── mk-table/
 │       └── index.vue         # 统一表格样式与分页布局
 ├── mk-filterable-dropdown/   # 带搜索过滤和滚动列表的下拉框，使用方手动导入
@@ -189,6 +191,22 @@ import { Setting } from '@element-plus/icons-vue'
 - 不直接使用 Unicode、Font Class 或裸 `<svg><use>`。
 - 更新图标时直接覆盖 `src/assets/iconfont.js`。
 - 保持 Symbol ID 稳定；ID 变化时必须同步修改所有对应的 `MkIcon name`。
+
+## MkSearchList
+
+页面侧栏中由搜索框和滚动内容组成的列表使用全局自动注册的 `MkSearchList`。组件通过
+`v-model` 接收搜索关键词，统一提供可清空的搜索框、搜索图标和占满剩余高度的
+`el-scrollbar`；列表过滤、分组、选中和操作等业务逻辑由默认插槽中的调用方负责。
+
+```vue
+<MkSearchList v-model="searchKeyword" placeholder="搜索工作空间">
+  <button v-for="workspace in filteredWorkspaces" :key="workspace.id">
+    {{ workspace.name }}
+  </button>
+</MkSearchList>
+```
+
+组件需要位于有明确高度的纵向 Flex 容器中，才能让内部滚动区域正确占用剩余空间。
 
 ## MkTable
 

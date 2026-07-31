@@ -292,56 +292,48 @@ function permissionTableSpan({ row, columnIndex }: { row: PermissionRow; columnI
           <MkIcon name="icon_add_outlined" :size="18" />
         </el-button>
       </header>
-      <div>
-        <el-input v-model="searchKeyword" clearable placeholder="搜索" class="mb-2">
-          <template #prefix>
-            <MkIcon name="icon_search-outlined" />
-          </template>
-        </el-input>
+      <MkSearchList v-model="searchKeyword">
+        <div class="flex flex-col gap-1">
+          <section v-for="roleGroup in filteredRoleGroups" :key="roleGroup.id">
+            <button
+              type="button"
+              class="flex w-full items-center gap-2 pt-2 pb-1 text-left text-N500"
+              @click="toggleRoleGroup(roleGroup.id)"
+            >
+              <MkIcon
+                :icon="ArrowDown"
+                :size="10"
+                class="transition-transform"
+                :class="{ '-rotate-90': !expandedRoleGroupIds.includes(roleGroup.id) }"
+              />
+              <span class="font-medium">{{ roleGroup.name }}</span>
+            </button>
 
-        <el-scrollbar>
-          <div class="flex flex-col gap-1">
-            <section v-for="roleGroup in filteredRoleGroups" :key="roleGroup.id">
+            <div v-if="expandedRoleGroupIds.includes(roleGroup.id)" class="flex flex-col gap-1">
               <button
+                v-for="role in roleGroup.roles"
+                :key="role.id"
                 type="button"
-                class="flex w-full items-center gap-2 pt-2 pb-1 text-left text-N500"
-                @click="toggleRoleGroup(roleGroup.id)"
+                class="flex h-10 w-full items-center gap-1.5 rounded-md px-2 text-left"
+                :class="
+                  selectedRoleId === role.id
+                    ? 'bg-primary/10 font-medium text-primary'
+                    : 'text-N900 hover:bg-black/5'
+                "
+                @click="selectRole(role.id)"
               >
-                <MkIcon
-                  :icon="ArrowDown"
-                  :size="10"
-                  class="transition-transform"
-                  :class="{ '-rotate-90': !expandedRoleGroupIds.includes(roleGroup.id) }"
-                />
-                <span class="font-medium">{{ roleGroup.name }}</span>
-              </button>
-
-              <div v-if="expandedRoleGroupIds.includes(roleGroup.id)" class="flex flex-col gap-1">
-                <button
-                  v-for="role in roleGroup.roles"
-                  :key="role.id"
-                  type="button"
-                  class="flex h-10 w-full items-center gap-1.5 rounded-md px-2 text-left"
-                  :class="
-                    selectedRoleId === role.id
-                      ? 'bg-primary/10 font-medium text-primary'
-                      : 'text-N900 hover:bg-black/5'
-                  "
-                  @click="selectRole(role.id)"
+                <span>{{ role.name }}</span>
+                <span
+                  v-if="role.system"
+                  class="flex h-5 items-center rounded-sm bg-black/10 px-1 text-sm text-N600"
                 >
-                  <span>{{ role.name }}</span>
-                  <span
-                    v-if="role.system"
-                    class="flex h-5 items-center rounded-sm bg-black/10 px-1 text-sm text-N600"
-                  >
-                    系
-                  </span>
-                </button>
-              </div>
-            </section>
-          </div>
-        </el-scrollbar>
-      </div>
+                  系
+                </span>
+              </button>
+            </div>
+          </section>
+        </div>
+      </MkSearchList>
     </aside>
 
     <div v-if="selectedRole" class="flex min-w-0 flex-1 flex-col px-6">

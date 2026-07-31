@@ -16,7 +16,7 @@ const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
     <div class="flex">
       <LayoutSidebar :mode="mode" />
       <main
-        class="h-layout-content w-full overflow-hidden rounded-tl-xl bg-white transition-[margin] duration-200"
+        class="mk-layout__main h-layout-content w-full overflow-hidden rounded-tl-xl bg-white transition-[margin] duration-200"
       >
         <RouterView />
       </main>
@@ -24,4 +24,10 @@ const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.mk-layout {
+  &__main {
+    box-shadow: 0px 0px 4px 0px rgb(var(--mk-N900-rgb) / 2%);
+  }
+}
+</style>

@@ -157,7 +157,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'appearance',
           name: 'system-appearance',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/settings/AppearanceSettingsView.vue'),
           meta: { title: '外观设置', order: 20 },
         },
         {
