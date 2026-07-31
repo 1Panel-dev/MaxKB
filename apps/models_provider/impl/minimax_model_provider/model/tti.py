@@ -1,10 +1,7 @@
 # coding=utf-8
-from http import HTTPStatus
 from typing import Dict
 
 import requests
-from dashscope import ImageSynthesis, MultiModalConversation
-from dashscope.aigc.image_generation import ImageGeneration
 
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
@@ -47,14 +44,25 @@ class MiniMaxTextToImageModel(MaxKBBaseModel, BaseTextToImage):
     def check_auth(self):
         return True
 
-    def generate_image(self, prompt: str, negative_prompt: str = None):
+    def generate_image(self, prompt: str, negative_prompt: str = None, subject_reference=None):
         headers = {"Authorization": f"Bearer {self.api_key}"}
+
+        params = self.params or {}
+        subject_reference = (
+            subject_reference if subject_reference is not None else params.get('subject_reference')
+        )
 
         payload = {
             "model": self.model_name,
             "prompt": prompt,
-            **self.params,
+            **{key: value for key, value in params.items() if key != 'subject_reference'},
         }
+        if subject_reference:
+            if isinstance(subject_reference, str):
+                subject_reference = [{"type": "character", "image_file": subject_reference}]
+            elif not isinstance(subject_reference, list):
+                raise ValueError('subject_reference must be an image URL, data URL, or list of reference objects')
+            payload['subject_reference'] = subject_reference
         try:
             response = requests.post(f'{self.api_base}/image_generation', headers=headers, json=payload)
             response.raise_for_status()

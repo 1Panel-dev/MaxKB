@@ -5,15 +5,15 @@ from typing import Dict, Any
 from django.utils.translation import gettext_lazy as _, gettext
 from common import forms
 from common.exception.app_exception import AppApiException
-from common.forms import BaseForm, PasswordInputField, SingleSelect, SliderField, TooltipLabel
+from common.forms import BaseForm, PasswordInputField, SliderField, TooltipLabel
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 from common.utils.logger import maxkb_logger
 
 
 class MiniMaxModelParams(BaseForm):
     """
-    Parameters class for the Qwen Text-to-Image model.
-    Defines fields such as image size, number of images, and style.
+    Parameters for MiniMax image generation.
+    Defines the output count and optional subject reference input.
     """
 
     n = SliderField(
@@ -24,6 +24,14 @@ class MiniMaxModelParams(BaseForm):
         _max=4,
         _step=1,
         precision=0
+    )
+
+    subject_reference = forms.TextInputField(
+        TooltipLabel(
+            _('Subject reference image'),
+            _('Public image URL or base64 data URL used for image-to-image generation')
+        ),
+        required=False,
     )
 
 
@@ -75,7 +83,7 @@ class MiniMaxTextToImageModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            res = model.check_auth()
+            model.check_auth()
         except Exception as e:
             maxkb_logger.error(f'Exception: {e}', exc_info=True)
             if isinstance(e, AppApiException):
