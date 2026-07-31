@@ -23,8 +23,6 @@ from system_manage.api.user_resource_permission import UserResourcePermissionAPI
     UserResourcePermissionPageAPI
 from system_manage.serializers.user_group_resource_permission import UserGroupResourcePermissionSerializer, \
     ResourceUserGroupPermissionSerializer
-from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer, \
-    ResourceUserPermissionSerializer
 from users.models.user_group import SystemUserGroup
 
 
@@ -49,7 +47,7 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
         tags=[_('Resources authorization')]  # type: ignore
     )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_GROUP_RESOURCE_PERMISSION'),
                                      operate=Operate.READ),
         RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, user_group_id: str, resource: str):
@@ -71,7 +69,7 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
          get_operation_object=lambda r, k: get_user_operation_object(k.get('user_group_id'))
          )
     @has_permissions(
-        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+        lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_GROUP_RESOURCE_PERMISSION'),
                                      operate=Operate.EDIT),
         RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, user_group_id: str, resource: str):
@@ -93,15 +91,15 @@ class WorkSpaceUserGroupResourcePermissionView(APIView):
             tags=[_('Resources authorization')]  # type: ignore
         )
         @has_permissions(
-            lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_RESOURCE_PERMISSION'),
+            lambda r, kwargs: Permission(group=Group(kwargs.get('resource') + '_WORKSPACE_USER_GROUP_RESOURCE_PERMISSION'),
                                          operate=Operate.READ),
             RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, user_group_id: str, resource: str, current_page: str,
                 page_size: str):
             return result.success(UserGroupResourcePermissionSerializer(
                 data={'workspace_id': workspace_id, 'user_group_id': user_group_id, 'auth_target_type': resource}
-                ).page({'name': request.query_params.get('name'),
-                        'permission': request.query_params.getlist('permission[]')}, current_page, page_size, request.user))
+            ).page({'name': request.query_params.get('name'),
+                    'permission': request.query_params.getlist('permission[]')}, current_page, page_size, request.user))
 
 
 class WorkspaceResourceUserGroupPermissionView(APIView):
@@ -109,9 +107,9 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
 
     @extend_schema(
         methods=['GET'],
-        description=_('Get user authorization status of resource'),
-        summary=_('Get user authorization status of resource'),
-        operation_id=_('Get user authorization status of resource'),  # type: ignore
+        description=_('Get user group authorization status of resource'),
+        summary=_('Get user group authorization status of resource'),
+        operation_id=_('Get user group authorization status of resource'),  # type: ignore
         parameters=ResourceUserPermissionAPI.get_parameters(),
         responses=ResourceUserPermissionAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
@@ -122,16 +120,16 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}"),
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}"),
         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER','')),
+                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
                                                      operate=Operate.SELF,
-                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}")],
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
                        CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(UserGroupResourcePermissionSerializer(
-            data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource.replace('_FOLDER',''),
+            data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource.replace('_FOLDER', ''),
                   }).list(
             {'name': request.query_params.get("name"),
              'permission': request.query_params.getlist("permission[]")
@@ -139,15 +137,15 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
 
     @extend_schema(
         methods=['PUT'],
-        description=_('Edit user authorization status of resource'),
-        summary=_('Edit user authorization status of resource'),
-        operation_id=_('Edit user authorization status of resource'),  # type: ignore
+        description=_('Edit user group authorization status of resource'),
+        summary=_('Edit user group authorization status of resource'),
+        operation_id=_('Edit user group authorization status of resource'),  # type: ignore
         parameters=ResourceUserPermissionEditAPI.get_parameters(),
         request=ResourceUserPermissionEditAPI.get_request(),
         responses=ResourceUserPermissionEditAPI.get_response(),
         tags=[_('Resources authorization')]  # type: ignore
     )
-    @log(menu='System', operate='Edit user authorization status of resource',
+    @log(menu='System', operate='Edit user group authorization status of resource',
          get_operation_object=lambda r, k: get_user_operation_object(k.get('user_id'))
          )
     @has_permissions(
@@ -156,16 +154,17 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
         lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                      operate=Operate.AUTH,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}"),
+                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}"),
         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER','')),
+                       [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
                                                      operate=Operate.SELF,
-                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}")],
+                                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
                        CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserGroupPermissionSerializer(
-            data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource.replace('_FOLDER',''), })
+            data={'workspace_id': workspace_id, "target": target,
+                  'auth_target_type': resource.replace('_FOLDER', ''), })
                               .edit(instance=request.data, current_user_id=request.user.id))
 
     class Page(APIView):
@@ -173,9 +172,9 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
 
         @extend_schema(
             methods=['GET'],
-            description=_('Get user authorization status of resource by page'),
-            summary=_('Get user authorization status of resource by page'),
-            operation_id=_('Get user authorization status of resource by page'),  # type: ignore
+            description=_('Get user group authorization status of resource by page'),
+            summary=_('Get user group authorization status of resource by page'),
+            operation_id=_('Get user group authorization status of resource by page'),  # type: ignore
             parameters=ResourceUserPermissionPageAPI.get_parameters(),
             responses=ResourceUserPermissionPageAPI.get_response(),
             tags=[_('Resources authorization')]  # type: ignore
@@ -184,19 +183,20 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
             lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
                                          operate=Operate.AUTH,
                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}:ROLE/WORKSPACE_MANAGE"),
-        lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
-                                     operate=Operate.AUTH,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}"),
-             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER','')),
-                                     operate=Operate.SELF,
-                                     resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER','')}/{kwargs.get('target')}")],
+            lambda r, kwargs: Permission(group=Group(kwargs.get('resource')),
+                                         operate=Operate.AUTH,
+                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}"),
+            ViewPermission([RoleConstants.USER.get_workspace_role()],
+                           [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
+                                                         operate=Operate.SELF,
+                                                         resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
                            CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, target: str, resource: str, current_page: int,
                 page_size: int):
             return result.success(ResourceUserGroupPermissionSerializer(
-                data={'workspace_id': workspace_id, "target": target, 'auth_target_type': resource.replace('_FOLDER',''), }
+                data={'workspace_id': workspace_id, "target": target,
+                      'auth_target_type': resource.replace('_FOLDER', ''), }
             ).page({'name': request.query_params.get("name"),
                     'permission': request.query_params.getlist("permission[]")}, current_page, page_size,
                    ))
