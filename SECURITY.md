@@ -1,17 +1,11 @@
 # 安全说明
 
-如果您发现安全问题，请直接联系我们：
-
-- support@fit2cloud.com
-- 400-052-0755
+如果您发现安全问题，请[提交给我们](https://github.com/1Panel-dev/MaxKB/security/advisories/new)。
 
 感谢您的支持！
 
 # Security Policy
 
-All security bugs should be reported to the contact as below:
-
-- support@fit2cloud.com
-- 400-052-0755
+Any security issue please [submit a vulnerability report](https://github.com/1Panel-dev/MaxKB/security/advisories/new).
 
 Thanks for your support!
