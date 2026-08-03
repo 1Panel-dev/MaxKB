@@ -34,4 +34,7 @@ urlpatterns = [
     path('auth/login/<str:access_token>', views.LocalLoginView.as_view()),
     path('auth/logout', views.Logout.as_view(), name='logout'),
     path('chat_user/profile', views.ChatUserProfileView.as_view(), name="chat_user_profile"),
+    path('api_key', views.ChatUserApiKeyView.as_view()),
+    path('api_key/<int:current_page>/<int:page_size>', views.ChatUserApiKeyView.Page.as_view()),
+    path('api_key/<str:api_key_id>', views.ChatUserApiKeyView.Operate.as_view())
 ]
