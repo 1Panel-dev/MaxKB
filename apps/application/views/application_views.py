@@ -12,7 +12,7 @@ from application.serializers.application_statistics_serializers import Applicati
 from application.swagger_api.application_api import ApplicationApi
 from application.swagger_api.application_statistics_api import ApplicationStatisticsApi
 from application.views.common import get_application_operation_object
-from common.auth import TokenAuth, has_permissions
+from common.auth import TokenAuth, has_permissions, AllTokenAuth
 from common.constants.permission_constants import CompareConstants, PermissionConstants, Permission, Group, Operate, \
     ViewPermission, RoleConstants
 from common.exception.app_exception import AppAuthenticationFailed
@@ -315,7 +315,7 @@ class Application(APIView):
                               'user_id': request.user.id}).get_application(app_id))
 
     class Profile(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary=_("Get application related information"),
