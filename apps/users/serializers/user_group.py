@@ -2,7 +2,8 @@
 
 import uuid_utils.compat as uuid
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, OuterRef, Subquery
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -34,7 +35,6 @@ class SystemUserGroupModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUserGroup
         fields = ['id', 'name', 'workspace_id']
-
 
 
 class SystemUserGroupCreateSerializer(serializers.Serializer):
@@ -105,16 +105,24 @@ class SystemUserGroupCreateSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label='Workspace ID')
 
         def get_user_groups(self, workspace_id: str):
-
-            groups = (
+            return list(
                 SystemUserGroup.objects
                 .filter(workspace_id=workspace_id)
                 .annotate(
-                    count=Count("systemusergrouprelation_set__user", distinct=True)
+                    count=Coalesce(
+                        Subquery(
+                            SystemUserGroupRelation.objects
+                            .filter(group_id=OuterRef('id'))
+                            .values('group_id')
+                            .annotate(cnt=Count('id'))
+                            .values('cnt')
+                        ),
+                        0
+                    )
                 )
                 .order_by("name")
+                .values("id", "name", "workspace_id", "count")
             )
-            return SystemUserGroupModelSerializer(groups, many=True).data
 
 
 class UserGroupAddMemberSerializer(serializers.Serializer):
