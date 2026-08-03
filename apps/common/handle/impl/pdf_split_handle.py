@@ -125,9 +125,144 @@ class PdfSplitHandle(BaseSplitHandle):
         return content
 
     @staticmethod
+    def extract_page_lines(page):
+        lines = []
+        current_text = []
+        current_sizes = []
+
+        def flush_line():
+            text = "".join(current_text).strip()
+            if text:
+                font_size = current_sizes[0] if current_sizes else 0
+                lines.append((text, font_size))
+            current_text.clear()
+            current_sizes.clear()
+
+        def visitor_text(text, cm, tm, font_dict, font_size):
+            if text is None:
+                return
+            parts = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+            for index, part in enumerate(parts):
+                current_text.append(part)
+                if part.strip() and font_size:
+                    current_sizes.append(float(font_size))
+                if index < len(parts) - 1:
+                    flush_line()
+
+        try:
+            page.extract_text(visitor_text=visitor_text)
+        except BaseException:
+            text = PdfSplitHandle.extract_page_text(page)
+            return [(line.strip(), 0) for line in text.splitlines() if line.strip()]
+        flush_line()
+        if lines:
+            return lines
+
+        text = page.extract_text() or ""
+        return [(line.strip(), 0) for line in text.splitlines() if line.strip()]
+
+    @staticmethod
+    def get_page_image_count(page):
+        try:
+            return len(page.images)
+        except BaseException:
+            return 0
+
+    @staticmethod
+    def extract_page_text(page):
+        return (page.extract_text() or "").replace("\0", "")
+
+    @staticmethod
+    def get_toc(doc):
+        try:
+            outline = doc.outline
+        except BaseException:
+            return []
+
+        toc = []
+        PdfSplitHandle.collect_toc(doc, outline, 1, toc)
+        return toc
+
+    @staticmethod
+    def collect_toc(doc, outline, level, toc):
+        for item in outline:
+            if isinstance(item, list):
+                PdfSplitHandle.collect_toc(doc, item, level + 1, toc)
+                continue
+
+            page_number = PdfSplitHandle.get_destination_page_number(doc, item)
+            if page_number is None:
+                continue
+
+            title = getattr(item, "title", None)
+            if title is None and hasattr(item, "get"):
+                title = item.get("/Title")
+            if title is None:
+                title = str(item)
+            toc.append(
+                (
+                    level,
+                    str(title).replace("\0", ""),
+                    page_number,
+                    PdfSplitHandle.get_destination_top(item),
+                )
+            )
+
+    @staticmethod
+    def get_destination_top(destination):
+        top = getattr(destination, "top", None)
+        try:
+            return float(top)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def extract_page_text_by_position(page, top=None, bottom=None):
+        if top is None and bottom is None:
+            return PdfSplitHandle.extract_page_text(page)
+
+        text_parts = []
+
+        def visitor_text(text, cm, tm, font_dict, font_size):
+            if not text:
+                return
+
+            # Text matrix coordinates can be relative to a page-level transform.
+            # Convert the text origin to PDF user-space coordinates before comparing
+            # it with the outline destination's /Top value.
+            x = tm[4] if len(tm) > 4 else 0
+            y = tm[5] if len(tm) > 5 else 0
+            if len(cm) > 5:
+                y = x * cm[1] + y * cm[3] + cm[5]
+
+            if top is not None and y > top:
+                return
+            if bottom is not None and y <= bottom:
+                return
+            text_parts.append(text)
+
+        try:
+            page.extract_text(visitor_text=visitor_text)
+        except BaseException:
+            return PdfSplitHandle.extract_page_text(page)
+        return "".join(text_parts).replace("\0", "")
+
+    @staticmethod
+    def remove_leading_title(text, *titles):
+        for title in titles:
+            title = title.strip()
+            if not title:
+                continue
+            pattern = r"^\s*" + r"\s*".join(re.escape(char) for char in title)
+            stripped_text, count = re.subn(pattern, "", text, count=1)
+            if count:
+                return stripped_text
+        return text
+
+    @staticmethod
     def handle_toc(doc, limit):
         # 找到目录
-        toc = doc.get_toc()
+        toc = PdfSplitHandle.get_toc(doc)
         if toc is None or len(toc) == 0:
             return None
 
@@ -136,14 +271,20 @@ class PdfSplitHandle(BaseSplitHandle):
 
         # 遍历目录并按章节提取文本
         for i, entry in enumerate(toc):
-            level, title, start_page = entry
-            start_page -= 1  # PyMuPDF 页码从 0 开始，书签页码从 1 开始
+            level, title, start_page, start_top = entry
             chapter_title = title
             # 确定结束页码，如果是最后一个章节则到文档末尾
             if i + 1 < len(toc):
-                end_page = toc[i + 1][2] - 1
+                _next_level, next_title, next_start_page, next_top = toc[i + 1]
+                # A positioned bookmark can start partway down a page. Include that
+                # page and keep only the text above the next bookmark for this chapter.
+                end_page = next_start_page if next_top is not None else next_start_page - 1
             else:
-                end_page = doc.page_count - 1
+                end_page = len(doc.pages) - 1
+                next_title = None
+                next_start_page = None
+                next_top = None
+            end_page = max(start_page, end_page)
 
             # 去掉标题中的符号
             title = PdfSplitHandle.handle_chapter_title(title)
@@ -151,37 +292,48 @@ class PdfSplitHandle(BaseSplitHandle):
             # 提取该章节的文本内容
             chapter_text = ""
             for page_num in range(start_page, end_page + 1):
-                page = doc.load_page(page_num)  # 加载页面
-                text = page.get_text("text")
-                text = re.sub(r'(?<!。)\n+', '', text)
-                text = re.sub(r'(?<!.)\n+', '', text)
-                # print(f'title: {title}')
+                page_top = start_top if page_num == start_page else None
+                page_bottom = next_top if page_num == next_start_page else None
+                text = PdfSplitHandle.extract_page_text_by_position(doc.pages[page_num], page_top, page_bottom)
+                text = re.sub(r"(?<!。)\n+", "", text)
+                text = re.sub(r"(?<!.)\n+", "", text)
 
-                idx = text.find(title)
-                if idx > -1:
-                    text = text[idx + len(title):]
+                if page_num == start_page:
+                    if start_top is not None:
+                        text = PdfSplitHandle.remove_leading_title(text, chapter_title, title)
+                    else:
+                        idx = text.find(title)
+                        if idx > -1:
+                            text = text[idx + len(title):]
 
-                if i + 1 < len(toc):
-                    l, next_title, next_start_page = toc[i + 1]
-                    next_title = PdfSplitHandle.handle_chapter_title(next_title)
-                    # print(f'next_title: {next_title}')
-                    idx = text.find(next_title)
+                if next_title is not None and next_top is None:
+                    handled_next_title = PdfSplitHandle.handle_chapter_title(next_title)
+                    idx = text.find(handled_next_title)
                     if idx > -1:
                         text = text[:idx]
 
                 chapter_text += text  # 提取文本
 
             # Null characters are not allowed.
-            chapter_text = chapter_text.replace('\0', '')
+            chapter_text = chapter_text.replace("\0", "")
             # 限制标题长度
             real_chapter_title = chapter_title[:256]
             # 限制章节内容长度
             if 0 < limit < len(chapter_text):
                 split_text = PdfSplitHandle.split_text(chapter_text, limit)
                 for text in split_text:
-                    chapters.append({"title": real_chapter_title, "content": text})
+                    chapters.append(
+                        {"title": real_chapter_title, "content": text.encode("utf-8", "ignore").decode("utf-8")}
+                    )
             else:
-                chapters.append({"title": real_chapter_title, "content": chapter_text if chapter_text else real_chapter_title})
+                chapters.append(
+                    {
+                        "title": real_chapter_title,
+                        "content": (chapter_text if chapter_text else real_chapter_title)
+                        .encode("utf-8", "ignore")
+                        .decode("utf-8"),
+                    }
+                )
             # 保存章节内容和章节标题
         return chapters
 
