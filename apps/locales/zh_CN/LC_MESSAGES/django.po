@@ -9641,3 +9641,24 @@ msgstr "获取门户登录信息"
 
 msgid "Portal logout"
 msgstr "门户退出登录"
+
+msgid "Create ChatUserAPIKey"
+msgstr "创建对话用户 API 密钥"
+
+msgid "Get ChatUserAPIKey List"
+msgstr "获取对话用户 API 密钥列表"
+
+msgid "Delete ChatUserAPIKey"
+msgstr "删除对话用户 API 密钥"
+
+msgid "Chat User API Key"
+msgstr "对话用户 API 密钥"
+
+msgid "Add chat user API key"
+msgstr "添加对话用户 API 密钥"
+
+msgid "Get chat user API key list"
+msgstr "获取对话用户 API 密钥列表"
+
+msgid "Delete chat user API key"
+msgstr "删除对话用户 API 密钥"
