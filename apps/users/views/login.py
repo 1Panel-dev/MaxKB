@@ -51,15 +51,15 @@ class LoginView(APIView):
         token, f_token = LoginSerializer().login(request.data)
         response = result.success(token)
 
+        is_https = request.scheme == "https"
         response.set_cookie(
-            "mk_file_auth",
+            key="mk_file_auth",
             value=f_token,
             max_age=7 * 24 * 3600,
-            path=f"{CONFIG.get_admin_path()}",
-            domain=None,
-            secure=request.scheme == "https",
+            path=CONFIG.get_admin_path(),
+            secure=is_https,
             httponly=True,
-            samesite="None",
+            samesite="None" if is_https else "Lax",
         )
         return response
 
