@@ -220,7 +220,65 @@ class PdfSplitHandle(BaseSplitHandle):
                 title = item.get("/Title")
             if title is None:
                 title = str(item)
-            toc.append((level, str(title).replace("\0", ""), page_number))
+            toc.append(
+                (
+                    level,
+                    str(title).replace("\0", ""),
+                    page_number,
+                    PdfSplitHandle.get_destination_top(item),
+                )
+            )
+
+    @staticmethod
+    def get_destination_top(destination):
+        top = getattr(destination, "top", None)
+        try:
+            return float(top)
+        except (TypeError, ValueError):
+            return None
+
+    @staticmethod
+    def extract_page_text_by_position(page, top=None, bottom=None):
+        if top is None and bottom is None:
+            return PdfSplitHandle.extract_page_text(page)
+
+        text_parts = []
+
+        def visitor_text(text, cm, tm, font_dict, font_size):
+            if not text:
+                return
+
+            # Text matrix coordinates can be relative to a page-level transform.
+            # Convert the text origin to PDF user-space coordinates before comparing
+            # it with the outline destination's /Top value.
+            x = tm[4] if len(tm) > 4 else 0
+            y = tm[5] if len(tm) > 5 else 0
+            if len(cm) > 5:
+                y = x * cm[1] + y * cm[3] + cm[5]
+
+            if top is not None and y > top:
+                return
+            if bottom is not None and y <= bottom:
+                return
+            text_parts.append(text)
+
+        try:
+            page.extract_text(visitor_text=visitor_text)
+        except BaseException:
+            return PdfSplitHandle.extract_page_text(page)
+        return "".join(text_parts).replace("\0", "")
+
+    @staticmethod
+    def remove_leading_title(text, *titles):
+        for title in titles:
+            title = title.strip()
+            if not title:
+                continue
+            pattern = r"^\s*" + r"\s*".join(re.escape(char) for char in title)
+            stripped_text, count = re.subn(pattern, "", text, count=1)
+            if count:
+                return stripped_text
+        return text
 
     @staticmethod
     def handle_toc(doc, limit):
@@ -234,13 +292,19 @@ class PdfSplitHandle(BaseSplitHandle):
 
         # 遍历目录并按章节提取文本
         for i, entry in enumerate(toc):
-            level, title, start_page = entry
+            level, title, start_page, start_top = entry
             chapter_title = title
             # 确定结束页码，如果是最后一个章节则到文档末尾
             if i + 1 < len(toc):
-                end_page = toc[i + 1][2] - 1
+                _next_level, next_title, next_start_page, next_top = toc[i + 1]
+                # A positioned bookmark can start partway down a page. Include that
+                # page and keep only the text above the next bookmark for this chapter.
+                end_page = next_start_page if next_top is not None else next_start_page - 1
             else:
                 end_page = len(doc.pages) - 1
+                next_title = None
+                next_start_page = None
+                next_top = None
             end_page = max(start_page, end_page)
 
             # 去掉标题中的符号
@@ -249,20 +313,23 @@ class PdfSplitHandle(BaseSplitHandle):
             # 提取该章节的文本内容
             chapter_text = ""
             for page_num in range(start_page, end_page + 1):
-                text = PdfSplitHandle.extract_page_text(doc.pages[page_num])
+                page_top = start_top if page_num == start_page else None
+                page_bottom = next_top if page_num == next_start_page else None
+                text = PdfSplitHandle.extract_page_text_by_position(doc.pages[page_num], page_top, page_bottom)
                 text = re.sub(r"(?<!。)\n+", "", text)
                 text = re.sub(r"(?<!.)\n+", "", text)
-                # print(f'title: {title}')
 
-                idx = text.find(title)
-                if idx > -1:
-                    text = text[idx + len(title) :]
+                if page_num == start_page:
+                    if start_top is not None:
+                        text = PdfSplitHandle.remove_leading_title(text, chapter_title, title)
+                    else:
+                        idx = text.find(title)
+                        if idx > -1:
+                            text = text[idx + len(title) :]
 
-                if i + 1 < len(toc):
-                    _level, next_title, next_start_page = toc[i + 1]
-                    next_title = PdfSplitHandle.handle_chapter_title(next_title)
-                    # print(f'next_title: {next_title}')
-                    idx = text.find(next_title)
+                if next_title is not None and next_top is None:
+                    handled_next_title = PdfSplitHandle.handle_chapter_title(next_title)
+                    idx = text.find(handled_next_title)
                     if idx > -1:
                         text = text[:idx]
 
