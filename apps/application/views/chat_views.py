@@ -20,7 +20,7 @@ from application.serializers.chat_serializers import ChatSerializers, ChatRecord
 from application.swagger_api.chat_api import ChatApi, VoteApi, ChatRecordApi, ImproveApi, ChatRecordImproveApi, \
     ChatClientHistoryApi, OpenAIChatApi
 from application.views import get_application_operation_object
-from common.auth import TokenAuth, has_permissions, OpenAIKeyAuth
+from common.auth import TokenAuth, has_permissions, OpenAIKeyAuth, AllTokenAuth
 from common.constants.authentication_type import AuthenticationType
 from common.constants.permission_constants import Permission, Group, Operate, \
     RoleConstants, ViewPermission, CompareConstants
@@ -70,7 +70,7 @@ class ChatView(APIView):
                       'user_id': request.user.id}).export(request.data)
 
     class Open(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary=_("Get the session id according to the application id"),
@@ -114,7 +114,7 @@ class ChatView(APIView):
                 data={**request.data, 'user_id': request.user.id}).open())
 
     class Message(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary=_("dialogue"),
