@@ -130,15 +130,16 @@ class AnonymousAuthentication(APIView):
                      "Access-Control-Allow-Methods": "POST",
                      "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
         )
+        is_https = request.scheme == "https"
+
         response.set_cookie(
-            'mk_file_auth',
+            key="mk_file_auth",
             value=f_token,
             max_age=7 * 24 * 3600,
             path=f'{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
-            domain=None,
-            secure=request.scheme == "https",
+            secure=is_https,
             httponly=True,
-            samesite="None",
+            samesite="None" if is_https else "Lax",
         )
         return response
 
