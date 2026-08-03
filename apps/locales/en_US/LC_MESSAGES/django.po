@@ -9493,3 +9493,27 @@ msgstr ""
 
 msgid "cors config"
 msgstr ""
+
+msgid "Get published application list by page"
+msgstr ""
+
+msgid "Portal login"
+msgstr ""
+
+msgid "Invalid encrypted data"
+msgstr ""
+
+msgid "Portal authentication is not enabled"
+msgstr ""
+
+msgid "Portal authentication is not configured"
+msgstr ""
+
+msgid "Portal local login is not enabled"
+msgstr ""
+
+msgid "Get portal login info"
+msgstr ""
+
+msgid "Portal logout"
+msgstr ""
