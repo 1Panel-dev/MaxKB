@@ -260,11 +260,30 @@ class PdfSplitHandle(BaseSplitHandle):
         return text
 
     @staticmethod
+    def discard_ambiguous_destination_tops(toc):
+        position_counts = {}
+        for _level, _title, page_number, top in toc:
+            if top is not None:
+                position = (page_number, top)
+                position_counts[position] = position_counts.get(position, 0) + 1
+
+        ambiguous_tops = {top for (_page_number, top), count in position_counts.items() if count > 1}
+
+        return [
+            (level, title, page_number, None if top in ambiguous_tops else top)
+            for level, title, page_number, top in toc
+        ]
+
+    @staticmethod
     def handle_toc(doc, limit):
         # 找到目录
         toc = PdfSplitHandle.get_toc(doc)
         if toc is None or len(toc) == 0:
             return None
+        # Some PDF generators assign the same default position to every bookmark
+        # on a page. Such coordinates cannot define chapter boundaries, so preserve
+        # the title-based behavior for those entries.
+        toc = PdfSplitHandle.discard_ambiguous_destination_tops(toc)
 
         # 创建存储章节内容的数组
         chapters = []
