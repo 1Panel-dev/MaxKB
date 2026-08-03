@@ -6,10 +6,12 @@
     @date：2025/11/5 14:53
     @desc:
 """
-from pathlib import Path
-from ...const import CONFIG, PROJECT_DIR
 import os
+from pathlib import Path
+
 from django.utils.translation import gettext_lazy as _
+
+from ...const import CONFIG, PROJECT_DIR
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -46,6 +48,7 @@ INSTALLED_APPS = [
     'oss',
     'trigger',
     'django_apscheduler',
+    "portal"
 ]
 
 MIDDLEWARE = [
