@@ -9575,3 +9575,45 @@ msgstr "编辑用户组对资源的授权状态"
 
 msgid "Get user group authorization status of resource by page"
 msgstr "分页获取用户组对资源的授权状态"
+
+msgid "Get portal configuration"
+msgstr "获取门户配置"
+
+msgid "Save portal configuration"
+msgstr "保存门户配置"
+
+msgid "Portal"
+msgstr "门户"
+
+msgid "Portal configuration does not exist"
+msgstr "门户配置不存在"
+
+msgid "portal name"
+msgstr "门户名称"
+
+msgid "portal description"
+msgstr "门户描述"
+
+msgid "portal logo"
+msgstr "门户Logo"
+
+msgid "tab logo"
+msgstr "浏览器Tab Logo"
+
+msgid "enable public access"
+msgstr "是否开启公开访问"
+
+msgid "enable api"
+msgstr "是否开启API服务"
+
+msgid "enable auth"
+msgstr "是否开启身份认证"
+
+msgid "auth config"
+msgstr "身份认证配置"
+
+msgid "enable cors"
+msgstr "是否开启跨域设置"
+
+msgid "cors config"
+msgstr "跨域配置"

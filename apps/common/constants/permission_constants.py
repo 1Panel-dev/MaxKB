@@ -104,6 +104,7 @@ class Group(Enum):
     KNOWLEDGE_FOLDER = "KNOWLEDGE_FOLDER"
     TOOL_FOLDER = "TOOL_FOLDER"
     CHAT_USER_GROUP = "CHAT_USER_GROUP"
+    PORTAL = "PORTAL"
 
 
 class SystemGroup(Enum):
@@ -127,6 +128,7 @@ class SystemGroup(Enum):
     CHAT_USER = "CHAT_USER"
     CHAT_USER_GROUP = "CHAT_USER_GROUP"
     CHAT_USER_AUTH = "CHAT_USER_AUTH"
+    PORTAL = "PORTAL"
     OPERATION_LOG = "OPERATION_LOG"
     APPEARANCE_SETTINGS = "APPEARANCE_SETTINGS"
     LOGIN_AUTH = "LOGIN_AUTH"
@@ -179,7 +181,6 @@ class TopLevelGroup(Enum):
     WORKSPACE = "WORKSPACE"
     #
     OTHER = "OTHER"
-
 
 
 class Operate(Enum):
@@ -487,6 +488,7 @@ Permission_Label = {
     TopLevelGroup.CHAT_CLIENT.value: _("Chat Client"),
     SystemGroup.CHAT_USER_GROUP.value: _("Chat User Group"),
     SystemGroup.CHAT_USER_AUTH.value: _("Chat User Auth"),
+    SystemGroup.PORTAL.value: _("Portal"),
 }
 GROUPS = {
     TopLevelGroup.IAM: (
@@ -515,6 +517,7 @@ GROUPS = {
         SystemGroup.CHAT_USER,
         SystemGroup.CHAT_USER_GROUP,
         SystemGroup.CHAT_USER_AUTH,
+        SystemGroup.PORTAL,
         WorkspaceGroup.CHAT_USER,
         WorkspaceGroup.CHAT_USER_GROUP,
     ),
@@ -589,11 +592,11 @@ class Permission:
     def __eq__(self, other):
         if isinstance(other, Permission):
             return (
-                self.group == other.group
-                and self.operate == other.operate
-                and self.resource_path == other.resource_path
-                and self.parent_group == other.parent_group
-                and self.is_ee == other.is_ee
+                    self.group == other.group
+                    and self.operate == other.operate
+                    and self.resource_path == other.resource_path
+                    and self.parent_group == other.parent_group
+                    and self.is_ee == other.is_ee
             )
         return str(self) == str(other)
 
@@ -1533,6 +1536,15 @@ class PermissionConstants(Enum):
                                      role_list=[RoleConstants.ADMIN],
                                      parent_group=[SystemGroup.CHAT_USER_AUTH]
                                      )
+    PORTAL_READ = Permission(group=Group.PORTAL, operate=Operate.READ,
+                             role_list=[RoleConstants.ADMIN],
+                             parent_group=[SystemGroup.PORTAL]
+                             )
+    PORTAL_EDIT = Permission(group=Group.PORTAL, operate=Operate.EDIT,
+                             role_list=[RoleConstants.ADMIN],
+                             parent_group=[SystemGroup.PORTAL]
+                             )
+
     WORKSPACE_CHAT_USER_READ = Permission(group=Group.WORKSPACE_CHAT_USER, operate=Operate.READ,
                                           role_list=[RoleConstants.ADMIN],
                                           parent_group=[WorkspaceGroup.CHAT_USER]

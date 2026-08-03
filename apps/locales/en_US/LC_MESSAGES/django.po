@@ -9451,3 +9451,45 @@ msgstr ""
 
 msgid "Get user group authorization status of resource by page"
 msgstr ""
+
+msgid "Get portal configuration"
+msgstr ""
+
+msgid "Save portal configuration"
+msgstr ""
+
+msgid "Portal"
+msgstr ""
+
+msgid "Portal configuration does not exist"
+msgstr ""
+
+msgid "portal name"
+msgstr ""
+
+msgid "portal description"
+msgstr ""
+
+msgid "portal logo"
+msgstr ""
+
+msgid "tab logo"
+msgstr ""
+
+msgid "enable public access"
+msgstr ""
+
+msgid "enable api"
+msgstr ""
+
+msgid "enable auth"
+msgstr ""
+
+msgid "auth config"
+msgstr ""
+
+msgid "enable cors"
+msgstr ""
+
+msgid "cors config"
+msgstr ""
