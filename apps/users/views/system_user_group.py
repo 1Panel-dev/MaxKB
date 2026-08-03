@@ -1,7 +1,6 @@
 # coding=utf-8
 
 from django.utils.translation import gettext_lazy as _
-from django.db.models import Count
 from drf_spectacular.utils import extend_schema
 from rest_framework.request import Request
 from rest_framework.views import APIView
@@ -21,7 +20,7 @@ from users.serializers.user_group import (
     SystemUserGroupCreateSerializer,
     UserGroupAddMemberSerializer,
     UserGroupRemoveMemberSerializer,
-    UserGroupListPageSerializer, SystemUserGroupModelSerializer
+    UserGroupListPageSerializer
 )
 
 
