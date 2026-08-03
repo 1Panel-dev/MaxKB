@@ -6,8 +6,12 @@
     @date：2026/8/3
     @desc: 门户API文档
 """
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import OpenApiParameter
+
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
+from users.serializers.login import LoginRequest
 
 
 class PortalAPI(APIMixin):
@@ -38,6 +42,56 @@ class PortalAPI(APIMixin):
                 }
             }
 
+        @staticmethod
+        def get_response():
+            return DefaultResultSerializer
+
+    class Application(APIMixin):
+        @staticmethod
+        def get_parameters():
+            return [
+                OpenApiParameter(
+                    name='current_page',
+                    description='当前页码',
+                    type=OpenApiTypes.INT,
+                    location='path',
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name='page_size',
+                    description='每页数量',
+                    type=OpenApiTypes.INT,
+                    location='path',
+                    required=True,
+                ),
+                OpenApiParameter(
+                    name='name',
+                    description='应用名称搜索',
+                    type=OpenApiTypes.STR,
+                    location='query',
+                    required=False,
+                ),
+            ]
+
+        @staticmethod
+        def get_response():
+            return DefaultResultSerializer
+
+    class Login(APIMixin):
+        @staticmethod
+        def get_request():
+            return LoginRequest
+
+        @staticmethod
+        def get_response():
+            return DefaultResultSerializer
+
+    class Info(APIMixin):
+        @staticmethod
+        def get_response():
+            return DefaultResultSerializer
+
+    class Logout(APIMixin):
         @staticmethod
         def get_response():
             return DefaultResultSerializer

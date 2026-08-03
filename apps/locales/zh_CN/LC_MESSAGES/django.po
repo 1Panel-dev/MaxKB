@@ -9617,3 +9617,27 @@ msgstr "是否开启跨域设置"
 
 msgid "cors config"
 msgstr "跨域配置"
+
+msgid "Get published application list by page"
+msgstr "分页获取已发布应用列表"
+
+msgid "Portal login"
+msgstr "门户登录"
+
+msgid "Invalid encrypted data"
+msgstr "无效的加密数据"
+
+msgid "Portal authentication is not enabled"
+msgstr "门户身份认证未开启"
+
+msgid "Portal authentication is not configured"
+msgstr "门户身份认证未配置"
+
+msgid "Portal local login is not enabled"
+msgstr "门户本地登录未开启"
+
+msgid "Get portal login info"
+msgstr "获取门户登录信息"
+
+msgid "Portal logout"
+msgstr "门户退出登录"
