@@ -87,3 +87,14 @@ class ResourceChatUserGroupAuthorize(models.Model):
     class Meta:
         db_table = "resource_chat_user_group_authorize"
         unique_together = ('user_group_id', 'resource_type', 'resource_id')
+
+
+class ChatUserApiKey(models.Model):
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    user = models.ForeignKey(ChatUser, on_delete=models.CASCADE, verbose_name="用户")
+    secret_key = models.CharField(max_length=1024, verbose_name="秘钥", unique=True)
+    is_active = models.BooleanField(default=True, verbose_name="是否开启")
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, null=True, db_index=True)
+
+    class Meta:
+        db_table = "chat_user_api_key"
