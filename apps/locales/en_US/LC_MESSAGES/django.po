@@ -9428,21 +9428,6 @@ msgstr ""
 msgid "Chat User Group"
 msgstr ""
 
-msgid "Create or update System User Group"
-msgstr ""
-
-msgid "Get System User Group list by workspace id"
-msgstr ""
-
-msgid "Delete System User Group"
-msgstr ""
-
-msgid "Add members to System User Group"
-msgstr ""
-
-msgid "Remove members from System User Group"
-msgstr ""
-
 msgid "Get user group authorization status of resource"
 msgstr ""
 
@@ -9450,4 +9435,25 @@ msgid "Edit user group authorization status of resource"
 msgstr ""
 
 msgid "Get user group authorization status of resource by page"
+msgstr ""
+
+msgid "Create ChatUserAPIKey"
+msgstr ""
+
+msgid "Get ChatUserAPIKey List"
+msgstr ""
+
+msgid "Delete ChatUserAPIKey"
+msgstr ""
+
+msgid "Chat User API Key"
+msgstr ""
+
+msgid "Add chat user API key"
+msgstr ""
+
+msgid "Get chat user API key list"
+msgstr ""
+
+msgid "Delete chat user API key"
 msgstr ""
