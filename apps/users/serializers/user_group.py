@@ -33,7 +33,7 @@ def add_or_edit_user_group_relation(user, user_group_ids):
 class SystemUserGroupModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUserGroup
-        fields = ['id', 'name', 'workspace_id', 'count']
+        fields = ['id', 'name', 'workspace_id']
 
 
 
