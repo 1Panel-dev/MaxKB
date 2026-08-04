@@ -80,7 +80,9 @@ class SystemUserGroupView(APIView):
     )
     @has_permissions(PermissionConstants.SYSTEM_USER_GROUP_READ, RoleConstants.ADMIN)
     def get(self, request: Request, workspace_id: str):
-        return result.success(SystemUserGroupCreateSerializer.UserGroupListSerializer().get_user_groups(workspace_id))
+        return result.success(SystemUserGroupCreateSerializer.Query(
+            data={'workspace_id': workspace_id}
+        ).list())
 
     class Delete(APIView):
         authentication_classes = [TokenAuth]

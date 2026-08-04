@@ -10,6 +10,15 @@ class Portal(AppModelMixin):
     """
     门户配置
     """
+
+    id = models.UUIDField(
+        primary_key=True,
+        max_length=128,
+        default=uuid.uuid7,
+        editable=False,
+        verbose_name="主键id"
+    )
+
     # 基础信息
     name = models.CharField(
         max_length=64,

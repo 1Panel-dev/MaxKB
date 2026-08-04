@@ -2,8 +2,7 @@
 
 import uuid_utils.compat as uuid
 from django.db import transaction
-from django.db.models import Count, OuterRef, Subquery
-from django.db.models.functions import Coalesce
+from django.db.models import Count
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -32,9 +31,14 @@ def add_or_edit_user_group_relation(user, user_group_ids):
 
 
 class SystemUserGroupModelSerializer(serializers.ModelSerializer):
+    count = serializers.SerializerMethodField()
+
+    def get_count(self, obj):
+        return getattr(obj, 'count', 0)
+
     class Meta:
         model = SystemUserGroup
-        fields = ['id', 'name', 'workspace_id']
+        fields = ['id', 'name', 'workspace_id', 'count']
 
 
 class SystemUserGroupCreateSerializer(serializers.Serializer):
@@ -101,28 +105,21 @@ class SystemUserGroupCreateSerializer(serializers.Serializer):
             self.group.delete()
             return True
 
-    class UserGroupListSerializer(serializers.ModelSerializer):
+    class Query(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label='Workspace ID')
 
-        def get_user_groups(self, workspace_id: str):
-            return list(
+        def get_query_set(self):
+            return (
                 SystemUserGroup.objects
-                .filter(workspace_id=workspace_id)
-                .annotate(
-                    count=Coalesce(
-                        Subquery(
-                            SystemUserGroupRelation.objects
-                            .filter(group_id=OuterRef('id'))
-                            .values('group_id')
-                            .annotate(cnt=Count('id'))
-                            .values('cnt')
-                        ),
-                        0
-                    )
-                )
-                .order_by("name")
-                .values("id", "name", "workspace_id", "count")
+                .filter(workspace_id=self.data.get('workspace_id'))
+                .annotate(count=Count('user_relations'))
+                .order_by('name')
             )
+
+        def list(self, with_valid=True):
+            if with_valid:
+                self.is_valid(raise_exception=True)
+            return SystemUserGroupModelSerializer(self.get_query_set(), many=True).data
 
 
 class UserGroupAddMemberSerializer(serializers.Serializer):

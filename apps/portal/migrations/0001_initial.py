@@ -7,6 +7,7 @@ def create_default_portal(apps, schema_editor):
     Portal = apps.get_model("portal", "Portal")
 
     Portal.objects.create(
+        id="019fca92-0371-7a03-a7bb-445ebeb1314c",
         name="智能体门户",
         description="默认门户",
         enable_public_access=True,
@@ -28,6 +29,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Portal',
             fields=[
+                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
                 ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
                 ('name', models.CharField(default='智能体门户', max_length=64, verbose_name='门户名称')),

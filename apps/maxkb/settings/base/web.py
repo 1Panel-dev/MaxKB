@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'oss',
     'trigger',
     'django_apscheduler',
-    "portal"
+    "portal",
+    "django.contrib.postgres"
 ]
 
 MIDDLEWARE = [

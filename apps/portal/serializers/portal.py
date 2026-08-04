@@ -121,10 +121,9 @@ class PortalApplicationSerializer(serializers.Serializer):
                                      help_text=_('Application name'))
 
         def get_query_set(self):
-            queryset = Application.objects.filter(is_publish=True).filter(
-                id__in=ApplicationAccessToken.objects.filter(
-                    authentication=False
-                ).values_list('application_id', flat=True)
+            queryset = Application.objects.filter(is_publish=True).only(
+                'id', 'name', 'desc', 'icon', 'type',
+                'dialogue_number', 'prologue', 'is_publish', 'create_time'
             )
             name = self.data.get('name')
             if name:
@@ -132,12 +131,17 @@ class PortalApplicationSerializer(serializers.Serializer):
             return queryset.order_by('-create_time')
 
         def _apply_auth_filter(self, queryset, user_id):
-            chat_user_exists = ChatUser.objects.filter(
-                id=user_id
-            ).exists()
-
+            chat_user_exists = ChatUser.objects.filter(id=user_id).exists()
+            public_apps = ApplicationAccessToken.objects.filter(
+                application_id=OuterRef('id'),
+                authentication=False
+            )
             if not chat_user_exists:
-                return queryset
+                return queryset.filter(Exists(public_apps))
+            authed_token_exists = ApplicationAccessToken.objects.filter(
+                application_id=OuterRef('id'),
+                authentication=True
+            )
             direct_auth = ResourceChatUserAuthorize.objects.filter(
                 resource_id=OuterRef('id'),
                 resource_type=ResourceType.APPLICATION.value,
@@ -153,7 +157,10 @@ class PortalApplicationSerializer(serializers.Serializer):
                 is_auth=True,
                 user_group_id__in=user_groups
             )
-            return queryset.filter(Exists(direct_auth) | Exists(group_auth))
+            return queryset.filter(
+                Exists(public_apps) |
+                (Exists(authed_token_exists) & (Exists(direct_auth) | Exists(group_auth)))
+            )
 
         def page(self, current_page, page_size, user_id, with_valid=True):
             if with_valid:
