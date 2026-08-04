@@ -601,7 +601,6 @@ class UserManageSerializer(serializers.Serializer):
                     user_dict[user_id] = {
                         'id': user_id,
                         'nick_name': relation.user.nick_name,
-                        'email': relation.user.email,
                         'roles': [relation.role.role_name]
                     }
                 else:
@@ -614,7 +613,6 @@ class UserManageSerializer(serializers.Serializer):
             {
                 'id': user.id,
                 'nick_name': user.nick_name,
-                'email': user.email,
                 'roles': [RoleConstants.USER.name]
             } for user in user_list
         ]
