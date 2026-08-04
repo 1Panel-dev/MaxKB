@@ -59,6 +59,7 @@ request.interceptors.response.use(
   (response) => {
     const responseData = response.data as ApiResponse<unknown>
     if (responseData.code !== 200) {
+      MsgError(responseData.message)
       return Promise.reject(responseData)
     }
     return response
@@ -85,6 +86,9 @@ request.interceptors.response.use(
     }
     if (status === 403) {
       MsgError(error.response?.data.message || 'No permission to access')
+    }
+    if (error.code !== 'ECONNABORTED' && ![401, 403, 404].includes(status ?? 0)) {
+      MsgError(error.response?.data.message || error.message)
     }
 
     return Promise.reject(error)

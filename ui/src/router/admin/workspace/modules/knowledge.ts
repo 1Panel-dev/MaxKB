@@ -7,7 +7,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
     redirect: { name: 'workspace-knowledge-list' },
     meta: {
       title: '知识库',
-      activeMenu: '/workspace/knowledge',
+      activeMenu: 'workspace-knowledge',
       icon: 'icon_book_outlined',
       activeIcon: 'icon_book_filled',
       order: 30,

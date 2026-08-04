@@ -35,11 +35,12 @@ const providerComponents = {
 const currentConfig = computed(() => qrCodeConfigs.value[qrCodeProvider.value])
 const currentProviderComponent = computed(() => providerComponents[qrCodeProvider.value])
 
-onMounted(async () => {
-  const sources = await externalLoginApi.getQrCodeSources()
-  qrCodeConfigs.value = Object.fromEntries(
-    sources.map(({ auth_type: provider, config }) => [provider, config]),
-  )
+onMounted(() => {
+  externalLoginApi.getQrCodeSources().then((sources) => {
+    qrCodeConfigs.value = Object.fromEntries(
+      sources.map(({ auth_type: provider, config }) => [provider, config]),
+    )
+  })
 })
 </script>
 

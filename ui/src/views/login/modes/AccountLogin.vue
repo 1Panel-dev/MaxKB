@@ -49,37 +49,41 @@ const handleLogin = async () => {
   const valid = await accountLoginFormRef.value.validate().catch(() => false)
   if (!valid) return
 
-  isSubmitting.value = true
-  try {
-    if (loginMethod.value === 'LDAP') {
-      await login.asyncLdapLogin(accountLoginForm)
-    } else {
-      const encryptor = new JSEncrypt()
-      encryptor.setPublicKey(props.rsaPublicKey ?? '')
-      const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
-      if (!encryptedData) throw new Error('登录信息加密失败')
-      await login.asyncLogin({
-        encryptedData,
-        username: accountLoginForm.username,
-        password: '',
-      })
+  let loginRequest: Promise<void>
+  if (loginMethod.value === 'LDAP') {
+    loginRequest = login.asyncLdapLogin(accountLoginForm)
+  } else {
+    const encryptor = new JSEncrypt()
+    encryptor.setPublicKey(props.rsaPublicKey ?? '')
+    const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
+    if (!encryptedData) {
+      MsgError('登录信息加密失败')
+      return
     }
-    await router.push({ name: 'workspace-home' })
-  } catch (error) {
-    MsgError(error instanceof Error ? error.message : '登录失败')
-    await refreshCaptcha()
-  } finally {
-    isSubmitting.value = false
+    loginRequest = login.asyncLogin({
+      encryptedData,
+      username: accountLoginForm.username,
+      password: '',
+    })
   }
+
+  isSubmitting.value = true
+  loginRequest
+    .then(
+      () => router.push({ name: 'workspace-home' }),
+      () => refreshCaptcha(),
+    )
+    .finally(() => {
+      isSubmitting.value = false
+    })
 }
 
-const refreshCaptcha = async () => {
+const refreshCaptcha = () => {
   if (loginMethod.value === 'LDAP') return
-  try {
-    captchaImage.value = (await loginApi.getCaptcha(accountLoginForm.username)).captcha
-  } catch {
-    captchaImage.value = ''
-  }
+  captchaImage.value = ''
+  return loginApi.getCaptcha(accountLoginForm.username).then((captcha) => {
+    captchaImage.value = captcha.captcha
+  })
 }
 
 const selectLoginMethod = async (method: LoginMethod) => {
@@ -98,26 +102,28 @@ const selectLoginMethod = async (method: LoginMethod) => {
   accountLoginFormRef.value?.clearValidate()
 }
 
-const getExternalLoginUrl = async (authType: LoginMethod) => {
+const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
   if (authType === 'SAML2') return externalLoginApi.getSamlLoginUrl()
-  const config = (await externalLoginApi.getExternalAuthSetting(authType)).config
-  if (!config) return ''
-  if (authType === 'CAS' && config.ldpUri) {
-    const separator = config.ldpUri.includes('?') ? '&' : '?'
-    return `${config.ldpUri}${separator}service=${encodeURIComponent(config.redirectUrl)}`
-  }
-  if (!['OIDC', 'OAuth2'].includes(authType) || !config.authEndpoint || !config.clientId) return ''
-  const params = new URLSearchParams({
-    client_id: config.clientId,
-    redirect_uri: config.redirectUrl,
-    response_type: 'code',
+  return externalLoginApi.getExternalAuthSetting(authType).then(({ config }) => {
+    if (!config) return ''
+    if (authType === 'CAS' && config.ldpUri) {
+      const separator = config.ldpUri.includes('?') ? '&' : '?'
+      return `${config.ldpUri}${separator}service=${encodeURIComponent(config.redirectUrl)}`
+    }
+    if (!['OIDC', 'OAuth2'].includes(authType) || !config.authEndpoint || !config.clientId)
+      return ''
+    const params = new URLSearchParams({
+      client_id: config.clientId,
+      redirect_uri: config.redirectUrl,
+      response_type: 'code',
+    })
+    if (authType === 'OAuth2') params.set('state', crypto.randomUUID())
+    if (config.state && authType === 'OIDC') params.set('state', config.state)
+    if (config.scope || authType === 'OIDC') {
+      params.set('scope', config.scope || 'openid profile email')
+    }
+    return `${config.authEndpoint}?${params}`
   })
-  if (authType === 'OAuth2') params.set('state', crypto.randomUUID())
-  if (config.state && authType === 'OIDC') params.set('state', config.state)
-  if (config.scope || authType === 'OIDC') {
-    params.set('scope', config.scope || 'openid profile email')
-  }
-  return `${config.authEndpoint}?${params}`
 }
 
 watch(
@@ -164,7 +170,6 @@ watch(
         <el-form-item prop="username">
           <el-input
             v-model="accountLoginForm.username"
-            autocomplete="username"
             placeholder="请输入用户名"
             @blur="refreshCaptcha"
           />
@@ -172,7 +177,6 @@ watch(
         <el-form-item prop="password">
           <el-input
             v-model="accountLoginForm.password"
-            autocomplete="current-password"
             placeholder="请输入密码"
             show-password
             type="password"
@@ -180,7 +184,11 @@ watch(
         </el-form-item>
         <div v-if="loginMethod !== 'LDAP' && captchaImage" class="flex gap-2">
           <el-form-item prop="captcha" class="flex-1">
-            <el-input v-model="accountLoginForm.captcha" placeholder="请输入验证码" />
+            <el-input
+              v-model="accountLoginForm.captcha"
+              autocomplete="off"
+              placeholder="请输入验证码"
+            />
           </el-form-item>
           <button
             type="button"

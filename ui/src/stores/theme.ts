@@ -34,10 +34,12 @@ export const useThemeStore = defineStore('theme', {
 
   actions: {
     /** 加载、保存并应用服务端外观主题。 */
-    async loadThemeInfo() {
-      if (this.isInitialized) return this.themeInfo
-      this.applyThemeInfo(await platformInfoApi.getThemeInfo())
-      return this.themeInfo
+    loadThemeInfo() {
+      if (this.isInitialized) return Promise.resolve(this.themeInfo)
+      return platformInfoApi.getThemeInfo().then((themeInfo) => {
+        this.applyThemeInfo(themeInfo)
+        return this.themeInfo
+      })
     },
 
     /** 恢复并应用社区版或请求失败时使用的默认主题。 */

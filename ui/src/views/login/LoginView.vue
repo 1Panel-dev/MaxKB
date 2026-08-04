@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import platformInfoApi from '@/api/admin/auth/platform-info'
 import type { LoginConfig } from '@/api/admin/auth/types'
 import { useStore } from '@/stores'
-import { MsgError } from '@/utils/message'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
@@ -62,37 +61,44 @@ const completeClientLogin = async () => {
   await router.push({ name: 'workspace-home' })
 }
 
-onBeforeMount(async () => {
+onBeforeMount(() => {
   isLoading.value = true
-  try {
-    await platformInfo.loadPlatformInfo()
-    if (platformInfo.isPremium) {
-      await theme.loadThemeInfo().catch(() => theme.applyDefaultTheme())
-      if (route.query.login_mode !== 'manual') {
-        const configuredLogin = await platformInfoApi.getLoginConfig().catch(() => null)
-        if (configuredLogin) {
-          loginConfig.value = {
-            ...configuredLogin,
-            login_methods: configuredLogin.login_methods?.length
-              ? configuredLogin.login_methods
-              : ['LOCAL'],
-          }
-        }
+  platformInfo
+    .loadPlatformInfo()
+    .then(() => {
+      if (!platformInfo.isPremium) {
+        theme.applyDefaultTheme()
+        return
       }
-    } else {
-      theme.applyDefaultTheme()
-    }
-    loginMode.value = qrCodeProviders.value.includes(
-      loginConfig.value.default_value as QrCodeProvider,
-    )
-      ? 'qr-code'
-      : 'account'
-    await completeClientLogin()
-  } catch (error) {
-    MsgError(String(error))
-  } finally {
-    isLoading.value = false
-  }
+
+      const themeRequest = theme.loadThemeInfo().then(undefined, () => theme.applyDefaultTheme())
+      const loginConfigRequest =
+        route.query.login_mode === 'manual'
+          ? Promise.resolve()
+          : platformInfoApi.getLoginConfig().then(
+              (configuredLogin) => {
+                loginConfig.value = {
+                  ...configuredLogin,
+                  login_methods: configuredLogin.login_methods?.length
+                    ? configuredLogin.login_methods
+                    : ['LOCAL'],
+                }
+              },
+              () => undefined,
+            )
+      return Promise.all([themeRequest, loginConfigRequest])
+    })
+    .then(() => {
+      loginMode.value = qrCodeProviders.value.includes(
+        loginConfig.value.default_value as QrCodeProvider,
+      )
+        ? 'qr-code'
+        : 'account'
+      return completeClientLogin()
+    })
+    .finally(() => {
+      isLoading.value = false
+    })
 })
 </script>
 

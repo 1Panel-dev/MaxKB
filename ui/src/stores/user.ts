@@ -15,16 +15,12 @@ function getDefaultLanguage() {
 interface UserState {
   language: string
   userInfo: CurrentUser | null
-  workspaceId: string
-  workspaceList: WorkspaceSummary[]
 }
 
 export const useUserStore = defineStore('user', {
   state: (): UserState => ({
     language: getDefaultLanguage(),
     userInfo: null,
-    workspaceId: localStorage.getItem(WORKSPACE_STORAGE_KEY) ?? '',
-    workspaceList: [],
   }),
 
   getters: {
@@ -33,24 +29,18 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     /** 加载当前用户，并校验语言和当前工作空间。 */
-    async loadCurrentUser() {
-      this.userInfo = await currentUserApi.getCurrentUser()
-      if (this.userInfo.language) this.setLanguage(this.userInfo.language)
-      this.workspaceList = this.userInfo.workspace_list?.length
-        ? this.userInfo.workspace_list
-        : [{ ...DEFAULT_WORKSPACE }]
-      const workspaceExists = this.workspaceList.some(
-        (workspace) => workspace.id === this.workspaceId,
-      )
-      if (!workspaceExists) this.setWorkspaceId(this.workspaceList[0]?.id ?? DEFAULT_WORKSPACE.id)
-      return this.userInfo
+    loadCurrentUser() {
+      return currentUserApi.getCurrentUser().then((userInfo) => {
+        this.userInfo = userInfo
+        if (userInfo.language) this.setLanguage(userInfo.language)
+
+        return userInfo
+      })
     },
 
     /** 清除仅在登录状态下有效的用户数据。 */
     clearCurrentUser() {
       this.userInfo = null
-      this.workspaceId = ''
-      this.workspaceList = []
       localStorage.removeItem(WORKSPACE_STORAGE_KEY)
     },
 
@@ -60,10 +50,5 @@ export const useUserStore = defineStore('user', {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
     },
 
-    /** 更新并持久化当前工作空间。 */
-    setWorkspaceId(workspaceId: string) {
-      this.workspaceId = workspaceId
-      localStorage.setItem(WORKSPACE_STORAGE_KEY, workspaceId)
-    },
   },
 })

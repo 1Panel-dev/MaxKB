@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import MkFilterableDropdown from '@/components/mk-filterable-dropdown/index.vue'
 import { ArrowDown, Collection } from '@element-plus/icons-vue'
+import { useStore } from '@/stores'
 
 /**
  * 工作空间下拉框。
@@ -9,21 +11,23 @@ import { ArrowDown, Collection } from '@element-plus/icons-vue'
  */
 defineOptions({ name: 'WorkspaceDropdown' })
 
-/** 当前选中的工作空间 */
-const selectedWorkspace = ref<string | number>('maxkb')
-/** 工作空间列表；后续由工作空间接口返回 */
-const workspaceOptions = [
-  {
-    label: 'MaxKB 工作空间工作空间',
-    value: 'maxkb-default',
+const route = useRoute()
+const router = useRouter()
+const { user } = useStore()
+
+const selectedWorkspace = computed<string | number>({
+  get: () => user.workspaceId,
+  set: (workspaceId) => {
+    const normalizedWorkspaceId = String(workspaceId)
+    if (normalizedWorkspaceId === user.workspaceId || !route.name) return
+    void router.push({
+      name: route.name,
+      params: { ...route.params, workspaceId: normalizedWorkspaceId },
+      query: route.query,
+      hash: route.hash,
+    })
   },
-  { label: 'MaxKB 工作空间', value: 'maxkb' },
-  { label: 'MaxKB 工作空间 1', value: 'maxkb-1' },
-  { label: 'MaxKB 工作空间 2', value: 'maxkb-2' },
-  { label: '工作空间名称比较长的展示效果如下', value: 'long-name' },
-  { label: '研发工作空间', value: 'development' },
-  { label: '测试工作空间', value: 'testing' },
-]
+})
 </script>
 
 <template>

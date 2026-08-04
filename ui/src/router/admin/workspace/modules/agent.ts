@@ -7,7 +7,7 @@ export const agentRoutes: RouteRecordRaw[] = [
     redirect: { name: 'workspace-agent-list' },
     meta: {
       title: '智能体',
-      activeMenu: '/workspace/agent',
+      activeMenu: 'workspace-agent',
       icon: 'icon_robot_outlined',
       activeIcon: 'icon_robot_filled',
       order: 20,

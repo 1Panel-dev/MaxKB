@@ -3,8 +3,10 @@ import AvatarDropdown from './avatar-dropdown/index.vue'
 import WorkspaceDropdown from './workspace-dropdown/index.vue'
 import { Setting } from '@element-plus/icons-vue'
 import { isWorkspace, isSystem } from '@/router/admin/utils'
+import { useStore } from '@/stores'
 import type { LayoutMode } from './types'
 const router = useRouter()
+const { user } = useStore()
 const props = withDefaults(
   defineProps<{
     mode?: LayoutMode
@@ -14,7 +16,11 @@ const props = withDefaults(
   },
 )
 function switchMode() {
-  router.push({ name: isWorkspace(props.mode) ? 'system-users' : 'workspace-home' })
+  router.push(
+    isWorkspace(props.mode)
+      ? { name: 'system-users' }
+      : { name: 'workspace-home', params: { workspaceId: user.workspaceId } },
+  )
 }
 </script>
 
@@ -32,7 +38,7 @@ function switchMode() {
 
     <div class="flex items-center gap-5">
       <el-button class="bg-primary-gradient" round>
-        <MkIcon name="icon_start_outlined"/>
+        <MkIcon name="icon_start_outlined" />
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />

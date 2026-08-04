@@ -40,7 +40,7 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to) => {
+router.beforeEach((to) => {
   NProgress.start()
 
   const { login, platformInfo, theme, user } = useStore()
@@ -68,32 +68,59 @@ router.beforeEach(async (to) => {
     }
   }
 
-  try {
-    await platformInfo.loadPlatformInfo()
-    if (!theme.isInitialized) {
-      if (platformInfo.isPremium) {
-        await theme.loadThemeInfo()
-      } else {
-        theme.applyDefaultTheme()
-      }
-    }
-  } catch {
-    theme.applyDefaultTheme()
-  }
+  return platformInfo
+    .loadPlatformInfo()
+    .then(
+      () => {
+        if (theme.isInitialized) return
+        if (!platformInfo.isPremium) {
+          theme.applyDefaultTheme()
+          return
+        }
+        return theme.loadThemeInfo().then(undefined, () => theme.applyDefaultTheme())
+      },
+      () => theme.applyDefaultTheme(),
+    )
+    .then(() => {
+      const currentUserRequest = user.userInfo ? Promise.resolve() : user.loadCurrentUser()
+      return currentUserRequest.then(
+        () => {
+          if (to.meta.scope !== 'workspace') return true
 
-  if (!user.userInfo) {
-    try {
-      await user.loadCurrentUser()
-    } catch {
-      login.clearToken()
-      return {
-        name: 'login',
-        query: { redirect: to.fullPath },
-      }
-    }
-  }
+          const routeWorkspaceId = Array.isArray(to.params.workspaceId)
+            ? to.params.workspaceId[0]
+            : to.params.workspaceId
+          const workspaceExists = user.workspaceList.some(
+            (workspace) => workspace.id === routeWorkspaceId,
+          )
 
-  return true
+          if (routeWorkspaceId && workspaceExists) {
+            if (routeWorkspaceId !== user.workspaceId) user.setWorkspaceId(routeWorkspaceId)
+            return true
+          }
+
+          const workspaceId =
+            user.workspaceList.find((workspace) => workspace.id === user.workspaceId)?.id ??
+            user.workspaceList[0]?.id ??
+            'default'
+          user.setWorkspaceId(workspaceId)
+          return {
+            name: to.name,
+            params: { ...to.params, workspaceId },
+            query: to.query,
+            hash: to.hash,
+            replace: true,
+          }
+        },
+        () => {
+          login.clearToken()
+          return {
+            name: 'login' as const,
+            query: { redirect: to.fullPath },
+          }
+        },
+      )
+    })
 })
 
 router.afterEach((to) => {

@@ -31,10 +31,12 @@ export const usePlatformInfoStore = defineStore('platformInfo', {
 
   actions: {
     /** 加载并保存登录前所需的平台公开信息。 */
-    async loadPlatformInfo() {
-      if (this.platformInfo) return this.platformInfo
-      this.platformInfo = await platformInfoApi.getPlatformInfo()
-      return this.platformInfo
+    loadPlatformInfo() {
+      if (this.platformInfo) return Promise.resolve(this.platformInfo)
+      return platformInfoApi.getPlatformInfo().then((platformInfo) => {
+        this.platformInfo = platformInfo
+        return platformInfo
+      })
     },
   },
 })

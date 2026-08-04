@@ -22,26 +22,25 @@ export const useLoginStore = defineStore('login', {
   },
 
   actions: {
-    async asyncLogin(loginRequest: LoginRequest) {
-      const response = await loginApi.postLogin(loginRequest)
-      this.setToken(response.token)
+    asyncLogin(loginRequest: LoginRequest) {
+      return loginApi.postLogin(loginRequest).then((response) => this.setToken(response.token))
     },
 
-    async asyncLdapLogin(loginRequest: LoginRequest) {
-      const response = await loginApi.postLdapLogin(loginRequest)
-      this.setToken(response.token)
+    asyncLdapLogin(loginRequest: LoginRequest) {
+      return loginApi.postLdapLogin(loginRequest).then((response) => this.setToken(response.token))
     },
 
-    async asyncLoginWithDingTalk(code: string, fromClient = false) {
-      const response = fromClient
-        ? await externalLoginApi.getDingTalkOauthCallback(code)
-        : await externalLoginApi.getDingTalkCallback(code)
-      this.setToken(response.token)
+    asyncLoginWithDingTalk(code: string, fromClient = false) {
+      const loginRequest = fromClient
+        ? externalLoginApi.getDingTalkOauthCallback(code)
+        : externalLoginApi.getDingTalkCallback(code)
+      return loginRequest.then((response) => this.setToken(response.token))
     },
 
-    async asyncLoginWithLark(code: string) {
-      const response = await externalLoginApi.getLarkOauthCallback(code)
-      this.setToken(response.token)
+    asyncLoginWithLark(code: string) {
+      return externalLoginApi
+        .getLarkOauthCallback(code)
+        .then((response) => this.setToken(response.token))
     },
 
     /** 保存当前登录凭证。 */

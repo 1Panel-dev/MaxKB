@@ -42,7 +42,10 @@ src/router/
 
 Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路由的 `children` 自动生成。
 
-Workspace 根地址为 `/admin/workspace`。父路由的 `scope` 会合并到匹配的子路由 `meta` 中。
+Workspace 根地址为 `/admin/workspace/:workspaceId`。登录后从用户信息中取得可用工作空间；没有
+可用工作空间时使用 `default`。访问 Workspace 路由时，导航拦截器会校验地址中的
+`workspaceId`、同步用户 Store，并为缺失或无效的参数替换为当前可用工作空间。父路由的
+`scope` 会合并到匹配的子路由 `meta` 中。
 
 每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面应放在同一个路由文件中。
 
@@ -121,11 +124,11 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 `MkIcon` 的 `name` 属性渲染。需要在菜单激活后切换图标时，通过 `activeIcon` 配置激活状态
 的 Symbol ID；未配置时继续使用 `icon`。Router 目录禁止导入或传入 Element Plus 图标组件。
 
-侧栏默认使用当前页面的 `route.path` 匹配菜单激活项。详情、创建和编辑等子页面需要继续高亮
-所属一级菜单时，在一级父路由中配置该菜单的绝对路径 `activeMenu`，由 Vue Router 合并到
-所有后代路由的 `meta`。侧栏统一使用 `route.meta.activeMenu ?? route.path` 进行匹配，不在
-组件中截取 URL 或回溯路由层级。个别子页面需要激活其他菜单时，可在子路由中覆盖
-`activeMenu`。
+System 侧栏默认使用当前页面的 `route.path` 匹配菜单激活项。Workspace 地址包含动态
+`workspaceId`，其侧栏使用路由名称匹配；详情、创建和编辑等子页面需要继续高亮所属一级菜单
+时，在一级父路由中把该菜单的路由名称配置为 `activeMenu`，由 Vue Router 合并到所有后代
+路由的 `meta`。个别子页面需要激活其他菜单时，可在子路由中覆盖 `activeMenu`。Workspace
+侧栏跳转必须携带当前路由的 `workspaceId`，不要拼接或写死工作空间路径。
 
 ## Scope 来源判断
 
@@ -151,13 +154,13 @@ const mode = computed(() => route.meta.scope ?? 'workspace')
 Workspace 页面：
 
 ```text
-/admin/workspace/agent
-/admin/workspace/agent/:agentId
-/admin/workspace/agent/:agentId/edit
+/admin/workspace/:workspaceId/agent
+/admin/workspace/:workspaceId/agent/:agentId
+/admin/workspace/:workspaceId/agent/:agentId/edit
 
-/admin/workspace/knowledge
-/admin/workspace/knowledge/:knowledgeId
-/admin/workspace/knowledge/:knowledgeId/document/:documentId
+/admin/workspace/:workspaceId/knowledge
+/admin/workspace/:workspaceId/knowledge/:knowledgeId
+/admin/workspace/:workspaceId/knowledge/:knowledgeId/document/:documentId
 ```
 
 System 复用页面（仅替换根前缀）：

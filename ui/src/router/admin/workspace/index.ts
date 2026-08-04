@@ -20,7 +20,7 @@ const moduleRoutes: RouteRecordRaw[] = [
 ]
 
 export const workspaceRoutes: RouteRecordRaw = {
-  path: '/workspace',
+  path: '/workspace/:workspaceId',
   component: () => import('@/layout/AppLayout.vue'),
   meta: { scope: 'workspace' },
   children: moduleRoutes,

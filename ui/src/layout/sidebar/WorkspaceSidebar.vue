@@ -7,13 +7,18 @@ import type { LayoutMenuItem } from '@/layout/types'
 const route = useRoute()
 const router = useRouter()
 const workspaceMenuItems = getChildRouteList('workspace')
-const workspaceActiveMenuPath = computed(() => route.meta.activeMenu ?? route.path)
+const workspaceActiveMenuName = computed(() => route.meta.activeMenu ?? String(route.name ?? ''))
 
 const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) =>
-  Boolean(
-    workspaceMenuItem.route &&
-    router.resolve(workspaceMenuItem.route).path === workspaceActiveMenuPath.value,
-  )
+  workspaceMenuItem.name === workspaceActiveMenuName.value
+
+function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
+  if (!workspaceMenuItem.route) return
+  void router.push({
+    name: workspaceMenuItem.name,
+    params: { workspaceId: route.params.workspaceId },
+  })
+}
 </script>
 
 <template>
@@ -23,7 +28,7 @@ const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) =>
       :key="workspaceMenuItem.name"
       class="flex-col-center w-full cursor-pointer rounded-md py-2 text-xs font-semibold text-N600"
       :class="isWorkspaceMenuActive(workspaceMenuItem) && 'bg-white text-N900'"
-      @click="workspaceMenuItem.route && router.push(workspaceMenuItem.route)"
+      @click="navigateToWorkspaceMenu(workspaceMenuItem)"
     >
       <MkIcon
         v-if="workspaceMenuItem.icon"

@@ -59,9 +59,3 @@ h6 {
   font-weight: 500;
   line-height: var(--mk-line-height-base);
 }
-
-input {
-  &:internal-autofill-selected {
-    background-color: transparent !important;
-  }
-}

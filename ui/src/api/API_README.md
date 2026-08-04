@@ -58,6 +58,9 @@ src/api/
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
   `post`、`put`、`del` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
+- 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
+  提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
+  非提示类失败处理可以按需保留失败分支。
 - token 和语言分别由 `stores/login.ts`、`stores/user.ts` 管理；Router、Axios 等业务代码通过
   `stores/index.ts` 导出的 `useStore()` 按需访问 Store；401 响应统一清除 token 并跳转 Admin
   登录页。
