@@ -8,7 +8,7 @@
       </div>
       <div>
         <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-          <el-button text @click="copyClick(data?.answer_text)">
+          <el-button text @click="copy(data)">
             <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
           </el-button>
         </el-tooltip>
@@ -17,7 +17,6 @@
   </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
 import { copyClick } from '@/utils/clipboard'
 
 import { datetimeFormat } from '@/utils/time'
@@ -35,5 +34,19 @@ const props = defineProps({
     default: () => {},
   },
 })
+
+function removeFormRander(text: string) {
+  return text.replace(/<form_rander>.*?<\/form_rander>/gs, '').trim()
+}
+const copy = (data: any) => {
+  try {
+    const text = data.answer_text_list
+      .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
+      .join('\n\n')
+    copyClick(removeFormRander(text))
+  } catch (e: any) {
+    copyClick(removeFormRander(data?.answer_text.trim()))
+  }
+}
 </script>
 <style lang="scss" scoped></style>
