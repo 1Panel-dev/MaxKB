@@ -21,7 +21,8 @@ class SystemUserGroup(models.Model):
 class SystemUserGroupRelation(models.Model):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="用户")
-    group = models.ForeignKey(SystemUserGroup, on_delete=models.CASCADE, verbose_name="用户组")
+    group = models.ForeignKey(SystemUserGroup, on_delete=models.CASCADE, verbose_name="用户组",
+                              related_name="user_relations")
 
     class Meta:
         db_table = "system_user_group_relation"
