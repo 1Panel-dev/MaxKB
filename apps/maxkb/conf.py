@@ -47,7 +47,12 @@ class Config(dict):
         "REDIS_MAX_CONNECTIONS": 100,
         # 外置语言包路径
         "EXTERNAL_LOCALE_PATH": "/opt/maxkb/local/locales",
-        "FILE_AUTH": "1"
+        "FILE_AUTH": "1",
+        # S3 配置
+        "S3_ACCESS_KEY": "seaweedfsadmin",
+        "S3_SECRET_KEY": "seaweedfsadmin",
+        "S3_ENDPOINT": "http://127.0.0.1:8333",
+        "S3_BUCKET_NAME": "maxkb",
     }
 
     def get_debug(self) -> bool:
