@@ -27,7 +27,7 @@
         </span>
         <span class="ml-8">
           <el-tooltip effect="dark" :content="$t('common.copy')" placement="top">
-            <el-button text @click="copyClick(data?.answer_text)">
+            <el-button text @click="copy(data)">
               <AppIcon iconName="app-copy" class="color-secondary"></AppIcon>
             </el-button>
           </el-tooltip>
@@ -153,6 +153,17 @@ function editMark(data: any) {
 }
 
 const audioPlayerStatus = ref(false)
+
+const copy = (data: any) => {
+  try {
+    const text = data.answer_text_list
+      .map((item: Array<any>) => item.map((i) => i.content).join('\n'))
+      .join('\n\n')
+    copyClick(removeFormRander(text))
+  } catch (e: any) {
+    copyClick(removeFormRander(data?.answer_text.trim()))
+  }
+}
 
 function markdownToPlainText(md: string) {
   return (
