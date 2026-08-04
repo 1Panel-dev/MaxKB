@@ -112,8 +112,11 @@ class ChatRecordShareLinkSerializer(serializers.Serializer):
         super().is_valid(raise_exception=True)
         chat_id = self.data.get('chat_id')
         application_id = self.data.get('application_id')
+        user_id = self.data.get('user_id')
 
-        chat_query_set = Chat.objects.filter(id=chat_id, application_id=application_id, is_deleted=False)
+        chat_query_set = Chat.objects.filter(
+            id=chat_id, application_id=application_id, chat_user_id=user_id, is_deleted=False
+        )
         if not chat_query_set.exists():
             raise AppApiException(500, _('Chat id does not exist'))
 
