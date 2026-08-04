@@ -658,10 +658,9 @@ class UserManageSerializer(serializers.Serializer):
                 user_id = relation.user.id
                 if user_id not in user_dict:
                     user_dict[user_id] = {
-                        "id": user_id,
-                        "nick_name": relation.user.nick_name,
-                        "email": relation.user.email,
-                        "roles": [relation.role.role_name],
+                        'id': user_id,
+                        'nick_name': relation.user.nick_name,
+                        'roles': [relation.role.role_name]
                     }
                 else:
                     user_dict[user_id]["roles"].append(relation.role.role_name)
@@ -670,8 +669,11 @@ class UserManageSerializer(serializers.Serializer):
             return list(user_dict.values())
         user_list = User.objects.exclude(role=RoleConstants.ADMIN.name)
         return [
-            {"id": user.id, "nick_name": user.nick_name, "email": user.email, "roles": [RoleConstants.USER.name]}
-            for user in user_list
+            {
+                'id': user.id,
+                'nick_name': user.nick_name,
+                'roles': [RoleConstants.USER.name]
+            } for user in user_list
         ]
 
     class BatchDelete(serializers.Serializer):
