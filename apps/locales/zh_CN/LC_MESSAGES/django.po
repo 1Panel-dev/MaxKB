@@ -8002,6 +8002,27 @@ msgstr "检查字段是否正确"
 msgid "The platform configuration corresponding to {type} was not found"
 msgstr "未找到对应 {type} 的平台配置"
 
+#: apps/xpack/serializers/platform_serializer.py:56
+msgid "Bot ID is required"
+msgstr "Bot ID 是必填项"
+
+#: apps/xpack/serializers/platform_serializer.py:166
+#, python-brace-format
+msgid ""
+"This bot_id is already bound to another application ({app}). "
+"Each bot_id can only correspond to one application."
+msgstr ""
+"该 bot_id 已绑定到另一个应用 ({app})，"
+"每个 bot_id 只能对应一个应用。"
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:126
+msgid "Hello! I am an AI assistant. How can I help you?"
+msgstr "您好！我是智能助手，有什么可以帮您的吗？"
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:188
+msgid "Sorry, I have encountered some issues. Please try again later."
+msgstr "抱歉，我遇到了一些问题，请稍后再试。"
+
 #: apps/xpack/serializers/resource_chat_user.py:35
 #: apps/xpack/serializers/resource_chat_user.py:111
 #: apps/xpack/serializers/resource_chat_user_group.py:18
