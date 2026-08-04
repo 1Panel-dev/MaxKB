@@ -7882,6 +7882,27 @@ msgstr ""
 msgid "The platform configuration corresponding to {type} was not found"
 msgstr ""
 
+#: apps/xpack/serializers/platform_serializer.py:56
+msgid "Bot ID is required"
+msgstr "Bot ID is required"
+
+#: apps/xpack/serializers/platform_serializer.py:166
+#, python-brace-format
+msgid ""
+"This bot_id is already bound to another application ({app}). "
+"Each bot_id can only correspond to one application."
+msgstr ""
+"This bot_id is already bound to another application ({app}). "
+"Each bot_id can only correspond to one application."
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:126
+msgid "Hello! I am an AI assistant. How can I help you?"
+msgstr "Hello! I am an AI assistant. How can I help you?"
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:188
+msgid "Sorry, I have encountered some issues. Please try again later."
+msgstr "Sorry, I have encountered some issues. Please try again later."
+
 #: apps/xpack/serializers/resource_chat_user.py:35
 #: apps/xpack/serializers/resource_chat_user.py:111
 #: apps/xpack/serializers/resource_chat_user_group.py:18
