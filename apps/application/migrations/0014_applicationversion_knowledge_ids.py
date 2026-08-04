@@ -53,9 +53,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AddField(
-            model_name='applicationversion',
-            name='knowledge_ids',
-            field=models.JSONField(default=list, verbose_name='数据集id列表'),
+            model_name="applicationversion",
+            name="knowledge_ids",
+            field=models.JSONField(default=list, verbose_name="数据集id列表"),
         ),
         migrations.RunPython(forwards, migrations.RunPython.noop),
     ]

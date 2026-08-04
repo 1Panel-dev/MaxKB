@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('application', '0014_chatrecord_workflow_context'),
+        ('application', '0014_applicationversion_knowledge_ids'),
     ]
 
     operations = [
@@ -14,5 +14,10 @@ class Migration(migrations.Migration):
             model_name='chat',
             name='execute_type',
             field=models.CharField(choices=[('ANONYMOUS_USER', '匿名用户'), ('CHAT_USER', '对话用户'), ('SYSTEM_API_KEY', '系统API_KEY'), ('APPLICATION_API_KEY', '应用API_KEY'), ('PLATFORM_USER', '平台用户')], default='CHAT', max_length=64, verbose_name='执行类型'),
+        ),
+        migrations.AddField(
+            model_name="chatrecord",
+            name="workflow_context",
+            field=models.JSONField(blank=True, default=dict, null=True, verbose_name="工作流上下文"),
         ),
     ]
