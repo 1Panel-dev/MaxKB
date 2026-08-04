@@ -1,17 +1,25 @@
 /** 提供应用 Pinia 实例和组件外的统一 Store 访问入口。 */
 
 import { createPinia } from 'pinia'
-import { useAuthStore } from './auth'
+import { useLoginStore } from './login'
+import { usePlatformInfoStore } from './platform-info'
+import { useThemeStore } from './theme'
 import { useUserStore } from './user'
 
 export const pinia = createPinia()
 
 const stores = {
-  get auth() {
-    return useAuthStore(pinia)
+  get login() {
+    return useLoginStore(pinia)
+  },
+  get platformInfo() {
+    return usePlatformInfoStore(pinia)
   },
   get user() {
     return useUserStore(pinia)
+  },
+  get theme() {
+    return useThemeStore(pinia)
   },
 }
 

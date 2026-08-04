@@ -8,7 +8,6 @@ src/api/
 ├── admin/
 │   ├── core/             # Admin 请求基础能力
 │   │   ├── request.ts    # Axios 实例、HTTP 方法与统一响应解包
-│   │   ├── error.ts      # 标准 ApiError
 │   │   ├── types.ts      # 通用响应、分页与请求配置类型
 │   ├── auth/             # Admin 登录认证接口
 │   ├── workspace/        # 工作空间业务接口
@@ -33,7 +32,11 @@ src/api/
 - 一类资源的增删改查放在同一个文件，不创建汇总所有业务接口的 `api.ts`。
 - 模块私有类型优先与接口放在同一文件；同一业务域多个模块共享的类型放该业务域的
   `types.ts`；协议通用类型放 `admin/core/types.ts`。
-- 使用具名导出并从具体模块直接导入，不创建只做二次转发的 `index.ts`。
+- 每个业务接口使用 `export function` 单独导出，同时在文件末尾通过 `export default { ... }`
+  直接默认导出接口对象，不为默认导出声明中间变量；调用方统一按“文件名 camelCase + `Api`”
+  命名默认导入并通过该对象调用，不创建只做二次转发的 `index.ts`。
+  例如从 `login.ts` 使用 `import loginApi from '@/api/admin/auth/login'`，再调用
+  `loginApi.postLogin()`。
 - 文件形成多个清晰子能力后再升级为同名目录，避免提前增加层级。
 
 ## 接口命名
@@ -45,7 +48,7 @@ src/api/
   `put`，删除使用 `delete`。局部更新接口真实采用 PATCH 时使用 `patch`。
 - HTTP 方法前缀后必须带有明确的业务名称，不导出 `get`、`post`、`list`、`detail`、`login`
   或 `logout` 等缺少请求方式或业务含义的名称。
-- 不统一追加冗余的 `Api` 后缀；接口所属业务域由目录和文件表达。
+- 函数名不追加 `Api` 后缀，所属业务域由目录和文件名表达。
 
 ## 请求约定
 
@@ -55,9 +58,7 @@ src/api/
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
   `post`、`put`、`del` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
-- 后端业务 `code` 错误抛出 `ApiError`；HTTP、超时和网络错误保留 Axios 原始错误。全局错误
-  分支在请求拦截器中按状态码和明确的例外接口路径统一处理，业务模块不要重复判断。
-- token 和语言分别由 `stores/auth.ts`、`stores/user.ts` 管理；Router、Axios 等组件外代码通过
+- token 和语言分别由 `stores/login.ts`、`stores/user.ts` 管理；Router、Axios 等业务代码通过
   `stores/index.ts` 导出的 `useStore()` 按需访问 Store；401 响应统一清除 token 并跳转 Admin
   登录页。
 - loading 不作为 API 函数参数，由调用接口的页面或 Store 管理。

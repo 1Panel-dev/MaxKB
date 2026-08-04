@@ -1,17 +1,34 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+import JSEncrypt from 'jsencrypt'
+import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { AccountLoginForm, LoginMethod, LoginOption } from '../types'
+import externalLoginApi from '@/api/admin/auth/external-login'
+import loginApi from '@/api/admin/auth/login'
+import type { LoginConfig } from '@/api/admin/auth/types'
+import { useStore } from '@/stores'
+import { MsgConfirm, MsgError } from '@/utils/message'
+import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
+import type { AccountLoginForm, LoginMethod } from '../types'
 
 defineOptions({ name: 'AccountLogin' })
 
-withDefaults(
-  defineProps<{
-    loginMethods?: LoginOption<LoginMethod>[]
-  }>(),
-  {
-    loginMethods: () => [],
-  },
+const props = defineProps<{
+  loginConfig?: LoginConfig
+  rsaPublicKey?: string
+}>()
+
+const router = useRouter()
+const { login } = useStore()
+const isSubmitting = ref(false)
+const captchaImage = ref('')
+const loginMethod = ref<LoginMethod>('LOCAL')
+const accountLoginMethods = computed(() =>
+  (props.loginConfig?.login_methods ?? [])
+    .filter(
+      (method) => method !== 'LOCAL' && !qrCodeLoginMethods.some((provider) => provider === method),
+    )
+    .map((method) => ({ label: loginMethodLabels[method], value: method })),
 )
 
 const accountLoginFormRef = ref<FormInstance>()
@@ -22,18 +39,113 @@ const accountLoginForm = reactive<AccountLoginForm>({
 })
 
 const accountLoginRules: FormRules<AccountLoginForm> = {
-  captcha: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
+  captcha: [{ required: false, message: '请输入验证码', trigger: 'blur' }],
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
 }
 
 const handleLogin = async () => {
   if (!accountLoginFormRef.value) return
+  const valid = await accountLoginFormRef.value.validate().catch(() => false)
+  if (!valid) return
 
-  await accountLoginFormRef.value.validate((valid) => {
-    if (!valid) return
-  })
+  isSubmitting.value = true
+  try {
+    if (loginMethod.value === 'LDAP') {
+      await login.asyncLdapLogin(accountLoginForm)
+    } else {
+      const encryptor = new JSEncrypt()
+      encryptor.setPublicKey(props.rsaPublicKey ?? '')
+      const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
+      if (!encryptedData) throw new Error('登录信息加密失败')
+      await login.asyncLogin({
+        encryptedData,
+        username: accountLoginForm.username,
+        password: '',
+      })
+    }
+    await router.push({ name: 'workspace-home' })
+  } catch (error) {
+    MsgError(error instanceof Error ? error.message : '登录失败')
+    await refreshCaptcha()
+  } finally {
+    isSubmitting.value = false
+  }
 }
+
+const refreshCaptcha = async () => {
+  if (loginMethod.value === 'LDAP') return
+  try {
+    captchaImage.value = (await loginApi.getCaptcha(accountLoginForm.username)).captcha
+  } catch {
+    captchaImage.value = ''
+  }
+}
+
+const selectLoginMethod = async (method: LoginMethod) => {
+  if (method !== 'LOCAL' && method !== 'LDAP') {
+    const redirectUrl = await getExternalLoginUrl(method)
+    if (!redirectUrl) return
+    await MsgConfirm('跳转提示', '即将跳转至外部认证页面，是否继续？', {
+      confirmButtonText: '跳转',
+    })
+    window.location.href = redirectUrl
+    return
+  }
+  loginMethod.value = method
+  Object.assign(accountLoginForm, { captcha: '', password: '', username: '' })
+  captchaImage.value = ''
+  accountLoginFormRef.value?.clearValidate()
+}
+
+const getExternalLoginUrl = async (authType: LoginMethod) => {
+  if (authType === 'SAML2') return externalLoginApi.getSamlLoginUrl()
+  const config = (await externalLoginApi.getExternalAuthSetting(authType)).config
+  if (!config) return ''
+  if (authType === 'CAS' && config.ldpUri) {
+    const separator = config.ldpUri.includes('?') ? '&' : '?'
+    return `${config.ldpUri}${separator}service=${encodeURIComponent(config.redirectUrl)}`
+  }
+  if (!['OIDC', 'OAuth2'].includes(authType) || !config.authEndpoint || !config.clientId) return ''
+  const params = new URLSearchParams({
+    client_id: config.clientId,
+    redirect_uri: config.redirectUrl,
+    response_type: 'code',
+  })
+  if (authType === 'OAuth2') params.set('state', crypto.randomUUID())
+  if (config.state && authType === 'OIDC') params.set('state', config.state)
+  if (config.scope || authType === 'OIDC') {
+    params.set('scope', config.scope || 'openid profile email')
+  }
+  return `${config.authEndpoint}?${params}`
+}
+
+watch(
+  () => props.loginConfig?.default_value,
+  (method) => {
+    if (method === 'LOCAL' || method === 'LDAP') loginMethod.value = method
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.loginConfig,
+  (config) => {
+    if (!config) return
+    const methods = config.login_methods ?? []
+    const hasEmbeddedLogin = methods.some(
+      (method) =>
+        method === 'LOCAL' ||
+        method === 'LDAP' ||
+        qrCodeLoginMethods.some((provider) => provider === method),
+    )
+    if (!hasEmbeddedLogin) {
+      void getExternalLoginUrl(config.default_value).then((url) => {
+        if (url) window.location.href = url
+      })
+    }
+  },
+)
 </script>
 
 <template>
@@ -54,6 +166,7 @@ const handleLogin = async () => {
             v-model="accountLoginForm.username"
             autocomplete="username"
             placeholder="请输入用户名"
+            @blur="refreshCaptcha"
           />
         </el-form-item>
         <el-form-item prop="password">
@@ -65,27 +178,45 @@ const handleLogin = async () => {
             type="password"
           />
         </el-form-item>
-        <!-- <div class="verification-row">
-      <el-form-item prop="captcha">
-        <el-input v-model="accountLoginForm.captcha" placeholder="请输入验证码" />
-      </el-form-item>
-      <button type="button" class="captcha-image" aria-label="刷新验证码">验证码</button>
-    </div> -->
+        <div v-if="loginMethod !== 'LDAP' && captchaImage" class="flex gap-2">
+          <el-form-item prop="captcha" class="flex-1">
+            <el-input v-model="accountLoginForm.captcha" placeholder="请输入验证码" />
+          </el-form-item>
+          <button
+            type="button"
+            class="h-10 overflow-hidden rounded-md"
+            aria-label="刷新验证码"
+            @click="refreshCaptcha"
+          >
+            <img :src="captchaImage" alt="验证码" class="h-full" />
+          </button>
+        </div>
         <el-form-item>
-          <el-button native-type="submit" type="primary" class="w-full">登录</el-button>
+          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full"
+            >登录</el-button
+          >
         </el-form-item>
       </el-form>
-      <el-button size="default" class="-mt-2" link type="primary"> 忘记密码？ </el-button>
+      <el-button
+        size="default"
+        class="-mt-2"
+        link
+        type="primary"
+        @click="router.push({ name: 'forgot-password' })"
+      >
+        忘记密码？
+      </el-button>
     </div>
-    <div v-if="loginMethods.length" class="third-login flex-col-center gap-4">
+    <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
       <el-divider>其他登录方式</el-divider>
       <div>
         <el-button
-          v-for="method in loginMethods"
+          v-for="method in accountLoginMethods"
           :key="method.value"
           circle
           size="large"
           class="text-xs! font-medium!"
+          @click="selectLoginMethod(method.value)"
         >
           {{ method.label }}
         </el-button>

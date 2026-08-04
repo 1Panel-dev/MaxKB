@@ -97,9 +97,9 @@ Structural responsibilities:
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
 - Put route-level screens in `views/<feature>/`; keep reusable feature components below their owning feature when they are not globally shared.
 - Put shared client state in `stores/`; component-local state should remain in the component.
-- Reuse the Pinia instance exported by `stores/index.ts`; Router, Axios, and other code outside Vue
-  components access application stores through `useStore()`, while components import only the
-  specific Store they use.
+- Reuse the Pinia instance exported by `stores/index.ts`; application code accesses Store instances
+  through `useStore()`. Store modules may import a specific Store directly when coordinating state
+  internally to avoid circular access through the aggregate entry.
 - Put functions shared by most pages or multiple business modules in `utils/`; detailed placement, file organization, and naming rules are maintained in `src/utils/UTILS_README.md`.
 - Import source assets through `src/assets/`; use `public/` only when a file must retain its original filename and URL.
 

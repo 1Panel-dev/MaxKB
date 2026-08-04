@@ -40,13 +40,13 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   NProgress.start()
 
-  const { auth } = useStore()
+  const { login, platformInfo, theme, user } = useStore()
   const queryToken = getQueryToken(to.query.token)
   if (queryToken) {
-    auth.setToken(queryToken)
+    login.setToken(queryToken)
     const { token: _token, ...query } = to.query
     return {
       path: to.path,
@@ -61,10 +61,35 @@ router.beforeEach((to) => {
     return true
   }
 
-  if (!auth.isAuthenticated) {
+  if (!login.isAuthenticated) {
     return {
       name: 'login',
       query: { redirect: to.fullPath },
+    }
+  }
+
+  try {
+    await platformInfo.loadPlatformInfo()
+    if (!theme.isInitialized) {
+      if (platformInfo.isPremium) {
+        await theme.loadThemeInfo()
+      } else {
+        theme.applyDefaultTheme()
+      }
+    }
+  } catch {
+    theme.applyDefaultTheme()
+  }
+
+  if (!user.userInfo) {
+    try {
+      await user.loadCurrentUser()
+    } catch {
+      login.clearToken()
+      return {
+        name: 'login',
+        query: { redirect: to.fullPath },
+      }
     }
   }
 

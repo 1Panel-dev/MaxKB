@@ -1,55 +1,110 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import platformInfoApi from '@/api/admin/auth/platform-info'
+import type { LoginConfig } from '@/api/admin/auth/types'
+import { useStore } from '@/stores'
+import { MsgError } from '@/utils/message'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
-import { loginMethodLabels, qrCodeLoginMethods } from './constants'
-import type { LoginConfig, LoginMethod, LoginMode, LoginOption, QrCodeProvider } from './types'
+import { qrCodeLoginMethods } from './constants'
+import { loadLoginScript } from '../../utils/script-loader.ts'
+import type { LoginMode, QrCodeProvider } from './types'
 
-// TODO: 后期替换为登录配置接口返回的数据。
+const route = useRoute()
+const router = useRouter()
+const { login, platformInfo, theme } = useStore()
+const isLoading = ref(true)
+const rsaPublicKey = computed(() => platformInfo.platformInfo?.rsa ?? '')
 const loginConfig = ref<LoginConfig>({
   default_value: 'LOCAL',
-  login_methods: ['SAML2', 'wecom', 'dingtalk', 'lark', 'OIDC', 'LDAP', 'OAuth2', 'CAS', 'LOCAL'],
+  login_methods: ['LOCAL'],
+  max_attempts: 1,
 })
+const loginMode = ref<LoginMode>('account')
 
-const isQrCodeLoginMethod = (method: LoginMethod): method is QrCodeProvider =>
-  qrCodeLoginMethods.includes(method as QrCodeProvider)
-
-const loginMode = ref<LoginMode>(
-  isQrCodeLoginMethod(loginConfig.value.default_value) ? 'qr-code' : 'account',
+const qrCodeProviders = computed(() =>
+  (loginConfig.value.login_methods ?? []).filter((method): method is QrCodeProvider =>
+    qrCodeLoginMethods.includes(method as QrCodeProvider),
+  ),
 )
-
-const normalLoginMethods = computed<LoginOption<LoginMethod>[]>(() =>
-  loginConfig.value.login_methods
-    .filter((method) => method !== 'LOCAL' && !isQrCodeLoginMethod(method))
-    .map((method) => ({ label: loginMethodLabels[method], value: method })),
-)
-
-const qrCodeProviders = computed<LoginOption<QrCodeProvider>[]>(() =>
-  loginConfig.value.login_methods.filter(isQrCodeLoginMethod).map((method) => ({
-    label: loginMethodLabels[method],
-    value: method,
-  })),
-)
-
 const showLoginModeSwitch = computed(
-  () => loginConfig.value.login_methods.includes('LOCAL') && qrCodeProviders.value.length > 0,
+  () =>
+    (loginConfig.value.login_methods ?? []).includes('LOCAL') && qrCodeProviders.value.length > 0,
 )
 
-const toggleLoginMode = () => {
-  loginMode.value = loginMode.value === 'account' ? 'qr-code' : 'account'
+const completeClientLogin = async () => {
+  const client = typeof route.query.client === 'string' ? route.query.client : ''
+  if (client === 'dingtalk' && typeof route.query.corpId === 'string') {
+    const dingTalkSdk = await import('dingtalk-jsapi')
+    const result = await dingTalkSdk.runtime.permission.requestAuthCode({
+      corpId: route.query.corpId,
+    })
+    await login.asyncLoginWithDingTalk(result.code, true)
+  } else if (client === 'lark' && typeof route.query.appId === 'string') {
+    await loadLoginScript(
+      'https://lf-scm-cn.feishucdn.com/lark/op/h5-js-sdk-1.5.35.js',
+      'lark-client-sdk',
+    )
+    if (!window.tt) throw new Error('飞书客户端 SDK 加载失败')
+    const code = await new Promise<string>((resolve, reject) => {
+      window.tt?.requestAuthCode({
+        appId: route.query.appId as string,
+        success: (result) => resolve(result.code),
+        fail: reject,
+      })
+    })
+    await login.asyncLoginWithLark(code)
+  } else {
+    return
+  }
+  await router.push({ name: 'workspace-home' })
 }
+
+onBeforeMount(async () => {
+  isLoading.value = true
+  try {
+    await platformInfo.loadPlatformInfo()
+    if (platformInfo.isPremium) {
+      await theme.loadThemeInfo().catch(() => theme.applyDefaultTheme())
+      if (route.query.login_mode !== 'manual') {
+        const configuredLogin = await platformInfoApi.getLoginConfig().catch(() => null)
+        if (configuredLogin) {
+          loginConfig.value = {
+            ...configuredLogin,
+            login_methods: configuredLogin.login_methods?.length
+              ? configuredLogin.login_methods
+              : ['LOCAL'],
+          }
+        }
+      }
+    } else {
+      theme.applyDefaultTheme()
+    }
+    loginMode.value = qrCodeProviders.value.includes(
+      loginConfig.value.default_value as QrCodeProvider,
+    )
+      ? 'qr-code'
+      : 'account'
+    await completeClientLogin()
+  } catch (error) {
+    MsgError(String(error))
+  } finally {
+    isLoading.value = false
+  }
+})
 </script>
 
 <template>
-  <LoginLayout>
+  <LoginLayout v-loading="isLoading">
     <el-button
       v-if="showLoginModeSwitch"
       type="primary"
       text
       class="login-mode-switch"
       :aria-label="loginMode === 'account' ? '切换扫码登录' : '切换账号登录'"
-      @click="toggleLoginMode"
+      @click="loginMode = loginMode === 'account' ? 'qr-code' : 'account'"
     >
       <MkIcon
         :name="loginMode === 'account' ? 'icon_qr_outlined' : 'icon_pc_outlined'"
@@ -57,13 +112,12 @@ const toggleLoginMode = () => {
       />
     </el-button>
 
-    <AccountLogin v-if="loginMode === 'account'" :login-methods="normalLoginMethods" />
-    <QrCodeLogin
-      v-else-if="loginMode === 'qr-code'"
-      :default-provider="loginConfig.default_value"
-      :providers="qrCodeProviders"
-      @change-mode="loginMode = $event"
+    <AccountLogin
+      v-if="loginMode === 'account'"
+      :login-config="loginConfig"
+      :rsa-public-key="rsaPublicKey"
     />
+    <QrCodeLogin v-else :login-config="loginConfig" />
   </LoginLayout>
 </template>
 

@@ -18,7 +18,9 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
     "axios": "^1.19.0",
+    "dingtalk-jsapi": "^3.2.9",
     "element-plus": "^2.14.2",
+    "jsencrypt": "^3.5.4",
     "nprogress": "^0.2.0",
     "pinia": "^3.0.4",
     "vue": "^3.5.38",
