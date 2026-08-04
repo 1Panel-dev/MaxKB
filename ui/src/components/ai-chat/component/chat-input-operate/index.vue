@@ -435,6 +435,7 @@ const props = withDefaults(
 )
 const emit = defineEmits(['update:chatId', 'update:loading', 'update:showUserInput', 'backBottom'])
 const chartOpenId = ref<string>()
+let chatIdPromise: Promise<string> | null = null
 const chatId_context = computed({
   get: () => {
     if (chartOpenId.value) {
@@ -549,7 +550,12 @@ const uploadFile = async (file: any, fileList: any) => {
   const inner = reactive(file)
   fileAllList.value.push(inner)
   if (!chatId_context.value) {
-    chatId_context.value = await props.openChatId()
+    if (!chatIdPromise) {
+      chatIdPromise = props.openChatId().finally(() => {
+        chatIdPromise = null
+      })
+    }
+    chatId_context.value = await chatIdPromise
   }
   const api =
     props.type === 'debug-ai-chat'
