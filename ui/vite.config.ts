@@ -10,7 +10,7 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 
 const envDir = './env'
-const defaultBackendTarget = 'http://127.0.0.1:8080'
+const defaultBackendTarget = 'https://mk-ee.fit2cloud.cn/'
 const projectRoot = fileURLToPath(new URL('.', import.meta.url))
 
 const renameHtmlPlugin = (outDir: string, entry: string) => {

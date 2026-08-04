@@ -2,8 +2,9 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { Delete, EditPen, MoreFilled, Plus, UserFilled } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
 import MkIcon from '@/components/global/mk-icon/index.vue'
+import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface SystemWorkspace {
   id: string
@@ -80,7 +81,7 @@ async function handleWorkspaceCommand(command: WorkspaceAction, workspaceId: str
       })
 
       workspace.name = value.trim()
-      ElMessage.success('重命名成功')
+      MsgSuccess('重命名成功')
     } catch {
       return
     }
@@ -89,10 +90,8 @@ async function handleWorkspaceCommand(command: WorkspaceAction, workspaceId: str
   }
 
   try {
-    await ElMessageBox.confirm(`确认删除“${workspace.name}”吗？`, '删除工作空间', {
+    await MsgConfirm('删除工作空间', `确认删除“${workspace.name}”吗？`, {
       confirmButtonText: '删除',
-      cancelButtonText: '取消',
-      type: 'warning',
     })
 
     systemWorkspaces.value = systemWorkspaces.value.filter(({ id }) => id !== workspaceId)
@@ -101,14 +100,14 @@ async function handleWorkspaceCommand(command: WorkspaceAction, workspaceId: str
       selectedWorkspaceId.value = systemWorkspaces.value[0]?.id ?? ''
     }
 
-    ElMessage.success('删除成功')
+    MsgSuccess('删除成功')
   } catch {
     return
   }
 }
 
 function addMember() {
-  ElMessage.info('添加成员功能待接入')
+  MsgInfo('添加成员功能待接入')
 }
 </script>
 

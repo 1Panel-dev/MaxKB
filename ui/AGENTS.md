@@ -13,6 +13,8 @@ Before making changes, determine which areas the task touches and read the corre
 - Components: `src/components/COMPONENT_README.md` is the source of truth for component rules.
 - Constants: `src/constants/CONSTANT_README.md` is the source of truth for shared constant rules.
 - Utilities: `src/utils/UTILS_README.md` is the source of truth for shared utility rules.
+- API: `src/api/API_README.md` is the source of truth for request infrastructure and business API
+  organization.
 
 Follow this maintenance flow:
 
@@ -49,6 +51,8 @@ ui/
 │   │   ├── iconfont.js        # Generated SVG Symbol resource; replace, do not edit
 │   │   ├── logo/             # Product and brand logos
 │   │   └── workflow/         # Workflow-related visual assets
+│   ├── api/                   # Admin and Chat request infrastructure and business APIs
+│   │   └── API_README.md      # API layering, placement, typing, and request rules
 │   ├── components/            # Shared UI components
 │   │   ├── COMPONENT_README.md # Shared component conventions and usage
 │   │   ├── global/            # Frequently used components auto-registered by Vite
@@ -60,7 +64,7 @@ ui/
 │   ├── locales/               # Reserved for internationalization messages and locale setup
 │   ├── router/                # Vue Router routes and router instance
 │   │   └── ROUTE_README.md    # Routing conventions and rules
-│   ├── stores/                # Shared Pinia state stores
+│   ├── stores/                # Shared Pinia instance and state stores
 │   ├── styles/                # Global styles, theme tokens, and third-party style integration
 │   │   ├── font/             # Locally hosted application fonts
 │   │   ├── variables.scss    # Canonical runtime `--mk-*` color and theme variables
@@ -88,9 +92,14 @@ Directories marked as reserved may be empty while their feature is being introdu
 Structural responsibilities:
 
 - Put reusable application chrome in `layout/`, not in individual route views.
+- Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
+  by domain and resource according to `src/api/API_README.md`.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
 - Put route-level screens in `views/<feature>/`; keep reusable feature components below their owning feature when they are not globally shared.
 - Put shared client state in `stores/`; component-local state should remain in the component.
+- Reuse the Pinia instance exported by `stores/index.ts`; Router, Axios, and other code outside Vue
+  components access application stores through `useStore()`, while components import only the
+  specific Store they use.
 - Put functions shared by most pages or multiple business modules in `utils/`; detailed placement, file organization, and naming rules are maintained in `src/utils/UTILS_README.md`.
 - Import source assets through `src/assets/`; use `public/` only when a file must retain its original filename and URL.
 

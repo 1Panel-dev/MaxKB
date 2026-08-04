@@ -69,6 +69,24 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
 
+Admin 使用末尾 catch-all 路由 `not-found` 渲染 `views/error/NotFoundView.vue`。直接访问不存在的
+页面或 Admin API 返回需要全局处理的 404 时，统一进入该页面。
+
+## Admin 导航拦截器
+
+Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
+
+1. 导航开始时调用 `NProgress.start()`，导航完成或发生路由错误时调用
+   `NProgress.done()`；统一关闭 Spinner，视觉样式由 `styles/nprogress.scss` 维护。
+2. `login`、`forgot-password`、`not-found` 为公开路由，不校验登录状态。
+3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
+   导航清理地址栏中的 token。
+4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址。
+5. 导航完成后根据 `route.meta.title` 更新浏览器标题。
+
+用户资料加载和权限判断应在对应 Store、API 与权限模型落地后接入，不在路由中放置无实际实现的
+占位判断。
+
 ### Chat
 
 Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由加入 Admin 路由表。

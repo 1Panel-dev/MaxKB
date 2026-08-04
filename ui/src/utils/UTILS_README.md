@@ -9,6 +9,7 @@
 src/utils/
 ├── UTILS_README.md       # utils 目录的放置、拆分、命名和注释规则
 ├── array.ts              # 跨页面复用的数组转换、筛选、去重等处理函数
+├── message.ts            # Element Plus 全局消息提示的统一封装
 ├── number.ts             # 跨页面复用的数字计算、转换和格式化函数
 └── use-responsive.ts     # 需要同步组件状态时使用的响应式屏幕判断
 ```
@@ -24,6 +25,14 @@ src/utils/
 - 不要为了统一导出而新增只做二次转发的 `index.ts`，使用方从具体文件直接导入。
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
+
+## 消息提示
+
+轻量反馈按需从 `utils/message.ts` 导入 `MsgSuccess`、`MsgInfo`、`MsgWarning` 或 `MsgError`，
+不要在业务代码和请求层直接调用 `ElMessage`。
+消息默认显示关闭按钮并在 `3000ms` 后关闭；特殊场景通过第二个参数覆盖 Element Plus 消息
+选项。确认操作统一按需导入 `MsgConfirm(title, message, options?)`，默认提供确认、取消按钮和
+warning 类型；输入和普通警告弹窗继续直接使用 `ElMessageBox`。
 
 ```ts
 /** 提供跨页面复用的数组处理函数。 */

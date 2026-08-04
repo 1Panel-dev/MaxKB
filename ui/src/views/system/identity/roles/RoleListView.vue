@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowDown, UserFilled } from '@element-plus/icons-vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessageBox } from 'element-plus'
+import { MsgSuccess } from '@/utils/message'
 
 interface SystemRole {
   id: string
@@ -259,7 +260,7 @@ async function createRole() {
 
     generalRoleGroup?.roles.push(newRole)
     selectedRoleId.value = newRole.id
-    ElMessage.success('角色创建成功')
+    MsgSuccess('角色创建成功')
   } catch {
     return
   }

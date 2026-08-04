@@ -5,10 +5,6 @@ import type { AccountLoginForm, LoginMethod, LoginOption } from '../types'
 
 defineOptions({ name: 'AccountLogin' })
 
-const emit = defineEmits<{
-  'select-method': [method: LoginMethod]
-}>()
-
 withDefaults(
   defineProps<{
     loginMethods?: LoginOption<LoginMethod>[]
@@ -41,54 +37,59 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <h2 class="mb-4">账号登录</h2>
+  <div class="flex h-full flex-col">
+    <div class="min-h-0 flex-1">
+      <h2 class="mb-4">账号登录</h2>
 
-  <el-form
-    ref="accountLoginFormRef"
-    :model="accountLoginForm"
-    :rules="accountLoginRules"
-    class="login-form"
-    @submit.prevent="handleLogin"
-    size="large"
-  >
-    <el-form-item prop="username">
-      <el-input
-        v-model="accountLoginForm.username"
-        autocomplete="username"
-        placeholder="请输入用户名"
-      />
-    </el-form-item>
-    <el-form-item prop="password">
-      <el-input
-        v-model="accountLoginForm.password"
-        autocomplete="current-password"
-        placeholder="请输入密码"
-        show-password
-        type="password"
-      />
-    </el-form-item>
-    <!-- <div class="verification-row">
+      <el-form
+        ref="accountLoginFormRef"
+        :model="accountLoginForm"
+        :rules="accountLoginRules"
+        class="login-form"
+        @submit.prevent="handleLogin"
+        size="large"
+      >
+        <el-form-item prop="username">
+          <el-input
+            v-model="accountLoginForm.username"
+            autocomplete="username"
+            placeholder="请输入用户名"
+          />
+        </el-form-item>
+        <el-form-item prop="password">
+          <el-input
+            v-model="accountLoginForm.password"
+            autocomplete="current-password"
+            placeholder="请输入密码"
+            show-password
+            type="password"
+          />
+        </el-form-item>
+        <!-- <div class="verification-row">
       <el-form-item prop="captcha">
         <el-input v-model="accountLoginForm.captcha" placeholder="请输入验证码" />
       </el-form-item>
       <button type="button" class="captcha-image" aria-label="刷新验证码">验证码</button>
     </div> -->
-
-    <el-button native-type="submit" type="primary" size="large" class="w-full">登录</el-button>
-
-    <RouterLink :to="{ name: 'forgot-password' }" class="forgot-password"> 忘记密码？ </RouterLink>
-  </el-form>
-
-  <div v-if="loginMethods.length" class="alternative-login">
-    <p>其他登录方式</p>
-    <div class="alternative-login-options">
-      <el-button
-        v-for="method in loginMethods"
-        :key="method.value"
-        @click="emit('select-method', method.value)"
-      >
-        {{ method.label }}
-      </el-button>
+        <el-form-item>
+          <el-button native-type="submit" type="primary" class="w-full">登录</el-button>
+        </el-form-item>
+      </el-form>
+      <el-button size="default" class="-mt-2" link type="primary"> 忘记密码？ </el-button>
+    </div>
+    <div v-if="loginMethods.length" class="third-login flex-col-center gap-4">
+      <el-divider>其他登录方式</el-divider>
+      <div>
+        <el-button
+          v-for="method in loginMethods"
+          :key="method.value"
+          circle
+          size="large"
+          class="text-xs! font-medium!"
+        >
+          {{ method.label }}
+        </el-button>
+      </div>
     </div>
   </div>
 </template>

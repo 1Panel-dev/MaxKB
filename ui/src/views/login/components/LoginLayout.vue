@@ -32,7 +32,7 @@ const backgroundStyle = computed<CSSProperties>(() => ({
 </script>
 
 <template>
-  <div class="login-layout" :class="{ 'is-preview': preview }">
+  <div class="login-layout">
     <div class="login-background" :style="backgroundStyle"></div>
 
     <header class="login-header flex-between">
@@ -88,13 +88,8 @@ const backgroundStyle = computed<CSSProperties>(() => ({
 }
 .login-card {
   --el-card-padding: 40px;
+  height: 526px;
   position: relative;
-}
 
-.is-preview {
-  height: 900px;
-  min-height: 900px;
-  pointer-events: none;
-  width: 1440px;
 }
 </style>

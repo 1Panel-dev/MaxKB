@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { Grid, Monitor } from '@element-plus/icons-vue'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
@@ -44,15 +43,19 @@ const toggleLoginMode = () => {
 
 <template>
   <LoginLayout>
-    <button
+    <el-button
       v-if="showLoginModeSwitch"
-      type="button"
+      type="primary"
+      text
       class="login-mode-switch"
       :aria-label="loginMode === 'account' ? '切换扫码登录' : '切换账号登录'"
       @click="toggleLoginMode"
     >
-      <MkIcon :icon="loginMode === 'account' ? Grid : Monitor" :size="24" />
-    </button>
+      <MkIcon
+        :name="loginMode === 'account' ? 'icon_qr_outlined' : 'icon_pc_outlined'"
+        :size="48"
+      />
+    </el-button>
 
     <AccountLogin v-if="loginMode === 'account'" :login-methods="normalLoginMethods" />
     <QrCodeLogin
@@ -66,9 +69,29 @@ const toggleLoginMode = () => {
 
 <style scoped>
 .login-mode-switch {
+  border-radius: 0 12px 0 0;
+  height: 70px;
+  margin: 0;
+  overflow: hidden;
+  padding: 0;
   position: absolute;
-  right: 12px;
-  top: 12px;
+  right: 0;
+  top: 0;
+  width: 70px;
   z-index: 1;
+  .el-icon {
+    top: -6px;
+    right: -6px;
+  }
+
+  &::after {
+    background: var(--el-color-white);
+    clip-path: polygon(0 0, 0 100%, 100% 100%);
+    content: '';
+    inset: 0;
+    opacity: 1;
+    position: absolute;
+    transition: opacity 0.2s;
+  }
 }
 </style>

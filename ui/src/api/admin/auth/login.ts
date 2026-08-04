@@ -1,0 +1,19 @@
+/** 提供 Admin 账号登录、登出和验证码接口。 */
+
+import { get, post } from '../core/request'
+import type { CaptchaResponse, LoginRequest, LoginResponse } from './types'
+
+/** 使用账号和密码登录 Admin 应用。 */
+export function postLogin(loginRequest: LoginRequest) {
+  return post<LoginResponse, LoginRequest>('/user/login', loginRequest)
+}
+
+/** 退出当前 Admin 登录状态。 */
+export function postLogout() {
+  return post<boolean>('/user/logout')
+}
+
+/** 获取当前账号所需的登录验证码。 */
+export function getCaptcha(username?: string) {
+  return get<CaptchaResponse>('/user/captcha', { username })
+}
