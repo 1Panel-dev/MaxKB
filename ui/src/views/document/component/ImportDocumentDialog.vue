@@ -80,7 +80,7 @@
           /><span>{{ $t('views.document.form.similarity.placeholder') }}</span>
         </div>
       </el-form-item>
-      <el-form-item prop="allow_download">
+      <el-form-item prop="allow_download" v-if="!isImport">
         <el-checkbox v-model="form.allow_download">
           {{
             type == 1
