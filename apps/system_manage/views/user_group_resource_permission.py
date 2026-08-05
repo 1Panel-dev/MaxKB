@@ -15,8 +15,12 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ViewPermission, \
-    CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.group_constants import Group
+from common.auth.constants.operate_constants import Operate
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
+from common.auth.struct.permission import Permission
 from common.log.log import log
 from system_manage.api.user_resource_permission import UserResourcePermissionAPI, EditUserResourcePermissionAPI, \
     ResourceUserPermissionAPI, ResourceUserPermissionPageAPI, ResourceUserPermissionEditAPI, \
@@ -125,7 +129,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                        [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
                                                      operate=Operate.SELF,
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
-                       CompareConstants.AND),
+                       compare=CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(UserGroupResourcePermissionSerializer(
@@ -159,7 +163,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                        [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
                                                      operate=Operate.SELF,
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
-                       CompareConstants.AND),
+                       compare=CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, target: str, resource: str):
         return result.success(ResourceUserGroupPermissionSerializer(
@@ -190,7 +194,7 @@ class WorkspaceResourceUserGroupPermissionView(APIView):
                            [lambda r, kwargs: Permission(group=Group(kwargs.get('resource').replace('_FOLDER', '')),
                                                          operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('resource').replace('_FOLDER', '')}/{kwargs.get('target')}")],
-                           CompareConstants.AND),
+                           compare=CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, target: str, resource: str, current_page: int,
                 page_size: int):

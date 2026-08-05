@@ -9,7 +9,11 @@ from application.models import Application
 from application.serializers.application_api_key import ApplicationKeySerializer
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
+
 from common.log.log import log
 from common.result import result, DefaultResultSerializer
 
@@ -42,8 +46,9 @@ class ApplicationKey(APIView):
     @has_permissions(PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_application_permission(),
                      PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
-                                    [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                    CompareConstants.AND),
+                                    [
+                                        PermissionConstants.APPLICATION.get_workspace_application_permission()],
+                                    compare=CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
                      )
     def post(self, request: Request, workspace_id: str, application_id: str):
@@ -67,7 +72,7 @@ class ApplicationKey(APIView):
                          PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str, current_page: int, page_size: int):
             return result.success(ApplicationKeySerializer(
@@ -92,7 +97,7 @@ class ApplicationKey(APIView):
                          PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Modify application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),
@@ -118,7 +123,7 @@ class ApplicationKey(APIView):
                          PermissionConstants.APPLICATION_OVERVIEW_API_KEY.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Application', operate="Delete application API_KEY",
              get_operation_object=lambda r, k: get_application_operation_object(k.get('application_id')),

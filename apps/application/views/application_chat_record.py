@@ -10,7 +10,10 @@
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.utils.common import query_params_to_single_dict
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -50,7 +53,7 @@ class ApplicationChatRecord(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
@@ -85,18 +88,16 @@ class ApplicationChatRecord(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                CompareConstants.AND,
-            ),
-            RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
-        )
+                compare=CompareConstants.AND, ),
+            RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(
-            self,
-            request: Request,
-            workspace_id: str,
-            application_id: str,
-            chat_id: str,
-            current_page: int,
-            page_size: int,
+                self,
+                request: Request,
+                workspace_id: str,
+                application_id: str,
+                chat_id: str,
+                current_page: int,
+                page_size: int,
         ):
             return result.success(
                 ApplicationChatRecordQuerySerializers(
@@ -131,7 +132,7 @@ class ApplicationChatRecordOperateAPI(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
@@ -167,7 +168,7 @@ class ApplicationChatRecordAddKnowledge(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
@@ -200,7 +201,7 @@ class ApplicationChatRecordImprove(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
@@ -236,19 +237,19 @@ class ApplicationChatRecordImproveParagraph(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
     )
     def put(
-        self,
-        request: Request,
-        workspace_id: str,
-        application_id: str,
-        chat_id: str,
-        chat_record_id: str,
-        knowledge_id: str,
-        document_id: str,
+            self,
+            request: Request,
+            workspace_id: str,
+            application_id: str,
+            chat_id: str,
+            chat_record_id: str,
+            knowledge_id: str,
+            document_id: str,
     ):
         return result.success(
             ApplicationChatRecordImproveSerializer(
@@ -282,20 +283,20 @@ class ApplicationChatRecordImproveParagraph(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         )
         def delete(
-            self,
-            request: Request,
-            workspace_id: str,
-            application_id: str,
-            chat_id: str,
-            chat_record_id: str,
-            knowledge_id: str,
-            document_id: str,
-            paragraph_id: str,
+                self,
+                request: Request,
+                workspace_id: str,
+                application_id: str,
+                chat_id: str,
+                chat_record_id: str,
+                knowledge_id: str,
+                document_id: str,
+                paragraph_id: str,
         ):
             return result.success(
                 ApplicationChatRecordImproveSerializer.Operate(

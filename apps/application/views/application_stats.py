@@ -17,7 +17,10 @@ from common.auth import TokenAuth
 from django.utils.translation import gettext_lazy as _
 
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 
 
 class ApplicationStats(APIView):
@@ -36,7 +39,7 @@ class ApplicationStats(APIView):
                      PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                    CompareConstants.AND),
+                                     compare=CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
@@ -64,7 +67,7 @@ class ApplicationStats(APIView):
                          PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                        CompareConstants.AND),
+                                         compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(
@@ -91,7 +94,7 @@ class ApplicationStats(APIView):
                          PermissionConstants.APPLICATION_OVERVIEW_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                        CompareConstants.AND),
+                                         compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, application_id: str):
             return result.success(

@@ -50,9 +50,30 @@ def new_instance_by_class_path(class_path: str):
     return HandlerClass()
 
 
-handles = [new_instance_by_class_path(class_path) for class_path in settings.AUTH_HANDLES]
-chat_handles = [new_instance_by_class_path(class_path) for class_path in settings.CHAT_AUTH_HANDLES]
-all_handles = handles + chat_handles
+handles = None
+chat_handles = None
+all_handles = None
+
+
+def get_handles():
+    global handles
+    if handles is None:
+        handles = [new_instance_by_class_path(class_path) for class_path in settings.AUTH_HANDLES]
+    return handles
+
+
+def get_chat_handles():
+    global chat_handles
+    if chat_handles is None:
+        chat_handles = [new_instance_by_class_path(class_path) for class_path in settings.CHAT_AUTH_HANDLES]
+    return chat_handles
+
+
+def get_all_handles():
+    global all_handles
+    if all_handles is None:
+        all_handles = get_handles() + get_chat_handles()
+    return all_handles
 
 
 class TokenDetails:
@@ -85,7 +106,7 @@ class TokenAuth(TokenAuthentication):
         try:
             token = auth[7:]
             token_details = TokenDetails(token)
-            for handle in handles:
+            for handle in get_handles():
                 if handle.support(request, token, token_details.get_token_details):
                     return handle.handle(request, token, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
@@ -111,7 +132,7 @@ class ChatTokenAuth(TokenAuthentication):
         try:
             token = auth[7:]
             token_details = TokenDetails(token)
-            for handle in chat_handles:
+            for handle in get_chat_handles():
                 if handle.support(request, token, token_details.get_token_details):
                     return handle.handle(request, token, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
@@ -137,7 +158,7 @@ class AllTokenAuth(TokenAuthentication):
         try:
             token = auth[7:]
             token_details = TokenDetails(token)
-            for handle in all_handles:
+            for handle in get_all_handles():
                 if handle.support(request, token, token_details.get_token_details):
                     return handle.handle(request, token, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))

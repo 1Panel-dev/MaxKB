@@ -15,7 +15,7 @@ from django.db.models import QuerySet
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_knowledge_node.i_search_knowledge_node import ISearchKnowledgeStepNode
 from common.config.embedding_config import VectorStore
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import get_file_content

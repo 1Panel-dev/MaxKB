@@ -12,9 +12,8 @@ from django.utils.translation import gettext_lazy as _
 from application.models import ApplicationAccessToken
 from common.auth.common import ChatUserToken
 from common.auth.handle.auth_base_handle import AuthBaseHandle
-from common.constants.authentication_type import AuthenticationType
-from common.constants.permission_constants import RoleConstants, Permission, Group, Operate, ChatAuth
-from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.auth.struct.auth import Principal, Auth
+from common.constants.authentication_type import AuthenticationType, ChatUserType
 from common.exception.app_exception import AppAuthenticationFailed
 from maxkb.settings import edition
 
@@ -46,11 +45,5 @@ class ChatAnonymousUserToken(AuthBaseHandle):
             if chat_user_token.authentication.auth_type != application_access_token.authentication_value.get('type',
                                                                                                              ''):
                 raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
-        return None, ChatAuth(
-            current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],
-            permission_list=[
-                Permission(group=Group.APPLICATION,
-                           operate=Operate.USE)],
-            application_id=application_access_token.application_id,
-            chat_user_id=chat_user_token.chat_user_id,
-            chat_user_type=chat_user_token.chat_user_type)
+
+        return Principal(chat_user_token.chat_user_id, ChatUserType.ANONYMOUS_USER), Auth(set(), {})

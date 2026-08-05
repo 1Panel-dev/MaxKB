@@ -6,7 +6,10 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions, check_batch_permissions, get_is_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common import result
 from knowledge.api.knowledge import KnowledgeBaseCreateAPI, KnowledgeWebCreateAPI, KnowledgeTreeReadAPI, \
@@ -75,7 +78,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Modify knowledge base information",
@@ -102,7 +105,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Delete knowledge base",
@@ -128,7 +131,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.Operate(
@@ -259,7 +262,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_SYNC.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Synchronize the knowledge base of the website",
@@ -294,7 +297,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_HIT_TEST.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
             return result.success(KnowledgeSerializer.HitTest(
@@ -344,7 +347,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_VECTOR.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate='Re-vectorize',
@@ -371,7 +374,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Export knowledge base",
@@ -398,7 +401,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Export knowledge base containing images",
@@ -425,7 +428,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_EXPORT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Export knowledge bundle",
@@ -492,7 +495,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_GENERATE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='document', operate='Generate related documents',
@@ -551,7 +554,7 @@ class KnowledgeView(APIView):
             PermissionConstants.KNOWLEDGE_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='Knowledge Base', operate="Modify knowledge base information",

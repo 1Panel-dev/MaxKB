@@ -11,10 +11,10 @@ import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
-from common.constants.permission_constants import ResourceAuthType, ResourcePermissionRole, ResourcePermission
-from users.models.user_group import SystemUserGroup
+from common.constants.resource_permission_constants import ResourceAuthType, ResourcePermissionConstants, \
+    AuthTargetType
 
-from .workspace_user_permission import AuthTargetType
+from users.models.user_group import SystemUserGroup
 
 
 class WorkspaceUserGroupResourcePermission(models.Model):
@@ -41,8 +41,8 @@ class WorkspaceUserGroupResourcePermission(models.Model):
                                  default=list,
                                  base_field=models.CharField(max_length=256,
                                                              blank=True,
-                                                             choices=ResourcePermission.choices + ResourcePermissionRole.choices,
-                                                             default=ResourcePermission.VIEW))
+                                                             choices=ResourcePermissionConstants.choices,
+                                                             default=ResourcePermissionConstants.VIEW))
 
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now_add=True, db_index=True)
 

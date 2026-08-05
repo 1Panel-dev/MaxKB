@@ -8,7 +8,8 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.log.log import log
 from models_provider.api.model import DefaultModelResponse
 from users.api.user_group import (

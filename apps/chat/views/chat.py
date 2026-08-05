@@ -31,7 +31,7 @@ from common.auth import ChatTokenAuth
 from common.auth.common import FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ChatAuth
+from common.auth.common import ChatAuthentication
 from common.exception.app_exception import AppAuthenticationFailed, AppApiException
 from common.log.log import _get_ip_address, log
 from common.result import result
@@ -157,7 +157,7 @@ class ApplicationProfile(APIView):
         tags=[_('Chat')]  # type: ignore
     )
     def get(self, request: Request):
-        if isinstance(request.auth, ChatAuth):
+        if isinstance(request.auth, ChatAuthentication):
             return result.success(ApplicationProfileSerializer(
                 data={'application_id': request.auth.application_id}).profile())
         raise AppAuthenticationFailed(401, "身份异常")

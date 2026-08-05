@@ -16,7 +16,10 @@ from application.serializers.application_chat import ChatCountSerializer
 from application.serializers.common import ChatInfo
 from common.auth.authentication import get_is_permissions
 from common.chunk import text_to_chunk
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException, AppUnauthorizedFailed
 from common.utils.common import post
@@ -344,7 +347,7 @@ class ApplicationChatRecordAddKnowledgeSerializer(serializers.Serializer):
                 ViewPermission(
                     [RoleConstants.USER.get_workspace_role()],
                     [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    CompareConstants.AND,
+                    compare=CompareConstants.AND,
                 ),
             )
         else:
@@ -483,7 +486,7 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
                 ViewPermission(
                     [RoleConstants.USER.get_workspace_role()],
                     [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    CompareConstants.AND,
+                    compare=CompareConstants.AND,
                 ),
             )
         else:
@@ -564,7 +567,7 @@ class ApplicationChatRecordImproveSerializer(serializers.Serializer):
                         ViewPermission(
                             [RoleConstants.USER.get_workspace_role()],
                             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                            CompareConstants.AND,
+                            compare=CompareConstants.AND,
                         ),
                     )
                 else:

@@ -8,7 +8,7 @@ from typing import Dict
 import uuid_utils.compat as uuid
 from common.config.embedding_config import ModelManage
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import ResourceAuthType, ResourcePermission
+from common.constants.resource_permission_constants import ResourceAuthType
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.exception.app_exception import AppApiException

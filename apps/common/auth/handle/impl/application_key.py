@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 
 from application.models import ApplicationApiKey, ChatUserType, ApplicationAccessToken
 from common.auth.handle.auth_base_handle import AuthBaseHandle
-from common.constants.permission_constants import Permission, Group, Operate, RoleConstants, ChatAuth
+from common.auth.struct.auth import Principal, Auth
 from common.exception.app_exception import AppAuthenticationFailed
 
 
@@ -32,14 +32,7 @@ class ApplicationKey(AuthBaseHandle):
                 if application_access_token.authentication_value.get('type',
                                                                      'password') != 'password':
                     raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
-        return None, ChatAuth(
-            current_role_list=[RoleConstants.CHAT_ANONYMOUS_USER],
-            permission_list=[
-                Permission(group=Group.APPLICATION,
-                           operate=Operate.READ)],
-            application_id=application_api_key.application_id,
-            chat_user_id=str(application_api_key.id),
-            chat_user_type=ChatUserType.APPLICATION_API_KEY.value)
+        return Principal(str(application_api_key.id), ChatUserType.APPLICATION_API_KEY), Auth(set(), {})
 
     def support(self, request, token: str, get_token_details):
         return str(token).startswith("application-") or str(token).startswith('agent-')

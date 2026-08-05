@@ -10,7 +10,7 @@
 from django.http import HttpResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from common.auth import TokenDetails, handles
+from common.auth import TokenDetails, get_handles
 from maxkb.const import CONFIG
 
 content = """
@@ -126,7 +126,7 @@ class DocHeadersMiddleware(MiddlewareMixin):
                 try:
                     token = auth[7:]
                     token_details = TokenDetails(token)
-                    for handle in handles:
+                    for handle in get_handles():
                         if handle.support(request, token, token_details.get_token_details):
                             handle.handle(request, token, token_details.get_token_details)
                             return response

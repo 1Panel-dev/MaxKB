@@ -6,8 +6,13 @@ from rest_framework.views import APIView
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import Permission, Group, Operate, RoleConstants, ViewPermission, \
-    PermissionConstants, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.group_constants import Group
+from common.auth.constants.operate_constants import Operate
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
+from common.auth.struct.permission import Permission
 from common.log.log import log
 from common.result import result
 from folders.api.folder import FolderCreateAPI, FolderEditAPI, FolderReadAPI, FolderTreeReadAPI, FolderDeleteAPI
@@ -47,7 +52,7 @@ class FolderView(APIView):
                                          [Permission(group=Group(kwargs.get('source')),
                                                      operate=Operate.SELF,
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{r.data.get('parent_id')}"
-                                                     )], CompareConstants.AND),
+                                                     )], compare=CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
     )
     @log(
@@ -109,7 +114,7 @@ class FolderView(APIView):
                                              [Permission(group=Group(kwargs.get('source')),
                                                          operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
-                                                         )], CompareConstants.AND),
+                                                         )], compare=CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         @log(
@@ -161,7 +166,7 @@ class FolderView(APIView):
                                              [Permission(group=Group(kwargs.get('source')),
                                                          operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source')}/{kwargs.get('folder_id')}"
-                                                         )], CompareConstants.AND),
+                                                         )], compare=CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
         )
         @log(

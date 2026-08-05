@@ -3,7 +3,7 @@
 import uuid_utils.compat
 from django.db import migrations, models
 
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.utils.common import password_encrypt
 from maxkb.const import CONFIG
 
@@ -20,7 +20,6 @@ def insert_default_data(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -30,8 +29,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='User',
             fields=[
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('email', models.EmailField(blank=True, db_index=True, max_length=254, null=True, unique=True, verbose_name='邮箱')),
+                ('id',
+                 models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False,
+                                  verbose_name='主键id')),
+                ('email', models.EmailField(blank=True, db_index=True, max_length=254, null=True, unique=True,
+                                            verbose_name='邮箱')),
                 ('phone', models.CharField(db_index=True, default='', max_length=20, verbose_name='电话')),
                 ('nick_name', models.CharField(db_index=True, max_length=150, unique=True, verbose_name='昵称')),
                 ('username', models.CharField(db_index=True, max_length=150, unique=True, verbose_name='用户名')),
@@ -40,7 +42,8 @@ class Migration(migrations.Migration):
                 ('source', models.CharField(db_index=True, default='LOCAL', max_length=10, verbose_name='来源')),
                 ('is_active', models.BooleanField(db_index=True, default=True)),
                 ('language', models.CharField(default=None, max_length=10, null=True, verbose_name='语言')),
-                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, null=True, verbose_name='创建时间')),
+                ('create_time',
+                 models.DateTimeField(auto_now_add=True, db_index=True, null=True, verbose_name='创建时间')),
                 ('update_time', models.DateTimeField(auto_now=True, db_index=True, null=True, verbose_name='修改时间')),
             ],
             options={

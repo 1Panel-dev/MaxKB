@@ -9,7 +9,10 @@
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
@@ -133,7 +136,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -165,7 +168,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -196,7 +199,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, model_id: str):
@@ -252,7 +255,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -287,7 +290,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, model_id: str):
@@ -315,7 +318,7 @@ class ModelSetting(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.MODEL.get_workspace_model_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def put(self, request: Request, workspace_id: str, model_id: str):
