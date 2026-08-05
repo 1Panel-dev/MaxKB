@@ -7565,6 +7565,14 @@ msgstr ""
 msgid "Please analyze the content of the image."
 msgstr ""
 
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:281
+msgid "Please analyze the content of the file."
+msgstr ""
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:283
+msgid "Please analyze the content of the video."
+msgstr ""
+
 #: apps/xpack/serializers/channel/ding_talk.py:95
 #, python-brace-format
 msgid "DingTalk application: {user}"
