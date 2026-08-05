@@ -7684,6 +7684,14 @@ msgstr "图片下载失败，请检查网络"
 msgid "Please analyze the content of the image."
 msgstr "请分析图片内容。"
 
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:281
+msgid "Please analyze the content of the file."
+msgstr "请分析文件内容。"
+
+#: apps/xpack/serializers/channel/aibot/bot_manager.py:283
+msgid "Please analyze the content of the video."
+msgstr "请分析视频内容。"
+
 #: apps/xpack/serializers/channel/ding_talk.py:95
 msgid "DingTalk application: {user}"
 msgstr "钉钉智能体: {user}"
