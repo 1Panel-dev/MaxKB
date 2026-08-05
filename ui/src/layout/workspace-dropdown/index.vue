@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import type { DropdownOption } from '@/components/global/mk-filterable-dropdown/types'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
+import type { DropdownOption } from '@/types'
 
 defineOptions({ name: 'WorkspaceDropdown' })
 const router = useRouter()
@@ -13,7 +13,7 @@ const { user } = useStore()
 const workspaceOptions = computed<DropdownOption[]>(() => {
   const workspaces = user.userInfo?.workspace_list
   return workspaces?.length
-    ? workspaces.map(({ id, name }) => ({ value: id, label: name }))
+    ? workspaces.map(({ id, name }) => ({ value: id ?? 'default', label: name }))
     : [{ value: 'default', label: '默认工作空间' }]
 })
 const selectedWorkspace = ref<string | number>('default')

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import externalLoginApi from '@/api/admin/auth/external-login'
-import type { LoginConfig, QrCodeConfig } from '@/api/admin/auth/types'
+import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/types'
 import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
-import type { QrCodeProvider } from '../types'
 
 defineOptions({ name: 'QrCodeLogin' })
 

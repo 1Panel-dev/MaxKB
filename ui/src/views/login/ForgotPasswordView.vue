@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
+import type { ForgotPasswordForm } from '@/types'
 import LoginLayout from './components/LoginLayout.vue'
-import type { ForgotPasswordForm } from './types'
 
 defineOptions({ name: 'ForgotPasswordView' })
 

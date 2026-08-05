@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 import platformInfoApi from '@/api/admin/auth/platform-info'
-import type { PlatformInfo } from '@/api/admin/auth/types'
+import type { PlatformInfo } from '@/types'
 
 interface PlatformInfoState {
   platformInfo: PlatformInfo | null

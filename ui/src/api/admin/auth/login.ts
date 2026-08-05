@@ -1,7 +1,7 @@
 /** 提供 Admin 普通账号登录、LDAP 登录、登出和验证码接口。 */
 
 import { get, post } from '../core/request'
-import type { CaptchaResponse, LoginRequest, LoginResponse } from './types'
+import type { CaptchaResponse, LoginRequest, LoginResponse } from '@/types'
 
 /** 使用账号和密码登录 Admin 应用。 */
 export function postLogin(loginRequest: LoginRequest) {

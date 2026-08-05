@@ -1,17 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import {
-  Delete,
-  EditPen,
-  MoreFilled,
-  Plus,
-  Search,
-  User,
-  UserFilled,
-} from '@element-plus/icons-vue'
+import { computed, onMounted, ref } from 'vue'
+import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-plus/icons-vue'
+import workspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
-import type { DropdownOption } from '@/components/global/mk-filterable-dropdown/types'
-import { useStore } from '@/stores'
+import type { ComplexSearchFieldOption, ComplexSearchValue, DropdownOption } from '@/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface UserGroup {
@@ -28,14 +20,16 @@ interface UserGroupMember {
   username: string
 }
 
-type SearchField = 'name' | 'username'
 type UserGroupAction = 'delete' | 'rename'
 
-const { user } = useStore()
 const groupSearchKeyword = ref('')
-const selectedWorkspaceId = ref<string | number>('default')
-const memberSearchKeyword = ref('')
-const memberSearchField = ref<SearchField>('username')
+
+const memberSearchKeyword = ref<ComplexSearchValue>()
+const memberSearchField = ref('username')
+const memberSearchFields: ComplexSearchFieldOption[] = [
+  { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'name' },
+]
 const selectedGroupId = ref('finance')
 const paginationConfig = ref({
   currentPage: 2,
@@ -61,13 +55,6 @@ const userGroupMembers = ref<UserGroupMember[]>([
   { id: 9, name: 'shaohu', username: 'shaohu', roles: ['普通用户'], source: '企业微信' },
   { id: 10, name: '白新', username: 'baixin', roles: ['普通用户'], source: '飞书' },
 ])
-const workspaceOptions = computed(() => {
-  const workspaces = user.userInfo?.workspace_list
-  return workspaces?.length
-    ? workspaces.map((workspace) => ({ label: workspace.name, value: workspace.id }))
-    : [{ label: 'default', value: 'default' }]
-})
-
 const filteredUserGroups = computed(() => {
   const keyword = groupSearchKeyword.value.trim().toLowerCase()
 
@@ -81,12 +68,14 @@ const selectedUserGroup = computed(() => {
 })
 
 const filteredUserGroupMembers = computed(() => {
-  const keyword = memberSearchKeyword.value.trim().toLowerCase()
+  const keyword = String(memberSearchKeyword.value ?? '')
+    .trim()
+    .toLowerCase()
 
   if (!keyword) return userGroupMembers.value
 
   return userGroupMembers.value.filter((member) =>
-    member[memberSearchField.value].toLowerCase().includes(keyword),
+    member[memberSearchField.value as 'name' | 'username'].toLowerCase().includes(keyword),
   )
 })
 
@@ -134,10 +123,29 @@ function addMemberToGroup(member: UserGroupMember) {
   MsgSuccess(`已将“${member.name}”添加到用户组`)
 }
 
+/* 选择工作空间列表 */
+const selectedWorkspaceId = ref<string | number>('default')
+const workspaceOptions = ref<DropdownOption[]>([])
+
 function handleWorkspaceSelect(option: DropdownOption) {
   selectedWorkspaceId.value = option.value
   selectedGroupId.value = userGroups.value[0]?.id ?? ''
 }
+
+function loadWorkspaceOptions() {
+  workspaceApi.getSystemWorkspaceList().then((workspaces) => {
+    workspaceOptions.value = workspaces.map(({ id, name }) => ({
+      label: name,
+      value: id ?? 'default',
+    }))
+
+    if (!workspaceOptions.value.some(({ value }) => value === selectedWorkspaceId.value)) {
+      selectedWorkspaceId.value = workspaceOptions.value[0]?.value ?? 'default'
+    }
+  })
+}
+
+onMounted(() => loadWorkspaceOptions())
 </script>
 
 <template>
@@ -206,17 +214,11 @@ function handleWorkspaceSelect(option: DropdownOption) {
 
         <div class="flex-between mb-4">
           <el-button type="primary" :icon="Plus" @click="addMember">添加成员</el-button>
-          <el-input v-model="memberSearchKeyword" class="!w-70" placeholder="请输入">
-            <template #prepend>
-              <el-select v-model="memberSearchField" class="!w-22">
-                <el-option label="用户名" value="username" />
-                <el-option label="姓名" value="name" />
-              </el-select>
-            </template>
-            <template #suffix>
-              <MkIcon :icon="Search" class="text-N500" />
-            </template>
-          </el-input>
+          <MkComplexSearch
+            v-model="memberSearchKeyword"
+            v-model:field="memberSearchField"
+            :fields="memberSearchFields"
+          />
         </div>
 
         <MkTable

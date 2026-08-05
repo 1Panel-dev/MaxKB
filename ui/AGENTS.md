@@ -13,6 +13,8 @@ Before making changes, determine which areas the task touches and read the corre
 - Components: `src/components/COMPONENT_README.md` is the source of truth for component rules.
 - Constants: `src/constants/CONSTANT_README.md` is the source of truth for shared constant rules.
 - Utilities: `src/utils/UTILS_README.md` is the source of truth for shared utility rules.
+- Types: `src/types/TYPE_README.md` is the source of truth for reusable TypeScript declarations and
+  their single import entry.
 - API: `src/api/API_README.md` is the source of truth for request infrastructure and business API
   organization.
 - Views: `src/views/VIEW_README.md` is the source of truth for page responsibilities and
@@ -75,6 +77,8 @@ ui/
 │   │   ├── app.scss          # Fonts, base element styles, and app-wide defaults
 │   │   ├── index.scss        # Sass entry that aggregates global Sass modules
 │   │   └── STYLE_README.md    # Local UI conventions and color-variable usage examples
+│   ├── types/                 # Reusable TypeScript declarations with one public import entry
+│   │   └── TYPE_README.md     # Type placement, naming, and import rules
 │   ├── utils/                 # Cross-feature utilities grouped by domain or capability
 │   │   └── UTILS_README.md    # Shared utility placement and naming rules
 │   ├── views/                 # Route-level page components grouped by feature
@@ -99,6 +103,8 @@ Structural responsibilities:
   by domain and resource according to `src/api/API_README.md`.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
 - Put shared client state in `stores/`; component-local state should remain in the component.
+- Put reusable TypeScript declarations in `types/`; application code imports them only from
+  `@/types`. Types used by only one file may remain private in that file.
 - Reuse the Pinia instance exported by `stores/index.ts`; application code accesses Store instances
   through `useStore()`. Store modules may import a specific Store directly when coordinating state
   internally to avoid circular access through the aggregate entry.

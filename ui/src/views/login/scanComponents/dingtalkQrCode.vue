@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import type { QrCodeConfig } from '@/api/admin/auth/types'
 import { useStore } from '@/stores'
+import type { QrCodeConfig } from '@/types'
 import { MsgError } from '@/utils/message'
-import { loadLoginScript } from '../../../utils/script-loader'
+import { loadLoginScript } from '@/utils/script-loader'
 
 defineOptions({ name: 'DingTalkQrCode' })
 

@@ -1,4 +1,4 @@
-import type { LoginMethod, QrCodeProvider } from './types'
+import type { LoginMethod, QrCodeProvider } from '@/types'
 
 export const loginMethodLabels: Record<LoginMethod, string> = {
   CAS: 'CAS',

@@ -3,8 +3,8 @@
 import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
+import type { ApiResponse, LoadingTarget, RequestParams } from '@/types'
 import { MsgError } from '@/utils/message'
-import type { ApiResponse, LoadingTarget, RequestParams } from './types'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'

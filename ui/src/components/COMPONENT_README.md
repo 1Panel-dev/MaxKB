@@ -43,15 +43,16 @@ Vite 使用 `unplugin-vue-components`，但只扫描 `src/components/global`。�
 src/components/
 ├── COMPONENT_README.md
 ├── global/                   # 高频、稳定的基础组件，自动注册
+│   ├── mk-complex-search/
+│   │   └── index.vue         # 字段选择与输入/枚举条件组合搜索框
 │   ├── mk-dropdown/
 │   │   ├── index.vue             # 统一下拉菜单箭头和弹层间距
 │   │   ├── mk-dropdown-menu.vue  # 统一下拉菜单容器
 │   │   └── mk-dropdown-item.vue  # 统一菜单项图标、内容和选中状态布局
+│   ├── mk-filterable-dropdown/
+│   │   └── index.vue         # 带搜索过滤和滚动列表的下拉框
 │   ├── mk-icon/
 │   │   └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
-│   ├── mk-filterable-dropdown/
-│   │   ├── index.vue         # 带搜索过滤和滚动列表的下拉框
-│   │   └── types.ts          # 下拉选项的最小公共类型
 │   ├── mk-search-list/
 │   │   └── index.vue         # 统一搜索框与剩余空间滚动列表布局
 │   ├── mk-search-input/
@@ -72,6 +73,7 @@ src/components/
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应 `mk-icon/index.vue`。
 - 使用 `index.vue` 作为入口时，必须通过 `defineOptions({ name: 'ComponentName' })` 显式声明多单词组件名，避免 ESLint 将组件名推断为 `index`。
 - 组件内部实现、Props 和事件保持类型化。
+- 公共组件对外类型统一写入 `src/types`，并从 `@/types` 导入；组件目录不创建 `types.ts`。
 - 组件样式默认使用 `scoped`；只有明确的全局规则才放入 `src/styles`。
 - `global` 组件不要创建只用于二次导出的 `components/index.ts`，模板组件由自动注册插件解析。
 - 除 `global` 外的共享组件必须从具体路径手动导入，让依赖关系在使用文件中可见。
@@ -221,6 +223,33 @@ import { Setting } from '@element-plus/icons-vue'
 
 ```vue
 <MkSearchInput v-model="searchKeyword" placeholder="搜索工作空间" />
+```
+
+## MkComplexSearch
+
+需要在多个字段间切换搜索条件时使用全局自动注册的 `MkComplexSearch`。组件通过默认
+`v-model` 接收条件值，通过 `v-model:field` 接收当前字段；`fields` 配置字段标签、字段值和
+控件类型。字段默认为文本输入，枚举条件使用 `select` 并提供 `options`。切换字段时组件会清空
+原条件值，并触发 `field-change` 和 `change`；输入或选择完成时触发 `change`。
+
+```vue
+<MkComplexSearch
+  v-model="searchValue"
+  v-model:field="searchField"
+  :fields="[
+    { label: '用户名', value: 'username' },
+    {
+      label: '状态',
+      value: 'enabled',
+      type: 'select',
+      options: [
+        { label: '启用', value: true },
+        { label: '禁用', value: false },
+      ],
+    },
+  ]"
+  @change="loadUsers"
+/>
 ```
 
 ## MkSearchList

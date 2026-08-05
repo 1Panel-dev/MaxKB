@@ -2,14 +2,13 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import platformInfoApi from '@/api/admin/auth/platform-info'
-import type { LoginConfig } from '@/api/admin/auth/types'
 import { useStore } from '@/stores'
+import type { LoginConfig, LoginMode, QrCodeProvider } from '@/types'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
 import { qrCodeLoginMethods } from './constants'
-import { loadLoginScript } from '../../utils/script-loader.ts'
-import type { LoginMode, QrCodeProvider } from './types'
+import { loadLoginScript } from '@/utils/script-loader.ts'
 
 const route = useRoute()
 const router = useRouter()

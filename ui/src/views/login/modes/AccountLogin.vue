@@ -5,11 +5,10 @@ import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import externalLoginApi from '@/api/admin/auth/external-login'
 import loginApi from '@/api/admin/auth/login'
-import type { LoginConfig } from '@/api/admin/auth/types'
 import { useStore } from '@/stores'
+import type { AccountLoginForm, LoginConfig, LoginMethod } from '@/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
 import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
-import type { AccountLoginForm, LoginMethod } from '../types'
 
 defineOptions({ name: 'AccountLogin' })
 

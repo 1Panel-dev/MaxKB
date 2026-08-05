@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 import currentUserApi from '@/api/admin/auth/current-user'
-import type { CurrentUser } from '@/api/admin/auth/types'
+import type { CurrentUser } from '@/types'
 
 const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 

@@ -2,7 +2,7 @@
 
 import { defineStore } from 'pinia'
 import platformInfoApi from '@/api/admin/auth/platform-info'
-import type { ThemeInfo } from '@/api/admin/auth/types'
+import type { ThemeInfo } from '@/types'
 
 const DEFAULT_THEME_COLOR = '#3370ff'
 const DEFAULT_THEME_INFO: ThemeInfo = {

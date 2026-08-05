@@ -3,8 +3,8 @@ import { ref, watch } from 'vue'
 import SystemSidebar from './sidebar/SystemSidebar.vue'
 import WorkspaceSidebar from './sidebar/WorkspaceSidebar.vue'
 import { isSystem, isWorkspace } from '@/router/admin/utils'
+import type { LayoutMode } from '@/types'
 import { useIsSmallScreen } from '@/utils/use-responsive'
-import type { LayoutMode } from './types'
 
 defineProps<{
   mode: LayoutMode

@@ -1,3 +1,5 @@
+/** 应用布局和菜单使用的数据类型。 */
+
 import type { RouteLocationRaw } from 'vue-router'
 
 export interface LayoutMenuItem {

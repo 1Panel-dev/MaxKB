@@ -1,3 +1,5 @@
+/** Vue Router 的业务范围和路由元信息声明。 */
+
 export type RouteScope = 'workspace' | 'system'
 
 declare module 'vue-router' {

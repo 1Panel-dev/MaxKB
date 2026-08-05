@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getChildRouteList } from '@/router/admin/utils'
-import type { LayoutMenuItem } from '@/layout/types'
+import type { LayoutMenuItem } from '@/types'
 
 const route = useRoute()
 const router = useRouter()

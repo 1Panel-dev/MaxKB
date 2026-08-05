@@ -6,8 +6,6 @@ import { systemRoutes } from './system'
 import { workspaceRoutes } from './workspace'
 import { workflowRoutes } from './workflow'
 
-export type { RouteScope } from './types'
-
 const PUBLIC_ROUTE_NAMES = new Set(['login', 'forgot-password', 'not-found'])
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 

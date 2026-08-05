@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="Option extends DropdownOption = DropdownOption">
 import { CaretBottom } from '@element-plus/icons-vue'
-import type { DropdownOption } from '@/components/global/mk-filterable-dropdown/types'
+import type { DropdownOption } from '@/types'
 
 defineOptions({ name: 'MkWorkspaceDropdown' })
 
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   >
     <template #default="{ text }">
       <el-button text class="flex max-w-50 items-center gap-1 rounded-md px-2! py-[7px]!">
-        <MkIcon name="icon_moments-categories_outlined" class="mr-1"/>
+        <MkIcon name="icon_moments-categories_outlined" class="mr-1" />
         <span class="min-w-0 flex-1 truncate">{{ text }}</span>
         <MkIcon :icon="CaretBottom" :size="14" class="shrink-0 ml-1 text-N600!" />
       </el-button>

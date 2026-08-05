@@ -1,7 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { LayoutMenuItem } from '@/layout/types'
+import type { LayoutMenuItem, RouteScope } from '@/types'
 import { systemRoutes } from './system'
-import type { RouteScope } from './types'
 import { workspaceRoutes } from './workspace'
 
 const scopedRoutes: RouteRecordRaw[] = [workspaceRoutes, systemRoutes]

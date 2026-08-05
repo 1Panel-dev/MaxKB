@@ -5,15 +5,16 @@
 
 ## 放置规则
 
-- `views/<feature>/` 是页面功能边界。路由级页面、该功能专用组件、类型、常量、组合式函数和
+- `views/<feature>/` 是页面功能边界。路由级页面、该功能专用组件、常量、组合式函数和
   其他业务逻辑应放在同一个功能目录或其子目录中。
 - 路由级 Vue 组件使用 `PascalCase` 并以 `View.vue` 结尾，例如 `UserListView.vue`。
 - 仅供一个页面使用的代码放在该页面旁边；同一功能下多个页面复用的代码放在它们最近的共同
   功能目录中。
 - 页面专用组件放在所属功能的 `components/` 中。不要为了复用一个页面内部实现而提前移动到
   `src/components`。
-- 页面专用类型和常量可使用 `types.ts`、`constants.ts`；其他逻辑文件应按具体职责命名，避免
-  `common.ts`、`helpers.ts` 等含义模糊的名称。
+- 跨文件使用的类型统一写入 `src/types` 并从 `@/types` 导入；仅在单个页面文件内部使用的类型
+  可以就近声明，但不得导出。页面常量可使用 `constants.ts`；其他逻辑文件应按具体职责命名，
+  避免 `common.ts`、`helpers.ts` 等含义模糊的名称。
 - 只有代码确实跨多个功能复用时，才按对应专项规则上移到 `src/components`、`src/constants`、
   `src/utils`、`src/stores` 或 `src/api`。
 - 页面目录存在多个层级时，目录名应表达业务层级，例如
@@ -28,30 +29,29 @@ src/views/<feature>/
 ├── components/               # 仅供该功能使用的组件
 ├── composables/              # 仅供该功能使用的组合式逻辑
 ├── constants.ts              # 仅供该功能使用的常量
-└── types.ts                  # 仅供该功能使用的类型
 ```
 
 不需要为了匹配示例创建空目录；有对应代码时再创建。
 
 ## 页面功能登记
 
-| 页面 | 功能说明 |
-| --- | --- |
-| `agent/AgentDetailView.vue` | 智能体详情页面 |
-| `chat/ChatView.vue` | Chat 入口的对话页面 |
-| `error/NotFoundView.vue` | Admin 未匹配路由和全局 404 页面 |
-| `home/HomeView.vue` | Workspace 首页 |
-| `knowledge/KnowledgeDetailView.vue` | 知识库详情页面 |
-| `knowledge/DocumentDetailView.vue` | 知识库文档详情页面 |
-| `login/LoginView.vue` | Admin 登录页面 |
-| `login/ForgotPasswordView.vue` | 忘记密码页面 |
-| `system/SystemView.vue` | System 模块通用占位页面 |
-| `system/identity/groups/UserGroupListView.vue` | 用户组列表页面 |
-| `system/identity/roles/RoleListView.vue` | 角色列表页面 |
-| `system/identity/users/UserListView.vue` | 用户列表页面 |
-| `system/identity/workspaces/WorkspaceListView.vue` | 工作空间列表页面 |
-| `system/settings/AppearanceSettingsView.vue` | 系统外观设置和登录外观预览页面 |
-| `workflow/WorkflowView.vue` | 工作流编排全屏页面 |
+| 页面                                               | 功能说明                        |
+| -------------------------------------------------- | ------------------------------- |
+| `agent/AgentDetailView.vue`                        | 智能体详情页面                  |
+| `chat/ChatView.vue`                                | Chat 入口的对话页面             |
+| `error/NotFoundView.vue`                           | Admin 未匹配路由和全局 404 页面 |
+| `home/HomeView.vue`                                | Workspace 首页                  |
+| `knowledge/KnowledgeDetailView.vue`                | 知识库详情页面                  |
+| `knowledge/DocumentDetailView.vue`                 | 知识库文档详情页面              |
+| `login/LoginView.vue`                              | Admin 登录页面                  |
+| `login/ForgotPasswordView.vue`                     | 忘记密码页面                    |
+| `system/SystemView.vue`                            | System 模块通用占位页面         |
+| `system/identity/groups/UserGroupListView.vue`     | 用户组列表页面                  |
+| `system/identity/roles/RoleListView.vue`           | 角色列表页面                    |
+| `system/identity/users/UserListView.vue`           | 用户列表页面                    |
+| `system/identity/workspaces/WorkspaceListView.vue` | 工作空间列表页面                |
+| `system/settings/AppearanceSettingsView.vue`       | 系统外观设置和登录外观预览页面  |
+| `workflow/WorkflowView.vue`                        | 工作流编排全屏页面              |
 
 ## 备注要求
 

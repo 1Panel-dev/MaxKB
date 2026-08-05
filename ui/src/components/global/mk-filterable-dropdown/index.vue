@@ -1,6 +1,6 @@
 <script setup lang="ts" generic="Option extends DropdownOption = DropdownOption">
 import { computed, ref } from 'vue'
-import type { DropdownOption } from './types'
+import type { DropdownOption } from '@/types'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。

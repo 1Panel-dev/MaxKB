@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, watch } from 'vue'
-import type { QrCodeConfig } from '@/api/admin/auth/types'
+import type { QrCodeConfig } from '@/types'
 import { MsgError } from '@/utils/message'
-import { loadLoginScript } from '../../../utils/script-loader'
+import { loadLoginScript } from '@/utils/script-loader'
 
 defineOptions({ name: 'LarkQrCode' })
 

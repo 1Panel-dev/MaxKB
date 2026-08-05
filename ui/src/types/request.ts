@@ -1,4 +1,4 @@
-/** 定义 Admin API 请求层共享的协议与请求类型。 */
+/** 请求基础设施使用的协议、分页和 loading 类型。 */
 
 export interface ApiResponse<T> {
   code: number

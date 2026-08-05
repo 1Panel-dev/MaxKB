@@ -3,7 +3,7 @@
 import { defineStore } from 'pinia'
 import externalLoginApi from '@/api/admin/auth/external-login'
 import loginApi from '@/api/admin/auth/login'
-import type { LoginRequest } from '@/api/admin/auth/types'
+import type { LoginRequest } from '@/types'
 import { useUserStore } from './user'
 
 const TOKEN_STORAGE_KEY = 'token'
