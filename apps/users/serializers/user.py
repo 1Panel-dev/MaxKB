@@ -20,12 +20,13 @@ from common.constants.permission_constants import (
     Auth,
     ResourceAuthType,
     ResourcePermission,
+    ResourcePermissionRole,
     RoleConstants,
 )
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
-from common.utils.common import password_encrypt, password_verify
+from common.utils.common import get_random_chars, password_encrypt, password_verify, valid_license
 from common.utils.rsa_util import decrypt
 from django.core import validators
 from django.core.cache import cache
@@ -33,8 +34,10 @@ from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
-from django.utils.translation import get_language
+from django.utils import translation
+from django.utils.translation import get_language, to_locale
 from django.utils.translation import gettext_lazy as _
+from maxkb import settings
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from rest_framework import serializers
@@ -72,9 +75,7 @@ class CreateUserSerializer(serializers.Serializer):
     phone = serializers.CharField(required=False, label=_("Phone"))
     source = serializers.CharField(required=False, label=_("Source"), default="LOCAL")
     user_group_ids = serializers.ListField(
-        child=serializers.CharField(required=False),
-        required=False,
-        label=_('User Group IDs')
+        child=serializers.CharField(required=False), required=False, label=_("User Group IDs")
     )
 
 
@@ -86,10 +87,7 @@ def _get_workspace_name_mapping():
 
 
 def _get_user_group_workspace_mapping(user_ids):
-    user_group_relations = (
-        SystemUserGroupRelation.objects.filter(user_id__in=user_ids)
-        .select_related("group")
-    )
+    user_group_relations = SystemUserGroupRelation.objects.filter(user_id__in=user_ids).select_related("group")
     workspace_mapping = _get_workspace_name_mapping()
     user_group_mapping = defaultdict(
         lambda: {
@@ -617,7 +615,7 @@ class UserManageSerializer(serializers.Serializer):
             user.save()
             return True
 
-    def get_user_list(self, workspace_id, nick_name):
+    def get_user_list(self, user_id, workspace_id, nick_name):
         """
         获取用户列表
         :param workspace_id: 工作空间ID
@@ -625,19 +623,27 @@ class UserManageSerializer(serializers.Serializer):
         """
         workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         if workspace_user_role_mapping_model:
-            user_ids = (
-                workspace_user_role_mapping_model.objects.filter(workspace_id=workspace_id)
-                .values_list("user_id", flat=True)
-                .distinct()
-            )
-        else:
-            user_ids = User.objects.filter(role__in=RoleConstants.USER.name).values_list('id', flat=True)
+            # 判断当前用户是否属于该空间，不属于直接返回空
+            if not workspace_user_role_mapping_model.objects.filter(
+                workspace_id=workspace_id, user_id=user_id
+            ).exists():
+                query_set = User.objects.none()
+            else:
+                query_set = User.objects.filter(
+                    id__in=workspace_user_role_mapping_model.objects.filter(workspace_id=workspace_id).values("user_id")
+                )
 
-        query_set = User.objects.filter(id__in=user_ids)
+        else:
+            if user_id == "f0dd8f71-e4ee-11ee-8c84-a8a1595801ab":
+                query_set = User.objects.all()
+            else:
+                query_set = User.objects.filter(role=RoleConstants.USER.name)
+
         if nick_name:
             query_set = query_set.filter(nick_name__contains=nick_name)
 
         users = query_set.values("id", "nick_name")[:200]
+
         return list(users)
 
     def get_user_members(self, workspace_id):
@@ -658,9 +664,9 @@ class UserManageSerializer(serializers.Serializer):
                 user_id = relation.user.id
                 if user_id not in user_dict:
                     user_dict[user_id] = {
-                        'id': user_id,
-                        'nick_name': relation.user.nick_name,
-                        'roles': [relation.role.role_name]
+                        "id": user_id,
+                        "nick_name": relation.user.nick_name,
+                        "roles": [relation.role.role_name],
                     }
                 else:
                     user_dict[user_id]["roles"].append(relation.role.role_name)
@@ -668,13 +674,7 @@ class UserManageSerializer(serializers.Serializer):
             # 将字典值转换为列表形式
             return list(user_dict.values())
         user_list = User.objects.exclude(role=RoleConstants.ADMIN.name)
-        return [
-            {
-                'id': user.id,
-                'nick_name': user.nick_name,
-                'roles': [RoleConstants.USER.name]
-            } for user in user_list
-        ]
+        return [{"id": user.id, "nick_name": user.nick_name, "roles": [RoleConstants.USER.name]} for user in user_list]
 
     class BatchDelete(serializers.Serializer):
         ids = serializers.ListField(required=True, label=_("User IDs"))
@@ -762,6 +762,7 @@ def update_user_role(instance, user, user_id=None):
         role_version, role_get_key = Cache_Version.ROLE_LIST.value
         cache.delete(role_get_key(str(user.id)), version=role_version)
 
+
 def set_user_groups(user_id, instance):
     user_group_ids = instance.get("user_group_ids") or []
 
@@ -770,7 +771,6 @@ def set_user_groups(user_id, instance):
             1004,
             _("One or more user groups do not exist"),
         )
-
     SystemUserGroupRelation.objects.filter(user_id=user_id).delete()
     if user_group_ids:
         SystemUserGroupRelation.objects.bulk_create(
@@ -783,6 +783,203 @@ def set_user_groups(user_id, instance):
         )
 
     return None
+
+
+def _set_resource_permissions(user_id, workspace_ids, default_permission, auth_type):
+    """
+    设置具体资源权限
+    """
+    # 批量查询资源并按工作空间分组
+    resource_maps = _get_resource_maps(workspace_ids)
+
+    # 构造权限实例
+    instances = []
+    for ws in workspace_ids:
+        instances.extend(
+            _create_resource_permission_instances(ws, resource_maps, user_id, default_permission, auth_type)
+        )
+
+    # 批量创建权限
+    _batch_create_permissions(instances)
+
+
+def _get_resource_maps(workspace_ids):
+    """
+    获取各类型资源按工作空间的映射
+    """
+    from collections import defaultdict
+
+    from application.models import Application, ApplicationFolder
+    from knowledge.models import Knowledge, KnowledgeFolder
+    from models_provider.models import Model
+    from tools.models import Tool, ToolFolder
+
+    resource_maps = {
+        "apps": defaultdict(list),
+        "app_folders": defaultdict(list),
+        "knowledge": defaultdict(list),
+        "knowledge_folders": defaultdict(list),
+        "tools": defaultdict(list),
+        "tool_folders": defaultdict(list),
+        "models": defaultdict(list),
+    }
+
+    # 查询应用资源
+    for ws, rid in Application.objects.filter(workspace_id__in=workspace_ids).values_list("workspace_id", "id"):
+        resource_maps["apps"][ws].append(rid)
+
+    for ws, fid in (
+        ApplicationFolder.objects.filter(workspace_id__in=workspace_ids)
+        .exclude(id__in=workspace_ids)
+        .values_list("workspace_id", "id")
+    ):
+        resource_maps["app_folders"][ws].append(fid)
+
+    # 查询知识库资源
+    for ws, kid in Knowledge.objects.filter(workspace_id__in=workspace_ids).values_list("workspace_id", "id"):
+        resource_maps["knowledge"][ws].append(kid)
+
+    for ws, kfid in (
+        KnowledgeFolder.objects.filter(workspace_id__in=workspace_ids)
+        .exclude(id__in=workspace_ids)
+        .values_list("workspace_id", "id")
+    ):
+        resource_maps["knowledge_folders"][ws].append(kfid)
+
+    # 查询工具资源
+    for ws, tid in Tool.objects.filter(workspace_id__in=workspace_ids).values_list("workspace_id", "id"):
+        resource_maps["tools"][ws].append(tid)
+
+    for ws, tfid in (
+        ToolFolder.objects.filter(workspace_id__in=workspace_ids)
+        .exclude(id__in=workspace_ids)
+        .values_list("workspace_id", "id")
+    ):
+        resource_maps["tool_folders"][ws].append(tfid)
+
+    # 查询模型资源
+    for ws, mid in Model.objects.filter(workspace_id__in=workspace_ids).values_list("workspace_id", "id"):
+        resource_maps["models"][ws].append(mid)
+
+    return resource_maps
+
+
+def _create_resource_permission_instances(workspace_id, resource_maps, user_id, permission, auth_type):
+    """
+    创建资源权限实例列表
+    """
+    instances = []
+    if permission == ResourcePermission.MANAGE:
+        permission = [ResourcePermission.VIEW, ResourcePermission.MANAGE]
+    else:
+        permission = [permission]
+
+    # 应用权限
+    for rid in resource_maps["apps"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=rid,
+                auth_target_type=AuthTargetType.APPLICATION.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 应用文件夹权限
+    for fid in resource_maps["app_folders"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=fid,
+                auth_target_type=AuthTargetType.APPLICATION.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 知识库权限
+    for kid in resource_maps["knowledge"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=kid,
+                auth_target_type=AuthTargetType.KNOWLEDGE.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 知识库文件夹权限
+    for kf in resource_maps["knowledge_folders"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=kf,
+                auth_target_type=AuthTargetType.KNOWLEDGE.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 工具权限
+    for tid in resource_maps["tools"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=tid,
+                auth_target_type=AuthTargetType.TOOL.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 工具文件夹权限
+    for tf in resource_maps["tool_folders"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=tf,
+                auth_target_type=AuthTargetType.TOOL.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    # 模型权限
+    for mid in resource_maps["models"].get(workspace_id, []):
+        instances.append(
+            WorkspaceUserResourcePermission(
+                target=mid,
+                auth_target_type=AuthTargetType.MODEL.value,
+                permission_list=permission,
+                workspace_id=workspace_id,
+                user_id=user_id,
+                auth_type=auth_type,
+            )
+        )
+
+    return instances
+
+
+def _batch_create_permissions(instances, batch_size=500):
+    """
+    批量创建权限实例
+    """
+    if not instances:
+        return
+
+    objs = WorkspaceUserResourcePermission.objects
+    for i in range(0, len(instances), batch_size):
+        objs.bulk_create(instances[i : i + batch_size])
+
+
 class RePasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(
         required=True,
