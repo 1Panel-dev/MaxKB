@@ -13,32 +13,36 @@ import random
 import re
 from collections import defaultdict
 
+import uuid_utils.compat as uuid
+from common.constants.cache_version import Cache_Version
+from common.constants.exception_code_constants import ExceptionCodeConstants
+from common.constants.permission_constants import (
+    Auth,
+    ResourceAuthType,
+    ResourcePermission,
+    ResourcePermissionRole,
+    RoleConstants,
+)
+from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.db.search import page_search
+from common.exception.app_exception import AppApiException
+from common.utils.common import get_random_chars, password_encrypt, password_verify, valid_license
+from common.utils.rsa_util import decrypt
+from django.core import validators
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
 from django.utils import translation
-from rest_framework import serializers
-import uuid_utils.compat as uuid
-
-from common.constants.cache_version import Cache_Version
-from common.constants.exception_code_constants import ExceptionCodeConstants
-from common.constants.permission_constants import RoleConstants, Auth, ResourceAuthType, ResourcePermissionRole, \
-    ResourcePermission
-from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import page_search
-from common.exception.app_exception import AppApiException
-from common.utils.common import valid_license, password_encrypt, password_verify, get_random_chars
-from common.utils.rsa_util import decrypt
+from django.utils.translation import get_language, to_locale
+from django.utils.translation import gettext_lazy as _
 from maxkb import settings
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
-from system_manage.models import SystemSetting, SettingType, AuthTargetType, WorkspaceUserResourcePermission
+from rest_framework import serializers
+from system_manage.models import AuthTargetType, SettingType, SystemSetting, WorkspaceUserResourcePermission
 from users.models import User
-from django.utils.translation import gettext_lazy as _, to_locale
-from django.core import validators
-from django.core.mail import send_mail
-from django.utils.translation import get_language
 
 PASSWORD_REGEX = re.compile(
     r"^"  # 开始
@@ -555,7 +559,7 @@ class UserManageSerializer(serializers.Serializer):
             user.save()
             return True
 
-    def get_user_list(self, workspace_id, nick_name):
+    def get_user_list(self, user_id,workspace_id, nick_name):
         """
         获取用户列表
         :param workspace_id: 工作空间ID
@@ -563,20 +567,27 @@ class UserManageSerializer(serializers.Serializer):
         """
         workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         if workspace_user_role_mapping_model:
-            user_ids = (
-                workspace_user_role_mapping_model.objects
-                .filter(workspace_id=workspace_id)
-                .values_list('user_id', flat=True)
-                .distinct()
-            )
-        else:
-            user_ids = User.objects.filter(role__in=RoleConstants.USER.name).values_list('id', flat=True)
+            # 判断当前用户是否属于该空间，不属于直接返回空
+            if not workspace_user_role_mapping_model.objects.filter(
+                workspace_id=workspace_id, user_id=user_id
+            ).exists():
+                query_set = User.objects.none()
+            else:
+                query_set = User.objects.filter(
+                    id__in=workspace_user_role_mapping_model.objects.filter(workspace_id=workspace_id).values("user_id")
+                )
 
-        query_set = User.objects.filter(id__in=user_ids)
+        else:
+            if user_id == "f0dd8f71-e4ee-11ee-8c84-a8a1595801ab":
+                query_set = User.objects.all()
+            else:
+                query_set = User.objects.filter(role=RoleConstants.USER.name)
+
         if nick_name:
             query_set = query_set.filter(nick_name__contains=nick_name)
 
-        users = query_set.values('id', 'nick_name')[:200]
+        users = query_set.values("id", "nick_name")[:200]
+
         return list(users)
 
     def get_user_members(self, workspace_id):
@@ -813,11 +824,12 @@ def _get_resource_maps(workspace_ids):
     """
     获取各类型资源按工作空间的映射
     """
+    from collections import defaultdict
+
     from application.models import Application, ApplicationFolder
     from knowledge.models import Knowledge, KnowledgeFolder
-    from tools.models import Tool, ToolFolder
     from models_provider.models import Model
-    from collections import defaultdict
+    from tools.models import Tool, ToolFolder
 
     resource_maps = {
         'apps': defaultdict(list),
