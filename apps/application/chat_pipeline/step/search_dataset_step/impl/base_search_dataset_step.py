@@ -16,7 +16,7 @@ from rest_framework.utils.formatting import lazy_format
 from application.chat_pipeline.I_base_chat_pipeline import ParagraphPipelineModel
 from application.chat_pipeline.step.search_dataset_step.i_search_dataset_step import ISearchDatasetStep
 from common.config.embedding_config import VectorStore, ModelManage
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import get_file_content

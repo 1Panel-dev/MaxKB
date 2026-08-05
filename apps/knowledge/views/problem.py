@@ -5,7 +5,10 @@ from rest_framework.views import Request
 
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
@@ -32,7 +35,7 @@ class ProblemView(APIView):
         PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
         q = ProblemSerializers.Query(
@@ -60,7 +63,7 @@ class ProblemView(APIView):
         PermissionConstants.KNOWLEDGE_PROBLEM_CREATE.get_workspace_permission_workspace_manage_role(),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
         ViewPermission([RoleConstants.USER.get_workspace_role()],
-                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                       [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
     )
     @log(
         menu='problem', operate='Create question',
@@ -88,7 +91,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, problem_id: str):
             return result.success(ProblemSerializers.Operate(
@@ -117,7 +120,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='problem', operate='Batch associated paragraphs',
@@ -147,7 +150,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='problem', operate='Batch deletion issues',
@@ -176,7 +179,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_DELETE.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='problem', operate='Delete question',
@@ -208,7 +211,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_PROBLEM_EDIT.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         @log(
             menu='problem', operate='Modify question',
@@ -243,7 +246,7 @@ class ProblemView(APIView):
             PermissionConstants.KNOWLEDGE_DOCUMENT_READ.get_workspace_permission_workspace_manage_role(),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
             ViewPermission([RoleConstants.USER.get_workspace_role()],
-                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], CompareConstants.AND),
+                           [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()], compare=CompareConstants.AND),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page, page_size):
             d = ProblemSerializers.Query(

@@ -9,7 +9,7 @@
 from django.db import models
 import uuid_utils.compat as uuid
 
-from common.constants.permission_constants import Group
+from common.auth.constants.group_constants import Group
 from common.mixins.app_model_mixin import AppModelMixin
 
 

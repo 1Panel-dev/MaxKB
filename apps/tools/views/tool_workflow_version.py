@@ -15,7 +15,10 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from knowledge.api.knowledge_version import KnowledgeVersionListAPI, KnowledgeVersionPageAPI, \
     KnowledgeVersionOperateAPI
@@ -49,7 +52,7 @@ class ToolWorkflowVersionView(APIView):
                      PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                    CompareConstants.AND),
+                                    compare=CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def get(self, request: Request, workspace_id, tool_id: str):
         return result.success(
@@ -73,7 +76,7 @@ class ToolWorkflowVersionView(APIView):
                          PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, tool_id: str, current_page: int, page_size: int):
             return result.success(
@@ -98,7 +101,7 @@ class ToolWorkflowVersionView(APIView):
                          PermissionConstants.TOOL_READ.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         def get(self, request: Request, workspace_id: str, tool_id: str, tool_version_id: str):
             return result.success(
@@ -120,7 +123,7 @@ class ToolWorkflowVersionView(APIView):
                          PermissionConstants.TOOL_EDIT.get_workspace_permission_workspace_manage_role(),
                          ViewPermission([RoleConstants.USER.get_workspace_role()],
                                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                                        CompareConstants.AND),
+                                        compare=CompareConstants.AND),
                          RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(menu='Tool', operate="Modify tool version information",
              get_operation_object=lambda r, k: get_tool_operation_object(k.get('tool_id')),

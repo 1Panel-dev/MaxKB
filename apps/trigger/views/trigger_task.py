@@ -17,7 +17,8 @@ from common import result
 from trigger.api.trigger_task import TriggerTaskRecordExecutionDetailsAPI, TriggerTaskRecordPageAPI, TriggerTaskAPI
 from trigger.serializers.trigger_task import TriggerTaskQuerySerializer, TriggerTaskRecordQuerySerializer, \
     TriggerTaskRecordOperateSerializer
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 
 
 class TriggerTaskView(APIView):

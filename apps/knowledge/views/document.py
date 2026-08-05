@@ -1,6 +1,9 @@
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from common.result import result
 from django.utils.translation import gettext_lazy as _
@@ -65,7 +68,7 @@ class DocumentView(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
     )
     @log(
@@ -98,7 +101,7 @@ class DocumentView(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
     )
     def get(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -138,7 +141,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -164,7 +167,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -197,7 +200,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -236,7 +239,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str):
@@ -299,7 +302,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -337,7 +340,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -375,7 +378,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -413,7 +416,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -450,7 +453,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -487,7 +490,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -527,7 +530,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -567,7 +570,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -607,7 +610,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -646,7 +649,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -683,7 +686,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -720,7 +723,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -760,7 +763,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -788,7 +791,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -814,7 +817,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -849,7 +852,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, current_page: int, page_size: int):
@@ -894,7 +897,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -927,7 +930,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -960,7 +963,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -985,7 +988,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -1018,7 +1021,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -1048,7 +1051,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def post(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
@@ -1082,7 +1085,7 @@ class DocumentView(APIView):
                 ViewPermission(
                     [RoleConstants.USER.get_workspace_role()],
                     [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    CompareConstants.AND,
+                    compare=CompareConstants.AND,
                 ),
             )
             @log(
@@ -1123,7 +1126,7 @@ class DocumentView(APIView):
                 ViewPermission(
                     [RoleConstants.USER.get_workspace_role()],
                     [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                    CompareConstants.AND,
+                    compare=CompareConstants.AND,
                 ),
             )
             @log(
@@ -1163,7 +1166,7 @@ class DocumentView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -1207,7 +1210,7 @@ class WebDocumentView(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
     )
     @log(
@@ -1249,7 +1252,7 @@ class QaDocumentView(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
     )
     @log(
@@ -1291,7 +1294,7 @@ class TableDocumentView(APIView):
         ViewPermission(
             [RoleConstants.USER.get_workspace_role()],
             [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
-            CompareConstants.AND,
+            compare=CompareConstants.AND,
         ),
     )
     @log(

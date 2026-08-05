@@ -16,13 +16,12 @@ from collections import defaultdict
 import uuid_utils.compat as uuid
 from common.constants.cache_version import Cache_Version
 from common.constants.exception_code_constants import ExceptionCodeConstants
-from common.constants.permission_constants import (
-    Auth,
-    ResourceAuthType,
-    ResourcePermission,
-    ResourcePermissionRole,
-    RoleConstants,
-)
+
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.auth import Auth
+from common.constants.permission_constants import ResourcePermission
+from common.constants.resource_permission_constants import ResourceAuthType
+
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -194,8 +193,8 @@ class UserProfileSerializer(serializers.Serializer):
             "nick_name": user.nick_name,
             "email": user.email,
             "source": user.source,
-            "role": auth.role_list,
-            "permissions": auth.permission_list,
+            "role": list(auth.roles),
+            "permissions": auth.permissions,
             "is_edit_password": password_verify(CONFIG.get("DEFAULT_PASSWORD", "MaxKB@123.."), user.password)
             if user.source == "LOCAL"
             else False,
@@ -558,9 +557,9 @@ class UserManageSerializer(serializers.Serializer):
         @staticmethod
         def _check_admin_modification(user, instance):
             if (
-                user.role == RoleConstants.ADMIN.name
-                and "is_active" in instance
-                and instance.get("is_active") is not None
+                    user.role == RoleConstants.ADMIN.name
+                    and "is_active" in instance
+                    and instance.get("is_active") is not None
             ):
                 raise AppApiException(1004, _("Cannot modify administrator status"))
 
@@ -625,7 +624,7 @@ class UserManageSerializer(serializers.Serializer):
         if workspace_user_role_mapping_model:
             # 判断当前用户是否属于该空间，不属于直接返回空
             if not workspace_user_role_mapping_model.objects.filter(
-                workspace_id=workspace_id, user_id=user_id
+                    workspace_id=workspace_id, user_id=user_id
             ).exists():
                 query_set = User.objects.none()
             else:
@@ -701,9 +700,9 @@ def update_user_role(instance, user, user_id=None):
         license_is_valid = DatabaseModelManage.get_model("license_is_valid") or (lambda: False)
         license_is_valid = license_is_valid() if license_is_valid() is not None else False
         if not role_setting or (
-            len(role_setting) == 1
-            and role_setting[0].get("role_id") == ""
-            and len(role_setting[0].get("workspace_ids", [])) == 0
+                len(role_setting) == 1
+                and role_setting[0].get("role_id") == ""
+                and len(role_setting[0].get("workspace_ids", [])) == 0
         ):
             if not license_is_valid:
                 workspace_user_role_mapping_model.objects.create(
@@ -829,9 +828,9 @@ def _get_resource_maps(workspace_ids):
         resource_maps["apps"][ws].append(rid)
 
     for ws, fid in (
-        ApplicationFolder.objects.filter(workspace_id__in=workspace_ids)
-        .exclude(id__in=workspace_ids)
-        .values_list("workspace_id", "id")
+            ApplicationFolder.objects.filter(workspace_id__in=workspace_ids)
+                    .exclude(id__in=workspace_ids)
+                    .values_list("workspace_id", "id")
     ):
         resource_maps["app_folders"][ws].append(fid)
 
@@ -840,9 +839,9 @@ def _get_resource_maps(workspace_ids):
         resource_maps["knowledge"][ws].append(kid)
 
     for ws, kfid in (
-        KnowledgeFolder.objects.filter(workspace_id__in=workspace_ids)
-        .exclude(id__in=workspace_ids)
-        .values_list("workspace_id", "id")
+            KnowledgeFolder.objects.filter(workspace_id__in=workspace_ids)
+                    .exclude(id__in=workspace_ids)
+                    .values_list("workspace_id", "id")
     ):
         resource_maps["knowledge_folders"][ws].append(kfid)
 
@@ -851,9 +850,9 @@ def _get_resource_maps(workspace_ids):
         resource_maps["tools"][ws].append(tid)
 
     for ws, tfid in (
-        ToolFolder.objects.filter(workspace_id__in=workspace_ids)
-        .exclude(id__in=workspace_ids)
-        .values_list("workspace_id", "id")
+            ToolFolder.objects.filter(workspace_id__in=workspace_ids)
+                    .exclude(id__in=workspace_ids)
+                    .values_list("workspace_id", "id")
     ):
         resource_maps["tool_folders"][ws].append(tfid)
 
@@ -977,7 +976,7 @@ def _batch_create_permissions(instances, batch_size=500):
 
     objs = WorkspaceUserResourcePermission.objects
     for i in range(0, len(instances), batch_size):
-        objs.bulk_create(instances[i : i + batch_size])
+        objs.bulk_create(instances[i: i + batch_size])
 
 
 class RePasswordSerializer(serializers.Serializer):

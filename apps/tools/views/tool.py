@@ -1,7 +1,10 @@
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import check_batch_permissions, has_permissions
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
@@ -153,7 +156,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -182,7 +185,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(menu="Tool", operate="Get tool")
@@ -205,7 +208,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -246,7 +249,7 @@ class ToolView(APIView):
                     ViewPermission(
                         [RoleConstants.USER.get_workspace_role()],
                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                        CompareConstants.AND,
+                        compare=CompareConstants.AND,
                     ),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
@@ -295,7 +298,7 @@ class ToolView(APIView):
                     ViewPermission(
                         [RoleConstants.USER.get_workspace_role()],
                         [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                        CompareConstants.AND,
+                        compare=CompareConstants.AND,
                     ),
                     RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
                 ),
@@ -437,7 +440,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         @log(
@@ -491,7 +494,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def put(self, request: Request, tool_id: str, workspace_id: str):
@@ -703,7 +706,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, current_page: int, page_size: int):
@@ -738,7 +741,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, tool_id: str, workspace_id: str, record_id: str):
@@ -795,7 +798,7 @@ class ToolView(APIView):
             ViewPermission(
                 [RoleConstants.USER.get_workspace_role()],
                 [PermissionConstants.TOOL.get_workspace_tool_permission()],
-                CompareConstants.AND,
+                compare=CompareConstants.AND,
             ),
         )
         def get(self, request: Request, workspace_id: str, tool_id: str):

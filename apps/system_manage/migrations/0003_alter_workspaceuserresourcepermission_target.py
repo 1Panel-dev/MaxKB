@@ -5,7 +5,6 @@ from functools import reduce
 from django.db import migrations, models
 from django.db.models import QuerySet
 
-from common.constants.permission_constants import WorkspaceUserRoleMapping
 from common.utils.common import group_by
 
 
@@ -16,20 +15,32 @@ def workspace_user_role_mapping_model_exists(workspace_user_role_mapping_model):
         return False
     return False
 
-def delete_auth(apps,folder_model):
+
+def delete_auth(apps, folder_model):
     workspace_user_resource_permission_model = apps.get_model('system_manage', 'WorkspaceUserResourcePermission')
-    QuerySet(workspace_user_resource_permission_model).filter(target__in=QuerySet(folder_model).values_list('id')).delete()
+    QuerySet(workspace_user_resource_permission_model).filter(
+        target__in=QuerySet(folder_model).values_list('id')).delete()
 
 
-def get_workspace_user_resource_permission_list(apps, auth_target_type, workspace_user_role_mapping_model_workspace_dict,
+def get_workspace_user_resource_permission_list(apps, auth_target_type,
+                                                workspace_user_role_mapping_model_workspace_dict,
                                                 folder_model):
     workspace_user_resource_permission_model = apps.get_model('system_manage', 'WorkspaceUserResourcePermission')
     return reduce(lambda x, y: [*x, *y], [
         [workspace_user_resource_permission_model(target=f.id, workspace_id=f.workspace_id, user_id=wurm.user_id,
-                                         auth_target_type=auth_target_type, auth_type="RESOURCE_PERMISSION_GROUP",
-                                         permission_list=['VIEW','MANAGE'] if wurm.user_id == f.user_id else ['VIEW']) for wurm in
+                                                  auth_target_type=auth_target_type,
+                                                  auth_type="RESOURCE_PERMISSION_GROUP",
+                                                  permission_list=['VIEW', 'MANAGE'] if wurm.user_id == f.user_id else [
+                                                      'VIEW']) for wurm in
          workspace_user_role_mapping_model_workspace_dict.get(f.workspace_id, [])] for f in
         QuerySet(folder_model).all()], [])
+
+
+class WorkspaceUserRoleMapping:
+    def __init__(self, workspace_id, role_id, user_id):
+        self.workspace_id = workspace_id
+        self.role_id = role_id
+        self.user_id = user_id
 
 
 def auth_folder(apps, schema_editor):
@@ -59,20 +70,20 @@ def auth_folder(apps, schema_editor):
                          QuerySet(workspace_user_role_mapping_model)}.values()],
             lambda item: item.workspace_id)
 
-    workspace_user_resource_permission_list = get_workspace_user_resource_permission_list(apps,"APPLICATION",
+    workspace_user_resource_permission_list = get_workspace_user_resource_permission_list(apps, "APPLICATION",
                                                                                           workspace_user_role_mapping_model_workspace_dict,
                                                                                           application_folder_model)
 
-    workspace_user_resource_permission_list += get_workspace_user_resource_permission_list(apps,"TOOL",
+    workspace_user_resource_permission_list += get_workspace_user_resource_permission_list(apps, "TOOL",
                                                                                            workspace_user_role_mapping_model_workspace_dict,
                                                                                            tool_folder_model)
 
-    workspace_user_resource_permission_list += get_workspace_user_resource_permission_list(apps,"KNOWLEDGE",
+    workspace_user_resource_permission_list += get_workspace_user_resource_permission_list(apps, "KNOWLEDGE",
                                                                                            workspace_user_role_mapping_model_workspace_dict,
                                                                                            knowledge_folder_model)
-    delete_auth(apps,application_folder_model)
-    delete_auth(apps,knowledge_folder_model)
-    delete_auth(apps,tool_folder_model)
+    delete_auth(apps, application_folder_model)
+    delete_auth(apps, knowledge_folder_model)
+    delete_auth(apps, tool_folder_model)
     QuerySet(workspace_user_resource_permission_model).bulk_create(workspace_user_resource_permission_list)
 
 

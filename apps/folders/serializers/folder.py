@@ -10,7 +10,9 @@ from rest_framework import serializers
 from application.models.application import Application, ApplicationFolder
 from application.serializers.application import ApplicationOperateSerializer
 from application.serializers.application_folder import ApplicationFolderTreeSerializer
-from common.constants.permission_constants import Group, ResourcePermission, ResourcePermissionRole, RoleConstants
+from common.auth.constants.group_constants import Group
+from common.auth.constants.role_constants import RoleConstants
+from common.constants.resource_permission_constants import ResourcePermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.exception.app_exception import AppApiException
 from folders.api.folder import FolderCreateRequest
@@ -278,7 +280,7 @@ class FolderSerializer(serializers.Serializer):
                         Q(user_id=self.data.get('user_id')) &
                         Q(auth_target_type=self.data.get('source')) &
                         Q(target__in=source_ids) &
-                        Q(permission_list__overlap=[ResourcePermission.MANAGE, ResourcePermissionRole.ROLE])
+                        Q(permission_list__overlap=[ResourcePermissionConstants.MANAGE, ResourcePermissionConstants.ROLE])
                     ).count()
                     if auth_list != len(source_ids):
                         raise AppApiException(500, _('This folder contains resources that you dont have permission'))

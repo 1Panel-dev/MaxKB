@@ -19,8 +19,8 @@ from rest_framework import serializers
 
 from application.models import Application
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import get_default_workspace_user_role_mapping_list, RoleConstants, \
-    ResourcePermission, ResourcePermissionRole, ResourceAuthType
+from common.auth.constants.role_constants import RoleConstants
+from common.constants.resource_permission_constants import ResourceAuthType, ResourcePermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search, native_page_search, get_dynamics_model
 from common.db.sql_execute import select_list
@@ -167,7 +167,7 @@ class UserResourcePermissionSerializer(serializers.Serializer):
             else:
                 return False
         else:
-            return wurp.permission_list.__contains__(ResourcePermission.VIEW.value)
+            return wurp.permission_list.__contains__(ResourcePermissionConstants.VIEW.value)
 
     def auth_resource_batch(self, resource_id_list: list):
         self.is_valid(raise_exception=True)
@@ -181,9 +181,9 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         workspace_user_resource_permission = [WorkspaceUserResourcePermission(
             target=resource_id,
             auth_target_type=auth_target_type,
-            permission_list=[ResourcePermission.VIEW,
-                             ResourcePermission.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
-                ResourcePermissionRole.ROLE],
+            permission_list=[ResourcePermissionConstants.VIEW,
+                             ResourcePermissionConstants.MANAGE] if auth_type == ResourceAuthType.RESOURCE_PERMISSION_GROUP else [
+                ResourcePermissionConstants.ROLE],
             workspace_id=workspace_id,
             user_id=user_id,
             auth_type=auth_type
@@ -204,8 +204,8 @@ class UserResourcePermissionSerializer(serializers.Serializer):
         WorkspaceUserResourcePermission(
             target=resource_id,
             auth_target_type=auth_target_type,
-            permission_list=[ResourcePermission.VIEW,
-                             ResourcePermission.MANAGE],
+            permission_list=[ResourcePermissionConstants.VIEW,
+                             ResourcePermissionConstants.MANAGE],
             workspace_id=workspace_id,
             user_id=user_id,
             auth_type=ResourceAuthType.RESOURCE_PERMISSION_GROUP

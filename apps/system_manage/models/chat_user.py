@@ -9,8 +9,6 @@
 import uuid_utils.compat as uuid
 from django.db import models
 
-from common.constants.permission_constants import Group
-
 
 class ChatUser(models.Model):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
@@ -50,8 +48,8 @@ class UserGroupRelation(models.Model):
 
 class ResourceType(models.TextChoices):
     """资源类型"""
-    KNOWLEDGE = Group.KNOWLEDGE.value, '知识库'
-    APPLICATION = Group.APPLICATION.value, '应用'
+    KNOWLEDGE = 'KNOWLEDGE', '知识库'
+    APPLICATION = 'APPLICATION', '应用'
 
 
 class ResourceChatUserAuthorize(models.Model):

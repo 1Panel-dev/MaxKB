@@ -14,7 +14,8 @@ from application.api.application_stats import ApplicationStatsAPI
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 from homepage.api.home_page_api import ApplicationTokensRankingAPI, ApplicationQuestionRankingAPI, UserTokensRankingAPI, \
     ApplicationAggregationAPI, KnowledgeAggregationAPI, ToolAggregationAPI, ModelAggregationAPI, \
     ApplicationMonitoringAPI, RankingBaseAPI, TokensAggregationAPI, RankingBaseExportAPI

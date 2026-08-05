@@ -18,7 +18,10 @@ from application.serializers.application_access_token import AccessTokenSerializ
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
 from common.log.log import log
 
 def get_application_operation_object(application_id):
@@ -49,7 +52,7 @@ class AccessToken(APIView):
                      PermissionConstants.APPLICATION_OVERVIEW_ACCESS.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                    CompareConstants.AND),
+                                     compare=CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     def put(self, request: Request, workspace_id: str, application_id: str):
         return result.success(
@@ -68,7 +71,7 @@ class AccessToken(APIView):
                      PermissionConstants.APPLICATION_READ.get_workspace_permission_workspace_manage_role(),
                      ViewPermission([RoleConstants.USER.get_workspace_role()],
                                     [PermissionConstants.APPLICATION.get_workspace_application_permission()],
-                                    CompareConstants.AND),
+                                     compare=CompareConstants.AND),
                      RoleConstants.WORKSPACE_MANAGE.get_workspace_role()
                      )
     def get(self, request: Request, workspace_id: str, application_id: str):

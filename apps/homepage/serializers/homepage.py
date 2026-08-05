@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from rest_framework import serializers
 
 from application.models import Application, ApplicationChatUserStats, Chat, ChatRecord
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.db.search import native_search, get_dynamics_model, page_search
 from common.utils.common import get_file_content
 from knowledge.models import Knowledge

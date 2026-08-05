@@ -16,8 +16,13 @@ from application.api.application_api import ApplicationCreateAPI
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
-from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants, \
-    Permission, Group, Operate
+from common.auth.constants.compare_constants import CompareConstants
+from common.auth.constants.group_constants import Group
+from common.auth.constants.operate_constants import Operate
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.aggregate_permission import ViewPermission
+from common.auth.struct.permission import Permission
 from common.log.log import log
 from common.result import DefaultResultSerializer
 from trigger.models import Trigger
@@ -270,7 +275,7 @@ class TaskSourceTriggerView(APIView):
                        [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
                                                      operate=Operate.SELF,
                                                      resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
-                       CompareConstants.AND),
+                       compare=CompareConstants.AND),
         RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
     @log(
         menu="Trigger", operate="Create trigger in source",
@@ -358,7 +363,7 @@ class TaskSourceTriggerView(APIView):
                            [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
                                                          operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
-                           CompareConstants.AND),
+                           compare=CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(
             menu="Trigger", operate="Modify the source point trigger",
@@ -390,7 +395,7 @@ class TaskSourceTriggerView(APIView):
                            [lambda r, kwargs: Permission(group=Group(kwargs.get('source_type')),
                                                          operate=Operate.SELF,
                                                          resource_path=f"/WORKSPACE/{kwargs.get('workspace_id')}/{kwargs.get('source_type')}/{kwargs.get('source_id')}")],
-                           CompareConstants.AND),
+                           compare=CompareConstants.AND),
             RoleConstants.WORKSPACE_MANAGE.get_workspace_role())
         @log(
             menu="Trigger", operate="Delete the source point trigger",

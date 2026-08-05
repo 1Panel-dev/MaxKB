@@ -1,15 +1,18 @@
 # coding=utf-8
-from common.auth import AllTokenAuth, TokenAuth
-from common.auth.authentication import has_permissions
-from common.constants.permission_constants import ChatAuth, RoleConstants
-from common.log.log import log
-from common.result import result
+
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
-from knowledge.api.file import FileGetAPI, FileUploadAPI, GetUrlContentAPI
-from oss.serializers.file import FileSerializer, get_url_content
 from rest_framework.parsers import MultiPartParser
 from rest_framework.views import APIView, Request
+
+from common.auth import TokenAuth, AllTokenAuth
+from common.auth.authentication import has_permissions
+from common.auth.common import ChatAuthentication
+from common.auth.constants.role_constants import RoleConstants
+from common.log.log import log
+from common.result import result
+from knowledge.api.file import FileGetAPI, FileUploadAPI, GetUrlContentAPI
+from oss.serializers.file import FileSerializer, get_url_content
 
 
 class FileRetrievalView(APIView):
@@ -86,7 +89,7 @@ class GetUrlView(APIView):
         tags=[_('Chat')]  # type: ignore
     )
     def get(self, request: Request, application_id: str):
-        if isinstance(request.auth, ChatAuth) and request.auth.application_id and str(
+        if isinstance(request.auth, ChatAuthentication) and request.auth.application_id and str(
                 request.auth.application_id) != application_id:
             return result.error(_('No permission'))
         url = request.query_params.get('url')

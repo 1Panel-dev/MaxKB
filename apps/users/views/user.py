@@ -18,7 +18,8 @@ from rest_framework.views import APIView
 from common.auth.authenticate import TokenAuth
 from common.auth.authentication import has_permissions
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import PermissionConstants, RoleConstants
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.exception.app_exception import AppApiException
 from common.log.log import log
 from common.result import result
@@ -71,7 +72,7 @@ class UserProfileView(APIView):
 
                    responses=UserProfileAPI.get_response())
     def get(self, request: Request):
-        return result.success(UserProfileSerializer().profile(request.user, request.auth))
+        return result.success(UserProfileSerializer().profile(request.user.profile, request.auth))
 
 
 class TestPermissionsUserView(APIView):
@@ -85,7 +86,7 @@ class TestPermissionsUserView(APIView):
                    responses=UserProfileAPI.get_response())
     @has_permissions(PermissionConstants.USER_EDIT, RoleConstants.ADMIN)
     def get(self, request: Request):
-        return result.success(UserProfileSerializer().profile(request.user, request.auth))
+        return result.success(UserProfileSerializer().profile(request.user.profile, request.auth))
 
 
 class SwitchUserLanguageView(APIView):
@@ -119,7 +120,7 @@ class TestWorkspacePermissionUserView(APIView):
                    parameters=TestWorkspacePermissionUserApi.get_parameters())
     @has_permissions(PermissionConstants.USER_EDIT.get_workspace_permission(), RoleConstants.ADMIN)
     def get(self, request: Request, workspace_id):
-        return result.success(UserProfileSerializer().profile(request.user, request.auth))
+        return result.success(UserProfileSerializer().profile(request.user.profile, request.auth))
 
 
 class UserList(APIView):

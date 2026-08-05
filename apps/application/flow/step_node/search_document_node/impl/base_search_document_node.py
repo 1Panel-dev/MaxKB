@@ -7,7 +7,7 @@ from django.db.models import QuerySet
 
 from application.flow.i_step_node import NodeResult
 from application.flow.step_node.search_document_node.i_search_document_node import ISearchDocumentStepNode
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, DocumentTag, Knowledge
