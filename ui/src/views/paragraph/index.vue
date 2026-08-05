@@ -3,7 +3,7 @@
     <div class="flex align-center" style="width: 78%">
       <back-button to="-1" style="margin-left: -4px"></back-button>
       <h3 style="display: inline-block">{{ documentDetail?.name }}</h3>
-      <el-text type="info" v-if="documentDetail?.type === '1'"
+      <el-text type="info" v-if="documentDetail?.type == 1"
         >（{{ $t('views.document.form.source_url.label') }}：<el-link
           :href="documentDetail?.meta?.source_url"
           target="_blank"
