@@ -1,7 +1,6 @@
-<script setup lang="ts" generic="Option extends { label: string; value: string | number }">
-import { computed, h, ref } from 'vue'
-import { Search } from '@element-plus/icons-vue'
-import MkIcon from '@/components/global/mk-icon/index.vue'
+<script setup lang="ts" generic="Option extends DropdownOption = DropdownOption">
+import { computed, ref } from 'vue'
+import type { DropdownOption } from './types'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。
@@ -10,28 +9,26 @@ import MkIcon from '@/components/global/mk-icon/index.vue'
  */
 defineOptions({ name: 'MkFilterableDropdown' })
 
-type DropdownValue = string | number
-
 const props = withDefaults(
   defineProps<{
     /** 下拉菜单数据 */
     options: Option[]
     /** 未选中数据时触发器显示的文字 */
     placeholder?: string
-    /** 搜索输入框的占位文字 */
-    searchPlaceholder?: string
     /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
   {
     placeholder: '请选择',
-    searchPlaceholder: '搜索',
     emptyText: '暂无匹配结果',
   },
 )
 
 /** 当前选中菜单项的 value */
-const selectedValue = defineModel<DropdownValue>({ required: true })
+const selectedValue = defineModel<string | number>({ required: true })
+const emit = defineEmits<{
+  select: [option: Option]
+}>()
 const searchKeyword = ref('')
 
 const selectedOption = computed(() =>
@@ -57,6 +54,11 @@ defineSlots<{
 function handleVisibleChange(visible: boolean) {
   if (!visible) searchKeyword.value = ''
 }
+
+function handleItemClick(option: Option) {
+  selectedValue.value = option.value
+  emit('select', option)
+}
 </script>
 
 <template>
@@ -71,12 +73,7 @@ function handleVisibleChange(visible: boolean) {
     <template #dropdown>
       <div class="w-70 overflow-hidden rounded-md">
         <div class="p-2 pb-1" @click.stop @keydown.stop>
-          <el-input
-            v-model="searchKeyword"
-            :prefix-icon="Search"
-            :placeholder="searchPlaceholder"
-            clearable
-          />
+          <MkSearchInput v-model="searchKeyword" />
         </div>
 
         <el-scrollbar max-height="200px">
@@ -86,7 +83,7 @@ function handleVisibleChange(visible: boolean) {
               :key="option.value"
               selectable
               :selected="option.value === selectedValue"
-              @click="selectedValue = option.value"
+              @click="handleItemClick(option)"
             >
               <slot name="option" :option="option">
                 <span class="block truncate">{{ option.label }}</span>

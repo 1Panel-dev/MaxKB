@@ -33,7 +33,7 @@ const initialize = async () => {
     },
     async ({ authCode }) => {
       await login.asyncLoginWithDingTalk(authCode)
-      await router.push({ name: 'workspace-home' })
+      await router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
     },
     MsgError,
   )

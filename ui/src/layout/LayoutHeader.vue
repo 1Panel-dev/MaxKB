@@ -3,10 +3,8 @@ import AvatarDropdown from './avatar-dropdown/index.vue'
 import WorkspaceDropdown from './workspace-dropdown/index.vue'
 import { Setting } from '@element-plus/icons-vue'
 import { isWorkspace, isSystem } from '@/router/admin/utils'
-import { useStore } from '@/stores'
 import type { LayoutMode } from './types'
 const router = useRouter()
-const { user } = useStore()
 const props = withDefaults(
   defineProps<{
     mode?: LayoutMode
@@ -19,7 +17,7 @@ function switchMode() {
   router.push(
     isWorkspace(props.mode)
       ? { name: 'system-users' }
-      : { name: 'workspace-home', params: { workspaceId: user.workspaceId } },
+      : { name: 'workspace-home', params: { workspaceId: 'default' } },
   )
 }
 </script>

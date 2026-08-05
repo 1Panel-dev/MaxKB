@@ -336,7 +336,6 @@ function permissionTableSpan({ row, columnIndex }: { row: PermissionRow; columnI
         </div>
       </MkSearchList>
     </aside>
-
     <div v-if="selectedRole" class="flex min-w-0 flex-1 flex-col px-6">
       <header class="flex items-center justify-between py-4">
         <div class="flex min-w-0 items-center gap-2">

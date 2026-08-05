@@ -15,6 +15,8 @@ Before making changes, determine which areas the task touches and read the corre
 - Utilities: `src/utils/UTILS_README.md` is the source of truth for shared utility rules.
 - API: `src/api/API_README.md` is the source of truth for request infrastructure and business API
   organization.
+- Views: `src/views/VIEW_README.md` is the source of truth for page responsibilities and
+  feature-local code organization.
 
 Follow this maintenance flow:
 
@@ -76,6 +78,7 @@ ui/
 │   ├── utils/                 # Cross-feature utilities grouped by domain or capability
 │   │   └── UTILS_README.md    # Shared utility placement and naming rules
 │   ├── views/                 # Route-level page components grouped by feature
+│   │   ├── VIEW_README.md     # Page responsibilities and feature-local code rules
 │   │   ├── home/             # Workspace home page
 │   │   ├── system/           # System-management pages
 │   │   ├── login/            # Reserved for admin login pages
@@ -95,7 +98,6 @@ Structural responsibilities:
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
-- Put route-level screens in `views/<feature>/`; keep reusable feature components below their owning feature when they are not globally shared.
 - Put shared client state in `stores/`; component-local state should remain in the component.
 - Reuse the Pinia instance exported by `stores/index.ts`; application code accesses Store instances
   through `useStore()`. Store modules may import a specific Store directly when coordinating state

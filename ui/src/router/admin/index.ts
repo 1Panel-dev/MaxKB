@@ -26,7 +26,7 @@ function getQueryToken(tokenQuery: unknown) {
 const router = createRouter({
   history: createWebHistory(ADMIN_BASE_PATH),
   routes: [
-    { path: '/', redirect: { name: 'workspace-home' } },
+    { path: '/', redirect: { name: 'workspace-home', params: { workspaceId: 'default' } } },
     ...loginRoutes,
     ...workflowRoutes,
     workspaceRoutes,
@@ -82,36 +82,9 @@ router.beforeEach((to) => {
       () => theme.applyDefaultTheme(),
     )
     .then(() => {
-      const currentUserRequest = user.userInfo ? Promise.resolve() : user.loadCurrentUser()
-      return currentUserRequest.then(
-        () => {
-          if (to.meta.scope !== 'workspace') return true
-
-          const routeWorkspaceId = Array.isArray(to.params.workspaceId)
-            ? to.params.workspaceId[0]
-            : to.params.workspaceId
-          const workspaceExists = user.workspaceList.some(
-            (workspace) => workspace.id === routeWorkspaceId,
-          )
-
-          if (routeWorkspaceId && workspaceExists) {
-            if (routeWorkspaceId !== user.workspaceId) user.setWorkspaceId(routeWorkspaceId)
-            return true
-          }
-
-          const workspaceId =
-            user.workspaceList.find((workspace) => workspace.id === user.workspaceId)?.id ??
-            user.workspaceList[0]?.id ??
-            'default'
-          user.setWorkspaceId(workspaceId)
-          return {
-            name: to.name,
-            params: { ...to.params, workspaceId },
-            query: to.query,
-            hash: to.hash,
-            replace: true,
-          }
-        },
+      if (user.userInfo) return true
+      return user.loadCurrentUser().then(
+        () => true,
         () => {
           login.clearToken()
           return {

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 
 function goHome() {
-  void router.replace({ name: 'workspace-home' })
+  void router.replace({ name: 'workspace-home', params: { workspaceId: 'default' } })
 }
 </script>
 

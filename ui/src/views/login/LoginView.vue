@@ -58,7 +58,7 @@ const completeClientLogin = async () => {
   } else {
     return
   }
-  await router.push({ name: 'workspace-home' })
+  await router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
 }
 
 onBeforeMount(() => {

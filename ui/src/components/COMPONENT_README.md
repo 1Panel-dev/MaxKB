@@ -49,11 +49,16 @@ src/components/
 │   │   └── mk-dropdown-item.vue  # 统一菜单项图标、内容和选中状态布局
 │   ├── mk-icon/
 │   │   └── index.vue         # MaxKB SVG Symbol 与 Element Plus 图标统一入口
+│   ├── mk-filterable-dropdown/
+│   │   ├── index.vue         # 带搜索过滤和滚动列表的下拉框
+│   │   └── types.ts          # 下拉选项的最小公共类型
 │   ├── mk-search-list/
 │   │   └── index.vue         # 统一搜索框与剩余空间滚动列表布局
+│   ├── mk-search-input/
+│   │   └── index.vue         # 统一搜索图标并透传 ElInput 属性和事件
 │   └── mk-table/
 │       └── index.vue         # 统一表格样式与分页布局
-├── mk-filterable-dropdown/   # 带搜索过滤和滚动列表的下拉框，使用方手动导入
+├── mk-workspace-dropdown/    # 工作空间选择下拉框，选项和点击业务由使用方提供
 │   └── index.vue
 └── user-selector/            # 低频共享组件示例，使用方手动引入
     └── index.vue
@@ -73,10 +78,11 @@ src/components/
 
 ## MkFilterableDropdown
 
-`MkFilterableDropdown` 是带搜索过滤和滚动列表的低频共享下拉框，需要从
-`@/components/mk-filterable-dropdown/index.vue` 手动导入。触发器通过默认插槽传入；菜单项
-需要自定义图片、图标或其他业务内容时，使用 `option` 作用域插槽并通过当前 `option` 渲染。
-未传入 `option` 插槽时默认显示 `option.label`。
+`MkFilterableDropdown` 是自动注册的带搜索过滤和滚动列表的共享下拉框。触发器通过默认插槽
+传入；菜单项需要自定义图片、图标或其他业务内容时，使用 `option` 作用域插槽并通过当前 `option` 渲染。
+未传入 `option` 插槽时默认显示 `option.label`。选项以公共 `DropdownOption` 作为最小约束，
+可以附加业务字段；组件泛型会保留具体类型。选择菜单项时，组件先更新 `v-model`，再通过
+`select` 事件返回完整的 `option`。
 
 ```vue
 <MkFilterableDropdown v-model="selectedValue" :options="options">
@@ -94,6 +100,21 @@ src/components/
 
 ```ts
 const options = [{ label: '工作空间', logoUrl: '/workspace.png', value: 'workspace' }]
+```
+
+## MkWorkspaceDropdown
+
+`MkWorkspaceDropdown` 统一工作空间下拉框的图标和触发器布局，需要从
+`@/components/mk-workspace-dropdown/index.vue` 手动导入。使用方通过 `options` 传入当前页面
+可用的工作空间，通过 `v-model` 控制选中值，并在 `select` 中实现路由切换、重新加载数据
+等页面业务；公共组件内部不读取用户 Store，也不执行导航。
+
+```vue
+<MkWorkspaceDropdown
+  v-model="selectedWorkspaceId"
+  :options="workspaceOptions"
+  @select="handleWorkspaceSelect"
+/>
 ```
 
 ## MkDropdown
@@ -191,6 +212,16 @@ import { Setting } from '@element-plus/icons-vue'
 - 不直接使用 Unicode、Font Class 或裸 `<svg><use>`。
 - 更新图标时直接覆盖 `src/assets/iconfont.js`。
 - 保持 Symbol ID 稳定；ID 变化时必须同步修改所有对应的 `MkIcon name`。
+
+## MkSearchInput
+
+项目内带搜索图标的输入框使用全局自动注册的 `MkSearchInput`。组件默认 placeholder 为“搜索”且具有clearable，
+并在 `prefix` 插槽显示搜索图标；`v-model`、其他属性和事件直接传递给 Element Plus Input，因此可以el-input原生能力。传入 `prefix` 插槽时可以覆盖默认搜索
+图标，`prepend`、`append` 和 `suffix` 插槽也会继续透传。
+
+```vue
+<MkSearchInput v-model="searchKeyword" placeholder="搜索工作空间" />
+```
 
 ## MkSearchList
 

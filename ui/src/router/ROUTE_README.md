@@ -42,9 +42,8 @@ src/router/
 
 Workspace 使用 `AppLayout`，左侧导航根据 `scope: 'workspace'` 对应路由的 `children` 自动生成。
 
-Workspace 根地址为 `/admin/workspace/:workspaceId`。登录后从用户信息中取得可用工作空间；没有
-可用工作空间时使用 `default`。访问 Workspace 路由时，导航拦截器会校验地址中的
-`workspaceId`、同步用户 Store，并为缺失或无效的参数替换为当前可用工作空间。父路由的
+Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当前路由参数为准。应用根
+地址、登录成功和从 System 返回 Workspace 时统一进入 `/admin/workspace/default`。父路由的
 `scope` 会合并到匹配的子路由 `meta` 中。
 
 每个业务模块在 `admin/workspace/modules` 中独立维护。模块的列表、创建、详情、编辑等页面应放在同一个路由文件中。
@@ -86,7 +85,7 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
    导航清理地址栏中的 token。
 4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址。
 5. 访问受保护页面时加载或复用平台公开信息和主题，使刷新页面也能恢复版本与外观状态。
-6. token 有效但当前用户尚未加载时，通过用户 Store 加载当前用户、语言及工作空间；加载失败
+6. token 有效但当前用户尚未加载时，通过用户 Store 加载当前用户及语言；加载失败
    时清除登录状态并返回登录页。
 7. 导航完成后根据 `route.meta.title` 更新浏览器标题。
 

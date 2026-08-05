@@ -70,7 +70,7 @@ const handleLogin = async () => {
   isSubmitting.value = true
   loginRequest
     .then(
-      () => router.push({ name: 'workspace-home' }),
+      () => router.push({ name: 'workspace-home', params: { workspaceId: 'default' } }),
       () => refreshCaptcha(),
     )
     .finally(() => {

@@ -39,7 +39,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'groups',
           name: 'system-groups',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/identity/groups/UserGroupListView.vue'),
           meta: { title: '用户组', order: 40 },
         },
         {
