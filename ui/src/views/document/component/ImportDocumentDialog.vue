@@ -83,7 +83,7 @@
       <el-form-item prop="allow_download">
         <el-checkbox v-model="form.allow_download">
           {{
-            type === '1'
+            type == 1
               ? $t('views.document.form.allow_preview')
               : $t('views.document.form.allow_download')
           }}
