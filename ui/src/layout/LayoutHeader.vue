@@ -16,7 +16,7 @@ const props = withDefaults(
 function switchMode() {
   router.push(
     isWorkspace(props.mode)
-      ? { name: 'system-users' }
+      ? { name: 'system-home' }
       : { name: 'workspace-home', params: { workspaceId: 'default' } },
   )
 }

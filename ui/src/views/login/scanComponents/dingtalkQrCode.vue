@@ -10,7 +10,7 @@ defineOptions({ name: 'DingTalkQrCode' })
 
 const props = defineProps<{ config: QrCodeConfig }>()
 const router = useRouter()
-const { login } = useStore()
+const { auth } = useStore()
 
 const initialize = async () => {
   if (!props.config.app_key || !props.config.corp_id) return
@@ -32,7 +32,7 @@ const initialize = async () => {
       state: 'fit2cloud-ding-qr',
     },
     async ({ authCode }) => {
-      await login.asyncLoginWithDingTalk(authCode)
+      await auth.asyncLoginWithDingTalk(authCode)
       await router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
     },
     MsgError,

@@ -8,7 +8,7 @@ import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
 import { qrCodeLoginMethods } from './constants'
 
-const { profile, theme } = useStore()
+const { auth, theme } = useStore()
 
 const isLoading = ref(true)
 const loginConfig = ref<LoginConfig>({
@@ -48,10 +48,10 @@ const showLoginModeSwitch = computed(
 
 onBeforeMount(() => {
   isLoading.value = true
-  profile
+  auth
     .loadBaseProfile()
     .then(() => {
-      if (profile.isPE || profile.isEE) {
+      if (auth.isPE || auth.isEE) {
         const loginConfigRequest = BaseInfoApi.getLoginConfig().then((config) => {
           if (Object.keys(config).length > 0) {
             loginConfig.value = config

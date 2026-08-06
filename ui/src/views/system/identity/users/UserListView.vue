@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type { OptionItem } from '@/types'
-import type { SystemUser, SystemUserQuery } from '@/types'
+import type { LoginMethod, OptionItem, SystemUser, SystemUserQuery } from '@/types'
 import { datetimeFormat } from '@/utils/time'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import UserFromDrawer from './components/UserFromDrawer.vue'
 
+const { auth } = useStore()
 const route = useRoute()
-const searchFields: Option[] = [
+
+const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+
+/* 列表查询相关 */
+const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
   { label: '邮箱', value: 'email' },
@@ -28,25 +34,7 @@ const paginationConfig = ref({
 })
 const systemUsersData = ref<SystemUser[]>([])
 const systemUsersLoading = ref(false)
-const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 const systemUserQuery = ref<SystemUserQuery>()
-
-function loadSystemUsers() {
-  systemUsersLoading.value = true
-  UserManageApi
-    .getUserManagePage(paginationConfig.value, systemUserQuery.value)
-    .then((pageData) => {
-      systemUsersData.value = pageData.records
-      paginationConfig.value = {
-        currentPage: pageData.current,
-        pageSize: pageData.size,
-        total: pageData.total,
-      }
-    })
-    .finally(() => {
-      systemUsersLoading.value = false
-    })
-}
 
 function handleSearchChange(query?: SystemUserQuery) {
   systemUserQuery.value = query
@@ -57,6 +45,21 @@ function handleSearchChange(query?: SystemUserQuery) {
 function handlePageSizeChange() {
   paginationConfig.value.currentPage = 1
   loadSystemUsers()
+}
+function loadSystemUsers() {
+  systemUsersLoading.value = true
+  UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
+    .then((res) => {
+      systemUsersData.value = res.records
+      paginationConfig.value = {
+        currentPage: res.current,
+        pageSize: res.size,
+        total: res.total,
+      }
+    })
+    .finally(() => {
+      systemUsersLoading.value = false
+    })
 }
 
 onMounted(() => loadSystemUsers())
@@ -87,8 +90,53 @@ onMounted(() => loadSystemUsers())
       <el-table-column type="selection" width="40" />
       <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
       <el-table-column prop="username" label="用户名" show-overflow-tooltip />
+      <el-table-column width="100" label="状态">
+        <template #default="{ row }">
+          <MkStatusLabel :active="row.is_active" />
+        </template>
+      </el-table-column>
 
-      <el-table-column prop="creator" label="创建人" width="120" />
+      <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+        <template #default="{ row }">
+          {{ row.email || '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" width="120" label="手机号">
+        <template #default="{ row }">
+          {{ row.phone || '-' }}
+        </template>
+      </el-table-column>
+
+      <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="210" label="角色">
+        <template #default="{ row }">
+          <!-- <div v-if="row.role_name?.length" class="flex items-center gap-1">
+            <el-tag type="info">{{ row.role_name[0] }}</el-tag>
+            <el-popover
+              v-if="row.role_name.length > 1"
+              placement="bottom-start"
+              trigger="hover"
+              :width="600"
+            >
+              <template #reference>
+                <el-tag type="info">+{{ row.role_name.length - 1 }}</el-tag>
+              </template>
+              <el-table :data="row.role_workspace" max-height="320">
+                <el-table-column prop="roleName" label="角色" min-width="180" />
+                <el-table-column prop="workspace" label="工作空间" min-width="320">
+                </el-table-column>
+              </el-table>
+            </el-popover>
+          </div>
+          <span v-else>-</span> -->
+        </template>
+      </el-table-column>
+
+      <el-table-column label="用户来源">
+        <template #default="{ row }">
+          {{ row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+        </template>
+      </el-table-column>
+
       <el-table-column label="创建时间" width="180">
         <template #default="{ row }">
           {{ datetimeFormat(row.create_time) }}

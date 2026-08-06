@@ -5,10 +5,10 @@ import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores'
 import type { LoginConfig, LoginMethod } from '@/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
-import { loginMethodLabels } from '../constants'
 
 interface AccountLoginForm {
   captcha: string
@@ -24,7 +24,7 @@ const props = defineProps<{
 
 const route = useRoute()
 const router = useRouter()
-const { login, profile } = useStore()
+const { auth } = useStore()
 const isSubmitting = ref(false)
 const identifyCode = ref('')
 const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? 'LOCAL')
@@ -62,7 +62,7 @@ const handleLogin = async () => {
     if (valid) {
       isSubmitting.value = true
       if (loginMethod.value === 'LDAP') {
-        login
+        auth
           .asyncLdapLogin(accountLoginForm)
           .then(() => {
             router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
@@ -72,7 +72,7 @@ const handleLogin = async () => {
           })
       } else {
         const encryptor = new JSEncrypt()
-        encryptor.setPublicKey(profile.BaseProfile?.rsa ?? '')
+        encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
         if (!encryptedData) {
           MsgError('登录信息加密失败')
@@ -80,7 +80,7 @@ const handleLogin = async () => {
           return
         }
 
-        login
+        auth
           .asyncLogin({
             encryptedData,
             password: '',
@@ -179,7 +179,9 @@ onMounted(() => {
 <template>
   <div class="flex h-full flex-col">
     <div class="min-h-0 flex-1">
-      <h2 class="mb-4">{{ loginMethodLabels[loginMethod] }}</h2>
+      <h2 class="mb-4">
+        {{ loginMethod === 'LDAP' ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
+      </h2>
 
       <el-form
         ref="accountLoginFormRef"

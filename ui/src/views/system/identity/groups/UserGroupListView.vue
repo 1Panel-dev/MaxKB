@@ -4,7 +4,6 @@ import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-pl
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import type { OptionItem } from '@/types'
-import type { ComplexSearchFieldOption } from '@/components/global/mk-complex-search/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface UserGroup {
@@ -26,7 +25,7 @@ type UserGroupAction = 'delete' | 'rename'
 const groupSearchKeyword = ref('')
 
 const memberSearchQuery = ref<Record<string, boolean | number | string>>()
-const memberSearchFields: ComplexSearchFieldOption[] = [
+const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'name' },
 ]
@@ -127,9 +126,9 @@ function addMemberToGroup(member: UserGroupMember) {
 
 /* 选择工作空间列表 */
 const selectedWorkspaceId = ref<string | number>('default')
-const workspaceOptions = ref<Option[]>([])
+const workspaceOptions = ref<OptionItem[]>([])
 
-function handleWorkspaceSelect(option: Option) {
+function handleWorkspaceSelect(option: OptionItem) {
   selectedWorkspaceId.value = option.value
   selectedGroupId.value = userGroups.value[0]?.id ?? ''
 }

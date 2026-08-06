@@ -5,9 +5,20 @@ import { systemKnowledgeRoutes } from './modules/knowledge'
 export const systemRoutes: RouteRecordRaw = {
   path: '/system',
   component: () => import('@/layout/AppLayout.vue'),
-  redirect: { name: 'system-users' },
+  redirect: { name: 'system-home' },
   meta: { scope: 'system' },
   children: [
+    {
+      path: 'home',
+      name: 'system-home',
+      component: () => import('@/views/system/SystemView.vue'),
+      meta: {
+        title: '首页',
+        activeIcon: 'icon_home_filled',
+        icon: 'icon_home_outlined',
+        order: 0,
+      },
+    },
     {
       path: 'identity',
       name: 'system-identity',

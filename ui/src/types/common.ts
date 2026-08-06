@@ -1,7 +1,9 @@
-/** 多个公共下拉组件共同使用的最小选项约束。 */
+/** 多个公共组件共同使用的通用选项类型。 */
 
-export interface OptionItem {
+export interface OptionItem<Value extends boolean | number | string = string | number> {
+  disabled?: boolean
   label: string
-  value: string | number
+  options?: OptionItem<boolean | number | string>[]
+  value: Value
   [key: string]: unknown
 }

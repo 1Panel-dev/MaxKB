@@ -57,6 +57,8 @@ src/components/
 │   │   └── index.vue         # 统一搜索框与剩余空间滚动列表布局
 │   ├── mk-search-input/
 │   │   └── index.vue         # 统一搜索图标并透传 ElInput 属性和事件
+│   ├── mk-status-label/
+│   │   └── index.vue         # 统一启用、禁用状态的图标与文案
 │   └── mk-table/
 │       └── index.vue         # 统一表格样式与分页布局
 ├── mk-workspace-dropdown/    # 工作空间选择下拉框，选项和点击业务由使用方提供
@@ -84,8 +86,7 @@ src/components/
 
 `MkFilterableDropdown` 是自动注册的带搜索过滤和滚动列表的共享下拉框。触发器通过默认插槽
 传入；菜单项需要自定义图片、图标或其他业务内容时，使用 `option` 作用域插槽并通过当前 `option` 渲染。
-未传入 `option` 插槽时默认显示 `option.label`。选项以 `src/components/common.ts` 中的
-`Option` 作为最小约束，
+未传入 `option` 插槽时默认显示 `option.label`。选项以 `@/types` 中的 `OptionItem` 作为最小约束，
 可以附加业务字段；组件泛型会保留具体类型。选择菜单项时，组件先更新 `v-model`，再通过
 `select` 事件返回完整的 `option`。
 
@@ -228,6 +229,16 @@ import { Setting } from '@element-plus/icons-vue'
 <MkSearchInput v-model="searchKeyword" placeholder="搜索工作空间" />
 ```
 
+## MkStatusLabel
+
+布尔状态使用全局自动注册的 `MkStatusLabel` 展示。通过 `active` 控制启用或禁用状态；默认文案为
+“已启用”和“已禁用”，可通过 `active-text`、`inactive-text` 按业务语义修改。
+
+```vue
+<MkStatusLabel :active="row.is_active" />
+<MkStatusLabel :active="task.completed" active-text="已完成" inactive-text="未完成" />
+```
+
 ## MkComplexSearch
 
 需要在多个字段间切换搜索条件时使用全局自动注册的 `MkComplexSearch`。组件通过默认
@@ -235,8 +246,7 @@ import { Setting } from '@element-plus/icons-vue'
 配置后使用下拉选择。输入或选择完成时，`change` 事件返回 `{ [field]: value }`；
 切换字段或清空条件时返回 `undefined`。
 
-需要在脚本中声明字段配置时，从
-`@/components/global/mk-complex-search/types` 导入 `ComplexSearchFieldOption`。
+需要在脚本中声明字段配置时，从 `@/types` 导入通用的 `OptionItem`。
 
 ```vue
 <MkComplexSearch

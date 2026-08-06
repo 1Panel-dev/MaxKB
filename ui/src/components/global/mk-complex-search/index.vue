@@ -6,12 +6,12 @@ defineOptions({ name: 'MkComplexSearch' })
 
 const props = withDefaults(
   defineProps<{
-    fields: OptionItem[]
+    fields: OptionItem<string>[]
   }>(),
   {},
 )
 const emit = defineEmits<{
-  change: [value: Record<string, unknown> | undefined]
+  change: [value: Record<string, boolean | number | string> | undefined]
 }>()
 
 const searchValue = ref('')

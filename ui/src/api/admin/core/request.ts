@@ -10,13 +10,13 @@ const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
 function setRequestHeaders(config: InternalAxiosRequestConfig) {
-  const { login, user } = useStore()
+  const { auth, user } = useStore()
 
   if (!(config.headers instanceof AxiosHeaders)) {
     config.headers = new AxiosHeaders(config.headers)
   }
-  if (login.token) {
-    config.headers.set('Authorization', `Bearer ${login.token}`)
+  if (auth.token) {
+    config.headers.set('Authorization', `Bearer ${auth.token}`)
   }
   if (user.language) {
     config.headers.set('Accept-Language', user.language)
@@ -80,8 +80,8 @@ request.interceptors.response.use(
       void router.push({ name: 'not-found' })
     }
     if (status === 401 && !requestUrl.includes('application/profile')) {
-      const { login } = useStore()
-      login.clearToken()
+      const { auth } = useStore()
+      auth.clearToken()
       router.push({ name: 'login' })
     }
     if (status === 403) {

@@ -52,7 +52,7 @@ Workspace 根地址为 `/admin/workspace/:workspaceId`。`workspaceId` 只以当
 
 System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的 `children` 自动生成。
 
-System 根地址为 `/admin/system`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
+System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
 
 系统外观设置页面地址为 `/admin/system/settings/appearance`，使用
 `views/system/settings/AppearanceSettingsView.vue`，并复用 `views/login/components`

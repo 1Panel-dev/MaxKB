@@ -6,20 +6,14 @@ import { systemRoutes } from './system'
 import { workspaceRoutes } from './workspace'
 import { workflowRoutes } from './workflow'
 
-const PUBLIC_ROUTE_NAMES = new Set(['login', 'forgot-password', 'not-found'])
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
 NProgress.configure({
-  minimum: 0.1,
+  minimum: 0.3,
   showSpinner: false,
-  speed: 300,
+  speed: 500,
   trickleSpeed: 200,
 })
-
-function getQueryToken(tokenQuery: unknown) {
-  const token = Array.isArray(tokenQuery) ? tokenQuery[0] : tokenQuery
-  return typeof token === 'string' ? token : undefined
-}
 
 const router = createRouter({
   history: createWebHistory(ADMIN_BASE_PATH),
@@ -38,37 +32,24 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   NProgress.start()
-  if (to.name === '404') {
-    return
-  }
-  const { login, user } = useStore()
-  const queryToken = getQueryToken(to.query.token)
-  if (queryToken) {
-    login.setToken(queryToken)
-    const { token: _token, ...query } = to.query
-    return {
-      path: to.path,
-      query,
-      hash: to.hash,
-      replace: true,
+  const notAuthRouteNameList = ['login', 'forgot-password', 'not-found']
+  const { auth, user } = useStore()
+
+  if (!notAuthRouteNameList.includes(to.name ? to.name.toString() : '')) {
+    if (to.query && to.query.token) {
+      auth.setToken(to.query.token.toString())
+    }
+    if (!auth.isAuthenticated) {
+      auth.clearToken()
+      return { name: 'login', query: { redirect: to.fullPath } }
+    }
+    await auth.loadBaseProfile()
+    if (!user.userInfo) {
+      await user.loadCurrentUser()
     }
   }
-
-  const routeName = typeof to.name === 'string' ? to.name : ''
-  if (PUBLIC_ROUTE_NAMES.has(routeName)) {
-    return true
-  }
-
-  if (!login.isAuthenticated) {
-    return {
-      name: 'login',
-      query: { redirect: to.fullPath },
-    }
-  }
-
-  return user.loadCurrentUser().then(() => {})
 })
 
 router.afterEach((to) => {

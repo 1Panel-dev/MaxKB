@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/types'
-import { loginMethodLabels } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
@@ -41,7 +41,7 @@ onMounted(() => {
       <el-tab-pane
         v-for="provider in qrCodeLoginMethods"
         :key="provider"
-        :label="loginMethodLabels[provider]"
+        :label="LOGIN_METHOD_LABELS[provider]"
         :name="provider"
       />
     </el-tabs>

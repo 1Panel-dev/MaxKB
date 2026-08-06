@@ -11,7 +11,7 @@ type Language = 'en' | 'zh-CN' | 'zh-TW'
 
 const currentLanguage = ref<Language>('zh-CN')
 const router = useRouter()
-const { login, user } = useStore()
+const { auth, user } = useStore()
 const languages: Array<{ label: string; value: Language }> = [
   { label: 'English', value: 'en' },
   { label: '简体中文', value: 'zh-CN' },
@@ -21,7 +21,7 @@ const languages: Array<{ label: string; value: Language }> = [
 function handleLogout() {
   const loginMode = user.userInfo?.source
   LoginApi.postLogout().then(() => {
-    login.clearToken()
+    auth.clearToken()
     router.push(
       loginMode && ['CAS', 'OIDC', 'OAuth2'].includes(loginMode)
         ? { name: 'login', query: { login_mode: 'manual' } }

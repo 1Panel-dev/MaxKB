@@ -3,6 +3,9 @@
 @theme {
   /* colors */
   --color-primary: var(--mk-primary);
+  --color-danger: var(--mk-danger);
+  --color-success: var(--mk-success);
+  --color-warning: var(--mk-warning);
   --color-N100: var(--mk-N100);
   --color-N300: var(--mk-N300);
   --color-N350: var(--mk-N350);
