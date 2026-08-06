@@ -58,7 +58,7 @@ class SystemChatUserView(APIView):
         request=ChatUserAPI.get_request(),
         responses=ChatUserAPI.get_response(),
     )
-    @has_permissions(PermissionConstants.CHAT_USER_CREATE, RoleConstants.ADMIN)
+    @has_permissions(PermissionConstants.CHAT_USER_CREATE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
     @log(
         menu="User management",
         operate="Add user",
@@ -78,7 +78,7 @@ class SystemChatUserView(APIView):
             tags=[_("System/Chat user")],  # type: ignore
             responses=ChatUserPageApi.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_READ, PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_READ, PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request):
             return result.success(ChatUserSerializer.list())
 
@@ -94,7 +94,7 @@ class SystemChatUserView(APIView):
             parameters=DeleteUserApi.get_parameters(),
             responses=DefaultModelResponse.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_DELETE, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_DELETE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="User management",
             operate="Delete user",
@@ -112,7 +112,7 @@ class SystemChatUserView(APIView):
             request=DeleteUserApi.get_parameters(),
             responses=UserProfileAPI.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_id):
             return result.success(ChatUserSerializer.Operate(data={"id": user_id}).one(with_valid=True))
 
@@ -126,7 +126,7 @@ class SystemChatUserView(APIView):
             request=EditUserApi.get_request(),
             responses=UserProfileAPI.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_EDIT, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_EDIT, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="Chat user",
             operate="Update user information",
@@ -147,7 +147,7 @@ class SystemChatUserView(APIView):
             request=AddMemberApi.get_parameters(),
             responses=UserProfileAPI.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_group_id):
             return result.success(
                 ChatUserSerializer.GetUserListByGroup(data={"group_id": user_group_id}).get_user_list()
@@ -165,7 +165,7 @@ class SystemChatUserView(APIView):
             request=DeleteUserApi.get_request(),
             responses=DefaultModelResponse.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_DELETE, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_DELETE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="Chat user",
             operate="Batch delete user",
@@ -186,7 +186,7 @@ class SystemChatUserView(APIView):
             request=BatchAddGroupApi.get_request(),
             responses=DefaultModelResponse.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_GROUP, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_GROUP, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="Chat user",
             operate="Batch add user to group",
@@ -208,7 +208,7 @@ class SystemChatUserView(APIView):
             request=ChangeUserPasswordApi.get_request(),
             responses=DefaultModelResponse.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_EDIT, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_EDIT, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="Chat user",
             operate="Change password",
@@ -231,7 +231,7 @@ class SystemChatUserView(APIView):
             parameters=ChatUserPageApi.get_parameters(),
             responses=UserPageApi.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.CHAT_USER_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, current_page, page_size):
             d = ChatUserSerializer.Query(
                 data={
@@ -257,7 +257,7 @@ class SystemChatUserGroupView(APIView):
         responses=CreateUserGroupApi.get_response(),
         tags=[_("System/User Group")],  # type: ignore
     )  # type: ignore
-    @has_permissions(PermissionConstants.USER_GROUP_CREATE, PermissionConstants.USER_GROUP_EDIT, RoleConstants.ADMIN)
+    @has_permissions(PermissionConstants.USER_GROUP_CREATE, PermissionConstants.USER_GROUP_EDIT, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
     @log(
         menu="User group",
         operate="Create or update user group",
@@ -274,7 +274,7 @@ class SystemChatUserGroupView(APIView):
         responses=UserGroupListApi.get_response(),
         tags=[_("System/User Group")],  # type: ignore
     )
-    @has_permissions(PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN)
+    @has_permissions(PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
     def get(self, request: Request):
         return result.success(UserGroupCreateSerializer().get_user_group_list())
 
@@ -290,7 +290,7 @@ class SystemChatUserGroupView(APIView):
             responses=DefaultModelResponse,
             tags=[_("System/User Group")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.USER_GROUP_DELETE, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_GROUP_DELETE, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="User group",
             operate="Delete user group",
@@ -314,7 +314,7 @@ class SystemChatUserGroupView(APIView):
             responses=DefaultModelResponse,
             tags=[_("System/User Group")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.USER_GROUP_ADD_MEMBER, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_GROUP_ADD_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="User group",
             operate="Add member to user group",
@@ -342,7 +342,7 @@ class SystemChatUserGroupView(APIView):
             responses=DefaultModelResponse,
             tags=[_("System/User Group")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         @log(
             menu="User group",
             operate="Remove member from user group",
@@ -369,7 +369,7 @@ class SystemChatUserGroupView(APIView):
             parameters=UserGroupListApi.get_parameters(),
             responses=UserGroupListApi.get_response(),
         )
-        @has_permissions(PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN)
+        @has_permissions(PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
         def get(self, request: Request, user_group_id: str, current_page: int, page_size: int):
             d = UserGroupListPageSerializer.Query(
                 data={
