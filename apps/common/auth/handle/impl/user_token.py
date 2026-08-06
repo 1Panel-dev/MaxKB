@@ -66,8 +66,9 @@ def get_permissions(user,
                                    role_model_dict.get(workspace_user_role.role_id) else False)],
                 user_id=user_id)
 
-            workspace_user_group_resource_permission_list = QuerySet(WorkspaceUserGroupResourcePermission).filter(
-                user_group__systemusergrouprelation__user_id=user_id
+            workspace_user_group_resource_permission_list = QuerySet(
+                WorkspaceUserGroupResourcePermission).filter(
+                user_group__user_relations__user_id=user_id
             ).select_related('user_group').distinct()
             "----------------------处理资源权限--------------------------------------------------"
             for _ in list(workspace_user_permission_list) + list(workspace_user_group_resource_permission_list):
@@ -92,7 +93,7 @@ def get_permissions(user,
                     for role_id in role_ids:
                         for m in (role_permission_mapping_dict.get(str(role_id)) or []):
                             p = PERMISSION_STR_MAP.get(m.permission_id)
-                            if p.meta.scope == PermissionScopeConstants.WORKSPACE:
+                            if PermissionScopeConstants.WORKSPACE in p.meta.scope:
                                 permissions.append(p)
 
                     for group, ps in group_by(permissions, lambda p: p.meta.group).items():
@@ -108,7 +109,7 @@ def get_permissions(user,
                                _role_permission_mapping_list]
                 # 过滤工作空间权限
                 permissions = [_permission for _permission in permissions if
-                               _permission.meta.scope == PermissionScopeConstants.WORKSPACE]
+                               PermissionScopeConstants.WORKSPACE in _permission.meta.scope]
                 for group, ps in group_by(permissions, lambda p: p.meta.group).items():
                     k = f"{group}:{_.workspace_id}"
                     bits = reduce(lambda x, y: x | y, [p.value.bit() for p in ps], 0)
@@ -118,7 +119,7 @@ def get_permissions(user,
                                   _role_permission_mapping in
                                   role_permission_mapping_list]
             system_permissions = [_permission for _permission in system_permissions if
-                                  _permission.meta.scope == PermissionScopeConstants.SYSTEM]
+                                  PermissionScopeConstants.SYSTEM in _permission.meta.scope]
             for group, permissions in group_by(system_permissions,
                                                lambda _permission: _permission.meta.group).items():
                 permission_map[f"{group}"] = reduce(lambda x, y: x | y,
@@ -132,7 +133,7 @@ def get_permissions(user,
                 workspace_id__in=workspace_id_list, user_id=user_id)
             workspace_user_group_resource_permission_list = QuerySet(
                 WorkspaceUserGroupResourcePermission).filter(
-                user_group__systemusergrouprelation__user_id=user_id
+                user_group__user_relations__user_id=user_id
             ).select_related('user_group').distinct()
 
             for _ in list(workspace_user_permission_list) + list(workspace_user_group_resource_permission_list):

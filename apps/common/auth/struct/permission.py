@@ -46,7 +46,7 @@ class PermissionMeta:
     role_list: list = field(default_factory=list)
     category: Optional[Category] = None
     resource_permission_group_list: Optional[list] = None
-    scope: Optional[PermissionScopeConstants] = None
+    scope: list[PermissionScopeConstants] = field(default_factory=list)
     is_ee: bool = True
 
 
