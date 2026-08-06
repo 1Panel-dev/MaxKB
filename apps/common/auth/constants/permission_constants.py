@@ -59,6 +59,11 @@ class ResourcePermissionConst:
     MODEL_MANAGE = ResourcePermissionGroup(Group.MODEL, "MANAGE")
 
 
+from maxkb import settings
+
+is_ee: bool = settings.edition == "EE"
+
+
 class PermissionConstants(Enum):
     """
      权限枚举
@@ -110,7 +115,7 @@ class PermissionConstants(Enum):
 
     USER_SET_ROLE = (Permission(
         group=Group.USER, sub_group=Group.USER, operate=Operate.SET_ROLE, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM))
 
     USER_IMPORT = (Permission(
         group=Group.USER, sub_group=Group.USER, operate=Operate.IMPORT, bit_index=5
@@ -670,39 +675,39 @@ class PermissionConstants(Enum):
     # ==================== 工作空间管理 ====================
     WORKSPACE_READ = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_CREATE = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_EDIT = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_DELETE = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_ADD_MEMBER = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.ADD_MEMBER, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_REMOVE_MEMBER = (Permission(
         group=Group.WORKSPACE, sub_group=Group.WORKSPACE, operate=Operate.REMOVE_MEMBER, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_WORKSPACE_READ = (Permission(
         group=Group.WORKSPACE_WORKSPACE, sub_group=Group.WORKSPACE_WORKSPACE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_WORKSPACE_ADD_MEMBER = (Permission(
         group=Group.WORKSPACE_WORKSPACE, sub_group=Group.WORKSPACE_WORKSPACE, operate=Operate.ADD_MEMBER, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     WORKSPACE_WORKSPACE_REMOVE_MEMBER = (Permission(
         group=Group.WORKSPACE_WORKSPACE, sub_group=Group.WORKSPACE_WORKSPACE, operate=Operate.REMOVE_MEMBER, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM, is_ee=is_ee))
 
     # ==================== 登录认证 ====================
     LOGIN_AUTH_READ = (Permission(
@@ -1101,624 +1106,624 @@ class PermissionConstants(Enum):
     # ==================== 共享工具 ====================
     SHARED_TOOL_READ = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_CREATE = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_EDIT = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_DELETE = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_IMPORT = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.IMPORT, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_EXPORT = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.EXPORT, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_PUBLISH = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.PUBLISH, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.RELATE_VIEW, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_EXECUTE_RECORD = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.RECORD, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_TOOL_TO_WORKSPACE = (Permission(
         group=Group.SYSTEM_TOOL, sub_group=Group.SYSTEM_TOOL, operate=Operate.TO_WORKSPACE, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # ==================== 共享知识库 ====================
     SHARED_KNOWLEDGE_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_CREATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_SYNC = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.SYNC, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_VECTOR = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.VECTOR, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_EXPORT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.EXPORT, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_GENERATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.GENERATE, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DELETE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.DELETE, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TO_WORKSPACE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_KNOWLEDGE, operate=Operate.TO_WORKSPACE, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库工作流
     SHARED_KNOWLEDGE_WORKFLOW_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_WORKFLOW_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_WORKFLOW_EXPORT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EXPORT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_WORKFLOW_PUBLISH = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.PUBLISH, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库文档
     SHARED_KNOWLEDGE_DOCUMENT_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_CREATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_DELETE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_SYNC = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.SYNC, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_EXPORT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EXPORT, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_GENERATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.GENERATE, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_VECTOR = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.VECTOR, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_MIGRATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.MIGRATE, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_TAG = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TAG, bit_index=10
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_REPLACE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.REPLACE, bit_index=11
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_DOCUMENT_TOKEN = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TOKEN, bit_index=12
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库标签
     SHARED_KNOWLEDGE_TAG_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TAG_CREATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TAG_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TAG_DELETE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库问题
     SHARED_KNOWLEDGE_PROBLEM_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_PROBLEM_CREATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_PROBLEM_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_PROBLEM_DELETE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_PROBLEM_RELATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.RELATE, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库术语库
     SHARED_KNOWLEDGE_TERMBASE_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TERMBASE_CREATE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TERMBASE_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TERMBASE_DELETE = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_TERMBASE_EXPORT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EXPORT, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库命中测试
     SHARED_KNOWLEDGE_HIT_TEST = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_HIT_TEST, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # 共享知识库对话用户
     SHARED_KNOWLEDGE_CHAT_USER_READ = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_KNOWLEDGE_CHAT_USER_EDIT = (Permission(
         group=Group.SYSTEM_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # ==================== 共享模型 ====================
     SHARED_MODEL_READ = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_MODEL_CREATE = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_MODEL_EDIT = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_MODEL_DELETE = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_MODEL_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.RELATE_VIEW, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     SHARED_MODEL_TO_WORKSPACE = (Permission(
         group=Group.SYSTEM_MODEL, sub_group=Group.SYSTEM_MODEL, operate=Operate.TO_WORKSPACE, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.SHARED, is_ee=is_ee))
 
     # ==================== 资源管理 - 应用 ====================
     RESOURCE_APPLICATION_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_EDIT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_DELETE = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.DELETE, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_EXPORT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.EXPORT, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_COPY = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.COPY, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_AUTH = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.AUTH, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_PUBLISH = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.PUBLISH, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_TRIGGER_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_READ,
         bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_TRIGGER_CREATE = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_CREATE,
         bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_TRIGGER_EDIT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_EDIT,
         bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_TRIGGER_DELETE = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.TRIGGER_DELETE,
         bit_index=10
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_RES_APPLICATION, operate=Operate.RELATE_VIEW,
         bit_index=11
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 应用概览
     RESOURCE_APPLICATION_OVERVIEW_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_OVERVIEW_EMBED = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.EMBED, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_OVERVIEW_ACCESS = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.ACCESS, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_OVERVIEW_DISPLAY = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.DISPLAY, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_OVERVIEW_API_KEY = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.API_KEY, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_OVERVIEW_PUBLIC = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_OVERVIEW, operate=Operate.PUBLIC_ACCESS, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 应用接入
     RESOURCE_APPLICATION_ACCESS_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_ACCESS, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_ACCESS_EDIT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_ACCESS, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 应用对话用户
     RESOURCE_APPLICATION_CHAT_USER_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_CHAT_USER_EDIT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 应用对话日志
     RESOURCE_APPLICATION_CHAT_LOG_READ = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_LOG, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_CHAT_LOG_ADD_KNOWLEDGE = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_LOG, operate=Operate.ADD_KNOWLEDGE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_CHAT_LOG_ANNOTATION = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_LOG, operate=Operate.ANNOTATION, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_CHAT_LOG_EXPORT = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_LOG, operate=Operate.EXPORT, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_APPLICATION_CHAT_LOG_CLEAR_POLICY = (Permission(
         group=Group.SYSTEM_RES_APPLICATION, sub_group=Group.SYSTEM_CHAT_LOG, operate=Operate.CLEAR_POLICY, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # ==================== 资源管理 - 知识库 ====================
     RESOURCE_KNOWLEDGE_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DELETE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.DELETE, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_SYNC = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.SYNC, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_EXPORT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.EXPORT, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_PUBLISH = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.PUBLISH, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_VECTOR = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.VECTOR, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_GENERATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.GENERATE, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_AUTH = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.AUTH, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_RES_KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库工作流
     RESOURCE_KNOWLEDGE_WORKFLOW_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_WORKFLOW_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_WORKFLOW_EXPORT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.EXPORT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_WORKFLOW_PUBLISH = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_WORKFLOW, operate=Operate.PUBLISH, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库文档
     RESOURCE_KNOWLEDGE_DOCUMENT_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_CREATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_DELETE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_SYNC = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.SYNC, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_EXPORT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.EXPORT, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_GENERATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.GENERATE, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_VECTOR = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.VECTOR, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_MIGRATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.MIGRATE, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_TAG = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TAG, bit_index=10
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_REPLACE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.REPLACE, bit_index=11
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_DOCUMENT_TOKEN = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_DOCUMENT, operate=Operate.TOKEN, bit_index=12
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库命中测试
     RESOURCE_KNOWLEDGE_HIT_TEST = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_HIT_TEST, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库问题
     RESOURCE_KNOWLEDGE_PROBLEM_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_PROBLEM_CREATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_PROBLEM_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_PROBLEM_DELETE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_PROBLEM_RELATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_PROBLEM, operate=Operate.RELATE, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库术语库
     RESOURCE_KNOWLEDGE_TERMBASE_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TERMBASE_CREATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TERMBASE_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TERMBASE_DELETE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TERMBASE_EXPORT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TERMBASE, operate=Operate.EXPORT, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库标签
     RESOURCE_KNOWLEDGE_TAG_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TAG_CREATE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.CREATE, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TAG_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.EDIT, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_TAG_DELETE = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_TAG, operate=Operate.DELETE, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # 资源管理 - 知识库对话用户
     RESOURCE_KNOWLEDGE_CHAT_USER_READ = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_KNOWLEDGE_CHAT_USER_EDIT = (Permission(
         group=Group.SYSTEM_RES_KNOWLEDGE, sub_group=Group.SYSTEM_CHAT_USER, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # ==================== 资源管理 - 工具 ====================
     RESOURCE_TOOL_READ = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_EDIT = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_DELETE = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.DELETE, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_EXPORT = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.EXPORT, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_PUBLISH = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.PUBLISH, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_AUTH = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.AUTH, bit_index=5
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.RELATE_VIEW, bit_index=6
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_EXECUTE_RECORD = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.RECORD, bit_index=7
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_TRIGGER_READ = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.TRIGGER_READ, bit_index=8
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_TRIGGER_CREATE = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.TRIGGER_CREATE, bit_index=9
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_TRIGGER_EDIT = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.TRIGGER_EDIT, bit_index=10
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_TOOL_TRIGGER_DELETE = (Permission(
         group=Group.SYSTEM_RES_TOOL, sub_group=Group.SYSTEM_RES_TOOL, operate=Operate.TRIGGER_DELETE, bit_index=11
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # ==================== 资源管理 - 模型 ====================
     RESOURCE_MODEL_READ = (Permission(
         group=Group.SYSTEM_RES_MODEL, sub_group=Group.SYSTEM_RES_MODEL, operate=Operate.READ, bit_index=0
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_MODEL_EDIT = (Permission(
         group=Group.SYSTEM_RES_MODEL, sub_group=Group.SYSTEM_RES_MODEL, operate=Operate.EDIT, bit_index=1
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_MODEL_DELETE = (Permission(
         group=Group.SYSTEM_RES_MODEL, sub_group=Group.SYSTEM_RES_MODEL, operate=Operate.DELETE, bit_index=2
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_MODEL_AUTH = (Permission(
         group=Group.SYSTEM_RES_MODEL, sub_group=Group.SYSTEM_RES_MODEL, operate=Operate.AUTH, bit_index=3
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     RESOURCE_MODEL_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.SYSTEM_RES_MODEL, sub_group=Group.SYSTEM_RES_MODEL, operate=Operate.RELATE_VIEW, bit_index=4
-    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=True))
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.RESOURCE, is_ee=is_ee))
 
     # ==================== 操作日志 ====================
     OPERATION_LOG_READ = (Permission(
