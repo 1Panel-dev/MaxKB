@@ -2,7 +2,7 @@ import type { LoginMethod, QrCodeProvider } from '@/types'
 
 export const loginMethodLabels: Record<LoginMethod, string> = {
   CAS: 'CAS',
-  LDAP: 'LDAP',
+  LDAP: 'LDAP 登录',
   LOCAL: '账号登录',
   OAuth2: 'OAuth2',
   OIDC: 'OIDC',

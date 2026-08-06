@@ -30,7 +30,7 @@ const initialize = async () => {
     goto: authorizeUrl.toString(),
     height: '266',
     id: 'lark-qr-code',
-    style: 'width:280px;height:280px;border:1px solid #e8e8e8;margin:0 auto;border-radius:8px;',
+    style: 'width:280px;height:280px;margin:0 auto;',
     width: '266',
   })
 
@@ -55,7 +55,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="mb-4 text-center">
+  <div class="mt-6 flex-center">
+    <img src="@/assets/logo/logo_lark.svg" alt="" width="24px" class="mr-2" />
     <h2>飞书扫码登录</h2>
   </div>
   <div id="lark-qr-code" />

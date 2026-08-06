@@ -40,8 +40,10 @@ const router = createRouter({
 
 router.beforeEach((to) => {
   NProgress.start()
-
-  const { login, platformProfile, theme, user } = useStore()
+  if (to.name === '404') {
+    return
+  }
+  const { login, user } = useStore()
   const queryToken = getQueryToken(to.query.token)
   if (queryToken) {
     login.setToken(queryToken)
@@ -66,32 +68,7 @@ router.beforeEach((to) => {
     }
   }
 
-  return platformProfile
-    .loadPlatformProfile()
-    .then(
-      () => {
-        if (theme.isInitialized) return
-        if (!platformProfile.isPremium) {
-          theme.applyDefaultTheme()
-          return
-        }
-        return theme.loadThemeInfo().then(undefined, () => theme.applyDefaultTheme())
-      },
-      () => theme.applyDefaultTheme(),
-    )
-    .then(() => {
-      if (user.userInfo) return true
-      return user.loadCurrentUser().then(
-        () => true,
-        () => {
-          login.clearToken()
-          return {
-            name: 'login' as const,
-            query: { redirect: to.fullPath },
-          }
-        },
-      )
-    })
+  return user.loadCurrentUser().then(() => {})
 })
 
 router.afterEach((to) => {

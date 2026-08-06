@@ -22,10 +22,5 @@ const iframeUrl = computed(() => {
 </script>
 
 <template>
-  <iframe
-    v-if="iframeUrl"
-    :src="iframeUrl"
-    class="-mt-8 h-95 w-full border-0"
-    title="企业微信扫码登录"
-  />
+  <iframe v-if="iframeUrl" :src="iframeUrl" class="h-95 w-full" />
 </template>

@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/types'
-import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
+import { loginMethodLabels } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
@@ -10,19 +10,11 @@ import WecomQrCode from '../scanComponents/wecomQrCode.vue'
 defineOptions({ name: 'QrCodeLogin' })
 
 const props = defineProps<{ loginConfig: LoginConfig }>()
-const qrCodeProviders = computed(() =>
-  (props.loginConfig.login_methods ?? [])
-    .filter((method): method is QrCodeProvider =>
-      qrCodeLoginMethods.some((provider) => provider === method),
-    )
-    .map((method) => ({ label: loginMethodLabels[method], value: method })),
-)
+const qrCodeLoginMethods = computed(() => props.loginConfig.login_methods ?? [])
+
 const qrCodeConfigs = ref<Partial<Record<QrCodeProvider, QrCodeConfig>>>({})
-const defaultProvider = props.loginConfig.default_value
 const qrCodeProvider = ref<QrCodeProvider>(
-  qrCodeLoginMethods.some((provider) => provider === defaultProvider)
-    ? (defaultProvider as QrCodeProvider)
-    : (qrCodeProviders.value[0]?.value ?? 'wecom'),
+  (props.loginConfig.default_value as QrCodeProvider) ?? 'wecom',
 )
 
 const providerComponents = {
@@ -47,10 +39,10 @@ onMounted(() => {
   <div class="qr-login">
     <el-tabs v-model="qrCodeProvider" class="provider-tabs">
       <el-tab-pane
-        v-for="provider in qrCodeProviders"
-        :key="provider.value"
-        :label="provider.label"
-        :name="provider.value"
+        v-for="provider in qrCodeLoginMethods"
+        :key="provider"
+        :label="loginMethodLabels[provider]"
+        :name="provider"
       />
     </el-tabs>
     <component :is="currentProviderComponent" v-if="currentConfig" :config="currentConfig" />

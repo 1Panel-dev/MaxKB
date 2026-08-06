@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
 import type { LoginConfig, QrCodeProvider } from '@/types'
@@ -8,13 +7,10 @@ import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
 import { qrCodeLoginMethods } from './constants'
-import { loadLoginScript } from '@/utils/script-loader.ts'
 
-const route = useRoute()
-const router = useRouter()
-const { login, profile, theme } = useStore()
+const { profile, theme } = useStore()
+
 const isLoading = ref(true)
-const rsaPublicKey = computed(() => profile.BaseProfile?.rsa ?? '')
 const loginConfig = ref<LoginConfig>({
   default_value: 'LOCAL',
   login_methods: ['LOCAL'],
@@ -27,54 +23,65 @@ const qrCodeProviders = computed(() =>
     qrCodeLoginMethods.includes(method as QrCodeProvider),
   ),
 )
-const showLoginModeSwitch = computed(
-  () =>
-    (loginConfig.value.login_methods ?? []).includes('LOCAL') && qrCodeProviders.value.length > 0,
+const accountLoginMethods = computed(() =>
+  (loginConfig.value.login_methods ?? []).filter(
+    (method) => !qrCodeLoginMethods.includes(method as QrCodeProvider),
+  ),
 )
-
-const completeClientLogin = async () => {
-  const client = typeof route.query.client === 'string' ? route.query.client : ''
-  if (client === 'dingtalk' && typeof route.query.corpId === 'string') {
-    const dingTalkSdk = await import('dingtalk-jsapi')
-    const result = await dingTalkSdk.runtime.permission.requestAuthCode({
-      corpId: route.query.corpId,
-    })
-    await login.asyncLoginWithDingTalk(result.code, true)
-  } else if (client === 'lark' && typeof route.query.appId === 'string') {
-    await loadLoginScript(
-      'https://lf-scm-cn.feishucdn.com/lark/op/h5-js-sdk-1.5.35.js',
-      'lark-client-sdk',
-    )
-    if (!window.tt) throw new Error('飞书客户端 SDK 加载失败')
-    const code = await new Promise<string>((resolve, reject) => {
-      window.tt?.requestAuthCode({
-        appId: route.query.appId as string,
-        success: (result) => resolve(result.code),
-        fail: reject,
-      })
-    })
-    await login.asyncLoginWithLark(code)
-  } else {
-    return
-  }
-  await router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
-}
+const accountLoginConfig = computed<LoginConfig>(() => ({
+  ...loginConfig.value,
+  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
+    ? 'LOCAL'
+    : loginConfig.value.default_value,
+  login_methods: accountLoginMethods.value,
+}))
+const qrCodeLoginConfig = computed<LoginConfig>(() => ({
+  ...loginConfig.value,
+  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
+    ? loginConfig.value.default_value
+    : 'wecom',
+  login_methods: qrCodeProviders.value,
+}))
+const showLoginModeSwitch = computed(
+  () => accountLoginMethods.value.length > 0 && qrCodeProviders.value.length > 0,
+)
 
 onBeforeMount(() => {
   isLoading.value = true
-  profile.loadBaseProfile().then(() => {
-    // 企业版和专业版：第三方登录
-    if (profile.isPE || profile.isEE) {
-      const loginConfigRequest = BaseInfoApi.getLoginConfig()
-      const themeRequest = theme.loadThemeInfo()
-      return Promise.all([themeRequest, loginConfigRequest])
-    }
-  })
+  profile
+    .loadBaseProfile()
+    .then(() => {
+      if (profile.isPE || profile.isEE) {
+        const loginConfigRequest = BaseInfoApi.getLoginConfig().then((config) => {
+          if (Object.keys(config).length > 0) {
+            loginConfig.value = config
+          } else {
+            loginConfig.value = {
+              max_attempts: 1,
+              default_value: 'LOCAL',
+              login_methods: ['LOCAL'],
+            }
+          }
+        })
+        const themeRequest = theme.loadThemeInfo()
+        return Promise.all([themeRequest, loginConfigRequest])
+      }
+
+      loginConfig.value = {
+        max_attempts: 1,
+        default_value: 'LOCAL',
+        login_methods: ['LOCAL'],
+      }
+    })
+
+    .finally(() => {
+      isLoading.value = false
+    })
 })
 </script>
 
 <template>
-  <LoginLayout v-loading="isLoading">
+  <LoginLayout v-if="!isLoading">
     <el-button
       v-if="showLoginModeSwitch"
       type="primary"
@@ -89,12 +96,8 @@ onBeforeMount(() => {
       />
     </el-button>
 
-    <AccountLogin
-      v-if="loginMode === 'account'"
-      :login-config="loginConfig"
-      :rsa-public-key="rsaPublicKey"
-    />
-    <QrCodeLogin v-else :login-config="loginConfig" />
+    <AccountLogin v-if="loginMode === 'account'" :login-config="accountLoginConfig" />
+    <QrCodeLogin v-else :login-config="qrCodeLoginConfig" />
   </LoginLayout>
 </template>
 

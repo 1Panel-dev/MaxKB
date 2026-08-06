@@ -47,8 +47,18 @@ watch(
 </script>
 
 <template>
-  <div class="mb-4 text-center">
+  <div class="mt-6 flex-center">
+    <img src="@/assets/logo/logo_dingtalk.svg" alt="" width="24px" class="mr-2" />
     <h2>钉钉扫码登录</h2>
   </div>
-  <div id="dingtalk-qr-code" class="mx-auto size-70 rounded-lg border border-N200" />
+  <div class="ding-talk-layout">
+    <div id="dingtalk-qr-code" />
+  </div>
 </template>
+<style lang="scss" scoped>
+.ding-talk-layout {
+  margin: auto;
+  width: 280px;
+  height: 280px;
+}
+</style>

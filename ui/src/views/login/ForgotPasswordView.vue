@@ -37,7 +37,6 @@ const handleResetPassword = async () => {
 <template>
   <LoginLayout>
     <h1>忘记密码</h1>
-    <p class="mt-2 text-N600">验证您的邮箱后重新设置登录密码</p>
 
     <el-form
       ref="forgotPasswordFormRef"

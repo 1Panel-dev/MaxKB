@@ -44,8 +44,8 @@ function handleLogout() {
             <img src="@/assets/mk-icon-user-gradient.svg" alt="" class="w-[54%]!" />
           </el-avatar>
           <div>
-            <div class="font-medium text-lg">{{ '飞小致' }}</div>
-            <div class="text-N600">{{ 'feixaozhi' }}</div>
+            <div class="font-medium text-lg">{{ user.userInfo?.nick_name }}</div>
+            <div class="text-N600">{{ user.userInfo?.username }}</div>
           </div>
         </div>
         <el-divider />

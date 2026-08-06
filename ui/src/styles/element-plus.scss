@@ -43,6 +43,7 @@
     padding: 0;
   }
   &.is-circle {
+    height: var(--el-button-size);
     &:hover {
       box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
       color: var(--mk-N900);
