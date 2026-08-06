@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import platformInfoApi from '@/api/admin/auth/platform-info'
+import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
-import type { LoginConfig, LoginMode, QrCodeProvider } from '@/types'
+import type { LoginConfig, QrCodeProvider } from '@/types'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
@@ -12,15 +12,15 @@ import { loadLoginScript } from '@/utils/script-loader.ts'
 
 const route = useRoute()
 const router = useRouter()
-const { login, platformInfo, theme } = useStore()
+const { login, profile, theme } = useStore()
 const isLoading = ref(true)
-const rsaPublicKey = computed(() => platformInfo.platformInfo?.rsa ?? '')
+const rsaPublicKey = computed(() => profile.BaseProfile?.rsa ?? '')
 const loginConfig = ref<LoginConfig>({
   default_value: 'LOCAL',
   login_methods: ['LOCAL'],
   max_attempts: 1,
 })
-const loginMode = ref<LoginMode>('account')
+const loginMode = ref<'account' | 'qr-code'>('account')
 
 const qrCodeProviders = computed(() =>
   (loginConfig.value.login_methods ?? []).filter((method): method is QrCodeProvider =>
@@ -62,42 +62,14 @@ const completeClientLogin = async () => {
 
 onBeforeMount(() => {
   isLoading.value = true
-  platformInfo
-    .loadPlatformInfo()
-    .then(() => {
-      if (!platformInfo.isPremium) {
-        theme.applyDefaultTheme()
-        return
-      }
-
-      const themeRequest = theme.loadThemeInfo().then(undefined, () => theme.applyDefaultTheme())
-      const loginConfigRequest =
-        route.query.login_mode === 'manual'
-          ? Promise.resolve()
-          : platformInfoApi.getLoginConfig().then(
-              (configuredLogin) => {
-                loginConfig.value = {
-                  ...configuredLogin,
-                  login_methods: configuredLogin.login_methods?.length
-                    ? configuredLogin.login_methods
-                    : ['LOCAL'],
-                }
-              },
-              () => undefined,
-            )
+  profile.loadBaseProfile().then(() => {
+    // 企业版和专业版：第三方登录
+    if (profile.isPE || profile.isEE) {
+      const loginConfigRequest = BaseInfoApi.getLoginConfig()
+      const themeRequest = theme.loadThemeInfo()
       return Promise.all([themeRequest, loginConfigRequest])
-    })
-    .then(() => {
-      loginMode.value = qrCodeProviders.value.includes(
-        loginConfig.value.default_value as QrCodeProvider,
-      )
-        ? 'qr-code'
-        : 'account'
-      return completeClientLogin()
-    })
-    .finally(() => {
-      isLoading.value = false
-    })
+    }
+  })
 })
 </script>
 

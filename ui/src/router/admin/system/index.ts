@@ -14,7 +14,7 @@ export const systemRoutes: RouteRecordRaw = {
       redirect: { name: 'system-users' },
       meta: {
         title: '身份与权限',
-        icon: 'icon-setting',
+        icon: 'icon_account_outlined',
         order: 10,
       },
       children: [

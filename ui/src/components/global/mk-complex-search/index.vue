@@ -1,43 +1,45 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
-import type { ComplexSearchFieldOption, ComplexSearchValue } from '@/types'
+import { computed } from 'vue'
+import type { OptionItem } from '@/types'
 
 defineOptions({ name: 'MkComplexSearch' })
 
 const props = withDefaults(
   defineProps<{
-    fields: ComplexSearchFieldOption[]
+    fields: OptionItem[]
   }>(),
   {},
 )
-
-const searchValue = defineModel<ComplexSearchValue | undefined>('')
-const searchField = defineModel<string>('field', { required: true })
 const emit = defineEmits<{
-  change: [value: ComplexSearchValue | undefined]
-  fieldChange: [field: string]
+  change: [value: Record<string, unknown> | undefined]
 }>()
 
-const activeField = computed(() => props.fields.find(({ value }) => value === searchField.value))
-const inputValue = computed<number | string>({
-  get: () => {
-    return typeof searchValue.value === 'boolean' ? '' : (searchValue.value ?? '')
-  },
-  set: (value) => {
-    searchValue.value = value
-  },
-})
+const searchValue = ref('')
+const searchField = ref(props.fields[0]?.value ?? '')
 
-watch(searchField, (field) => {
+const activeField = computed(() => props.fields.find(({ value }) => value === searchField.value))
+
+function handleFieldChange() {
   searchValue.value = ''
-  emit('fieldChange', field)
-  emit('change', '')
-})
+  emit('change', undefined)
+}
+
+function handleChange() {
+  if (searchValue.value === '' || searchValue.value === undefined) {
+    emit('change', undefined)
+  } else {
+    emit('change', { [searchField.value]: searchValue.value })
+  }
+}
 </script>
 
 <template>
   <div class="mk-complex-search flex">
-    <el-select v-model="searchField" class="mk-complex-search__field w-23!">
+    <el-select
+      v-model="searchField"
+      class="mk-complex-search__field w-23!"
+      @change="handleFieldChange"
+    >
       <el-option
         v-for="field in fields"
         :key="field.value"
@@ -47,17 +49,17 @@ watch(searchField, (field) => {
     </el-select>
 
     <el-select
-      v-if="activeField?.type === 'select'"
+      v-if="activeField?.options"
       :key="activeField.value"
       v-model="searchValue"
       class="mk-complex-search__value w-50!"
       clearable
       placeholder="请选择"
-      @change="emit('change', $event)"
+      @change="handleChange"
     >
       <el-option
-        v-for="option in activeField.options ?? []"
-        :key="String(option.value)"
+        v-for="(option, index) in activeField.options ?? []"
+        :key="index"
         :disabled="option.disabled"
         :label="option.label"
         :value="option.value"
@@ -67,11 +69,11 @@ watch(searchField, (field) => {
     <el-input
       v-else
       :key="activeField?.value"
-      v-model="inputValue"
+      v-model="searchValue"
       class="mk-complex-search__value w-50!"
       clearable
       placeholder="请输入"
-      @change="emit('change', $event)"
+      @change="handleChange"
     />
   </div>
 </template>

@@ -1,9 +1,9 @@
 /** 管理 Admin 登录凭证。 */
 
 import { defineStore } from 'pinia'
-import externalLoginApi from '@/api/admin/auth/external-login'
-import loginApi from '@/api/admin/auth/login'
-import type { LoginRequest } from '@/types'
+import ExternalLoginApi from '@/api/admin/auth/external-login'
+import LoginApi from '@/api/admin/auth/login'
+import type { LoginRequest } from '@/api/admin/auth/types'
 import { useUserStore } from './user'
 
 const TOKEN_STORAGE_KEY = 'token'
@@ -23,22 +23,22 @@ export const useLoginStore = defineStore('login', {
 
   actions: {
     asyncLogin(loginRequest: LoginRequest) {
-      return loginApi.postLogin(loginRequest).then((response) => this.setToken(response.token))
+      return LoginApi.postLogin(loginRequest).then((response) => this.setToken(response.token))
     },
 
     asyncLdapLogin(loginRequest: LoginRequest) {
-      return loginApi.postLdapLogin(loginRequest).then((response) => this.setToken(response.token))
+      return LoginApi.postLdapLogin(loginRequest).then((response) => this.setToken(response.token))
     },
 
     asyncLoginWithDingTalk(code: string, fromClient = false) {
       const loginRequest = fromClient
-        ? externalLoginApi.getDingTalkOauthCallback(code)
-        : externalLoginApi.getDingTalkCallback(code)
+        ? ExternalLoginApi.getDingTalkOauthCallback(code)
+        : ExternalLoginApi.getDingTalkCallback(code)
       return loginRequest.then((response) => this.setToken(response.token))
     },
 
     asyncLoginWithLark(code: string) {
-      return externalLoginApi
+      return ExternalLoginApi
         .getLarkOauthCallback(code)
         .then((response) => this.setToken(response.token))
     },

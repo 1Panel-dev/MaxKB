@@ -41,7 +41,7 @@ const router = createRouter({
 router.beforeEach((to) => {
   NProgress.start()
 
-  const { login, platformInfo, theme, user } = useStore()
+  const { login, platformProfile, theme, user } = useStore()
   const queryToken = getQueryToken(to.query.token)
   if (queryToken) {
     login.setToken(queryToken)
@@ -66,12 +66,12 @@ router.beforeEach((to) => {
     }
   }
 
-  return platformInfo
-    .loadPlatformInfo()
+  return platformProfile
+    .loadPlatformProfile()
     .then(
       () => {
         if (theme.isInitialized) return
-        if (!platformInfo.isPremium) {
+        if (!platformProfile.isPremium) {
           theme.applyDefaultTheme()
           return
         }

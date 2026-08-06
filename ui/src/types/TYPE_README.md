@@ -1,37 +1,61 @@
 # Types 目录说明
 
-`src/types` 统一管理项目中可复用的 TypeScript 类型，业务代码只允许从 `@/types` 导入类型。
+本文档是 TypeScript 类型归属、复用和去重规则的唯一依据。
+
+`src/types` 不集中存放所有类型，只存放同时被 API 层和对应 View 或 Component 使用的跨层业务
+类型。API、Router、Layout、View 或 Component 内部专用的类型，应保留在所属目录或实现文件
+中。
+
+## 判断流程
+
+新增或移动类型前，按以下顺序判断：
+
+1. 只在一个文件中使用：直接在该文件中声明，不导出。
+2. 只在同一个业务边界内跨文件使用：放在该边界的 `types.ts`；存在多处重复声明时，提取到
+   最近共同目录的 `common.ts`。
+3. 只属于 API、Router 或 Layout：分别放在 `api`、`router` 或 `layout` 的对应目录中，不放入
+   `src/types`。
+4. 同一个业务类型同时被 API 和 View 或 Component 使用：放入 `src/types/<domain>.ts`，通过
+   `src/types/index.ts` 导出，使用方统一从 `@/types` 导入。
+
+Store 或其他模块需要某个类型时，仍按类型的业务所有权判断位置，不能仅因“跨文件使用”就移入
+`src/types`。
+
+## 各目录的类型归属
+
+- API 专用的请求参数、响应包装、请求配置和基础设施类型，放在对应 API 文件、资源目录的
+  `types.ts`，或该 API 业务域的 `common.ts`。
+- Router 专用的 `RouteMeta` 扩展、路由 Scope 和导航生成类型，放在 `src/router` 的对应目录。
+- Layout 专用的布局模式、菜单和应用框架类型，放在 `src/layout` 的对应目录。
+- View 专用类型放在页面文件或所属功能目录；Component 专用类型放在组件实现或组件目录。
+- 只有 API 返回或接收的业务模型还需要被 View 或 Component 直接使用时，才提升到
+  `src/types`。
+
+## `src/types` 结构
 
 ```text
 src/types/
-├── index.ts                # 唯一公共入口
-├── complex-search.ts       # 组合搜索组件字段、选项和值类型
-├── current-user.ts         # 当前登录用户类型
-├── external-login.ts       # 第三方登录和扫码登录类型
-├── filterable-dropdown.ts  # 可过滤下拉组件类型
-├── layout.ts               # 应用布局和菜单类型
-├── login.ts                # 普通登录、登录配置及页面交互类型
-├── platform-info.ts        # 平台版本、许可和外观类型
-├── request.ts              # 请求协议、分页和 loading 类型
-├── router.ts               # Router 范围与 RouteMeta 扩展
-├── system-user.ts          # 系统用户管理类型
-└── workspace.ts            # 工作空间类型
+├── index.ts                # 跨层共享类型的唯一公共入口
+├── login.ts                # 认证 API 与登录页面共用的业务类型
+└── system-user.ts          # 系统用户 API 与用户管理页面共用的业务类型
 ```
 
-## 书写规则
+不要为了匹配示例创建空文件。
 
-- `index.ts` 只负责导出各领域类型文件，不直接堆放具体类型声明。
-- 类型文件按具体业务、API 资源或组件能力命名，并尽量与对应实现文件保持一致，例如
-  `login.ts`、`external-login.ts`、`current-user.ts`、`workspace.ts` 和
-  `filterable-dropdown.ts`；禁止使用 `api.ts`、`component.ts`、`business.ts`、`common.ts`
-  等范围过大的文件名。
-- 请求响应包装、分页、loading 等基础设施类型写入 `request.ts`；具体接口的请求和响应类型写入
-  对应业务文件，不按“API 类型”集中。
-- 公共组件类型按具体组件能力命名，例如可过滤下拉选项写入 `filterable-dropdown.ts`；新增其他
-  组件类型时建立对应能力文件，不把所有组件声明集中到同一文件。
-- 页面、组件、Store、Router 和 API 统一使用 `import type { ... } from '@/types'`。
-- 禁止从 `@/api/**/types`、`@/components/**/types`、相对路径 `./types` 等位置导入共享类型。
-- 仅在单个文件内部使用的实现类型可以就近声明，但不得导出；一旦跨文件使用，就移动到
-  `src/types` 并通过 `@/types` 导入。
+## 去重规则
+
+- 新增类型前先搜索是否已有等价声明，优先复用或扩展已有类型。
+- 同一业务边界内出现重复类型时，提取到最近共同目录的 `common.ts`，使用方从该文件导入。
+- `common.ts` 只收纳该目录下多个文件真正共用的类型，不得成为无关声明的集合。
+- API 与 View/Component 出现同一业务类型时，不保留两份声明；将唯一声明移到
+  `src/types/<domain>.ts`。
+- 名称相同但业务含义或字段约束不同的类型不要强行合并，应使用明确的领域名称区分。
+
+## 导入与书写规则
+
+- `src/types/index.ts` 只导出跨层共享类型，不直接声明类型。
+- 使用方统一从 `@/types` 导入 `src/types` 中的类型；领域内部类型从所属文件直接导入，不通过
+  `src/types/index.ts` 二次转发。
+- 类型文件按明确业务域命名。`common.ts` 仅用于已经确认的重复声明，不作为默认文件名。
 - 使用 `interface` 描述对象结构，使用 `type` 描述联合类型、交叉类型、工具类型结果或别名。
 - 类型名称必须体现业务含义，避免使用 `Data`、`Item`、`Info` 等缺少上下文的通用名称。

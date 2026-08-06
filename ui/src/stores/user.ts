@@ -1,8 +1,8 @@
 /** 管理 Admin 用户相关的共享状态。 */
 
 import { defineStore } from 'pinia'
-import currentUserApi from '@/api/admin/auth/current-user'
-import type { CurrentUser } from '@/types'
+import CurrentUserApi from '@/api/admin/auth/current-user'
+import type { CurrentUserInfo } from '@/api/admin/auth/types'
 
 const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 
@@ -12,7 +12,7 @@ function getDefaultLanguage() {
 
 interface UserState {
   language: string
-  userInfo: CurrentUser | null
+  userInfo: CurrentUserInfo | null
 }
 
 export const useUserStore = defineStore('user', {
@@ -28,7 +28,7 @@ export const useUserStore = defineStore('user', {
   actions: {
     /** 加载当前用户，并同步当前语言。 */
     loadCurrentUser() {
-      return currentUserApi.getCurrentUser().then((userInfo) => {
+      return CurrentUserApi.getCurrentUserInfo().then((userInfo) => {
         this.userInfo = userInfo
         if (userInfo.language) this.setLanguage(userInfo.language)
 

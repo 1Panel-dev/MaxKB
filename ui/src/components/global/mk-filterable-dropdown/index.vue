@@ -1,6 +1,6 @@
-<script setup lang="ts" generic="Option extends DropdownOption = DropdownOption">
+<script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { DropdownOption } from '@/types'
+import type { OptionItem } from '@/types'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。
@@ -12,14 +12,11 @@ defineOptions({ name: 'MkFilterableDropdown' })
 const props = withDefaults(
   defineProps<{
     /** 下拉菜单数据 */
-    options: Option[]
-    /** 未选中数据时触发器显示的文字 */
-    placeholder?: string
+    options: OptionItem[]
     /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
   {
-    placeholder: '请选择',
     emptyText: '暂无匹配结果',
   },
 )
@@ -27,7 +24,7 @@ const props = withDefaults(
 /** 当前选中菜单项的 value */
 const selectedValue = defineModel<string | number>({ required: true })
 const emit = defineEmits<{
-  select: [option: Option]
+  select: [option: OptionItem]
 }>()
 const searchKeyword = ref('')
 
@@ -46,16 +43,16 @@ const filteredOptions = computed(() => {
 
 defineSlots<{
   /** 下拉框触发器，由使用方决定按钮结构和样式 */
-  default(props: { selectedOption?: Option; text: string }): unknown
+  default(props: { selectedOption?: OptionItem; text: string }): unknown
   /** 菜单项内容，接收当前 option；未传入时显示 option.label */
-  option?(props: { option: Option }): unknown
+  option?(props: { option: OptionItem }): unknown
 }>()
 
 function handleVisibleChange(visible: boolean) {
   if (!visible) searchKeyword.value = ''
 }
 
-function handleItemClick(option: Option) {
+function handleItemClick(option: OptionItem) {
   selectedValue.value = option.value
   emit('select', option)
 }
@@ -68,7 +65,7 @@ function handleItemClick(option: Option) {
     placement="bottom-start"
     @visible-change="handleVisibleChange"
   >
-    <slot :selected-option="selectedOption" :text="selectedOption?.label ?? placeholder" />
+    <slot :selected-option="selectedOption" :text="selectedOption?.label ?? ''" />
 
     <template #dropdown>
       <div class="w-70 overflow-hidden rounded-md">

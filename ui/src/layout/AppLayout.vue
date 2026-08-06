@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
-import type { LayoutMode } from '@/types'
+import type { LayoutMode } from './types'
 import LayoutHeader from './LayoutHeader.vue'
 import LayoutSidebar from './LayoutSidebar.vue'
 

@@ -1,4 +1,4 @@
-/** 请求基础设施使用的协议、分页和 loading 类型。 */
+/** Admin 请求基础设施内部使用的协议和 loading 类型。 */
 
 export interface ApiResponse<T> {
   code: number
@@ -6,20 +6,13 @@ export interface ApiResponse<T> {
   data: T
 }
 
-export interface PageData<T> {
-  total: number
-  records: T[]
-  current: number
-  size: number
-}
-
 export type RequestParams = Record<string, unknown>
 
-export interface LoadingRef {
+interface LoadingRef {
   value: boolean
 }
 
-export interface LoadingProgress {
+interface LoadingProgress {
   start(): void
   done(): void
 }

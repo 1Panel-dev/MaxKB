@@ -8,7 +8,10 @@ src/api/
 ├── admin/
 │   ├── core/             # Admin 请求基础能力
 │   │   ├── request.ts    # Axios 实例、HTTP 方法与统一响应解包
+│   │   └── types.ts      # Admin 请求协议和 loading 类型
 │   ├── auth/             # Admin 登录认证接口
+│   │   └── types.ts      # 认证 API 与认证 Store 共用类型
+│   ├── common.ts         # 多个 Admin API 业务域共用的类型
 │   ├── workspace/        # 工作空间业务接口
 │   └── system/           # 系统管理业务接口
 ├── chat/                 # Chat 独立请求体系，当前预留
@@ -29,14 +32,16 @@ src/api/
 - 业务 API 按一级业务域、二级资源文件归类，例如 `workspace/agent.ts` 和
   `system/workspace.ts`。
 - 一类资源的增删改查放在同一个文件，不创建同名业务文件夹或汇总所有业务接口的 `api.ts`。
-- API 请求参数、响应数据、分页和请求配置等类型统一声明在 `src/types`，API 文件使用
-  `import type { ... } from '@/types'`，不在 API 目录内创建 `types.ts`。
+- 只在 API 内部使用的请求参数、响应包装、分页和请求配置类型保留在对应 API 文件或业务目录；
+  多个 API 文件重复使用时，提取到最近共同目录的 `common.ts`，不要放入 `src/types`。
+- 同一个业务类型需要同时被 API 和 View 或 Component 使用时，才声明在 `src/types` 并从
+  `@/types` 导入。API 与页面层不得各自维护一份重复声明。
 - 每个业务接口使用 `export function` 单独导出，同时在文件末尾通过 `export default { ... }`
-  直接默认导出接口对象，不为默认导出声明中间变量；调用方统一按“文件名 camelCase + `Api`”
+  直接默认导出接口对象，不为默认导出声明中间变量；调用方统一按“文件名 PascalCase + `Api`”
   命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
-  例如从 `login.ts` 使用 `import loginApi from '@/api/admin/auth/login'`，再调用
-  `loginApi.postLogin()`；System Workspace API 使用
-  `import workspaceApi from '@/api/admin/system/workspace'`。
+  例如从 `login.ts` 使用 `import LoginApi from '@/api/admin/auth/login'`，再调用
+  `LoginApi.postLogin()`；System Workspace API 使用
+  `import WorkspaceApi from '@/api/admin/system/workspace'`。
 
 ## 接口命名
 

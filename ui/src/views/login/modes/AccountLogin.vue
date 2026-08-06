@@ -3,12 +3,18 @@ import { computed, reactive, ref, watch } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
-import externalLoginApi from '@/api/admin/auth/external-login'
-import loginApi from '@/api/admin/auth/login'
+import ExternalLoginApi from '@/api/admin/auth/external-login'
+import LoginApi from '@/api/admin/auth/login'
 import { useStore } from '@/stores'
-import type { AccountLoginForm, LoginConfig, LoginMethod } from '@/types'
+import type { LoginConfig, LoginMethod } from '@/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
 import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
+
+interface AccountLoginForm {
+  captcha: string
+  password: string
+  username: string
+}
 
 defineOptions({ name: 'AccountLogin' })
 
@@ -80,7 +86,7 @@ const handleLogin = async () => {
 const refreshCaptcha = () => {
   if (loginMethod.value === 'LDAP') return
   captchaImage.value = ''
-  return loginApi.getCaptcha(accountLoginForm.username).then((captcha) => {
+  return LoginApi.getCaptcha(accountLoginForm.username).then((captcha) => {
     captchaImage.value = captcha.captcha
   })
 }
@@ -102,8 +108,8 @@ const selectLoginMethod = async (method: LoginMethod) => {
 }
 
 const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
-  if (authType === 'SAML2') return externalLoginApi.getSamlLoginUrl()
-  return externalLoginApi.getExternalAuthSetting(authType).then(({ config }) => {
+  if (authType === 'SAML2') return ExternalLoginApi.getSamlLoginUrl()
+  return ExternalLoginApi.getExternalAuthSetting(authType).then(({ config }) => {
     if (!config) return ''
     if (authType === 'CAS' && config.ldpUri) {
       const separator = config.ldpUri.includes('?') ? '&' : '?'

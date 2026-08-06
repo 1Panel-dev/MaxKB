@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
-import loginApi from '@/api/admin/auth/login'
+import LoginApi from '@/api/admin/auth/login'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'AvatarDropdown' })
@@ -20,7 +20,7 @@ const languages: Array<{ label: string; value: Language }> = [
 
 function handleLogout() {
   const loginMode = user.userInfo?.source
-  loginApi.postLogout().then(() => {
+  LoginApi.postLogout().then(() => {
     login.clearToken()
     router.push(
       loginMode && ['CAS', 'OIDC', 'OAuth2'].includes(loginMode)

@@ -3,14 +3,14 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
-import type { DropdownOption } from '@/types'
+import type { Option } from '@/types/common'
 
 defineOptions({ name: 'WorkspaceDropdown' })
 const router = useRouter()
 const route = useRoute()
 const { user } = useStore()
 
-const workspaceOptions = computed<DropdownOption[]>(() => {
+const workspaceOptions = computed<Option[]>(() => {
   const workspaces = user.userInfo?.workspace_list
   return workspaces?.length
     ? workspaces.map(({ id, name }) => ({ value: id ?? 'default', label: name }))
@@ -26,7 +26,7 @@ watch(
   { immediate: true },
 )
 
-function handleWorkspaceSelect(option: DropdownOption) {
+function handleWorkspaceSelect(option: Option) {
   const workspaceId = String(option.value)
   if (workspaceId === route.params.workspaceId || !route.name) return
   void router.push({

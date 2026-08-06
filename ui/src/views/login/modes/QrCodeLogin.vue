@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import externalLoginApi from '@/api/admin/auth/external-login'
+import ExternalLoginApi from '@/api/admin/auth/external-login'
 import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/types'
 import { loginMethodLabels, qrCodeLoginMethods } from '../constants'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
@@ -35,7 +35,7 @@ const currentConfig = computed(() => qrCodeConfigs.value[qrCodeProvider.value])
 const currentProviderComponent = computed(() => providerComponents[qrCodeProvider.value])
 
 onMounted(() => {
-  externalLoginApi.getQrCodeSources().then((sources) => {
+  ExternalLoginApi.getQrCodeSources().then((sources) => {
     qrCodeConfigs.value = Object.fromEntries(
       sources.map(({ auth_type: provider, config }) => [provider, config]),
     )

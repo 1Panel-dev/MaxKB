@@ -73,7 +73,9 @@ src/components/
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应 `mk-icon/index.vue`。
 - 使用 `index.vue` 作为入口时，必须通过 `defineOptions({ name: 'ComponentName' })` 显式声明多单词组件名，避免 ESLint 将组件名推断为 `index`。
 - 组件内部实现、Props 和事件保持类型化。
-- 公共组件对外类型统一写入 `src/types`，并从 `@/types` 导入；组件目录不创建 `types.ts`。
+- 组件专用类型保留在组件实现中；组件目录内多个文件共用时放在该组件的 `types.ts`，出现重复
+  声明时提取到最近共同目录的 `common.ts`。只有同一业务类型还被 API 使用时，才放入
+  `src/types` 并从 `@/types` 导入。
 - 组件样式默认使用 `scoped`；只有明确的全局规则才放入 `src/styles`。
 - `global` 组件不要创建只用于二次导出的 `components/index.ts`，模板组件由自动注册插件解析。
 - 除 `global` 外的共享组件必须从具体路径手动导入，让依赖关系在使用文件中可见。
@@ -82,7 +84,8 @@ src/components/
 
 `MkFilterableDropdown` 是自动注册的带搜索过滤和滚动列表的共享下拉框。触发器通过默认插槽
 传入；菜单项需要自定义图片、图标或其他业务内容时，使用 `option` 作用域插槽并通过当前 `option` 渲染。
-未传入 `option` 插槽时默认显示 `option.label`。选项以公共 `DropdownOption` 作为最小约束，
+未传入 `option` 插槽时默认显示 `option.label`。选项以 `src/components/common.ts` 中的
+`Option` 作为最小约束，
 可以附加业务字段；组件泛型会保留具体类型。选择菜单项时，组件先更新 `v-model`，再通过
 `select` 事件返回完整的 `option`。
 
@@ -228,27 +231,27 @@ import { Setting } from '@element-plus/icons-vue'
 ## MkComplexSearch
 
 需要在多个字段间切换搜索条件时使用全局自动注册的 `MkComplexSearch`。组件通过默认
-`v-model` 接收条件值，通过 `v-model:field` 接收当前字段；`fields` 配置字段标签、字段值和
-控件类型。字段默认为文本输入，枚举条件使用 `select` 并提供 `options`。切换字段时组件会清空
-原条件值，并触发 `field-change` 和 `change`；输入或选择完成时触发 `change`。
+`fields` 配置字段标签、字段值和可选的枚举项。未配置 `options` 时使用文本输入，
+配置后使用下拉选择。输入或选择完成时，`change` 事件返回 `{ [field]: value }`；
+切换字段或清空条件时返回 `undefined`。
+
+需要在脚本中声明字段配置时，从
+`@/components/global/mk-complex-search/types` 导入 `ComplexSearchFieldOption`。
 
 ```vue
 <MkComplexSearch
-  v-model="searchValue"
-  v-model:field="searchField"
   :fields="[
     { label: '用户名', value: 'username' },
     {
       label: '状态',
       value: 'enabled',
-      type: 'select',
       options: [
         { label: '启用', value: true },
         { label: '禁用', value: false },
       ],
     },
   ]"
-  @change="loadUsers"
+  @change="loadUsers($event)"
 />
 ```
 

@@ -1,5 +1,17 @@
 import { get } from '../core/request'
-import type { PageData, SystemUser, SystemUserPage, SystemUserQuery } from '@/types'
+import type { SystemUser, SystemUserQuery } from '@/types'
+
+interface SystemUserPage {
+  currentPage: number
+  pageSize: number
+}
+
+interface PageData<T> {
+  total: number
+  records: T[]
+  current: number
+  size: number
+}
 
 const prefix = '/user_manage'
 

@@ -1,5 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
-import type { LayoutMenuItem, RouteScope } from '@/types'
+import type { LayoutMenuItem } from '@/layout/types'
+import type { RouteScope } from './types'
 import { systemRoutes } from './system'
 import { workspaceRoutes } from './workspace'
 

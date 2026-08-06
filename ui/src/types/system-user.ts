@@ -1,21 +1,6 @@
 /** 系统用户管理使用的数据类型。 */
 
-import type { RequestParams } from './request'
-
-export interface UserFormValue {
-  email: string
-  name: string
-  phone: string
-  role: string
-  username: string
-}
-
-export interface SystemUserPage {
-  currentPage: number
-  pageSize: number
-}
-
-export interface SystemUserQuery extends RequestParams {
+export interface SystemUserQuery extends Record<string, unknown> {
   email?: string
   is_active?: boolean
   nick_name?: string

@@ -1,15 +1,15 @@
-<script setup lang="ts" generic="Option extends DropdownOption = DropdownOption">
+<script setup lang="ts">
 import { CaretBottom } from '@element-plus/icons-vue'
-import type { DropdownOption } from '@/types'
+import type { OptionItem } from '@/types'
 
 defineOptions({ name: 'MkWorkspaceDropdown' })
 
 const props = defineProps<{
-  options: Option[]
+  options: OptionItem[]
 }>()
 const selectedWorkspace = defineModel<string | number>({ required: true })
 const emit = defineEmits<{
-  select: [option: Option]
+  select: [option: OptionItem]
 }>()
 </script>
 
@@ -17,7 +17,6 @@ const emit = defineEmits<{
   <MkFilterableDropdown
     v-model="selectedWorkspace"
     :options="props.options"
-    placeholder="请选择工作空间"
     @select="emit('select', $event)"
   >
     <template #default="{ text }">

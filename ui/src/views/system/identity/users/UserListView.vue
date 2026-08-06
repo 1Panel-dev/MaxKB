@@ -1,26 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import userManageApi from '@/api/admin/system/user-manage'
-import type {
-  ComplexSearchFieldOption,
-  ComplexSearchValue,
-  SystemUser,
-  SystemUserQuery,
-} from '@/types'
+import UserManageApi from '@/api/admin/system/user-manage'
+import type { OptionItem } from '@/types'
+import type { SystemUser, SystemUserQuery } from '@/types'
 import { datetimeFormat } from '@/utils/time'
+import UserFromDrawer from './components/UserFromDrawer.vue'
 
 const route = useRoute()
-const searchField = ref('username')
-const searchKeyword = ref<ComplexSearchValue>()
-const searchFields: ComplexSearchFieldOption[] = [
+const searchFields: Option[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
   { label: '邮箱', value: 'email' },
   {
     label: '状态',
     value: 'is_active',
-    type: 'select',
     options: [
       { label: '启用', value: true },
       { label: '禁用', value: false },
@@ -34,17 +28,13 @@ const paginationConfig = ref({
 })
 const systemUsersData = ref<SystemUser[]>([])
 const systemUsersLoading = ref(false)
-
-function getSystemUserQuery(): SystemUserQuery | undefined {
-  if (searchKeyword.value === '' || searchKeyword.value === undefined) return undefined
-
-  return { [searchField.value]: searchKeyword.value }
-}
+const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+const systemUserQuery = ref<SystemUserQuery>()
 
 function loadSystemUsers() {
   systemUsersLoading.value = true
-  userManageApi
-    .getUserManagePage(paginationConfig.value, getSystemUserQuery())
+  UserManageApi
+    .getUserManagePage(paginationConfig.value, systemUserQuery.value)
     .then((pageData) => {
       systemUsersData.value = pageData.records
       paginationConfig.value = {
@@ -58,7 +48,8 @@ function loadSystemUsers() {
     })
 }
 
-function handleSearchChange() {
+function handleSearchChange(query?: SystemUserQuery) {
+  systemUserQuery.value = query
   paginationConfig.value.currentPage = 1
   loadSystemUsers()
 }
@@ -75,12 +66,13 @@ onMounted(() => loadSystemUsers())
   <div class="system-identity-users px-6">
     <header class="flex-between py-4">
       <h4>{{ route.meta.title }}</h4>
-      <MkComplexSearch
-        v-model="searchKeyword"
-        v-model:field="searchField"
-        :fields="searchFields"
-        @change="handleSearchChange"
-      />
+      <div class="flex items-center gap-3">
+        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <el-button type="primary" @click="userFormDrawerRef?.open()">
+          <MkIcon name="icon_add_outlined" :size="18" />
+          <span>创建用户</span>
+        </el-button>
+      </div>
     </header>
 
     <MkTable
@@ -98,18 +90,20 @@ onMounted(() => loadSystemUsers())
 
       <el-table-column prop="creator" label="创建人" width="120" />
       <el-table-column label="创建时间" width="180">
-        <template #default="{ row }: { row: SystemUser }">
+        <template #default="{ row }">
           {{ datetimeFormat(row.create_time) }}
         </template>
       </el-table-column>
       <el-table-column label="操作" width="160" fixed="right">
-        <template #default="{ row }: { row: SystemUser }">
+        <template #default="{ row }">
           <div class="flex items-center gap-1">
             <el-switch v-model="row.is_active" size="small" />
           </div>
         </template>
       </el-table-column>
     </MkTable>
+
+    <UserFromDrawer ref="userFormDrawerRef" />
   </div>
 </template>
 

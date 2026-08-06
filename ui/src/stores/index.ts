@@ -2,7 +2,7 @@
 
 import { createPinia } from 'pinia'
 import { useLoginStore } from './login'
-import { usePlatformInfoStore } from './platform-info'
+import { useProfileStore } from './profile'
 import { useThemeStore } from './theme'
 import { useUserStore } from './user'
 
@@ -12,8 +12,8 @@ const stores = {
   get login() {
     return useLoginStore(pinia)
   },
-  get platformInfo() {
-    return usePlatformInfoStore(pinia)
+  get profile() {
+    return useProfileStore(pinia)
   },
   get user() {
     return useUserStore(pinia)

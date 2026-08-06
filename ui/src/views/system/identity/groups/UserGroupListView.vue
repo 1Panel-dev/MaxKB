@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-plus/icons-vue'
-import workspaceApi from '@/api/admin/system/workspace'
+import WorkspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
-import type { ComplexSearchFieldOption, ComplexSearchValue, DropdownOption } from '@/types'
+import type { OptionItem } from '@/types'
+import type { ComplexSearchFieldOption } from '@/components/global/mk-complex-search/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface UserGroup {
@@ -24,8 +25,7 @@ type UserGroupAction = 'delete' | 'rename'
 
 const groupSearchKeyword = ref('')
 
-const memberSearchKeyword = ref<ComplexSearchValue>()
-const memberSearchField = ref('username')
+const memberSearchQuery = ref<Record<string, boolean | number | string>>()
 const memberSearchFields: ComplexSearchFieldOption[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'name' },
@@ -68,15 +68,17 @@ const selectedUserGroup = computed(() => {
 })
 
 const filteredUserGroupMembers = computed(() => {
-  const keyword = String(memberSearchKeyword.value ?? '')
+  const [field, value] = Object.entries(memberSearchQuery.value ?? {})[0] ?? []
+  const keyword = String(value ?? '')
     .trim()
     .toLowerCase()
 
-  if (!keyword) return userGroupMembers.value
+  if (!field || !keyword) return userGroupMembers.value
 
-  return userGroupMembers.value.filter((member) =>
-    member[memberSearchField.value as 'name' | 'username'].toLowerCase().includes(keyword),
-  )
+  return userGroupMembers.value.filter((member) => {
+    if (field !== 'name' && field !== 'username') return true
+    return member[field].toLowerCase().includes(keyword)
+  })
 })
 
 async function createUserGroup() {
@@ -125,15 +127,15 @@ function addMemberToGroup(member: UserGroupMember) {
 
 /* 选择工作空间列表 */
 const selectedWorkspaceId = ref<string | number>('default')
-const workspaceOptions = ref<DropdownOption[]>([])
+const workspaceOptions = ref<Option[]>([])
 
-function handleWorkspaceSelect(option: DropdownOption) {
+function handleWorkspaceSelect(option: Option) {
   selectedWorkspaceId.value = option.value
   selectedGroupId.value = userGroups.value[0]?.id ?? ''
 }
 
 function loadWorkspaceOptions() {
-  workspaceApi.getSystemWorkspaceList().then((workspaces) => {
+  WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
     workspaceOptions.value = workspaces.map(({ id, name }) => ({
       label: name,
       value: id ?? 'default',
@@ -214,11 +216,7 @@ onMounted(() => loadWorkspaceOptions())
 
         <div class="flex-between mb-4">
           <el-button type="primary" :icon="Plus" @click="addMember">添加成员</el-button>
-          <MkComplexSearch
-            v-model="memberSearchKeyword"
-            v-model:field="memberSearchField"
-            :fields="memberSearchFields"
-          />
+          <MkComplexSearch :fields="memberSearchFields" @change="memberSearchQuery = $event" />
         </div>
 
         <MkTable
