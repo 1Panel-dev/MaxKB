@@ -24,7 +24,6 @@ class Migration(migrations.Migration):
                 ('token_limit', models.BigIntegerField(blank=True, null=True, verbose_name='Tokens上限')),
                 ('used_tokens', models.BigIntegerField(default=0, verbose_name='当前周期已使用Tokens')),
                 ('total_tokens', models.BigIntegerField(default=0, verbose_name='累计Tokens')),
-                ('period_start', models.DateTimeField(blank=True, null=True, verbose_name='当前周期开始时间')),
                 ('period_end', models.DateTimeField(blank=True, null=True, verbose_name='当前周期结束时间')),
             ],
             options={

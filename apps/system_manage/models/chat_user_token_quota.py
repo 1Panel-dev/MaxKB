@@ -27,7 +27,7 @@ class ChatUserTokenQuota(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
 
-    user_id = models.UUIDField(max_length=128, verbose_name="用户id", db_index=True)
+    user_id = models.UUIDField(max_length=128, unique=True, verbose_name="用户id")
 
     quota_type = models.CharField(max_length=20, choices=QuotaType.choices,
                                   default=QuotaType.UNLIMITED, verbose_name="配额模式")
@@ -43,7 +43,6 @@ class ChatUserTokenQuota(AppModelMixin):
     used_tokens = models.BigIntegerField(default=0, verbose_name="当前周期已使用Tokens")
     total_tokens = models.BigIntegerField(default=0, verbose_name="累计Tokens")
 
-    period_start = models.DateTimeField(null=True, blank=True, verbose_name="当前周期开始时间")
     period_end = models.DateTimeField(null=True, blank=True, verbose_name="当前周期结束时间")
 
     class Meta:
