@@ -1063,6 +1063,9 @@ class PermissionConstants(Enum):
     WORKSPACE_CHAT_USER_GROUP = (Permission(
         group=Group.WORKSPACE_CHAT_USER, sub_group=Group.WORKSPACE_CHAT_USER, operate=Operate.USER_GROUP, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT))
+    WORKSPACE_CHAT_USER_QUOTA_SETTING = (Permission(
+        group=Group.WORKSPACE_CHAT_USER, sub_group=Group.WORKSPACE_CHAT_USER, operate=Operate.QUOTA_SETTING, bit_index=5
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT))
 
     # ==================== 工作空间对话用户组 ====================
     WORKSPACE_USER_GROUP_READ = (Permission(
