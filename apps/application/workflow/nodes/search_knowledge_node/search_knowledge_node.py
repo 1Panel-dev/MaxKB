@@ -18,8 +18,8 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
+from common.auth.constants.role_constants import RoleConstants
 from common.config.embedding_config import VectorStore
-from common.constants.permission_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import native_search
 from common.utils.common import flat_map, get_file_content
