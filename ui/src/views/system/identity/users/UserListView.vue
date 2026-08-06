@@ -7,6 +7,7 @@ import type { LoginMethod, OptionItem, SystemUser, SystemUserQuery } from '@/typ
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import UserFromDrawer from './components/UserFromDrawer.vue'
+import RoleWorkspaceTag from './components/RoleWorkspaceTag.vue'
 
 const { auth } = useStore()
 const route = useRoute()
@@ -109,25 +110,7 @@ onMounted(() => loadSystemUsers())
 
       <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="210" label="角色">
         <template #default="{ row }">
-          <!-- <div v-if="row.role_name?.length" class="flex items-center gap-1">
-            <el-tag type="info">{{ row.role_name[0] }}</el-tag>
-            <el-popover
-              v-if="row.role_name.length > 1"
-              placement="bottom-start"
-              trigger="hover"
-              :width="600"
-            >
-              <template #reference>
-                <el-tag type="info">+{{ row.role_name.length - 1 }}</el-tag>
-              </template>
-              <el-table :data="row.role_workspace" max-height="320">
-                <el-table-column prop="roleName" label="角色" min-width="180" />
-                <el-table-column prop="workspace" label="工作空间" min-width="320">
-                </el-table-column>
-              </el-table>
-            </el-popover>
-          </div>
-          <span v-else>-</span> -->
+          <RoleWorkspaceTag :role-names="row.role_name" :role-workspace="row.role_workspace" />
         </template>
       </el-table-column>
 
