@@ -226,7 +226,10 @@
                 :detail="executionDetail"
                 :appType="applicationDetail?.type"
               />
-              <ParagraphDocumentContent :detail="rightPanelDetail" v-else />
+              <ParagraphDocumentContent
+                :detail="rightPanelDetail"
+                v-if="rightPanelType === 'paragraphDocument'"
+              />
             </el-scrollbar>
           </div>
         </div>
@@ -243,7 +246,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed, watch, provide } from 'vue'
+import { computed, nextTick, onMounted, provide, ref } from 'vue'
 import { marked } from 'marked'
 import { saveAs } from 'file-saver'
 import sanitizeHtml from 'sanitize-html'
