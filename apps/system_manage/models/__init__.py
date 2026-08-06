@@ -11,3 +11,4 @@ from .workspace_user_group_permission import *
 from .system_setting import *
 from .log_management import *
 from .chat_user import *
+from .chat_user_token_quota import *
