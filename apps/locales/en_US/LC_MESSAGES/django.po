@@ -9555,3 +9555,39 @@ msgstr ""
 
 msgid "Quota Setting"
 msgstr "Quota Setting"
+
+#: apps/xpack/serializers/chat_user.py:746
+msgid "Quota mode"
+msgstr "Quota mode"
+
+#: apps/xpack/serializers/chat_user.py:750
+msgid "Period unit"
+msgstr "Period unit"
+
+#: apps/xpack/serializers/chat_user.py:754
+msgid "Period quantity"
+msgstr "Period quantity"
+
+#: apps/xpack/serializers/chat_user.py:758
+msgid "Token limit (K)"
+msgstr "Token limit (K)"
+
+#: apps/xpack/serializers/chat_user.py:765
+msgid "Period unit is required for periodic quota"
+msgstr "Period unit is required for periodic quota"
+
+#: apps/xpack/serializers/chat_user.py:767
+msgid "Period quantity is required for periodic quota"
+msgstr "Period quantity is required for periodic quota"
+
+#: apps/xpack/serializers/chat_user.py:769
+msgid "Token limit is required for periodic quota"
+msgstr "Token limit is required for periodic quota"
+
+#: apps/xpack/views/system_chat_user.py:73
+msgid "Get chat user quota"
+msgstr "Get chat user quota"
+
+#: apps/xpack/views/system_chat_user.py:82
+msgid "Set chat user quota"
+msgstr "Set chat user quota"
