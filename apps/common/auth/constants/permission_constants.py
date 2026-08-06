@@ -76,12 +76,12 @@ class PermissionConstants(Enum):
     KNOWLEDGE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SELF, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     APPLICATION = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.SELF, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     MODEL = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.SELF, bit_index=0
@@ -145,37 +145,37 @@ class PermissionConstants(Enum):
     MODEL_READ = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.READ, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_VIEW]))
 
     MODEL_CREATE = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.CREATE, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE]))
 
     MODEL_EDIT = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.EDIT, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE]))
 
     MODEL_DELETE = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.DELETE, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE]))
 
     MODEL_RESOURCE_AUTHORIZATION = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.AUTH, bit_index=5
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE]))
 
     MODEL_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.RELATE_VIEW, bit_index=6
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE]))
 
     # ==================== 触发器 ====================
@@ -311,129 +311,129 @@ class PermissionConstants(Enum):
     KNOWLEDGE_READ = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.READ, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW]))
 
     KNOWLEDGE_CREATE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.CREATE, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW]))
 
     KNOWLEDGE_EDIT = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EDIT, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_DELETE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.DELETE, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_SYNC = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SYNC, bit_index=5
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_EXPORT = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EXPORT, bit_index=6
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_VECTOR = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.VECTOR, bit_index=7
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_GENERATE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.GENERATE, bit_index=8
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_BATCH_DELETE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE, bit_index=9
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_BATCH_MOVE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_MOVE, bit_index=10
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_RESOURCE_AUTHORIZATION = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.AUTH, bit_index=11
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=12
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     # ==================== 知识库文件夹 ====================
     KNOWLEDGE_FOLDER_READ = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW]))
 
     KNOWLEDGE_FOLDER_CREATE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_FOLDER_EDIT = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_FOLDER_DELETE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_FOLDER_AUTH = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     # ==================== 知识库工作流 ====================
     KNOWLEDGE_WORKFLOW_READ = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW]))
 
     KNOWLEDGE_WORKFLOW_EDIT = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EDIT, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_WORKFLOW_EXPORT = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EXPORT, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     KNOWLEDGE_WORKFLOW_PUBLISH = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.PUBLISH, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE]))
 
     # ==================== 知识库文档 ====================
@@ -717,219 +717,219 @@ class PermissionConstants(Enum):
     APPLICATION_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.READ, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_CREATE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.CREATE, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_COPY = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.COPY, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_EDIT = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EDIT, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_DELETE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.DELETE, bit_index=5
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_IMPORT = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.IMPORT, bit_index=6
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_EXPORT = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EXPORT, bit_index=7
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_PUBLISH = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.PUBLISH, bit_index=8
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_BATCH_DELETE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.BATCH_DELETE, bit_index=9
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_BATCH_MOVE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.BATCH_MOVE, bit_index=10
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_RESOURCE_AUTHORIZATION = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.AUTH, bit_index=11
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_RELATE_RESOURCE_VIEW = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.RELATE_VIEW, bit_index=12
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # 应用触发器
     APPLICATION_TRIGGER_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_READ, bit_index=13
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     APPLICATION_TRIGGER_CREATE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_CREATE, bit_index=14
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     APPLICATION_TRIGGER_EDIT = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_EDIT, bit_index=15
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     APPLICATION_TRIGGER_DELETE = (Permission(
         group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_DELETE, bit_index=16
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE))
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE]))
 
     # ==================== 应用文件夹 ====================
     APPLICATION_FOLDER_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_FOLDER_CREATE = (Permission(
         group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_FOLDER_EDIT = (Permission(
         group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_FOLDER_DELETE = (Permission(
         group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_FOLDER_AUTH = (Permission(
         group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # ==================== 应用概览 ====================
     APPLICATION_OVERVIEW_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_OVERVIEW_EMBED = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.EMBED, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_OVERVIEW_ACCESS = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.ACCESS, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_OVERVIEW_DISPLAY = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.DISPLAY, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_OVERVIEW_API_KEY = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.API_KEY, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_OVERVIEW_PUBLIC = (Permission(
         group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.PUBLIC_ACCESS, bit_index=5
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # ==================== 应用接入 ====================
     APPLICATION_ACCESS_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.ACCESS, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_ACCESS_EDIT = (Permission(
         group=Group.APPLICATION, sub_group=Group.ACCESS, operate=Operate.EDIT, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # ==================== 应用对话用户 ====================
     APPLICATION_CHAT_USER_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_USER, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_CHAT_USER_EDIT = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_USER, operate=Operate.EDIT, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # ==================== 应用对话日志 ====================
     APPLICATION_CHAT_LOG_READ = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.READ, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW]))
 
     APPLICATION_CHAT_LOG_ANNOTATION = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.ANNOTATION, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_CHAT_LOG_EXPORT = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.EXPORT, bit_index=2
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_CHAT_LOG_CLEAR_POLICY = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.CLEAR_POLICY, bit_index=3
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     APPLICATION_CHAT_LOG_ADD_KNOWLEDGE = (Permission(
         group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.ADD_KNOWLEDGE, bit_index=4
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.RESOURCE,
-                      scope=PermissionScopeConstants.WORKSPACE_RESOURCE,
+                      scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
                       resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE]))
 
     # ==================== 其他 ====================
@@ -1800,9 +1800,10 @@ def group_permissions_by_scope() -> Dict[str, List[Permission]]:
         permission = _permission.value
         meta = _permission.meta
         if meta.scope:
-            _array = grouped.get(meta.scope) or []
-            _array.append(_permission)
-            grouped[meta.scope] = _array
+            for scope_item in meta.scope:
+                _array = grouped.get(scope_item) or []
+                _array.append(_permission)
+                grouped[scope_item] = _array
     return dict(grouped)
 
 
