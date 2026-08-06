@@ -9693,3 +9693,40 @@ msgstr "刪除對話用戶 API 密鑰"
 
 msgid "Quota Setting"
 msgstr "配額設置"
+
+
+#: apps/xpack/serializers/chat_user.py:746
+msgid "Quota mode"
+msgstr "配額模式"
+
+#: apps/xpack/serializers/chat_user.py:750
+msgid "Period unit"
+msgstr "週期單位"
+
+#: apps/xpack/serializers/chat_user.py:754
+msgid "Period quantity"
+msgstr "週期數量"
+
+#: apps/xpack/serializers/chat_user.py:758
+msgid "Token limit (K)"
+msgstr "Tokens 上限（K）"
+
+#: apps/xpack/serializers/chat_user.py:765
+msgid "Period unit is required for periodic quota"
+msgstr "按週期限制時，週期單位不能為空"
+
+#: apps/xpack/serializers/chat_user.py:767
+msgid "Period quantity is required for periodic quota"
+msgstr "按週期限制時，週期數量不能為空"
+
+#: apps/xpack/serializers/chat_user.py:769
+msgid "Token limit is required for periodic quota"
+msgstr "按週期限制時，Tokens 上限不能為空"
+
+#: apps/xpack/views/system_chat_user.py:73
+msgid "Get chat user quota"
+msgstr "獲取對話用戶配額"
+
+#: apps/xpack/views/system_chat_user.py:82
+msgid "Set chat user quota"
+msgstr "設置對話用戶配額"
