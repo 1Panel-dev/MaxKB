@@ -78,7 +78,8 @@ def get_permissions(user,
                          _resource_permission
                          in
                          _.permission_list if _resource_permission in ['VIEW', 'MANAGE']])
-                    for group, permissions in group_by(all_permissions, lambda _permission: _permission.group).items():
+                    for group, permissions in group_by(all_permissions,
+                                                       lambda _permission: _permission.value.group).items():
                         k = f"{group}:{_.workspace_id}:{_.target}"
                         bits = reduce(lambda x, y: x | y,
                                       [_permission.value.bit() for
