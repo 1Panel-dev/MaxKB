@@ -14,31 +14,28 @@ import re
 from collections import defaultdict
 
 import uuid_utils.compat as uuid
-from common.constants.cache_version import Cache_Version
-from common.constants.exception_code_constants import ExceptionCodeConstants
-
-from common.auth.constants.role_constants import RoleConstants
-from common.auth.struct.auth import Auth
-from common.constants.resource_permission_constants import ResourceAuthType
-
-from common.database_model_manage.database_model_manage import DatabaseModelManage
-from common.db.search import page_search
-from common.exception.app_exception import AppApiException
-from common.utils.common import get_random_chars, password_encrypt, password_verify, valid_license
-from common.utils.rsa_util import decrypt
 from django.core import validators
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.mail.backends.smtp import EmailBackend
 from django.db import transaction
 from django.db.models import Q, QuerySet
-from django.utils import translation
-from django.utils.translation import get_language, to_locale
+from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
-from maxkb import settings
+from rest_framework import serializers
+
+from common.auth.constants.role_constants import RoleConstants
+from common.auth.struct.auth import Auth
+from common.constants.cache_version import Cache_Version
+from common.constants.exception_code_constants import ExceptionCodeConstants
+from common.constants.resource_permission_constants import ResourcePermissionConstants
+from common.database_model_manage.database_model_manage import DatabaseModelManage
+from common.db.search import page_search
+from common.exception.app_exception import AppApiException
+from common.utils.common import password_encrypt, password_verify
+from common.utils.rsa_util import decrypt
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
-from rest_framework import serializers
 from system_manage.models import AuthTargetType, SettingType, SystemSetting, WorkspaceUserResourcePermission
 from users.models import User
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
@@ -867,8 +864,8 @@ def _create_resource_permission_instances(workspace_id, resource_maps, user_id, 
     创建资源权限实例列表
     """
     instances = []
-    if permission == ResourcePermission.MANAGE:
-        permission = [ResourcePermission.VIEW, ResourcePermission.MANAGE]
+    if permission == ResourcePermissionConstants.MANAGE:
+        permission = [ResourcePermissionConstants.VIEW, ResourcePermissionConstants.MANAGE]
     else:
         permission = [permission]
 
