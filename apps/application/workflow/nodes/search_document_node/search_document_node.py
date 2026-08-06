@@ -14,7 +14,7 @@ from rest_framework import serializers
 
 from application.workflow.common import WorkflowType
 from application.workflow.i_node import INode
-from common.constants.permission_constants import RoleConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, DocumentTag, Knowledge

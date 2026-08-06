@@ -15,8 +15,9 @@ from rest_framework.views import APIView
 from common import result
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
+from common.auth.constants.permission_constants import PermissionConstants
+from common.auth.constants.role_constants import RoleConstants
 from common.constants.cache_version import Cache_Version
-from common.constants.permission_constants import PermissionConstants, RoleConstants
 from common.log.log import log
 from common.utils.common import query_params_to_single_dict
 from django.core.cache import cache

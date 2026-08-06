@@ -19,7 +19,6 @@ from common.constants.exception_code_constants import ExceptionCodeConstants
 
 from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.auth import Auth
-from common.constants.permission_constants import ResourcePermission
 from common.constants.resource_permission_constants import ResourceAuthType
 
 from common.database_model_manage.database_model_manage import DatabaseModelManage

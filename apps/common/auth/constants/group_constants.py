@@ -61,7 +61,7 @@ class Group(Enum):
     # 对话相关
     CHAT_USER_GROUP = ("CHAT_USER_GROUP", _("Chat User Group"))
     CHAT_USER_AUTH = ("CHAT_USER_AUTH", _("Chat User Auth"))
-
+    PORTAL = ("PORTAL", _('portal'))
     # 其他
     OTHER = ("OTHER", _("Other"))
     HOMEPAGE = ("HOMEPAGE", _("Home page"))

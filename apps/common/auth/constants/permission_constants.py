@@ -1020,6 +1020,11 @@ class PermissionConstants(Enum):
     CHAT_USER_AUTH_EDIT = (Permission(
         group=Group.CHAT_USER_AUTH, sub_group=Group.CHAT_USER_AUTH, operate=Operate.EDIT, bit_index=0
     ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT))
+    PORTAL_READ = (Permission(group=Group.PORTAL, sub_group=Group.PORTAL, operate=Operate.READ,
+                              bit_index=0), PermissionMeta(role_list=[RoleConstants.ADMIN],
+                                                           ))
+    PORTAL_EDIT = (Permission(group=Group.PORTAL, sub_group=Group.PORTAL, operate=Operate.EDIT,
+                              bit_index=0), PermissionMeta(role_list=[RoleConstants.ADMIN]))
 
     # ==================== 工作空间对话用户 ====================
     WORKSPACE_CHAT_USER_READ = (Permission(
