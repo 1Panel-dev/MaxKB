@@ -9690,3 +9690,6 @@ msgstr "獲取對話用戶 API 密鑰列表"
 
 msgid "Delete chat user API key"
 msgstr "刪除對話用戶 API 密鑰"
+
+msgid "Quota Setting"
+msgstr "配額設置"

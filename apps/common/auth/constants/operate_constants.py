@@ -66,6 +66,7 @@ class Operate(Enum):
     TOKEN = ("READ+TOKEN", _("Token Index"))
     TO_WORKSPACE = ("READ+TO_WORKSPACE", _("Authorize to Workspace"))
     SET_ROLE = ("READ+SET_ROLE", _("Set Role"))
+    QUOTA_SETTING = ("READ+QUOTA_SETTING", _("Quota Setting"))
 
     def __init__(self, value, label):
         self._value_ = value
