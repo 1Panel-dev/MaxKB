@@ -47,7 +47,7 @@ class PermissionMeta:
     category: Optional[Category] = None
     resource_permission_group_list: Optional[list] = None
     scope: list[PermissionScopeConstants] = field(default_factory=list)
-    is_ee: bool = True
+    is_ee: bool = False
 
 
 @dataclass(frozen=True)
