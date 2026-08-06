@@ -77,6 +77,14 @@ class PermissionConstants(Enum):
         group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.EXPORT, bit_index=1
     ), PermissionMeta(role_list=[RoleConstants.ADMIN, RoleConstants.USER], category=Category.WORKSPACE))
 
+    SYSTEM_HOMEPAGE_READ = (Permission(
+        group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.READ, bit_index=0
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM))
+
+    SYSTEM_HOMEPAGE_EXPORT = (Permission(
+        group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.EXPORT, bit_index=1
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.IAM))
+
     # ==================== 资源主分组（无子分组） ====================
     KNOWLEDGE = (Permission(
         group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SELF, bit_index=0
@@ -990,6 +998,10 @@ class PermissionConstants(Enum):
 
     CHAT_USER_GROUP = (Permission(
         group=Group.CHAT_USER, sub_group=Group.CHAT_USER, operate=Operate.USER_GROUP, bit_index=5
+    ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT))
+
+    CHAT_USER_QUOTA_SETTING = (Permission(
+        group=Group.CHAT_USER, sub_group=Group.CHAT_USER, operate=Operate.QUOTA_SETTING, bit_index=6
     ), PermissionMeta(role_list=[RoleConstants.ADMIN], category=Category.CHAT_CLIENT))
 
     # ==================== 对话用户组 ====================

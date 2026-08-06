@@ -9552,3 +9552,6 @@ msgstr ""
 
 msgid "Delete chat user API key"
 msgstr ""
+
+msgid "Quota Setting"
+msgstr "Quota Setting"

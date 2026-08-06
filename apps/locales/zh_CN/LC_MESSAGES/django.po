@@ -9691,3 +9691,6 @@ msgstr "获取对话用户 API 密钥列表"
 
 msgid "Delete chat user API key"
 msgstr "删除对话用户 API 密钥"
+
+msgid "Quota Setting"
+msgstr "配额设置"
