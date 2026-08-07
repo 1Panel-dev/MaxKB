@@ -420,6 +420,7 @@ function permissionTableSpan({ row, columnIndex }: { row: PermissionRow; columnI
       <div v-else class="min-h-0 flex-1">
         <MkTable
           :data="[]"
+          :max-table-height="330"
           :pagination-config="{ currentPage: 1, pageSize: 10, total: 0 }"
           row-key="id"
         >

@@ -25,6 +25,29 @@ Element Plus 图标不是全局组件。需要作为属性传递或在脚本中�
 和交互模式，不要自行重复实现已有能力。例如菜单跳转优先使用 `el-menu` 的 `router` 属性，
 而不是监听 `select` 后手动调用路由。只有原生 API 无法满足需求时，才补充自定义逻辑。
 
+### 单一触发节点
+
+Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-popover`、
+`el-popconfirm`、`MkDropdown` 和基于它封装的下拉组件，其默认触发插槽或 `reference` 插槽
+必须只渲染一个有效根节点。多个并列按钮、标签或文本需要先用一个具有实际布局盒的 `span`
+或 `div` 包裹；不要使用 `template` 或 `display: contents` 充当包裹层，否则浮层无法可靠计算
+触发区域的位置和尺寸。
+
+```vue
+<el-popover trigger="hover">
+  <template #reference>
+    <span class="inline-flex items-center gap-1">
+      <el-tag>管理员</el-tag>
+      <el-tag>+2</el-tag>
+    </span>
+  </template>
+  <div>浮层内容</div>
+</el-popover>
+```
+
+创建或评审组件、页面时，应同时检查直接使用的 Element Plus 浮层组件，以及转发触发插槽的
+项目封装组件，确保每一层最终都向 Element Plus 传递单一有效节点。
+
 ## 自动注册
 
 Vite 使用 `unplugin-vue-components`，但只扫描 `src/components/global`。该目录中的组件可以直接在 Vue 模板中使用，无需手动 `import`：
@@ -221,9 +244,10 @@ import { Setting } from '@element-plus/icons-vue'
 
 ## MkSearchInput
 
-项目内带搜索图标的输入框使用全局自动注册的 `MkSearchInput`。组件默认 placeholder 为“搜索”且具有clearable，
-并在 `prefix` 插槽显示搜索图标；`v-model`、其他属性和事件直接传递给 Element Plus Input，因此可以el-input原生能力。传入 `prefix` 插槽时可以覆盖默认搜索
-图标，`prepend`、`append` 和 `suffix` 插槽也会继续透传。
+项目内带搜索图标的输入框使用全局自动注册的 `MkSearchInput`。组件默认 placeholder 为“搜索”
+并支持清空，在 `prefix` 插槽显示搜索图标；`v-model`、其他属性和事件直接传递给 Element Plus
+Input，因此可以继续使用 `el-input` 的原生能力。传入 `prefix` 插槽时可以覆盖默认搜索图标，
+`prepend`、`append` 和 `suffix` 插槽也会继续透传。
 
 ```vue
 <MkSearchInput v-model="searchKeyword" placeholder="搜索工作空间" />
@@ -241,8 +265,8 @@ import { Setting } from '@element-plus/icons-vue'
 
 ## MkComplexSearch
 
-需要在多个字段间切换搜索条件时使用全局自动注册的 `MkComplexSearch`。组件通过默认
-`fields` 配置字段标签、字段值和可选的枚举项。未配置 `options` 时使用文本输入，
+需要在多个字段间切换搜索条件时使用全局自动注册的 `MkComplexSearch`。通过 `fields` 配置
+字段标签、字段值和可选的枚举项。未配置 `options` 时使用文本输入，
 配置后使用下拉选择。输入或选择完成时，`change` 事件返回 `{ [field]: value }`；
 切换字段或清空条件时返回 `undefined`。
 
@@ -283,18 +307,33 @@ import { Setting } from '@element-plus/icons-vue'
 
 ## MkTable
 
-项目内带分页的标准表格使用全局自动注册的 `MkTable`。组件内部组合 `el-table` 和
-`el-pagination`。`MkTable` 不提供 `border`；需要原生边框的场景直接使用 `el-table`。
-默认不开启列宽拖拽；传入 `resizable` 后，组件内部借用 `border` 开启拖拽，但视觉上隐藏
-表格外框和纵向列线，并为可拖拽的表头分隔线提供悬停、拖动高亮效果。
+项目内带分页的标准表格使用全局自动注册的 `MkTable`。组件组合 `el-table`、分页、可选的列宽
+拖拽和批量选择操作栏；不需要分页的场景直接使用 `el-table`。
+
+### 表格与分页
 
 `data` 和 `paginationConfig` 由 `MkTable` 直接接收；其余 Element Plus Table
-属性与事件通过 `$attrs` 透传。列继续使用`el-table-column` 声明。
+属性与事件通过 `$attrs` 透传，列继续使用 `el-table-column` 声明。分页参数统一放入
+`paginationConfig`：
+
+```ts
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 20,
+  pageSizes: [10, 20, 50, 100],
+  total: 0,
+})
+```
+
+`pageSizes` 可省略，默认使用 `[10, 20, 50, 100]`。通过
+`v-model:pagination-config` 接收页码和每页数量的变化，也可以监听 `current-change` 和
+`size-change`。
 
 ```vue
 <MkTable
   v-model:pagination-config="paginationConfig"
   :data="currentPageUsers"
+  :max-table-height="280"
   resizable
   row-key="id"
 >
@@ -302,21 +341,37 @@ import { Setting } from '@element-plus/icons-vue'
 </MkTable>
 ```
 
-分页参数统一放入 `paginationConfig`：
+### 高度与列宽拖拽
 
-```ts
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 10,
-  pageSizes: [10, 20, 50, 100],
-  total: 0,
-})
+组件使用窗口高度减去 `maxTableHeight` 计算表格 `max-height`，并在窗口尺寸变化时重新计算。
+`maxTableHeight` 表示页面中除表格外需要扣除的高度，默认值为 `250`；页面应根据表格上方和
+下方的实际占用空间传入。
+
+`MkTable` 默认不开启列宽拖拽，也不提供原生边框样式。传入 `resizable` 后，组件借用 Element
+Plus 的 `border` 开启列宽拖拽，但会隐藏表格外框和纵向列线，并为可拖拽的表头分隔线提供
+悬停、拖动高亮效果。需要显示原生边框的场景直接使用 `el-table`。
+
+### 批量选择
+
+表格包含 `type="selection"` 的选择列时，勾选任意数据会在页面底部显示选择操作栏。底栏复选框
+与表头全选状态同步，支持全选、取消全选和半选状态。组件统一显示“已选 n/当前数据总数”和
+“取消”，“取消”会清空当前选择；业务操作按钮通过 `footer-batch-actions` 插槽传入，当前选择
+通过 `selection-change` 事件返回。
+
+```vue
+<MkTable :data="systemUsers" @selection-change="selectedUsers = $event">
+  <el-table-column type="selection" width="40" />
+  <el-table-column prop="username" label="用户名" />
+
+  <template #footer-batch-actions>
+    <el-button @click="setRoles(selectedUsers)">设置角色</el-button>
+    <el-button type="danger" plain @click="removeUsers(selectedUsers)">删除</el-button>
+  </template>
+</MkTable>
 ```
 
-`pageSizes` 可省略，默认使用 `[10, 20, 50, 100]`。
-
-`MkTable` 固定包含分页；不需要分页的场景直接使用 `el-table`。通过组件暴露的 `tableRef` 可以调用内部 Element Plus
-Table 方法。
+组件暴露 `tableRef` 和 `clearSelection()`；需要调用其他 Element Plus Table 方法时使用
+`tableRef`。
 
 ## 新增公共组件
 

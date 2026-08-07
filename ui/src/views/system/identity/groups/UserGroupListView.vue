@@ -221,7 +221,7 @@ onMounted(() => loadWorkspaceOptions())
         <MkTable
           v-model:pagination-config="paginationConfig"
           :data="filteredUserGroupMembers"
-          max-height="516"
+          :max-table-height="330"
           row-key="id"
         >
           <el-table-column type="selection" width="40" />

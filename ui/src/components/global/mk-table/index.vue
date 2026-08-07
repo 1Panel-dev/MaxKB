@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { TableInstance } from 'element-plus'
 
 defineOptions({ name: 'MkTable', inheritAttrs: false })
@@ -16,11 +16,13 @@ interface PaginationConfig {
 const props = withDefaults(
   defineProps<{
     data?: unknown[]
+    maxTableHeight?: number
     paginationConfig?: PaginationConfig
     resizable?: boolean
   }>(),
   {
     data: () => [],
+    maxTableHeight: 250,
     paginationConfig: () => ({
       currentPage: 1,
       pageSize: 20,
@@ -33,12 +35,41 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   'current-change': [currentPage: number]
+  'selection-change': [selection: unknown[]]
   'size-change': [pageSize: number]
   'update:paginationConfig': [paginationConfig: PaginationConfig]
 }>()
 
 const tableRef = ref<TableInstance>()
+
 const paginationPageSizes = computed(() => props.paginationConfig.pageSizes ?? DEFAULT_PAGE_SIZES)
+
+/** 表格高度 */
+const tableHeight = ref(window.innerHeight - props.maxTableHeight)
+function updateTableHeight() {
+  tableHeight.value = window.innerHeight - props.maxTableHeight
+}
+
+/** 选择操作栏 */
+const selectedRows = ref<unknown[]>([])
+const isAllRowsSelected = computed(() => tableRef.value?.store.states.isAllSelected.value ?? false)
+const isSelectionIndeterminate = computed(
+  () => selectedRows.value.length > 0 && !isAllRowsSelected.value,
+)
+
+function handleSelectionChange(selection: unknown[]) {
+  selectedRows.value = selection
+  emit('selection-change', selection)
+}
+
+function handleToggleAllSelection() {
+  tableRef.value?.toggleAllSelection()
+}
+
+function clearSelection() {
+  tableRef.value?.clearSelection()
+  selectedRows.value = []
+}
 
 /**
  * 列宽拖拽
@@ -102,7 +133,16 @@ function handlePageSizeChange(pageSize: number) {
   emit('size-change', pageSize)
 }
 
-defineExpose({ tableRef })
+onMounted(() => {
+  updateTableHeight()
+  window.addEventListener('resize', updateTableHeight)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateTableHeight)
+})
+
+defineExpose({ clearSelection, tableRef })
 </script>
 
 <template>
@@ -116,8 +156,10 @@ defineExpose({ tableRef })
       ref="tableRef"
       :class="{ 'mk-table__resizable--borderless': props.resizable }"
       :data="props.data"
+      :max-height="tableHeight"
       v-bind="$attrs"
       :border="props.resizable"
+      @selection-change="handleSelectionChange"
     >
       <slot />
     </el-table>
@@ -140,6 +182,24 @@ defineExpose({ tableRef })
         :pager-count="5"
       />
     </div>
+
+    <footer
+      v-if="selectedRows.length > 0"
+      class="fixed bottom-0 z-20 flex items-center border-t bg-white w-full -ml-6 px-6 py-4"
+    >
+      <div class="mr-4 flex items-center gap-3">
+        <el-checkbox
+          :indeterminate="isSelectionIndeterminate"
+          :model-value="isAllRowsSelected"
+          @change="handleToggleAllSelection"
+        />
+        <span>已选 {{ selectedRows.length }}/{{ props.data.length }}</span>
+      </div>
+      <div class="gap-3">
+        <slot name="footer-batch-actions" />
+        <el-button text type="primary" @click="clearSelection">取消</el-button>
+      </div>
+    </footer>
   </div>
 </template>
 

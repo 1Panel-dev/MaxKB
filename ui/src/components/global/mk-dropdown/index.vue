@@ -27,6 +27,12 @@ const mergedPopperOptions = computed<Partial<Options>>(() => ({
   ],
 }))
 
+defineSlots<{
+  /** 下拉触发器，必须只渲染一个有效根节点 */
+  default(): unknown
+  dropdown(): unknown
+}>()
+
 function handleOpen() {
   dropdownRef.value?.handleOpen()
 }

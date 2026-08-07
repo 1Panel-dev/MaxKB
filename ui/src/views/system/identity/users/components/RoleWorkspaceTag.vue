@@ -26,15 +26,12 @@ const tableData = computed(() => {
 
 <template>
   <div v-if="roleNames?.length" class="flex items-center gap-1">
-    <el-popover
-      v-if="roleNames.length > 1"
-      placement="bottom-start"
-      trigger="hover"
-      :width="600"
-    >
+    <el-popover v-if="roleNames.length > 1" placement="bottom-start" trigger="hover" :width="600">
       <template #reference>
-        <el-tag type="info">{{ roleNames[0] }}</el-tag>
-        <el-tag type="info">+{{ roleNames.length - 1 }}</el-tag>
+        <span class="inline-flex items-center gap-1">
+          <el-tag type="info">{{ roleNames[0] }}</el-tag>
+          <el-tag type="info">+{{ roleNames.length - 1 }}</el-tag>
+        </span>
       </template>
       <el-table :data="tableData" max-height="320">
         <el-table-column prop="roleName" label="角色" min-width="180" />

@@ -4,15 +4,21 @@ import { useRoute } from 'vue-router'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
 import type { LoginMethod, OptionItem, SystemUser, SystemUserQuery } from '@/types'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import UserFromDrawer from './components/UserFromDrawer.vue'
 import RoleWorkspaceTag from './components/RoleWorkspaceTag.vue'
 
+interface MkTableExpose {
+  clearSelection: () => void
+}
+
 const { auth } = useStore()
 const route = useRoute()
 
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+const userTableRef = ref<MkTableExpose>()
 
 /* 列表查询相关 */
 const searchFields: OptionItem<string>[] = [
@@ -49,7 +55,7 @@ function handlePageSizeChange() {
 }
 function loadSystemUsers() {
   systemUsersLoading.value = true
-  UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
+  return UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
     .then((res) => {
       systemUsersData.value = res.records
       paginationConfig.value = {
@@ -61,6 +67,34 @@ function loadSystemUsers() {
     .finally(() => {
       systemUsersLoading.value = false
     })
+}
+
+/* 批量删除 */
+const batchSelectedUsers = ref<SystemUser[]>([])
+function handleBatchDelete() {
+  const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
+  MsgConfirm('批量删除用户', `确定删除选中的 ${batchSelectedUsers.value.length} 个用户吗？`, {
+    confirmButtonClass: 'danger',
+    confirmButtonText: '删除',
+  })
+    .then(() => {
+      systemUsersLoading.value = true
+
+      return UserManageApi.postBatchDeleteUsers(selectedUserIds).then(async () => {
+        MsgSuccess('删除成功')
+        await loadSystemUsers()
+        userTableRef.value?.clearSelection()
+      })
+    })
+
+    .catch(() => {})
+    .finally(() => {
+      systemUsersLoading.value = false
+    })
+}
+
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedUsers.value = selection as SystemUser[]
 }
 
 onMounted(() => loadSystemUsers())
@@ -80,12 +114,13 @@ onMounted(() => loadSystemUsers())
     </header>
 
     <MkTable
+      ref="userTableRef"
       v-model:pagination-config="paginationConfig"
       :data="systemUsersData"
       v-loading="systemUsersLoading"
-      max-height="516"
       row-key="id"
       @current-change="loadSystemUsers"
+      @selection-change="handleBatchSelectionChange"
       @size-change="handlePageSizeChange"
     >
       <el-table-column type="selection" width="40" />
@@ -132,6 +167,11 @@ onMounted(() => loadSystemUsers())
           </div>
         </template>
       </el-table-column>
+
+      <template #footer-batch-actions>
+        <el-button type="primary" plain>设置角色</el-button>
+        <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
+      </template>
     </MkTable>
 
     <UserFromDrawer ref="userFormDrawerRef" />

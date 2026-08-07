@@ -169,7 +169,7 @@ function addMember() {
       <MkTable
         v-model:pagination-config="paginationConfig"
         :data="workspaceMembers"
-        max-height="612"
+        :max-table-height="320"
         row-key="id"
       >
         <el-table-column type="selection" width="64" />

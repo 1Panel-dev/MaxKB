@@ -20,6 +20,9 @@
   `src/utils`、`src/stores` 或 `src/api`。
 - 页面目录存在多个层级时，目录名应表达业务层级，例如
   `system/identity/groups/UserGroupListView.vue`，不要创建无业务含义的分组目录。
+- 页面脚本中的状态、计算属性和处理方法按照同一业务流程集中放置，并使用简短的业务备注划分
+  列表查询、批量操作等流程。流程较长的函数应在确认、请求、刷新等关键阶段添加说明，重点解释
+  Promise 返回、执行顺序和业务约束，不为含义明确的单行代码逐句添加注释。
 
 参考结构：
 
@@ -28,7 +31,6 @@ src/views/<feature>/
 ├── FeatureListView.vue       # 路由级列表页面
 ├── FeatureDetailView.vue     # 路由级详情页面
 ├── components/               # 仅供该功能使用的组件
-├── composables/              # 仅供该功能使用的组合式逻辑
 ├── constants.ts              # 仅供该功能使用的常量
 ```
 

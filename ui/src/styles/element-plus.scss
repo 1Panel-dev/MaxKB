@@ -1,11 +1,22 @@
 :root {
   --el-color-primary: var(--mk-primary);
+  --el-color-primary-light-1: color-mix(in srgb, var(--mk-primary) 85%, white);
   --el-color-primary-light-3: color-mix(in srgb, var(--mk-primary) 70%, white);
+  --el-color-primary-light-4: color-mix(in srgb, var(--mk-primary) 60%, white);
   --el-color-primary-light-5: color-mix(in srgb, var(--mk-primary) 50%, white);
+  --el-color-primary-light-6: color-mix(in srgb, var(--mk-primary) 40%, white);
   --el-color-primary-light-7: color-mix(in srgb, var(--mk-primary) 30%, white);
   --el-color-primary-light-8: color-mix(in srgb, var(--mk-primary) 20%, white);
   --el-color-primary-light-9: color-mix(in srgb, var(--mk-primary) 10%, white);
   --el-color-danger: var(--mk-danger);
+  --el-color-danger-light-1: color-mix(in srgb, var(--mk-danger) 85%, white);
+  --el-color-danger-light-3: color-mix(in srgb, var(--mk-danger) 70%, white);
+  --el-color-danger-light-4: color-mix(in srgb, var(--mk-danger) 60%, white);
+  --el-color-danger-light-5: color-mix(in srgb, var(--mk-danger) 50%, white);
+  --el-color-danger-light-6: color-mix(in srgb, var(--mk-danger) 40%, white);
+  --el-color-danger-light-7: color-mix(in srgb, var(--mk-danger) 30%, white);
+  --el-color-danger-light-8: color-mix(in srgb, var(--mk-danger) 20%, white);
+  --el-color-danger-light-9: color-mix(in srgb, var(--mk-danger) 10%, white);
   --el-color-success: var(--mk-success);
   --el-color-warning: var(--mk-warning);
   --el-border-color: var(--mk-N350);
@@ -51,12 +62,28 @@
       border-color: var(--el-border-color);
     }
   }
+  &.is-plain {
+    --el-button-bg-color: transparent !important;
+  }
   &--primary {
     --el-button-text-color: var(--el-color-white);
+    --el-button-hover-bg-color: var(--el-color-primary-light-1);
     &.is-text {
       &:not(.is-disabled):hover {
         background: rgb(var(--mk-primary-rgb) / 10%);
       }
+    }
+    &.is-plain {
+      --el-button-border-color: var(--el-color-primary) !important;
+      --el-button-hover-bg-color: var(--el-color-primary-light-8);
+      --el-button-hover-text-color: var(--el-color-primary) !important;
+    }
+  }
+  &--danger {
+    &.is-plain {
+      --el-button-border-color: var(--el-color-danger) !important;
+      --el-button-hover-bg-color: var(--el-color-danger-light-8);
+      --el-button-hover-text-color: var(--el-color-danger) !important;
     }
   }
   // 自定义maxkb渐变色按钮
@@ -198,8 +225,8 @@
     background-color: white !important;
     border: var(--el-border) !important;
 
-    &:hover {
-      background-color: var(--el-color-primary-light-9) !important;
+    &:not(.is-active):hover {
+      background-color: var(--el-color-primary-light-8) !important;
       border-color: var(--el-pagination-hover-color) !important;
     }
     &.is-active {
