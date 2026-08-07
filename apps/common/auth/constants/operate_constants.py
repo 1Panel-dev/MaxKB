@@ -77,6 +77,20 @@ class Operate(Enum):
     SYSTEM_API_KEY = ("READ+DELETE", _("System API Key"))
     PORTAL = ("READ+PORTAL", _("Portal"))
 
+    ANNOTATION_AUTH = ('ANNOTATION', _("Annotation"))
+    PASSWORD = ("PASSWORD", _("Password verification"))
+    LOCAL = ("LOCAL", _("Account login"))
+    CAS = ("CAS", _("CAS"))
+    DINGTALK = ("DINGTALK", _("dingtalk"))
+    WECOM = ("WECOM", _("WeCom"))
+    LARK = ("LARK", _("lark"))
+    OIDC = ("OIDC", _("OIDC"))
+    LDAP = ("LDAP", _("LDAP"))
+    OAUTH2 = ("OAUTH2", _("OAUTH2"))
+
     def __init__(self, value, label):
         self._value_ = value
         self.label = label
+
+    def __str__(self):
+        return self.value
