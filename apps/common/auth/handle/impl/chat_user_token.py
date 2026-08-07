@@ -14,11 +14,15 @@ from application.models import ApplicationAccessToken, ChatUserType
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants, CHAT_PERMISSION_STR_MAP
 from common.auth.constants.group_constants import Group
 from common.auth.constants.operate_constants import Operate
-from common.auth.constants.permission_constants import PERMISSION_STR_MAP
 from common.auth.handle.auth_base_handle import AuthBaseHandle
 from common.auth.struct.auth import Principal, Auth
 from common.constants.authentication_type import AuthenticationType
-from system_manage.models import ResourceChatUserGroupAuthorize, ResourceType, ResourceChatUserAuthorize
+from system_manage.models import ResourceChatUserGroupAuthorize, ResourceType, ResourceChatUserAuthorize, \
+    UserGroupRelation
+
+login_type_list = [Operate.LOCAL.value, Operate.CAS.value, Operate.DINGTALK.value, Operate.WECOM.value,
+                   Operate.LARK.value, Operate.OIDC.value, Operate.LDAP.value,
+                   Operate.OAUTH2.value]
 
 
 class ChatUserToken(AuthBaseHandle):
@@ -40,16 +44,24 @@ class ChatUserToken(AuthBaseHandle):
         elif login_type.upper() == str(Operate.PASSWORD):
             application_access_token_list = (application_access_token_list
                                              .filter(authentication=True, authentication_value__type='password'))
-        else:
+
+        elif login_type_list.__contains__(login_type.upper()):
             _type = ChatUserType.CHAT_USER
+            user_id = auth_details.get('id')
+            user_group_ids = QuerySet(UserGroupRelation).filter(
+                user_id=user_id,
+            ).values_list('group_id', flat=True)
+
             group_qs = QuerySet(ResourceChatUserGroupAuthorize).filter(
                 resource_type=ResourceType.APPLICATION,
                 is_auth=True,
+                user_group_id__in=user_group_ids,
             ).values_list('resource_id', flat=True)
 
             user_qs = QuerySet(ResourceChatUserAuthorize).filter(
                 resource_type=ResourceType.APPLICATION,
                 is_auth=True,
+                user_id=user_id,
             ).values_list('resource_id', flat=True)
             application_access_token_list = application_access_token_list.filter(
                 Q(authentication_value__type='login'),
