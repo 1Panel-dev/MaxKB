@@ -59,3 +59,21 @@ h6 {
   font-weight: 500;
   line-height: var(--mk-line-height-base);
 }
+
+/*
+  标题前带竖线样式
+*/
+.mk-title-decoration {
+  position: relative;
+  padding-left: 10px;
+  &:before {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 67%;
+    content: '';
+    background: var(--el-color-primary);
+  }
+}

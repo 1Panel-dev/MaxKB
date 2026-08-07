@@ -7,3 +7,9 @@ export interface OptionItem<Value extends boolean | number | string = string | n
   value: Value
   [key: string]: unknown
 }
+
+export interface List {
+  id: string
+  name: string
+  [key: string]: unknown
+}

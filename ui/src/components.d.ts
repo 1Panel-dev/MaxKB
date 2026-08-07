@@ -22,6 +22,7 @@ declare module 'vue' {
     MkSearchList: typeof import('./components/global/mk-search-list/index.vue')['default']
     MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
     MkTable: typeof import('./components/global/mk-table/index.vue')['default']
+    MkTagGroup: typeof import('./components/global/mk-tag-group/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
@@ -39,6 +40,7 @@ declare global {
   const MkSearchList: typeof import('./components/global/mk-search-list/index.vue')['default']
   const MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
   const MkTable: typeof import('./components/global/mk-table/index.vue')['default']
+  const MkTagGroup: typeof import('./components/global/mk-tag-group/index.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
 }

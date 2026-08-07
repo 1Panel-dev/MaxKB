@@ -44,6 +44,7 @@ function switchMode() {
         <MkIcon :icon="Setting" />
         <span>系统管理</span>
       </el-button>
+      <!--  TODO 只有系统管理员权限没有返回工作空间 -->
       <el-button v-if="isSystem(mode)" class="-mx-1" text @click="switchMode">
         <MkIcon name="icon_left_outlined" />
         <span>返回工作空间</span>

@@ -34,8 +34,12 @@
 .el-button {
   --el-button-font-weight: 400 !important;
   --el-button-text-color: var(--mk-N900);
+  --el-button-hover-bg-color: var(--mk-N100);
+  --el-button-hover-text-color: var(--mk-N900);
+  --el-button-hover-border-color: var(--el-border-color);
   height: auto;
   padding: 7px 11px;
+  line-height: 16px;
   &--large {
     font-size: 16px;
     padding: 11px;
@@ -47,7 +51,7 @@
     line-height: 18px;
     padding: calc(var(--spacing) * 1);
     &:not(.is-disabled):hover {
-      background: rgb(var(--mk-N900-rgb) / 10%);
+      background: var(--mk-N900-transparent-10);
     }
   }
   &.is-link {
@@ -66,8 +70,10 @@
     --el-button-bg-color: transparent !important;
   }
   &--primary {
+    --el-button-hover-text-color: var(--el-color-white);
     --el-button-text-color: var(--el-color-white);
     --el-button-hover-bg-color: var(--el-color-primary-light-1);
+    --el-button-hover-border-color: var(--el-color-primary-light-1);
     &.is-text {
       &:not(.is-disabled):hover {
         background: rgb(var(--mk-primary-rgb) / 10%);
@@ -100,6 +106,9 @@
 }
 .el-button [class*='el-icon'] + span {
   margin-left: calc(var(--spacing) * 1);
+}
+.el-button + .el-button {
+  margin-left: 0;
 }
 
 /* card */
@@ -137,6 +146,33 @@
   }
 }
 
+/* drawer */
+.el-drawer {
+  &__header {
+    margin: 0;
+    border-bottom: 1px solid var(--el-border-color);
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4)
+      calc(var(--spacing) * 6);
+  }
+  &__close-btn {
+    padding: calc(var(--spacing) * 1);
+    color: var(--mk-N600);
+    border-radius: var(--el-border-radius-base);
+    &:hover {
+      background-color: var(--mk-N900-transparent-10);
+      i {
+        color: var(--mk-N600) !important;
+      }
+    }
+  }
+  &__body {
+    padding: 0;
+  }
+  &__footer {
+    border-top: 1px solid var(--el-border-color);
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 6);
+  }
+}
 /* dropdown */
 .el-dropdown {
   color: currentColor;
@@ -178,12 +214,16 @@
 /* form */
 .el-form-item {
   margin-bottom: calc(var(--spacing) * 4);
+  &__error {
+    position: unset;
+    font-size: 14px;
+    line-height: var(--mk-line-height-base);
+  }
+  &__label {
+    color: var(--mk-N900);
+  }
 }
-.el-form-item__error {
-  position: unset;
-  font-size: 14px;
-  line-height: var(--mk-line-height-base);
-}
+
 /* input */
 .el-input {
   --el-input-text-color: var(--el-text-color-primary);
@@ -195,10 +235,8 @@
   &__wrapper {
     padding: 1px 11px !important;
   }
-}
-
-.el-input__prefix-inner {
-  color: var(--mk-N600);
+  &__prefix {
+  }
 }
 
 /* pagination */
@@ -262,13 +300,24 @@
 }
 
 /* select */
-.el-select__caret {
-  color: var(--mk-N600);
-  font-size: 16px;
+.el-select {
+  &__caret {
+    color: var(--mk-N600);
+    font-size: 16px;
+  }
+  &__placeholder {
+    color: var(--mk-N900);
+  }
+  &__wrapper {
+    padding: 5px 12px;
+    line-height: 22px;
+  }
 }
+
 .el-select__popper {
   &.el-popper {
     border: 1px solid var(--mk-N300);
+    padding: 4px;
   }
   .el-popper__arrow {
     display: none;
@@ -286,12 +335,35 @@
     translate: 0 8px;
   }
 }
-.el-select__placeholder {
-  color: var(--mk-N900);
-}
-.el-select__wrapper {
-  padding: 5px 12px;
-  line-height: 22px;
+.el-select-dropdown {
+  &__list {
+    padding: 0;
+  }
+  &__item {
+    border-radius: var(--el-border-radius-small);
+    color: var(--mk-N900);
+    padding: 0 calc(var(--spacing) * 8) 0 calc(var(--spacing) * 2);
+    &.is-hovering {
+      background-color: var(--mk-N900-transparent-10);
+    }
+    &.is-selected {
+      font-weight: 400;
+      &::after {
+        background-color: var(--mk-primary);
+        content: '';
+        width: 16px;
+        -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944Z'/%3E%3C/svg%3E")
+          center / contain no-repeat;
+        mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944Z'/%3E%3C/svg%3E")
+          center / contain no-repeat;
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 16px;
+      }
+    }
+  }
 }
 
 /* switch */

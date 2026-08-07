@@ -1,5 +1,5 @@
 export interface WorkspaceItem {
-  id?: string
+  id: string
   name: string
-  user_count?: number
+  [key: string]: unknown
 }

@@ -2,21 +2,28 @@
 import { computed } from 'vue'
 
 interface Props {
-  roleNames?: string[]
-  roleWorkspace?: Record<string, string[]>
+  firstColumnLabel: string
+  firstColumnProp: string
+  secondColumnLabel: string
+  secondColumnProp: string
+  tagNames?: string[]
+  tagWorkspace?: Record<string, string[]>
 }
 
 const props = defineProps<Props>()
 
-// 将 {普通用户: ["小白跃升坊"]} 转换为 [{roleName: "普通用户", workspace: "小白跃升坊"}]
+// 将 {普通用户: ["小白跃升坊"]} 转换为表格可消费的动态字段行。
 const tableData = computed(() => {
-  if (!props.roleWorkspace) return []
+  if (!props.tagWorkspace) return []
 
-  const result: Array<{ roleName: string; workspace: string }> = []
+  const result: Array<Record<string, string>> = []
 
-  Object.entries(props.roleWorkspace).forEach(([roleName, workspaces]) => {
+  Object.entries(props.tagWorkspace).forEach(([tagName, workspaces]) => {
     workspaces.forEach((workspace) => {
-      result.push({ roleName, workspace })
+      result.push({
+        [props.firstColumnProp]: tagName,
+        [props.secondColumnProp]: workspace,
+      })
     })
   })
 
@@ -25,20 +32,12 @@ const tableData = computed(() => {
 </script>
 
 <template>
-  <div v-if="roleNames?.length" class="flex items-center gap-1">
-    <el-popover v-if="roleNames.length > 1" placement="bottom-start" trigger="hover" :width="600">
-      <template #reference>
-        <span class="inline-flex items-center gap-1">
-          <el-tag type="info">{{ roleNames[0] }}</el-tag>
-          <el-tag type="info">+{{ roleNames.length - 1 }}</el-tag>
-        </span>
-      </template>
+  <MkTagGroup :tags="tagNames" trigger-area="all" :popover-width="600">
+    <template #popover>
       <el-table :data="tableData" max-height="320">
-        <el-table-column prop="roleName" label="角色" min-width="180" />
-        <el-table-column prop="workspace" label="工作空间" min-width="320" />
+        <el-table-column :prop="firstColumnProp" :label="firstColumnLabel" min-width="180" />
+        <el-table-column :prop="secondColumnProp" :label="secondColumnLabel" min-width="320" />
       </el-table>
-    </el-popover>
-    <el-tag v-else type="info">{{ roleNames[0] }}</el-tag>
-  </div>
-  <span v-else>-</span>
+    </template>
+  </MkTagGroup>
 </template>

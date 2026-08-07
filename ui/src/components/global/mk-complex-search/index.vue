@@ -87,6 +87,7 @@ function handleChange() {
     :deep(.el-select__wrapper) {
       box-shadow: none !important;
       border-radius: var(--el-border-radius-base) 0 0 var(--el-border-radius-base);
+      min-height: 30px !important;
     }
   }
 
@@ -96,6 +97,7 @@ function handleChange() {
       border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;
       min-height: 30px !important;
     }
+    --el-input-inner-height: 28px !important;
     :deep(.el-input__wrapper) {
       box-shadow: none !important;
       border-radius: 0 var(--el-border-radius-base) var(--el-border-radius-base) 0;

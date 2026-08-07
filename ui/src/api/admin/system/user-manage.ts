@@ -25,6 +25,13 @@ export function postBatchDeleteUsers(userIds: string[]) {
   return post<void, string[]>(`${prefix}/batch_delete`, userIds)
 }
 
+/**
+ * 获取系统默认密码
+ */
+const getSystemDefaultPassword: (loading?: Ref<boolean>) => Promise<Result<string>> = (loading) => {
+  return get('${prefix}/password', undefined, loading)
+}
+
 export default {
   getUserManagePage,
   postBatchDeleteUsers,

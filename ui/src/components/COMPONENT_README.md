@@ -82,6 +82,8 @@ src/components/
 │   │   └── index.vue         # 统一搜索图标并透传 ElInput 属性和事件
 │   ├── mk-status-label/
 │   │   └── index.vue         # 统一启用、禁用状态的图标与文案
+│   ├── mk-tag-group/
+│   │   └── index.vue         # 折叠展示标签组并提供可配置浮层
 │   └── mk-table/
 │       └── index.vue         # 统一表格样式与分页布局
 ├── mk-workspace-dropdown/    # 工作空间选择下拉框，选项和点击业务由使用方提供
@@ -261,6 +263,23 @@ Input，因此可以继续使用 `el-input` 的原生能力。传入 `prefix` �
 ```vue
 <MkStatusLabel :active="row.is_active" />
 <MkStatusLabel :active="task.completed" active-text="已完成" inactive-text="未完成" />
+```
+
+## MkTagGroup
+
+标签数组在表格等紧凑区域中使用全局自动注册的 `MkTagGroup` 折叠展示。组件显示第一个标签，
+其余标签收起为 `+N`；默认仅悬停 `+N` 打开浮层，并在浮层中展示剩余标签。传入
+`trigger-area="all"` 后，悬停第一个标签或 `+N` 均可打开浮层。`popover-disabled` 只禁用浮层，
+不改变标签折叠结果。需要展示表格等业务内容时使用 `popover` 作用域插槽。
+
+```vue
+<MkTagGroup :tags="roleNames" />
+
+<MkTagGroup :tags="roleNames" trigger-area="all" :popover-width="600">
+  <template #popover="{ tags }">
+    <el-table :data="getRoleTableData(tags)" />
+  </template>
+</MkTagGroup>
 ```
 
 ## MkComplexSearch

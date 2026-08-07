@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import LoginLayout from './components/LoginLayout.vue'
 
@@ -37,7 +37,7 @@ const validateConfirmPassword = (
   }
 }
 
-const forgotPasswordRules: FormRules<ForgotPasswordForm> = {
+const forgotPasswordRules = reactive<FormRules<ForgotPasswordForm>>({
   confirmPassword: [{ validator: validateConfirmPassword, trigger: 'blur' }],
   email: [
     { required: true, message: '请输入邮箱', trigger: 'blur' },
@@ -48,7 +48,7 @@ const forgotPasswordRules: FormRules<ForgotPasswordForm> = {
     { min: 6, max: 30, message: '密码长度应为 6-30 位', trigger: 'blur' },
   ],
   verificationCode: [{ required: true, message: '请输入验证码', trigger: 'blur' }],
-}
+})
 
 const handleResetPassword = async () => {
   if (!forgotPasswordFormRef.value) return

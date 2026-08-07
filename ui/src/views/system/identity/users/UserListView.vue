@@ -1,26 +1,56 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type { LoginMethod, OptionItem, SystemUser, SystemUserQuery } from '@/types'
+import type {
+  LoginMethod,
+  OptionItem,
+  SystemUser,
+  SystemUserQuery,
+} from '@/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import UserFromDrawer from './components/UserFromDrawer.vue'
 import RoleWorkspaceTag from './components/RoleWorkspaceTag.vue'
 
-interface MkTableExpose {
-  clearSelection: () => void
-}
-
 const { auth } = useStore()
 const route = useRoute()
 
+/* 创建用户啊 */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
-const userTableRef = ref<MkTableExpose>()
+
+/* 批量删除 */
+const batchSelectedUsers = ref<SystemUser[]>([])
+function handleBatchDelete() {
+  const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
+  MsgConfirm('批量删除用户', `确定删除选中的 ${batchSelectedUsers.value.length} 个用户吗？`, {
+    confirmButtonClass: 'danger',
+    confirmButtonText: '删除',
+  })
+    .then(() => {
+      systemUsersLoading.value = true
+
+      return UserManageApi.postBatchDeleteUsers(selectedUserIds).then(async () => {
+        MsgSuccess('删除成功')
+        await loadSystemUsers()
+        userTableRef.value?.clearSelection()
+      })
+    })
+
+    .catch(() => {})
+    .finally(() => {
+      systemUsersLoading.value = false
+    })
+}
+
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedUsers.value = selection as SystemUser[]
+}
 
 /* 列表查询相关 */
+const userTableRef = useTemplateRef('userTableRef')
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
@@ -69,34 +99,6 @@ function loadSystemUsers() {
     })
 }
 
-/* 批量删除 */
-const batchSelectedUsers = ref<SystemUser[]>([])
-function handleBatchDelete() {
-  const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm('批量删除用户', `确定删除选中的 ${batchSelectedUsers.value.length} 个用户吗？`, {
-    confirmButtonClass: 'danger',
-    confirmButtonText: '删除',
-  })
-    .then(() => {
-      systemUsersLoading.value = true
-
-      return UserManageApi.postBatchDeleteUsers(selectedUserIds).then(async () => {
-        MsgSuccess('删除成功')
-        await loadSystemUsers()
-        userTableRef.value?.clearSelection()
-      })
-    })
-
-    .catch(() => {})
-    .finally(() => {
-      systemUsersLoading.value = false
-    })
-}
-
-function handleBatchSelectionChange(selection: unknown[]) {
-  batchSelectedUsers.value = selection as SystemUser[]
-}
-
 onMounted(() => loadSystemUsers())
 </script>
 
@@ -106,8 +108,12 @@ onMounted(() => loadSystemUsers())
       <h4>{{ route.meta.title }}</h4>
       <div class="flex items-center gap-3">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <el-button>
+          <MkIcon name="icon_import_outlined" />
+          <span>导入用户</span>
+        </el-button>
         <el-button type="primary" @click="userFormDrawerRef?.open()">
-          <MkIcon name="icon_add_outlined" :size="18" />
+          <MkIcon name="icon_add_outlined" />
           <span>创建用户</span>
         </el-button>
       </div>
@@ -145,7 +151,27 @@ onMounted(() => loadSystemUsers())
 
       <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="210" label="角色">
         <template #default="{ row }">
-          <RoleWorkspaceTag :role-names="row.role_name" :role-workspace="row.role_workspace" />
+          <RoleWorkspaceTag
+            first-column-label="角色"
+            first-column-prop="roleName"
+            second-column-label="工作空间"
+            second-column-prop="workspace"
+            :tag-names="row.role_name"
+            :tag-workspace="row.role_workspace"
+          />
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="user_group_names" width="210" label="用户组">
+        <template #default="{ row }">
+          <RoleWorkspaceTag
+            first-column-label="用户组"
+            first-column-prop="userGroupName"
+            second-column-label="工作空间"
+            second-column-prop="workspace"
+            :tag-names="row.user_group_names"
+            :tag-workspace="row.role_workspace"
+          />
         </template>
       </el-table-column>
 
@@ -162,8 +188,11 @@ onMounted(() => loadSystemUsers())
       </el-table-column>
       <el-table-column label="操作" width="160" fixed="right">
         <template #default="{ row }">
-          <div class="flex items-center gap-1">
-            <el-switch v-model="row.is_active" size="small" />
+          <div class="flex items-center gap-3">
+            <span @click.stop>
+              <el-switch v-model="row.is_active" size="small" />
+            </span>
+            <el-divider direction="vertical" />
           </div>
         </template>
       </el-table-column>
