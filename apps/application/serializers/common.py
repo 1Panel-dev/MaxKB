@@ -18,6 +18,7 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
 
 from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
     ExecuteType
@@ -397,6 +398,10 @@ class ChatInfo:
                 ).save()
             else:
                 QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
+            # 记录Token消耗
+            total_tokens = (chat_record.message_tokens or 0) + (chat_record.answer_tokens or 0)
+            if total_tokens > 0:
+                ChatUserTokenQuota.consume(self.chat_user_id, total_tokens)
             # 插入会话记录
             QuerySet(ChatRecord).update_or_create(
                 id=chat_record.id,

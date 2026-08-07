@@ -12,8 +12,13 @@ from common.log.log import log
 from common.result import result
 from models_provider.api.model import DefaultModelResponse
 from system_manage.api.chat_user import BatchAddGroupApi, ChatUserAPI, ChatUserPageApi, EditUserApi
-from system_manage.api.user_group import AddMemberApi, CreateUserGroupApi, DeleteUserGroupApi, RemoveMemberApi, \
-    UserGroupListApi
+from system_manage.api.user_group import (
+    AddMemberApi,
+    CreateUserGroupApi,
+    DeleteUserGroupApi,
+    RemoveMemberApi,
+    UserGroupListApi,
+)
 from system_manage.models import ChatUser, UserGroup
 from system_manage.serializers.chat_user import (
     ChatUserSerializer,
@@ -78,7 +83,12 @@ class SystemChatUserView(APIView):
             tags=[_("System/Chat user")],  # type: ignore
             responses=ChatUserPageApi.get_response(),
         )
-        @has_permissions(PermissionConstants.CHAT_USER_READ, PermissionConstants.USER_GROUP_READ, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
+        @has_permissions(
+            PermissionConstants.CHAT_USER_READ,
+            PermissionConstants.USER_GROUP_READ,
+            RoleConstants.ADMIN,
+            RoleConstants.WORKSPACE_MANAGE,
+        )
         def get(self, request: Request):
             return result.success(ChatUserSerializer.list())
 
@@ -257,7 +267,12 @@ class SystemChatUserGroupView(APIView):
         responses=CreateUserGroupApi.get_response(),
         tags=[_("System/User Group")],  # type: ignore
     )  # type: ignore
-    @has_permissions(PermissionConstants.USER_GROUP_CREATE, PermissionConstants.USER_GROUP_EDIT, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
+    @has_permissions(
+        PermissionConstants.USER_GROUP_CREATE,
+        PermissionConstants.USER_GROUP_EDIT,
+        RoleConstants.ADMIN,
+        RoleConstants.WORKSPACE_MANAGE,
+    )
     @log(
         menu="User group",
         operate="Create or update user group",
@@ -342,7 +357,9 @@ class SystemChatUserGroupView(APIView):
             responses=DefaultModelResponse,
             tags=[_("System/User Group")],  # type: ignore
         )
-        @has_permissions(PermissionConstants.USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE)
+        @has_permissions(
+            PermissionConstants.USER_GROUP_REMOVE_MEMBER, RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE
+        )
         @log(
             menu="User group",
             operate="Remove member from user group",

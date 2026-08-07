@@ -9731,6 +9731,9 @@ msgstr "获取对话用户配额"
 msgid "Set chat user quota"
 msgstr "设置对话用户配额"
 
+msgid "The token quota for the current period has been exhausted. Please contact the administrator."
+msgstr "当前周期 Tokens 配额已用尽，请联系管理员。"
+
 #: apps/xpack/views/system_chat_user.py:101
 msgid "Batch set chat user quota"
 msgstr "批量设置对话用户配额"
