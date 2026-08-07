@@ -7,7 +7,7 @@ requires-python = "~=3.13.0"
 readme = "README.md"
 dependencies = [
     # Web framework & API
-    "django==6.0.7",
+    "django==6.1.0",
     "djangorestframework==3.17.2",
     "drf-spectacular[sidecar]==0.30.0",
 
