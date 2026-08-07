@@ -15,8 +15,12 @@ os.chdir(BASE_DIR)
 sys.path.insert(0, APP_DIR)
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "maxkb.settings")
 
-# 忽略 pydub 和 jieba 的语法警告, 3.14中已经是Error
-warnings.filterwarnings("ignore", category=SyntaxWarning, module="pydub|jieba")
+# 忽略 pydub / jieba / celery 等依赖的语法警告, 3.14中已经是Error
+# 注意: module= 对编译期触发的 SyntaxWarning 不生效, 需按 message 匹配
+# 用 PYTHONWARNINGS 而不仅是 warnings.filterwarnings, 因为 celery worker
+# 是独立子进程, 只有环境变量才能被继承, filterwarnings 只对当前进程生效
+os.environ.setdefault("PYTHONWARNINGS", "ignore::SyntaxWarning")
+warnings.filterwarnings("ignore", category=SyntaxWarning, message="invalid escape sequence")
 
 
 def collect_static():
