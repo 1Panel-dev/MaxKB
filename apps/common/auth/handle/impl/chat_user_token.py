@@ -60,10 +60,11 @@ class ChatUserToken(AuthBaseHandle):
         for application_access_token in application_access_token_list:
             permission_list = []
             if application_access_token.authentication:
-                if application_access_token.get('type') == 'password':
+                authentication_value = application_access_token.authentication_value
+                if authentication_value.get('type') == 'password':
                     permission_list.append(ChatPermissionConstants.CHAT_USER_PASSWORD.value)
-                elif application_access_token.get('type') == 'login':
-                    login_value = application_access_token.get('login_value') or []
+                elif authentication_value.get('type') == 'login':
+                    login_value = authentication_value.get('login_value') or []
                     for _value in login_value:
                         permission_str = f'{Group.CHAT_USER}_{_value.upper()}'
                         permission = CHAT_PERMISSION_STR_MAP.get(permission_str)
