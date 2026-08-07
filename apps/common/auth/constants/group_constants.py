@@ -116,6 +116,7 @@ class Group(Enum):
     SYSTEM_OVERVIEW = ("SYSTEM_OVERVIEW", _("Overview"))
     SYSTEM_ACCESS = ("SYSTEM_ACCESS", _("Application Access"))
     SYSTEM_CHAT_LOG = ("SYSTEM_CHAT_LOG", _("Conversation log"))
+    CHAT = ("CHAT", _("Chat"))
 
     def __init__(self, value, label):
         self._value_ = value

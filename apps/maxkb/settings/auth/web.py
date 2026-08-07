@@ -7,7 +7,7 @@
     @desc:
 """
 USER_TOKEN_AUTH = 'common.auth.handle.impl.user_token.UserToken'
-CHAT_ANONYMOUS_USER_AURH = 'common.auth.handle.impl.chat_anonymous_user_token.ChatAnonymousUserToken'
+CHAT_ANONYMOUS_USER_AURH = 'common.auth.handle.impl.chat_user_token.ChatUserToken'
 APPLICATION_KEY_AUTH = 'common.auth.handle.impl.application_key.ApplicationKey'
 AUTH_HANDLES = [
     USER_TOKEN_AUTH

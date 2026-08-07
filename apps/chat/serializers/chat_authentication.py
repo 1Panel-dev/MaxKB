@@ -13,9 +13,10 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationVersion
+from application.models import ApplicationAccessToken, Application, ApplicationVersion
 from application.serializers.application import ApplicationSerializerModel
-from common.auth.common import ChatUserToken, ChatAuthentication, FileToken
+from common.auth.common import FileToken, ChatToken
+from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -24,9 +25,7 @@ from common.utils.rsa_util import get_key_pair_by_sql
 
 
 class AnonymousAuthenticationSerializer(serializers.Serializer):
-    access_token = serializers.CharField(required=True, label=_("access_token"))
-
-    def auth(self, request, with_valid=True):
+    def auth(self, request):
         token = request.META.get('HTTP_AUTHORIZATION')
         token_details = {}
         try:
@@ -35,21 +34,11 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
                 token_details = signing.loads(token[7:])
         except Exception as e:
             pass
-        if with_valid:
-            self.is_valid(raise_exception=True)
-        access_token = self.data.get("access_token")
-        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
-        if application_access_token is not None and application_access_token.is_active:
-            chat_user_id = token_details.get('chat_user_id') or str(uuid.uuid7())
-            _type = AuthenticationType.CHAT_ANONYMOUS_USER
-            return ChatUserToken(application_access_token.application_id, None, access_token, _type,
-                                 ChatUserType.ANONYMOUS_USER,
-                                 chat_user_id, ChatAuthentication(None)).to_token(), FileToken(chat_user_id,
-                                                                                               AuthenticationType.CHAT_ANONYMOUS_USER.value,
-                                                                                               application_id=str(
-                                                                                                   application_access_token.application_id)).to_token()
-        else:
-            raise NotFound404(404, _("Invalid access_token"))
+        chat_user_id = token_details.get('id') or str(uuid.uuid7())
+        _type = AuthenticationType.CHAT_USER
+        return ChatToken(chat_user_id, _type,
+                         str(Operate.ANNOTATION_AUTH)).to_token(), FileToken(chat_user_id,
+                                                                             _type).to_token()
 
 
 class AuthProfileSerializer(serializers.Serializer):

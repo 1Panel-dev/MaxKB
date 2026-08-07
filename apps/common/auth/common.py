@@ -12,6 +12,8 @@ import threading
 
 from django.core import signing, cache
 
+from application.models import ChatUserType
+from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.utils.rsa_util import encrypt, decrypt
 
@@ -67,7 +69,7 @@ class FileToken:
                     'application_id': self.application_id
                 } if self.application_id else {
             'user_id': self.user_id,
-            'type': self.type
+            'type': str(self.type)
         })
 
     def to_token(self):
@@ -110,3 +112,20 @@ class ChatUserToken:
                              token_dict.get('access_token'), token_dict.get('type'), token_dict.get('chat_user_type'),
                              token_dict.get('chat_user_id'),
                              ChatAuthentication.new_instance(token_dict.get('authentication')))
+
+
+class ChatToken:
+    def __init__(self, user_id, _type: AuthenticationType, login_type: str):
+        self.user_id = user_id
+        self.type = _type
+        self.login_type = login_type
+
+    def to_dict(self):
+        return {
+            'user_id': str(self.user_id),
+            'type': str(self.type.value),
+            'login_type': str(self.login_type)
+        }
+
+    def to_token(self):
+        return signing.dumps(self.to_dict())

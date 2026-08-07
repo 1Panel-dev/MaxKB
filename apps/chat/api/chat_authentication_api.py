@@ -25,7 +25,7 @@ class OpenAIAPI(APIMixin):
 class ChatAuthenticationAPI(APIMixin):
     @staticmethod
     def get_request():
-        return AnonymousAuthenticationSerializer
+        return None
 
     @staticmethod
     def get_parameters():

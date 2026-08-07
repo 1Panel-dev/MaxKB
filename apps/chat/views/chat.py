@@ -121,8 +121,7 @@ class AnonymousAuthentication(APIView):
         tags=[_('Chat')]  # type: ignore
     )
     def post(self, request: Request):
-        token, f_token = AnonymousAuthenticationSerializer(
-            data={'access_token': request.data.get("access_token")}).auth(
+        token, f_token = AnonymousAuthenticationSerializer().auth(
             request)
         response = result.success(
             token,
@@ -369,7 +368,6 @@ class ResetCurrentUserPasswordView(APIView):
         return result.error(_("Failed to change password"))
 
 
-
 class ChatUserProfileView(APIView):
     authentication_classes = [ChatTokenAuth]
 
@@ -444,4 +442,3 @@ class Logout(APIView):
         auth = request.META.get("HTTP_AUTHORIZATION")
         cache.delete(get_key(token=auth[7:]), version=version)
         return result.success(True)
-

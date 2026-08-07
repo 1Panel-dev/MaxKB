@@ -21,8 +21,8 @@ class Permission:
     """
     权限信息
     """
-    group: Group
-    sub_group: Group
+    group: Group | str
+    sub_group: Group | str
     operate: Operate
     bit_index: int
     workspace_id: Optional[str] = None
@@ -33,7 +33,9 @@ class Permission:
         return 1 << self.bit_index
 
     def get_resource_permission_key(self, resource_id):
-        return f"{self.group}:{resource_id}"
+        workspace = f"w:{self.workspace_id}" if self.workspace_id else ""
+        resource = f"r:{self.resource_id}" if self.resource_id else ""
+        return f"{self.group}{workspace}{resource}"
 
     def __str__(self):
         sub = f"_{self.sub_group}" if self.sub_group != self.group else ""
