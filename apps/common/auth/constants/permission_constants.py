@@ -75,7 +75,7 @@ class PermissionConstants(Enum):
     HOMEPAGE_READ = (
         Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE],
         ),
@@ -84,7 +84,7 @@ class PermissionConstants(Enum):
     HOMEPAGE_EXPORT = (
         Permission(group=Group.HOMEPAGE, sub_group=Group.HOMEPAGE, operate=Operate.EXPORT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.USER],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE],
         ),
@@ -133,7 +133,7 @@ class PermissionConstants(Enum):
     USER_READ = (
         Permission(group=Group.USER, sub_group=Group.USER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.ADMIN],
             category=Category.IAM,
             scope=[PermissionScopeConstants.SYSTEM],
         ),
@@ -223,7 +223,7 @@ class PermissionConstants(Enum):
     MODEL_READ = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.READ, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_VIEW],
@@ -233,7 +233,7 @@ class PermissionConstants(Enum):
     MODEL_CREATE = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.CREATE, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE],
@@ -243,7 +243,7 @@ class PermissionConstants(Enum):
     MODEL_EDIT = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.EDIT, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE],
@@ -253,7 +253,7 @@ class PermissionConstants(Enum):
     MODEL_DELETE = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.DELETE, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE],
@@ -263,7 +263,7 @@ class PermissionConstants(Enum):
     MODEL_RESOURCE_AUTHORIZATION = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.AUTH, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE],
@@ -273,7 +273,7 @@ class PermissionConstants(Enum):
     MODEL_RELATE_RESOURCE_VIEW = (
         Permission(group=Group.MODEL, sub_group=Group.MODEL, operate=Operate.RELATE_VIEW, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.MODEL_MANAGE],
@@ -284,7 +284,7 @@ class PermissionConstants(Enum):
     TRIGGER_READ = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
+            role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -293,14 +293,14 @@ class PermissionConstants(Enum):
     TRIGGER_CREATE = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN], category=Category.WORKSPACE, scope=[PermissionScopeConstants.WORKSPACE]
+            role_list=[RoleConstants.WORKSPACE_MANAGE], category=Category.WORKSPACE, scope=[PermissionScopeConstants.WORKSPACE]
         ),
     )
 
     TRIGGER_EDIT = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
+            role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -309,7 +309,7 @@ class PermissionConstants(Enum):
     TRIGGER_DELETE = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
+            role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -318,7 +318,7 @@ class PermissionConstants(Enum):
     TRIGGER_RECORD = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.RECORD, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN],
+            role_list=[RoleConstants.WORKSPACE_MANAGE],
             category=Category.WORKSPACE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -328,7 +328,7 @@ class PermissionConstants(Enum):
     TOOL_READ = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.READ, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -338,7 +338,7 @@ class PermissionConstants(Enum):
     TOOL_CREATE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.CREATE, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -348,7 +348,7 @@ class PermissionConstants(Enum):
     TOOL_BATCH_MOVE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.BATCH_MOVE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -358,7 +358,7 @@ class PermissionConstants(Enum):
     TOOL_BATCH_DELETE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.BATCH_DELETE, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -368,7 +368,7 @@ class PermissionConstants(Enum):
     TOOL_EDIT = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.EDIT, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -378,7 +378,7 @@ class PermissionConstants(Enum):
     TOOL_DELETE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.DELETE, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -388,7 +388,7 @@ class PermissionConstants(Enum):
     TOOL_IMPORT = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.IMPORT, bit_index=7),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -398,7 +398,7 @@ class PermissionConstants(Enum):
     TOOL_EXPORT = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.EXPORT, bit_index=8),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -408,7 +408,7 @@ class PermissionConstants(Enum):
     TOOL_RESOURCE_AUTHORIZATION = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.AUTH, bit_index=9),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -418,7 +418,7 @@ class PermissionConstants(Enum):
     TOOL_RELATE_RESOURCE_VIEW = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.RELATE_VIEW, bit_index=10),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -428,7 +428,7 @@ class PermissionConstants(Enum):
     TOOL_PUBLISH = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.PUBLISH, bit_index=11),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -438,7 +438,7 @@ class PermissionConstants(Enum):
     TOOL_EXECUTE_RECORD = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.RECORD, bit_index=12),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -449,7 +449,7 @@ class PermissionConstants(Enum):
     TOOL_TRIGGER_READ = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.TRIGGER_READ, bit_index=13),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -459,7 +459,7 @@ class PermissionConstants(Enum):
     TOOL_TRIGGER_CREATE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.TRIGGER_CREATE, bit_index=14),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -469,7 +469,7 @@ class PermissionConstants(Enum):
     TOOL_TRIGGER_EDIT = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.TRIGGER_EDIT, bit_index=15),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -479,7 +479,7 @@ class PermissionConstants(Enum):
     TOOL_TRIGGER_DELETE = (
         Permission(group=Group.TOOL, sub_group=Group.TOOL, operate=Operate.TRIGGER_DELETE, bit_index=16),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -490,7 +490,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_READ = (
         Permission(group=Group.TOOL, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -500,7 +500,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_CREATE = (
         Permission(group=Group.TOOL, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -510,7 +510,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_EDIT = (
         Permission(group=Group.TOOL, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -520,7 +520,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_DELETE = (
         Permission(group=Group.TOOL, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -530,7 +530,7 @@ class PermissionConstants(Enum):
     TOOL_FOLDER_AUTH = (
         Permission(group=Group.TOOL, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.TOOL_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -541,7 +541,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.READ, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
@@ -551,7 +551,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.CREATE, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
@@ -561,7 +561,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EDIT, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -571,7 +571,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.DELETE, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -581,7 +581,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_SYNC = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.SYNC, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -591,7 +591,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_EXPORT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.EXPORT, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -601,7 +601,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_VECTOR = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.VECTOR, bit_index=7),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -611,7 +611,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_GENERATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.GENERATE, bit_index=8),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -621,7 +621,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_BATCH_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_DELETE, bit_index=9),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -631,7 +631,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_BATCH_MOVE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.BATCH_MOVE, bit_index=10),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -641,7 +641,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_RESOURCE_AUTHORIZATION = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.AUTH, bit_index=11),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -651,7 +651,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_RELATE_RESOURCE_VIEW = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.KNOWLEDGE, operate=Operate.RELATE_VIEW, bit_index=12),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -662,7 +662,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
@@ -672,7 +672,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -682,7 +682,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -692,7 +692,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -702,7 +702,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_FOLDER_AUTH = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -713,7 +713,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_WORKFLOW_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
@@ -723,7 +723,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_WORKFLOW_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EDIT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -733,7 +733,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_WORKFLOW_EXPORT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.EXPORT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -743,7 +743,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_WORKFLOW_PUBLISH = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.WORKFLOW, operate=Operate.PUBLISH, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
@@ -754,7 +754,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -764,7 +764,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -774,7 +774,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -784,7 +784,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -794,7 +794,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_SYNC = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.SYNC, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -804,7 +804,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_EXPORT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.EXPORT, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -814,7 +814,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_DOWNLOAD_SOURCE_FILE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.DOWNLOAD, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -824,7 +824,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_GENERATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.GENERATE, bit_index=7),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -834,7 +834,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_VECTOR = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.VECTOR, bit_index=8),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -844,7 +844,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_MIGRATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.MIGRATE, bit_index=9),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -854,7 +854,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_TAG = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TAG, bit_index=10),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -864,7 +864,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_REPLACE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.REPLACE, bit_index=11),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -874,7 +874,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_DOCUMENT_TOKEN = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.DOCUMENT, operate=Operate.TOKEN, bit_index=12),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -885,7 +885,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_HIT_TEST = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.HIT_TEST, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -896,7 +896,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_PROBLEM_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -906,7 +906,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_PROBLEM_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -916,7 +916,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_PROBLEM_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -926,7 +926,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_PROBLEM_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -936,7 +936,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_PROBLEM_RELATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.PROBLEM, operate=Operate.RELATE, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -947,7 +947,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TERMBASE_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -957,7 +957,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TERMBASE_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -967,7 +967,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TERMBASE_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -977,7 +977,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TERMBASE_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TERMBASE, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -988,7 +988,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TAG_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -998,7 +998,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TAG_CREATE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE],
@@ -1008,7 +1008,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TAG_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -1018,7 +1018,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_TAG_DELETE = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.TAG, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -1029,7 +1029,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_CHAT_USER_READ = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_VIEW],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -1039,7 +1039,7 @@ class PermissionConstants(Enum):
     KNOWLEDGE_CHAT_USER_EDIT = (
         Permission(group=Group.KNOWLEDGE, sub_group=Group.CHAT_USER, operate=Operate.EDIT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             resource_permission_group_list=[ResourcePermissionConst.KNOWLEDGE_MANAGE],
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
@@ -1285,7 +1285,7 @@ class PermissionConstants(Enum):
     APPLICATION_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.READ, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1295,7 +1295,7 @@ class PermissionConstants(Enum):
     APPLICATION_CREATE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.CREATE, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1305,7 +1305,7 @@ class PermissionConstants(Enum):
     APPLICATION_COPY = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.COPY, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1315,7 +1315,7 @@ class PermissionConstants(Enum):
     APPLICATION_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EDIT, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1325,7 +1325,7 @@ class PermissionConstants(Enum):
     APPLICATION_DELETE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.DELETE, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1335,7 +1335,7 @@ class PermissionConstants(Enum):
     APPLICATION_IMPORT = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.IMPORT, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1345,7 +1345,7 @@ class PermissionConstants(Enum):
     APPLICATION_EXPORT = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.EXPORT, bit_index=7),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1355,7 +1355,7 @@ class PermissionConstants(Enum):
     APPLICATION_PUBLISH = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.PUBLISH, bit_index=8),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1365,7 +1365,7 @@ class PermissionConstants(Enum):
     APPLICATION_BATCH_DELETE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.BATCH_DELETE, bit_index=9),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1375,7 +1375,7 @@ class PermissionConstants(Enum):
     APPLICATION_BATCH_MOVE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.BATCH_MOVE, bit_index=10),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1385,7 +1385,7 @@ class PermissionConstants(Enum):
     APPLICATION_RESOURCE_AUTHORIZATION = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.AUTH, bit_index=11),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1395,7 +1395,7 @@ class PermissionConstants(Enum):
     APPLICATION_RELATE_RESOURCE_VIEW = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.RELATE_VIEW, bit_index=12),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1406,7 +1406,7 @@ class PermissionConstants(Enum):
     APPLICATION_TRIGGER_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_READ, bit_index=13),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -1415,7 +1415,7 @@ class PermissionConstants(Enum):
     APPLICATION_TRIGGER_CREATE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_CREATE, bit_index=14),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
         ),
@@ -1424,7 +1424,7 @@ class PermissionConstants(Enum):
     APPLICATION_TRIGGER_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_EDIT, bit_index=15),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -1433,7 +1433,7 @@ class PermissionConstants(Enum):
     APPLICATION_TRIGGER_DELETE = (
         Permission(group=Group.APPLICATION, sub_group=Group.APPLICATION, operate=Operate.TRIGGER_DELETE, bit_index=16),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
         ),
@@ -1443,7 +1443,7 @@ class PermissionConstants(Enum):
     APPLICATION_FOLDER_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1453,7 +1453,7 @@ class PermissionConstants(Enum):
     APPLICATION_FOLDER_CREATE = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1463,7 +1463,7 @@ class PermissionConstants(Enum):
     APPLICATION_FOLDER_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.EDIT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1473,7 +1473,7 @@ class PermissionConstants(Enum):
     APPLICATION_FOLDER_DELETE = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.DELETE, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1483,7 +1483,7 @@ class PermissionConstants(Enum):
     APPLICATION_FOLDER_AUTH = (
         Permission(group=Group.APPLICATION, sub_group=Group.FOLDER, operate=Operate.AUTH, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1494,7 +1494,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1504,7 +1504,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_EMBED = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.EMBED, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1514,7 +1514,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_ACCESS = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.ACCESS, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1524,7 +1524,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_DISPLAY = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.DISPLAY, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1534,7 +1534,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_API_KEY = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.API_KEY, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1544,7 +1544,7 @@ class PermissionConstants(Enum):
     APPLICATION_OVERVIEW_PUBLIC = (
         Permission(group=Group.APPLICATION, sub_group=Group.OVERVIEW, operate=Operate.PUBLIC_ACCESS, bit_index=5),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1555,7 +1555,7 @@ class PermissionConstants(Enum):
     APPLICATION_ACCESS_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.ACCESS, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1565,7 +1565,7 @@ class PermissionConstants(Enum):
     APPLICATION_ACCESS_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.ACCESS, operate=Operate.EDIT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1576,7 +1576,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_USER_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_USER, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1586,7 +1586,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_USER_EDIT = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_USER, operate=Operate.EDIT, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1597,7 +1597,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_READ = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.READ, bit_index=0),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_VIEW],
@@ -1607,7 +1607,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_ANNOTATION = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.ANNOTATION, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1617,7 +1617,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_EXPORT = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.EXPORT, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1627,7 +1627,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_CLEAR_POLICY = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.CLEAR_POLICY, bit_index=3),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1637,7 +1637,7 @@ class PermissionConstants(Enum):
     APPLICATION_CHAT_LOG_ADD_KNOWLEDGE = (
         Permission(group=Group.APPLICATION, sub_group=Group.CHAT_LOG, operate=Operate.ADD_KNOWLEDGE, bit_index=4),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.USER],
+            role_list=[RoleConstants.WORKSPACE_MANAGE, RoleConstants.USER],
             category=Category.RESOURCE,
             scope=[PermissionScopeConstants.WORKSPACE_RESOURCE],
             resource_permission_group_list=[ResourcePermissionConst.APPLICATION_MANAGE],
@@ -1657,7 +1657,7 @@ class PermissionConstants(Enum):
     LICENSE_UPDATE = (
         Permission(group=Group.OTHER, sub_group=Group.OTHER, operate=Operate.LICENSE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+            role_list=[RoleConstants.ADMIN],
             category=Category.SYSTEM_SETTING,
             scope=[PermissionScopeConstants.SYSTEM],
         ),
@@ -1740,7 +1740,7 @@ class PermissionConstants(Enum):
     CHAT_USER_SYNC = (
         Permission(group=Group.CHAT_USER, sub_group=Group.CHAT_USER, operate=Operate.SYNC, bit_index=2),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+            role_list=[RoleConstants.ADMIN],
             category=Category.CHAT_CLIENT,
             scope=[PermissionScopeConstants.SYSTEM],
         ),
@@ -1776,7 +1776,7 @@ class PermissionConstants(Enum):
     CHAT_USER_QUOTA_SETTING = (
         Permission(group=Group.CHAT_USER, sub_group=Group.CHAT_USER, operate=Operate.QUOTA_SETTING, bit_index=6),
         PermissionMeta(
-            role_list=[RoleConstants.ADMIN, RoleConstants.WORKSPACE_MANAGE],
+            role_list=[RoleConstants.ADMIN],
             category=Category.CHAT_CLIENT,
             scope=[PermissionScopeConstants.SYSTEM],
         ),
