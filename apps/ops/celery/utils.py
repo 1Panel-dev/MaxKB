@@ -5,32 +5,11 @@ import os
 import uuid
 
 from django.conf import settings
-from django_celery_beat.models import (
-    PeriodicTasks
-)
 
 from common.utils.logger import maxkb_logger
 from maxkb.const import PROJECT_DIR
 
 logger = logging.getLogger(__file__)
-
-
-def disable_celery_periodic_task(task_name):
-    from django_celery_beat.models import PeriodicTask
-    PeriodicTask.objects.filter(name=task_name).update(enabled=False)
-    PeriodicTasks.update_changed()
-
-
-def delete_celery_periodic_task(task_name):
-    from django_celery_beat.models import PeriodicTask
-    PeriodicTask.objects.filter(name=task_name).delete()
-    PeriodicTasks.update_changed()
-
-
-def get_celery_periodic_task(task_name):
-    from django_celery_beat.models import PeriodicTask
-    task = PeriodicTask.objects.filter(name=task_name).first()
-    return task
 
 
 def make_dirs(name, mode=0o700, exist_ok=False):

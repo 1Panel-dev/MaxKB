@@ -10,7 +10,6 @@ from celery.signals import (
 )
 from django.core.cache import cache
 from django_apscheduler.models import DjangoJob
-from django_celery_beat.models import PeriodicTask
 
 from common.utils.logger import maxkb_logger
 from .decorator import get_after_app_ready_tasks, get_after_app_shutdown_clean_tasks
@@ -76,10 +75,6 @@ def on_app_ready(sender=None, headers=None, **kwargs):
     logger.debug("Work ready signal recv")
     logger.debug("Start need start task: [{}]".format(", ".join(tasks)))
     for task in tasks:
-        periodic_task = PeriodicTask.objects.filter(task=task).first()
-        if periodic_task and not periodic_task.enabled:
-            logger.debug("Periodic task [{}] is disabled!".format(task))
-            continue
         subtask(task).delay()
 
 
@@ -99,7 +94,6 @@ def after_app_shutdown_periodic_tasks(sender=None, **kwargs):
     tasks = get_after_app_shutdown_clean_tasks()
     logger.debug("Worker shutdown signal recv")
     logger.debug("Clean period tasks: [{}]".format(', '.join(tasks)))
-    PeriodicTask.objects.filter(name__in=tasks).delete()
 
 
 @after_setup_logger.connect

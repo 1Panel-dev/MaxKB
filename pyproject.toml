@@ -13,7 +13,6 @@ dependencies = [
 
     # Django ecosystem
     "django-apscheduler==0.7.0",
-    "django-celery-beat==2.9.0",
     "django-db-connection-pool==1.2.6",
     "django-mptt==0.18.0",
     "django-redis==7.0.0",

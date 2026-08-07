@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'common',
     'system_manage',
     'models_provider',
-    'django_celery_beat',
     'application',
     'chat',
     'oss',
