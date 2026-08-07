@@ -52,4 +52,12 @@ class ChatAuthenticationProfileAPI(APIMixin):
 class ChatOpenAPI(APIMixin):
     @staticmethod
     def get_parameters():
-        return []
+        return [
+            OpenApiParameter(
+                name="application_id",
+                description=_("Application ID"),
+                type=OpenApiTypes.UUID,
+                location=OpenApiParameter.PATH,
+                required=True,
+            )
+        ]
