@@ -36,6 +36,6 @@ class Principal:
                  profile=None,
                  **keywords):
         self.id = _id
-        self._type = _type
+        self.type = _type
         self.profile = profile
         self.keywords = keywords

@@ -217,14 +217,15 @@ class OpenView(APIView):
         responses=None,
         tags=[_('Chat')]  # type: ignore
     )
-    def get(self, request: Request):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def get(self, request: Request, application_id: str):
         ip_address = _get_ip_address(request)
         return result.success(OpenChatSerializers(
-            data={'application_id': request.auth.application_id,
-                  'chat_user_id': request.auth.chat_user_id, 'chat_user_type': request.auth.chat_user_type,
+            data={'application_id': application_id,
+                  'chat_user_id': request.user.id, 'chat_user_type': request.user.type,
                   'ip_address': ip_address,
                   'source': {
-                      'type': ChatSourceChoices.API_CALL.value if request.auth.chat_user_type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value},
+                      'type': ChatSourceChoices.API_CALL.value if request.user.type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value},
                   'debug': False}).open())
 
 

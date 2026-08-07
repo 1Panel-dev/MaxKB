@@ -15,7 +15,7 @@ urlpatterns = [
     path('application/<str:application_id>/profile', views.ApplicationProfile.as_view(), name='profile'),
     path('chat_message/<str:chat_id>', views.ChatView.as_view(), name='chat'),
     path('chat_message/<str:chat_id>/cancel', views.CancelWorkflowView.as_view(), name='cancel_workflow'),
-    path('open', views.OpenView.as_view(), name='open'),
+    path('application/<str:application_id>/open', views.OpenView.as_view(), name='open'),
     path('text_to_speech', views.TextToSpeech.as_view()),
     path('speech_to_text', views.SpeechToText.as_view()),
     path('captcha', views.CaptchaView.as_view(), name='captcha'),
