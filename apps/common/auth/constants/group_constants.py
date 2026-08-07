@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： group_constants.py
-    @date：2026/8/3 17:31
-    @desc: 权限分组常量，用于菜单和权限分类
+@project: MaxKB
+@Author：虎虎虎
+@file： group_constants.py
+@date：2026/8/3 17:31
+@desc: 权限分组常量，用于菜单和权限分类
 """
+
 from enum import Enum
 
 from django.utils.translation import gettext_lazy as _
@@ -61,7 +62,7 @@ class Group(Enum):
     # 对话相关
     CHAT_USER_GROUP = ("CHAT_USER_GROUP", _("Chat User Group"))
     CHAT_USER_AUTH = ("CHAT_USER_AUTH", _("Chat User Auth"))
-    PORTAL = ("PORTAL", _('portal'))
+    PORTAL = ("PORTAL", _("portal"))
     # 其他
     OTHER = ("OTHER", _("Other"))
     HOMEPAGE = ("HOMEPAGE", _("Home page"))
@@ -69,6 +70,13 @@ class Group(Enum):
 
     # 资源授权分组
     RESOURCE_PERMISSION = ("RESOURCE_PERMISSION", _("Resource Permission"))
+    APPLICATION_RESOURCE_PERMISSION = (
+        "APPLICATION_RESOURCE_PERMISSION",
+        _("Application"),
+    )
+    KNOWLEDGE_RESOURCE_PERMISSION = ("KNOWLEDGE_RESOURCE_PERMISSION", _("Knowledge"))
+    TOOL_RESOURCE_PERMISSION = ("TOOL_RESOURCE_PERMISSION", _("Tool"))
+    MODEL_RESOURCE_PERMISSION = ("MODEL_RESOURCE_PERMISSION", _("Model"))
 
     # 工作空间分组
     WORKSPACE_ROLE = ("WORKSPACE_ROLE", _("Role Management"))

@@ -1,19 +1,21 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： operate_constants.py
-    @date：2026/8/3 17:32
-    @desc: 操作权限常量
+@project: MaxKB
+@Author：虎虎虎
+@file： operate_constants.py
+@date：2026/8/3 17:32
+@desc: 操作权限常量
 """
+
 from enum import Enum
 from django.utils.translation import gettext_lazy as _
 
 
 class Operate(Enum):
     """
-     一个权限组的操作权限
+    一个权限组的操作权限
     """
+
     SELF = ("", "")
     READ = ("READ", _("Read"))
     EDIT = ("READ+EDIT", _("Edit"))
@@ -67,6 +69,13 @@ class Operate(Enum):
     TO_WORKSPACE = ("READ+TO_WORKSPACE", _("Authorize to Workspace"))
     SET_ROLE = ("READ+SET_ROLE", _("Set Role"))
     QUOTA_SETTING = ("READ+QUOTA_SETTING", _("Quota Setting"))
+
+    ABOUT = ("READ", _("About"))
+    LICENSE = ("READ+UPDATE", _("Update License"))
+    SWITCH_LANGUAGE = ("READ+EDIT", _("Switch Language"))
+    CHANGE_PASSWORD = ("READ+CREATE", _("Change Password"))
+    SYSTEM_API_KEY = ("READ+DELETE", _("System API Key"))
+    PORTAL = ("READ+PORTAL", _("Portal"))
 
     def __init__(self, value, label):
         self._value_ = value
