@@ -9730,3 +9730,6 @@ msgstr "獲取對話用戶配額"
 #: apps/xpack/views/system_chat_user.py:82
 msgid "Set chat user quota"
 msgstr "設置對話用戶配額"
+
+msgid "The token quota for the current period has been exhausted. Please contact the administrator."
+msgstr "當前週期 Tokens 配額已用盡，請聯繫管理員。"

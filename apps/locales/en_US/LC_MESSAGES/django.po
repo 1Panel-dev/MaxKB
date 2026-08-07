@@ -9591,3 +9591,6 @@ msgstr "Get chat user quota"
 #: apps/xpack/views/system_chat_user.py:82
 msgid "Set chat user quota"
 msgstr "Set chat user quota"
+
+msgid "The token quota for the current period has been exhausted. Please contact the administrator."
+msgstr ""

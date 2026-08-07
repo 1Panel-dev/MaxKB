@@ -4,30 +4,85 @@ import uuid_utils.compat
 from django.db import migrations, models
 
 
-class Migration(migrations.Migration):
+def migrate_historical_tokens(apps, schema_editor):
+    ChatRecord = apps.get_model('application', 'ChatRecord')
+    Chat = apps.get_model('application', 'Chat')
+    ChatUserTokenQuota = apps.get_model('system_manage', 'ChatUserTokenQuota')
 
+    chat_user_map = {
+        str(c['id']): c['chat_user_id']
+        for c in Chat.objects.values('id', 'chat_user_id').iterator()
+    }
+    user_totals = {}
+    queryset = ChatRecord.objects.filter(message_tokens__isnull=False) | ChatRecord.objects.filter(
+        answer_tokens__isnull=False)
+    for record in queryset.values('chat_id', 'message_tokens', 'answer_tokens').iterator(chunk_size=5000):
+        user_id = chat_user_map.get(str(record['chat_id']))
+        if not user_id:
+            continue
+        tokens = (record['message_tokens'] or 0) + (record['answer_tokens'] or 0)
+        user_totals[user_id] = user_totals.get(user_id, 0) + tokens
+
+    objs = [
+        ChatUserTokenQuota(user_id=uid, total_tokens=total)
+        for uid, total in user_totals.items()
+    ]
+    ChatUserTokenQuota.objects.bulk_create(objs, batch_size=500)
+
+
+class Migration(migrations.Migration):
     dependencies = [
-        ('system_manage', '0007_workspaceusergroupresourcepermission'),
+        ("system_manage", "0007_workspaceusergroupresourcepermission"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ChatUserTokenQuota',
+            name="ChatUserTokenQuota",
             fields=[
-                ('create_time', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='创建时间')),
-                ('update_time', models.DateTimeField(auto_now=True, db_index=True, verbose_name='修改时间')),
-                ('id', models.UUIDField(default=uuid_utils.compat.uuid7, editable=False, primary_key=True, serialize=False, verbose_name='主键id')),
-                ('user_id', models.UUIDField(db_index=True, verbose_name='用户id')),
-                ('quota_type', models.CharField(choices=[('UNLIMITED', '不限额'), ('PERIODIC', '按周期限制')], default='UNLIMITED', max_length=20, verbose_name='配额模式')),
-                ('period_type', models.CharField(blank=True, choices=[('DAY', '天'), ('WEEK', '周'), ('MONTH', '月')], max_length=10, null=True, verbose_name='周期单位')),
-                ('period_value', models.PositiveIntegerField(blank=True, null=True, verbose_name='周期数量')),
-                ('token_limit', models.BigIntegerField(blank=True, null=True, verbose_name='Tokens上限')),
-                ('used_tokens', models.BigIntegerField(default=0, verbose_name='当前周期已使用Tokens')),
-                ('total_tokens', models.BigIntegerField(default=0, verbose_name='累计Tokens')),
-                ('period_end', models.DateTimeField(blank=True, null=True, verbose_name='当前周期结束时间')),
+                ("create_time", models.DateTimeField(auto_now_add=True, db_index=True, verbose_name="创建时间")),
+                ("update_time", models.DateTimeField(auto_now=True, db_index=True, verbose_name="修改时间")),
+                (
+                    "id",
+                    models.UUIDField(
+                        default=uuid_utils.compat.uuid7,
+                        editable=False,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="主键id",
+                    ),
+                ),
+                ("user_id", models.UUIDField(unique=True, verbose_name="用户id")),
+                (
+                    "quota_type",
+                    models.CharField(
+                        choices=[("UNLIMITED", "不限额"), ("PERIODIC", "按周期限制")],
+                        default="UNLIMITED",
+                        max_length=20,
+                        verbose_name="配额模式",
+                    ),
+                ),
+                (
+                    "period_type",
+                    models.CharField(
+                        blank=True,
+                        choices=[("DAY", "天"), ("WEEK", "周"), ("MONTH", "月")],
+                        max_length=10,
+                        null=True,
+                        verbose_name="周期单位",
+                    ),
+                ),
+                ("period_value", models.PositiveIntegerField(blank=True, null=True, verbose_name="周期数量")),
+                ("token_limit", models.BigIntegerField(blank=True, null=True, verbose_name="Tokens上限")),
+                ("used_tokens", models.BigIntegerField(default=0, verbose_name="当前周期已使用Tokens")),
+                ("total_tokens", models.BigIntegerField(default=0, verbose_name="累计Tokens")),
+                ("period_end", models.DateTimeField(blank=True, null=True, verbose_name="当前周期结束时间")),
             ],
             options={
-                'db_table': 'chat_user_token_quota',
+                "db_table": "chat_user_token_quota",
             },
+        ),
+        migrations.RunPython(
+            migrate_historical_tokens,
+            migrations.RunPython.noop,
         ),
     ]
