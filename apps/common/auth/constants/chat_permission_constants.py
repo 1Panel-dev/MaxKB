@@ -10,6 +10,7 @@ from enum import Enum
 
 from common.auth.constants.group_constants import Group
 from common.auth.constants.operate_constants import Operate
+from common.auth.struct.aggregate_permission import AggregatePermission
 from common.auth.struct.permission import Permission
 
 
@@ -29,7 +30,7 @@ class ChatPermissionConstants(Enum):
         return self._build_workspace_permission('application_id')
 
     def _build_workspace_permission(self, resource_id_key=None):
-        def permission_factory(_, kwargs):
+        def permission_factory(_, **kwargs):
             return Permission(group=self.value.group,
                               sub_group=self.value.sub_group,
                               operate=self.value.operate,
@@ -38,3 +39,12 @@ class ChatPermissionConstants(Enum):
                               resource_id=kwargs.get(resource_id_key) if resource_id_key else None)
 
         return permission_factory
+
+    @staticmethod
+    def get_aggregate_permissions():
+        return AggregatePermission(
+            permissions=[_permission.get_permission() for _permission in ChatPermissionConstants])
+
+
+# 权限字符串与权限对象的Map
+CHAT_PERMISSION_STR_MAP = {_permission.value.__str__(): _permission for _permission in ChatPermissionConstants}

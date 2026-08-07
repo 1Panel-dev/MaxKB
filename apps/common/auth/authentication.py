@@ -19,7 +19,7 @@ def _build(items, request, kwargs, compare) -> AggregatePermission:
     roles, permissions, aggregates = [], [], []
     for it in items:
         if callable(it) and not isinstance(it, AggregatePermission):
-            it = it(request, kwargs)
+            it = it(request, **kwargs)
         if isinstance(it, AggregatePermission):
             aggregates.append(it)
         elif isinstance(it, (RoleConstants, Role)):

@@ -11,7 +11,7 @@ from functools import reduce
 from django.db.models import QuerySet, Q
 
 from application.models import ApplicationAccessToken, ChatUserType
-from common.auth.constants.chat_permission_constants import ChatPermissionConstants
+from common.auth.constants.chat_permission_constants import ChatPermissionConstants, CHAT_PERMISSION_STR_MAP
 from common.auth.constants.group_constants import Group
 from common.auth.constants.operate_constants import Operate
 from common.auth.constants.permission_constants import PERMISSION_STR_MAP
@@ -66,12 +66,12 @@ class ChatUserToken(AuthBaseHandle):
                     login_value = application_access_token.get('login_value') or []
                     for _value in login_value:
                         permission_str = f'{Group.CHAT_USER}_{_value.upper()}'
-                        permission = PERMISSION_STR_MAP.get(permission_str)
+                        permission = CHAT_PERMISSION_STR_MAP.get(permission_str)
                         if permission:
-                            permission_list.append(permission)
+                            permission_list.append(permission.value)
 
             else:
                 permission_list.append(ChatPermissionConstants.CHAT_USER_ANONYMOUS.value)
             k = f"{Group.CHAT_USER}:r:{application_access_token.application_id}"
-            permissions[k] = reduce(lambda x, y: x | y, [p.value.bit() for p in permission_list], 0)
+            permissions[k] = reduce(lambda x, y: x | y, [p.bit() for p in permission_list], 0)
         return Principal(auth_details.get('user_id'), _type), Auth(set(), permissions)
