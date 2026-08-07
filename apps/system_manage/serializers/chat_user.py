@@ -38,18 +38,6 @@ def add_or_edit_user_group_relation(user, user_group_ids):
     if groups.count() != len(user_group_ids):
         raise AppApiException(500, _("Some user groups do not exist"))
 
-    UserGroupRelation.objects.bulk_create([UserGroupRelation(user=user, group=group) for group in groups])
-
-
-def _format_tokens(count):
-    if count is None:
-        return "不限"
-    if count >= 1_000_000:
-        return f"{count / 1_000_000:.1f}M"
-    if count >= 1_000:
-        return f"{count / 1_000:.1f}K"
-    return str(count)
-
 
 class ChatUserSerializer(serializers.Serializer):
     class UserInstance(serializers.Serializer):
@@ -171,7 +159,7 @@ class ChatUserSerializer(serializers.Serializer):
                 if q.quota_type == "PERIODIC" and q.period_end and now >= q.period_end:
                     effective_used = 0
                     effective_period_end = q.period_end
-                    delta_kwargs = {f'{q.period_type.lower()}s': q.period_value}
+                    delta_kwargs = {f"{q.period_type.lower()}s": q.period_value}
                     while effective_period_end <= now:
                         effective_period_end += relativedelta(**delta_kwargs)
                 quota_map[str(q.user_id)] = {
