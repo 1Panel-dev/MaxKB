@@ -79,6 +79,9 @@ dependencies = [
     "ruff==0.15.21",
 ]
 
+[dependency-groups]
+dev = ["pre-commit==4.6.1"]
+
 [tool.uv]
 package = false
 

@@ -1,0 +1,8 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.21
+    hooks:
+      - id: ruff-format
+        name: ruff format and stage
+        entry: bash -c 'ruff format "$@" && git add -- "$@"' --
+        require_serial: true
