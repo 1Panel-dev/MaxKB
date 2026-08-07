@@ -28,7 +28,9 @@ from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechTo
 from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
     AuthProfileSerializer
 from common.auth import ChatTokenAuth
+from common.auth.authentication import has_permissions
 from common.auth.common import FileToken
+from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.auth.common import ChatAuthentication
@@ -155,11 +157,10 @@ class ApplicationProfile(APIView):
         responses=None,
         tags=[_('Chat')]  # type: ignore
     )
-    def get(self, request: Request):
-        if isinstance(request.auth, ChatAuthentication):
-            return result.success(ApplicationProfileSerializer(
-                data={'application_id': request.auth.application_id}).profile())
-        raise AppAuthenticationFailed(401, "身份异常")
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def get(self, request: Request, application_id: str):
+        return result.success(ApplicationProfileSerializer(
+            data={'application_id': application_id}).profile())
 
 
 class AuthProfile(APIView):
