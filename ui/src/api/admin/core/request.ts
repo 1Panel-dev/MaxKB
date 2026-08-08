@@ -3,7 +3,8 @@
 import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
-import type { ApiResponse, LoadingTarget, RequestParams } from './types'
+import type { ApiResponse, LoadingTarget } from './types'
+import type { RequestParams } from '@/types'
 import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
@@ -112,7 +113,7 @@ export async function promise<T>(
 }
 
 /** 发送 GET 请求。 */
-export function get<T>(
+export function get<T = unknown>(
   url: string,
   params?: RequestParams,
   loading?: LoadingTarget,
@@ -122,7 +123,7 @@ export function get<T>(
 }
 
 /** 发送 POST 请求。 */
-export function post<T, TData = unknown>(
+export function post<TData = unknown, T = unknown>(
   url: string,
   data?: TData,
   params?: RequestParams,
@@ -133,7 +134,7 @@ export function post<T, TData = unknown>(
 }
 
 /** 发送 PUT 请求。 */
-export function put<T, TData = unknown>(
+export function put<TData = unknown, T = unknown>(
   url: string,
   data?: TData,
   params?: RequestParams,
@@ -144,7 +145,7 @@ export function put<T, TData = unknown>(
 }
 
 /** 发送 DELETE 请求。 */
-export function del<T, TData = unknown>(
+export function del<TData = unknown, T = unknown>(
   url: string,
   params?: RequestParams,
   data?: TData,

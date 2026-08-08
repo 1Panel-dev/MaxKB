@@ -3,32 +3,47 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type {
-  LoginMethod,
-  OptionItem,
-  SystemUser,
-  SystemUserQuery,
-} from '@/types'
+import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
-import UserFromDrawer from './components/UserFromDrawer.vue'
+import UserFromDrawer from './UserFromDrawer.vue'
+import UserPwdDialog from './UserPwdDialog.vue'
 import RoleWorkspaceTag from './components/RoleWorkspaceTag.vue'
 
 const { auth } = useStore()
 const route = useRoute()
-
-/* 创建用户啊 */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+
+/* 密码修改 */
+const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
+function editUserPassword(user: SystemUser) {
+  userPwdDialogRef.value?.open(user)
+}
+/* 删除用户*/
+function deleteUser(user: SystemUser) {
+  MsgConfirm(
+    `确定删除用户“${user.username}”吗？`,
+    '删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。',
+  )
+    .then(() => {
+      systemUsersLoading.value = true
+      return UserManageApi.deleteUser(user.id).then(() => {
+        MsgSuccess('删除成功')
+        return loadSystemUsers()
+      })
+    })
+    .catch(() => {})
+    .finally(() => {
+      systemUsersLoading.value = false
+    })
+}
 
 /* 批量删除 */
 const batchSelectedUsers = ref<SystemUser[]>([])
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
-  MsgConfirm('批量删除用户', `确定删除选中的 ${batchSelectedUsers.value.length} 个用户吗？`, {
-    confirmButtonClass: 'danger',
-    confirmButtonText: '删除',
-  })
+  MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
     .then(() => {
       systemUsersLoading.value = true
 
@@ -71,9 +86,9 @@ const paginationConfig = ref({
 })
 const systemUsersData = ref<SystemUser[]>([])
 const systemUsersLoading = ref(false)
-const systemUserQuery = ref<SystemUserQuery>()
+const systemUserQuery = ref<RequestParams>()
 
-function handleSearchChange(query?: SystemUserQuery) {
+function handleSearchChange(query?: RequestParams) {
   systemUserQuery.value = query
   paginationConfig.value.currentPage = 1
   loadSystemUsers()
@@ -83,8 +98,12 @@ function handlePageSizeChange() {
   paginationConfig.value.currentPage = 1
   loadSystemUsers()
 }
-function loadSystemUsers() {
+function loadSystemUsers(resetQuery = false) {
   systemUsersLoading.value = true
+  if (resetQuery) {
+    systemUserQuery.value = undefined
+    paginationConfig.value.currentPage = 1
+  }
   return UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
     .then((res) => {
       systemUsersData.value = res.records
@@ -125,7 +144,7 @@ onMounted(() => loadSystemUsers())
       :data="systemUsersData"
       v-loading="systemUsersLoading"
       row-key="id"
-      @current-change="loadSystemUsers"
+      @current-change="loadSystemUsers()"
       @selection-change="handleBatchSelectionChange"
       @size-change="handlePageSizeChange"
     >
@@ -149,27 +168,21 @@ onMounted(() => loadSystemUsers())
         </template>
       </el-table-column>
 
-      <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="210" label="角色">
+      <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
         <template #default="{ row }">
           <RoleWorkspaceTag
-            first-column-label="角色"
-            first-column-prop="roleName"
-            second-column-label="工作空间"
-            second-column-prop="workspace"
-            :tag-names="row.role_name"
+            :table-render-params="{ property: '角色', value: '工作空间' }"
+            :tags="row.role_name"
             :tag-workspace="row.role_workspace"
           />
         </template>
       </el-table-column>
 
-      <el-table-column prop="user_group_names" width="210" label="用户组">
+      <el-table-column prop="user_group_names" width="180" label="用户组">
         <template #default="{ row }">
           <RoleWorkspaceTag
-            first-column-label="用户组"
-            first-column-prop="userGroupName"
-            second-column-label="工作空间"
-            second-column-prop="workspace"
-            :tag-names="row.user_group_names"
+            :table-render-params="{ property: '用户组', value: '工作空间' }"
+            :tags="row.role_name"
             :tag-workspace="row.role_workspace"
           />
         </template>
@@ -193,6 +206,23 @@ onMounted(() => loadSystemUsers())
               <el-switch v-model="row.is_active" size="small" />
             </span>
             <el-divider direction="vertical" />
+            <div class="flex gap-1">
+              <el-tooltip effect="dark" content="编辑" placement="top">
+                <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
+                  <mk-icon name="icon_edit_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="修改用户密码" placement="top">
+                <el-button type="primary" text @click.stop="editUserPassword(row)">
+                  <mk-icon name="icon-key_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip effect="dark" content="删除" placement="top">
+                <el-button type="primary" text @click.stop="deleteUser(row)">
+                  <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
           </div>
         </template>
       </el-table-column>
@@ -203,7 +233,8 @@ onMounted(() => loadSystemUsers())
       </template>
     </MkTable>
 
-    <UserFromDrawer ref="userFormDrawerRef" />
+    <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
+    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers" />
   </div>
 </template>
 

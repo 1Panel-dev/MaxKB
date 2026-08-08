@@ -23,12 +23,6 @@ const props = withDefaults(
   {
     data: () => [],
     maxTableHeight: 250,
-    paginationConfig: () => ({
-      currentPage: 1,
-      pageSize: 20,
-      pageSizes: [10, 20, 50, 100],
-      total: 0,
-    }),
     resizable: false,
   },
 )
@@ -42,7 +36,7 @@ const emit = defineEmits<{
 
 const tableRef = ref<TableInstance>()
 
-const paginationPageSizes = computed(() => props.paginationConfig.pageSizes ?? DEFAULT_PAGE_SIZES)
+const paginationPageSizes = computed(() => props.paginationConfig?.pageSizes ?? DEFAULT_PAGE_SIZES)
 
 /** 表格高度 */
 const tableHeight = ref(window.innerHeight - props.maxTableHeight)
@@ -118,6 +112,10 @@ function handleTableMouseMove(event: MouseEvent) {
 
 /** 分页 */
 function handleCurrentPageChange(currentPage: number) {
+  if (!props.paginationConfig) {
+    return
+  }
+
   emit('update:paginationConfig', {
     ...props.paginationConfig,
     currentPage,
@@ -126,6 +124,10 @@ function handleCurrentPageChange(currentPage: number) {
 }
 
 function handlePageSizeChange(pageSize: number) {
+  if (!props.paginationConfig) {
+    return
+  }
+
   emit('update:paginationConfig', {
     ...props.paginationConfig,
     pageSize,
@@ -169,7 +171,7 @@ defineExpose({ clearSelection, tableRef })
       :style="resizeHoverStyle"
     />
 
-    <div class="mt-4 flex justify-end">
+    <div class="mt-4 flex justify-end" v-if="props.paginationConfig">
       <el-pagination
         background
         :current-page="props.paginationConfig.currentPage"

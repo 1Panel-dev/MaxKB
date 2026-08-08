@@ -39,6 +39,7 @@ function handleChange() {
       v-model="searchField"
       class="mk-complex-search__field w-23!"
       @change="handleFieldChange"
+      :persistent="false"
     >
       <el-option
         v-for="field in fields"
@@ -56,6 +57,7 @@ function handleChange() {
       clearable
       placeholder="请选择"
       @change="handleChange"
+      :persistent="false"
     >
       <el-option
         v-for="(option, index) in activeField.options ?? []"

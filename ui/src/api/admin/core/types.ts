@@ -6,8 +6,6 @@ export interface ApiResponse<T> {
   data: T
 }
 
-export type RequestParams = Record<string, unknown>
-
 interface LoadingRef {
   value: boolean
 }
@@ -18,3 +16,15 @@ interface LoadingProgress {
 }
 
 export type LoadingTarget = LoadingRef | LoadingProgress
+
+export interface ResponsePage<T> {
+  total: number
+  records: T[]
+  current: number
+  size: number
+}
+
+export interface ParamsPage {
+  currentPage: number
+  pageSize: number
+}

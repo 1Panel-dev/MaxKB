@@ -14,7 +14,6 @@ const route = useRoute()
 const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
 </script>
-<!-- :persistent="false" -->
 <template>
   <div class="mk-system-sidebar flex h-full flex-col">
     <el-scrollbar class="min-h-0 flex-1">
@@ -25,6 +24,7 @@ const systemMenuItems = getChildRouteList('system')
         :collapse-transition="false"
         :default-active="route.path"
         router
+        :persistent="false"
       >
         <template v-for="item in systemMenuItems" :key="item.name">
           <!-- 有子菜单 -->

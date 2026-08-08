@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import type { DropdownInstance } from 'element-plus'
 import type { Options } from '@popperjs/core'
 
 defineOptions({ name: 'MkDropdown', inheritAttrs: false })
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     popperOptions?: Partial<Options>
     persistent?: boolean
@@ -18,14 +18,6 @@ const props = withDefaults(
 )
 
 const dropdownRef = ref<DropdownInstance>()
-
-const mergedPopperOptions = computed<Partial<Options>>(() => ({
-  ...props.popperOptions,
-  modifiers: [
-    ...(props.popperOptions.modifiers ?? []),
-    { name: 'offset', options: { offset: [0, 4] } },
-  ],
-}))
 
 defineSlots<{
   /** 下拉触发器，必须只渲染一个有效根节点 */
@@ -45,14 +37,7 @@ defineExpose({ handleOpen, handleClose })
 </script>
 
 <template>
-  <el-dropdown
-    class="mk-dropdown"
-    ref="dropdownRef"
-    :persistent="persistent"
-    v-bind="$attrs"
-    :show-arrow="false"
-    :popper-options="mergedPopperOptions"
-  >
+  <el-dropdown class="mk-dropdown" ref="dropdownRef" :persistent="persistent" v-bind="$attrs">
     <slot />
     <template #dropdown>
       <slot name="dropdown" />

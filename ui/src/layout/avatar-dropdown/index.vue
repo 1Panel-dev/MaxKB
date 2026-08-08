@@ -32,7 +32,7 @@ function handleLogout() {
 </script>
 
 <template>
-  <MkDropdown ref="dropdownRef" trigger="click" placement="bottom-end">
+  <MkDropdown ref="dropdownRef" trigger="click" placement="bottom-end" >
     <el-avatar :size="32" class="cursor-pointer bg-primary-gradient!">
       <img src="@/assets/mk-icon-user-gradient.svg" alt="" class="w-[54%]!" />
     </el-avatar>
@@ -52,7 +52,7 @@ function handleLogout() {
         <MkDropdownMenu>
           <MkDropdownItem :icon="Setting">修改密码</MkDropdownItem>
           <MkDropdownItem @click.stop class="p-0!">
-            <MkDropdown class="w-full" trigger="hover" placement="left-start" :persistent="true">
+            <MkDropdown class="w-full" trigger="hover" placement="left-start">
               <div class="flex-between w-full gap-2 p-2">
                 <div class="flex items-center gap-2">
                   <MkIcon :icon="Setting" class="text-N600!" />

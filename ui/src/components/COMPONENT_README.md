@@ -150,14 +150,7 @@ const options = [{ label: '工作空间', logoUrl: '/workspace.png', value: 'wor
 
 ## MkDropdown
 
-项目内的普通下拉菜单使用全局自动注册的 `MkDropdown`，不要直接使用 `el-dropdown`。它基于 Element Plus Dropdown，并统一提供以下默认值：
-
-- `showArrow: false`：弹层不显示箭头。
-- `offset: 4`：触发器与弹层保持 `4px` 间距。
-
-> **UI 规范：以上两个值为项目统一固定值，业务组件不得修改或覆盖。** 如需调整，必须先更新统一 UI 规范，再修改 `MkDropdown`；禁止在调用处传入 `show-arrow`、`offset` 或通过 `popper-options` 覆盖间距。
-
-除上述两个固定配置外，其他 Element Plus Dropdown 属性和 `default`、`dropdown` 插槽会原样透传。
+项目内的普通下拉菜单使用全局自动注册的 `MkDropdown`，不要直接使用 `el-dropdown`。它基于 Element Plus Dropdown 属性和 `default`、`dropdown` 插槽会原样透传。
 
 `MkDropdown` 的 `dropdown` 插槽内必须使用 `MkDropdownMenu` 和 `MkDropdownItem`，禁止与
 `el-dropdown-menu`、`el-dropdown-item` 混用。Element Plus 原始组件只允许出现在对应
@@ -326,8 +319,8 @@ Input，因此可以继续使用 `el-input` 的原生能力。传入 `prefix` �
 
 ## MkTable
 
-项目内带分页的标准表格使用全局自动注册的 `MkTable`。组件组合 `el-table`、分页、可选的列宽
-拖拽和批量选择操作栏；不需要分页的场景直接使用 `el-table`。
+项目内的标准表格使用全局自动注册的 `MkTable`。组件组合 `el-table`、可选分页、可选的列宽
+拖拽和批量选择操作栏。
 
 ### 表格与分页
 
@@ -344,7 +337,8 @@ const paginationConfig = ref({
 })
 ```
 
-`pageSizes` 可省略，默认使用 `[10, 20, 50, 100]`。通过
+`paginationConfig` 可省略，省略时不显示分页器；其中的 `pageSizes` 可省略，默认使用
+`[10, 20, 50, 100]`。通过
 `v-model:pagination-config` 接收页码和每页数量的变化，也可以监听 `current-change` 和
 `size-change`。
 

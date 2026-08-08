@@ -1,42 +1,38 @@
-/** 系统用户管理使用的数据类型。 */
+/** 系统用户 API 与用户管理页面共用的业务类型。 */
 
-export interface CurrentUserRole {
-  id: string
-  name: string
-  type: string
+export interface SystemUserRoleAssignment {
+  role_id: string
+  workspace_ids: string[]
 }
 
-export interface SystemUserQuery extends Record<string, unknown> {
-  email?: string
-  is_active?: boolean
-  nick_name?: string
-  source?: string
-  username?: string
-}
-
-export interface SystemUser {
-  create_time: string
-  email: string
-  id: string
-  is_active: boolean
-  nick_name: string
-  phone: string | null
-  role: string
-  role_name?: string[]
-  role_setting?: Array<{
-    role_id: string
-    workspace_ids: string[]
-  }>
-  role_workspace?: Record<string, string[]>
-  source: string
-  update_time: string
-  user_group_ids: string[]
-  user_group_names: string[]
-  user_group_workspace: SystemUserGroupWorkspace[]
+export interface SystemUserRequest {
+  id?: string
   username: string
+  email: string
+  nick_name: string
+  password?: string
+  phone: string
+  role_setting: SystemUserRoleAssignment[]
+  encrypted?: boolean
 }
 
-export interface SystemUserGroupWorkspace {
-  user_group_names: string[]
-  workspace: string
+export interface SystemUserPasswordRequest {
+  encryptedData: string
+}
+
+/** 系统用户列表项，getUserManagePage 返回的用户记录。 */
+export interface SystemUser {
+  id: string
+  username: string
+  nick_name: string
+  email: string
+  phone: string
+  is_active: boolean
+  source: string
+  role_name?: string[]
+  role_workspace?: Record<string, string[]>
+  role_setting?: SystemUserRoleAssignment[]
+  user_group_names?: string[]
+  create_time: string
+  update_time?: string
 }

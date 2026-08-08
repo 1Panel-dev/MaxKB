@@ -38,8 +38,7 @@ src/types/
 ├── index.ts                # 跨层共享类型的唯一公共入口
 ├── common.ts               # 多个公共组件共同使用的通用选项类型
 ├── login.ts                # 认证 API 与登录页面共用的业务类型
-├── system-user.ts          # 系统用户 API 与用户管理页面共用的业务类型
-└── workspace.ts            # 当前用户与工作空间 API 共用的业务类型
+└── system-user.ts          # 系统用户 API 与用户管理页面共用的业务类型
 ```
 
 不要为了匹配示例创建空文件。

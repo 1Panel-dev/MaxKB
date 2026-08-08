@@ -55,10 +55,9 @@ const accountLoginRules = reactive<FormRules<AccountLoginForm>>({
 })
 
 const handleLogin = async () => {
-  const formEl = accountLoginFormRef.value
-  if (!formEl) return
+  if (!accountLoginFormRef.value) return
 
-  await formEl.validate((valid) => {
+  await accountLoginFormRef.value.validate((valid) => {
     if (valid) {
       isSubmitting.value = true
       if (loginMethod.value === 'LDAP') {
@@ -239,7 +238,7 @@ onMounted(() => {
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
       <el-divider>其他登录方式</el-divider>
-      <div>
+      <div class="flex gap-4">
         <template v-for="method in accountLoginMethods" :key="method">
           <el-button
             circle

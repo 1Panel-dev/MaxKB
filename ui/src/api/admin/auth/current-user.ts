@@ -1,7 +1,7 @@
 /** 提供 Admin 登录后的当前用户接口。 */
 
 import { get } from '../core/request'
-import type { WorkspaceItem, List } from '@/types'
+import type { SelectOption } from '@/types'
 import type { CurrentUserInfo } from './types'
 
 /** 获取当前登录用户、权限、语言及可用工作空间。 */
@@ -11,12 +11,12 @@ export function getCurrentUserInfo() {
 
 /** 获取当前用户可分配的工作空间列表。 */
 export function getCurrentUserWorkspaceList() {
-  return get<WorkspaceItem[]>('/workspace/current_user')
+  return get<SelectOption[]>('/workspace/current_user')
 }
 
 /** 获取当前用户可分配的角色列表。 */
 export function getCurrentUserRoleList() {
-  return get<List[]>('/role_list/current_user')
+  return get<SelectOption[]>('/role_list/current_user')
 }
 
 export default {

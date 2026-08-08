@@ -48,12 +48,12 @@ export function MsgError(message: MessageContent, options?: MessageOverrides) {
 }
 
 /** 显示确认对话框，确认时 resolve，取消或关闭时 reject。 */
-export function MsgConfirm(title: string, message: ConfirmContent, options?: ConfirmOverrides) {
+export function MsgConfirm(title: string, message?: ConfirmContent, options?: ConfirmOverrides) {
   return ElMessageBox.confirm(message, title, {
     cancelButtonText: '取消',
-    confirmButtonText: '确认',
+    confirmButtonText: '删除',
+    confirmButtonType: 'danger',
     showCancelButton: true,
-    type: 'warning',
     ...options,
   })
 }
