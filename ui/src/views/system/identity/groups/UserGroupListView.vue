@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-plus/icons-vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
-import type { OptionItem } from '@/types'
+import type { OptionItem, WorkspaceItem } from '@/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface UserGroup {
@@ -135,9 +135,10 @@ function handleWorkspaceSelect(option: OptionItem) {
 
 function loadWorkspaceOptions() {
   WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
-    workspaceOptions.value = workspaces.map(({ id, name }) => ({
-      label: name,
-      value: id ?? 'default',
+    workspaceOptions.value = workspaces.map((item) => ({
+      ...item,
+      label: item.name,
+      value: item.id ?? 'default',
     }))
 
     if (!workspaceOptions.value.some(({ value }) => value === selectedWorkspaceId.value)) {

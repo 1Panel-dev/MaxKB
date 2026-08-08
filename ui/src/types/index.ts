@@ -2,3 +2,4 @@
 export type * from './common'
 export type * from './login'
 export type * from './system-user'
+export type * from './system-workspace'
