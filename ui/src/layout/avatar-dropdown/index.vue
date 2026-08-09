@@ -32,7 +32,7 @@ function handleLogout() {
 </script>
 
 <template>
-  <MkDropdown ref="dropdownRef" trigger="click" placement="bottom-end" >
+  <MkDropdown ref="dropdownRef" trigger="click" placement="bottom-end">
     <el-avatar :size="32" class="cursor-pointer bg-primary-gradient!">
       <img src="@/assets/mk-icon-user-gradient.svg" alt="" class="w-[54%]!" />
     </el-avatar>
@@ -76,10 +76,7 @@ function handleLogout() {
               </template>
             </MkDropdown>
           </MkDropdownItem>
-        </MkDropdownMenu>
-        <el-divider />
-        <MkDropdownMenu>
-          <MkDropdownItem :icon="Setting" @click="handleLogout">退出登录</MkDropdownItem>
+          <MkDropdownItem divided :icon="Setting" @click="handleLogout">退出登录</MkDropdownItem>
         </MkDropdownMenu>
       </div>
     </template>

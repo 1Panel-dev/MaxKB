@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Plus, User, UserFilled } from '@element-plus/icons-vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
+import type { RequestParams, OptionItem, WorkspaceItem } from '@/api/types'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-
-import type { OptionItem, WorkspaceItem } from '@/api/types'
-import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
+import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 
 interface UserGroup {
   id: string
@@ -22,24 +20,17 @@ interface UserGroupMember {
   username: string
 }
 
-const memberSearchQuery = ref<Record<string, boolean | number | string>>()
-const memberSearchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'name' },
-]
-const selectedGroupId = ref('finance')
+/* 成员列表相关 */
 const paginationConfig = ref({
   currentPage: 2,
   pageSize: 10,
   total: 20,
 })
-const userGroups = ref<UserGroup[]>([
-  { id: 'delivery', name: '交付', memberCount: 18 },
-  { id: 'finance', name: '财务', memberCount: 20 },
-  { id: 'development', name: '研发', memberCount: 36 },
-  { id: 'marketing', name: '市场', memberCount: 24 },
-  { id: 'sales', name: '销售', memberCount: 28 },
-])
+const memberSearchQuery = ref<RequestParams>()
+const memberSearchFields: OptionItem<string>[] = [
+  { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'name' },
+]
 const userGroupMembers = ref<UserGroupMember[]>([
   { id: 1, name: 'test-w', username: 'test-w', roles: ['工作空间管理员'], source: '系统用户' },
   { id: 2, name: 'Eira1', username: 'Eira1', roles: ['普通用户', '管理员'], source: '钉钉' },
@@ -52,39 +43,25 @@ const userGroupMembers = ref<UserGroupMember[]>([
   { id: 9, name: 'shaohu', username: 'shaohu', roles: ['普通用户'], source: '企业微信' },
   { id: 10, name: '白新', username: 'baixin', roles: ['普通用户'], source: '飞书' },
 ])
-const selectedUserGroup = computed(() => {
-  return userGroups.value.find(({ id }) => id === selectedGroupId.value)
-})
-
-const filteredUserGroupMembers = computed(() => {
-  const [field, value] = Object.entries(memberSearchQuery.value ?? {})[0] ?? []
-  const keyword = String(value ?? '')
-    .trim()
-    .toLowerCase()
-
-  if (!field || !keyword) return userGroupMembers.value
-
-  return userGroupMembers.value.filter((member) => {
-    if (field !== 'name' && field !== 'username') return true
-    return member[field].toLowerCase().includes(keyword)
-  })
-})
-
-async function createUserGroup() {
-  const groupName = `用户组 ${userGroups.value.length + 1}`
-  const group = { id: `group-${Date.now()}`, memberCount: 0, name: groupName }
-
-  userGroups.value.push(group)
-  selectedGroupId.value = group.id
-  MsgSuccess('用户组创建成功')
+function handleMemberSearch(query?: RequestParams) {
+  memberSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  return
 }
 
-function addMember() {
-  MsgInfo('添加成员功能待接入')
-}
-
-function addMemberToGroup(member: UserGroupMember) {
-  MsgSuccess(`已将“${member.name}”添加到用户组`)
+/* 选择用户组列表 */
+const currentGroup = ref<UserGroup>()
+const userGroups = ref<UserGroup[]>([
+  { id: 'delivery', name: '交付', memberCount: 18 },
+  { id: 'finance', name: '财务', memberCount: 20 },
+  { id: 'development', name: '研发', memberCount: 36 },
+  { id: 'marketing', name: '市场', memberCount: 24 },
+  { id: 'sales', name: '销售', memberCount: 28 },
+])
+function handleGroupSelect(group: UserGroup) {
+  currentGroup.value = group
+  paginationConfig.value.currentPage = 1
+  return
 }
 
 /* 选择工作空间列表 */
@@ -93,7 +70,6 @@ const workspaceOptions = ref<WorkspaceItem[]>([])
 
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
   selectedWorkspaceId.value = workspace.id ?? 'default'
-  selectedGroupId.value = userGroups.value[0]?.id ?? ''
 }
 
 function loadWorkspaceOptions() {
@@ -129,10 +105,10 @@ onMounted(() => loadWorkspaceOptions())
 
         <MkSearchList
           :data="userGroups"
-          :default-active="selectedGroupId"
-          @click="selectedGroupId = $event.id"
+          :default-active="currentGroup?.id"
+          @click="handleGroupSelect"
         >
-          <template #action-dropdown="{ row: group }">
+          <template #action-dropdown>
             <MkDropdownMenu>
               <MkDropdownItem>
                 <template #icon>
@@ -140,9 +116,7 @@ onMounted(() => loadWorkspaceOptions())
                 </template>
                 <span>重命名</span>
               </MkDropdownItem>
-            </MkDropdownMenu>
-            <el-divider />
-            <MkDropdownMenu>
+              <el-divider />
               <MkDropdownItem>
                 <template #icon>
                   <MkIcon name="icon_delete-trash_outlined" />
@@ -153,52 +127,54 @@ onMounted(() => loadWorkspaceOptions())
           </template>
         </MkSearchList>
       </aside>
-      <section v-if="selectedUserGroup" class="min-w-0 flex-1 px-6">
+      <section v-if="currentGroup" class="min-w-0 flex-1 px-6">
         <header class="flex h-14 items-center gap-2">
-          <h4>{{ selectedUserGroup.name }}</h4>
+          <h4>{{ currentGroup?.name }}</h4>
           <el-divider direction="vertical" />
           <span class="flex items-center text-N500">
-            <MkIcon :icon="UserFilled" class="mr-1" />
-            {{ selectedUserGroup.memberCount }}
+            <MkIcon name="icon_member_filled" class="mr-1" />
+            {{ currentGroup?.memberCount }}
           </span>
         </header>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" :icon="Plus" @click="addMember">添加成员</el-button>
-          <MkComplexSearch :fields="memberSearchFields" @change="memberSearchQuery = $event" />
+          <el-button type="primary">
+            <MkIcon name="icon_add_outlined" />
+            <span>添加成员</span>
+          </el-button>
+          <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
         </div>
 
         <MkTable
+          :max-table-height="340"
           v-model:pagination-config="paginationConfig"
-          :data="filteredUserGroupMembers"
-          :max-table-height="330"
-          row-key="id"
+          :data="userGroupMembers"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column prop="name" label="姓名" min-width="198" show-overflow-tooltip />
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
-            <template #default="{ row }: { row: UserGroupMember }">
-              <div class="flex items-center gap-1">
-                <el-tag effect="plain" type="info">{{ row.roles[0] }}</el-tag>
-                <el-tag v-if="row.roles.length > 1" effect="plain" type="info">
-                  +{{ row.roles.length - 1 }}
-                </el-tag>
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
-          <el-table-column label="操作" width="80" fixed="right">
-            <template #default="{ row }: { row: UserGroupMember }">
-              <el-button
-                text
-                type="primary"
-                :icon="User"
-                aria-label="添加到用户组"
-                @click="addMemberToGroup(row)"
+            <template #default="{ row }">
+              <MkWorkspaceRelationTags
+                :table-render-params="{ property: '角色', value: '工作空间' }"
+                :tags="row.role_name"
+                :tag-workspace="row.role_workspace"
               />
             </template>
           </el-table-column>
+          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
+          <el-table-column label="操作" width="70" fixed="right">
+            <template #default="{ row }">
+              <el-tooltip effect="dark" content="移除" placement="top">
+                <el-button type="primary" text>
+                  <MkIcon name="icon_assigned_outlined" />
+                </el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <template #footer-batch-actions>
+            <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+          </template>
         </MkTable>
       </section>
     </div>

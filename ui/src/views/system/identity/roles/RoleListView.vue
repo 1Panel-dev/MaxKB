@@ -418,12 +418,7 @@ function permissionTableSpan({ row, columnIndex }: { row: PermissionRow; columnI
       </el-scrollbar>
 
       <div v-else class="min-h-0 flex-1">
-        <MkTable
-          :data="[]"
-          :max-table-height="330"
-          :pagination-config="{ currentPage: 1, pageSize: 10, total: 0 }"
-          row-key="id"
-        >
+        <MkTable :data="[]">
           <el-table-column prop="name" label="姓名" />
           <el-table-column prop="username" label="用户名" />
           <el-table-column prop="email" label="邮箱" />

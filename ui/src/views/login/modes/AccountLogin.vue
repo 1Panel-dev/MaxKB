@@ -228,7 +228,7 @@ onMounted(() => {
       </el-form>
       <el-button
         size="default"
-        class="-mt-2"
+        class="mt-3"
         link
         type="primary"
         @click="router.push({ name: 'forgot-password' })"

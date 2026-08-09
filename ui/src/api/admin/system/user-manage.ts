@@ -5,6 +5,7 @@ import type {
   SystemUser,
   SystemUserRequest,
   SystemUserPasswordRequest,
+  SystemUserOption,
 } from '@/api/types'
 
 const prefix = '/user_manage'
@@ -44,6 +45,11 @@ export function postBatchDeleteUsers(userIds: string[]) {
   return post<string[], boolean>(`${prefix}/batch_delete`, userIds)
 }
 
+/** 获得全部用户 */
+export function getAllUsers(query?: RequestParams) {
+  return get<SystemUserOption[]>('/user/list', query)
+}
+
 export default {
   deleteUser,
   getDefaultPassword,
@@ -52,4 +58,5 @@ export default {
   postBatchDeleteUsers,
   putUser,
   putUserPassword,
+  getAllUsers,
 }

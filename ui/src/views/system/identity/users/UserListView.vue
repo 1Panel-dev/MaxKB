@@ -7,13 +7,61 @@ import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/api/t
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
+import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
 import UserPwdDialog from './UserPwdDialog.vue'
-import RoleWorkspaceTag from './components/RoleWorkspaceTag.vue'
 
 const { auth } = useStore()
 const route = useRoute()
+
+/* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+
+/* 列表查询相关 */
+const userTableRef = useTemplateRef('userTableRef')
+const systemUsersLoading = ref(false)
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 20,
+  total: 0,
+})
+const systemUsersData = ref<SystemUser[]>([])
+const searchFields: OptionItem<string>[] = [
+  { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'nick_name' },
+  { label: '邮箱', value: 'email' },
+  {
+    label: '状态',
+    value: 'is_active',
+    options: [
+      { label: '启用', value: true },
+      { label: '禁用', value: false },
+    ],
+  },
+]
+const systemUserQuery = ref<RequestParams>()
+
+function handleSearchChange(query?: RequestParams) {
+  systemUserQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadSystemUsers()
+}
+
+function loadSystemUsers(resetQuery = false) {
+  systemUsersLoading.value = true
+  if (resetQuery) {
+    systemUserQuery.value = undefined
+    paginationConfig.value.currentPage = 1
+  }
+  return UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
+    .then((res) => {
+      systemUsersData.value = res.records
+      paginationConfig.value.total = res.total
+    })
+    .finally(() => {
+      systemUsersLoading.value = false
+    })
+}
 
 /* 密码修改 */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
@@ -64,60 +112,6 @@ function handleBatchSelectionChange(selection: unknown[]) {
   batchSelectedUsers.value = selection as SystemUser[]
 }
 
-/* 列表查询相关 */
-const userTableRef = useTemplateRef('userTableRef')
-const searchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'nick_name' },
-  { label: '邮箱', value: 'email' },
-  {
-    label: '状态',
-    value: 'is_active',
-    options: [
-      { label: '启用', value: true },
-      { label: '禁用', value: false },
-    ],
-  },
-]
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
-const systemUsersData = ref<SystemUser[]>([])
-const systemUsersLoading = ref(false)
-const systemUserQuery = ref<RequestParams>()
-
-function handleSearchChange(query?: RequestParams) {
-  systemUserQuery.value = query
-  paginationConfig.value.currentPage = 1
-  loadSystemUsers()
-}
-
-function handlePageSizeChange() {
-  paginationConfig.value.currentPage = 1
-  loadSystemUsers()
-}
-function loadSystemUsers(resetQuery = false) {
-  systemUsersLoading.value = true
-  if (resetQuery) {
-    systemUserQuery.value = undefined
-    paginationConfig.value.currentPage = 1
-  }
-  return UserManageApi.getUserManagePage(paginationConfig.value, systemUserQuery.value)
-    .then((res) => {
-      systemUsersData.value = res.records
-      paginationConfig.value = {
-        currentPage: res.current,
-        pageSize: res.size,
-        total: res.total,
-      }
-    })
-    .finally(() => {
-      systemUsersLoading.value = false
-    })
-}
-
 onMounted(() => loadSystemUsers())
 </script>
 
@@ -143,10 +137,9 @@ onMounted(() => loadSystemUsers())
       v-model:pagination-config="paginationConfig"
       :data="systemUsersData"
       v-loading="systemUsersLoading"
-      row-key="id"
       @current-change="loadSystemUsers()"
+      @size-change="loadSystemUsers()"
       @selection-change="handleBatchSelectionChange"
-      @size-change="handlePageSizeChange"
     >
       <el-table-column type="selection" width="40" />
       <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
@@ -170,7 +163,7 @@ onMounted(() => loadSystemUsers())
 
       <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
         <template #default="{ row }">
-          <RoleWorkspaceTag
+          <MkWorkspaceRelationTags
             :table-render-params="{ property: '角色', value: '工作空间' }"
             :tags="row.role_name"
             :tag-workspace="row.role_workspace"
@@ -180,7 +173,7 @@ onMounted(() => loadSystemUsers())
 
       <el-table-column prop="user_group_names" width="180" label="用户组">
         <template #default="{ row }">
-          <RoleWorkspaceTag
+          <MkWorkspaceRelationTags
             :table-render-params="{ property: '用户组', value: '工作空间' }"
             :tags="row.role_name"
             :tag-workspace="row.role_workspace"

@@ -130,6 +130,7 @@ function handlePageSizeChange(pageSize: number) {
 
   emit('update:paginationConfig', {
     ...props.paginationConfig,
+    currentPage: 1,
     pageSize,
   })
   emit('size-change', pageSize)
@@ -159,6 +160,7 @@ defineExpose({ clearSelection, tableRef })
       :class="{ 'mk-table__resizable--borderless': props.resizable }"
       :data="props.data"
       :max-height="tableHeight"
+      row-key="id"
       v-bind="$attrs"
       :border="props.resizable"
       @selection-change="handleSelectionChange"

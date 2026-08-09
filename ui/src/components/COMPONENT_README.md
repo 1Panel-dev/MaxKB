@@ -34,6 +34,8 @@ src/components/
 │   │   ├── index.vue             # 下拉容器
 │   │   ├── mk-dropdown-menu.vue  # 下拉菜单容器
 │   │   └── mk-dropdown-item.vue  # 菜单项布局和选中状态
+│   ├── mk-drawer/
+│   │   └── index.vue             # 统一抽屉关闭行为和内容滚动布局
 │   ├── mk-filterable-dropdown/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
@@ -48,8 +50,10 @@ src/components/
 │       └── index.vue             # 标签折叠和剩余标签浮层
 ├── mk-search-list/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
-└── mk-workspace-dropdown/
-    └── index.vue                 # 工作空间选择下拉框，手动导入
+├── mk-workspace-dropdown/
+│   └── index.vue                 # 工作空间选择下拉框，手动导入
+└── mk-workspace-relation-tags/
+    └── index.vue                 # 标签及关联工作空间展示，手动导入
 ```
 
 Vite 的 `unplugin-vue-components` 只扫描 `src/components/global`。该目录中的组件可以直接在
@@ -58,6 +62,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
+import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 ```
 
 自动注册只适用于 Vue 模板。脚本中的类型、常量和 Element Plus 图标仍需显式导入。自动生成
@@ -99,6 +104,23 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 ```
 
 ## 自动注册组件
+
+### MkDrawer
+
+全局抽屉组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
+按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以通过同名 Props
+覆盖。Element Plus Drawer 的其他属性和事件通过 `$attrs` 透传，`header`、默认和 `footer`
+插槽保持可用。
+
+```vue
+<MkDrawer v-model="visible" title="创建用户" size="600">
+  <el-form>...</el-form>
+  <template #footer>
+    <el-button @click="visible = false">取消</el-button>
+    <el-button type="primary">创建</el-button>
+  </template>
+</MkDrawer>
+```
 
 ### MkComplexSearch
 
@@ -154,7 +176,9 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 </MkDropdownItem>
 ```
 
-禁止使用菜单项的 `divided` 属性。需要分组时，在菜单外层结构使用独立的 `el-divider`。
+禁止使用菜单项的 `divided` 属性。需要分组时，在同一个 `MkDropdownMenu` 内的菜单项之间使用
+独立的 `el-divider`；`dropdown` 插槽必须只提供一个 `MkDropdownMenu` 根节点。菜单项通过
+左右 `4px` margin 保留悬停背景的缩进，分割线不使用该 margin，因此会铺满菜单宽度。
 
 ### MkFilterableDropdown
 
@@ -236,7 +260,8 @@ const paginationConfig = ref({
 ```
 
 使用 `v-model:pagination-config` 接收页码和每页数量变化，也可以监听 `current-change` 和
-`size-change`。
+`size-change`。切换每页数量时，组件会同时将 `currentPage` 重置为 `1`，页面只需在
+`size-change` 中重新加载数据，不要重复修改页码。
 
 ```vue
 <MkTable
@@ -287,7 +312,8 @@ const paginationConfig = ref({
 `id` 识别选中项；数据字段不同时，通过 `props` 中的 `label`、`value` 建立字段映射。`row` 插槽接收
 `row`、`index` 和 `active`。`action` 插槽用于普通行操作，`action-dropdown` 插槽用于下拉菜单；
 两者均接收 `row`、`index`。操作区默认隐藏，鼠标移入列表项或操作区获得焦点时显示，
-且不会触发列表项选中。点击列表项会触发 `click(row, index)`，
+且不会触发列表项选中。下拉菜单的打开和关闭由 `MkDropdown` 管理。点击列表项会触发
+`click(row, index)`，
 过滤结果每批渲染 50 条，滚动到底部后自动追加下一批。组件必须放在具有明确高度的纵向 Flex 容器中。
 
 Props 和模型：
@@ -317,7 +343,7 @@ Props 和模型：
 - `data` 应传入全量数据；组件内的 50 条分批仅用于控制 DOM 渲染数量，不替代后端分页。
 - 搜索词或数据源变化时，渲染范围和滚动位置会重置到第一批。
 - 提供 `action-dropdown` 时，组件内部使用固定 More 按钮和点击型、非 Teleport 的
-  `MkDropdown`；移出行和菜单后会关闭菜单并让触发器失焦。
+  `MkDropdown`。
 - `action` 和 `action-dropdown` 二选一；同时提供时优先渲染 `action-dropdown`，不渲染 `action`。
 
 #### 默认字段示例
@@ -403,6 +429,25 @@ import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
   v-model="selectedWorkspaceId"
   :options="workspaceOptions"
   @select="handleWorkspaceSelect"
+/>
+```
+
+### MkWorkspaceRelationTags
+
+用于展示标签组，并在悬浮表格中展示每个标签关联的工作空间。
+`tags` 控制表格单元格中的折叠标签；`tagWorkspace` 使用标签名称作为键、工作空间
+名称数组作为值；`tableRenderParams.property` 和 `tableRenderParams.value` 分别设置
+悬浮表格的标签列与工作空间列标题。组件位于非全局目录，使用时需要手动导入。
+
+```vue
+<script setup lang="ts">
+import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+</script>
+
+<MkWorkspaceRelationTags
+  :table-render-params="{ property: '角色', value: '工作空间' }"
+  :tags="user.role_name"
+  :tag-workspace="user.role_workspace"
 />
 ```
 

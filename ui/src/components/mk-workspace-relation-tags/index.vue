@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+defineOptions({ name: 'MkWorkspaceRelationTags' })
 /**
  * 标签与工作空间的关联关系映射
  * 键为标签名称，值为该标签关联的工作空间名称数组。

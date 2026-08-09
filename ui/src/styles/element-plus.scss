@@ -123,7 +123,11 @@
   margin-left: calc(var(--spacing) * 1);
 }
 .el-button + .el-button {
-  margin-left: 0;
+  &.is-link,
+  &.is-text,
+  &.is-circle {
+    margin-left: 0;
+  }
 }
 
 /* card */
@@ -143,6 +147,48 @@
 /* checkbox */
 .el-checkbox {
   --el-checkbox-input-border: 1px solid var(--mk-N500);
+}
+
+/* dialog */
+.el-dialog {
+  --el-dialog-padding-primary: 24px;
+  --el-dialog-title-font-size: 16px;
+  &__header {
+    padding-bottom: 0;
+  }
+  &__headerbtn {
+    right: 20px;
+    top: 20px;
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    border-radius: var(--el-border-radius-base);
+    .el-dialog__close {
+      font-size: 20px;
+      color: var(--mk-N600);
+    }
+    &:hover {
+      background-color: var(--mk-N900-transparent-10);
+      .el-dialog__close {
+        color: var(--mk-N600);
+      }
+    }
+  }
+  &__title {
+    font-weight: 500;
+  }
+  &__body {
+    padding-top: var(--el-dialog-padding-primary);
+    padding-bottom: var(--el-dialog-padding-primary);
+  }
+  &__footer {
+    padding: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    display: flex;
+    gap: calc(var(--spacing) * 3);
+  }
 }
 
 /* divider */
@@ -194,11 +240,12 @@
 }
 
 .el-dropdown-menu {
-  padding: calc(var(--spacing) * 1);
+  padding: calc(var(--spacing) * 1) 0;
   &__item {
     border-radius: var(--el-border-radius-small);
     color: var(--mk-N900);
     gap: calc(var(--spacing) * 2);
+    margin: 0 calc(var(--spacing) * 1);
     min-width: calc(var(--spacing) * 20);
     padding: 5px calc(var(--spacing) * 2);
     i {
@@ -214,9 +261,9 @@
       background-color: var(--mk-N900-transparent-10);
       color: currentColor;
     }
-    // 自带的分割线与设计不符合禁止使用
     &--divided {
-      display: none;
+      border-top: 1px solid var(--el-border-color);
+      margin: calc(var(--spacing) * 1) 0;
     }
   }
 }
@@ -224,6 +271,9 @@
 /* form */
 .el-form-item {
   margin-bottom: calc(var(--spacing) * 4);
+  &:last-child {
+    margin-bottom: 0;
+  }
   &__error {
     position: unset;
     font-size: 14px;
@@ -280,15 +330,12 @@
   &__title {
     font-weight: 500;
   }
-  &__content {
+  &__message {
     padding-bottom: var(--el-messagebox-padding-primary);
   }
   &__btns {
     padding: 0;
     gap: calc(var(--spacing) * 3);
-    button {
-      min-width: 80px;
-    }
   }
 }
 
@@ -490,7 +537,7 @@
   }
 
   &:not(.el-table--border) thead th {
-    border: none !important;
+    border-bottom: none !important;
   }
   .el-table__cell {
     padding: 0;

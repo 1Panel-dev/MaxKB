@@ -36,3 +36,9 @@ export interface SystemUser {
   create_time: string
   update_time?: string
 }
+
+export interface SystemUserOption {
+  id: string
+  nick_name: string
+  username: string
+}

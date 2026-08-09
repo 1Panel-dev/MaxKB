@@ -99,61 +99,6 @@ function selectRow(row: T, index: number) {
   currentValue.value = row[valueField.value]
   emit('click', row, index)
 }
-
-// 点击型 Dropdown 由列表内部持有，移出当前行及其菜单后统一关闭。
-const actionDropdownInstances = new Map<unknown, { handleClose: () => void }>()
-const hoveredActionValue = ref<unknown>()
-const focusedActionValue = ref<unknown>()
-
-function setActionDropdownRef(row: T, instance: unknown) {
-  const actionKey = row[valueField.value]
-  const dropdownInstance = instance as { handleClose?: () => void } | null
-
-  if (typeof dropdownInstance?.handleClose === 'function') {
-    actionDropdownInstances.set(actionKey, dropdownInstance as { handleClose: () => void })
-  } else {
-    actionDropdownInstances.delete(actionKey)
-  }
-}
-
-function isActionVisible(row: T) {
-  const actionValue = row[valueField.value]
-  return hoveredActionValue.value === actionValue || focusedActionValue.value === actionValue
-}
-
-function showAction(row: T) {
-  hoveredActionValue.value = row[valueField.value]
-}
-
-function focusAction(row: T) {
-  focusedActionValue.value = row[valueField.value]
-}
-
-function blurAction(event: FocusEvent) {
-  const actionElement = event.currentTarget as HTMLElement
-  if (!event.relatedTarget || !actionElement.contains(event.relatedTarget as Node)) {
-    focusedActionValue.value = undefined
-  }
-}
-
-function closeActionDropdown(row: T, event: MouseEvent) {
-  const actionValue = row[valueField.value]
-  hoveredActionValue.value = undefined
-  if (focusedActionValue.value === actionValue) focusedActionValue.value = undefined
-  actionDropdownInstances.get(actionValue)?.handleClose()
-
-  const rowElement = event.currentTarget as HTMLElement
-  nextTick(() => {
-    requestAnimationFrame(() => {
-      if (
-        document.activeElement instanceof HTMLElement &&
-        rowElement.contains(document.activeElement)
-      ) {
-        document.activeElement.blur()
-      }
-    })
-  })
-}
 </script>
 
 <template>
@@ -164,14 +109,12 @@ function closeActionDropdown(row: T, event: MouseEvent) {
       <div v-if="filteredData.length" class="flex flex-col gap-1">
         <template v-for="(row, index) in renderData" :key="String(row[valueField] ?? index)">
           <div
-            class="flex p-2 cursor-pointer items-center rounded-md hover:bg-N900/10"
+            class="group flex cursor-pointer items-center rounded-md p-2 hover:bg-N900/10"
             :class="{
               'bg-primary/10 hover:bg-primary/10 font-medium text-primary':
                 currentValue === row[valueField],
             }"
             @click="selectRow(row, index)"
-            @mouseenter="showAction(row)"
-            @mouseleave="closeActionDropdown(row, $event)"
           >
             <slot name="row" :row="row" :index="index" :active="currentValue === row[valueField]">
               <span class="min-w-0 flex-1 truncate">{{ row[labelField] }}</span>
@@ -179,23 +122,11 @@ function closeActionDropdown(row: T, event: MouseEvent) {
             <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
             <div
               v-if="$slots.action || $slots['action-dropdown']"
-              class="ml-auto flex shrink-0 items-center transition-opacity"
-              :class="
-                isActionVisible(row)
-                  ? 'pointer-events-auto opacity-100'
-                  : 'pointer-events-none opacity-0'
-              "
+              class="pointer-events-none ml-auto flex shrink-0 items-center font-normal text-N900 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100"
               @click.stop
-              @focusin="focusAction(row)"
-              @focusout="blurAction"
               @keydown.stop
             >
-              <MkDropdown
-                v-if="$slots['action-dropdown']"
-                :ref="(instance) => setActionDropdownRef(row, instance)"
-                trigger="click"
-                :teleported="false"
-              >
+              <MkDropdown v-if="$slots['action-dropdown']" trigger="click" :teleported="false">
                 <el-button class="-mr-1" text>
                   <MkIcon name="icon_more_outlined" />
                 </el-button>

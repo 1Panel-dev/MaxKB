@@ -6,7 +6,12 @@ import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from './components/UserRoleSetting.vue'
-import type { SelectOption, SystemUser, SystemUserRequest, SystemUserRoleAssignment } from '@/api/types/index.ts'
+import type {
+  SelectOption,
+  SystemUser,
+  SystemUserRequest,
+  SystemUserRoleAssignment,
+} from '@/api/types/index.ts'
 import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
@@ -193,104 +198,89 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <el-drawer
-    v-model="drawerVisible"
-    direction="rtl"
-    size="600"
-    :show-close="true"
-    destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    @closed="resetData"
-  >
+  <MkDrawer v-model="drawerVisible" direction="rtl" @closed="resetData">
     <template #header>
       <h4>{{ drawerTitle }}</h4>
     </template>
-    <el-scrollbar>
-      <div class="p-5">
-        <el-form
-          ref="userFormRef"
-          :model="userForm"
-          :rules="userFormRules"
-          label-position="top"
-          require-asterisk-position="right"
-          @submit.prevent="submitUser"
-        >
-          <section>
-            <h4 class="mk-title-decoration mb-4">基本信息</h4>
-            <el-form-item label="用户名" prop="username">
-              <el-input
-                v-model="userForm.username"
-                :disabled="isEdit"
-                maxlength="64"
-                minlength="4"
-                placeholder="请输入用户名"
-                show-word-limit
-              />
-            </el-form-item>
-            <el-form-item label="姓名" prop="nick_name">
-              <el-input
-                v-model="userForm.nick_name"
-                maxlength="64"
-                placeholder="请输入姓名"
-                show-word-limit
-              />
-            </el-form-item>
+    <el-form
+      ref="userFormRef"
+      :model="userForm"
+      :rules="userFormRules"
+      label-position="top"
+      require-asterisk-position="right"
+      @submit.prevent="submitUser"
+    >
+      <section>
+        <h4 class="mk-title-decoration mb-4">基本信息</h4>
+        <el-form-item label="用户名" prop="username">
+          <el-input
+            v-model="userForm.username"
+            :disabled="isEdit"
+            maxlength="64"
+            minlength="4"
+            placeholder="请输入用户名"
+            show-word-limit
+          />
+        </el-form-item>
+        <el-form-item label="姓名" prop="nick_name">
+          <el-input
+            v-model="userForm.nick_name"
+            maxlength="64"
+            placeholder="请输入姓名"
+            show-word-limit
+          />
+        </el-form-item>
 
-            <el-form-item label="邮箱" prop="email">
-              <el-input v-model="userForm.email" type="email" placeholder="请输入邮箱" />
-            </el-form-item>
+        <el-form-item label="邮箱" prop="email">
+          <el-input v-model="userForm.email" type="email" placeholder="请输入邮箱" />
+        </el-form-item>
 
-            <el-form-item label="手机号" prop="phone">
-              <el-input v-model="userForm.phone" maxlength="11" placeholder="请输入手机号" />
-            </el-form-item>
+        <el-form-item label="手机号" prop="phone">
+          <el-input v-model="userForm.phone" maxlength="11" placeholder="请输入手机号" />
+        </el-form-item>
 
-            <el-form-item v-if="!isEdit" label="默认密码">
-              <el-input v-model="userForm.password" readonly>
-                <template #suffix>
-                  <el-button text @click="copyDefaultPassword" class="-mr-1">
-                    <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
-                  </el-button>
-                </template>
-              </el-input>
-            </el-form-item>
-          </section>
-          <section v-if="auth.isEE || auth.isPE">
-            <h4 class="mk-title-decoration mb-4">角色设置</h4>
-            <UserRoleSetting
-              v-model="userForm.role_setting"
-              :loading="roleSettingOptionsLoading"
-              :role-options="roleOptions"
-              :show-workspace="auth.isEE"
-              :workspace-options="workspaceOptions"
-            />
-          </section>
-          <section>
-            <h4 class="mk-title-decoration mb-4">用户组</h4>
-            <el-form-item>
-              <el-cascader
-                v-model="selectedUserGroupIds"
-                class="w-full"
-                :options="userGroupOptions"
-                :props="userGroupCascaderProps"
-                :show-all-levels="false"
-                clearable
-                filterable
-                placeholder="请选择用户组"
-              />
-            </el-form-item>
-          </section>
-        </el-form>
-      </div>
-    </el-scrollbar>
+        <el-form-item v-if="!isEdit" label="默认密码">
+          <el-input v-model="userForm.password" readonly>
+            <template #suffix>
+              <el-button text @click="copyDefaultPassword" class="-mr-1">
+                <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
+              </el-button>
+            </template>
+          </el-input>
+        </el-form-item>
+      </section>
+      <section v-if="auth.isEE || auth.isPE">
+        <h4 class="mk-title-decoration mb-4 mt-4">角色设置</h4>
+        <UserRoleSetting
+          v-model="userForm.role_setting"
+          :loading="roleSettingOptionsLoading"
+          :role-options="roleOptions"
+          :show-workspace="auth.isEE"
+          :workspace-options="workspaceOptions"
+        />
+      </section>
+      <section>
+        <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
+        <el-form-item>
+          <el-cascader
+            v-model="selectedUserGroupIds"
+            class="w-full"
+            :options="userGroupOptions"
+            :props="userGroupCascaderProps"
+            :show-all-levels="false"
+            clearable
+            filterable
+            placeholder="请选择用户组"
+          />
+        </el-form-item>
+      </section>
+    </el-form>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <el-button @click="close">取消</el-button>
-        <el-button :loading="userSubmitting" type="primary" @click="submitUser">
-          {{ submitText }}
-        </el-button>
-      </div>
+      <el-button @click="close">取消</el-button>
+      <el-button :loading="userSubmitting" type="primary" @click="submitUser">
+        {{ submitText }}
+      </el-button>
     </template>
-  </el-drawer>
+  </MkDrawer>
 </template>

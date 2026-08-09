@@ -101,7 +101,7 @@ function removeRole(index: number) {
     </el-form-item>
   </div>
 
-  <el-button link type="primary" @click="addRole" class="-mt-1 mb-6">
+  <el-button link type="primary" @click="addRole" class="-mt-3">
     <mk-icon name="icon_add_outlined"></mk-icon>
     <span>添加角色</span>
   </el-button>
