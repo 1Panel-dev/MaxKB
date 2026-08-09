@@ -158,18 +158,24 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 ### MkFilterableDropdown
 
-带搜索过滤和滚动列表的下拉选择。通过 `v-model` 传入选中值，通过 `options` 传入
-`OptionItem[]`；`emptyText` 默认为“暂无匹配结果”。默认插槽接收 `selectedOption` 和 `text`，
-用于渲染触发器；`option` 插槽接收当前选项，未传入时显示 `option.label`。选择后先更新
-`v-model`，再通过 `select` 返回完整选项。
+带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、
+`value` 作为唯一值；数据结构不同时通过 `props.label` 和 `props.value` 映射，使用方式与
+`MkSearchList` 一致。原始选项类型会贯穿 `options`、作用域插槽和 `select` 事件。
+`emptyText` 默认为“暂无匹配结果”。默认插槽接收 `selectedOption` 和 `text`，`option` 插槽接收
+当前原始选项；选择后先更新 `v-model`，再通过 `select` 返回未经转换的原始选项。
 
 ```vue
-<MkFilterableDropdown v-model="selectedValue" :options="options" @select="handleSelect">
+<MkFilterableDropdown
+  v-model="selectedWorkspaceId"
+  :options="workspaces"
+  :props="{ label: 'name', value: 'id' }"
+  @select="handleWorkspaceSelect"
+>
   <template #default="{ text }">
     <button type="button">{{ text }}</button>
   </template>
   <template #option="{ option }">
-    <span class="truncate">{{ option.label }}</span>
+    <span class="truncate">{{ option.name }}</span>
   </template>
 </MkFilterableDropdown>
 ```
@@ -209,11 +215,7 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 ```vue
 <MkStatusLabel :active="row.is_active" />
-<MkStatusLabel
-  :active="task.completed"
-  active-text="已完成"
-  inactive-text="未完成"
-/>
+<MkStatusLabel :active="task.completed" active-text="已完成" inactive-text="未完成" />
 ```
 
 ### MkTable
@@ -281,20 +283,110 @@ const paginationConfig = ref({
 
 ### MkSearchList
 
-组合搜索框和占满剩余空间的滚动区域。组件只接收搜索关键词的 `v-model`，列表过滤、分组、
-选中和操作逻辑由默认插槽中的调用方负责。组件必须放在具有明确高度的纵向 Flex 容器中。
+组合搜索框和占满剩余空间的滚动列表。传入 `data` 时，组件默认按 `name` 过滤并按
+`id` 识别选中项；数据字段不同时，通过 `props` 中的 `label`、`value` 建立字段映射。`row` 插槽接收
+`row`、`index` 和 `active`。`action` 插槽用于普通行操作，`action-dropdown` 插槽用于下拉菜单；
+两者均接收 `row`、`index`。操作区默认隐藏，鼠标移入列表项或操作区获得焦点时显示，
+且不会触发列表项选中。点击列表项会触发 `click(row, index)`，
+过滤结果每批渲染 50 条，滚动到底部后自动追加下一批。组件必须放在具有明确高度的纵向 Flex 容器中。
+
+Props 和模型：
+
+| 名称            | 类型                                   | 默认值       | 说明                                                 |
+| --------------- | -------------------------------------- | ------------ | ---------------------------------------------------- |
+| `v-model`       | `string`                               | `''`         | 搜索关键词                                           |
+| `data`          | `T[]`                                  | —            | 列表全量数据，由组件在前端过滤                       |
+| `defaultActive` | `string \| number`                     | `''`         | 初始选中项对应的唯一值                               |
+| `emptyText`     | `string`                               | `'暂无数据'` | 空列表和无搜索结果的提示                             |
+| `props`         | `{ label?: keyof T; value?: keyof T }` | `{}`         | 字段映射，`label` 默认为 `name`，`value` 默认为 `id` |
+
+插槽和事件：
+
+| 名称              | 参数                                         | 说明                                                  |
+| ----------------- | -------------------------------------------- | ----------------------------------------------------- |
+| `row`             | `{ row: T, index: number, active: boolean }` | 自定义列表项主体；未提供时显示 label 字段             |
+| `action`          | `{ row: T, index: number }`                  | 自定义普通行操作；仅在未提供 `action-dropdown` 时渲染 |
+| `action-dropdown` | `{ row: T, index: number }`                  | 自定义点击型下拉菜单；使用组件内置 More 触发器        |
+| `empty`           | 无                                           | 自定义空状态                                          |
+| `click`           | `(row: T, index: number)`                    | 列表项点击事件                                        |
+
+使用备注：
+
+- `props.value` 对应的值应在列表中唯一，同时用于渲染 key 和选中判断。
+- 默认搜索只匹配 `props.label` 对应字段，忽略大小写和关键词首尾空格。
+- `data` 应传入全量数据；组件内的 50 条分批仅用于控制 DOM 渲染数量，不替代后端分页。
+- 搜索词或数据源变化时，渲染范围和滚动位置会重置到第一批。
+- 提供 `action-dropdown` 时，组件内部使用固定 More 按钮和点击型、非 Teleport 的
+  `MkDropdown`；移出行和菜单后会关闭菜单并让触发器失焦。
+- `action` 和 `action-dropdown` 二选一；同时提供时优先渲染 `action-dropdown`，不渲染 `action`。
+
+#### 默认字段示例
+
+不传 `props` 时，数据项默认使用 `name` 作为展示和搜索文本，使用 `id` 作为渲染 key
+和选中值。未提供 `row` 插槽时，列表项直接显示 `name`。
 
 ```vue
 <script setup lang="ts">
+import { ref } from 'vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
+
+interface SearchListItem {
+  id: string
+  name: string
+}
+
+const searchKeyword = ref('')
+const selectedItem = ref<SearchListItem>()
+const selectedIndex = ref(-1)
+const searchItems: SearchListItem[] = [
+  { id: '1', name: '管理员' },
+  { id: '2', name: '普通用户' },
+]
+
+function selectItem(item: SearchListItem, index: number) {
+  selectedItem.value = item
+  selectedIndex.value = index
+}
 </script>
 
-<MkSearchList v-model="searchKeyword">
-  <button v-for="workspace in filteredWorkspaces" :key="workspace.id">
-    {{ workspace.name }}
-  </button>
+<MkSearchList v-model="searchKeyword" :data="searchItems" default-active="2" @click="selectItem" />
+```
+
+上例中：
+
+- 搜索词匹配 `name`。
+- `id === '2'` 的“普通用户”初始显示为选中状态。
+- 点击后 `click` 返回完整数据项和当前索引。
+- 超过 50 条时首次只渲染 50 条，滚动到底部再追加 50 条。
+
+#### 自定义字段与操作区示例
+
+业务数据不使用 `name/id` 时，通过 `props.label` 和 `props.value` 指定替代字段。
+
+```vue
+<MkSearchList
+  v-model="searchKeyword"
+  :data="workspaces"
+  :props="{ label: 'displayName', value: 'workspaceId' }"
+  @click="selectWorkspace"
+>
+  <template #row="{ row: workspace, active }">
+    <span :class="{ 'font-medium': active }">{{ workspace.displayName }}</span>
+  </template>
+  <template #action-dropdown="{ row: workspace }">
+    <MkDropdownMenu>
+      <MkDropdownItem @click="editWorkspace(workspace)">
+        编辑 {{ workspace.displayName }}
+      </MkDropdownItem>
+    </MkDropdownMenu>
+  </template>
 </MkSearchList>
 ```
+
+上例中，搜索匹配 `displayName`，`workspaceId` 用于 key 和选中判断。`row` 负责
+自定义主体内容，`action-dropdown` 负责每行的下拉菜单内容，由组件显示固定 More 按钮。
+`props` 中未传的字段保留默认值，例如只传
+`:props="{ label: 'title' }"` 时，唯一值字段仍为 `id`。
 
 ### MkWorkspaceDropdown
 

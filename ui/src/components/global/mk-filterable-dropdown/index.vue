@@ -1,6 +1,5 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TOption extends object">
 import { computed, ref } from 'vue'
-import type { OptionItem } from '@/api/types'
 
 /**
  * 带搜索过滤和滚动列表的下拉选择组件。
@@ -9,51 +8,71 @@ import type { OptionItem } from '@/api/types'
  */
 defineOptions({ name: 'MkFilterableDropdown' })
 
-const props = withDefaults(
+const componentProps = withDefaults(
   defineProps<{
     /** 下拉菜单数据 */
-    options: OptionItem[]
+    options: TOption[]
+    /** 将业务数据的字段名映射为组件的展示字段和唯一值字段 */
+    props?: {
+      label?: keyof TOption & string
+      value?: keyof TOption & string
+    }
     /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
   {
     emptyText: '暂无匹配结果',
+    props: () => ({}),
   },
 )
 
 /** 当前选中菜单项的 value */
 const selectedValue = defineModel<string | number>({ required: true })
 const emit = defineEmits<{
-  select: [option: OptionItem]
+  select: [option: TOption]
 }>()
 const searchKeyword = ref('')
+const labelField = computed(() => componentProps.props.label ?? ('label' as keyof TOption & string))
+const valueField = computed(() => componentProps.props.value ?? ('value' as keyof TOption & string))
+
+function getOptionLabel(option: TOption) {
+  return String(option[labelField.value] ?? '')
+}
+
+function getOptionValue(option: TOption) {
+  const value = option[valueField.value]
+  return typeof value === 'string' || typeof value === 'number' ? value : String(value ?? '')
+}
 
 const selectedOption = computed(() =>
-  props.options.find((option) => option.value === selectedValue.value),
+  componentProps.options.find((option) => getOptionValue(option) === selectedValue.value),
+)
+const selectedText = computed(() =>
+  selectedOption.value === undefined ? '' : getOptionLabel(selectedOption.value),
 )
 
 const filteredOptions = computed(() => {
   const normalizedKeyword = searchKeyword.value.trim().toLocaleLowerCase()
-  if (!normalizedKeyword) return props.options
+  if (!normalizedKeyword) return componentProps.options
 
-  return props.options.filter((option) =>
-    option.label.toLocaleLowerCase().includes(normalizedKeyword),
+  return componentProps.options.filter((option) =>
+    getOptionLabel(option).toLocaleLowerCase().includes(normalizedKeyword),
   )
 })
 
 defineSlots<{
   /** 下拉框触发器，由使用方决定按钮结构和样式 */
-  default(props: { selectedOption?: OptionItem; text: string }): unknown
-  /** 菜单项内容，接收当前 option；未传入时显示 option.label */
-  option?(props: { option: OptionItem }): unknown
+  default(props: { selectedOption?: TOption; text: string }): unknown
+  /** 菜单项内容，接收当前原始 option */
+  option?(props: { option: TOption }): unknown
 }>()
 
 function handleVisibleChange(visible: boolean) {
   if (!visible) searchKeyword.value = ''
 }
 
-function handleItemClick(option: OptionItem) {
-  selectedValue.value = option.value
+function handleItemClick(option: TOption) {
+  selectedValue.value = getOptionValue(option)
   emit('select', option)
 }
 </script>
@@ -65,7 +84,7 @@ function handleItemClick(option: OptionItem) {
     placement="bottom-start"
     @visible-change="handleVisibleChange"
   >
-    <slot :selected-option="selectedOption" :text="selectedOption?.label ?? ''" />
+    <slot :selected-option="selectedOption" :text="selectedText" />
 
     <template #dropdown>
       <div class="w-70 overflow-hidden rounded-md">
@@ -77,13 +96,13 @@ function handleItemClick(option: OptionItem) {
           <MkDropdownMenu>
             <MkDropdownItem
               v-for="option in filteredOptions"
-              :key="option.value"
+              :key="getOptionValue(option)"
               selectable
-              :selected="option.value === selectedValue"
+              :selected="getOptionValue(option) === selectedValue"
               @click="handleItemClick(option)"
             >
               <slot name="option" :option="option">
-                <span class="block truncate">{{ option.label }}</span>
+                <span class="block truncate">{{ getOptionLabel(option) }}</span>
               </slot>
             </MkDropdownItem>
 

@@ -29,19 +29,19 @@ defineSlots<{
 
 <template>
   <el-dropdown-item
-    class="mk-dropdown-item"
+    class="mk-dropdown-item flex items-center"
     :class="{ 'text-primary!': selectable && selected }"
     v-bind="$attrs"
   >
-    <span v-if="icon || $slots.icon" class="flex shrink-0 items-center text-N600">
+    <span v-if="icon || $slots.icon" class="flex shrink-0 items-center text-N600!">
       <slot name="icon">
         <MkIcon v-if="icon" :icon="icon" />
       </slot>
     </span>
-    <div class="flex-1 overflow-hidden">
+    <div class="flex-1 flex items-center gap-2 overflow-hidden">
       <slot />
     </div>
-    <span v-if="selectable" class="flex size-4 shrink-0 items-center justify-center">
+    <span v-if="selectable" class="size-4 shrink-0">
       <MkIcon v-if="selected" :icon="Check" />
     </span>
   </el-dropdown-item>

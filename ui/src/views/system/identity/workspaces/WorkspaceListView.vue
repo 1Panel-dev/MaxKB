@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import type { WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import { Delete, EditPen, MoreFilled, Plus, UserFilled } from '@element-plus/icons-vue'
+import { Plus, UserFilled } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const paginationConfig = ref({
@@ -19,8 +19,6 @@ const workspaceMembers: WorkspaceMemberItem[] = []
 const currentWorkspace = ref<WorkspaceItem>()
 const workspacesList = ref<WorkspaceItem[]>([])
 
-function handleWorkspaceCommand() {}
-
 function loadWorkspaceOptions() {
   WorkspaceApi.getSystemWorkspaceList().then((res) => {
     workspacesList.value = res
@@ -34,35 +32,37 @@ onMounted(async () => {
 
 <template>
   <div class="system-identity-workspaces flex h-full">
-    <aside class="flex w-60 shrink-0 flex-col border-r p-4">
-      <header class="flex-between mb-4">
+    <aside class="flex w-sidebar-expanded shrink-0 flex-col border-r">
+      <header class="flex-between p-4">
         <h4>{{ route.meta.title }}</h4>
-        <el-button text type="primary">
+        <el-button text type="primary" class="-mr-1">
           <MkIcon name="icon_add_outlined" :size="18" />
         </el-button>
       </header>
-      <MkSearchList>
-        <div class="flex flex-col gap-1">
-          <div
-            v-for="workspace in workspacesList"
-            :key="workspace.id"
-            class="h-10 flex items-center rounded-md px-2"
-          >
-            <span class="min-w-0 flex-1 truncate">{{ workspace.name }}</span>
-
-            <MkDropdown class="-mr-1" trigger="click">
-              <el-button text @click.stop>
-                <MkIcon :icon="MoreFilled" />
-              </el-button>
-              <template #dropdown>
-                <MkDropdownMenu>
-                  <MkDropdownItem command="rename" :icon="EditPen">重命名</MkDropdownItem>
-                  <MkDropdownItem command="delete" :icon="Delete">删除</MkDropdownItem>
-                </MkDropdownMenu>
+      <MkSearchList
+        :data="workspacesList"
+        :default-active="currentWorkspace?.id"
+        @click="currentWorkspace = $event"
+      >
+        <template #action-dropdown>
+          <MkDropdownMenu>
+            <MkDropdownItem>
+              <template #icon>
+                <MkIcon name="icon_edit_outlined" />
               </template>
-            </MkDropdown>
-          </div>
-        </div>
+              <span>重命名</span>
+            </MkDropdownItem>
+          </MkDropdownMenu>
+          <el-divider />
+          <MkDropdownMenu>
+            <MkDropdownItem>
+              <template #icon>
+                <MkIcon name="icon_delete-trash_outlined" />
+              </template>
+              <span>删除</span>
+            </MkDropdownItem>
+          </MkDropdownMenu>
+        </template>
       </MkSearchList>
     </aside>
 
@@ -73,7 +73,7 @@ onMounted(async () => {
           <el-divider direction="vertical" />
           <span class="flex items-center text-N500">
             <MkIcon :icon="UserFilled" :size="16" class="mr-1" />
-            {{ currentWorkspace?.memberCount }}
+            {{ currentWorkspace?.user_count }}
           </span>
         </div>
       </header>

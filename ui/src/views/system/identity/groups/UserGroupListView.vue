@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-plus/icons-vue'
+import { Plus, User, UserFilled } from '@element-plus/icons-vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
+import MkSearchList from '@/components/mk-search-list/index.vue'
+
 import type { OptionItem, WorkspaceItem } from '@/api/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
@@ -19,10 +21,6 @@ interface UserGroupMember {
   source: string
   username: string
 }
-
-type UserGroupAction = 'delete' | 'rename'
-
-const groupSearchKeyword = ref('')
 
 const memberSearchQuery = ref<Record<string, boolean | number | string>>()
 const memberSearchFields: OptionItem<string>[] = [
@@ -54,14 +52,6 @@ const userGroupMembers = ref<UserGroupMember[]>([
   { id: 9, name: 'shaohu', username: 'shaohu', roles: ['普通用户'], source: '企业微信' },
   { id: 10, name: '白新', username: 'baixin', roles: ['普通用户'], source: '飞书' },
 ])
-const filteredUserGroups = computed(() => {
-  const keyword = groupSearchKeyword.value.trim().toLowerCase()
-
-  if (!keyword) return userGroups.value
-
-  return userGroups.value.filter(({ name }) => name.toLowerCase().includes(keyword))
-})
-
 const selectedUserGroup = computed(() => {
   return userGroups.value.find(({ id }) => id === selectedGroupId.value)
 })
@@ -89,33 +79,6 @@ async function createUserGroup() {
   MsgSuccess('用户组创建成功')
 }
 
-async function handleUserGroupCommand(command: UserGroupAction, groupId: string) {
-  const group = userGroups.value.find(({ id }) => id === groupId)
-
-  if (!group) return
-
-  if (command === 'rename') {
-    group.name = `${group.name}-重命名`
-    MsgSuccess('重命名成功')
-    return
-  }
-
-  try {
-    await MsgConfirm('删除用户组', `确认删除“${group.name}”吗？`, {
-      confirmButtonText: '删除',
-    })
-    userGroups.value = userGroups.value.filter(({ id }) => id !== groupId)
-
-    if (selectedGroupId.value === groupId) {
-      selectedGroupId.value = userGroups.value[0]?.id ?? ''
-    }
-
-    MsgSuccess('删除成功')
-  } catch {
-    return
-  }
-}
-
 function addMember() {
   MsgInfo('添加成员功能待接入')
 }
@@ -125,24 +88,20 @@ function addMemberToGroup(member: UserGroupMember) {
 }
 
 /* 选择工作空间列表 */
-const selectedWorkspaceId = ref<string | number>('default')
-const workspaceOptions = ref<OptionItem[]>([])
+const selectedWorkspaceId = ref('default')
+const workspaceOptions = ref<WorkspaceItem[]>([])
 
-function handleWorkspaceSelect(option: OptionItem) {
-  selectedWorkspaceId.value = option.value
+function handleWorkspaceSelect(workspace: WorkspaceItem) {
+  selectedWorkspaceId.value = workspace.id ?? 'default'
   selectedGroupId.value = userGroups.value[0]?.id ?? ''
 }
 
 function loadWorkspaceOptions() {
   WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
-    workspaceOptions.value = workspaces.map((item) => ({
-      ...item,
-      label: item.name,
-      value: item.id ?? 'default',
-    }))
+    workspaceOptions.value = workspaces
 
-    if (!workspaceOptions.value.some(({ value }) => value === selectedWorkspaceId.value)) {
-      selectedWorkspaceId.value = workspaceOptions.value[0]?.value ?? 'default'
+    if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
+      selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
     }
   })
 }
@@ -160,48 +119,38 @@ onMounted(() => loadWorkspaceOptions())
       />
     </header>
     <div class="flex min-h-0 flex-1">
-      <aside class="flex w-sidebar-expanded border-r shrink-0 flex-col p-4">
-        <header class="flex-between mb-4 h-6">
+      <aside class="flex w-sidebar-expanded shrink-0 flex-col border-r">
+        <header class="flex-between p-4">
           <h4>用户组</h4>
-          <el-tooltip content="创建用户组" placement="top">
-            <el-button class="!size-6" text type="primary" @click="createUserGroup">
-              <MkIcon name="icon_add_outlined" :size="20" />
-            </el-button>
-          </el-tooltip>
+          <el-button class="-mr-1" text type="primary" @click="createUserGroup">
+            <MkIcon name="icon_add_outlined" :size="18" />
+          </el-button>
         </header>
 
-        <MkSearchList v-model="groupSearchKeyword" placeholder="搜索">
-          <div class="flex flex-col gap-1 pt-2">
-            <div
-              v-for="group in filteredUserGroups"
-              :key="group.id"
-              class="group flex h-10 cursor-pointer items-center rounded-md px-2"
-              :class="group.id === selectedGroupId ? 'bg-primary/10 text-primary' : 'hover:bg-N100'"
-              role="button"
-              tabindex="0"
-              @click="selectedGroupId = group.id"
-              @keydown.enter="selectedGroupId = group.id"
-            >
-              <span class="min-w-0 flex-1 truncate">{{ group.name }}</span>
-              <MkDropdown trigger="click" @command="handleUserGroupCommand($event, group.id)">
-                <el-button
-                  class="!size-6 opacity-0 group-hover:opacity-100"
-                  :class="{ '!opacity-100': group.id === selectedGroupId }"
-                  text
-                  @click.stop
-                >
-                  <MkIcon :icon="MoreFilled" />
-                </el-button>
-                <template #dropdown>
-                  <MkDropdownMenu>
-                    <MkDropdownItem command="rename" :icon="EditPen">重命名</MkDropdownItem>
-                    <el-divider />
-                    <MkDropdownItem command="delete" :icon="Delete">删除</MkDropdownItem>
-                  </MkDropdownMenu>
+        <MkSearchList
+          :data="userGroups"
+          :default-active="selectedGroupId"
+          @click="selectedGroupId = $event.id"
+        >
+          <template #action-dropdown="{ row: group }">
+            <MkDropdownMenu>
+              <MkDropdownItem>
+                <template #icon>
+                  <MkIcon name="icon_edit_outlined" />
                 </template>
-              </MkDropdown>
-            </div>
-          </div>
+                <span>重命名</span>
+              </MkDropdownItem>
+            </MkDropdownMenu>
+            <el-divider />
+            <MkDropdownMenu>
+              <MkDropdownItem>
+                <template #icon>
+                  <MkIcon name="icon_delete-trash_outlined" />
+                </template>
+                <span>删除</span>
+              </MkDropdownItem>
+            </MkDropdownMenu>
+          </template>
         </MkSearchList>
       </aside>
       <section v-if="selectedUserGroup" class="min-w-0 flex-1 px-6">
