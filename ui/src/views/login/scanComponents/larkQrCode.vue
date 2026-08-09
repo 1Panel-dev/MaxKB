@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, watch } from 'vue'
-import type { QrCodeConfig } from '@/types'
+import type { QrCodeConfig } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { loadLoginScript } from '@/utils/script-loader'
 

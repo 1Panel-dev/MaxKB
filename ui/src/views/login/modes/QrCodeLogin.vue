@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
-import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/types'
+import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/api/types/index.ts'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'

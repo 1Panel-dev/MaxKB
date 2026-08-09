@@ -6,7 +6,7 @@ import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from './components/UserRoleSetting.vue'
-import type { SelectOption, SystemUser, SystemUserRequest, SystemUserRoleAssignment } from '@/types'
+import type { SelectOption, SystemUser, SystemUserRequest, SystemUserRoleAssignment } from '@/api/types/index.ts'
 import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })

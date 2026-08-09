@@ -5,7 +5,7 @@ import type {
   SystemUser,
   SystemUserRequest,
   SystemUserPasswordRequest,
-} from '@/types'
+} from '@/api/types'
 
 const prefix = '/user_manage'
 

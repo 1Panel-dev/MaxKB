@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { CaretBottom } from '@element-plus/icons-vue'
-import type { OptionItem } from '@/types'
+import type { OptionItem } from '@/api/types'
 
 defineOptions({ name: 'MkWorkspaceDropdown' })
 

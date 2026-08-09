@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { Delete, EditPen, MoreFilled, Plus, User, UserFilled } from '@element-plus/icons-vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
-import type { OptionItem, WorkspaceItem } from '@/types'
+import type { OptionItem, WorkspaceItem } from '@/api/types'
 import { MsgConfirm, MsgInfo, MsgSuccess } from '@/utils/message'
 
 interface UserGroup {

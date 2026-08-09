@@ -4,7 +4,7 @@ import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
-import type { SystemUser } from '@/types'
+import type { SystemUser } from '@/api/types'
 import { MsgError, MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })

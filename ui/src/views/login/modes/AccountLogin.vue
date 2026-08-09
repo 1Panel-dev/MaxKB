@@ -7,7 +7,7 @@ import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores'
-import type { LoginConfig, LoginMethod } from '@/types'
+import type { LoginConfig, LoginMethod } from '@/api/types'
 import { MsgConfirm, MsgError } from '@/utils/message'
 
 interface AccountLoginForm {

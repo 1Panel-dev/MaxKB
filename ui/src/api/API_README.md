@@ -11,10 +11,13 @@ src/api/
 │   │   └── types.ts      # Admin 请求协议和 loading 类型
 │   ├── auth/             # Admin 登录认证接口
 │   │   └── types.ts      # 认证 API 与认证 Store 共用类型
-│   ├── common.ts         # 多个 Admin API 业务域共用的类型
 │   ├── workspace/        # 工作空间业务接口
 │   └── system/           # 系统管理业务接口
 ├── chat/                 # Chat 独立请求体系，当前预留
+├── types/                # API 与 View/Component 共用的业务类型
+│   ├── index.ts          # API 公共类型的唯一导入入口
+│   ├── common.ts         # 多个 API 业务域共用的基础类型
+│   └── <domain>.ts       # 按明确业务域拆分的共享类型
 └── API_README.md
 ```
 
@@ -32,16 +35,41 @@ src/api/
 - 业务 API 按一级业务域、二级资源文件归类，例如 `workspace/agent.ts` 和
   `system/workspace.ts`。
 - 一类资源的增删改查放在同一个文件，不创建同名业务文件夹或汇总所有业务接口的 `api.ts`。
-- 只在 API 内部使用的请求参数、响应包装、分页和请求配置类型保留在对应 API 文件或业务目录；
-  多个 API 文件重复使用时，提取到最近共同目录的 `common.ts`，不要放入 `src/types`。
-- 同一个业务类型需要同时被 API 和 View 或 Component 使用时，才声明在 `src/types` 并从
-  `@/types` 导入。API 与页面层不得各自维护一份重复声明。
 - 每个业务接口使用 `export function` 单独导出，同时在文件末尾通过 `export default { ... }`
   直接默认导出接口对象，不为默认导出声明中间变量；调用方统一按“文件名 PascalCase + `Api`”
   命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
   例如从 `login.ts` 使用 `import LoginApi from '@/api/admin/auth/login'`，再调用
   `LoginApi.postLogin()`；System Workspace API 使用
   `import WorkspaceApi from '@/api/admin/system/workspace'`。
+
+## 类型组织
+
+API 类型统一在 `src/api` 范围内管理，相关规则由本文档统一维护。
+
+新增或移动类型时按以下顺序判断：
+
+1. 只在一个文件中使用：直接在该文件中声明，不导出。
+2. 只在同一个 API 业务边界内跨文件使用：放在该边界的 `types.ts`；出现重复声明时，提取到
+   最近共同目录的 `common.ts`。
+3. 同一个业务类型同时被 API 和 View 或 Component 使用：放入 `src/api/types/<domain>.ts`，
+   通过 `src/api/types/index.ts` 导出。
+4. Router、Layout、View 或 Component 专属类型保留在所属目录或实现文件，不放入
+   `src/api/types`。
+
+具体规则：
+
+- API 专用的请求参数、响应包装、请求配置和基础设施类型，放在对应 API 文件、资源目录的
+  `types.ts`，或该 API 业务域的 `common.ts`。
+- `src/api/types` 只存放 API 与 View 或 Component 跨层共用的业务类型，使用方统一通过
+  `import type { ... } from '@/api/types'` 导入，不写 `/index.ts`。
+- `src/api/types/index.ts` 只负责导出各业务域类型，不直接声明类型。
+- 新增类型前先搜索是否已有等价声明，优先复用或扩展已有类型。
+- 同一业务边界内的重复类型提取到最近共同目录的 `common.ts`；`common.ts` 不得成为无关类型
+  的集合。
+- API 与 View 或 Component 使用同一业务类型时只保留一份声明，不得在两层分别定义。
+- 名称相同但业务含义或字段约束不同的类型不要强行合并，应使用明确的领域名称区分。
+- 使用 `interface` 描述对象结构，使用 `type` 描述联合类型、交叉类型、工具类型结果或别名。
+- 类型名称必须体现业务含义，避免使用 `Data`、`Item`、`Info` 等脱离领域后含义不清的名称。
 
 ## 接口命名
 

@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
-import type { LoginConfig, QrCodeProvider } from '@/types'
+import type { LoginConfig, QrCodeProvider } from '@/api/types/index.ts'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'

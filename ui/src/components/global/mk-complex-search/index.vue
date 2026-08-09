@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { OptionItem } from '@/types'
+import type { OptionItem } from '@/api/types'
 
 defineOptions({ name: 'MkComplexSearch' })
 

@@ -1,6 +1,6 @@
 import { get } from '../core/request'
 import type { ResponsePage, ParamsPage } from '../core/types'
-import type { RequestParams, WorkspaceItem } from '@/types'
+import type { RequestParams, WorkspaceItem } from '@/api/types'
 
 const prefix = '/system/workspace'
 

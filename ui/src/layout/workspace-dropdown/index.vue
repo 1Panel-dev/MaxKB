@@ -3,7 +3,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
-import type { WorkspaceItem } from '@/types'
+import type { WorkspaceItem } from '@/api/types'
 
 defineOptions({ name: 'WorkspaceDropdown' })
 const router = useRouter()

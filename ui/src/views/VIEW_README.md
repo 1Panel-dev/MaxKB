@@ -12,10 +12,9 @@
   功能目录中。
 - 页面专用组件放在所属功能的 `components/` 中。不要为了复用一个页面内部实现而提前移动到
   `src/components`。
-- 仅在一个页面文件使用的类型就近声明且不导出；同一页面功能内跨文件使用的类型放在功能目录
-  的 `types.ts`，重复声明提取到最近共同目录的 `common.ts`。只有同一业务类型还被 API 使用
-  时，才移入 `src/types` 并从 `@/types` 导入。页面常量可使用 `constants.ts`；其他逻辑文件应
-  按具体职责命名，避免 `helpers.ts` 等含义模糊的名称。
+- 页面类型的归属和复用遵循 `src/api/API_README.md`；API 与页面共用的业务类型从
+  `@/api/types` 导入。页面常量可使用 `constants.ts`；其他逻辑文件应按具体职责命名，避免
+  `helpers.ts` 等含义模糊的名称。
 - 只有代码确实跨多个功能复用时，才按对应专项规则上移到 `src/components`、`src/constants`、
   `src/utils`、`src/stores` 或 `src/api`。
 - 页面目录存在多个层级时，目录名应表达业务层级，例如

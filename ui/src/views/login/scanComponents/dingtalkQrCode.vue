@@ -2,7 +2,7 @@
 import { nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/stores'
-import type { QrCodeConfig } from '@/types'
+import type { QrCodeConfig } from '@/api/types'
 import { MsgError } from '@/utils/message'
 import { loadLoginScript } from '@/utils/script-loader'
 

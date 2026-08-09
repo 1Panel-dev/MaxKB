@@ -13,10 +13,8 @@ Before making changes, determine which areas the task touches and read the corre
 - Components: `src/components/COMPONENT_README.md` is the source of truth for component rules.
 - Constants: `src/constants/CONSTANT_README.md` is the source of truth for shared constant rules.
 - Utilities: `src/utils/UTILS_README.md` is the source of truth for shared utility rules.
-- Types: `src/types/TYPE_README.md` is the source of truth for TypeScript declaration ownership,
-  deduplication, and cross-layer shared types.
-- API: `src/api/API_README.md` is the source of truth for request infrastructure and business API
-  organization.
+- API: `src/api/API_README.md` is the source of truth for request infrastructure, business API
+  organization, and API type ownership.
 - Views: `src/views/VIEW_README.md` is the source of truth for page responsibilities and
   feature-local code organization.
 
@@ -55,7 +53,8 @@ ui/
 │   │   ├── iconfont.js        # Generated SVG Symbol resource; replace, do not edit
 │   │   ├── logo/             # Product and brand logos
 │   │   └── workflow/         # Workflow-related visual assets
-│   ├── api/                   # Admin and Chat request infrastructure and business APIs
+│   ├── api/                   # Request infrastructure, business APIs, and shared API types
+│   │   ├── types/             # Types shared by APIs and their View or Component consumers
 │   │   └── API_README.md      # API layering, placement, typing, and request rules
 │   ├── components/            # Shared UI components
 │   │   ├── COMPONENT_README.md # Shared component conventions and usage
@@ -77,8 +76,6 @@ ui/
 │   │   ├── app.scss          # Fonts, base element styles, and app-wide defaults
 │   │   ├── index.scss        # Sass entry that aggregates global Sass modules
 │   │   └── STYLE_README.md    # Local UI conventions and color-variable usage examples
-│   ├── types/                 # Types shared by APIs and their View or Component consumers
-│   │   └── TYPE_README.md     # Type placement, naming, and import rules
 │   ├── utils/                 # Cross-feature utilities grouped by domain or capability
 │   │   └── UTILS_README.md    # Shared utility placement and naming rules
 │   ├── views/                 # Route-level page components grouped by feature

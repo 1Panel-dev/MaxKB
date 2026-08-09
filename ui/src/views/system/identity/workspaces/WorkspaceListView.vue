@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import type { WorkspaceItem, WorkspaceMemberItem } from '@/types'
+import type { WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
+import MkSearchList from '@/components/mk-search-list/index.vue'
 import { Delete, EditPen, MoreFilled, Plus, UserFilled } from '@element-plus/icons-vue'
 
 const route = useRoute()

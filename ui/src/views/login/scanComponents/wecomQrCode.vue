@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { QrCodeConfig } from '@/types'
+import type { QrCodeConfig } from '@/api/types'
 
 defineOptions({ name: 'WecomQrCode' })
 

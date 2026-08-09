@@ -4,7 +4,7 @@ import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfi
 import router from '@/router/admin'
 import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
-import type { RequestParams } from '@/types'
+import type { RequestParams } from '@/api/types'
 import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes

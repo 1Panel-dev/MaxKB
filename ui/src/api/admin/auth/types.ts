@@ -1,6 +1,6 @@
 /** Admin 认证 API 及其 Store 消费方共同使用的类型。 */
 
-import type { LoginMethod, QrCodeConfig, SelectOption } from '@/types'
+import type { LoginMethod, QrCodeConfig, SelectOption } from '@/api/types'
 
 export interface CurrentUserInfo {
   email: string

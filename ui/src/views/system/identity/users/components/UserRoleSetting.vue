@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormItemRule } from 'element-plus'
-import type { SelectOption, SystemUserRoleAssignment } from '@/types'
+import type { SelectOption, SystemUserRoleAssignment } from '@/api/types'
 
 defineOptions({ name: 'UserRoleSettingSection' })
 

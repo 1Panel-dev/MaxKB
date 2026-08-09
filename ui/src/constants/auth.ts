@@ -1,4 +1,4 @@
-import type { LoginMethod } from '@/types'
+import type { LoginMethod } from '@/api/types'
 
 export const LOGIN_METHOD_LABELS: Record<LoginMethod, string> = {
   CAS: 'CAS',
