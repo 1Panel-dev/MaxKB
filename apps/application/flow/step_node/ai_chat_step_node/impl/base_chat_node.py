@@ -130,6 +130,9 @@ def write_context(node_variable: Dict, workflow_variable: Dict, node: INode, wor
     _write_context(node_variable, workflow_variable, node, workflow, content, reasoning_content)
 
 
+CHAT_FILE_LIST_FIELDS = ("image_list", "document_list", "audio_list", "video_list", "other_list")
+
+
 def get_default_model_params_setting(model_id):
     model = QuerySet(Model).filter(id=model_id).first()
     credential = get_model_credential(model.provider, model.model_type, model.model_name)
@@ -397,7 +400,7 @@ class BaseChatNode(IChatNode):
                         500, _("Agent Key is required for agent tool 【{name}】").format(name=app.name)
                     )
                 executor = ToolExecutor()
-                app_config = executor.get_app_mcp_config(api_key)
+                app_config = executor.get_app_mcp_config(api_key, self.get_chat_files())
                 mcp_servers_config[app.name] = app_config
 
         if skill_tool_ids and len(skill_tool_ids) > 0:
@@ -463,6 +466,22 @@ class BaseChatNode(IChatNode):
             )
 
         return None
+
+    def get_chat_files(self):
+        """
+        获取本次对话上传的文件, 用于透传给被当作工具调用的应用/MCP
+        """
+        chat_files = {}
+        for field in CHAT_FILE_LIST_FIELDS:
+            file_list = getattr(self.workflow_manage, field, None) or []
+            items = [
+                {key: item.get(key) for key in ("name", "url", "file_id") if item.get(key) is not None}
+                for item in file_list
+                if isinstance(item, dict)
+            ]
+            if items:
+                chat_files[field] = items
+        return chat_files
 
     def handle_variables(self, tool_params):
         # 处理参数中的变量

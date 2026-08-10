@@ -19,7 +19,7 @@ def mcp_view(request):
             return HttpResponse(status=204)
 
         auth_header = request.headers.get("Authorization", "").replace("Bearer ", "")
-        handler = MCPToolHandler(auth_header)
+        handler = MCPToolHandler(auth_header, request.headers.get("X-MaxKB-Chat-Files", ""))
 
         # 路由方法
         if method == "initialize":
