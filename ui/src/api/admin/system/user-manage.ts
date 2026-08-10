@@ -57,6 +57,14 @@ function getAllUsers(query?: RequestParams) {
   return get<SystemUserOption[]>('/user/list', query)
 }
 
+/** 获取空间下的成员用户
+ * @param workspaceId 工作空间ID
+ * 资源授权  和用户组的 用户下拉列表使用
+ */
+function getWorkspaceMembers(workspaceId: string, query?: RequestParams) {
+  return get<SystemUserOption[]>(`/workspace/${workspaceId}/user_member`, query)
+}
+
 export default {
   deleteUser,
   getUserManagePage,
@@ -67,4 +75,5 @@ export default {
   putUser,
   putUserPassword,
   getAllUsers,
+  getWorkspaceMembers,
 }
