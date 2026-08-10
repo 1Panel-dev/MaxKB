@@ -136,7 +136,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'groups',
           name: 'system-chat-groups',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/chat/user-groups/GroupsListView.vue'),
           meta: { title: '对话用户组', order: 20 },
         },
         {

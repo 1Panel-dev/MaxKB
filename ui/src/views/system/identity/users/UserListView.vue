@@ -200,17 +200,17 @@ onMounted(() => loadSystemUsers())
             </span>
             <el-divider direction="vertical" />
             <div class="flex gap-1">
-              <el-tooltip effect="dark" content="编辑" placement="top">
+              <el-tooltip content="编辑" placement="top">
                 <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
                   <mk-icon name="icon_edit_outlined"></mk-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip effect="dark" content="修改用户密码" placement="top">
+              <el-tooltip content="修改用户密码" placement="top">
                 <el-button type="primary" text @click.stop="editUserPassword(row)">
                   <mk-icon name="icon-key_outlined"></mk-icon>
                 </el-button>
               </el-tooltip>
-              <el-tooltip effect="dark" content="删除" placement="top">
+              <el-tooltip content="删除" placement="top">
                 <el-button type="primary" text @click.stop="deleteUser(row)">
                   <mk-icon name="icon_delete-trash_outlined"></mk-icon>
                 </el-button>

@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { FormItemRule } from 'element-plus'
-import type { CreateWorkspaceMemberParamsItem, SelectOption, SystemUserOption } from '@/api/types'
+import type { CreateWorkspaceMemberParamsItem, ListItem, SystemUserOption } from '@/api/types'
 
 defineOptions({ name: 'MemberRoleSetting' })
 
 defineProps<{
   remoteUserMethod: (keyword: string) => Promise<void>
   roleLoading?: boolean
-  roleOptions: SelectOption[]
+  roleOptions: ListItem[]
   userLoading?: boolean
   userOptions: SystemUserOption[]
 }>()

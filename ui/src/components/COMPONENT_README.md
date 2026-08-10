@@ -176,10 +176,6 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 </MkDropdownItem>
 ```
 
-禁止使用菜单项的 `divided` 属性。需要分组时，在同一个 `MkDropdownMenu` 内的菜单项之间使用
-独立的 `el-divider`；`dropdown` 插槽必须只提供一个 `MkDropdownMenu` 根节点。菜单项通过
-左右 `4px` margin 保留悬停背景的缩进，分割线不使用该 margin，因此会铺满菜单宽度。
-
 ### MkFilterableDropdown
 
 带搜索过滤和滚动列表的下拉选择。组件不限制选项字段，默认使用 `label` 作为展示和搜索字段、

@@ -28,8 +28,8 @@ function open(workspace?: WorkspaceItem) {
       name: '',
     })
   }
-  nextTick(() => formRef.value?.clearValidate())
   dialogVisible.value = true
+  nextTick(() => formRef.value?.clearValidate())
 }
 
 function submit() {

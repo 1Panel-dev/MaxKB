@@ -52,6 +52,7 @@ src/views/<feature>/
 | `system/identity/roles/RoleListView.vue`           | 角色列表页面                    |
 | `system/identity/users/UserListView.vue`           | 用户列表页面                    |
 | `system/identity/workspaces/WorkspaceListView.vue` | 工作空间列表页面                |
+| `system/chat/groups/GroupsListView.vue`            | 对话用户组及组成员管理页面      |
 | `system/settings/AppearanceSettingsView.vue`       | 系统外观设置和登录外观预览页面  |
 | `workflow/WorkflowView.vue`                        | 工作流编排全屏页面              |
 

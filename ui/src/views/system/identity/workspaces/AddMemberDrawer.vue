@@ -6,7 +6,7 @@ import UserManageApi from '@/api/admin/system/user-manage'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import type {
   CreateWorkspaceMemberParamsItem,
-  SelectOption,
+  ListItem,
   SystemUserOption,
   WorkspaceItem,
 } from '@/api/types'
@@ -33,7 +33,7 @@ const memberForm = reactive<{ members: CreateWorkspaceMemberParamsItem[] }>({
 /* 成员与角色选项 */
 const userOptions = ref<SystemUserOption[]>([])
 const userOptionsLoading = ref(false)
-const roleOptions = ref<SelectOption[]>([])
+const roleOptions = ref<ListItem[]>([])
 const roleOptionsLoading = ref(false)
 let userRequestSequence = 0
 

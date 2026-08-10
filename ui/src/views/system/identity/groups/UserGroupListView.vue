@@ -116,8 +116,7 @@ onMounted(() => loadWorkspaceOptions())
                 </template>
                 <span>重命名</span>
               </MkDropdownItem>
-              <el-divider />
-              <MkDropdownItem>
+              <MkDropdownItem divided>
                 <template #icon>
                   <MkIcon name="icon_delete-trash_outlined" />
                 </template>
@@ -165,7 +164,7 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
-              <el-tooltip effect="dark" content="移除" placement="top">
+              <el-tooltip content="移除" placement="top">
                 <el-button type="primary" text>
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>

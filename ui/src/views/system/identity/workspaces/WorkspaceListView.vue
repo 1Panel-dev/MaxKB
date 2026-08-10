@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
 import type { RequestParams, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
@@ -105,28 +105,10 @@ function loadWorkspaceMembers() {
     })
 }
 
-/** 同一用户连续记录的合并行数，组内仅首行保存 rowspan。 */
-const workspaceMemberRowSpans = computed(() => {
-  const rowSpans = Array<number>(workspaceMembers.value.length).fill(0)
-  let groupStartIndex = 0
-
-  for (let rowIndex = 1; rowIndex <= workspaceMembers.value.length; rowIndex += 1) {
-    const isGroupEnd =
-      rowIndex === workspaceMembers.value.length ||
-      workspaceMembers.value[rowIndex]?.user_id !== workspaceMembers.value[groupStartIndex]?.user_id
-
-    if (isGroupEnd) {
-      rowSpans[groupStartIndex] = rowIndex - groupStartIndex
-      groupStartIndex = rowIndex
-    }
-  }
-
-  return rowSpans
-})
-
 /** 同一用户的选择框、姓名和用户名按连续记录合并。 */
 function objectSpanMethod({
   column,
+  row,
   rowIndex,
 }: {
   row: WorkspaceMemberItem
@@ -138,8 +120,12 @@ function objectSpanMethod({
     column.type === 'selection' || column.property === 'nick_name' || column.property === 'username'
   if (!shouldMerge) return
 
-  const rowspan = workspaceMemberRowSpans.value[rowIndex] ?? 0
-  return rowspan > 0 ? { rowspan, colspan: 1 } : { rowspan: 0, colspan: 0 }
+  const userId = row.user_id
+  if (workspaceMembers.value[rowIndex - 1]?.user_id === userId) return [0, 0]
+
+  let rowspan = 1
+  while (workspaceMembers.value[rowIndex + rowspan]?.user_id === userId) rowspan += 1
+  return [rowspan, 1]
 }
 
 function getWorkspaceMemberRowKey(member: WorkspaceMemberItem) {
@@ -200,9 +186,11 @@ onMounted(() => loadWorkspaceOptions())
     <aside class="flex w-sidebar-expanded shrink-0 flex-col border-r">
       <header class="flex-between p-4">
         <h4>{{ route.meta.title }}</h4>
-        <el-button text type="primary" class="-mr-1" @click="workspaceDialogRef?.open()">
-          <MkIcon name="icon_add_outlined" :size="18" />
-        </el-button>
+        <el-tooltip content="创建工作空间" placement="top">
+          <el-button text type="primary" class="-mr-1" @click="workspaceDialogRef?.open()">
+            <MkIcon name="icon_add_outlined" :size="18" />
+          </el-button>
+        </el-tooltip>
       </header>
       <MkSearchList
         :data="workspacesList"
@@ -229,18 +217,16 @@ onMounted(() => loadWorkspaceOptions())
     </aside>
 
     <section class="min-w-0 flex-1 px-6">
-      <header class="py-4">
-        <div class="flex items-center gap-2">
-          <h4>{{ currentWorkspace?.name }}</h4>
-          <el-divider direction="vertical" />
-          <span class="flex items-center text-N500">
-            <MkIcon name="icon_member_filled" class="mr-1" />
-            {{ currentWorkspace?.user_count }}
-          </span>
-        </div>
+      <header class="py-4 flex items-center gap-2">
+        <h4>{{ currentWorkspace?.name }}</h4>
+        <el-divider direction="vertical" />
+        <span class="flex items-center text-N500">
+          <MkIcon name="icon_member_filled" class="mr-1" />
+          {{ currentWorkspace?.user_count }}
+        </span>
       </header>
       <div class="flex-between mb-4">
-        <el-button type="primary" :disabled="!currentWorkspace" @click="addMemberDrawerRef?.open()">
+        <el-button type="primary" @click="addMemberDrawerRef?.open()">
           <MkIcon name="icon_add_outlined" />
           <span>添加成员</span>
         </el-button>
@@ -263,7 +249,7 @@ onMounted(() => loadWorkspaceOptions())
         <el-table-column prop="role_name" label="角色" class-name="border-l!" />
         <el-table-column label="操作" width="70" fixed="right">
           <template #default="{ row }">
-            <el-tooltip effect="dark" content="移除" placement="top">
+            <el-tooltip content="移除" placement="top">
               <el-button type="primary" text @click="handleRemoveMember(row)">
                 <MkIcon name="icon_assigned_outlined" />
               </el-button>

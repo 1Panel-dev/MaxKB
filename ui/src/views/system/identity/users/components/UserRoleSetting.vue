@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { FormItemRule } from 'element-plus'
-import type { SelectOption, SystemUserRoleAssignment } from '@/api/types'
+import type { ListItem, SystemUserRoleAssignment } from '@/api/types'
 
 defineOptions({ name: 'UserRoleSettingSection' })
 
 withDefaults(
   defineProps<{
     loading?: boolean
-    roleOptions: SelectOption[]
+    roleOptions: ListItem[]
     showWorkspace?: boolean
-    workspaceOptions: SelectOption[]
+    workspaceOptions: ListItem[]
   }>(),
   { showWorkspace: true },
 )

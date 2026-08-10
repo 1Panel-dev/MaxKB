@@ -2,7 +2,7 @@
 export type RequestParams = Record<string, unknown>
 
 /** 通用的 ID + 名称选项，用于下拉列表、标签等场景。 */
-export interface SelectOption {
+export interface ListItem {
   id: string
   name: string
   [key: string]: unknown

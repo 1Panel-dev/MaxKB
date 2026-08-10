@@ -7,7 +7,7 @@ import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from './components/UserRoleSetting.vue'
 import type {
-  SelectOption,
+  ListItem,
   SystemUser,
   SystemUserRequest,
   SystemUserRoleAssignment,
@@ -56,8 +56,8 @@ const userFormRules = reactive<FormRules<SystemUserRequest>>({
 
 // 角色设置选项
 const roleSettingOptionsLoading = ref(false)
-const roleOptions = ref<SelectOption[]>([])
-const workspaceOptions = ref<SelectOption[]>([])
+const roleOptions = ref<ListItem[]>([])
+const workspaceOptions = ref<ListItem[]>([])
 
 function loadRoleSettingOptions() {
   roleSettingOptionsLoading.value = true
