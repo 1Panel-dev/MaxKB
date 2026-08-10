@@ -6967,6 +6967,14 @@ msgstr ""
 msgid "Remove member from system workspace"
 msgstr ""
 
+#: apps/workspace/views/workspace.py:173
+msgid "Batch remove members from system workspace"
+msgstr ""
+
+#: apps/workspace/serializers/workspace_serializers.py:244
+msgid "User relation IDs"
+msgstr ""
+
 #: apps/workspace/views/workspace.py:133 apps/workspace/views/workspace.py:134
 #: apps/workspace/views/workspace.py:135
 msgid "Get system workspace member list"

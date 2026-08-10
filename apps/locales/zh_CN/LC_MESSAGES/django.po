@@ -7086,6 +7086,14 @@ msgstr "系统工作空间添加成员"
 msgid "Remove member from system workspace"
 msgstr "系统工作空间移除成员"
 
+#: apps/workspace/views/workspace.py:173
+msgid "Batch remove members from system workspace"
+msgstr "批量移除系统工作空间成员"
+
+#: apps/workspace/serializers/workspace_serializers.py:244
+msgid "User relation IDs"
+msgstr "用户关系 ID 列表"
+
 #: apps/workspace/views/workspace.py:133 apps/workspace/views/workspace.py:134
 #: apps/workspace/views/workspace.py:135
 msgid "Get system workspace member list"
