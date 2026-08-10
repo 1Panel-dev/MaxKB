@@ -109,14 +109,11 @@ class AgentTokenAuth(TokenAuthentication):
         # 未认证
         if auth is None:
             raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
-        if not auth.startswith("Bearer "):
-            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         try:
-            token = auth[7:]
-            token_details = TokenDetails(token)
+            token_details = TokenDetails(auth)
             for handle in agent_handle:
-                if handle.support(request, token, token_details.get_token_details):
-                    return handle.handle(request, token, token_details.get_token_details)
+                if handle.support(request, auth, token_details.get_token_details):
+                    return handle.handle(request, auth, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         except Exception as e:
             traceback.format_exc()
@@ -135,14 +132,11 @@ class AllTokenAuth(TokenAuthentication):
         # 未认证
         if auth is None:
             raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
-        if not auth.startswith("Bearer "):
-            raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         try:
-            token = auth[7:]
-            token_details = TokenDetails(token)
+            token_details = TokenDetails(auth)
             for handle in all_handles:
-                if handle.support(request, token, token_details.get_token_details):
-                    return handle.handle(request, token, token_details.get_token_details)
+                if handle.support(request, auth, token_details.get_token_details):
+                    return handle.handle(request, auth, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
         except Exception as e:
             traceback.format_exc()
