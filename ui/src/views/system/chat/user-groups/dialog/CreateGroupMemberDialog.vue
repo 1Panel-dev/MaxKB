@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatGroupsApi from '@/api/admin/system/chat-user-groups'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import type { ListItem, ChatGroupMemberOption } from '@/api/types'
+import type { ChatUserBase, ListItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{
@@ -15,7 +15,7 @@ const visible = ref(false)
 const loading = ref(false)
 const optionsLoading = ref(false)
 const formRef = ref<FormInstance>()
-const userOptions = ref<ChatGroupMemberOption[]>([])
+const userOptions = ref<ChatUserBase[]>([])
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 const formRules: FormRules = {
   userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }],

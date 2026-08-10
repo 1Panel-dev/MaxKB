@@ -37,7 +37,7 @@ function handleChange() {
   <div class="mk-complex-search flex">
     <el-select
       v-model="searchField"
-      class="mk-complex-search__field w-23!"
+      class="mk-complex-search__field w-26!"
       @change="handleFieldChange"
       :persistent="false"
     >

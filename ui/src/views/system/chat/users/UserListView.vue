@@ -7,6 +7,7 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import UserFromDrawer from './UserFromDrawer.vue'
+import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
 
@@ -14,6 +15,9 @@ const route = useRoute()
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+
+/* 导入用户 */
+const importUsersDialogRef = ref<InstanceType<typeof ImportUsersDialog>>()
 
 /* 列表查询相关 */
 const userTableRef = useTemplateRef('userTableRef')
@@ -142,7 +146,11 @@ onMounted(() => loadChatUsers())
       <h4>{{ route.meta.title }}</h4>
       <div class="flex items-center">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-        <el-button class="ml-3" type="primary" @click="userFormDrawerRef?.open()">
+        <el-button class="ml-3" @click="importUsersDialogRef?.open()">
+          <MkIcon name="icon_import_outlined" />
+          <span>导入用户</span>
+        </el-button>
+        <el-button type="primary" @click="userFormDrawerRef?.open()">
           <MkIcon name="icon_add_outlined" />
           <span>创建用户</span>
         </el-button>
@@ -236,6 +244,7 @@ onMounted(() => loadChatUsers())
     </MkTable>
 
     <UserFromDrawer ref="userFormDrawerRef" @refresh="loadChatUsers" />
+    <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
     <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
     <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
   </div>

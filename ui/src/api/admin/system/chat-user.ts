@@ -5,6 +5,7 @@ import type {
   ChatUserBase,
   ChatUser,
   ChatUserRequest,
+  ChatUserSyncResult,
   ChatUserUpdateRequest,
   RequestParams,
 } from '@/api/types'
@@ -54,13 +55,25 @@ function postBatchSetChatUserGroups(request: BatchSetChatUserGroupsRequest) {
   return post<BatchSetChatUserGroupsRequest, boolean>(`${prefix}/batch_add_group`, request)
 }
 
+/** 获取可导入的对话用户来源。 */
+function getChatUserSyncTypes() {
+  return get<string[]>(`${prefix}/sync_types`)
+}
+
+/** 从指定来源导入对话用户。 */
+function postSyncChatUsers(syncType: string) {
+  return post<undefined, ChatUserSyncResult>(`${prefix}/sync/${syncType}`)
+}
+
 export default {
   deleteChatUser,
   getChatUserPage,
   getChatUser,
+  getChatUserSyncTypes,
   postBatchDeleteChatUsers,
   postBatchSetChatUserGroups,
   postChatUser,
+  postSyncChatUsers,
   putChatUser,
   putChatUserPassword,
 }

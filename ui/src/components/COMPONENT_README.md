@@ -116,12 +116,14 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 
 全局对话框组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
 按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以通过同名 Props
-覆盖。Element Plus Dialog 的其他属性和事件通过 `$attrs` 透传，`header`、默认和 `footer`
-插槽保持可用。内容区域最大高度为 `calc(100vh - 120px)`，即相对浏览器可视高度上下各预留
-`60px`，内容超出后显示滚动条。
+覆盖。Element Plus Dialog 的其他属性和事件通过 `$attrs` 透传，`header`、`subtitle`、默认和
+`footer` 插槽保持可用。`subtitle` 位于标题下方的 Header 区域，并统一使用
+`mb-6 text-sm text-N600` 样式；仅使用 `subtitle` 时，组件仍会按照 Element Plus 原生的标题
+ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条。
 
 ```vue
 <MkDialog v-model="visible" title="创建工作空间" width="600">
+  <template #subtitle>创建后可继续添加工作空间成员。</template>
   <el-form>...</el-form>
   <template #footer>
     <el-button @click="visible = false">取消</el-button>

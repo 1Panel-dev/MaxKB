@@ -41,3 +41,13 @@ export interface BatchSetChatUserGroupsRequest {
   user_group_ids: string[]
   is_append: boolean
 }
+
+export interface ChatUserSyncConflict {
+  type: string
+  users: string[]
+}
+
+export interface ChatUserSyncResult {
+  success_count: number
+  conflict_users: ChatUserSyncConflict[]
+}

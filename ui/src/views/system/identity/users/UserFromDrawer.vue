@@ -74,12 +74,6 @@ function loadDefaultPassword() {
   })
 }
 
-async function copyDefaultPassword() {
-  if (userForm.password) {
-    await copyText(userForm.password, '默认密码已复制')
-  }
-}
-
 // 角色与工作空间选项
 const roleSettingOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
@@ -243,7 +237,7 @@ defineExpose({ open })
         <el-form-item v-if="!isEdit" label="默认密码">
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
-              <el-button text @click="copyDefaultPassword" class="-mr-1">
+              <el-button text @click="copyText(userForm.password)" class="-mr-1">
                 <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
               </el-button>
             </template>

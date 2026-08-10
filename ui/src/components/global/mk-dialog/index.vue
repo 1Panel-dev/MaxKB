@@ -6,7 +6,8 @@ const visible = defineModel<boolean>({ default: false })
 defineSlots<{
   default(): unknown
   footer(): unknown
-  header(): unknown
+  header(props: { close: () => void; titleClass: string; titleId: string }): unknown
+  subtitle(): unknown
 }>()
 </script>
 
@@ -20,12 +21,24 @@ defineSlots<{
     :width="600"
     v-bind="$attrs"
   >
-    <template v-if="$slots.header" #header>
-      <slot name="header" />
+    <template v-if="$slots.header || $slots.subtitle" #header="{ close, titleClass, titleId }">
+      <slot
+        v-if="$slots.header"
+        name="header"
+        :close="close"
+        :title-class="titleClass"
+        :title-id="titleId"
+      />
+      <span v-else :id="titleId" :class="titleClass">{{ $attrs.title }}</span>
+      <p v-if="$slots.subtitle" class="mt-2 text-N600">
+        <slot name="subtitle" />
+      </p>
     </template>
 
     <el-scrollbar>
-      <div style="max-height: calc(100vh - 272px)"><slot /></div>
+      <div style="max-height: calc(100vh - 272px)">
+        <slot />
+      </div>
     </el-scrollbar>
 
     <template v-if="$slots.footer" #footer>

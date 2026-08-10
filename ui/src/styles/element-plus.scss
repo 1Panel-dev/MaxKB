@@ -467,9 +467,8 @@
 }
 
 .el-select-dropdown {
-  padding: 4px;
   &__list {
-    padding: 0;
+    padding: 4px;
   }
   &__item {
     border-radius: var(--el-border-radius-small);

@@ -7,8 +7,8 @@ import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import type { ChatUser, ChatUserRequest } from '@/api/types'
-import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
+import type { ListItem, ChatUser, ChatUserRequest } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
 
@@ -57,28 +57,8 @@ const userFormRules = reactive<FormRules<ChatUserRequest>>({
 })
 
 /* 用户组选项 */
-const userGroupOptions = ref<CascaderOption[]>([])
+const userGroupOptions = ref<ListItem[]>([])
 const userGroupOptionsLoading = ref(false)
-const userGroupCascaderProps: CascaderProps = {
-  children: 'children',
-  emitPath: false,
-  label: 'name',
-  multiple: true,
-  value: 'id',
-}
-
-// 默认密码
-function loadDefaultPassword() {
-  return CommonApi.getDefaultPassword().then(({ password }) => {
-    userForm.password = password
-  })
-}
-
-async function copyDefaultPassword() {
-  if (userForm.password) {
-    await copyText(userForm.password)
-  }
-}
 
 function loadUserGroupOptions() {
   userGroupOptionsLoading.value = true
@@ -89,6 +69,13 @@ function loadUserGroupOptions() {
     .finally(() => {
       userGroupOptionsLoading.value = false
     })
+}
+
+// 默认密码
+function loadDefaultPassword() {
+  return CommonApi.getDefaultPassword().then(({ password }) => {
+    userForm.password = password
+  })
 }
 
 async function submitUser() {
@@ -223,7 +210,7 @@ defineExpose({ open })
         <el-form-item v-if="!isEdit" label="默认密码">
           <el-input v-model="userForm.password" readonly>
             <template #suffix>
-              <el-button text @click="copyDefaultPassword" class="-mr-1">
+              <el-button text @click="copyText(userForm.password)" class="-mr-1">
                 <mk-icon name="icon_copy_outlined" class="text-N600"></mk-icon>
               </el-button>
             </template>
