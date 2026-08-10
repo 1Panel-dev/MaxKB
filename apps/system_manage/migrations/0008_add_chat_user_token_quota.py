@@ -10,7 +10,7 @@ def migrate_historical_tokens(apps, schema_editor):
     ChatUserTokenQuota = apps.get_model('system_manage', 'ChatUserTokenQuota')
 
     chat_user_map = {
-        str(c['id']): c['chat_user_id']
+        str(c['id']): str(c['chat_user_id'])
         for c in Chat.objects.values('id', 'chat_user_id').iterator()
     }
     user_totals = {}
@@ -24,10 +24,11 @@ def migrate_historical_tokens(apps, schema_editor):
         user_totals[user_id] = user_totals.get(user_id, 0) + tokens
 
     objs = [
-        ChatUserTokenQuota(user_id=uid, total_tokens=total)
+        ChatUserTokenQuota(user_id=uid, total_tokens=total, used_tokens=total)
         for uid, total in user_totals.items()
     ]
-    ChatUserTokenQuota.objects.bulk_create(objs, batch_size=500)
+    if objs:
+        ChatUserTokenQuota.objects.bulk_create(objs, batch_size=500)
 
 
 class Migration(migrations.Migration):
@@ -51,7 +52,7 @@ class Migration(migrations.Migration):
                         verbose_name="主键id",
                     ),
                 ),
-                ("user_id", models.UUIDField(unique=True, verbose_name="用户id")),
+                ("user_id", models.CharField(db_index=True, max_length=128, unique=True, verbose_name="用户id")),
                 (
                     "quota_type",
                     models.CharField(
