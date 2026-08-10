@@ -31,7 +31,7 @@ class ChatUserTokenQuota(AppModelMixin):
     """
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
 
-    user_id = models.UUIDField(max_length=128, unique=True, verbose_name="用户id")
+    user_id = models.CharField(max_length=128, unique=True, verbose_name="用户id", db_index=True)
 
     quota_type = models.CharField(max_length=20, choices=QuotaType.choices,
                                   default=QuotaType.UNLIMITED, verbose_name="配额模式")
