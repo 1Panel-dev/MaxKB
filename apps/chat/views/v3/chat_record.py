@@ -4,7 +4,7 @@
     @Author：虎虎
     @file： chat_record.py
     @date：2025/6/23 10:42
-    @desc:
+    @desc: v3 chat record views —— application_id 从 path 获取，用户身份从 request.user(Principal) 获取
 """
 from django.utils.translation import gettext_lazy as _
 from drf_spectacular.utils import extend_schema
@@ -19,6 +19,8 @@ from chat.serializers.chat_record import VoteSerializer, HistoricalConversationS
     HistoricalConversationRecordSerializer, HistoricalConversationOperateSerializer
 from common import result
 from common.auth import ChatTokenAuth
+from common.auth.authentication import has_permissions
+from common.auth.constants.chat_permission_constants import ChatPermissionConstants
 
 
 class VoteView(APIView):
@@ -28,15 +30,16 @@ class VoteView(APIView):
         methods=['PUT'],
         description=_("Like, Dislike"),
         summary=_("Like, Dislike"),
-        operation_id=_("Like, Dislike"),  # type: ignore
+        operation_id=_("V3 Like, Dislike"),  # type: ignore
         parameters=VoteAPI.get_parameters(),
         request=VoteAPI.get_request(),
         responses=VoteAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def put(self, request: Request, chat_id: str, chat_record_id: str):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def put(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
         return result.success(VoteSerializer(
-            data={'application_id': request.auth.application_id,
+            data={'application_id': application_id,
                   'chat_id': chat_id,
                   'chat_record_id': chat_record_id
                   }).vote(request.data))
@@ -49,16 +52,17 @@ class HistoricalConversationView(APIView):
         methods=['GET'],
         description=_("Get historical conversation"),
         summary=_("Get historical conversation"),
-        operation_id=_("Get historical conversation"),  # type: ignore
+        operation_id=_("V3 Get historical conversation"),  # type: ignore
         parameters=HistoricalConversationAPI.get_parameters(),
         responses=HistoricalConversationAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def get(self, request: Request):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def get(self, request: Request, application_id: str):
         return result.success(HistoricalConversationSerializer(
             data={
-                'application_id': request.auth.application_id,
-                'chat_user_id': request.auth.chat_user_id,
+                'application_id': application_id,
+                'chat_user_id': request.user.id,
             }).list())
 
     class Operate(APIView):
@@ -68,17 +72,18 @@ class HistoricalConversationView(APIView):
             methods=['PUT'],
             description=_("Modify conversation about"),
             summary=_("Modify conversation about"),
-            operation_id=_("Modify conversation about"),  # type: ignore
+            operation_id=_("V3 Modify conversation about"),  # type: ignore
             parameters=HistoricalConversationOperateAPI.get_parameters(),
             request=HistoricalConversationOperateAPI.get_request(),
             responses=HistoricalConversationOperateAPI.get_response(),
-            tags=[_('Chat')]  # type: ignore
+            tags=[_('V3 Chat')]  # type: ignore
         )
-        def put(self, request: Request, chat_id: str):
+        @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+        def put(self, request: Request, application_id: str, chat_id: str):
             return result.success(HistoricalConversationOperateSerializer(
                 data={
-                    'application_id': request.auth.application_id,
-                    'chat_user_id': request.auth.chat_user_id,
+                    'application_id': application_id,
+                    'chat_user_id': request.user.id,
                     'chat_id': chat_id,
                 }).edit_abstract(request.data)
                                   )
@@ -87,16 +92,17 @@ class HistoricalConversationView(APIView):
             methods=['DELETE'],
             description=_("Delete history conversation"),
             summary=_("Delete history conversation"),
-            operation_id=_("Delete history conversation"),  # type: ignore
+            operation_id=_("V3 Delete history conversation"),  # type: ignore
             parameters=HistoricalConversationOperateAPI.get_parameters(),
             responses=HistoricalConversationOperateAPI.get_response(),
-            tags=[_('Chat')]  # type: ignore
+            tags=[_('V3 Chat')]  # type: ignore
         )
-        def delete(self, request: Request, chat_id: str):
+        @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+        def delete(self, request: Request, application_id: str, chat_id: str):
             return result.success(HistoricalConversationOperateSerializer(
                 data={
-                    'application_id': request.auth.application_id,
-                    'chat_user_id': request.auth.chat_user_id,
+                    'application_id': application_id,
+                    'chat_user_id': request.user.id,
                     'chat_id': chat_id,
                 }).logic_delete())
 
@@ -107,15 +113,16 @@ class HistoricalConversationView(APIView):
             methods=['DELETE'],
             description=_("Batch delete history conversation"),
             summary=_("Batch delete history conversation"),
-            operation_id=_("Batch delete history conversation"),  # type: ignore
+            operation_id=_("V3 Batch delete history conversation"),  # type: ignore
             parameters=HistoricalConversationOperateAPI.get_parameters(),
             responses=HistoricalConversationOperateAPI.get_response(),
-            tags=[_('Chat')]  # type: ignore
+            tags=[_('V3 Chat')]  # type: ignore
         )
-        def delete(self, request: Request):
+        @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+        def delete(self, request: Request, application_id: str):
             return result.success(HistoricalConversationOperateSerializer.Clear(data={
-                'application_id': request.auth.application_id,
-                'chat_user_id': request.auth.chat_user_id,
+                'application_id': application_id,
+                'chat_user_id': request.user.id,
             }).batch_logic_delete())
 
     class PageView(APIView):
@@ -125,16 +132,17 @@ class HistoricalConversationView(APIView):
             methods=['GET'],
             description=_("Get historical conversation by page"),
             summary=_("Get historical conversation by page"),
-            operation_id=_("Get historical conversation by page"),  # type: ignore
+            operation_id=_("V3 Get historical conversation by page"),  # type: ignore
             parameters=PageHistoricalConversationAPI.get_parameters(),
             responses=PageHistoricalConversationAPI.get_response(),
-            tags=[_('Chat')]  # type: ignore
+            tags=[_('V3 Chat')]  # type: ignore
         )
-        def get(self, request: Request, current_page: int, page_size: int):
+        @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+        def get(self, request: Request, application_id: str, current_page: int, page_size: int):
             return result.success(HistoricalConversationSerializer(
                 data={
-                    'application_id': request.auth.application_id,
-                    'chat_user_id': request.auth.chat_user_id,
+                    'application_id': application_id,
+                    'chat_user_id': request.user.id,
                 }).page(current_page, page_size))
 
 
@@ -145,17 +153,18 @@ class HistoricalConversationRecordView(APIView):
         methods=['GET'],
         description=_("Get historical conversation records"),
         summary=_("Get historical conversation records"),
-        operation_id=_("Get historical conversation records"),  # type: ignore
+        operation_id=_("V3 Get historical conversation records"),  # type: ignore
         parameters=HistoricalConversationRecordAPI.get_parameters(),
         responses=HistoricalConversationRecordAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def get(self, request: Request, chat_id: str):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def get(self, request: Request, application_id: str, chat_id: str):
         return result.success(HistoricalConversationRecordSerializer(
             data={
                 'chat_id': chat_id,
-                'application_id': request.auth.application_id,
-                'chat_user_id': request.auth.chat_user_id,
+                'application_id': application_id,
+                'chat_user_id': request.user.id,
             }).list())
 
     class PageView(APIView):
@@ -165,17 +174,18 @@ class HistoricalConversationRecordView(APIView):
             methods=['GET'],
             description=_("Get historical conversation records by page "),
             summary=_("Get historical conversation records by page"),
-            operation_id=_("Get historical conversation records by page"),  # type: ignore
+            operation_id=_("V3 Get historical conversation records by page"),  # type: ignore
             parameters=PageHistoricalConversationRecordAPI.get_parameters(),
             responses=PageHistoricalConversationRecordAPI.get_response(),
-            tags=[_('Chat')]  # type: ignore
+            tags=[_('V3 Chat')]  # type: ignore
         )
-        def get(self, request: Request, chat_id: str, current_page: int, page_size: int):
+        @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+        def get(self, request: Request, application_id: str, chat_id: str, current_page: int, page_size: int):
             return result.success(HistoricalConversationRecordSerializer(
                 data={
                     'chat_id': chat_id,
-                    'application_id': request.auth.application_id,
-                    'chat_user_id': request.auth.chat_user_id,
+                    'application_id': application_id,
+                    'chat_user_id': request.user.id,
                 }).page(current_page, page_size))
 
 
@@ -186,16 +196,17 @@ class ChatRecordView(APIView):
         methods=['GET'],
         description=_("Get conversation details"),
         summary=_("Get conversation details"),
-        operation_id=_("Get conversation details"),  # type: ignore
+        operation_id=_("V3 Get conversation details"),  # type: ignore
         parameters=PageHistoricalConversationRecordAPI.get_parameters(),
         responses=PageHistoricalConversationRecordAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def get(self, request: Request, chat_id: str, chat_record_id: str):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def get(self, request: Request, application_id: str, chat_id: str, chat_record_id: str):
         return result.success(ChatRecordOperateSerializer(
             data={
                 'chat_id': chat_id,
                 'chat_record_id': chat_record_id,
-                'application_id': request.auth.application_id,
-                'chat_user_id': request.auth.chat_user_id,
+                'application_id': application_id,
+                'chat_user_id': request.user.id,
             }).one(False))

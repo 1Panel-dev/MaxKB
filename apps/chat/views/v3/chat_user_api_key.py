@@ -18,9 +18,9 @@ class ChatUserApiKeyView(APIView):
         methods=["POST"],
         description=_("Create ChatUserAPIKey"),
         summary=_("Create ChatUserAPIKey"),
-        operation_id=_("Create ChatUserAPIKey"),
+        operation_id="V3 Create ChatUserAPIKey",
         responses=None,
-        tags=[_("Chat User API Key")],
+        tags=[_("V3 Chat User API Key")],
     )
     @log(menu="Chat User API Key", operate="Add chat user API key")
     def post(self, request: Request):
@@ -33,18 +33,18 @@ class ChatUserApiKeyView(APIView):
             methods=["GET"],
             description=_("Get ChatUserAPIKey List"),
             summary=_("Get ChatUserAPIKey List"),
-            operation_id=_("Get ChatUserAPIKey List"),
+            operation_id="V3 Get ChatUserAPIKey List",
             parameters=[
                 OpenApiParameter(name='order_by', type=OpenApiTypes.STR, location=OpenApiParameter.QUERY,
                                  description=_('order by'), required=False),
             ],
             responses=None,
-            tags=[_("Chat User API Key")],
+            tags=[_("V3 Chat User API Key")],
         )
         def get(self, request: Request, current_page, page_size):
             return result.success(
                 ChatUserApiKeySerializer(
-                    data={"user_id": request.user.id,"order_by": request.query_params.get("order_by")}
+                    data={"user_id": request.user.id, "order_by": request.query_params.get("order_by")}
                 ).page(current_page, page_size)
             )
 
@@ -55,10 +55,10 @@ class ChatUserApiKeyView(APIView):
             methods=["DELETE"],
             description=_("Delete ChatUserAPIKey"),
             summary=_("Delete ChatUserAPIKey"),
-            operation_id=_("Delete ChatUserAPIKey"),
+            operation_id="V3 Delete ChatUserAPIKey",
             responses=None,
             parameters=None,
-            tags=[_("Chat User API Key")],
+            tags=[_("V3 Chat User API Key")],
         )
         @log(menu="Chat User API Key", operate="Delete chat user API key")
         def delete(self, request: Request, api_key_id: str):

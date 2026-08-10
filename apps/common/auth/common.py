@@ -115,16 +115,18 @@ class ChatUserToken:
 
 
 class ChatToken:
-    def __init__(self, user_id, _type: AuthenticationType, login_type: str):
+    def __init__(self, user_id, _type: AuthenticationType, login_type: str, **kwargs):
         self.user_id = user_id
         self.type = _type
         self.login_type = login_type
+        self.kwargs = kwargs
 
     def to_dict(self):
         return {
             'user_id': str(self.user_id),
             'type': str(self.type.value),
-            'login_type': str(self.login_type)
+            'login_type': str(self.login_type),
+            'kwargs': self.kwargs
         }
 
     def to_token(self):

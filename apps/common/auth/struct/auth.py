@@ -22,20 +22,20 @@ class Auth:
     def __init__(self,
                  roles: set[RoleConstants | Role | str],
                  permissions: Dict[str, int],
-                 **keywords):
+                 **kwargs):
         # 权限列表
         self.permissions = permissions
         # 角色列表
         self.roles = roles
-        self.keywords = keywords
+        self.kwargs = kwargs
 
 
 class Principal:
     def __init__(self, _id,
                  _type: ChatUserType | UserType,
                  profile=None,
-                 **keywords):
+                 **kwargs):
         self.id = _id
         self.type = _type
         self.profile = profile
-        self.keywords = keywords
+        self.kwargs = kwargs

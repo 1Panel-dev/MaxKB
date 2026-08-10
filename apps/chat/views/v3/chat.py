@@ -90,18 +90,16 @@ class OpenAIView(APIView):
         methods=['POST'],
         description=_('OpenAI Interface Dialogue'),
         summary=_('OpenAI Interface Dialogue'),
-        operation_id=_('OpenAI Interface Dialogue'),  # type: ignore
+        operation_id=_('V3 OpenAI Interface Dialogue'),  # type: ignore
         request=OpenAIAPI.get_request(),
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     def post(self, request: Request, application_id: str):
         ip_address = _get_ip_address(request)
-        if application_id != str(request.auth.application_id):
-            raise AppAuthenticationFailed(500, _('Secret key is invalid'))
         return OpenAIChatSerializer(
-            data={'application_id': application_id, 'chat_user_id': request.auth.chat_user_id,
-                  'chat_user_type': request.auth.chat_user_type,
+            data={'application_id': application_id, 'chat_user_id': request.user.id,
+                  'chat_user_type': request.user.type,
                   'ip_address': ip_address,
                   'source': {"type": ChatSourceChoices.API_CALL.value}}).chat(request.data)
 
@@ -117,10 +115,10 @@ class AnonymousAuthentication(APIView):
         methods=['POST'],
         description=_('Application Anonymous Certification'),
         summary=_('Application Anonymous Certification'),
-        operation_id=_('Application Anonymous Certification'),  # type: ignore
+        operation_id=_('V3 Application Anonymous Certification'),  # type: ignore
         request=ChatAuthenticationAPI.get_request(),
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     def post(self, request: Request):
         token, f_token = AnonymousAuthenticationSerializer().auth(
@@ -152,10 +150,10 @@ class ApplicationProfile(APIView):
         methods=['GET'],
         description=_("Get application related information"),
         summary=_("Get application related information"),
-        operation_id=_("Get application related information"),  # type: ignore
+        operation_id=_("V3 Get application related information"),  # type: ignore
         request=None,
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def get(self, request: Request, application_id: str):
@@ -168,10 +166,10 @@ class AuthProfile(APIView):
         methods=['GET'],
         description=_("Get application authentication information"),
         summary=_("Get application authentication information"),
-        operation_id=_("Get application authentication information"),  # type: ignore
+        operation_id=_("V3 Get application authentication information"),  # type: ignore
         parameters=ChatAuthenticationProfileAPI.get_parameters(),
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     def get(self, request: Request):
         return result.success(
@@ -185,22 +183,23 @@ class ChatView(APIView):
         methods=['POST'],
         description=_("dialogue"),
         summary=_("dialogue"),
-        operation_id=_("dialogue"),  # type: ignore
+        operation_id=_("V3 dialogue"),  # type: ignore
         request=ChatAPI.get_request(),
         parameters=ChatAPI.get_parameters(),
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def post(self, request: Request, chat_id: str):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def post(self, request: Request, application_id: str, chat_id: str):
         ip_address = _get_ip_address(request)
         return ChatSerializers(data={'chat_id': chat_id,
-                                     'chat_user_id': request.auth.chat_user_id,
-                                     'chat_user_type': request.auth.chat_user_type,
-                                     'application_id': request.auth.application_id,
+                                     'chat_user_id': request.user.id,
+                                     'chat_user_type': request.user.type,
+                                     'application_id': application_id,
                                      'debug': False,
                                      'ip_address': ip_address,
                                      'source': {
-                                         'type': ChatSourceChoices.API_CALL.value if request.auth.chat_user_type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value}
+                                         'type': ChatSourceChoices.API_CALL.value if request.user.type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value}
                                      }
                                ).chat(request.data)
 
@@ -212,10 +211,10 @@ class OpenView(APIView):
         methods=['GET'],
         description=_("Get the session id according to the application id"),
         summary=_("Get the session id according to the application id"),
-        operation_id=_("Get the session id according to the application id"),  # type: ignore
+        operation_id=_("V3 Get the session id according to the application id"),  # type: ignore
         parameters=ChatOpenAPI.get_parameters(),
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def get(self, request: Request, application_id: str):
@@ -236,13 +235,13 @@ class CancelWorkflowView(APIView):
         methods=['POST'],
         description=_("Cancel running workflow"),
         summary=_("Cancel running workflow"),
-        operation_id=_("Cancel running workflow"),  # type: ignore
+        operation_id=_("V3 Cancel running workflow"),  # type: ignore
         parameters=[
             OpenApiParameter(name='chat_id', type=OpenApiTypes.UUID, location=OpenApiParameter.PATH,
                              description=_('Chat ID')),
         ],
         responses=None,
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
         from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
@@ -259,8 +258,8 @@ class CaptchaView(APIView):
     @extend_schema(methods=['GET'],
                    summary=_("Get Chat captcha"),
                    description=_("Get Chat captcha"),
-                   operation_id=_("Get Chat captcha"),  # type: ignore
-                   tags=[_("Chat")],  # type: ignore
+                   operation_id=_("V3 Get Chat captcha"),  # type: ignore
+                   tags=[_("V3 Chat")],  # type: ignore
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
         username = request.query_params.get('username', None)
@@ -275,15 +274,16 @@ class SpeechToText(APIView):
         methods=['POST'],
         description=_("speech to text"),
         summary=_("speech to text"),
-        operation_id=_("speech to text"),  # type: ignore
+        operation_id=_("V3 speech to text"),  # type: ignore
         request=SpeechToTextAPI.get_request(),
         responses=SpeechToTextAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def post(self, request: Request):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def post(self, request: Request, application_id: str):
         return result.success(
             SpeechToTextSerializers(
-                data={'application_id': request.auth.application_id})
+                data={'application_id': application_id})
             .speech_to_text({'file': request.FILES.get('file')}))
 
 
@@ -294,14 +294,15 @@ class TextToSpeech(APIView):
         methods=['POST'],
         description=_("text to speech"),
         summary=_("text to speech"),
-        operation_id=_("text to speech"),  # type: ignore
+        operation_id=_("V3 text to speech"),  # type: ignore
         request=TextToSpeechAPI.get_request(),
         responses=TextToSpeechAPI.get_response(),
-        tags=[_('Chat')]  # type: ignore
+        tags=[_('V3 Chat')]  # type: ignore
     )
-    def post(self, request: Request):
+    @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
+    def post(self, request: Request, application_id: str):
         byte_data = TextToSpeechSerializers(
-            data={'application_id': request.auth.application_id}).text_to_speech(request.data)
+            data={'application_id': application_id}).text_to_speech(request.data)
         return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
                                                             'Content-Disposition': 'attachment; filename="abc.mp3"'})
 
@@ -314,10 +315,10 @@ class UploadFile(APIView):
         methods=['POST'],
         description=_("Upload files"),
         summary=_("Upload files"),
-        operation_id=_("Upload files"),  # type: ignore
+        operation_id=_("V3 Upload files"),  # type: ignore
         request=TextToSpeechAPI.get_request(),
         responses=TextToSpeechAPI.get_response(),
-        tags=[_('Application')]  # type: ignore
+        tags=[_('V3 Application')]  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
         files = request.FILES.getlist('file')
@@ -326,7 +327,7 @@ class UploadFile(APIView):
         for file in files:
             file_url = FileSerializer(
                 data={'file': file, 'meta': meta, 'source_id': chat_id, 'source_type': FileSourceType.CHAT, }).upload(
-                request.auth.chat_user_id)
+                request.user.id)
             file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
         return result.success(file_ids)
 
@@ -338,8 +339,8 @@ class ResetCurrentUserPasswordView(APIView):
         methods=["POST"],
         summary=_("Modify current user password"),
         description=_("Modify current user password"),
-        operation_id=_("Modify current user password"),  # type: ignore
-        tags=[_("Chat User")],  # type: ignore
+        operation_id=_("V3 Modify current user password"),  # type: ignore
+        tags=[_("V3 Chat User")],  # type: ignore
         request=ResetPasswordAPI.get_request(),
         responses=DefaultModelResponse.get_response(),
     )
@@ -377,8 +378,8 @@ class ChatUserProfileView(APIView):
         methods=["GET"],
         summary=_("Get current user information"),
         description=_("Get current user information"),
-        operation_id=_("Get current user information"),  # type: ignore
-        tags=[_("Chat User")],  # type: ignore
+        operation_id=_("V3 Get current user information"),  # type: ignore
+        tags=[_("V3 Chat User")],  # type: ignore
         responses=UserProfileAPI.get_response(),
     )
     def get(self, request: Request):
@@ -414,8 +415,8 @@ class LocalLoginView(BaseAuthView):
         methods=["POST"],
         description=_("Log in"),
         summary=_("Log in"),
-        operation_id=_("Log in"),  # type: ignore
-        tags=[_("Chat User/login")],  # type: ignore
+        operation_id=_("V3 Log in"),  # type: ignore
+        tags=[_("V3 Chat User/login")],  # type: ignore
         request=LoginAPI.get_request(),
         responses=LoginAPI.get_response(),
     )
@@ -434,8 +435,8 @@ class Logout(APIView):
         methods=["POST"],
         summary=_("Sign out"),
         description=_("Sign out"),
-        operation_id=_("Sign out"),  # type: ignore
-        tags=[_("Chat User")],  # type: ignore
+        operation_id=_("V3 Sign out"),  # type: ignore
+        tags=[_("V3 Chat User")],  # type: ignore
         responses=DefaultModelResponse.get_response(),
     )
     @log(menu="Chat User/logout", operate="Sign out", get_operation_object=lambda r, k: {"name": r.user.username})
