@@ -225,7 +225,7 @@ onMounted(() => loadChatUserGroups())
     <CreateGroupMemberDialog
       ref="memberDialogRef"
       :current-group="currentGroup"
-      @refresh="loadChatUserGroups"
+      @refresh="loadGroupMembers(true)"
     />
   </div>
 </template>

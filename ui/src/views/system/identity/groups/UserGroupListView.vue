@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
+import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { RequestParams, OptionItem, WorkspaceItem } from '@/api/types'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+import CreateOrUpdateGroupDialog from './CreateOrUpdateGroupDialog.vue'
+import CreateGroupMemberDialog from './CreateGroupMemberDialog.vue'
 
 interface UserGroup {
   id: string
@@ -49,6 +53,43 @@ function handleMemberSearch(query?: RequestParams) {
   return
 }
 
+const selectedGroupMembers = ref<UserGroupMember[]>([])
+function handleMemberSelectionChange(selection: unknown[]) {
+  selectedGroupMembers.value = selection as UserGroupMember[]
+}
+
+/* 添加成员drawer */
+const memberDialogRef =
+  useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
+
+function handleRemoveMembers(member?: UserGroupMember) {
+  const group = currentGroup.value
+  const members = member ? [member] : selectedGroupMembers.value
+  if (!group || !members.length) return
+
+  const title = member
+    ? `是否移除成员：${member.name}？`
+    : `是否移除选中的 ${members.length} 个成员？`
+  MsgConfirm(title, '', { confirmButtonText: '移除' })
+    .then(() => {
+      return UserGroupsApi.postRemoveSystemUserGroupMembers(
+        selectedWorkspaceId.value,
+        group.id,
+        members.map(({ id }) => id),
+      ).then(() => {
+        MsgSuccess('移除成功')
+        const removedMemberIds = new Set(members.map(({ id }) => id))
+        userGroupMembers.value = userGroupMembers.value.filter(
+          ({ id }) => !removedMemberIds.has(id),
+        )
+        paginationConfig.value.total = userGroupMembers.value.length
+        group.memberCount = Math.max(0, group.memberCount - members.length)
+        selectedGroupMembers.value = []
+      })
+    })
+    .catch(() => {})
+}
+
 /* 选择用户组列表 */
 const currentGroup = ref<UserGroup>()
 const userGroups = ref<UserGroup[]>([
@@ -62,6 +103,35 @@ function handleGroupSelect(group: UserGroup) {
   currentGroup.value = group
   paginationConfig.value.currentPage = 1
   return
+}
+
+/* 新增、重命名与删除用户组 */
+const groupDialogRef =
+  useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
+
+function handleGroupSaved(group: { id: string; name: string }) {
+  const currentGroupIndex = userGroups.value.findIndex(({ id }) => id === group.id)
+  if (currentGroupIndex >= 0) {
+    userGroups.value[currentGroupIndex] = {
+      ...userGroups.value[currentGroupIndex]!,
+      name: group.name,
+    }
+  } else {
+    userGroups.value.push({ ...group, memberCount: 0 })
+  }
+  currentGroup.value = userGroups.value.find(({ id }) => id === group.id)
+}
+
+function deleteGroup(group: UserGroup) {
+  MsgConfirm(`确定删除用户组“${group.name}”吗？`, '删除后，组内成员不会被删除。')
+    .then(() => {
+      return UserGroupsApi.deleteSystemUserGroup(selectedWorkspaceId.value, group.id).then(() => {
+        MsgSuccess('删除成功')
+        userGroups.value = userGroups.value.filter(({ id }) => id !== group.id)
+        if (currentGroup.value?.id === group.id) currentGroup.value = userGroups.value[0]
+      })
+    })
+    .catch(() => {})
 }
 
 /* 选择工作空间列表 */
@@ -98,7 +168,7 @@ onMounted(() => loadWorkspaceOptions())
       <aside class="flex w-sidebar-expanded shrink-0 flex-col border-r">
         <header class="flex-between p-4">
           <h4>用户组</h4>
-          <el-button class="-mr-1" text type="primary" @click="createUserGroup">
+          <el-button class="-mr-1" text type="primary" @click="groupDialogRef?.open()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </header>
@@ -108,15 +178,15 @@ onMounted(() => loadWorkspaceOptions())
           :default-active="currentGroup?.id"
           @click="handleGroupSelect"
         >
-          <template #action-dropdown>
+          <template #action-dropdown="{ row }">
             <MkDropdownMenu>
-              <MkDropdownItem>
+              <MkDropdownItem @click="groupDialogRef?.open(row)">
                 <template #icon>
                   <MkIcon name="icon_edit_outlined" />
                 </template>
                 <span>重命名</span>
               </MkDropdownItem>
-              <MkDropdownItem divided>
+              <MkDropdownItem divided @click="deleteGroup(row)">
                 <template #icon>
                   <MkIcon name="icon_delete-trash_outlined" />
                 </template>
@@ -137,7 +207,7 @@ onMounted(() => loadWorkspaceOptions())
         </header>
 
         <div class="flex-between mb-4">
-          <el-button type="primary">
+          <el-button type="primary" @click="memberDialogRef?.open()">
             <MkIcon name="icon_add_outlined" />
             <span>添加成员</span>
           </el-button>
@@ -148,6 +218,7 @@ onMounted(() => loadWorkspaceOptions())
           :max-table-height="340"
           v-model:pagination-config="paginationConfig"
           :data="userGroupMembers"
+          @selection-change="handleMemberSelectionChange"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column prop="name" label="姓名" min-width="198" show-overflow-tooltip />
@@ -165,17 +236,28 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column label="操作" width="70" fixed="right">
             <template #default="{ row }">
               <el-tooltip content="移除" placement="top">
-                <el-button type="primary" text>
+                <el-button type="primary" text @click="handleRemoveMembers(row)">
                   <MkIcon name="icon_assigned_outlined" />
                 </el-button>
               </el-tooltip>
             </template>
           </el-table-column>
           <template #footer-batch-actions>
-            <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+            <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
           </template>
         </MkTable>
       </section>
     </div>
+
+    <CreateOrUpdateGroupDialog
+      ref="groupDialogRef"
+      :workspace-id="selectedWorkspaceId"
+      @refresh="handleGroupSaved"
+    />
+    <CreateGroupMemberDialog
+      ref="memberDialogRef"
+      :current-group="currentGroup"
+      @refresh="loadGroupMembers(true)"
+    />
   </div>
 </template>
