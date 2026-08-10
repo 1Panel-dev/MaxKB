@@ -5,13 +5,19 @@
 
 ## 放置规则
 
-- `views/<feature>/` 是页面功能边界。路由级页面、该功能专用组件、常量、组合式函数和
-  其他业务逻辑应放在同一个功能目录或其子目录中。
-- 路由级 Vue 组件使用 `PascalCase` 并以 `View.vue` 结尾，例如 `UserListView.vue`。
-- 仅供一个页面使用的代码放在该页面旁边；同一功能下多个页面复用的代码放在它们最近的共同
-  功能目录中。
-- 页面专用组件放在所属功能的 `components/` 中。不要为了复用一个页面内部实现而提前移动到
-  `src/components`。
+- `views/<feature>/` 是页面功能边界。每个独立功能页面使用自己的目录，路由页面和该页面专用
+  代码放在同一目录或其子目录中，不要把多个无关页面平铺在上级目录。
+- 路由级 Vue 组件统一使用 `PascalCase` 并以 `View.vue` 结尾，例如
+  `UserListView.vue`。
+- 页面拆分出的普通子组件统一放在当前功能目录的 `components/` 中，不与路由页面、Dialog 或
+  Drawer 混放。
+- 页面使用的 Dialog 统一放在当前功能目录的 `dialog/` 中，文件使用 `PascalCase` 并以
+  `Dialog.vue` 结尾，例如 `UserPwdDialog.vue`。
+- 页面使用的 Drawer 放在当前功能目录中，文件使用 `PascalCase` 并以 `Drawer.vue` 结尾，
+  例如 `AddMemberDrawer.vue`。Drawer 不放入 `components/` 或 `dialog/`。
+- 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
+  共同功能目录中。
+- 不要为了复用一个页面内部实现而提前移动到 `src/components`。
 - 页面类型的归属和复用遵循 `src/api/API_README.md`；API 与页面共用的业务类型从
   `@/api/types` 导入。页面常量可使用 `constants.ts`；其他逻辑文件应按具体职责命名，避免
   `helpers.ts` 等含义模糊的名称。
@@ -26,14 +32,43 @@
 参考结构：
 
 ```text
-src/views/<feature>/
-├── FeatureListView.vue       # 路由级列表页面
-├── FeatureDetailView.vue     # 路由级详情页面
-├── components/               # 仅供该功能使用的组件
-├── constants.ts              # 仅供该功能使用的常量
+src/views/<feature>/<page>/
+├── FeatureListView.vue           # 路由级页面，统一以 View.vue 结尾
+├── FeatureEditDrawer.vue         # 页面抽屉，统一以 Drawer.vue 结尾
+├── components/                   # 页面拆分出的普通子组件
+│   └── FeatureSetting.vue
+├── dialog/                       # 页面弹窗，统一放在独立目录
+│   ├── CreateFeatureDialog.vue   # 创建弹窗，统一以 Dialog.vue 结尾
+│   └── DeleteFeatureDialog.vue   # 删除弹窗
+└── constants.ts                  # 仅供该功能使用的常量
 ```
 
 不需要为了匹配示例创建空目录；有对应代码时再创建。
+
+当前 System 用户页面示例：
+
+```text
+src/views/system/identity/users/
+├── UserListView.vue               # 用户列表路由页面
+├── UserFromDrawer.vue             # 用户表单抽屉
+├── components/
+│   └── UserRoleSetting.vue        # 用户角色设置子组件
+└── dialog/
+    ├── BatchSetUserRoleDialog.vue # 批量设置用户角色弹窗
+    └── UserPwdDialog.vue          # 修改用户密码弹窗
+```
+
+## 文件命名
+
+| 文件职责 | 命名格式 | 示例 |
+| --- | --- | --- |
+| 路由页面 | `XxxView.vue` | `WorkspaceListView.vue` |
+| 抽屉 | `XxxDrawer.vue` | `AddMemberDrawer.vue` |
+| 弹窗 | `XxxDialog.vue` | `CreateOrUpdateWorkspaceDialog.vue` |
+| 页面普通组件 | 按具体业务职责使用 `PascalCase.vue` | `MemberRoleSetting.vue` |
+
+不要使用缺少组件职责后缀的页面文件名，也不要把 Dialog 命名为 Drawer 或把 Drawer 命名为
+Dialog。新增或重命名文件时，应同步更新所有导入和页面功能登记。
 
 ## 页面功能登记
 
@@ -52,7 +87,7 @@ src/views/<feature>/
 | `system/identity/roles/RoleListView.vue`           | 角色列表页面                    |
 | `system/identity/users/UserListView.vue`           | 用户列表页面                    |
 | `system/identity/workspaces/WorkspaceListView.vue` | 工作空间列表页面                |
-| `system/chat/groups/GroupsListView.vue`            | 对话用户组及组成员管理页面      |
+| `system/chat/user-groups/GroupsListView.vue`       | 对话用户组及组成员管理页面      |
 | `system/settings/AppearanceSettingsView.vue`       | 系统外观设置和登录外观预览页面  |
 | `workflow/WorkflowView.vue`                        | 工作流编排全屏页面              |
 

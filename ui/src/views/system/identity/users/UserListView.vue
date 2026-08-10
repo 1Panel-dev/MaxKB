@@ -9,7 +9,8 @@ import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
-import UserPwdDialog from './UserPwdDialog.vue'
+import UserPwdDialog from './dialog/UserPwdDialog.vue'
+import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
 
 const { auth } = useStore()
 const route = useRoute()
@@ -65,6 +66,13 @@ function loadSystemUsers(resetQuery = false) {
 
 /* 密码修改dialog */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
+
+/* 批量设置角色 */
+const batchSetUserRoleDialogRef = ref<InstanceType<typeof BatchSetUserRoleDialog>>()
+
+function openBatchSetUserRoleDialog() {
+  batchSetUserRoleDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
+}
 
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
@@ -219,13 +227,21 @@ onMounted(() => loadSystemUsers())
       </el-table-column>
 
       <template #footer-batch-actions>
-        <el-button type="primary" plain>设置角色</el-button>
+        <el-button
+          v-if="auth.isEE || auth.isPE"
+          type="primary"
+          plain
+          @click="openBatchSetUserRoleDialog"
+        >
+          设置角色
+        </el-button>
         <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
       </template>
     </MkTable>
 
     <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
     <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
+    <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
   </div>
 </template>
 

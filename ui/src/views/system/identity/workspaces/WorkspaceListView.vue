@@ -7,7 +7,7 @@ import WorkspaceApi from '@/api/admin/system/workspace'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from './AddMemberDrawer.vue'
-import CreateOrUpdateWorkspaceDialog from './CreateOrUpdateWorkspaceDialog.vue'
+import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
 
 const route = useRoute()
 

@@ -4,7 +4,7 @@ import type { ListItem, SystemUserRoleAssignment } from '@/api/types'
 
 defineOptions({ name: 'UserRoleSettingSection' })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     loading?: boolean
     roleOptions: ListItem[]
@@ -27,6 +27,10 @@ const workspaceRequiredRule: FormItemRule = {
   min: 1,
   message: '请选择工作空间',
   trigger: 'change',
+}
+
+function isAdminRole(roleId: string) {
+  return props.roleOptions.find(({ id }) => id === roleId)?.type === 'ADMIN'
 }
 
 function addRole() {
@@ -66,7 +70,7 @@ function removeRole(index: number) {
     </el-form-item>
 
     <el-form-item
-      v-if="showWorkspace"
+      v-if="showWorkspace && !isAdminRole(roleAssignment.role_id)"
       class="flex-1"
       :label="index === 0 ? '工作空间' : ''"
       :prop="`role_setting.${index}.workspace_ids`"

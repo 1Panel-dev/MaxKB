@@ -6,6 +6,8 @@ import type {
   SystemUserRequest,
   SystemUserPasswordRequest,
   SystemUserOption,
+  BatchSetUserRolesRequest,
+  BatchSetUserWorkspaceRolesRequest,
 } from '@/api/types'
 
 const prefix = '/user_manage'
@@ -45,6 +47,16 @@ export function postBatchDeleteUsers(userIds: string[]) {
   return post<string[], boolean>(`${prefix}/batch_delete`, userIds)
 }
 
+/** 专业版批量设置系统用户角色。 */
+export function postBatchSetUserRoles(request: BatchSetUserRolesRequest) {
+  return post<BatchSetUserRolesRequest, boolean>(`${prefix}/batch/add_role`, request)
+}
+
+/** 企业版批量设置系统用户角色及工作空间。 */
+export function postBatchSetUserWorkspaceRoles(request: BatchSetUserWorkspaceRolesRequest) {
+  return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, request)
+}
+
 /** 获得全部用户 */
 export function getAllUsers(query?: RequestParams) {
   return get<SystemUserOption[]>('/user/list', query)
@@ -56,6 +68,8 @@ export default {
   getUserManagePage,
   postUser,
   postBatchDeleteUsers,
+  postBatchSetUserRoles,
+  postBatchSetUserWorkspaceRoles,
   putUser,
   putUserPassword,
   getAllUsers,

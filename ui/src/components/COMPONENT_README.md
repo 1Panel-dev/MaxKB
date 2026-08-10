@@ -9,10 +9,15 @@
 
 按以下顺序选择组件：
 
-1. 优先使用项目已有的 Mk 组件。
-2. 没有对应 Mk 组件时，优先使用 Element Plus 现成组件。
-3. 通过 Props、事件、插槽、公开方法、Tailwind class 或必要的样式覆盖适配设计稿。
-4. 现有组件无法满足必要的结构或行为时，再新增自定义组件。
+1. 首先检查 `src/components/global`，优先使用全局自动注册的 Mk 封装组件。
+2. 全局组件无法满足时，检查 `src/components` 中需要手动导入的共享组件。
+3. 没有对应 Mk 组件时，再使用 Element Plus 现成组件。
+4. 通过 Props、事件、插槽、公开方法、Tailwind class 或必要的样式覆盖适配设计稿。
+5. 现有组件无法满足必要的结构或行为时，再新增自定义组件。
+
+已有全局 Mk 组件封装相同能力时，业务页面和业务组件必须使用该封装，不要绕过它直接使用
+底层 Element Plus 组件，也不要在功能目录重复封装。例如对话框使用 `MkDialog`、抽屉使用
+`MkDrawer`、下拉菜单使用 `MkDropdown`、图标使用 `MkIcon`、标准表格使用 `MkTable`。
 
 Element Plus 已在 `src/main.ts` 和 `src/chat.ts` 中全局注册，Vue 模板可以直接使用。Element Plus
 图标需要从 `@element-plus/icons-vue` 显式导入。

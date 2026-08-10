@@ -7,8 +7,8 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
-import CreateOrUpdateGroupDialog from './CreateOrUpdateGroupDialog.vue'
-import CreateGroupMemberDialog from './CreateGroupMemberDialog.vue'
+import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
+import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 
 interface UserGroup {
   id: string

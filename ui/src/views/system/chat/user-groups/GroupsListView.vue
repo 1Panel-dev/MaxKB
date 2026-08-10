@@ -12,8 +12,8 @@ import type {
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import CreateGroupMemberDialog from './CreateGroupMemberDialog.vue'
-import CreateOrUpdateGroupDialog from './CreateOrUpdateGroupDialog.vue'
+import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
+import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 
 const route = useRoute()
 

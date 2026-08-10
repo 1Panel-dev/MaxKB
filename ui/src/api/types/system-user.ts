@@ -5,6 +5,18 @@ export interface SystemUserRoleAssignment {
   workspace_ids: string[]
 }
 
+export interface BatchSetUserRolesRequest {
+  ids: string[]
+  is_append: boolean
+  role_ids: string[]
+}
+
+export interface BatchSetUserWorkspaceRolesRequest {
+  ids: string[]
+  is_append: boolean
+  role_setting: SystemUserRoleAssignment[]
+}
+
 export interface SystemUserRequest {
   id?: string
   username: string
