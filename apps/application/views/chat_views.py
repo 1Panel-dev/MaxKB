@@ -218,7 +218,7 @@ class ChatView(APIView):
                 page_size=page_size))
 
         class Operate(APIView):
-            authentication_classes = [TokenAuth]
+            authentication_classes = [AllTokenAuth]
 
             @action(methods=['DELETE'], detail=False)
             @swagger_auto_schema(operation_summary=_("Client deletes conversation"),
@@ -324,7 +324,7 @@ class ChatView(APIView):
                       'chat_id': chat_id, 'order_asc': request.query_params.get('order_asc')}).list())
 
         class Page(APIView):
-            authentication_classes = [TokenAuth]
+            authentication_classes = [AllTokenAuth]
 
             @action(methods=['GET'], detail=False)
             @swagger_auto_schema(operation_summary=_("Get the conversation history list by page"),
@@ -348,7 +348,7 @@ class ChatView(APIView):
                                                                                                         page_size))
 
         class Vote(APIView):
-            authentication_classes = [TokenAuth]
+            authentication_classes = [AllTokenAuth]
 
             @action(methods=['PUT'], detail=False)
             @swagger_auto_schema(operation_summary=_("Like, Dislike"),
@@ -392,7 +392,7 @@ class ChatView(APIView):
                     data={'chat_id': chat_id, 'chat_record_id': chat_record_id}).get())
 
         class Improve(APIView):
-            authentication_classes = [TokenAuth]
+            authentication_classes = [AllTokenAuth]
 
             @action(methods=['PUT'], detail=False)
             @swagger_auto_schema(operation_summary=_("Annotation"),
@@ -481,7 +481,7 @@ class ChatView(APIView):
                               'paragraph_id': paragraph_id}).delete())
 
     class UploadFile(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
         parser_classes = [MultiPartParser]
 
         @action(methods=['POST'], detail=False)
