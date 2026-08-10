@@ -195,7 +195,7 @@ class ChatView(APIView):
                           'chat_id': chat_id}).delete())
 
     class ClientChatHistoryPage(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['GET'], detail=False)
         @swagger_auto_schema(operation_summary=_("Get client conversation list by paging"),
