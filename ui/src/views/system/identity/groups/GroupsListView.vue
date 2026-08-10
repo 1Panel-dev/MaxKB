@@ -2,6 +2,7 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
+import type { SystemUserGroup, SystemUserGroupMember } from '@/api/admin/system/user-groups'
 import type { RequestParams, OptionItem, WorkspaceItem } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
@@ -10,128 +11,145 @@ import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/ind
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 
-interface UserGroup {
-  id: string
-  memberCount: number
-  name: string
-}
-
-interface UserGroupMember {
-  id: number
-  name: string
-  roles: string[]
-  source: string
-  username: string
-}
-
 /* 成员列表相关 */
+const loadingMembers = ref(false)
 const paginationConfig = ref({
-  currentPage: 2,
+  currentPage: 1,
   pageSize: 10,
-  total: 20,
+  total: 0,
 })
 const memberSearchQuery = ref<RequestParams>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'name' },
+  { label: '姓名', value: 'nick_name' },
 ]
-const userGroupMembers = ref<UserGroupMember[]>([
-  { id: 1, name: 'test-w', username: 'test-w', roles: ['工作空间管理员'], source: '系统用户' },
-  { id: 2, name: 'Eira1', username: 'Eira1', roles: ['普通用户', '管理员'], source: '钉钉' },
-  { id: 3, name: '司马图南', username: 'simatunan', roles: ['普通用户'], source: '钉钉' },
-  { id: 4, name: '吕晓', username: 'lvxiao', roles: ['usso-工作空间管理员'], source: 'CAS' },
-  { id: 5, name: '涂晓', username: 'tuixao', roles: ['普通用户'], source: 'LDAP' },
-  { id: 6, name: '裴尔', username: 'peier', roles: ['普通用户'], source: 'OIDC' },
-  { id: 7, name: '裴尔尔', username: 'peierer', roles: ['普通用户'], source: 'OAuth2' },
-  { id: 8, name: '裴晓尔', username: 'peixiaoer', roles: ['普通用户'], source: '企业微信' },
-  { id: 9, name: 'shaohu', username: 'shaohu', roles: ['普通用户'], source: '企业微信' },
-  { id: 10, name: '白新', username: 'baixin', roles: ['普通用户'], source: '飞书' },
-])
+const userGroupMembers = ref<SystemUserGroupMember[]>([])
 function handleMemberSearch(query?: RequestParams) {
   memberSearchQuery.value = query
   paginationConfig.value.currentPage = 1
-  return
+  loadUserGroupMembers()
 }
 
-const selectedGroupMembers = ref<UserGroupMember[]>([])
+const selectedGroupMembers = ref<SystemUserGroupMember[]>([])
 function handleMemberSelectionChange(selection: unknown[]) {
-  selectedGroupMembers.value = selection as UserGroupMember[]
+  selectedGroupMembers.value = selection as SystemUserGroupMember[]
 }
 
 /* 添加成员drawer */
 const memberDialogRef =
   useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
 
-function handleRemoveMembers(member?: UserGroupMember) {
+function handleRemoveMembers(member?: SystemUserGroupMember) {
   const group = currentGroup.value
   const members = member ? [member] : selectedGroupMembers.value
   if (!group || !members.length) return
 
+  const targetName = member ? member.nick_name || member.username : ''
   const title = member
-    ? `是否移除成员：${member.name}？`
+    ? `是否移除成员：${targetName}？`
     : `是否移除选中的 ${members.length} 个成员？`
   MsgConfirm(title, '', { confirmButtonText: '移除' })
     .then(() => {
       return UserGroupsApi.postRemoveSystemUserGroupMembers(
         selectedWorkspaceId.value,
         group.id,
-        members.map(({ id }) => id),
+        members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
       ).then(() => {
         MsgSuccess('移除成功')
-        const removedMemberIds = new Set(members.map(({ id }) => id))
+        const removedRelationIds = new Set(
+          members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
+        )
         userGroupMembers.value = userGroupMembers.value.filter(
-          ({ id }) => !removedMemberIds.has(id),
+          ({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id),
         )
         paginationConfig.value.total = userGroupMembers.value.length
-        group.memberCount = Math.max(0, group.memberCount - members.length)
         selectedGroupMembers.value = []
+        loadUserGroups()
       })
     })
     .catch(() => {})
 }
 
 /* 选择用户组列表 */
-const currentGroup = ref<UserGroup>()
-const userGroups = ref<UserGroup[]>([
-  { id: 'delivery', name: '交付', memberCount: 18 },
-  { id: 'finance', name: '财务', memberCount: 20 },
-  { id: 'development', name: '研发', memberCount: 36 },
-  { id: 'marketing', name: '市场', memberCount: 24 },
-  { id: 'sales', name: '销售', memberCount: 28 },
-])
-function handleGroupSelect(group: UserGroup) {
+const loadingGroups = ref(false)
+const currentGroup = ref<SystemUserGroup>()
+const userGroups = ref<SystemUserGroup[]>([])
+
+function loadUserGroups() {
+  loadingGroups.value = true
+  UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value)
+    .then((groups) => {
+      userGroups.value = groups
+      if (!currentGroup.value || !groups.some(({ id }) => id === currentGroup.value?.id)) {
+        currentGroup.value = groups[0]
+        loadUserGroupMembers()
+      }
+    })
+    .finally(() => {
+      loadingGroups.value = false
+    })
+}
+
+function handleGroupSelect(group: SystemUserGroup) {
   currentGroup.value = group
   paginationConfig.value.currentPage = 1
-  return
+  loadUserGroupMembers()
 }
 
 /* 新增、重命名与删除用户组 */
 const groupDialogRef =
   useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
 
-function handleGroupSaved(group: { id: string; name: string }) {
-  const currentGroupIndex = userGroups.value.findIndex(({ id }) => id === group.id)
-  if (currentGroupIndex >= 0) {
-    userGroups.value[currentGroupIndex] = {
-      ...userGroups.value[currentGroupIndex]!,
-      name: group.name,
-    }
+function handleGroupSaved(group: SystemUserGroup) {
+  const existingIndex = userGroups.value.findIndex(({ id }) => id === group.id)
+  if (existingIndex >= 0) {
+    userGroups.value[existingIndex] = group
   } else {
-    userGroups.value.push({ ...group, memberCount: 0 })
+    userGroups.value.push(group)
   }
   currentGroup.value = userGroups.value.find(({ id }) => id === group.id)
+  if (currentGroup.value?.id === group.id) {
+    loadUserGroupMembers()
+  }
 }
 
-function deleteGroup(group: UserGroup) {
-  MsgConfirm(`确定删除用户组“${group.name}”吗？`, '删除后，组内成员不会被删除。')
+function deleteGroup(group: SystemUserGroup) {
+  MsgConfirm(`确定删除用户组"${group.name}"吗？`, '删除后，组内成员不会被删除。')
     .then(() => {
       return UserGroupsApi.deleteSystemUserGroup(selectedWorkspaceId.value, group.id).then(() => {
         MsgSuccess('删除成功')
         userGroups.value = userGroups.value.filter(({ id }) => id !== group.id)
-        if (currentGroup.value?.id === group.id) currentGroup.value = userGroups.value[0]
+        if (currentGroup.value?.id === group.id) {
+          currentGroup.value = userGroups.value[0]
+          loadUserGroupMembers()
+        }
       })
     })
     .catch(() => {})
+}
+
+/* 加载成员列表 */
+function loadUserGroupMembers(reset = false) {
+  if (!currentGroup.value) return
+  if (reset) {
+    paginationConfig.value.currentPage = 1
+  }
+
+  const { currentPage, pageSize } = paginationConfig.value
+  loadingMembers.value = true
+  UserGroupsApi.getSystemUserGroupMembers(
+    selectedWorkspaceId.value,
+    currentGroup.value.id,
+    { currentPage, pageSize },
+    memberSearchQuery.value,
+  )
+    .then(({ total, records }) => {
+      userGroupMembers.value = records
+      paginationConfig.value.total = total
+    })
+    .finally(() => {
+      loadingMembers.value = false
+    })
 }
 
 /* 选择工作空间列表 */
@@ -140,6 +158,7 @@ const workspaceOptions = ref<WorkspaceItem[]>([])
 
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
   selectedWorkspaceId.value = workspace.id ?? 'default'
+  loadUserGroups()
 }
 
 function loadWorkspaceOptions() {
@@ -149,6 +168,8 @@ function loadWorkspaceOptions() {
     if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
       selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
     }
+
+    loadUserGroups()
   })
 }
 
@@ -174,6 +195,7 @@ onMounted(() => loadWorkspaceOptions())
         </header>
 
         <MkSearchList
+          v-loading="loadingGroups"
           :data="userGroups"
           :default-active="currentGroup?.id"
           @click="handleGroupSelect"
@@ -202,7 +224,7 @@ onMounted(() => loadWorkspaceOptions())
           <el-divider direction="vertical" />
           <span class="flex items-center text-N500">
             <MkIcon name="icon_member_filled" class="mr-1" />
-            {{ currentGroup?.memberCount }}
+            {{ currentGroup?.count }}
           </span>
         </header>
 
@@ -215,20 +237,20 @@ onMounted(() => loadWorkspaceOptions())
         </div>
 
         <MkTable
+          v-loading="loadingMembers"
           :max-table-height="340"
           v-model:pagination-config="paginationConfig"
           :data="userGroupMembers"
           @selection-change="handleMemberSelectionChange"
         >
           <el-table-column type="selection" width="40" />
-          <el-table-column prop="name" label="姓名" min-width="198" show-overflow-tooltip />
+          <el-table-column prop="nick_name" label="姓名" min-width="198" show-overflow-tooltip />
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
             <template #default="{ row }">
               <MkWorkspaceRelationTags
                 :table-render-params="{ property: '角色', value: '工作空间' }"
-                :tags="row.role_name"
-                :tag-workspace="row.role_workspace"
+                :tags="row.role ? [row.role] : []"
               />
             </template>
           </el-table-column>
@@ -256,8 +278,9 @@ onMounted(() => loadWorkspaceOptions())
     />
     <CreateGroupMemberDialog
       ref="memberDialogRef"
+      :workspace-id="selectedWorkspaceId"
       :current-group="currentGroup"
-      @refresh="loadGroupMembers(true)"
+      @refresh="loadUserGroupMembers(true)"
     />
   </div>
 </template>

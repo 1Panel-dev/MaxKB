@@ -144,6 +144,7 @@ class UserGroupAddMemberSerializer(serializers.Serializer):
 
         mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         valid_user_ids = set(
+            str(uid) for uid in
             mapping_model.objects.filter(
                 workspace_id=workspace_id,
                 user_id__in=user_id_set,

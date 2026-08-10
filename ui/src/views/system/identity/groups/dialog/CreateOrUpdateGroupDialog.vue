@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { ListItem } from '@/api/types'
+import UserGroupsApi, { type SystemUserGroup } from '@/api/admin/system/user-groups'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{
-  refresh: [group: ListItem]
+  refresh: [group: SystemUserGroup]
 }>()
 
 const props = defineProps<{
@@ -21,7 +20,7 @@ const formRules: FormRules = {
   name: [{ required: true, message: '请输入用户组名称', trigger: 'blur' }],
 }
 
-function open(group?: ListItem) {
+function open(group?: { id: string; name: string }) {
   if (group) {
     groupForm.id = group?.id
     groupForm.name = group?.name
@@ -34,7 +33,7 @@ function submit() {
     if (!valid) return
 
     loading.value = true
-    UserGroupsApi.postSystemUserGroup({ ...groupForm, workspaceId: props.workspaceId })
+    UserGroupsApi.postSystemUserGroup(props.workspaceId, { id: groupForm.id, name: groupForm.name })
       .then((group) => {
         MsgSuccess(groupForm.id ? '重命名成功' : '创建成功')
         emit('refresh', group)

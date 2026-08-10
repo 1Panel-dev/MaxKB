@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatGroupsApi from '@/api/admin/system/chat-user-groups'
-import ChatUserApi from '@/api/admin/system/chat-user'
-import type { ListItem, ChatGroupMemberOption } from '@/api/types'
+import UserGroupsApi from '@/api/admin/system/user-groups'
+import UserManageApi from '@/api/admin/system/user-manage'
+import type { SystemUserOption } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{
-  currentGroup?: ListItem
+  workspaceId: string
+  currentGroup?: { id: string; name: string }
 }>()
 const emit = defineEmits<{ refresh: [] }>()
 
@@ -15,22 +16,38 @@ const visible = ref(false)
 const loading = ref(false)
 const optionsLoading = ref(false)
 const formRef = ref<FormInstance>()
-const userOptions = ref<ChatGroupMemberOption[]>([])
+const userOptions = ref<SystemUserOption[]>([])
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 const formRules: FormRules = {
-  userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }],
+  userIds: [{ required: true, message: '请选择用户', trigger: 'change' }],
 }
+
+let searchTimer: ReturnType<typeof setTimeout> | null = null
 
 function open() {
   visible.value = true
+  fetchUserOptions()
+}
+
+function fetchUserOptions(query?: string) {
   optionsLoading.value = true
-  return ChatUserApi.getChatUser()
+  UserManageApi.getWorkspaceMembers(
+    props.workspaceId,
+    query ? { nick_name: query } : undefined,
+  )
     .then((users) => {
       userOptions.value = users
     })
     .finally(() => {
       optionsLoading.value = false
     })
+}
+
+function handleRemoteSearch(query: string) {
+  if (searchTimer) clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => {
+    fetchUserOptions(query)
+  }, 300)
 }
 
 function submit() {
@@ -41,7 +58,7 @@ function submit() {
     if (!valid) return
 
     loading.value = true
-    ChatGroupsApi.postChatUserGroupMembers(groupId, memberForm.userIds)
+    UserGroupsApi.postSystemUserGroupMembers(props.workspaceId, groupId, memberForm.userIds)
       .then(() => {
         MsgSuccess('添加成功')
         emit('refresh')
@@ -64,6 +81,10 @@ function resetData() {
   optionsLoading.value = false
   userOptions.value = []
   formRef.value?.clearValidate()
+  if (searchTimer) {
+    clearTimeout(searchTimer)
+    searchTimer = null
+  }
 }
 
 defineExpose({ open })
@@ -72,14 +93,17 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top">
-      <el-form-item label="对话用户" prop="userIds">
+      <el-form-item label="用户" prop="userIds">
         <el-select
           v-model="memberForm.userIds"
           class="w-full"
           filterable
+          remote
+          reserve-keyword
           multiple
           collapse-tags
           collapse-tags-tooltip
+          :remote-method="handleRemoteSearch"
           :loading="optionsLoading"
           placeholder="请选择用户名或姓名"
         >

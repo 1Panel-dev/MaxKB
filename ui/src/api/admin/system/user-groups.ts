@@ -1,44 +1,82 @@
-import type { ListItem } from '@/api/types'
+import { del, get, post } from '../core/request'
+import type { ParamsPage, ResponsePage } from '../core/types'
+import type { ListItem, RequestParams } from '@/api/types'
 
-export interface SystemUserGroupRequest {
-  id?: string
+export interface SystemUserGroup {
+  id: string
   name: string
-  workspaceId: string
+  workspace_id: string
+  count: number
 }
 
-/**
- * 创建或重命名系统用户组。
- * TODO 后端接口就绪后，在此接入 Admin 请求层并移除本地占位返回。
- */
-function postSystemUserGroup(group: SystemUserGroupRequest) {
-  return Promise.resolve<ListItem>({
-    id: group.id ?? crypto.randomUUID(),
-    name: group.name,
-  })
+export interface SystemUserGroupMember {
+  id: string
+  username: string
+  email: string
+  phone: string
+  is_active: boolean
+  role: string
+  nick_name: string
+  create_time: string
+  update_time: string
+  source: string
+  system_user_group_relation_id: string
 }
 
-/**
- * 删除系统用户组。
- * TODO 后端接口就绪后，在此接入 Admin 请求层并移除本地占位返回。
- */
-function deleteSystemUserGroup(_workspaceId: string, _groupId: string) {
-  return Promise.resolve(true)
+const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
+
+export function getSystemUserGroups(workspaceId: string) {
+  return get<SystemUserGroup[]>(prefix(workspaceId))
 }
 
-/**
- * 移除系统用户组成员。
- * TODO 后端接口就绪后，在此接入 Admin 请求层并移除本地占位返回。
- */
-function postRemoveSystemUserGroupMembers(
-  _workspaceId: string,
-  _groupId: string,
-  _memberIds: Array<number | string>,
+export function postSystemUserGroup(workspaceId: string, group: { id?: string; name: string }) {
+  return post<{ id?: string; name: string }, SystemUserGroup>(prefix(workspaceId), group)
+}
+
+export function deleteSystemUserGroup(workspaceId: string, groupId: string) {
+  return del<undefined, boolean>(`${prefix(workspaceId)}/${groupId}`)
+}
+
+export function getSystemUserGroupMembers(
+  workspaceId: string,
+  groupId: string,
+  page: ParamsPage,
+  query?: RequestParams,
 ) {
-  return Promise.resolve(true)
+  return get<ResponsePage<SystemUserGroupMember>>(
+    `${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
+    query,
+  )
+}
+
+export function postSystemUserGroupMembers(
+  workspaceId: string,
+  groupId: string,
+  userIds: string[],
+) {
+  return post<{ user_ids: string[] }, boolean>(
+    `${prefix(workspaceId)}/${groupId}/add_member`,
+    { user_ids: userIds },
+  )
+}
+
+export function postRemoveSystemUserGroupMembers(
+  workspaceId: string,
+  groupId: string,
+  relationIds: string[],
+) {
+  return del<{ group_relation_ids: string[] }, boolean>(
+    `${prefix(workspaceId)}/${groupId}/remove_member`,
+    undefined,
+    { group_relation_ids: relationIds },
+  )
 }
 
 export default {
   deleteSystemUserGroup,
-  postSystemUserGroup,
+  getSystemUserGroupMembers,
+  getSystemUserGroups,
   postRemoveSystemUserGroupMembers,
+  postSystemUserGroup,
+  postSystemUserGroupMembers,
 }
