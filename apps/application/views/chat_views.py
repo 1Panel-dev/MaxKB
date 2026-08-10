@@ -283,7 +283,7 @@ class ChatView(APIView):
         authentication_classes = [TokenAuth]
 
         class Operate(APIView):
-            authentication_classes = [TokenAuth]
+            authentication_classes = [AllTokenAuth]
 
             @action(methods=['GET'], detail=False)
             @swagger_auto_schema(operation_summary=_("Get conversation record details"),

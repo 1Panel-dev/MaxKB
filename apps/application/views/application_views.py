@@ -632,7 +632,7 @@ class Application(APIView):
                     current_page, page_size))
 
     class SpeechToText(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['POST'], detail=False)
         @has_permissions(
@@ -648,7 +648,7 @@ class Application(APIView):
                 .speech_to_text(request.FILES.getlist('file')[0]))
 
     class TextToSpeech(APIView):
-        authentication_classes = [TokenAuth]
+        authentication_classes = [AllTokenAuth]
 
         @action(methods=['POST'], detail=False)
         @swagger_auto_schema(operation_summary=_("text to speech"),
