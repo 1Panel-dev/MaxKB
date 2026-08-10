@@ -338,15 +338,44 @@ exec({dedent(code)!a})
         }
         return tool_config
 
-    def get_app_mcp_config(self, api_key):
+    def get_app_mcp_config(self, api_key, chat_files=None):
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+        }
+        # 将外层应用本次对话上传的文件透传给被嵌套的应用
+        chat_files_header = self.encode_chat_files(chat_files)
+        if chat_files_header:
+            headers["X-MaxKB-Chat-Files"] = chat_files_header
         app_config = {
             "url": f"http://127.0.0.1:8080{CONFIG.get_chat_path()}/api/mcp",
             "transport": "streamable_http",
-            "headers": {
-                "Authorization": f"Bearer {api_key}",
-            },
+            "headers": headers,
         }
         return app_config
+
+    @staticmethod
+    def encode_chat_files(chat_files, max_size=6000):
+        """
+        将文件列表编码为可放入 HTTP 头的字符串(base64), 超出长度限制时逐步裁剪
+        """
+        if not chat_files:
+            return None
+
+        def encode(data):
+            return base64.b64encode(json.dumps(data, ensure_ascii=False).encode("utf-8")).decode()
+
+        encoded = encode(chat_files)
+        if len(encoded) <= max_size:
+            return encoded
+        # 去掉 url, 仅保留 file_id/name, 下游节点通过 file_id 读取文件
+        simplified = {
+            key: [{k: v for k, v in item.items() if k != "url"} for item in value] for key, value in chat_files.items()
+        }
+        encoded = encode(simplified)
+        if len(encoded) <= max_size:
+            return encoded
+        maxkb_logger.warning("Chat files are too large to be passed to the nested agent, skipped")
+        return None
 
     def _exec(self, execute_file, _id):
         kwargs = {
