@@ -14,6 +14,9 @@ APPLICATION_KEY_AUTH = 'common.auth.handle.impl.application_key.ApplicationKey'
 
 AUTH_HANDLES = [
     USER_TOKEN_AUTH,
+]
+
+AGENT_HANDLES = [
+    APPLICATION_KEY_AUTH,
     PUBLIC_ACCESS_TOKEN_AUTH,
-    APPLICATION_KEY_AUTH
 ]
