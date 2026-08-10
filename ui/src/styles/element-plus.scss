@@ -183,11 +183,6 @@
   }
   &__footer {
     padding: 0;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    align-items: center;
-    display: flex;
-    gap: calc(var(--spacing) * 3);
   }
 }
 

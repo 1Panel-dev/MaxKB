@@ -53,20 +53,8 @@ const userPasswordRules = reactive<FormRules<UserPasswordForm>>({
 })
 
 function open(user: Pick<SystemUser, 'id'>) {
-  resetData()
   userId.value = user.id
   dialogVisible.value = true
-}
-
-function close() {
-  dialogVisible.value = false
-}
-
-function resetData() {
-  Object.assign(userPasswordForm, { password: '', re_password: '' })
-  passwordSubmitting.value = false
-  userId.value = ''
-  userPasswordFormRef.value?.clearValidate()
 }
 
 async function submitPassword() {
@@ -92,20 +80,22 @@ async function submitPassword() {
       passwordSubmitting.value = false
     })
 }
+function close() {
+  dialogVisible.value = false
+  resetData()
+}
 
+function resetData() {
+  Object.assign(userPasswordForm, { password: '', re_password: '' })
+  passwordSubmitting.value = false
+  userId.value = ''
+  userPasswordFormRef.value?.clearValidate()
+}
 defineExpose({ open })
 </script>
 
 <template>
-  <el-dialog
-    v-model="dialogVisible"
-    title="修改用户密码"
-    width="480"
-    destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    @closed="resetData"
-  >
+  <MkDialog v-model="dialogVisible" title="修改用户密码" @closed="resetData">
     <el-form
       ref="userPasswordFormRef"
       :model="userPasswordForm"
@@ -137,12 +127,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <div class="flex justify-end gap-2">
-        <el-button @click="close">取消</el-button>
-        <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
-          保存
-        </el-button>
-      </div>
+      <el-button @click="close">取消</el-button>
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
+        保存
+      </el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

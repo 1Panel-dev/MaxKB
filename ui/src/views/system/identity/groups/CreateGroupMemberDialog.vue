@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatGroupsApi from '@/api/admin/system/chat-user-groups'
 import ChatUserApi from '@/api/admin/system/chat-user'
@@ -22,10 +22,8 @@ const formRules: FormRules = {
 }
 
 function open() {
-  memberForm.userIds = []
   visible.value = true
   optionsLoading.value = true
-  nextTick(() => formRef.value?.clearValidate())
   return ChatUserApi.getChatUser()
     .then((users) => {
       userOptions.value = users
@@ -46,8 +44,8 @@ function submit() {
     ChatGroupsApi.postChatUserGroupMembers(groupId, memberForm.userIds)
       .then(() => {
         MsgSuccess('添加成功')
-        visible.value = false
         emit('refresh')
+        close()
       })
       .finally(() => {
         loading.value = false
@@ -55,18 +53,24 @@ function submit() {
   })
 }
 
+function close() {
+  visible.value = false
+  resetData()
+}
+
+function resetData() {
+  memberForm.userIds = []
+  loading.value = false
+  optionsLoading.value = false
+  userOptions.value = []
+  formRef.value?.clearValidate()
+}
+
 defineExpose({ open })
 </script>
 
 <template>
-  <el-dialog
-    v-model="visible"
-    title="添加成员"
-    width="600px"
-    destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-  >
+  <MkDialog v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top">
       <el-form-item label="对话用户" prop="userIds">
         <el-select
@@ -89,8 +93,8 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="close">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

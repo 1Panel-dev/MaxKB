@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
@@ -20,7 +20,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  saved: []
+  refresh: []
 }>()
 
 const visible = ref(false)
@@ -35,15 +35,11 @@ const userOptions = ref<SystemUserOption[]>([])
 const userOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
 const roleOptionsLoading = ref(false)
-let userRequestSequence = 0
 
 function loadUserOptions(keyword = '') {
-  const requestSequence = ++userRequestSequence
   userOptionsLoading.value = true
   return UserManageApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
     .then((users) => {
-      if (requestSequence !== userRequestSequence) return
-
       const selectedUserIds = new Set(memberForm.members.flatMap(({ user_ids }) => user_ids))
       const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
       userOptions.value = [
@@ -51,7 +47,7 @@ function loadUserOptions(keyword = '') {
       ]
     })
     .finally(() => {
-      if (requestSequence === userRequestSequence) userOptionsLoading.value = false
+      userOptionsLoading.value = false
     })
 }
 
@@ -69,7 +65,6 @@ function loadRoleOptions() {
 function open() {
   memberForm.members = [{ role_ids: [], user_ids: [] }]
   visible.value = true
-  nextTick(() => formRef.value?.clearValidate())
   return Promise.all([loadUserOptions(), loadRoleOptions()])
 }
 
@@ -90,8 +85,8 @@ function submit() {
     )
       .then(() => {
         MsgSuccess('添加成功')
-        visible.value = false
-        emit('saved')
+        emit('refresh')
+        close()
       })
       .finally(() => {
         loading.value = false
@@ -99,11 +94,26 @@ function submit() {
   })
 }
 
+function close() {
+  visible.value = false
+  resetData()
+}
+
+function resetData() {
+  memberForm.members = []
+  loading.value = false
+  roleOptions.value = []
+  roleOptionsLoading.value = false
+  userOptions.value = []
+  userOptionsLoading.value = false
+  formRef.value?.clearValidate()
+}
+
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="添加成员">
+  <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" label-position="top">
       <MemberRoleSetting
         v-model="memberForm.members"
@@ -116,7 +126,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="close">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
     </template>
   </MkDrawer>

@@ -119,9 +119,9 @@ onMounted(() => loadSystemUsers())
   <div class="system-identity-users px-6">
     <header class="flex-between py-4">
       <h4>{{ route.meta.title }}</h4>
-      <div class="flex items-center gap-3">
+      <div class="flex items-center">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-        <el-button>
+        <el-button class="ml-3">
           <MkIcon name="icon_import_outlined" />
           <span>导入用户</span>
         </el-button>
@@ -142,8 +142,8 @@ onMounted(() => loadSystemUsers())
       @selection-change="handleBatchSelectionChange"
     >
       <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" show-overflow-tooltip />
+      <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
+      <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
       <el-table-column width="100" label="状态">
         <template #default="{ row }">
           <MkStatusLabel :active="row.is_active" />

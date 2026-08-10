@@ -30,6 +30,8 @@ src/components/
 ├── global/                       # 高频、稳定的基础组件，自动注册
 │   ├── mk-complex-search/
 │   │   └── index.vue             # 字段选择与输入或枚举条件组合搜索框
+│   ├── mk-dialog/
+│   │   └── index.vue             # 统一对话框关闭行为和内容滚动布局
 │   ├── mk-dropdown/
 │   │   ├── index.vue             # 下拉容器
 │   │   ├── mk-dropdown-menu.vue  # 下拉菜单容器
@@ -105,6 +107,24 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 
 ## 自动注册组件
 
+### MkDialog
+
+全局对话框组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
+按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以通过同名 Props
+覆盖。Element Plus Dialog 的其他属性和事件通过 `$attrs` 透传，`header`、默认和 `footer`
+插槽保持可用。内容区域最大高度为 `calc(100vh - 120px)`，即相对浏览器可视高度上下各预留
+`60px`，内容超出后显示滚动条。
+
+```vue
+<MkDialog v-model="visible" title="创建工作空间" width="600">
+  <el-form>...</el-form>
+  <template #footer>
+    <el-button @click="visible = false">取消</el-button>
+    <el-button type="primary">创建</el-button>
+  </template>
+</MkDialog>
+```
+
 ### MkDrawer
 
 全局抽屉组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
@@ -121,6 +141,11 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
   </template>
 </MkDrawer>
 ```
+
+业务 Dialog 和 Drawer 的状态生命周期保持一致：`open()` 先调用 `resetData()`，再回填编辑数据并
+显示浮层；`close()` 先关闭浮层，再调用 `resetData()`；组件同时监听 `closed` 调用
+`resetData()`，确保点击右上角关闭按钮时也完成清理。`resetData()` 应统一重置表单、提交状态、
+临时选项和表单校验，不把清理逻辑散落在 `open()`、取消按钮或提交成功回调中。
 
 ### MkComplexSearch
 

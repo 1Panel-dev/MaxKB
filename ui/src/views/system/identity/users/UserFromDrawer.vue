@@ -171,13 +171,13 @@ function open(user?: SystemUser) {
 
 function close() {
   drawerVisible.value = false
-  userFormRef.value?.clearValidate()
   resetData()
 }
 
 function resetData() {
   Object.assign(userForm, {
     email: '',
+    id: undefined,
     nick_name: '',
     password: '',
     phone: '',
@@ -194,11 +194,11 @@ function resetData() {
   userFormRef.value?.clearValidate()
 }
 
-defineExpose({ close, open })
+defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" direction="rtl" @closed="resetData">
+  <MkDrawer v-model="drawerVisible" @closed="resetData">
     <template #header>
       <h4>{{ drawerTitle }}</h4>
     </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, reactive, ref } from 'vue'
+import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { ListItem } from '@/api/types'
@@ -25,13 +25,8 @@ function open(group?: ListItem) {
   if (group) {
     groupForm.id = group?.id
     groupForm.name = group?.name
-  } else {
-    Object.assign(groupForm, {
-      name: '',
-    })
   }
   visible.value = true
-  nextTick(() => formRef.value?.clearValidate())
 }
 
 function submit() {
@@ -42,8 +37,8 @@ function submit() {
     UserGroupsApi.postSystemUserGroup({ ...groupForm, workspaceId: props.workspaceId })
       .then((group) => {
         MsgSuccess(groupForm.id ? '重命名成功' : '创建成功')
-        visible.value = false
         emit('refresh', group)
+        close()
       })
       .finally(() => {
         loading.value = false
@@ -51,17 +46,25 @@ function submit() {
   })
 }
 
+function close() {
+  visible.value = false
+  resetData()
+}
+
+function resetData() {
+  Object.assign(groupForm, { name: '' })
+  loading.value = false
+  formRef.value?.clearValidate()
+}
+
 defineExpose({ open })
 </script>
 
 <template>
-  <el-dialog
+  <MkDialog
     v-model="visible"
     :title="groupForm.id ? '重命名用户组' : '创建用户组'"
-    width="600px"
-    destroy-on-close
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
+    @closed="resetData"
   >
     <el-form ref="formRef" :model="groupForm" :rules="formRules" label-position="top">
       <el-form-item label="用户组名称" prop="name">
@@ -75,10 +78,10 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button @click="close">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">
         {{ groupForm.id ? '保存' : '创建' }}
       </el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

@@ -13,6 +13,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
+    MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
     MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']
     MkDropdown: typeof import('./components/global/mk-dropdown/index.vue')['default']
     MkDropdownItem: typeof import('./components/global/mk-dropdown/mk-dropdown-item.vue')['default']
@@ -31,6 +32,7 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
+  const MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
   const MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']
   const MkDropdown: typeof import('./components/global/mk-dropdown/index.vue')['default']
   const MkDropdownItem: typeof import('./components/global/mk-dropdown/mk-dropdown-item.vue')['default']
