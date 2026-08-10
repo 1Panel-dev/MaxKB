@@ -8,7 +8,7 @@ import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores'
 import type { LoginConfig, LoginMethod } from '@/api/types'
-import { MsgConfirm, MsgError } from '@/utils/message'
+import { MsgConfirm } from '@/utils/message'
 
 interface AccountLoginForm {
   captcha: string
@@ -74,7 +74,6 @@ const handleLogin = async () => {
         encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedData = encryptor.encrypt(JSON.stringify(accountLoginForm))
         if (!encryptedData) {
-          MsgError('登录信息加密失败')
           isSubmitting.value = false
           return
         }

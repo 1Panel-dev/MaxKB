@@ -27,3 +27,8 @@ export interface QrCodeConfig {
   corp_id?: string
   qr_url?: string
 }
+
+export interface UpdatePasswordForm {
+  password: string
+  re_password: string
+}

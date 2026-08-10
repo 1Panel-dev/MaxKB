@@ -4,26 +4,25 @@ import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
-import type { SystemUser } from '@/api/types'
-import { MsgError, MsgSuccess } from '@/utils/message'
+import type { UpdatePasswordForm,SystemUser } from '@/api/types'
+import {  MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })
 
-interface UserPasswordForm {
-  password: string
-  re_password: string
-}
+
 
 const emit = defineEmits<{
-  refresh: [resetQuery: boolean]
+  refresh: []
 }>()
 
 const { auth } = useStore()
+
 const dialogVisible = ref(false)
 const passwordSubmitting = ref(false)
+
 const userId = ref('')
 const userPasswordFormRef = ref<FormInstance>()
-const userPasswordForm = reactive<UserPasswordForm>({
+const userPasswordForm = reactive<UpdatePasswordForm>({
   password: '',
   re_password: '',
 })
@@ -32,54 +31,54 @@ function validateConfirmPassword(_rule: unknown, value: string, callback: (error
   if (!value) {
     callback(new Error('请输入确认密码'))
   } else if (value !== userPasswordForm.password) {
-    callback(new Error('两次输入的密码不一致'))
+    callback(new Error('输入的密码不一致'))
   } else {
     callback()
   }
 }
 
-const passwordPattern =
-  /^(?=.*[a-z])(?=.*[-_!@#$%^&*`~.()+=])(?:(?=.*[A-Z])|(?=.*\d))[a-zA-Z0-9-_!@#$%^&*`~.()+=]{6,20}$/
-const userPasswordRules = reactive<FormRules<UserPasswordForm>>({
+const userPasswordRules = reactive<FormRules<UpdatePasswordForm>>({
   password: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
     {
-      pattern: passwordPattern,
-      message: '密码需为6-20位，并包含小写字母、特殊字符及大写字母或数字',
+      min: 6,
+      max: 20,
+      message: '长度应为 6-20 个字符',
       trigger: 'blur',
     },
   ],
   re_password: [{ validator: validateConfirmPassword, trigger: 'blur' }],
 })
 
-function open(user: Pick<SystemUser, 'id'>) {
+function open(user: SystemUser) {
   userId.value = user.id
   dialogVisible.value = true
 }
 
 async function submitPassword() {
-  const valid = await userPasswordFormRef.value?.validate().catch(() => false)
-  if (!valid) return
-
-  const encryptor = new JSEncrypt()
-  encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
-  const encryptedData = encryptor.encrypt(JSON.stringify(userPasswordForm))
-  if (!encryptedData) {
-    MsgError('密码加密失败')
-    return
-  }
-
-  passwordSubmitting.value = true
-  return UserManageApi.putUserPassword(userId.value, { encryptedData })
-    .then(() => {
-      MsgSuccess('密码修改成功')
-      emit('refresh', false)
-      close()
-    })
-    .finally(() => {
+  userPasswordFormRef.value?.validate((valid) => {
+    if (!valid) return
+    passwordSubmitting.value = true
+    const encryptor = new JSEncrypt()
+    encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
+    const encryptedData = encryptor.encrypt(JSON.stringify(userPasswordForm))
+    if (!encryptedData) {
       passwordSubmitting.value = false
-    })
+      return
+    }
+
+    return UserManageApi.putUserPassword(userId.value, { encryptedData })
+      .then(() => {
+        MsgSuccess('密码修改成功')
+        emit('refresh')
+        close()
+      })
+      .finally(() => {
+        passwordSubmitting.value = false
+      })
+  })
 }
+
 function close() {
   dialogVisible.value = false
   resetData()
@@ -102,7 +101,7 @@ defineExpose({ open })
       :rules="userPasswordRules"
       label-position="top"
       require-asterisk-position="right"
-      @submit.prevent="submitPassword"
+      @submit.prevent
     >
       <el-form-item label="新密码" prop="password">
         <el-input

@@ -63,11 +63,9 @@ function loadSystemUsers(resetQuery = false) {
     })
 }
 
-/* 密码修改 */
+/* 密码修改dialog */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
-function editUserPassword(user: SystemUser) {
-  userPwdDialogRef.value?.open(user)
-}
+
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
   MsgConfirm(
@@ -206,7 +204,7 @@ onMounted(() => loadSystemUsers())
                 </el-button>
               </el-tooltip>
               <el-tooltip content="修改用户密码" placement="top">
-                <el-button type="primary" text @click.stop="editUserPassword(row)">
+                <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
                   <mk-icon name="icon-key_outlined"></mk-icon>
                 </el-button>
               </el-tooltip>
@@ -227,7 +225,7 @@ onMounted(() => loadSystemUsers())
     </MkTable>
 
     <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
-    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers" />
+    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
   </div>
 </template>
 

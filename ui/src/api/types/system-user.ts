@@ -16,10 +16,6 @@ export interface SystemUserRequest {
   encrypted?: boolean
 }
 
-export interface SystemUserPasswordRequest {
-  encryptedData: string
-}
-
 /** 系统用户列表项，getUserManagePage 返回的用户记录。 */
 export interface SystemUser {
   id: string
@@ -41,4 +37,8 @@ export interface SystemUserOption {
   id: string
   nick_name: string
   username: string
+}
+
+export interface SystemUserPasswordRequest {
+  encryptedData?: string
 }
