@@ -7,8 +7,8 @@ requires-python = "~=3.13.0"
 readme = "README.md"
 dependencies = [
     # Web framework & API
-    "django==6.0.7",
-    "djangorestframework==3.17.2",
+    "django==6.1.0",
+    "djangorestframework==3.18.0",
     "drf-spectacular[sidecar]==0.30.0",
 
     # Django ecosystem
@@ -27,19 +27,19 @@ dependencies = [
     "langchain-huggingface==1.2.2",
     "langchain-mcp-adapters==0.3.2",
     "langchain-ollama==1.1.0",
-    "langchain-openai==1.4.1",
+    "langchain-openai==1.4.2",
     "langgraph==1.2.10",
     "torch==2.13.0",
     "sentence-transformers==5.7.0",
     "xinference-client==3.1.0",
 
     # Model providers & cloud SDKs
-    "anthropic==0.120.2",
-    "boto3==1.43.66",
+    "anthropic==0.121.0",
+    "boto3==1.43.67",
     "cohere==7.0.8",
     "dashscope==1.26.5",
     "qianfan==0.4.12.3",
-    "tencentcloud-sdk-python-common==3.1.152",
+    "tencentcloud-sdk-python-common==3.1.153",
     "tencentcloud-sdk-python-hunyuan==3.1.56",
     "tencentcloud-sdk-python-asr==3.1.137",
     "volcengine-python-sdk[ark]==5.0.44",
