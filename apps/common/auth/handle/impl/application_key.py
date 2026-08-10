@@ -32,7 +32,8 @@ class ApplicationKey(AuthBaseHandle):
                 if application_access_token.authentication_value.get('type',
                                                                      'password') != 'password':
                     raise AppAuthenticationFailed(1002, _('Authentication information is incorrect'))
-        return Principal(str(application_api_key.id), ChatUserType.APPLICATION_API_KEY), Auth(set(), {})
+        return Principal(str(application_api_key.id), ChatUserType.APPLICATION_API_KEY,
+                         application_id=str(application_api_key.application_id)), Auth(set(), {})
 
     def support(self, request, token: str, get_token_details):
         return str(token).startswith("application-") or str(token).startswith('agent-')

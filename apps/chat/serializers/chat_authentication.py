@@ -41,6 +41,34 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
                                                                              _type).to_token()
 
 
+class AnonymousAuthenticationV2Serializer(serializers.Serializer):
+    """v2 匿名认证：application_id 不在 path，从 access_token 解出并写进 token，
+    供 ChatUserToken handler 收窄到该应用。"""
+    access_token = serializers.CharField(required=True, label=_("access_token"))
+
+    def auth(self, request, with_valid=True):
+        token = request.META.get('HTTP_AUTHORIZATION')
+        token_details = {}
+        try:
+            # 校验token
+            if token is not None:
+                token_details = signing.loads(token[7:])
+        except Exception as e:
+            pass
+        if with_valid:
+            self.is_valid(raise_exception=True)
+        access_token = self.data.get("access_token")
+        application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
+        if application_access_token is None or not application_access_token.is_active:
+            raise NotFound404(404, _("Invalid access_token"))
+        chat_user_id = token_details.get('user_id') or token_details.get('id') or str(uuid.uuid7())
+        _type = AuthenticationType.CHAT_USER
+        application_id = str(application_access_token.application_id)
+        return ChatToken(chat_user_id, _type, str(Operate.ANNOTATION_AUTH),
+                         application_id=application_id).to_token(), \
+            FileToken(chat_user_id, _type, application_id=application_id).to_token()
+
+
 class AuthProfileSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=True, label=_("access_token"))
 

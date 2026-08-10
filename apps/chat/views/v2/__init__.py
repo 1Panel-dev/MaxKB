@@ -6,5 +6,7 @@
     @date：2025/5/29 16:08
     @desc:
 """
-from . import v2
-from . import v3
+from .chat_embed import *
+from .chat import *
+from .chat_record import *
+from .mcp import mcp_view
