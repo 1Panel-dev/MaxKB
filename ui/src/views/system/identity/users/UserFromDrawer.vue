@@ -5,6 +5,7 @@ import CommonApi from '@/api/admin/system/common'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
+import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from './components/UserRoleSetting.vue'
 import type {
@@ -75,8 +76,7 @@ function loadDefaultPassword() {
 
 async function copyDefaultPassword() {
   if (userForm.password) {
-    await navigator.clipboard.writeText(userForm.password)
-    MsgSuccess('默认密码已复制')
+    await copyText(userForm.password, '默认密码已复制')
   }
 }
 

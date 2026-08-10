@@ -29,7 +29,7 @@ withDefaults(
       v-if="tags?.length > 1"
     >
       <template #reference>
-        <el-tag type="info">+{{ tags.length - 1 }}</el-tag>
+        <el-tag type="info" class="cursor-pointer">+{{ tags.length - 1 }}</el-tag>
       </template>
       <div class="flex flex-wrap gap-1">
         <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info">

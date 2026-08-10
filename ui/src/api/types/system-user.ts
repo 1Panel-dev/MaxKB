@@ -28,6 +28,15 @@ export interface SystemUserRequest {
   encrypted?: boolean
 }
 
+export interface SystemUserUpdateRequest {
+  email?: string
+  nick_name?: string
+  phone?: string
+  is_active?: boolean
+  role_setting?: SystemUserRoleAssignment[]
+  user_group_ids?: string[]
+}
+
 /** 系统用户列表项，getUserManagePage 返回的用户记录。 */
 export interface SystemUser {
   id: string
@@ -36,11 +45,13 @@ export interface SystemUser {
   email: string
   phone: string
   is_active: boolean
+  role: string
   source: string
   role_name?: string[]
   role_workspace?: Record<string, string[]>
   role_setting?: SystemUserRoleAssignment[]
   user_group_names?: string[]
+  user_group_ids?: string[]
   create_time: string
   update_time?: string
 }
@@ -49,8 +60,4 @@ export interface SystemUserOption {
   id: string
   nick_name: string
   username: string
-}
-
-export interface SystemUserPasswordRequest {
-  encryptedData?: string
 }

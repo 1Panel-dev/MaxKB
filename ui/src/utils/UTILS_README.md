@@ -9,6 +9,7 @@
 src/utils/
 ├── UTILS_README.md       # utils 目录的放置、拆分、命名和注释规则
 ├── array.ts              # 跨页面复用的数组转换、筛选、去重等处理函数
+├── clipboard.ts          # 剪贴板文本复制和成功反馈
 ├── message.ts            # Element Plus 全局消息提示的统一封装
 ├── number.ts             # 跨页面复用的数字计算、转换和格式化函数
 ├── time.ts               # 跨页面复用的日期时间格式化函数

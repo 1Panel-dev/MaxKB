@@ -5,6 +5,7 @@ import CommonApi from '@/api/admin/system/common'
 import ChatUserApi from '@/api/admin/system/chat-user'
 import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
 import { useStore } from '@/stores'
+import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import type { ChatUser, ChatUserRequest } from '@/api/types'
 import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
@@ -45,10 +46,19 @@ const userFormRules = reactive<FormRules<ChatUserRequest>>({
   ],
   email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
+  user_group_ids: [
+    {
+      type: 'array',
+      required: true,
+      message: '请选择用户组',
+      trigger: 'change',
+    },
+  ],
 })
 
-// 用户组选项
+/* 用户组选项 */
 const userGroupOptions = ref<CascaderOption[]>([])
+const userGroupOptionsLoading = ref(false)
 const userGroupCascaderProps: CascaderProps = {
   children: 'children',
   emitPath: false,
@@ -66,15 +76,19 @@ function loadDefaultPassword() {
 
 async function copyDefaultPassword() {
   if (userForm.password) {
-    await navigator.clipboard.writeText(userForm.password)
-    MsgSuccess('默认密码已复制')
+    await copyText(userForm.password)
   }
 }
 
 function loadUserGroupOptions() {
-  return ChatUserGroupsApi.getChatUserGroups().then((groups) => {
-    userGroupOptions.value = groups
-  })
+  userGroupOptionsLoading.value = true
+  return ChatUserGroupsApi.getChatUserGroups()
+    .then((groups) => {
+      userGroupOptions.value = groups
+    })
+    .finally(() => {
+      userGroupOptionsLoading.value = false
+    })
 }
 
 async function submitUser() {
@@ -84,7 +98,12 @@ async function submitUser() {
       userSubmitting.value = true
 
       if (isEdit.value) {
-        ChatUserApi.putChatUser(editingUserId.value, userForm)
+        ChatUserApi.putChatUser(editingUserId.value, {
+          email: userForm.email,
+          nick_name: userForm.nick_name,
+          phone: userForm.phone,
+          user_group_ids: userForm.user_group_ids,
+        })
           .then(() => {
             MsgSuccess('编辑成功')
             emit('refresh', false)
@@ -116,7 +135,6 @@ async function submitUser() {
 }
 
 function open(user?: ChatUser) {
-  resetData()
   if (user) {
     Object.assign(userForm, {
       username: user.username,
@@ -152,6 +170,7 @@ function resetData() {
   isEdit.value = false
   editingUserId.value = ''
   userSubmitting.value = false
+  userGroupOptionsLoading.value = false
   userGroupOptions.value = []
   userFormRef.value?.clearValidate()
 }
@@ -213,17 +232,24 @@ defineExpose({ open })
       </section>
       <section>
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
-        <el-form-item>
-          <el-cascader
+        <el-form-item label="用户组" prop="user_group_ids">
+          <el-select
             v-model="userForm.user_group_ids"
             class="w-full"
-            :options="userGroupOptions"
-            :props="userGroupCascaderProps"
-            :show-all-levels="false"
+            :loading="userGroupOptionsLoading"
             clearable
             filterable
+            multiple
             placeholder="请选择用户组"
-          />
+            fit-input-width
+          >
+            <el-option
+              v-for="userGroup in userGroupOptions"
+              :key="userGroup.id"
+              :label="userGroup.name"
+              :value="userGroup.id"
+            />
+          </el-select>
         </el-form-item>
       </section>
     </el-form>

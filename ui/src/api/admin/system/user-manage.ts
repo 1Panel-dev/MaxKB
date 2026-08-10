@@ -1,10 +1,10 @@
 import { del, get, post, put } from '../core/request'
-import type { ResponsePage, ParamsPage } from '../core/types'
+import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
 import type {
   RequestParams,
   SystemUser,
   SystemUserRequest,
-  SystemUserPasswordRequest,
+  SystemUserUpdateRequest,
   SystemUserOption,
   BatchSetUserRolesRequest,
   BatchSetUserWorkspaceRolesRequest,
@@ -23,13 +23,13 @@ function postUser(user: SystemUserRequest) {
 }
 
 /** 编辑系统用户。 */
-function putUser(userId: string, user: SystemUserRequest) {
-  return put<SystemUserRequest, SystemUser>(`${prefix}/${userId}`, user)
+function putUser(userId: string, user: SystemUserUpdateRequest) {
+  return put<SystemUserUpdateRequest, SystemUser>(`${prefix}/${userId}`, user)
 }
 
 /** 修改系统用户密码。 */
-function putUserPassword(userId: string, password: SystemUserPasswordRequest) {
-  return put<SystemUserPasswordRequest, boolean>(`${prefix}/${userId}/re_password`, password)
+function putUserPassword(userId: string, password: PasswordRequest) {
+  return put<PasswordRequest, boolean>(`${prefix}/${userId}/re_password`, password)
 }
 
 /** 删除系统用户。 */

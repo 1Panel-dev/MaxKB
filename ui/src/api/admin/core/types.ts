@@ -28,3 +28,7 @@ export interface ParamsPage {
   currentPage: number
   pageSize: number
 }
+
+export interface PasswordRequest {
+  encryptedData: string
+}

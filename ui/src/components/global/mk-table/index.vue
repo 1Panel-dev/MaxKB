@@ -199,10 +199,9 @@ defineExpose({ clearSelection, tableRef })
         />
         <span>已选 {{ selectedRows.length }}/{{ props.data.length }}</span>
       </div>
-      <div class="flex items-center gap-3">
-        <slot name="footer-batch-actions" />
-        <el-button text type="primary" class="shrink-0" @click="clearSelection">取消</el-button>
-      </div>
+
+      <slot name="footer-batch-actions" />
+      <el-button text type="primary" class="shrink-0 ml-3!" @click="clearSelection">取消</el-button>
     </footer>
   </div>
 </template>

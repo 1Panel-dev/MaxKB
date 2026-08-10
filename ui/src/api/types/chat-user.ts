@@ -28,8 +28,12 @@ export interface ChatUserRequest {
   is_active?: boolean
 }
 
-export interface ChatUserPasswordRequest {
-  encryptedData: string
+export interface ChatUserUpdateRequest {
+  email?: string
+  nick_name?: string
+  phone?: string
+  user_group_ids?: string[]
+  is_active?: boolean
 }
 
 export interface BatchSetChatUserGroupsRequest {

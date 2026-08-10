@@ -35,6 +35,14 @@ const searchFields: OptionItem<string>[] = [
       { label: '禁用', value: false },
     ],
   },
+  {
+    label: '用户来源',
+    value: 'source',
+    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
+      label: value === 'LOCAL' ? '本地创建' : label,
+      value,
+    })),
+  },
 ]
 const chatUserQuery = ref<RequestParams>()
 
@@ -63,16 +71,23 @@ function loadChatUsers(resetQuery = false) {
 /* 密码修改dialog */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
 
-/* 批量设置用户组 */
-const batchSetUserGroupDialogRef = ref<InstanceType<typeof BatchSetUserGroupDialog>>()
+/* 修改用户状态 */
+function handleChangeStatus(user: ChatUser) {
+  const nextActive = !user.is_active
 
-function openBatchSetUserGroupDialog() {
-  batchSetUserGroupDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
+  return ChatUserApi.putChatUser(user.id, {
+    is_active: nextActive,
+  })
+    .then(() => {
+      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      return true
+    })
+    .catch(() => false)
 }
 
-/* 删除用户*/
+/* 删除用户 */
 function deleteUser(user: ChatUser) {
-  MsgConfirm(`确定删除用户“${user.username}”吗？`)
+  MsgConfirm(`确定删除用户：${user.username}？`)
     .then(() => {
       chatUsersLoading.value = true
       return ChatUserApi.deleteChatUser(user.id).then(() => {
@@ -88,6 +103,11 @@ function deleteUser(user: ChatUser) {
 
 /* 批量删除 */
 const batchSelectedUsers = ref<ChatUser[]>([])
+
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedUsers.value = selection as ChatUser[]
+}
+
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
   MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
@@ -100,28 +120,17 @@ function handleBatchDelete() {
         userTableRef.value?.clearSelection()
       })
     })
-
     .catch(() => {})
     .finally(() => {
       chatUsersLoading.value = false
     })
 }
 
-function handleBatchSelectionChange(selection: unknown[]) {
-  batchSelectedUsers.value = selection as ChatUser[]
-}
+/* 批量设置用户组 */
+const batchSetUserGroupDialogRef = ref<InstanceType<typeof BatchSetUserGroupDialog>>()
 
-function updateUserStatus(user: ChatUser) {
-  return ChatUserApi.putChatUser(user.id, {
-    username: user.username,
-    nick_name: user.nick_name,
-    email: user.email ?? '',
-    phone: user.phone ?? '',
-    is_active: user.is_active,
-    user_group_ids: user.user_group_ids,
-  }).catch(() => {
-    user.is_active = !user.is_active
-  })
+function openBatchSetUserGroupDialog() {
+  batchSetUserGroupDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
 }
 
 onMounted(() => loadChatUsers())
@@ -177,7 +186,7 @@ onMounted(() => loadChatUsers())
 
       <el-table-column label="用户来源">
         <template #default="{ row }">
-          {{ row.source === 'LOCAL' ? '本地用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+          {{ row.source === 'LOCAL' ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
         </template>
       </el-table-column>
 
@@ -190,7 +199,11 @@ onMounted(() => loadChatUsers())
         <template #default="{ row }">
           <div class="flex items-center gap-3">
             <span @click.stop>
-              <el-switch v-model="row.is_active" size="small" @change="updateUserStatus(row)" />
+              <el-switch
+                v-model="row.is_active"
+                size="small"
+                :before-change="() => handleChangeStatus(row)"
+              />
             </span>
             <el-divider direction="vertical" />
             <div class="flex gap-1">

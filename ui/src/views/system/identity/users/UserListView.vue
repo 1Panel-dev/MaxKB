@@ -12,7 +12,7 @@ import UserFromDrawer from './UserFromDrawer.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
 
-const { auth } = useStore()
+const { auth, user } = useStore()
 const route = useRoute()
 
 /* 添加编辑用户表单drawer */
@@ -67,11 +67,18 @@ function loadSystemUsers(resetQuery = false) {
 /* 密码修改dialog */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
 
-/* 批量设置角色 */
-const batchSetUserRoleDialogRef = ref<InstanceType<typeof BatchSetUserRoleDialog>>()
+/* 修改用户状态 */
+function handleChangeStatus(systemUser: SystemUser) {
+  const nextActive = !systemUser.is_active
 
-function openBatchSetUserRoleDialog() {
-  batchSetUserRoleDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
+  return UserManageApi.putUser(systemUser.id, {
+    is_active: nextActive,
+  })
+    .then(() => {
+      MsgSuccess(nextActive ? '启用成功' : '禁用成功')
+      return true
+    })
+    .catch(() => false)
 }
 
 /* 删除用户*/
@@ -95,6 +102,9 @@ function deleteUser(user: SystemUser) {
 
 /* 批量删除 */
 const batchSelectedUsers = ref<SystemUser[]>([])
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedUsers.value = selection as SystemUser[]
+}
 function handleBatchDelete() {
   const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
   MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
@@ -114,8 +124,10 @@ function handleBatchDelete() {
     })
 }
 
-function handleBatchSelectionChange(selection: unknown[]) {
-  batchSelectedUsers.value = selection as SystemUser[]
+/* 批量设置角色 */
+const batchSetUserRoleDialogRef = ref<InstanceType<typeof BatchSetUserRoleDialog>>()
+function openBatchSetUserRoleDialog() {
+  batchSetUserRoleDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
 }
 
 onMounted(() => loadSystemUsers())
@@ -202,7 +214,12 @@ onMounted(() => loadSystemUsers())
         <template #default="{ row }">
           <div class="flex items-center gap-3">
             <span @click.stop>
-              <el-switch v-model="row.is_active" size="small" />
+              <el-switch
+                v-model="row.is_active"
+                :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
+                :before-change="() => handleChangeStatus(row)"
+                size="small"
+              />
             </span>
             <el-divider direction="vertical" />
             <div class="flex gap-1">

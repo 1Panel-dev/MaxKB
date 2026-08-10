@@ -6,7 +6,6 @@ export interface ChatUserGroupMember extends ChatUserBase {
   user_group_relation_id: string
 }
 
-export type ChatGroupMemberOption = ChatUserBase
 
 export interface ChatUserGroupRequest {
   id?: string

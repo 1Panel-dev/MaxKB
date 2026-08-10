@@ -61,7 +61,6 @@ function submitBatchSetUserGroups() {
 }
 
 function open(userIds: string[]) {
-  resetData()
   batchGroupForm.ids = [...userIds]
   dialogVisible.value = true
   loadUserGroupOptions()
@@ -108,6 +107,7 @@ defineExpose({ open })
           filterable
           multiple
           placeholder="请选择用户组"
+          fit-input-width
         >
           <el-option
             v-for="userGroup in userGroupOptions"
