@@ -50,7 +50,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'groups',
           name: 'system-groups',
-          component: () => import('@/views/system/identity/groups/UserGroupListView.vue'),
+          component: () => import('@/views/system/identity/groups/GroupsListView.vue'),
           meta: { title: '用户组', order: 40 },
         },
         {
@@ -130,7 +130,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'users',
           name: 'system-chat-users',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/chat/users/UserListView.vue'),
           meta: { title: '对话用户', order: 10 },
         },
         {

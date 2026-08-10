@@ -2,17 +2,11 @@
 import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import CommonApi from '@/api/admin/system/common'
-import CurrentUserApi from '@/api/admin/auth/current-user'
-import UserManageApi from '@/api/admin/system/user-manage'
+import ChatUserApi from '@/api/admin/system/chat-user'
+import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import UserRoleSetting from './components/UserRoleSetting.vue'
-import type {
-  ListItem,
-  SystemUser,
-  SystemUserRequest,
-  SystemUserRoleAssignment,
-} from '@/api/types/index.ts'
+import type { ChatUser, ChatUserRequest } from '@/api/types'
 import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
@@ -26,20 +20,21 @@ const emit = defineEmits<{
 const userFormRef = ref<FormInstance>()
 const drawerVisible = ref(false)
 const isEdit = ref(false)
+const editingUserId = ref('')
 const userSubmitting = ref(false)
-const userForm = reactive<SystemUserRequest>({
+const userForm = reactive<ChatUserRequest>({
   email: '',
   nick_name: '',
   password: '',
   phone: '',
-  role_setting: [{ role_id: '', workspace_ids: [] }],
+  user_group_ids: [],
   username: '',
 })
 
 const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
 const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
 
-const userFormRules = reactive<FormRules<SystemUserRequest>>({
+const userFormRules = reactive<FormRules<ChatUserRequest>>({
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },
@@ -48,15 +43,11 @@ const userFormRules = reactive<FormRules<SystemUserRequest>>({
     { required: true, message: '请输入姓名', trigger: 'blur' },
     { min: 1, max: 64, message: '长度应为 1-64 个字符', trigger: 'blur' },
   ],
-  email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' },
-  ],
+  email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
 })
 
 // 用户组选项
-const selectedUserGroupIds = ref<string[]>([])
 const userGroupOptions = ref<CascaderOption[]>([])
 const userGroupCascaderProps: CascaderProps = {
   children: 'children',
@@ -80,30 +71,9 @@ async function copyDefaultPassword() {
   }
 }
 
-// 角色与工作空间选项
-const roleSettingOptionsLoading = ref(false)
-const roleOptions = ref<ListItem[]>([])
-const workspaceOptions = ref<ListItem[]>([])
-
-function loadRoleSettingOptions() {
-  roleSettingOptionsLoading.value = true
-  const roleSettingOptionRequests: Promise<void>[] = []
-
-  roleSettingOptionRequests.push(
-    CurrentUserApi.getCurrentUserRoleList().then((roles) => {
-      roleOptions.value = roles
-    }),
-  )
-  if (auth.isEE) {
-    roleSettingOptionRequests.push(
-      CurrentUserApi.getCurrentUserWorkspaceList().then((workspaces) => {
-        workspaceOptions.value = workspaces
-      }),
-    )
-  }
-
-  return Promise.all(roleSettingOptionRequests).finally(() => {
-    roleSettingOptionsLoading.value = false
+function loadUserGroupOptions() {
+  return ChatUserGroupsApi.getChatUserGroups().then((groups) => {
+    userGroupOptions.value = groups
   })
 }
 
@@ -114,7 +84,7 @@ async function submitUser() {
       userSubmitting.value = true
 
       if (isEdit.value) {
-        UserManageApi.putUser(userForm.id as string, userForm)
+        ChatUserApi.putChatUser(editingUserId.value, userForm)
           .then(() => {
             MsgSuccess('编辑成功')
             emit('refresh', false)
@@ -127,7 +97,7 @@ async function submitUser() {
         const encryptor = new JSEncrypt()
         encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
-        UserManageApi.postUser({
+        ChatUserApi.postChatUser({
           ...userForm,
           encrypted: true,
           password: encryptedPassword as string,
@@ -145,25 +115,20 @@ async function submitUser() {
   })
 }
 
-function open(user?: SystemUser) {
+function open(user?: ChatUser) {
   resetData()
   if (user) {
     Object.assign(userForm, {
-      id: user.id,
       username: user.username,
-      email: user.email,
+      email: user.email ?? '',
       nick_name: user.nick_name,
-      phone: user.phone,
-      role_setting: user.role_setting?.map((item: SystemUserRoleAssignment) => ({
-        ...item,
-        workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
-      })),
+      phone: user.phone ?? '',
+      user_group_ids: [...user.user_group_ids],
     })
+    editingUserId.value = user.id
     isEdit.value = true
   }
-  if (auth.isEE || auth.isPE) {
-    loadRoleSettingOptions()
-  }
+  loadUserGroupOptions()
   if (!isEdit.value) {
     loadDefaultPassword()
   }
@@ -178,19 +143,15 @@ function close() {
 function resetData() {
   Object.assign(userForm, {
     email: '',
-    id: undefined,
     nick_name: '',
     password: '',
     phone: '',
-    role_setting: [{ role_id: '', workspace_ids: [] }],
+    user_group_ids: [],
     username: '',
   })
   isEdit.value = false
-  roleSettingOptionsLoading.value = false
+  editingUserId.value = ''
   userSubmitting.value = false
-  roleOptions.value = []
-  workspaceOptions.value = []
-  selectedUserGroupIds.value = []
   userGroupOptions.value = []
   userFormRef.value?.clearValidate()
 }
@@ -250,20 +211,11 @@ defineExpose({ open })
           </el-input>
         </el-form-item>
       </section>
-      <section v-if="auth.isEE || auth.isPE">
-        <h4 class="mk-title-decoration mb-4 mt-4">角色设置</h4>
-        <UserRoleSetting
-          v-model="userForm.role_setting"
-          :loading="roleSettingOptionsLoading"
-          :role-options="roleOptions"
-          :workspace-options="workspaceOptions"
-        />
-      </section>
       <section>
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
         <el-form-item>
           <el-cascader
-            v-model="selectedUserGroupIds"
+            v-model="userForm.user_group_ids"
             class="w-full"
             :options="userGroupOptions"
             :props="userGroupCascaderProps"

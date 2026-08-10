@@ -1,0 +1,229 @@
+<script setup lang="ts">
+import { onMounted, ref, useTemplateRef } from 'vue'
+import { useRoute } from 'vue-router'
+import ChatUserApi from '@/api/admin/system/chat-user'
+import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { datetimeFormat } from '@/utils/time'
+import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import UserFromDrawer from './UserFromDrawer.vue'
+import UserPwdDialog from './dialog/UserPwdDialog.vue'
+import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
+
+const route = useRoute()
+
+/* 添加编辑用户表单drawer */
+const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
+
+/* 列表查询相关 */
+const userTableRef = useTemplateRef('userTableRef')
+const chatUsersLoading = ref(false)
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 20,
+  total: 0,
+})
+const chatUsersData = ref<ChatUser[]>([])
+const searchFields: OptionItem<string>[] = [
+  { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'nick_name' },
+  {
+    label: '状态',
+    value: 'is_active',
+    options: [
+      { label: '启用', value: true },
+      { label: '禁用', value: false },
+    ],
+  },
+]
+const chatUserQuery = ref<RequestParams>()
+
+function handleSearchChange(query?: RequestParams) {
+  chatUserQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadChatUsers()
+}
+
+function loadChatUsers(resetQuery = false) {
+  chatUsersLoading.value = true
+  if (resetQuery) {
+    chatUserQuery.value = undefined
+    paginationConfig.value.currentPage = 1
+  }
+  return ChatUserApi.getChatUserPage(paginationConfig.value, chatUserQuery.value)
+    .then((res) => {
+      chatUsersData.value = res.records
+      paginationConfig.value.total = res.total
+    })
+    .finally(() => {
+      chatUsersLoading.value = false
+    })
+}
+
+/* 密码修改dialog */
+const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
+
+/* 批量设置用户组 */
+const batchSetUserGroupDialogRef = ref<InstanceType<typeof BatchSetUserGroupDialog>>()
+
+function openBatchSetUserGroupDialog() {
+  batchSetUserGroupDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
+}
+
+/* 删除用户*/
+function deleteUser(user: ChatUser) {
+  MsgConfirm(`确定删除用户“${user.username}”吗？`)
+    .then(() => {
+      chatUsersLoading.value = true
+      return ChatUserApi.deleteChatUser(user.id).then(() => {
+        MsgSuccess('删除成功')
+        return loadChatUsers()
+      })
+    })
+    .catch(() => {})
+    .finally(() => {
+      chatUsersLoading.value = false
+    })
+}
+
+/* 批量删除 */
+const batchSelectedUsers = ref<ChatUser[]>([])
+function handleBatchDelete() {
+  const selectedUserIds = batchSelectedUsers.value.map(({ id }) => id)
+  MsgConfirm(`是否删除选中的 ${batchSelectedUsers.value.length} 个用户？`)
+    .then(() => {
+      chatUsersLoading.value = true
+
+      return ChatUserApi.postBatchDeleteChatUsers(selectedUserIds).then(async () => {
+        MsgSuccess('删除成功')
+        await loadChatUsers()
+        userTableRef.value?.clearSelection()
+      })
+    })
+
+    .catch(() => {})
+    .finally(() => {
+      chatUsersLoading.value = false
+    })
+}
+
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedUsers.value = selection as ChatUser[]
+}
+
+function updateUserStatus(user: ChatUser) {
+  return ChatUserApi.putChatUser(user.id, {
+    username: user.username,
+    nick_name: user.nick_name,
+    email: user.email ?? '',
+    phone: user.phone ?? '',
+    is_active: user.is_active,
+    user_group_ids: user.user_group_ids,
+  }).catch(() => {
+    user.is_active = !user.is_active
+  })
+}
+
+onMounted(() => loadChatUsers())
+</script>
+
+<template>
+  <div class="system-chat-users px-6">
+    <header class="flex-between py-4">
+      <h4>{{ route.meta.title }}</h4>
+      <div class="flex items-center">
+        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <el-button class="ml-3" type="primary" @click="userFormDrawerRef?.open()">
+          <MkIcon name="icon_add_outlined" />
+          <span>创建用户</span>
+        </el-button>
+      </div>
+    </header>
+
+    <MkTable
+      ref="userTableRef"
+      v-model:pagination-config="paginationConfig"
+      :data="chatUsersData"
+      v-loading="chatUsersLoading"
+      @current-change="loadChatUsers()"
+      @size-change="loadChatUsers()"
+      @selection-change="handleBatchSelectionChange"
+    >
+      <el-table-column type="selection" width="40" />
+      <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
+      <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
+      <el-table-column width="100" label="状态">
+        <template #default="{ row }">
+          <MkStatusLabel :active="row.is_active" />
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+        <template #default="{ row }">
+          {{ row.email || '-' }}
+        </template>
+      </el-table-column>
+      <el-table-column prop="phone" width="120" label="手机号">
+        <template #default="{ row }">
+          {{ row.phone || '-' }}
+        </template>
+      </el-table-column>
+
+      <el-table-column prop="user_group_names" width="180" label="用户组">
+        <template #default="{ row }">
+          <MkTagGroup :tags="row.user_group_names" />
+        </template>
+      </el-table-column>
+
+      <el-table-column label="用户来源">
+        <template #default="{ row }">
+          {{ row.source === 'LOCAL' ? '本地用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="创建时间" width="180">
+        <template #default="{ row }">
+          {{ datetimeFormat(row.create_time) }}
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="160" fixed="right">
+        <template #default="{ row }">
+          <div class="flex items-center gap-3">
+            <span @click.stop>
+              <el-switch v-model="row.is_active" size="small" @change="updateUserStatus(row)" />
+            </span>
+            <el-divider direction="vertical" />
+            <div class="flex gap-1">
+              <el-tooltip content="编辑" placement="top">
+                <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
+                  <mk-icon name="icon_edit_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="修改用户密码" placement="top">
+                <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
+                  <mk-icon name="icon-key_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+              <el-tooltip content="删除" placement="top">
+                <el-button type="primary" text @click.stop="deleteUser(row)">
+                  <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                </el-button>
+              </el-tooltip>
+            </div>
+          </div>
+        </template>
+      </el-table-column>
+
+      <template #footer-batch-actions>
+        <el-button type="primary" plain @click="openBatchSetUserGroupDialog">
+          设置用户组
+        </el-button>
+        <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
+      </template>
+    </MkTable>
+
+    <UserFromDrawer ref="userFormDrawerRef" @refresh="loadChatUsers" />
+    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
+    <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
+  </div>
+</template>
