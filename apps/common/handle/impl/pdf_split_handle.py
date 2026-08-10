@@ -7,6 +7,7 @@
     @desc:
 """
 import logging
+import math
 import os
 import re
 import tempfile
@@ -127,50 +128,36 @@ class PdfSplitHandle(BaseSplitHandle):
     @staticmethod
     def extract_page_lines(page):
         lines = []
-        current_text = []
-        current_sizes = []
-
-        def flush_line():
-            text = "".join(current_text).strip()
-            if text:
-                font_size = current_sizes[0] if current_sizes else 0
-                lines.append((text, font_size))
-            current_text.clear()
-            current_sizes.clear()
-
-        def visitor_text(text, cm, tm, font_dict, font_size):
-            if text is None:
-                return
-            parts = text.replace("\r\n", "\n").replace("\r", "\n").split("\n")
-            for index, part in enumerate(parts):
-                current_text.append(part)
-                if part.strip() and font_size:
-                    current_sizes.append(float(font_size))
-                if index < len(parts) - 1:
-                    flush_line()
-
         try:
-            page.extract_text(visitor_text=visitor_text)
+            text_dict = page.get_text("dict")
+            for block in text_dict.get("blocks", []):
+                if block.get("type") != 0:
+                    continue
+                for line in block.get("lines", []):
+                    spans = line.get("spans", [])
+                    text = "".join(span.get("text", "") for span in spans).strip()
+                    if text:
+                        font_size = float(spans[0].get("size", 0)) if spans else 0
+                        lines.append((text, font_size))
         except BaseException:
             text = PdfSplitHandle.extract_page_text(page)
             return [(line.strip(), 0) for line in text.splitlines() if line.strip()]
-        flush_line()
         if lines:
             return lines
 
-        text = page.extract_text() or ""
+        text = PdfSplitHandle.extract_page_text(page)
         return [(line.strip(), 0) for line in text.splitlines() if line.strip()]
 
     @staticmethod
     def get_page_image_count(page):
         try:
-            return len(page.images)
+            return len(page.get_images())
         except BaseException:
             return 0
 
     @staticmethod
     def extract_page_text(page):
-        return (page.extract_text() or "").replace("\0", "")
+        return (page.get_text("text") or "").replace("\0", "")
 
     @staticmethod
     def get_toc(doc):
@@ -185,72 +172,63 @@ class PdfSplitHandle(BaseSplitHandle):
 
     @staticmethod
     def collect_toc(doc, outline, level, toc):
-        for item in outline:
-            if isinstance(item, list):
-                PdfSplitHandle.collect_toc(doc, item, level + 1, toc)
-                continue
-
+        item = outline
+        while item is not None:
             page_number = PdfSplitHandle.get_destination_page_number(doc, item)
-            if page_number is None:
-                continue
-
-            title = getattr(item, "title", None)
-            if title is None and hasattr(item, "get"):
-                title = item.get("/Title")
-            if title is None:
-                title = str(item)
-            toc.append(
-                (
-                    level,
-                    str(title).replace("\0", ""),
-                    page_number,
-                    PdfSplitHandle.get_destination_top(item),
+            if page_number is not None:
+                title = item.title or str(item)
+                toc.append(
+                    (
+                        level,
+                        str(title).replace("\0", ""),
+                        page_number,
+                        PdfSplitHandle.get_destination_top(item),
+                    )
                 )
-            )
+            if item.down is not None:
+                PdfSplitHandle.collect_toc(doc, item.down, level + 1, toc)
+            item = item.next
+
+    @staticmethod
+    def get_destination_page_number(doc, destination):
+        page_number = getattr(destination, "page", None)
+        try:
+            page_number = int(page_number)
+        except (TypeError, ValueError):
+            return None
+        if 0 <= page_number < doc.page_count:
+            return page_number
+        return None
 
     @staticmethod
     def get_destination_top(destination):
-        top = getattr(destination, "top", None)
+        top = getattr(destination, "y", None)
         try:
-            return float(top)
+            top = float(top)
         except (TypeError, ValueError):
             return None
+        return top if math.isfinite(top) else None
 
     @staticmethod
     def extract_page_text_by_position(page, top=None, bottom=None):
         if top is None and bottom is None:
             return PdfSplitHandle.extract_page_text(page)
 
-        text_parts = []
-
-        def visitor_text(text, cm, tm, font_dict, font_size):
-            if not text:
-                return
-
-            # Text matrix coordinates can be relative to a page-level transform.
-            # Convert the text origin to PDF user-space coordinates before comparing
-            # it with the outline destination's /Top value.
-            x = tm[4] if len(tm) > 4 else 0
-            y = tm[5] if len(tm) > 5 else 0
-            if len(cm) > 5:
-                y = x * cm[1] + y * cm[3] + cm[5]
-
-            if top is not None and y > top:
-                return
-            if bottom is not None and y <= bottom:
-                return
-            text_parts.append(text)
-
         try:
-            page.extract_text(visitor_text=visitor_text)
+            page_rect = page.rect
+            clip_top = max(page_rect.y0, top) if top is not None else page_rect.y0
+            clip_bottom = min(page_rect.y1, bottom) if bottom is not None else page_rect.y1
+            if clip_top >= clip_bottom:
+                return ""
+            clip = fitz.Rect(page_rect.x0, clip_top, page_rect.x1, clip_bottom)
+            return (page.get_text("text", clip=clip) or "").replace("\0", "")
         except BaseException:
             return PdfSplitHandle.extract_page_text(page)
-        return "".join(text_parts).replace("\0", "")
 
     @staticmethod
     def remove_leading_title(text, *titles):
         for title in titles:
-            title = title.strip()
+            title = re.sub(r"\s+", "", title)
             if not title:
                 continue
             pattern = r"^\s*" + r"\s*".join(re.escape(char) for char in title)
@@ -267,10 +245,10 @@ class PdfSplitHandle(BaseSplitHandle):
                 position = (page_number, top)
                 position_counts[position] = position_counts.get(position, 0) + 1
 
-        ambiguous_tops = {top for (_page_number, top), count in position_counts.items() if count > 1}
+        ambiguous_positions = {position for position, count in position_counts.items() if count > 1}
 
         return [
-            (level, title, page_number, None if top in ambiguous_tops else top)
+            (level, title, page_number, None if (page_number, top) in ambiguous_positions else top)
             for level, title, page_number, top in toc
         ]
 
@@ -295,11 +273,18 @@ class PdfSplitHandle(BaseSplitHandle):
             # 确定结束页码，如果是最后一个章节则到文档末尾
             if i + 1 < len(toc):
                 _next_level, next_title, next_start_page, next_top = toc[i + 1]
+                if (
+                    next_start_page == start_page
+                    and start_top is not None
+                    and next_top is not None
+                    and next_top <= start_top
+                ):
+                    next_top = None
                 # A positioned bookmark can start partway down a page. Include that
                 # page and keep only the text above the next bookmark for this chapter.
                 end_page = next_start_page if next_top is not None else next_start_page - 1
             else:
-                end_page = len(doc.pages) - 1
+                end_page = doc.page_count - 1
                 next_title = None
                 next_start_page = None
                 next_top = None
@@ -313,7 +298,8 @@ class PdfSplitHandle(BaseSplitHandle):
             for page_num in range(start_page, end_page + 1):
                 page_top = start_top if page_num == start_page else None
                 page_bottom = next_top if page_num == next_start_page else None
-                text = PdfSplitHandle.extract_page_text_by_position(doc.pages[page_num], page_top, page_bottom)
+                page = doc.load_page(page_num)
+                text = PdfSplitHandle.extract_page_text_by_position(page, page_top, page_bottom)
                 text = re.sub(r"(?<!。)\n+", "", text)
                 text = re.sub(r"(?<!.)\n+", "", text)
 
