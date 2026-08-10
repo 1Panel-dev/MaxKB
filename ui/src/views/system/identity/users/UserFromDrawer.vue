@@ -54,7 +54,32 @@ const userFormRules = reactive<FormRules<SystemUserRequest>>({
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
 })
 
-// 角色设置选项
+// 用户组选项
+const selectedUserGroupIds = ref<string[]>([])
+const userGroupOptions = ref<CascaderOption[]>([])
+const userGroupCascaderProps: CascaderProps = {
+  children: 'children',
+  emitPath: false,
+  label: 'name',
+  multiple: true,
+  value: 'id',
+}
+
+// 默认密码
+function loadDefaultPassword() {
+  return UserManageApi.getDefaultPassword().then(({ password }) => {
+    userForm.password = password
+  })
+}
+
+async function copyDefaultPassword() {
+  if (userForm.password) {
+    await navigator.clipboard.writeText(userForm.password)
+    MsgSuccess('默认密码已复制')
+  }
+}
+
+// 角色与工作空间选项
 const roleSettingOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
 const workspaceOptions = ref<ListItem[]>([])
@@ -79,31 +104,6 @@ function loadRoleSettingOptions() {
   return Promise.all(roleSettingOptionRequests).finally(() => {
     roleSettingOptionsLoading.value = false
   })
-}
-
-// 用户组选项
-const selectedUserGroupIds = ref<string[]>([])
-const userGroupOptions = ref<CascaderOption[]>([])
-const userGroupCascaderProps: CascaderProps = {
-  children: 'children',
-  emitPath: false,
-  label: 'name',
-  multiple: true,
-  value: 'id',
-}
-
-// 默认密码
-function loadDefaultPassword() {
-  return UserManageApi.getDefaultPassword().then(({ password }) => {
-    userForm.password = password
-  })
-}
-
-async function copyDefaultPassword() {
-  if (userForm.password) {
-    await navigator.clipboard.writeText(userForm.password)
-    MsgSuccess('默认密码已复制')
-  }
 }
 
 async function submitUser() {
@@ -255,7 +255,6 @@ defineExpose({ open })
           v-model="userForm.role_setting"
           :loading="roleSettingOptionsLoading"
           :role-options="roleOptions"
-          :show-workspace="auth.isEE"
           :workspace-options="workspaceOptions"
         />
       </section>

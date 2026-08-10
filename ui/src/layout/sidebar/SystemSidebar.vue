@@ -101,7 +101,7 @@ const systemMenuItems = getChildRouteList('system')
   }
   .el-menu-item {
     border-radius: var(--el-border-radius-base);
-    color: var(--mk-N900);
+    color: var(--el-text-color-primary);
     height: auto;
     line-height: 18px;
     padding: 11px calc(var(--spacing) * 2) !important;
@@ -125,7 +125,7 @@ const systemMenuItems = getChildRouteList('system')
 
     &__title {
       border-radius: var(--el-border-radius-base);
-      color: var(--mk-N900);
+      color: var(--el-text-color-primary);
       height: auto;
       line-height: 18px;
       padding: 11px calc(var(--spacing) * 2) !important;
@@ -158,7 +158,7 @@ const systemMenuItems = getChildRouteList('system')
     &__title {
       padding: 9px calc(var(--spacing) * 4) !important;
       font-size: var(--mk-font-size-base);
-      color: var(--mk-N600);
+      color: var(--el-text-color-regular);
     }
   }
   // 菜单收起

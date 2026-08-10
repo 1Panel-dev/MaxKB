@@ -296,7 +296,7 @@ const selectTheme = (themeOption: ThemeOption) => {
 }
 
 :deep(.appearance-form .el-form-item__label) {
-  color: var(--mk-N900);
+  color: var(--el-text-color-primary);
   padding-bottom: calc(var(--spacing) * 2);
 }
 

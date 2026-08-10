@@ -1,18 +1,15 @@
 <script setup lang="ts">
 import type { FormItemRule } from 'element-plus'
 import type { ListItem, SystemUserRoleAssignment } from '@/api/types'
+import { useStore } from '@/stores'
 
 defineOptions({ name: 'UserRoleSettingSection' })
-
-const props = withDefaults(
-  defineProps<{
-    loading?: boolean
-    roleOptions: ListItem[]
-    showWorkspace?: boolean
-    workspaceOptions: ListItem[]
-  }>(),
-  { showWorkspace: true },
-)
+const { auth } = useStore()
+const props = defineProps<{
+  loading?: boolean
+  roleOptions: ListItem[]
+  workspaceOptions: ListItem[]
+}>()
 
 const roleAssignments = defineModel<SystemUserRoleAssignment[]>({ required: true })
 
@@ -69,8 +66,9 @@ function removeRole(index: number) {
       </el-select>
     </el-form-item>
 
+    <!-- 企业版不设置工作空间 -->
     <el-form-item
-      v-if="showWorkspace && !isAdminRole(roleAssignment.role_id)"
+      v-if="auth.isEE && !isAdminRole(roleAssignment.role_id)"
       class="flex-1"
       :label="index === 0 ? '工作空间' : ''"
       :prop="`role_setting.${index}.workspace_ids`"

@@ -24,8 +24,8 @@ defineSlots<{
       <slot name="header" />
     </template>
 
-    <el-scrollbar max-height="calc(100vh - 120px)">
-      <div><slot /></div>
+    <el-scrollbar>
+      <div style="max-height: calc(100vh - 272px)"><slot /></div>
     </el-scrollbar>
 
     <template v-if="$slots.footer" #footer>

@@ -29,9 +29,9 @@ export const useAuthStore = defineStore('auth', {
         state.baseProfile.edition !== 'CE' &&
         !state.baseProfile.license_is_valid,
       ),
-    isCE: (state) => state.baseProfile?.edition === 'CE',
-    isPE: (state) => state.baseProfile?.edition === 'PE' && state.baseProfile.license_is_valid,
-    isEE: (state) => state.baseProfile?.edition === 'EE' && state.baseProfile.license_is_valid,
+    isCE: (state) => state.baseProfile?.edition === 'CE', // 社区版
+    isPE: (state) => state.baseProfile?.edition === 'PE' && state.baseProfile.license_is_valid, // 专业版
+    isEE: (state) => state.baseProfile?.edition === 'EE' && state.baseProfile.license_is_valid, // 企业版
   },
 
   actions: {

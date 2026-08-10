@@ -5,12 +5,12 @@ import type { CaptchaResponse, LoginRequest, LoginResponse } from './types'
 
 /** 使用账号和密码登录 Admin 应用。 */
 export function postLogin(loginRequest: LoginRequest) {
-  return post<LoginResponse, LoginRequest>('/user/login', loginRequest)
+  return post<LoginRequest, LoginResponse>('/user/login', loginRequest)
 }
 
 /** 使用 LDAP 账号登录 Admin 应用。 */
 export function postLdapLogin(loginRequest: LoginRequest) {
-  return post<LoginResponse, LoginRequest>('/ldap/login', loginRequest)
+  return post<LoginRequest, LoginResponse>('/ldap/login', loginRequest)
 }
 
 /** 退出当前 Admin 登录状态。 */

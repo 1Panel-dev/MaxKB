@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type { ListItem, SystemUserRoleAssignment } from '@/api/types'
+import type { ListItem, BatchSetUserWorkspaceRolesRequest } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from '../components/UserRoleSetting.vue'
@@ -16,36 +16,23 @@ const emit = defineEmits<{
   refresh: []
 }>()
 
-interface BatchSetUserRoleForm {
-  ids: string[]
-  is_append: boolean
-  role_ids: string[]
-  role_setting: SystemUserRoleAssignment[]
-}
-
-const defaultRoleAssignment = (): SystemUserRoleAssignment => ({
-  role_id: '',
-  workspace_ids: [],
-})
 const batchRoleFormRef = ref<FormInstance>()
 const dialogVisible = ref(false)
-const optionsLoading = ref(false)
+
 const submitting = ref(false)
-const roleOptions = ref<ListItem[]>([])
-const workspaceOptions = ref<ListItem[]>([])
-const batchRoleForm = reactive<BatchSetUserRoleForm>({
+
+const batchRoleForm = reactive<BatchSetUserWorkspaceRolesRequest>({
   ids: [],
   is_append: true,
-  role_ids: [],
-  role_setting: [defaultRoleAssignment()],
-})
-const batchRoleFormRules = reactive<FormRules<BatchSetUserRoleForm>>({
-  role_ids: [{ required: true, type: 'array', min: 1, message: '请选择角色', trigger: 'change' }],
+  role_setting: [{ role_id: '', workspace_ids: [] }],
 })
 
 /* 角色与工作空间选项 */
+const roleSettingOptionsLoading = ref(false)
+const roleOptions = ref<ListItem[]>([])
+const workspaceOptions = ref<ListItem[]>([])
 function loadRoleSettingOptions() {
-  optionsLoading.value = true
+  roleSettingOptionsLoading.value = true
   const optionRequests: Promise<void>[] = [
     CurrentUserApi.getCurrentUserRoleList().then((roles) => {
       roleOptions.value = roles
@@ -61,7 +48,7 @@ function loadRoleSettingOptions() {
   }
 
   return Promise.all(optionRequests).finally(() => {
-    optionsLoading.value = false
+    roleSettingOptionsLoading.value = false
   })
 }
 
@@ -88,7 +75,7 @@ function submitBatchSetUserRoles() {
       : UserManageApi.postBatchSetUserRoles({
           ids: batchRoleForm.ids,
           is_append: batchRoleForm.is_append,
-          role_ids: batchRoleForm.role_ids,
+          role_ids: batchRoleForm.role_setting.map((assignment) => assignment.role_id),
         })
 
     return request
@@ -104,7 +91,6 @@ function submitBatchSetUserRoles() {
 }
 
 function open(userIds: string[]) {
-  resetData()
   batchRoleForm.ids = [...userIds]
   dialogVisible.value = true
   loadRoleSettingOptions()
@@ -119,10 +105,9 @@ function resetData() {
   Object.assign(batchRoleForm, {
     ids: [],
     is_append: true,
-    role_ids: [],
-    role_setting: [defaultRoleAssignment()],
+    role_setting: [{ role_id: '', workspace_ids: [] }],
   })
-  optionsLoading.value = false
+  roleSettingOptionsLoading.value = false
   submitting.value = false
   roleOptions.value = []
   workspaceOptions.value = []
@@ -133,46 +118,25 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="dialogVisible" title="设置角色" @closed="resetData">
+  <MkDialog v-model="dialogVisible" title="设置角色" align-center @closed="resetData">
     <el-form
       ref="batchRoleFormRef"
       :model="batchRoleForm"
-      :rules="batchRoleFormRules"
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent="submitBatchSetUserRoles"
     >
-      <el-form-item label="设置方式" prop="is_append">
+      <el-form-item label="设置方式">
         <el-radio-group v-model="batchRoleForm.is_append">
           <el-radio :value="true">追加</el-radio>
           <el-radio :value="false">替换</el-radio>
         </el-radio-group>
       </el-form-item>
 
-      <el-form-item v-if="auth.isPE" label="角色" prop="role_ids">
-        <el-select
-          v-model="batchRoleForm.role_ids"
-          placeholder="请选择角色"
-          :loading="optionsLoading"
-          clearable
-          filterable
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-        >
-          <el-option
-            v-for="roleOption in roleOptions"
-            :key="roleOption.id"
-            :label="roleOption.name"
-            :value="roleOption.id"
-          />
-        </el-select>
-      </el-form-item>
-
       <UserRoleSetting
-        v-else-if="auth.isEE"
+        v-if="auth.isEE || auth.isPE"
         v-model="batchRoleForm.role_setting"
-        :loading="optionsLoading"
+        :loading="roleSettingOptionsLoading"
         :role-options="roleOptions"
         :workspace-options="workspaceOptions"
       />
