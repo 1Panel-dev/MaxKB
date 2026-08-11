@@ -2,7 +2,7 @@ FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
 # UI assets are architecture-independent; build on the native builder platform
 # to avoid running esbuild through QEMU during multi-platform builds (ETXTBSY).
 FROM --platform=$BUILDPLATFORM node:18-alpine3.18 as web-build
-COPY community/ui /ui
+COPY ui /ui
 WORKDIR /ui
 RUN npm install && \
     export NODE_OPTIONS="--max-old-space-size=4096" && \
