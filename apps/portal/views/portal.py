@@ -22,7 +22,8 @@ from common.log.log import log
 from common.utils.common import query_params_to_single_dict
 from django.core.cache import cache
 from portal.api.portal import PortalAPI
-from portal.serializers.portal import PortalSerializer, PortalApplicationSerializer, PortalLoginSerializer
+from portal.serializers.portal import PortalSerializer, PortalApplicationSerializer, PortalLoginSerializer, \
+    PortalHistoricalConversationSerializer
 
 
 class PortalView(APIView):
@@ -73,6 +74,24 @@ class PortalApplicationView(APIView):
     @has_permissions(PermissionConstants.PORTAL_READ, RoleConstants.ADMIN)
     def get(self, request: Request, current_page: int, page_size: int):
         return result.success(PortalApplicationSerializer.Query(
+            data={**query_params_to_single_dict(request.query_params)}
+        ).page(current_page, page_size, str(request.user.id)))
+
+
+class PortalHistoricalConversationView(APIView):
+    authentication_classes = [TokenAuth]
+
+    @extend_schema(
+        methods=['GET'],
+        description=_('Get portal historical conversation by page'),
+        summary=_('Get portal historical conversation by page'),
+        operation_id=_('Get portal historical conversation by page'),
+        parameters=PortalAPI.Conversation.get_parameters(),
+        responses=PortalAPI.Conversation.get_response(),
+        tags=[_('Portal')]
+    )
+    def get(self, request: Request, current_page: int, page_size: int):
+        return result.success(PortalHistoricalConversationSerializer.Query(
             data={**query_params_to_single_dict(request.query_params)}
         ).page(current_page, page_size, str(request.user.id)))
 
