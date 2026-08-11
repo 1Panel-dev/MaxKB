@@ -7,6 +7,7 @@ import UserManageApi from '@/api/admin/system/user-manage'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
+import UserGroupSetting from './components/UserGroupSetting.vue'
 import UserRoleSetting from './components/UserRoleSetting.vue'
 import type {
   ListItem,
@@ -14,7 +15,7 @@ import type {
   SystemUserRequest,
   SystemUserRoleAssignment,
 } from '@/api/types/index.ts'
-import type { CascaderOption, CascaderProps, FormInstance, FormRules } from 'element-plus'
+import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
 
@@ -57,24 +58,6 @@ const userFormRules = reactive<FormRules<SystemUserRequest>>({
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
 })
 
-// 用户组选项
-const selectedUserGroupIds = ref<string[]>([])
-const userGroupOptions = ref<CascaderOption[]>([])
-const userGroupCascaderProps: CascaderProps = {
-  children: 'children',
-  emitPath: false,
-  label: 'name',
-  multiple: true,
-  value: 'id',
-}
-
-// 默认密码
-function loadDefaultPassword() {
-  return CommonApi.getDefaultPassword().then(({ password }) => {
-    userForm.password = password
-  })
-}
-
 // 角色与工作空间选项
 const roleSettingOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
@@ -99,6 +82,18 @@ function loadRoleSettingOptions() {
 
   return Promise.all(roleSettingOptionRequests).finally(() => {
     roleSettingOptionsLoading.value = false
+  })
+}
+
+// 用户组相关
+const selectedWorkspaceIds = computed(() => [
+  ...new Set(userForm.role_setting.flatMap(({ workspace_ids }) => workspace_ids)),
+])
+
+// 默认密码
+function loadDefaultPassword() {
+  return CommonApi.getDefaultPassword().then(({ password }) => {
+    userForm.password = password
   })
 }
 
@@ -149,10 +144,13 @@ function open(user?: SystemUser) {
       email: user.email,
       nick_name: user.nick_name,
       phone: user.phone,
-      role_setting: user.role_setting?.map((item: SystemUserRoleAssignment) => ({
-        ...item,
-        workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
-      })),
+      role_setting: user.role_setting?.length
+        ? user.role_setting.map((item: SystemUserRoleAssignment) => ({
+            ...item,
+            workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
+          }))
+        : [{ role_id: '', workspace_ids: [] }],
+      user_group_ids: user.user_group_ids ?? [],
     })
     isEdit.value = true
   }
@@ -186,8 +184,6 @@ function resetData() {
   userSubmitting.value = false
   roleOptions.value = []
   workspaceOptions.value = []
-  selectedUserGroupIds.value = []
-  userGroupOptions.value = []
   userFormRef.value?.clearValidate()
 }
 
@@ -255,20 +251,13 @@ defineExpose({ open })
           :workspace-options="workspaceOptions"
         />
       </section>
-      <section>
+      <section v-if="selectedWorkspaceIds.length">
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
-        <el-form-item>
-          <el-cascader
-            v-model="selectedUserGroupIds"
-            class="w-full"
-            :options="userGroupOptions"
-            :props="userGroupCascaderProps"
-            :show-all-levels="false"
-            clearable
-            filterable
-            placeholder="请选择用户组"
-          />
-        </el-form-item>
+        <UserGroupSetting
+          v-model="userForm.user_group_ids"
+          :workspace-ids="selectedWorkspaceIds"
+          :workspace-options="workspaceOptions"
+        />
       </section>
     </el-form>
 

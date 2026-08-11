@@ -52,6 +52,7 @@ src/views/system/identity/users/
 ├── UserListView.vue               # 用户列表路由页面
 ├── UserFromDrawer.vue             # 用户表单抽屉
 ├── components/
+│   ├── UserGroupSetting.vue       # 用户组与工作空间异步联动设置
 │   └── UserRoleSetting.vue        # 用户角色设置子组件
 └── dialog/
     ├── BatchSetUserRoleDialog.vue # 批量设置用户角色弹窗
