@@ -144,6 +144,50 @@
   box-shadow: 0px 6px 24px 0px rgb(var(--el-text-color-primary-rgb) / 8%);
 }
 
+/* cascader */
+.el-cascader {
+  --el-cascader-tag-background: var(--mk-N900-transparent-10) !important;
+  .icon-arrow-down {
+    font-size: 16px !important;
+  }
+}
+
+.el-cascader-panel {
+  --el-cascader-node-background-hover: var(--mk-N900-transparent-10);
+  --el-cascader-menu-text-color: var(--el-text-color-primary);
+}
+.el-cascader-menu {
+  &__list {
+    padding: 4px;
+  }
+}
+.el-cascader-node {
+  border-radius: var(--el-border-radius-small);
+  padding: 0 calc(var(--spacing) * 8) 0 calc(var(--spacing) * 2);
+
+  &__label {
+    padding: 0;
+  }
+
+  &__prefix {
+    left: auto;
+    right: 6px;
+  }
+  &__postfix {
+    right: 8px;
+    color: var(--mk-N500);
+  }
+  &.in-active-path {
+    color: var(--el-text-color-primary);
+    font-weight: 400;
+  }
+  &.is-active {
+    font-weight: 400;
+  }
+  .el-icon {
+    font-size: 16px;
+  }
+}
 /* checkbox */
 .el-checkbox {
   --el-checkbox-input-border: 1px solid var(--mk-N500);

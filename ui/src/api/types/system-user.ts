@@ -26,6 +26,7 @@ export interface SystemUserRequest {
   phone: string
   role_setting: SystemUserRoleAssignment[]
   encrypted?: boolean
+  user_group_ids?: string[]
 }
 
 export interface SystemUserUpdateRequest {
