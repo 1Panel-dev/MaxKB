@@ -35,6 +35,7 @@ const userForm = reactive<SystemUserRequest>({
   phone: '',
   role_setting: [{ role_id: '', workspace_ids: [] }],
   username: '',
+  user_group_ids: [],
 })
 
 const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
@@ -177,6 +178,7 @@ function resetData() {
     password: '',
     phone: '',
     role_setting: [{ role_id: '', workspace_ids: [] }],
+    user_group_ids: [],
     username: '',
   })
   isEdit.value = false
