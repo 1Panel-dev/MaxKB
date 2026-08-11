@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import UserGroupsApi, { type SystemUserGroup } from '@/api/admin/system/user-groups'
+import UserGroupsApi from '@/api/admin/system/user-groups'
+import type { SystemUserGroup } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{

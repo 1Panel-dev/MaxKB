@@ -2,8 +2,13 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { SystemUserGroup, SystemUserGroupMember } from '@/api/admin/system/user-groups'
-import type { RequestParams, OptionItem, WorkspaceItem } from '@/api/types'
+import type {
+  RequestParams,
+  OptionItem,
+  WorkspaceItem,
+  SystemUserGroup,
+  SystemUserGroupMember,
+} from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
@@ -60,7 +65,8 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
           members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
         )
         userGroupMembers.value = userGroupMembers.value.filter(
-          ({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id),
+          ({ system_user_group_relation_id }) =>
+            !removedRelationIds.has(system_user_group_relation_id),
         )
         paginationConfig.value.total = userGroupMembers.value.length
         selectedGroupMembers.value = []

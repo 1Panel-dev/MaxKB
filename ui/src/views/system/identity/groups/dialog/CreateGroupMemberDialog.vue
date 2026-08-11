@@ -14,27 +14,19 @@ const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)
 const loading = ref(false)
-const optionsLoading = ref(false)
 const formRef = ref<FormInstance>()
-const userOptions = ref<SystemUserOption[]>([])
-const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 const formRules: FormRules = {
   userIds: [{ required: true, message: '请选择用户', trigger: 'change' }],
 }
+const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 
+/* 成员选项 */
+const optionsLoading = ref(false)
+const userOptions = ref<SystemUserOption[]>([])
 let searchTimer: ReturnType<typeof setTimeout> | null = null
-
-function open() {
-  visible.value = true
-  fetchUserOptions()
-}
-
-function fetchUserOptions(query?: string) {
+function loadUserOptions(query?: string) {
   optionsLoading.value = true
-  UserManageApi.getWorkspaceMembers(
-    props.workspaceId,
-    query ? { nick_name: query } : undefined,
-  )
+  UserManageApi.getWorkspaceMembers(props.workspaceId, query ? { nick_name: query } : undefined)
     .then((users) => {
       userOptions.value = users
     })
@@ -46,7 +38,7 @@ function fetchUserOptions(query?: string) {
 function handleRemoteSearch(query: string) {
   if (searchTimer) clearTimeout(searchTimer)
   searchTimer = setTimeout(() => {
-    fetchUserOptions(query)
+    loadUserOptions(query)
   }, 300)
 }
 
@@ -68,6 +60,11 @@ function submit() {
         loading.value = false
       })
   })
+}
+
+function open() {
+  visible.value = true
+  loadUserOptions()
 }
 
 function close() {

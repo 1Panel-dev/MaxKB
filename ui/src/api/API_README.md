@@ -35,6 +35,8 @@ src/api/
 - 业务 API 按一级业务域、二级资源文件归类，例如 `workspace/agent.ts` 和
   `system/workspace.ts`。
 - 一类资源的增删改查放在同一个文件，不创建同名业务文件夹或汇总所有业务接口的 `api.ts`。
+- 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
+  或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
 - 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
   `export default { ... }` 直接默认导出接口对象，不为默认导出声明中间变量。调用方统一按
   “文件名 PascalCase + `Api`”命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
@@ -75,7 +77,7 @@ API 类型统一在 `src/api` 范围内管理，相关规则由本文档统一�
 
 ## 接口命名
 
-- 导出函数使用“HTTP 方法 + 业务名称”的 camelCase 名称，使调用处能直接识别请求方式，
+- 业务接口函数使用“HTTP 方法 + 业务名称”的 camelCase 名称，使调用处能直接识别请求方式，
   例如 `getCaptcha`、`postLogin`、`postLogout`、`getWorkspaceDetail`、`postTool`、
   `putRole` 和 `deleteKnowledge`。
 - 前缀与实际请求方法保持一致：查询使用 `get`，创建和业务动作使用 `post`，完整更新使用

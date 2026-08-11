@@ -1,42 +1,25 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { ListItem, RequestParams } from '@/api/types'
-
-export interface SystemUserGroup {
-  id: string
-  name: string
-  workspace_id: string
-  count: number
-}
-
-export interface SystemUserGroupMember {
-  id: string
-  username: string
-  email: string
-  phone: string
-  is_active: boolean
-  role: string
-  nick_name: string
-  create_time: string
-  update_time: string
-  source: string
-  system_user_group_relation_id: string
-}
+import type { SystemUserGroup, SystemUserGroupMember, RequestParams } from '@/api/types'
 
 const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
 
+/** 获取指定工作空间的系统用户组列表。 */
 const getSystemUserGroups = (workspaceId: string) => {
   return get<SystemUserGroup[]>(prefix(workspaceId))
 }
 
+/** 创建或更新指定工作空间的系统用户组。 */
 const postSystemUserGroup = (workspaceId: string, group: { id?: string; name: string }) => {
   return post<{ id?: string; name: string }, SystemUserGroup>(prefix(workspaceId), group)
 }
 
+/** 删除指定工作空间的系统用户组。 */
 const deleteSystemUserGroup = (workspaceId: string, groupId: string) => {
   return del<undefined, boolean>(`${prefix(workspaceId)}/${groupId}`)
 }
 
+/** 获取指定系统用户组的成员分页列表。 */
 const getSystemUserGroupMembers = (
   workspaceId: string,
   groupId: string,
@@ -49,12 +32,14 @@ const getSystemUserGroupMembers = (
   )
 }
 
+/** 向指定系统用户组添加成员。 */
 const postSystemUserGroupMembers = (workspaceId: string, groupId: string, userIds: string[]) => {
   return post<{ user_ids: string[] }, boolean>(`${prefix(workspaceId)}/${groupId}/add_member`, {
     user_ids: userIds,
   })
 }
 
+/** 从指定系统用户组移除成员。 */
 const postRemoveSystemUserGroupMembers = (
   workspaceId: string,
   groupId: string,
