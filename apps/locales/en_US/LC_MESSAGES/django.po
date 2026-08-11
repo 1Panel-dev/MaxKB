@@ -9602,3 +9602,6 @@ msgstr "Set chat user quota"
 
 msgid "The token quota for the current period has been exhausted. Please contact the administrator."
 msgstr ""
+
+msgid "Get portal historical conversation by page"
+msgstr ""
