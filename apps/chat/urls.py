@@ -30,7 +30,7 @@ v3=[
  path('embed', v3_views.ChatEmbedView.as_view()),
  path('mcp', v3_views.mcp_view),
  path('auth/anonymous', v3_views.AnonymousAuthentication.as_view()),
- path('auth/login/<str:access_token>', v3_views.LocalLoginView.as_view()),
+ path('auth/login', v3_views.LocalLoginView.as_view()),
  path('auth/logout', v3_views.Logout.as_view(), name='v3_logout'),
  path('profile', v3_views.AuthProfile.as_view()),
  path('captcha', v3_views.CaptchaView.as_view(), name='v3_captcha'),

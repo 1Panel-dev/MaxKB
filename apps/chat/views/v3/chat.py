@@ -43,7 +43,7 @@ from maxkb.const import CONFIG
 from models_provider.api.model import DefaultModelResponse
 from oss.serializers.file import FileSerializer
 from system_manage.serializers.chat_user import RePasswordSerializer, ChatUserProfileSerializer
-from system_manage.serializers.chat_user_serializer import ChatUserAccessTokenSerializer
+from chat.serializers.chat_user_serializer import ChatUserAccessTokenV3Serializer
 from users.api import CaptchaAPI, LoginAPI
 from users.api.user import ResetPasswordAPI, UserProfileAPI
 from users.serializers.login import CaptchaSerializer
@@ -135,7 +135,7 @@ class AnonymousAuthentication(APIView):
             key="mk_file_auth",
             value=f_token,
             max_age=7 * 24 * 3600,
-            path=f'{CONFIG.get_chat_path()}/{request.data.get("access_token")}',
+            path=CONFIG.get_chat_path(),
             secure=is_https,
             httponly=True,
             samesite="None" if is_https else "Lax",
@@ -263,8 +263,8 @@ class CaptchaView(APIView):
                    responses=CaptchaAPI.get_response())
     def get(self, request: Request):
         username = request.query_params.get('username', None)
-        accessToken = request.query_params.get('accessToken', None)
-        return result.success(CaptchaSerializer().chat_generate(username, 'chat', accessToken))
+        application_id = request.query_params.get('application_id', None)
+        return result.success(CaptchaSerializer().chat_generate(username, 'chat', application_id))
 
 
 class SpeechToText(APIView):
@@ -383,13 +383,13 @@ class ChatUserProfileView(APIView):
         responses=UserProfileAPI.get_response(),
     )
     def get(self, request: Request):
-        return result.success(ChatUserProfileSerializer().profile(request.user))
+        return result.success(ChatUserProfileSerializer().profile(request.user.profile))
 
 
 class BaseAuthView(APIView):
     @staticmethod
-    def create_token_and_cache(access_token, user, request):
-        token = ChatUserAccessTokenSerializer.create_token_and_cache(access_token, user, request)
+    def create_token_and_cache(user, request):
+        token, f_token = ChatUserAccessTokenV3Serializer.create_token_and_cache(user, request)
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
         return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
@@ -420,12 +420,12 @@ class LocalLoginView(BaseAuthView):
         request=LoginAPI.get_request(),
         responses=LoginAPI.get_response(),
     )
-    def post(self, request: Request, access_token: str = None):
-        user = ChatUserAccessTokenSerializer.local_login(request.data, access_token)
+    def post(self, request: Request):
+        user = ChatUserAccessTokenV3Serializer.local_login(request.data)
         user.source = "LOCAL"
-        token, f_token = self.create_token_and_cache(access_token, user, request)
+        token, f_token = self.create_token_and_cache(user, request)
         response = result.success({'token': token})
-        return self.generate(request, f_token, response, path=f'/chat/{access_token}/')
+        return self.generate(request, f_token, response, path=f'/chat/')
 
 
 class Logout(APIView):
