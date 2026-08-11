@@ -13,12 +13,12 @@ import type {
 const prefix = '/system/chat_user'
 
 /** 获取对话用户。 */
-function getChatUser() {
+const getChatUser = () => {
   return get<ChatUserBase[]>(`${prefix}/list`)
 }
 
 /** 获取对话用户分页列表。 */
-function getChatUserPage(page: ParamsPage, query?: RequestParams) {
+const getChatUserPage = (page: ParamsPage, query?: RequestParams) => {
   return get<ResponsePage<ChatUser>>(
     `${prefix}/user_manage/${page.currentPage}/${page.pageSize}`,
     query,
@@ -26,42 +26,42 @@ function getChatUserPage(page: ParamsPage, query?: RequestParams) {
 }
 
 /** 创建对话用户。 */
-function postChatUser(user: ChatUserRequest) {
+const postChatUser = (user: ChatUserRequest) => {
   return post<ChatUserRequest, ChatUser>(prefix, user)
 }
 
 /** 编辑对话用户。 */
-function putChatUser(userId: string, user: ChatUserUpdateRequest) {
+const putChatUser = (userId: string, user: ChatUserUpdateRequest) => {
   return put<ChatUserUpdateRequest, ChatUser>(`${prefix}/${userId}`, user)
 }
 
 /** 修改对话用户密码。 */
-function putChatUserPassword(userId: string, password: PasswordRequest) {
+const putChatUserPassword = (userId: string, password: PasswordRequest) => {
   return put<PasswordRequest, boolean>(`${prefix}/${userId}/re_password`, password)
 }
 
 /** 删除对话用户。 */
-function deleteChatUser(userId: string) {
+const deleteChatUser = (userId: string) => {
   return del<boolean>(`${prefix}/${userId}`)
 }
 
 /** 批量删除对话用户。 */
-function postBatchDeleteChatUsers(userIds: string[]) {
+const postBatchDeleteChatUsers = (userIds: string[]) => {
   return post<string[], boolean>(`${prefix}/batch_delete`, userIds)
 }
 
 /** 批量设置对话用户所属用户组。 */
-function postBatchSetChatUserGroups(request: BatchSetChatUserGroupsRequest) {
+const postBatchSetChatUserGroups = (request: BatchSetChatUserGroupsRequest) => {
   return post<BatchSetChatUserGroupsRequest, boolean>(`${prefix}/batch_add_group`, request)
 }
 
 /** 获取可导入的对话用户来源。 */
-function getChatUserSyncTypes() {
+const getChatUserSyncTypes = () => {
   return get<string[]>(`${prefix}/sync_types`)
 }
 
 /** 从指定来源导入对话用户。 */
-function postSyncChatUsers(syncType: string) {
+const postSyncChatUsers = (syncType: string) => {
   return post<undefined, ChatUserSyncResult>(`${prefix}/sync/${syncType}`)
 }
 

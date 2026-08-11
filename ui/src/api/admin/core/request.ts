@@ -58,6 +58,9 @@ request.interceptors.request.use(setRequestHeaders)
 
 request.interceptors.response.use(
   (response) => {
+    if (response.data instanceof Blob) {
+      return response
+    }
     const responseData = response.data as ApiResponse<unknown>
     if (responseData.code !== 200) {
       MsgError(responseData.message)
@@ -131,6 +134,21 @@ export function post<TData = unknown, T = unknown>(
   timeout?: number,
 ) {
   return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
+}
+
+/** 发送返回文件 Blob 的 POST 请求。 */
+export async function postBlob<TData = unknown>(
+  url: string,
+  data?: TData,
+  loading?: LoadingTarget,
+) {
+  startLoading(loading)
+  try {
+    const response = await request.post<Blob>(url, data, { responseType: 'blob' })
+    return response.data
+  } finally {
+    finishLoading(loading)
+  }
 }
 
 /** 发送 PUT 请求。 */

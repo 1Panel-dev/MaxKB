@@ -162,7 +162,8 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'authentication',
           name: 'system-login-authentication',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () =>
+            import('@/views/system/settings/authentication/AuthenticationSettingsView.vue'),
           meta: { title: '系统用户认证', order: 10 },
         },
         {
@@ -174,7 +175,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'email',
           name: 'system-email',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/settings/email/EmailSettingsView.vue'),
           meta: { title: '邮箱设置', order: 30 },
         },
       ],
@@ -182,7 +183,7 @@ export const systemRoutes: RouteRecordRaw = {
     {
       path: 'logs',
       name: 'system-logs',
-      component: () => import('@/views/system/SystemView.vue'),
+      component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
       meta: { title: '操作日志', icon: 'icon-setting', order: 60 },
     },
   ],

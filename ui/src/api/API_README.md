@@ -35,9 +35,11 @@ src/api/
 - 业务 API 按一级业务域、二级资源文件归类，例如 `workspace/agent.ts` 和
   `system/workspace.ts`。
 - 一类资源的增删改查放在同一个文件，不创建同名业务文件夹或汇总所有业务接口的 `api.ts`。
-- 每个业务接口使用 `export function` 单独导出，同时在文件末尾通过 `export default { ... }`
-  直接默认导出接口对象，不为默认导出声明中间变量；调用方统一按“文件名 PascalCase + `Api`”
-  命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
+- 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
+  `export default { ... }` 直接默认导出接口对象，不为默认导出声明中间变量。调用方统一按
+  “文件名 PascalCase + `Api`”命名默认导入并通过该对象调用，不创建只做二次转发的聚合入口。
+  该规则适用于 `admin/auth`、`admin/workspace`、`admin/system` 等业务 API；
+  `admin/core/request.ts` 等请求基础设施可按职责提供具名导出。
   例如从 `login.ts` 使用 `import LoginApi from '@/api/admin/auth/login'`，再调用
   `LoginApi.postLogin()`；System Workspace API 使用
   `import WorkspaceApi from '@/api/admin/system/workspace'`。
@@ -90,6 +92,7 @@ API 类型统一在 `src/api` 范围内管理，相关规则由本文档统一�
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
   `post`、`put`、`del` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
+- 文件下载接口使用 `postBlob` 获取原始 `Blob`，由调用页面负责命名并触发浏览器下载。
 - 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
   提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
   非提示类失败处理可以按需保留失败分支。

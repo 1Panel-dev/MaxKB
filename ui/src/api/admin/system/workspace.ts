@@ -11,18 +11,14 @@ const prefix = '/system/workspace'
 
 /** 首页头部工作空间列表 | 系统管理的工作空间模块 */
 // TODO 工作空间管理员接口 /workspace 未区分
-function getSystemWorkspaceList() {
+const getSystemWorkspaceList = () => {
   return get<WorkspaceItem[]>(prefix)
 }
 
 /** 获取工作空间成员列表 **/
 // TODO 工作空间管理员接口 /workspace 未区分
 
-function getWorkspaceMemberList(
-  workspace_id: string,
-  page: ParamsPage,
-  query?: RequestParams,
-) {
+const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: RequestParams) => {
   return get<ResponsePage<WorkspaceMemberItem>>(
     `${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`,
     query,
@@ -30,25 +26,22 @@ function getWorkspaceMemberList(
 }
 
 /** 新建或更新工作空间。 */
-function postWorkspace(workspace: WorkspaceItem) {
+const postWorkspace = (workspace: WorkspaceItem) => {
   return post<WorkspaceItem, boolean>(prefix, workspace)
 }
 
 /** 删除工作空间前校验。 */
-function getWorkspaceDeleteCheck(workspaceId: string) {
+const getWorkspaceDeleteCheck = (workspaceId: string) => {
   return get<unknown>(`${prefix}/${workspaceId}/check`)
 }
 
 /** 删除工作空间。 */
-function deleteWorkspace(workspaceId: string) {
+const deleteWorkspace = (workspaceId: string) => {
   return del<boolean>(`${prefix}/${workspaceId}`)
 }
 
 /** 新增工作空间成员。 */
-function postWorkspaceMembers(
-  workspaceId: string,
-  members: CreateWorkspaceMemberParamsItem[],
-) {
+const postWorkspaceMembers = (workspaceId: string, members: CreateWorkspaceMemberParamsItem[]) => {
   return post<CreateWorkspaceMemberParamsItem[], boolean>(
     `${prefix}/${workspaceId}/add_member`,
     members,
@@ -56,7 +49,7 @@ function postWorkspaceMembers(
 }
 
 /** 移除工作空间成员。 */
-function postRemoveWorkspaceMember(workspaceId: string, userRelationId: string) {
+const postRemoveWorkspaceMember = (workspaceId: string, userRelationId: string) => {
   return post<undefined, boolean>(`${prefix}/${workspaceId}/remove_member/${userRelationId}`)
 }
 

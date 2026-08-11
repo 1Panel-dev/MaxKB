@@ -25,46 +25,41 @@ export interface SystemUserGroupMember {
 
 const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
 
-export function getSystemUserGroups(workspaceId: string) {
+const getSystemUserGroups = (workspaceId: string) => {
   return get<SystemUserGroup[]>(prefix(workspaceId))
 }
 
-export function postSystemUserGroup(workspaceId: string, group: { id?: string; name: string }) {
+const postSystemUserGroup = (workspaceId: string, group: { id?: string; name: string }) => {
   return post<{ id?: string; name: string }, SystemUserGroup>(prefix(workspaceId), group)
 }
 
-export function deleteSystemUserGroup(workspaceId: string, groupId: string) {
+const deleteSystemUserGroup = (workspaceId: string, groupId: string) => {
   return del<undefined, boolean>(`${prefix(workspaceId)}/${groupId}`)
 }
 
-export function getSystemUserGroupMembers(
+const getSystemUserGroupMembers = (
   workspaceId: string,
   groupId: string,
   page: ParamsPage,
   query?: RequestParams,
-) {
+) => {
   return get<ResponsePage<SystemUserGroupMember>>(
     `${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
     query,
   )
 }
 
-export function postSystemUserGroupMembers(
-  workspaceId: string,
-  groupId: string,
-  userIds: string[],
-) {
-  return post<{ user_ids: string[] }, boolean>(
-    `${prefix(workspaceId)}/${groupId}/add_member`,
-    { user_ids: userIds },
-  )
+const postSystemUserGroupMembers = (workspaceId: string, groupId: string, userIds: string[]) => {
+  return post<{ user_ids: string[] }, boolean>(`${prefix(workspaceId)}/${groupId}/add_member`, {
+    user_ids: userIds,
+  })
 }
 
-export function postRemoveSystemUserGroupMembers(
+const postRemoveSystemUserGroupMembers = (
   workspaceId: string,
   groupId: string,
   relationIds: string[],
-) {
+) => {
   return del<{ group_relation_ids: string[] }, boolean>(
     `${prefix(workspaceId)}/${groupId}/remove_member`,
     undefined,

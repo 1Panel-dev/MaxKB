@@ -5,17 +5,17 @@ import type { ListItem } from '@/api/types'
 import type { CurrentUserInfo } from './types'
 
 /** 获取当前登录用户、权限、语言及可用工作空间。 */
-function getCurrentUserInfo() {
+const getCurrentUserInfo = () => {
   return get<CurrentUserInfo>('/user/profile')
 }
 
 /** 获取当前用户可分配的工作空间列表。 */
-function getCurrentUserWorkspaceList() {
+const getCurrentUserWorkspaceList = () => {
   return get<ListItem[]>('/workspace/current_user')
 }
 
 /** 获取当前用户可分配的角色列表。 */
-function getCurrentUserRoleList() {
+const getCurrentUserRoleList = () => {
   return get<ListItem[]>('/role_list/current_user')
 }
 
