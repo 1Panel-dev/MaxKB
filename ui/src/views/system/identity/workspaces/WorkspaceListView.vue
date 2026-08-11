@@ -166,7 +166,17 @@ function handleBatchDelete() {
   MsgConfirm(`是否删除选中的 ${batchSelectedMembers.value.length} 个成员？`, '')
     .then(() => {
       workspaceMembersLoading.value = true
-      // TODO 需要批量删除接口
+      return WorkspaceApi.postBatchRemoveWorkspaceMembers(
+        workspaceId,
+        batchSelectedMembers.value.map(({ user_relation_id }) => user_relation_id),
+      ).then(({ success_count, failed_count }) => {
+        if (failed_count > 0) {
+          MsgSuccess(`移除成功 ${success_count} 个成员，失败 ${failed_count} 个`)
+        } else {
+          MsgSuccess('移除成功')
+        }
+        return loadWorkspaceMembers()
+      })
     })
     .catch(() => {})
     .finally(() => {
