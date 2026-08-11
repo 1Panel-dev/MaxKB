@@ -36,7 +36,7 @@ class ChatAuthenticationAPI(APIMixin):
         pass
 
 
-class ChatAuthenticationProfileAPI(APIMixin):
+class ChatAuthenticationProfileAPIV2(APIMixin):
 
     @staticmethod
     def get_parameters():
@@ -44,6 +44,19 @@ class ChatAuthenticationProfileAPI(APIMixin):
             name="access_token",
             description=_("access_token"),
             type=OpenApiTypes.STR,
+            location='query',
+            required=True,
+        )]
+
+
+class ChatAuthenticationProfileAPI(APIMixin):
+
+    @staticmethod
+    def get_parameters():
+        return [OpenApiParameter(
+            name="application_id",
+            description=_("Application ID"),
+            type=OpenApiTypes.UUID,
             location='query',
             required=True,
         )]

@@ -70,43 +70,49 @@ class AnonymousAuthenticationV2Serializer(serializers.Serializer):
 
 
 class AuthProfileSerializer(serializers.Serializer):
+    """v3: 直接通过 application_id 获取认证 profile"""
+    application_id = serializers.UUIDField(required=True, label=_("application_id"))
+
+    def profile(self):
+        self.is_valid(raise_exception=True)
+        application_id = self.validated_data.get("application_id")
+        application_access_token = QuerySet(ApplicationAccessToken).filter(application_id=application_id).first()
+        if application_access_token is None:
+            raise NotFound404(404, _("Invalid application_id"))
+        if not application_access_token.is_active:
+            raise NotFound404(404, _("Invalid application_id"))
+        login_value = application_access_token.authentication_value.get('login_value', [])
+        chat_platform = DatabaseModelManage.get_model('chat_platform')
+        if chat_platform is not None:
+            types = QuerySet(chat_platform).filter(is_active=True, is_valid=True).values_list('auth_type', flat=True)
+            login_value = list(set(login_value) & set(types))
+            if 'LOCAL' in application_access_token.authentication_value.get('login_value', []):
+                login_value.insert(0, 'LOCAL')
+        return {
+            'application_name': application_access_token.application.name,
+            'authentication': application_access_token.authentication,
+            'authentication_type': application_access_token.authentication_value.get('type', 'password'),
+            'max_attempts': application_access_token.authentication_value.get('max_attempts', 1),
+            'login_value': login_value,
+            'rsaKey': get_key_pair_by_sql().get('key')
+        }
+
+
+class AuthProfileV2Serializer(serializers.Serializer):
+    """v2: 通过 access_token 查表得到 application_id，委托给 AuthProfileSerializer"""
     access_token = serializers.CharField(required=True, label=_("access_token"))
 
     def profile(self):
         self.is_valid(raise_exception=True)
-        access_token = self.data.get("access_token")
+        access_token = self.validated_data.get("access_token")
         application_access_token = QuerySet(ApplicationAccessToken).filter(access_token=access_token).first()
         if application_access_token is None:
             raise NotFound404(404, _("Invalid access_token"))
         if not application_access_token.is_active:
             raise NotFound404(404, _("Invalid access_token"))
-        application_id = application_access_token.application_id
-        profile = {
-            'authentication': False
-        }
-        application_setting_model = DatabaseModelManage.get_model('application_setting')
-        chat_platform = DatabaseModelManage.get_model('chat_platform')
-        if application_setting_model and chat_platform:
-            application_setting = QuerySet(application_setting_model).filter(application_id=application_id).first()
-            types = QuerySet(chat_platform).filter(is_active=True, is_valid=True).values_list('auth_type', flat=True)
-            login_value = application_access_token.authentication_value.get('login_value', [])
-            max_attempts = application_access_token.authentication_value.get('max_attempts', 1)
-            final_login_value = list(set(login_value) & set(types))
-            if 'LOCAL' in login_value:
-                final_login_value.insert(0, 'LOCAL')
-            if application_setting is not None:
-                profile = {
-                    'icon': application_setting.application.icon,
-                    'application_name': application_setting.application.name,
-                    'bg_icon': application_setting.chat_background,
-                    'authentication': application_access_token.authentication,
-                    'authentication_type': application_access_token.authentication_value.get(
-                        'type', 'password'),
-                    'max_attempts': max_attempts,
-                    'login_value': final_login_value,
-                    'rsaKey': get_key_pair_by_sql().get('key')
-                }
-        return profile
+        return AuthProfileSerializer(
+            data={'application_id': application_access_token.application_id}
+        ).profile()
 
 
 class ApplicationProfileSerializer(serializers.Serializer):

@@ -173,7 +173,7 @@ class AuthProfile(APIView):
     )
     def get(self, request: Request):
         return result.success(
-            AuthProfileSerializer(data={'access_token': request.query_params.get("access_token")}).profile())
+            AuthProfileSerializer(data={'application_id': request.query_params.get("application_id")}).profile())
 
 
 class ChatView(APIView):

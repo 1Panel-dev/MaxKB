@@ -22,11 +22,11 @@ from rest_framework.views import APIView
 from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
 from application.models import ChatUserType, ChatSourceChoices
 from chat.api.chat_api import ChatAPI
-from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
+from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPIV2, ChatOpenAPI, OpenAIAPI
 from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechToTextSerializers, \
     TextToSpeechSerializers, OpenAIChatSerializer
 from chat.serializers.chat_authentication import AnonymousAuthenticationV2Serializer, ApplicationProfileSerializer, \
-    AuthProfileSerializer
+    AuthProfileV2Serializer
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.common import FileToken
@@ -168,13 +168,13 @@ class AuthProfile(APIView):
         description=_("Get application authentication information"),
         summary=_("Get application authentication information"),
         operation_id=_("Get application authentication information"),  # type: ignore
-        parameters=ChatAuthenticationProfileAPI.get_parameters(),
+        parameters=ChatAuthenticationProfileAPIV2.get_parameters(),
         responses=None,
         tags=[_('Chat')]  # type: ignore
     )
     def get(self, request: Request):
         return result.success(
-            AuthProfileSerializer(data={'access_token': request.query_params.get("access_token")}).profile())
+            AuthProfileV2Serializer(data={'access_token': request.query_params.get("access_token")}).profile())
 
 
 class ChatView(APIView):
