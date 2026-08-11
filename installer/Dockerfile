@@ -1,8 +1,11 @@
 FROM ghcr.io/1panel-dev/maxkb-vector-model:v1.0.1 AS vector-model
-FROM node:18-alpine3.18 AS web-build
-COPY ui ui
-RUN cd ui && \
-    npm install && \
+# UI assets are architecture-independent; build on the native builder platform
+# to avoid running esbuild through QEMU during multi-platform builds (ETXTBSY).
+FROM --platform=$BUILDPLATFORM node:18-alpine3.18 as web-build
+COPY community/ui /ui
+WORKDIR /ui
+RUN npm install && \
+    export NODE_OPTIONS="--max-old-space-size=4096" && \
     npm run build && \
     rm -rf ./node_modules
 FROM ghcr.io/1panel-dev/maxkb-python-pg:python3.11-pg15.14 AS stage-build
@@ -19,7 +22,7 @@ COPY . /opt/maxkb/app
 RUN mkdir -p /opt/maxkb/app /opt/maxkb/model /opt/maxkb/conf && \
     rm -rf /opt/maxkb/app/ui
 
-COPY --from=web-build ui /opt/maxkb/app/ui
+COPY --from=web-build /ui /opt/maxkb/app/ui
 WORKDIR /opt/maxkb/app
 RUN python3 -m venv /opt/py3 && \
     pip install poetry==1.8.5 --break-system-packages && \
