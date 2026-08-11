@@ -2,7 +2,7 @@ name: Python Format Check
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [opened, reopened]
 
 jobs:
   pre-commit:
