@@ -114,5 +114,16 @@ def to_ts_vector(text: str, user_words: List[str] = None):
 def to_query(text: str, user_words: List[str] = None):
     tokenizer = _build_tokenizer(user_words) if user_words else jieba
     extract_tags = tokenizer.lcut(text, cut_all=True)
-    result = " ".join(extract_tags)
+    query_tokens = []
+    previous_token_is_negation = False
+    for token in extract_tags:
+        if token == '-':
+            # PostgreSQL treats each standalone '-' as a nested NOT operator.
+            if previous_token_is_negation:
+                continue
+            previous_token_is_negation = True
+        elif token.strip():
+            previous_token_is_negation = False
+        query_tokens.append(token)
+    result = " ".join(query_tokens)
     return result
