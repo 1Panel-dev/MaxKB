@@ -187,17 +187,24 @@ class MiniMaxTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
                 while True:
                     result = self._load_websocket_message(await websocket.recv())
                     event = result.get("event")
-                    if event == "task_result":
-                        audio_hex = result.get("data", {}).get("audio", "")
+                    if event == "task_continued":
+                        audio_hex = (result.get("data") or {}).get("audio", "")
                         if audio_hex:
                             try:
                                 audio.extend(bytes.fromhex(audio_hex))
                             except ValueError as error:
                                 raise Exception("MiniMax TTS WebSocket returned invalid audio data") from error
-                    elif event == "task_finished":
-                        break
-                    else:
-                        raise Exception(f"MiniMax TTS WebSocket returned unexpected event: {event}")
+                        if result.get("is_final"):
+                            break
+                        continue
+                    if event == "task_failed":
+                        raise Exception("MiniMax TTS WebSocket task failed")
+                    raise Exception(f"MiniMax TTS WebSocket returned unexpected event: {event}")
+
+                await websocket.send(json.dumps({"event": "task_finish"}))
+                finished = self._load_websocket_message(await websocket.recv())
+                if finished.get("event") != "task_finished":
+                    raise Exception("MiniMax TTS WebSocket task was not finished")
 
                 if not audio:
                     raise Exception("MiniMax TTS WebSocket returned empty audio data")

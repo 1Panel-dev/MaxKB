@@ -177,8 +177,9 @@ class MiniMaxTextToSpeechTest(unittest.TestCase):
             [
                 json.dumps({"event": "connected_success", "base_resp": {"status_code": 0}}),
                 json.dumps({"event": "task_started", "base_resp": {"status_code": 0}}),
-                json.dumps({"event": "task_result", "data": {"audio": "0001"}}),
-                json.dumps({"event": "task_result", "data": {"audio": "ff"}}),
+                json.dumps({"event": "task_continued", "data": {"audio": "0001"}, "is_final": False}),
+                json.dumps({"event": "task_continued", "data": None, "is_final": False}),
+                json.dumps({"event": "task_continued", "data": {"audio": "ff"}, "is_final": True}),
                 json.dumps({"event": "task_finished", "base_resp": {"status_code": 0}}),
             ]
         )
@@ -203,6 +204,7 @@ class MiniMaxTextToSpeechTest(unittest.TestCase):
             sent_messages[1],
             {"event": "task_continue", "text": "Hello\nworld"},
         )
+        self.assertEqual(sent_messages[2], {"event": "task_finish"})
 
 
 if __name__ == "__main__":
