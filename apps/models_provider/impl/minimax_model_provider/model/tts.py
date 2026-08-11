@@ -43,6 +43,33 @@ class MiniMaxTextToSpeech(MaxKBBaseModel, BaseTextToSpeech):
     def check_auth(self):
         self.text_to_speech(_('Hello'))
 
+    def voice_design(self, prompt: str, voice_id: str) -> str:
+        api_base = self.api_base.rstrip('/')
+        response = requests.post(
+            f'{api_base}/voice_design',
+            json={
+                'prompt': prompt,
+                'voice_id': voice_id,
+            },
+            headers={
+                'Authorization': f'Bearer {self.api_key}',
+                'Content-Type': 'application/json',
+            },
+            timeout=60,
+        )
+        response.raise_for_status()
+
+        result = response.json()
+        base_response = result.get('base_resp', {})
+        if base_response.get('status_code', 0) != 0:
+            error_msg = base_response.get('status_msg', 'Unknown error')
+            raise Exception(f'MiniMax voice design API error: {error_msg}')
+
+        designed_voice_id = result.get('voice_id')
+        if not designed_voice_id:
+            raise Exception('MiniMax voice design returned no voice ID')
+        return designed_voice_id
+
     def text_to_speech(self, text):
         text = _remove_empty_lines(text)
         api_base = self.api_base.rstrip('/')
