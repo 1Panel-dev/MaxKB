@@ -193,8 +193,8 @@ onMounted(() => loadSystemUsers())
         <template #default="{ row }">
           <MkWorkspaceRelationTags
             :table-render-params="{ property: '用户组', value: '工作空间' }"
-            :tags="row.role_name"
-            :tag-workspace="row.role_workspace"
+            :tags="row.user_group_names"
+            :tag-workspace="row.user_group_workspace"
           />
         </template>
       </el-table-column>
