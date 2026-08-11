@@ -54,6 +54,11 @@ class TokenDetails:
         return self.token_details
 
 
+agent_handle = [new_instance_by_class_path(class_path) for class_path in settings.AGENT_HANDLES]
+
+all_handles = handles + agent_handle
+
+
 class OpenAIKeyAuth(TokenAuthentication):
     def authenticate(self, request):
         auth = request.META.get('HTTP_AUTHORIZATION')
@@ -63,7 +68,7 @@ class OpenAIKeyAuth(TokenAuthentication):
             raise AppAuthenticationFailed(1003, _('Not logged in, please log in first'))
         try:
             token_details = TokenDetails(auth)
-            for handle in handles:
+            for handle in all_handles:
                 if handle.support(request, auth, token_details.get_token_details):
                     return handle.handle(request, auth, token_details.get_token_details)
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
@@ -95,10 +100,6 @@ class TokenAuth(TokenAuthentication):
                 raise e
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
 
-
-agent_handle = [new_instance_by_class_path(class_path) for class_path in settings.AGENT_HANDLES]
-
-all_handles = handles + agent_handle
 
 class AgentTokenAuth(TokenAuthentication):
     keyword = "Bearer"
@@ -144,4 +145,3 @@ class AllTokenAuth(TokenAuthentication):
                                                                                                                  AppApiException):
                 raise e
             raise AppAuthenticationFailed(1002, _('Authentication information is incorrect! illegal user'))
-
