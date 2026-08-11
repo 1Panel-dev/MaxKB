@@ -13,7 +13,6 @@ from common.db.search import page_search
 from common.exception.app_exception import AppApiException
 from system_manage.models import UserGroup, UserGroupRelation
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
-from users.serializers.user import UserInstanceSerializer
 
 
 @transaction.atomic
@@ -238,8 +237,11 @@ class UserGroupListPageSerializer(serializers.Serializer):
                 page_size,
                 query_set,
                 post_records_handler=lambda relation: {
-                    **UserInstanceSerializer(relation.user).data,
-                    "system_user_group_relation_id": relation.id,
+                    "id": str(relation.user.id),
+                    "username": relation.user.username,
+                    "nick_name": relation.user.nick_name,
+                    "email": relation.user.email,
+                    "system_user_group_relation_id": str(relation.id),
                 },
             )
 
