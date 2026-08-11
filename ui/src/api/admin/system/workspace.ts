@@ -53,11 +53,26 @@ const postRemoveWorkspaceMember = (workspaceId: string, userRelationId: string) 
   return post<undefined, boolean>(`${prefix}/${workspaceId}/remove_member/${userRelationId}`)
 }
 
+export interface WorkspaceBatchRemoveResult {
+  success_count: number
+  failed_count: number
+  failed_ids: string[]
+}
+
+/** 批量移除工作空间成员。 */
+const postBatchRemoveWorkspaceMembers = (workspaceId: string, userRelationIds: string[]) => {
+  return post<{ user_relation_ids: string[] }, WorkspaceBatchRemoveResult>(
+    `${prefix}/${workspaceId}/batch_remove_member`,
+    { user_relation_ids: userRelationIds },
+  )
+}
+
 export default {
   deleteWorkspace,
   getSystemWorkspaceList,
   getWorkspaceMemberList,
   getWorkspaceDeleteCheck,
+  postBatchRemoveWorkspaceMembers,
   postRemoveWorkspaceMember,
   postWorkspace,
   postWorkspaceMembers,

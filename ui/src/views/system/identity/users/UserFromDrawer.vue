@@ -86,9 +86,14 @@ function loadRoleSettingOptions() {
 }
 
 // 用户组相关
-const selectedWorkspaceIds = computed(() => [
-  ...new Set(userForm.role_setting.flatMap(({ workspace_ids }) => workspace_ids)),
-])
+const selectedWorkspaceIds = computed(() => {
+  if (!auth.isEE && !auth.isPE) {
+    return ['default']
+  }
+  return [
+    ...new Set(userForm.role_setting.flatMap(({ workspace_ids }) => workspace_ids)),
+  ]
+})
 
 // 默认密码
 function loadDefaultPassword() {
