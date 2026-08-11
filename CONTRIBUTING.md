@@ -14,6 +14,18 @@ This [development guideline](https://github.com/1Panel-dev/MaxKB/wiki/3-%E5%BC%8
 
 Note: If you split your pull request to small changes, please make sure any of the changes goes to master will not break anything. Otherwise, it can not be merged until this feature complete.
 
+## Code formatting
+
+This project uses [pre-commit](https://pre-commit.com/) and Ruff to format Python code. After cloning the repository and setting up the development environment, install the Git hook once:
+
+```bash
+uv sync --group dev
+uv run pre-commit install --install-hooks
+```
+
+
+The hook runs automatically on each `git commit` and stages files changed by the formatter. The same check also runs in CI for every pull request, so all formatting changes must be committed before the pull request can be merged.
+
 ## Report issues
 It is a great way to contribute by reporting an issue. Well-written and complete bug reports are always welcome! Please open an issue and follow the template to fill in required information.
 
