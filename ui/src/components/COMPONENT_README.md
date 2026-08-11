@@ -47,6 +47,9 @@ src/components/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
+│   ├── mk-view-layout/
+│   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
+│   │   └── layout-aside.vue      # 页面可选左侧栏结构
 │   ├── mk-search-input/
 │   │   └── index.vue             # 带默认搜索图标的输入框
 │   ├── mk-status-label/
@@ -230,6 +233,32 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
     <span class="truncate">{{ option.name }}</span>
   </template>
 </MkFilterableDropdown>
+```
+
+### MkViewLayout
+
+路由页面的通用内容结构，统一提供满高弹性布局、可选左侧栏、右侧标题栏和滚动内容区。标题优先
+使用 `title` Prop，未传入时读取当前路由的 `meta.title`。不传 `header` 插槽时自动渲染标题；需要
+标题右侧操作或其他自定义结构时，使用 `header` 作用域插槽完整渲染，并从插槽参数取得解析后的
+`title`。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。
+`aside` 作用域插槽提供 `title` 和已经包含左侧标题栏样式的 `Header` 动态组件，左侧标题与内容
+可以集中写在同一个插槽中。
+
+```vue
+<MkViewLayout>
+  <template #aside="{ title, Header }">
+    <component :is="Header">
+      <h4>{{ title }}</h4>
+      <el-button text type="primary">创建</el-button>
+    </component>
+    左侧列表
+  </template>
+  <template #header="{ title }">
+    <h4>{{ title }}</h4>
+    <el-button type="primary">创建</el-button>
+  </template>
+  右侧内容
+</MkViewLayout>
 ```
 
 ### MkIcon

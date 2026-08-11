@@ -205,13 +205,8 @@ onMounted(loadLoginSetting)
 </script>
 
 <template>
-  <section class="h-full px-6 py-4" v-loading="loading">
-    <header class="mb-4">
-      <h4>系统用户认证</h4>
-      <p class="mt-1 text-N600">配置系统登录策略及第三方身份认证服务。</p>
-    </header>
-
-    <el-tabs v-model="activeTab" class="h-[calc(100%-64px)]">
+  <MkViewLayout v-loading="loading">
+    <el-tabs v-model="activeTab" class="h-full">
       <el-tab-pane label="登录设置" name="LOGIN">
         <el-form ref="loginFormRef" class="max-w-3xl" :model="loginSetting" label-position="top">
           <el-form-item label="允许的登录方式" prop="login_methods" required>
@@ -295,5 +290,5 @@ onMounted(loadLoginSetting)
         </el-scrollbar>
       </el-tab-pane>
     </el-tabs>
-  </section>
+  </MkViewLayout>
 </template>

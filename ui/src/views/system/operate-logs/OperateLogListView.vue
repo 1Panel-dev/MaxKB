@@ -147,14 +147,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="h-full px-6 py-4">
-    <header class="mb-4 flex-between">
-      <h4>操作日志</h4>
+  <MkPageLayout title="操作日志">
+    <template #actions>
       <div class="flex gap-3">
         <el-button @click="handleExport">导出</el-button>
         <el-button @click="openCleanPolicy">清理策略</el-button>
       </div>
-    </header>
+    </template>
 
     <div class="mb-4 flex-between gap-4">
       <div class="flex gap-3">
@@ -290,5 +289,5 @@ onMounted(() => {
         <el-button type="primary" @click="saveCleanPolicy">保存</el-button>
       </template>
     </el-dialog>
-  </section>
+  </MkPageLayout>
 </template>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import { useRoute } from 'vue-router'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
 import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/api/types/index.ts'
@@ -13,7 +12,6 @@ import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
 
 const { auth, user } = useStore()
-const route = useRoute()
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
@@ -134,9 +132,9 @@ onMounted(() => loadSystemUsers())
 </script>
 
 <template>
-  <div class="system-identity-users px-6">
-    <header class="flex-between py-4">
-      <h4>{{ route.meta.title }}</h4>
+  <MkViewLayout class="system-identity-users">
+    <template #header="{ title }">
+      <h4>{{ title }}</h4>
       <div class="flex items-center">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <el-button class="ml-3">
@@ -148,7 +146,7 @@ onMounted(() => loadSystemUsers())
           <span>创建用户</span>
         </el-button>
       </div>
-    </header>
+    </template>
 
     <MkTable
       ref="userTableRef"
@@ -259,7 +257,7 @@ onMounted(() => loadSystemUsers())
     <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
     <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
     <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
-  </div>
+  </MkViewLayout>
 </template>
 
 <style scoped lang="scss"></style>

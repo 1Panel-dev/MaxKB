@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import { useRoute } from 'vue-router'
 import ChatUserApi from '@/api/admin/system/chat-user'
 import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -10,8 +9,6 @@ import UserFromDrawer from './UserFromDrawer.vue'
 import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
-
-const route = useRoute()
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
@@ -141,9 +138,9 @@ onMounted(() => loadChatUsers())
 </script>
 
 <template>
-  <div class="system-chat-users px-6">
-    <header class="flex-between py-4">
-      <h4>{{ route.meta.title }}</h4>
+  <MkViewLayout class="system-chat-users" v-loading="chatUsersLoading">
+    <template #header="{ title }">
+      <h4>{{ title }}</h4>
       <div class="flex items-center">
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
         <el-button class="ml-3" @click="importUsersDialogRef?.open()">
@@ -155,7 +152,7 @@ onMounted(() => loadChatUsers())
           <span>创建用户</span>
         </el-button>
       </div>
-    </header>
+    </template>
 
     <MkTable
       ref="userTableRef"
@@ -247,5 +244,5 @@ onMounted(() => loadChatUsers())
     <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
     <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
     <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
-  </div>
+  </MkViewLayout>
 </template>
