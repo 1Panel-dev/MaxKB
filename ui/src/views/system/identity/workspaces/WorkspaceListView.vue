@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue'
-import { useRoute } from 'vue-router'
 import type { TableColumnCtx } from 'element-plus'
 import type { RequestParams, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import WorkspaceApi from '@/api/admin/system/workspace'
@@ -8,8 +7,6 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
-
-const route = useRoute()
 
 /* 添加工作空间表单dialog */
 const workspaceDialogRef =
@@ -192,16 +189,16 @@ onMounted(() => loadWorkspaceOptions())
 </script>
 
 <template>
-  <div class="system-identity-workspaces flex h-full" v-loading="workspaceLoading">
-    <aside class="flex w-sidebar-expanded shrink-0 flex-col border-r">
-      <header class="flex-between p-4">
-        <h4>{{ route.meta.title }}</h4>
+  <MkViewLayout class="system-identity-workspaces" v-loading="workspaceLoading">
+    <template #aside="{ title, Header }">
+      <component :is="Header">
+        <h4>{{ title }}</h4>
         <el-tooltip content="创建工作空间" placement="top">
           <el-button text type="primary" class="-mr-1" @click="workspaceDialogRef?.open()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </el-tooltip>
-      </header>
+      </component>
       <MkSearchList
         :data="workspacesList"
         :default-active="currentWorkspace?.id"
@@ -224,54 +221,56 @@ onMounted(() => loadWorkspaceOptions())
           </MkDropdownMenu>
         </template>
       </MkSearchList>
-    </aside>
+    </template>
 
-    <section class="min-w-0 flex-1 px-6">
-      <header class="py-4 flex items-center gap-2">
+    <template #header>
+      <div class="flex items-center gap-2">
         <h4>{{ currentWorkspace?.name }}</h4>
         <el-divider direction="vertical" />
         <span class="flex items-center text-N500">
           <MkIcon name="icon_member_filled" class="mr-1" />
           {{ currentWorkspace?.user_count }}
         </span>
-      </header>
-      <div class="flex-between mb-4">
-        <el-button type="primary" @click="addMemberDrawerRef?.open()">
-          <MkIcon name="icon_add_outlined" />
-          <span>添加成员</span>
-        </el-button>
-        <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
       </div>
+    </template>
 
-      <MkTable
-        v-model:pagination-config="paginationConfig"
-        :data="workspaceMembers"
-        v-loading="workspaceMembersLoading"
-        @current-change="loadWorkspaceMembers()"
-        @size-change="loadWorkspaceMembers()"
-        @selection-change="handleBatchSelectionChange"
-        :span-method="objectSpanMethod"
-        :row-key="getWorkspaceMemberRowKey"
-      >
-        <el-table-column type="selection" width="64" />
-        <el-table-column prop="nick_name" label="姓名" />
-        <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="role_name" label="角色" class-name="border-l!" />
-        <el-table-column label="操作" width="70" fixed="right">
-          <template #default="{ row }">
-            <el-tooltip content="移除" placement="top">
-              <el-button type="primary" text @click="handleRemoveMember(row)">
-                <MkIcon name="icon_assigned_outlined" />
-              </el-button>
-            </el-tooltip>
-          </template>
-        </el-table-column>
+    <div class="flex-between mb-4">
+      <el-button type="primary" @click="addMemberDrawerRef?.open()">
+        <MkIcon name="icon_add_outlined" />
+        <span>添加成员</span>
+      </el-button>
+      <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
+    </div>
 
-        <template #footer-batch-actions>
-          <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+    <MkTable
+      v-model:pagination-config="paginationConfig"
+      :data="workspaceMembers"
+      v-loading="workspaceMembersLoading"
+      @current-change="loadWorkspaceMembers()"
+      @size-change="loadWorkspaceMembers()"
+      @selection-change="handleBatchSelectionChange"
+      :span-method="objectSpanMethod"
+      :max-table-height="280"
+      :row-key="getWorkspaceMemberRowKey"
+    >
+      <el-table-column type="selection" width="64" />
+      <el-table-column prop="nick_name" label="姓名" />
+      <el-table-column prop="username" label="用户名" />
+      <el-table-column prop="role_name" label="角色" class-name="border-l!" />
+      <el-table-column label="操作" width="70" fixed="right">
+        <template #default="{ row }">
+          <el-tooltip content="移除" placement="top">
+            <el-button type="primary" text @click="handleRemoveMember(row)">
+              <MkIcon name="icon_assigned_outlined" />
+            </el-button>
+          </el-tooltip>
         </template>
-      </MkTable>
-    </section>
+      </el-table-column>
+
+      <template #footer-batch-actions>
+        <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+      </template>
+    </MkTable>
 
     <CreateOrUpdateWorkspaceDialog ref="workspaceDialogRef" @refresh="loadWorkspaceOptions" />
     <AddMemberDrawer
@@ -279,5 +278,5 @@ onMounted(() => loadWorkspaceOptions())
       :current-workspace="currentWorkspace"
       @refresh="loadWorkspaceOptions"
     />
-  </div>
+  </MkViewLayout>
 </template>

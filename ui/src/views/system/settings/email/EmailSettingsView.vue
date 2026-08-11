@@ -61,52 +61,45 @@ onMounted(loadEmailSetting)
 </script>
 
 <template>
-  <section class="h-full px-6 py-4" v-loading="loading">
-    <header class="mb-4">
-      <h4>邮箱设置</h4>
-      <p class="mt-1 text-N600">配置用于验证码、密码找回等系统邮件的 SMTP 服务。</p>
-    </header>
-
-    <el-scrollbar class="h-[calc(100%-64px)]">
-      <el-form
-        ref="emailFormRef"
-        class="max-w-3xl"
-        :model="emailSetting"
-        :rules="rules"
-        label-position="top"
-        require-asterisk-position="right"
-      >
-        <div class="grid grid-cols-2 gap-x-4">
-          <el-form-item label="SMTP 主机" prop="email_host">
-            <el-input v-model="emailSetting.email_host" placeholder="例如 smtp.example.com" />
-          </el-form-item>
-          <el-form-item label="SMTP 端口" prop="email_port">
-            <el-input v-model="emailSetting.email_port" placeholder="例如 465" />
-          </el-form-item>
-        </div>
-        <el-form-item label="SMTP 用户名" prop="email_host_user">
-          <el-input v-model="emailSetting.email_host_user" placeholder="请输入 SMTP 用户名" />
+  <MkViewLayout class="system-settings-email" v-loading="loading">
+    <el-form
+      ref="emailFormRef"
+      class="max-w-3xl"
+      :model="emailSetting"
+      :rules="rules"
+      label-position="top"
+      require-asterisk-position="right"
+    >
+      <div class="grid grid-cols-2 gap-x-4">
+        <el-form-item label="SMTP 主机" prop="email_host">
+          <el-input v-model="emailSetting.email_host" placeholder="例如 smtp.example.com" />
         </el-form-item>
-        <el-form-item label="发件人邮箱" prop="from_email">
-          <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
+        <el-form-item label="SMTP 端口" prop="email_port">
+          <el-input v-model="emailSetting.email_port" placeholder="例如 465" />
         </el-form-item>
-        <el-form-item label="SMTP 密码" prop="email_host_password">
-          <el-input
-            v-model="emailSetting.email_host_password"
-            type="password"
-            show-password
-            placeholder="请输入 SMTP 密码或授权码"
-          />
-        </el-form-item>
-        <div class="mb-4 flex gap-6">
-          <el-checkbox v-model="emailSetting.email_use_ssl">启用 SSL</el-checkbox>
-          <el-checkbox v-model="emailSetting.email_use_tls">启用 TLS</el-checkbox>
-        </div>
-        <div class="flex gap-3">
-          <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
-          <el-button @click="submitEmailSetting('test')">测试连接</el-button>
-        </div>
-      </el-form>
-    </el-scrollbar>
-  </section>
+      </div>
+      <el-form-item label="SMTP 用户名" prop="email_host_user">
+        <el-input v-model="emailSetting.email_host_user" placeholder="请输入 SMTP 用户名" />
+      </el-form-item>
+      <el-form-item label="发件人邮箱" prop="from_email">
+        <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
+      </el-form-item>
+      <el-form-item label="SMTP 密码" prop="email_host_password">
+        <el-input
+          v-model="emailSetting.email_host_password"
+          type="password"
+          show-password
+          placeholder="请输入 SMTP 密码或授权码"
+        />
+      </el-form-item>
+      <div class="mb-4 flex gap-6">
+        <el-checkbox v-model="emailSetting.email_use_ssl">启用 SSL</el-checkbox>
+        <el-checkbox v-model="emailSetting.email_use_tls">启用 TLS</el-checkbox>
+      </div>
+      <div class="flex gap-3">
+        <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
+        <el-button @click="submitEmailSetting('test')">测试连接</el-button>
+      </div>
+    </el-form>
+  </MkViewLayout>
 </template>

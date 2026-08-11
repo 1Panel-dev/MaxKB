@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
     MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
     MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
     MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']
@@ -24,6 +25,7 @@ declare module 'vue' {
     MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
     MkTable: typeof import('./components/global/mk-table/index.vue')['default']
     MkTagGroup: typeof import('./components/global/mk-tag-group/index.vue')['default']
+    MkViewLayout: typeof import('./components/global/mk-view-layout/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
@@ -31,6 +33,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
   const MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
   const MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
   const MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']
@@ -43,6 +46,7 @@ declare global {
   const MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
   const MkTable: typeof import('./components/global/mk-table/index.vue')['default']
   const MkTagGroup: typeof import('./components/global/mk-tag-group/index.vue')['default']
+  const MkViewLayout: typeof import('./components/global/mk-view-layout/index.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
 }
