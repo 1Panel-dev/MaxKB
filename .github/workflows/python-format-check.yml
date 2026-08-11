@@ -1,7 +1,6 @@
 name: Python Format Check
 
 on:
-  push:
   pull_request:
     types: [opened, synchronize, reopened]
 
