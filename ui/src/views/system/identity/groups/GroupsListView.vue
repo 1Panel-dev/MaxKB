@@ -175,7 +175,7 @@ function loadWorkspaceOptions() {
       selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
     }
 
-    loadUserGroups()
+    return loadUserGroups()
   })
 }
 
@@ -183,7 +183,7 @@ onMounted(() => loadWorkspaceOptions())
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-groups">
+  <MkViewLayout class="system-identity-groups" :loading="!selectedWorkspaceId && loadingGroups">
     <template #top>
       <MkWorkspaceDropdown
         v-model="selectedWorkspaceId"
@@ -225,68 +225,73 @@ onMounted(() => loadWorkspaceOptions())
       </MkSearchList>
     </template>
 
-    <template #header>
-      <div class="flex items-center gap-2">
-        <h4>{{ currentGroup?.name }}</h4>
-        <el-divider direction="vertical" />
-        <span class="flex items-center text-N500">
-          <MkIcon name="icon_member_filled" class="mr-1" />
-          {{ currentGroup?.count }}
-        </span>
-      </div>
-    </template>
+    <template #default="{ Header }">
+      <template v-if="currentGroup">
+        <component :is="Header">
+          <div class="flex items-center gap-2">
+            <h4>{{ currentGroup.name }}</h4>
+            <el-divider direction="vertical" />
+            <span class="flex items-center text-N500">
+              <MkIcon name="icon_member_filled" class="mr-1" />
+              {{ currentGroup.count }}
+            </span>
+          </div>
+        </component>
 
-    <div class="flex-between mb-4">
-      <el-button type="primary" @click="memberDialogRef?.open()">
-        <MkIcon name="icon_add_outlined" />
-        <span>添加成员</span>
-      </el-button>
-      <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
-    </div>
+        <div class="flex-between mb-4">
+          <el-button type="primary" @click="memberDialogRef?.open()">
+            <MkIcon name="icon_add_outlined" />
+            <span>添加成员</span>
+          </el-button>
+          <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
+        </div>
 
-    <MkTable
-      v-loading="loadingMembers"
-      :max-table-height="340"
-      v-model:pagination-config="paginationConfig"
-      :data="userGroupMembers"
-      @selection-change="handleMemberSelectionChange"
-    >
-      <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="198" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
-      <el-table-column label="角色" min-width="198">
-        <template #default="{ row }">
-          <MkWorkspaceRelationTags
-            :table-render-params="{ property: '角色', value: '工作空间' }"
-            :tags="row.role ? [row.role] : []"
-          />
-        </template>
-      </el-table-column>
-      <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
-      <el-table-column label="操作" width="70" fixed="right">
-        <template #default="{ row }">
-          <el-tooltip content="移除" placement="top">
-            <el-button type="primary" text @click="handleRemoveMembers(row)">
-              <MkIcon name="icon_assigned_outlined" />
-            </el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <template #footer-batch-actions>
-        <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+        <MkTable
+          v-loading="loadingMembers"
+          :max-table-height="340"
+          v-model:pagination-config="paginationConfig"
+          :data="userGroupMembers"
+          @selection-change="handleMemberSelectionChange"
+          :search="Boolean(memberSearchQuery)"
+        >
+          <el-table-column type="selection" width="40" />
+          <el-table-column prop="nick_name" label="姓名" min-width="198" show-overflow-tooltip />
+          <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
+          <el-table-column label="角色" min-width="198">
+            <template #default="{ row }">
+              <MkWorkspaceRelationTags
+                :table-render-params="{ property: '角色', value: '工作空间' }"
+                :tags="row.role ? [row.role] : []"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
+          <el-table-column label="操作" width="70" fixed="right">
+            <template #default="{ row }">
+              <el-tooltip content="移除" placement="top">
+                <el-button type="primary" text @click="handleRemoveMembers(row)">
+                  <MkIcon name="icon_assigned_outlined" />
+                </el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <template #footer-batch-actions>
+            <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+          </template>
+        </MkTable>
       </template>
-    </MkTable>
-
-    <CreateOrUpdateGroupDialog
-      ref="groupDialogRef"
-      :workspace-id="selectedWorkspaceId"
-      @refresh="handleGroupSaved"
-    />
-    <CreateGroupMemberDialog
-      ref="memberDialogRef"
-      :workspace-id="selectedWorkspaceId"
-      :current-group="currentGroup"
-      @refresh="loadUserGroupMembers(true)"
-    />
+      <MkEmpty v-else class="flex-1" />
+    </template>
   </MkViewLayout>
+  <CreateOrUpdateGroupDialog
+    ref="groupDialogRef"
+    :workspace-id="selectedWorkspaceId"
+    @refresh="handleGroupSaved"
+  />
+  <CreateGroupMemberDialog
+    ref="memberDialogRef"
+    :workspace-id="selectedWorkspaceId"
+    :current-group="currentGroup"
+    @refresh="loadUserGroupMembers(true)"
+  />
 </template>

@@ -19,14 +19,11 @@ const emailFormRef = useTemplateRef<FormInstance>('emailFormRef')
 const emailSetting = reactive<EmailSetting>({ ...defaultEmailSetting })
 const loading = ref(false)
 const rules: FormRules<EmailSetting> = {
-  email_host: [{ required: true, message: '请输入 SMTP 主机地址', trigger: 'blur' }],
-  email_port: [{ required: true, message: '请输入 SMTP 端口', trigger: 'blur' }],
-  email_host_user: [{ required: true, message: '请输入 SMTP 用户名', trigger: 'blur' }],
-  email_host_password: [{ required: true, message: '请输入 SMTP 密码', trigger: 'blur' }],
-  from_email: [
-    { required: true, message: '请输入发件人邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱地址', trigger: 'blur' },
-  ],
+  email_host: [{ required: true, message: '请输入 SMTP Host', trigger: 'blur' }],
+  email_port: [{ required: true, message: '请输入 SMTP Port', trigger: 'blur' }],
+  email_host_user: [{ required: true, message: '请输入 SMTP 账户', trigger: 'blur' }],
+  email_host_password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  from_email: [{ required: true, message: '请输入发件人邮箱', trigger: 'blur' }],
 }
 
 /* 邮箱设置加载与提交 */
@@ -61,45 +58,51 @@ onMounted(loadEmailSetting)
 </script>
 
 <template>
-  <MkViewLayout class="system-settings-email" v-loading="loading">
+  <MkViewLayout class="system-settings-email" :loading="loading">
     <el-form
+      class="max-w-200"
       ref="emailFormRef"
-      class="max-w-3xl"
       :model="emailSetting"
       :rules="rules"
       label-position="top"
       require-asterisk-position="right"
     >
-      <div class="grid grid-cols-2 gap-x-4">
-        <el-form-item label="SMTP 主机" prop="email_host">
-          <el-input v-model="emailSetting.email_host" placeholder="例如 smtp.example.com" />
-        </el-form-item>
-        <el-form-item label="SMTP 端口" prop="email_port">
-          <el-input v-model="emailSetting.email_port" placeholder="例如 465" />
-        </el-form-item>
-      </div>
-      <el-form-item label="SMTP 用户名" prop="email_host_user">
-        <el-input v-model="emailSetting.email_host_user" placeholder="请输入 SMTP 用户名" />
+      <el-form-item label="SMTP Host" prop="email_host">
+        <el-input v-model="emailSetting.email_host" placeholder="请输入 SMTP Host" />
+      </el-form-item>
+      <el-form-item label="SMTP Port" prop="email_port">
+        <el-input v-model="emailSetting.email_port" placeholder="请输入 SMTP Port" />
+      </el-form-item>
+
+      <el-form-item label="SMTP 账户" prop="email_host_user">
+        <el-input v-model="emailSetting.email_host_user" placeholder="请输入 SMTP 账户" />
       </el-form-item>
       <el-form-item label="发件人邮箱" prop="from_email">
         <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
       </el-form-item>
-      <el-form-item label="SMTP 密码" prop="email_host_password">
+      <el-form-item label="密码" prop="email_host_password">
         <el-input
           v-model="emailSetting.email_host_password"
           type="password"
           show-password
-          placeholder="请输入 SMTP 密码或授权码"
+          placeholder="请输入发件人密码"
         />
       </el-form-item>
-      <div class="mb-4 flex gap-6">
-        <el-checkbox v-model="emailSetting.email_use_ssl">启用 SSL</el-checkbox>
-        <el-checkbox v-model="emailSetting.email_use_tls">启用 TLS</el-checkbox>
-      </div>
-      <div class="flex gap-3">
-        <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
-        <el-button @click="submitEmailSetting('test')">测试连接</el-button>
-      </div>
+      <el-form-item>
+        <div class="flex flex-col">
+          <p>启用 SSL<span class="text-N500">（如果 SMTP 端口是 465，通常需要启用 SSL）</span></p>
+          <el-switch v-model="emailSetting.email_use_ssl" class="self-start" />
+        </div>
+      </el-form-item>
+      <el-form-item>
+        <div class="flex flex-col">
+          <p>启用 TLS<span class="text-N500">（如果 SMTP 端口是 587，通常需要启用 TL）</span></p>
+          <el-switch v-model="emailSetting.email_use_tls" class="self-start" />
+        </div>
+      </el-form-item>
+
+      <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
+      <el-button @click="submitEmailSetting('test')">测试连接</el-button>
     </el-form>
   </MkViewLayout>
 </template>

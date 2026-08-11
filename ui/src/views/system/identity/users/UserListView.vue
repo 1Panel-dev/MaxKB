@@ -133,131 +133,135 @@ onMounted(() => loadSystemUsers())
 
 <template>
   <MkViewLayout class="system-identity-users">
-    <template #header="{ title }">
-      <h4>{{ title }}</h4>
-      <div class="flex items-center">
-        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-        <el-button class="ml-3">
-          <MkIcon name="icon_import_outlined" />
-          <span>导入用户</span>
-        </el-button>
-        <el-button type="primary" @click="userFormDrawerRef?.open()">
-          <MkIcon name="icon_add_outlined" />
-          <span>创建用户</span>
-        </el-button>
-      </div>
-    </template>
+    <template #default="{ title, Header }">
+      <component :is="Header">
+        <h4>{{ title }}</h4>
+        <div class="flex items-center">
+          <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <el-button class="ml-3">
+            <MkIcon name="icon_import_outlined" />
+            <span>导入用户</span>
+          </el-button>
+          <el-button type="primary" @click="userFormDrawerRef?.open()">
+            <MkIcon name="icon_add_outlined" />
+            <span>创建用户</span>
+          </el-button>
+        </div>
+      </component>
 
-    <MkTable
-      ref="userTableRef"
-      v-model:pagination-config="paginationConfig"
-      :data="systemUsersData"
-      v-loading="systemUsersLoading"
-      @current-change="loadSystemUsers()"
-      @size-change="loadSystemUsers()"
-      @selection-change="handleBatchSelectionChange"
-    >
-      <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-      <el-table-column width="100" label="状态">
-        <template #default="{ row }">
-          <MkStatusLabel :active="row.is_active" />
-        </template>
-      </el-table-column>
+      <MkTable
+        ref="userTableRef"
+        v-model:pagination-config="paginationConfig"
+        :data="systemUsersData"
+        v-loading="systemUsersLoading"
+        @current-change="loadSystemUsers()"
+        @size-change="loadSystemUsers()"
+        @selection-change="handleBatchSelectionChange"
+        :search="Boolean(systemUserQuery)"
+      >
+        <el-table-column type="selection" width="40" />
+        <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
+        <el-table-column width="100" label="状态">
+          <template #default="{ row }">
+            <MkStatusLabel :active="row.is_active" />
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
-        <template #default="{ row }">
-          {{ row.email || '-' }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" width="120" label="手机号">
-        <template #default="{ row }">
-          {{ row.phone || '-' }}
-        </template>
-      </el-table-column>
+        <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+          <template #default="{ row }">
+            {{ row.email || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="phone" width="120" label="手机号">
+          <template #default="{ row }">
+            {{ row.phone || '-' }}
+          </template>
+        </el-table-column>
 
-      <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
-        <template #default="{ row }">
-          <MkWorkspaceRelationTags
-            :table-render-params="{ property: '角色', value: '工作空间' }"
-            :tags="row.role_name"
-            :tag-workspace="row.role_workspace"
-          />
-        </template>
-      </el-table-column>
+        <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
+          <template #default="{ row }">
+            <MkWorkspaceRelationTags
+              :table-render-params="{ property: '角色', value: '工作空间' }"
+              :tags="row.role_name"
+              :tag-workspace="row.role_workspace"
+            />
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="user_group_names" width="180" label="用户组">
-        <template #default="{ row }">
-          <MkWorkspaceRelationTags
-            :table-render-params="{ property: '用户组', value: '工作空间' }"
-            :tags="row.user_group_names"
-            :tag-workspace="row.user_group_workspace"
-          />
-        </template>
-      </el-table-column>
+        <el-table-column prop="user_group_names" width="180" label="用户组">
+          <template #default="{ row }">
+            <MkWorkspaceRelationTags
+              :table-render-params="{ property: '用户组', value: '工作空间' }"
+              :tags="row.user_group_names"
+              :tag-workspace="row.user_group_workspace"
+            />
+          </template>
+        </el-table-column>
 
-      <el-table-column label="用户来源">
-        <template #default="{ row }">
-          {{ row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
-        </template>
-      </el-table-column>
+        <el-table-column label="用户来源">
+          <template #default="{ row }">
+            {{
+              row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+            }}
+          </template>
+        </el-table-column>
 
-      <el-table-column label="创建时间" width="180">
-        <template #default="{ row }">
-          {{ datetimeFormat(row.create_time) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="160" fixed="right">
-        <template #default="{ row }">
-          <div class="flex items-center gap-3">
-            <span @click.stop>
-              <el-switch
-                v-model="row.is_active"
-                :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
-                :before-change="() => handleChangeStatus(row)"
-                size="small"
-              />
-            </span>
-            <el-divider direction="vertical" />
-            <div class="flex gap-1">
-              <el-tooltip content="编辑" placement="top">
-                <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
-                  <mk-icon name="icon_edit_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="修改用户密码" placement="top">
-                <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
-                  <mk-icon name="icon-key_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="删除" placement="top">
-                <el-button type="primary" text @click.stop="deleteUser(row)">
-                  <mk-icon name="icon_delete-trash_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
+        <el-table-column label="创建时间" width="180">
+          <template #default="{ row }">
+            {{ datetimeFormat(row.create_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right">
+          <template #default="{ row }">
+            <div class="flex items-center gap-3">
+              <span @click.stop>
+                <el-switch
+                  v-model="row.is_active"
+                  :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
+                  :before-change="() => handleChangeStatus(row)"
+                  size="small"
+                />
+              </span>
+              <el-divider direction="vertical" />
+              <div class="flex gap-1">
+                <el-tooltip content="编辑" placement="top">
+                  <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
+                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="修改用户密码" placement="top">
+                  <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
+                    <mk-icon name="icon-key_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="删除" placement="top">
+                  <el-button type="primary" text @click.stop="deleteUser(row)">
+                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
-          </div>
+          </template>
+        </el-table-column>
+
+        <template #footer-batch-actions>
+          <el-button
+            v-if="auth.isEE || auth.isPE"
+            type="primary"
+            plain
+            @click="openBatchSetUserRoleDialog"
+          >
+            设置角色
+          </el-button>
+          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
-      </el-table-column>
-
-      <template #footer-batch-actions>
-        <el-button
-          v-if="auth.isEE || auth.isPE"
-          type="primary"
-          plain
-          @click="openBatchSetUserRoleDialog"
-        >
-          设置角色
-        </el-button>
-        <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
-      </template>
-    </MkTable>
-
-    <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
-    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
-    <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
+      </MkTable>
+    </template>
   </MkViewLayout>
+  <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
+  <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
+  <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
 </template>
 
 <style scoped lang="scss"></style>

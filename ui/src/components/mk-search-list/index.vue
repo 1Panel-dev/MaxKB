@@ -140,7 +140,9 @@ function selectRow(row: T, index: number) {
         </template>
       </div>
       <slot v-else name="empty">
-        <el-empty :description="emptyText" :image-size="80" />
+        <p class="text-center mt-20 text-N600">
+          {{ searchKeyword ? '没有找到相关内容' : emptyText }}
+        </p>
       </slot>
     </el-scrollbar>
   </div>

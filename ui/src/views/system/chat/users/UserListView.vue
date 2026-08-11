@@ -138,111 +138,115 @@ onMounted(() => loadChatUsers())
 </script>
 
 <template>
-  <MkViewLayout class="system-chat-users" v-loading="chatUsersLoading">
-    <template #header="{ title }">
-      <h4>{{ title }}</h4>
-      <div class="flex items-center">
-        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-        <el-button class="ml-3" @click="importUsersDialogRef?.open()">
-          <MkIcon name="icon_import_outlined" />
-          <span>导入用户</span>
-        </el-button>
-        <el-button type="primary" @click="userFormDrawerRef?.open()">
-          <MkIcon name="icon_add_outlined" />
-          <span>创建用户</span>
-        </el-button>
-      </div>
-    </template>
+  <MkViewLayout class="system-chat-users" :loading="chatUsersLoading">
+    <template #default="{ title, Header }">
+      <component :is="Header">
+        <h4>{{ title }}</h4>
+        <div class="flex items-center">
+          <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <el-button class="ml-3" @click="importUsersDialogRef?.open()">
+            <MkIcon name="icon_import_outlined" />
+            <span>导入用户</span>
+          </el-button>
+          <el-button type="primary" @click="userFormDrawerRef?.open()">
+            <MkIcon name="icon_add_outlined" />
+            <span>创建用户</span>
+          </el-button>
+        </div>
+      </component>
 
-    <MkTable
-      ref="userTableRef"
-      v-model:pagination-config="paginationConfig"
-      :data="chatUsersData"
-      v-loading="chatUsersLoading"
-      @current-change="loadChatUsers()"
-      @size-change="loadChatUsers()"
-      @selection-change="handleBatchSelectionChange"
-    >
-      <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
-      <el-table-column width="100" label="状态">
-        <template #default="{ row }">
-          <MkStatusLabel :active="row.is_active" />
-        </template>
-      </el-table-column>
+      <MkTable
+        ref="userTableRef"
+        v-model:pagination-config="paginationConfig"
+        :data="chatUsersData"
+        v-loading="chatUsersLoading"
+        @current-change="loadChatUsers()"
+        @size-change="loadChatUsers()"
+        @selection-change="handleBatchSelectionChange"
+        :search="Boolean(chatUserQuery)"
+      >
+        <el-table-column type="selection" width="40" />
+        <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
+        <el-table-column prop="username" label="用户名" min-width="150" show-overflow-tooltip />
+        <el-table-column width="100" label="状态">
+          <template #default="{ row }">
+            <MkStatusLabel :active="row.is_active" />
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
-        <template #default="{ row }">
-          {{ row.email || '-' }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" width="120" label="手机号">
-        <template #default="{ row }">
-          {{ row.phone || '-' }}
-        </template>
-      </el-table-column>
+        <el-table-column prop="email" label="邮箱" show-overflow-tooltip min-width="180">
+          <template #default="{ row }">
+            {{ row.email || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="phone" width="120" label="手机号">
+          <template #default="{ row }">
+            {{ row.phone || '-' }}
+          </template>
+        </el-table-column>
 
-      <el-table-column prop="user_group_names" width="180" label="用户组">
-        <template #default="{ row }">
-          <MkTagGroup :tags="row.user_group_names" />
-        </template>
-      </el-table-column>
+        <el-table-column prop="user_group_names" width="180" label="用户组">
+          <template #default="{ row }">
+            <MkTagGroup :tags="row.user_group_names" />
+          </template>
+        </el-table-column>
 
-      <el-table-column label="用户来源">
-        <template #default="{ row }">
-          {{ row.source === 'LOCAL' ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
-        </template>
-      </el-table-column>
+        <el-table-column label="用户来源">
+          <template #default="{ row }">
+            {{
+              row.source === 'LOCAL' ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+            }}
+          </template>
+        </el-table-column>
 
-      <el-table-column label="创建时间" width="180">
-        <template #default="{ row }">
-          {{ datetimeFormat(row.create_time) }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="160" fixed="right">
-        <template #default="{ row }">
-          <div class="flex items-center gap-3">
-            <span @click.stop>
-              <el-switch
-                v-model="row.is_active"
-                size="small"
-                :before-change="() => handleChangeStatus(row)"
-              />
-            </span>
-            <el-divider direction="vertical" />
-            <div class="flex gap-1">
-              <el-tooltip content="编辑" placement="top">
-                <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
-                  <mk-icon name="icon_edit_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="修改用户密码" placement="top">
-                <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
-                  <mk-icon name="icon-key_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
-              <el-tooltip content="删除" placement="top">
-                <el-button type="primary" text @click.stop="deleteUser(row)">
-                  <mk-icon name="icon_delete-trash_outlined"></mk-icon>
-                </el-button>
-              </el-tooltip>
+        <el-table-column label="创建时间" width="180">
+          <template #default="{ row }">
+            {{ datetimeFormat(row.create_time) }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="160" fixed="right">
+          <template #default="{ row }">
+            <div class="flex items-center gap-3">
+              <span @click.stop>
+                <el-switch
+                  v-model="row.is_active"
+                  size="small"
+                  :before-change="() => handleChangeStatus(row)"
+                />
+              </span>
+              <el-divider direction="vertical" />
+              <div class="flex gap-1">
+                <el-tooltip content="编辑" placement="top">
+                  <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
+                    <mk-icon name="icon_edit_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="修改用户密码" placement="top">
+                  <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
+                    <mk-icon name="icon-key_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+                <el-tooltip content="删除" placement="top">
+                  <el-button type="primary" text @click.stop="deleteUser(row)">
+                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
+                  </el-button>
+                </el-tooltip>
+              </div>
             </div>
-          </div>
+          </template>
+        </el-table-column>
+
+        <template #footer-batch-actions>
+          <el-button type="primary" plain @click="openBatchSetUserGroupDialog">
+            设置用户组
+          </el-button>
+          <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
-      </el-table-column>
-
-      <template #footer-batch-actions>
-        <el-button type="primary" plain @click="openBatchSetUserGroupDialog">
-          设置用户组
-        </el-button>
-        <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
-      </template>
-    </MkTable>
-
-    <UserFromDrawer ref="userFormDrawerRef" @refresh="loadChatUsers" />
-    <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
-    <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
-    <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
+      </MkTable>
+    </template>
   </MkViewLayout>
+  <UserFromDrawer ref="userFormDrawerRef" @refresh="loadChatUsers" />
+  <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
+  <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
+  <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
 </template>

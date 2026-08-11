@@ -135,7 +135,7 @@ onMounted(() => loadChatUserGroups())
 </script>
 
 <template>
-  <MkViewLayout class="system-chat-groups" v-loading="groupsLoading">
+  <MkViewLayout class="system-chat-groups" :loading="groupsLoading">
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -164,61 +164,69 @@ onMounted(() => loadChatUserGroups())
         </template>
       </MkSearchList>
     </template>
-    <template #header>
-      <div class="flex items-center gap-2">
-        <h4>{{ currentGroup?.name }}</h4>
-        <el-divider direction="vertical" />
-        <span class="flex items-center text-N500">
-          <MkIcon name="icon_member_filled" class="mr-1" />
-          {{ paginationConfig.total }}
-        </span>
-      </div>
-    </template>
+    <template #default="{ Header }">
+      <template v-if="currentGroup">
+        <component :is="Header">
+          <div class="flex items-center gap-2">
+            <h4>{{ currentGroup.name }}</h4>
+            <el-divider direction="vertical" />
+            <span class="flex items-center text-N500">
+              <MkIcon name="icon_member_filled" class="mr-1" />
+              {{ paginationConfig.total }}
+            </span>
+          </div>
+        </component>
 
-    <div class="flex-between mb-4">
-      <el-button type="primary" @click="memberDialogRef?.open()">
-        <MkIcon name="icon_add_outlined" />
-        <span>添加成员</span>
-      </el-button>
-      <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
-    </div>
+        <div class="flex-between mb-4">
+          <el-button type="primary" @click="memberDialogRef?.open()">
+            <MkIcon name="icon_add_outlined" />
+            <span>添加成员</span>
+          </el-button>
+          <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
+        </div>
 
-    <MkTable
-      ref="memberTableRef"
-      v-model:pagination-config="paginationConfig"
-      :data="groupMembers"
-      v-loading="membersLoading"
-      @current-change="loadGroupMembers()"
-      @size-change="loadGroupMembers()"
-      @selection-change="handleBatchSelectionChange"
-    >
-      <el-table-column type="selection" width="40" />
-      <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
-      <el-table-column prop="username" label="用户名" show-overflow-tooltip />
-      <el-table-column prop="source" label="用户来源" min-width="140">
-        <template #default="{ row }">
-          {{ row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
-        </template>
-      </el-table-column>
-      <el-table-column label="操作" width="70" fixed="right">
-        <template #default="{ row }">
-          <el-tooltip content="移除" placement="top">
-            <el-button type="primary" text @click="handleRemoveMembers(row)">
-              <MkIcon name="icon_assigned_outlined" />
-            </el-button>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-      <template #footer-batch-actions>
-        <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+        <MkTable
+          ref="memberTableRef"
+          v-model:pagination-config="paginationConfig"
+          :data="groupMembers"
+          v-loading="membersLoading"
+          @current-change="loadGroupMembers()"
+          @size-change="loadGroupMembers()"
+          @selection-change="handleBatchSelectionChange"
+          :search="Boolean(memberQuery)"
+        >
+          <el-table-column type="selection" width="40" />
+          <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
+          <el-table-column prop="username" label="用户名" show-overflow-tooltip />
+          <el-table-column prop="source" label="用户来源" min-width="140">
+            <template #default="{ row }">
+              {{
+                row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+              }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="70" fixed="right">
+            <template #default="{ row }">
+              <el-tooltip content="移除" placement="top">
+                <el-button type="primary" text @click="handleRemoveMembers(row)">
+                  <MkIcon name="icon_assigned_outlined" />
+                </el-button>
+              </el-tooltip>
+            </template>
+          </el-table-column>
+          <template #footer-batch-actions>
+            <el-button type="danger" plain @click="handleRemoveMembers()">移除</el-button>
+          </template>
+        </MkTable>
       </template>
-    </MkTable>
-
-    <CreateOrUpdateGroupDialog ref="groupDialogRef" @refresh="loadChatUserGroups" />
-    <CreateGroupMemberDialog
-      ref="memberDialogRef"
-      :current-group="currentGroup"
-      @refresh="loadGroupMembers(true)"
-    />
+      <MkEmpty v-else class="flex-1" />
+    </template>
   </MkViewLayout>
+
+  <CreateOrUpdateGroupDialog ref="groupDialogRef" @refresh="loadChatUserGroups" />
+  <CreateGroupMemberDialog
+    ref="memberDialogRef"
+    :current-group="currentGroup"
+    @refresh="loadGroupMembers(true)"
+  />
 </template>
