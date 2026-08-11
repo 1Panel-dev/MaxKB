@@ -205,7 +205,7 @@ onMounted(loadLoginSetting)
 </script>
 
 <template>
-  <MkViewLayout v-loading="loading">
+  <MkViewLayout :loading="loading">
     <el-tabs v-model="activeTab" class="h-full">
       <el-tab-pane label="登录设置" name="LOGIN">
         <el-form ref="loginFormRef" class="max-w-3xl" :model="loginSetting" label-position="top">

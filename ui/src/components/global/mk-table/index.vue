@@ -19,6 +19,7 @@ const props = withDefaults(
     maxTableHeight?: number
     paginationConfig?: PaginationConfig
     resizable?: boolean
+    search?: boolean
   }>(),
   {
     data: () => [],
@@ -149,7 +150,13 @@ defineExpose({ clearSelection, tableRef })
 </script>
 
 <template>
+  <MkEmpty
+    v-if="!props.paginationConfig?.total"
+    :type="search ? 'search' : ''"
+    class="flex-1"
+  />
   <div
+    v-else
     ref="tableRootRef"
     class="mk-table relative w-full"
     @mouseleave="clearResizeHover"
@@ -167,6 +174,7 @@ defineExpose({ clearSelection, tableRef })
     >
       <slot />
     </el-table>
+
     <div
       v-if="props.resizable && resizeHoverStyle"
       class="mk-table__resize-hover-indicator"

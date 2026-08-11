@@ -43,13 +43,16 @@ src/components/
 │   │   └── mk-dropdown-item.vue  # 菜单项布局和选中状态
 │   ├── mk-drawer/
 │   │   └── index.vue             # 统一抽屉关闭行为和内容滚动布局
+│   ├── mk-empty/
+│   │   └── index.vue             # 普通无数据与搜索无匹配的统一空状态
 │   ├── mk-filterable-dropdown/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
-│   │   └── layout-aside.vue      # 页面可选左侧栏结构
+│   │   ├── layout-aside.vue      # 页面可选左侧栏结构
+│   │   └── layout-main.ts        # 右侧标题标记提取与滚动内容渲染
 │   ├── mk-search-input/
 │   │   └── index.vue             # 带默认搜索图标的输入框
 │   ├── mk-status-label/
@@ -114,6 +117,17 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 ```
 
 ## 自动注册组件
+
+### MkEmpty
+
+全局空状态组件，基于 `el-empty` 统一图片和默认文案。`type` 默认为 `default`，展示“暂无数据”；
+搜索无匹配时使用 `type="search"`。可通过 `description`、`image`、`image-size` 覆盖默认内容，
+其余 Element Plus Empty 属性通过 `$attrs` 透传，默认、`image` 和 `description` 插槽保持可用。
+
+```vue
+<MkEmpty />
+<MkEmpty type="search" />
+```
 
 ### MkDialog
 
@@ -237,15 +251,17 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 ### MkViewLayout
 
-路由页面的通用内容结构，统一提供满高弹性布局、可选左侧栏、右侧标题栏和滚动内容区。标题优先
-使用 `title` Prop，未传入时读取当前路由的 `meta.title`。不传 `header` 插槽时自动渲染标题；需要
-标题右侧操作或其他自定义结构时，使用 `header` 作用域插槽完整渲染，并从插槽参数取得解析后的
-`title`。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。
-`aside` 作用域插槽提供 `title` 和已经包含左侧标题栏样式的 `Header` 动态组件，左侧标题与内容
-可以集中写在同一个插槽中。
+路由页面的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title` Prop，未传入
+时读取当前路由的 `meta.title`。`aside` 和默认作用域插槽都提供 `title` 与对应区域的 `Header`
+标记组件。默认插槽中的 `Header` 会由布局提取到右侧滚动区上方，其余节点统一放入
+`el-scrollbar`；页面因此可以在同一个插槽中组织标题、内容和空状态，并只写一次业务状态判断。
+传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。页面加载状态通过
+`loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。默认插槽没有
+声明作用域参数时会自动显示当前标题；使用 `#default="{ Header }"` 后则由页面通过
+`<component :is="Header">` 控制标题，空状态分支不会自动补充标题。
 
 ```vue
-<MkViewLayout>
+<MkViewLayout :loading="loading">
   <template #aside="{ title, Header }">
     <component :is="Header">
       <h4>{{ title }}</h4>
@@ -253,11 +269,15 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
     </component>
     左侧列表
   </template>
-  <template #header="{ title }">
-    <h4>{{ title }}</h4>
-    <el-button type="primary">创建</el-button>
+  <template #default="{ title, Header }">
+    <template v-if="selectedItem">
+      <component :is="Header">
+        <h4>{{ title }}</h4>
+      </component>
+      右侧内容
+    </template>
+    <MkEmpty v-else />
   </template>
-  右侧内容
 </MkViewLayout>
 ```
 
