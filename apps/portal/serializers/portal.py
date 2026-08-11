@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：MaxKB
-    @file： portal.py
-    @date：2026/8/3
-    @desc: 门户配置序列化器
+@project: MaxKB
+@Author：MaxKB
+@file： portal.py
+@date：2026/8/3
+@desc: 门户配置序列化器
 """
+
 import json
 import uuid_utils.compat as uuid
 from django.core import signing
@@ -17,7 +18,6 @@ from rest_framework import serializers
 from application.models import Application, Chat
 from application.models.application_access_token import ApplicationAccessToken
 from common.auth.common import FileToken
-from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
@@ -28,33 +28,46 @@ from common.utils.rsa_util import decrypt, get_key_pair_by_sql
 from knowledge.models import File, FileSourceType
 from maxkb.const import CONFIG
 from portal.models import Portal
-from system_manage.models.chat_user import ChatUser, ResourceChatUserAuthorize, ResourceChatUserGroupAuthorize, \
-    ResourceType, UserGroupRelation
+from system_manage.models.chat_user import (
+    ChatUser,
+    ResourceChatUserAuthorize,
+    ResourceChatUserGroupAuthorize,
+    ResourceType,
+    UserGroupRelation,
+)
 from users.serializers.login import LoginRequest
 
 system_version, system_get_key = Cache_Version.SYSTEM.value
 
 
 class PortalSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False, label=_('portal name'), help_text=_('portal name'))
-    description = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                        label=_('portal description'), help_text=_('portal description'))
-    logo = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                 label=_('portal logo'), help_text=_('portal logo'))
-    tab_logo = serializers.CharField(required=False, allow_null=True, allow_blank=True,
-                                     label=_('tab logo'), help_text=_('tab logo'))
-    enable_public_access = serializers.BooleanField(required=False, label=_('enable public access'),
-                                                    help_text=_('enable public access'))
-    enable_api = serializers.BooleanField(required=False, label=_('enable api'), help_text=_('enable api'))
-    enable_auth = serializers.BooleanField(required=False, label=_('enable auth'), help_text=_('enable auth'))
-    auth_config = serializers.JSONField(required=False, label=_('auth config'), help_text=_('auth config'))
-    enable_cors = serializers.BooleanField(required=False, label=_('enable cors'), help_text=_('enable cors'))
-    cors_config = serializers.JSONField(required=False, label=_('cors config'), help_text=_('cors config'))
+    name = serializers.CharField(required=False, label=_("portal name"), help_text=_("portal name"))
+    description = serializers.CharField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        label=_("portal description"),
+        help_text=_("portal description"),
+    )
+    logo = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, label=_("portal logo"), help_text=_("portal logo")
+    )
+    tab_logo = serializers.CharField(
+        required=False, allow_null=True, allow_blank=True, label=_("tab logo"), help_text=_("tab logo")
+    )
+    enable_public_access = serializers.BooleanField(
+        required=False, label=_("enable public access"), help_text=_("enable public access")
+    )
+    enable_api = serializers.BooleanField(required=False, label=_("enable api"), help_text=_("enable api"))
+    enable_auth = serializers.BooleanField(required=False, label=_("enable auth"), help_text=_("enable auth"))
+    auth_config = serializers.JSONField(required=False, label=_("auth config"), help_text=_("auth config"))
+    enable_cors = serializers.BooleanField(required=False, label=_("enable cors"), help_text=_("enable cors"))
+    cors_config = serializers.JSONField(required=False, label=_("cors config"), help_text=_("cors config"))
 
     class Model(serializers.ModelSerializer):
         class Meta:
             model = Portal
-            fields = '__all__'
+            fields = "__all__"
 
     def one(self, with_valid=True):
         if with_valid:
@@ -76,7 +89,7 @@ class PortalSerializer(serializers.Serializer):
         return f"./oss/file/{file_id}"
 
     def _handle_file_field(self, portal, field_name, value):
-        if hasattr(value, 'read'):
+        if hasattr(value, "read"):
             old_url = getattr(portal, field_name)
             if old_url:
                 old_file_id = old_url.split("/")[-1]
@@ -92,11 +105,11 @@ class PortalSerializer(serializers.Serializer):
         portal = Portal.objects.first()
         if portal is None:
             raise AppApiException(500, _("Portal configuration does not exist"))
-        file_fields = ['logo', 'tab_logo', 'id', 'create_time', 'update_time']
+        file_fields = ["logo", "tab_logo", "id", "create_time", "update_time"]
         for field, value in instance.items():
             if hasattr(portal, field) and field not in file_fields:
                 setattr(portal, field, value)
-        for field_name in ['logo', 'tab_logo']:
+        for field_name in ["logo", "tab_logo"]:
             if field_name in instance:
                 self._handle_file_field(portal, field_name, instance.get(field_name))
         portal.save()
@@ -108,34 +121,22 @@ class PortalApplicationAuthMixin:
 
     @staticmethod
     def get_authorized_application_queryset(user_id):
-        public_apps = ApplicationAccessToken.objects.filter(
-            application_id=OuterRef('id'),
-            authentication=False
-        )
+        public_apps = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=False)
         if not ChatUser.objects.filter(id=user_id).exists():
             return Application.objects.filter(Exists(public_apps))
-        authed_token_exists = ApplicationAccessToken.objects.filter(
-            application_id=OuterRef('id'),
-            authentication=True
-        )
+        authed_token_exists = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=True)
         direct_auth = ResourceChatUserAuthorize.objects.filter(
-            resource_id=OuterRef('id'),
-            resource_type=ResourceType.APPLICATION.value,
-            is_auth=True,
-            user_id=user_id
+            resource_id=OuterRef("id"), resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user_id
         )
-        user_groups = UserGroupRelation.objects.filter(
-            user_id=user_id
-        ).values_list('group_id', flat=True)
+        user_groups = UserGroupRelation.objects.filter(user_id=user_id).values_list("group_id", flat=True)
         group_auth = ResourceChatUserGroupAuthorize.objects.filter(
-            resource_id=OuterRef('id'),
+            resource_id=OuterRef("id"),
             resource_type=ResourceType.APPLICATION.value,
             is_auth=True,
-            user_group_id__in=user_groups
+            user_group_id__in=user_groups,
         )
         return Application.objects.filter(
-            Exists(public_apps) |
-            (Exists(authed_token_exists) & (Exists(direct_auth) | Exists(group_auth)))
+            Exists(public_apps) | (Exists(authed_token_exists) & (Exists(direct_auth) | Exists(group_auth)))
         )
 
 
@@ -151,25 +152,23 @@ class ApplicationResponseSerializer(serializers.Serializer):
 
 
 class PortalApplicationSerializer(serializers.Serializer):
-
     class Query(PortalApplicationAuthMixin, serializers.Serializer):
-        name = serializers.CharField(required=False, allow_blank=True, label=_('Application Name'),
-                                     help_text=_('Application name'))
+        name = serializers.CharField(
+            required=False, allow_blank=True, label=_("Application Name"), help_text=_("Application name")
+        )
 
         def get_query_set(self):
             queryset = Application.objects.filter(is_publish=True)
-            name = self.data.get('name')
+            name = self.data.get("name")
             if name:
                 queryset = queryset.filter(name__icontains=name)
-            return queryset.order_by('-create_time')
+            return queryset.order_by("-create_time")
 
         def page(self, current_page, page_size, user_id, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
             queryset = self.get_query_set()
-            queryset = queryset.filter(
-                id__in=self.get_authorized_application_queryset(user_id).values('id')
-            )
+            queryset = queryset.filter(id__in=self.get_authorized_application_queryset(user_id).values("id"))
             return page_search(
                 current_page,
                 page_size,
@@ -187,28 +186,28 @@ class PortalHistoricalConversationResponseSerializer(serializers.Serializer):
 
     def get_application(self, chat):
         return {
-            'id': str(chat.application_id),
-            'name': chat.application.name,
-            'icon': chat.application.icon,
+            "id": str(chat.application_id),
+            "name": chat.application.name,
+            "icon": chat.application.icon,
         }
 
 
 class PortalHistoricalConversationSerializer(serializers.Serializer):
-
     class Query(PortalApplicationAuthMixin, serializers.Serializer):
-        name = serializers.CharField(required=False, allow_blank=True, label=_('Application Name'),
-                                     help_text=_('Application name'))
+        name = serializers.CharField(
+            required=False, allow_blank=True, label=_("Application Name"), help_text=_("Application name")
+        )
 
         def get_query_set(self, user_id):
             queryset = Chat.objects.filter(
                 chat_user_id=user_id,
                 is_deleted=False,
-                application_id__in=self.get_authorized_application_queryset(user_id).values('id')
+                application_id__in=self.get_authorized_application_queryset(user_id).values("id"),
             )
-            name = self.data.get('name')
+            name = self.data.get("name")
             if name:
                 queryset = queryset.filter(application__name__icontains=name)
-            return queryset.select_related('application').order_by('-update_time', 'id')
+            return queryset.select_related("application").order_by("-update_time", "id")
 
         def page(self, current_page, page_size, user_id, with_valid=True):
             if with_valid:
@@ -222,11 +221,10 @@ class PortalHistoricalConversationSerializer(serializers.Serializer):
 
 
 class PortalLoginSerializer(serializers.Serializer):
-
     @staticmethod
     def login(instance):
-        username = instance.get('username', '')
-        encrypted_data = instance.get('encryptedData', '')
+        username = instance.get("username", "")
+        encrypted_data = instance.get("encryptedData", "")
 
         if encrypted_data:
             try:
@@ -234,7 +232,7 @@ class PortalLoginSerializer(serializers.Serializer):
                 decrypted_data = json.loads(decrypted_raw) if decrypted_raw else {}
                 if isinstance(decrypted_data, dict):
                     instance.update(decrypted_data)
-            except Exception as e:
+            except Exception:
                 raise AppApiException(500, _("Invalid encrypted data"))
 
         try:
@@ -246,26 +244,26 @@ class PortalLoginSerializer(serializers.Serializer):
             raise AppApiException(500, str(e))
 
         validated_data = request_serializer.validated_data
-        username = validated_data.get('username', '')
-        password = validated_data.get('password', '')
-        captcha = validated_data.get('captcha', '')
+        username = validated_data.get("username", "")
+        password = validated_data.get("password", "")
+        captcha = validated_data.get("captcha", "")
 
         portal = Portal.objects.first()
         if portal is None or not portal.enable_auth:
             raise AppApiException(500, _("Portal authentication is not enabled"))
         auth_config = portal.auth_config or {}
-        login_value = auth_config.get('login_value', [])
-        if 'LOCAL' not in login_value:
+        login_value = auth_config.get("login_value", [])
+        if "LOCAL" not in login_value:
             raise AppApiException(500, _("Portal local login is not enabled"))
 
-        max_attempts = auth_config.get('max_attempts', 1)
-        failed_attempts = auth_config.get('failed_attempts', 5)
-        lock_time = auth_config.get('lock_time', 10)
+        max_attempts = auth_config.get("max_attempts", 1)
+        failed_attempts = auth_config.get("failed_attempts", 5)
+        lock_time = auth_config.get("lock_time", 10)
 
         license_validator = DatabaseModelManage.get_model("license_is_valid")
         is_license_valid = bool(license_validator()) if license_validator else False
 
-        cache_key = system_get_key(f'portal_{username}')
+        cache_key = system_get_key(f"portal_{username}")
         if is_license_valid:
             if PortalLoginSerializer._is_account_locked(username, failed_attempts):
                 raise AppApiException(
@@ -282,33 +280,35 @@ class PortalLoginSerializer(serializers.Serializer):
 
         if needs_password_upgrade(user.password):
             user.password = password_encrypt(password)
-            user.save(update_fields=['password'])
+            user.save(update_fields=["password"])
 
         if not user.is_active:
             raise AppApiException(1005, _("The user has been disabled, please contact the administrator!"))
 
         cache.delete(cache_key, version=system_version)
-        cache.delete(system_get_key(f'portal_{username}_lock'), version=system_version)
+        cache.delete(system_get_key(f"portal_{username}_lock"), version=system_version)
 
-        token = signing.dumps({
-            'username': user.username,
-            'id': str(user.id),
-            'type': 'PORTAL_USER',
-        })
+        token = signing.dumps(
+            {
+                "username": user.username,
+                "id": str(user.id),
+                "type": "PORTAL_USER",
+            }
+        )
         version, get_key = Cache_Version.TOKEN.value
         timeout = CONFIG.get_session_timeout()
         cache.set(get_key(token), user, timeout=timeout, version=version)
-        f_token = FileToken(str(user.id), 'PORTAL_USER').to_token()
+        f_token = FileToken(str(user.id), "PORTAL_USER").to_token()
         record_log(
-            menu='Portal',
-            operate='Log in',
+            menu="Portal",
+            operate="Log in",
             request=None,
-            user={'username': user.username},
+            user={"username": user.username},
             status=200,
-            operation_object={'name': user.username},
-            workspace_id='default'
+            operation_object={"name": user.username},
+            workspace_id="default",
         )
-        return {'token': token}, f_token
+        return {"token": token}, f_token
 
     @staticmethod
     def get_login_profile():
@@ -317,26 +317,26 @@ class PortalLoginSerializer(serializers.Serializer):
             raise AppApiException(500, _("Portal configuration does not exist"))
         auth_config = portal.auth_config or {}
         return {
-            'name': portal.name,
-            'description': portal.description or '',
-            'logo': portal.logo or '',
-            'enable_auth': portal.enable_auth,
-            'authentication_type': auth_config.get('type', 'password') if portal.enable_auth else '',
-            'login_value': auth_config.get('login_value', []) if portal.enable_auth else [],
-            'max_attempts': auth_config.get('max_attempts', 1) if portal.enable_auth else 1,
-            'rsa_key': get_key_pair_by_sql().get('key', ''),
+            "name": portal.name,
+            "description": portal.description or "",
+            "logo": portal.logo or "",
+            "enable_auth": portal.enable_auth,
+            "authentication_type": auth_config.get("type", "password") if portal.enable_auth else "",
+            "login_value": auth_config.get("login_value", []) if portal.enable_auth else [],
+            "max_attempts": auth_config.get("max_attempts", 1) if portal.enable_auth else 1,
+            "rsa_key": get_key_pair_by_sql().get("key", ""),
         }
 
     @staticmethod
     def _is_account_locked(username: str, failed_attempts: int) -> bool:
         if failed_attempts == -1:
             return False
-        lock_cache = cache.get(system_get_key(f'portal_{username}_lock'), version=system_version)
+        lock_cache = cache.get(system_get_key(f"portal_{username}_lock"), version=system_version)
         return bool(lock_cache)
 
     @staticmethod
     def _need_captcha(username: str, max_attempts: int) -> bool:
-        cache_key = system_get_key(f'portal_{username}')
+        cache_key = system_get_key(f"portal_{username}")
         if max_attempts == -1:
             return False
         if max_attempts > 0:
@@ -349,8 +349,7 @@ class PortalLoginSerializer(serializers.Serializer):
         if not captcha:
             raise AppApiException(1005, _("Captcha is required"))
         captcha_cache = cache.get(
-            Cache_Version.CAPTCHA.get_key(captcha=f'portal_{username}'),
-            version=Cache_Version.CAPTCHA.get_version()
+            Cache_Version.CAPTCHA.get_key(captcha=f"portal_{username}"), version=Cache_Version.CAPTCHA.get_version()
         )
         if captcha_cache is None or captcha.lower() != captcha_cache:
             raise AppApiException(1005, _("Captcha code error or expiration"))
@@ -376,10 +375,7 @@ class PortalLoginSerializer(serializers.Serializer):
                 % (failed_attempts, remain_attempts),
             )
         try:
-            cache.add(
-                system_get_key(f'portal_{username}_lock'), 1,
-                timeout=lock_time * 60, version=system_version
-            )
+            cache.add(system_get_key(f"portal_{username}_lock"), 1, timeout=lock_time * 60, version=system_version)
         except Exception:
             pass
         raise AppApiException(
@@ -390,7 +386,7 @@ class PortalLoginSerializer(serializers.Serializer):
 def _record_login_fail(username: str, expire: int = 600):
     if not username:
         return
-    fail_key = system_get_key(f'portal_{username}')
+    fail_key = system_get_key(f"portal_{username}")
     try:
         cache.incr(fail_key, 1, version=system_version)
     except ValueError:
@@ -400,7 +396,7 @@ def _record_login_fail(username: str, expire: int = 600):
 def _record_login_fail_lock(username: str, expire: int = 10):
     if not username:
         return 0
-    lock_key = system_get_key(f'portal_{username}_lock_count')
+    lock_key = system_get_key(f"portal_{username}_lock_count")
     try:
         fail_count = cache.incr(lock_key, 1, version=system_version)
     except ValueError:
