@@ -1,0 +1,48 @@
+name: Python Format Check
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pre-commit:
+    name: Ruff format changed files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install pre-commit
+        run: python -m pip install pre-commit==4.6.1
+
+      - name: Check changed files
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          if ! git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null; then
+            if git show-ref --verify --quiet "refs/remotes/origin/${DEFAULT_BRANCH}"; then
+              BASE_SHA=$(git merge-base "$HEAD_SHA" "origin/${DEFAULT_BRANCH}")
+            elif git cat-file -e "${HEAD_SHA}^" 2>/dev/null; then
+              BASE_SHA=$(git rev-parse "${HEAD_SHA}^")
+            else
+              pre-commit run --all-files
+              git diff --cached --exit-code
+              exit 0
+            fi
+          fi
+
+          pre-commit run --from-ref "$BASE_SHA" --to-ref "$HEAD_SHA"
+
+          # The local hook formats and stages files. A clean index proves that
+          # every changed Python file was already formatted before CI ran.
+          git diff --cached --exit-code
