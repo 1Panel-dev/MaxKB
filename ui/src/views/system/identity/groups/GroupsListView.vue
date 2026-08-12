@@ -44,6 +44,10 @@ function handleMemberSelectionChange(selection: unknown[]) {
 const memberDialogRef =
   useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
 
+function handleOpenMemberDialog() {
+  memberDialogRef.value?.open()
+}
+
 function handleRemoveMembers(member?: SystemUserGroupMember) {
   const group = currentGroup.value
   const members = member ? [member] : selectedGroupMembers.value
@@ -102,9 +106,13 @@ function handleGroupSelect(group: SystemUserGroup) {
   loadUserGroupMembers()
 }
 
-/* 新增、重命名与删除用户组 */
+/* 新增、重命名用户组 */
 const groupDialogRef =
   useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
+
+function handleOpenGroupDialog(group?: SystemUserGroup) {
+  groupDialogRef.value?.open(group)
+}
 
 function handleGroupSaved(group: SystemUserGroup) {
   const existingIndex = userGroups.value.findIndex(({ id }) => id === group.id)
@@ -119,6 +127,7 @@ function handleGroupSaved(group: SystemUserGroup) {
   }
 }
 
+/* 删除用户组 */
 function deleteGroup(group: SystemUserGroup) {
   MsgConfirm(`确定删除用户组"${group.name}"吗？`, '删除后，组内成员不会被删除。')
     .then(() => {
@@ -195,7 +204,7 @@ onMounted(() => loadWorkspaceOptions())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <el-tooltip content="创建用户组" placement="top">
-          <el-button class="-mr-1" text type="primary" @click="groupDialogRef?.open()">
+          <el-button class="-mr-1" text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </el-tooltip>
@@ -208,7 +217,7 @@ onMounted(() => loadWorkspaceOptions())
       >
         <template #action-dropdown="{ row }">
           <MkDropdownMenu>
-            <MkDropdownItem @click="groupDialogRef?.open(row)">
+            <MkDropdownItem @click="handleOpenGroupDialog(row)">
               <template #icon>
                 <MkIcon name="icon_edit_outlined" />
               </template>
@@ -239,7 +248,7 @@ onMounted(() => loadWorkspaceOptions())
         </component>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" @click="memberDialogRef?.open()">
+          <el-button type="primary" @click="handleOpenMemberDialog">
             <MkIcon name="icon_add_outlined" />
             <span>添加成员</span>
           </el-button>
