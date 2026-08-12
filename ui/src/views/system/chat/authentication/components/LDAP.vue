@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import AuthSettingApi from '@/api/admin/system/auth-setting'
+import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
 import type { AuthProviderSetting } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -24,7 +24,7 @@ const rules = reactive<FormRules<AuthProviderSetting>>({
 
 function loadSetting() {
   loading.value = true
-  return AuthSettingApi.getAuthSetting(form.auth_type)
+  return ChatUserAuthApi.getAuthSetting(form.auth_type)
     .then((setting) => {
       const ldapMapping = setting.config?.ldap_mapping
       Object.assign(form, setting, {
@@ -46,8 +46,8 @@ function submit(action: 'save' | 'test') {
     loading.value = true
     const request =
       action === 'test'
-        ? AuthSettingApi.postAuthSettingConnection(form)
-        : AuthSettingApi.putAuthSetting(form.auth_type, form)
+        ? ChatUserAuthApi.postAuthSettingConnection(form)
+        : ChatUserAuthApi.putAuthSetting(form.auth_type, form)
     request
       .then(() => MsgSuccess(action === 'test' ? '连接成功' : '保存成功'))
       .finally(() => (loading.value = false))

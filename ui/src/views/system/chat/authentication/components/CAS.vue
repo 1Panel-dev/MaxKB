@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import AuthSettingApi from '@/api/admin/system/auth-setting'
+import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
 import type { AuthProviderSetting } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -24,7 +24,7 @@ const rules = reactive<FormRules<AuthProviderSetting>>({
 function loadSetting() {
   loading.value = true
 
-  return AuthSettingApi.getAuthSetting(form.auth_type)
+  return ChatUserAuthApi.getAuthSetting(form.auth_type)
     .then((setting) => {
       const settingConfig = setting.config ?? {}
       const ldpUri = settingConfig.ldpUri ?? ''
@@ -47,7 +47,7 @@ function submit() {
   authFormRef.value?.validate((valid) => {
     if (!valid) return
     loading.value = true
-    AuthSettingApi.putAuthSetting(form.auth_type, form)
+    ChatUserAuthApi.putAuthSetting(form.auth_type, form)
       .then(() => MsgSuccess('保存成功'))
       .finally(() => (loading.value = false))
   })

@@ -1,19 +1,111 @@
 <script setup lang="ts">
-import AuthProviderForm, { type AuthProviderField } from './AuthProviderForm.vue'
+import { onMounted, reactive, ref, useTemplateRef } from 'vue'
+import type { FormInstance, FormRules } from 'element-plus'
+import AuthSettingApi from '@/api/admin/system/auth-setting'
+import type { AuthProviderSetting } from '@/api/types'
+import { MsgSuccess } from '@/utils/message'
 
-const callbackUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/oauth2`
-const fields: AuthProviderField[] = [
-  { key: 'authEndpoint', label: '授权端点' },
-  { key: 'tokenEndpoint', label: 'Token 端点' },
-  { key: 'userInfoEndpoint', label: '用户信息端点' },
-  { key: 'scope', label: 'Scope' },
-  { key: 'clientId', label: 'Client ID' },
-  { key: 'clientSecret', label: 'Client Secret', type: 'password' },
-  { key: 'fieldMapping', label: '字段映射', type: 'textarea' },
-  { key: 'redirectUrl', label: '回调地址', defaultValue: callbackUrl },
-]
+defineOptions({ name: 'OidcAuthenticationSetting' })
+const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/oauth2`
+
+const authFormRef = useTemplateRef<FormInstance>('authFormRef')
+const loading = ref(false)
+const form = reactive<AuthProviderSetting>({
+  auth_type: 'OAuth2',
+  config: {
+    authEndpoint: '',
+    tokenEndpoint: '',
+    userInfoEndpoint: '',
+    scope: '',
+    clientId: '',
+    clientSecret: '',
+    redirectUrl: '',
+    fieldMapping: '',
+  },
+  is_active: false,
+})
+const rules = reactive<FormRules<AuthProviderSetting>>({
+  'config.authEndpoint': [{ required: true, message: '请输入授权端地址', trigger: 'blur' }],
+  'config.tokenEndpoint': [{ required: true, message: '请输入 Token 端地址', trigger: 'blur' }],
+  'config.userInfoEndpoint': [{ required: true, message: '请输入用户信息端地址', trigger: 'blur' }],
+  'config.scope': [{ required: true, message: '请输入连接范围', trigger: 'blur' }],
+  'config.clientId': [{ required: true, message: '请输入客户端 ID', trigger: 'blur' }],
+  'config.clientSecret': [{ required: true, message: '请输入客户端密钥', trigger: 'blur' }],
+  'config.fieldMapping': [{ required: true, message: '请输入字段映射', trigger: 'blur' }],
+  'config.redirectUrl': [{ required: true, message: '请输入回调地址', trigger: 'blur' }],
+})
+
+function loadSetting() {
+  loading.value = true
+
+  return AuthSettingApi.getAuthSetting(form.auth_type)
+    .then((setting) => {
+      const settingConfig = setting.config ?? {}
+      Object.assign(form, setting, {
+        config: {
+          ...form.config,
+          ...settingConfig,
+          redirectUrl: settingConfig.redirectUrl || defaultRedirectUrl,
+        },
+      })
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+function submit() {
+  authFormRef.value?.validate((valid) => {
+    if (!valid) return
+    loading.value = true
+    AuthSettingApi.putAuthSetting(form.auth_type, form)
+      .then(() => MsgSuccess('保存成功'))
+      .finally(() => (loading.value = false))
+  })
+}
+onMounted(() => loadSetting())
 </script>
 
 <template>
-  <AuthProviderForm auth-type="OAuth2" :fields="fields" />
+  <el-form
+    ref="authFormRef"
+    v-loading="loading"
+    class="max-w-200"
+    :model="form"
+    :rules="rules"
+    label-position="top"
+  >
+    <el-form-item label="授权端地址" prop="config.authEndpoint"
+      ><el-input v-model="form.config.authEndpoint" placeholder="请输入授权端地址"
+    /></el-form-item>
+    <el-form-item label="Token 端地址" prop="config.tokenEndpoint"
+      ><el-input v-model="form.config.tokenEndpoint" placeholder="请输入 Token 端地址"
+    /></el-form-item>
+    <el-form-item label="用户信息端地址" prop="config.userInfoEndpoint"
+      ><el-input v-model="form.config.userInfoEndpoint" placeholder="请输入用户信息端地址"
+    /></el-form-item>
+    <el-form-item label="连接范围" prop="config.scope"
+      ><el-input v-model="form.config.scope" placeholder="请输入连接范围"
+    /></el-form-item>
+    <el-form-item label="客户端 ID" prop="config.clientId"
+      ><el-input v-model="form.config.clientId" placeholder="请输入客户端 ID"
+    /></el-form-item>
+    <el-form-item label="客户端密钥" prop="config.clientSecret"
+      ><el-input
+        v-model="form.config.clientSecret"
+        type="password"
+        show-password
+        placeholder="请输入客户端密钥"
+    /></el-form-item>
+    <el-form-item label="字段映射" prop="config.fieldMapping"
+      ><el-input v-model="form.config.fieldMapping" placeholder="请输入字段映射"
+    /></el-form-item>
+    <el-form-item label="回调地址" prop="config.redirectUrl"
+      ><el-input v-model="form.config.redirectUrl" placeholder="请输入回调地址"
+    /></el-form-item>
+    <el-form-item
+      ><div class="flex flex-col">
+        <span>启用 OAuth2 认证</span><el-switch v-model="form.is_active" class="self-start" /></div
+    ></el-form-item>
+    <el-button type="primary" @click="submit">保存</el-button>
+  </el-form>
 </template>

@@ -1,3 +1,6 @@
+import type { OptionItem } from '@/api/types/common'
+import type { QrCodeProvider } from '@/api/types/login'
+
 export type AuthProviderType = 'LDAP' | 'CAS' | 'OIDC' | 'OAuth2' | 'SAML2'
 
 export interface AuthProviderSetting {
@@ -7,13 +10,8 @@ export interface AuthProviderSetting {
   is_active: boolean
 }
 
-export interface LoginMethodOption {
-  label: string
-  value: string
-}
-
 export interface LoginAuthSetting {
-  auth_types?: LoginMethodOption[]
+  auth_types?: OptionItem[]
   default_value: string
   failed_attempts: number
   group_id?: string
@@ -22,14 +20,12 @@ export interface LoginAuthSetting {
   max_attempts: number
   permission?: string
   role_id?: string
-  system_options?: LoginMethodOption[]
+  system_options?: OptionItem[]
   workspace_id?: string
 }
 
-export type QrLoginPlatformType = 'wecom' | 'dingtalk' | 'lark'
-
 export interface QrLoginPlatform {
-  auth_type: QrLoginPlatformType
+  auth_type: QrCodeProvider
   config: Record<string, string>
   is_active: boolean
   is_valid: boolean
@@ -38,5 +34,5 @@ export interface QrLoginPlatform {
 export interface QrLoginPlatformRequest {
   config: Record<string, string>
   isActive: boolean
-  key: QrLoginPlatformType
+  key: QrCodeProvider
 }
