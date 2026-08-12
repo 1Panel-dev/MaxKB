@@ -1532,7 +1532,7 @@ class ToolSerializer(serializers.Serializer):
             if self.data.get("state"):
                 query_set = query_set.filter(Q(state=self.data.get("state", "")))
             if self.data.get("source_name"):
-                query_set = query_set.filter(Q(tool_name__icontains=self.data.get("source_name", "")))
+                query_set = query_set.filter(Q(source_name__icontains=self.data.get("source_name", "")))
             if self.data.get("record_id"):
                 query_set = query_set.filter(Q(id=self.data.get("record_id")))
             if self.data.get("workspace_id"):
@@ -1545,7 +1545,7 @@ class ToolSerializer(serializers.Serializer):
                 query_set,
                 lambda record: {
                     **ToolRecordModelSerializer(record).data,
-                    "source_name": record.tool_name,
+                    "source_name": record.source_name,
                     "tool_icon": record.tool_icon,
                     "trigger_type": record.trigger_type,
                 },
