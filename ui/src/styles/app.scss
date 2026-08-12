@@ -15,7 +15,7 @@ body,
 }
 
 body {
-  background: var(--mk-layout);
+  background: var(--mk-N200);
   color: var(--el-text-color-primary);
   font-family: 'PingFang SC', AlibabaPuHuiTi !important;
   font-size: var(--mk-font-size-base);
@@ -75,5 +75,16 @@ h6 {
     height: 67%;
     content: '';
     background: var(--el-color-primary);
+  }
+}
+
+/*
+  必填文字的星号
+*/
+.mk-required {
+  &:after {
+    content: '*';
+    color: var(--el-color-danger);
+    margin-left: 4px;
   }
 }

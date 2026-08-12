@@ -50,6 +50,11 @@ function handleLoginMethodsChange(loginMethods: string[]) {
   }
 }
 
+/* 登录次数不为0*/
+function normalizeNonZeroNumber(value: number | undefined) {
+  return value === undefined || value === 0 ? 1 : value
+}
+
 // 角色与工作空间选项
 const roleSettingOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
@@ -173,78 +178,97 @@ onMounted(() => {
     </el-form-item>
 
     <el-form-item label="账号登录验证码设置" required>
-      <div class="flex items-center gap-2">
-        <span>登录失败</span>
-        <el-input-number
-          v-model="form.max_attempts"
-          :max="10"
-          :min="-1"
-          controls-position="right"
-        />
-        <span>登录失败</span>
-        <span class="text-N500">(值为-1时，不显示验证码)</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span>登录失败</span>
-        <el-input-number
-          v-model="form.failed_attempts"
-          :max="10"
-          :min="-1"
-          controls-position="right"
-        />
-        <span>次，</span>
-        <span>锁定账号</span>
-        <el-input-number v-model="form.lock_time" :min="1" controls-position="right" />
-        <span>分钟</span>
-      </div>
+      <el-card shadow="never" class="bg-N100! w-full">
+        <div class="flex items-center gap-2">
+          <span>登录失败</span>
+          <el-input-number
+            v-model="form.max_attempts"
+            :max="10"
+            :min="-1"
+            :step="1"
+            :value-on-clear="-1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
+          <span>登录失败</span>
+          <span class="text-N500">(值为-1时，不显示验证码)</span>
+        </div>
+        <div class="flex items-center gap-2 mt-4">
+          <span>登录失败</span>
+          <el-input-number
+            v-model="form.failed_attempts"
+            :max="10"
+            :min="-1"
+            :step="1"
+            :value-on-clear="-1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
+          <span>次，</span>
+          <span>锁定账号</span>
+          <el-input-number
+            v-model="form.lock_time"
+            :min="1"
+            :step="1"
+            :value-on-clear="1"
+            @change="form.max_attempts = normalizeNonZeroNumber($event)"
+          />
+          <span>分钟</span>
+        </div>
+      </el-card>
     </el-form-item>
-    <p>第三方用户默认角色分配</p>
-    <el-form-item label="角色" prop="role_id">
-      <el-select
-        v-model="form.role_id"
-        :loading="roleSettingOptionsLoading"
-        filterable
-        clearable
-        placeholder="请选择角色"
-        @change="handleRoleChange"
-      >
-        <el-option v-for="role in roleOptions" :key="role.id" :label="role.name" :value="role.id" />
-      </el-select>
-    </el-form-item>
-    <el-form-item label="工作空间" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">
-      <el-select
-        v-model="form.workspace_id"
-        :loading="roleSettingOptionsLoading"
-        filterable
-        clearable
-        placeholder="请选择工作空间"
-        @change="handleWorkspaceChange"
-      >
-        <el-option
-          v-for="workspace in workspaceOptions"
-          :key="workspace.id"
-          :label="workspace.name"
-          :value="workspace.id"
-        />
-      </el-select>
-    </el-form-item>
-    <el-form-item label="用户组" v-if="form.workspace_id">
-      <el-select
-        filterable
-        clearable
-        v-model="form.group_id"
-        :loading="loadingGroups"
-        placeholder="请选择用户组"
-        class="w-240"
-      >
-        <el-option
-          v-for="userGroup in userGroups"
-          :key="userGroup.id"
-          :label="userGroup.name"
-          :value="userGroup.id"
-        />
-      </el-select>
-    </el-form-item>
-    <el-button type="primary" @click="submit">保存</el-button>
+    <p class="mb-2">第三方用户默认角色分配</p>
+    <el-card shadow="never" class="bg-N100!">
+      <el-form-item label="角色" prop="role_id">
+        <el-select
+          v-model="form.role_id"
+          :loading="roleSettingOptionsLoading"
+          filterable
+          clearable
+          placeholder="请选择角色"
+          @change="handleRoleChange"
+        >
+          <el-option
+            v-for="role in roleOptions"
+            :key="role.id"
+            :label="role.name"
+            :value="role.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="工作空间" prop="workspace_id" v-if="auth.isEE && showWorkspaceSelector">
+        <el-select
+          v-model="form.workspace_id"
+          :loading="roleSettingOptionsLoading"
+          filterable
+          clearable
+          placeholder="请选择工作空间"
+          @change="handleWorkspaceChange"
+        >
+          <el-option
+            v-for="workspace in workspaceOptions"
+            :key="workspace.id"
+            :label="workspace.name"
+            :value="workspace.id"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="用户组" v-if="form.workspace_id">
+        <el-select
+          filterable
+          clearable
+          v-model="form.group_id"
+          :loading="loadingGroups"
+          placeholder="请选择用户组"
+          class="w-240"
+        >
+          <el-option
+            v-for="userGroup in userGroups"
+            :key="userGroup.id"
+            :label="userGroup.name"
+            :value="userGroup.id"
+          />
+        </el-select>
+      </el-form-item>
+    </el-card>
+    <el-button class="mt-4" type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

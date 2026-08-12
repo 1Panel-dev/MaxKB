@@ -189,7 +189,7 @@ const systemMenuItems = getChildRouteList('system')
 }
 
 .el-popper.mk-system-sidebar-menu-popper {
-  background-color: var(--mk-layout);
+  background-color: var(--mk-N200);
   background-image: var(--mk-layout-gradient);
   border-radius: var(--el-border-radius-base);
   .el-menu {
