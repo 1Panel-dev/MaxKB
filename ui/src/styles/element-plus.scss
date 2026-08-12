@@ -191,6 +191,10 @@
 /* checkbox */
 .el-checkbox {
   --el-checkbox-input-border: 1px solid var(--mk-N500);
+  --el-checkbox-input-width: 16px;
+  --el-checkbox-input-height: 16px;
+  margin: 0;
+  min-width: 120px;
 }
 
 /* dialog */

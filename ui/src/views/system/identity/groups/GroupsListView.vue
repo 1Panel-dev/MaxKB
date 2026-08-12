@@ -87,7 +87,7 @@ const userGroups = ref<SystemUserGroup[]>([])
 
 function loadUserGroups() {
   loadingGroups.value = true
-  UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value)
+  return UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value)
     .then((groups) => {
       userGroups.value = groups
       if (!currentGroup.value || !groups.some(({ id }) => id === currentGroup.value?.id)) {
@@ -170,6 +170,7 @@ function loadUserGroupMembers(reset = false) {
 /* 选择工作空间列表 */
 const selectedWorkspaceId = ref('default')
 const workspaceOptions = ref<WorkspaceItem[]>([])
+const loadingView = ref(false)
 
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
   selectedWorkspaceId.value = workspace.id ?? 'default'
@@ -177,22 +178,27 @@ function handleWorkspaceSelect(workspace: WorkspaceItem) {
 }
 
 function loadWorkspaceOptions() {
-  WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
-    workspaceOptions.value = workspaces
+  loadingView.value = true
+  return WorkspaceApi.getSystemWorkspaceList()
+    .then((workspaces) => {
+      workspaceOptions.value = workspaces
 
-    if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
-      selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
-    }
+      if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
+        selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
+      }
 
-    return loadUserGroups()
-  })
+      return loadUserGroups()
+    })
+    .finally(() => {
+      loadingView.value = false
+    })
 }
 
 onMounted(() => loadWorkspaceOptions())
 </script>
 
 <template>
-  <MkViewLayout class="system-identity-groups" :loading="!selectedWorkspaceId && loadingGroups">
+  <MkViewLayout class="system-identity-groups" :loading="loadingView">
     <template #top>
       <MkWorkspaceDropdown
         v-model="selectedWorkspaceId"
