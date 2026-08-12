@@ -17,7 +17,18 @@
   --el-color-danger-light-7: color-mix(in srgb, var(--mk-danger) 30%, white);
   --el-color-danger-light-8: color-mix(in srgb, var(--mk-danger) 20%, white);
   --el-color-danger-light-9: color-mix(in srgb, var(--mk-danger) 10%, white);
+  --el-color-danger-dark-1: color-mix(in srgb, var(--mk-danger) 85%, black);
   --el-color-success: var(--mk-success);
+  --el-color-success-light-1: color-mix(in srgb, var(--mk-success) 85%, white);
+  --el-color-success-light-3: color-mix(in srgb, var(--mk-success) 70%, white);
+  --el-color-success-light-4: color-mix(in srgb, var(--mk-success) 60%, white);
+  --el-color-success-light-5: color-mix(in srgb, var(--mk-success) 50%, white);
+  --el-color-success-light-6: color-mix(in srgb, var(--mk-success) 40%, white);
+  --el-color-success-light-7: color-mix(in srgb, var(--mk-success) 30%, white);
+  --el-color-success-light-8: color-mix(in srgb, var(--mk-success) 20%, white);
+  --el-color-success-light-9: color-mix(in srgb, var(--mk-success) 10%, white);
+  --el-color-success-dark-1: color-mix(in srgb, var(--mk-success) 85%, black);
+
   --el-color-warning: var(--mk-warning);
   --el-border-color: var(--mk-N350);
   --el-border-radius-base: 6px;
@@ -134,11 +145,20 @@
 /* card */
 .el-card {
   --el-card-border-radius: 12px;
+  overflow: visible;
+  &__body {
+    overflow: inherit;
+  }
   &.is-always-shadow {
     border: none;
   }
   &.is-never-shadow {
     border: none;
+  }
+  &.is-never-shadow {
+    &:hover {
+      border-color: var(--el-color-primary);
+    }
   }
 }
 
@@ -565,6 +585,7 @@
 /* switch */
 .el-switch {
   --el-switch-off-color: var(--mk-N400);
+  height: 22px;
 }
 .el-switch--small {
   .el-switch__core {
@@ -644,10 +665,12 @@
 
 /* tag */
 .el-tag {
-  --el-tag-font-size: 14px;
   max-width: 115px;
   border: none;
   padding: 0 6px;
+  &:not(&--small) {
+    --el-tag-font-size: 14px;
+  }
 
   &__content {
     overflow: hidden;
@@ -657,6 +680,14 @@
   &--info {
     --el-tag-text-color: var(--el-text-color-primary) !important;
     --el-tag-bg-color: var(--mk-N900-transparent-10) !important;
+  }
+  &--success {
+    --el-tag-text-color: var(--el-color-success-dark-1) !important;
+    --el-tag-bg-color: rgb(var(--mk-success-rgb) / 20%) !important;
+  }
+  &--danger {
+    --el-tag-text-color: var(--el-color-danger-dark-1) !important;
+    --el-tag-bg-color: rgb(var(--mk-danger-rgb) / 20%) !important;
   }
   &__close {
     .el-icon {

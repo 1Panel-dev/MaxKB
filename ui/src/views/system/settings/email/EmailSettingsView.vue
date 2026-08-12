@@ -54,7 +54,7 @@ function submitEmailSetting(action: 'save' | 'test') {
   })
 }
 
-onMounted(loadEmailSetting)
+onMounted(() => loadEmailSetting())
 </script>
 
 <template>

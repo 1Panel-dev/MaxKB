@@ -3,7 +3,7 @@ import { ref, type Component } from 'vue'
 import LDAP from './components/LDAP.vue'
 import CAS from './components/CAS.vue'
 import OIDC from './components/OIDC.vue'
-import SCAN from './components/SCAN.vue'
+import SCAN from './components/SCANLogin.vue'
 import OAuth2 from './components/OAuth2.vue'
 import Saml2 from './components/Saml2.vue'
 import LoginSetting from './components/LoginSetting.vue'
@@ -14,7 +14,7 @@ interface AuthenticationTab {
   name: string
 }
 
-const activeName = ref('LoginSetting')
+const activeName = ref('SCAN')
 const authenticationTabs: AuthenticationTab[] = [
   { label: '登录设置', name: 'LoginSetting', component: LoginSetting },
   { label: 'LDAP', name: 'LDAP', component: LDAP },

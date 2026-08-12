@@ -142,7 +142,8 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'authentication',
           name: 'system-chat-authentication',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () =>
+            import('@/views/system/chat/authentication/AuthenticationView.vue'),
           meta: { title: '对话用户认证', order: 30 },
         },
         {
@@ -163,7 +164,7 @@ export const systemRoutes: RouteRecordRaw = {
           path: 'authentication',
           name: 'system-login-authentication',
           component: () =>
-            import('@/views/system/settings/authentication/AuthenticationSettingsView.vue'),
+            import('@/views/system/settings/authentication/AuthenticationView.vue'),
           meta: { title: '系统用户认证', order: 10 },
         },
         {

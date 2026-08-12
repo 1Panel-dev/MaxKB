@@ -11,3 +11,11 @@ export const LOGIN_METHOD_LABELS: Record<LoginMethod, string> = {
   lark: '飞书',
   wecom: '企业微信',
 }
+
+export const SCAN_FIELD_LABELS: Record<string, string> = {
+  agent_id: 'Agent ID',
+  app_key: 'App Key',
+  app_secret: 'App Secret',
+  callback_url: '回调地址',
+  corp_id: 'Corp ID',
+}
