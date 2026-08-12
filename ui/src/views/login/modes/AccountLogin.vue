@@ -81,7 +81,6 @@ const handleLogin = async () => {
         auth
           .asyncLogin({
             encryptedData,
-            password: '',
             username: accountLoginForm.username,
           })
           .then(() => {
@@ -98,7 +97,6 @@ const handleLogin = async () => {
 
 const refreshCaptcha = () => {
   if (loginMethod.value === 'LDAP') return
-  identifyCode.value = ''
   LoginApi.getCaptcha(accountLoginForm.username).then((res) => {
     identifyCode.value = res.captcha
   })

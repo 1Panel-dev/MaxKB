@@ -14,8 +14,8 @@ export const systemRoutes: RouteRecordRaw = {
       component: () => import('@/views/system/SystemView.vue'),
       meta: {
         title: '首页',
-        activeIcon: 'icon_home_filled',
-        icon: 'icon_home_outlined',
+        activeIcon: 'icon_screen_outlined',
+        icon: 'icon_screen_outlined',
         order: 0,
       },
     },
@@ -125,7 +125,7 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'chat',
       name: 'system-chat',
       redirect: { name: 'system-chat-users' },
-      meta: { title: '对话端管理', icon: 'icon-setting', order: 40 },
+      meta: { title: '对话端管理', icon: 'icon_contacts_outlined', order: 40 },
       children: [
         {
           path: 'users',

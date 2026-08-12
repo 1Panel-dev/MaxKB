@@ -28,10 +28,15 @@ const authenticationTabs: AuthenticationTab[] = [
 
 <template>
   <MkViewLayout class="system-settings-authentication">
-    <el-tabs v-model="activeName" class="authentication-tabs h-full">
+    <el-tabs v-model="activeName" class="authentication-tabs min-h-0 flex-1 flex-col">
       <template v-for="authenticationTab in authenticationTabs" :key="authenticationTab.name">
-        <el-tab-pane :label="authenticationTab.label" :name="authenticationTab.name" lazy>
-          <el-scrollbar class="min-h-0 flex-1">
+        <el-tab-pane
+          class="h-full"
+          :label="authenticationTab.label"
+          :name="authenticationTab.name"
+          lazy
+        >
+          <el-scrollbar>
             <div class="py-4">
               <component :is="authenticationTab.component" />
             </div>
@@ -42,4 +47,15 @@ const authenticationTabs: AuthenticationTab[] = [
   </MkViewLayout>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.authentication-tabs {
+  :deep(.el-tabs__header) {
+    flex-shrink: 0;
+  }
+
+  :deep(.el-tabs__content) {
+    min-height: 0;
+    flex: 1;
+  }
+}
+</style>

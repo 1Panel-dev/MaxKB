@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import AvatarDropdown from './avatar-dropdown/index.vue'
 import WorkspaceDropdown from './workspace-dropdown/index.vue'
-import { Setting } from '@element-plus/icons-vue'
 import { isWorkspace, isSystem } from '@/router/admin/utils'
 import type { LayoutMode } from './types'
 const router = useRouter()
@@ -41,7 +40,7 @@ function switchMode() {
       </el-button>
       <el-divider direction="vertical" />
       <el-button v-if="isWorkspace(mode)" class="-mx-1" text @click="switchMode">
-        <MkIcon :icon="Setting" />
+        <MkIcon name="icon_admin_outlined"  />
         <span>系统管理</span>
       </el-button>
       <!--  TODO 只有系统管理员权限没有返回工作空间 -->

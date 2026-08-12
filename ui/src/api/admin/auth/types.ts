@@ -18,7 +18,7 @@ export interface CurrentUserInfo {
 
 export interface LoginRequest {
   username: string
-  password: string
+  password?: string
   captcha?: string
   encryptedData?: string
 }

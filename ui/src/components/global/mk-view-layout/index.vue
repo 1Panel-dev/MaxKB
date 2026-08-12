@@ -65,7 +65,7 @@ const LayoutContent: FunctionalComponent = () => {
         </template>
       </LayoutAside>
 
-      <main class="mb-6 flex min-w-0 flex-1 flex-col px-6">
+      <main class="mb-6 flex min-w-0 flex-1 flex-col px-6 min-h-0">
         <LayoutContent />
       </main>
     </div>

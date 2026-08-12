@@ -13,7 +13,6 @@
   --mk-success-rgb: 52 199 36;
   --mk-warning: #ff8800;
   --mk-warning-rgb: 255 136 0;
-  --mk-layout: #eff0f1;
   --mk-layout-gradient: linear-gradient(
     187.61deg,
     rgba(235, 241, 255, 0.35) 39.6%,
@@ -22,6 +21,9 @@
   // 用于表头背景。
   --mk-N100: #f5f6f7;
   --mk-N100-rgb: 245 246 247;
+  // 通常用于禁用
+  --mk-N200: #eff0f1;
+  --mk-N200-rgb: 239 240 241;
   // 通常用于card边框。
   --mk-N300: #dee0e3;
   --mk-N300-rgb: 222 224 227;

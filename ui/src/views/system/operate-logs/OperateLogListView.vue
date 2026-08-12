@@ -151,7 +151,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkPageLayout title="操作日志">
+  <MkViewLayout>
     <template #actions>
       <div class="flex gap-3">
         <el-button @click="handleExport">导出</el-button>
@@ -293,5 +293,5 @@ onMounted(() => {
         <el-button type="primary" @click="saveCleanPolicy">保存</el-button>
       </template>
     </el-dialog>
-  </MkPageLayout>
+  </MkViewLayout>
 </template>
