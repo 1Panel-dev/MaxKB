@@ -209,7 +209,7 @@ async function loadPdf(url: string) {
     const doc = await loadingTask.promise
 
     if (currentToken !== requestToken.value) {
-      await doc.destroy()
+      await loadingTask.destroy()
       return
     }
 
