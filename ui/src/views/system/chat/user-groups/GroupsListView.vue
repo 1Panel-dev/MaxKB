@@ -18,6 +18,10 @@ import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 const groupDialogRef =
   useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
 
+function handleOpenGroupDialog(group?: ListItem) {
+  groupDialogRef.value?.open(group)
+}
+
 /* 用户组列表与选择 */
 const groupsLoading = ref(false)
 const chatUserGroups = ref<ListItem[]>([])
@@ -101,6 +105,10 @@ function handleMemberSearch(query?: RequestParams) {
 const memberDialogRef =
   useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
 
+function handleOpenMemberDialog() {
+  memberDialogRef.value?.open()
+}
+
 /* (批量)移除成员 */
 const batchSelectedMembers = ref<ChatUserGroupMember[]>([])
 function handleBatchSelectionChange(selection: unknown[]) {
@@ -140,7 +148,7 @@ onMounted(() => loadChatUserGroups())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <el-tooltip content="创建用户组" placement="top">
-          <el-button text type="primary" @click="groupDialogRef?.open()">
+          <el-button text type="primary" @click="handleOpenGroupDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </el-tooltip>
@@ -152,7 +160,7 @@ onMounted(() => loadChatUserGroups())
       >
         <template #action-dropdown="{ row }">
           <MkDropdownMenu>
-            <MkDropdownItem @click="groupDialogRef?.open(row)">
+            <MkDropdownItem @click="handleOpenGroupDialog(row)">
               <template #icon><MkIcon name="icon_edit_outlined" /></template>
               <span>重命名</span>
             </MkDropdownItem>
@@ -178,7 +186,7 @@ onMounted(() => loadChatUserGroups())
         </component>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" @click="memberDialogRef?.open()">
+          <el-button type="primary" @click="handleOpenMemberDialog">
             <MkIcon name="icon_add_outlined" />
             <span>添加成员</span>
           </el-button>

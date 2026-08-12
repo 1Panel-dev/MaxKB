@@ -24,3 +24,18 @@ export interface LoginAuthSetting {
   system_options?: LoginMethodOption[]
   workspace_id?: string
 }
+
+export type QrLoginPlatformType = 'wecom' | 'dingtalk' | 'lark'
+
+export interface QrLoginPlatform {
+  auth_type: QrLoginPlatformType
+  config: Record<string, string>
+  is_active: boolean
+  is_valid: boolean
+}
+
+export interface QrLoginPlatformRequest {
+  config: Record<string, string>
+  isActive: boolean
+  key: QrLoginPlatformType
+}

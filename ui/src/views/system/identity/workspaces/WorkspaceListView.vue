@@ -12,6 +12,10 @@ import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialo
 const workspaceDialogRef =
   useTemplateRef<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>('workspaceDialogRef')
 
+function handleOpenWorkspaceDialog(workspace?: WorkspaceItem) {
+  workspaceDialogRef.value?.open(workspace)
+}
+
 /* 选择工作空间列表 */
 const workspaceLoading = ref(false)
 const currentWorkspace = ref<WorkspaceItem>()
@@ -133,6 +137,10 @@ function getWorkspaceMemberRowKey(member: WorkspaceMemberItem) {
 const addMemberDrawerRef =
   useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
 
+function handleOpenAddMemberDrawer() {
+  addMemberDrawerRef.value?.open()
+}
+
 /* 删除成员 */
 function handleRemoveMember(member: WorkspaceMemberItem) {
   const workspaceId = currentWorkspace.value?.id
@@ -194,7 +202,7 @@ onMounted(() => loadWorkspaceOptions())
       <component :is="Header">
         <h4>{{ title }}</h4>
         <el-tooltip content="创建工作空间" placement="top">
-          <el-button text type="primary" class="-mr-1" @click="workspaceDialogRef?.open()">
+          <el-button text type="primary" class="-mr-1" @click="handleOpenWorkspaceDialog()">
             <MkIcon name="icon_add_outlined" :size="18" />
           </el-button>
         </el-tooltip>
@@ -206,7 +214,7 @@ onMounted(() => loadWorkspaceOptions())
       >
         <template #action-dropdown="{ row: workspace }">
           <MkDropdownMenu>
-            <MkDropdownItem @click="workspaceDialogRef?.open(workspace)">
+            <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
               <template #icon>
                 <MkIcon name="icon_edit_outlined" />
               </template>
@@ -237,7 +245,7 @@ onMounted(() => loadWorkspaceOptions())
         </component>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" @click="addMemberDrawerRef?.open()">
+          <el-button type="primary" @click="handleOpenAddMemberDrawer">
             <MkIcon name="icon_add_outlined" />
             <span>添加成员</span>
           </el-button>

@@ -13,8 +13,16 @@ import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 
+function handleOpenUserFormDrawer(chatUser?: ChatUser) {
+  userFormDrawerRef.value?.open(chatUser)
+}
+
 /* 导入用户 */
 const importUsersDialogRef = ref<InstanceType<typeof ImportUsersDialog>>()
+
+function handleOpenImportUsersDialog() {
+  importUsersDialogRef.value?.open()
+}
 
 /* 列表查询相关 */
 const userTableRef = useTemplateRef('userTableRef')
@@ -71,6 +79,10 @@ function loadChatUsers(resetQuery = false) {
 
 /* 密码修改dialog */
 const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
+
+function handleOpenUserPwdDialog(chatUser: ChatUser) {
+  userPwdDialogRef.value?.open(chatUser)
+}
 
 /* 修改用户状态 */
 function handleChangeStatus(user: ChatUser) {
@@ -144,11 +156,11 @@ onMounted(() => loadChatUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button class="ml-3" @click="importUsersDialogRef?.open()">
+          <el-button class="ml-3" @click="handleOpenImportUsersDialog">
             <MkIcon name="icon_import_outlined" />
             <span>导入用户</span>
           </el-button>
-          <el-button type="primary" @click="userFormDrawerRef?.open()">
+          <el-button type="primary" @click="handleOpenUserFormDrawer()">
             <MkIcon name="icon_add_outlined" />
             <span>创建用户</span>
           </el-button>
@@ -217,12 +229,12 @@ onMounted(() => loadChatUsers())
               <el-divider direction="vertical" />
               <div class="flex gap-1">
                 <el-tooltip content="编辑" placement="top">
-                  <el-button type="primary" text @click.stop="userFormDrawerRef?.open(row)">
+                  <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <mk-icon name="icon_edit_outlined"></mk-icon>
                   </el-button>
                 </el-tooltip>
                 <el-tooltip content="修改用户密码" placement="top">
-                  <el-button type="primary" text @click.stop="userPwdDialogRef?.open(row)">
+                  <el-button type="primary" text @click.stop="handleOpenUserPwdDialog(row)">
                     <mk-icon name="icon-key_outlined"></mk-icon>
                   </el-button>
                 </el-tooltip>

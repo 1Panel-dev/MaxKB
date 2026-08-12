@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { Component, FunctionalComponent } from 'vue'
+import { Fragment, h, isVNode, type FunctionalComponent, type VNode } from 'vue'
 import { useRoute } from 'vue-router'
 import LayoutAside from './layout-aside.vue'
-import LayoutMain from './layout-main'
 
 defineOptions({ name: 'MkViewLayout', inheritAttrs: false })
 
@@ -18,16 +17,39 @@ const props = withDefaults(
 
 defineSlots<{
   aside?: (props: { Header: FunctionalComponent; title: string }) => unknown
-  default?: (props: { Header: Component; title: string }) => unknown
+  default?: (props: { Header: FunctionalComponent; title: string }) => unknown
   top?: () => unknown
 }>()
 
 const route = useRoute()
 const title = computed(() => props.title || route.meta.title || '')
 const slots = useSlots()
-const fallbackTitle = computed(() =>
-  !slots.default || slots.default.length === 0 ? title.value : '',
-)
+const LayoutHeader: FunctionalComponent = (_, { slots }) =>
+  h('header', { class: 'flex-between shrink-0 py-4' }, slots.default?.())
+
+function flattenSlotNodes(children: unknown): VNode[] {
+  const childNodes = Array.isArray(children) ? children : [children]
+
+  return childNodes.flatMap((child) => {
+    if (!isVNode(child)) return []
+    if (child.type === Fragment) return flattenSlotNodes(child.children)
+    return [child]
+  })
+}
+
+const LayoutContent: FunctionalComponent = () => {
+  const contentNodes = flattenSlotNodes(
+    slots.default?.({ Header: LayoutHeader, title: title.value }),
+  )
+  const hasCustomHeader = contentNodes.some((node) => node.type === LayoutHeader)
+
+  return [
+    hasCustomHeader || !title.value
+      ? null
+      : h('header', { class: 'flex-between shrink-0 py-4' }, [h('h4', title.value)]),
+    ...contentNodes,
+  ]
+}
 </script>
 
 <template>
@@ -43,11 +65,9 @@ const fallbackTitle = computed(() =>
         </template>
       </LayoutAside>
 
-      <LayoutMain :fallback-title="fallbackTitle" :title="title">
-        <template #default="{ Header, title: mainTitle }">
-          <slot :Header="Header" :title="mainTitle" />
-        </template>
-      </LayoutMain>
+      <main class="mb-6 flex min-w-0 flex-1 flex-col px-6">
+        <LayoutContent />
+      </main>
     </div>
   </div>
 </template>

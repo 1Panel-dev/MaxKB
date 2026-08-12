@@ -51,8 +51,7 @@ src/components/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
-│   │   ├── layout-aside.vue      # 页面可选左侧栏结构
-│   │   └── layout-main.ts        # 右侧标题标记提取与滚动内容渲染
+│   │   └── layout-aside.vue      # 页面可选左侧栏结构
 │   ├── mk-search-input/
 │   │   └── index.vue             # 带默认搜索图标的输入框
 │   ├── mk-status-label/
@@ -253,9 +252,9 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 路由页面的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title` Prop，未传入
 时读取当前路由的 `meta.title`。`aside` 和默认作用域插槽都提供 `title` 与对应区域的 `Header`
-标记组件。默认插槽中的 `Header` 会由布局提取到右侧滚动区上方，其余节点统一放入
-`el-scrollbar`；页面因此可以在同一个插槽中组织标题、内容和空状态，并只写一次业务状态判断。
-传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。页面加载状态通过
+包装组件，页面可以在同一个插槽中组织标题、内容和空状态，并只写一次业务状态判断。组件不统一
+处理内容滚动，需要滚动的页面自行使用 `el-scrollbar`。传入 `aside` 插槽后才会渲染左侧栏；左右
+结构上方的独立内容放入 `top` 插槽。页面加载状态通过
 `loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。默认插槽没有
 声明作用域参数时会自动显示当前标题；使用 `#default="{ Header }"` 后则由页面通过
 `<component :is="Header">` 控制标题，空状态分支不会自动补充标题。
