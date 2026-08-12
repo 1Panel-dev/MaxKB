@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import type { ChatUserSyncConflict, OptionItem } from '@/api/types'
+import type { ChatUserSyncConflict, OptionItem, LoginMethod } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { MsgSuccess } from '@/utils/message'
 
@@ -33,7 +33,7 @@ function loadSyncTypes() {
   return ChatUserApi.getChatUserSyncTypes()
     .then((syncTypes) => {
       syncTypeOptions.value = syncTypes.map((syncType) => ({
-        label: syncType === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[syncType],
+        label: syncType === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[syncType as LoginMethod],
         value: syncType,
       }))
       importUsersForm.syncType = syncTypeOptions.value[0]?.value ?? ''

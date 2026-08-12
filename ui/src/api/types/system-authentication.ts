@@ -16,6 +16,7 @@ export interface LoginAuthSetting {
   auth_types?: LoginMethodOption[]
   default_value: string
   failed_attempts: number
+  group_id?: string
   lock_time: number
   login_methods: string[]
   max_attempts: number

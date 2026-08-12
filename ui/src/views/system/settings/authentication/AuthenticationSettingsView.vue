@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, type Component } from 'vue'
-import LDAP from './component/LDAP.vue'
-import CAS from './component/CAS.vue'
-import OIDC from './component/OIDC.vue'
-import SCAN from './component/SCAN.vue'
-import OAuth2 from './component/OAuth2.vue'
-import Saml2 from './component/Saml2.vue'
-import Setting from './component/Setting.vue'
+import LDAP from './components/LDAP.vue'
+import CAS from './components/CAS.vue'
+import OIDC from './components/OIDC.vue'
+import SCAN from './components/SCAN.vue'
+import OAuth2 from './components/OAuth2.vue'
+import Saml2 from './components/Saml2.vue'
+import LoginSetting from './components/LoginSetting.vue'
 
 interface AuthenticationTab {
   component: Component
@@ -14,9 +14,9 @@ interface AuthenticationTab {
   name: string
 }
 
-const activeName = ref('SETTING')
+const activeName = ref('LoginSetting')
 const authenticationTabs: AuthenticationTab[] = [
-  { label: '登录设置', name: 'SETTING', component: Setting },
+  { label: '登录设置', name: 'LoginSetting', component: LoginSetting },
   { label: 'LDAP', name: 'LDAP', component: LDAP },
   { label: 'CAS', name: 'CAS', component: CAS },
   { label: 'OIDC', name: 'OIDC', component: OIDC },
@@ -27,29 +27,19 @@ const authenticationTabs: AuthenticationTab[] = [
 </script>
 
 <template>
-  <MkViewLayout class="authentication-settings">
+  <MkViewLayout class="system-settings-authentication">
     <el-tabs v-model="activeName" class="authentication-tabs h-full">
-      <el-tab-pane
-        v-for="authenticationTab in authenticationTabs"
-        :key="authenticationTab.name"
-        :label="authenticationTab.label"
-        :name="authenticationTab.name"
-        lazy
-      >
-        <component :is="authenticationTab.component" />
-      </el-tab-pane>
+      <template v-for="authenticationTab in authenticationTabs" :key="authenticationTab.name">
+        <el-tab-pane :label="authenticationTab.label" :name="authenticationTab.name" lazy>
+          <el-scrollbar class="min-h-0 flex-1">
+            <div class="py-4">
+              <component :is="authenticationTab.component" />
+            </div>
+          </el-scrollbar>
+        </el-tab-pane>
+      </template>
     </el-tabs>
   </MkViewLayout>
 </template>
 
-<style scoped lang="scss">
-.authentication-tabs {
-  :deep(.el-tabs__content) {
-    height: calc(100% - 56px);
-  }
-
-  :deep(.el-tab-pane) {
-    height: 100%;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
