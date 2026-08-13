@@ -1,7 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
+import {
+  LOGIN_METHOD,
+  type ChatUser,
+  type LoginMethod,
+  type OptionItem,
+  type RequestParams,
+} from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
@@ -48,7 +54,7 @@ const searchFields: OptionItem<string>[] = [
     label: '用户来源',
     value: 'source',
     options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-      label: value === 'LOCAL' ? '本地创建' : label,
+      label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
       value,
     })),
   },
@@ -175,7 +181,7 @@ onMounted(() => loadChatUsers())
         @current-change="loadChatUsers()"
         @size-change="loadChatUsers()"
         @selection-change="handleBatchSelectionChange"
-        :search="Boolean(chatUserQuery)"
+        :isSearching="Boolean(chatUserQuery)"
       >
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
@@ -206,7 +212,9 @@ onMounted(() => loadChatUsers())
         <el-table-column label="用户来源">
           <template #default="{ row }">
             {{
-              row.source === 'LOCAL' ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+              row.source === LOGIN_METHOD.LOCAL
+                ? '本地创建'
+                : LOGIN_METHOD_LABELS[row.source as LoginMethod]
             }}
           </template>
         </el-table-column>

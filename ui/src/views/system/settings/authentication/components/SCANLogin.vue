@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import AuthScanApi from '@/api/admin/system/auth-scan-setting'
-import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformRequest } from '@/api/types'
+import {
+  LOGIN_METHOD,
+  type QrCodeProvider,
+  type QrLoginPlatform,
+  type QrLoginPlatformRequest,
+} from '@/api/types'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants/auth'
 import { MsgSuccess, MsgError } from '@/utils/message'
 import dingtalkLogo from '@/assets/logo/logo_dingtalk.svg'
@@ -20,16 +25,16 @@ const platformDefinitions: {
   logo: string
 }[] = [
   {
-    key: 'wecom',
+    key: LOGIN_METHOD.WECOM,
     logo: enterpriseWechatLogo,
     configKeys: ['corp_id', 'agent_id', 'app_secret'],
   },
   {
-    key: 'dingtalk',
+    key: LOGIN_METHOD.DINGTALK,
     logo: dingtalkLogo,
     configKeys: ['corp_id', 'app_key', 'app_secret'],
   },
-  { key: 'lark', logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
+  { key: LOGIN_METHOD.LARK, logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
 ]
 
 const apiBaseUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api`

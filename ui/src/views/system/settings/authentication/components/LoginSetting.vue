@@ -4,7 +4,14 @@ import type { FormInstance, FormRules } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type { ListItem, LoginAuthSetting, SystemUserGroup, LoginMethod } from '@/api/types'
+import {
+  LOGIN_METHOD,
+  ROLE_TYPE,
+  type ListItem,
+  type LoginAuthSetting,
+  type SystemUserGroup,
+  type LoginMethod,
+} from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
@@ -14,12 +21,12 @@ const { auth } = useStore()
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
 const form = reactive<LoginAuthSetting>({
-  login_methods: ['LOCAL'],
-  default_value: 'LOCAL',
+  login_methods: [LOGIN_METHOD.LOCAL],
+  default_value: LOGIN_METHOD.LOCAL,
   max_attempts: 1,
   failed_attempts: 5,
   lock_time: 10,
-  role_id: 'USER',
+  role_id: ROLE_TYPE.USER,
   workspace_id: 'default',
   permission: 'NOT_AUTH',
 })
@@ -62,7 +69,7 @@ const workspaceOptions = ref<ListItem[]>([])
 const selectedRoleType = computed(
   () => roleOptions.value.find(({ id }) => id === form.role_id)?.type,
 )
-const showWorkspaceSelector = computed(() => selectedRoleType.value !== 'ADMIN')
+const showWorkspaceSelector = computed(() => selectedRoleType.value !== ROLE_TYPE.ADMIN)
 
 function loadRoleSettingOptions() {
   roleSettingOptionsLoading.value = true

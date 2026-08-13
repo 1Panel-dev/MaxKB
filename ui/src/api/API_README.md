@@ -68,6 +68,11 @@ API 类型统一在 `src/api` 范围内管理，相关规则由本文档统一�
   `import type { ... } from '@/api/types'` 导入，不写 `/index.ts`。
 - `src/api/types/index.ts` 只负责导出各业务域类型，不直接声明类型。
 - 新增类型前先搜索是否已有等价声明，优先复用或扩展已有类型。
+- 后端字段的固定协议值与其类型放在同一个 `src/api/types/<domain>.ts` 中：使用
+  `as const` 对象声明运行时常量，并从该对象派生联合类型。协议常量是唯一数据源；新增、删除或
+  修改协议值只维护对应的 API 类型文件，业务判断不得重复使用裸字符串或另建同值常量。
+- 同时导出协议常量的类型模块在 `src/api/types/index.ts` 中使用 `export *`；只有纯类型模块使用
+  `export type *`。
 - 同一业务边界内的重复类型提取到最近共同目录的 `common.ts`；`common.ts` 不得成为无关类型
   的集合。
 - API 与 View 或 Component 使用同一业务类型时只保留一份声明，不得在两层分别定义。

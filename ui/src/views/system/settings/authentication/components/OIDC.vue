@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
-import type { AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'OidcAuthenticationSetting' })
@@ -12,7 +12,7 @@ const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? '
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
 const form = reactive<AuthProviderSetting>({
-  auth_type: 'OIDC',
+  auth_type: LOGIN_METHOD.OIDC,
   config: {
     authEndpoint: '',
     tokenEndpoint: '',

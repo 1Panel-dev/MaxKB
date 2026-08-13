@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="T extends Record<string, unknown>">
 import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 import { computed, nextTick, ref, watch } from 'vue'
+import MkListItem from './mk-list-item.vue'
 
 defineOptions({ name: 'MkSearchList' })
 
@@ -48,7 +49,7 @@ defineSlots<{
   action(props: { row: T; index: number }): unknown
   'action-dropdown'(props: { row: T; index: number }): unknown
   empty(): unknown
-  row(props: { row: T; index: number; active: boolean }): unknown
+  default(props: { row: T; index: number; active: boolean }): unknown
 }>()
 
 const currentValue = ref<unknown>(componentProps.defaultActive)
@@ -108,35 +109,23 @@ function selectRow(row: T, index: number) {
     <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 px-4 py-2" @end-reached="loadMore">
       <div v-if="filteredData.length" class="flex flex-col gap-1">
         <template v-for="(row, index) in renderData" :key="String(row[valueField] ?? index)">
-          <div
-            class="group flex cursor-pointer items-center rounded-md p-2 hover:bg-N900/10"
-            :class="{
-              'bg-primary/10 hover:bg-primary/10 font-medium text-primary':
-                currentValue === row[valueField],
-            }"
+          <MkListItem
+            :active="currentValue === row[valueField]"
+            :index="index"
+            :label-field="labelField"
+            :row="row"
             @click="selectRow(row, index)"
           >
-            <slot name="row" :row="row" :index="index" :active="currentValue === row[valueField]">
-              <span class="min-w-0 flex-1 truncate">{{ row[labelField] }}</span>
-            </slot>
-            <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
-            <div
-              v-if="$slots.action || $slots['action-dropdown']"
-              class="pointer-events-none ml-auto flex shrink-0 items-center font-normal text-N900 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100"
-              @click.stop
-              @keydown.stop
-            >
-              <MkDropdown v-if="$slots['action-dropdown']" trigger="click" :teleported="false">
-                <el-button class="-mr-1" text>
-                  <MkIcon name="icon_more_outlined" />
-                </el-button>
-                <template #dropdown>
-                  <slot name="action-dropdown" :row="row" :index="index" />
-                </template>
-              </MkDropdown>
-              <slot v-else name="action" :row="row" :index="index" />
-            </div>
-          </div>
+            <template v-if="$slots.default" #default="slotProps">
+              <slot v-bind="slotProps" />
+            </template>
+            <template v-if="$slots.action" #action="slotProps">
+              <slot name="action" v-bind="slotProps" />
+            </template>
+            <template v-if="$slots['action-dropdown']" #action-dropdown="slotProps">
+              <slot name="action-dropdown" v-bind="slotProps" />
+            </template>
+          </MkListItem>
         </template>
       </div>
       <slot v-else name="empty">

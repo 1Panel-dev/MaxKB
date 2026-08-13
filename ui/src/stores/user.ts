@@ -3,6 +3,7 @@
 import { defineStore } from 'pinia'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import type { CurrentUserInfo } from '@/api/admin/auth/types'
+import { ROLE_TYPE } from '@/api/types'
 
 const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 
@@ -22,7 +23,7 @@ export const useUserStore = defineStore('user', {
   }),
 
   getters: {
-    is_admin: (state) => state.userInfo?.role.includes('ADMIN') ?? false,
+    is_admin: (state) => state.userInfo?.role.includes(ROLE_TYPE.ADMIN) ?? false,
 
     /** 当前用户角色集合，供权限模块（@/permission）判定使用。getter 已缓存。 */
     roleSet: (state): Set<string> => new Set(state.userInfo?.role ?? []),

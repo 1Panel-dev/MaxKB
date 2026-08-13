@@ -24,8 +24,6 @@ defineSlots<{
 const route = useRoute()
 const title = computed(() => props.title || route.meta.title || '')
 const slots = useSlots()
-const LayoutHeader: FunctionalComponent = (_, { slots }) =>
-  h('header', { class: 'flex-between shrink-0 py-4' }, slots.default?.())
 
 function flattenSlotNodes(children: unknown): VNode[] {
   const childNodes = Array.isArray(children) ? children : [children]
@@ -37,6 +35,9 @@ function flattenSlotNodes(children: unknown): VNode[] {
   })
 }
 
+const LayoutHeader: FunctionalComponent = (_, { slots }) =>
+  h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, slots.default?.())
+
 const LayoutContent: FunctionalComponent = () => {
   const contentNodes = flattenSlotNodes(
     slots.default?.({ Header: LayoutHeader, title: title.value }),
@@ -46,7 +47,7 @@ const LayoutContent: FunctionalComponent = () => {
   return [
     hasCustomHeader || !title.value
       ? null
-      : h('header', { class: 'flex-between shrink-0 py-4' }, [h('h4', title.value)]),
+      : h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)]),
     ...contentNodes,
   ]
 }

@@ -2,14 +2,14 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
-import type { AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'LdapAuthenticationSetting' })
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
 const form = reactive<AuthProviderSetting>({
-  auth_type: 'LDAP',
+  auth_type: LOGIN_METHOD.LDAP,
   config: { ldap_server: '', base_dn: '', password: '', ou: '', ldap_filter: '', ldap_mapping: '' },
   is_active: false,
 })

@@ -243,8 +243,8 @@ onMounted(() => loadWorkspaceOptions())
     <template #default="{ Header }">
       <template v-if="currentGroup">
         <component :is="Header">
-          <div class="flex items-center gap-2">
-            <h4>{{ currentGroup.name }}</h4>
+          <div class="flex min-w-0 flex-1 items-center gap-2">
+            <h4 class="min-w-0 truncate">{{ currentGroup.name }}</h4>
             <el-divider direction="vertical" />
             <span class="flex items-center text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />
@@ -263,11 +263,11 @@ onMounted(() => loadWorkspaceOptions())
 
         <MkTable
           v-loading="loadingMembers"
-          :max-table-height="340"
+          :max-table-height="280"
           v-model:pagination-config="paginationConfig"
           :data="userGroupMembers"
           @selection-change="handleMemberSelectionChange"
-          :search="Boolean(memberSearchQuery)"
+          :isSearching="Boolean(memberSearchQuery)"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" label="姓名" min-width="198" show-overflow-tooltip />

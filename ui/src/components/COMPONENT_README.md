@@ -35,6 +35,8 @@ src/components/
 ├── global/                       # 高频、稳定的基础组件，自动注册
 │   ├── mk-complex-search/
 │   │   └── index.vue             # 字段选择与输入或枚举条件组合搜索框
+│   ├── mk-collapse/
+│   │   └── index.vue             # 带标题和过渡动画的折叠内容区
 │   ├── mk-dialog/
 │   │   └── index.vue             # 统一对话框关闭行为和内容滚动布局
 │   ├── mk-dropdown/
@@ -61,7 +63,8 @@ src/components/
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
 ├── mk-search-list/
-│   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
+│   ├── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
+│   └── mk-list-item.vue          # 列表与业务分组列表复用的私有行结构
 ├── mk-workspace-dropdown/
 │   └── index.vue                 # 工作空间选择下拉框，手动导入
 └── mk-workspace-relation-tags/
@@ -116,6 +119,17 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 ```
 
 ## 自动注册组件
+
+### MkCollapse
+
+带标题触发器和展开过渡动画的内容折叠组件。通过 `v-model` 控制展开状态，默认展开；点击标题行
+会切换状态，默认插槽放置折叠内容。
+
+```vue
+<MkCollapse v-model="expanded" title="系统管理员">
+  <div>折叠内容</div>
+</MkCollapse>
+```
 
 ### MkEmpty
 

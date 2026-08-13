@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type { ListItem, BatchSetUserWorkspaceRolesRequest } from '@/api/types'
+import { ROLE_TYPE, type ListItem, type BatchSetUserWorkspaceRolesRequest } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import UserRoleSetting from '../components/UserRoleSetting.vue'
@@ -67,7 +67,8 @@ function submitBatchSetUserRoles() {
           role_setting: batchRoleForm.role_setting.map((assignment) => ({
             ...assignment,
             workspace_ids:
-              roleOptions.value.find(({ id }) => id === assignment.role_id)?.type === 'ADMIN'
+              roleOptions.value.find(({ id }) => id === assignment.role_id)?.type ===
+              ROLE_TYPE.ADMIN
                 ? ['None']
                 : assignment.workspace_ids,
           })),

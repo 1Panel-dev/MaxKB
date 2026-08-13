@@ -2,7 +2,12 @@
 import { computed, onMounted, ref } from 'vue'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
-import type { LoginConfig, QrCodeConfig, QrCodeProvider } from '@/api/types/index.ts'
+import {
+  LOGIN_METHOD,
+  type LoginConfig,
+  type QrCodeConfig,
+  type QrCodeProvider,
+} from '@/api/types/index.ts'
 import DingTalkQrCode from '../scanComponents/dingtalkQrCode.vue'
 import LarkQrCode from '../scanComponents/larkQrCode.vue'
 import WecomQrCode from '../scanComponents/wecomQrCode.vue'
@@ -14,13 +19,13 @@ const qrCodeLoginMethods = computed(() => props.loginConfig.login_methods ?? [])
 
 const qrCodeConfigs = ref<Partial<Record<QrCodeProvider, QrCodeConfig>>>({})
 const qrCodeProvider = ref<QrCodeProvider>(
-  (props.loginConfig.default_value as QrCodeProvider) ?? 'wecom',
+  (props.loginConfig.default_value as QrCodeProvider) ?? LOGIN_METHOD.WECOM,
 )
 
 const providerComponents = {
-  dingtalk: DingTalkQrCode,
-  lark: LarkQrCode,
-  wecom: WecomQrCode,
+  [LOGIN_METHOD.DINGTALK]: DingTalkQrCode,
+  [LOGIN_METHOD.LARK]: LarkQrCode,
+  [LOGIN_METHOD.WECOM]: WecomQrCode,
 }
 
 const currentConfig = computed(() => qrCodeConfigs.value[qrCodeProvider.value])

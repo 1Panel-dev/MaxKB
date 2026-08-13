@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import LoginApi from '@/api/admin/auth/login'
+import { LOGIN_METHOD } from '@/api/types'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'AvatarDropdown' })
@@ -23,7 +24,8 @@ function handleLogout() {
   LoginApi.postLogout().then(() => {
     auth.clearToken()
     router.push(
-      loginMode && ['CAS', 'OIDC', 'OAuth2'].includes(loginMode)
+      loginMode &&
+        ([LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2] as string[]).includes(loginMode)
         ? { name: 'login', query: { login_mode: 'manual' } }
         : { name: 'login' },
     )

@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, type Component } from 'vue'
+import { LOGIN_METHOD } from '@/api/types'
 import LDAP from './components/LDAP.vue'
 import CAS from './components/CAS.vue'
 import OIDC from './components/OIDC.vue'
 import SCAN from './components/SCANLogin.vue'
 import OAuth2 from './components/OAuth2.vue'
-import Saml2 from './components/Saml2.vue'
-import LoginSetting from './components/LoginSetting.vue'
 
 interface AuthenticationTab {
   component: Component
@@ -14,14 +13,12 @@ interface AuthenticationTab {
   name: string
 }
 
-const activeName = ref('SCAN')
+const activeName = ref(LOGIN_METHOD.LDAP)
 const authenticationTabs: AuthenticationTab[] = [
-  { label: '登录设置', name: 'LoginSetting', component: LoginSetting },
-  { label: 'LDAP', name: 'LDAP', component: LDAP },
-  { label: 'CAS', name: 'CAS', component: CAS },
-  { label: 'OIDC', name: 'OIDC', component: OIDC },
-  { label: 'OAuth2', name: 'OAuth2', component: OAuth2 },
-  { label: 'SAML2', name: 'SAML2', component: Saml2 },
+  { label: 'LDAP', name: LOGIN_METHOD.LDAP, component: LDAP },
+  { label: 'CAS', name: LOGIN_METHOD.CAS, component: CAS },
+  { label: 'OIDC', name: LOGIN_METHOD.OIDC, component: OIDC },
+  { label: 'OAuth2', name: LOGIN_METHOD.OAUTH2, component: OAuth2 },
   { label: '扫码登录', name: 'SCAN', component: SCAN },
 ]
 </script>
@@ -47,15 +44,4 @@ const authenticationTabs: AuthenticationTab[] = [
   </MkViewLayout>
 </template>
 
-<style scoped lang="scss">
-.authentication-tabs {
-  :deep(.el-tabs__header) {
-    flex-shrink: 0;
-  }
-
-  :deep(.el-tabs__content) {
-    min-height: 0;
-    flex: 1;
-  }
-}
-</style>
+<style scoped lang="scss"></style>
