@@ -19,7 +19,7 @@ const props = withDefaults(
     maxTableHeight?: number
     paginationConfig?: PaginationConfig
     resizable?: boolean
-    search?: boolean
+    isSearching?: boolean
   }>(),
   {
     data: () => [],
@@ -42,7 +42,9 @@ const paginationPageSizes = computed(() => props.paginationConfig?.pageSizes ?? 
 /** 表格高度 */
 const tableHeight = ref(window.innerHeight - props.maxTableHeight)
 function updateTableHeight() {
-  tableHeight.value = window.innerHeight - props.maxTableHeight
+  tableHeight.value = props.paginationConfig
+    ? window.innerHeight - props.maxTableHeight
+    : window.innerHeight - props.maxTableHeight + 50
 }
 
 /** 选择操作栏 */
@@ -151,8 +153,8 @@ defineExpose({ clearSelection, tableRef })
 
 <template>
   <MkEmpty
-    v-if="!props.paginationConfig?.total"
-    :type="search ? 'search' : ''"
+    v-if="props.paginationConfig ? !props.paginationConfig?.total : props.data.length === 0"
+    :type="isSearching ? 'search' : ''"
     class="flex-1"
   />
   <div

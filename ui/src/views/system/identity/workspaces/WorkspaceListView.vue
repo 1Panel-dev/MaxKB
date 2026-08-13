@@ -234,8 +234,8 @@ onMounted(() => loadWorkspaceOptions())
     <template #default="{ Header }">
       <template v-if="currentWorkspace">
         <component :is="Header">
-          <div class="flex items-center gap-2">
-            <h4>{{ currentWorkspace.name }}</h4>
+          <div class="flex min-w-0 flex-1 items-center gap-2">
+            <h4 class="min-w-0 truncate">{{ currentWorkspace.name }}</h4>
             <el-divider direction="vertical" />
             <span class="flex items-center text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />
@@ -262,7 +262,7 @@ onMounted(() => loadWorkspaceOptions())
           :span-method="objectSpanMethod"
           :max-table-height="280"
           :row-key="getWorkspaceMemberRowKey"
-          :search="Boolean(memberSearchQuery)"
+          :isSearching="Boolean(memberSearchQuery)"
         >
           <el-table-column type="selection" width="64" />
           <el-table-column prop="nick_name" label="姓名" />

@@ -7,7 +7,7 @@ import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { useStore } from '@/stores'
-import type { LoginConfig, LoginMethod } from '@/api/types'
+import { LOGIN_METHOD, type LoginConfig, type LoginMethod } from '@/api/types'
 import { MsgConfirm } from '@/utils/message'
 
 interface AccountLoginForm {
@@ -27,16 +27,22 @@ const router = useRouter()
 const { auth } = useStore()
 const isSubmitting = ref(false)
 const identifyCode = ref('')
-const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? 'LOCAL')
+const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_METHOD.LOCAL)
 
 const accountLoginMethods = computed(() => {
   let loginMethods = [...(props.loginConfig?.login_methods ?? [])]
-  if (loginMethods.includes('LOCAL')) {
-    loginMethods = ['LOCAL', ...loginMethods.filter((method) => method !== 'LOCAL')]
-  } else if (loginMethods.includes('LDAP')) {
-    loginMethods = ['LDAP', ...loginMethods.filter((method) => method !== 'LDAP')]
+  if (loginMethods.includes(LOGIN_METHOD.LOCAL)) {
+    loginMethods = [
+      LOGIN_METHOD.LOCAL,
+      ...loginMethods.filter((method) => method !== LOGIN_METHOD.LOCAL),
+    ]
+  } else if (loginMethods.includes(LOGIN_METHOD.LDAP)) {
+    loginMethods = [
+      LOGIN_METHOD.LDAP,
+      ...loginMethods.filter((method) => method !== LOGIN_METHOD.LDAP),
+    ]
   }
-  if (loginMethods.length === 1 && loginMethods[0] === 'LOCAL') return []
+  if (loginMethods.length === 1 && loginMethods[0] === LOGIN_METHOD.LOCAL) return []
 
   return loginMethods
 })
@@ -60,7 +66,7 @@ const handleLogin = async () => {
   await accountLoginFormRef.value.validate((valid) => {
     if (valid) {
       isSubmitting.value = true
-      if (loginMethod.value === 'LDAP') {
+      if (loginMethod.value === LOGIN_METHOD.LDAP) {
         auth
           .asyncLdapLogin(accountLoginForm)
           .then(() => {
@@ -96,14 +102,14 @@ const handleLogin = async () => {
 }
 
 const refreshCaptcha = () => {
-  if (loginMethod.value === 'LDAP') return
+  if (loginMethod.value === LOGIN_METHOD.LDAP) return
   LoginApi.getCaptcha(accountLoginForm.username).then((res) => {
     identifyCode.value = res.captcha
   })
 }
 
 const selectLoginMethod = (method: LoginMethod) => {
-  if (method !== 'LOCAL' && method !== 'LDAP') {
+  if (method !== LOGIN_METHOD.LOCAL && method !== LOGIN_METHOD.LDAP) {
     void redirectExternalLogin(method, true)
     return
   }
@@ -129,25 +135,25 @@ const redirectExternalLogin = async (method: LoginMethod, needConfirm: boolean) 
 }
 
 const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
-  if (authType === 'SAML2') return ExternalLoginApi.getSamlLoginUrl()
+  if (authType === LOGIN_METHOD.SAML2) return ExternalLoginApi.getSamlLoginUrl()
 
   return ExternalLoginApi.getExternalAuthSetting(authType).then(({ config }) => {
     if (!config) return ''
 
     const redirectUrl = `${config.redirectUrl}`
-    if (authType === 'CAS') {
+    if (authType === LOGIN_METHOD.CAS) {
       if (!config.ldpUri) return ''
       const separator = config.ldpUri.includes('?') ? '&' : '?'
       return `${config.ldpUri}${separator}service=${encodeURIComponent(redirectUrl)}`
     }
-    if (authType === 'OIDC') {
+    if (authType === LOGIN_METHOD.OIDC) {
       if (!config.authEndpoint || !config.clientId) return ''
       const scope = config.scope || 'openid+profile+email'
       let url = `${config.authEndpoint}?client_id=${config.clientId}&redirect_uri=${redirectUrl}&response_type=code&scope=${scope}`
       if (config.state) url += `&state=${config.state}`
       return url
     }
-    if (authType === 'OAuth2') {
+    if (authType === LOGIN_METHOD.OAUTH2) {
       if (!config.authEndpoint || !config.clientId) return ''
       let url = `${config.authEndpoint}?client_id=${config.clientId}&response_type=code&redirect_uri=${redirectUrl}&state=${crypto.randomUUID()}`
       if (config.scope) url += `&scope=${config.scope}`
@@ -164,7 +170,9 @@ onMounted(() => {
     const loginMethod = loginMethods[0]
     if (
       loginMethod &&
-      ['CAS', 'OIDC', 'OAuth2', 'SAML2'].some((authType) => authType === loginMethod)
+      [LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some(
+        (authType) => authType === loginMethod,
+      )
     ) {
       void redirectExternalLogin(loginMethod, false)
     }
@@ -176,7 +184,7 @@ onMounted(() => {
   <div class="flex h-full flex-col">
     <div class="min-h-0 flex-1">
       <h2 class="mb-4">
-        {{ loginMethod === 'LDAP' ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
+        {{ loginMethod === LOGIN_METHOD.LDAP ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
       </h2>
 
       <el-form
@@ -202,7 +210,7 @@ onMounted(() => {
             type="password"
           />
         </el-form-item>
-        <div v-if="loginMethod !== 'LDAP' && identifyCode" class="flex gap-2">
+        <div v-if="loginMethod !== LOGIN_METHOD.LDAP && identifyCode" class="flex gap-2">
           <el-form-item prop="captcha" class="flex-1">
             <el-input
               v-model="accountLoginForm.captcha"
@@ -244,7 +252,7 @@ onMounted(() => {
             @click="selectLoginMethod(method)"
             v-if="loginMethod !== method"
           >
-            <MkIcon v-if="method === 'LOCAL'" name="icon_pc_outlined" :size="22.5" />
+            <MkIcon v-if="method === LOGIN_METHOD.LOCAL" name="icon_pc_outlined" :size="22.5" />
             <span v-else>{{ method }}</span>
           </el-button>
         </template>

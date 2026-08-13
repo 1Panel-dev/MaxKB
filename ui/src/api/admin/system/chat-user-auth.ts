@@ -17,21 +17,8 @@ const postAuthSettingConnection = (setting: AuthProviderSetting) => {
 const putAuthSetting = (authType: AuthProviderType, setting: AuthProviderSetting) => {
   return put<AuthProviderSetting, boolean>(`${prefix}/${authType}/info`, setting)
 }
-
-/** 获取对话用户登录设置。 */
-const getLoginSetting = () => {
-  return get<LoginAuthSetting>(`${prefix}/setting`)
-}
-
-/** 保存对话用户登录设置。 */
-const putLoginSetting = (setting: LoginAuthSetting) => {
-  return put<LoginAuthSetting, boolean>(`${prefix}/setting`, setting)
-}
-
 export default {
   getAuthSetting,
-  getLoginSetting,
   postAuthSettingConnection,
   putAuthSetting,
-  putLoginSetting,
 }

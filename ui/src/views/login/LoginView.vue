@@ -2,7 +2,7 @@
 import { computed, onBeforeMount, ref } from 'vue'
 import BaseInfoApi from '@/api/admin/auth/base-info.ts'
 import { useStore } from '@/stores'
-import type { LoginConfig, QrCodeProvider } from '@/api/types/index.ts'
+import { LOGIN_METHOD, type LoginConfig, type QrCodeProvider } from '@/api/types/index.ts'
 import LoginLayout from './components/LoginLayout.vue'
 import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
@@ -12,8 +12,8 @@ const { auth, theme } = useStore()
 
 const isLoading = ref(true)
 const loginConfig = ref<LoginConfig>({
-  default_value: 'LOCAL',
-  login_methods: ['LOCAL'],
+  default_value: LOGIN_METHOD.LOCAL,
+  login_methods: [LOGIN_METHOD.LOCAL],
   max_attempts: 1,
 })
 const loginMode = ref<'account' | 'qr-code'>('account')
@@ -31,7 +31,7 @@ const accountLoginMethods = computed(() =>
 const accountLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
   default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
-    ? 'LOCAL'
+    ? LOGIN_METHOD.LOCAL
     : loginConfig.value.default_value,
   login_methods: accountLoginMethods.value,
 }))
@@ -39,7 +39,7 @@ const qrCodeLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
   default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
     ? loginConfig.value.default_value
-    : 'wecom',
+    : LOGIN_METHOD.WECOM,
   login_methods: qrCodeProviders.value,
 }))
 const showLoginModeSwitch = computed(
@@ -58,8 +58,8 @@ onBeforeMount(() => {
           } else {
             loginConfig.value = {
               max_attempts: 1,
-              default_value: 'LOCAL',
-              login_methods: ['LOCAL'],
+              default_value: LOGIN_METHOD.LOCAL,
+              login_methods: [LOGIN_METHOD.LOCAL],
             }
           }
         })
@@ -69,8 +69,8 @@ onBeforeMount(() => {
 
       loginConfig.value = {
         max_attempts: 1,
-        default_value: 'LOCAL',
-        login_methods: ['LOCAL'],
+        default_value: LOGIN_METHOD.LOCAL,
+        login_methods: [LOGIN_METHOD.LOCAL],
       }
     })
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { FormItemRule } from 'element-plus'
-import type { ListItem, SystemUserRoleAssignment } from '@/api/types'
+import { ROLE_TYPE, type ListItem, type SystemUserRoleAssignment } from '@/api/types'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'UserRoleSettingSection' })
@@ -27,7 +27,7 @@ const workspaceRequiredRule: FormItemRule = {
 }
 
 function isAdminRole(roleId: string) {
-  return props.roleOptions.find(({ id }) => id === roleId)?.type === 'ADMIN'
+  return props.roleOptions.find(({ id }) => id === roleId)?.type === ROLE_TYPE.ADMIN
 }
 
 function addRole() {

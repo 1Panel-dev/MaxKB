@@ -218,7 +218,6 @@
   --el-checkbox-input-width: 16px;
   --el-checkbox-input-height: 16px;
   margin: 0;
-  min-width: 120px;
 }
 
 /* dialog */
@@ -529,6 +528,32 @@
   }
 }
 
+.el-radio-group {
+  &:has(.el-radio-button) {
+    border: 1px solid var(--el-border-color);
+    border-radius: var(--el-border-radius-base);
+    padding: var(--spacing);
+    gap: var(--spacing);
+  }
+}
+.el-radio-button {
+  --el-radio-button-checked-bg-color: rgb(var(--mk-primary-rgb) / 10%);
+  --el-radio-button-checked-text-color: var(--el-color-primary);
+  &__inner {
+    border: none !important;
+    outline: none !important;
+    padding: 5px 8px;
+    font-weight: 400;
+    border-radius: var(--el-border-radius-small) !important;
+  }
+  &.is-active {
+    .el-radio-button__inner {
+      font-weight: 500 !important;
+      box-shadow: none !important;
+    }
+  }
+}
+
 /* select */
 .el-select {
   &__caret {
@@ -601,6 +626,11 @@
   --el-tabs-header-height: 34px;
   &__header {
     margin: 0;
+    flex-shrink: 0;
+  }
+  &__content {
+    min-height: 0;
+    flex: 1;
   }
   &__item {
     padding: 2px 14px;
@@ -668,15 +698,19 @@
   max-width: 115px;
   border: none;
   padding: 0 6px;
-  &:not(&--small) {
-    --el-tag-font-size: 14px;
-  }
-
+  font-weight: 400 !important;
   &__content {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  &:not(&--small) {
+    --el-tag-font-size: 14px;
+  }
+  &--small {
+    padding: 4px;
+  }
+
   &--info {
     --el-tag-text-color: var(--el-text-color-primary) !important;
     --el-tag-bg-color: var(--mk-N900-transparent-10) !important;

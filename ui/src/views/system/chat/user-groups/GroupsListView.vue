@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatGroupsApi from '@/api/admin/system/chat-user-groups.ts'
-import type {
-  ListItem,
-  ChatUserGroupMember,
-  LoginMethod,
-  OptionItem,
-  RequestParams,
+import {
+  LOGIN_METHOD,
+  type ListItem,
+  type ChatUserGroupMember,
+  type LoginMethod,
+  type OptionItem,
+  type RequestParams,
 } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -175,8 +176,8 @@ onMounted(() => loadChatUserGroups())
     <template #default="{ Header }">
       <template v-if="currentGroup">
         <component :is="Header">
-          <div class="flex items-center gap-2">
-            <h4>{{ currentGroup.name }}</h4>
+          <div class="flex min-w-0 flex-1 items-center gap-2">
+            <h4 class="min-w-0 truncate">{{ currentGroup.name }}</h4>
             <el-divider direction="vertical" />
             <span class="flex items-center text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />
@@ -201,15 +202,18 @@ onMounted(() => loadChatUserGroups())
           @current-change="loadGroupMembers()"
           @size-change="loadGroupMembers()"
           @selection-change="handleBatchSelectionChange"
-          :search="Boolean(memberQuery)"
+          :isSearching="Boolean(memberQuery)"
+          :max-table-height="280"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" label="姓名" show-overflow-tooltip />
           <el-table-column prop="username" label="用户名" show-overflow-tooltip />
-          <el-table-column prop="source" label="用户来源" min-width="140">
+          <el-table-column prop="source" label="用户来源">
             <template #default="{ row }">
               {{
-                row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+                row.source === LOGIN_METHOD.LOCAL
+                  ? '系统用户'
+                  : LOGIN_METHOD_LABELS[row.source as LoginMethod]
               }}
             </template>
           </el-table-column>

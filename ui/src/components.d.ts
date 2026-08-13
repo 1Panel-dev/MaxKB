@@ -13,6 +13,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
+    MkCollapse: typeof import('./components/global/mk-collapse/index.vue')['default']
     MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
     MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
     MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']
@@ -35,6 +36,7 @@ declare module 'vue' {
 // For TSX support
 declare global {
   const LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
+  const MkCollapse: typeof import('./components/global/mk-collapse/index.vue')['default']
   const MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
   const MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
   const MkDrawer: typeof import('./components/global/mk-drawer/index.vue')['default']

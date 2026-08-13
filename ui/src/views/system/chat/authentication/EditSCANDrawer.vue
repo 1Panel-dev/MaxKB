@@ -2,7 +2,7 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserAuthScanApi from '@/api/admin/system/chat-user-auth-scan'
-import type { QrLoginPlatformRequest } from '@/api/types'
+import { LOGIN_METHOD, type QrLoginPlatformRequest } from '@/api/types'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants/auth'
 import { MsgSuccess, MsgError } from '@/utils/message'
 
@@ -11,7 +11,7 @@ const visible = ref(false)
 const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
 const form = reactive<QrLoginPlatformRequest>({
-  key: 'wecom',
+  key: LOGIN_METHOD.WECOM,
   isActive: false,
   config: {},
 })
@@ -65,7 +65,7 @@ function close() {
 }
 
 function resetData() {
-  Object.assign(form, { key: 'wecom', isActive: false, config: {} })
+  Object.assign(form, { key: LOGIN_METHOD.WECOM, isActive: false, config: {} })
   formRef.value?.resetFields()
 }
 defineExpose({ open })

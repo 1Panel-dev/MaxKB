@@ -2,7 +2,14 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
-import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/api/types/index.ts'
+import {
+  LOGIN_METHOD,
+  ROLE_TYPE,
+  type LoginMethod,
+  type OptionItem,
+  type SystemUser,
+  type RequestParams,
+} from '@/api/types/index.ts'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
@@ -165,7 +172,7 @@ onMounted(() => loadSystemUsers())
         @current-change="loadSystemUsers()"
         @size-change="loadSystemUsers()"
         @selection-change="handleBatchSelectionChange"
-        :search="Boolean(systemUserQuery)"
+        :isSearching="Boolean(systemUserQuery)"
       >
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />
@@ -210,7 +217,9 @@ onMounted(() => loadSystemUsers())
         <el-table-column label="用户来源">
           <template #default="{ row }">
             {{
-              row.source === 'LOCAL' ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod]
+              row.source === LOGIN_METHOD.LOCAL
+                ? '系统用户'
+                : LOGIN_METHOD_LABELS[row.source as LoginMethod]
             }}
           </template>
         </el-table-column>
@@ -226,7 +235,7 @@ onMounted(() => loadSystemUsers())
               <span @click.stop>
                 <el-switch
                   v-model="row.is_active"
-                  :disabled="row.role === 'ADMIN' || row.id === user.userInfo?.id"
+                  :disabled="row.role === ROLE_TYPE.ADMIN || row.id === user.userInfo?.id"
                   :before-change="() => handleChangeStatus(row)"
                   size="small"
                 />
