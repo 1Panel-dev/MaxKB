@@ -8,7 +8,8 @@ export interface CurrentUserInfo {
   is_edit_password?: boolean
   language?: string
   nick_name: string
-  permissions: string[]
+  /** 权限位图：key 为「组(+工作空间+资源)」，value 为该组内操作授权位的按位或。 */
+  permissions: Record<string, number>
   role: string[]
   role_name?: string[]
   source?: string

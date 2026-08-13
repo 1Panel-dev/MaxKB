@@ -23,6 +23,19 @@ export const useUserStore = defineStore('user', {
 
   getters: {
     is_admin: (state) => state.userInfo?.role.includes('ADMIN') ?? false,
+
+    /** 当前用户角色集合，供权限模块（@/permission）判定使用。getter 已缓存。 */
+    roleSet: (state): Set<string> => new Set(state.userInfo?.role ?? []),
+
+    /** 当前用户权限位图（组 key → BigInt 位掩码），供权限模块判定使用。getter 已缓存。 */
+    permissionMap: (state): Map<string, bigint> => {
+      const source = state.userInfo?.permissions ?? {}
+      const result = new Map<string, bigint>()
+      for (const [key, value] of Object.entries(source)) {
+        result.set(key, BigInt(value ?? 0))
+      }
+      return result
+    },
   },
 
   actions: {
