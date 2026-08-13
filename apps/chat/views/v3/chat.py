@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： chat.py
-    @date：2025/6/6 11:18
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： chat.py
+@date：2025/6/6 11:18
+@desc:
 """
+
 import json
 
 import requests
@@ -23,10 +24,18 @@ from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
 from application.models import ChatUserType, ChatSourceChoices
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
-from chat.serializers.chat import OpenChatSerializers, ChatSerializers, SpeechToTextSerializers, \
-    TextToSpeechSerializers, OpenAIChatSerializer
-from chat.serializers.chat_authentication import AnonymousAuthenticationSerializer, ApplicationProfileSerializer, \
-    AuthProfileSerializer
+from chat.serializers.chat import (
+    OpenChatSerializers,
+    ChatSerializers,
+    SpeechToTextSerializers,
+    TextToSpeechSerializers,
+    OpenAIChatSerializer,
+)
+from chat.serializers.chat_authentication import (
+    AnonymousAuthenticationSerializer,
+    ApplicationProfileSerializer,
+    AuthProfileSerializer,
+)
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.common import FileToken
@@ -63,19 +72,18 @@ class ResourceProxy(APIView):
         if not image_url:
             return result.error("Missing 'url' parameter")
         try:
-
             # 发送GET请求，流式获取图片内容
             response = requests.get(
                 image_url,
                 stream=True,  # 启用流式响应
                 allow_redirects=True,
-                timeout=10
+                timeout=10,
             )
-            content_type = response.headers.get('Content-Type', '').split(';')[0]
+            content_type = response.headers.get("Content-Type", "").split(";")[0]
             # 创建Django流式响应
             django_response = StreamingHttpResponse(
                 stream_image(response),  # 使用生成器
-                content_type=content_type
+                content_type=content_type,
             )
 
             return django_response
@@ -87,55 +95,70 @@ class OpenAIView(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['POST'],
-        description=_('OpenAI Interface Dialogue'),
-        summary=_('OpenAI Interface Dialogue'),
-        operation_id=_('V3 OpenAI Interface Dialogue'),  # type: ignore
+        methods=["POST"],
+        description=_("OpenAI Interface Dialogue"),
+        summary=_("OpenAI Interface Dialogue"),
+        operation_id=_("V3 OpenAI Interface Dialogue"),  # type: ignore
         request=OpenAIAPI.get_request(),
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def post(self, request: Request, application_id: str):
         ip_address = _get_ip_address(request)
         return OpenAIChatSerializer(
-            data={'application_id': application_id, 'chat_user_id': request.user.id,
-                  'chat_user_type': request.user.type,
-                  'ip_address': ip_address,
-                  'source': {"type": ChatSourceChoices.API_CALL.value}}).chat(request.data)
+            data={
+                "application_id": application_id,
+                "chat_user_id": request.user.id,
+                "chat_user_type": request.user.type,
+                "ip_address": ip_address,
+                "source": {"type": ChatSourceChoices.API_CALL.value},
+            }
+        ).chat(request.data)
 
 
 class AnonymousAuthentication(APIView):
     def options(self, request, *args, **kwargs):
         return HttpResponse(
-            headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
-                     "Access-Control-Allow-Methods": "POST",
-                     "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}, )
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "POST",
+                "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token",
+            },
+        )
 
     @extend_schema(
-        methods=['POST'],
-        description=_('Application Anonymous Certification'),
-        summary=_('Application Anonymous Certification'),
-        operation_id=_('V3 Application Anonymous Certification'),  # type: ignore
+        methods=["POST"],
+        description=_("Application Anonymous Certification"),
+        summary=_("Application Anonymous Certification"),
+        operation_id=_("V3 Application Anonymous Certification"),  # type: ignore
         request=ChatAuthenticationAPI.get_request(),
+        parameters=ChatAuthenticationAPI.get_parameters(),
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def post(self, request: Request):
-        token, f_token = AnonymousAuthenticationSerializer().auth(
-            request)
+        serializer = AnonymousAuthenticationSerializer(data=request.query_params)
+        serializer.is_valid(raise_exception=True)
+        token, f_token = serializer.auth(request)
         response = result.success(
             token,
-            headers={"Access-Control-Allow-Origin": "*", "Access-Control-Allow-Credentials": "true",
-                     "Access-Control-Allow-Methods": "POST",
-                     "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token"}
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": "true",
+                "Access-Control-Allow-Methods": "POST",
+                "Access-Control-Allow-Headers": "Origin,Content-Type,Cookie,Accept,Token",
+            },
         )
         is_https = request.scheme == "https"
 
+        application_id = serializer.validated_data.get("application_id")
+        cookie_path = f"{CONFIG.get_chat_path()}/{application_id}" if application_id else CONFIG.get_chat_path()
         response.set_cookie(
             key="mk_file_auth",
             value=f_token,
             max_age=7 * 24 * 3600,
-            path=CONFIG.get_chat_path(),
+            path=cookie_path,
             secure=is_https,
             httponly=True,
             samesite="None" if is_https else "Lax",
@@ -147,164 +170,185 @@ class ApplicationProfile(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['GET'],
+        methods=["GET"],
         description=_("Get application related information"),
         summary=_("Get application related information"),
         operation_id=_("V3 Get application related information"),  # type: ignore
         request=None,
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def get(self, request: Request, application_id: str):
-        return result.success(ApplicationProfileSerializer(
-            data={'application_id': application_id}).profile())
+        return result.success(ApplicationProfileSerializer(data={"application_id": application_id}).profile())
 
 
 class AuthProfile(APIView):
     @extend_schema(
-        methods=['GET'],
+        methods=["GET"],
         description=_("Get application authentication information"),
         summary=_("Get application authentication information"),
         operation_id=_("V3 Get application authentication information"),  # type: ignore
         parameters=ChatAuthenticationProfileAPI.get_parameters(),
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def get(self, request: Request):
         return result.success(
-            AuthProfileSerializer(data={'application_id': request.query_params.get("application_id")}).profile())
+            AuthProfileSerializer(data={"application_id": request.query_params.get("application_id")}).profile()
+        )
 
 
 class ChatView(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['POST'],
+        methods=["POST"],
         description=_("dialogue"),
         summary=_("dialogue"),
         operation_id=_("V3 dialogue"),  # type: ignore
         request=ChatAPI.get_request(),
         parameters=ChatAPI.get_parameters(),
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def post(self, request: Request, application_id: str, chat_id: str):
         ip_address = _get_ip_address(request)
-        return ChatSerializers(data={'chat_id': chat_id,
-                                     'chat_user_id': request.user.id,
-                                     'chat_user_type': request.user.type,
-                                     'application_id': application_id,
-                                     'debug': False,
-                                     'ip_address': ip_address,
-                                     'source': {
-                                         'type': ChatSourceChoices.API_CALL.value if request.user.type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value}
-                                     }
-                               ).chat(request.data)
+        return ChatSerializers(
+            data={
+                "chat_id": chat_id,
+                "chat_user_id": request.user.id,
+                "chat_user_type": request.user.type,
+                "application_id": application_id,
+                "debug": False,
+                "ip_address": ip_address,
+                "source": {
+                    "type": ChatSourceChoices.API_CALL.value
+                    if request.user.type == ChatUserType.APPLICATION_API_KEY.value
+                    else ChatSourceChoices.ONLINE.value
+                },
+            }
+        ).chat(request.data)
 
 
 class OpenView(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['GET'],
+        methods=["GET"],
         description=_("Get the session id according to the application id"),
         summary=_("Get the session id according to the application id"),
         operation_id=_("V3 Get the session id according to the application id"),  # type: ignore
         parameters=ChatOpenAPI.get_parameters(),
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def get(self, request: Request, application_id: str):
         ip_address = _get_ip_address(request)
-        return result.success(OpenChatSerializers(
-            data={'application_id': application_id,
-                  'chat_user_id': request.user.id, 'chat_user_type': request.user.type,
-                  'ip_address': ip_address,
-                  'source': {
-                      'type': ChatSourceChoices.API_CALL.value if request.user.type == ChatUserType.APPLICATION_API_KEY.value else ChatSourceChoices.ONLINE.value},
-                  'debug': False}).open())
+        return result.success(
+            OpenChatSerializers(
+                data={
+                    "application_id": application_id,
+                    "chat_user_id": request.user.id,
+                    "chat_user_type": request.user.type,
+                    "ip_address": ip_address,
+                    "source": {
+                        "type": ChatSourceChoices.API_CALL.value
+                        if request.user.type == ChatUserType.APPLICATION_API_KEY.value
+                        else ChatSourceChoices.ONLINE.value
+                    },
+                    "debug": False,
+                }
+            ).open()
+        )
 
 
 class CancelWorkflowView(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['POST'],
+        methods=["POST"],
         description=_("Cancel running workflow"),
         summary=_("Cancel running workflow"),
         operation_id=_("V3 Cancel running workflow"),  # type: ignore
         parameters=[
-            OpenApiParameter(name='chat_id', type=OpenApiTypes.UUID, location=OpenApiParameter.PATH,
-                             description=_('Chat ID')),
+            OpenApiParameter(
+                name="chat_id", type=OpenApiTypes.UUID, location=OpenApiParameter.PATH, description=_("Chat ID")
+            ),
         ],
         responses=None,
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
         from application.workflow.workflow_run_registry import WorkflowRunRegistry, CancelResult
+
         result_enum = WorkflowRunRegistry.cancel_by_chat_id(chat_id)
         if result_enum == CancelResult.CANCELLED:
-            return result.success({'status': 'cancelled', 'chat_id': chat_id})
+            return result.success({"status": "cancelled", "chat_id": chat_id})
         elif result_enum == CancelResult.NOT_FOUND:
-            return result.success({'status': 'not_found', 'chat_id': chat_id})
+            return result.success({"status": "not_found", "chat_id": chat_id})
         else:
-            return result.fail(500, _('Failed to cancel workflow'))
+            return result.fail(500, _("Failed to cancel workflow"))
 
 
 class CaptchaView(APIView):
-    @extend_schema(methods=['GET'],
-                   summary=_("Get Chat captcha"),
-                   description=_("Get Chat captcha"),
-                   operation_id=_("V3 Get Chat captcha"),  # type: ignore
-                   tags=[_("V3 Chat")],  # type: ignore
-                   responses=CaptchaAPI.get_response())
+    @extend_schema(
+        methods=["GET"],
+        summary=_("Get Chat captcha"),
+        description=_("Get Chat captcha"),
+        operation_id=_("V3 Get Chat captcha"),  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
+        responses=CaptchaAPI.get_response(),
+    )
     def get(self, request: Request):
-        username = request.query_params.get('username', None)
-        application_id = request.query_params.get('application_id', None)
-        return result.success(CaptchaSerializer().chat_generate(username, 'chat', application_id))
+        username = request.query_params.get("username", None)
+        application_id = request.query_params.get("application_id", None)
+        return result.success(CaptchaSerializer().chat_generate(username, "chat", application_id))
 
 
 class SpeechToText(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['POST'],
+        methods=["POST"],
         description=_("speech to text"),
         summary=_("speech to text"),
         operation_id=_("V3 speech to text"),  # type: ignore
         request=SpeechToTextAPI.get_request(),
         responses=SpeechToTextAPI.get_response(),
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def post(self, request: Request, application_id: str):
         return result.success(
-            SpeechToTextSerializers(
-                data={'application_id': application_id})
-            .speech_to_text({'file': request.FILES.get('file')}))
+            SpeechToTextSerializers(data={"application_id": application_id}).speech_to_text(
+                {"file": request.FILES.get("file")}
+            )
+        )
 
 
 class TextToSpeech(APIView):
     authentication_classes = [ChatTokenAuth]
 
     @extend_schema(
-        methods=['POST'],
+        methods=["POST"],
         description=_("text to speech"),
         summary=_("text to speech"),
         operation_id=_("V3 text to speech"),  # type: ignore
         request=TextToSpeechAPI.get_request(),
         responses=TextToSpeechAPI.get_response(),
-        tags=[_('V3 Chat')]  # type: ignore
+        tags=[_("V3 Chat")],  # type: ignore
     )
     @has_permissions(ChatPermissionConstants.get_aggregate_permissions())
     def post(self, request: Request, application_id: str):
-        byte_data = TextToSpeechSerializers(
-            data={'application_id': application_id}).text_to_speech(request.data)
-        return HttpResponse(byte_data, status=200, headers={'Content-Type': 'audio/mp3',
-                                                            'Content-Disposition': 'attachment; filename="abc.mp3"'})
+        byte_data = TextToSpeechSerializers(data={"application_id": application_id}).text_to_speech(request.data)
+        return HttpResponse(
+            byte_data,
+            status=200,
+            headers={"Content-Type": "audio/mp3", "Content-Disposition": 'attachment; filename="abc.mp3"'},
+        )
 
 
 class UploadFile(APIView):
@@ -312,23 +356,28 @@ class UploadFile(APIView):
     parser_classes = [MultiPartParser]
 
     @extend_schema(
-        methods=['POST'],
+        methods=["POST"],
         description=_("Upload files"),
         summary=_("Upload files"),
         operation_id=_("V3 Upload files"),  # type: ignore
         request=TextToSpeechAPI.get_request(),
         responses=TextToSpeechAPI.get_response(),
-        tags=[_('V3 Application')]  # type: ignore
+        tags=[_("V3 Application")],  # type: ignore
     )
     def post(self, request: Request, chat_id: str):
-        files = request.FILES.getlist('file')
+        files = request.FILES.getlist("file")
         file_ids = []
         meta = {}
         for file in files:
             file_url = FileSerializer(
-                data={'file': file, 'meta': meta, 'source_id': chat_id, 'source_type': FileSourceType.CHAT, }).upload(
-                request.user.id)
-            file_ids.append({'name': file.name, 'url': file_url, 'file_id': file_url.split('/')[-1]})
+                data={
+                    "file": file,
+                    "meta": meta,
+                    "source_id": chat_id,
+                    "source_type": FileSourceType.CHAT,
+                }
+            ).upload(request.user.id)
+            file_ids.append({"name": file.name, "url": file_url, "file_id": file_url.split("/")[-1]})
         return result.success(file_ids)
 
 
@@ -395,7 +444,7 @@ class BaseAuthView(APIView):
         return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
 
     @classmethod
-    def generate(self, request, f_token: str, response: HttpResponse, path: str = '/chat'):
+    def generate(self, request, f_token: str, response: HttpResponse, path: str = "/chat"):
         secure = request.is_secure()
         response.set_cookie(
             "mk_file_auth",
@@ -424,8 +473,8 @@ class LocalLoginView(BaseAuthView):
         user = ChatUserAccessTokenV3Serializer.local_login(request.data)
         user.source = "LOCAL"
         token, f_token = self.create_token_and_cache(user, request)
-        response = result.success({'token': token})
-        return self.generate(request, f_token, response, path=f'/chat/')
+        response = result.success({"token": token})
+        return self.generate(request, f_token, response, path=f"/chat/")
 
 
 class Logout(APIView):

@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： common.py
-    @date：2025/6/6 19:55
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： common.py
+@date：2025/6/6 19:55
+@desc:
 """
+
 import hashlib
 import json
 import threading
@@ -63,14 +64,11 @@ class FileToken:
         self.application_id = application_id
 
     def to_dict(self):
-        return ({
-                    'user_id': self.user_id,
-                    'type': self.type,
-                    'application_id': self.application_id
-                } if self.application_id else {
-            'user_id': self.user_id,
-            'type': str(self.type)
-        })
+        return (
+            {"user_id": self.user_id, "type": str(self.type), "application_id": self.application_id}
+            if self.application_id
+            else {"user_id": self.user_id, "type": str(self.type)}
+        )
 
     def to_token(self):
         return signing.dumps(self.to_dict())
@@ -78,12 +76,20 @@ class FileToken:
     @staticmethod
     def new_instance(token):
         token_dict = signing.loads(token)
-        return FileToken(token_dict.get('user_id'), token_dict.get('type'), token_dict.get('application_id'))
+        return FileToken(token_dict.get("user_id"), token_dict.get("type"), token_dict.get("application_id"))
 
 
 class ChatUserToken:
-    def __init__(self, application_id, user_id, access_token, _type, chat_user_type, chat_user_id,
-                 authentication: ChatAuthentication):
+    def __init__(
+        self,
+        application_id,
+        user_id,
+        access_token,
+        _type,
+        chat_user_type,
+        chat_user_id,
+        authentication: ChatAuthentication,
+    ):
         self.application_id = application_id
         self.user_id = user_id
         self.access_token = access_token
@@ -94,13 +100,13 @@ class ChatUserToken:
 
     def to_dict(self):
         return {
-            'application_id': str(self.application_id),
-            'user_id': str(self.user_id),
-            'access_token': self.access_token,
-            'type': str(self.type.value),
-            'chat_user_type': str(self.chat_user_type),
-            'chat_user_id': str(self.chat_user_id),
-            'authentication': self.authentication.to_string()
+            "application_id": str(self.application_id),
+            "user_id": str(self.user_id),
+            "access_token": self.access_token,
+            "type": str(self.type.value),
+            "chat_user_type": str(self.chat_user_type),
+            "chat_user_id": str(self.chat_user_id),
+            "authentication": self.authentication.to_string(),
         }
 
     def to_token(self):
@@ -108,10 +114,15 @@ class ChatUserToken:
 
     @staticmethod
     def new_instance(token_dict):
-        return ChatUserToken(token_dict.get('application_id'), token_dict.get('user_id'),
-                             token_dict.get('access_token'), token_dict.get('type'), token_dict.get('chat_user_type'),
-                             token_dict.get('chat_user_id'),
-                             ChatAuthentication.new_instance(token_dict.get('authentication')))
+        return ChatUserToken(
+            token_dict.get("application_id"),
+            token_dict.get("user_id"),
+            token_dict.get("access_token"),
+            token_dict.get("type"),
+            token_dict.get("chat_user_type"),
+            token_dict.get("chat_user_id"),
+            ChatAuthentication.new_instance(token_dict.get("authentication")),
+        )
 
 
 class ChatToken:
@@ -123,10 +134,10 @@ class ChatToken:
 
     def to_dict(self):
         return {
-            'user_id': str(self.user_id),
-            'type': str(self.type.value),
-            'login_type': str(self.login_type),
-            'kwargs': self.kwargs
+            "user_id": str(self.user_id),
+            "type": str(self.type.value),
+            "login_type": str(self.login_type),
+            "kwargs": self.kwargs,
         }
 
     def to_token(self):
