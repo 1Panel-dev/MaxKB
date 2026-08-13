@@ -18,10 +18,19 @@ from django.core.cache import cache
 from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from serializers import chat_user
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
 
-from application.models import Application, ChatRecord, Chat, ApplicationVersion, ChatUserType, ApplicationTypeChoices, \
-    ExecuteType
+from application.models import (
+    Application,
+    ChatRecord,
+    Chat,
+    ApplicationVersion,
+    ChatUserType,
+    ApplicationTypeChoices,
+    ExecuteType,
+)
 from application.serializers.application_chat import ChatCountSerializer
 from common.constants.cache_version import Cache_Version
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -199,7 +208,9 @@ class ChatInfo:
     def get_chat_user(self, asker=None):
         if self.chat_user:
             return self.chat_user
-        chat_user_model = DatabaseModelManage.get_model("chat_user")
+        from system_manage.models import ChatUser
+
+        chat_user_model = ChatUser
         if self.chat_user_type == ChatUserType.CHAT_USER.value and chat_user_model:
             chat_user = QuerySet(chat_user_model).filter(id=self.chat_user_id).first()
             return {
@@ -336,11 +347,17 @@ class ChatInfo:
                 ).save()
 
     def save_chat(self):
-        Chat(id=self.chat_id, application_id=self.application_id, abstract="新建对话",
-             execute_type=ExecuteType.DEBUG if self.debug else ExecuteType.CHAT,
-             chat_user_id=self.chat_user_id, chat_user_type=self.chat_user_type,
-             ip_address=self.ip_address, source=self.source,
-             asker=self.get_chat_user()).save()
+        Chat(
+            id=self.chat_id,
+            application_id=self.application_id,
+            abstract="新建对话",
+            execute_type=ExecuteType.DEBUG if self.debug else ExecuteType.CHAT,
+            chat_user_id=self.chat_user_id,
+            chat_user_type=self.chat_user_type,
+            ip_address=self.ip_address,
+            source=self.source,
+            asker=self.get_chat_user(),
+        ).save()
 
     def set_chat_variable(self, chat_context):
         if not self.debug:
