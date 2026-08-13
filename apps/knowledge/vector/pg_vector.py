@@ -15,10 +15,12 @@ from typing import Dict, List
 import uuid_utils.compat as uuid
 from django.contrib.postgres.search import SearchVector
 from django.db.models import QuerySet, Value
-from langchain_core.embeddings import Embeddings
+from django.utils.translation import gettext_lazy as _
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 from common.db.search import generate_sql_by_query_dict
 from common.db.sql_execute import select_list
+from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.ts_vecto_util import to_ts_vector, to_query
 from knowledge.models import Embedding, SearchMode, SourceType, Termbase
@@ -51,7 +53,7 @@ class PGVector(BaseVectorStore):
         paragraph_id: str,
         source_id: str,
         is_active: bool,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
     ):
         text = normalize_for_embedding(text)
         text_embedding = [float(x) for x in embedding.embed_query(text)]
@@ -71,12 +73,12 @@ class PGVector(BaseVectorStore):
             source_id=source_id,
             embedding=text_embedding,
             source_type=source_type,
-            search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms)), config='simple'),
+            search_vector=SearchVector(Value(to_ts_vector(text, user_words=terms)), config="simple"),
         )
         embedding.save()
         return True
 
-    def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
+    def _batch_save(self, text_list: List[Dict], embedding: MaxKBBaseEmbeddingModel, is_the_task_interrupted):
         texts = [normalize_for_embedding(row.get("text")) for row in text_list]
         embeddings = embedding.embed_documents(texts)
         embedding_list = [
@@ -100,7 +102,7 @@ class PGVector(BaseVectorStore):
                             ),
                         )
                     ),
-                    config='simple',
+                    config="simple",
                 ),
             )
             for index in range(0, len(texts))
@@ -117,34 +119,94 @@ class PGVector(BaseVectorStore):
         top_number: int,
         similarity: float,
         search_mode: SearchMode,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
+        image_list: list[str] | None = None,
     ):
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
+        image_list = list(image_list or [])
         exclude_dict = {}
         query_text = normalize_for_embedding(query_text)
-        embedding_query = embedding.embed_query(query_text)
         if exclude_document_id_list is not None and len(exclude_document_id_list) > 0:
             exclude_dict.__setitem__("document_id__in", exclude_document_id_list)
-        for search_handle in search_handle_list:
-            if search_handle.support(search_mode):
-                # Query per knowledge base to leverage per-KB partial HNSW indexes
-                # (WHERE knowledge_id = '{k_id}'), which won't be used with knowledge_id__in
-                if len(knowledge_id_list) == 1:
-                    query_set = QuerySet(Embedding).filter(knowledge_id=knowledge_id_list[0], is_active=True).exclude(**exclude_dict)
-                    return search_handle.handle(
-                        query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
-                    )
-                else:
-                    all_results = []
-                    for kid in knowledge_id_list:
-                        query_set = QuerySet(Embedding).filter(knowledge_id=kid, is_active=True).exclude(**exclude_dict)
-                        results = search_handle.handle(
-                            query_set, query_text, embedding_query, top_number, similarity, search_mode, knowledge_id_list
-                        )
-                        all_results.extend(results)
-                    all_results.sort(key=lambda x: x.get("similarity", x.get("comprehensive_score", 0)), reverse=True)
-                    return all_results[:top_number]
+
+        if image_list and not embedding.supports_image_embedding():
+            raise AppApiException(500, _("The current embedding model does not support image embedding"))
+
+        query_units = []
+        if search_mode == SearchMode.keywords:
+            if not query_text:
+                return []
+            query_units.append({"type": "text", "embedding": []})
+        else:
+            if query_text:
+                query_units.append({"type": "text", "embedding": embedding.embed_query(query_text)})
+            if image_list:
+                image_embeddings = embedding.embed_images(image_list)
+                if len(image_embeddings) != len(image_list):
+                    raise AppApiException(500, _("The image embedding model returned an incomplete result"))
+                query_units.extend({"type": "image", "embedding": value} for value in image_embeddings)
+
+        if not query_units:
+            return []
+
+        # Query each text/image vector independently and keep the best score for each
+        # paragraph. This avoids averaging unrelated images and preserves image-to-image
+        # retrieval in the provider's shared multimodal vector space.
+        all_results = []
+        for query_unit_index, query_unit in enumerate(query_units):
+            unit_search_mode = search_mode
+            if query_unit["type"] == "image" and search_mode == SearchMode.blend:
+                unit_search_mode = SearchMode.embedding
+            search_handle = next(
+                (handle for handle in search_handle_list if handle.support(unit_search_mode)),
+                None,
+            )
+            if search_handle is None:
+                continue
+
+            # Query per knowledge base to leverage per-KB partial HNSW indexes
+            # (WHERE knowledge_id = '{k_id}'), which won't be used with knowledge_id__in.
+            for knowledge_id in knowledge_id_list:
+                query_set = (
+                    QuerySet(Embedding).filter(knowledge_id=knowledge_id, is_active=True).exclude(**exclude_dict)
+                )
+                results = search_handle.handle(
+                    query_set,
+                    query_text,
+                    query_unit["embedding"],
+                    top_number,
+                    similarity,
+                    unit_search_mode,
+                    knowledge_id_list,
+                )
+                all_results.extend(
+                    {
+                        **result,
+                        "query_unit_type": query_unit["type"],
+                        "query_unit_index": query_unit_index,
+                    }
+                    for result in results
+                )
+
+        best_result_by_paragraph = {}
+        for result in all_results:
+            paragraph_id = str(result.get("paragraph_id"))
+            score = result.get("comprehensive_score", result.get("similarity", 0)) or 0
+            previous = best_result_by_paragraph.get(paragraph_id)
+            if previous is None:
+                best_result_by_paragraph[paragraph_id] = result
+                continue
+            previous_score = previous.get("comprehensive_score", previous.get("similarity", 0)) or 0
+            if score > previous_score:
+                best_result_by_paragraph[paragraph_id] = result
+
+        result_list = list(best_result_by_paragraph.values())
+        result_list.sort(
+            key=lambda item: item.get("comprehensive_score", item.get("similarity", 0)) or 0,
+            reverse=True,
+        )
+        return result_list[:top_number]
 
     def query(
         self,
@@ -176,6 +238,7 @@ class PGVector(BaseVectorStore):
                         qs = qs.exclude(paragraph_id__in=exclude_paragraph_list)
                     qs = qs.exclude(**exclude_dict)
                     return qs
+
                 if len(knowledge_id_list) == 1:
                     query_set = build_query_set(knowledge_id_list[0])
                     return search_handle.handle(
@@ -265,7 +328,17 @@ class EmbeddingSearch(ISearch):
             with_table_name=True,
         )
         embedding_model = select_list(
-            exec_sql, [len(query_embedding), json.dumps(query_embedding), *exec_params, len(query_embedding), json.dumps(query_embedding), top_number, similarity, top_number]
+            exec_sql,
+            [
+                len(query_embedding),
+                json.dumps(query_embedding),
+                *exec_params,
+                len(query_embedding),
+                json.dumps(query_embedding),
+                top_number,
+                similarity,
+                top_number,
+            ],
         )
         return embedding_model
 
@@ -297,7 +370,14 @@ class KeywordsSearch(ISearch):
             else None
         )
         embedding_model = select_list(
-            exec_sql, [to_query(query_text, user_words=terms), *exec_params, to_query(query_text, user_words=terms), similarity, top_number]
+            exec_sql,
+            [
+                to_query(query_text, user_words=terms),
+                *exec_params,
+                to_query(query_text, user_words=terms),
+                similarity,
+                top_number,
+            ],
         )
         return embedding_model
 

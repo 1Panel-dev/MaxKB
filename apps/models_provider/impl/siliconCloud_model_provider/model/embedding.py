@@ -11,10 +11,13 @@ from typing import Dict
 from common.utils.logger import maxkb_logger
 import requests
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 
-class SiliconCloudEmbeddingModel(MaxKBBaseModel):
+class SiliconCloudEmbeddingModel(MaxKBBaseEmbeddingModel):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     model_name: str
     openai_api_key: str
     base_url: str
@@ -31,7 +34,7 @@ class SiliconCloudEmbeddingModel(MaxKBBaseModel):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        optional_params = MaxKBBaseEmbeddingModel.filter_optional_params(model_kwargs)
         return SiliconCloudEmbeddingModel(
             api_key=model_credential.get("api_key"),
             model_name=model_name,

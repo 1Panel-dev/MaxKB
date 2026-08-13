@@ -1,10 +1,10 @@
 from typing import Dict, List
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 from volcenginesdkarkruntime import Ark
 
 
-class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
+class VolcanicEngineEmbeddingModel(MaxKBBaseEmbeddingModel):
     api_key: str
     model_name: str
     api_base: str
@@ -21,7 +21,7 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        optional_params = MaxKBBaseEmbeddingModel.filter_optional_params(model_kwargs)
         return VolcanicEngineEmbeddingModel(
             api_key=model_credential.get("api_key"),
             model=model_name,
@@ -48,6 +48,25 @@ class VolcanicEngineEmbeddingModel(MaxKBBaseModel):
         else:
             resp = self.client.embeddings.create(model=self.model_name, input=texts, **(self.params or {}))
             return [e.embedding for e in resp.data]
+
+    def supports_image_embedding(self) -> bool:
+        return self.model_name.startswith("doubao-embedding-vision-")
+
+    def embed_images(self, images: List[str]) -> List[List[float]]:
+        if not self.supports_image_embedding():
+            return []
+        embeddings = []
+        for image in images:
+            resp = self.client.multimodal_embeddings.create(
+                model=self.model_name,
+                input=[{"type": "image_url", "image_url": {"url": image}}],
+                encoding_format="float",
+                **(self.params or {}),
+            )
+            value = self._extract_embedding(resp.data)
+            if value is not None:
+                embeddings.append(value)
+        return embeddings
 
     def _extract_embedding(self, data):
         if isinstance(data, list) and len(data) > 0:

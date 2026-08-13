@@ -31,8 +31,9 @@ from knowledge.models import (
     Termbase,
 )
 from knowledge.serializers.common import create_knowledge_index
-from langchain_core.embeddings import Embeddings
+from knowledge.services.paragraph_assets import embed_paragraph_assets
 from maxkb.conf import PROJECT_DIR
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 from common.config.embedding_config import VectorStore
 from common.db.search import get_dynamics_model, native_search, native_update
@@ -61,7 +62,7 @@ class SyncWebDocumentArgs:
 
 
 class UpdateProblemArgs:
-    def __init__(self, problem_id: str, problem_content: str, embedding_model: Embeddings):
+    def __init__(self, problem_id: str, problem_content: str, embedding_model: MaxKBBaseEmbeddingModel):
         self.problem_id = problem_id
         self.problem_content = problem_content
         self.embedding_model = embedding_model
@@ -79,7 +80,7 @@ class UpdateEmbeddingDocumentIdArgs:
         paragraph_id_list: List[str],
         target_document_id: str,
         target_knowledge_id: str,
-        target_embedding_model: Embeddings = None,
+        target_embedding_model: MaxKBBaseEmbeddingModel = None,
     ):
         self.paragraph_id_list = paragraph_id_list
         self.target_document_id = target_document_id
@@ -89,11 +90,11 @@ class UpdateEmbeddingDocumentIdArgs:
 
 class ListenerManagement:
     @staticmethod
-    def embedding_by_problem(args, embedding_model: Embeddings):
+    def embedding_by_problem(args, embedding_model: MaxKBBaseEmbeddingModel):
         VectorStore.get_embedding_vector().save(**args, embedding=embedding_model)
 
     @staticmethod
-    def embedding_by_paragraph_list(paragraph_id_list, embedding_model: Embeddings):
+    def embedding_by_paragraph_list(paragraph_id_list, embedding_model: MaxKBBaseEmbeddingModel):
         try:
             data_list = native_search(
                 {
@@ -117,7 +118,7 @@ class ListenerManagement:
             )
 
     @staticmethod
-    def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: Embeddings):
+    def embedding_by_paragraph_data_list(data_list, paragraph_id_list, embedding_model: MaxKBBaseEmbeddingModel):
         maxkb_logger.info(
             _("Start--->Embedding paragraph: {paragraph_id_list}").format(paragraph_id_list=paragraph_id_list)
         )
@@ -130,6 +131,7 @@ class ListenerManagement:
 
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_save_function)
+            embed_paragraph_assets(paragraph_id_list, embedding_model)
             ListenerManagement.update_status(
                 QuerySet(Paragraph).filter(id__in=paragraph_id_list), TaskType.EMBEDDING, State.SUCCESS
             )
@@ -148,7 +150,7 @@ class ListenerManagement:
             )
 
     @staticmethod
-    def embedding_by_paragraph(paragraph_id, embedding_model: Embeddings):
+    def embedding_by_paragraph(paragraph_id, embedding_model: MaxKBBaseEmbeddingModel):
         """
         向量化段落 根据段落id
         @param paragraph_id:    段落id
@@ -180,6 +182,7 @@ class ListenerManagement:
 
             # 批量向量化
             VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, is_the_task_interrupted)
+            embed_paragraph_assets([paragraph_id], embedding_model)
             # 更新到开始状态
             ListenerManagement.update_status(
                 QuerySet(Paragraph).filter(id=paragraph_id), TaskType.EMBEDDING, State.SUCCESS
@@ -197,7 +200,7 @@ class ListenerManagement:
             maxkb_logger.info(_("End--->Embedding paragraph: {paragraph_id}").format(paragraph_id=paragraph_id))
 
     @staticmethod
-    def embedding_by_data_list(data_list: List, embedding_model: Embeddings):
+    def embedding_by_data_list(data_list: List, embedding_model: MaxKBBaseEmbeddingModel):
         # 批量向量化
         VectorStore.get_embedding_vector().batch_save(data_list, embedding_model, lambda: False)
 
@@ -224,13 +227,11 @@ class ListenerManagement:
             chunks = paragraph.chunks
             # 提前查询一次用户词汇，避免循环内重复查询
             user_words = list(
-                QuerySet(Termbase)
-                .filter(knowledge_id=paragraph.knowledge_id)
-                .values_list("content", flat=True)
+                QuerySet(Termbase).filter(knowledge_id=paragraph.knowledge_id).values_list("content", flat=True)
             )
             data_list = list(QuerySet(Embedding).filter(paragraph_id=paragraph_id))
             for data, chunk in zip(data_list, chunks):
-                data.search_vector = SearchVector(Value(to_ts_vector(chunk, user_words=user_words)), config='simple')
+                data.search_vector = SearchVector(Value(to_ts_vector(chunk, user_words=user_words)), config="simple")
             # 批量保存，减少数据库写入次数
             QuerySet(Embedding).filter(paragraph_id=paragraph_id).bulk_update(data_list, ["search_vector"])
 
@@ -351,7 +352,7 @@ class ListenerManagement:
             lock.release()
 
     @staticmethod
-    def embedding_by_document(document_id, embedding_model: Embeddings, state_list=None):
+    def embedding_by_document(document_id, embedding_model: MaxKBBaseEmbeddingModel, state_list=None):
         """
         向量化文档
         @param state_list:
@@ -412,7 +413,7 @@ class ListenerManagement:
             rlock.un_lock("embedding:" + str(document_id))
 
     @staticmethod
-    def embedding_by_knowledge(knowledge_id, embedding_model: Embeddings):
+    def embedding_by_knowledge(knowledge_id, embedding_model: MaxKBBaseEmbeddingModel):
         """
         向量化知识库
         @param knowledge_id: 知识库id
@@ -509,10 +510,18 @@ class ListenerManagement:
         top_number: int,
         similarity: float,
         search_mode: SearchMode,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
+        image_list: list[str] | None = None,
     ):
         return VectorStore.get_embedding_vector().hit_test(
-            query_text, knowledge_id, exclude_document_id_list, top_number, similarity, search_mode, embedding
+            query_text,
+            knowledge_id,
+            exclude_document_id_list,
+            top_number,
+            similarity,
+            search_mode,
+            embedding,
+            image_list,
         )
 
     @staticmethod
@@ -544,8 +553,8 @@ class ListenerManagement:
                 .annotate(
                     reversed_status=Reverse("status"),
                     task_type_status=Coalesce(
-                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value('')),
-                        Value('n'),
+                        NullIf(Substr("reversed_status", TaskType.TOKENIZE.value, 1), Value("")),
+                        Value("n"),
                     ),
                 )
                 .filter(task_type_status__in=state_list, document_id=document_id)

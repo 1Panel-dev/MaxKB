@@ -10,12 +10,16 @@
 from http import HTTPStatus
 from typing import Dict, List
 
+import dashscope
 from openai import OpenAI
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 
-class AliyunBaiLianEmbedding(MaxKBBaseModel):
+class AliyunBaiLianEmbedding(MaxKBBaseEmbeddingModel):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     model_name: str
     optional_params: dict
     api_base: str
@@ -33,7 +37,7 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
 
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        optional_params = MaxKBBaseEmbeddingModel.filter_optional_params(model_kwargs)
         return AliyunBaiLianEmbedding(
             api_key=model_credential.get("dashscope_api_key"),
             model_name=model_name,
@@ -48,8 +52,6 @@ class AliyunBaiLianEmbedding(MaxKBBaseModel):
     def embed_documents(self, texts: List[str], chunk_size: int | None = None) -> List[List[float]]:
         # 处理多模态的向量化
         if any(k in self.model_name for k in ("vl-embedding", "embedding-vision", "multimodal")):
-            import dashscope
-
             dashscope.api_key = self.api_key
             dashscope.base_http_api_url = self.api_base
             multimodal_input = [{"text": text} for text in texts]

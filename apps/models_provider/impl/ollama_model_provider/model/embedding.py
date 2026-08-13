@@ -12,10 +12,13 @@ from typing import Dict, List
 from langchain_ollama import OllamaEmbeddings
 
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 
-class OllamaEmbedding(MaxKBBaseModel, OllamaEmbeddings):
+class OllamaEmbedding(MaxKBBaseEmbeddingModel, OllamaEmbeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return OllamaEmbedding(

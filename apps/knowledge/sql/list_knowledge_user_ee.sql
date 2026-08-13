@@ -19,7 +19,8 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                  WHEN
                      "app_knowledge_temp"."count" IS NULL THEN 0
                  ELSE "app_knowledge_temp"."count" END AS application_mapping_count,
-             "document_temp".document_count
+             "document_temp".document_count,
+             "document_temp".image_count
       FROM (SELECT knowledge.*
             FROM knowledge knowledge ${knowledge_custom_sql}
             AND "knowledge".id::text in (select target
@@ -39,7 +40,10 @@ FROM (SELECT "temp_knowledge".id::text, "temp_knowledge".name,
                                  'VIEW' = any (permission_list)
                        end
             )) temp_knowledge
-               LEFT JOIN (SELECT "count"("id") AS document_count, "sum"("char_length") "char_length", knowledge_id
+               LEFT JOIN (SELECT "count"("id") FILTER (WHERE "resource_type" = 'document') AS document_count,
+                                 "count"("id") FILTER (WHERE "resource_type" = 'image')    AS image_count,
+                                 "sum"("char_length")                                      "char_length",
+                                 knowledge_id
                           FROM "document"
                           GROUP BY knowledge_id) "document_temp" ON temp_knowledge."id" = "document_temp".knowledge_id
                LEFT JOIN (SELECT "count"("id"), knowledge_id

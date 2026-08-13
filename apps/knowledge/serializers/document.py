@@ -35,7 +35,7 @@ from common.handle.impl.text.zip_split_handle import ZipSplitHandle
 from common.utils.common import bulk_create_in_batches, get_file_content, parse_file_link, parse_image, post
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from common.utils.split_model import flat_map, get_split_model
+from common.utils.split_model import flat_map
 from django.contrib.postgres.fields import JSONField
 from django.core import validators
 from django.db import models, transaction
@@ -44,23 +44,20 @@ from django.db.models.aggregates import Max
 from django.db.models.functions import Coalesce, NullIf, Reverse, Substr
 from django.db.models.query_utils import Q
 from django.http import HttpResponse
-from django.utils.translation import get_language, gettext, to_locale
+from django.utils import timezone
+from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
-from maxkb.const import PROJECT_DIR
-from models_provider.models import Model
-from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-from oss.serializers.file import FileSerializer
-from rest_framework import serializers
-from xlwt import Utils
-
 from knowledge.models import (
+    ContentOrigin,
     Document,
+    DocumentResourceType,
     DocumentTag,
     File,
     FileSourceType,
     Knowledge,
     KnowledgeType,
     Paragraph,
+    ParagraphAsset,
     Problem,
     ProblemParagraphMapping,
     State,
@@ -75,22 +72,45 @@ from knowledge.serializers.common import (
     write_image,
     zip_dir,
 )
+from knowledge.serializers.document_strategy import (
+    DocumentStrategySerializer,
+    DocumentSyncStrategySerializer,
+    WebSourceURLField,
+)
 from knowledge.serializers.paragraph import (
     ParagraphInstanceSerializer,
     ParagraphSerializers,
     delete_problems_and_mappings,
 )
+from knowledge.services.document_cleanup import delete_document_data
+from knowledge.services.document_strategy import (
+    PROCESSOR_VERSION,
+    apply_length_strategy,
+    document_source_hash,
+    normalize_document_strategy,
+    parse_web_content,
+    strategy_hashes,
+)
+from knowledge.services.incremental_sync import IncrementalDocumentSync, prepare_remote_paragraphs
+from knowledge.services.paragraph_assets import process_visual_assets, sync_paragraph_assets
 from knowledge.task.embedding import (
-    delete_embedding_by_document,
     delete_embedding_by_document_list,
     delete_embedding_by_paragraph_ids,
     embedding_by_document,
     embedding_by_document_list,
+    embedding_by_paragraph_list,
     tokenize_by_document,
     update_embedding_knowledge_id,
 )
 from knowledge.task.generate import generate_related_by_document_id
-from knowledge.task.sync import sync_web_document
+from knowledge.web_assets import internalize_web_images
+from maxkb.const import PROJECT_DIR
+from models_provider.models import Model
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
+from ops import celery_app
+from oss.serializers.file import FileSerializer
+from rest_framework import serializers
+from xlwt import Utils
 
 default_split_handle = TextSplitHandle()
 split_handles = [
@@ -139,6 +159,9 @@ class DocumentInstanceSerializer(serializers.Serializer):
     )
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
     source_file_id = serializers.UUIDField(required=False, allow_null=True, label=_("source file id"))
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
+    meta = serializers.DictField(required=False)
+    type = serializers.IntegerField(required=False)
 
 
 class CancelInstanceSerializer(serializers.Serializer):
@@ -200,15 +223,27 @@ class DocumentSplitRequest(serializers.Serializer):
         required=False, child=serializers.CharField(required=True, label=_("patterns")), label=_("patterns")
     )
     with_filter = serializers.BooleanField(required=False, label=_("Auto Clean"))
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
 class DocumentWebInstanceSerializer(serializers.Serializer):
     source_url_list = serializers.ListField(
         required=True,
         label=_("document url list"),
-        child=serializers.CharField(required=True, label=_("document url list")),
+        allow_empty=False,
+        child=WebSourceURLField(required=True, max_length=2048, label=_("document url list")),
     )
     selector = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("selector"))
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
+
+    def validate_source_url_list(self, source_url_list):
+        # Keep request order while preventing the same page from being imported more than once in one task.
+        return list(dict.fromkeys(source_url.strip() for source_url in source_url_list))
+
+    def validate(self, attrs):
+        attrs["selector"] = (attrs.get("selector") or "body").strip() or "body"
+        attrs["doc_strategy"] = normalize_document_strategy(attrs.get("doc_strategy"))
+        return attrs
 
 
 class DocumentInstanceQASerializer(serializers.Serializer):
@@ -374,6 +409,11 @@ class DocumentSerializers(serializers.Serializer):
             target_knowledge = QuerySet(Knowledge).filter(id=target_knowledge_id).first()
             document_id_list = self.data.get("document_id_list")
             document_list = QuerySet(Document).filter(knowledge_id=knowledge_id, id__in=document_id_list)
+            if (
+                document_list.filter(resource_type=DocumentResourceType.IMAGE).exists()
+                and target_knowledge.type != KnowledgeType.BASE
+            ):
+                raise AppApiException(500, _("Image documents can only be migrated to a general knowledge base"))
             paragraph_list = QuerySet(Paragraph).filter(knowledge_id=knowledge_id, document_id__in=document_id_list)
 
             problem_paragraph_mapping_list = QuerySet(ProblemParagraphMapping).filter(paragraph__in=paragraph_list)
@@ -419,6 +459,7 @@ class DocumentSerializers(serializers.Serializer):
             pid_list = [paragraph.id for paragraph in paragraph_list]
             # 修改段落信息
             paragraph_list.update(knowledge_id=target_knowledge_id)
+            QuerySet(ParagraphAsset).filter(document_id__in=document_id_list).update(knowledge_id=target_knowledge_id)
             # 修改向量信息
             if model_id:
                 delete_embedding_by_paragraph_ids(pid_list)
@@ -480,6 +521,13 @@ class DocumentSerializers(serializers.Serializer):
         no_tag = serializers.BooleanField(required=False, default=False, allow_null=True)
         tag_exclude = serializers.BooleanField(required=False, default=False, allow_null=True)
         create_user = serializers.UUIDField(required=False, allow_null=True)
+        resource_type = serializers.ChoiceField(
+            choices=DocumentResourceType.choices,
+            required=False,
+            allow_null=True,
+            allow_blank=True,
+            default=DocumentResourceType.DOCUMENT,
+        )
 
         def get_query_set(self):
             query_set = QuerySet(model=Document)
@@ -535,12 +583,15 @@ class DocumentSerializers(serializers.Serializer):
                 query_set = query_set.filter(id__in=document_id_list)
             if "create_user" in self.data and self.data.get("create_user") is not None:
                 query_set = query_set.filter(**{"user_id": self.data.get("create_user")})
+            query_set = query_set.filter(resource_type=self.data.get("resource_type") or DocumentResourceType.DOCUMENT)
             order_by = self.data.get("order_by", "")
             order_by_query_set = QuerySet(
                 model=get_dynamics_model(
                     {
                         "char_length": models.CharField(),
                         "paragraph_count": models.IntegerField(),
+                        "hit_num": models.IntegerField(),
+                        "last_hit_time": models.DateTimeField(),
                         "update_time": models.IntegerField(),
                         "create_time": models.DateTimeField(),
                     }
@@ -578,9 +629,19 @@ class DocumentSerializers(serializers.Serializer):
         workspace_id = serializers.CharField(required=False, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=False, label=_("knowledge id"))
         document_id = serializers.UUIDField(required=True, label=_("document id"))
+        strategy_mode = serializers.ChoiceField(
+            choices=["default", "custom"], required=False, default="default", label=_("document strategy mode")
+        )
+        doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
+            DocumentSyncStrategySerializer(
+                data={
+                    "strategy_mode": self.validated_data.get("strategy_mode", "default"),
+                    "doc_strategy": self.validated_data.get("doc_strategy"),
+                }
+            ).is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
             query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
             if workspace_id:
@@ -591,17 +652,19 @@ class DocumentSerializers(serializers.Serializer):
             first = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
             if first is None:
                 raise AppApiException(500, _("document id not exist"))
-            if first.type != KnowledgeType.WEB:
+            if first.type != KnowledgeType.WEB or first.resource_type != DocumentResourceType.DOCUMENT:
                 raise AppApiException(500, _("Synchronization is only supported for web site types"))
 
         @transaction.atomic
-        def sync(self, with_valid=True, with_embedding=True):
+        def sync(self, with_valid=True, with_embedding=True, response: Fork.Response | None = None):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id = self.data.get("document_id")
-            document = QuerySet(Document).filter(id=document_id, knowledge_id=self.data.get("knowledge_id")).first()
+            document_id = self.initial_data.get("document_id")
+            document = (
+                QuerySet(Document).filter(id=document_id, knowledge_id=self.initial_data.get("knowledge_id")).first()
+            )
             state = State.SUCCESS
-            if document.type != KnowledgeType.WEB:
+            if document.type != KnowledgeType.WEB or document.resource_type != DocumentResourceType.DOCUMENT:
                 return True
             try:
                 ListenerManagement.update_status(
@@ -614,53 +677,39 @@ class DocumentSerializers(serializers.Serializer):
                     if "selector" in document.meta and document.meta.get("selector") is not None
                     else []
                 )
-                result = Fork(source_url, selector_list).fork()
+                result = response or Fork(source_url, selector_list).fork()
                 if result.status == 200:
-                    # 删除段落
-                    QuerySet(model=Paragraph).filter(document_id=document_id).delete()
-                    # 删除问题
-                    QuerySet(model=ProblemParagraphMapping).filter(document_id=document_id).delete()
-                    delete_problems_and_mappings([document_id])
-                    # 删除向量库
-                    delete_embedding_by_document(document_id)
-                    paragraphs = get_split_model("web.md").parse(result.content)
-                    char_length = reduce(lambda x, y: x + y, [len(p.get("content")) for p in paragraphs], 0)
-                    QuerySet(Document).filter(id=document_id).update(char_length=char_length)
-                    document_paragraph_model = DocumentSerializers.Create.get_paragraph_model(document, paragraphs)
-
-                    paragraph_model_list = document_paragraph_model.get("paragraph_model_list")
-                    problem_paragraph_object_list = document_paragraph_model.get("problem_paragraph_object_list")
-                    problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
-                        problem_paragraph_object_list, document.knowledge_id
-                    ).to_problem_model_list()
-                    # 批量插入段落
-                    if len(paragraph_model_list) > 0:
-                        max_position = (
-                            Paragraph.objects.filter(document_id=document_id).aggregate(max_position=Max("position"))[
-                                "max_position"
-                            ]
-                            or 0
-                        )
-                        for i, paragraph in enumerate(paragraph_model_list):
-                            paragraph.position = max_position + i + 1
-                        QuerySet(Paragraph).bulk_create(paragraph_model_list)
-                    # 批量插入问题
-                    QuerySet(Problem).bulk_create(problem_model_list) if len(problem_model_list) > 0 else None
-                    # 插入关联问题
-                    QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
-                        problem_paragraph_mapping_list
-                    ) > 0 else None
-                    # 向量化
-                    if with_embedding:
+                    strategy_mode = self.validated_data.get("strategy_mode", "default") if with_valid else "default"
+                    split_strategy = normalize_document_strategy(
+                        self.validated_data.get("doc_strategy") if strategy_mode == "custom" else document.doc_strategy
+                    )
+                    content = internalize_web_images(result.content, document.knowledge_id)
+                    paragraphs = parse_web_content(content, split_strategy)
+                    incoming_source_hash = document_source_hash(prepare_remote_paragraphs(paragraphs))
+                    incoming_strategy_hashes = strategy_hashes(split_strategy)
+                    strategy_unchanged = all(
+                        getattr(document, key) == value for key, value in incoming_strategy_hashes.items()
+                    )
+                    if document.source_hash == incoming_source_hash and strategy_unchanged:
+                        document.last_sync_time = timezone.now()
+                        document.save(update_fields=["last_sync_time", "update_time"])
+                        merge_result = None
+                    else:
+                        merge_result = IncrementalDocumentSync(document, split_strategy).merge(paragraphs)
+                    if merge_result is None:
+                        changed_paragraphs = QuerySet(Paragraph).none()
+                    else:
+                        changed_paragraphs = QuerySet(Paragraph).filter(id__in=merge_result.reembed_ids)
+                    assets = sync_paragraph_assets(changed_paragraphs, document.visual_strategy_hash)
+                    process_visual_assets(assets, split_strategy)
+                    if merge_result is not None and merge_result.disabled_ids:
+                        delete_embedding_by_paragraph_ids(merge_result.disabled_ids)
+                    # 只重建新增或有效内容变化的向量，稳定段落 ID 与问题关联都保持不变。
+                    if with_embedding and merge_result is not None and merge_result.reembed_ids:
                         embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)
-                        ListenerManagement.update_status(
-                            QuerySet(Document).filter(id=document_id), TaskType.EMBEDDING, State.PENDING
-                        )
-                        ListenerManagement.update_status(
-                            QuerySet(Paragraph).filter(document_id=document_id), TaskType.EMBEDDING, State.PENDING
-                        )
+                        ListenerManagement.update_status(changed_paragraphs, TaskType.EMBEDDING, State.PENDING)
                         ListenerManagement.get_aggregation_document_status(document_id)()
-                        embedding_by_document.delay(document_id, embedding_model_id)
+                        embedding_by_paragraph_list.delay(merge_result.reembed_ids, embedding_model_id)
 
                 else:
                     state = State.FAILURE
@@ -752,7 +801,7 @@ class DocumentSerializers(serializers.Serializer):
             response.write(zip_buffer.getvalue())
             return response
 
-        def download_source_file(self,mk_file_auth=None):
+        def download_source_file(self, mk_file_auth=None):
             self.is_valid(raise_exception=True)
             file = QuerySet(File).filter(source_id=self.data.get("document_id")).first()
             if not file:
@@ -782,6 +831,16 @@ class DocumentSerializers(serializers.Serializer):
                 if update_key in instance and instance.get(update_key) is not None:
                     _document.__setattr__(update_key, instance.get(update_key))
             _document.save()
+            if (
+                _document.resource_type == DocumentResourceType.IMAGE
+                and "name" in instance
+                and instance.get("name") is not None
+            ):
+                source_file_ids = [_document.meta.get("source_file_id")] if _document.meta else []
+                QuerySet(File).filter(
+                    Q(source_id=str(_document.id), source_type=FileSourceType.DOCUMENT)
+                    | Q(id__in=[file_id for file_id in source_file_ids if file_id])
+                ).update(file_name=instance.get("name"))
             return self.one()
 
         def cancel(self, instance, with_valid=True):
@@ -818,21 +877,7 @@ class DocumentSerializers(serializers.Serializer):
         @transaction.atomic
         def delete(self):
             self.is_valid(raise_exception=True)
-            document_id = self.data.get("document_id")
-            source_file_ids = [
-                doc["meta"].get("source_file_id") for doc in Document.objects.filter(id=document_id).values("meta")
-            ]
-            QuerySet(File).filter(id__in=source_file_ids).delete()
-            QuerySet(File).filter(source_id=document_id, source_type=FileSourceType.DOCUMENT).delete()
-            paragraph_ids = QuerySet(model=Paragraph).filter(document_id=document_id).values_list("id", flat=True)
-            # 删除问题
-            delete_problems_and_mappings(paragraph_ids)
-            # 删除段落
-            QuerySet(model=Paragraph).filter(document_id=document_id).delete()
-            # 删除向量库
-            delete_embedding_by_document(document_id)
-            QuerySet(model=DocumentTag).filter(document_id=document_id).delete()
-            QuerySet(model=Document).filter(id=document_id).delete()
+            delete_document_data([self.data.get("document_id")])
             return True
 
         def refresh(self, state_list=None, with_valid=True):
@@ -1043,6 +1088,13 @@ class DocumentSerializers(serializers.Serializer):
             QuerySet(ProblemParagraphMapping).bulk_create(problem_paragraph_mapping_list) if len(
                 problem_paragraph_mapping_list
             ) > 0 else None
+            IncrementalDocumentSync(document_model, document_model.doc_strategy)._sync_title_questions(
+                list(QuerySet(Paragraph).filter(document_id=document_model.id))
+            )
+            assets = sync_paragraph_assets(
+                QuerySet(Paragraph).filter(document_id=document_model.id), document_model.visual_strategy_hash
+            )
+            process_visual_assets(assets, document_model.doc_strategy)
             document_id = str(document_model.id)
             return (
                 DocumentSerializers.Operate(data={"knowledge_id": knowledge_id, "document_id": document_id}).one(
@@ -1082,33 +1134,67 @@ class DocumentSerializers(serializers.Serializer):
             meta = {**instance.get("meta"), **source_meta} if instance.get("meta") is not None else source_meta
             meta = {**convert_uuid_to_str(meta), "allow_download": True}
 
+            strategy = normalize_document_strategy(instance.get("doc_strategy"))
+            hashes = strategy_hashes(strategy)
+            paragraphs = instance.get("paragraphs", [])
+            origin = (
+                ContentOrigin.SYNCED
+                if instance.get("source_file_id") or instance.get("type") in [KnowledgeType.WEB, KnowledgeType.LARK]
+                else ContentOrigin.MANUAL
+            )
+            normalized_paragraphs = [
+                {
+                    **paragraph,
+                    "origin": paragraph.get("origin", origin),
+                    "child_length": strategy["split"]["child_length"],
+                }
+                for paragraph in paragraphs
+            ]
+            if origin == ContentOrigin.SYNCED:
+                normalized_paragraphs = prepare_remote_paragraphs(normalized_paragraphs)
             document_model = Document(
                 **{
                     "knowledge_id": knowledge_id,
                     "id": uuid.uuid7(),
                     "name": instance.get("name"),
                     "char_length": reduce(
-                        lambda x, y: x + y, [len(p.get("content")) for p in instance.get("paragraphs", [])], 0
+                        lambda x, y: x + y, [len(p.get("content")) for p in normalized_paragraphs], 0
                     ),
                     "meta": meta,
+                    "doc_strategy": strategy,
+                    "source_hash": document_source_hash(normalized_paragraphs),
+                    "processor_version": PROCESSOR_VERSION,
+                    **hashes,
                     "type": instance.get("type") if instance.get("type") is not None else KnowledgeType.BASE,
+                    # Standalone images must go through ImageDocumentService so that file validation,
+                    # visual processing and ParagraphAsset creation cannot be bypassed.
+                    "resource_type": DocumentResourceType.DOCUMENT,
                     "user_id": user_id,
                 }
             )
 
-            return DocumentSerializers.Create.get_paragraph_model(
-                document_model, instance.get("paragraphs") if "paragraphs" in instance else []
-            )
+            return DocumentSerializers.Create.get_paragraph_model(document_model, normalized_paragraphs)
 
         def save_web(self, instance: Dict, with_valid=True):
+            request_serializer = DocumentWebInstanceSerializer(data=instance)
             if with_valid:
-                DocumentWebInstanceSerializer(data=instance).is_valid(raise_exception=True)
+                request_serializer.is_valid(raise_exception=True)
                 self.is_valid(raise_exception=True)
+                instance = request_serializer.validated_data
+            else:
+                instance = {
+                    **instance,
+                    "selector": (instance.get("selector") or "body").strip() or "body",
+                    "doc_strategy": normalize_document_strategy(instance.get("doc_strategy")),
+                }
             knowledge_id = self.data.get("knowledge_id")
             user_id = self.data.get("user_id")
             source_url_list = instance.get("source_url_list")
             selector = instance.get("selector")
-            sync_web_document.delay(knowledge_id, user_id, source_url_list, selector)
+            celery_app.send_task(
+                "celery:sync_web_document",
+                args=[knowledge_id, user_id, source_url_list, selector, instance.get("doc_strategy")],
+            )
 
         def save_qa(self, instance: Dict, with_valid=True):
             if with_valid:
@@ -1220,22 +1306,37 @@ class DocumentSerializers(serializers.Serializer):
 
         def parse(self, instance):
             self.is_valid(instance=instance, raise_exception=True)
-            DocumentSplitRequest(data=instance).is_valid(raise_exception=True)
+            request_serializer = DocumentSplitRequest(data=instance)
+            request_serializer.is_valid(raise_exception=True)
+            validated_data = request_serializer.validated_data
 
-            file_list = instance.get("file")
-            return reduce(
+            file_list = validated_data.get("file")
+            strategy_input = validated_data.get("doc_strategy") or {
+                "split": {
+                    "patterns": validated_data.get("patterns"),
+                    "max_length": validated_data.get("limit", 4096),
+                    "auto_clean": validated_data.get("with_filter", False),
+                }
+            }
+            strategy = normalize_document_strategy(strategy_input)
+            parse_limit = 100000 if strategy["split"].get("patterns") == [] else strategy["split"]["max_length"]
+            documents = reduce(
                 lambda x, y: [*x, *y],
                 [
                     self.file_to_paragraph(
                         f,
-                        instance.get("patterns", None),
-                        instance.get("with_filter", None),
-                        instance.get("limit", 4096),
+                        strategy["split"].get("patterns"),
+                        strategy["split"].get("auto_clean", False),
+                        parse_limit,
                     )
                     for f in file_list
                 ],
                 [],
             )
+            for document in documents:
+                document["content"] = apply_length_strategy(document.get("content", []), strategy)
+                document["doc_strategy"] = strategy
+            return documents
 
         def save_image(self, image_list):
             if image_list is not None and len(image_list) > 0:
@@ -1400,6 +1501,14 @@ class DocumentSerializers(serializers.Serializer):
             bulk_create_in_batches(Problem, problem_model_list, batch_size=1000)
             # 批量插入关联问题
             bulk_create_in_batches(ProblemParagraphMapping, problem_paragraph_mapping_list, batch_size=1000)
+            for document in document_model_list:
+                IncrementalDocumentSync(document, document.doc_strategy)._sync_title_questions(
+                    list(QuerySet(Paragraph).filter(document_id=document.id))
+                )
+                assets = sync_paragraph_assets(
+                    QuerySet(Paragraph).filter(document_id=document.id), document.visual_strategy_hash
+                )
+                process_visual_assets(assets, document.doc_strategy)
             # 查询文档
             query_set = QuerySet(model=Document)
             if len(document_model_list) == 0:

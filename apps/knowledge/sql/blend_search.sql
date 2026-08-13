@@ -8,12 +8,16 @@ WITH vector_top AS (
 )
 SELECT
 	paragraph_id,
+	source_id,
+	source_type,
 	comprehensive_score,
 	comprehensive_score AS similarity
 FROM
 	(
 	SELECT DISTINCT ON
 		(vc.paragraph_id) vc.paragraph_id,
+		e.source_id,
+		e.source_type,
 		(1 - vc.distance + COALESCE(ts_rank_cd(e.search_vector, websearch_to_tsquery('simple', %s), 32), 0)) AS comprehensive_score
 	FROM
 		vector_top vc

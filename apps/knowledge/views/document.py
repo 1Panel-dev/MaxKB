@@ -119,6 +119,7 @@ class DocumentView(APIView):
                     "no_tag": "NO_TAG" in raw_tags,
                     "desc": request.query_params.get("desc"),
                     "user_id": request.query_params.get("user_id"),
+                    "resource_type": request.query_params.get("resource_type"),
                 }
             ).list()
         )
@@ -354,7 +355,12 @@ class DocumentView(APIView):
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return result.success(
                 DocumentSerializers.Sync(
-                    data={"document_id": document_id, "knowledge_id": knowledge_id, "workspace_id": workspace_id}
+                    data={
+                        **request.data,
+                        "document_id": document_id,
+                        "knowledge_id": knowledge_id,
+                        "workspace_id": workspace_id,
+                    }
                 ).sync()
             )
 
@@ -876,6 +882,7 @@ class DocumentView(APIView):
                         "hit_handling_method": request.query_params.get("hit_handling_method"),
                         "order_by": request.query_params.get("order_by"),
                         "create_user": request.query_params.get("create_user"),
+                        "resource_type": request.query_params.get("resource_type"),
                     }
                 ).page(current_page, page_size)
             )
@@ -969,7 +976,7 @@ class DocumentView(APIView):
         def get(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str):
             return DocumentSerializers.Operate(
                 data={"workspace_id": workspace_id, "document_id": document_id, "knowledge_id": knowledge_id}
-            ).download_source_file(mk_file_auth=request.COOKIES.get('mk_file_auth'))
+            ).download_source_file(mk_file_auth=request.COOKIES.get("mk_file_auth"))
 
     class ReplaceSourceFile(APIView):
         authentication_classes = [TokenAuth]

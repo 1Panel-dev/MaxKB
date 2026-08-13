@@ -11,10 +11,13 @@ from typing import Dict
 
 from langchain_openai import OpenAIEmbeddings
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 
-class RegoloEmbeddingModel(MaxKBBaseModel, OpenAIEmbeddings):
+class RegoloEmbeddingModel(MaxKBBaseEmbeddingModel, OpenAIEmbeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return RegoloEmbeddingModel(

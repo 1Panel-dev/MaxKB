@@ -17,7 +17,7 @@ import json
 import numpy as np
 from numpy import ndarray
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 from models_provider.langchain_compat.sparkllm import SparkLLMTextEmbeddings
 
 _task_queue = queue.Queue()
@@ -65,7 +65,10 @@ def _worker():
 threading.Thread(target=_worker, daemon=True).start()
 
 
-class XFEmbedding(MaxKBBaseModel, SparkLLMTextEmbeddings):
+class XFEmbedding(MaxKBBaseEmbeddingModel, SparkLLMTextEmbeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return XFEmbedding(

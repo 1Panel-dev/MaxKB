@@ -65,6 +65,52 @@ class HitHandlingMethod(models.TextChoices):
     directly_return = "directly_return", "直接返回"
 
 
+class ContentOrigin(models.TextChoices):
+    MANUAL = "manual", "手工创建"
+    SYNCED = "synced", "外部同步"
+
+
+class DocumentResourceType(models.TextChoices):
+    DOCUMENT = "document", "文档"
+    IMAGE = "image", "图片"
+
+
+class LocalState(models.TextChoices):
+    CLEAN = "clean", "未修改"
+    MODIFIED = "modified", "本地已修改"
+    DELETED = "deleted", "本地已删除"
+
+
+class SyncState(models.TextChoices):
+    ACTIVE = "active", "正常"
+    REMOTE_DELETED = "remote_deleted", "远端已删除"
+    CONFLICT = "conflict", "同步冲突"
+
+
+class KnowledgeSyncType(models.TextChoices):
+    INCREMENTAL = "incremental", "增量同步"
+    REPLACE = "replace", "替换同步"
+    COMPLETE = "complete", "完整同步"
+
+
+class KnowledgeSyncStatus(models.TextChoices):
+    RUNNING = "running", "同步中"
+    SUCCESS = "success", "同步成功"
+    FAILURE = "failure", "同步失败"
+
+
+class KnowledgeSyncTrigger(models.TextChoices):
+    MANUAL = "manual", "手动同步"
+    SCHEDULED = "scheduled", "定时同步"
+
+
+class AssetProcessStatus(models.TextChoices):
+    PENDING = "pending", "待处理"
+    SUCCESS = "success", "处理成功"
+    FAILURE = "failure", "处理失败"
+    SKIPPED = "skipped", "未启用"
+
+
 class Status:
     type_cls = TaskType
     state_cls = State
@@ -146,6 +192,51 @@ class Knowledge(AppModelMixin):
         db_table = "knowledge"
 
 
+class KnowledgeSyncLog(AppModelMixin):
+    """Execution history for manual and scheduled external knowledge synchronization."""
+
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.ForeignKey(
+        Knowledge,
+        on_delete=models.CASCADE,
+        db_constraint=False,
+        related_name="sync_logs",
+        verbose_name="知识库",
+    )
+    workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", db_index=True)
+    sync_type = models.CharField(
+        max_length=16,
+        choices=KnowledgeSyncType.choices,
+        default=KnowledgeSyncType.INCREMENTAL,
+        verbose_name="同步方式",
+    )
+    trigger_type = models.CharField(
+        max_length=16,
+        choices=KnowledgeSyncTrigger.choices,
+        default=KnowledgeSyncTrigger.MANUAL,
+        verbose_name="触发方式",
+    )
+    status = models.CharField(
+        max_length=16,
+        choices=KnowledgeSyncStatus.choices,
+        default=KnowledgeSyncStatus.RUNNING,
+        db_index=True,
+        verbose_name="同步状态",
+    )
+    total_count = models.PositiveIntegerField(default=0, verbose_name="文档总数")
+    synced_count = models.PositiveIntegerField(default=0, verbose_name="已同步数")
+    skipped_count = models.PositiveIntegerField(default=0, verbose_name="跳过数")
+    deleted_count = models.PositiveIntegerField(default=0, verbose_name="删除数")
+    failed_count = models.PositiveIntegerField(default=0, verbose_name="失败数")
+    duration_ms = models.PositiveBigIntegerField(default=0, verbose_name="耗时毫秒")
+    message = models.TextField(default="", blank=True, verbose_name="结果信息")
+
+    class Meta:
+        db_table = "knowledge_sync_log"
+        ordering = ["-create_time"]
+        indexes = [models.Index(fields=["knowledge", "-create_time"])]
+
+
 class KnowledgeWorkflow(AppModelMixin):
     """
     知识库工作流表
@@ -201,6 +292,13 @@ class Document(AppModelMixin):
     type = models.IntegerField(
         verbose_name="类型", choices=KnowledgeType.choices, default=KnowledgeType.BASE, db_index=True
     )
+    resource_type = models.CharField(
+        verbose_name="资源类型",
+        max_length=16,
+        choices=DocumentResourceType.choices,
+        default=DocumentResourceType.DOCUMENT,
+        db_index=True,
+    )
     hit_handling_method = models.CharField(
         verbose_name="命中处理方式",
         max_length=20,
@@ -208,6 +306,18 @@ class Document(AppModelMixin):
         default=HitHandlingMethod.optimization,
     )
     directly_return_similarity = models.FloatField(verbose_name="直接回答相似度", default=0.9)
+    hit_num = models.IntegerField(verbose_name="召回次数", default=0, db_index=True)
+    last_hit_time = models.DateTimeField(verbose_name="最后一次召回时间", null=True, blank=True, db_index=True)
+
+    # 导入/同步策略必须跟随文档保存，后续同步使用同一份策略，避免重新分段造成全量抖动。
+    doc_strategy = models.JSONField(verbose_name="文档处理策略", default=dict)
+    source_hash = models.CharField(verbose_name="远端文档内容哈希", max_length=64, default="", db_index=True)
+    split_strategy_hash = models.CharField(verbose_name="分段策略哈希", max_length=64, default="")
+    visual_strategy_hash = models.CharField(verbose_name="图片处理策略哈希", max_length=64, default="")
+    index_strategy_hash = models.CharField(verbose_name="索引增强策略哈希", max_length=64, default="")
+    processor_version = models.CharField(verbose_name="处理器版本", max_length=32, default="v1")
+    sync_version = models.PositiveIntegerField(verbose_name="同步版本", default=0)
+    last_sync_time = models.DateTimeField(verbose_name="最后同步时间", null=True, blank=True, db_index=True)
 
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
@@ -259,13 +369,91 @@ class Paragraph(AppModelMixin):
     title = models.CharField(max_length=256, verbose_name="标题", default="", db_index=True)
     status = models.CharField(verbose_name="状态", max_length=20, default=get_default_status, db_index=True)
     status_meta = models.JSONField(verbose_name="状态数据", default=default_status_meta)
-    hit_num = models.IntegerField(verbose_name="命中次数", default=0)
+    hit_num = models.IntegerField(verbose_name="召回次数", default=0, db_index=True)
+    last_hit_time = models.DateTimeField(verbose_name="最后一次召回时间", null=True, blank=True, db_index=True)
     is_active = models.BooleanField(default=True, db_index=True)
     position = models.IntegerField(verbose_name="段落顺序", default=0, db_index=True)
     chunks = ArrayField(verbose_name="块", base_field=models.CharField(), default=list)
+    content_schema = models.JSONField(verbose_name="结构化内容", default=list)
+    origin = models.CharField(
+        verbose_name="内容来源",
+        max_length=16,
+        choices=ContentOrigin.choices,
+        default=ContentOrigin.MANUAL,
+        db_index=True,
+    )
+    source_key = models.CharField(verbose_name="远端稳定键", max_length=512, default="", db_index=True)
+    source_hash = models.CharField(verbose_name="远端内容哈希", max_length=64, default="", db_index=True)
+    source_snapshot = models.JSONField(verbose_name="上次同步快照", default=dict)
+    source_updated_at = models.DateTimeField(verbose_name="远端更新时间", null=True, blank=True)
+    local_state = models.CharField(
+        verbose_name="本地状态", max_length=16, choices=LocalState.choices, default=LocalState.CLEAN, db_index=True
+    )
+    sync_state = models.CharField(
+        verbose_name="同步状态", max_length=24, choices=SyncState.choices, default=SyncState.ACTIVE, db_index=True
+    )
+    anchor_paragraph = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        db_constraint=False,
+        blank=True,
+        null=True,
+        related_name="anchored_paragraphs",
+    )
+    placement = models.CharField(verbose_name="相对锚点位置", max_length=8, default="after")
 
     class Meta:
         db_table = "paragraph"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "source_key"],
+                condition=~models.Q(source_key=""),
+                name="uniq_document_paragraph_source_key",
+            )
+        ]
+
+
+class ParagraphAsset(AppModelMixin):
+    """段落内的图片等资产；资产属于文档生命周期，不是独立知识类型。"""
+
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
+    knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, db_constraint=False)
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, db_constraint=False, related_name="assets")
+    paragraph = models.ForeignKey(Paragraph, on_delete=models.CASCADE, db_constraint=False, related_name="assets")
+    file = models.ForeignKey("File", on_delete=models.DO_NOTHING, db_constraint=False, related_name="paragraph_assets")
+    asset_type = models.CharField(verbose_name="资产类型", max_length=16, default="image", db_index=True)
+    position = models.PositiveIntegerField(verbose_name="段落内位置", default=0)
+    origin = models.CharField(
+        verbose_name="内容来源", max_length=16, choices=ContentOrigin.choices, default=ContentOrigin.SYNCED
+    )
+    source_asset_key = models.CharField(verbose_name="远端资产稳定键", max_length=512, default="", db_index=True)
+    source_hash = models.CharField(verbose_name="远端资产哈希", max_length=64, default="", db_index=True)
+    caption = models.TextField(verbose_name="图片标题", default="")
+    ocr_text = models.TextField(verbose_name="OCR 文本", default="")
+    description = models.TextField(verbose_name="图片描述", default="")
+    local_state = models.CharField(
+        verbose_name="本地状态", max_length=16, choices=LocalState.choices, default=LocalState.CLEAN
+    )
+    sync_state = models.CharField(
+        verbose_name="同步状态", max_length=24, choices=SyncState.choices, default=SyncState.ACTIVE
+    )
+    process_status = models.CharField(
+        verbose_name="处理状态", max_length=16, choices=AssetProcessStatus.choices, default=AssetProcessStatus.PENDING
+    )
+    process_error = models.TextField(verbose_name="处理错误", default="")
+    visual_strategy_hash = models.CharField(verbose_name="图片处理策略哈希", max_length=64, default="")
+    processor_version = models.CharField(verbose_name="处理器版本", max_length=32, default="v1")
+    meta = models.JSONField(verbose_name="元数据", default=dict)
+
+    class Meta:
+        db_table = "paragraph_asset"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "source_asset_key"],
+                condition=~models.Q(source_asset_key=""),
+                name="uniq_document_asset_source_key",
+            )
+        ]
 
 
 class Problem(AppModelMixin):
@@ -276,7 +464,8 @@ class Problem(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     knowledge = models.ForeignKey(Knowledge, on_delete=models.DO_NOTHING, db_constraint=False)
     content = models.CharField(max_length=256, verbose_name="问题内容", db_index=True)
-    hit_num = models.IntegerField(verbose_name="命中次数", default=0)
+    hit_num = models.IntegerField(verbose_name="召回次数", default=0, db_index=True)
+    last_hit_time = models.DateTimeField(verbose_name="最后一次召回时间", null=True, blank=True, db_index=True)
 
     class Meta:
         db_table = "problem"
@@ -288,6 +477,7 @@ class ProblemParagraphMapping(AppModelMixin):
     document = models.ForeignKey(Document, on_delete=models.DO_NOTHING, db_constraint=False)
     problem = models.ForeignKey(Problem, on_delete=models.DO_NOTHING, db_constraint=False)
     paragraph = models.ForeignKey(Paragraph, on_delete=models.DO_NOTHING, db_constraint=False)
+    meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:
         db_table = "problem_paragraph_mapping"
@@ -312,6 +502,7 @@ class SourceType(models.IntegerChoices):
     PROBLEM = 0, "问题"
     PARAGRAPH = 1, "段落"
     TITLE = 2, "标题"
+    IMAGE = 3, "图片"
 
 
 class SearchMode(models.TextChoices):
@@ -534,32 +725,23 @@ class PublicFileAccess(AppModelMixin):
     公共文件访问控制表
     记录哪些文件允许公开访问
     """
-    id = models.UUIDField(
-        primary_key=True,
-        max_length=128,
-        default=uuid.uuid7,
-        editable=False,
-        verbose_name="主键id"
-    )
+
+    id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
 
     source_type = models.CharField(
         max_length=20,
         choices=[
-            ('FILE', '文件'),
-            ('APPLICATION', '应用'),
-            ('KNOWLEDGE', '知识库'),
+            ("FILE", "文件"),
+            ("APPLICATION", "应用"),
+            ("KNOWLEDGE", "知识库"),
         ],
         db_index=True,
-        verbose_name="资源类型"
+        verbose_name="资源类型",
     )
-    source_id = models.CharField(
-        max_length=128,
-        db_index=True,
-        verbose_name="资源ID"
-    )
+    source_id = models.CharField(max_length=128, db_index=True, verbose_name="资源ID")
 
     class Meta:
-        db_table = 'public_file_access'
+        db_table = "public_file_access"
         indexes = [
-            models.Index(fields=['source_type', 'source_id']),
+            models.Index(fields=["source_type", "source_id"]),
         ]

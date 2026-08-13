@@ -2,11 +2,18 @@ from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter
 
 from common.mixins.api_mixin import APIMixin
-from common.result import ResultSerializer, DefaultResultSerializer
+from common.result import DefaultResultSerializer, ResultPageSerializer, ResultSerializer
 from knowledge.serializers.common import BatchSerializer, BatchMoveSerializer
 from knowledge.serializers.common import GenerateRelatedSerializer
-from knowledge.serializers.knowledge import KnowledgeBaseCreateRequest, KnowledgeModelSerializer, KnowledgeEditRequest, \
-    KnowledgeWebCreateRequest, HitTestSerializer, KnowledgeImportRequest
+from knowledge.serializers.knowledge import (
+    KnowledgeBaseCreateRequest,
+    KnowledgeModelSerializer,
+    KnowledgeEditRequest,
+    KnowledgeWebCreateRequest,
+    HitTestSerializer,
+    KnowledgeImportRequest,
+)
+from knowledge.serializers.knowledge_sync import KnowledgeSyncLogSerializer, KnowledgeSyncSettingRequest
 
 
 class KnowledgeCreateResponse(ResultSerializer):
@@ -22,16 +29,16 @@ class KnowledgeReadAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            )
+            ),
         ]
 
     @staticmethod
@@ -47,7 +54,7 @@ class KnowledgeBaseCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -69,7 +76,7 @@ class KnowledgeWebCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -91,16 +98,16 @@ class KnowledgeEditAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
-            )
+            ),
         ]
 
     @staticmethod
@@ -120,35 +127,35 @@ class KnowledgeTreeReadAPI(KnowledgeReadAPI):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description="文件夹id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=True,
             ),
             OpenApiParameter(
                 name="user_id",
                 description="用户id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="name",
                 description="名称",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="desc",
                 description="描述",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
         ]
@@ -162,42 +169,42 @@ class KnowledgePageAPI(KnowledgeReadAPI):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="current_page",
                 description="当前页码",
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="page_size",
                 description="每页条数",
                 type=OpenApiTypes.INT,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description="文件夹id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=True,
             ),
             OpenApiParameter(
                 name="name",
                 description="名称",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="desc",
                 description="描述",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
         ]
@@ -211,21 +218,21 @@ class SyncWebAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="sync_type",
-                description="同步类型 (replace: 替换同步, complete: 完整同步)",
+                description="同步类型 (incremental: 增量同步, replace: 替换同步, complete: 完整同步)",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=True,
             ),
         ]
@@ -233,6 +240,52 @@ class SyncWebAPI(APIMixin):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
+
+class KnowledgeSyncSettingResponse(ResultSerializer):
+    def get_data(self):
+        return KnowledgeSyncSettingRequest()
+
+
+class KnowledgeSyncSettingAPI(SyncWebAPI):
+    @staticmethod
+    def get_request():
+        return KnowledgeSyncSettingRequest
+
+    @staticmethod
+    def get_response():
+        return KnowledgeSyncSettingResponse
+
+
+class KnowledgeSyncLogResponse(ResultPageSerializer):
+    def get_data(self):
+        return KnowledgeSyncLogSerializer(many=True)
+
+
+class KnowledgeSyncLogAPI(SyncWebAPI):
+    @staticmethod
+    def get_parameters():
+        return [
+            *SyncWebAPI.get_parameters()[:2],
+            OpenApiParameter(
+                name="current_page",
+                description="当前页码",
+                type=OpenApiTypes.INT,
+                location="path",
+                required=True,
+            ),
+            OpenApiParameter(
+                name="page_size",
+                description="每页条数",
+                type=OpenApiTypes.INT,
+                location="path",
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_response():
+        return KnowledgeSyncLogResponse
 
 
 class GenerateRelatedAPI(SyncWebAPI):
@@ -259,7 +312,7 @@ class GetModelAPI(SyncWebAPI):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -267,6 +320,7 @@ class GetModelAPI(SyncWebAPI):
     @staticmethod
     def get_response():
         return DefaultResultSerializer
+
 
 class KnowledgeExportAPI(APIMixin):
     @staticmethod
@@ -276,21 +330,21 @@ class KnowledgeExportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="with_source_file",
                 description="是否导出原始文件",
                 type=OpenApiTypes.BOOL,
-                location='query',
+                location="query",
                 required=False,
             ),
         ]
@@ -308,7 +362,7 @@ class KnowledgeBatchOperateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             )
         ]
@@ -330,7 +384,7 @@ class KnowledgeImportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]

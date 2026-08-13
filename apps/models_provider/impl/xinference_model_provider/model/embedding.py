@@ -4,10 +4,21 @@ from typing import Dict, Optional, List, Any
 
 from langchain_core.embeddings import Embeddings
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
+
+try:
+    from xinference.client import RESTfulClient
+except ImportError:
+    try:
+        from xinference_client import RESTfulClient
+    except ImportError:
+        RESTfulClient = None
 
 
-class XinferenceEmbedding(MaxKBBaseModel, Embeddings):
+class XinferenceEmbedding(MaxKBBaseEmbeddingModel, Embeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     client: Any
     server_url: Optional[str]
     """URL of the xinference server"""
@@ -33,16 +44,11 @@ class XinferenceEmbedding(MaxKBBaseModel, Embeddings):
     def __init__(
         self, server_url: Optional[str] = None, model_uid: Optional[str] = None, api_key: Optional[str] = None
     ):
-        try:
-            from xinference.client import RESTfulClient
-        except ImportError:
-            try:
-                from xinference_client import RESTfulClient
-            except ImportError as e:
-                raise ImportError(
-                    "Could not import RESTfulClient from xinference. Please install it"
-                    " with `pip install xinference` or `pip install xinference_client`."
-                ) from e
+        if RESTfulClient is None:
+            raise ImportError(
+                "Could not import RESTfulClient from xinference. Please install it"
+                " with `pip install xinference` or `pip install xinference_client`."
+            )
 
         if server_url is None:
             raise ValueError("Please provide server URL")

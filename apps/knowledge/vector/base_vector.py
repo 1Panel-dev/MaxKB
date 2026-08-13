@@ -15,7 +15,7 @@ from typing import Dict, List
 
 from common.chunk import text_to_chunk
 from common.utils.common import sub_array
-from langchain_core.embeddings import Embeddings
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 from knowledge.models import SearchMode, SourceType
 
@@ -94,7 +94,7 @@ class BaseVectorStore(ABC):
         paragraph_id: str,
         source_id: str,
         is_active: bool,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
     ):
         """
         插入向量数据
@@ -123,7 +123,7 @@ class BaseVectorStore(ABC):
         for child_array in result:
             self._batch_save(child_array, embedding, lambda: False)
 
-    def batch_save(self, data_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
+    def batch_save(self, data_list: List[Dict], embedding: MaxKBBaseEmbeddingModel, is_the_task_interrupted):
         """
         批量插入
         @param data_list: 数据列表
@@ -150,12 +150,12 @@ class BaseVectorStore(ABC):
         paragraph_id: str,
         source_id: str,
         is_active: bool,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
     ):
         pass
 
     @abstractmethod
-    def _batch_save(self, text_list: List[Dict], embedding: Embeddings, is_the_task_interrupted):
+    def _batch_save(self, text_list: List[Dict], embedding: MaxKBBaseEmbeddingModel, is_the_task_interrupted):
         pass
 
     def search(
@@ -165,17 +165,23 @@ class BaseVectorStore(ABC):
         exclude_document_id_list: list[str],
         exclude_paragraph_list: list[str],
         is_active: bool,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
     ):
         if knowledge_id_list is None or len(knowledge_id_list) == 0:
             return []
         query_text = normalize_for_embedding(query_text)
         query_embedding = embedding.embed_query(query_text)
         result = self.query(
-            query_text, query_embedding,
-            knowledge_id_list, None,
-            exclude_document_id_list, exclude_paragraph_list,
-            is_active, 3, 0.65, SearchMode.embedding
+            query_text,
+            query_embedding,
+            knowledge_id_list,
+            None,
+            exclude_document_id_list,
+            exclude_paragraph_list,
+            is_active,
+            3,
+            0.65,
+            SearchMode.embedding,
         )
         return result[0] if result else None
 
@@ -204,7 +210,8 @@ class BaseVectorStore(ABC):
         top_number: int,
         similarity: float,
         search_mode: SearchMode,
-        embedding: Embeddings,
+        embedding: MaxKBBaseEmbeddingModel,
+        image_list: list[str] | None = None,
     ):
         pass
 

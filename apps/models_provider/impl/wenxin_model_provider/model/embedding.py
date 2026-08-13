@@ -11,11 +11,14 @@ from typing import Dict, List
 
 import openai
 
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 from models_provider.langchain_compat.baidu_qianfan_endpoint import QianfanEmbeddingsEndpoint
 
 
-class QianfanV1Embeddings(MaxKBBaseModel, QianfanEmbeddingsEndpoint):
+class QianfanV1Embeddings(MaxKBBaseEmbeddingModel, QianfanEmbeddingsEndpoint):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         return QianfanV1Embeddings(
@@ -25,7 +28,10 @@ class QianfanV1Embeddings(MaxKBBaseModel, QianfanEmbeddingsEndpoint):
         )
 
 
-class QianfanV2EmbeddingModel(MaxKBBaseModel):
+class QianfanV2EmbeddingModel(MaxKBBaseEmbeddingModel):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     model_name: str
 
     @staticmethod
@@ -56,7 +62,10 @@ class QianfanV2EmbeddingModel(MaxKBBaseModel):
         return [e.embedding for e in res.data]
 
 
-class QianfanEmbeddings(MaxKBBaseModel):
+class QianfanEmbeddings(MaxKBBaseEmbeddingModel):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
         api_version = model_credential.get("api_version", "v1")

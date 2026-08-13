@@ -3,6 +3,7 @@ import asyncio
 import base64
 import json
 import pickle
+from copy import deepcopy
 from functools import reduce
 from typing import Dict, List
 
@@ -20,8 +21,8 @@ from application.flow.common import Workflow, WorkflowMode
 from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
-from application.flow.tools import save_workflow_mapping
-from application.serializers.application import get_mcp_tools
+from application.flow.tools import get_tool_id_list, save_workflow_mapping
+from application.mcp_tools import get_mcp_tools
 from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -44,7 +45,8 @@ from knowledge.models import (
 )
 from knowledge.models.knowledge_action import KnowledgeAction, State
 from knowledge.serializers.common import update_resource_mapping_by_knowledge
-from knowledge.serializers.knowledge import KnowledgeModelSerializer
+from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
+from knowledge.services.document_cleanup import delete_document_data
 from system_manage.models import AuthTargetType
 from system_manage.models.resource_mapping import ResourceType
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -169,7 +171,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             },
         )
 
-    def action(self, instance: Dict, user, with_valid=True):
+    def action(self, instance: Dict, user, with_valid=True, sync_log_id=None):
         if with_valid:
             self.is_valid(raise_exception=True)
         knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=self.data.get("knowledge_id")).first()
@@ -179,6 +181,15 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"), state=State.STARTED, meta=meta
         ).save()
         knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
+        if sync_log_id is None:
+            knowledge.meta = {
+                **(knowledge.meta or {}),
+                "workflow_sync_input": {
+                    "data_source": deepcopy(instance.get("data_source") or {}),
+                    "knowledge_base": deepcopy(instance.get("knowledge_base") or {}),
+                },
+            }
+            knowledge.save(update_fields=["meta", "update_time"])
         instance["knowledge_base"] = {
             **(instance.get("knowledge_base") or {}),
             "knowledge": {
@@ -198,7 +209,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "user_id": str(user.id),
                 **instance,
             },
-            KnowledgeWorkflowPostHandler(None, knowledge_action_id),
+            KnowledgeWorkflowPostHandler(None, knowledge_action_id, sync_log_id, delete_document_data),
             is_the_task_interrupted=lambda: (
                 cache.get(
                     Cache_Version.KNOWLEDGE_WORKFLOW_INTERRUPTED.get_key(action_id=knowledge_action_id),
@@ -284,18 +295,22 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            if not QuerySet(KnowledgeAction).filter(
-                id=self.data.get("id"), knowledge_id=self.data.get("knowledge_id")
-            ).exists():
+            if (
+                not QuerySet(KnowledgeAction)
+                .filter(id=self.data.get("id"), knowledge_id=self.data.get("knowledge_id"))
+                .exists()
+            ):
                 raise AppApiException(500, _("Knowledge action does not exist"))
 
         def one(self, is_valid=True):
             if is_valid:
                 self.is_valid(raise_exception=True)
             knowledge_action_id = self.data.get("id")
-            knowledge_action = QuerySet(KnowledgeAction).filter(
-                id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id")
-            ).first()
+            knowledge_action = (
+                QuerySet(KnowledgeAction)
+                .filter(id=knowledge_action_id, knowledge_id=self.data.get("knowledge_id"))
+                .first()
+            )
             return {
                 "id": knowledge_action_id,
                 "knowledge_id": knowledge_action.knowledge_id,
@@ -405,7 +420,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
                     if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
-                       raise AppApiException(500, _("Illegal download callback url"))
+                        raise AppApiException(500, _("Illegal download callback url"))
                     requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")
@@ -428,7 +443,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
             kbwf_instance_bytes = instance.get("file").read()
             try:
                 kbwf_instance = restricted_loads(kbwf_instance_bytes)
-            except Exception as e:
+            except Exception:
                 raise AppApiException(1001, _("Unsupported file format"))
             knowledge_workflow = kbwf_instance.knowledge_workflow
             tool_list = kbwf_instance.get_tool_list()
@@ -551,8 +566,6 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 knowledge_id = self.data.get("knowledge_id")
                 knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                 knowledge = QuerySet(Knowledge).filter(id=knowledge_id).first()
-                from application.flow.tools import get_tool_id_list
-
                 tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                 tool_list = []
                 if len(tool_id_list) > 0:
@@ -652,7 +665,7 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 try:
                     download_callback_url = template_instance.get("downloadCallbackUrl", "")
                     if not validate_trusted_url(download_callback_url, ALLOWED_CALLBACK_HOSTS):
-                       raise AppApiException(500, _("Illegal download callback url"))
+                        raise AppApiException(500, _("Illegal download callback url"))
                     requests.get(download_callback_url, timeout=5, allow_redirects=False)
                 except Exception as e:
                     maxkb_logger.error(f"callback appstore tool download error: {e}")

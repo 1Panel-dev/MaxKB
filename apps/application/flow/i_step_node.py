@@ -1,28 +1,36 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： i_step_node.py
-    @date：2024/6/3 14:57
-    @desc:
+@project: maxkb
+@Author：虎
+@file： i_step_node.py
+@date：2024/6/3 14:57
+@desc:
 """
+
 import time
 import uuid
 from abc import abstractmethod
 from hashlib import sha1
-from typing import Type, Dict, List
-
-from django.core import cache
-from django.db.models import QuerySet
-from rest_framework import serializers
-from rest_framework.exceptions import ValidationError, ErrorDetail
+from typing import Dict, List, Type
 
 from application.flow.common import Answer, NodeChunk
 from application.long_term_memory import extract_long_term_memory
-from application.models import ApplicationChatUserStats
-from application.models import ChatRecord, ChatUserType
+from application.models import ApplicationChatUserStats, ChatRecord, ChatUserType
 from common.field.common import InstanceField
+from django.core import cache
+from django.db.models import QuerySet
+from knowledge.models import (
+    Document,
+    DocumentResourceType,
+    KnowledgeSyncLog,
+    KnowledgeSyncStatus,
+    KnowledgeSyncType,
+    KnowledgeType,
+    Paragraph,
+)
 from knowledge.models.knowledge_action import KnowledgeAction, State
+from rest_framework import serializers
+from rest_framework.exceptions import ErrorDetail, ValidationError
 from tools.models import ToolRecord
 
 chat_cache = cache
@@ -32,18 +40,18 @@ def write_context(step_variable: Dict, global_variable: Dict, node, workflow):
     if step_variable is not None:
         for key in step_variable:
             node.context[key] = step_variable[key]
-        if workflow.is_result(node, NodeResult(step_variable, global_variable)) and 'answer' in step_variable:
-            answer = step_variable['answer']
+        if workflow.is_result(node, NodeResult(step_variable, global_variable)) and "answer" in step_variable:
+            answer = step_variable["answer"]
             yield answer
             node.answer_text = answer
     if global_variable is not None:
         for key in global_variable:
             workflow.context[key] = global_variable[key]
-    node.context['run_time'] = time.time() - node.context['start_time']
+    node.context["run_time"] = time.time() - node.context["start_time"]
 
 
 def is_interrupt(node, step_variable: Dict, global_variable: Dict):
-    return node.type == 'form-node' and not node.context.get('is_submit', False)
+    return node.type == "form-node" and not node.context.get("is_submit", False)
 
 
 class WorkFlowPostHandler:
@@ -52,18 +60,26 @@ class WorkFlowPostHandler:
 
     def handler(self, workflow):
         workflow_body = workflow.get_body()
-        question = workflow_body.get('question')
-        chat_record_id = workflow_body.get('chat_record_id')
-        chat_id = workflow_body.get('chat_id')
+        question = workflow_body.get("question")
+        chat_record_id = workflow_body.get("chat_record_id")
+        chat_id = workflow_body.get("chat_id")
         details = workflow.get_runtime_details()
-        message_tokens = sum([row.get('message_tokens') for row in details.values() if
-                              'message_tokens' in row and row.get('message_tokens') is not None])
-        answer_tokens = sum([row.get('answer_tokens') for row in details.values() if
-                             'answer_tokens' in row and row.get('answer_tokens') is not None])
+        message_tokens = sum(
+            [
+                row.get("message_tokens")
+                for row in details.values()
+                if "message_tokens" in row and row.get("message_tokens") is not None
+            ]
+        )
+        answer_tokens = sum(
+            [
+                row.get("answer_tokens")
+                for row in details.values()
+                if "answer_tokens" in row and row.get("answer_tokens") is not None
+            ]
+        )
         answer_text_list = workflow.get_answer_text_list()
-        answer_text = '\n\n'.join(
-            '\n\n'.join([a.get('content') for a in answer]) for answer in
-            answer_text_list)
+        answer_text = "\n\n".join("\n\n".join([a.get("content") for a in answer]) for answer in answer_text_list)
         if workflow.chat_record is not None:
             chat_record = workflow.chat_record
             chat_record.problem_text = question
@@ -72,58 +88,148 @@ class WorkFlowPostHandler:
             chat_record.message_tokens = message_tokens
             chat_record.answer_tokens = answer_tokens
             chat_record.answer_text_list = answer_text_list
-            chat_record.run_time = time.time() - workflow.context['start_time']
+            chat_record.run_time = time.time() - workflow.context["start_time"]
         else:
-            chat_record = ChatRecord(id=chat_record_id,
-                                     chat_id=chat_id,
-                                     problem_text=question,
-                                     answer_text=answer_text,
-                                     details=details,
-                                     message_tokens=message_tokens,
-                                     answer_tokens=answer_tokens,
-                                     answer_text_list=answer_text_list,
-                                     run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
-                                         'start_time') is not None else 0,
-                                     index=0,
-                                     ip_address=self.chat_info.ip_address,
-                                     source=self.chat_info.source)
+            chat_record = ChatRecord(
+                id=chat_record_id,
+                chat_id=chat_id,
+                problem_text=question,
+                answer_text=answer_text,
+                details=details,
+                message_tokens=message_tokens,
+                answer_tokens=answer_tokens,
+                answer_text_list=answer_text_list,
+                run_time=time.time() - workflow.context.get("start_time")
+                if workflow.context.get("start_time") is not None
+                else 0,
+                index=0,
+                ip_address=self.chat_info.ip_address,
+                source=self.chat_info.source,
+            )
 
         self.chat_info.append_chat_record(chat_record)
         self.chat_info.set_cache()
 
         if not self.chat_info.debug and [ChatUserType.ANONYMOUS_USER.value, ChatUserType.CHAT_USER.value].__contains__(
-                workflow_body.get('chat_user_type')):
-            application_public_access_client = (QuerySet(ApplicationChatUserStats)
-                                                .filter(chat_user_id=workflow_body.get('chat_user_id'),
-                                                        chat_user_type=workflow_body.get('chat_user_type'),
-                                                        application_id=self.chat_info.application_id).first())
+            workflow_body.get("chat_user_type")
+        ):
+            application_public_access_client = (
+                QuerySet(ApplicationChatUserStats)
+                .filter(
+                    chat_user_id=workflow_body.get("chat_user_id"),
+                    chat_user_type=workflow_body.get("chat_user_type"),
+                    application_id=self.chat_info.application_id,
+                )
+                .first()
+            )
             if application_public_access_client is not None:
                 application_public_access_client.access_num = application_public_access_client.access_num + 1
-                application_public_access_client.intraday_access_num = application_public_access_client.intraday_access_num + 1
+                application_public_access_client.intraday_access_num = (
+                    application_public_access_client.intraday_access_num + 1
+                )
                 application_public_access_client.save()
         self.chat_info = None
 
         extract_long_term_memory.apply_async(
             args=(
-                workflow_body.get('workspace_id'),
-                workflow_body.get('application_id'),
-                workflow_body.get('chat_user_id'),
+                workflow_body.get("workspace_id"),
+                workflow_body.get("application_id"),
+                workflow_body.get("chat_user_id"),
             ),
             countdown=1,
         )
 
 
 class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
-    def __init__(self, chat_info, knowledge_action_id):
+    def __init__(self, chat_info, knowledge_action_id, sync_log_id=None, document_cleanup=None):
         super().__init__(chat_info)
         self.knowledge_action_id = knowledge_action_id
+        self.sync_log_id = sync_log_id
+        self.document_cleanup = document_cleanup
 
     def handler(self, workflow):
         state = get_workflow_state(workflow)
-        QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(
-            state=state,
-            run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
-                'start_time') is not None else 0)
+        run_time = (
+            time.time() - workflow.context.get("start_time") if workflow.context.get("start_time") is not None else 0
+        )
+        QuerySet(KnowledgeAction).filter(id=self.knowledge_action_id).update(state=state, run_time=run_time)
+        if self.sync_log_id is not None:
+            sync_log = QuerySet(KnowledgeSyncLog).filter(id=self.sync_log_id).first()
+            if sync_log is not None:
+                new_documents = list(
+                    QuerySet(Document).filter(
+                        knowledge_id=sync_log.knowledge_id,
+                        type=KnowledgeType.WORKFLOW,
+                        resource_type=DocumentResourceType.DOCUMENT,
+                        create_time__gte=sync_log.create_time,
+                    )
+                )
+                synced_count = len(new_documents)
+                skipped_count = 0
+                if (
+                    state == State.SUCCESS
+                    and sync_log.sync_type == KnowledgeSyncType.INCREMENTAL
+                    and self.document_cleanup is not None
+                ):
+                    old_documents = list(
+                        QuerySet(Document).filter(
+                            knowledge_id=sync_log.knowledge_id,
+                            type=KnowledgeType.WORKFLOW,
+                            resource_type=DocumentResourceType.DOCUMENT,
+                            create_time__lt=sync_log.create_time,
+                        )
+                    )
+                    old_by_name = {}
+                    for document in old_documents:
+                        old_by_name.setdefault(document.name, []).append(document)
+                    for new_document in new_documents:
+                        matched = old_by_name.get(new_document.name, [])
+                        if not matched:
+                            continue
+                        new_content = list(
+                            QuerySet(Paragraph)
+                            .filter(document_id=new_document.id)
+                            .order_by("position")
+                            .values_list("title", "content")
+                        )
+                        unchanged = next(
+                            (
+                                old_document
+                                for old_document in matched
+                                if list(
+                                    QuerySet(Paragraph)
+                                    .filter(document_id=old_document.id)
+                                    .order_by("position")
+                                    .values_list("title", "content")
+                                )
+                                == new_content
+                            ),
+                            None,
+                        )
+                        if unchanged is not None:
+                            self.document_cleanup([new_document.id])
+                            synced_count -= 1
+                            skipped_count += 1
+                        else:
+                            self.document_cleanup([document.id for document in matched])
+                total_count = (
+                    QuerySet(Document)
+                    .filter(
+                        knowledge_id=sync_log.knowledge_id,
+                        resource_type=DocumentResourceType.DOCUMENT,
+                    )
+                    .count()
+                )
+                is_success = state == State.SUCCESS
+                QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
+                    status=KnowledgeSyncStatus.SUCCESS if is_success else KnowledgeSyncStatus.FAILURE,
+                    total_count=total_count,
+                    synced_count=synced_count,
+                    skipped_count=skipped_count,
+                    failed_count=0 if is_success else 1,
+                    duration_ms=max(0, round(run_time * 1000)),
+                    message=f"Workflow action {self.knowledge_action_id}: {state}",
+                )
 
 
 def get_tool_workflow_state(workflow):
@@ -132,7 +238,7 @@ def get_tool_workflow_state(workflow):
     details = workflow.get_runtime_details()
     node_list = details.values()
     all_node = [*node_list, *get_loop_workflow_node(node_list)]
-    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
+    err = any([True for value in all_node if value.get("status") == 500 and not value.get("enableException")])
     if err:
         return State.FAILURE
     return State.SUCCESS
@@ -155,21 +261,25 @@ class ToolWorkflowPostHandler(WorkFlowPostHandler):
 
     def handler(self, workflow):
         state = get_tool_workflow_state(workflow)
-        record = ToolRecord(id=self.chat_info.tool_record_id, tool_id=self.tool_id,
-                            workspace_id=self.chat_info.workspace_id,
-                            source_type=self.chat_info.source_type,
-                            source_id=self.chat_info.source_id,
-                            state=state,
-                            run_time=time.time() - workflow.context.get('start_time') if workflow.context.get(
-                                'start_time') is not None else 0,
-                            meta={
-                                'input_field_list': workflow.get_input_field_list(),
-                                'output_field_list': workflow.get_output_field_list(),
-                                'input': workflow.get_input(),
-                                'output': workflow.out_context,
-                                'details': workflow.get_runtime_details(),
-                                'answer_text_list': workflow.get_answer_text_list()
-                            })
+        record = ToolRecord(
+            id=self.chat_info.tool_record_id,
+            tool_id=self.tool_id,
+            workspace_id=self.chat_info.workspace_id,
+            source_type=self.chat_info.source_type,
+            source_id=self.chat_info.source_id,
+            state=state,
+            run_time=time.time() - workflow.context.get("start_time")
+            if workflow.context.get("start_time") is not None
+            else 0,
+            meta={
+                "input_field_list": workflow.get_input_field_list(),
+                "output_field_list": workflow.get_output_field_list(),
+                "input": workflow.get_input(),
+                "output": workflow.out_context,
+                "details": workflow.get_runtime_details(),
+                "answer_text_list": workflow.get_answer_text_list(),
+            },
+        )
         self.chat_info.set_record(record)
         self.chat_info = None
         self.tool_id = None
@@ -178,8 +288,8 @@ class ToolWorkflowPostHandler(WorkFlowPostHandler):
 def get_loop_workflow_node(node_list):
     result = []
     for item in node_list:
-        if item.get('type') == 'loop-node':
-            for loop_item in item.get('loop_node_data') or []:
+        if item.get("type") == "loop-node":
+            for loop_item in item.get("loop_node_data") or []:
                 for inner_item in loop_item.values():
                     result.append(inner_item)
     return result
@@ -191,18 +301,19 @@ def get_workflow_state(workflow):
     details = workflow.get_runtime_details()
     node_list = details.values()
     all_node = [*node_list, *get_loop_workflow_node(node_list)]
-    err = any([True for value in all_node if value.get('status') == 500 and not value.get('enableException')])
+    err = any([True for value in all_node if value.get("status") == 500 and not value.get("enableException")])
     if err:
         return State.FAILURE
-    write_is_exist = any([True for value in all_node if value.get('type') == 'knowledge-write-node'])
+    write_is_exist = any([True for value in all_node if value.get("type") == "knowledge-write-node"])
     if not write_is_exist:
         return State.FAILURE
     return State.SUCCESS
 
 
 class NodeResult:
-    def __init__(self, node_variable: Dict, workflow_variable: Dict,
-                 _write_context=write_context, _is_interrupt=is_interrupt):
+    def __init__(
+        self, node_variable: Dict, workflow_variable: Dict, _write_context=write_context, _is_interrupt=is_interrupt
+    ):
         self._write_context = _write_context
         self.node_variable = node_variable
         self.workflow_variable = workflow_variable
@@ -212,7 +323,7 @@ class NodeResult:
         return self._write_context(self.node_variable, self.workflow_variable, node, workflow)
 
     def is_assertion_result(self):
-        return 'branch_id' in self.node_variable
+        return "branch_id" in self.node_variable
 
     def is_interrupt_exec(self, current_node):
         """
@@ -226,14 +337,15 @@ class NodeResult:
 class ReferenceAddressSerializer(serializers.Serializer):
     node_id = serializers.CharField(required=True, label="节点id")
     fields = serializers.ListField(
-        child=serializers.CharField(required=True, label="节点字段"), required=True,
-        label="节点字段数组")
+        child=serializers.CharField(required=True, label="节点字段"), required=True, label="节点字段数组"
+    )
 
 
 class FlowParamsSerializer(serializers.Serializer):
     # 历史对答
-    history_chat_record = serializers.ListField(child=InstanceField(model_type=ChatRecord, required=True),
-                                                label="历史对答")
+    history_chat_record = serializers.ListField(
+        child=InstanceField(model_type=ChatRecord, required=True), label="历史对答"
+    )
 
     question = serializers.CharField(required=True, label="用户问题")
 
@@ -271,7 +383,7 @@ class ToolFlowParamsSerializer(serializers.Serializer):
 
 
 class INode:
-    view_type = 'many_view'
+    view_type = "many_view"
 
     @abstractmethod
     def save_context(self, details, workflow_manage):
@@ -280,17 +392,31 @@ class INode:
     def get_answer_list(self) -> List[Answer] | None:
         if self.answer_text is None:
             return None
-        reasoning_content_enable = self.context.get('model_setting', {}).get('reasoning_content_enable', False)
+        reasoning_content_enable = self.context.get("model_setting", {}).get("reasoning_content_enable", False)
         return [
-            Answer(self.answer_text, self.view_type, self.runtime_node_id, self.workflow_params.get('chat_record_id'),
-                   {},
-                   self.runtime_node_id, self.context.get('reasoning_content', '') if reasoning_content_enable else '')]
+            Answer(
+                self.answer_text,
+                self.view_type,
+                self.runtime_node_id,
+                self.workflow_params.get("chat_record_id"),
+                {},
+                self.runtime_node_id,
+                self.context.get("reasoning_content", "") if reasoning_content_enable else "",
+            )
+        ]
 
-    def __init__(self, node, workflow_params, workflow_manage, up_node_id_list=None,
-                 get_node_params=lambda node: node.properties.get('node_data'), salt=None):
+    def __init__(
+        self,
+        node,
+        workflow_params,
+        workflow_manage,
+        up_node_id_list=None,
+        get_node_params=lambda node: node.properties.get("node_data"),
+        salt=None,
+    ):
         # 当前步骤上下文,用于存储当前步骤信息
         self.status = 200
-        self.err_message = ''
+        self.err_message = ""
         self.node = node
         self.node_params = get_node_params(node)
         self.workflow_params = workflow_params
@@ -304,11 +430,10 @@ class INode:
             up_node_id_list = []
         self.up_node_id_list = up_node_id_list
         self.node_chunk = NodeChunk()
-        self.runtime_node_id = sha1(uuid.NAMESPACE_DNS.bytes + bytes(str(uuid.uuid5(uuid.NAMESPACE_DNS,
-                                                                                    "".join([*sorted(up_node_id_list),
-                                                                                             node.id]))),
-                                                                     "utf-8")).hexdigest() + (
-                                   "__" + str(salt) if salt is not None else '')
+        self.runtime_node_id = sha1(
+            uuid.NAMESPACE_DNS.bytes
+            + bytes(str(uuid.uuid5(uuid.NAMESPACE_DNS, "".join([*sorted(up_node_id_list), node.id]))), "utf-8")
+        ).hexdigest() + ("__" + str(salt) if salt is not None else "")
         self.extra = {}
 
     def valid_args(self, node_params, flow_params):
@@ -320,8 +445,8 @@ class INode:
         if node_params_serializer_class is not None:
             self.node_params_serializer = node_params_serializer_class(data=node_params)
             self.node_params_serializer.is_valid(raise_exception=True)
-        if self.node.properties.get('status', 200) != 200:
-            raise ValidationError(ErrorDetail(f'节点{self.node.properties.get("stepName")} 不可用'))
+        if self.node.properties.get("status", 200) != 200:
+            raise ValidationError(ErrorDetail(f"节点{self.node.properties.get('stepName')} 不可用"))
 
     def get_reference_field(self, fields: List[str]):
         return self.get_field(self.context, fields)
@@ -348,7 +473,7 @@ class INode:
         self.answer_text = str(e)
         self.err_message = str(e)
         current_time = time.time()
-        self.context['run_time'] = current_time - (self.context.get('start_time') or current_time)
+        self.context["run_time"] = current_time - (self.context.get("start_time") or current_time)
 
         def write_error_context(answer, status=200):
             pass
@@ -360,9 +485,9 @@ class INode:
         :return: 执行结果
         """
         start_time = time.time()
-        self.context['start_time'] = start_time
+        self.context["start_time"] = start_time
         result = self._run()
-        self.context['run_time'] = time.time() - start_time
+        self.context["run_time"] = time.time() - start_time
         return result
 
     def _run(self):

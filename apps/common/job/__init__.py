@@ -1,14 +1,16 @@
 # coding=utf-8
 """
-    @project: maxkb
-    @Author：虎
-    @file： __init__.py
-    @date：2024/3/14 11:54
-    @desc:
+@project: maxkb
+@Author：虎
+@file： __init__.py
+@date：2024/3/14 11:54
+@desc:
 """
+
 from .clean_chat_job import *
 from .clean_debug_file_job import *
 from .client_access_num_job import *
+from knowledge.services.knowledge_sync_schedule import restore_knowledge_sync_jobs
 
 
 def run():
@@ -16,3 +18,4 @@ def run():
     clean_chat_job.run()
     clean_debug_file_job.run()
     client_access_num_job.run()
+    restore_knowledge_sync_jobs()

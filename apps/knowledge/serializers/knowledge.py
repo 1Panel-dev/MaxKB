@@ -4,16 +4,16 @@ import os
 import pickle
 import re
 import tempfile
-import traceback
 import zipfile
 from collections import defaultdict
-from functools import reduce
+from functools import partial, reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
 from urllib.parse import quote
 
 import requests
 import uuid_utils.compat as uuid
+import openpyxl
 from celery_once import AlreadyQueued
 from common.chunk import text_to_chunk
 from common.config.embedding_config import VectorStore
@@ -24,10 +24,7 @@ from common.event.listener_manage import ListenerManagement
 from common.exception.app_exception import AppApiException
 from common.field.common import UploadedFileField
 from common.utils.common import bulk_create_in_batches, get_file_content, parse_image, post
-from common.utils.fork import ChildLink, Fork
 from common.utils.logger import maxkb_logger
-from common.utils.split_model import get_split_model
-from django.core import validators
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import models, transaction
 from django.db.models import QuerySet
@@ -38,6 +35,7 @@ from django.utils.translation import gettext_lazy as _, gettext
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
 from models_provider.models import Model
+from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
 from rest_framework import serializers
 from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
@@ -53,16 +51,25 @@ from knowledge.models import (
     Knowledge,
     KnowledgeFolder,
     KnowledgeScope,
+    KnowledgeSyncTrigger,
     KnowledgeType,
     KnowledgeWorkflow,
     Paragraph,
     Problem,
     ProblemParagraphMapping,
     SearchMode,
+    SourceType,
     State,
     Tag,
     TaskType,
     Termbase,
+)
+from knowledge.services.document_strategy import normalize_document_strategy
+from knowledge.services.knowledge_sync_schedule import remove_knowledge_sync_job
+from knowledge.services.multimodal_retrieval import (
+    MAX_QUERY_IMAGE_COUNT,
+    get_hit_asset_map,
+    load_image_query_inputs,
 )
 from knowledge.serializers.common import (
     BatchMoveSerializer,
@@ -80,28 +87,18 @@ from knowledge.serializers.common import (
     zip_dir,
 )
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.document_strategy import DocumentStrategySerializer, WebSourceURLField
+from knowledge.serializers.knowledge_model import KnowledgeModelSerializer
+from knowledge.serializers.knowledge_workflow import (
+    KBWFInstance,
+    KnowledgeWorkflowModelSerializer,
+    KnowledgeWorkflowSerializer,
+)
 from knowledge.task.embedding import delete_embedding_by_knowledge, embedding_by_knowledge
 from knowledge.task.generate import generate_related_by_knowledge_id
 from knowledge.task.sync import sync_replace_web_knowledge, sync_web_knowledge
-
-
-class KnowledgeModelSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Knowledge
-        fields = [
-            "id",
-            "name",
-            "desc",
-            "meta",
-            "folder_id",
-            "type",
-            "workspace_id",
-            "create_time",
-            "update_time",
-            "file_size_limit",
-            "file_count_limit",
-            "embedding_model_id",
-        ]
+from application.flow.tools import get_tool_id_list
+from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
 
 
 class KnowledgeBaseCreateRequest(serializers.Serializer):
@@ -120,8 +117,14 @@ class KnowledgeWebCreateRequest(serializers.Serializer):
     folder_id = serializers.CharField(required=True, label=_("folder id"))
     desc = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("knowledge description"))
     embedding_model_id = serializers.CharField(required=True, label=_("knowledge embedding"))
-    source_url = serializers.CharField(required=True, label=_("source url"))
+    source_url = WebSourceURLField(required=True, max_length=2048, label=_("source url"))
     selector = serializers.CharField(required=False, label=_("knowledge selector"), allow_null=True, allow_blank=True)
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
+
+    def validate(self, attrs):
+        attrs["selector"] = (attrs.get("selector") or "body").strip() or "body"
+        attrs["doc_strategy"] = normalize_document_strategy(attrs.get("doc_strategy"))
+        return attrs
 
 
 class KnowledgeEditRequest(serializers.Serializer):
@@ -135,6 +138,7 @@ class KnowledgeEditRequest(serializers.Serializer):
     )
     file_size_limit = serializers.IntegerField(required=False, label=_("file size limit"))
     file_count_limit = serializers.IntegerField(required=False, label=_("file count limit"))
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
     @staticmethod
     def get_knowledge_meta_valid_map():
@@ -146,27 +150,53 @@ class KnowledgeEditRequest(serializers.Serializer):
 
     def is_valid(self, *, knowledge: Knowledge = None):
         super().is_valid(raise_exception=True)
+        if "doc_strategy" in self.data and knowledge.type != KnowledgeType.WEB:
+            raise serializers.ValidationError(
+                {"doc_strategy": _("Document strategy settings only support Web knowledge")}
+            )
         if "meta" in self.data and self.data.get("meta") is not None:
             knowledge_meta_valid_map = self.get_knowledge_meta_valid_map()
             valid_class = knowledge_meta_valid_map.get(knowledge.type)
-            valid_class(data=self.data.get("meta")).is_valid(raise_exception=True)
+            meta_serializer = valid_class(data=self.data.get("meta"))
+            meta_serializer.is_valid(raise_exception=True)
+            self._validated_data["meta"] = meta_serializer.validated_data
+
+
+class HitTestImageSerializer(serializers.Serializer):
+    file_id = serializers.UUIDField(required=True, label=_("file id"))
+    name = serializers.CharField(required=False, allow_blank=True, label=_("file name"))
+    url = serializers.CharField(required=False, allow_blank=True, label=_("file url"))
 
 
 class HitTestSerializer(serializers.Serializer):
-    query_text = serializers.CharField(required=True, label=_("query text"))
+    query_text = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        default="",
+        label=_("query text"),
+    )
+    image_list = serializers.ListSerializer(
+        child=HitTestImageSerializer(),
+        required=False,
+        default=list,
+        max_length=MAX_QUERY_IMAGE_COUNT,
+        label=_("query image list"),
+    )
     top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
     similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_("similarity"))
-    search_mode = serializers.CharField(
-        required=True,
-        label=_("search mode"),
-        validators=[
-            validators.RegexValidator(
-                regex=re.compile("^embedding|keywords|blend$"),
-                message=_("The type only supports embedding|keywords|blend"),
-                code=500,
+    search_mode = serializers.ChoiceField(required=True, choices=SearchMode.choices, label=_("search mode"))
+
+    def validate(self, attrs):
+        attrs["query_text"] = (attrs.get("query_text") or "").strip()
+        image_list = attrs.get("image_list") or []
+        if not attrs["query_text"] and not image_list:
+            raise serializers.ValidationError(_("Query text and query images cannot both be empty"))
+        if image_list and attrs.get("search_mode") == SearchMode.keywords.value:
+            raise serializers.ValidationError(
+                {"search_mode": _("Image queries only support embedding or blend search")}
             )
-        ],
-    )
+        return attrs
 
 
 class KnowledgeSerializer(serializers.Serializer):
@@ -353,7 +383,7 @@ class KnowledgeSerializer(serializers.Serializer):
             embedding_model_id = get_embedding_model_id_by_knowledge_id(self.data.get("knowledge_id"))
             try:
                 embedding_by_knowledge.delay(knowledge_id, embedding_model_id)
-            except AlreadyQueued as e:
+            except AlreadyQueued:
                 raise AppApiException(500, _("Failed to send the vectorization task, please try again later!"))
 
         def generate_related(self, instance: Dict, with_valid=True):
@@ -382,7 +412,7 @@ class KnowledgeSerializer(serializers.Serializer):
             ListenerManagement.get_aggregation_document_status_by_knowledge_id(knowledge_id)()
             try:
                 generate_related_by_knowledge_id.delay(knowledge_id, model_id, model_params_setting, prompt, state_list)
-            except AlreadyQueued as e:
+            except AlreadyQueued:
                 raise AppApiException(500, _("Failed to send the vectorization task, please try again later!"))
 
         def list_application(self, with_valid=True):
@@ -444,17 +474,21 @@ class KnowledgeSerializer(serializers.Serializer):
             workflow = {}
 
             if knowledge_dict.get("type") == 4:
-                from knowledge.models import KnowledgeWorkflow
-
                 k = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_dict.get("id")).first()
                 if k:
                     workflow["work_flow"] = k.work_flow
                     workflow["is_publish"] = k.is_publish
                     workflow["publish_time"] = k.publish_time
+            meta = json.loads(knowledge_dict.get("meta", "{}"))
             return {
                 **knowledge_dict,
                 **workflow,
-                "meta": json.loads(knowledge_dict.get("meta", "{}")),
+                "meta": meta,
+                "doc_strategy": (
+                    normalize_document_strategy(meta.get("doc_strategy"))
+                    if knowledge_dict.get("type") == KnowledgeType.WEB
+                    else None
+                ),
                 "application_id_list": list(
                     filter(
                         lambda application_id: all_application_list.__contains__(application_id),
@@ -474,7 +508,9 @@ class KnowledgeSerializer(serializers.Serializer):
         def edit(self, instance: Dict, select_one=True):
             self.is_valid()
             knowledge = QuerySet(Knowledge).get(id=self.data.get("knowledge_id"))
-            KnowledgeEditRequest(data=instance).is_valid(knowledge=knowledge)
+            request_serializer = KnowledgeEditRequest(data=instance)
+            request_serializer.is_valid(knowledge=knowledge)
+            validated_data = request_serializer.validated_data
             if "embedding_model_id" in instance:
                 knowledge.embedding_model_id = instance.get("embedding_model_id")
             if "name" in instance:
@@ -482,7 +518,12 @@ class KnowledgeSerializer(serializers.Serializer):
             if "desc" in instance:
                 knowledge.desc = instance.get("desc")
             if "meta" in instance:
-                knowledge.meta = instance.get("meta")
+                knowledge.meta = validated_data.get("meta")
+            if "doc_strategy" in instance:
+                knowledge.meta = {
+                    **(knowledge.meta or {}),
+                    "doc_strategy": normalize_document_strategy(validated_data.get("doc_strategy")),
+                }
             if "folder_id" in instance:
                 knowledge.folder_id = instance.get("folder_id")
             if "file_size_limit" in instance:
@@ -506,6 +547,7 @@ class KnowledgeSerializer(serializers.Serializer):
             QuerySet(WorkspaceUserResourcePermission).filter(target=knowledge.id).delete()
             drop_knowledge_index(knowledge_id=knowledge.id)
             knowledge.delete()
+            transaction.on_commit(partial(remove_knowledge_sync_job, str(self.data.get("knowledge_id"))))
             QuerySet(File).filter(source_id=self.data.get("knowledge_id")).delete()
             QuerySet(File).filter(
                 source_id__in=[str(i) for i in document_query_set.values_list("id", flat=True)]
@@ -704,15 +746,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 if knowledge.type == KnowledgeType.WORKFLOW:
                     knowledge_workflow = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_id).first()
                     if knowledge_workflow:
-                        from application.flow.tools import get_tool_id_list
-                        from tools.models import Tool, ToolScope, ToolType, ToolWorkflow
-
-                        from knowledge.serializers.knowledge_workflow import (
-                            KBWFInstance,
-                            KnowledgeWorkflowModelSerializer,
-                            KnowledgeWorkflowSerializer,
-                        )
-
                         tool_id_list = get_tool_id_list(knowledge_workflow.work_flow, True)
                         tool_list = []
                         if len(tool_id_list) > 0:
@@ -742,9 +775,6 @@ class KnowledgeSerializer(serializers.Serializer):
         def _get_knowledge_workbook(
             data_dict: dict, document_dict: dict, doc_tag_map: dict, doc_obj_map: dict, paragraph_active_map: dict
         ):
-            import openpyxl
-            from openpyxl.cell.cell import ILLEGAL_CHARACTERS_RE
-
             workbook = openpyxl.Workbook()
             workbook.remove(workbook.active)
             if len(data_dict.keys()) == 0:
@@ -955,8 +985,6 @@ class KnowledgeSerializer(serializers.Serializer):
                     old_to_new_file_map[old_id] = str(new_file.id)
 
             # knowledge.xlsx -> doc + para + problem
-            import openpyxl
-
             xlsx_bytes = io.BytesIO(zf.read("knowledge.xlsx"))
             workbook = openpyxl.load_workbook(xlsx_bytes)
 
@@ -1108,8 +1136,6 @@ class KnowledgeSerializer(serializers.Serializer):
                 # 工作流导入
             if "workflow.kbwf" in namelist:
                 workflow_bytes = zf.read("workflow.kbwf")
-                from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowSerializer
-
                 workflow_file = SimpleUploadedFile("workflow.kbwf", workflow_bytes)
                 KnowledgeWorkflowSerializer.Import(
                     data={"knowledge_id": str(knowledge_id), "user_id": user_id, "workspace_id": workspace_id}
@@ -1211,11 +1237,21 @@ class KnowledgeSerializer(serializers.Serializer):
             }, knowledge_id
 
         def save_web(self, instance: Dict, with_valid=True):
+            request_serializer = KnowledgeWebCreateRequest(data=instance)
             if with_valid:
                 self.is_valid(raise_exception=True)
-                KnowledgeWebCreateRequest(data=instance).is_valid(raise_exception=True)
+                request_serializer.is_valid(raise_exception=True)
+                instance = request_serializer.validated_data
+            else:
+                instance = {
+                    **instance,
+                    "selector": (instance.get("selector") or "body").strip() or "body",
+                    "doc_strategy": normalize_document_strategy(instance.get("doc_strategy")),
+                }
 
             folder_id = instance.get("folder_id", self.data.get("workspace_id"))
+            selector = instance.get("selector")
+            doc_strategy = instance.get("doc_strategy")
 
             knowledge_id = uuid.uuid7()
             knowledge = Knowledge(
@@ -1230,8 +1266,9 @@ class KnowledgeSerializer(serializers.Serializer):
                 embedding_model_id=instance.get("embedding_model_id"),
                 meta={
                     "source_url": instance.get("source_url"),
-                    "selector": instance.get("selector", "body"),
+                    "selector": selector,
                     "embedding_model_id": instance.get("embedding_model_id"),
+                    "doc_strategy": doc_strategy,
                 },
             )
             knowledge.save()
@@ -1245,7 +1282,7 @@ class KnowledgeSerializer(serializers.Serializer):
             ).auth_resource(str(knowledge_id))
 
             sync_web_knowledge.delay(
-                str(knowledge_id), self.data.get("user_id"), instance.get("source_url"), instance.get("selector")
+                str(knowledge_id), self.data.get("user_id"), instance.get("source_url"), selector, doc_strategy
             )
             update_resource_mapping_by_knowledge(str(knowledge_id))
             return {**KnowledgeModelSerializer(knowledge).data, "document_list": []}
@@ -1254,16 +1291,10 @@ class KnowledgeSerializer(serializers.Serializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.CharField(required=True, label=_("knowledge id"))
         user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
-        sync_type = serializers.CharField(
+        sync_type = serializers.ChoiceField(
             required=True,
             label=_("sync type"),
-            validators=[
-                validators.RegexValidator(
-                    regex=re.compile("^replace|complete$"),
-                    message=_("The synchronization type only supports:replace|complete"),
-                    code=500,
-                )
-            ],
+            choices=["incremental", "replace", "complete"],
         )
 
         def is_valid(self, *, raise_exception=False):
@@ -1283,135 +1314,106 @@ class KnowledgeSerializer(serializers.Serializer):
         def sync(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            sync_type = self.data.get("sync_type")
-            knowledge_id = self.data.get("knowledge_id")
+            payload = self.validated_data if with_valid else self.initial_data
+            sync_type = payload.get("sync_type")
+            knowledge_id = payload.get("knowledge_id")
             knowledge = QuerySet(Knowledge).get(id=knowledge_id)
             self.__getattribute__(sync_type + "_sync")(knowledge)
             return True
 
-        @staticmethod
-        def get_sync_handler(knowledge):
-            def handler(child_link: ChildLink, response: Fork.Response):
-                if response.status == 200:
-                    try:
-                        document_name = (
-                            child_link.tag.text
-                            if child_link.tag is not None and len(child_link.tag.text.strip()) > 0
-                            else child_link.url
-                        )
-                        paragraphs = get_split_model("web.md").parse(response.content)
-                        maxkb_logger.info(child_link.url.strip())
-                        first = (
-                            QuerySet(Document)
-                            .filter(meta__source_url=child_link.url.strip(), knowledge=knowledge)
-                            .first()
-                        )
-                        if first is not None:
-                            # 如果存在,使用文档同步
-                            DocumentSerializers.Sync(data={"document_id": first.id}).sync()
-                        else:
-                            # 插入
-                            DocumentSerializers.Create(data={"knowledge_id": knowledge.id}).save(
-                                {
-                                    "name": document_name,
-                                    "paragraphs": paragraphs,
-                                    "meta": {
-                                        "source_url": child_link.url.strip(),
-                                        "selector": knowledge.meta.get("selector"),
-                                    },
-                                    "type": KnowledgeType.WEB,
-                                },
-                                with_valid=True,
-                            )
-                    except Exception as e:
-                        maxkb_logger.error(f"{str(e)}:{traceback.format_exc()}")
+        def _enqueue_sync(self, knowledge, sync_type):
+            meta = knowledge.meta or {}
+            url = meta.get("source_url")
+            selector = meta.get("selector")
+            doc_strategy = normalize_document_strategy((knowledge.meta or {}).get("doc_strategy"))
+            user_id = self.initial_data.get("user_id")
+            sync_replace_web_knowledge.delay(
+                str(knowledge.id),
+                user_id,
+                url,
+                selector,
+                doc_strategy,
+                sync_type,
+                record_log=True,
+                trigger_type=KnowledgeSyncTrigger.MANUAL,
+            )
 
-            return handler
+        def incremental_sync(self, knowledge):
+            self._enqueue_sync(knowledge, "incremental")
 
         def replace_sync(self, knowledge):
-            """
-            替换同步
-            :return:
-            """
-            url = knowledge.meta.get("source_url")
-            selector = knowledge.meta.get("selector") if "selector" in knowledge.meta else None
-            user_id = self.data.get("user_id")
-            sync_replace_web_knowledge.delay(str(knowledge.id), user_id, url, selector)
+            self._enqueue_sync(knowledge, "replace")
 
         def complete_sync(self, knowledge):
-            """
-            完整同步  删掉当前数据集下所有的文档,再进行同步
-            :return:
-            """
-            # 删除关联问题
-            QuerySet(ProblemParagraphMapping).filter(knowledge=knowledge).delete()
-            # 删除文档
-            QuerySet(Document).filter(knowledge=knowledge).delete()
-            # 删除段落
-            QuerySet(Paragraph).filter(knowledge=knowledge).delete()
-            # 删除向量
-            delete_embedding_by_knowledge(self.data.get("knowledge_id"))
-            # 同步
-            self.replace_sync(knowledge)
+            self._enqueue_sync(knowledge, "complete")
 
-    class HitTest(serializers.Serializer):
+    class HitTest(HitTestSerializer):
         workspace_id = serializers.CharField(required=True, label=_("workspace id"))
         knowledge_id = serializers.UUIDField(required=True, label=_("id"))
         user_id = serializers.UUIDField(required=False, label=_("user id"))
-        query_text = serializers.CharField(required=True, label=_("query text"))
-        top_number = serializers.IntegerField(required=True, max_value=10000, min_value=1, label=_("top number"))
-        similarity = serializers.FloatField(required=True, max_value=2, min_value=0, label=_("similarity"))
-        search_mode = serializers.CharField(
-            required=True,
-            label=_("search mode"),
-            validators=[
-                validators.RegexValidator(
-                    regex=re.compile("^embedding|keywords|blend$"),
-                    message=_("The type only supports embedding|keywords|blend"),
-                    code=500,
-                )
-            ],
-        )
 
-        def is_valid(self, *, raise_exception=True):
-            super().is_valid(raise_exception=True)
-            workspace_id = self.data.get("workspace_id")
-            query_set = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id"))
+        def validate(self, attrs):
+            attrs = super().validate(attrs)
+            workspace_id = attrs.get("workspace_id")
+            query_set = QuerySet(Knowledge).filter(id=attrs.get("knowledge_id"))
             if workspace_id:
                 query_set = query_set.filter(workspace_id=workspace_id)
             if not query_set.exists():
                 raise AppApiException(500, _("Knowledge id does not exist"))
-            if not QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).exists():
-                raise AppApiException(300, _("id does not exist"))
+            return attrs
 
         def hit_test(self):
-            self.is_valid()
+            self.is_valid(raise_exception=True)
+            data = self.validated_data
             vector = VectorStore.get_embedding_vector()
             exclude_document_id_list = [
                 str(document.id)
-                for document in QuerySet(Document).filter(knowledge_id=self.data.get("knowledge_id"), is_active=False)
+                for document in QuerySet(Document).filter(knowledge_id=data.get("knowledge_id"), is_active=False)
             ]
-            model = get_embedding_model_by_knowledge_id(self.data.get("knowledge_id"))
+            model = get_embedding_model_by_knowledge_id(data.get("knowledge_id"))
+            image_items = data.get("image_list") or []
+            if image_items and not model.supports_image_embedding():
+                raise AppApiException(500, _("The current embedding model does not support image embedding"))
+            image_inputs = load_image_query_inputs(image_items, data.get("user_id"))
             # 向量库检索
             hit_list = vector.hit_test(
-                self.data.get("query_text"),
-                [self.data.get("knowledge_id")],
+                data.get("query_text"),
+                [data.get("knowledge_id")],
                 exclude_document_id_list,
-                self.data.get("top_number"),
-                self.data.get("similarity"),
-                SearchMode(self.data.get("search_mode")),
+                data.get("top_number"),
+                data.get("similarity"),
+                SearchMode(data.get("search_mode")),
                 model,
+                image_inputs,
             )
-            hit_dict = reduce(lambda x, y: {**x, **y}, [{hit.get("paragraph_id"): hit} for hit in hit_list], {})
-            p_list = list_paragraph([h.get("paragraph_id") for h in hit_list])
-            return [
-                {
-                    **p,
-                    "similarity": hit_dict.get(p.get("id")).get("similarity"),
-                    "comprehensive_score": hit_dict.get(p.get("id")).get("comprehensive_score"),
-                }
-                for p in p_list
-            ]
+            paragraph_dict = {
+                str(paragraph.get("id")): paragraph
+                for paragraph in list_paragraph([hit.get("paragraph_id") for hit in hit_list])
+            }
+            hit_asset_map = get_hit_asset_map(hit_list)
+            result_list = []
+            for hit in hit_list:
+                paragraph = paragraph_dict.get(str(hit.get("paragraph_id")))
+                if paragraph is None:
+                    continue
+                current_hit = hit
+                source_id = current_hit.get("source_id")
+                source_type = current_hit.get("source_type")
+                is_image_hit = str(source_type) == str(SourceType.IMAGE.value)
+                result_list.append(
+                    {
+                        **paragraph,
+                        "similarity": current_hit.get("similarity"),
+                        "comprehensive_score": current_hit.get("comprehensive_score"),
+                        "source_id": source_id,
+                        "source_type": source_type,
+                        "hit_unit_type": "image" if is_image_hit else "text",
+                        "query_unit_type": current_hit.get("query_unit_type"),
+                        "query_unit_index": current_hit.get("query_unit_index"),
+                        "hit_asset": hit_asset_map.get(str(source_id)) if is_image_hit else None,
+                    }
+                )
+            return result_list
 
     class StoreKnowledge(serializers.Serializer):
         user_id = serializers.UUIDField(required=True, label=_("User ID"))

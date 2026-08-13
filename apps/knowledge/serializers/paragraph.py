@@ -15,15 +15,18 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from knowledge.models import (
+    ContentOrigin,
     Document,
     Knowledge,
     Paragraph,
+    LocalState,
     Problem,
     ProblemParagraphMapping,
     SourceType,
     State,
     TaskType,
 )
+from knowledge.services.document_strategy import stable_hash
 from knowledge.serializers.common import (
     BatchSerializer,
     ProblemParagraphManage,
@@ -56,9 +59,44 @@ class NullCharacterStrippedCharField(serializers.CharField):
 
 
 class ParagraphSerializer(serializers.ModelSerializer):
+    assets = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_assets(obj):
+        return list(
+            obj.assets.order_by("position").values(
+                "id",
+                "file_id",
+                "position",
+                "caption",
+                "ocr_text",
+                "description",
+                "process_status",
+                "process_error",
+                "sync_state",
+            )
+        )
+
     class Meta:
         model = Paragraph
-        fields = ["id", "content", "is_active", "document_id", "title", "create_time", "update_time", "position"]
+        fields = [
+            "id",
+            "content",
+            "is_active",
+            "document_id",
+            "title",
+            "create_time",
+            "update_time",
+            "position",
+            "hit_num",
+            "last_hit_time",
+            "content_schema",
+            "assets",
+            "origin",
+            "local_state",
+            "sync_state",
+        ]
+        read_only_fields = ["hit_num", "last_hit_time"]
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
@@ -254,6 +292,9 @@ class ParagraphSerializers(serializers.Serializer):
             if instance.get("content") is not None:
                 _paragraph.chunks = text_to_chunk(instance.get("content", ""))
 
+            if _paragraph.origin == ContentOrigin.SYNCED and any(key in instance for key in ["title", "content"]):
+                _paragraph.local_state = LocalState.MODIFIED
+
             if "problem_list" in instance:
                 update_problem_list = list(
                     filter(lambda row: "id" in row and row.get("id") is not None, instance.get("problem_list"))
@@ -336,8 +377,14 @@ class ParagraphSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
             paragraph_id = self.data.get("paragraph_id")
-            Paragraph.objects.filter(id=paragraph_id).delete()
-            delete_problems_and_mappings([paragraph_id])
+            paragraph = Paragraph.objects.filter(id=paragraph_id).first()
+            if paragraph and paragraph.origin == ContentOrigin.SYNCED:
+                paragraph.local_state = LocalState.DELETED
+                paragraph.is_active = False
+                paragraph.save(update_fields=["local_state", "is_active", "update_time"])
+            else:
+                Paragraph.objects.filter(id=paragraph_id).delete()
+                delete_problems_and_mappings([paragraph_id])
 
             update_document_char_length(self.data.get("document_id"))
             delete_embedding_by_paragraph(paragraph_id)
@@ -417,13 +464,25 @@ class ParagraphSerializers(serializers.Serializer):
 
         @staticmethod
         def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
+            origin = instance.get("origin", ContentOrigin.MANUAL)
+            title = instance.get("title") if "title" in instance else ""
+            content = instance.get("content") or ""
+            source_key = instance.get("source_key", "")
+            source_hash = instance.get("source_hash") or (
+                stable_hash({"title": title or "", "content": content}) if origin == ContentOrigin.SYNCED else ""
+            )
             paragraph = Paragraph(
                 id=uuid.uuid7(),
                 document_id=document_id,
-                content=instance.get("content"),
+                content=content,
                 knowledge_id=knowledge_id,
-                title=instance.get("title") if "title" in instance else "",
-                chunks=text_to_chunk(instance.get("content", "")),
+                title=title,
+                chunks=text_to_chunk(content, instance.get("child_length", 256)),
+                origin=origin,
+                source_key=source_key,
+                source_hash=source_hash,
+                source_snapshot=instance.get("source_snapshot")
+                or ({"title": title or "", "content": content} if origin == ContentOrigin.SYNCED else {}),
             )
             problem_paragraph_object_list = [
                 ProblemParagraphObject(knowledge_id, document_id, str(paragraph.id), problem.get("content"))
@@ -576,8 +635,15 @@ class ParagraphSerializers(serializers.Serializer):
                 BatchSerializer(data=instance).is_valid(model=Paragraph, raise_exception=True)
                 self.is_valid(raise_exception=True)
             paragraph_id_list = instance.get("id_list")
-            QuerySet(Paragraph).filter(id__in=paragraph_id_list).delete()
-            delete_problems_and_mappings(paragraph_id_list)
+            synced_ids = list(
+                QuerySet(Paragraph)
+                .filter(id__in=paragraph_id_list, origin=ContentOrigin.SYNCED)
+                .values_list("id", flat=True)
+            )
+            manual_ids = [paragraph_id for paragraph_id in paragraph_id_list if paragraph_id not in synced_ids]
+            QuerySet(Paragraph).filter(id__in=synced_ids).update(local_state=LocalState.DELETED, is_active=False)
+            QuerySet(Paragraph).filter(id__in=manual_ids).delete()
+            delete_problems_and_mappings(manual_ids)
             update_document_char_length(self.data.get("document_id"))
             # 删除向量库
             delete_embedding_by_paragraph_ids(paragraph_id_list)
@@ -812,7 +878,7 @@ class ParagraphSerializers(serializers.Serializer):
             paragraph = Paragraph.objects.get(
                 id=self.data.get("paragraph_id"),
                 knowledge_id=self.data.get("knowledge_id"),
-                document_id=self.data.get("document_id")
+                document_id=self.data.get("document_id"),
             )
             old_position = paragraph.position
 
@@ -829,6 +895,29 @@ class ParagraphSerializers(serializers.Serializer):
 
             # 更新当前段落的顺序
             paragraph.position = new_position
+            if paragraph.origin == ContentOrigin.MANUAL:
+                previous = (
+                    Paragraph.objects.filter(
+                        document_id=paragraph.document_id,
+                        origin=ContentOrigin.SYNCED,
+                        is_active=True,
+                        position__lt=new_position,
+                    )
+                    .order_by("-position")
+                    .first()
+                )
+                following = (
+                    Paragraph.objects.filter(
+                        document_id=paragraph.document_id,
+                        origin=ContentOrigin.SYNCED,
+                        is_active=True,
+                        position__gt=new_position,
+                    )
+                    .order_by("position")
+                    .first()
+                )
+                paragraph.anchor_paragraph = previous or following
+                paragraph.placement = "after" if previous else "before"
             paragraph.save()
 
 

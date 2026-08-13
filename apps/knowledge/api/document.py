@@ -4,9 +4,22 @@ from drf_spectacular.utils import OpenApiParameter
 from common.mixins.api_mixin import APIMixin
 from common.result import DefaultResultSerializer
 from knowledge.serializers.common import BatchSerializer
-from knowledge.serializers.document import DocumentInstanceSerializer, DocumentWebInstanceSerializer, \
-    CancelInstanceSerializer, BatchCancelInstanceSerializer, DocumentRefreshSerializer, BatchEditHitHandlingSerializer, \
-    DocumentBatchRefreshSerializer, DocumentBatchGenerateRelatedSerializer, DocumentMigrateSerializer
+from knowledge.serializers.document import (
+    DocumentInstanceSerializer,
+    DocumentWebInstanceSerializer,
+    CancelInstanceSerializer,
+    BatchCancelInstanceSerializer,
+    DocumentRefreshSerializer,
+    BatchEditHitHandlingSerializer,
+    DocumentBatchRefreshSerializer,
+    DocumentBatchGenerateRelatedSerializer,
+    DocumentMigrateSerializer,
+)
+from knowledge.serializers.document_strategy import DocumentSyncStrategySerializer
+from knowledge.serializers.image_document import (
+    ImagePreviewBatchCreateRequest,
+    ImagePreviewUpdateRequest,
+)
 
 
 class DocumentSplitAPI(APIMixin):
@@ -17,7 +30,7 @@ class DocumentSplitAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -25,28 +38,83 @@ class DocumentSplitAPI(APIMixin):
     @staticmethod
     def get_request():
         return {
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'file': {
-                        'type': 'string',
-                        'format': 'binary'  # Tells Swagger it's a file
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",  # Tells Swagger it's a file
                     },
-                    'limit': {
-                        'type': 'integer',
-                        'description': '分段长度'
-                    },
-                    'patterns': {
-                        'type': 'string',
-                        'description': '分段正则列表'
-                    },
-                    'with_filter': {
-                        'type': 'boolean',
-                        'description': '是否清除特殊字符'
-                    }
-                }
+                    "limit": {"type": "integer", "description": "分段长度"},
+                    "patterns": {"type": "string", "description": "分段正则列表"},
+                    "with_filter": {"type": "boolean", "description": "是否清除特殊字符"},
+                },
             }
         }
+
+
+class ImagePreviewAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return DocumentBatchAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return {
+            "multipart/form-data": {
+                "type": "object",
+                "required": ["file"],
+                "properties": {
+                    "file": {
+                        "type": "array",
+                        "items": {"type": "string", "format": "binary"},
+                        "description": "jpg/jpeg/png/webp/bmp, at most 50 files",
+                    },
+                    "doc_strategy": {"type": "object", "description": "document processing strategy"},
+                },
+            }
+        }
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class ImagePreviewOperateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return [
+            *DocumentBatchAPI.get_parameters(),
+            OpenApiParameter(
+                name="preview_id",
+                description="图片预览id",
+                type=OpenApiTypes.UUID,
+                location="path",
+                required=True,
+            ),
+        ]
+
+    @staticmethod
+    def get_request():
+        return ImagePreviewUpdateRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
+
+
+class ImageBatchCreateAPI(APIMixin):
+    @staticmethod
+    def get_parameters():
+        return DocumentBatchAPI.get_parameters()
+
+    @staticmethod
+    def get_request():
+        return ImagePreviewBatchCreateRequest
+
+    @staticmethod
+    def get_response():
+        return DefaultResultSerializer
 
 
 class DocumentBatchAPI(APIMixin):
@@ -57,14 +125,14 @@ class DocumentBatchAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -86,14 +154,14 @@ class DocumentBatchCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -115,14 +183,14 @@ class DocumentCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -144,21 +212,21 @@ class DocumentReadAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="document_id",
                 description="文档id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -186,30 +254,29 @@ class TableDocumentCreateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
-
         ]
 
     @staticmethod
     def get_request():
         return {
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'file': {
-                        'type': 'string',
-                        'format': 'binary'  # Tells Swagger it's a file
+            "multipart/form-data": {
+                "type": "object",
+                "properties": {
+                    "file": {
+                        "type": "string",
+                        "format": "binary",  # Tells Swagger it's a file
                     }
-                }
+                },
             }
         }
 
@@ -241,7 +308,9 @@ class BatchCancelTaskAPI(DocumentReadAPI):
 
 
 class SyncWebAPI(DocumentReadAPI):
-    pass
+    @staticmethod
+    def get_request():
+        return DocumentSyncStrategySerializer
 
 
 class RefreshAPI(DocumentReadAPI):
@@ -258,14 +327,14 @@ class BatchEditHitHandlingAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -283,42 +352,49 @@ class DocumentTreeReadAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="folder_id",
                 description="文件夹id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="user_id",
                 description="用户id",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="name",
                 description="名称",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=False,
             ),
             OpenApiParameter(
                 name="desc",
                 description="描述",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
+                required=False,
+            ),
+            OpenApiParameter(
+                name="resource_type",
+                description="资源类型: document|image",
+                type=OpenApiTypes.STR,
+                location="query",
                 required=False,
             ),
         ]
@@ -332,14 +408,14 @@ class DocumentSplitPatternAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -357,14 +433,14 @@ class BatchRefreshAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -382,14 +458,14 @@ class BatchGenerateRelatedAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -407,21 +483,21 @@ class TemplateExportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="type",
                 description="Export template type csv|excel",
                 type=OpenApiTypes.STR,
-                location='query',
+                location="query",
                 required=True,
             ),
         ]
@@ -439,21 +515,21 @@ class DocumentExportAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="document_id",
                 description="文档id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -471,21 +547,21 @@ class DocumentMigrateAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="target_knowledge_id",
                 description="目标知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -503,21 +579,21 @@ class DocumentDownloadSourceAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="document_id",
                 description="文档id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]
@@ -535,21 +611,21 @@ class DocumentTagsAPI(APIMixin):
                 name="workspace_id",
                 description="工作空间id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="knowledge_id",
                 description="知识库id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
             OpenApiParameter(
                 name="document_id",
                 description="文档id",
                 type=OpenApiTypes.STR,
-                location='path',
+                location="path",
                 required=True,
             ),
         ]

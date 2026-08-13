@@ -7,17 +7,21 @@
 @desc:
 """
 
+import time
 from typing import Dict
 
 from langchain_huggingface import HuggingFaceEmbeddings
 
 from common.utils.logger import maxkb_logger
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 max_retries = 3
 
 
-class LocalEmbedding(MaxKBBaseModel, HuggingFaceEmbeddings):
+class LocalEmbedding(MaxKBBaseEmbeddingModel, HuggingFaceEmbeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     @staticmethod
     def is_cache_model():
         return True
@@ -40,8 +44,6 @@ class LocalEmbedding(MaxKBBaseModel, HuggingFaceEmbeddings):
                     maxkb_logger.warning(
                         f"Test failed with meta tensor error, retrying... (attempt {attempt + 1}/{max_retries})"
                     )
-                    import time
-
                     time.sleep(1)
                     continue
                 raise e

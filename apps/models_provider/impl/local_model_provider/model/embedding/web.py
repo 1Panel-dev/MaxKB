@@ -14,10 +14,13 @@ from anthropic import BaseModel
 from langchain_core.embeddings import Embeddings
 
 from maxkb.const import CONFIG
-from models_provider.base_model_provider import MaxKBBaseModel
+from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
 
 
-class LocalEmbedding(MaxKBBaseModel, BaseModel, Embeddings):
+class LocalEmbedding(MaxKBBaseEmbeddingModel, BaseModel, Embeddings):
+    def supports_image_embedding(self) -> bool:
+        return False
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.model_id = kwargs.get("model_id", None)

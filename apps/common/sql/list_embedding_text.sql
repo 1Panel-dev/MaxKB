@@ -20,7 +20,16 @@ SELECT
 	paragraph."id" AS paragraph_id,
 	paragraph.knowledge_id AS knowledge_id,
 	1 AS source_type,
-	concat_ws(E'\n',paragraph.title,paragraph."content") AS "text",
+	concat_ws(
+		E'\n',
+		paragraph.title,
+		paragraph."content",
+		(
+			SELECT string_agg(concat_ws(E'\n', asset.caption, asset.ocr_text, asset.description), E'\n' ORDER BY asset.position)
+			FROM paragraph_asset asset
+			WHERE asset.paragraph_id = paragraph."id" AND asset.sync_state = 'active'
+		)
+	) AS "text",
 	paragraph.is_active AS is_active,
 	paragraph.chunks AS chunks
 FROM
