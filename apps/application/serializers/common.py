@@ -19,7 +19,6 @@ from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from serializers import chat_user
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
 
 from application.models import (
