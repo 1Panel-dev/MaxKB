@@ -101,7 +101,6 @@ function handleValidatePlatform(platform: QrLoginPlatformView) {
   loading.value = true
   return AuthScanApi.postValidateQrLoginPlatform(platform)
     .then((res) => {
-      // TODO: 校验判断有误
       res ? MsgSuccess('校验成功') : MsgError('校验失败')
     })
     .finally(() => {

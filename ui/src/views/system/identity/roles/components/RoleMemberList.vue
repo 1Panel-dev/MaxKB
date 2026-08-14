@@ -12,7 +12,6 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from '../AddMemberDrawer.vue'
 
 const props = defineProps<{ currentRole: RoleItem }>()
-const emit = defineEmits<{ changed: [] }>()
 const loading = ref(false)
 const members = ref<RoleMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
@@ -40,6 +39,8 @@ function handleSearch(query?: RequestParams) {
   loadMembers(true)
 }
 
+// 添加成员
+
 const addMemberDrawerRef =
   useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
 function handleOpenAddMemberDrawer() {
@@ -48,16 +49,15 @@ function handleOpenAddMemberDrawer() {
 
 function handleMemberAdded() {
   loadMembers(true)
-  emit('changed')
 }
 
+// 移除成员
 function handleRemoveMember(member: RoleMember) {
   MsgConfirm(`确定移除成员“${member.nick_name || member.username}”吗？`)
     .then(() => {
       loading.value = true
       return RoleApi.deleteRoleMember(props.currentRole.id, member.user_relation_id).then(() => {
         MsgSuccess('移除成功')
-        emit('changed')
         return loadMembers()
       })
     })
@@ -65,6 +65,23 @@ function handleRemoveMember(member: RoleMember) {
     .finally(() => {
       loading.value = false
     })
+}
+
+/* 批量删除成员 */
+const batchSelectedMembers = ref<RoleMember[]>([])
+function handleBatchDelete() {
+  MsgConfirm(`是否删除选中的 ${batchSelectedMembers.value.length} 个成员？`, '')
+    .then(() => {
+      // TODO: 批量删除
+    })
+    .catch(() => {})
+    .finally(() => {
+      loading.value = false
+    })
+}
+
+function handleBatchSelectionChange(selection: unknown[]) {
+  batchSelectedMembers.value = selection as RoleMember[]
 }
 
 watch(
@@ -90,6 +107,7 @@ watch(
       @current-change="loadMembers()"
       @size-change="loadMembers()"
       :max-table-height="290"
+      @selection-change="handleBatchSelectionChange"
     >
       <el-table-column type="selection" width="40" />
       <el-table-column prop="nick_name" label="姓名" min-width="180" show-overflow-tooltip />
@@ -110,6 +128,9 @@ watch(
           </el-tooltip>
         </template>
       </el-table-column>
+      <template #footer-batch-actions>
+        <el-button type="danger" plain @click="handleBatchDelete">移除</el-button>
+      </template>
     </MkTable>
   </div>
   <AddMemberDrawer

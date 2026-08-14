@@ -109,11 +109,12 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 
 稳定重复使用的 Flex 布局组合统一定义在 `tailwind.css`。当前提供：
 
-| 工具类            | 作用                                 |
-| ----------------- | ------------------------------------ |
-| `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中 |
-| `flex-center`     | 横向排列，在水平和垂直两个方向居中   |
-| `flex-col-center` | 纵向排列，在水平和垂直两个方向居中   |
+| 工具类              | 作用                                 |
+| ------------------- | ------------------------------------ |
+| `flex-between`      | 横向排列，两侧贴边，并在垂直方向居中 |
+| `flex-center`       | 横向排列，在水平和垂直两个方向居中   |
+| `flex-col-center`   | 纵向排列，在水平和垂直两个方向居中   |
+| `flex-wrap` | 横向排列，自动换行，行间距为 8px     |
 
 ```vue
 <div class="flex-between">
@@ -128,6 +129,11 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 <div class="flex-col-center">
   <MkIcon name="icon_home_filled" />
   <span>首页</span>
+</div>
+
+<div class="flex-wrap">
+  <span>选项一</span>
+  <span>选项二</span>
 </div>
 ```
 

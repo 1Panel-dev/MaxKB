@@ -31,7 +31,7 @@ withDefaults(
       <template #reference>
         <el-tag type="info" class="cursor-pointer">+{{ tags.length - 1 }}</el-tag>
       </template>
-      <div class="flex flex-wrap gap-1">
+      <div class="flex-wrap gap-1">
         <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info">
           {{ tag }}
         </el-tag>

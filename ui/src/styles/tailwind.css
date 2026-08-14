@@ -69,3 +69,10 @@
   flex-direction: column;
   justify-content: center;
 }
+
+/* 横向排列，自动换行且行间距为 8px */
+@utility flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: calc(var(--spacing) * 2);
+}

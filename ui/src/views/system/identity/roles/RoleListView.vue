@@ -85,10 +85,6 @@ function handleDeleteRole(role: RoleItem) {
     })
 }
 
-function handleMemberChanged() {
-  loadRoles(currentRole.value?.id)
-}
-
 onMounted(() => loadRoles())
 </script>
 
@@ -172,7 +168,7 @@ onMounted(() => loadRoles())
           :current-role="currentRole"
         />
         <!-- 成员 -->
-        <RoleMemberList v-else :current-role="currentRole" @changed="handleMemberChanged" />
+        <RoleMemberList v-else :current-role="currentRole" />
       </template>
       <MkEmpty v-else class="flex-1" />
     </template>
