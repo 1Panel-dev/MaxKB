@@ -58,8 +58,7 @@ src/views/system/identity/users/
 ├── UserListView.vue               # 用户列表路由页面
 ├── UserFromDrawer.vue             # 用户表单抽屉
 ├── components/
-│   ├── UserGroupSetting.vue       # 用户组与工作空间异步联动设置
-│   └── UserRoleSetting.vue        # 用户角色设置子组件
+│   └── UserGroupSetting.vue       # 用户组与工作空间异步联动设置
 └── dialog/
     ├── BatchSetUserRoleDialog.vue # 批量设置用户角色弹窗
     └── UserPwdDialog.vue          # 修改用户密码弹窗
@@ -72,7 +71,7 @@ src/views/system/identity/users/
 | 路由页面     | `XxxView.vue`                       | `WorkspaceListView.vue`             |
 | 抽屉         | `XxxDrawer.vue`                     | `AddMemberDrawer.vue`               |
 | 弹窗         | `XxxDialog.vue`                     | `CreateOrUpdateWorkspaceDialog.vue` |
-| 页面普通组件 | 按具体业务职责使用 `PascalCase.vue` | `MemberRoleSetting.vue`             |
+| 页面普通组件 | 按具体业务职责使用 `PascalCase.vue` | `UserGroupSetting.vue`              |
 
 不要使用缺少组件职责后缀的页面文件名，也不要把 Dialog 命名为 Drawer 或把 Drawer 命名为
 Dialog。新增或重命名文件时，应同步更新所有导入和页面功能登记。

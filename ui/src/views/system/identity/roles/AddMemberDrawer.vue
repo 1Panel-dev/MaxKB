@@ -13,7 +13,7 @@ import {
 } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import MemberWorkspaceSetting from './components/MemberWorkspaceSetting.vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'AddRoleMemberDrawer' })
 
@@ -115,15 +115,82 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" label-position="top">
-      <MemberWorkspaceSetting
+      <MkFormList
         v-model="memberForm.members"
-        :remote-user-method="loadUserOptions"
-        :show-workspace="showWorkspace"
-        :user-loading="userOptionsLoading"
-        :user-options="userOptions"
-        :workspace-loading="workspaceOptionsLoading"
-        :workspace-options="workspaceOptions"
-      />
+        add-text="添加成员"
+        :default-item="{ user_ids: [], workspace_ids: [] }"
+      >
+        <template #default="{ index, item: memberSetting }">
+          <el-form-item
+            class="flex-1"
+            :label="index === 0 ? '成员' : ''"
+            :prop="`members.${index}.user_ids`"
+            :rules="{
+              required: true,
+              type: 'array',
+              min: 1,
+              message: '请选择成员',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="memberSetting.user_ids"
+              :loading="userOptionsLoading"
+              :remote-method="loadUserOptions"
+              collapse-tags
+              collapse-tags-tooltip
+              filterable
+              fit-input-width
+              multiple
+              placeholder="请选择成员"
+              remote
+              :reserve-keyword="false"
+            >
+              <el-option
+                v-for="userOption in userOptions"
+                :key="userOption.id"
+                :label="userOption.nick_name || userOption.username"
+                :title="userOption.nick_name || userOption.username"
+                :value="userOption.id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            v-if="showWorkspace"
+            class="flex-1"
+            :label="index === 0 ? '工作空间' : ''"
+            :prop="`members.${index}.workspace_ids`"
+            :rules="{
+              required: true,
+              type: 'array',
+              min: 1,
+              message: '请选择工作空间',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="memberSetting.workspace_ids"
+              :loading="workspaceOptionsLoading"
+              collapse-tags
+              collapse-tags-tooltip
+              filterable
+              fit-input-width
+              multiple
+              placeholder="请选择工作空间"
+              :reserve-keyword="false"
+            >
+              <el-option
+                v-for="workspaceOption in workspaceOptions"
+                :key="workspaceOption.id"
+                :label="workspaceOption.name"
+                :title="workspaceOption.name"
+                :value="workspaceOption.id"
+              />
+            </el-select>
+          </el-form-item>
+        </template>
+      </MkFormList>
     </el-form>
 
     <template #footer>

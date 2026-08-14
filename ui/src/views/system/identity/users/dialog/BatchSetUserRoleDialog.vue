@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import { ROLE_TYPE, type ListItem, type BatchSetUserWorkspaceRolesRequest } from '@/api/types'
+import {
+  ROLE_TYPE,
+  type ListItem,
+  type BatchSetUserWorkspaceRolesRequest,
+  type SystemUserRoleAssignment,
+} from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import UserRoleSetting from '../components/UserRoleSetting.vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'BatchSetUserRoleDialog' })
 
@@ -31,6 +36,18 @@ const batchRoleForm = reactive<BatchSetUserWorkspaceRolesRequest>({
 const roleSettingOptionsLoading = ref(false)
 const roleOptions = ref<ListItem[]>([])
 const workspaceOptions = ref<ListItem[]>([])
+
+function isAdminRole(roleId: string) {
+  return roleOptions.value.find(({ id }) => id === roleId)?.type === ROLE_TYPE.ADMIN
+}
+
+function handleRoleChange(roleAssignment: SystemUserRoleAssignment, index: number) {
+  if (isAdminRole(roleAssignment.role_id)) {
+    roleAssignment.workspace_ids = []
+    nextTick(() => batchRoleFormRef.value?.clearValidate(`role_setting.${index}.workspace_ids`))
+  }
+}
+
 function loadRoleSettingOptions() {
   roleSettingOptionsLoading.value = true
   const optionRequests: Promise<void>[] = [
@@ -134,13 +151,81 @@ defineExpose({ open })
         </el-radio-group>
       </el-form-item>
 
-      <UserRoleSetting
+      <MkFormList
         v-if="auth.isEE || auth.isPE"
         v-model="batchRoleForm.role_setting"
-        :loading="roleSettingOptionsLoading"
-        :role-options="roleOptions"
-        :workspace-options="workspaceOptions"
-      />
+        add-text="添加角色"
+        :default-item="{ role_id: '', workspace_ids: [] }"
+      >
+        <template #default="{ index, item: roleAssignment }">
+          <el-form-item
+            class="flex-1"
+            :label="index === 0 ? '角色' : ''"
+            :prop="`role_setting.${index}.role_id`"
+            :rules="{
+              required: true,
+              message: '请选择角色',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="roleAssignment.role_id"
+              placeholder="请选择角色"
+              :loading="roleSettingOptionsLoading"
+              clearable
+              filterable
+              fit-input-width
+              @change="handleRoleChange(roleAssignment, index)"
+            >
+              <el-option
+                v-for="roleOption in roleOptions"
+                :key="roleOption.id"
+                :label="roleOption.name"
+                :title="roleOption.name"
+                :value="roleOption.id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <!-- 企业版用户的非系统管理员角色需要指定工作空间。 -->
+          <el-form-item
+            v-if="auth.isEE"
+            class="flex-1"
+            :label="index === 0 ? '工作空间' : ''"
+            :prop="`role_setting.${index}.workspace_ids`"
+            :rules="{
+              required: !isAdminRole(roleAssignment.role_id),
+              type: 'array',
+              min: 1,
+              message: '请选择工作空间',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="roleAssignment.workspace_ids"
+              :placeholder="isAdminRole(roleAssignment.role_id) ? '' : '请选择工作空间'"
+              :loading="roleSettingOptionsLoading"
+              :disabled="isAdminRole(roleAssignment.role_id)"
+              :validate-event="!isAdminRole(roleAssignment.role_id)"
+              clearable
+              filterable
+              fit-input-width
+              multiple
+              collapse-tags
+              collapse-tags-tooltip
+              :reserve-keyword="false"
+            >
+              <el-option
+                v-for="workspaceOption in workspaceOptions"
+                :key="workspaceOption.id"
+                :label="workspaceOption.name"
+                :title="workspaceOption.name"
+                :value="workspaceOption.id"
+              />
+            </el-select>
+          </el-form-item>
+        </template>
+      </MkFormList>
     </el-form>
 
     <template #footer>

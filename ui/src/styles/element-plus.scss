@@ -566,6 +566,7 @@
 
 /* select */
 .el-select {
+  --el-select-disabled-border: var(--el-border-color);
   &__caret {
     color: var(--el-text-color-regular);
     font-size: 16px;
@@ -576,6 +577,12 @@
   &__wrapper {
     padding: 4px 12px;
     line-height: 22px;
+    &.is-disabled {
+      background-color: var(--mk-N200);
+      .el-select__caret {
+        color: var(--el-text-color-disabled);
+      }
+    }
   }
   &__input {
     height: 22px;
