@@ -21,7 +21,7 @@ from rest_framework.request import Request
 from rest_framework.views import APIView
 
 from application.api.application_api import SpeechToTextAPI, TextToSpeechAPI
-from application.models import ChatUserType, ChatSourceChoices
+from application.models import ChatUserType, ChatSourceChoices, ApplicationAccessToken
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
 from chat.serializers.chat import (
@@ -38,12 +38,12 @@ from chat.serializers.chat_authentication import (
 )
 from common.auth import ChatTokenAuth
 from common.auth.authentication import has_permissions
-from common.auth.common import FileToken
+from common.auth.common import FileToken, ChatToken
 from common.auth.constants.chat_permission_constants import ChatPermissionConstants
+from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
-from common.auth.common import ChatAuthentication
-from common.exception.app_exception import AppAuthenticationFailed, AppApiException
+from common.exception.app_exception import AppApiException
 from common.log.log import _get_ip_address, log
 from common.result import result
 from common.utils.rsa_util import decrypt
@@ -409,7 +409,7 @@ class ResetCurrentUserPasswordView(APIView):
                 decrypted_data = json.loads(decrypted_raw) if decrypted_raw else {}
                 if isinstance(decrypted_data, dict):
                     request_data = decrypted_data
-            except Exception as e:
+            except Exception:
                 raise AppApiException(500, _("Invalid encrypted data"))
         serializer_obj = RePasswordSerializer(data=request_data)
         if serializer_obj.reset_password(request.user.id):
@@ -437,8 +437,17 @@ class ChatUserProfileView(APIView):
 
 class BaseAuthView(APIView):
     @staticmethod
-    def create_token_and_cache(user, request):
-        token, f_token = ChatUserAccessTokenV3Serializer.create_token_and_cache(user, request)
+    def create_token_and_cache(user, access_token, operate):
+        application_id = None
+        if access_token:
+            application_id = (
+                ApplicationAccessToken.objects.filter(access_token=access_token, is_active=True)
+                .values_list("application_id", flat=True)
+                .first()
+            )
+        token = ChatToken(
+            str(user.id), AuthenticationType.CHAT_USER, str(operate), application_id=application_id
+        ).to_token()
         version, get_key = Cache_Version.CHAT_USER_TOKEN.value
         cache.set(get_key(token), user, timeout=60 * 60 * 2, version=version)
         return token, FileToken(str(user.id), AuthenticationType.CHAT_USER.value).to_token()
@@ -472,9 +481,10 @@ class LocalLoginView(BaseAuthView):
     def post(self, request: Request):
         user = ChatUserAccessTokenV3Serializer.local_login(request.data)
         user.source = "LOCAL"
-        token, f_token = self.create_token_and_cache(user, request)
+        access_token = request.query_params.get("accessToken")
+        token, f_token = self.create_token_and_cache(user, access_token, Operate.LOCAL)
         response = result.success({"token": token})
-        return self.generate(request, f_token, response, path=f"/chat/")
+        return self.generate(request, f_token, response, path=f"/chat/{access_token + '/' if access_token else ''}")
 
 
 class Logout(APIView):
