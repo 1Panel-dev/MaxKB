@@ -3,7 +3,7 @@ from django.urls import path, include
 from application.views import ChatRecordDetailView, ChatRecordLinkView
 from chat.views import v2 as v2_views, v3 as v3_views
 
-app_name = 'chat'
+app_name = "chat"
 # @formatter:off
 # fmt: off
 
@@ -41,6 +41,8 @@ v3=[
  path('api_key', v3_views.ChatUserApiKeyView.as_view()),
  path('api_key/<int:current_page>/<int:page_size>', v3_views.ChatUserApiKeyView.Page.as_view()),
  path('api_key/<str:api_key_id>', v3_views.ChatUserApiKeyView.Operate.as_view()),
+ path('portal/application/<int:current_page>/<int:page_size>', v3_views.PortalApplicationView.as_view(), name='v3_portal_application'),
+ path('portal/chat/<int:current_page>/<int:page_size>', v3_views.PortalHistoricalConversationView.as_view(), name='v3_portal_historical_conversation'),
 ]
 v2=[
     path('embed', v2_views.ChatEmbedView.as_view()),
