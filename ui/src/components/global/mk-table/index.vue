@@ -160,7 +160,7 @@ defineExpose({ clearSelection, tableRef })
   <div
     v-else
     ref="tableRootRef"
-    class="mk-table relative w-full"
+    class="mk-table relative w-full min-h-0 flex-1"
     @mouseleave="clearResizeHover"
     @mousemove="handleTableMouseMove"
   >
@@ -199,7 +199,7 @@ defineExpose({ clearSelection, tableRef })
 
     <footer
       v-if="selectedRows.length > 0"
-      class="fixed bottom-0 z-20 flex items-center border-t bg-white w-full -ml-6 px-6 py-4"
+      class="absolute -inset-x-6 -bottom-6 z-10 border-t bg-white px-6 py-4 flex items-center"
     >
       <div class="mr-4 flex items-center gap-3">
         <el-checkbox

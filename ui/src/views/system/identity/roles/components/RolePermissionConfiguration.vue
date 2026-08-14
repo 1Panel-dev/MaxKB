@@ -25,13 +25,10 @@ const permissionTableKey = computed(
 function loadPermissions() {
   loading.value = true
   permissionData.value = []
-  return RoleApi.getRolePermissionList(props.currentRole.id)
-    .then((permissions) => {
-      permissionData.value = transformPermissions(permissions)
-    })
-    .finally(() => {
-      loading.value = false
-    })
+  return RoleApi.getRolePermissionList(props.currentRole.id).then((permissions) => {
+    permissionData.value = transformPermissions(permissions)
+    loading.value = false
+  })
 }
 
 function transformPermissions(modules: RolePermissionModule[]) {
@@ -118,31 +115,38 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 </script>
 
 <template>
-  <div>
+  <div class="relative min-h-0 flex-1" :class="{ 'pb-16': !disabled }">
     <MkTable
       :key="permissionTableKey"
       class="role-permission-table"
       row-key="id"
       :span-method="permissionTableSpan"
-      :max-table-height="disabled ? 200 : 250"
+      :max-table-height="disabled ? 200 : 240"
       :data="permissionData"
+      v-loading="loading"
     >
       <el-table-column prop="module" label="模块名称" width="150" />
       <el-table-column prop="name" label="操作对象" width="150" />
       <el-table-column label="权限">
         <template #default="{ row }">
-          <el-checkbox
-            v-for="permission in row.permissions"
-            :key="permission.id"
-            v-model="permission.enable"
-            :disabled="disabled"
-            class="w-30"
-            @change="(value: boolean) => handlePermissionChange(value, permission, row)"
-            >{{ permission.name }}</el-checkbox
-          >
+          <div class="flex-wrap">
+            <template v-for="permission in row.permissions" :key="permission.id">
+              <el-checkbox
+                v-model="permission.enable"
+                :disabled="disabled"
+                class="w-30"
+                @change="(value: boolean) => handlePermissionChange(value, permission, row)"
+                >{{ permission.name }}</el-checkbox
+              >
+            </template>
+          </div>
         </template>
       </el-table-column>
-      <el-table-column :width="40">
+      <el-table-column
+        class-name="permission-checkbox-column"
+        label-class-name="permission-checkbox-column"
+        :width="60"
+      >
         <template #header>
           <el-checkbox
             :model-value="allPermissionState.checked"
@@ -151,6 +155,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
             @change="handleCheckAll"
           />
         </template>
+
         <template #default="{ row }">
           <el-checkbox
             :model-value="getPermissionState(row.permissions).checked"
@@ -162,11 +167,12 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
       </el-table-column>
     </MkTable>
 
-    <div v-if="!disabled" class="flex justify-end px-6 py-4">
-      <el-button type="primary" :disabled="disabled" :loading="loading" @click="handleSave"
-        >保存</el-button
-      >
-    </div>
+    <footer
+      v-if="!disabled"
+      class="absolute -inset-x-6 -bottom-6 z-10 border-t bg-white px-6 py-4 text-right"
+    >
+      <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
+    </footer>
   </div>
 </template>
 
@@ -185,6 +191,14 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 
   thead th.el-table__cell {
     border-bottom: 1px solid var(--el-table-border-color) !important;
+  }
+
+  .permission-checkbox-column .cell {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 </style>

@@ -217,7 +217,17 @@
   --el-checkbox-input-border: 1px solid var(--mk-N500);
   --el-checkbox-input-width: 16px;
   --el-checkbox-input-height: 16px;
+  --el-checkbox-text-color: var(--el-text-color-primary);
+  --el-checkbox-disabled-checked-input-fill: var(--mk-N400);
+  --el-checkbox-disabled-checked-input-border-color: var(--mk-N400);
+  --el-checkbox-disabled-checked-icon-color: white;
+  --el-checkbox-checked-text-color: var(--el-text-color-primary);
   margin: 0;
+  height: unset;
+  &__label {
+    line-height: 22px;
+    font-weight: 400;
+  }
 }
 
 /* dialog */
