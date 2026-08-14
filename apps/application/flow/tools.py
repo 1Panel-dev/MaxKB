@@ -46,6 +46,11 @@ from langchain_core.messages import AIMessageChunk, BaseMessage, BaseMessageChun
 from langchain_core.tools import StructuredTool
 from langchain_core.utils._merge import merge_lists as _original_merge_lists
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from .anthropic_tool_content import (
+    collect_input_json_deltas,
+    finalize_anthropic_assistant_content,
+    is_anthropic_tool_finish,
+)
 from langgraph.checkpoint.memory import MemorySaver
 from maxkb.const import CONFIG
 from pydantic import Field, create_model
@@ -590,10 +595,23 @@ async def _yield_mcp_response(
                     _upsert_fragment(key, raw_id, func_name, part_args)
 
                 # ----------------------------------------------------------------
-                # 3. 检测工具调用结束，更新 tool_calls_info
+                # 2.1 Anthropic streams tool arguments as input_json_delta content
+                #     blocks. Fold those fragments into _tool_fragments so finish
+                #     handling can assemble a legal tool_use.input.
                 # ----------------------------------------------------------------
-                is_finish_chunk = (
-                    chunk[0].response_metadata.get("finish_reason") == "tool_calls" or chunk[0].chunk_position == "last"
+                if isinstance(chunk[0].content, list):
+                    for index, partial_json in collect_input_json_deltas(chunk[0].content).items():
+                        key = _get_fragment_key(index, None)
+                        if key is not None:
+                            _upsert_fragment(key, None, None, partial_json)
+
+                # ----------------------------------------------------------------
+                # 3. 检测工具调用结束，更新 tool_calls_info
+                #    Anthropic uses stop_reason=tool_use rather than OpenAI's
+                #    finish_reason=tool_calls.
+                # ----------------------------------------------------------------
+                is_finish_chunk = is_anthropic_tool_finish(
+                    chunk[0].response_metadata, chunk[0].chunk_position
                 )
 
                 if is_finish_chunk:
@@ -674,6 +692,14 @@ async def _yield_mcp_response(
                                 tc["function"]["arguments"] = frag["arguments"]
                         fixed_tool_calls.append(tc)
                     chunk[0].additional_kwargs["tool_calls"] = fixed_tool_calls
+
+                # Anthropic: never replay input_json_delta / empty text blocks.
+                if isinstance(chunk[0].content, list):
+                    chunk[0].content = finalize_anthropic_assistant_content(
+                        chunk[0].content,
+                        tool_calls=chunk[0].tool_calls,
+                        fragments=_tool_fragments,
+                    )
 
                 yield chunk[0]
 
