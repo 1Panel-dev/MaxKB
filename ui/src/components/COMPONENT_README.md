@@ -65,6 +65,8 @@ src/components/
 ├── mk-search-list/
 │   ├── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 │   └── mk-list-item.vue          # 列表与业务分组列表复用的私有行结构
+├── mk-form-list/
+│   └── index.vue                 # 可动态增删的表单行列表，手动导入
 ├── mk-workspace-dropdown/
 │   └── index.vue                 # 工作空间选择下拉框，手动导入
 └── mk-workspace-relation-tags/
@@ -76,6 +78,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 ```
@@ -395,6 +398,39 @@ const paginationConfig = ref({
 ```
 
 ## 手动导入组件
+
+### MkFormList
+
+用于多个业务字段组成的动态表单行，只负责重复行布局、添加和删除，不管理业务字段、校验规则或
+选项请求。通过 `v-model` 传入行数据，`defaultItem` 创建新行，列表始终至少保留一行。默认插槽
+提供 `item`、`index`，业务组件在插槽中继续声明
+`el-form-item`、字段路径和校验规则。
+
+```vue
+<script setup lang="ts">
+import MkFormList from '@/components/mk-form-list/index.vue'
+
+const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({ required: true })
+</script>
+
+<MkFormList
+  v-model="roleSettings"
+  add-text="添加角色"
+  :default-item="{ roleId: '', workspaceIds: [] }"
+>
+  <template #default="{ index, item }">
+    <el-form-item
+      class="flex-1"
+      :label="index===0 ? '角色' : ''"
+      :prop="`roleSettings.${index}.roleId`"
+    >
+      <el-select v-model="item.roleId" />
+    </el-form-item>
+  </template>
+</MkFormList>
+```
+
+`addText` 设置添加按钮文案。删除按钮及第一行与后续行的对齐由组件统一处理。
 
 ### MkSearchList
 

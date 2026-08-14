@@ -11,7 +11,7 @@ import type {
   WorkspaceItem,
 } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
-import MemberRoleSetting from './components/MemberRoleSetting.vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 
@@ -115,14 +115,81 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" label-position="top">
-      <MemberRoleSetting
+      <MkFormList
         v-model="memberForm.members"
-        :role-loading="roleOptionsLoading"
-        :role-options="roleOptions"
-        :user-loading="userOptionsLoading"
-        :user-options="userOptions"
-        :remote-user-method="loadUserOptions"
-      />
+        add-text="添加成员"
+        :default-item="{ role_ids: [], user_ids: [] }"
+      >
+        <template #default="{ index, item: memberSetting }">
+          <el-form-item
+            class="flex-1"
+            :label="index === 0 ? '成员' : ''"
+            :prop="`members.${index}.user_ids`"
+            :rules="{
+              required: true,
+              type: 'array',
+              min: 1,
+              message: '请选择成员',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="memberSetting.user_ids"
+              :loading="userOptionsLoading"
+              :remote-method="loadUserOptions"
+              collapse-tags
+              collapse-tags-tooltip
+              filterable
+              fit-input-width
+              multiple
+              placeholder="请选择成员"
+              remote
+              :reserve-keyword="false"
+            >
+              <el-option
+                v-for="userOption in userOptions"
+                :key="userOption.id"
+                :label="userOption.nick_name || userOption.username"
+                :title="userOption.nick_name || userOption.username"
+                :value="userOption.id"
+              />
+            </el-select>
+          </el-form-item>
+
+          <el-form-item
+            class="flex-1"
+            :label="index === 0 ? '角色' : ''"
+            :prop="`members.${index}.role_ids`"
+            :rules="{
+              required: true,
+              type: 'array',
+              min: 1,
+              message: '请选择角色',
+              trigger: 'change',
+            }"
+          >
+            <el-select
+              v-model="memberSetting.role_ids"
+              :loading="roleOptionsLoading"
+              collapse-tags
+              collapse-tags-tooltip
+              filterable
+              fit-input-width
+              multiple
+              placeholder="请选择角色"
+              :reserve-keyword="false"
+            >
+              <el-option
+                v-for="roleOption in roleOptions"
+                :key="roleOption.id"
+                :label="roleOption.name"
+                :title="roleOption.name"
+                :value="roleOption.id"
+              />
+            </el-select>
+          </el-form-item>
+        </template>
+      </MkFormList>
     </el-form>
 
     <template #footer>
