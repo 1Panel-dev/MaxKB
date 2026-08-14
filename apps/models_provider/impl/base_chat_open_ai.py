@@ -127,14 +127,12 @@ class BaseChatOpenAI(ChatOpenAI):
         )
 
     def _stream(self, *args: Any, **kwargs: Any) -> Iterator[ChatGenerationChunk]:
-        kwargs["stream_usage"] = True
         for chunk in super()._stream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
             yield chunk
 
     async def _astream(self, *args: Any, **kwargs: Any) -> AsyncIterator[ChatGenerationChunk]:
-        kwargs["stream_usage"] = True
         async for chunk in super()._astream(*args, **kwargs):
             if chunk.message.usage_metadata is not None:
                 self.usage_metadata = chunk.message.usage_metadata
