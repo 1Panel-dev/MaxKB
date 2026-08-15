@@ -115,7 +115,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 </script>
 
 <template>
-  <div class="relative min-h-0 flex-1" :class="{ 'pb-16': !disabled }">
+  <div class="relative flex min-h-0 flex-1 flex-col">
     <MkTable
       :key="permissionTableKey"
       class="role-permission-table"
@@ -169,7 +169,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
 
     <footer
       v-if="!disabled"
-      class="absolute -inset-x-6 -bottom-6 z-10 border-t bg-white px-6 py-4 text-right"
+      class="sticky -mb-6 -ml-6 -mr-6 bottom-0 z-10 mt-auto flex shrink-0 justify-end border-t bg-white px-6 py-4"
     >
       <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
     </footer>

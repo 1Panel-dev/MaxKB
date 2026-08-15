@@ -49,13 +49,13 @@ function handleRoleSelect(role: RoleItem) {
 }
 
 // 默认展开的角色组
-const expandedRoleTypes = ref<RoleType[]>([
+const DEFAULT_EXPANDED_ROLE_TYPES = new Set<RoleType>([
   ROLE_TYPE.ADMIN,
   ROLE_TYPE.WORKSPACE_MANAGE,
   ROLE_TYPE.USER,
 ])
-function isRoleGroupExpanded(roleType: RoleType) {
-  return expandedRoleTypes.value.includes(roleType)
+function isRoleGroupDefaultExpanded(roleType: RoleType) {
+  return DEFAULT_EXPANDED_ROLE_TYPES.has(roleType)
 }
 
 /* 创建、重命名角色 */
@@ -108,8 +108,9 @@ onMounted(() => loadRoles())
           <MkCollapse
             v-for="roleGroup in roleGroups"
             :key="roleGroup.type"
-            :model-value="isRoleGroupExpanded(roleGroup.type)"
+            :default-expanded="isRoleGroupDefaultExpanded(roleGroup.type)"
             :title="roleGroup.label"
+            trigger-class="text-N500"
           >
             <div class="flex flex-col gap-1">
               <MkListItem
@@ -122,7 +123,7 @@ onMounted(() => loadRoles())
                 @click="handleRoleSelect(role)"
               >
                 <template #default>
-                  <span class="min-w-0 truncate">{{ role.role_name }}</span>
+                  <span class="min-w-0 truncate" :title="role.role_name">{{ role.role_name }}</span>
                   <el-tag type="info" size="small" class="ml-[6px] text-N600!" v-if="role.internal"
                     >系</el-tag
                   >
@@ -148,7 +149,9 @@ onMounted(() => loadRoles())
       <template v-if="currentRole">
         <component :is="Header">
           <div class="flex min-w-0 flex-1 items-center gap-2">
-            <h4 class="min-w-0 truncate">{{ currentRole.role_name }}</h4>
+            <h4 class="min-w-0 truncate" :title="currentRole.role_name">
+              {{ currentRole.role_name }}
+            </h4>
             <el-tag type="info" size="small" class="shrink-0 text-N600!">
               {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag
             >

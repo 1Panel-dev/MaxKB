@@ -177,7 +177,7 @@ onMounted(() => loadChatUserGroups())
       <template v-if="currentGroup">
         <component :is="Header">
           <div class="flex min-w-0 flex-1 items-center gap-2">
-            <h4 class="min-w-0 truncate">{{ currentGroup.name }}</h4>
+            <h4 class="min-w-0 truncate" :title="currentGroup.name">{{ currentGroup.name }}</h4>
             <el-divider direction="vertical" />
             <span class="flex items-center text-N500">
               <MkIcon name="icon_member_filled" class="mr-1" />

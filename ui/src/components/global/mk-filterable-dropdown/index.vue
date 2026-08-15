@@ -102,7 +102,9 @@ function handleItemClick(option: TOption) {
               @click="handleItemClick(option)"
             >
               <slot name="option" :option="option">
-                <span class="block truncate">{{ getOptionLabel(option) }}</span>
+                <span class="block truncate" :title="getOptionLabel(option)">
+                  {{ getOptionLabel(option) }}
+                </span>
               </slot>
             </MkDropdownItem>
 
