@@ -26,7 +26,7 @@ const emit = defineEmits<{
     <template #default="{ text }">
       <el-button text class="flex max-w-50 items-center gap-1 rounded-md px-2! py-[7px]!">
         <MkIcon name="icon_moments-categories_outlined" class="mr-1" />
-        <span class="min-w-0 flex-1 truncate">{{ text }}</span>
+        <span class="min-w-0 flex-1 truncate" :title="text">{{ text }}</span>
         <MkIcon :icon="CaretBottom" :size="14" class="shrink-0 ml-1 text-N600!" />
       </el-button>
     </template>
@@ -34,7 +34,7 @@ const emit = defineEmits<{
     <template #option="{ option }">
       <div class="flex items-center gap-2">
         <MkIcon name="icon_moments-categories_outlined" />
-        <span class="min-w-0 flex-1 truncate">{{ option.name }}</span>
+        <span class="min-w-0 flex-1 truncate" :title="option.name">{{ option.name }}</span>
       </div>
     </template>
   </MkFilterableDropdown>

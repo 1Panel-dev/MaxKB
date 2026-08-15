@@ -1,30 +1,43 @@
 <script setup lang="ts">
 import { CaretBottom } from '@element-plus/icons-vue'
-
-/*  目前折叠面板仅仅是基础功能。后期会增加 自定义插槽*/
+import { ref, type HTMLAttributes } from 'vue'
 
 defineOptions({ name: 'MkCollapse' })
 
-defineProps<{
-  title: string
+const props = withDefaults(
+  defineProps<{
+    defaultExpanded?: boolean
+    title?: string
+    triggerClass?: HTMLAttributes['class']
+    triggerStyle?: HTMLAttributes['style']
+  }>(),
+  {
+    defaultExpanded: true,
+  },
+)
+
+defineSlots<{
+  label(): unknown
+  default(): unknown
 }>()
 
-const expanded = defineModel<boolean>({ default: true })
+const expanded = ref(props.defaultExpanded)
 </script>
 
 <template>
   <section>
-    <div
-      class="flex w-full cursor-pointer items-center gap-2 py-2 text-left text-N500"
-      @click="expanded = !expanded"
-    >
-      <MkIcon
-        :icon="CaretBottom"
-        :size="14"
-        class="transition-transform"
-        :class="{ '-rotate-90': !expanded }"
-      />
-      <span>{{ title }}</span>
+    <div class="py-2" :class="triggerClass" :style="triggerStyle" @click="expanded = !expanded">
+      <div class="flex w-full cursor-pointer items-center gap-2 text-left">
+        <MkIcon
+          :icon="CaretBottom"
+          :size="14"
+          class="transition-transform text-N600"
+          :class="{ '-rotate-90': !expanded }"
+        />
+        <slot name="label">
+          <span>{{ title }}</span>
+        </slot>
+      </div>
     </div>
     <el-collapse-transition>
       <div v-if="expanded">

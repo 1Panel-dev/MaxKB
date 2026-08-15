@@ -64,7 +64,7 @@ src/components/
 │       └── index.vue             # 标签折叠和剩余标签浮层
 ├── mk-search-list/
 │   ├── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
-│   └── mk-list-item.vue          # 列表与业务分组列表复用的私有行结构
+│   └── mk-list-item.vue          # 列表与业务分组列表复用的行结构
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
 ├── mk-workspace-dropdown/
@@ -78,6 +78,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
+import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
@@ -125,11 +126,20 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 
 ### MkCollapse
 
-带标题触发器和展开过渡动画的内容折叠组件。通过 `v-model` 控制展开状态，默认展开；点击标题行
-会切换状态，默认插槽放置折叠内容。
+带标题触发器和展开过渡动画的内容折叠组件。组件内部维护展开状态，`default-expanded` 设置初始
+状态且默认为 `true`；点击标题行会切换状态，不向外回传展开状态。默认插槽放置折叠内容，标题
+默认使用 `title` 属性，也可通过 `label` 插槽自定义；标题触发层可通过 `trigger-class` 和
+`trigger-style` 自定义 class 和行内样式。
 
 ```vue
-<MkCollapse v-model="expanded" title="系统管理员">
+<MkCollapse title="系统管理员">
+  <div>折叠内容</div>
+</MkCollapse>
+
+<MkCollapse :default-expanded="false" trigger-class="rounded-md bg-gray-50">
+  <template #label>
+    <strong>自定义标题</strong>
+  </template>
   <div>折叠内容</div>
 </MkCollapse>
 ```
@@ -260,7 +270,7 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
     <button type="button">{{ text }}</button>
   </template>
   <template #option="{ option }">
-    <span class="truncate">{{ option.name }}</span>
+    <span class="truncate" :title="option.name">{{ option.name }}</span>
   </template>
 </MkFilterableDropdown>
 ```
@@ -269,14 +279,23 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 路由页面的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title` Prop，未传入
 时读取当前路由的 `meta.title`。`aside` 和默认作用域插槽都提供 `title` 与对应区域的 `Header`
-包装组件，页面可以在同一个插槽中组织标题、内容和空状态，并只写一次业务状态判断。组件不统一
-处理内容滚动，需要滚动的页面自行使用 `el-scrollbar`。传入 `aside` 插槽后才会渲染左侧栏；左右
-结构上方的独立内容放入 `top` 插槽。页面加载状态通过
+包装组件；插槽未渲染 `Header` 时，组件会自动显示当前标题，页面需要添加操作区或自定义标题时
+再显式渲染 `Header`。Header 固定在主内容区顶部，其余默认插槽内容由组件统一放入
+`el-scrollbar`，页面不要再为整个主内容区嵌套滚动容器；Tabs、树或其他局部区域需要独立滚动时
+仍可自行使用 `el-scrollbar`。页面可以在同一个插槽中组织标题、内容和空状态，并只写一次业务
+状态判断。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。页面加载状态通过
 `loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。默认插槽没有
-声明作用域参数时会自动显示当前标题；使用 `#default="{ Header }"` 后则由页面通过
-`<component :is="Header">` 控制标题，空状态分支不会自动补充标题。
+渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。
+
+主内容区固定保留 `px-6` 水平留白。内置滚动容器会抵消两侧留白，再为滚动内容补回 `24px`
+水平间距，使滚动条贴齐主区域右边界，并允许 `MkTable` 的底部操作栏延伸至完整主区域宽度。
 
 ```vue
+<MkViewLayout :loading="loading">
+  <template #aside>左侧列表</template>
+  <template #default>右侧内容</template>
+</MkViewLayout>
+
 <MkViewLayout :loading="loading">
   <template #aside="{ title, Header }">
     <component :is="Header">
@@ -374,7 +393,8 @@ const paginationConfig = ref({
 
 包含 `type="selection"` 的选择列时，选择数据会显示页面底部操作栏。批量按钮放入
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
-`clearSelection()`。
+`clearSelection()`。操作栏在 `MkViewLayout` 的主内容滚动区域内吸附于页面底部，不随表格内容
+滚出可视区域。
 
 ```vue
 <MkTable :data="systemUsers" @selection-change="selectedUsers = $event">
@@ -431,6 +451,26 @@ const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({
 ```
 
 `addText` 设置添加按钮文案。删除按钮及第一行与后续行的对齐由组件统一处理。
+
+### MkListItem
+
+提供列表行的统一间距、悬停状态、选中状态和可选操作区。仅自定义默认插槽时，可以只传
+`active` 并监听 `click`；不需要补充无实际用途的 `row`、`label-field` 或 `index`。
+
+```vue
+<MkListItem :active="active" @click="handleSelect()">
+  <MkIcon name="icon_assigned_outlined" :size="20" />
+  <span>共享模型</span>
+</MkListItem>
+```
+
+数据驱动使用时传入 `row`。`label-field` 默认读取 `name`，`index` 默认为 `0`；未提供默认插槽时
+组件显示对应字段文本。`action` 和 `action-dropdown` 插槽需要配合 `row` 使用，并接收 `row`、
+`index`。
+
+```vue
+<MkListItem :active="currentRole?.id === role.id" :row="role" @click="selectRole(role)" />
+```
 
 ### MkSearchList
 

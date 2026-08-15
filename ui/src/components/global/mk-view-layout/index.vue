@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Fragment, h, isVNode, type FunctionalComponent, type VNode } from 'vue'
+import { computed, Fragment, h, isVNode, type FunctionalComponent, type VNode, useSlots } from 'vue'
 import { useRoute } from 'vue-router'
+import { ElScrollbar } from 'element-plus'
 import LayoutAside from './layout-aside.vue'
 
 defineOptions({ name: 'MkViewLayout', inheritAttrs: false })
@@ -42,13 +43,24 @@ const LayoutContent: FunctionalComponent = () => {
   const contentNodes = flattenSlotNodes(
     slots.default?.({ Header: LayoutHeader, title: title.value }),
   )
-  const hasCustomHeader = contentNodes.some((node) => node.type === LayoutHeader)
+  const customHeaderNodes = contentNodes.filter((node) => node.type === LayoutHeader)
+  const bodyNodes = contentNodes.filter((node) => node.type !== LayoutHeader)
+  const headerNodes = customHeaderNodes.length
+    ? customHeaderNodes
+    : title.value
+      ? [h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)])]
+      : []
 
   return [
-    hasCustomHeader || !title.value
-      ? null
-      : h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)]),
-    ...contentNodes,
+    ...headerNodes,
+    h(
+      ElScrollbar,
+      {
+        class: '-mx-6 -mb-6 min-h-0 flex-1',
+        viewClass: 'flex min-h-full flex-col px-6 pb-6',
+      },
+      { default: () => bodyNodes },
+    ),
   ]
 }
 </script>

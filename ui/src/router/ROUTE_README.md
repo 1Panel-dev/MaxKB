@@ -153,6 +153,9 @@ const mode = computed(() => route.meta.scope ?? 'workspace')
 Workspace 页面：
 
 ```text
+/admin/workspace/:workspaceId/tools
+/admin/workspace/:workspaceId/model
+
 /admin/workspace/:workspaceId/agent
 /admin/workspace/:workspaceId/agent/:agentId
 /admin/workspace/:workspaceId/agent/:agentId/edit

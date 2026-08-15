@@ -1,11 +1,13 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
-defineOptions({ name: 'MkSearchListItem' })
+<script setup lang="ts" generic="T extends Record<string, unknown> = Record<string, unknown>">
+import { computed } from 'vue'
 
-defineProps<{
+defineOptions({ name: 'MkListItem' })
+
+const { active = false, index = 0, labelField, row } = defineProps<{
   active?: boolean
-  index: number
-  labelField: keyof T & string
-  row: T
+  index?: number
+  labelField?: keyof T & string
+  row?: T
 }>()
 
 const emit = defineEmits<{
@@ -17,6 +19,13 @@ defineSlots<{
   'action-dropdown'(props: { row: T; index: number }): unknown
   default?(props: { row: T; index: number; active: boolean }): unknown
 }>()
+
+const itemLabel = computed(() => {
+  if (!row) return ''
+  const field = labelField ?? ('name' as keyof T & string)
+  return String(row[field] ?? '')
+})
+const slotRow = computed(() => row as T)
 </script>
 
 <template>
@@ -25,8 +34,10 @@ defineSlots<{
     :class="{ 'bg-primary/10 font-medium text-primary hover:bg-primary/10': active }"
     @click="emit('click')"
   >
-    <slot :row="row" :index="index" :active="Boolean(active)">
-      <span class="min-w-0 flex-1 truncate">{{ row[labelField] }}</span>
+    <slot :row="slotRow" :index="index" :active="active">
+      <span v-if="row" class="min-w-0 flex-1 truncate" :title="itemLabel">
+        {{ itemLabel }}
+      </span>
     </slot>
     <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
     <div
@@ -40,10 +51,10 @@ defineSlots<{
           <MkIcon name="icon_more_outlined" />
         </el-button>
         <template #dropdown>
-          <slot name="action-dropdown" :row="row" :index="index" />
+          <slot name="action-dropdown" :row="slotRow" :index="index" />
         </template>
       </MkDropdown>
-      <slot v-else name="action" :row="row" :index="index" />
+      <slot v-else name="action" :row="slotRow" :index="index" />
     </div>
   </div>
 </template>

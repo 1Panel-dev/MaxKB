@@ -74,11 +74,22 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 
 ```html
 <h1>页面标题</h1>
-<h2 class="truncate text-primary">内容标题</h2>
+<h2 class="truncate text-primary" title="完整的内容标题">完整的内容标题</h2>
 ```
 
 设计规范中的特大标题为 `30px/38px/600`，仅用于特殊页面级展示，不占用 `h1` 至 `h6`
 的常规内容层级。
+
+## 文本省略
+
+使用 `truncate`、`line-clamp-*` 等工具类省略文本时，必须在同一元素补充原生 `title` 属性，
+使鼠标悬停时可以查看完整内容。动态文本使用 `:title` 绑定，组合文本应复用同一个格式化结果，
+确保页面显示内容与 `title` 完全一致。
+
+```vue
+<span class="truncate" :title="workspace.name">{{ workspace.name }}</span>
+<p class="line-clamp-2" :title="description">{{ description }}</p>
+```
 
 ## 样式实现优先级
 
