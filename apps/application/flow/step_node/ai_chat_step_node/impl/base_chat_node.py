@@ -523,9 +523,10 @@ class BaseChatNode(IChatNode):
             images = self._process_images(image)
         if video and vision:
             videos = self._process_videos(video, model)
-        return HumanMessage(
-            content=[*videos, *images, {"type": "text", "text": self.workflow_manage.generate_prompt(prompt)}]
-        )
+        prompt = self.workflow_manage.generate_prompt(prompt)
+        if images or videos:
+            return HumanMessage(content=[*videos, *images, {"type": "text", "text": prompt}])
+        return HumanMessage(content=prompt)
 
     def is_vision(self):
         if "vision" in self.node_params_serializer.data:
