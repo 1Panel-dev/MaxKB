@@ -293,7 +293,9 @@ class PermissionConstants(Enum):
     TRIGGER_CREATE = (
         Permission(group=Group.TRIGGER, sub_group=Group.TRIGGER, operate=Operate.CREATE, bit_index=1),
         PermissionMeta(
-            role_list=[RoleConstants.WORKSPACE_MANAGE], category=Category.WORKSPACE, scope=[PermissionScopeConstants.WORKSPACE]
+            role_list=[RoleConstants.WORKSPACE_MANAGE],
+            category=Category.WORKSPACE,
+            scope=[PermissionScopeConstants.WORKSPACE],
         ),
     )
 
@@ -3603,7 +3605,7 @@ class PermissionConstants(Enum):
         self.meta = meta
 
     def _build_workspace_permission(self, resource_id_key=None):
-        def permission_factory(_, **kwargs):
+        def permission_factory(_, kwargs):
             return Permission(
                 group=self.value.group,
                 sub_group=self.value.sub_group,

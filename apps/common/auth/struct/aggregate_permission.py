@@ -1,10 +1,10 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： aggregate_permission.py
-    @date：2026/8/5 10:11
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： aggregate_permission.py
+@date：2026/8/5 10:11
+@desc:
 """
 
 from typing import Protocol, List, Union
@@ -18,19 +18,21 @@ from common.auth.struct.permission import Role, Permission
 
 
 class RoleFunc(Protocol):
-    def __call__(self, request: Request, **kwargs) -> RoleConstants | Role: ...
+    def __call__(self, request: Request, kwargs) -> RoleConstants | Role: ...
 
 
 class PermissionFunc(Protocol):
-    def __call__(self, request: Request, **kwargs) -> PermissionConstants | Permission: ...
+    def __call__(self, request: Request, kwargs) -> PermissionConstants | Permission: ...
 
 
 class AggregatePermission:
-    def __init__(self,
-                 roles: List[Union[RoleConstants, RoleFunc]] = None,
-                 permissions: List[Union[PermissionConstants, PermissionFunc]] = None,
-                 aggregatePermissions: List['AggregatePermission'] = None,
-                 compare: CompareConstants = CompareConstants.OR):
+    def __init__(
+        self,
+        roles: List[Union[RoleConstants, RoleFunc]] = None,
+        permissions: List[Union[PermissionConstants, PermissionFunc]] = None,
+        aggregatePermissions: List["AggregatePermission"] = None,
+        compare: CompareConstants = CompareConstants.OR,
+    ):
         # 不能用可变默认值；原 stub 的 `= list` 其实是把类型对象赋进去了
         self.roles = roles if roles is not None else []
         self.permissions = permissions if permissions is not None else []
@@ -51,10 +53,10 @@ class AggregatePermission:
         # （return 后生成器不再前进，后面的 permission/role 不会被求值）
         def results():
             for role in self.roles:
-                resolved = role(request, **kwargs) if callable(role) else role
+                resolved = role(request, kwargs) if callable(role) else role
                 yield self._match_role(resolved, user_roles)
             for permission in self.permissions:
-                resolved = permission(request, **kwargs) if callable(permission) else permission
+                resolved = permission(request, kwargs) if callable(permission) else permission
                 yield self._match_permission(resolved, user_permissions)
             for aggregate in self.aggregatePermissions:
                 yield aggregate.hasPermission(request, **kwargs)
@@ -69,8 +71,7 @@ class AggregatePermission:
         return is_and
 
     @staticmethod
-    def _match_permission(permission: Union[PermissionConstants, Permission],
-                          user_permissions: dict) -> bool:
+    def _match_permission(permission: Union[PermissionConstants, Permission], user_permissions: dict) -> bool:
         p = permission.value if isinstance(permission, PermissionConstants) else permission
         key = p.get_resource_permission_key(p.resource_id) if p.resource_id else str(p)
         return key in user_permissions and (user_permissions[key] & p.bit()) > 0
