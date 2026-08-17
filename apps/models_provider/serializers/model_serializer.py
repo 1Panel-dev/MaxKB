@@ -24,7 +24,7 @@ from models_provider.constants.model_provider_constants import ModelProvideConst
 from models_provider.models import Model, Status
 from models_provider.tools import get_model_credential
 from rest_framework import serializers
-from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission, WorkspaceUserGroupResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -172,9 +172,9 @@ class ModelSerializer(serializers.Serializer):
         def pause_download(self, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            QuerySet(Model).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).update(status=Status.PAUSE_DOWNLOAD)
+            QuerySet(Model).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).update(
+                status=Status.PAUSE_DOWNLOAD
+            )
             return True
 
         @transaction.atomic
@@ -210,9 +210,7 @@ class ModelSerializer(serializers.Serializer):
         def edit(self, instance: Dict, user_id: str, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            model = QuerySet(Model).filter(
-                id=self.data.get("id"), workspace_id=self.data.get("workspace_id")
-            ).first()
+            model = QuerySet(Model).filter(id=self.data.get("id"), workspace_id=self.data.get("workspace_id")).first()
 
             credential, model_credential, provider_handler = ModelSerializer.Edit(data={**instance}).is_valid(
                 model=model
@@ -373,6 +371,14 @@ class ModelSerializer(serializers.Serializer):
             role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
             return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
 
+        @staticmethod
+        def get_workspace_user_group_resource_permission_query_set(workspace_id, user_id):
+            return QuerySet(WorkspaceUserGroupResourcePermission).filter(
+                auth_target_type="MODEL",
+                workspace_id=workspace_id,
+                user_group__user_relations__user_id=user_id,
+            )
+
         def list(self, workspace_id, with_valid):
             if with_valid:
                 self.is_valid(raise_exception=True)
@@ -457,6 +463,9 @@ class ModelSerializer(serializers.Serializer):
                     "workspace_user_resource_permission_query_set": QuerySet(WorkspaceUserResourcePermission).filter(
                         auth_target_type="MODEL", workspace_id=workspace_id, user_id=user_id
                     ),
+                    "workspace_user_group_resource_permission_query_set": self.get_workspace_user_group_resource_permission_query_set(
+                        workspace_id, user_id
+                    ),
                 }
                 if (not workspace_manage)
                 else {
@@ -489,9 +498,13 @@ class ModelSerializer(serializers.Serializer):
             super().is_valid(raise_exception=True)
 
             validated_data = self.validated_data
-            model = QuerySet(Model).filter(
-                id=validated_data["id"],
-            ).first()
+            model = (
+                QuerySet(Model)
+                .filter(
+                    id=validated_data["id"],
+                )
+                .first()
+            )
 
             if model is None:
                 raise AppApiException(500, _("Model does not exist"))
