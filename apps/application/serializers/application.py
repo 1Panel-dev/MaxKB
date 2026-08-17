@@ -58,7 +58,7 @@ from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from rest_framework import serializers, status
 from rest_framework.utils.formatting import lazy_format
-from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission
+from system_manage.models import AuthTargetType, WorkspaceUserResourcePermission, WorkspaceUserGroupResourcePermission
 from system_manage.models.resource_mapping import ResourceMapping
 from system_manage.serializers.resource_mapping_serializers import ResourceMappingSerializer
 from system_manage.serializers.user_resource_permission import UserResourcePermissionSerializer
@@ -601,11 +601,15 @@ class Query(serializers.Serializer):
         resource_and_folder_query_set = QuerySet(WorkspaceUserResourcePermission).filter(
             auth_target_type="APPLICATION", workspace_id=workspace_id, user_id=user_id
         )
+        resource_and_group_query_set = self.get_workspace_user_group_resource_permission_query_set(
+            workspace_id, user_id
+        )
 
         return (
             {
                 "application_query_set": application_query_set,
                 "workspace_user_resource_permission_query_set": resource_and_folder_query_set,
+                "workspace_user_group_resource_permission_query_set": resource_and_group_query_set,
             }
             if (not workspace_manage)
             else {
@@ -619,6 +623,14 @@ class Query(serializers.Serializer):
         workspace_user_role_mapping_model = DatabaseModelManage.get_model("workspace_user_role_mapping")
         role_permission_mapping_model = DatabaseModelManage.get_model("role_permission_mapping_model")
         return workspace_user_role_mapping_model is not None and role_permission_mapping_model is not None
+
+    @staticmethod
+    def get_workspace_user_group_resource_permission_query_set(workspace_id, user_id):
+        return QuerySet(WorkspaceUserGroupResourcePermission).filter(
+            auth_target_type="APPLICATION",
+            workspace_id=workspace_id,
+            user_group__user_relations__user_id=user_id,
+        )
 
     def list(self, instance: Dict):
         self.is_valid(raise_exception=True)
@@ -840,7 +852,7 @@ class ApplicationSerializer(serializers.Serializer):
         mk_instance_bytes = instance.get("file").read()
         try:
             mk_instance = restricted_loads(mk_instance_bytes)
-        except Exception as e:
+        except Exception:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
         tool_list = mk_instance.get_tool_list()
@@ -1499,7 +1511,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
         res = requests.get(download_url, timeout=5, allow_redirects=False)
         try:
             mk_instance = restricted_loads(res.content)
-        except Exception as e:
+        except Exception:
             raise AppApiException(1001, _("Unsupported file format"))
         application = mk_instance.application
         tool_list = mk_instance.get_tool_list()
