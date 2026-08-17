@@ -4,9 +4,13 @@ import type { OptionItem } from '@/api/types'
 
 defineOptions({ name: 'MkComplexSearch' })
 
+interface ComplexSearchField extends OptionItem<string> {
+  remoteMethod?: (query: string) => Promise<unknown> | void
+}
+
 const props = withDefaults(
   defineProps<{
-    fields: OptionItem<string>[]
+    fields: ComplexSearchField[]
   }>(),
   {},
 )
@@ -14,14 +18,36 @@ const emit = defineEmits<{
   change: [value: Record<string, boolean | number | string> | undefined]
 }>()
 
+// 异步搜索
+const remoteLoading = ref(false)
+let remoteRequestId = 0
+function handleRemoteSearch(query: string) {
+  const request = activeField.value?.remoteMethod?.(query)
+  if (!(request instanceof Promise)) return
+
+  const requestId = ++remoteRequestId
+  remoteLoading.value = true
+  request.then(
+    () => {
+      if (requestId === remoteRequestId) remoteLoading.value = false
+    },
+    () => {
+      if (requestId === remoteRequestId) remoteLoading.value = false
+    },
+  )
+}
+
 const searchValue = ref('')
 const searchField = ref(props.fields[0]?.value ?? '')
 
 const activeField = computed(() => props.fields.find(({ value }) => value === searchField.value))
 
 function handleFieldChange() {
+  const shouldClearSearch = searchValue.value !== '' && searchValue.value !== undefined
+  remoteRequestId += 1
+  remoteLoading.value = false
   searchValue.value = ''
-  emit('change', undefined)
+  if (shouldClearSearch) emit('change', undefined)
 }
 
 function handleChange() {
@@ -55,7 +81,12 @@ function handleChange() {
       v-model="searchValue"
       class="mk-complex-search__value w-50!"
       clearable
+      :loading="remoteLoading"
       placeholder="请选择"
+      filterable
+      reserve-keyword
+      :remote="Boolean(activeField.remoteMethod)"
+      :remote-method="handleRemoteSearch"
       @change="handleChange"
       :persistent="false"
     >

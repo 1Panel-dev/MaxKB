@@ -52,11 +52,6 @@ const postBatchSetUserWorkspaceRoles = (request: BatchSetUserWorkspaceRolesReque
   return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, request)
 }
 
-/** 获得全部用户 */
-const getAllUsers = (query?: RequestParams) => {
-  return get<SystemUserOption[]>('/user/list', query)
-}
-
 /** 获取空间下的成员用户
  * @param workspaceId 工作空间ID
  * 资源授权  和用户组的 用户下拉列表使用
@@ -74,6 +69,5 @@ export default {
   postBatchSetUserWorkspaceRoles,
   putUser,
   putUserPassword,
-  getAllUsers,
   getWorkspaceMembers,
 }

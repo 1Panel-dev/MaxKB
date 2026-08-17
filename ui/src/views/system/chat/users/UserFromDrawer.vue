@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
-import CommonApi from '@/api/admin/system/common'
+import CommonSystemApi from '@/api/admin/system/common'
 import ChatUserApi from '@/api/admin/system/chat-user'
 import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
 import { useStore } from '@/stores'
@@ -73,7 +73,7 @@ function loadUserGroupOptions() {
 
 // 默认密码
 function loadDefaultPassword() {
-  return CommonApi.getDefaultPassword().then(({ password }) => {
+  return CommonSystemApi.getDefaultPassword().then(({ password }) => {
     userForm.password = password
   })
 }

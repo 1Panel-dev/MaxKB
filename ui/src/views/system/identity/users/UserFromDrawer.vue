@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
-import CommonApi from '@/api/admin/system/common'
+import CommonSystemApi from '@/api/admin/system/common'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { ROLE_TYPE } from '@/api/types'
@@ -107,7 +107,7 @@ const selectedWorkspaceIds = computed(() => {
 
 // 默认密码
 function loadDefaultPassword() {
-  return CommonApi.getDefaultPassword().then(({ password }) => {
+  return CommonSystemApi.getDefaultPassword().then(({ password }) => {
     userForm.password = password
   })
 }

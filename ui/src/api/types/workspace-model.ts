@@ -1,0 +1,65 @@
+/** Workspace 模型与工具页面共用的业务类型。 */
+
+export const MODEL_STATUS = {
+  DOWNLOAD: 'DOWNLOAD',
+  ERROR: 'ERROR',
+  PAUSE_DOWNLOAD: 'PAUSE_DOWNLOAD',
+  SUCCESS: 'SUCCESS',
+} as const
+
+export type ModelStatus = (typeof MODEL_STATUS)[keyof typeof MODEL_STATUS]
+
+export interface ModelProvider {
+  icon: string
+  name: string
+  provider: string
+}
+
+export interface WorkspaceModel {
+  create_time?: string
+  id: string
+  meta?: Record<string, unknown>
+  model_name: string
+  model_type: string
+  name: string
+  nick_name?: string
+  provider: string
+  source?: 'shared' | 'workspace'
+  status: ModelStatus
+  user_id?: string
+  username?: string
+  workspace_id?: string
+}
+
+export interface WorkspaceUserOption {
+  id: string
+  nick_name: string
+}
+
+
+export interface ModelPayload {
+  credential: Record<string, unknown>
+  model_name: string
+  model_type: string
+  name: string
+  provider: string
+}
+
+export interface DynamicFormField {
+  default_value?: unknown
+  field: string
+  label: string
+  required?: boolean
+  [key: string]: unknown
+}
+
+export interface BaseModelOption {
+  desc?: string
+  model_type: string
+  name: string
+}
+
+export interface ModelTypeOption {
+  key: string
+  value: string
+}

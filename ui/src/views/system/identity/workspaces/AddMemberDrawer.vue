@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
-import UserManageApi from '@/api/admin/system/user-manage'
+import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import type {
   CreateWorkspaceMemberParamsItem,
@@ -38,7 +38,7 @@ const roleOptionsLoading = ref(false)
 
 function loadUserOptions(keyword = '') {
   userOptionsLoading.value = true
-  return UserManageApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
+  return CommonSystemApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
     .then((users) => {
       const selectedUserIds = new Set(memberForm.members.flatMap(({ user_ids }) => user_ids))
       const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
