@@ -92,12 +92,40 @@ def clean_method(query_conditions, clean_log=True):
                     chatrecord__isnull=True,
                     id__in=chat_ids,
                 )
+                orphan_chats = list(chats)
+                orphan_chat_ids = [chat.id for chat in orphan_chats]
 
-                user_ids = list(chats.values_list("user_id", flat=True).distinct())
+                # 按 (application_id, chat_user_id) 收集孤儿会话的用户，
+                # 仅当该用户在该应用下不再有其它会话时才删除其访问统计，避免误删其他应用或仍活跃用户的统计
+                app_user_ids = {}
+                for chat in orphan_chats:
+                    if chat.chat_user_id:
+                        app_user_ids.setdefault(chat.application_id, set()).add(str(chat.chat_user_id))
 
-                ApplicationChatUserStats.objects.filter(chat_user_id__in=user_ids).delete()
+                if app_user_ids:
+                    all_user_ids = set()
+                    for user_ids in app_user_ids.values():
+                        all_user_ids.update(user_ids)
 
-                chats.delete()
+                    # 一次查询找出仍存在其它会话的 (application_id, chat_user_id)
+                    remaining_keys = Chat.objects.filter(
+                        application_id__in=app_user_ids.keys(),
+                        chat_user_id__in=all_user_ids,
+                    ).exclude(id__in=orphan_chat_ids).values_list('application_id', 'chat_user_id').distinct()
+
+                    remaining_app_user_ids = {}
+                    for app_id, user_id in remaining_keys:
+                        remaining_app_user_ids.setdefault(app_id, set()).add(user_id)
+
+                    for app_id, user_ids in app_user_ids.items():
+                        user_ids_to_delete = user_ids - remaining_app_user_ids.get(app_id, set())
+                        if user_ids_to_delete:
+                            ApplicationChatUserStats.objects.filter(
+                                application_id=app_id,
+                                chat_user_id__in=user_ids_to_delete,
+                            ).delete()
+
+                Chat.objects.filter(id__in=orphan_chat_ids).delete()
             File.objects.filter(loid__in=[file.loid for file in files_to_delete]).delete()
 
             if deleted_count < batch_size:
