@@ -31,7 +31,7 @@ const expanded = ref(props.defaultExpanded)
         <MkIcon
           :icon="CaretBottom"
           :size="14"
-          class="transition-transform text-N600"
+          class="transition-transform text-N600!"
           :class="{ '-rotate-90': !expanded }"
         />
         <slot name="label">

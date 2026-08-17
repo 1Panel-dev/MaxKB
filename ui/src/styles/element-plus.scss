@@ -145,6 +145,7 @@
 /* card */
 .el-card {
   --el-card-border-radius: 12px;
+  --el-card-padding: 16px;
   overflow: visible;
   &__body {
     overflow: inherit;
@@ -155,7 +156,8 @@
   &.is-never-shadow {
     border: none;
   }
-  &.is-never-shadow {
+  &.is-hover-shadow {
+    cursor: pointer;
     &:hover {
       border-color: var(--el-color-primary);
     }

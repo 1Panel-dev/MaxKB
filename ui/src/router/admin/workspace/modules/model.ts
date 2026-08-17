@@ -8,7 +8,7 @@ export const modelRoutes: RouteRecordRaw[] = [
     meta: {
       title: '模型',
       icon: 'icon_dataset_outlined',
-      activeIcon: 'icon_dataset_outlined',
+      activeIcon: 'icon_dataset_filled',
       order: 50,
     },
   },

@@ -30,7 +30,7 @@ const slotRow = computed(() => row as T)
 
 <template>
   <div
-    class="group flex cursor-pointer items-center rounded-md p-2 hover:bg-N900/10"
+    class="group flex cursor-pointer items-center rounded-md px-2 py-[9px] hover:bg-N900/10"
     :class="{ 'bg-primary/10 font-medium text-primary hover:bg-primary/10': active }"
     @click="emit('click')"
   >

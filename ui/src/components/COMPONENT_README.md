@@ -67,6 +67,10 @@ src/components/
 │   └── mk-list-item.vue          # 列表与业务分组列表复用的行结构
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
+├── mk-source-card/
+│   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
+│   ├── mk-source-card-action.vue # 卡片悬浮操作容器
+│   └── mk-source-card-action-dropdown.vue # 卡片 More 下拉菜单
 ├── mk-workspace-dropdown/
 │   └── index.vue                 # 工作空间选择下拉框，手动导入
 └── mk-workspace-relation-tags/
@@ -80,6 +84,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
+import MkSourceCard from '@/components/mk-source-card/index.vue'
 import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
 ```
@@ -199,8 +204,9 @@ ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条
 
 ### MkComplexSearch
 
-用于在多个字段之间切换搜索条件。`fields` 使用 `@/api/types` 中的 `OptionItem<string>[]`；字段
-包含 `options` 时使用下拉选择，否则使用文本输入。输入或选择完成时，`change` 返回
+用于在多个字段之间切换搜索条件。`fields` 中的基础字段使用 `@/api/types` 中的
+`OptionItem<string>`；字段包含 `options` 时使用下拉选择，否则使用文本输入。选项字段配置
+`remoteMethod` 后自动启用远程搜索，并由该方法异步加载当前字段的选项。输入或选择完成时，`change` 返回
 `{ [field]: value }`；切换字段或清空条件时返回 `undefined`。
 
 ```vue
@@ -217,6 +223,19 @@ ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条
     },
   ]"
   @change="loadUsers($event)"
+/>
+
+<MkComplexSearch
+  :fields="[
+    { label: '名称', value: 'name' },
+    {
+      label: '创建者',
+      value: 'create_user',
+      options: creatorOptions,
+      remoteMethod: loadCreatorOptions,
+    },
+  ]"
+  @change="loadResources($event)"
 />
 ```
 
@@ -418,6 +437,58 @@ const paginationConfig = ref({
 ```
 
 ## 手动导入组件
+
+### MkSourceCard
+
+用于模型、工具等带来源信息的等高资源卡片。`title` 提供默认标题，`nick_name` 和 `create_time`
+提供固定样式的创建信息；`subtitle` 插槽也始终应用 `text-sm text-N600`。默认插槽放置资源详情，
+`footer` 插槽作为左侧常驻内容并始终贴在卡片底部；无论是否传入内容，底部都会保留固定位置。
+`footer` 作用域提供 `Action` 和 `ActionDropdown`。左侧常驻内容与 `Action` 写在同一个插槽内；
+`Action` 是卡片悬浮或内部获得焦点时显示的右侧操作容器，可以只放开关或按钮。
+需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，下拉菜单内容写入其默认插槽。
+需要自定义头部时可
+通过 `icon`、`title`、`subtitle` 和 `tag` 插槽覆盖对应区域；`title` 插槽提供 `{ title }`，
+便于在保留标题文案的同时追加状态图标等内容。
+
+```vue
+<script setup lang="ts">
+import MkSourceCard from '@/components/mk-source-card/index.vue'
+</script>
+
+<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
+  <template #icon><ProviderIcon /></template>
+  <template #title="{ title }">
+    <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
+    <MkIcon name="icon_warning_filled" />
+  </template>
+  <ul>资源详情</ul>
+  <template #footer="{ Action, ActionDropdown }">
+    <span>左侧常驻内容</span>
+    <component :is="Action">
+      <el-switch size="small" />
+      <component :is="ActionDropdown">
+        <MkDropdownMenu>
+          <MkDropdownItem>编辑</MkDropdownItem>
+          <MkDropdownItem>删除</MkDropdownItem>
+        </MkDropdownMenu>
+      </component>
+    </component>
+  </template>
+</MkSourceCard>
+```
+
+只需要悬浮显示开关时，可以不使用 `ActionDropdown`：
+
+```vue
+<MkSourceCard title="大语言模型" nick_name="管理员" create_time="2026-08-17">
+  <template #footer="{ Action }">
+    <span>左侧常驻内容</span>
+    <component :is="Action">
+      <el-switch size="small" />
+    </component>
+  </template>
+</MkSourceCard>
+```
 
 ### MkFormList
 

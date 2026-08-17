@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
+import CommonSystemApi from '@/api/admin/system/common'
 import RoleApi from '@/api/admin/system/role'
-import UserManageApi from '@/api/admin/system/user-manage'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import {
   ROLE_TYPE,
@@ -35,7 +35,7 @@ const workspaceOptionsLoading = ref(false)
 
 function loadUserOptions(keyword = '') {
   userOptionsLoading.value = true
-  return UserManageApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
+  return CommonSystemApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
     .then((users) => {
       const selectedUserIds = new Set(memberForm.members.flatMap(({ user_ids }) => user_ids))
       const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
