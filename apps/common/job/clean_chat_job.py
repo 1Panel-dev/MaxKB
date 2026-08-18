@@ -48,12 +48,9 @@ def clean_chat_log_job_lock():
 
 def delete_orphan_chats(orphan_chat_ids):
     if not orphan_chat_ids:
-        maxkb_logger.info('[clean_chat_log] delete_orphan_chats skipped, orphan_chat_ids is empty')
         return
 
-    maxkb_logger.info(f'[clean_chat_log] start delete_orphan_chats, orphan_chat_count={len(orphan_chat_ids)}')
     orphan_chats = list(Chat.objects.filter(id__in=orphan_chat_ids))
-    maxkb_logger.info(f'[clean_chat_log] loaded orphan chats, count={len(orphan_chats)}')
 
     # 按 (application_id, chat_user_id) 收集孤儿会话的用户，
     # 仅当该用户在该应用下不再有其它会话时才删除其访问统计，避免误删其他应用或仍活跃用户的统计
@@ -80,10 +77,6 @@ def delete_orphan_chats(orphan_chat_ids):
         for app_id, user_ids in app_user_ids.items():
             user_ids_to_delete = user_ids - remaining_app_user_ids.get(app_id, set())
             if user_ids_to_delete:
-                maxkb_logger.info(
-                    f'[clean_chat_log] delete application_chat_user_stats, '
-                    f'application_id={app_id}, chat_user_count={len(user_ids_to_delete)}'
-                )
                 ApplicationChatUserStats.objects.annotate(
                     chat_user_id_str=Cast('chat_user_id', output_field=CharField(max_length=128))
                 ).filter(
@@ -97,21 +90,15 @@ def delete_orphan_chats(orphan_chat_ids):
 
 def clean_method(query_conditions, clean_log=True):
     batch_size = 500
-    maxkb_logger.info(f'[clean_chat_log] start clean_method, clean_log={clean_log}, batch_size={batch_size}')
     while True:
         with transaction.atomic():
             chat_records = ChatRecord.objects.filter(query_conditions).select_related('chat').only('id', 'chat_id',
                                                                                                    'create_time')[
                            :batch_size]
             if not chat_records:
-                maxkb_logger.info('[clean_chat_log] no more chat_records, break batch loop')
                 break
             chat_record_ids = [record.id for record in chat_records]
             chat_ids = {record.chat_id for record in chat_records}
-            maxkb_logger.info(
-                f'[clean_chat_log] fetch batch chat_records, '
-                f'chat_record_count={len(chat_record_ids)}, chat_count={len(chat_ids)}'
-            )
 
             # 计算每个 chat_id 的最大 create_time
             max_create_times = ChatRecord.objects.filter(id__in=chat_record_ids).values('chat_id').annotate(
@@ -139,7 +126,6 @@ def clean_method(query_conditions, clean_log=True):
                     .annotate(count=Count('id'))
 
                 count_map = {item['chat_id']: item['count'] for item in updated_counts}
-                maxkb_logger.info(f'[clean_chat_log] remaining chat_record count_map={count_map}')
 
                 for chat_id in chat_ids:
                     count = count_map.get(chat_id, 0)  # 如果没有记录则为0
@@ -147,10 +133,6 @@ def clean_method(query_conditions, clean_log=True):
 
                 # 删除已经没有关联 ChatRecord 的 Chat
                 orphan_chat_ids = [chat_id for chat_id in chat_ids if count_map.get(chat_id, 0) == 0]
-                maxkb_logger.info(
-                    f'[clean_chat_log] orphan_chat_ids_count={len(orphan_chat_ids)}, '
-                    f'orphan_chat_ids={orphan_chat_ids}'
-                )
                 delete_orphan_chats(orphan_chat_ids)
             File.objects.filter(loid__in=[file.loid for file in files_to_delete]).delete()
 
@@ -158,7 +140,6 @@ def clean_method(query_conditions, clean_log=True):
                 break
 
     if clean_log:
-        maxkb_logger.info('[clean_chat_log] start final orphan chat cleanup')
         orphan_chat_ids = list(
             Chat.objects.filter(chatrecord__isnull=True).values_list('id', flat=True)
         )
@@ -175,7 +156,7 @@ def run():
             existing_job = scheduler.get_job(job_id='clean_chat_log')
             if existing_job is not None:
                 existing_job.remove()
-            scheduler.add_job(clean_chat_log_job, 'interval', minutes=5, id='clean_chat_log',
+            scheduler.add_job(clean_chat_log_job, 'cron', hour='0', minute='5', id='clean_chat_log',
                               misfire_grace_time=300, max_instances=1)
         finally:
             rlock.un_lock('clean_chat_log_job')
