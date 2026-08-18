@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： start_node.py
-    @date：2026/7/1 16:59
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： start_node.py
+@date：2026/7/1 16:59
+@desc:
 """
+
 import time
 from typing import List
 
@@ -21,9 +22,9 @@ from application.workflow.status import Status
 
 def get_default_global_variable(input_field_list: List):
     return {
-        item.get('variable') or item.get('field'): item.get('default_value')
+        item.get("variable") or item.get("field"): item.get("default_value")
         for item in input_field_list
-        if item.get('default_value', None) is not None
+        if item.get("default_value", None) is not None
     }
 
 
@@ -37,34 +38,28 @@ class ApplicationSerializer(serializers.Serializer):
 class StarNode(INode):
     serializer_class = ApplicationSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION]
-    type = 'start-node'
+    type = "start-node"
 
     def execute(self):
         workflow_params = self.get_workflow_parameters()
-        base_node = self.workflow_manage.workflow.get_node('base-node')
+        base_node = self.workflow_manage.workflow.get_node("base-node")
 
-        user_input_field_list = base_node.properties.get('user_input_field_list', []) if base_node else []
-        api_input_field_list = base_node.properties.get('api_input_field_list', []) if base_node else []
+        user_input_field_list = base_node.properties.get("user_input_field_list", []) if base_node else []
+        api_input_field_list = base_node.properties.get("api_input_field_list", []) if base_node else []
         default_global = get_default_global_variable(user_input_field_list)
         default_api_global = get_default_global_variable(api_input_field_list)
 
-        history_chat_record = workflow_params.get('history_chat_record', [])
-        history_context = [
-            {'question': r.problem_text, 'answer': r.answer_text}
-            for r in history_chat_record
-        ]
+        history_chat_record = workflow_params.get("history_chat_record", [])
+        history_context = [{"question": r.problem_text, "answer": r.answer_text} for r in history_chat_record]
 
-        chat_id = workflow_params.get('chat_id')
-        chat_user_id = workflow_params.get('chat_user_id')
+        chat_id = workflow_params.get("chat_id")
+        chat_user_id = workflow_params.get("chat_user_id")
 
-        memory = ''
+        memory = ""
         if chat_user_id:
             long_term_memory = (
                 QuerySet(ApplicationLongTermMemory)
-                .filter(
-                    chat_user_id=chat_user_id,
-                    application_id=workflow_params.get('application_id')
-                )
+                .filter(chat_user_id=chat_user_id, application_id=workflow_params.get("application_id"))
                 .first()
             )
             if long_term_memory:
@@ -73,26 +68,26 @@ class StarNode(INode):
         workflow_variable = {
             **default_global,
             **default_api_global,
-            'time': timezone.localtime(timezone.now()).strftime('%Y-%m-%d %H:%M:%S'),
-            'start_time': time.time(),
-            'history_context': history_context,
-            'chat_id': str(chat_id) if chat_id else None,
-            'chat_user_id': chat_user_id,
-            'chat_user_type': workflow_params.get('chat_user_type'),
-            'chat_user': workflow_params.get('chat_user'),
-            'chat_user_group': workflow_params.get('chat_user_group'),
-            'memory': memory,
+            "time": timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
+            "start_time": time.time(),
+            "history_context": history_context,
+            "chat_id": str(chat_id) if chat_id else None,
+            "chat_user_id": chat_user_id,
+            "chat_user_type": workflow_params.get("chat_user_type"),
+            "chat_user": workflow_params.get("chat_user"),
+            "chat_user_group": workflow_params.get("chat_user_group"),
+            "memory": memory,
         }
 
-        question = workflow_params.get('question', '')
+        question = workflow_params.get("question", "")
         node_variable = {
-            'question': question,
-            'image': workflow_params.get('image_list', []),
-            'document': workflow_params.get('document_list', []),
-            'audio': workflow_params.get('audio_list', []),
-            'video': workflow_params.get('video_list', []),
-            'other': workflow_params.get('other_list', []),
-            'memory': memory,
+            "question": question,
+            "image": workflow_params.get("image_list", []),
+            "document": workflow_params.get("document_list", []),
+            "audio": workflow_params.get("audio_list", []),
+            "video": workflow_params.get("video_list", []),
+            "other": workflow_params.get("other_list", []),
+            "memory": memory,
         }
 
         for key, value in node_variable.items():
@@ -101,9 +96,22 @@ class StarNode(INode):
         for key, value in workflow_variable.items():
             self.workflow_manage.context[key] = value
 
-        config = self.node.properties.get('config', {})
+        config = self.node.properties.get("config", {})
         if config:
-            for field in config.get('globalFields', []):
-                key = field.get('value')
+            for field in config.get("globalFields", []):
+                key = field.get("value")
                 if key:
-                    self.workflow_manage.context[key] = workflow_variable.get(key, '')
+                    self.workflow_manage.context[key] = workflow_variable.get(key, "")
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "question": self.get_context("question"),
+                "image": self.get_context("image"),
+                "document": self.get_context("document"),
+                "audio": self.get_context("audio"),
+                "video": self.get_context("video"),
+            }
+        )
+        return details

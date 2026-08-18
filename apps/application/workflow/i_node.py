@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： i_node.py
-    @date：2026/6/29  16:41
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： i_node.py
+@date：2026/6/29  16:41
+@desc:
 """
+
 import time
 from enum import Enum
 from typing import Optional, Type, Callable
@@ -20,13 +21,14 @@ from common.utils.logger import maxkb_logger
 
 class CancelledException(Exception):
     """工作流取消异常"""
+
     pass
 
 
 class Signal(str, Enum):
-    BREAK = 'BREAK'
-    CONTINUE = 'CONTINUE'
-    FORM = 'FORM'
+    BREAK = "BREAK"
+    CONTINUE = "CONTINUE"
+    FORM = "FORM"
     CANCELLED = "CANCELLED"
 
 
@@ -58,21 +60,21 @@ class INode:
         通用锚点: anchor('right') → '{id}_right',
                 anchor(branch_id, 'right') → '{id}_{branch_id}_right'
         """
-        return '_'.join([self.node.id, *map(str, parts)])
+        return "_".join([self.node.id, *map(str, parts)])
 
     def success_anchor(self):
         """
         成功锚点
         @return: 成功锚点
         """
-        return self.anchor('right')
+        return self.anchor("right")
 
     def fail_anchor(self):
         """
         失败锚点
         @return: 失败锚点
         """
-        return self.branch_anchor('exception')
+        return self.branch_anchor("exception")
 
     def branch_anchor(self, branch_id):
         """
@@ -80,7 +82,7 @@ class INode:
         @param branch_id: 自定义分支id
         @return: 自定义锚点
         """
-        return self.anchor(branch_id, 'right')
+        return self.anchor(branch_id, "right")
 
     def execute(self):
         pass
@@ -90,7 +92,7 @@ class INode:
         运行节点
         @return: 不响应数据
         """
-        self.data['start_time'] = time.time()
+        self.data["start_time"] = time.time()
         self.status = Status.RUNNING
         try:
             self._run()
@@ -122,16 +124,35 @@ class INode:
         self._completed = True
         self.status = status
         if error:
-            self.data['error'] = str(error)
-        self.data['run_time'] = time.time() - self.data['start_time']
+            self.data["error"] = str(error)
+        self.data["run_time"] = time.time() - self.data["start_time"]
         if signal:
             self.workflow_manage.signal = signal
             anchors = []
         if anchors is None:
-            anchors = [self.success_anchor() if [Status.SUCCESS, Status.CANCELLED].__contains__(
-                status) else self.fail_anchor()]
+            anchors = [
+                self.success_anchor() if [Status.SUCCESS, Status.CANCELLED].__contains__(status) else self.fail_anchor()
+            ]
         self._dispatch(anchors)
         self.workflow_manage.assertion_end(error)
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        """
+        获取节点运行详情
+        @param index: 节点索引
+        @param position: 位置信息，用于表单节点等断点续跑场景
+        @param old_details: 旧的详情数据，用于表单节点等断点续跑场景
+        @return: 节点详情字典
+        """
+        return {
+            "node_id": self.node.id,
+            "name": self.get_node_name(),
+            "index": index,
+            "run_time": self.data.get("run_time"),
+            "type": self.type,
+            "status": self.status.value if self.status else None,
+            "error": self.data.get("error"),
+        }
 
     def _dispatch(self, anchors):
         """
@@ -143,9 +164,8 @@ class INode:
         known = {en.edge.sourceAnchorId for en in edge_node_list}
         unknown = set(anchors) - known
         if unknown and known:
-            maxkb_logger.warning(f'node {self.node.id}: anchors {unknown} matched no edges, known={known}')
-        self.workflow_manage.next_nodes(
-            [en.node for en in edge_node_list if en.edge.sourceAnchorId in anchors])
+            maxkb_logger.warning(f"node {self.node.id}: anchors {unknown} matched no edges, known={known}")
+        self.workflow_manage.next_nodes([en.node for en in edge_node_list if en.edge.sourceAnchorId in anchors])
 
     def get_node_id(self):
         """

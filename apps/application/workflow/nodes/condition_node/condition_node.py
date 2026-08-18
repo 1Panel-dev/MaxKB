@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： condition_node.py
-    @date：2026/7/2 10:00
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： condition_node.py
+@date：2026/7/2 10:00
+@desc:
 """
+
 from typing import List
 
 from django.utils.translation import gettext_lazy as _
@@ -37,17 +38,17 @@ class ConditionNodeSerializer(serializers.Serializer):
 class ConditionNode(INode):
     serializer_class = ConditionNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
-    type = 'condition-node'
+    type = "condition-node"
 
     def execute(self):
         node_params = self.get_parameters()
-        branch_list = node_params.get('branch', [])
+        branch_list = node_params.get("branch", [])
         branch = self._evaluate_branches(branch_list)
-        branch_id = branch.get('id')
-        branch_name = branch.get('type')
+        branch_id = branch.get("id")
+        branch_name = branch.get("type")
 
-        self.write_context('branch_id', branch_id)
-        self.write_context('branch_name', branch_name)
+        self.write_context("branch_id", branch_id)
+        self.write_context("branch_name", branch_name)
 
         self.complete(Status.SUCCESS, [self.branch_anchor(branch_id)])
 
@@ -58,8 +59,14 @@ class ConditionNode(INode):
         return branch_list[-1] if branch_list else {}
 
     def _branch_assertion(self, branch):
-        return do_assertion(
-            self.workflow_manage,
-            branch.get('condition'),
-            branch.get('conditions')
+        return do_assertion(self.workflow_manage, branch.get("condition"), branch.get("conditions"))
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "branch_id": self.get_context("branch_id"),
+                "branch_name": self.get_context("branch_name"),
+            }
         )
+        return details

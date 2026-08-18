@@ -26,7 +26,6 @@ from common.db.search import native_search
 from common.utils.common import flat_map, get_file_content
 from common.utils.shared_resource_auth import filter_authorized_ids
 from knowledge.models import Document, Paragraph, Knowledge, SearchMode
-from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -244,16 +243,6 @@ class SearchKnowledgeNode(INode):
         paragraph_list = _list_paragraph(embedding_list, vector)
         result = [_reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
         result = sorted(result, key=lambda p: p.get("similarity"), reverse=True)
-        if not workflow_params.get("debug", False):
-            recalled_paragraph_ids = {paragraph.get("id") for paragraph in result}
-            record_recall_safely(
-                [
-                    embedding
-                    for embedding in embedding_list
-                    if str(embedding.get("paragraph_id")) in recalled_paragraph_ids
-                ],
-                tracker=get_recall_tracker(self.workflow_manage),
-            )
 
         self.write_context("paragraph_list", result)
         self.write_context("is_hit_handling_method_list", [row for row in result if row.get("is_hit_handling_method")])
@@ -279,3 +268,15 @@ class SearchKnowledgeNode(INode):
         if fields:
             return self.workflow_manage.get_reference_field(fields[0], fields[1:])
         return None
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "question": self.get_context("question"),
+                "paragraph_list": self.get_context("paragraph_list"),
+                "data": self.get_context("data"),
+                "show_knowledge": self.get_context("show_knowledge"),
+            }
+        )
+        return details

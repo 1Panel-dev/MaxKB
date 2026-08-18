@@ -1,9 +1,10 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @file： parameter_extraction_node.py
-    @desc:
+@project: MaxKB
+@file： parameter_extraction_node.py
+@desc:
 """
+
 import json
 import re
 
@@ -42,9 +43,10 @@ class ParameterExtractionNodeSerializer(serializers.Serializer):
     variable_list = serializers.ListField(required=True, label=_("Split variables"))
     model_params_setting = serializers.DictField(required=False, label=_("Model parameter settings"))
     model_id = serializers.CharField(required=False, allow_blank=True, allow_null=True, label=_("Model id"))
-    model_id_type = serializers.CharField(required=False, default='custom', label=_("Model id type"))
-    model_id_reference = serializers.ListField(required=False, child=serializers.CharField(), allow_empty=True,
-                                               label=_("Reference Field"))
+    model_id_type = serializers.CharField(required=False, default="custom", label=_("Model id type"))
+    model_id_reference = serializers.ListField(
+        required=False, child=serializers.CharField(), allow_empty=True, label=_("Reference Field")
+    )
 
 
 def _get_default_model_params_setting(model_id):
@@ -55,17 +57,23 @@ def _get_default_model_params_setting(model_id):
 
 
 def _generate_properties(variable_list):
-    return {variable['field']: {'type': variable['parameter_type'], 'description': (variable.get('desc') or ""),
-                                'title': variable['label']} for variable in variable_list}
+    return {
+        variable["field"]: {
+            "type": variable["parameter_type"],
+            "description": (variable.get("desc") or ""),
+            "title": variable["label"],
+        }
+        for variable in variable_list
+    }
 
 
 def _generate_example(variable_list):
-    return {variable['field']: None for variable in variable_list}
+    return {variable["field"]: None for variable in variable_list}
 
 
 def _generate_content(input_variable, variable_list):
     properties = _generate_properties(variable_list)
-    prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
+    prompt_template = PromptTemplate.from_template(prompt, template_format="jinja2")
     value = prompt_template.format(properties=properties, question=input_variable)
     return value
 
@@ -78,8 +86,8 @@ def _json_loads(response, variable_list):
 
     extraction_strategies = [
         lambda: json.loads(cleaned),
-        lambda: json.loads(re.search(r'```(?:json)?\s*(\{.*?\})\s*```', cleaned, re.DOTALL).group(1)),
-        lambda: json.loads(re.search(r'(\{.*\})', cleaned, flags=re.DOTALL).group(1)),
+        lambda: json.loads(re.search(r"```(?:json)?\s*(\{.*?\})\s*```", cleaned, re.DOTALL).group(1)),
+        lambda: json.loads(re.search(r"(\{.*\})", cleaned, flags=re.DOTALL).group(1)),
     ]
     for strategy in extraction_strategies:
         try:
@@ -93,48 +101,57 @@ def _json_loads(response, variable_list):
 class ParameterExtractionNode(INode):
     serializer_class = ParameterExtractionNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
-    type = 'parameter-extraction-node'
+    type = "parameter-extraction-node"
 
     def execute(self):
         node_params = self.get_parameters()
         workflow_params = self.get_workflow_parameters()
 
-        model_id = node_params.get('model_id')
-        model_id_type = node_params.get('model_id_type', 'custom')
-        model_id_reference = node_params.get('model_id_reference')
-        model_params_setting = node_params.get('model_params_setting')
-        input_variable_ref = node_params.get('input_variable')
-        variable_list = node_params.get('variable_list')
+        model_id = node_params.get("model_id")
+        model_id_type = node_params.get("model_id_type", "custom")
+        model_id_reference = node_params.get("model_id_reference")
+        model_params_setting = node_params.get("model_params_setting")
+        input_variable_ref = node_params.get("input_variable")
+        variable_list = node_params.get("variable_list")
 
-        if model_id_type == 'reference' and model_id_reference:
+        if model_id_type == "reference" and model_id_reference:
             reference_data = self.workflow_manage.get_reference_field(
-                model_id_reference[0], model_id_reference[1:],
+                model_id_reference[0],
+                model_id_reference[1:],
             )
             if reference_data and isinstance(reference_data, dict):
-                model_id = reference_data.get('model_id', model_id)
-                model_params_setting = reference_data.get('model_params_setting')
+                model_id = reference_data.get("model_id", model_id)
+                model_params_setting = reference_data.get("model_params_setting")
 
         if not model_id:
-            raise Exception(_('Model is not allowed to be empty'))
+            raise Exception(_("Model is not allowed to be empty"))
 
         if model_params_setting is None and model_id:
             model_params_setting = _get_default_model_params_setting(model_id)
 
-        workspace_id = workflow_params.get('workspace_id')
-        chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id,
-                                                              **(model_params_setting or {}))
+        workspace_id = workflow_params.get("workspace_id")
+        chat_model = get_model_instance_by_model_workspace_id(model_id, workspace_id, **(model_params_setting or {}))
 
-        input_variable = self.workflow_manage.get_reference_field(
-            input_variable_ref[0], input_variable_ref[1:])
+        input_variable = self.workflow_manage.get_reference_field(input_variable_ref[0], input_variable_ref[1:])
 
         input_variable_str = str(input_variable)
-        self.write_context('request', input_variable_str)
+        self.write_context("request", input_variable_str)
 
         content = _generate_content(input_variable_str, variable_list)
         self._check_cancelled()
         response = chat_model.invoke([HumanMessage(content=content)])
         result = _json_loads(response.content, variable_list)
 
-        self.write_context('result', result)
+        self.write_context("result", result)
         for key, value in result.items():
             self.write_context(key, value)
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "request": self.get_context("request"),
+                "result": self.get_context("result"),
+            }
+        )
+        return details
