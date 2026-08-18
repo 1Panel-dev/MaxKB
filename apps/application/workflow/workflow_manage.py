@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： workflow_manage.py
-    @date：2026/6/29 10:30
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： workflow_manage.py
+@date：2026/6/29 10:30
+@desc:
 """
+
 from __future__ import annotations
 
 import threading
@@ -15,14 +16,17 @@ from langchain_core.prompts import PromptTemplate
 
 from application.workflow.common import Workflow, WorkflowType, Node, get_node_parameters
 from application.workflow.i_node import INode, Signal
-from application.workflow.message.struct.content import Content
+from application.workflow.message.struct.content import Content, Position
 
 from application.workflow.status import Status
 
 
 class CallBack:
-    def __init__(self, on_next: Callable[[WorkflowManage, Content], None],
-                 on_complete: Callable[[WorkflowManage, Optional[Exception]], None]):
+    def __init__(
+        self,
+        on_next: Callable[[WorkflowManage, Content], None],
+        on_complete: Callable[[WorkflowManage, Optional[Exception]], None],
+    ):
         self.on_next = on_next
         self.on_complete = on_complete
 
@@ -35,12 +39,14 @@ class WorkflowManage:
     # 是否结束
     done: bool
 
-    def __init__(self,
-                 workflow: Workflow,
-                 parameters: Dict,
-                 workflow_type: WorkflowType,
-                 call_back: CallBack,
-                 get_start_node: Callable[[Workflow, WorkflowManage], INode]):
+    def __init__(
+        self,
+        workflow: Workflow,
+        parameters: Dict,
+        workflow_type: WorkflowType,
+        call_back: CallBack,
+        get_start_node: Callable[[Workflow, WorkflowManage], INode],
+    ):
         """
 
         @param workflow:      工作流对象
@@ -57,6 +63,7 @@ class WorkflowManage:
         self.nodes = []
         self.node_dict = {}
         self.signal = None
+        self.details = {"position": {}, "details": {}}
         self.start_node = get_start_node(workflow, self)
 
     def run(self):
@@ -84,20 +91,23 @@ class WorkflowManage:
         # 需要校验是否可执行
         for n in nodes:
             condition = n.properties.get("condition")
-            if condition == 'AND':
+            if condition == "AND":
                 up_nodes = self.workflow.get_up_nodes(n.id)
                 # 如果是AND就是前面所有节点都执行结束
                 unfinished = {Status.BEFORE_RUNNING, Status.RUNNING}
                 end = all(
-                    [self.node_dict.get(node.id) and self.node_dict.get(node.id).status not in unfinished for node in
-                     up_nodes])
+                    [
+                        self.node_dict.get(node.id) and self.node_dict.get(node.id).status not in unfinished
+                        for node in up_nodes
+                    ]
+                )
                 if not end:
                     return
 
         with self._lock:
             from application.workflow.nodes import get_node_class
-            instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters)
-                         for n in nodes]
+
+            instances = [get_node_class(n.type, self.workflow_type)(n, self, get_node_parameters) for n in nodes]
             self.nodes.extend(instances)
             for node in instances:
                 self.node_dict[node.node.id] = node
@@ -173,6 +183,7 @@ class WorkflowManage:
         工作流输出结束的时候调用
         @return: None
         """
+        self.details = self.get_details()
         self.call_back.on_complete(self, error)
 
     def get_parameters(self):
@@ -182,6 +193,31 @@ class WorkflowManage:
         """
         return self.parameters
 
+    def get_details(self, position: Position = None, old_details=None):
+        """
+        获取所有节点的运行详情
+        @param position: 位置信息，用于表单节点等需要断点续跑的场景
+        @param old_details: 旧的详情数据，用于表单节点等断点续跑场景
+        @return: 包含position和details的字典
+        """
+        details_result = []
+        position_index = 0
+        if old_details and position:
+            for index, value in enumerate(old_details):
+                details_result.append(value)
+                if position.id == value.get("node_id"):
+                    position_index = index
+        for index, node in enumerate(self.nodes):
+            if node.node.id == position.id and index == 0:
+                details = node.get_details(
+                    index + position_index, position=position, old_details=old_details[position_index]
+                )
+                details_result.insert(position_index, details)
+            else:
+                details = node.get_details(index + position_index)
+                details_result.append(details)
+        return details_result
+
     def generate_prompt(self, prompt):
         """
         处理提示词
@@ -189,7 +225,7 @@ class WorkflowManage:
         @return: 处理后的提示词
         """
         prompt = self.workflow.reset_prompt(prompt)
-        prompt_template = PromptTemplate.from_template(prompt, template_format='jinja2')
+        prompt_template = PromptTemplate.from_template(prompt, template_format="jinja2")
         return prompt_template.format(context=self.context)
 
     def get_reference_field(self, node_id, fields):
@@ -211,8 +247,7 @@ class WorkflowManage:
         return obj
 
     @classmethod
-    def from_context(cls, chat_record_id, workflow, parameters, workflow_type,
-                     call_back, get_start_node):
+    def from_context(cls, chat_record_id, workflow, parameters, workflow_type, call_back, get_start_node):
         """从历史 context 恢复 WorkflowManage"""
         from application.models import ChatRecord
         from django.core.cache import cache
@@ -238,7 +273,7 @@ class WorkflowManage:
                 parameters=parameters,
                 workflow_type=workflow_type,
                 call_back=call_back,
-                get_start_node=get_start_node
+                get_start_node=get_start_node,
             )
 
             # 恢复全局 context
@@ -247,6 +282,7 @@ class WorkflowManage:
             return instance
         except Exception as e:
             import traceback
+
             traceback.print_exc()
             return None
 

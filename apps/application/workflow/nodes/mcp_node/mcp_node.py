@@ -27,19 +27,19 @@ class McpNodeSerializer(serializers.Serializer):
 class McpNode(INode):
     serializer_class = McpNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
-    type = 'mcp-node'
+    type = "mcp-node"
 
     def execute(self):
         node_params = self.get_parameters()
 
-        mcp_servers = node_params.get('mcp_servers')
-        mcp_server = node_params.get('mcp_server')
-        mcp_tool = node_params.get('mcp_tool')
-        mcp_tool_id = node_params.get('mcp_tool_id')
-        mcp_source = node_params.get('mcp_source')
-        tool_params = node_params.get('tool_params', {})
+        mcp_servers = node_params.get("mcp_servers")
+        mcp_server = node_params.get("mcp_server")
+        mcp_tool = node_params.get("mcp_tool")
+        mcp_tool_id = node_params.get("mcp_tool_id")
+        mcp_source = node_params.get("mcp_source")
+        tool_params = node_params.get("tool_params", {})
 
-        if mcp_source == 'referencing':
+        if mcp_source == "referencing":
             if not mcp_tool_id:
                 raise ValueError("MCP tool ID is required when mcp_source is 'referencing'.")
             tool = QuerySet(Tool).filter(id=mcp_tool_id).first()
@@ -67,9 +67,9 @@ class McpNode(INode):
         res = asyncio.run(call_tool(mcp_tool, params))
         result = [content.text for content in res.content]
 
-        self.write_context('result', result)
-        self.write_context('tool_params', params)
-        self.write_context('mcp_tool', mcp_tool)
+        self.write_context("result", result)
+        self.write_context("tool_params", params)
+        self.write_context("mcp_tool", mcp_tool)
 
     def _handle_variables(self, tool_params: Any) -> Any:
         if isinstance(tool_params, dict):
@@ -88,3 +88,14 @@ class McpNode(INode):
         if fields:
             return self.workflow_manage.get_reference_field(fields[0], fields[1:])
         return None
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "mcp_tool": self.get_context("mcp_tool"),
+                "tool_params": self.get_context("tool_params"),
+                "result": self.get_context("result"),
+            }
+        )
+        return details

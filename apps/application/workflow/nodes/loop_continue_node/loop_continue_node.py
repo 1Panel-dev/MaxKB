@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： loop_continue_node.py
-    @date：2026/7/6 15:10
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： loop_continue_node.py
+@date：2026/7/6 15:10
+@desc:
 """
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
@@ -29,17 +30,26 @@ class LoopContinueNodeSerializer(serializers.Serializer):
 class LoopContinueNode(INode):
     serializer_class = LoopContinueNodeSerializer
     supported_workflow_type_list = [WorkflowType.APPLICATION, WorkflowType.KNOWLEDGE, WorkflowType.TOOL]
-    type = 'loop-continue-node'
+    type = "loop-continue-node"
 
     def execute(self):
         node_params = self.get_parameters()
-        condition = node_params.get('condition')
-        condition_list = node_params.get('condition_list', [])
+        condition = node_params.get("condition")
+        condition_list = node_params.get("condition_list", [])
 
         is_continue = do_assertion(self.workflow_manage, condition, condition_list)
-        self.write_context('is_continue', is_continue)
+        self.write_context("is_continue", is_continue)
 
         if is_continue:
             self.complete(Status.SUCCESS, signal=Signal.CONTINUE)
             return
         self.complete(Status.SUCCESS)
+
+    def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
+        details = super().get_details(index, position, old_details, **kwargs)
+        details.update(
+            {
+                "is_continue": self.get_context("is_continue"),
+            }
+        )
+        return details
