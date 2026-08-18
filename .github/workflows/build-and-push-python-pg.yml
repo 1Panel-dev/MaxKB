@@ -25,7 +25,7 @@ jobs:
         run: |
           DOCKER_IMAGE=ghcr.io/1panel-dev/maxkb-base
           DOCKER_PLATFORMS=${{ github.event.inputs.architecture }}
-          TAG_NAME=python3.13-pg17.10-20260624
+          TAG_NAME=python3.13-pg17.11-20260902
           DOCKER_IMAGE_TAGS="--tag ${DOCKER_IMAGE}:${TAG_NAME}"
           echo "docker_image=${DOCKER_IMAGE}" >> $GITHUB_OUTPUT
           echo "version=${TAG_NAME}" >> $GITHUB_OUTPUT
