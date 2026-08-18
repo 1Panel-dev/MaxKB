@@ -80,7 +80,8 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 | 页面                                                            | 功能说明                        |
 | --------------------------------------------------------------- | ------------------------------- |
-| `agent/AgentDetailView.vue`                                     | 智能体详情页面                  |
+| `agent/AgentDetailView.vue`                                     | 智能体详情及工作流入口页面      |
+| `workflow/AgentWorkflowView.vue`                                | 智能体工作流页面头部与全屏画布  |
 | `chat/ChatView.vue`                                             | Chat 入口的对话页面             |
 | `error/NotFoundView.vue`                                        | Admin 未匹配路由和全局 404 页面 |
 | `home/HomeView.vue`                                             | Workspace 首页                  |
@@ -101,7 +102,6 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/settings/email/EmailSettingsView.vue`                   | 系统邮件 SMTP 服务配置页面      |
 | `system/operate-logs/OperateLogListView.vue`                    | 系统操作日志查询与清理页面      |
 | `tool/ToolView.vue`                                             | 工作空间工具目录与工具卡片页面  |
-| `workflow/WorkflowView.vue`                                     | 工作流编排全屏页面              |
 
 ## 备注要求
 
