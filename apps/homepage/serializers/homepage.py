@@ -129,9 +129,9 @@ class HomePageSerializer(serializers.Serializer):
                 create_time__gte=start_time,
                 create_time__lte=end_time,
             )
-            if is_workspace_manage:
+            if is_workspace_manage(auth, workspace_id):
                 query = query.filter(chat__application__workspace_id=workspace_id)
-            elif is_extends_workspace_manage:
+            elif is_extends_workspace_manage(auth, workspace_id):
                 if has_extends_workspace_manage_permission(
                     auth, PermissionConstants.APPLICATION_READ.value, workspace_id
                 ):
