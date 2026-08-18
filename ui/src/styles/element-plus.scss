@@ -145,6 +145,7 @@
 /* card */
 .el-card {
   --el-card-border-radius: 12px;
+  --el-card-border-color: var(--mk-N300);
   --el-card-padding: 16px;
   overflow: visible;
   &__body {
@@ -516,6 +517,9 @@
     &[data-popper-placement^='top'] {
       translate: 0 8px;
     }
+  }
+  &.el-tooltip:not(.el-select__popper, .el-dropdown__popper, .el-popover, .el-cascader__dropdown) {
+    max-width: 320px;
   }
 }
 

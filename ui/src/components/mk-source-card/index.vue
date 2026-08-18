@@ -79,7 +79,7 @@ const slots = defineSlots<{
       <slot />
     </div>
 
-    <footer class="flex min-h-8 items-center gap-2">
+    <footer class="flex items-center gap-2">
       <slot
         name="footer"
         :Action="MkSourceCardAction"

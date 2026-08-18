@@ -8,7 +8,7 @@ defineSlots<{
 
 <template>
   <MkDropdown trigger="click" placement="bottom-end" :teleported="false">
-    <el-button text>
+    <el-button class="-mr-1 -mb-1"  text>
       <MkIcon name="icon_more_outlined" />
     </el-button>
 

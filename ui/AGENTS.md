@@ -56,8 +56,9 @@ ui/
 │   ├── api/                   # Request infrastructure, business APIs, and shared API types
 │   │   ├── types/             # Types shared by APIs and their View or Component consumers
 │   │   └── API_README.md      # API layering, placement, typing, and request rules
-│   ├── components/            # Shared UI components
+│   ├── components/            # Shared UI and cross-page business components
 │   │   ├── COMPONENT_README.md # Shared component conventions and usage
+│   │   ├── business/          # Cross-page business components, imported explicitly
 │   │   ├── global/            # Frequently used components auto-registered by Vite
 │   │   │   └── mk-icon/       # Unified SVG Symbol and Element Plus icon component
 │   │   └── <component-name>/   # Less-frequent shared components imported explicitly
@@ -95,6 +96,8 @@ Directories marked as reserved may be empty while their feature is being introdu
 
 Structural responsibilities:
 
+- Put cross-page business components in `components/business/`, name them after their business
+  responsibility without the `Mk` prefix, and keep page-specific components in their owning View.
 - Put reusable application chrome in `layout/`, not in individual route views.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
