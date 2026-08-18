@@ -1,12 +1,12 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-/** Workflow 使用独立的全屏编排界面，不挂载工作空间侧栏。 */
+/** 各业务 Workflow 使用独立的全屏画布，不挂载 Workspace 或 System Layout。 */
 export const workflowRoutes: RouteRecordRaw[] = [
   {
-    path: '/workflow/:id',
-    name: 'workflow-editor',
-    component: () => import('@/views/workflow/WorkflowView.vue'),
-    meta: { title: '工作流编排' },
+    path: '/workflow/agent/:agentId',
+    name: 'workflow-agent',
+    component: () => import('@/views/workflow/AgentWorkflowView.vue'),
+    props: true,
+    meta: { title: '智能体工作流' },
   },
-  // 调试、运行记录等页面继续在此模块中扩展。
 ]
