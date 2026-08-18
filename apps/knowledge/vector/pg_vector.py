@@ -24,6 +24,7 @@ from common.utils.ts_vecto_util import to_ts_vector, to_query
 from knowledge.models import Embedding, SearchMode, SourceType, Termbase
 from knowledge.vector.base_vector import BaseVectorStore, normalize_for_embedding
 from maxkb.conf import PROJECT_DIR
+from maxkb.const import CONFIG
 
 
 class PGVector(BaseVectorStore):
@@ -326,6 +327,8 @@ class BlendSearch(ISearch):
             if knowledge_id_list
             else None
         )
+        vector_weight = float(CONFIG.get("SEARCH_VECTOR_WEIGHT") or 0.5)
+        keyword_weight = 1 - vector_weight
         embedding_model = select_list(
             exec_sql,
             [
@@ -335,6 +338,8 @@ class BlendSearch(ISearch):
                 len(query_embedding),
                 json.dumps(query_embedding),
                 top_number,
+                vector_weight,
+                keyword_weight,
                 to_query(query_text, user_words=terms),
                 similarity,
                 top_number,
