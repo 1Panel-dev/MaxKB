@@ -2,8 +2,6 @@ import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   ToolCatalogResponse,
-  ToolFolder,
-  ToolFolderPayload,
   ToolListQuery,
   ToolPayload,
   ToolTreeResponse,
@@ -11,7 +9,6 @@ import type {
 } from '@/api/types'
 
 const getPrefix = (workspaceId: string) => `/workspace/${workspaceId}/tool`
-const getFolderPrefix = (workspaceId: string) => `/workspace/${workspaceId}/TOOL/folder`
 
 /** 获取当前目录下的工具和子文件夹。 */
 const getToolTree = (workspaceId: string, query?: ToolListQuery) => {
@@ -29,26 +26,6 @@ const getToolPage = (workspaceId: string, page: ParamsPage, query?: ToolListQuer
     `${getPrefix(workspaceId)}/${page.currentPage}/${page.pageSize}`,
     query,
   )
-}
-
-/** 获取工具文件夹树。 */
-const getToolFolderTree = (workspaceId: string) => {
-  return get<ToolFolder[]>(getFolderPrefix(workspaceId))
-}
-
-/** 创建工具文件夹。 */
-const postToolFolder = (workspaceId: string, payload: ToolFolderPayload) => {
-  return post<ToolFolderPayload, ToolFolder>(getFolderPrefix(workspaceId), payload)
-}
-
-/** 更新工具文件夹。 */
-const putToolFolder = (workspaceId: string, folderId: string, payload: ToolFolderPayload) => {
-  return put<ToolFolderPayload, ToolFolder>(`${getFolderPrefix(workspaceId)}/${folderId}`, payload)
-}
-
-/** 删除工具文件夹及其内容。 */
-const deleteToolFolder = (workspaceId: string, folderId: string) => {
-  return del<undefined, boolean>(`${getFolderPrefix(workspaceId)}/${folderId}`)
 }
 
 /** 创建工作空间工具。 */
@@ -93,17 +70,13 @@ const putBatchMoveTools = (workspaceId: string, toolIds: string[], folderId: str
 
 export default {
   deleteTool,
-  deleteToolFolder,
   getToolCatalog,
   getToolDetail,
-  getToolFolderTree,
   getToolPage,
   getToolTree,
   postTool,
-  postToolFolder,
   postToolTestConnection,
   putBatchDeleteTools,
   putBatchMoveTools,
   putTool,
-  putToolFolder,
 }
