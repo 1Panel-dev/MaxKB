@@ -10,9 +10,9 @@ import type {
   SystemUserGroupMember,
 } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
+import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 
@@ -200,7 +200,7 @@ onMounted(() => loadWorkspaceOptions())
 <template>
   <MkViewLayout class="system-identity-groups" :loading="loadingView">
     <template #top>
-      <MkWorkspaceDropdown
+      <WorkspaceDropdown
         v-model="selectedWorkspaceId"
         :options="workspaceOptions"
         @select="handleWorkspaceSelect"
@@ -274,7 +274,7 @@ onMounted(() => loadWorkspaceOptions())
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
             <template #default="{ row }">
-              <MkWorkspaceRelationTags
+              <WorkspaceRelationTags
                 :table-render-params="{ property: '角色', value: '工作空间' }"
                 :tags="row.role ? [row.role] : []"
               />

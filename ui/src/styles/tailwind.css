@@ -76,3 +76,18 @@
   flex-wrap: wrap;
   row-gap: calc(var(--spacing) * 2);
 }
+
+/* group 内的操作区默认隐藏，悬浮或获得焦点时显示 */
+@utility group-hover-visible {
+  opacity: 0;
+  pointer-events: none;
+  transition-duration: 150ms;
+  transition-property: opacity;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+
+  :where(.group):hover &,
+  :where(.group):focus-within & {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

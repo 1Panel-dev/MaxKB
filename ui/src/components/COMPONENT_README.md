@@ -2,18 +2,19 @@
 
 本文档是项目公共组件规则的唯一依据。新增、修改、移动或使用公共组件前，应先阅读本文档。
 
-`src/components` 只存放跨页面或跨业务模块复用的 UI 组件。仅在单个功能内使用的组件，应放在
-对应的 `views/<feature>/components` 中。
+`src/components` 存放跨页面或跨业务模块复用的 UI 组件与业务组件。仅在单个功能内使用的组件，
+应放在对应的 `views/<feature>/components` 中。
 
 ## 组件选型
 
 按以下顺序选择组件：
 
 1. 首先检查 `src/components/global`，优先使用全局自动注册的 Mk 封装组件。
-2. 全局组件无法满足时，检查 `src/components` 中需要手动导入的共享组件。
-3. 没有对应 Mk 组件时，再使用 Element Plus 现成组件。
-4. 通过 Props、事件、插槽、公开方法、Tailwind class 或必要的样式覆盖适配设计稿。
-5. 现有组件无法满足必要的结构或行为时，再新增自定义组件。
+2. 涉及固定跨页面业务时，检查 `src/components/business` 中手动导入的业务组件。
+3. 以上组件无法满足时，检查 `src/components` 直属目录中手动导入的共享 UI 组件。
+4. 没有对应 Mk 组件时，再使用 Element Plus 现成组件。
+5. 通过 Props、事件、插槽、公开方法、Tailwind class 或必要的样式覆盖适配设计稿。
+6. 现有组件无法满足必要的结构或行为时，再新增自定义组件。
 
 已有全局 Mk 组件封装相同能力时，业务页面和业务组件必须使用该封装，不要绕过它直接使用
 底层 Element Plus 组件，也不要在功能目录重复封装。例如对话框使用 `MkDialog`、抽屉使用
@@ -32,6 +33,17 @@ Element Plus 已在 `src/main.ts` 和 `src/chat.ts` 中全局注册，Vue 模板
 ```text
 src/components/
 ├── COMPONENT_README.md
+├── business/                     # 跨页面复用的业务组件，不使用 Mk 前缀
+│   ├── folder-tree/              # Workspace 文件夹虚拟树及固定 CRUD 业务
+│   │   ├── index.vue
+│   │   ├── FolderFormDialog.vue
+│   │   ├── MoveFolderDialog.vue
+│   │   ├── VirtualizedTree.vue
+│   │   └── types.ts
+│   ├── workspace-dropdown/
+│   │   └── index.vue             # 工作空间选择下拉框
+│   └── workspace-relation-tags/
+│       └── index.vue             # 标签及关联工作空间展示
 ├── global/                       # 高频、稳定的基础组件，自动注册
 │   ├── mk-complex-search/
 │   │   └── index.vue             # 字段选择与输入或枚举条件组合搜索框
@@ -67,14 +79,10 @@ src/components/
 │   └── mk-list-item.vue          # 列表与业务分组列表复用的行结构
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
-├── mk-source-card/
+└── mk-source-card/
 │   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
 │   ├── mk-source-card-action.vue # 卡片悬浮操作容器
 │   └── mk-source-card-action-dropdown.vue # 卡片 More 下拉菜单
-├── mk-workspace-dropdown/
-│   └── index.vue                 # 工作空间选择下拉框，手动导入
-└── mk-workspace-relation-tags/
-    └── index.vue                 # 标签及关联工作空间展示，手动导入
 ```
 
 Vite 的 `unplugin-vue-components` 只扫描 `src/components/global`。该目录中的组件可以直接在
@@ -85,8 +93,9 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
-import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
-import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+import FolderTree from '@/components/business/folder-tree/index.vue'
+import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
+import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 ```
 
 自动注册只适用于 Vue 模板。脚本中的类型、常量和 Element Plus 图标仍需显式导入。自动生成
@@ -95,8 +104,9 @@ import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/ind
 ## 组件约定
 
 - 高频、稳定、跨多数页面使用的基础组件放入 `global`。
-- 使用页面较少、有明确业务含义或依赖较重的共享组件放在
-  `components/<component-name>`，由使用方手动导入。
+- 跨页面复用且依赖业务类型、固定业务接口或领域交互的组件放入 `business/<component-name>`，
+  由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
+- 不依赖固定业务的共享组合 UI 组件放在 `components/<component-name>`，由使用方手动导入。
 - 一个公共组件使用一个 kebab-case 目录，入口统一为 `index.vue`。
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应
   `mk-icon/index.vue`。
@@ -348,9 +358,9 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 - `src/assets/iconfont.js` 只允许整体替换，不要手动编辑；Symbol ID 变化时同步更新所有引用。
 
 ```vue
-<MkIcon name="icon_left_outlined" />
+<MkIcon name="icon_left_outlined" class="text-danger!" />
 <MkIcon name="icon_home_filled" gradient />
-<MkIcon :icon="Setting" :size="20" color="#3370ff" />
+<MkIcon :icon="Setting" :size="20" />
 ```
 
 ### MkSearchInput
@@ -651,7 +661,38 @@ function selectItem(item: SearchListItem, index: number) {
 `props` 中未传的字段保留默认值，例如只传
 `:props="{ label: 'title' }"` 时，唯一值字段仍为 `id`。
 
-### MkWorkspaceDropdown
+## 跨页面业务组件
+
+业务组件可以调用其固定业务 API，但应将通用展示部分拆成内部纯 UI 组件；页面继续负责资源列表
+查询、路由跳转等所属页面业务。业务组件必须显式导入，不参与全局自动注册。
+
+### FolderTree
+
+Workspace 的文件夹虚拟树业务组件。组件根据 `workspaceId` 和 `source` 调用统一文件夹接口，负责
+文件夹树查询、搜索、排序、创建、编辑、移动和删除。通过 `v-model` 控制当前文件夹 ID，选择
+文件夹时触发 `select`；`beforeTree` 插槽用于“全部”“共享”等不属于文件夹接口的固定入口。
+
+```vue
+<script setup lang="ts">
+import { FOLDER_SOURCE } from '@/api/types'
+import FolderTree from '@/components/business/folder-tree/index.vue'
+</script>
+
+<FolderTree
+  v-model="currentFolderId"
+  :source="FOLDER_SOURCE.TOOL"
+  :workspace-id="workspaceId"
+  @select="handleFolderSelect"
+>
+  <template #beforeTree>全部工具、共享工具等固定入口</template>
+</FolderTree>
+```
+
+页面顶部需要触发根目录创建时，通过页面语义处理方法调用组件暴露的 `openCreate()`；外部数据变化
+后可调用 `refresh()` 重新加载文件夹树。`VirtualizedTree.vue` 基于 `@he-tree/vue` 的 `Draggable`
+实现虚拟渲染和拖拽交互，只负责树 UI，不调用 API；不要替换为 Element Plus `el-tree-v2`。
+
+### WorkspaceDropdown
 
 统一工作空间下拉框的图标和触发器布局。通过 `options` 传入工作空间选项，通过 `v-model`
 控制选中值，选择后通过 `select` 返回完整选项。组件不读取 Store，也不执行导航；路由切换和
@@ -659,17 +700,17 @@ function selectItem(item: SearchListItem, index: number) {
 
 ```vue
 <script setup lang="ts">
-import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
+import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 </script>
 
-<MkWorkspaceDropdown
+<WorkspaceDropdown
   v-model="selectedWorkspaceId"
   :options="workspaceOptions"
   @select="handleWorkspaceSelect"
 />
 ```
 
-### MkWorkspaceRelationTags
+### WorkspaceRelationTags
 
 用于展示标签组，并在悬浮表格中展示每个标签关联的工作空间。
 `tags` 控制表格单元格中的折叠标签；`tagWorkspace` 使用标签名称作为键、工作空间
@@ -678,10 +719,10 @@ import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
 
 ```vue
 <script setup lang="ts">
-import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 </script>
 
-<MkWorkspaceRelationTags
+<WorkspaceRelationTags
   :table-render-params="{ property: '角色', value: '工作空间' }"
   :tags="user.role_name"
   :tag-workspace="user.role_workspace"
@@ -690,7 +731,7 @@ import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/ind
 
 ## 新增公共组件
 
-1. 根据使用范围选择 `global`、`components` 直属目录或所属功能目录。
+1. 根据使用范围选择 `global`、`components` 直属目录、`components/business` 或所属功能目录。
 2. 在 `<component-name>/index.vue` 创建组件，并声明多单词组件名。
 3. 使用类型化 Props、Emits 和 Slots。
 4. `global` 组件在模板中直接使用；其他共享组件由使用方从具体路径导入。

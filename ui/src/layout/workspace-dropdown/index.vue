@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import MkWorkspaceDropdown from '@/components/mk-workspace-dropdown/index.vue'
+import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import { useStore } from '@/stores'
 import type { WorkspaceItem } from '@/api/types'
 
@@ -37,7 +37,7 @@ function handleWorkspaceSelect(workspace: WorkspaceItem) {
 </script>
 
 <template>
-  <MkWorkspaceDropdown
+  <WorkspaceDropdown
     v-model="selectedWorkspace"
     :options="workspaceOptions"
     @select="handleWorkspaceSelect"

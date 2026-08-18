@@ -122,7 +122,13 @@ onMounted(() => {
     <template #default="{ Header }">
       <component :is="Header">
         <h4>{{ currentProvider.name }}</h4>
-        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <div class="flex items-center">
+          <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <el-button type="primary" class="ml-3">
+            <MkIcon name="icon_add_outlined" />
+            <span>添加模型</span>
+          </el-button>
+        </div>
       </component>
 
       <el-row v-if="workspaceModels.length" :gutter="16" class="gap-y-4">

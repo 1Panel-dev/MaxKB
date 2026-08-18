@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.2",
+    "@he-tree/vue": "^2.10.5",
     "axios": "^1.19.0",
     "dingtalk-jsapi": "^3.2.9",
     "element-plus": "^2.14.2",

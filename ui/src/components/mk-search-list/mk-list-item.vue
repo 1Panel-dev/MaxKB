@@ -42,7 +42,7 @@ const slotRow = computed(() => row as T)
     <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
     <div
       v-if="$slots.action || $slots['action-dropdown']"
-      class="pointer-events-none ml-auto flex shrink-0 items-center font-normal text-N900 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 focus-within:pointer-events-auto focus-within:opacity-100"
+      class="group-hover-visible ml-auto flex shrink-0 items-center font-normal text-N900"
       @click.stop
       @keydown.stop
     >

@@ -13,7 +13,7 @@ import {
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
-import MkWorkspaceRelationTags from '@/components/mk-workspace-relation-tags/index.vue'
+import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
@@ -196,7 +196,7 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
           <template #default="{ row }">
-            <MkWorkspaceRelationTags
+            <WorkspaceRelationTags
               :table-render-params="{ property: '角色', value: '工作空间' }"
               :tags="row.role_name"
               :tag-workspace="row.role_workspace"
@@ -206,7 +206,7 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column prop="user_group_names" width="180" label="用户组">
           <template #default="{ row }">
-            <MkWorkspaceRelationTags
+            <WorkspaceRelationTags
               :table-render-params="{ property: '用户组', value: '工作空间' }"
               :tags="row.user_group_names"
               :tag-workspace="row.user_group_workspace"

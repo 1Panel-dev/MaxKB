@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { WarningFilled } from '@element-plus/icons-vue'
 import type { WorkspaceModel } from '@/api/types'
 import { MODEL_STATUS } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants/model'
@@ -10,13 +9,18 @@ defineOptions({ name: 'ModelCard' })
 const props = defineProps<{
   icon: string
   model: WorkspaceModel
-  shared?: boolean
+  shared: boolean
 }>()
 
-function getModelErrorMessage() {
-  const message = props.model.meta?.message
-  return typeof message === 'string' && message ? message : '模型不可用'
-}
+const errMessage = computed(() => {
+  if (props.model.meta?.message) {
+    if (props.model.meta.message === 'pull model manifest: file does not exist') {
+      return `${props.model.model_name} 模型在 Ollama 不存在`
+    }
+    return props.model.meta.message
+  }
+  return ''
+})
 </script>
 
 <template>
@@ -30,27 +34,19 @@ function getModelErrorMessage() {
     </template>
     <template #title="{ title }">
       <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
-      <span v-if="model.status === MODEL_STATUS.ERROR" class="shrink-0">
-        <el-tooltip effect="dark" :content="getModelErrorMessage()" placement="top">
-          <el-icon class="shrink-0 text-danger" :size="18">
-            <WarningFilled />
-          </el-icon>
-        </el-tooltip>
-      </span>
-      <span v-if="model.status === MODEL_STATUS.PAUSE_DOWNLOAD" class="shrink-0">
-        <el-tooltip
-          effect="dark"
-          :content="`基础模型: ${model.model_name} 下载失败`"
-          placement="top"
-        >
-          <el-icon class="shrink-0 text-danger" :size="18">
-            <WarningFilled />
-          </el-icon>
-        </el-tooltip>
-      </span>
+
+      <el-tooltip :content="errMessage" v-if="model.status === MODEL_STATUS.ERROR">
+        <MkIcon name="icon_warning_filled" class="text-danger!" />
+      </el-tooltip>
+      <el-tooltip
+        v-if="model.status === MODEL_STATUS.PAUSE_DOWNLOAD"
+        :content="`基础模型: ${model.model_name} 下载失败`"
+      >
+        <MkIcon name="icon_warning_filled" type="danger" />
+      </el-tooltip>
     </template>
     <template #tag>
-      <el-tag v-if="shared" size="small" type="info" class="text-N600!">共享</el-tag>
+      <el-tag v-if="props.shared" size="small" type="info" class="text-N600!">共享</el-tag>
     </template>
 
     <ul class="flex flex-col gap-2">
@@ -72,13 +68,25 @@ function getModelErrorMessage() {
     </ul>
 
     <template #footer="{ Action, ActionDropdown }">
-      <component :is="Action">
+      <component :is="Action" v-if="!props.shared">
         <component :is="ActionDropdown">
           <MkDropdownMenu>
-            <MkDropdownItem>编辑</MkDropdownItem>
-            <MkDropdownItem>模型参数设置</MkDropdownItem>
-            <MkDropdownItem>资源授权</MkDropdownItem>
-            <MkDropdownItem divided>删除</MkDropdownItem>
+            <MkDropdownItem>
+              <template #icon><MkIcon name="icon_edit_outlined" /></template>
+              <span>编辑</span>
+            </MkDropdownItem>
+            <MkDropdownItem>
+              <template #icon><MkIcon name="icon_preferences_outlined" /></template>
+              <span>模型参数设置</span>
+            </MkDropdownItem>
+            <MkDropdownItem>
+              <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
+              <span>资源授权</span>
+            </MkDropdownItem>
+            <MkDropdownItem divided>
+              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+              <span>删除</span>
+            </MkDropdownItem>
           </MkDropdownMenu>
         </component>
       </component>
