@@ -66,6 +66,13 @@ ui/
 │   │   └── CONSTANT_README.md # Shared constant placement and naming rules
 │   ├── layout/                # Shared application shells, headers, sidebars, and layout types
 │   ├── locales/               # Reserved for internationalization messages and locale setup
+│   ├── mk-workflow/           # LogicFlow canvas and workflow domain components
+│   │   ├── components/        # Reusable workflow canvas UI
+│   │   ├── core/              # Shared canvas behavior and node infrastructure
+│   │   ├── icons/             # Workflow node icons
+│   │   ├── nodes/             # Workflow node definitions and components
+│   │   ├── plugins/           # Canvas-local plugins
+│   │   └── index.vue          # MkWorkflow canvas entry
 │   ├── router/                # Vue Router routes and router instance
 │   │   └── ROUTE_README.md    # Routing conventions and rules
 │   ├── stores/                # Shared Pinia instance and state stores
@@ -84,9 +91,8 @@ ui/
 │   │   ├── home/             # Workspace home page
 │   │   ├── system/           # System-management pages
 │   │   ├── login/            # Reserved for admin login pages
-│   │   └── chat/             # Chat-side pages, including user login
-│   └── workflow/              # Workflow editor domain code
-│       └── nodes/             # Workflow node definitions and components
+│   │   ├── chat/             # Chat-side pages, including user login
+│   │   └── workflow/         # Full-screen workflow route pages
 ├── vite.config.ts            # Vite entries, plugins, aliases, proxy, and build output
 ├── tsconfig*.json            # TypeScript configuration
 └── package.json              # Dependencies and npm scripts
@@ -99,6 +105,8 @@ Structural responsibilities:
 - Put cross-page business components in `components/business/`, name them after their business
   responsibility without the `Mk` prefix, and keep page-specific components in their owning View.
 - Put reusable application chrome in `layout/`, not in individual route views.
+- Keep LogicFlow initialization, node registration, and canvas behavior inside `mk-workflow/`.
+  Full-screen Workflow Views own the page header and page-level actions around `MkWorkflow`.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.

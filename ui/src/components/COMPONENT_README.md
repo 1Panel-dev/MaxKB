@@ -40,6 +40,8 @@ src/components/
 │   │   ├── MoveFolderDialog.vue
 │   │   ├── VirtualizedTree.vue
 │   │   └── types.ts
+│   ├── model-select/
+│   │   └── index.vue             # 按供应商分组的模型选择器
 │   ├── workspace-dropdown/
 │   │   └── index.vue             # 工作空间选择下拉框
 │   └── workspace-relation-tags/
@@ -94,6 +96,7 @@ import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import ModelSelect from '@/components/business/model-select/index.vue'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 ```
@@ -691,6 +694,26 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 页面顶部需要触发根目录创建时，通过页面语义处理方法调用组件暴露的 `openCreate()`；外部数据变化
 后可调用 `refresh()` 重新加载文件夹树。`VirtualizedTree.vue` 基于 `@he-tree/vue` 的 `Draggable`
 实现虚拟渲染和拖拽交互，只负责树 UI，不调用 API；不要替换为 Element Plus `el-tree-v2`。
+
+### ModelSelect
+
+按供应商分组展示模型，通过 `v-model` 控制模型 ID，并在选择变化时触发 `change`。`options` 使用
+供应商标识作为键、模型数组作为值；组件根据 `modelType` 调用供应商接口补充分组名称和图标，
+模型列表仍由使用方按当前业务上下文查询。
+
+```vue
+<script setup lang="ts">
+import ModelSelect from '@/components/business/model-select/index.vue'
+</script>
+
+<ModelSelect
+  v-model="selectedModelId"
+  model-type="LLM"
+  :options="modelOptions"
+  placeholder="请选择模型"
+  @change="handleModelChange"
+/>
+```
 
 ### WorkspaceDropdown
 

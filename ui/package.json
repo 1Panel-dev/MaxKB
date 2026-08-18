@@ -16,8 +16,11 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@antv/layout": "^2.0.0",
     "@element-plus/icons-vue": "^2.3.2",
     "@he-tree/vue": "^2.10.5",
+    "@logicflow/core": "^2.2.5",
+    "@logicflow/extension": "^2.3.1",
     "axios": "^1.19.0",
     "dingtalk-jsapi": "^3.2.9",
     "element-plus": "^2.14.2",
