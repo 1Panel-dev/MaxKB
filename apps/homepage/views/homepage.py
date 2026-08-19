@@ -416,7 +416,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -443,7 +443,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -470,7 +470,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -497,7 +497,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -524,7 +524,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -556,7 +556,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -588,7 +588,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -621,7 +621,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -654,7 +654,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -687,7 +687,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_EXPORT.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -718,7 +718,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_EXPORT.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -749,7 +749,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_EXPORT.value],
                 compare=CompareConstants.AND,
             ),
         )
@@ -780,7 +780,7 @@ class SystemHomePageAPI(APIView):
             RoleConstants.ADMIN,
             ViewPermission(
                 roles=[RoleConstants.EXTENDS_ADMIN],
-                permissions=[PermissionConstants.HOMEPAGE_READ.value],
+                permissions=[PermissionConstants.SYSTEM_HOMEPAGE_READ.value],
                 compare=CompareConstants.AND,
             ),
         )
