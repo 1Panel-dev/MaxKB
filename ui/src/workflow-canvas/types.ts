@@ -1,3 +1,4 @@
+import LogicFlow from '@logicflow/core'
 /** LogicFlow 节点类型，作为工作流图数据中的稳定协议值。 */
 export enum WorkflowNodeType {
   Base = 'base-node',
@@ -65,4 +66,14 @@ export interface WorkflowNodeField {
   label: string
   type?: string
   value: string
+}
+export type ShapeItem = {
+  callback?: (logicFlow: LogicFlow, container?: HTMLElement) => void
+  className?: string
+  disabled?: boolean
+  icon?: string
+  label?: string
+  properties?: LogicFlow.PropertiesType
+  text?: string
+  type?: string
 }

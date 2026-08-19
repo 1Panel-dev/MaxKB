@@ -9,23 +9,14 @@ import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
-
+import {type ShapeItem} from "@/workflow-canvas/types"
 defineOptions({ name: 'MkWorkflow' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & {
   set_loop_body?: () => void
 }
 
-type ShapeItem = {
-  callback?: (logicFlow: LogicFlow, container?: HTMLElement) => void
-  className?: string
-  disabled?: boolean
-  icon?: string
-  label?: string
-  properties?: LogicFlow.PropertiesType
-  text?: string
-  type?: string
-}
+
 
 const props = withDefaults(
   defineProps<{
@@ -78,6 +69,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   })
 
   initDefaultShortcut(lf.value, lf.value.graphModel)
+  console.log(Object.values(nodeModules).map(({ default: node }) => node))
   lf.value.batchRegister([...Object.values(nodeModules).map(({ default: node }) => node), AppEdge])
   lf.value.setDefaultEdgeType('app-edge')
   lf.value.render(data ? data : {})
