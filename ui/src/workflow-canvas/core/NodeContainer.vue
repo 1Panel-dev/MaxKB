@@ -364,6 +364,26 @@ onMounted(() => {
   set(props.nodeModel, 'selectOn', selectOn)
   set(props.nodeModel, 'focusOn', focusOn)
   set(props.nodeModel, 'clearSelectOn', clearSelectOn)
+  initResizeObserver()
+})
+let resizeObserver: ResizeObserver | null = null
+const initResizeObserver=()=>{
+   if (!containerRef.value) return
+  
+  resizeObserver = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const {  height } = entry.contentRect
+      // 在这里处理尺寸变化
+      resizeStepContainer({  height:height+32 })
+    }
+  })
+  
+  resizeObserver.observe(containerRef.value)
+}
+const containerRef = ref<HTMLElement>()
+onBeforeUnmount(() => {
+  resizeObserver?.disconnect()
+  resizeObserver = null
 })
 </script>
 <template>
@@ -372,7 +392,7 @@ onMounted(() => {
       class="step-container overflow-visible rounded-lg border-2 border-white bg-white p-4"
       :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
     >
-      <div v-resize="resizeStepContainer">
+      <div ref="containerRef" >
         <div class="flex-between">
           <div
             class="flex w-[69%] items-center"
