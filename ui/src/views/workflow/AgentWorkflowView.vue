@@ -2,8 +2,9 @@
 import type LogicFlow from '@logicflow/core'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types.ts'
+import {nodeDict} from "@/workflow-canvas/config/node-mapping.ts"
 import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
-
+import {type ShapeItem} from "@/workflow-canvas/types"
 defineOptions({ name: 'AgentWorkflowView' })
 
 defineProps<{
@@ -17,9 +18,24 @@ const emit = defineEmits<{
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
 
 const handleAddNode = (nodeType: WorkflowNodeType) => {
-  workflowRef.value?.addNode(nodeType)
-}
+  const shapeItem=toShapeItem(nodeType)
+  if(!shapeItem){
+     return
+  }
+  workflowRef.value?.addNode(shapeItem)
+  }
 
+const toShapeItem=(nodeType: WorkflowNodeType)=>{
+ const node=nodeDict[nodeType]
+  if(node){
+  const shapeItem:ShapeItem={
+   type: node.type,
+   properties:node.properties,
+   text:node.text
+  }
+  return shapeItem;
+}
+}
 const handleSave = () => {
   const graphData = workflowRef.value?.getGraphData()
   if (graphData) emit('save', graphData)

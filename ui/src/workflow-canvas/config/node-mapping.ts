@@ -57,7 +57,7 @@ export const workflowModelDict: Record<WorkflowMode, WorkflowNodeMatcher> = {
     )
   },
 }
-export const nodeDict: Partial<Record<WorkflowNodeType, unknown>> = {
+export const nodeDict: Partial<Record<WorkflowNodeType, Record<string,any>>> = {
   [WorkflowNodeType.AiChat]: NodeData.aiChatNode,
   [WorkflowNodeType.SearchKnowledge]: NodeData.searchKnowledgeNode,
   [WorkflowNodeType.SearchDocument]: NodeData.searchDocumentNode,
