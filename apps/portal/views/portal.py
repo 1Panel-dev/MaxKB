@@ -20,14 +20,11 @@ from common.auth.constants.permission_constants import PermissionConstants
 from common.auth.constants.role_constants import RoleConstants
 from common.constants.cache_version import Cache_Version
 from common.log.log import log
-from common.utils.common import query_params_to_single_dict
 from django.core.cache import cache
 from portal.api.portal import PortalAPI
 from portal.serializers.portal import (
     PortalSerializer,
-    PortalApplicationSerializer,
     PortalLoginSerializer,
-    PortalHistoricalConversationSerializer,
 )
 
 
@@ -60,47 +57,6 @@ class PortalView(APIView):
     @has_permissions(PermissionConstants.PORTAL_EDIT, RoleConstants.ADMIN)
     def put(self, request: Request):
         return result.success(PortalSerializer().edit(request.data))
-
-
-class PortalApplicationView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=["GET"],
-        description=_("Get published application list by page"),
-        summary=_("Get published application list by page"),
-        operation_id=_("Get published application list by page"),
-        parameters=PortalAPI.Application.get_parameters(),
-        responses=PortalAPI.Application.get_response(),
-        tags=[_("Portal")],
-    )
-    @has_permissions(PermissionConstants.PORTAL_READ, RoleConstants.ADMIN)
-    def get(self, request: Request, current_page: int, page_size: int):
-        return result.success(
-            PortalApplicationSerializer.Query(data={**query_params_to_single_dict(request.query_params)}).page(
-                current_page, page_size, str(request.user.id)
-            )
-        )
-
-
-class PortalHistoricalConversationView(APIView):
-    authentication_classes = [TokenAuth]
-
-    @extend_schema(
-        methods=["GET"],
-        description=_("Get portal historical conversation by page"),
-        summary=_("Get portal historical conversation by page"),
-        operation_id=_("Get portal historical conversation by page"),
-        parameters=PortalAPI.Conversation.get_parameters(),
-        responses=PortalAPI.Conversation.get_response(),
-        tags=[_("Portal")],
-    )
-    def get(self, request: Request, current_page: int, page_size: int):
-        return result.success(
-            PortalHistoricalConversationSerializer.Query(
-                data={**query_params_to_single_dict(request.query_params)}
-            ).page(current_page, page_size, str(request.user.id))
-        )
 
 
 class PortalLoginView(APIView):
