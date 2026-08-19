@@ -8,8 +8,8 @@ export const FOLDER_SOURCE = {
 
 export type FolderSource = (typeof FOLDER_SOURCE)[keyof typeof FOLDER_SOURCE]
 
-export interface WorkspaceFolder {
-  children?: WorkspaceFolder[]
+export interface FolderItem {
+  children?: FolderItem[]
   create_time?: string
   desc?: string | null
   id: string
@@ -17,22 +17,11 @@ export interface WorkspaceFolder {
   parent_id?: string | null
   update_time?: string
   user_id?: string | null
-  workspace_id: string
+  workspace_id?: string
 }
 
-export interface WorkspaceFolderCreatePayload {
-  desc?: string | null
-  name: string
-  parent_id?: string | null
-}
-
-export interface WorkspaceFolderUpdatePayload {
+export interface FolderRequest {
   desc?: string | null
   name?: string
   parent_id?: string | null
-}
-
-export interface WorkspaceFolderQuery {
-  name?: string
-  [key: string]: unknown
 }

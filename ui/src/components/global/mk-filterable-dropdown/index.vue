@@ -93,25 +93,27 @@ function handleItemClick(option: TOption) {
         </div>
 
         <el-scrollbar max-height="200px">
-          <MkDropdownMenu>
-            <MkDropdownItem
-              v-for="option in filteredOptions"
-              :key="getOptionValue(option)"
-              selectable
-              :selected="getOptionValue(option) === selectedValue"
-              @click="handleItemClick(option)"
-            >
-              <slot name="option" :option="option">
-                <span class="block truncate" :title="getOptionLabel(option)">
-                  {{ getOptionLabel(option) }}
-                </span>
-              </slot>
-            </MkDropdownItem>
+          <div class="px-1">
+            <MkDropdownMenu>
+              <MkDropdownItem
+                v-for="option in filteredOptions"
+                :key="getOptionValue(option)"
+                selectable
+                :selected="getOptionValue(option) === selectedValue"
+                @click="handleItemClick(option)"
+              >
+                <slot name="option" :option="option">
+                  <span class="block truncate" :title="getOptionLabel(option)">
+                    {{ getOptionLabel(option) }}
+                  </span>
+                </slot>
+              </MkDropdownItem>
 
-            <MkDropdownItem v-if="filteredOptions.length === 0" disabled>
-              <span class="text-N600">{{ emptyText }}</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+              <MkDropdownItem v-if="filteredOptions.length === 0" disabled>
+                <span class="text-N600">{{ emptyText }}</span>
+              </MkDropdownItem>
+            </MkDropdownMenu>
+          </div>
         </el-scrollbar>
       </div>
     </template>

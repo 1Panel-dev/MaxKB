@@ -1,21 +1,18 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type {
-  OptionItem,
-  RequestParams,
-  ToolListQuery,
-  ToolType,
-  WorkspaceFolder,
-  WorkspaceTool,
-} from '@/api/types'
+import type { OptionItem, RequestParams, ToolListQuery, ToolType, WorkspaceTool } from '@/api/types'
 import { FOLDER_SOURCE, TOOL_SCOPE, TOOL_TYPE } from '@/api/types'
 import CommonApi from '@/api/admin/workspace/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import FolderTree from '@/components/business/folder-tree/index.vue'
-import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './components/ToolCard.vue'
+
+const route = useRoute()
+const {
+  params: { workspaceId },
+} = route
 
 type ToolNavigation = 'all' | 'shared' | string
 
@@ -28,8 +25,6 @@ const TOOL_TYPE_OPTIONS: OptionItem<ToolType | ''>[] = [
   { label: '数据源', value: TOOL_TYPE.DATA_SOURCE },
 ]
 
-const route = useRoute()
-const workspaceId = computed(() => String(route.params.workspaceId))
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 const loading = ref(false)
 const visibleTools = ref<WorkspaceTool[]>([])
@@ -60,19 +55,20 @@ function getToolListQuery(): ToolListQuery {
 }
 
 /* 工具列表 */
+
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 20,
+  total: 0,
+})
 function loadVisibleTools() {
   loading.value = true
   const query = getToolListQuery()
 
-  const request =
-    activeNavigation.value === 'all' || isShared.value
-      ? ToolApi.getToolCatalog(workspaceId.value, query).then((catalog) =>
-          isShared.value ? catalog.shared_tools : catalog.tools,
-        )
-      : ToolApi.getToolTree(workspaceId.value, {
-          ...query,
-          folder_id: activeNavigation.value,
-        }).then(({ tools }) => tools)
+  const request = ToolApi.getToolPage(workspaceId, paginationConfig.value, {
+    ...query,
+    folder_id: 'default',
+  }).then(({ tools }) => tools)
 
   return request
     .then((tools) => {
@@ -162,14 +158,9 @@ function handleDeleteTool(tool: WorkspaceTool) {
     })
 }
 
-function handleWorkspaceChange() {
-  activeNavigation.value = 'shared'
-  activeTitle.value = '共享工具'
-  selectedToolId.value = ''
+onMounted(() => {
   loadVisibleTools()
-}
-
-watch(workspaceId, handleWorkspaceChange, { immediate: true })
+})
 </script>
 
 <template>
@@ -188,41 +179,8 @@ watch(workspaceId, handleWorkspaceChange, { immediate: true })
         ref="folderTreeRef"
         v-model="activeNavigation"
         :source="FOLDER_SOURCE.TOOL"
-        :workspace-id="workspaceId"
-        @deleted="handleFolderDeleted"
         @select="handleNavigationSelect"
-        @updated="handleFolderUpdated"
       >
-        <template #beforeTree>
-          <div class="px-4">
-            <MkListItem
-              :active="activeNavigation === 'shared'"
-              @click="handleNavigationSelect('shared')"
-            >
-              <MkIcon
-                :name="
-                  activeNavigation === 'shared'
-                    ? 'icon_folder-share_filled'
-                    : 'icon_folder_outlined'
-                "
-                :size="18"
-                class="mr-2"
-              />
-              <span>共享工具</span>
-            </MkListItem>
-
-            <el-divider class="my-1!" />
-
-            <MkListItem :active="activeNavigation === 'all'" @click="handleNavigationSelect('all')">
-              <MkIcon
-                :name="activeNavigation === 'all' ? 'icon_card_filled' : 'icon_card_outlined'"
-                :size="18"
-                class="mr-2"
-              />
-              <span>全部工具</span>
-            </MkListItem>
-          </div>
-        </template>
       </FolderTree>
     </template>
 

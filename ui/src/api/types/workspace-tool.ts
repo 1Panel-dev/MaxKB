@@ -1,6 +1,6 @@
 /** Workspace 工具列表和工具维护共用的业务类型。 */
 
-import type { WorkspaceFolder } from './workspace-folder'
+import type { WorkspaceFolder } from './folder'
 
 export const TOOL_SCOPE = {
   INTERNAL: 'INTERNAL',

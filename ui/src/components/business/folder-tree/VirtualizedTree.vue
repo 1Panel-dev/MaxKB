@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { CaretBottom } from '@element-plus/icons-vue'
 import { Draggable, dragContext } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
-import type { WorkspaceFolder } from '@/api/types'
-
+import type { FolderItem } from '@/api/types'
+import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 defineOptions({ name: 'FolderVirtualizedTree' })
 
-interface FolderTreeNode extends Omit<WorkspaceFolder, 'children'> {
+interface FolderTreeNode extends Omit<FolderItem, 'children'> {
   children?: FolderTreeNode[]
   disabled?: boolean
 }
@@ -27,33 +28,29 @@ interface DropTargetInfo {
 
 const props = withDefaults(
   defineProps<{
-    canManage?: boolean
+    canEdit?: boolean
     currentNodeKey?: string
-    data?: WorkspaceFolder[]
+    data?: FolderItem[]
     draggable?: boolean
     filterText?: string
-    protectedNodeId?: string
   }>(),
   {
-    canManage: true,
+    canEdit: true,
     currentNodeKey: '',
     data: () => [],
     draggable: false,
     filterText: '',
-    protectedNodeId: '',
   },
 )
 
 const emit = defineEmits<{
-  create: [folder: WorkspaceFolder]
-  delete: [folder: WorkspaceFolder]
-  edit: [folder: WorkspaceFolder]
-  move: [folder: WorkspaceFolder]
-  nodeDrop: [draggingFolder: WorkspaceFolder, targetFolder: WorkspaceFolder, dropType: DropType]
-  select: [folder: WorkspaceFolder]
+  create: [folder: FolderItem]
+  delete: [folder: FolderItem]
+  edit: [folder: FolderItem]
+  move: [folder: FolderItem]
+  nodeDrop: [draggingFolder: FolderItem, targetFolder: FolderItem, dropType: DropType]
+  nodeClick: [folder: FolderItem]
 }>()
-
-const canDrag = computed(() => props.canManage && props.draggable && !props.filterText.trim())
 
 function filterFolders(folders: FolderTreeNode[], keyword: string): FolderTreeNode[] {
   if (!keyword) return folders
@@ -91,19 +88,7 @@ function handleNodeClick(stat: FolderStat) {
     stat.open = !stat.open
     return
   }
-  emit('select', stat.data)
-}
-
-function isNodeDraggable(stat: FolderStat) {
-  return !stat.data.disabled && stat.data.id !== props.protectedNodeId
-}
-
-function isNodeDroppable(stat: FolderStat) {
-  return !stat.data.disabled
-}
-
-function getNodeKey(stat: FolderStat) {
-  return stat.data.id
+  emit('nodeClick', stat.data)
 }
 
 function buildNodeDropArgs() {
@@ -142,137 +127,60 @@ function handleAfterDrop() {
 </script>
 
 <template>
-  <div class="h-full min-h-0">
-    <Draggable
-      v-if="filteredTreeData.length"
-      aria-label="文件夹树"
-      class="folder-virtualized-tree"
-      :default-open="false"
-      :disable-drag="!canDrag"
-      :disable-drop="!canDrag"
-      :each-draggable="isNodeDraggable"
-      :each-droppable="isNodeDroppable"
-      :model-value="filteredTreeData"
-      :node-key="getNodeKey"
-      :root-droppable="false"
-      :stat-handler="handleStat"
-      virtualization
-      @after-drop="handleAfterDrop"
-      @click:node="handleNodeClick"
-    >
-      <template #default="{ node, stat }: { node: FolderTreeNode; stat: FolderStat }">
-        <div
-          class="folder-tree-node group flex min-w-0 items-center"
-          :class="{
-            'is-current': currentNodeKey === node.id,
-            'is-disabled': node.disabled,
-          }"
-        >
-          <button
-            type="button"
-            class="folder-tree-arrow flex-center shrink-0"
-            :class="{ 'rotate-90': stat.open }"
-            :style="{ visibility: stat.children.length ? 'visible' : 'hidden' }"
-            aria-label="展开或收起文件夹"
+  <Draggable
+    class="mk-virtualized-tree h-full min-h-0"
+    virtualization
+    :default-open="false"
+    v-bind="$attrs"
+    :model-value="filteredTreeData"
+    @click:node="handleNodeClick"
+    @after-drop="handleAfterDrop"
+    :statHandler="handleStat"
+    :disableDrag="!draggable"
+    :disableDrop="!draggable"
+  >
+    <template #default="{ node, stat }: { node: FolderTreeNode; stat: FolderStat }">
+      <MkListItem :class="currentNodeKey === node.id ? 'is-current' : ''" class="mk-tree-node">
+        <template #default>
+          <MkIcon
             @click.stop="stat.open = !stat.open"
-          >
-            <MkIcon name="icon_right_outlined" :size="16" />
-          </button>
+            :icon="CaretBottom"
+            :size="14"
+            :style="{ visibility: stat.children.length ? 'visible' : 'hidden' }"
+            class="text-N600! mr-1.5"
+            :class="{ '-rotate-90': !stat.open }"
+          />
+          <slot name="default" v-bind="{ node, stat }">
+            <span class="min-w-0 truncate" :title="node.name">{{ node.name }}</span>
+          </slot>
+        </template>
 
-          <div class="flex min-w-0 flex-1 items-center gap-2 pr-2">
-            <MkIcon name="icon_file-folder_colorful" :size="18" />
-            <span class="min-w-0 flex-1 truncate" :title="node.name">{{ node.name }}</span>
-
-            <MkDropdown v-if="canManage" trigger="click" :teleported="false">
-              <el-button text class="group-hover-visible -mr-1" @click.stop>
-                <MkIcon name="icon_more_outlined" />
-              </el-button>
-              <template #dropdown>
-                <MkDropdownMenu>
-                  <MkDropdownItem @click="emit('create', node)">
-                    <template #icon><MkIcon name="icon_add_outlined" /></template>
-                    <span>创建子文件夹</span>
-                  </MkDropdownItem>
-                  <MkDropdownItem @click="emit('edit', node)">
-                    <template #icon><MkIcon name="icon_edit_outlined" /></template>
-                    <span>编辑</span>
-                  </MkDropdownItem>
-                  <MkDropdownItem
-                    :disabled="node.id === protectedNodeId"
-                    @click="emit('move', node)"
-                  >
-                    <template #icon><MkIcon name="icon_right_outlined" /></template>
-                    <span>移动到</span>
-                  </MkDropdownItem>
-                  <MkDropdownItem
-                    divided
-                    :disabled="node.id === protectedNodeId"
-                    @click="emit('delete', node)"
-                  >
-                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    <span>删除</span>
-                  </MkDropdownItem>
-                </MkDropdownMenu>
-              </template>
-            </MkDropdown>
-          </div>
-        </div>
-      </template>
-    </Draggable>
-
-    <p v-else class="pt-20 text-center text-N600">暂无文件夹</p>
-  </div>
+        <template #action-dropdown="{ row }">
+          <slot name="action-dropdown" :row="row"></slot>
+        </template>
+      </MkListItem>
+    </template>
+  </Draggable>
 </template>
 
-<style lang="scss" scoped>
-.folder-virtualized-tree {
-  height: 100%;
-  overflow: auto;
-  scrollbar-gutter: stable;
-
-  :deep(.he-tree-drag-placeholder) {
-    background-color: color-mix(in srgb, var(--mk-primary) 10%, transparent);
-    border: 2px dashed var(--mk-primary);
+<style lang="scss">
+.mk-virtualized-tree {
+  overflow: auto !important;
+  .mk-tree-node {
+    &:hover {
+      background: none;
+    }
+  }
+  .tree-node {
     border-radius: var(--el-border-radius-base);
-    width: 98%;
-  }
-
-  :deep(.tree-node) {
-    border-radius: var(--el-border-radius-base);
-    cursor: pointer;
-    padding: 2px 0;
-  }
-}
-
-.folder-tree-arrow {
-  background: transparent;
-  border: 0;
-  color: var(--mk-N600);
-  height: calc(var(--spacing) * 9);
-  padding: 0;
-  transition: transform 0.2s;
-  width: calc(var(--spacing) * 7);
-}
-
-.folder-tree-node {
-  border-radius: var(--el-border-radius-base);
-  min-height: calc(var(--spacing) * 9);
-  width: 100%;
-
-  &:hover {
-    background-color: color-mix(in srgb, var(--mk-N900) 6%, transparent);
-  }
-
-  &.is-current {
-    background-color: color-mix(in srgb, var(--mk-primary) 10%, transparent);
-    color: var(--mk-primary);
-    font-weight: 500;
-  }
-
-  &.is-disabled {
-    color: var(--mk-N600);
-    cursor: not-allowed;
-    opacity: 0.6;
+    &:hover {
+      background: var(--mk-N900-transparent-10);
+    }
+    &:has(.mk-tree-node.is-current) {
+      background: rgb(var(--mk-primary-rgb) / 10%);
+      color: var(--el-color-primary);
+      font-weight: 500;
+    }
   }
 }
 </style>
