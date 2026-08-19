@@ -19,5 +19,19 @@ urlpatterns = [
     path("workspace/<str:workspace_id>/homepage/chat_record/aggregation",views.HomePageAPI.ChatRecordAggregation.as_view()),
     path("workspace/<str:workspace_id>/homepage/question_ranking/export",views.HomePageAPI.ApplicationQuestionRankingExport.as_view()),
     path("workspace/<str:workspace_id>/homepage/tokens_ranking/export",views.HomePageAPI.ApplicationTokensRankingExport.as_view()),
-    path("workspace/<str:workspace_id>/homepage/user_tokens_ranking/export",views.HomePageAPI.UserTokensRankingExport.as_view())
+    path("workspace/<str:workspace_id>/homepage/user_tokens_ranking/export",views.HomePageAPI.UserTokensRankingExport.as_view()),
+
+    path("system/homepage/application/aggregation",views.SystemHomePageAPI.ApplicationAggregation.as_view()),
+    path("system/homepage/knowledge/aggregation",views.SystemHomePageAPI.KnowledgeAggregation.as_view()),
+    path("system/homepage/tool/aggregation",views.SystemHomePageAPI.ToolAggregation.as_view()),
+    path("system/homepage/model/aggregation",views.SystemHomePageAPI.ModelAggregation.as_view()),
+    path("system/homepage/tokens/aggregation",views.SystemHomePageAPI.TokensAggregation.as_view()),
+    path("system/homepage/chat_record/aggregation",views.SystemHomePageAPI.ChatRecordAggregation.as_view()),
+    path("system/homepage/application/tokens_ranking/<int:current_page>/<int:page_size>",views.SystemHomePageAPI.ApplicationTokensRanking.as_view()),
+    path("system/homepage/application/question_ranking/<int:current_page>/<int:page_size>",views.SystemHomePageAPI.ApplicationQuestionRanking.as_view()),
+    path("system/homepage/application/user_tokens_ranking/<int:current_page>/<int:page_size>",views.SystemHomePageAPI.UserTokensRanking.as_view()),
+    path("system/homepage/monitoring/aggregation",views.SystemHomePageAPI.ApplicationMonitoring.as_view()),
+    path("system/homepage/question_ranking/export",views.SystemHomePageAPI.ApplicationQuestionRankingExport.as_view()),
+    path("system/homepage/tokens_ranking/export",views.SystemHomePageAPI.ApplicationTokensRankingExport.as_view()),
+    path("system/homepage/user_tokens_ranking/export",views.SystemHomePageAPI.UserTokensRankingExport.as_view())
 ]

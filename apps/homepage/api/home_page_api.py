@@ -1,10 +1,10 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： home_page_api.py
-    @date：2026/5/18 16:02
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： home_page_api.py
+@date：2026/5/18 16:02
+@desc:
 """
 
 from django.utils.translation import gettext_lazy as _
@@ -22,13 +22,14 @@ from common.mixins.api_mixin import APIMixin
 class ApplicationMonitoringAPI(APIMixin):
     @staticmethod
     def get_parameters():
-        return [OpenApiParameter(
-            name="workspace_id",
-            description="工作空间id",
-            type=OpenApiTypes.STR,
-            location='path',
-            required=True,
-        ),
+        return [
+            OpenApiParameter(
+                name="workspace_id",
+                description="工作空间id",
+                type=OpenApiTypes.STR,
+                location="path",
+                required=True,
+            ),
             OpenApiParameter(
                 name="application_id",
                 description="application ID",
@@ -55,7 +56,6 @@ class ApplicationMonitoringAPI(APIMixin):
 
 
 class RankingBaseAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -106,7 +106,6 @@ class RankingBaseAPI(APIMixin):
 
 
 class RankingBaseExportAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -143,7 +142,6 @@ class RankingBaseExportAPI(APIMixin):
 
 
 class ApplicationTokensRankingAPI(RankingBaseAPI):
-
     @staticmethod
     def get_response():
         return inline_serializer(
@@ -173,7 +171,6 @@ class ApplicationTokensRankingAPI(RankingBaseAPI):
 
 
 class ApplicationQuestionRankingAPI(RankingBaseAPI):
-
     @staticmethod
     def get_response():
         return inline_serializer(
@@ -203,33 +200,39 @@ class ApplicationQuestionRankingAPI(RankingBaseAPI):
 
 
 class UserTokensRankingAPI(RankingBaseAPI):
-
     @staticmethod
-    def get_response(serializer=inline_serializer(name="UserTokensRankingResponse", fields={
-        "code": serializers.IntegerField(help_text=_("Response code")),
-        "message": serializers.CharField(help_text=_("Response message")),
-        "data": inline_serializer(name="UserTokensRankingPage",
-                                  fields={"total": serializers.IntegerField(help_text=_("Total count")),
-                                          "records": serializers.ListField(help_text=_("User tokens ranking list"),
-                                                                           child=inline_serializer(
-                                                                               name="UserTokensRankingItem", fields={
-                                                                                   "chat_user_id": serializers.CharField(
-                                                                                       help_text=_("Chat user ID")),
-                                                                                   "chat_user_type": serializers.CharField(
-                                                                                       help_text=_("Chat user type")),
-                                                                                   "total_tokens": serializers.IntegerField(
-                                                                                       help_text=_(
-                                                                                           "Total consumed tokens")),
-                                                                                   "chat_record_count": serializers.IntegerField(
-                                                                                       help_text=_("Question count")),
-                                                                                   "asker": serializers.JSONField(
-                                                                                       help_text=_(
-                                                                                           "Asker user information")), }, ), ), }, ), }, )):
+    def get_response(
+        serializer=inline_serializer(
+            name="UserTokensRankingResponse",
+            fields={
+                "code": serializers.IntegerField(help_text=_("Response code")),
+                "message": serializers.CharField(help_text=_("Response message")),
+                "data": inline_serializer(
+                    name="UserTokensRankingPage",
+                    fields={
+                        "total": serializers.IntegerField(help_text=_("Total count")),
+                        "records": serializers.ListField(
+                            help_text=_("User tokens ranking list"),
+                            child=inline_serializer(
+                                name="UserTokensRankingItem",
+                                fields={
+                                    "chat_user_id": serializers.CharField(help_text=_("Chat user ID")),
+                                    "chat_user_type": serializers.CharField(help_text=_("Chat user type")),
+                                    "total_tokens": serializers.IntegerField(help_text=_("Total consumed tokens")),
+                                    "chat_record_count": serializers.IntegerField(help_text=_("Question count")),
+                                    "asker": serializers.JSONField(help_text=_("Asker user information")),
+                                },
+                            ),
+                        ),
+                    },
+                ),
+            },
+        ),
+    ):
         return serializer
 
 
 class ApplicationAggregationAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -292,7 +295,6 @@ class TokensAggregationAPI(APIMixin):
 
 
 class KnowledgeAggregationAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -329,7 +331,6 @@ class KnowledgeAggregationAPI(APIMixin):
 
 
 class ToolAggregationAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -366,7 +367,6 @@ class ToolAggregationAPI(APIMixin):
 
 
 class ModelAggregationAPI(APIMixin):
-
     @staticmethod
     def get_request():
         return None
@@ -400,3 +400,28 @@ class ModelAggregationAPI(APIMixin):
                 description=_("Workspace ID"),
             ),
         ]
+
+
+def system_parameters(api_class):
+    """系统管理端点参数：workspace_id 由 PATH 必填改为可选 query 参数（传了查指定工作空间，缺省查全局）"""
+    params = api_class.get_parameters()
+    return [
+        (
+            OpenApiParameter(
+                name="workspace_id",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description=_("Workspace ID (optional; omit to query across all workspaces)"),
+            )
+            if _param_name(p) == "workspace_id"
+            else p
+        )
+        for p in params
+    ]
+
+
+def _param_name(param):
+    if isinstance(param, dict):
+        return param.get("name")
+    return getattr(param, "name", None)
