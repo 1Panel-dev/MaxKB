@@ -30,7 +30,7 @@ class PortalApplicationAuthMixin:
     def get_authorized_application_queryset(user_id):
         public_apps = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=False)
         if not ChatUser.objects.filter(id=user_id).exists():
-            return Application.objects.filter(Exists(public_apps))
+            return Application.objects.filter(is_publish=True).filter(Exists(public_apps))
         authed_token_exists = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=True)
         direct_auth = ResourceChatUserAuthorize.objects.filter(
             resource_id=OuterRef("id"), resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user_id
@@ -42,7 +42,7 @@ class PortalApplicationAuthMixin:
             is_auth=True,
             user_group_id__in=user_groups,
         )
-        return Application.objects.filter(
+        return Application.objects.filter(is_publish=True).filter(
             Exists(public_apps) | (Exists(authed_token_exists) & (Exists(direct_auth) | Exists(group_auth)))
         )
 
