@@ -10,6 +10,14 @@ import type {
 
 const getPrefix = (workspaceId: string) => `/workspace/${workspaceId}/tool`
 
+/** 获取工具分页列表。 */
+const getToolPage = (workspaceId: string, page: ParamsPage, query?: ToolListQuery) => {
+  return get<ResponsePage<WorkspaceTool>>(
+    `${getPrefix(workspaceId)}/${page.currentPage}/${page.pageSize}`,
+    query,
+  )
+}
+
 /** 获取当前目录下的工具和子文件夹。 */
 const getToolTree = (workspaceId: string, query?: ToolListQuery) => {
   return get<ToolTreeResponse>(getPrefix(workspaceId), query)
@@ -18,14 +26,6 @@ const getToolTree = (workspaceId: string, query?: ToolListQuery) => {
 /** 获取工作空间全部工具以及已授权的共享工具。 */
 const getToolCatalog = (workspaceId: string, query?: ToolListQuery) => {
   return get<ToolCatalogResponse>(`${getPrefix(workspaceId)}/tool_list`, query)
-}
-
-/** 获取工具分页列表。 */
-const getToolPage = (workspaceId: string, page: ParamsPage, query?: ToolListQuery) => {
-  return get<ResponsePage<WorkspaceTool>>(
-    `${getPrefix(workspaceId)}/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
 }
 
 /** 创建工作空间工具。 */

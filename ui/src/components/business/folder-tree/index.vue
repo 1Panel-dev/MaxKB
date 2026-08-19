@@ -1,40 +1,54 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import type { FolderSource, WorkspaceFolder } from '@/api/types'
+import type { FolderSource, FolderItem } from '@/api/types'
 import FolderApi from '@/api/admin/workspace/folder'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
 import MoveFolderDialog from './MoveFolderDialog.vue'
-import FolderVirtualizedTree from './VirtualizedTree.vue'
+import VirtualizedTree from './VirtualizedTree.vue'
 import { FOLDER_SORT, type FolderFormSubmit, type FolderMoveSubmit, type FolderSort } from './types'
 
 defineOptions({ name: 'FolderTree' })
 
+const route = useRoute()
+const {
+  params: { workspaceId },
+} = route
+
 const props = withDefaults(
   defineProps<{
-    canManage?: boolean
+    canEdit?: boolean
     hideRoot?: boolean
     source: FolderSource
-    workspaceId: string
   }>(),
   {
-    canManage: true,
+    canEdit: true,
     hideRoot: true,
   },
 )
 
 const emit = defineEmits<{
-  created: [folder: WorkspaceFolder]
-  deleted: [folder: WorkspaceFolder, selectionAffected: boolean]
-  loaded: [folders: WorkspaceFolder[]]
-  moved: [folder: WorkspaceFolder]
-  select: [folder: WorkspaceFolder]
-  updated: [folder: WorkspaceFolder]
+  created: [folder: FolderItem]
+  deleted: [folder: FolderItem, selectionAffected: boolean]
+  loaded: [folders: FolderItem[]]
+  moved: [folder: FolderItem]
+  select: [folder: FolderItem]
+  updated: [folder: FolderItem]
 }>()
 
 defineSlots<{
   beforeTree?: () => unknown
 }>()
+
+const ALL_FOLDER: FolderItem = {
+  name: '全部模型',
+  id: 'default',
+}
+const SHARED_FOLDER: FolderItem = {
+  id: 'shared',
+  name: '共享模型',
+}
 
 const currentNodeKey = defineModel<string>({ default: '' })
 const folderFormDialogRef =
@@ -43,7 +57,7 @@ const moveFolderDialogRef =
   useTemplateRef<InstanceType<typeof MoveFolderDialog>>('moveFolderDialogRef')
 const loading = ref(false)
 const saving = ref(false)
-const folderTree = ref<WorkspaceFolder[]>([])
+const folderTree = ref<FolderItem[]>([])
 const searchKeyword = ref('')
 const currentSort = ref<FolderSort>(FOLDER_SORT.CREATE_TIME_DESC)
 
@@ -55,21 +69,17 @@ const sortOptions: { label: string; value: FolderSort }[] = [
 ]
 
 const visibleFolders = computed(() => {
-  const rootFolder =
-    folderTree.value.find(({ id }) => id === props.workspaceId) ?? folderTree.value[0]
+  const rootFolder = folderTree.value.find(({ id }) => id === workspaceId) ?? folderTree.value[0]
   const folders =
-    props.hideRoot && rootFolder?.id === props.workspaceId
+    props.hideRoot && rootFolder?.id === workspaceId
       ? (rootFolder.children ?? [])
       : folderTree.value
 
   return sortFolders(folders)
 })
 
-function sortFolders(folders: WorkspaceFolder[]): WorkspaceFolder[] {
-  const compareMethods: Record<
-    FolderSort,
-    (left: WorkspaceFolder, right: WorkspaceFolder) => number
-  > = {
+function sortFolders(folders: FolderItem[]): FolderItem[] {
+  const compareMethods: Record<FolderSort, (left: FolderItem, right: FolderItem) => number> = {
     [FOLDER_SORT.CREATE_TIME_ASC]: (left, right) =>
       new Date(left.create_time ?? 0).getTime() - new Date(right.create_time ?? 0).getTime(),
     [FOLDER_SORT.CREATE_TIME_DESC]: (left, right) =>
@@ -84,7 +94,7 @@ function sortFolders(folders: WorkspaceFolder[]): WorkspaceFolder[] {
   }))
 }
 
-function containsFolder(folder: WorkspaceFolder, folderId: string): boolean {
+function containsFolder(folder: FolderItem, folderId: string): boolean {
   return (
     folder.id === folderId ||
     Boolean(folder.children?.some((child) => containsFolder(child, folderId)))
@@ -94,7 +104,7 @@ function containsFolder(folder: WorkspaceFolder, folderId: string): boolean {
 /* 文件夹树 */
 function loadFolders() {
   loading.value = true
-  return FolderApi.getFolderTree(props.workspaceId, props.source)
+  return FolderApi.getFolderTree(workspaceId, props.source)
     .then((folders) => {
       folderTree.value = folders
       emit('loaded', folders)
@@ -104,34 +114,34 @@ function loadFolders() {
     })
 }
 
-function handleFolderSelect(folder: WorkspaceFolder) {
+function handleFolderSelect(folder: FolderItem) {
   currentNodeKey.value = folder.id
   emit('select', folder)
 }
 
 function handleSortSelect(sort: FolderSort) {
   currentSort.value = sort
-  localStorage.setItem(`folder-sort:${props.workspaceId}:${props.source}`, sort)
+  localStorage.setItem(`folder-sort:${workspaceId}:${props.source}`, sort)
 }
 
 /* 文件夹表单 */
-function handleOpenCreateFolder(parentId = props.workspaceId) {
+function handleOpenCreateFolder(parentId = workspaceId) {
   folderFormDialogRef.value?.open(parentId)
 }
 
-function handleOpenCreateChildFolder(folder: WorkspaceFolder) {
+function handleOpenCreateChildFolder(folder: FolderItem) {
   folderFormDialogRef.value?.open(folder.id)
 }
 
-function handleOpenEditFolder(folder: WorkspaceFolder) {
-  folderFormDialogRef.value?.open(folder.parent_id ?? props.workspaceId, folder)
+function handleOpenEditFolder(folder: FolderItem) {
+  folderFormDialogRef.value?.open(folder.parent_id ?? workspaceId, folder)
 }
 
 function handleFolderSubmit({ folderId, payload }: FolderFormSubmit) {
   saving.value = true
   const request = folderId
-    ? FolderApi.putFolder(props.workspaceId, props.source, folderId, payload)
-    : FolderApi.postFolder(props.workspaceId, props.source, {
+    ? FolderApi.putFolder(workspaceId, props.source, folderId, payload)
+    : FolderApi.postFolder(workspaceId, props.source, {
         ...payload,
         name: payload.name ?? '',
       })
@@ -151,13 +161,13 @@ function handleFolderSubmit({ folderId, payload }: FolderFormSubmit) {
 }
 
 /* 文件夹移动与删除 */
-function handleOpenMoveFolder(folder: WorkspaceFolder) {
+function handleOpenMoveFolder(folder: FolderItem) {
   moveFolderDialogRef.value?.open(folder)
 }
 
 function handleMoveFolder({ folder, targetFolderId }: FolderMoveSubmit) {
   saving.value = true
-  return FolderApi.putFolder(props.workspaceId, props.source, folder.id, {
+  return FolderApi.putFolder(workspaceId, props.source, folder.id, {
     parent_id: targetFolderId,
   })
     .then((updatedFolder) => {
@@ -171,17 +181,17 @@ function handleMoveFolder({ folder, targetFolderId }: FolderMoveSubmit) {
 }
 
 function handleFolderDrop(
-  draggingFolder: WorkspaceFolder,
-  targetFolder: WorkspaceFolder,
+  draggingFolder: FolderItem,
+  targetFolder: FolderItem,
   dropType: 'after' | 'before' | 'inner',
 ) {
   const targetParentId =
-    dropType === 'inner' ? targetFolder.id : (targetFolder.parent_id ?? props.workspaceId)
+    dropType === 'inner' ? targetFolder.id : (targetFolder.parent_id ?? workspaceId)
 
   if (draggingFolder.parent_id === targetParentId) return loadFolders()
 
   saving.value = true
-  return FolderApi.putFolder(props.workspaceId, props.source, draggingFolder.id, {
+  return FolderApi.putFolder(workspaceId, props.source, draggingFolder.id, {
     parent_id: targetParentId,
   })
     .then((updatedFolder) => {
@@ -194,12 +204,12 @@ function handleFolderDrop(
     })
 }
 
-function handleDeleteFolder(folder: WorkspaceFolder) {
+function handleDeleteFolder(folder: FolderItem) {
   MsgConfirm(`确认删除文件夹“${folder.name}”？`, '文件夹内的资源也会被删除，请谨慎操作。')
     .then(() => {
       saving.value = true
       const selectionAffected = containsFolder(folder, currentNodeKey.value)
-      return FolderApi.deleteFolder(props.workspaceId, props.source, folder.id).then(() => {
+      return FolderApi.deleteFolder(workspaceId, props.source, folder.id).then(() => {
         if (selectionAffected) currentNodeKey.value = ''
         MsgSuccess('删除成功')
         return loadFolders().then(() => emit('deleted', folder, selectionAffected))
@@ -211,17 +221,9 @@ function handleDeleteFolder(folder: WorkspaceFolder) {
     })
 }
 
-watch(
-  () => [props.workspaceId, props.source] as const,
-  () => {
-    const storedSort = localStorage.getItem(`folder-sort:${props.workspaceId}:${props.source}`)
-    if (Object.values(FOLDER_SORT).includes(storedSort as FolderSort)) {
-      currentSort.value = storedSort as FolderSort
-    }
-    loadFolders()
-  },
-  { immediate: true },
-)
+onMounted(() => {
+  loadFolders()
+})
 
 defineExpose({ openCreate: handleOpenCreateFolder, refresh: loadFolders })
 </script>
@@ -250,23 +252,74 @@ defineExpose({ openCreate: handleOpenCreateFolder, refresh: loadFolders })
       </MkDropdown>
     </div>
 
-    <slot name="beforeTree" />
+    <div class="px-4">
+      <MkListItem
+        :active="currentNodeKey === SHARED_FOLDER.id"
+        @click="handleFolderSelect(SHARED_FOLDER)"
+      >
+        <MkIcon
+          :name="
+            currentNodeKey === SHARED_FOLDER.id
+              ? 'icon_folder-share_filled'
+              : 'icon_folder_outlined'
+          "
+          :size="18"
+          class="mr-2"
+        />
+        <span>共享模型</span>
+      </MkListItem>
+
+      <el-divider class="my-1!" />
+
+      <MkListItem
+        :active="currentNodeKey === ALL_FOLDER.id"
+        @click="handleFolderSelect(ALL_FOLDER)"
+      >
+        <MkIcon
+          :name="currentNodeKey === ALL_FOLDER.id ? 'icon_card_filled' : 'icon_card_outlined'"
+          :size="18"
+          class="mr-2"
+        />
+        <span>全部模型</span>
+      </MkListItem>
+    </div>
 
     <div class="min-h-0 flex-1 px-4 pb-4">
-      <FolderVirtualizedTree
-        :can-manage="canManage"
-        :current-node-key="currentNodeKey"
+      <VirtualizedTree
+        :canEdit="canEdit"
         :data="visibleFolders"
-        :draggable="canManage"
         :filter-text="searchKeyword"
-        :protected-node-id="workspaceId"
-        @create="handleOpenCreateChildFolder"
-        @delete="handleDeleteFolder"
-        @edit="handleOpenEditFolder"
-        @move="handleOpenMoveFolder"
         @node-drop="handleFolderDrop"
-        @select="handleFolderSelect"
-      />
+        @node-click="handleFolderSelect"
+      >
+        <template #default="{ node }">
+          <MkIcon name="icon_file-folder_colorful" class="mr-2" :size="18" />
+          <span class="min-w-0 flex-1 truncate" :title="node.name">
+            {{ node.name }}
+          </span>
+        </template>
+
+        <template v-if="canEdit" #action-dropdown="{ row }">
+          <MkDropdownMenu>
+            <MkDropdownItem @click="handleOpenEditFolder(row)">
+              <template #icon><MkIcon name="icon_add_outlined" /></template>
+              <span>创建子文件夹</span>
+            </MkDropdownItem>
+            <MkDropdownItem @click="handleOpenEditFolder(row)">
+              <template #icon><MkIcon name="icon_edit_outlined" /></template>
+              <span>编辑</span>
+            </MkDropdownItem>
+            <MkDropdownItem @click="handleOpenEditFolder(row)">
+              <template #icon><MkIcon name="icon_right_outlined" /></template>
+              <span>移动到</span>
+            </MkDropdownItem>
+            <MkDropdownItem divided @click="handleDeleteFolder(row)">
+              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+              <span>删除</span>
+            </MkDropdownItem>
+          </MkDropdownMenu>
+        </template>
+      </VirtualizedTree>
     </div>
 
     <FolderFormDialog ref="folderFormDialogRef" :loading="saving" @submit="handleFolderSubmit" />

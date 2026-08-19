@@ -189,7 +189,7 @@
   }
 }
 .el-cascader-node {
-  border-radius: var(--el-border-radius-small);
+  border-radius: var(--el-border-radius-base);
   padding: 0 calc(var(--spacing) * 8) 0 calc(var(--spacing) * 2);
 
   &__label {
@@ -321,7 +321,7 @@
 .el-dropdown-menu {
   padding: calc(var(--spacing) * 1) 0;
   &__item {
-    border-radius: var(--el-border-radius-small);
+    border-radius: var(--el-border-radius-base);
     color: var(--el-text-color-primary);
     gap: calc(var(--spacing) * 2);
     margin: 0 calc(var(--spacing) * 1);
@@ -600,7 +600,7 @@
     padding: 4px;
   }
   &__item {
-    border-radius: var(--el-border-radius-small);
+    border-radius: var(--el-border-radius-base);
     color: var(--el-text-color-primary);
     padding: 0 calc(var(--spacing) * 8) 0 calc(var(--spacing) * 2);
     max-width: 100%;
