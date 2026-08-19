@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ClickOutside as vClickOutside } from 'element-plus'
-import WorkflowNodeMenu from '@/mk-workflow/extension/WorkflowNodeMenu.vue'
-import { WorkflowNodeType } from '@/mk-workflow/types'
+import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
+import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'WorkflowComponentMenu' })
 
@@ -24,7 +24,7 @@ const handleSelect = (nodeType: WorkflowNodeType) => {
     </el-button>
 
     <el-collapse-transition>
-      <WorkflowNodeMenu
+      <NodeMenu
         v-show="popoverVisible"
         class="absolute right-0 top-[calc(100%+8px)] z-[2000]"
         @select="handleSelect"

@@ -17,6 +17,8 @@ Before making changes, determine which areas the task touches and read the corre
   organization, and API type ownership.
 - Views: `src/views/VIEW_README.md` is the source of truth for page responsibilities and
   feature-local code organization.
+- Workflow canvas: `src/workflow-canvas/README.md` is the source of truth for LogicFlow canvas
+  responsibilities, configuration boundaries, node maintenance, and View integration.
 
 Follow this maintenance flow:
 
@@ -66,12 +68,15 @@ ui/
 │   │   └── CONSTANT_README.md # Shared constant placement and naming rules
 │   ├── layout/                # Shared application shells, headers, sidebars, and layout types
 │   ├── locales/               # Reserved for internationalization messages and locale setup
-│   ├── mk-workflow/           # LogicFlow canvas and workflow domain components
-│   │   ├── components/        # Reusable workflow canvas UI
-│   │   ├── core/              # Shared canvas behavior and node infrastructure
+│   ├── workflow-canvas/       # LogicFlow canvas and workflow domain components
+│   │   ├── component/         # Reusable workflow canvas UI
+│   │   ├── config/            # Maintainable node data, menus, mappings, and constants
+│   │   ├── core/              # Stable canvas behavior and shared node infrastructure
 │   │   ├── icons/             # Workflow node icons
 │   │   ├── nodes/             # Workflow node definitions and components
 │   │   ├── plugins/           # Canvas-local plugins
+│   │   ├── README.md          # Canvas boundaries and maintenance rules
+│   │   ├── types.ts           # Workflow canvas protocol types
 │   │   └── index.vue          # MkWorkflow canvas entry
 │   ├── router/                # Vue Router routes and router instance
 │   │   └── ROUTE_README.md    # Routing conventions and rules
@@ -105,8 +110,9 @@ Structural responsibilities:
 - Put cross-page business components in `components/business/`, name them after their business
   responsibility without the `Mk` prefix, and keep page-specific components in their owning View.
 - Put reusable application chrome in `layout/`, not in individual route views.
-- Keep LogicFlow initialization, node registration, and canvas behavior inside `mk-workflow/`.
-  Full-screen Workflow Views own the page header and page-level actions around `MkWorkflow`.
+- Keep LogicFlow initialization, node registration, and canvas behavior inside `workflow-canvas/`.
+  Every page rendering this canvas belongs in `views/workflow/`; those Views own the page header,
+  route and page-level actions around `MkWorkflow`.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.

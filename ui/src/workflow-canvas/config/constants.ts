@@ -1,0 +1,35 @@
+export const compareList = [
+  { value: 'is_null', label: '为空' },
+  { value: 'is_not_null', label: '不为空' },
+  { value: 'contain', label: '包含' },
+  { value: 'not_contain', label: '不包含' },
+  { value: 'eq', label: '等于' },
+  { value: 'not_eq', label: '不等于' },
+  { value: 'ge', label: '大于等于' },
+  { value: 'gt', label: '大于' },
+  { value: 'le', label: '小于等于' },
+  { value: 'lt', label: '小于' },
+  { value: 'len_eq', label: '长度等于' },
+  { value: 'len_ge', label: '长度大于等于' },
+  { value: 'len_gt', label: '长度大于' },
+  { value: 'len_le', label: '长度小于等于' },
+  { value: 'len_lt', label: '长度小于' },
+  { value: 'is_true', label: '为真' },
+  { value: 'is_not_true', label: '不为真' },
+  { value: 'start_with', label: 'startWith' },
+  { value: 'end_with', label: 'endWith' },
+  { value: 'regex', label: '正则匹配' },
+  { value: 'wildcard', label: '通配符匹配' },
+]
+
+export const fileTooltip = JSON.stringify(
+  [
+    {
+      name: 'File Name',
+      url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
+      file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
+    },
+  ],
+  null,
+  2,
+)
