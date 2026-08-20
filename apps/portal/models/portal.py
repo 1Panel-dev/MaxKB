@@ -25,6 +25,8 @@ class Portal(AppModelMixin):
     # API服务配置
     enable_api = models.BooleanField(default=True, verbose_name="是否开启API服务")
 
+    enable_knowledge_base_api = models.BooleanField(default=True, verbose_name="是否开启知识库API")
+
     # 身份认证配置
     enable_auth = models.BooleanField(default=False, verbose_name="是否开启身份认证")
 
