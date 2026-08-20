@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎虎
-    @file： permission.py
-    @date：2026/8/3 17:29
-    @desc:
+@project: MaxKB
+@Author：虎虎虎
+@file： permission.py
+@date：2026/8/3 17:29
+@desc:
 """
+
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -21,6 +22,7 @@ class Permission:
     """
     权限信息
     """
+
     group: Group | str
     sub_group: Group | str
     operate: Operate
@@ -58,7 +60,7 @@ class Role:
     workspace_id: str = None
 
     def __str__(self):
-        return f"{self.name}{(':' + self.workspace_id) if self.workspace_id else ''}"
+        return f"{self.name}{(':w:' + self.workspace_id) if self.workspace_id else ''}"
 
     def __eq__(self, other):
         return str(self) == str(other)
