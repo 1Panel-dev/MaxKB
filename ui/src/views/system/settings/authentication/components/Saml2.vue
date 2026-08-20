@@ -2,14 +2,15 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
-import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'SamlAuthenticationSetting' })
 const samlApiBaseUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/saml2`
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<AuthProviderSetting>({
+const form = reactive<AuthProviderSettingPayload>({
   auth_type: LOGIN_METHOD.SAML2,
   config: {
     idpMetaUrl: '',
@@ -23,7 +24,7 @@ const form = reactive<AuthProviderSetting>({
   },
   is_active: false,
 })
-const rules = reactive<FormRules<AuthProviderSetting>>({
+const rules = reactive<FormRules<AuthProviderSettingPayload>>({
   'config.idpMetaUrl': [{ required: true, message: '请输入 Idp MetaData Url', trigger: 'blur' }],
   'config.privateKey': [{ required: true, message: '请输入 SP Private Key', trigger: 'blur' }],
   'config.certificate': [{ required: true, message: '请输入 SP Certificate', trigger: 'blur' }],

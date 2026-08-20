@@ -3,11 +3,11 @@ import { nextTick, reactive, ref } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import {
-  ROLE_TYPE,
-  type ListItem,
-  type BatchSetUserWorkspaceRolesRequest,
-  type SystemUserRoleAssignment,
+import { ROLE_TYPE } from '@/api/enums'
+import type {
+  ListItem,
+  BatchSetUserWorkspaceRolesRequest,
+  SystemUserRoleAssignment,
 } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'

@@ -2,7 +2,8 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
-import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'OidcAuthenticationSetting' })
@@ -11,7 +12,7 @@ const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? '
 
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<AuthProviderSetting>({
+const form = reactive<AuthProviderSettingPayload>({
   auth_type: LOGIN_METHOD.OIDC,
   config: {
     authEndpoint: '',
@@ -26,7 +27,7 @@ const form = reactive<AuthProviderSetting>({
   },
   is_active: false,
 })
-const rules = reactive<FormRules<AuthProviderSetting>>({
+const rules = reactive<FormRules<AuthProviderSettingPayload>>({
   'config.authEndpoint': [{ required: true, message: '请输入授权端地址', trigger: 'blur' }],
   'config.tokenEndpoint': [{ required: true, message: '请输入 Token 端地址', trigger: 'blur' }],
   'config.userInfoEndpoint': [{ required: true, message: '请输入用户信息端地址', trigger: 'blur' }],

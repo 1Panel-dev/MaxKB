@@ -2,14 +2,8 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
-import {
-  LOGIN_METHOD,
-  ROLE_TYPE,
-  type LoginMethod,
-  type OptionItem,
-  type SystemUser,
-  type RequestParams,
-} from '@/api/types/index.ts'
+import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
+import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'

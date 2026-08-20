@@ -3,14 +3,14 @@ import type { QrCodeProvider } from '@/api/types/login'
 
 export type AuthProviderType = 'LDAP' | 'CAS' | 'OIDC' | 'OAuth2' | 'SAML2'
 
-export interface AuthProviderSetting {
+export interface AuthProviderSettingPayload {
   id?: string
   auth_type: AuthProviderType
   config: Record<string, string | boolean>
   is_active: boolean
 }
 
-export interface LoginAuthSetting {
+export interface LoginAuthSettingPayload {
   auth_types?: OptionItem[]
   default_value: string
   failed_attempts: number
@@ -31,7 +31,7 @@ export interface QrLoginPlatform {
   is_valid: boolean
 }
 
-export interface QrLoginPlatformRequest {
+export interface QrLoginPlatformPayload {
   config: Record<string, string>
   isActive: boolean
   key: QrCodeProvider

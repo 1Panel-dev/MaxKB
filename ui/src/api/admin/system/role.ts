@@ -6,9 +6,8 @@ import type {
   RoleItem,
   RoleMember,
   RolePermissionModule,
-  SaveRoleRequest,
+  RolePayload,
   SaveRolePermissionRequest,
-  RoleType,
 } from '@/api/types'
 
 const prefix = '/system/role'
@@ -19,8 +18,8 @@ const getRoleList = () => {
 }
 
 /** 创建或重命名自定义角色。 */
-const postRole = (role: SaveRoleRequest) => {
-  return post<SaveRoleRequest, RoleItem>(prefix, role)
+const postRole = (payload: RolePayload) => {
+  return post<RolePayload, RoleItem>(prefix, payload)
 }
 
 /** 删除自定义角色。 */
@@ -49,8 +48,8 @@ const getRoleMemberList = (roleId: string, page: ParamsPage, query?: RequestPara
 }
 
 /** 为指定角色添加成员。 */
-const postRoleMembers = (roleId: string, request: CreateRoleMembersRequest) => {
-  return post<CreateRoleMembersRequest, boolean>(`${prefix}/${roleId}/add_member`, request)
+const postRoleMembers = (roleId: string, payload: CreateRoleMembersRequest) => {
+  return post<CreateRoleMembersRequest, boolean>(`${prefix}/${roleId}/add_member`, payload)
 }
 
 /** 从指定角色移除成员。 */

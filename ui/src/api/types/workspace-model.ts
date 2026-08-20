@@ -1,15 +1,10 @@
 /** Workspace 模型与工具页面共用的业务类型。 */
 
-export const MODEL_STATUS = {
-  DOWNLOAD: 'DOWNLOAD',
-  ERROR: 'ERROR',
-  PAUSE_DOWNLOAD: 'PAUSE_DOWNLOAD',
-  SUCCESS: 'SUCCESS',
-} as const
+import { MODEL_STATUS } from '@/api/enums'
 
 export type ModelStatus = (typeof MODEL_STATUS)[keyof typeof MODEL_STATUS]
 
-export interface ModelProvider {
+export interface ModelProviderItem {
   icon: string
   name: string
   provider: string
@@ -35,7 +30,6 @@ export interface WorkspaceUserOption {
   id: string
   nick_name: string
 }
-
 
 export interface ModelPayload {
   credential: Record<string, unknown>

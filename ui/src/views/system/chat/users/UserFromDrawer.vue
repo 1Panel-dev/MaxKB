@@ -7,7 +7,7 @@ import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
-import type { ListItem, ChatUser, ChatUserRequest } from '@/api/types'
+import type { ListItem, ChatUser, ChatUserPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
@@ -23,7 +23,7 @@ const drawerVisible = ref(false)
 const isEdit = ref(false)
 const editingUserId = ref('')
 const userSubmitting = ref(false)
-const userForm = reactive<ChatUserRequest>({
+const userForm = reactive<ChatUserPayload>({
   email: '',
   nick_name: '',
   password: '',
@@ -35,7 +35,7 @@ const userForm = reactive<ChatUserRequest>({
 const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
 const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
 
-const userFormRules = reactive<FormRules<ChatUserRequest>>({
+const userFormRules = reactive<FormRules<ChatUserPayload>>({
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },

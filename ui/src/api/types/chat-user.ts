@@ -17,7 +17,7 @@ export interface ChatUser extends ChatUserBase {
   user_group_names: string[]
 }
 
-export interface ChatUserRequest {
+export interface ChatUserPayload {
   username: string
   nick_name: string
   email: string

@@ -1,17 +1,6 @@
 /** 登录 API 与登录页面共同使用的业务类型。 */
 
-/** 后端登录方式协议值；新增或修改登录方式时以此处为唯一数据源。 */
-export const LOGIN_METHOD = {
-  CAS: 'CAS',
-  DINGTALK: 'dingtalk',
-  LDAP: 'LDAP',
-  LARK: 'lark',
-  LOCAL: 'LOCAL',
-  OAUTH2: 'OAuth2',
-  OIDC: 'OIDC',
-  SAML2: 'SAML2',
-  WECOM: 'wecom',
-} as const
+import { LOGIN_METHOD } from '@/api/enums'
 
 export type LoginMethod = (typeof LOGIN_METHOD)[keyof typeof LOGIN_METHOD]
 

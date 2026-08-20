@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
-import type {
-  ModelProvider as ModelProviderItem,
-  OptionItem,
-  RequestParams,
-  WorkspaceModel,
-} from '@/api/types'
-import { MODEL_TYPE_LABELS } from '@/constants/model'
+import type { ModelProviderItem, OptionItem, RequestParams, WorkspaceModel } from '@/api/types'
+import { MODEL_TYPE_LABELS } from '@/constants'
 import CommonApi from '@/api/admin/workspace/common'
 import ModelApi from '@/api/admin/workspace/model/model'
 import CommonSystemApi from '@/api/admin/system/common'
@@ -21,11 +15,6 @@ const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
   name: '全部模型',
   provider: 'all',
 }
-
-const route = useRoute()
-const {
-  params: { workspaceId },
-} = route
 
 const loading = ref(false)
 const currentProvider = ref<ModelProviderItem>(DEFAULT_MODEL_PROVIDER)
@@ -113,7 +102,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-model-view" :loading="loading">
+  <MkViewLayout class="workspace-model-view">
     <template #aside>
       <ModelProvider
         :model-value="currentProvider"
@@ -133,21 +122,22 @@ onMounted(() => {
           </el-button>
         </div>
       </component>
-
-      <el-row v-if="workspaceModels.length" :gutter="16" class="gap-y-4">
-        <el-col
-          v-for="model in workspaceModels"
-          :key="model.id"
-          :xs="24"
-          :sm="24"
-          :md="12"
-          :lg="8"
-          :xl="6"
-        >
-          <ModelCard :model="model" :icon="getModelIcon(model)" :shared="isShared" />
-        </el-col>
-      </el-row>
-      <MkEmpty v-else class="mt-24" />
+      <div v-loading="loading">
+        <el-row v-if="workspaceModels.length" :gutter="16" class="gap-y-4">
+          <el-col
+            v-for="model in workspaceModels"
+            :key="model.id"
+            :xs="24"
+            :sm="24"
+            :md="12"
+            :lg="8"
+            :xl="6"
+          >
+            <ModelCard :model="model" :icon="getModelIcon(model)" :shared="isShared" />
+          </el-col>
+        </el-row>
+        <MkEmpty v-else class="mt-24" />
+      </div>
     </template>
   </MkViewLayout>
 </template>

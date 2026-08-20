@@ -1,4 +1,5 @@
-import { TOOL_TYPE, type ToolType } from '@/api/types/workspace-tool'
+import { TOOL_TYPE } from '@/api/enums'
+import type { ToolType } from '@/api/types'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import * as NodeData from './node-data'
 interface WorkflowModelNode {
@@ -57,7 +58,7 @@ export const workflowModelDict: Record<WorkflowMode, WorkflowNodeMatcher> = {
     )
   },
 }
-export const nodeDict: Partial<Record<WorkflowNodeType, Record<string,any>>> = {
+export const nodeDict: Partial<Record<WorkflowNodeType, Record<string, any>>> = {
   [WorkflowNodeType.AiChat]: NodeData.aiChatNode,
   [WorkflowNodeType.SearchKnowledge]: NodeData.searchKnowledgeNode,
   [WorkflowNodeType.SearchDocument]: NodeData.searchDocumentNode,

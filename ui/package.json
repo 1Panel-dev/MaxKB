@@ -55,7 +55,6 @@
     "unplugin-auto-import": "^21.0.0",
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.0.16",
-    "vite-plugin-vue-devtools": "^8.1.2",
     "vue-eslint-parser": "^10.4.1",
     "vue-tsc": "^3.3.5"
   },

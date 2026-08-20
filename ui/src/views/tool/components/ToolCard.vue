@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, type Component } from 'vue'
 import { Box, Coin, Connection, MagicStick } from '@element-plus/icons-vue'
+import { TOOL_TYPE } from '@/api/enums'
 import type { ToolType, WorkspaceTool } from '@/api/types'
-import { TOOL_TYPE } from '@/api/types'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'ToolCard' })
@@ -115,16 +115,4 @@ function handleStatusChange(active: string | number | boolean) {
   </MkSourceCard>
 </template>
 
-<style lang="scss" scoped>
-.tool-card {
-  height: 228px;
-
-  &.is-selected {
-    border-color: var(--mk-primary);
-  }
-
-  :deep(.el-card__body > footer) {
-    margin-top: auto;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

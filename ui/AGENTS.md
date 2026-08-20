@@ -55,7 +55,8 @@ ui/
 │   │   ├── iconfont.js        # Generated SVG Symbol resource; replace, do not edit
 │   │   ├── logo/             # Product and brand logos
 │   │   └── workflow/         # Workflow-related visual assets
-│   ├── api/                   # Request infrastructure, business APIs, and shared API types
+│   ├── api/                   # Request infrastructure, business APIs, enums, and shared API types
+│   │   ├── enums/             # Backend fixed-value enums, exposed through one public entry
 │   │   ├── types/             # Types shared by APIs and their View or Component consumers
 │   │   └── API_README.md      # API layering, placement, typing, and request rules
 │   ├── components/            # Shared UI and cross-page business components
@@ -115,6 +116,8 @@ Structural responsibilities:
   route and page-level actions around `MkWorkflow`.
 - Put server communication in `api/`, isolate Admin and Chat request systems, and group business APIs
   by domain and resource according to `src/api/API_README.md`.
+- Put backend fixed-value enums in `api/enums/` and import them through `@/api/enums`; keep
+  `api/types/` as the type-only public entry for API and UI consumers.
 - Put constants shared by most pages or multiple business modules in `constants/`, and split files by a specific domain. Keep constants used by only one page or feature with their owning code.
 - Put shared client state in `stores/`; component-local state should remain in the component.
 - Reuse the Pinia instance exported by `stores/index.ts`; application code accesses Store instances
@@ -175,7 +178,7 @@ Keep these behaviors:
 - `base: './'` for v2-compatible static deployment.
 - `envDir: './env'`.
 - Proxy `/admin/api`, `/chat/api`, `/doc`, `/schema`, `/static`, and `oss` file paths to the backend.
-- Keep Tailwind, Vue, Vue JSX, Vue DevTools, Element Plus auto import, and component auto registration plugins.
+- Keep Tailwind, Vue, Vue JSX, Element Plus auto import, and component auto registration plugins.
 - Do not add `unplugin-vue-define-options`; Vue 3.5 already supports `defineOptions`.
 - Avoid adding `vite-plugin-html` unless multi-template requirements exceed Vite's built-in HTML env replacement.
 

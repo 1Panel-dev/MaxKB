@@ -2,7 +2,8 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
-import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'CasAuthenticationSetting' })
@@ -10,12 +11,12 @@ defineOptions({ name: 'CasAuthenticationSetting' })
 const defaultRedirectUrl = `${window.location.origin}${window.MaxKB?.prefix ?? ''}/api/cas`
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<AuthProviderSetting>({
+const form = reactive<AuthProviderSettingPayload>({
   auth_type: LOGIN_METHOD.CAS,
   config: { ldpUri: '', validateUrl: '', redirectUrl: defaultRedirectUrl },
   is_active: false,
 })
-const rules = reactive<FormRules<AuthProviderSetting>>({
+const rules = reactive<FormRules<AuthProviderSettingPayload>>({
   'config.ldpUri': [{ required: true, message: '请输入 ldpUri', trigger: 'blur' }],
   'config.validateUrl': [{ required: true, message: '请输入验证地址', trigger: 'blur' }],
   'config.redirectUrl': [{ required: true, message: '请输入回调地址', trigger: 'blur' }],

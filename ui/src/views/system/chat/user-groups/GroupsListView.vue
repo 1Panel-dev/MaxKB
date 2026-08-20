@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatGroupsApi from '@/api/admin/system/chat-user-groups.ts'
-import {
-  LOGIN_METHOD,
-  type ListItem,
-  type ChatUserGroupMember,
-  type LoginMethod,
-  type OptionItem,
-  type RequestParams,
+import { LOGIN_METHOD } from '@/api/enums'
+import type {
+  ListItem,
+  ChatUserGroupMember,
+  LoginMethod,
+  OptionItem,
+  RequestParams,
 } from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'

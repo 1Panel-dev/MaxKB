@@ -1,12 +1,6 @@
 import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type {
-  ToolCatalogResponse,
-  ToolListQuery,
-  ToolPayload,
-  ToolTreeResponse,
-  WorkspaceTool,
-} from '@/api/types'
+import type { RequestParams, ToolPayload, WorkspaceTool } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -15,31 +9,21 @@ const getPrefix = () => {
 }
 
 /** 获取工具分页列表。 */
-const getToolPage = (page: ParamsPage, query?: ToolListQuery) => {
+const getToolPage = (page: ParamsPage, query?: RequestParams) => {
   return get<ResponsePage<WorkspaceTool>>(
     `${getPrefix()}/${page.currentPage}/${page.pageSize}`,
     query,
   )
 }
 
-/** 获取当前目录下的工具和子文件夹。 */
-const getToolTree = (query?: ToolListQuery) => {
-  return get<ToolTreeResponse>(getPrefix(), query)
-}
-
-/** 获取工作空间全部工具以及已授权的共享工具。 */
-const getToolCatalog = (query?: ToolListQuery) => {
-  return get<ToolCatalogResponse>(`${getPrefix()}/tool_list`, query)
+/** 更新工作空间工具。 */
+const putTool = (toolId: string, payload: ToolPayload) => {
+  return put<ToolPayload, WorkspaceTool>(`${getPrefix()}/${toolId}`, payload)
 }
 
 /** 创建工作空间工具。 */
 const postTool = (payload: ToolPayload) => {
   return post<ToolPayload, WorkspaceTool>(getPrefix(), payload)
-}
-
-/** 更新工作空间工具。 */
-const putTool = (toolId: string, payload: ToolPayload) => {
-  return put<ToolPayload, WorkspaceTool>(`${getPrefix()}/${toolId}`, payload)
 }
 
 /** 获取工具详情。 */
@@ -73,11 +57,10 @@ const putBatchMoveTools = (toolIds: string[], folderId: string) => {
 }
 
 export default {
-  deleteTool,
-  getToolCatalog,
-  getToolDetail,
   getToolPage,
-  getToolTree,
+  deleteTool,
+  getToolDetail,
+
   postTool,
   postToolTestConnection,
   putBatchDeleteTools,

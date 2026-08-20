@@ -1,4 +1,5 @@
-import { LOGIN_METHOD, ROLE_TYPE, type LoginMethod, type RoleType } from '@/api/types'
+import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
+import type { LoginMethod, RoleType } from '@/api/types'
 
 export const LOGIN_METHOD_LABELS: Record<LoginMethod, string> = {
   [LOGIN_METHOD.CAS]: 'CAS',

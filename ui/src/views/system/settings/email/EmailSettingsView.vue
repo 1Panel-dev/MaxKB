@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import type { EmailSetting } from '@/api/types'
+import type { EmailSettingPayload } from '@/api/types'
 import EmailSettingApi from '@/api/admin/system/email-setting'
 import { MsgSuccess } from '@/utils/message'
 
-const defaultEmailSetting: EmailSetting = {
+const defaultEmailSetting: EmailSettingPayload = {
   email_host: '',
   email_host_password: '',
   email_host_user: '',
@@ -16,9 +16,9 @@ const defaultEmailSetting: EmailSetting = {
 }
 
 const emailFormRef = useTemplateRef<FormInstance>('emailFormRef')
-const emailSetting = reactive<EmailSetting>({ ...defaultEmailSetting })
+const emailSetting = reactive<EmailSettingPayload>({ ...defaultEmailSetting })
 const loading = ref(false)
-const rules: FormRules<EmailSetting> = {
+const rules: FormRules<EmailSettingPayload> = {
   email_host: [{ required: true, message: '请输入 SMTP Host', trigger: 'blur' }],
   email_port: [{ required: true, message: '请输入 SMTP Port', trigger: 'blur' }],
   email_host_user: [{ required: true, message: '请输入 SMTP 账户', trigger: 'blur' }],

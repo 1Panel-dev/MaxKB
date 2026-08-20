@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE, type RoleItem, type RoleType, type SaveRoleRequest } from '@/api/types'
-import { ROLE_TYPE_LABELS } from '@/constants/auth'
+import type { RoleItem, RoleType, RolePayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { ROLE_TYPE } from '@/api/enums'
+import { ROLE_TYPE_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [role: RoleItem] }>()
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
-const roleForm = reactive<SaveRoleRequest>({ role_name: '' })
-const rules: FormRules<SaveRoleRequest> = {
+const roleForm = reactive<RolePayload>({ role_name: '' })
+const rules: FormRules<RolePayload> = {
   role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
   role_type: [{ required: true, message: '请选择继承角色', trigger: 'change' }],
 }

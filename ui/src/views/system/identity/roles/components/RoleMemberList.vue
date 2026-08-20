@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef, watch } from 'vue'
 import RoleApi from '@/api/admin/system/role'
-import {
-  ROLE_TYPE,
-  type OptionItem,
-  type RequestParams,
-  type RoleItem,
-  type RoleMember,
-} from '@/api/types'
+import { ROLE_TYPE } from '@/api/enums'
+import type { OptionItem, RequestParams, RoleItem, RoleMember } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from '../AddMemberDrawer.vue'
 

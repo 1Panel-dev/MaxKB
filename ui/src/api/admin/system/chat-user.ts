@@ -4,7 +4,7 @@ import type {
   BatchSetChatUserGroupsRequest,
   ChatUserBase,
   ChatUser,
-  ChatUserRequest,
+  ChatUserPayload,
   ChatUserSyncResult,
   ChatUserUpdateRequest,
   RequestParams,
@@ -26,13 +26,13 @@ const getChatUserPage = (page: ParamsPage, query?: RequestParams) => {
 }
 
 /** 创建对话用户。 */
-const postChatUser = (user: ChatUserRequest) => {
-  return post<ChatUserRequest, ChatUser>(prefix, user)
+const postChatUser = (payload: ChatUserPayload) => {
+  return post<ChatUserPayload, ChatUser>(prefix, payload)
 }
 
 /** 编辑对话用户。 */
-const putChatUser = (userId: string, user: ChatUserUpdateRequest) => {
-  return put<ChatUserUpdateRequest, ChatUser>(`${prefix}/${userId}`, user)
+const putChatUser = (userId: string, payload: ChatUserUpdateRequest) => {
+  return put<ChatUserUpdateRequest, ChatUser>(`${prefix}/${userId}`, payload)
 }
 
 /** 修改对话用户密码。 */

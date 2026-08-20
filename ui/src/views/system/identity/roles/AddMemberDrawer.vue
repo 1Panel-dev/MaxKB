@@ -4,13 +4,8 @@ import type { FormInstance } from 'element-plus'
 import CommonSystemApi from '@/api/admin/system/common'
 import RoleApi from '@/api/admin/system/role'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import {
-  ROLE_TYPE,
-  type CreateRoleMemberItem,
-  type RoleItem,
-  type SystemUserOption,
-  type WorkspaceItem,
-} from '@/api/types'
+import { ROLE_TYPE } from '@/api/enums'
+import type { CreateRoleMemberItem, RoleItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import MkFormList from '@/components/mk-form-list/index.vue'

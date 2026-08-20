@@ -5,7 +5,7 @@ import CurrentUserApi from '@/api/admin/auth/current-user'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import type {
-  CreateWorkspaceMemberParamsItem,
+  CreateWorkspaceMemberPayload,
   ListItem,
   SystemUserOption,
   WorkspaceItem,
@@ -26,7 +26,7 @@ const emit = defineEmits<{
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
-const memberForm = reactive<{ members: CreateWorkspaceMemberParamsItem[] }>({
+const memberForm = reactive<{ members: CreateWorkspaceMemberPayload[] }>({
   members: [],
 })
 

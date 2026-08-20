@@ -52,6 +52,7 @@ const emit = defineEmits<{
   nodeClick: [folder: FolderItem]
 }>()
 
+// 过滤树
 function filterFolders(folders: FolderTreeNode[], keyword: string): FolderTreeNode[] {
   if (!keyword) return folders
 
@@ -69,6 +70,15 @@ const filteredTreeData = computed(() =>
   filterFolders(props.data as FolderTreeNode[], props.filterText.trim().toLocaleLowerCase()),
 )
 
+// 点击展开或选择
+function handleNodeClick(stat: FolderStat) {
+  if (stat.data.disabled) return
+  if (stat.data.id === props.currentNodeKey) {
+    stat.open = !stat.open
+    return
+  }
+  emit('nodeClick', stat.data)
+}
 function containsCurrentFolder(folder: FolderTreeNode): boolean {
   return (
     folder.id === props.currentNodeKey ||
@@ -82,15 +92,7 @@ function handleStat<T extends FolderStat>(stat: T): T {
   return stat
 }
 
-function handleNodeClick(stat: FolderStat) {
-  if (stat.data.disabled) return
-  if (stat.data.id === props.currentNodeKey) {
-    stat.open = !stat.open
-    return
-  }
-  emit('nodeClick', stat.data)
-}
-
+// 拖拽
 function buildNodeDropArgs() {
   const draggingNode = dragContext.dragNode as FolderStat | null
   const targetInfo = dragContext.targetInfo as DropTargetInfo | null
@@ -165,6 +167,10 @@ function handleAfterDrop() {
 
 <style lang="scss">
 .mk-virtualized-tree {
+  --el-scrollbar-opacity: 0.3;
+  --el-scrollbar-bg-color: var(--el-text-color-secondary);
+  --el-scrollbar-hover-opacity: 0.5;
+  --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;
 
@@ -173,7 +179,6 @@ function handleAfterDrop() {
     height: 6px;
     width: 6px;
   }
-
   &::-webkit-scrollbar-thumb {
     background-color: transparent;
     border-radius: var(--el-border-radius-small);
@@ -209,6 +214,9 @@ function handleAfterDrop() {
       color: var(--el-color-primary);
       font-weight: 500;
     }
+  }
+  .vtlist-inner {
+    gap: calc(var(--spacing) * 1);
   }
 }
 </style>

@@ -2,7 +2,7 @@ import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   ChatUserGroupMember,
-  ChatUserGroupRequest,
+  ChatUserGroupPayload,
   ListItem,
   RequestParams,
 } from '@/api/types'
@@ -15,8 +15,8 @@ const getChatUserGroups = () => {
 }
 
 /** 创建或重命名对话用户组。 */
-const postChatUserGroup = (group: ChatUserGroupRequest) => {
-  return post<ChatUserGroupRequest, boolean>(prefix, group)
+const postChatUserGroup = (payload: ChatUserGroupPayload) => {
+  return post<ChatUserGroupPayload, boolean>(prefix, payload)
 }
 
 /** 删除对话用户组。 */

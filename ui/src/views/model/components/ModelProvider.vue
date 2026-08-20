@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { ModelProvider } from '@/api/types'
+import type { ModelProviderItem } from '@/api/types'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 
 defineOptions({ name: 'ModelProvider' })
 
-const ALL_MODEL_PROVIDER: ModelProvider = {
+const ALL_MODEL_PROVIDER: ModelProviderItem = {
   icon: '',
   name: '全部模型',
   provider: 'all',
 }
-const SHARED_MODEL_PROVIDER: ModelProvider = {
+const SHARED_MODEL_PROVIDER: ModelProviderItem = {
   icon: '',
   name: '共享模型',
   provider: 'shared',
@@ -25,11 +25,11 @@ const LOCAL_PROVIDER_IDS = new Set([
 ])
 
 const props = defineProps<{
-  modelValue: ModelProvider
-  providers: ModelProvider[]
+  modelValue: ModelProviderItem
+  providers: ModelProviderItem[]
 }>()
 const emit = defineEmits<{
-  'update:modelValue': [value: ModelProvider]
+  'update:modelValue': [value: ModelProviderItem]
 }>()
 
 const publicProviders = computed(() =>
@@ -39,7 +39,7 @@ const privateProviders = computed(() =>
   props.providers.filter(({ provider }) => LOCAL_PROVIDER_IDS.has(provider)),
 )
 
-function handleProviderSelect(provider: ModelProvider) {
+function handleProviderSelect(provider: ModelProviderItem) {
   emit('update:modelValue', provider)
 }
 </script>

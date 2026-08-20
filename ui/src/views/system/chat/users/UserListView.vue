@@ -1,16 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import {
-  LOGIN_METHOD,
-  type ChatUser,
-  type LoginMethod,
-  type OptionItem,
-  type RequestParams,
-} from '@/api/types'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { datetimeFormat } from '@/utils/time'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import UserFromDrawer from './UserFromDrawer.vue'
 import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
