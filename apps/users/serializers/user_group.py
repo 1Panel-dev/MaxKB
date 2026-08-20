@@ -241,6 +241,7 @@ class UserGroupListPageSerializer(serializers.Serializer):
                     "username": relation.user.username,
                     "nick_name": relation.user.nick_name,
                     "system_user_group_relation_id": str(relation.id),
+                    "source": relation.user.source,
                 },
             )
 

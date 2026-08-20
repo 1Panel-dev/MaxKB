@@ -276,7 +276,7 @@ onMounted(() => loadWorkspaceOptions())
             <template #default="{ row }">
               <WorkspaceRelationTags
                 :table-render-params="{ property: '角色', value: '工作空间' }"
-                :tags="row.role ? [row.role] : []"
+                :tags="row.roles"
               />
             </template>
           </el-table-column>
