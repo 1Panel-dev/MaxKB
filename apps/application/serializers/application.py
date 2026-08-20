@@ -557,6 +557,9 @@ class ApplicationListResponse(serializers.Serializer):
         required=True, label=_("Application Description"), help_text=_("Application Description")
     )
     is_publish = serializers.BooleanField(required=True, label=_("Model id"), help_text=_("Model id"))
+    is_portal = serializers.BooleanField(
+        required=True, label=_("Whether to publish on portal"), help_text=_("Whether to publish on portal")
+    )
     type = serializers.CharField(required=True, label=_("Application type"), help_text=_("Application type"))
     resource_type = serializers.CharField(required=True, label=_("Resource type"), help_text=_("Resource type"))
     user_id = serializers.CharField(required=True, label=_("Affiliation user"), help_text=_("Affiliation user"))
@@ -690,6 +693,7 @@ class ApplicationImportRequest(serializers.Serializer):
 
 class ApplicationEditSerializer(serializers.Serializer):
     name = serializers.CharField(required=False, max_length=64, min_length=1, label=_("Application Name"))
+    is_portal = serializers.BooleanField(required=False, label=_("Whether to publish on portal"))
     desc = serializers.CharField(
         required=False,
         max_length=256,
@@ -1422,6 +1426,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             ToolExecutor().validate_mcp_transport(json.dumps(instance.get("mcp_servers")))
         update_keys = [
             "name",
+            "is_portal",
             "desc",
             "model_id",
             "multiple_rounds_dialogue",
