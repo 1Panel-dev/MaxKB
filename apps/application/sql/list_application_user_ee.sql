@@ -2,6 +2,7 @@ select *
 from (select application."id"::text, application."name",
              application."desc",
              application."is_publish",
+             application."is_portal",
              application."type",
              'application'      as "resource_type",
              application."workspace_id",

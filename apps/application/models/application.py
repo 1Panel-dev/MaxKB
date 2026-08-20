@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application.py
-    @date：2025/5/7 15:29
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application.py
+@date：2025/5/7 15:29
+@desc:
 """
+
 import uuid_utils.compat as uuid
 from django.db import models
 from mptt.fields import TreeForeignKey
@@ -23,45 +24,50 @@ class ApplicationFolder(MPTTModel, AppModelMixin):
     desc = models.CharField(max_length=200, null=True, blank=True, verbose_name="描述")
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
-    parent = TreeForeignKey('self', on_delete=models.DO_NOTHING, null=True, blank=True, related_name='children')
+    parent = TreeForeignKey("self", on_delete=models.DO_NOTHING, null=True, blank=True, related_name="children")
 
     class Meta:
         db_table = "application_folder"
 
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ["name"]
 
 
 class ApplicationTypeChoices(models.TextChoices):
     """订单类型"""
-    SIMPLE = 'SIMPLE', '简易'
-    WORK_FLOW = 'WORK_FLOW', '工作流'
+
+    SIMPLE = "SIMPLE", "简易"
+    WORK_FLOW = "WORK_FLOW", "工作流"
 
 
 def get_dataset_setting_dict():
-    return {'top_n': 3, 'similarity': 0.6, 'max_paragraph_char_number': 5000, 'search_mode': 'embedding',
-            'no_references_setting': {
-                'status': 'ai_questioning',
-                'value': '{question}'
-            }}
+    return {
+        "top_n": 3,
+        "similarity": 0.6,
+        "max_paragraph_char_number": 5000,
+        "search_mode": "embedding",
+        "no_references_setting": {"status": "ai_questioning", "value": "{question}"},
+    }
 
 
 def get_model_setting_dict():
     return {
-        'prompt': Application.get_default_model_prompt(),
-        'no_references_prompt': '{question}',
-        'reasoning_content_start': '<think>',
-        'reasoning_content_end': '</think>',
-        'reasoning_content_enable': False,
+        "prompt": Application.get_default_model_prompt(),
+        "no_references_prompt": "{question}",
+        "reasoning_content_start": "<think>",
+        "reasoning_content_end": "</think>",
+        "reasoning_content_enable": False,
     }
 
 
 class Application(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     workspace_id = models.CharField(max_length=64, verbose_name="工作空间id", default="default", db_index=True)
-    folder = models.ForeignKey(ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id",
-                               default='default')
+    folder = models.ForeignKey(
+        ApplicationFolder, on_delete=models.DO_NOTHING, verbose_name="文件夹id", default="default"
+    )
     is_publish = models.BooleanField(verbose_name="是否发布", default=False)
+    is_portal = models.BooleanField(verbose_name="是否在门户上架", default=False)
     name = models.CharField(max_length=128, verbose_name="应用名称", db_index=True)
     desc = models.CharField(max_length=512, verbose_name="引用描述", default="")
     prologue = models.CharField(max_length=40960, verbose_name="开场白", default="")
@@ -76,15 +82,25 @@ class Application(AppModelMixin):
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
-    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
-                            default=ApplicationTypeChoices.SIMPLE, max_length=256)
-    problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
-                                                   null=True,
-                                                   default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中")
-    tts_model = models.ForeignKey(Model, related_name='tts_model_id', on_delete=models.SET_NULL, db_constraint=False,
-                                  blank=True, null=True)
-    stt_model = models.ForeignKey(Model, related_name='stt_model_id', on_delete=models.SET_NULL, db_constraint=False,
-                                  blank=True, null=True)
+    type = models.CharField(
+        verbose_name="应用类型",
+        choices=ApplicationTypeChoices.choices,
+        default=ApplicationTypeChoices.SIMPLE,
+        max_length=256,
+    )
+    problem_optimization_prompt = models.CharField(
+        verbose_name="问题优化提示词",
+        max_length=102400,
+        blank=True,
+        null=True,
+        default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中",
+    )
+    tts_model = models.ForeignKey(
+        Model, related_name="tts_model_id", on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True
+    )
+    stt_model = models.ForeignKey(
+        Model, related_name="stt_model_id", on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True
+    )
     tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
@@ -105,26 +121,29 @@ class Application(AppModelMixin):
     skill_tool_ids = models.JSONField(verbose_name="技能ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
     file_clean_time = models.IntegerField(verbose_name="文件清理时间", default=180)
-    long_term_enable = models.BooleanField(verbose_name='长期记忆是否开启', default=False)
-    long_term_model = models.ForeignKey(Model, related_name='long_term_model_id', on_delete=models.SET_NULL,
-                                        db_constraint=False, blank=True, null=True)
+    long_term_enable = models.BooleanField(verbose_name="长期记忆是否开启", default=False)
+    long_term_model = models.ForeignKey(
+        Model, related_name="long_term_model_id", on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True
+    )
     long_term_model_params_setting = models.JSONField(verbose_name="长期记忆模型参数相关设置", default=dict)
-    long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
-    long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
+    long_term_trigger_type = models.CharField(verbose_name="长期记忆触发类型", default="ROUND")
+    long_term_trigger_setting = models.JSONField(verbose_name="长期记忆触发配置", default=dict)
 
     @staticmethod
     def get_default_model_prompt():
-        return ('已知信息：'
-                '\n{data}'
-                '\n回答要求：'
-                '\n- 如果你不知道答案或者没有从获取答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。'
-                '\n- 避免提及你是从<data></data>中获得的知识。'
-                '\n- 请保持答案与<data></data>中描述的一致。'
-                '\n- 请使用markdown 语法优化答案的格式。'
-                '\n- <data></data>中的图片链接、链接地址和脚本语言请完整返回。'
-                '\n- 请使用与问题相同的语言来回答。'
-                '\n问题：'
-                '\n{question}')
+        return (
+            "已知信息："
+            "\n{data}"
+            "\n回答要求："
+            "\n- 如果你不知道答案或者没有从获取答案，请回答“没有在知识库中查找到相关信息，建议咨询相关技术支持或参考官方文档进行操作”。"
+            "\n- 避免提及你是从<data></data>中获得的知识。"
+            "\n- 请保持答案与<data></data>中描述的一致。"
+            "\n- 请使用markdown 语法优化答案的格式。"
+            "\n- <data></data>中的图片链接、链接地址和脚本语言请完整返回。"
+            "\n- 请使用与问题相同的语言来回答。"
+            "\n问题："
+            "\n{question}"
+        )
 
     class Meta:
         db_table = "application"
@@ -160,15 +179,21 @@ class ApplicationVersion(AppModelMixin):
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
     work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
-    type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
-                            default=ApplicationTypeChoices.SIMPLE, max_length=256)
-    problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
-                                                   null=True,
-                                                   default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中")
-    tts_model_id = models.UUIDField(verbose_name="文本转语音模型id",
-                                    blank=True, null=True)
-    stt_model_id = models.UUIDField(verbose_name="语音转文本模型id",
-                                    blank=True, null=True)
+    type = models.CharField(
+        verbose_name="应用类型",
+        choices=ApplicationTypeChoices.choices,
+        default=ApplicationTypeChoices.SIMPLE,
+        max_length=256,
+    )
+    problem_optimization_prompt = models.CharField(
+        verbose_name="问题优化提示词",
+        max_length=102400,
+        blank=True,
+        null=True,
+        default="()里面是用户问题,根据上下文回答揣测用户问题({question}) 要求: 输出一个补全问题,并且放在<data></data>标签中",
+    )
+    tts_model_id = models.UUIDField(verbose_name="文本转语音模型id", blank=True, null=True)
+    stt_model_id = models.UUIDField(verbose_name="语音转文本模型id", blank=True, null=True)
     tts_model_enable = models.BooleanField(verbose_name="语音合成模型是否启用", default=False)
     stt_model_enable = models.BooleanField(verbose_name="语音识别模型是否启用", default=False)
     tts_type = models.CharField(verbose_name="语音播放类型", max_length=20, default="BROWSER")
@@ -187,11 +212,11 @@ class ApplicationVersion(AppModelMixin):
     application_ids = models.JSONField(verbose_name="应用ID列表", default=list)
     skill_tool_ids = models.JSONField(verbose_name="技能ID列表", default=list)
     mcp_output_enable = models.BooleanField(verbose_name="MCP输出是否启用", default=True)
-    long_term_enable = models.BooleanField(verbose_name='长期记忆是否开启', default=False)
+    long_term_enable = models.BooleanField(verbose_name="长期记忆是否开启", default=False)
     long_term_model_id = models.UUIDField(verbose_name="长期记忆模型id", blank=True, null=True)
     long_term_model_params_setting = models.JSONField(verbose_name="长期记忆模型参数相关设置", default=dict)
-    long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
-    long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
+    long_term_trigger_type = models.CharField(verbose_name="长期记忆触发类型", default="ROUND")
+    long_term_trigger_setting = models.JSONField(verbose_name="长期记忆触发配置", default=dict)
     knowledge_ids = models.JSONField(verbose_name="数据集id列表", default=list)
 
     class Meta:

@@ -30,7 +30,7 @@ class PortalApplicationAuthMixin:
     def get_authorized_application_queryset(user_id):
         public_apps = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=False)
         if not ChatUser.objects.filter(id=user_id).exists():
-            return Application.objects.filter(is_publish=True).filter(Exists(public_apps))
+            return Application.objects.filter(is_publish=True, is_portal=True).filter(Exists(public_apps))
         authed_token_exists = ApplicationAccessToken.objects.filter(application_id=OuterRef("id"), authentication=True)
         direct_auth = ResourceChatUserAuthorize.objects.filter(
             resource_id=OuterRef("id"), resource_type=ResourceType.APPLICATION.value, is_auth=True, user_id=user_id
@@ -42,7 +42,7 @@ class PortalApplicationAuthMixin:
             is_auth=True,
             user_group_id__in=user_groups,
         )
-        return Application.objects.filter(is_publish=True).filter(
+        return Application.objects.filter(is_publish=True, is_portal=True).filter(
             Exists(public_apps) | (Exists(authed_token_exists) & (Exists(direct_auth) | Exists(group_auth)))
         )
 
@@ -56,6 +56,7 @@ class ApplicationResponseSerializer(serializers.Serializer):
     dialogue_number = serializers.IntegerField(required=True)
     prologue = serializers.CharField(required=True)
     is_publish = serializers.BooleanField(required=True)
+    is_portal = serializers.BooleanField(required=True)
 
 
 class PortalApplicationSerializer(serializers.Serializer):
@@ -65,7 +66,7 @@ class PortalApplicationSerializer(serializers.Serializer):
         )
 
         def get_query_set(self):
-            queryset = Application.objects.filter(is_publish=True)
+            queryset = Application.objects.filter(is_publish=True, is_portal=True)
             name = self.data.get("name")
             if name:
                 queryset = queryset.filter(name__icontains=name)
