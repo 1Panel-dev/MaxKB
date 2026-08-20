@@ -65,17 +65,12 @@ function loadVisibleTools() {
   loading.value = true
   const query = getToolListQuery()
 
-  const request = ToolApi.getToolPage(workspaceId, paginationConfig.value, {
+  return ToolApi.getToolPage(paginationConfig.value, {
     ...query,
     folder_id: 'default',
-  }).then(({ tools }) => tools)
-
-  return request
+  })
     .then((tools) => {
-      visibleTools.value = tools.map((tool) => ({
-        ...tool,
-        source: isShared.value ? 'shared' : 'workspace',
-      }))
+      visibleTools.value = tools.records
     })
     .finally(() => {
       loading.value = false
@@ -112,10 +107,7 @@ function handleToolSelect(tool: WorkspaceTool) {
 
 /* 搜索与筛选 */
 function loadCreatorOptions(keyword: string) {
-  return CommonApi.getAllUsers(
-    workspaceId.value,
-    keyword ? { nick_name: keyword } : undefined,
-  ).then((users) => {
+  return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
   })
 }
@@ -133,7 +125,7 @@ function handleToolTypeChange() {
 /* 工具维护 */
 function handleToolStatusChange(tool: WorkspaceTool, active: boolean) {
   loading.value = true
-  return ToolApi.putTool(workspaceId.value, tool.id, { is_active: active })
+  return ToolApi.putTool(tool.id, { is_active: active })
     .then(() => {
       tool.is_active = active
       MsgSuccess(active ? '启用成功' : '禁用成功')
@@ -147,7 +139,7 @@ function handleDeleteTool(tool: WorkspaceTool) {
   MsgConfirm(`确认删除工具“${tool.name}”？`, '删除后无法恢复，请谨慎操作。')
     .then(() => {
       loading.value = true
-      return ToolApi.deleteTool(workspaceId.value, tool.id).then(() => {
+      return ToolApi.deleteTool(tool.id).then(() => {
         MsgSuccess('删除成功')
         return loadVisibleTools()
       })

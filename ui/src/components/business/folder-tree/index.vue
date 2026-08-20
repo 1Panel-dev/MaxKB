@@ -104,7 +104,7 @@ function containsFolder(folder: FolderItem, folderId: string): boolean {
 /* 文件夹树 */
 function loadFolders() {
   loading.value = true
-  return FolderApi.getFolderTree(workspaceId, props.source)
+  return FolderApi.getFolderTree(props.source)
     .then((folders) => {
       folderTree.value = folders
       emit('loaded', folders)
@@ -284,7 +284,7 @@ defineExpose({ openCreate: handleOpenCreateFolder, refresh: loadFolders })
       </MkListItem>
     </div>
 
-    <div class="min-h-0 flex-1 px-4 pb-4">
+    <div class="min-h-0 flex-1">
       <VirtualizedTree
         :canEdit="canEdit"
         :data="visibleFolders"

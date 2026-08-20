@@ -165,7 +165,35 @@ function handleAfterDrop() {
 
 <style lang="scss">
 .mk-virtualized-tree {
-  overflow: auto !important;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    height: 6px;
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: var(--el-border-radius-small);
+    transition: background-color var(--el-transition-duration);
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--el-scrollbar-bg-color);
+    opacity: var(--el-scrollbar-opacity);
+  }
+
+  &:hover {
+    scrollbar-color: color-mix(in srgb, var(--el-scrollbar-bg-color) 30%, transparent) transparent;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--el-scrollbar-bg-color);
+    opacity: var(--el-scrollbar-hover-opacity);
+  }
+
   .mk-tree-node {
     &:hover {
       background: none;
