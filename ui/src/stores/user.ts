@@ -3,7 +3,7 @@
 import { defineStore } from 'pinia'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import type { CurrentUserInfo } from '@/api/admin/auth/types'
-import { ROLE_TYPE } from '@/api/types'
+import { ROLE_TYPE } from '@/api/enums'
 
 const LANGUAGE_STORAGE_KEY = 'MaxKB-locale'
 

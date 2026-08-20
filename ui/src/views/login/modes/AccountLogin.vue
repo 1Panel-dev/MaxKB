@@ -5,9 +5,10 @@ import { useRoute, useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { useStore } from '@/stores'
-import { LOGIN_METHOD, type LoginConfig, type LoginMethod } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { LoginConfig, LoginMethod } from '@/api/types'
 import { MsgConfirm } from '@/utils/message'
 
 interface AccountLoginForm {

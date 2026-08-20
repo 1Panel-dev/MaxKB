@@ -1,4 +1,4 @@
-export interface EmailSetting {
+export interface EmailSettingPayload {
   email_host: string
   email_host_password: string
   email_host_user: string

@@ -1,10 +1,6 @@
 /** Workspace 下多个资源模块共用的文件夹业务类型。 */
 
-export const FOLDER_SOURCE = {
-  APPLICATION: 'APPLICATION',
-  KNOWLEDGE: 'KNOWLEDGE',
-  TOOL: 'TOOL',
-} as const
+import { FOLDER_SOURCE } from '@/api/enums'
 
 export type FolderSource = (typeof FOLDER_SOURCE)[keyof typeof FOLDER_SOURCE]
 

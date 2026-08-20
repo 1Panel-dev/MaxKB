@@ -1,21 +1,6 @@
 /** Workspace 工具列表和工具维护共用的业务类型。 */
 
-import type { WorkspaceFolder } from './folder'
-
-export const TOOL_SCOPE = {
-  INTERNAL: 'INTERNAL',
-  SHARED: 'SHARED',
-  WORKSPACE: 'WORKSPACE',
-} as const
-
-export const TOOL_TYPE = {
-  CUSTOM: 'CUSTOM',
-  DATA_SOURCE: 'DATA_SOURCE',
-  INTERNAL: 'INTERNAL',
-  MCP: 'MCP',
-  SKILL: 'SKILL',
-  WORKFLOW: 'WORKFLOW',
-} as const
+import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]
@@ -44,26 +29,6 @@ export interface WorkspaceTool {
   workspace_id: string
 }
 
-export interface ToolCatalogResponse {
-  shared_tools: WorkspaceTool[]
-  tools: WorkspaceTool[]
-}
-
-export interface ToolTreeResponse {
-  folders: WorkspaceFolder[]
-  tools: WorkspaceTool[]
-}
-
-export interface ToolListQuery {
-  create_user?: string
-  folder_id?: string
-  name?: string
-  scope?: ToolScope
-  tool_type?: ToolType
-  'tool_type_list[]'?: ToolType[]
-  [key: string]: unknown
-}
-
 export interface ToolPayload {
   code?: string
   desc?: string | null
@@ -76,9 +41,4 @@ export interface ToolPayload {
   name?: string
   scope?: ToolScope
   tool_type?: ToolType
-}
-
-export interface AddStoreToolPayload {
-  folder_id?: string | null
-  name?: string
 }

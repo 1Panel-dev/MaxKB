@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import RoleApi from '@/api/admin/system/role'
-import { ROLE_TYPE, type RoleItem, type RoleType } from '@/api/types'
-import { ROLE_TYPE_LABELS } from '@/constants/auth'
+import { ROLE_TYPE } from '@/api/enums'
+import type { RoleItem, RoleType } from '@/api/types'
+import { ROLE_TYPE_LABELS } from '@/constants'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import RoleMemberList from './components/RoleMemberList.vue'

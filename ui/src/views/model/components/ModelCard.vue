@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { WorkspaceModel } from '@/api/types'
-import { MODEL_STATUS } from '@/api/types'
-import { MODEL_TYPE_LABELS } from '@/constants/model'
+import { MODEL_STATUS } from '@/api/enums'
+import { MODEL_TYPE_LABELS } from '@/constants'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'ModelCard' })

@@ -12,19 +12,14 @@ const getFolderTree = (source: FolderSource, query?: RequestParams) => {
   return get<FolderItem[]>(getPrefix(source), query)
 }
 
+/** 更新 Workspace 的文件夹。 */
+const putFolder = (folderId: string, source: FolderSource, payload?: FolderRequest) => {
+  return put<FolderRequest, FolderItem>(`${getPrefix(source)}/${folderId}`, payload)
+}
+
 /** 在指定资源模块中创建 Workspace 文件夹。 */
 const postFolder = (source: FolderSource, payload: FolderRequest) => {
   return post<FolderRequest, FolderItem>(getPrefix(source), payload)
-}
-
-/** 更新指定 Workspace 文件夹。 */
-const putFolder = (
-  workspaceId: string,
-  source: FolderSource,
-  folderId: string,
-  payload: FolderRequest,
-) => {
-  return put<FolderRequest, FolderItem>(`${getPrefix(source)}/${folderId}`, payload)
 }
 
 /** 删除指定 Workspace 文件夹及其中的资源。 */

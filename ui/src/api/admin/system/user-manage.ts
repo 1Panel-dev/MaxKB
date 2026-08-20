@@ -3,9 +3,8 @@ import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
 import type {
   RequestParams,
   SystemUser,
-  SystemUserRequest,
+  SystemUserPayload,
   SystemUserUpdateRequest,
-  SystemUserOption,
   BatchSetUserRolesRequest,
   BatchSetUserWorkspaceRolesRequest,
 } from '@/api/types'
@@ -18,13 +17,13 @@ const getUserManagePage = (page: ParamsPage, query?: RequestParams) => {
 }
 
 /** 创建系统用户。 */
-const postUser = (user: SystemUserRequest) => {
-  return post<SystemUserRequest, SystemUser>(prefix, user)
+const postUser = (payload: SystemUserPayload) => {
+  return post<SystemUserPayload, SystemUser>(prefix, payload)
 }
 
 /** 编辑系统用户。 */
-const putUser = (userId: string, user: SystemUserUpdateRequest) => {
-  return put<SystemUserUpdateRequest, SystemUser>(`${prefix}/${userId}`, user)
+const putUser = (userId: string, payload: SystemUserUpdateRequest) => {
+  return put<SystemUserUpdateRequest, SystemUser>(`${prefix}/${userId}`, payload)
 }
 
 /** 修改系统用户密码。 */
@@ -43,13 +42,13 @@ const postBatchDeleteUsers = (userIds: string[]) => {
 }
 
 /** 专业版批量设置系统用户角色。 */
-const postBatchSetUserRoles = (request: BatchSetUserRolesRequest) => {
-  return post<BatchSetUserRolesRequest, boolean>(`${prefix}/batch/add_role`, request)
+const postBatchSetUserRoles = (payload: BatchSetUserRolesRequest) => {
+  return post<BatchSetUserRolesRequest, boolean>(`${prefix}/batch/add_role`, payload)
 }
 
 /** 企业版批量设置系统用户角色及工作空间。 */
-const postBatchSetUserWorkspaceRoles = (request: BatchSetUserWorkspaceRolesRequest) => {
-  return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, request)
+const postBatchSetUserWorkspaceRoles = (payload: BatchSetUserWorkspaceRolesRequest) => {
+  return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, payload)
 }
 
 

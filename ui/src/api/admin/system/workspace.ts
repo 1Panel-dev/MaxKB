@@ -1,7 +1,7 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
-  CreateWorkspaceMemberParamsItem,
+  CreateWorkspaceMemberPayload,
   RequestParams,
   WorkspaceItem,
   WorkspaceMemberItem,
@@ -41,8 +41,8 @@ const deleteWorkspace = (workspaceId: string) => {
 }
 
 /** 新增工作空间成员。 */
-const postWorkspaceMembers = (workspaceId: string, members: CreateWorkspaceMemberParamsItem[]) => {
-  return post<CreateWorkspaceMemberParamsItem[], boolean>(
+const postWorkspaceMembers = (workspaceId: string, members: CreateWorkspaceMemberPayload[]) => {
+  return post<CreateWorkspaceMemberPayload[], boolean>(
     `${prefix}/${workspaceId}/add_member`,
     members,
   )

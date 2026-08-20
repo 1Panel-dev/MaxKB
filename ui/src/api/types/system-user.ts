@@ -17,7 +17,7 @@ export interface BatchSetUserWorkspaceRolesRequest {
   role_setting: SystemUserRoleAssignment[]
 }
 
-export interface SystemUserRequest {
+export interface SystemUserPayload {
   id?: string
   username: string
   email: string

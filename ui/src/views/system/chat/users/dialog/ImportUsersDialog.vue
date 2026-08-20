@@ -1,14 +1,10 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import {
-  LOGIN_METHOD,
-  type ChatUserSyncConflict,
-  type OptionItem,
-  type LoginMethod,
-} from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import type { ChatUserSyncConflict, OptionItem, LoginMethod } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })

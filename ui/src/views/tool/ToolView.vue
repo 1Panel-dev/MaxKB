@@ -1,41 +1,35 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef, watch } from 'vue'
-import { useRoute } from 'vue-router'
-import type { OptionItem, RequestParams, ToolListQuery, ToolType, WorkspaceTool } from '@/api/types'
-import { FOLDER_SOURCE, TOOL_SCOPE, TOOL_TYPE } from '@/api/types'
+import { computed, ref, useTemplateRef } from 'vue'
+import { FOLDER_SOURCE, TOOL_SCOPE } from '@/api/enums'
+import type { OptionItem, RequestParams, ToolType, WorkspaceTool, FolderItem } from '@/api/types'
 import CommonApi from '@/api/admin/workspace/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
+import { TOOL_TYPE_OPTIONS } from '@/constants'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './components/ToolCard.vue'
 
-const route = useRoute()
-const {
-  params: { workspaceId },
-} = route
+/* 当前文件夹 */
+const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.TOOL].all })
+const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
-type ToolNavigation = 'all' | 'shared' | string
+function handleFolderSelect(folder: FolderItem) {
+  currentFolder.value = folder
+  selectedToolId.value = ''
+  resetAndLoadTools()
+}
 
-const TOOL_TYPE_OPTIONS: OptionItem<ToolType | ''>[] = [
-  { label: '全部', value: '' },
-  { label: '工具', value: TOOL_TYPE.CUSTOM },
-  { label: 'Skills', value: TOOL_TYPE.SKILL },
-  { label: '工作流', value: TOOL_TYPE.WORKFLOW },
-  { label: 'MCP', value: TOOL_TYPE.MCP },
-  { label: '数据源', value: TOOL_TYPE.DATA_SOURCE },
-]
-
-const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
+/* 工具查询搜索列表 */
 const loading = ref(false)
-const visibleTools = ref<WorkspaceTool[]>([])
-const activeNavigation = ref<ToolNavigation>('shared')
-const activeTitle = ref('共享工具')
-const selectedToolId = ref('')
-const toolType = ref<ToolType | ''>('')
-const toolQuery = ref<RequestParams>()
+const loadingMore = ref(false)
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 20,
+  total: 0,
+})
+const toolsData = ref<WorkspaceTool[]>([])
 const creatorOptions = ref<OptionItem<string>[]>([])
-
-const isShared = computed(() => activeNavigation.value === 'shared')
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
   {
@@ -45,67 +39,7 @@ const searchFields = computed(() => [
     remoteMethod: loadCreatorOptions,
   },
 ])
-
-function getToolListQuery(): ToolListQuery {
-  return {
-    ...toolQuery.value,
-    scope: TOOL_SCOPE.WORKSPACE,
-    ...(toolType.value ? { tool_type: toolType.value } : {}),
-  }
-}
-
-/* 工具列表 */
-
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
-function loadVisibleTools() {
-  loading.value = true
-  const query = getToolListQuery()
-
-  return ToolApi.getToolPage(paginationConfig.value, {
-    ...query,
-    folder_id: 'default',
-  })
-    .then((tools) => {
-      visibleTools.value = tools.records
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-function handleNavigationSelect(navigation: 'all' | 'shared' | WorkspaceFolder) {
-  selectedToolId.value = ''
-  if (typeof navigation === 'string') {
-    activeNavigation.value = navigation
-    activeTitle.value = navigation === 'all' ? '全部工具' : '共享工具'
-  } else {
-    activeNavigation.value = navigation.id
-    activeTitle.value = navigation.name
-  }
-  loadVisibleTools()
-}
-
-function handleCreateFolder() {
-  folderTreeRef.value?.openCreate()
-}
-
-function handleFolderDeleted(_folder: WorkspaceFolder, selectionAffected: boolean) {
-  if (selectionAffected) handleNavigationSelect('all')
-}
-
-function handleFolderUpdated(folder: WorkspaceFolder) {
-  if (activeNavigation.value === folder.id) activeTitle.value = folder.name
-}
-
-function handleToolSelect(tool: WorkspaceTool) {
-  selectedToolId.value = tool.id
-}
-
-/* 搜索与筛选 */
+const toolQuery = ref<RequestParams>()
 function loadCreatorOptions(keyword: string) {
   return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
@@ -114,12 +48,68 @@ function loadCreatorOptions(keyword: string) {
 
 function handleSearchChange(query?: RequestParams) {
   toolQuery.value = query
-  loadVisibleTools()
+  resetAndLoadTools()
 }
+
+const toolType = ref<ToolType | ''>('')
+let latestToolsRequest = 0
 
 function handleToolTypeChange() {
   selectedToolId.value = ''
-  loadVisibleTools()
+  resetAndLoadTools()
+}
+
+function loadToolsPage(currentPage = 1) {
+  const append = currentPage > 1
+  const requestId = ++latestToolsRequest
+  if (append) {
+    loadingMore.value = true
+  } else {
+    loading.value = true
+    loadingMore.value = false
+  }
+
+  return ToolApi.getToolPage(
+    { currentPage, pageSize: paginationConfig.value.pageSize },
+    {
+      ...toolQuery.value,
+      scope: TOOL_SCOPE.WORKSPACE,
+      folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL,
+      tool_type: toolType.value,
+    },
+  )
+    .then((tools) => {
+      if (requestId !== latestToolsRequest) return
+
+      toolsData.value = append ? [...toolsData.value, ...tools.records] : tools.records
+      paginationConfig.value.currentPage = tools.current
+      paginationConfig.value.pageSize = tools.size
+      paginationConfig.value.total = tools.total
+    })
+    .finally(() => {
+      if (requestId !== latestToolsRequest) return
+
+      loading.value = false
+      loadingMore.value = false
+    })
+}
+
+function resetAndLoadTools() {
+  paginationConfig.value.currentPage = 1
+  paginationConfig.value.total = 0
+  toolsData.value = []
+  return loadToolsPage()
+}
+
+const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
+const selectedToolId = ref('')
+
+function handleToolSelect(tool: WorkspaceTool) {
+  selectedToolId.value = tool.id
+}
+
+function handleCreateFolder() {
+  folderTreeRef.value?.openCreate()
 }
 
 /* 工具维护 */
@@ -141,7 +131,7 @@ function handleDeleteTool(tool: WorkspaceTool) {
       loading.value = true
       return ToolApi.deleteTool(tool.id).then(() => {
         MsgSuccess('删除成功')
-        return loadVisibleTools()
+        return loadToolsPage()
       })
     })
     .catch(() => {})
@@ -151,12 +141,12 @@ function handleDeleteTool(tool: WorkspaceTool) {
 }
 
 onMounted(() => {
-  loadVisibleTools()
+  loadToolsPage()
 })
 </script>
 
 <template>
-  <MkViewLayout class="workspace-tool-view" :loading="loading" title="工具">
+  <MkViewLayout class="workspace-tool-view">
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -169,21 +159,23 @@ onMounted(() => {
 
       <FolderTree
         ref="folderTreeRef"
-        v-model="activeNavigation"
         :source="FOLDER_SOURCE.TOOL"
-        @select="handleNavigationSelect"
+        @select="handleFolderSelect"
+        draggable
       >
       </FolderTree>
     </template>
 
     <template #default="{ Header }">
       <component :is="Header">
-        <div class="flex min-w-0 items-center gap-4">
-          <h4 class="truncate" :title="activeTitle">{{ activeTitle }}</h4>
+        <div class="flex min-w-0 flex-1 items-center gap-4">
+          <h4 class="min-w-0 truncate" :title="currentFolder?.name">{{ currentFolder?.name }}</h4>
+          <el-divider direction="vertical" />
           <el-select
             v-model="toolType"
-            aria-label="工具类型"
-            class="w-32"
+            class="w-30!"
+            :empty-values="[null, undefined]"
+            :value-on-clear="null"
             @change="handleToolTypeChange"
           >
             <el-option
@@ -196,28 +188,35 @@ onMounted(() => {
         </div>
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
       </component>
-
-      <el-row v-if="visibleTools.length" :gutter="16" class="gap-y-4">
-        <el-col
-          v-for="tool in visibleTools"
-          :key="`${tool.source}:${tool.id}`"
-          :xs="24"
-          :sm="24"
-          :md="12"
-          :lg="8"
-          :xl="8"
-        >
-          <ToolCard
-            :selected="selectedToolId === tool.id"
-            :shared="isShared"
-            :tool="tool"
-            @delete="handleDeleteTool"
-            @select="handleToolSelect"
-            @status-change="handleToolStatusChange"
-          />
-        </el-col>
-      </el-row>
-      <MkEmpty v-else class="mt-24" />
+      <div v-loading="loading">
+        <el-row v-if="toolsData.length" :gutter="16" class="gap-y-4">
+          <el-col
+            v-for="tool in toolsData"
+            :key="tool.id"
+            :xs="24"
+            :sm="24"
+            :md="12"
+            :lg="8"
+            :xl="8"
+          >
+            <ToolCard
+              :selected="selectedToolId === tool.id"
+              :shared="isShared"
+              :tool="tool"
+              @delete="handleDeleteTool"
+              @select="handleToolSelect"
+              @status-change="handleToolStatusChange"
+            />
+          </el-col>
+        </el-row>
+        <MkEmpty v-else-if="!loading" class="mt-24" />
+        <MkLoadMore
+          v-if="toolsData.length"
+          :loading="loadingMore"
+          :pagination-config="paginationConfig"
+          @load="loadToolsPage"
+        />
+      </div>
     </template>
   </MkViewLayout>
 </template>

@@ -65,6 +65,8 @@ src/components/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
+│   ├── mk-load-more/
+│   │   └── index.vue             # 分页列表滚动触底加载与结束状态
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
 │   │   └── layout-aside.vue      # 页面可选左侧栏结构
@@ -364,6 +366,19 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 <MkIcon name="icon_left_outlined" class="text-danger!" />
 <MkIcon name="icon_home_filled" gradient />
 <MkIcon :icon="Setting" :size="20" />
+```
+
+### MkLoadMore
+
+分页列表的滚动触底加载组件，使用 `IntersectionObserver` 监听组件所在滚动区域的底部，不依赖
+Element Plus 的 `v-infinite-scroll`。通过 `paginationConfig` 接收 `currentPage`、`pageSize` 和
+`total`，组件内部判断是否加载完成；接近底部时，`load` 事件返回下一页页码。`loading` 用于阻止
+重复请求并展示加载状态，`disabled` 可临时禁用加载，`distance` 设置提前触发距离且默认为
+`200px`。数据不足以撑满滚动区域时会继续加载，直至填满或全部加载完成。`loading` 和 `finished`
+插槽可覆盖默认提示。
+
+```vue
+<MkLoadMore :loading="loadingMore" :pagination-config="paginationConfig" @load="loadPage" />
 ```
 
 ### MkSearchInput

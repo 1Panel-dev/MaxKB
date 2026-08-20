@@ -1,21 +1,21 @@
 import { get, post, put } from '../core/request'
-import type { AuthProviderSetting, AuthProviderType, LoginAuthSetting } from '@/api/types'
+import type { AuthProviderSettingPayload, AuthProviderType } from '@/api/types'
 
 const prefix = '/chat_user/auth'
 
 /** 获取对话用户指定认证源配置。 */
 const getAuthSetting = (authType: AuthProviderType) => {
-  return get<Partial<AuthProviderSetting>>(`${prefix}/${authType}/detail`)
+  return get<Partial<AuthProviderSettingPayload>>(`${prefix}/${authType}/detail`)
 }
 
 /** 测试对话用户认证源连接。 */
-const postAuthSettingConnection = (setting: AuthProviderSetting) => {
-  return post<AuthProviderSetting, boolean>(`${prefix}/connection`, setting)
+const postAuthSettingConnection = (payload: AuthProviderSettingPayload) => {
+  return post<AuthProviderSettingPayload, boolean>(`${prefix}/connection`, payload)
 }
 
 /** 保存对话用户指定认证源配置。 */
-const putAuthSetting = (authType: AuthProviderType, setting: AuthProviderSetting) => {
-  return put<AuthProviderSetting, boolean>(`${prefix}/${authType}/info`, setting)
+const putAuthSetting = (authType: AuthProviderType, payload: AuthProviderSettingPayload) => {
+  return put<AuthProviderSettingPayload, boolean>(`${prefix}/${authType}/info`, payload)
 }
 export default {
   getAuthSetting,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, type Component } from 'vue'
-import { LOGIN_METHOD } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
 import LDAP from './components/LDAP.vue'
 import CAS from './components/CAS.vue'
 import OIDC from './components/OIDC.vue'

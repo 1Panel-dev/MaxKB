@@ -2,7 +2,8 @@
 import { computed, ref } from 'vue'
 import { Check } from '@element-plus/icons-vue'
 import ProviderApi from '@/api/admin/workspace/model/provider'
-import { MODEL_STATUS, type ModelProvider, type WorkspaceModel } from '@/api/types'
+import { MODEL_STATUS } from '@/api/enums'
+import type { ModelProviderItem, WorkspaceModel } from '@/api/types'
 
 defineOptions({
   name: 'ModelSelect',
@@ -36,7 +37,7 @@ const emit = defineEmits<{
   'update:modelValue': [modelId: string]
 }>()
 
-const providerOptions = ref<ModelProvider[]>([])
+const providerOptions = ref<ModelProviderItem[]>([])
 const loading = ref(false)
 
 const selectedModelId = computed({

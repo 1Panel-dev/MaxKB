@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router'
 import LoginApi from '@/api/admin/auth/login'
-import { LOGIN_METHOD } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
 import { useStore } from '@/stores'
 
 defineOptions({ name: 'AvatarDropdown' })

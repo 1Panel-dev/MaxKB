@@ -4,7 +4,7 @@ import JSEncrypt from 'jsencrypt'
 import CommonSystemApi from '@/api/admin/system/common'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
-import { ROLE_TYPE } from '@/api/types'
+import { ROLE_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
@@ -13,7 +13,7 @@ import UserGroupSetting from './components/UserGroupSetting.vue'
 import type {
   ListItem,
   SystemUser,
-  SystemUserRequest,
+  SystemUserPayload,
   SystemUserRoleAssignment,
 } from '@/api/types/index.ts'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -30,7 +30,7 @@ const userFormRef = ref<FormInstance>()
 const drawerVisible = ref(false)
 const isEdit = ref(false)
 const userSubmitting = ref(false)
-const userForm = reactive<SystemUserRequest>({
+const userForm = reactive<SystemUserPayload>({
   email: '',
   nick_name: '',
   password: '',
@@ -43,7 +43,7 @@ const userForm = reactive<SystemUserRequest>({
 const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
 const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
 
-const userFormRules = reactive<FormRules<SystemUserRequest>>({
+const userFormRules = reactive<FormRules<SystemUserPayload>>({
   username: [
     { required: true, message: '请输入用户名', trigger: 'blur' },
     { min: 4, max: 64, message: '长度应为 4-64 个字符', trigger: 'blur' },

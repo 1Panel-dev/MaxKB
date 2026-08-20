@@ -5,7 +5,7 @@ export interface WorkspaceItem {
   user_count?: number
 }
 
-export interface CreateWorkspaceMemberParamsItem {
+export interface CreateWorkspaceMemberPayload {
   user_ids: string[]
   role_ids: string[]
 }

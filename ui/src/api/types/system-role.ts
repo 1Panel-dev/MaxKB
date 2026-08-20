@@ -1,9 +1,4 @@
-/** 后端角色类型协议值；新增或修改角色类型时以此处为唯一数据源。 */
-export const ROLE_TYPE = {
-  ADMIN: 'ADMIN',
-  USER: 'USER',
-  WORKSPACE_MANAGE: 'WORKSPACE_MANAGE',
-} as const
+import { ROLE_TYPE } from '@/api/enums'
 
 export type RoleType = (typeof ROLE_TYPE)[keyof typeof ROLE_TYPE]
 
@@ -35,7 +30,7 @@ export interface RolePermissionModule {
   children: RolePermissionFeature[]
 }
 
-export interface SaveRoleRequest {
+export interface RolePayload {
   role_id?: string
   role_name: string
   role_type?: RoleType

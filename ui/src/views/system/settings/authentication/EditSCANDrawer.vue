@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import AuthScanApi from '@/api/admin/system/auth-scan-setting'
-import { LOGIN_METHOD, type QrLoginPlatformRequest } from '@/api/types'
-import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants/auth'
+import type { QrLoginPlatformPayload } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
 import { MsgSuccess, MsgError } from '@/utils/message'
 
 const emit = defineEmits<{ refresh: [] }>()
 const visible = ref(false)
 const loading = ref(false)
 const formRef = useTemplateRef<FormInstance>('formRef')
-const form = reactive<QrLoginPlatformRequest>({
+const form = reactive<QrLoginPlatformPayload>({
   key: LOGIN_METHOD.WECOM,
   isActive: false,
   config: {},
@@ -54,7 +55,7 @@ function handleValidatePlatform() {
     })
 }
 
-function open(platform: QrLoginPlatformRequest) {
+function open(platform: QrLoginPlatformPayload) {
   Object.assign(form, platform, { config: { ...platform.config } })
   visible.value = true
 }

@@ -2,18 +2,19 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
-import { LOGIN_METHOD, type AuthProviderSetting } from '@/api/types'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'LdapAuthenticationSetting' })
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<AuthProviderSetting>({
+const form = reactive<AuthProviderSettingPayload>({
   auth_type: LOGIN_METHOD.LDAP,
   config: { ldap_server: '', base_dn: '', password: '', ou: '', ldap_filter: '', ldap_mapping: '' },
   is_active: false,
 })
-const rules = reactive<FormRules<AuthProviderSetting>>({
+const rules = reactive<FormRules<AuthProviderSettingPayload>>({
   'config.ldap_server': [{ required: true, message: '请输入服务器地址', trigger: 'blur' }],
   'config.base_dn': [{ required: true, message: '请输入Bind DN', trigger: 'blur' }],
   'config.password': [{ required: true, message: '请输入密码', trigger: 'blur' }],

@@ -1,18 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import AuthSettingApi from '@/api/admin/system/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import {
-  LOGIN_METHOD,
-  ROLE_TYPE,
-  type ListItem,
-  type LoginAuthSetting,
-  type SystemUserGroup,
-  type LoginMethod,
-} from '@/api/types'
-import { LOGIN_METHOD_LABELS } from '@/constants/auth'
+import type { ListItem, LoginAuthSettingPayload, SystemUserGroup, LoginMethod } from '@/api/types'
+import type { FormInstance, FormRules } from 'element-plus'
+import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
+import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import { useStore } from '@/stores'
 
@@ -20,7 +14,7 @@ defineOptions({ name: 'AuthenticationSetting' })
 const { auth } = useStore()
 const authFormRef = useTemplateRef<FormInstance>('authFormRef')
 const loading = ref(false)
-const form = reactive<LoginAuthSetting>({
+const form = reactive<LoginAuthSettingPayload>({
   login_methods: [LOGIN_METHOD.LOCAL],
   default_value: LOGIN_METHOD.LOCAL,
   max_attempts: 1,
@@ -30,7 +24,7 @@ const form = reactive<LoginAuthSetting>({
   workspace_id: 'default',
   permission: 'NOT_AUTH',
 })
-const rules: FormRules<LoginAuthSetting> = {
+const rules: FormRules<LoginAuthSettingPayload> = {
   default_value: [{ required: true, message: '请选择默认登录方式', trigger: 'change' }],
   login_methods: [{ required: true, message: '请选择登录方式', trigger: 'change' }],
   role_id: [{ required: true, message: '请选择角色', trigger: 'change' }],
