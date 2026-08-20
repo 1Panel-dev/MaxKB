@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import UserManageApi from '@/api/admin/system/user-manage'
+import CommonSystemApi from '@/api/admin/system/common'
 import type { SystemUserOption } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -26,7 +26,7 @@ const userOptions = ref<SystemUserOption[]>([])
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 function loadUserOptions(query?: string) {
   optionsLoading.value = true
-  UserManageApi.getWorkspaceMembers(props.workspaceId, query ? { nick_name: query } : undefined)
+  CommonSystemApi.getWorkspaceMembers(props.workspaceId, query ? { nick_name: query } : undefined)
     .then((users) => {
       userOptions.value = users
     })

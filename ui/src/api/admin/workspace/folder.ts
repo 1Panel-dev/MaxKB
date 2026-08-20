@@ -1,22 +1,20 @@
 import { del, get, post, put } from '../core/request'
 import type { FolderSource, FolderItem, RequestParams, FolderRequest } from '@/api/types'
+import { getWorkspaceId } from '@/utils/workspace-context'
 
-const getPrefix = (workspaceId: string, source: FolderSource) =>
-  `/workspace/${workspaceId}/${source}/folder`
-
-/** 获取指定资源模块的 Workspace 文件夹树。 */
-const getFolderTree = (workspaceId: string, source: FolderSource, query?: RequestParams) => {
-  return get<FolderItem[]>(getPrefix(workspaceId, source), query)
+const getPrefix = (source: FolderSource) => {
+  const workspaceId = getWorkspaceId()
+  return `/workspace/${workspaceId}/${source}/folder`
 }
 
-/** 获取指定 Workspace 文件夹详情。 */
-const getFolderDetail = (workspaceId: string, source: FolderSource, folderId: string) => {
-  return get<FolderItem>(`${getPrefix(workspaceId, source)}/${folderId}`)
+/** 获取指定资源模块的 Workspace 文件夹树。 */
+const getFolderTree = (source: FolderSource, query?: RequestParams) => {
+  return get<FolderItem[]>(getPrefix(source), query)
 }
 
 /** 在指定资源模块中创建 Workspace 文件夹。 */
-const postFolder = (workspaceId: string, source: FolderSource, payload: FolderRequest) => {
-  return post<FolderRequest, FolderItem>(getPrefix(workspaceId, source), payload)
+const postFolder = (source: FolderSource, payload: FolderRequest) => {
+  return post<FolderRequest, FolderItem>(getPrefix(source), payload)
 }
 
 /** 更新指定 Workspace 文件夹。 */
@@ -26,17 +24,16 @@ const putFolder = (
   folderId: string,
   payload: FolderRequest,
 ) => {
-  return put<FolderRequest, FolderItem>(`${getPrefix(workspaceId, source)}/${folderId}`, payload)
+  return put<FolderRequest, FolderItem>(`${getPrefix(source)}/${folderId}`, payload)
 }
 
 /** 删除指定 Workspace 文件夹及其中的资源。 */
-const deleteFolder = (workspaceId: string, source: FolderSource, folderId: string) => {
-  return del<boolean>(`${getPrefix(workspaceId, source)}/${folderId}`)
+const deleteFolder = (source: FolderSource, folderId: string) => {
+  return del<boolean>(`${getPrefix(source)}/${folderId}`)
 }
 
 export default {
   deleteFolder,
-  getFolderDetail,
   getFolderTree,
   postFolder,
   putFolder,

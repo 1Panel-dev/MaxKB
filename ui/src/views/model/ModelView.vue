@@ -24,7 +24,7 @@ const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
 
 const route = useRoute()
 const {
-  params: { workspaceId},
+  params: { workspaceId },
 } = route
 
 const loading = ref(false)
@@ -60,7 +60,7 @@ const searchFields = computed(() => [
 function loadCreatorOptions(keyword: string) {
   const request = isShared.value
     ? CommonSystemApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
-    : CommonApi.getAllUsers(workspaceId, keyword ? { nick_name: keyword } : undefined)
+    : CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
 
   return request.then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
@@ -83,8 +83,8 @@ function loadModels() {
   }
 
   const request = isShared.value
-    ? ModelSharedApi.getModelList(workspaceId, modelQuery.value)
-    : ModelApi.getModelList(workspaceId, query)
+    ? ModelSharedApi.getModelList(modelQuery.value)
+    : ModelApi.getModelList(query)
 
   return request
     .then((models) => {
