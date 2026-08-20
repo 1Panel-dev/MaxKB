@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowAiChatNode' })
-
+const getModel = inject('getModel') as () => BaseNodeModel
+const model = getModel()
 interface AiChatNodeForm {
   model_id: string
   model_id_reference: string[]
@@ -16,25 +17,24 @@ interface AiChatNodeForm {
   system: string
 }
 
-const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const nodeCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('nodeCascaderRef')
 
 const formData = computed<AiChatNodeForm>({
   get: () => {
-    if (!props.nodeModel.properties.node_data) {
-      set(props.nodeModel.properties, 'node_data', {
+    if (!model.properties.node_data) {
+      model.properties.node_data = {
         model_id: '',
         model_id_reference: [],
         model_id_type: 'custom',
         model_setting: { reasoning_content_enable: false },
         prompt: '{{开始.question}}',
         system: '',
-      })
+      }
     }
-    return props.nodeModel.properties.node_data as AiChatNodeForm
+    return model.properties.node_data as AiChatNodeForm
   },
-  set: (value) => set(props.nodeModel.properties, 'node_data', value),
+  set: (value) => (model.properties.node_data = value),
 })
 
 function validate() {
@@ -43,14 +43,14 @@ function validate() {
       ? nodeCascaderRef.value?.validate()
       : Promise.resolve(),
     formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: props.nodeModel, errMessage: error }))
+  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
-onMounted(() => set(props.nodeModel, 'validate', validate))
+onMounted(() => set(model, 'validate', validate))
 </script>
 
 <template>
-  <NodeContainer :node-model="props.nodeModel">
+  <NodeContainer :node-model="model">
     <h6 class="mb-3">节点设置</h6>
     <el-form
       ref="formRef"
@@ -82,7 +82,7 @@ onMounted(() => set(props.nodeModel, 'validate', validate))
           v-if="formData.model_id_type === 'reference'"
           ref="nodeCascaderRef"
           v-model="formData.model_id_reference"
-          :node-model="props.nodeModel"
+          :node-model="model"
           class="w-full"
           placeholder="请选择变量"
         />

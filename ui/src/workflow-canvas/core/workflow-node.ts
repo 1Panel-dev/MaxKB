@@ -1,7 +1,5 @@
 import type { Component } from 'vue'
-import { createApp, h as createVNode } from 'vue'
-import ElementPlus from 'element-plus'
-import zhCn from 'element-plus/es/locale/lang/zh-cn'
+import { createApp } from 'vue'
 import {
   h as createLogicFlowElement,
   HtmlNode,
@@ -12,6 +10,7 @@ import {
 } from '@logicflow/core'
 import { BasicComponentsNode } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
+import { connect, disconnect } from './teleport'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
 type NodeFieldGroup = Record<string, WorkflowNodeField[]>
@@ -92,23 +91,31 @@ export class WorkflowNodeView extends HtmlNode {
     )
   }
 
-  setHtml(rootElement: SVGForeignObjectElement) {
+  setHtml(rootEl: SVGForeignObjectElement) {
     if (this.nodeApp) return
-    const mountElement = document.createElement('div')
-    rootElement.replaceChildren(mountElement)
-    const nodeModel = this.props.model
-
-    this.nodeApp = createApp({
-      render: () => createVNode(this.vueComponent, { nodeModel }),
-    })
-    this.nodeApp.use(ElementPlus, { locale: zhCn })
-    this.nodeApp.mount(mountElement)
+    if (!rootEl.innerHTML) {
+      const node = document.createElement('div')
+      node.setAttribute('data-node-id', this.props.model.id)
+      node.setAttribute('data-node-type', this.props.model.type)
+      rootEl.appendChild(node)
+      this.renderVueComponent(node)
+    }
+  }
+  protected renderVueComponent(root: any) {
+    const { model, graphModel } = this.props
+    if (root) {
+      connect(this.targetId(), this.vueComponent, root, () =>
+        this.props.graphModel.get_provide(reactive(model), reactive(graphModel)),
+      )
+    }
+  }
+  protected targetId() {
+    return `${this.props.graphModel.flowId}:${this.props.model.id}`
   }
 
   componentWillUnmount() {
     super.componentWillUnmount()
-    this.nodeApp?.unmount()
-    this.nodeApp = undefined
+    disconnect(this.targetId())
   }
 }
 

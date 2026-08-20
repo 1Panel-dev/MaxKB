@@ -4,6 +4,7 @@ import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'
 import { WorkflowMode } from '@/workflow-canvas/types'
 import { iconComponent } from '../icons/utils'
+import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
 
@@ -15,7 +16,7 @@ const props = withDefaults(
   defineProps<{
     global?: boolean
     modelValue: string[]
-    nodeModel: WorkflowNodeModel
+    nodeModel: BaseNodeModel
   }>(),
   { global: false },
 )
