@@ -9,14 +9,12 @@ import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
-import {type ShapeItem} from "@/workflow-canvas/types"
+import { type ShapeItem } from '@/workflow-canvas/types'
 defineOptions({ name: 'MkWorkflow' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & {
   set_loop_body?: () => void
 }
-
-
 
 const props = withDefaults(
   defineProps<{
@@ -75,10 +73,10 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   lf.value.render(data ? data : {})
 
   lf.value.graphModel.get_provide = (
-    node: LogicFlow.NodeData | null,
+    model: LogicFlow.NodeData | null,
     graph: GraphModel | null,
   ) => ({
-    getNode: () => node,
+    getModel: () => model,
     getGraph: () => graph,
     workflowMode: workflow_mode,
     loopWorkflowMode: loop_workflow_mode,

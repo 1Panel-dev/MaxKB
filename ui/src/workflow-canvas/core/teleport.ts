@@ -3,16 +3,8 @@ import type { Component } from 'vue'
 import { defineComponent, h, reactive, isVue3, Teleport, markRaw, Fragment } from 'vue-demi'
 
 type TeleportNodeModel = BaseNodeModel | BaseEdgeModel
-type TeleportProps = Record<string, unknown>
 type TeleportProvide = Record<string | symbol, unknown>
-type PropsFactory<NodeModel extends TeleportNodeModel> = (
-  node: NodeModel,
-  graph: GraphModel,
-) => TeleportProps
-type ProvideFactory<NodeModel extends TeleportNodeModel> = (
-  node: NodeModel,
-  graph: GraphModel,
-) => TeleportProvide
+type ProvideFactory<NodeModel extends TeleportNodeModel> = () => TeleportProvide
 
 let active = false
 const teleportItems = reactive<Record<string, Component>>({})
@@ -21,27 +13,13 @@ export function connect<NodeModel extends TeleportNodeModel>(
   id: string,
   component: Component,
   container: HTMLDivElement,
-  node: NodeModel,
-  graph: GraphModel,
-  get_props?: PropsFactory<NodeModel>,
-  get_provide?: ProvideFactory<NodeModel>,
+  get_provide: ProvideFactory<NodeModel>,
 ) {
-  if (!get_props) {
-    get_props = (node: BaseNodeModel | BaseEdgeModel, graph: GraphModel) => {
-      return { nodeModel: node, graph }
-    }
-  }
-  if (!get_provide) {
-    get_provide = (node: BaseNodeModel | BaseEdgeModel, graph: GraphModel) => ({
-      getNode: () => node,
-      getGraph: () => graph,
-    })
-  }
   if (active) {
     teleportItems[id] = markRaw(
       defineComponent({
-        render: () => h(Teleport, { to: container }, [h(component, get_props(node, graph))]),
-        provide: () => get_provide(node, graph),
+        render: () => h(Teleport, { to: container }, [h(component)]),
+        provide: () => get_provide(),
       }),
     )
   }

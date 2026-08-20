@@ -1,41 +1,41 @@
 <script setup lang="ts">
 import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowBaseNode' })
-
+const getModel = inject('getModel') as () => BaseNodeModel
+const model = getModel()
 interface BaseNodeForm {
   desc: string
   name: string
   prologue: string
 }
 
-const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const formRef = useTemplateRef<FormInstance>('formRef')
 
 const formData = computed<BaseNodeForm>({
   get: () => {
-    if (!props.nodeModel.properties.node_data) {
-      set(props.nodeModel.properties, 'node_data', { name: '', desc: '', prologue: '' })
+    if (!model.properties.node_data) {
+      set(model.properties, 'node_data', { name: '', desc: '', prologue: '' })
     }
-    return props.nodeModel.properties.node_data as BaseNodeForm
+    return model.properties.node_data as BaseNodeForm
   },
-  set: (value) => set(props.nodeModel.properties, 'node_data', value),
+  set: (value) => set(model.properties, 'node_data', value),
 })
 
 function validate() {
   return formRef.value
     ?.validate()
-    .catch((error) => Promise.reject({ node: props.nodeModel, errMessage: error }))
+    .catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
-onMounted(() => set(props.nodeModel, 'validate', validate))
+onMounted(() => set(model, 'validate', validate))
 </script>
 
 <template>
-  <NodeContainer :node-model="props.nodeModel">
+  <NodeContainer :node-model="model">
     <el-form
       ref="formRef"
       :model="formData"

@@ -5,6 +5,7 @@ import type { WorkflowNodeField, WorkflowNodeModel } from '@/workflow-canvas/cor
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
+import type { BaseEdgeModel, BaseNodeModel, GraphModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowStartNode' })
 
@@ -15,9 +16,9 @@ interface SourceField {
   variable?: string
 }
 
-const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
-const nodeModel = props.nodeModel
-const nodeConfig = nodeModel.properties.config ?? (nodeModel.properties.config = {})
+const getModel = inject('getModel') as () => BaseNodeModel
+const model = getModel()
+const nodeConfig = model.properties.config ?? (model.properties.config = {})
 
 const globalFields = computed(() => (nodeConfig.globalFields ?? []) as WorkflowNodeField[])
 const chatFields = computed(() => (nodeConfig.chatFields ?? []) as WorkflowNodeField[])
@@ -31,7 +32,7 @@ function formatFieldReference(fieldValue: string) {
 }
 
 function refreshFields() {
-  const baseNode = props.nodeModel.graphModel.getNodeModelById(WorkflowNodeType.Base)
+  const baseNode = model.graphModel.getNodeModelById(WorkflowNodeType.Base)
   const userFields = (
     cloneDeep(baseNode?.properties.user_input_field_list ?? []) as SourceField[]
   ).map((field: SourceField) => ({
@@ -65,18 +66,18 @@ function refreshFields() {
 
 onMounted(() => {
   refreshFields()
-  props.nodeModel.graphModel.eventCenter.on('refreshFieldList', refreshFields)
-  props.nodeModel.graphModel.eventCenter.on('chatFieldList', refreshFields)
+  model.graphModel.eventCenter.on('refreshFieldList', refreshFields)
+  model.graphModel.eventCenter.on('chatFieldList', refreshFields)
 })
 
 onBeforeUnmount(() => {
-  props.nodeModel.graphModel.eventCenter.off('refreshFieldList', refreshFields)
-  props.nodeModel.graphModel.eventCenter.off('chatFieldList', refreshFields)
+  model.graphModel.eventCenter.off('refreshFieldList', refreshFields)
+  model.graphModel.eventCenter.off('chatFieldList', refreshFields)
 })
 </script>
 
 <template>
-  <NodeContainer :node-model="props.nodeModel">
+  <NodeContainer :node-model="model">
     <h6 class="mb-2">全局变量</h6>
     <div class="rounded-md bg-N100 px-3 py-1 text-N600">
       <div

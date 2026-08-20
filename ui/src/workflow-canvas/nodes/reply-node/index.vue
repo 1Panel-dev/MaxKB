@@ -5,9 +5,11 @@ import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
+import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowReplyNode' })
-
+const getModel = inject('getModel') as () => BaseNodeModel
+const model = getModel()
 interface ReplyNodeForm {
   content: string
   fields: string[]
@@ -15,23 +17,22 @@ interface ReplyNodeForm {
   reply_type: 'content' | 'referencing'
 }
 
-const props = defineProps<{ nodeModel: WorkflowNodeModel }>()
 const formRef = useTemplateRef<FormInstance>('formRef')
 const nodeCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('nodeCascaderRef')
 
 const formData = computed<ReplyNodeForm>({
   get: () => {
-    if (!props.nodeModel.properties.node_data) {
-      set(props.nodeModel.properties, 'node_data', {
+    if (!model.properties.node_data) {
+      model.properties.node_data = {
         content: '',
         fields: [],
         is_result: true,
         reply_type: 'content',
-      })
+      }
     }
-    return props.nodeModel.properties.node_data as ReplyNodeForm
+    return model.properties.node_data as ReplyNodeForm
   },
-  set: (value) => set(props.nodeModel.properties, 'node_data', value),
+  set: (value) => (model.properties.node_data = value),
 })
 
 function validate() {
@@ -40,19 +41,19 @@ function validate() {
       ? nodeCascaderRef.value?.validate()
       : Promise.resolve(),
     formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: props.nodeModel, errMessage: error }))
+  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 
 onMounted(() => {
-  if (formData.value.is_result === undefined && isLastNode(props.nodeModel)) {
+  if (formData.value.is_result === undefined && isLastNode(model)) {
     formData.value.is_result = true
   }
-  set(props.nodeModel, 'validate', validate)
+  model.validate = validate
 })
 </script>
 
 <template>
-  <NodeContainer :node-model="props.nodeModel">
+  <NodeContainer :node-model="model">
     <el-form ref="formRef" :model="formData" label-position="top" @submit.prevent>
       <el-form-item label="回复内容">
         <template #label>
@@ -69,7 +70,7 @@ onMounted(() => {
           v-if="formData.reply_type === 'referencing'"
           ref="nodeCascaderRef"
           v-model="formData.fields"
-          :node-model="props.nodeModel"
+          :node-model="model"
           class="w-full"
           placeholder="请选择变量"
         />

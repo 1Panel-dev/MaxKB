@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Model } from '@logicflow/core'
+import type { BaseNodeModel, Model } from '@logicflow/core'
 import { ArrowDownBold, CircleCheck } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, watch } from 'vue'
@@ -10,7 +10,6 @@ import { WorkflowNodeType, WorkflowKind, type WorkflowNodeField } from '@/workfl
 import { MsgError, MsgConfirm } from '@/utils/message'
 import { BasicComponentsNode } from '@/workflow-canvas/config/node-mapping'
 import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
-import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 
 interface NodeNameForm {
@@ -40,7 +39,6 @@ type NodeContainerProperties = {
 
 const props = withDefaults(
   defineProps<{
-    nodeModel: WorkflowNodeModel
     exceptionNodeList?: string[]
   }>(),
   {
@@ -52,9 +50,9 @@ const props = withDefaults(
     ],
   },
 )
-const nodeProperties = computed(
-  () => props.nodeModel.properties as unknown as NodeContainerProperties,
-)
+const getModel = inject('getModel') as () => BaseNodeModel
+const model = getModel()
+const nodeProperties = computed(() => model.properties as unknown as NodeContainerProperties)
 
 const height = ref<{
   stepContainerHeight: number
@@ -69,17 +67,15 @@ const showAnchor = ref(false)
 const anchorData = ref<Model.AnchorConfig>()
 const dropdownMenuStyle = computed(() => {
   return {
-    top: anchorData.value
-      ? anchorData.value.y - props.nodeModel.y + props.nodeModel.height / 2 + 'px'
-      : '0px',
+    top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px',
   }
 })
 const nodeDisabled = computed({
   get: () => {
-    return props.nodeModel.properties.disabled || false
+    return model.properties.disabled || false
   },
   set: (v: boolean) => {
-    set(props.nodeModel.properties, 'disabled', v)
+    set(model.properties, 'disabled', v)
   },
 })
 const nodeEnabled = computed({
@@ -96,32 +92,32 @@ const form = ref<NodeNameForm>({
 
 const condition = computed({
   set: (v) => {
-    set(props.nodeModel.properties, 'condition', v)
+    set(model.properties, 'condition', v)
   },
   get: () => {
-    if (props.nodeModel.properties.condition) {
-      return props.nodeModel.properties.condition
+    if (model.properties.condition) {
+      return model.properties.condition
     }
-    set(props.nodeModel.properties, 'condition', 'AND')
+    set(model.properties, 'condition', 'AND')
     return true
   },
 })
 const showNode = computed({
   set: (v) => {
-    set(props.nodeModel.properties, 'showNode', v)
+    set(model.properties, 'showNode', v)
   },
   get: () => {
-    if (props.nodeModel.properties.showNode !== undefined) {
-      return props.nodeModel.properties.showNode
+    if (model.properties.showNode !== undefined) {
+      return model.properties.showNode
     }
-    set(props.nodeModel.properties, 'showNode', true)
+    set(model.properties, 'showNode', true)
     return true
   },
 })
 
 const node_status = computed(() => {
-  if (props.nodeModel.properties.status) {
-    return props.nodeModel.properties.status
+  if (model.properties.status) {
+    return model.properties.status
   }
   return 200
 })
@@ -129,7 +125,7 @@ const node_status = computed(() => {
 const sourceName = computed(() => {
   if (
     [WorkflowNodeType.Application, WorkflowNodeType.ToolLib].includes(
-      String(props.nodeModel.type) as WorkflowNodeType,
+      String(model.type) as WorkflowNodeType,
     )
   ) {
     return nodeProperties.value.node_data?.name || ''
@@ -138,7 +134,7 @@ const sourceName = computed(() => {
 })
 
 function renameNode() {
-  form.value.title = String(props.nodeModel.properties.stepName ?? '')
+  form.value.title = String(model.properties.stepName ?? '')
   nodeNameDialogVisible.value = true
 }
 const editName = async (formEl: FormInstance | null | undefined) => {
@@ -146,12 +142,12 @@ const editName = async (formEl: FormInstance | null | undefined) => {
   await formEl.validate((valid) => {
     if (valid) {
       if (
-        !props.nodeModel.graphModel.nodes
-          .filter((node) => node.id !== props.nodeModel.id)
+        !model.graphModel.nodes
+          .filter((node) => node.id !== model.id)
           .some((node) => node.properties.stepName === form.value.title)
       ) {
-        set(props.nodeModel.properties, 'stepName', form.value.title)
-        props.nodeModel.clearNextNodeField(true)
+        set(model.properties, 'stepName', form.value.title)
+        model.clearNextNodeField(true)
         nodeNameDialogVisible.value = false
         formEl.resetFields()
       } else {
@@ -163,43 +159,43 @@ const editName = async (formEl: FormInstance | null | undefined) => {
 
 const mousedown = (event?: MouseEvent) => {
   if (!event?.shiftKey) {
-    props.nodeModel.graphModel.clearSelectElements()
+    model.graphModel.clearSelectElements()
   }
-  set(props.nodeModel, 'isSelected', !props.nodeModel.isSelected)
-  set(props.nodeModel, 'isHovered', !props.nodeModel.isSelected)
-  props.nodeModel.graphModel.toFront(props.nodeModel.id)
+  set(model, 'isSelected', !model.isSelected)
+  set(model, 'isHovered', !model.isSelected)
+  model.graphModel.toFront(model.id)
 }
 const showicon = ref<number | string | null>(null)
 const copyNode = () => {
-  props.nodeModel.graphModel.clearSelectElements()
-  const cloneNode = props.nodeModel.graphModel.cloneNode(props.nodeModel.id)
+  model.graphModel.clearSelectElements()
+  const cloneNode = model.graphModel.cloneNode(model.id)
   if (!cloneNode) return
   set(cloneNode, 'isSelected', true)
   set(cloneNode, 'isHovered', true)
-  props.nodeModel.graphModel.toFront(cloneNode.id)
+  model.graphModel.toFront(cloneNode.id)
 }
 const deleteNode = () => {
   MsgConfirm('提示', '确定删除当前节点吗？', {
     confirmButtonText: '确定',
     confirmButtonClass: 'danger',
   }).then(() => {
-    if (String(props.nodeModel.type) === WorkflowNodeType.LoopNode) {
-      const next = props.nodeModel.graphModel.getNodeOutgoingNode(props.nodeModel.id)
+    if (String(model.type) === WorkflowNodeType.LoopNode) {
+      const next = model.graphModel.getNodeOutgoingNode(model.id)
       next.forEach((nextNode) => {
         if (String(nextNode.type) === WorkflowNodeType.LoopBodyNode) {
-          props.nodeModel.graphModel.deleteNode(nextNode.id)
+          model.graphModel.deleteNode(nextNode.id)
         }
       })
     }
-    props.nodeModel.graphModel.deleteNode(props.nodeModel.id)
+    model.graphModel.deleteNode(model.id)
   })
-  props.nodeModel.graphModel.eventCenter.emit('delete_node', undefined)
+  model.graphModel.eventCenter.emit('delete_node', undefined)
 }
 const resizeStepContainer = (wh: ResizeSize) => {
   if (wh.height) {
-    if (!props.nodeModel.virtual) {
+    if (!model.virtual) {
       height.value.stepContainerHeight = wh.height
-      props.nodeModel.setHeight(height.value.stepContainerHeight)
+      model.setHeight(height.value.stepContainerHeight)
     }
   }
 }
@@ -210,31 +206,31 @@ function clickNodes(nodeType: WorkflowNodeType) {
   if (!item || !anchor) return
 
   const width = Number((item.properties as { width?: number }).width ?? 214)
-  const nodeModel = props.nodeModel.graphModel.addNode({
+  const newModel = model.graphModel.addNode({
     type: item.type,
     properties: item.properties,
     x: anchor.x + width / 2 + 200,
     y: anchor.y - item.height,
   })
-  props.nodeModel.graphModel.addEdge({
+  newModel.graphModel.addEdge({
     type: 'app-edge',
-    sourceNodeId: props.nodeModel.id,
+    sourceNodeId: model.id,
     sourceAnchorId: anchor.id,
-    targetNodeId: nodeModel.id,
-    targetAnchorId: nodeModel.id + '_left',
+    targetNodeId: model.id,
+    targetAnchorId: model.id + '_left',
   })
 
   closeNodeMenu()
 }
 const enable_exception = computed({
   set: (v) => {
-    set(props.nodeModel.properties, 'enableException', v)
+    set(model.properties, 'enableException', v)
   },
   get: () => {
-    if (props.nodeModel.properties.enableException !== undefined) {
-      return props.nodeModel.properties.enableException
+    if (model.properties.enableException !== undefined) {
+      return model.properties.enableException
     }
-    set(props.nodeModel.properties, 'enableException', false)
+    set(model.properties, 'enableException', false)
     return false
   },
 })
@@ -244,8 +240,8 @@ const nodeFields = computed(() => {
       return {
         label: field.label,
         value: field.value,
-        globeLabel: `{{${props.nodeModel.properties.stepName}.${field.value}}}`,
-        globeValue: `{{context['${props.nodeModel.id}'].${field.value}}}`,
+        globeLabel: `{{${model.properties.stepName}.${field.value}}}`,
+        globeValue: `{{context['${model.id}'].${field.value}}}`,
       }
     })
     return fields
@@ -262,16 +258,16 @@ const abnormalNodeFields = computed(() => {
     {
       label: '异常信息',
       value: 'exception_message',
-      globeLabel: `{{${props.nodeModel.properties.stepName}.exception_message}}`,
-      globeValue: `{{context['${props.nodeModel.id}'].exception_message}}`,
+      globeLabel: `{{${model.properties.stepName}.exception_message}}`,
+      globeValue: `{{context['${model.id}'].exception_message}}`,
     },
   ]
 })
 watch(enable_exception, () => {
-  props.nodeModel.graphModel.eventCenter.emit(
+  model.graphModel.eventCenter.emit(
     'delete_edge',
-    props.nodeModel.outgoing.edges
-      .filter((item) => item.sourceAnchorId === `${props.nodeModel.id}_exception_right`)
+    model.outgoing.edges
+      .filter((item) => item.sourceAnchorId === `${model.id}_exception_right`)
       .map((item) => item.id),
   )
 })
@@ -318,7 +314,7 @@ const keyWord = ref('')
 const currentKeyWord = ref(false)
 const selectOn = (kw: string) => {
   keyWord.value = kw
-  props.nodeModel.setSelected(false)
+  model.setSelected(false)
   currentKeyWord.value = false
 }
 /**
@@ -326,7 +322,7 @@ const selectOn = (kw: string) => {
  * @param kw
  */
 const focusOn = () => {
-  props.nodeModel.setSelected(true)
+  model.setSelected(true)
   currentKeyWord.value = true
 }
 /**
@@ -358,26 +354,26 @@ const highlightedStepName = (contentText: string) => {
   }
 }
 onMounted(() => {
-  set(props.nodeModel, 'openNodeMenu', (anchor: Model.AnchorConfig) => {
+  set(model, 'openNodeMenu', (anchor: Model.AnchorConfig) => {
     showAnchor.value ? closeNodeMenu() : openNodeMenu(anchor)
   })
-  set(props.nodeModel, 'selectOn', selectOn)
-  set(props.nodeModel, 'focusOn', focusOn)
-  set(props.nodeModel, 'clearSelectOn', clearSelectOn)
+  set(model, 'selectOn', selectOn)
+  set(model, 'focusOn', focusOn)
+  set(model, 'clearSelectOn', clearSelectOn)
   initResizeObserver()
 })
 let resizeObserver: ResizeObserver | null = null
-const initResizeObserver=()=>{
-   if (!containerRef.value) return
-  
+const initResizeObserver = () => {
+  if (!containerRef.value) return
+
   resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      const {  height } = entry.contentRect
+      const { height } = entry.contentRect
       // 在这里处理尺寸变化
-      resizeStepContainer({  height:height+32 })
+      resizeStepContainer({ height: height + 32 })
     }
   })
-  
+
   resizeObserver.observe(containerRef.value)
 }
 const containerRef = ref<HTMLElement>()
@@ -390,9 +386,9 @@ onBeforeUnmount(() => {
   <div class="workflow-node-container relative overflow-visible p-4" @mousedown="mousedown">
     <div
       class="step-container overflow-visible rounded-lg border-2 border-white bg-white p-4"
-      :class="{ isSelected: props.nodeModel.isSelected, error: node_status !== 200 }"
+      :class="{ isSelected: model.isSelected, error: node_status !== 200 }"
     >
-      <div ref="containerRef" >
+      <div ref="containerRef">
         <div class="flex-between">
           <div
             class="flex w-[69%] items-center"
@@ -402,16 +398,16 @@ onBeforeUnmount(() => {
             @dragend.prevent
           >
             <component
-              :is="iconComponent(`${nodeModel.type}-icon`)"
+              :is="iconComponent(`${model.type}-icon`)"
               class="mr-2"
               :size="24"
-              :item="nodeModel?.properties.node_data"
+              :item="model?.properties.node_data"
               style="--el-avatar-border-radius: 6px"
             />
             <h4
               class="truncate break-all"
-              :title="String(nodeModel.properties.stepName ?? '')"
-              v-html="highlightedStepName(String(nodeModel.properties.stepName ?? ''))"
+              :title="String(model.properties.stepName ?? '')"
+              v-html="highlightedStepName(String(model.properties.stepName ?? ''))"
             ></h4>
           </div>
 
@@ -424,7 +420,7 @@ onBeforeUnmount(() => {
               />
             </el-button>
             <MkDropdown
-              v-if="showConditionOperate(String(nodeModel.type))"
+              v-if="showConditionOperate(String(model.type))"
               :teleported="false"
               trigger="click"
               placement="bottom-start"
@@ -446,11 +442,7 @@ onBeforeUnmount(() => {
                 </div>
               </template>
             </MkDropdown>
-            <MkDropdown
-              v-if="showOperate(String(nodeModel.type))"
-              :teleported="false"
-              trigger="click"
-            >
+            <MkDropdown v-if="showOperate(String(model.type))" :teleported="false" trigger="click">
               <el-button text>
                 <MkIcon name="icon_more_outlined" class="text-N600" />
               </el-button>
@@ -467,10 +459,10 @@ onBeforeUnmount(() => {
                   <template
                     v-if="
                       !(
-                        (String(nodeModel.type) == WorkflowNodeType.ToolLib &&
+                        (String(model.type) == WorkflowNodeType.ToolLib &&
                           nodeProperties.kind == WorkflowKind.DataSource) ||
-                        String(nodeModel.type) == WorkflowNodeType.DataSourceLocalNode ||
-                        String(nodeModel.type) == WorkflowNodeType.DataSourceWebNode
+                        String(model.type) == WorkflowNodeType.DataSourceLocalNode ||
+                        String(model.type) == WorkflowNodeType.DataSourceWebNode
                       )
                     "
                   >
@@ -495,7 +487,15 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <el-collapse-transition>
-          <div v-show="showNode" class="mt-4" @mousedown.stop @keydown.stop @click.stop>
+          <div
+            v-show="showNode"
+            class="mt-4"
+            @pointermove.stop
+            @pointerenter.stop
+            @mousedown.stop
+            @keydown.stop
+            @click.stop
+          >
             <el-alert
               v-if="nodeDisabled"
               class="mb-4"
@@ -508,7 +508,7 @@ onBeforeUnmount(() => {
               v-if="node_status != 200"
               class="mb-4"
               :title="
-                String(props.nodeModel.type) === WorkflowNodeType.Application
+                String(model.type) === WorkflowNodeType.Application
                   ? '该智能体不可用'
                   : '该工具不可用'
               "
@@ -522,7 +522,7 @@ onBeforeUnmount(() => {
                 <h5 class="my-2">
                   {{ output_title }}
                 </h5>
-                <div v-if="exceptionNodeList.includes(String(nodeModel.type))" class="text-right">
+                <div v-if="exceptionNodeList.includes(String(model.type))" class="text-right">
                   <span class="mr-2 mt-2 text-N600">异常捕获</span>
                   <el-switch v-model="enable_exception" size="small" />
                 </div>
