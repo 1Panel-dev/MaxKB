@@ -57,7 +57,7 @@ const postBatchSetChatUserGroups = (request: BatchSetChatUserGroupsRequest) => {
 
 /** 获取可导入的对话用户来源。 */
 const getChatUserSyncTypes = () => {
-  return get<string[]>(`${prefix}/sync_types`)
+  return get<string[]>(`${prefix}/sync/types`)
 }
 
 /** 从指定来源导入对话用户。 */
