@@ -51,6 +51,9 @@ class PortalSerializer(serializers.Serializer):
         required=False, label=_("enable public access"), help_text=_("enable public access")
     )
     enable_api = serializers.BooleanField(required=False, label=_("enable api"), help_text=_("enable api"))
+    enable_knowledge_base_api = serializers.BooleanField(
+        required=False, label=_("enable knowledge base api"), help_text=_("enable knowledge base api")
+    )
     enable_auth = serializers.BooleanField(required=False, label=_("enable auth"), help_text=_("enable auth"))
     auth_config = serializers.JSONField(required=False, label=_("auth config"), help_text=_("auth config"))
     enable_cors = serializers.BooleanField(required=False, label=_("enable cors"), help_text=_("enable cors"))
