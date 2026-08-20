@@ -195,7 +195,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
         if system_role == role_id:
             return [role_id]
         else:
-            return [f"{role_id}:/w/{workspace_id}", role_id]
+            return [f"{role_id}:w:{workspace_id}", role_id]
     else:
         r = role_dict.get(role_id)
         if r is None:
@@ -203,7 +203,7 @@ def reset_workspace_role(role_id, workspace_id, role_dict):
         role_type = role_dict.get(role_id).type
         if system_role == role_type:
             return [RoleConstants.EXTENDS_ADMIN.value.name]
-        return [f"EXTENDS_{role_type}:/w/{workspace_id}"]
+        return [f"EXTENDS_{role_type}:w:{workspace_id}"]
 
 
 def get_role_list(user, workspace_user_role_mapping_model, workspace_model, role_model, role_permission_mapping_model):
