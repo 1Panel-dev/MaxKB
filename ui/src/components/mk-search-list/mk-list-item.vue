@@ -3,7 +3,12 @@ import { computed } from 'vue'
 
 defineOptions({ name: 'MkListItem' })
 
-const { active = false, index = 0, labelField, row } = defineProps<{
+const {
+  active = false,
+  index = 0,
+  labelField,
+  row,
+} = defineProps<{
   active?: boolean
   index?: number
   labelField?: keyof T & string

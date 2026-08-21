@@ -42,6 +42,12 @@
   --el-disabled-text-color: var(--mk-N400);
 }
 
+/* avatar */
+.el-avatar {
+  --el-avatar-bg-color: #3370ff;
+  flex-shrink: 0;
+}
+
 /* button */
 .el-button {
   --el-button-font-weight: 400 !important;
@@ -89,7 +95,7 @@
     &:hover {
       box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
       color: var(--el-text-color-primary);
-      background: none;
+      background: transparent;
       border-color: var(--el-border-color);
     }
   }
