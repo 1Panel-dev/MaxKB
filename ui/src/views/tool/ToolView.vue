@@ -17,18 +17,12 @@ const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARE
 function handleFolderSelect(folder: FolderItem) {
   currentFolder.value = folder
   selectedToolId.value = ''
-  resetAndLoadTools()
+  infiniteScrollRef.value?.reset()
 }
 
 /* 工具查询搜索列表 */
-const loading = ref(false)
-const loadingMore = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
 const toolsData = ref<WorkspaceTool[]>([])
+const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
@@ -48,59 +42,26 @@ function loadCreatorOptions(keyword: string) {
 
 function handleSearchChange(query?: RequestParams) {
   toolQuery.value = query
-  resetAndLoadTools()
+  infiniteScrollRef.value?.reset()
 }
 
 const toolType = ref<ToolType | ''>('')
-let latestToolsRequest = 0
 
 function handleToolTypeChange() {
   selectedToolId.value = ''
-  resetAndLoadTools()
+  infiniteScrollRef.value?.reset()
 }
 
-function loadToolsPage(currentPage = 1) {
-  const append = currentPage > 1
-  const requestId = ++latestToolsRequest
-  if (append) {
-    loadingMore.value = true
-  } else {
-    loading.value = true
-    loadingMore.value = false
-  }
-
-  return ToolApi.getToolPage(
-    { currentPage, pageSize: paginationConfig.value.pageSize },
-    {
-      ...toolQuery.value,
-      scope: TOOL_SCOPE.WORKSPACE,
-      folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL,
-      tool_type: toolType.value,
-    },
-  )
-    .then((tools) => {
-      if (requestId !== latestToolsRequest) return
-
-      toolsData.value = append ? [...toolsData.value, ...tools.records] : tools.records
-      paginationConfig.value.currentPage = tools.current
-      paginationConfig.value.pageSize = tools.size
-      paginationConfig.value.total = tools.total
-    })
-    .finally(() => {
-      if (requestId !== latestToolsRequest) return
-
-      loading.value = false
-      loadingMore.value = false
-    })
+function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
+  return ToolApi.getToolPage(pagination, {
+    ...toolQuery.value,
+    scope: TOOL_SCOPE.WORKSPACE,
+    folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL,
+    tool_type: toolType.value,
+  })
 }
 
-function resetAndLoadTools() {
-  paginationConfig.value.currentPage = 1
-  paginationConfig.value.total = 0
-  toolsData.value = []
-  return loadToolsPage()
-}
-
+// 文件夹
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 const selectedToolId = ref('')
 
@@ -113,6 +74,7 @@ function handleCreateFolder() {
 }
 
 /* 工具维护 */
+const loading = ref(false)
 function handleToolStatusChange(tool: WorkspaceTool, active: boolean) {
   loading.value = true
   return ToolApi.putTool(tool.id, { is_active: active })
@@ -131,7 +93,7 @@ function handleDeleteTool(tool: WorkspaceTool) {
       loading.value = true
       return ToolApi.deleteTool(tool.id).then(() => {
         MsgSuccess('删除成功')
-        return loadToolsPage()
+        return infiniteScrollRef.value?.reset()
       })
     })
     .catch(() => {})
@@ -139,14 +101,10 @@ function handleDeleteTool(tool: WorkspaceTool) {
       loading.value = false
     })
 }
-
-onMounted(() => {
-  loadToolsPage()
-})
 </script>
 
 <template>
-  <MkViewLayout class="workspace-tool-view">
+  <MkViewLayout class="workspace-tool-view" collapsible>
     <template #aside="{ title, Header }">
       <component :is="Header">
         <h4>{{ title }}</h4>
@@ -189,33 +147,14 @@ onMounted(() => {
         <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
       </component>
       <div v-loading="loading">
-        <el-row v-if="toolsData.length" :gutter="16" class="gap-y-4">
-          <el-col
-            v-for="tool in toolsData"
-            :key="tool.id"
-            :xs="24"
-            :sm="24"
-            :md="12"
-            :lg="8"
-            :xl="8"
-          >
-            <ToolCard
-              :selected="selectedToolId === tool.id"
-              :shared="isShared"
-              :tool="tool"
-              @delete="handleDeleteTool"
-              @select="handleToolSelect"
-              @status-change="handleToolStatusChange"
-            />
-          </el-col>
-        </el-row>
-        <MkEmpty v-else-if="!loading" class="mt-24" />
-        <MkLoadMore
-          v-if="toolsData.length"
-          :loading="loadingMore"
-          :pagination-config="paginationConfig"
-          @load="loadToolsPage"
-        />
+        <MkInfiniteScroll ref="infiniteScrollRef" v-model="toolsData" :load="loadToolsPage">
+          <div v-if="toolsData.length" class="mk-resource-card-grid">
+            <template v-for="tool in toolsData" :key="tool.id">
+              <ToolCard :shared="isShared" :tool="tool" />
+            </template>
+          </div>
+          <MkEmpty v-else class="mt-24" />
+        </MkInfiniteScroll>
       </div>
     </template>
   </MkViewLayout>

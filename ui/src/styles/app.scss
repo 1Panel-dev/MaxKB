@@ -88,3 +88,10 @@ h6 {
     margin-left: 4px;
   }
 }
+
+// 资源的card grid布局
+.mk-resource-card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}

@@ -6,6 +6,7 @@
   --color-danger: var(--mk-danger);
   --color-success: var(--mk-success);
   --color-warning: var(--mk-warning);
+  --color-purple: var(--mk-purple);
   --color-N100: var(--mk-N100);
   --color-N300: var(--mk-N300);
   --color-N350: var(--mk-N350);
@@ -22,6 +23,9 @@
   --spacing-layout-content: calc(100vh - var(--mk-header-height));
   --spacing-sidebar: var(--mk-sidebar-width);
   --spacing-sidebar-expanded: var(--mk-sidebar-expanded-width);
+
+  /* shadows */
+  --shadow-md: var(--el-box-shadow-light);
 
   /* typography */
   --text-xs: 10px;
@@ -85,9 +89,14 @@
   transition-property: opacity;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 
-  :where(.group):hover &,
-  :where(.group):focus-within & {
+  :where(.group):is(:hover, :focus-within) & {
     opacity: 1;
     pointer-events: auto;
+  }
+
+  /* 存在更近但未激活的 group 时，取消外层 group 传递下来的显示状态 */
+  :where(.group):is(:hover, :focus-within) :where(.group:not(:hover):not(:focus-within)) & {
+    opacity: 0;
+    pointer-events: none;
   }
 }

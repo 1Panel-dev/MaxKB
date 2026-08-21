@@ -51,17 +51,17 @@ const errMessage = computed(() => {
 
     <ul class="flex flex-col gap-2">
       <li class="flex gap-4">
-        <span class="shrink-0 text-N600">模型类型</span>
+        <span class="shrink-0">模型类型</span>
         <span
-          class="min-w-0 flex-1 truncate"
+          class="min-w-0 flex-1 truncate text-N900"
           :title="MODEL_TYPE_LABELS[model.model_type] ?? model.model_type"
         >
           {{ MODEL_TYPE_LABELS[model.model_type] ?? model.model_type }}
         </span>
       </li>
       <li class="flex gap-4">
-        <span class="shrink-0 text-N600">基础模型</span>
-        <span class="min-w-0 flex-1 truncate" :title="model.model_name">
+        <span class="shrink-0">基础模型</span>
+        <span class="min-w-0 flex-1 truncate text-N900" :title="model.model_name">
           {{ model.model_name }}
         </span>
       </li>

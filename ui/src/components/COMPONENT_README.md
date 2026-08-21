@@ -65,7 +65,7 @@ src/components/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
-│   ├── mk-load-more/
+│   ├── mk-infinite-scroll/
 │   │   └── index.vue             # 分页列表滚动触底加载与结束状态
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
@@ -319,13 +319,15 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 仍可自行使用 `el-scrollbar`。页面可以在同一个插槽中组织标题、内容和空状态，并只写一次业务
 状态判断。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。页面加载状态通过
 `loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。默认插槽没有
-渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。
+渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。`collapsible` 默认为
+`false`；传入后，展开状态仅在鼠标移入侧栏或焦点进入侧栏时显示收起按钮，收起状态始终显示展开
+按钮。收起时释放侧栏宽度，页面不需要自行维护折叠状态。
 
 主内容区固定保留 `px-6` 水平留白。内置滚动容器会抵消两侧留白，再为滚动内容补回 `24px`
 水平间距，使滚动条贴齐主区域右边界，并允许 `MkTable` 的底部操作栏延伸至完整主区域宽度。
 
 ```vue
-<MkViewLayout :loading="loading">
+<MkViewLayout :loading="loading" collapsible>
   <template #aside>左侧列表</template>
   <template #default>右侧内容</template>
 </MkViewLayout>
@@ -368,17 +370,19 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 <MkIcon :icon="Setting" :size="20" />
 ```
 
-### MkLoadMore
+### MkInfiniteScroll
 
 分页列表的滚动触底加载组件，使用 `IntersectionObserver` 监听组件所在滚动区域的底部，不依赖
-Element Plus 的 `v-infinite-scroll`。通过 `paginationConfig` 接收 `currentPage`、`pageSize` 和
-`total`，组件内部判断是否加载完成；接近底部时，`load` 事件返回下一页页码。`loading` 用于阻止
-重复请求并展示加载状态，`disabled` 可临时禁用加载，`distance` 设置提前触发距离且默认为
-`200px`。数据不足以撑满滚动区域时会继续加载，直至填满或全部加载完成。`loading` 和 `finished`
-插槽可覆盖默认提示。
+Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载的列表数据，通过 `load`
+传入按页请求方法，并在内部管理页码、首次加载、数据追加、加载状态、结束状态和过期请求。请求
+方法接收 `{ currentPage, pageSize }`，返回包含 `records`、`current`、`size` 和 `total` 的分页结果。
+默认每页加载 20 条，可通过 `pageSize` 修改。组件挂载后自动加载第一页，之后只在底部哨兵随
+用户滚动进入可视区域时加载下一页。查询条件变化时通过组件暴露的 `reset()` 重新加载。
 
 ```vue
-<MkLoadMore :loading="loadingMore" :pagination-config="paginationConfig" @load="loadPage" />
+<MkInfiniteScroll ref="infiniteScrollRef" v-model="resources" :load="loadResourcePage">
+  <ResourceCard v-for="resource in resources" :key="resource.id" :resource="resource" />
+</MkInfiniteScroll>
 ```
 
 ### MkSearchInput

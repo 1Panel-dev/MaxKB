@@ -30,8 +30,8 @@ import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
 defineOptions({ name: 'MkSourceCard' })
 
 const props = defineProps<{
-  create_time?: string
-  nick_name?: string
+  create_time?: string  //创建日期
+  nick_name?: string // 创建者
   title: string
 }>()
 
@@ -75,7 +75,7 @@ const slots = defineSlots<{
 
       <slot name="tag" />
     </header>
-    <div class="my-4">
+    <div class="my-4 h-full text-N600">
       <slot />
     </div>
 

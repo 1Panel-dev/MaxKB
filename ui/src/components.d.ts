@@ -23,7 +23,7 @@ declare module 'vue' {
     MkEmpty: typeof import('./components/global/mk-empty/index.vue')['default']
     MkFilterableDropdown: typeof import('./components/global/mk-filterable-dropdown/index.vue')['default']
     MkIcon: typeof import('./components/global/mk-icon/index.vue')['default']
-    MkLoadMore: typeof import('./components/global/mk-load-more/index.vue')['default']
+    MkInfiniteScroll: typeof import('./components/global/mk-infinite-scroll/index.vue')['default']
     MkSearchInput: typeof import('./components/global/mk-search-input/index.vue')['default']
     MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
     MkTable: typeof import('./components/global/mk-table/index.vue')['default']
@@ -31,6 +31,7 @@ declare module 'vue' {
     MkViewLayout: typeof import('./components/global/mk-view-layout/index.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
   }
 }
 
@@ -47,7 +48,7 @@ declare global {
   const MkEmpty: typeof import('./components/global/mk-empty/index.vue')['default']
   const MkFilterableDropdown: typeof import('./components/global/mk-filterable-dropdown/index.vue')['default']
   const MkIcon: typeof import('./components/global/mk-icon/index.vue')['default']
-  const MkLoadMore: typeof import('./components/global/mk-load-more/index.vue')['default']
+  const MkInfiniteScroll: typeof import('./components/global/mk-infinite-scroll/index.vue')['default']
   const MkSearchInput: typeof import('./components/global/mk-search-input/index.vue')['default']
   const MkStatusLabel: typeof import('./components/global/mk-status-label/index.vue')['default']
   const MkTable: typeof import('./components/global/mk-table/index.vue')['default']
@@ -55,4 +56,5 @@ declare global {
   const MkViewLayout: typeof import('./components/global/mk-view-layout/index.vue')['default']
   const RouterLink: typeof import('vue-router')['RouterLink']
   const RouterView: typeof import('vue-router')['RouterView']
+  const ToolIcon: typeof import('./components/global/mk-icon/ToolIcon.vue')['default']
 }

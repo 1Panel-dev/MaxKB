@@ -102,7 +102,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <MkViewLayout class="workspace-model-view">
+  <MkViewLayout class="workspace-model-view" collapsible>
     <template #aside>
       <ModelProvider
         :model-value="currentProvider"
@@ -123,19 +123,18 @@ onMounted(() => {
         </div>
       </component>
       <div v-loading="loading">
-        <el-row v-if="workspaceModels.length" :gutter="16" class="gap-y-4">
-          <el-col
+        <div
+          v-if="workspaceModels.length"
+          class="mk-resource-card-grid"
+        >
+          <ModelCard
             v-for="model in workspaceModels"
             :key="model.id"
-            :xs="24"
-            :sm="24"
-            :md="12"
-            :lg="8"
-            :xl="6"
-          >
-            <ModelCard :model="model" :icon="getModelIcon(model)" :shared="isShared" />
-          </el-col>
-        </el-row>
+            :model="model"
+            :icon="getModelIcon(model)"
+            :shared="isShared"
+          />
+        </div>
         <MkEmpty v-else class="mt-24" />
       </div>
     </template>
