@@ -1,6 +1,6 @@
 import { del, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { RequestParams, ToolPayload, WorkspaceTool } from '@/api/types'
+import type { RequestParams, ToolPayload, ToolItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -10,7 +10,7 @@ const getPrefix = () => {
 
 /** 获取工具分页列表。 */
 const getToolPage = (page: ParamsPage, query?: RequestParams) => {
-  return get<ResponsePage<WorkspaceTool>>(
+  return get<ResponsePage<ToolItem>>(
     `${getPrefix()}/${page.currentPage}/${page.pageSize}`,
     query,
   )
@@ -18,17 +18,17 @@ const getToolPage = (page: ParamsPage, query?: RequestParams) => {
 
 /** 更新工作空间工具。 */
 const putTool = (toolId: string, payload: ToolPayload) => {
-  return put<ToolPayload, WorkspaceTool>(`${getPrefix()}/${toolId}`, payload)
+  return put<ToolPayload, ToolItem>(`${getPrefix()}/${toolId}`, payload)
 }
 
 /** 创建工作空间工具。 */
 const postTool = (payload: ToolPayload) => {
-  return post<ToolPayload, WorkspaceTool>(getPrefix(), payload)
+  return post<ToolPayload, ToolItem>(getPrefix(), payload)
 }
 
 /** 获取工具详情。 */
 const getToolDetail = (toolId: string) => {
-  return get<WorkspaceTool>(`${getPrefix()}/${toolId}`)
+  return get<ToolItem>(`${getPrefix()}/${toolId}`)
 }
 
 /** 删除工作空间工具。 */

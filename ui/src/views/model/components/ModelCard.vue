@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { WorkspaceModel } from '@/api/types'
+import type { ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
@@ -8,7 +8,7 @@ defineOptions({ name: 'ModelCard' })
 
 const props = defineProps<{
   icon: string
-  model: WorkspaceModel
+  model: ModelItem
   shared: boolean
 }>()
 

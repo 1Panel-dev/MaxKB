@@ -1,34 +1,19 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue'
-import { Box, Coin, Connection, MagicStick } from '@element-plus/icons-vue'
-import { TOOL_TYPE } from '@/api/enums'
-import type { ToolType, WorkspaceTool } from '@/api/types'
+import type { ToolItem } from '@/api/types'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 
 defineOptions({ name: 'ToolCard' })
 
 const props = defineProps<{
-  selected: boolean
   shared: boolean
-  tool: WorkspaceTool
+  tool: ToolItem
 }>()
 
 const emit = defineEmits<{
-  delete: [tool: WorkspaceTool]
-  select: [tool: WorkspaceTool]
-  statusChange: [tool: WorkspaceTool, active: boolean]
+  delete: [tool: ToolItem]
+  select: [tool: ToolItem]
+  statusChange: [tool: ToolItem, active: boolean]
 }>()
-
-const TOOL_TYPE_ICONS: Record<ToolType, Component> = {
-  [TOOL_TYPE.CUSTOM]: Box,
-  [TOOL_TYPE.DATA_SOURCE]: Coin,
-  [TOOL_TYPE.INTERNAL]: Box,
-  [TOOL_TYPE.MCP]: Connection,
-  [TOOL_TYPE.SKILL]: MagicStick,
-  [TOOL_TYPE.WORKFLOW]: Connection,
-}
-
-const isInlineSvg = computed(() => props.tool.icon?.trim().startsWith('<svg'))
 
 function handleStatusChange(active: string | number | boolean) {
   emit('statusChange', props.tool, Boolean(active))

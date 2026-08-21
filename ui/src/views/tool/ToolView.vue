@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
-import { FOLDER_SOURCE, TOOL_SCOPE } from '@/api/enums'
-import type { OptionItem, RequestParams, ToolType, WorkspaceTool, FolderItem } from '@/api/types'
+
 import CommonApi from '@/api/admin/workspace/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import { TOOL_TYPE_OPTIONS } from '@/constants'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import type { OptionItem, RequestParams, ToolType, ToolItem, FolderItem } from '@/api/types'
+import { FOLDER_SOURCE, TOOL_SCOPE } from '@/api/enums'
+import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './components/ToolCard.vue'
@@ -21,7 +21,7 @@ function handleFolderSelect(folder: FolderItem) {
 }
 
 /* 工具查询搜索列表 */
-const toolsData = ref<WorkspaceTool[]>([])
+const toolsData = ref<ToolItem[]>([])
 const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infiniteScrollRef')
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
@@ -65,7 +65,7 @@ function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
 const selectedToolId = ref('')
 
-function handleToolSelect(tool: WorkspaceTool) {
+function handleToolSelect(tool: ToolItem) {
   selectedToolId.value = tool.id
 }
 
@@ -75,7 +75,7 @@ function handleCreateFolder() {
 
 /* 工具维护 */
 const loading = ref(false)
-function handleToolStatusChange(tool: WorkspaceTool, active: boolean) {
+function handleToolStatusChange(tool: ToolItem, active: boolean) {
   loading.value = true
   return ToolApi.putTool(tool.id, { is_active: active })
     .then(() => {
@@ -87,7 +87,7 @@ function handleToolStatusChange(tool: WorkspaceTool, active: boolean) {
     })
 }
 
-function handleDeleteTool(tool: WorkspaceTool) {
+function handleDeleteTool(tool: ToolItem) {
   MsgConfirm(`确认删除工具“${tool.name}”？`, '删除后无法恢复，请谨慎操作。')
     .then(() => {
       loading.value = true

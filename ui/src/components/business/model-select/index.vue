@@ -3,18 +3,18 @@ import { computed, ref } from 'vue'
 import { Check } from '@element-plus/icons-vue'
 import ProviderApi from '@/api/admin/workspace/model/provider'
 import { MODEL_STATUS } from '@/api/enums'
-import type { ModelProviderItem, WorkspaceModel } from '@/api/types'
+import type { ModelProviderItem, ModelItem } from '@/api/types'
 
 defineOptions({
   name: 'ModelSelect',
   inheritAttrs: false,
 })
 
-type ModelOptions = Record<string, WorkspaceModel[]>
+type ModelOptions = Record<string, ModelItem[]>
 
 interface ModelOptionGroup {
   icon: string
-  models: WorkspaceModel[]
+  models: ModelItem[]
   name: string
   provider: string
 }

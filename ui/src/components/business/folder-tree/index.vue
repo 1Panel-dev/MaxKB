@@ -6,7 +6,7 @@ import { MsgSuccess } from '@/utils/message'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import VirtualizedTree from './VirtualizedTree.vue'
 import { FOLDER_SORT, type FolderSort } from './types'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants/folder'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
