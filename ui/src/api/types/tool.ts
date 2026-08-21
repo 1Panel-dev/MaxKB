@@ -5,7 +5,7 @@ import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 export type ToolScope = (typeof TOOL_SCOPE)[keyof typeof TOOL_SCOPE]
 export type ToolType = (typeof TOOL_TYPE)[keyof typeof TOOL_TYPE]
 
-export interface WorkspaceTool {
+export interface ToolItem {
   code?: string
   create_time?: string
   desc?: string | null

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { ModelProviderItem, OptionItem, RequestParams, WorkspaceModel } from '@/api/types'
+import type { ModelProviderItem, OptionItem, RequestParams, ModelItem } from '@/api/types'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import CommonApi from '@/api/admin/workspace/common'
 import ModelApi from '@/api/admin/workspace/model/model'
@@ -19,14 +19,14 @@ const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
 const loading = ref(false)
 const currentProvider = ref<ModelProviderItem>(DEFAULT_MODEL_PROVIDER)
 const modelProviders = ref<ModelProviderItem[]>([])
-const workspaceModels = ref<WorkspaceModel[]>([])
+const ModelItems = ref<ModelItem[]>([])
 const modelQuery = ref<RequestParams>()
 const creatorOptions = ref<OptionItem<string>[]>([])
 
 const isShared = computed(() => currentProvider.value.provider === 'shared')
 
 const getModelIcon = computed(
-  () => (model: WorkspaceModel) =>
+  () => (model: ModelItem) =>
     modelProviders.value.find(({ provider }) => provider === model.provider)?.icon ?? '',
 )
 
@@ -77,7 +77,7 @@ function loadModels() {
 
   return request
     .then((models) => {
-      workspaceModels.value = models
+      ModelItems.value = models
     })
     .finally(() => {
       loading.value = false
@@ -124,11 +124,11 @@ onMounted(() => {
       </component>
       <div v-loading="loading">
         <div
-          v-if="workspaceModels.length"
+          v-if="ModelItems.length"
           class="mk-resource-card-grid"
         >
           <ModelCard
-            v-for="model in workspaceModels"
+            v-for="model in ModelItems"
             :key="model.id"
             :model="model"
             :icon="getModelIcon(model)"

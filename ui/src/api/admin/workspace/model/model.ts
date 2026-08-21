@@ -1,5 +1,5 @@
 import { del, get, post, put } from '../../core/request'
-import type { RequestParams, ModelPayload, WorkspaceModel } from '@/api/types'
+import type { RequestParams, ModelPayload, ModelItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -9,27 +9,27 @@ const getPrefix = () => {
 
 /** 获取工作空间模型列表。 */
 const getModelList = (query?: RequestParams) => {
-  return get<WorkspaceModel[]>(getPrefix(), query)
+  return get<ModelItem[]>(getPrefix(), query)
 }
 
 /** 创建工作空间模型。 */
 const postModel = (payload: ModelPayload) => {
-  return post<ModelPayload, WorkspaceModel>(getPrefix(), payload)
+  return post<ModelPayload, ModelItem>(getPrefix(), payload)
 }
 
 /** 更新工作空间模型。 */
 const putModel = (modelId: string, payload: Partial<ModelPayload>) => {
-  return put<Partial<ModelPayload>, WorkspaceModel>(`${getPrefix()}/${modelId}`, payload)
+  return put<Partial<ModelPayload>, ModelItem>(`${getPrefix()}/${modelId}`, payload)
 }
 
 /** 获取包含认证信息的模型详情。 */
 const getModelDetail = (modelId: string) => {
-  return get<WorkspaceModel>(`${getPrefix()}/${modelId}`)
+  return get<ModelItem>(`${getPrefix()}/${modelId}`)
 }
 
 /** 获取不包含认证信息的模型元数据。 */
 const getModelMeta = (modelId: string) => {
-  return get<WorkspaceModel>(`${getPrefix()}/${modelId}/meta`)
+  return get<ModelItem>(`${getPrefix()}/${modelId}/meta`)
 }
 
 /** 删除工作空间模型。 */

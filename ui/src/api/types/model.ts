@@ -10,7 +10,7 @@ export interface ModelProviderItem {
   provider: string
 }
 
-export interface WorkspaceModel {
+export interface ModelItem {
   create_time?: string
   id: string
   meta?: Record<string, unknown>
