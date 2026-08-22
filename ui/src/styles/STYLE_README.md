@@ -96,6 +96,7 @@ Tailwind 在 `tailwind.css` 中显式重写了项目字号及对应行高：
 - 业务组件的布局、间距、尺寸、排版、颜色和常见交互状态优先使用 Tailwind 工具类。
 - 能直接组合工具类表达时，不要新增仅供单个元素使用的自定义 class，也不要为其新增 `<style>` 规则。
 - Element Plus 组件可通过 `class`、`popper-class` 等属性直接传入 Tailwind 工具类；覆盖组件默认样式时按需使用 Tailwind 的 `!` important 修饰符。
+- `el-avatar` 内部图片默认宽度为 `100%`；需要改变图片宽度时，统一在 `img` 上使用行内 `style="width: ..."`。
 - 仅在 Tailwind 无法清晰表达、必须使用复杂选择器、需要深层穿透，或样式确实会被多处共享时编写 Sass/CSS。此时 class 应使用有业务含义的名称，组件样式默认保持 `scoped`。
 - 运行时主题颜色仍以 `variables.scss` 的 `--mk-*` 变量为唯一数据源，并优先使用已映射的 `text-N900`、`text-N600`、`bg-primary` 等语义工具类。
 - 只添加会实际改变当前布局、样式或交互的 class。不要习惯性追加无效或重复的工具类；添加前应结合元素默认样式、父级布局和现有 class 判断其是否必要。

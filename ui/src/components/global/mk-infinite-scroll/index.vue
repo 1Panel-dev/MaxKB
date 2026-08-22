@@ -39,6 +39,9 @@ const finished = computed(
     pagination.value.currentPage > 0 &&
     pagination.value.currentPage * pagination.value.pageSize >= pagination.value.total,
 )
+const showFinishedText = computed(
+  () => finished.value && pagination.value.total > pagination.value.pageSize,
+)
 // 查询条件快速变化时可能并发 reset，只有最新版本的请求可以更新列表。
 let requestVersion = 0
 let infiniteScrollObserver: IntersectionObserver | undefined
@@ -110,7 +113,7 @@ defineExpose({ reset })
     <slot />
     <div ref="triggerRef" aria-live="polite" class="flex-center py-4 shrink-0 text-sm text-N600">
       <span v-if="loading">加载中...</span>
-      <span v-else-if="finished">没有更多了</span>
+      <span v-else-if="showFinishedText">没有更多了</span>
     </div>
   </div>
 </template>

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import type { WorkspaceFolder } from '@/api/types'
-import type { FolderMoveSubmit } from './types'
-import FolderVirtualizedTree from './VirtualizedTree.vue'
+import type { FolderMoveSubmit } from './types.ts'
+import FolderTree from './index.vue'
 
 defineOptions({ name: 'MoveFolderDialog' })
 
@@ -79,24 +79,31 @@ function handleSubmit() {
   })
 }
 
+// function handleMoveFolder({ folder, targetFolderId }: FolderMoveSubmit) {
+//   submiting.value = true
+//   return FolderApi.putFolder(workspaceId, props.source, folder.id, {
+//     parent_id: targetFolderId,
+//   })
+//     .then((updatedFolder) => {
+//       MsgSuccess('移动成功')
+//       moveFolderDialogRef.value?.close()
+//       return loadFolders().then(() => emit('moved', updatedFolder))
+//     })
+//     .finally(() => {
+//       submiting.value = false
+//     })
+// }
+
 defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="移动到" width="600" @closed="resetData">
-    <div class="flex h-100 flex-col gap-3">
-      <MkSearchInput v-model="searchKeyword" class="shrink-0" />
-      <div class="min-h-0 flex-1 rounded-md border p-2">
-        <FolderVirtualizedTree
-          :can-manage="false"
-          :current-node-key="selectedTargetId"
-          :data="moveFolders"
-          :filter-text="searchKeyword"
-          @select="handleTargetSelect"
-        />
-      </div>
-    </div>
-
+  <MkDialog v-model="visible" title="移动到" @closed="resetData">
+    <FolderTree
+      :current-node-key="selectedTargetId"
+      :data="moveFolders"
+      @select="handleTargetSelect"
+    />
     <template #footer>
       <el-button :disabled="loading" @click="close">取消</el-button>
       <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">

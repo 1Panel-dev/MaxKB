@@ -15,8 +15,9 @@ const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.TOOL].al
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
+  const folderChanged = folder.id !== currentFolder.value.id
   currentFolder.value = folder
-  infiniteScrollRef.value?.reset()
+  if (folderChanged) infiniteScrollRef.value?.reset()
 }
 // 新建文件夹
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -63,8 +64,6 @@ function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
     tool_type: toolType.value,
   })
 }
-
-
 
 /* 工具维护 */
 const loading = ref(false)
