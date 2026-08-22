@@ -178,7 +178,7 @@ Keep these behaviors:
 - `base: './'` for v2-compatible static deployment.
 - `envDir: './env'`.
 - Proxy `/admin/api`, `/chat/api`, `/doc`, `/schema`, `/static`, and `oss` file paths to the backend.
-- Keep Tailwind, Vue, Vue JSX, Element Plus auto import, and component auto registration plugins.
+- Keep Tailwind, Vue, Vue JSX, and component auto registration plugins.
 - Do not add `unplugin-vue-define-options`; Vue 3.5 already supports `defineOptions`.
 - Avoid adding `vite-plugin-html` unless multi-template requirements exceed Vite's built-in HTML env replacement.
 
@@ -186,5 +186,6 @@ Keep these behaviors:
 
 - Prefer existing project structure and naming.
 - Keep UI code typed and data-driven.
+- Explicitly import APIs used from Vue, Vue Router, and Pinia; do not restore API auto import.
 - Name business variables after their domain and purpose. Avoid context-free collection names such as
   `items` or `list` when a name such as `systemMenuItems` makes the contents clear.

@@ -6,7 +6,6 @@ import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import tailwindcss from '@tailwindcss/vite'
-import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 
 const envDir = './env'
@@ -45,12 +44,25 @@ const devEntryFallbackPlugin = (entry: string, basePath?: string): Plugin => {
       const normalizedBasePath = normalizeBasePath(basePath)
 
       server.middlewares.use((req, _res, next) => {
-        if (entry === 'index.html' || !req.url) {
+        if (!req.url) {
           next()
           return
         }
 
         const pathname = new URL(req.url, 'http://localhost').pathname
+
+        // 相对 favicon 地址会随当前路由加深，开发环境统一回退到 public/favicon.ico。
+        if (pathname.endsWith('/favicon.ico')) {
+          req.url = '/favicon.ico'
+          next()
+          return
+        }
+
+        if (entry === 'index.html') {
+          next()
+          return
+        }
+
         const acceptsHtml = req.headers.accept?.includes('text/html')
         const isAppRoute =
           pathname === '/' ||
@@ -155,10 +167,6 @@ export default defineConfig(({ mode }) => {
     envDir,
     plugins: [
       tailwindcss(),
-      AutoImport({
-        imports: ['vue', 'vue-router', 'pinia'],
-        dts: 'src/auto-imports.d.ts',
-      }),
       Components({
         dirs: ['src/components/global'],
         dts: 'src/components.d.ts',

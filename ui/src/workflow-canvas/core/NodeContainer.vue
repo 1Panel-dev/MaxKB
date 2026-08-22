@@ -2,7 +2,7 @@
 import type { BaseNodeModel, Model } from '@logicflow/core'
 import { ArrowDownBold, CircleCheck } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
-import { ref, computed, onMounted, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyText } from '@/utils/clipboard'

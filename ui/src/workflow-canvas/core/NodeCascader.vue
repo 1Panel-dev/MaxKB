@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, inject, onMounted, ref } from 'vue'
+
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { WorkflowNodeField } from '@/workflow-canvas/types'

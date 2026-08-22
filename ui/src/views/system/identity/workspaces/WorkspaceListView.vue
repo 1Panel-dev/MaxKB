@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from 'vue'
+import { onMounted, ref, useTemplateRef } from 'vue'
 import type { TableColumnCtx } from 'element-plus'
 import type { RequestParams, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import WorkspaceApi from '@/api/admin/system/workspace'

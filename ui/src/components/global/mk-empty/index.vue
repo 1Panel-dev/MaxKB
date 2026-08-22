@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import noDataImage from '@/assets/empty/no-data.svg'
 import noSearchResultsImage from '@/assets/empty/no-search-results.svg'
 

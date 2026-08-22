@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { agentRoutes } from './modules/agent'
+import { applicationRoutes } from './modules/application'
 import { homeRoutes } from './modules/home'
 import { knowledgeRoutes } from './modules/knowledge'
 import { modelRoutes } from './modules/model'
@@ -12,7 +12,7 @@ import { triggerRoutes } from './modules/trigger'
  */
 const moduleRoutes: RouteRecordRaw[] = [
   ...homeRoutes,
-  ...agentRoutes,
+  ...applicationRoutes,
   ...knowledgeRoutes,
   ...toolRoutes,
   ...modelRoutes,

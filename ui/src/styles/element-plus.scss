@@ -28,8 +28,8 @@
   --el-color-success-light-8: color-mix(in srgb, var(--mk-success) 20%, white);
   --el-color-success-light-9: color-mix(in srgb, var(--mk-success) 10%, white);
   --el-color-success-dark-1: color-mix(in srgb, var(--mk-success) 85%, black);
-
   --el-color-warning: var(--mk-warning);
+  --el-color-warning-dark-1: color-mix(in srgb, var(--mk-warning) 85%, black);
   --el-border-color: var(--mk-N350);
   --el-border-radius-base: 6px;
   --el-border-radius-round: 16px;
@@ -365,6 +365,8 @@
     line-height: var(--mk-line-height-base);
   }
   &__label {
+    display: block;
+    width: 100% !important;
     color: var(--el-text-color-primary);
   }
 }
@@ -751,6 +753,15 @@
   &--danger {
     --el-tag-text-color: var(--el-color-danger-dark-1) !important;
     --el-tag-bg-color: rgb(var(--mk-danger-rgb) / 20%) !important;
+  }
+  &--warning {
+    --el-tag-text-color: var(--el-color-warning-dark-1) !important;
+    --el-tag-bg-color: rgb(var(--mk-warning-rgb) / 20%) !important;
+  }
+  // primary tag不能随主题色变化 颜色值不能改变
+  &--primary {
+    --el-tag-text-color: #2b5fd9 !important;
+    --el-tag-bg-color: rgba(51, 112, 255, 0.2) !important;
   }
   &__close {
     .el-icon {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import type { ModelItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import { MODEL_TYPE_LABELS } from '@/constants'

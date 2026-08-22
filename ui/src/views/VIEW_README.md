@@ -81,30 +81,30 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 
 ## 页面功能登记
 
-| 页面                                                            | 功能说明                        |
-| --------------------------------------------------------------- | ------------------------------- |
-| `agent/AgentDetailView.vue`                                     | 智能体详情及工作流入口页面      |
-| `workflow/AgentWorkflowView.vue`                                | 智能体工作流页面头部与全屏画布  |
-| `chat/ChatView.vue`                                             | Chat 入口的对话页面             |
-| `error/NotFoundView.vue`                                        | Admin 未匹配路由和全局 404 页面 |
-| `home/HomeView.vue`                                             | Workspace 首页                  |
-| `knowledge/KnowledgeDetailView.vue`                             | 知识库详情页面                  |
-| `knowledge/DocumentDetailView.vue`                              | 知识库文档详情页面              |
-| `login/LoginView.vue`                                           | Admin 登录页面                  |
-| `login/ForgotPasswordView.vue`                                  | 忘记密码页面                    |
-| `model/ModelView.vue`                                           | 工作空间模型目录与模型卡片页面  |
-| `system/SystemView.vue`                                         | System 模块通用占位页面         |
-| `system/identity/groups/UserGroupListView.vue`                  | 用户组列表页面                  |
-| `system/identity/roles/RoleListView.vue`                        | 角色列表页面                    |
-| `system/identity/users/UserListView.vue`                        | 用户列表页面                    |
-| `system/identity/workspaces/WorkspaceListView.vue`              | 工作空间列表页面                |
-| `system/chat/user-groups/GroupsListView.vue`                    | 对话用户组及组成员管理页面      |
-| `system/chat/users/UserListView.vue`                            | 对话用户列表及用户导入管理页面  |
-| `system/settings/AppearanceSettingsView.vue`                    | 系统外观设置和登录外观预览页面  |
-| `system/settings/authentication/AuthenticationSettingsView.vue` | 系统登录及认证源配置页面        |
-| `system/settings/email/EmailSettingsView.vue`                   | 系统邮件 SMTP 服务配置页面      |
-| `system/operate-logs/OperateLogListView.vue`                    | 系统操作日志查询与清理页面      |
-| `tool/ToolView.vue`                                             | 工作空间工具目录与工具卡片页面  |
+| 页面                                                            | 功能说明                           |
+| --------------------------------------------------------------- | ---------------------------------- | --- |
+| `application/ApplicationView.vue`                               | 工作空间智能体目录与智能体卡片页面 |     |
+| `workflow/ApplicationWorkflowView.vue`                          | 智能体工作流页面头部与全屏画布     |
+| `chat/ChatView.vue`                                             | Chat 入口的对话页面                |
+| `error/NotFoundView.vue`                                        | Admin 未匹配路由和全局 404 页面    |
+| `home/HomeView.vue`                                             | Workspace 首页                     |
+| `knowledge/KnowledgeDetailView.vue`                             | 知识库详情页面                     |
+| `knowledge/DocumentDetailView.vue`                              | 知识库文档详情页面                 |
+| `login/LoginView.vue`                                           | Admin 登录页面                     |
+| `login/ForgotPasswordView.vue`                                  | 忘记密码页面                       |
+| `model/ModelView.vue`                                           | 工作空间模型目录与模型卡片页面     |
+| `system/SystemView.vue`                                         | System 模块通用占位页面            |
+| `system/identity/groups/UserGroupListView.vue`                  | 用户组列表页面                     |
+| `system/identity/roles/RoleListView.vue`                        | 角色列表页面                       |
+| `system/identity/users/UserListView.vue`                        | 用户列表页面                       |
+| `system/identity/workspaces/WorkspaceListView.vue`              | 工作空间列表页面                   |
+| `system/chat/user-groups/GroupsListView.vue`                    | 对话用户组及组成员管理页面         |
+| `system/chat/users/UserListView.vue`                            | 对话用户列表及用户导入管理页面     |
+| `system/settings/AppearanceSettingsView.vue`                    | 系统外观设置和登录外观预览页面     |
+| `system/settings/authentication/AuthenticationSettingsView.vue` | 系统登录及认证源配置页面           |
+| `system/settings/email/EmailSettingsView.vue`                   | 系统邮件 SMTP 服务配置页面         |
+| `system/operate-logs/OperateLogListView.vue`                    | 系统操作日志查询与清理页面         |
+| `tool/ToolView.vue`                                             | 工作空间工具目录与工具卡片页面     |
 
 ## 备注要求
 

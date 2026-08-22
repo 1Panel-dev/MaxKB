@@ -52,7 +52,6 @@
     "sass": "^1.101.0",
     "tailwindcss": "^4.3.2",
     "typescript": "~6.0.0",
-    "unplugin-auto-import": "^21.0.0",
     "unplugin-vue-components": "^32.1.0",
     "vite": "^8.0.16",
     "vue-eslint-parser": "^10.4.1",

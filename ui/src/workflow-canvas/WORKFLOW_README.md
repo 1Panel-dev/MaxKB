@@ -64,7 +64,7 @@ src/workflow-canvas/
 ## View 接入约定
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
-  `AgentWorkflowView.vue`。未来的智能体画布、知识库画布等都遵守此规则。
+  `ApplicationWorkflowView.vue`。未来的智能体画布、知识库画布等都遵守此规则。
 - View 在 `MkWorkflow` 外部组织页面头部和页面级操作。添加组件、保存、发布、调试等按钮不能
   放进 `workflow-canvas/index.vue`。
 - 画布页面需要独立全屏展示时，由 `src/router/admin/workflow/` 配置不挂载业务 Layout 的路由；

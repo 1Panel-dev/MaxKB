@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, inject, onMounted, useTemplateRef } from 'vue'
+
 import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
@@ -64,12 +66,12 @@ onMounted(() => set(model, 'validate', validate))
         :rules="{ required: true, message: '请选择或填写 AI 模型', trigger: 'change' }"
       >
         <template #label>
-          <div class="flex w-full items-center justify-between gap-3">
+          <div class="flex-between gap-3 w-full">
             <span>AI 模型</span>
             <el-select
               v-model="formData.model_id_type"
               :teleported="false"
-              class="w-24"
+              class="w-30!"
               size="small"
               @change="formData.model_id_reference = []"
             >
