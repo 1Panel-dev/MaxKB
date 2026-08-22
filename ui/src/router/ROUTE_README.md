@@ -20,13 +20,13 @@ src/router/
 │   ├── system/
 │   │   ├── index.ts             # 系统管理路由汇总
 │   │   └── modules/
-│   │       ├── agent.ts         # System 来源的智能体详情路由
+│   │       ├── application.ts         # System 来源的智能体详情路由
 │   │       └── knowledge.ts     # System 来源的知识库详情路由
 │   └── workspace/
 │       ├── index.ts             # 工作空间模块汇总
 │       └── modules/
 │           ├── home.ts          # 首页
-│           ├── agent.ts         # 智能体
+│           ├── application.ts         # 智能体
 │           ├── knowledge.ts     # 知识库
 │           ├── tool.ts          # 工具
 │           ├── model.ts         # 模型
@@ -70,7 +70,7 @@ Login、Workflow 路由没有挂载 `AppLayout`，因此不会出现在左侧导
 - `workflow`：集中维护各业务的全屏画布路由，当前包含智能体工作流，后续知识库等画布继续在
   `admin/workflow/index.ts` 中注册。
 - Workflow 统一使用 `/workflow/<canvas-type>/:resourceId` 结构；当前智能体工作流地址为
-  `/workflow/agent/:agentId`。智能体页面使用新标签打开该地址；路由参数
+  `/workflow/application/:applicationId`。智能体页面使用新标签打开该地址；路由参数
   只保留智能体标识，页面当前不请求接口。
 
 登录页面地址为 `/login`；忘记密码使用独立页面 `/forgot-password`，两者均复用登录布局且不挂载 `AppLayout`。
@@ -152,7 +152,7 @@ const route = useRoute()
 const mode = computed(() => route.meta.scope ?? 'workspace')
 ```
 
-## Agent 和 Knowledge 路由层级
+## Application 和 Knowledge 路由层级
 
 Workspace 页面：
 
@@ -160,9 +160,9 @@ Workspace 页面：
 /admin/workspace/:workspaceId/tools
 /admin/workspace/:workspaceId/model
 
-/admin/workspace/:workspaceId/agent
-/admin/workspace/:workspaceId/agent/:agentId
-/admin/workspace/:workspaceId/agent/:agentId/edit
+/admin/workspace/:workspaceId/application
+/admin/workspace/:workspaceId/application/:applicationId
+/admin/workspace/:workspaceId/application/:applicationId/edit
 
 /admin/workspace/:workspaceId/knowledge
 /admin/workspace/:workspaceId/knowledge/:knowledgeId
@@ -172,8 +172,8 @@ Workspace 页面：
 System 复用页面（仅替换根前缀）：
 
 ```text
-/admin/system/agent/:agentId
-/admin/system/agent/:agentId/edit
+/admin/system/application/:applicationId
+/admin/system/application/:applicationId/edit
 
 /admin/system/knowledge/:knowledgeId
 /admin/system/knowledge/:knowledgeId/document/:documentId

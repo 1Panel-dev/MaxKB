@@ -9,9 +9,10 @@ export function randomId() {
 /*
   icon url
 */
-export const resetUrl = (url: string, defaultUrl?: string) => {
-  if (url && url.startsWith('./')) {
-    return `${window.MaxKB?.prefix}/${url.substring(2)}`
+export const resetUrl = (url?: string | null, useDefault?: boolean) => {
+  const sourceUrl = url || (useDefault ? './favicon.ico' : '')
+  if (sourceUrl && sourceUrl.startsWith('./')) {
+    return `${window.MaxKB?.prefix}/${sourceUrl.substring(2)}`
   }
-  return url ? url : defaultUrl ? defaultUrl : ''
+  return sourceUrl
 }

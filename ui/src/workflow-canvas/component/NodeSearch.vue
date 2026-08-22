@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+
 import { ArrowDown, ArrowUp, Close, Search } from '@element-plus/icons-vue'
 import type LogicFlow from '@logicflow/core'
 import type { InputInstance } from 'element-plus'

@@ -1,5 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { systemAgentRoutes } from './modules/agent'
+import { systemApplicationRoutes } from './modules/application'
 import { systemKnowledgeRoutes } from './modules/knowledge'
 
 export const systemRoutes: RouteRecordRaw = {
@@ -93,7 +93,7 @@ export const systemRoutes: RouteRecordRaw = {
         },
       ],
     },
-    ...systemAgentRoutes,
+    ...systemApplicationRoutes,
     ...systemKnowledgeRoutes,
     {
       path: 'share',

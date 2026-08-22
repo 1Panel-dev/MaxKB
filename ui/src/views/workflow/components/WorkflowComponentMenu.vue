@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from 'vue'
+
 import { ClickOutside as vClickOutside } from 'element-plus'
 import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
@@ -19,9 +21,7 @@ const handleSelect = (nodeType: WorkflowNodeType) => {
 
 <template>
   <div v-click-outside="() => (popoverVisible = false)" class="relative">
-    <el-button type="primary" plain @click="popoverVisible = !popoverVisible">
-      添加组件
-    </el-button>
+    <el-button type="primary" plain @click="popoverVisible = !popoverVisible"> 添加组件 </el-button>
 
     <el-collapse-transition>
       <NodeMenu

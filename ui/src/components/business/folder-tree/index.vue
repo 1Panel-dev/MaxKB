@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import type { FolderSource, FolderItem } from '@/api/types'
 import FolderApi from '@/api/admin/workspace/folder'
+import type { FolderSource, FolderItem } from '@/api/types'
+import { FOLDER_SOURCE } from '@/api/enums'
+import { FOLDER_SORT, type FolderSort } from './types'
+import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess } from '@/utils/message'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import VirtualizedTree from './VirtualizedTree.vue'
-import { FOLDER_SORT, type FolderSort } from './types'
-import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
@@ -322,6 +323,7 @@ defineExpose({ refresh: loadFolders })
 
     <div class="px-4 mb-1">
       <MkListItem
+        v-if="source !== FOLDER_SOURCE.APPLICATION"
         :active="currentNodeKey === folderEntries.shared.id"
         @click="handleFolderClick(folderEntries.shared)"
       >

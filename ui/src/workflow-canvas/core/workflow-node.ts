@@ -1,5 +1,4 @@
-import type { Component } from 'vue'
-import { createApp } from 'vue'
+import { createApp, reactive, type Component } from 'vue'
 import {
   h as createLogicFlowElement,
   HtmlNode,

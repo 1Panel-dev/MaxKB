@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
-
 import CommonApi from '@/api/admin/workspace/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import type { OptionItem, RequestParams, ToolType, ToolItem, FolderItem } from '@/api/types'
@@ -11,13 +10,18 @@ import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolCard from './components/ToolCard.vue'
 
 /* 当前文件夹 */
+
 const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.TOOL].all })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
   currentFolder.value = folder
-  selectedToolId.value = ''
   infiniteScrollRef.value?.reset()
+}
+// 新建文件夹
+const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
+function handleCreateFolder() {
+  folderTreeRef.value?.openCreate()
 }
 
 /* 工具查询搜索列表 */
@@ -48,7 +52,6 @@ function handleSearchChange(query?: RequestParams) {
 const toolType = ref<ToolType | ''>('')
 
 function handleToolTypeChange() {
-  selectedToolId.value = ''
   infiniteScrollRef.value?.reset()
 }
 
@@ -61,17 +64,7 @@ function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
   })
 }
 
-// 文件夹
-const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
-const selectedToolId = ref('')
 
-function handleToolSelect(tool: ToolItem) {
-  selectedToolId.value = tool.id
-}
-
-function handleCreateFolder() {
-  folderTreeRef.value?.openCreate()
-}
 
 /* 工具维护 */
 const loading = ref(false)
@@ -109,8 +102,8 @@ function handleDeleteTool(tool: ToolItem) {
       <component :is="Header">
         <h4>{{ title }}</h4>
         <el-tooltip content="创建文件夹" placement="top">
-          <el-button text type="primary" class="-mr-1" @click="handleCreateFolder()">
-            <MkIcon name="icon_add_outlined" :size="18" />
+          <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
+            <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
         </el-tooltip>
       </component>

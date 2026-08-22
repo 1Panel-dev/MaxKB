@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, inject, onMounted, useTemplateRef } from 'vue'
+
 import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'

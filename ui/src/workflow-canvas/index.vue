@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { inject, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
+
 import LogicFlow, { type GraphModel } from '@logicflow/core'
 import '@logicflow/core/dist/index.css'
 import { SelectionSelect } from '@logicflow/extension'

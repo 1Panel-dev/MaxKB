@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { Check } from '@element-plus/icons-vue'
 import ProviderApi from '@/api/admin/workspace/model/provider'
 import { MODEL_STATUS } from '@/api/enums'

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed, ref } from 'vue'
+
 import aiChatIcon from '@/assets/workflow/icon_ai_chat.svg'
 import replyIcon from '@/assets/workflow/icon_reply.svg'
 import { WorkflowNodeType } from '@/workflow-canvas/types'
@@ -9,7 +11,7 @@ const emit = defineEmits<{
   select: [nodeType: WorkflowNodeType]
 }>()
 
-type WorkflowComponentTab = 'basic' | 'tool' | 'agent'
+type WorkflowComponentTab = 'basic' | 'tool' | 'application'
 
 const activeTab = ref<WorkflowComponentTab>('basic')
 const searchKeyword = ref('')
@@ -17,7 +19,7 @@ const searchKeyword = ref('')
 const workflowComponentTabs: Array<{ label: string; value: WorkflowComponentTab }> = [
   { label: '基础组件', value: 'basic' },
   { label: '工具', value: 'tool' },
-  { label: '智能体', value: 'agent' },
+  { label: '智能体', value: 'application' },
 ]
 
 const workflowComponentOptions = [
