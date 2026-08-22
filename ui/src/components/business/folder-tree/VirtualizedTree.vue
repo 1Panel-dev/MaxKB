@@ -87,7 +87,6 @@ function containsCurrentFolder(folder: FolderTreeNode): boolean {
 }
 
 function handleStat<T extends FolderStat>(stat: T): T {
-  stat.open = stat.level === 1
   if (props.filterText || containsCurrentFolder(stat.data)) stat.open = true
   return stat
 }
@@ -157,8 +156,8 @@ function handleAfterDrop() {
           </slot>
         </template>
 
-        <template #action-dropdown="{ row }">
-          <slot name="action-dropdown" :row="row"></slot>
+        <template #action-dropdown>
+          <slot name="action-dropdown" :row="node"></slot>
         </template>
       </MkListItem>
     </template>

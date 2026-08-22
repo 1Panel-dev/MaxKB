@@ -22,10 +22,10 @@ withDefaults(
     <img :src="resetUrl(icon)" alt="" />
   </el-avatar>
   <el-avatar v-else-if="type === TOOL_TYPE.MCP" shape="square" :size="size">
-    <img class="w-[73%]" src="@/assets/tool/icon_mcp.svg" alt="" />
+    <img style="width: 73%" src="@/assets/tool/icon_mcp.svg" alt="" />
   </el-avatar>
   <el-avatar v-else-if="type === TOOL_TYPE.SKILL" shape="square" :size="size">
-    <img class="w-[63%]" src="@/assets/tool/icon_skill.svg" alt="" />
+    <img style="width: 60%" src="@/assets/tool/icon_skill.svg" alt="" />
   </el-avatar>
   <el-avatar
     v-else-if="type === TOOL_TYPE.DATA_SOURCE"
@@ -33,7 +33,7 @@ withDefaults(
     shape="square"
     :size="size"
   >
-    <img class="w-[58%]" src="@/assets/tool/icon_datasource.svg" alt="" />
+    <img style="width: 58%" src="@/assets/tool/icon_datasource.svg" alt="" />
   </el-avatar>
   <el-avatar
     v-else-if="type === TOOL_TYPE.WORKFLOW"
@@ -41,9 +41,9 @@ withDefaults(
     shape="square"
     :size="size"
   >
-    <img class="w-[62%]" src="@/assets/workflow/logo_workflow.svg" alt="" />
+    <img style="width: 62%" src="@/assets/workflow/logo_workflow.svg" alt="" />
   </el-avatar>
   <el-avatar v-else class="bg-success!" shape="square" :size="size">
-    <img class="w-[63%]" src="@/assets/tool/icon_tool.svg" alt="" />
+    <img style="width: 63%" src="@/assets/tool/icon_tool.svg" alt="" />
   </el-avatar>
 </template>

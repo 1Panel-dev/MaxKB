@@ -10,9 +10,11 @@ import ApplicationCard from './components/ApplicationCard.vue'
 
 /* 当前文件夹 */
 const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.APPLICATION].all })
+
 function handleFolderSelect(folder: FolderItem) {
+  const folderChanged = folder.id !== currentFolder.value.id
   currentFolder.value = folder
-  infiniteScrollRef.value?.reset()
+  if (folderChanged) infiniteScrollRef.value?.reset()
 }
 // 新建文件夹
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -68,13 +70,19 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
       <component :is="Header">
         <h4>{{ title }}</h4>
         <el-tooltip content="创建文件夹" placement="top">
-          <el-button @click="handleCreateFolder" text type="primary" class="-mr-1" disabled>
+          <el-button @click="handleCreateFolder" text type="primary" class="-mr-1">
             <MkIcon name="icon_add-folder_outlined" :size="18" />
           </el-button>
         </el-tooltip>
       </component>
 
-      <FolderTree :source="FOLDER_SOURCE.APPLICATION" draggable @select="handleFolderSelect" />
+      <FolderTree
+        ref="folderTreeRef"
+        :source="FOLDER_SOURCE.APPLICATION"
+        @select="handleFolderSelect"
+        draggable
+      >
+      </FolderTree>
     </template>
 
     <template #default="{ Header }">

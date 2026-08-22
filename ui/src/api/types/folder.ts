@@ -16,7 +16,7 @@ export interface FolderItem {
   workspace_id?: string
 }
 
-export interface FolderRequest {
+export interface FolderPayload {
   desc?: string | null
   name?: string
   parent_id?: string | null
