@@ -295,8 +295,9 @@
 /* drawer */
 .el-drawer {
   &__header {
-    margin: 0;
+    position: relative;
     border-bottom: 1px solid var(--el-border-color);
+    margin: 0;
     padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4)
       calc(var(--spacing) * 6);
   }
@@ -320,6 +321,9 @@
   &__footer {
     border-top: 1px solid var(--el-border-color);
     padding: calc(var(--spacing) * 4) calc(var(--spacing) * 6);
+  }
+  &.btt {
+    height: calc(100% - 100px) !important;
   }
 }
 /* dropdown */
@@ -635,6 +639,102 @@
         top: 50%;
         transform: translateY(-50%);
         height: 16px;
+      }
+    }
+  }
+}
+
+/* steps */
+.el-steps {
+  align-items: center;
+
+  .el-step {
+    display: flex;
+    flex: 1;
+    height: 24px;
+    min-width: 0;
+    position: relative;
+
+    &:last-child {
+      flex: none;
+    }
+
+    &__head {
+      flex: none;
+      height: 24px;
+      position: absolute;
+      width: 100%;
+      z-index: 1;
+
+      &.is-process {
+        .el-step__icon {
+          background-color: var(--el-color-primary);
+          border-color: var(--el-color-primary);
+          color: white;
+        }
+      }
+      &.is-success {
+        color: var(--el-color-primary);
+        border-color: var(--el-color-primary);
+      }
+    }
+
+    &.is-horizontal .el-step__line {
+      background-color: var(--el-color-primary);
+      height: 1px !important;
+      left: 43px;
+      right: 8px;
+      top: 12px;
+    }
+
+    &__icon {
+      &.is-text {
+        border: 1px solid;
+      }
+      &-inner {
+        font-weight: 400;
+      }
+    }
+
+    &__main {
+      background-color: var(--el-bg-color);
+      flex: none;
+      margin-left: calc(var(--spacing) * 8);
+      padding: 0 calc(var(--spacing) * 2) 0 0;
+      position: relative;
+      z-index: 2;
+    }
+
+    &__title {
+      font-size: var(--mk-font-size-base);
+      line-height: 24px;
+      white-space: nowrap;
+
+      &.is-process {
+        color: var(--el-text-color-primary);
+        font-weight: 500;
+      }
+
+      &.is-wait {
+        color: var(--mk-N500);
+        font-weight: 400;
+      }
+      &.is-success {
+        color: var(--mk-N900);
+      }
+    }
+
+    &__description {
+      font-size: var(--mk-font-size-sm);
+      line-height: 20px;
+      white-space: nowrap;
+
+      &.is-process {
+        color: var(--el-text-color-primary);
+        font-weight: 400;
+      }
+
+      &.is-wait {
       }
     }
   }

@@ -117,18 +117,23 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 </div>
 ```
 
-## 常用 Flex 布局工具类
+## 常用布局工具类
 
-稳定重复使用的 Flex 布局组合统一定义在 `tailwind.css`。当前提供：
+稳定重复使用的布局组合统一定义在 `tailwind.css`。当前提供：
 
-| 工具类            | 作用                                 |
-| ----------------- | ------------------------------------ |
-| `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中 |
-| `flex-center`     | 横向排列，在水平和垂直两个方向居中   |
-| `flex-col-center` | 纵向排列，在水平和垂直两个方向居中   |
-| `flex-wrap`       | 横向排列，自动换行，行间距为 8px     |
+| 工具类            | 作用                                       |
+| ----------------- | ------------------------------------------ |
+| `absolute-center` | 绝对定位，相对最近的定位祖先水平和垂直居中 |
+| `flex-between`    | 横向排列，两侧贴边，并在垂直方向居中       |
+| `flex-center`     | 横向排列，在水平和垂直两个方向居中         |
+| `flex-col-center` | 纵向排列，在水平和垂直两个方向居中         |
+| `flex-wrap`       | 横向排列，自动换行，行间距为 8px           |
 
 ```vue
+<div class="relative h-40">
+  <div class="absolute-center">居中内容</div>
+</div>
+
 <div class="flex-between">
   <span>左侧</span>
   <span>右侧</span>
@@ -334,6 +339,17 @@ Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-
 `8px`，使触发器与弹层保持 `4px` 间距。该规则由 `element-plus.scss` 中的
 `.el-select__popper` 统一维护，业务组件不需要重复传入 `show-arrow`、`offset` 或
 `popper-class`。
+
+Steps 默认使用数字和标题横向排列，并保留 Element Plus 的 `active` 状态管理。Steps 放在
+Drawer 的 `header` 插槽内时，组合 `absolute-center` 和宽度工具类即可相对完整 Header 居中，
+不受左侧标题和右侧关闭按钮影响。
+
+```vue
+<el-steps :active="0" class="absolute-center w-75!">
+  <el-step title="选择供应商" />
+  <el-step title="添加模型" />
+</el-steps>
+```
 
 ### 普通 CSS 中叠加透明度
 
