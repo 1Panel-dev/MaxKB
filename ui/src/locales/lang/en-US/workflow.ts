@@ -15,7 +15,7 @@ export default {
     exportWorkflow: 'Export Workflow',
   },
   setting: {
-    restoreVersion: 'Restore Previous Version"',
+    restoreVersion: 'Restore Previous Version',
     restoreCurrentVersion: 'Restore to This Version',
     addComponent: 'Add',
     releaseHistory: 'Release History',
@@ -84,7 +84,7 @@ export default {
     nodeUnavailable: 'Node unavailable',
     needConnect1: 'The branch of the node needs to be connected',
     cannotEndNode: 'This node cannot be used as an end node',
-    loopNodeBreakNodeRequired: 'Wireless loop must have a Break node',
+    loopNodeBreakNodeRequired: 'Infinite loop must have a Break node',
   },
   nodes: {
     toolWorlflowNode: {
@@ -128,8 +128,8 @@ export default {
     baseNode: {
       visibilitySetting: {
         label: 'Visibility Setting',
-        showCondition‌: 'Show Condition',
-        hideCondition‌: 'Hide Condition',
+        showCondition: 'Show Condition',
+        hideCondition: 'Hide Condition',
       },
       fileUpload: {
         label: 'File Upload',
@@ -555,6 +555,6 @@ You are a master of problem optimization, adept at accurately inferring user int
   },
   SystemPromptPlaceholder: 'System Prompt, can reference variables in the system, such as',
   UserPromptPlaceholder: 'User Prompt, can reference variables in the system, such as',
-  initiator: 'Iniiator',
+  initiator: 'Initiator',
   abnormalInformation: 'Abnormal Information',
 }

@@ -79,7 +79,7 @@ export default {
     success: 'Successful',
     fail: 'Failed',
     all: 'All',
-    STARTED: 'Padding',
+    STARTED: 'Running',
     REVOKED: 'Cancelled',
     REVOKE: 'Cancelling',
   },
