@@ -1,6 +1,10 @@
 <script setup lang="ts">
 defineOptions({ name: 'MkDrawer', inheritAttrs: false })
 
+const props = defineProps<{
+  contentClass?: string
+}>()
+
 const visible = defineModel<boolean>({ default: false })
 
 defineSlots<{
@@ -24,8 +28,8 @@ defineSlots<{
       <slot name="header" />
     </template>
 
-    <el-scrollbar>
-      <div class="p-6"><slot /></div>
+    <el-scrollbar view-class="h-full">
+      <div class="p-6" :class="props.contentClass"><slot /></div>
     </el-scrollbar>
 
     <template v-if="$slots.footer" #footer>

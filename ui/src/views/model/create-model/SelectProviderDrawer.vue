@@ -6,9 +6,6 @@ import { MODEL_TYPE_LABELS } from '@/constants'
 
 defineOptions({ name: 'SelectProviderDrawer' })
 
-const props = defineProps<{
-  providers: ModelProviderItem[]
-}>()
 const emit = defineEmits<{
   select: [provider: ModelProviderItem]
 }>()
@@ -25,9 +22,17 @@ function resetData() {
 }
 
 function open() {
-  resetData()
-  providerOptions.value = props.providers
+  loadModelProviders()
   visible.value = true
+}
+
+/* 供应商 */
+function loadModelProviders() {
+  return ProviderApi.getProviderList().then((providers) => {
+    providerOptions.value = [...providers].sort((left, right) =>
+      left.name.localeCompare(right.name),
+    )
+  })
 }
 
 function close() {
@@ -40,48 +45,40 @@ function handleProviderSelect(provider: ModelProviderItem) {
   emit('select', provider)
 }
 
-function handleModelTypeChange(value: string) {
-  if (value === 'all') {
-    providerOptions.value = props.providers
-    return
-  }
-
-  loading.value = true
-  ProviderApi.getProviderListByModelType(value)
-    .then((providers) => {
-      providerOptions.value = providers
-    })
-    .finally(() => {
-      loading.value = false
-    })
+function handleModelTypeChange() {
+  // if (value === 'all') {
+  //   providerOptions.value = props.providers
+  //   return
+  // }
+  // loading.value = true
+  // ProviderApi.getProviderListByModelType(value)
+  //   .then((providers) => {
+  //     providerOptions.value = providers
+  //   })
+  //   .finally(() => {
+  //     loading.value = false
+  //   })
 }
 
 defineExpose({ open, close })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    class="create-model-step-drawer"
-    direction="btt"
-    size="calc(100% - 68px)"
-    title="添加模型"
-    @closed="resetData"
-  >
+  <MkDrawer v-model="visible" direction="btt" title="添加模型" @closed="resetData">
     <template #header>
-      <div class="grid w-full grid-cols-[1fr_460px_1fr] items-center pr-8">
+      <div class="flex w-full">
         <h4>添加模型</h4>
-        <el-steps :active="0" align-center>
+        <el-steps :active="0" class="absolute-center w-75!">
           <el-step title="选择供应商" />
           <el-step title="添加模型" />
         </el-steps>
       </div>
     </template>
 
-    <div class="mx-auto w-full max-w-[1110px] px-6 py-8">
-      <div class="mb-5 flex items-center justify-between">
+    <div class="max-w-200 mx-auto">
+      <div class="mb-5 flex-between">
         <h4>选择供应商</h4>
-        <el-select v-model="modelType" class="w-52" @change="handleModelTypeChange">
+        <el-select v-model="modelType" class="w-45!" @change="handleModelTypeChange">
           <el-option label="全部模型" value="all" />
           <el-option
             v-for="(label, value) in MODEL_TYPE_LABELS"
@@ -92,17 +89,15 @@ defineExpose({ open, close })
         </el-select>
       </div>
 
-      <div v-loading="loading" class="grid min-h-24 grid-cols-2 gap-5">
-        <button
-          v-for="provider in providerOptions"
-          :key="provider.provider"
-          type="button"
-          class="flex h-[78px] cursor-pointer items-center rounded-lg border border-N900/20 px-6 text-left transition-colors hover:border-primary hover:text-primary"
-          @click="handleProviderSelect(provider)"
-        >
-          <span class="h-7 w-7 shrink-0" :innerHTML="provider.icon" />
-          <span class="ml-4 text-lg font-medium">{{ provider.name }}</span>
-        </button>
+      <div v-loading="loading" class="grid grid-cols-2 gap-4">
+        <template v-for="provider in providerOptions" :key="provider.provider">
+          <el-card shadow="hover" @click="handleProviderSelect(provider)">
+            <div class="flex">
+              <span class="h-6 w-6 shrink-0" :innerHTML="provider.icon" />
+              <span class="ml-3 font-medium">{{ provider.name }}</span>
+            </div>
+          </el-card>
+        </template>
       </div>
 
       <MkEmpty v-if="!providerOptions.length" class="mt-24" />
@@ -110,15 +105,4 @@ defineExpose({ open, close })
   </MkDrawer>
 </template>
 
-<style scoped lang="scss">
-:deep(.create-model-step-drawer .el-drawer__body .p-6) {
-  min-height: 100%;
-  padding: 0;
-}
-
-:deep(.create-model-step-drawer .el-drawer__header) {
-  border-bottom: 1px solid var(--el-border-color-lighter);
-  margin-bottom: 0;
-  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 6);
-}
-</style>
+<style scoped lang="scss"></style>

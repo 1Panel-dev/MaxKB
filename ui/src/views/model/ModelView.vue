@@ -24,8 +24,6 @@ const modelProviders = ref<ModelProviderItem[]>([])
 const ModelItems = ref<ModelItem[]>([])
 const modelQuery = ref<RequestParams>()
 const creatorOptions = ref<OptionItem<string>[]>([])
-const selectProviderDrawerRef = ref<InstanceType<typeof SelectProviderDrawer>>()
-const createModelDrawerRef = ref<InstanceType<typeof CreateModelDrawer>>()
 
 const isShared = computed(() => currentProvider.value.provider === 'shared')
 
@@ -98,6 +96,8 @@ function handleProviderSelect(provider: ModelProviderItem) {
 }
 
 /* 创建模型 */
+const selectProviderDrawerRef = ref<InstanceType<typeof SelectProviderDrawer>>()
+const createModelDrawerRef = ref<InstanceType<typeof CreateModelDrawer>>()
 function handleOpenCreateModel() {
   selectProviderDrawerRef.value?.open()
 }
@@ -148,20 +148,20 @@ onMounted(() => {
         </div>
         <MkEmpty v-else class="mt-24" />
       </div>
-
-      <SelectProviderDrawer
-        ref="selectProviderDrawerRef"
-        :providers="modelProviders"
-        @select="handleCreateProviderSelect"
-      />
-      <CreateModelDrawer
-        ref="createModelDrawerRef"
-        :providers="modelProviders"
-        @back="handleBackToProviderSelect"
-        @refresh="loadModels"
-      />
     </template>
   </MkViewLayout>
+  <SelectProviderDrawer
+    v-if="!isShared"
+    ref="selectProviderDrawerRef"
+    @select="handleCreateProviderSelect"
+  />
+  <CreateModelDrawer
+    v-if="!isShared"
+    ref="createModelDrawerRef"
+    :providers="modelProviders"
+    @back="handleBackToProviderSelect"
+    @refresh="loadModels"
+  />
 </template>
 
 <style scoped lang="scss"></style>

@@ -4,7 +4,6 @@ import { CaretBottom } from '@element-plus/icons-vue'
 import { Draggable, dragContext } from '@he-tree/vue'
 import '@he-tree/vue/style/default.css'
 import type { FolderItem } from '@/api/types'
-import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 defineOptions({ name: 'FolderVirtualizedTree' })
 
 interface FolderTreeNode extends Omit<FolderItem, 'children'> {

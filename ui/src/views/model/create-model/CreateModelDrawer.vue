@@ -48,13 +48,6 @@ const formRules = computed<FormRules>(() => {
     name: [{ required: true, message: '请输入模型名称', trigger: 'blur' }],
   }
 
-  credentialFields.value.forEach((field) => {
-    if (field.required) {
-      rules[`credential.${field.field}`] = [
-        { required: true, message: `请输入${getFieldLabel(field)}`, trigger: 'blur' },
-      ]
-    }
-  })
   return rules
 })
 
@@ -93,7 +86,6 @@ function loadModelTypes(provider: ModelProviderItem) {
 }
 
 function open(provider: ModelProviderItem) {
-  resetData()
   visible.value = true
   loadModelTypes(provider)
 }
@@ -153,33 +145,6 @@ function handleBaseModelChange() {
     })
 }
 
-function getFieldLabel(field: DynamicFormField) {
-  return typeof field.label === 'string' ? field.label : field.label.label
-}
-
-function getFieldTooltip(field: DynamicFormField) {
-  return typeof field.label === 'string' ? '' : field.label.attrs?.tooltip
-}
-
-function getFieldAttrs(field: DynamicFormField) {
-  return field.attrs ?? {}
-}
-
-function getOptionLabel(field: DynamicFormField, option: Record<string, unknown>) {
-  return String(option[field.text_field ?? 'label'] ?? '')
-}
-
-function getOptionValue(field: DynamicFormField, option: Record<string, unknown>) {
-  return option[field.value_field ?? 'value']
-}
-
-function isFieldVisible(field: DynamicFormField) {
-  const relations = field.relation_show_field_dict ?? {}
-  return Object.entries(relations).every(([key, values]) =>
-    values.includes(modelForm.credential[key]),
-  )
-}
-
 function handleBack() {
   close()
   emit('back')
@@ -211,54 +176,54 @@ defineExpose({ open, close })
 <template>
   <MkDrawer
     v-model="visible"
-    class="create-model-form-drawer"
+    content-class="h-full p-0!"
     direction="btt"
-    size="calc(100% - 68px)"
     title="添加模型"
     @closed="resetData"
   >
     <template #header>
-      <div class="grid w-full grid-cols-[1fr_460px_1fr] items-center pr-8">
+      <div class="flex w-full">
         <h4>添加模型</h4>
-        <el-steps :active="1" align-center finish-status="success">
+        <el-steps :active="1" finish-status="success" class="absolute-center w-75!">
           <el-step title="选择供应商" />
           <el-step title="添加模型" />
         </el-steps>
       </div>
     </template>
 
-    <div class="flex h-full min-h-0">
-      <aside class="flex w-[332px] shrink-0 flex-col border-r border-N900/10 p-5">
-        <el-select model-value="all" class="mb-3 w-full">
-          <el-option label="全部模型" value="all" />
-        </el-select>
-        <el-scrollbar class="min-h-0 flex-1">
-          <button
+    <MkViewLayout :loading="optionLoading" :title="selectedProvider?.name ?? ''">
+      <template #aside="{ Header }">
+        <component :is="Header">
+          <el-select model-value="all" class="w-full">
+            <el-option label="全部模型" value="all" />
+          </el-select>
+        </component>
+
+        <el-scrollbar class="min-h-0 flex-1 px-4 pb-4">
+          <MkListItem
             v-for="provider in providers"
             :key="provider.provider"
-            type="button"
-            class="mb-1 flex h-14 w-full cursor-pointer items-center rounded-md px-3 text-left hover:bg-N900/5"
-            :class="{
-              'bg-primary/10 text-primary': selectedProvider?.provider === provider.provider,
-            }"
+            class="mb-1"
+            :active="selectedProvider?.provider === provider.provider"
             @click="handleProviderSelect(provider)"
           >
             <span class="h-6 w-6 shrink-0" :innerHTML="provider.icon" />
-            <span class="ml-3 truncate" :title="provider.name">{{ provider.name }}</span>
-          </button>
+            <span class="ml-3 min-w-0 flex-1 truncate" :title="provider.name">
+              {{ provider.name }}
+            </span>
+          </MkListItem>
         </el-scrollbar>
-      </aside>
+      </template>
 
-      <main class="flex min-w-0 flex-1 flex-col">
-        <div class="border-b border-N900/10 px-8 py-6">
+      <template #default="{ Header }">
+        <component :is="Header">
           <h4>{{ selectedProvider?.name }}</h4>
-        </div>
-        <el-scrollbar v-loading="optionLoading" class="min-h-0 flex-1">
+        </component>
+        <div class="mx-auto w-full max-w-200 pt-4">
           <el-form
             ref="formRef"
             :model="modelForm"
             :rules="formRules"
-            class="mx-auto max-w-[1110px] px-8 py-8"
             label-position="top"
             require-asterisk-position="right"
             @submit.prevent
@@ -323,59 +288,11 @@ defineExpose({ open, close })
               </el-select>
             </el-form-item>
 
-            <template v-for="field in credentialFields" :key="field.field">
-              <el-form-item v-if="isFieldVisible(field)" :prop="`credential.${field.field}`">
-                <template #label>
-                  <span class="inline-flex items-center gap-1">
-                    {{ getFieldLabel(field) }}
-                    <el-tooltip v-if="getFieldTooltip(field)" :content="getFieldTooltip(field)">
-                      <MkIcon :icon="InfoFilled" class="text-N600" />
-                    </el-tooltip>
-                  </span>
-                </template>
-
-                <el-switch
-                  v-if="field.input_type === 'SwitchInput'"
-                  v-model="modelForm.credential[field.field]"
-                  v-bind="getFieldAttrs(field)"
-                />
-                <el-slider
-                  v-else-if="field.input_type === 'Slider'"
-                  v-model="modelForm.credential[field.field] as number"
-                  v-bind="getFieldAttrs(field)"
-                />
-                <el-select
-                  v-else-if="field.option_list?.length"
-                  v-model="modelForm.credential[field.field]"
-                  class="w-full"
-                  v-bind="getFieldAttrs(field)"
-                >
-                  <el-option
-                    v-for="(option, index) in field.option_list"
-                    :key="index"
-                    :label="getOptionLabel(field, option)"
-                    :value="getOptionValue(field, option)"
-                  />
-                </el-select>
-                <el-input
-                  v-else
-                  v-model="modelForm.credential[field.field] as string"
-                  :show-password="field.input_type === 'PasswordInput'"
-                  :type="
-                    field.input_type === 'PasswordInput'
-                      ? 'password'
-                      : field.input_type === 'JsonInput'
-                        ? 'textarea'
-                        : 'text'
-                  "
-                  v-bind="getFieldAttrs(field)"
-                />
-              </el-form-item>
-            </template>
+            <template v-for="field in credentialFields" :key="field.field"> </template>
           </el-form>
-        </el-scrollbar>
-      </main>
-    </div>
+        </div>
+      </template>
+    </MkViewLayout>
 
     <template #footer>
       <el-button :disabled="loading" @click="close">取消</el-button>
@@ -384,26 +301,3 @@ defineExpose({ open, close })
     </template>
   </MkDrawer>
 </template>
-
-<style scoped lang="scss">
-:deep(.create-model-form-drawer .el-drawer__body .p-6) {
-  height: 100%;
-  padding: 0;
-}
-
-:deep(.create-model-form-drawer .el-drawer__footer),
-:deep(.create-model-form-drawer .el-drawer__header) {
-  border-color: var(--el-border-color-lighter);
-  border-style: solid;
-  margin-bottom: 0;
-  padding: calc(var(--spacing) * 4) calc(var(--spacing) * 6);
-}
-
-:deep(.create-model-form-drawer .el-drawer__footer) {
-  border-top-width: 1px;
-}
-
-:deep(.create-model-form-drawer .el-drawer__header) {
-  border-bottom-width: 1px;
-}
-</style>

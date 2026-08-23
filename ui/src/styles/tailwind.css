@@ -51,7 +51,15 @@
   }
 }
 
-/* flex layout utilities */
+/* layout utilities */
+/* 绝对定位，相对最近的定位祖先水平和垂直居中 */
+@utility absolute-center {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
 /* 横向排列，两侧贴边并垂直居中 */
 @utility flex-between {
   align-items: center;

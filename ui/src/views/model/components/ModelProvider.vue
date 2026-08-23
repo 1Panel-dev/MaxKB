@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ModelProviderItem } from '@/api/types'
-import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 
 defineOptions({ name: 'ModelProvider' })
 

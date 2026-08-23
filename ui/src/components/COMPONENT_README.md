@@ -67,6 +67,8 @@ src/components/
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
 │   ├── mk-infinite-scroll/
 │   │   └── index.vue             # 分页列表滚动触底加载与结束状态
+│   ├── mk-list-item/
+│   │   └── index.vue             # 列表与业务分组列表复用的行结构
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
 │   │   └── layout-aside.vue      # 页面可选左侧栏结构
@@ -79,8 +81,7 @@ src/components/
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
 ├── mk-search-list/
-│   ├── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
-│   └── mk-list-item.vue          # 列表与业务分组列表复用的行结构
+│   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
 ├── codemirror-editor/
@@ -97,7 +98,6 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
-import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
@@ -201,10 +201,11 @@ ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条
 
 ### MkDrawer
 
-全局抽屉组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
-按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以通过同名 Props
-覆盖。Element Plus Drawer 的其他属性和事件通过 `$attrs` 透传，`header`、默认和 `footer`
-插槽保持可用。
+全局抽屉组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。通过
+`content-class` 可以覆盖内容容器样式；全高布局可传入 `content-class="h-full p-0"`，再由
+`MkViewLayout` 管理内边距和滚动区域。默认显示关闭按钮、关闭时销毁内容，同时禁止点击遮罩或按
+Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus Drawer 的其他属性和事件通过
+`$attrs` 透传，`header`、默认和 `footer` 插槽保持可用。
 
 ```vue
 <MkDrawer v-model="visible" title="创建用户" size="600">
@@ -387,6 +388,26 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 <MkInfiniteScroll ref="infiniteScrollRef" v-model="resources" :load="loadResourcePage">
   <ResourceCard v-for="resource in resources" :key="resource.id" :resource="resource" />
 </MkInfiniteScroll>
+```
+
+### MkListItem
+
+提供列表行的统一间距、悬停状态、选中状态和可选操作区。仅自定义默认插槽时，可以只传
+`active` 并监听 `click`；不需要补充无实际用途的 `row`、`label-field` 或 `index`。
+
+```vue
+<MkListItem :active="active" @click="handleSelect()">
+  <MkIcon name="icon_assigned_outlined" :size="20" />
+  <span>共享模型</span>
+</MkListItem>
+```
+
+数据驱动使用时传入 `row`。`label-field` 默认读取 `name`，`index` 默认为 `0`；未提供默认插槽时
+组件显示对应字段文本。`action` 和 `action-dropdown` 插槽需要配合 `row` 使用，并接收 `row`、
+`index`。
+
+```vue
+<MkListItem :active="currentRole?.id === role.id" :row="role" @click="selectRole(role)" />
 ```
 
 ### MkSearchInput
@@ -579,26 +600,6 @@ const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({
 ```
 
 `addText` 设置添加按钮文案。删除按钮及第一行与后续行的对齐由组件统一处理。
-
-### MkListItem
-
-提供列表行的统一间距、悬停状态、选中状态和可选操作区。仅自定义默认插槽时，可以只传
-`active` 并监听 `click`；不需要补充无实际用途的 `row`、`label-field` 或 `index`。
-
-```vue
-<MkListItem :active="active" @click="handleSelect()">
-  <MkIcon name="icon_assigned_outlined" :size="20" />
-  <span>共享模型</span>
-</MkListItem>
-```
-
-数据驱动使用时传入 `row`。`label-field` 默认读取 `name`，`index` 默认为 `0`；未提供默认插槽时
-组件显示对应字段文本。`action` 和 `action-dropdown` 插槽需要配合 `row` 使用，并接收 `row`、
-`index`。
-
-```vue
-<MkListItem :active="currentRole?.id === role.id" :row="role" @click="selectRole(role)" />
-```
 
 ### MkSearchList
 

@@ -1,7 +1,6 @@
 <script setup lang="ts" generic="T extends Record<string, unknown>">
 import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 import { computed, nextTick, ref, watch } from 'vue'
-import MkListItem from './mk-list-item.vue'
 
 defineOptions({ name: 'MkSearchList' })
 
