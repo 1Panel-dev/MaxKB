@@ -5,10 +5,12 @@ import { MODEL_TYPE_LABELS } from '@/constants'
 import CommonApi from '@/api/admin/workspace/common'
 import ModelApi from '@/api/admin/workspace/model/model'
 import CommonSystemApi from '@/api/admin/system/common'
-import ModelSharedApi from '@/api/admin/workspace/model/model-shared'
+import SharedApi from '@/api/admin/workspace/shared.ts'
 import ProviderApi from '@/api/admin/workspace/model/provider'
 import ModelCard from './components/ModelCard.vue'
 import ModelProvider from './components/ModelProvider.vue'
+import CreateModelDrawer from './create-model/CreateModelDrawer.vue'
+import SelectProviderDrawer from './create-model/SelectProviderDrawer.vue'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
   icon: '',
@@ -22,6 +24,8 @@ const modelProviders = ref<ModelProviderItem[]>([])
 const ModelItems = ref<ModelItem[]>([])
 const modelQuery = ref<RequestParams>()
 const creatorOptions = ref<OptionItem<string>[]>([])
+const selectProviderDrawerRef = ref<InstanceType<typeof SelectProviderDrawer>>()
+const createModelDrawerRef = ref<InstanceType<typeof CreateModelDrawer>>()
 
 const isShared = computed(() => currentProvider.value.provider === 'shared')
 
@@ -47,11 +51,8 @@ const searchFields = computed(() => [
 ])
 
 function loadCreatorOptions(keyword: string) {
-  const request = isShared.value
-    ? CommonSystemApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
-    : CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined)
-
-  return request.then((users) => {
+  const requestApi = isShared.value ? CommonSystemApi : CommonApi
+  return requestApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
   })
 }
@@ -72,7 +73,7 @@ function loadModels() {
   }
 
   const request = isShared.value
-    ? ModelSharedApi.getModelList(modelQuery.value)
+    ? SharedApi.getModelList(modelQuery.value)
     : ModelApi.getModelList(query)
 
   return request
@@ -96,6 +97,19 @@ function handleProviderSelect(provider: ModelProviderItem) {
   loadModels()
 }
 
+/* 创建模型 */
+function handleOpenCreateModel() {
+  selectProviderDrawerRef.value?.open()
+}
+
+function handleCreateProviderSelect(provider: ModelProviderItem) {
+  createModelDrawerRef.value?.open(provider)
+}
+
+function handleBackToProviderSelect() {
+  selectProviderDrawerRef.value?.open()
+}
+
 onMounted(() => {
   Promise.all([loadModelProviders(), loadModels()])
 })
@@ -116,17 +130,14 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button type="primary" class="ml-3">
+          <el-button type="primary" class="ml-3" @click="handleOpenCreateModel">
             <MkIcon name="icon_add_outlined" />
             <span>添加模型</span>
           </el-button>
         </div>
       </component>
       <div v-loading="loading">
-        <div
-          v-if="ModelItems.length"
-          class="mk-resource-card-grid"
-        >
+        <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <ModelCard
             v-for="model in ModelItems"
             :key="model.id"
@@ -137,6 +148,18 @@ onMounted(() => {
         </div>
         <MkEmpty v-else class="mt-24" />
       </div>
+
+      <SelectProviderDrawer
+        ref="selectProviderDrawerRef"
+        :providers="modelProviders"
+        @select="handleCreateProviderSelect"
+      />
+      <CreateModelDrawer
+        ref="createModelDrawerRef"
+        :providers="modelProviders"
+        @back="handleBackToProviderSelect"
+        @refresh="loadModels"
+      />
     </template>
   </MkViewLayout>
 </template>

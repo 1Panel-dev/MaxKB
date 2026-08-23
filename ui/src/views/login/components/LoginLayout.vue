@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { CSSProperties } from 'vue'
-import defaultBackgroundImage from '@/assets/mk-login-background.png'
+import defaultBackgroundImage from '@/assets/mk_login_background.png'
 
 defineOptions({ name: 'LoginLayout' })
 

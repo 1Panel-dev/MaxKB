@@ -166,10 +166,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="drawerVisible" @closed="resetData">
-    <template #header>
-      <h4>{{ drawerTitle }}</h4>
-    </template>
+  <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
     <el-form
       ref="userFormRef"
       :model="userForm"

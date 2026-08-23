@@ -152,13 +152,7 @@ defineExpose({ clearSelection, tableRef })
 </script>
 
 <template>
-  <MkEmpty
-    v-if="props.paginationConfig ? !props.paginationConfig?.total : props.data.length === 0"
-    :type="isSearching ? 'search' : ''"
-    class="flex-1"
-  />
   <div
-    v-else
     ref="tableRootRef"
     class="mk-table relative flex w-full min-h-0 flex-1 flex-col"
     @mouseleave="clearResizeHover"

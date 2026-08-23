@@ -50,23 +50,6 @@ const moveFolders = computed<MoveFolderNode[]>(() => {
   return mapFolders(props.folders)
 })
 
-function resetData() {
-  movingFolder.value = undefined
-  searchKeyword.value = ''
-  selectedTargetId.value = ''
-}
-
-function open(folder: WorkspaceFolder) {
-  resetData()
-  movingFolder.value = folder
-  visible.value = true
-}
-
-function close() {
-  visible.value = false
-  resetData()
-}
-
 function handleTargetSelect(folder: WorkspaceFolder) {
   selectedTargetId.value = folder.id
 }
@@ -93,6 +76,21 @@ function handleSubmit() {
 //       submiting.value = false
 //     })
 // }
+
+function open(folder: WorkspaceFolder) {
+  movingFolder.value = folder
+  visible.value = true
+}
+
+function close() {
+  visible.value = false
+  resetData()
+}
+function resetData() {
+  movingFolder.value = undefined
+  searchKeyword.value = ''
+  selectedTargetId.value = ''
+}
 
 defineExpose({ close, open })
 </script>
