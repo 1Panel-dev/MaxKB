@@ -37,7 +37,7 @@ function switchMode() {
 
     <div class="flex items-center gap-5">
       <el-button class="bg-primary-gradient" round>
-        <MkIcon name="icon_start_outlined" />
+        <MkIcon name="icon_launch_outlined" />
         <span>升级</span>
       </el-button>
       <el-divider direction="vertical" />

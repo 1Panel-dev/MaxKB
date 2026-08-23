@@ -36,14 +36,14 @@ function handleLogout() {
 <template>
   <MkDropdown ref="dropdownRef" trigger="click" placement="bottom-end">
     <el-avatar :size="32" class="cursor-pointer bg-primary-gradient!">
-      <img src="@/assets/mk-icon-user-gradient.svg" alt="" style="width: 54%" />
+      <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
     </el-avatar>
 
     <template #dropdown>
       <div class="w-52">
         <div class="flex items-center gap-2 p-3">
           <el-avatar :size="40" class="bg-primary-gradient!">
-            <img src="@/assets/mk-icon-user-gradient.svg" alt="" style="width: 54%" />
+            <img src="@/assets/mk_icon_user_gradient.svg" alt="" style="width: 54%" />
           </el-avatar>
           <div>
             <div class="font-medium text-lg">{{ user.userInfo?.nick_name }}</div>

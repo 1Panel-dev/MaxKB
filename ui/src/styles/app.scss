@@ -95,3 +95,57 @@ h6 {
   gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 }
+
+.cm-editor {
+  --el-scrollbar-bg-color: var(--el-text-color-secondary);
+  --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
+  --el-scrollbar-hover-opacity: 0.5;
+  --el-scrollbar-opacity: 0.3;
+  height: 210px;
+  border: var(--el-border);
+  border-radius: var(--el-border-radius-base);
+  overflow: hidden;
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    background-color: transparent;
+    height: 6px;
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-corner {
+    background-color: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: var(--el-border-radius-base);
+    transition: background-color var(--el-transition-duration);
+  }
+
+  &:hover {
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--el-scrollbar-bg-color) calc(var(--el-scrollbar-opacity) * 100%),
+        transparent
+      )
+      transparent;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    background-color: var(--el-scrollbar-bg-color);
+    opacity: var(--el-scrollbar-opacity);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--el-scrollbar-hover-bg-color);
+    opacity: var(--el-scrollbar-hover-opacity);
+  }
+  .cm-gutters.cm-gutters-before {
+    border: none;
+  }
+  &.cm-focused {
+    outline: none!important;
+  }
+}

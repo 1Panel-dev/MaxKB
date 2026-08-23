@@ -15,3 +15,11 @@ export interface OptionItem<Value extends boolean | number | string = string | n
   value: Value
   [key: string]: unknown
 }
+
+
+export interface ExportError {
+  response: {
+    status: number
+    data: Blob
+  }
+}

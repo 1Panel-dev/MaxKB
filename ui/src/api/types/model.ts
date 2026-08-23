@@ -34,17 +34,33 @@ export interface WorkspaceUserOption {
 export interface ModelPayload {
   credential: Record<string, unknown>
   model_name: string
+  model_params_form?: DynamicFormField[]
   model_type: string
   name: string
   provider: string
 }
 
 export interface DynamicFormField {
+  attrs?: Record<string, unknown>
   default_value?: unknown
   field: string
-  label: string
+  input_type?: string
+  label: string | DynamicFormLabel
+  option_list?: Record<string, unknown>[]
+  relation_show_field_dict?: Record<string, unknown[]>
   required?: boolean
+  text_field?: string
+  value_field?: string
   [key: string]: unknown
+}
+
+export interface DynamicFormLabel {
+  attrs?: {
+    tooltip?: string
+    [key: string]: unknown
+  }
+  label: string
+  type?: string
 }
 
 export interface BaseModelOption {

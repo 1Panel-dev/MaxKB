@@ -83,6 +83,9 @@ src/components/
 │   └── mk-list-item.vue          # 列表与业务分组列表复用的行结构
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
+├── codemirror-editor/
+│   ├── index.vue                 # 支持异步诊断和全屏编辑的代码编辑器
+│   └── types.ts                  # 编辑器行列诊断类型
 └── mk-source-card/
 │   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
 │   ├── mk-source-card-action.vue # 卡片悬浮操作容器
@@ -96,6 +99,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkListItem from '@/components/mk-search-list/mk-list-item.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
+import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
@@ -469,6 +473,27 @@ const paginationConfig = ref({
 ```
 
 ## 手动导入组件
+
+### CodemirrorEditor
+
+基于 CodeMirror 6 的代码编辑器，当前内置 Python 语法和 One Dark 主题。通过 `v-model` 管理代码，
+通过 `lint` 传入异步检查函数；检查结果使用 `CodeLintIssue` 的行、列、结束位置、严重程度和消息
+生成编辑器诊断，组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
+入口；全屏确认时更新 `v-model` 并触发 `submit-dialog`，`header-extra` 插槽用于添加全屏标题栏操作。
+
+```vue
+<script setup lang="ts">
+import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
+
+const code = defineModel<string>({ required: true })
+
+function lintCode(sourceCode: string) {
+  return ToolApi.postToolPylint(sourceCode)
+}
+</script>
+
+<CodemirrorEditor v-model="code" :lint="lintCode" title="工具内容（Python）" />
+```
 
 ### MkSourceCard
 

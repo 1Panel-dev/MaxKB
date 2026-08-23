@@ -1,6 +1,11 @@
 /** 提供 Admin API 的 Axios 实例与常用 HTTP 请求封装。 */
 
-import axios, { AxiosHeaders, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, {
+  AxiosHeaders,
+  type AxiosRequestConfig,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
@@ -9,6 +14,10 @@ import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
+
+interface ExportRequestConfig extends AxiosRequestConfig {
+  skipGlobalErrorMessage?: boolean
+}
 
 function setRequestHeaders(config: InternalAxiosRequestConfig) {
   const { auth, user } = useStore()
@@ -48,6 +57,47 @@ function finishLoading(loading?: LoadingTarget) {
   loading.value = false
 }
 
+function extractFilename(contentDisposition?: string) {
+  if (!contentDisposition) {
+    return undefined
+  }
+
+  const encodedName = contentDisposition.match(/filename\*\s*=\s*(?:UTF-8'')?([^;]+)/i)?.[1]
+  const plainName = contentDisposition.match(/filename\s*=\s*(?:"([^"]+)"|([^;]+))/i)
+  const responseName = encodedName || plainName?.[1] || plainName?.[2]
+  if (!responseName) {
+    return undefined
+  }
+
+  const normalizedName = responseName.trim().replace(/^['"]|['"]$/g, '')
+  try {
+    return decodeURIComponent(normalizedName)
+  } catch {
+    return normalizedName
+  }
+}
+
+async function getResponseErrorMessage(error: unknown) {
+  if (!axios.isAxiosError<ApiResponse<unknown> | Blob | string>(error)) {
+    return undefined
+  }
+
+  const responseData = error.response?.data
+  if (responseData instanceof Blob) {
+    const text = await responseData.text()
+    try {
+      const data = JSON.parse(text) as Partial<ApiResponse<unknown>>
+      return data.message || text
+    } catch {
+      return text
+    }
+  }
+  if (typeof responseData === 'string') {
+    return responseData
+  }
+  return responseData?.message
+}
+
 export const request = axios.create({
   baseURL: `${ADMIN_BASE_PATH.replace(/\/+$/, '')}/api`,
   timeout: DEFAULT_TIMEOUT,
@@ -68,13 +118,16 @@ request.interceptors.response.use(
     }
     return response
   },
-  (error: unknown) => {
+  async (error: unknown) => {
     if (!axios.isAxiosError<ApiResponse<unknown>>(error)) {
       return Promise.reject(error)
     }
 
     const requestUrl = error.config?.url ?? ''
     const status = error.response?.status
+    const responseMessage = await getResponseErrorMessage(error)
+    const skipGlobalErrorMessage = (error.config as ExportRequestConfig | undefined)
+      ?.skipGlobalErrorMessage
 
     if (error.code === 'ECONNABORTED') {
       MsgError(error.message)
@@ -89,10 +142,14 @@ request.interceptors.response.use(
       router.push({ name: 'login' })
     }
     if (status === 403) {
-      MsgError(error.response?.data.message || 'No permission to access')
+      MsgError(responseMessage || 'No permission to access')
     }
-    if (error.code !== 'ECONNABORTED' && ![401, 403, 404].includes(status ?? 0)) {
-      MsgError(error.response?.data.message || error.message)
+    if (
+      error.code !== 'ECONNABORTED' &&
+      ![401, 403, 404].includes(status ?? 0) &&
+      !skipGlobalErrorMessage
+    ) {
+      MsgError(responseMessage || error.message)
     }
 
     return Promise.reject(error)
@@ -125,6 +182,44 @@ export function get<T = unknown>(
   return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }), loading)
 }
 
+/** 发送 GET 请求并将 Blob 响应下载为文件。 */
+export async function getExportFile(
+  fileName: string,
+  url: string,
+  params?: RequestParams,
+  loading?: LoadingTarget,
+): Promise<boolean> {
+  startLoading(loading)
+  try {
+    const response = await request.get<Blob>(url, {
+      params,
+      responseType: 'blob',
+      skipGlobalErrorMessage: true,
+    } as ExportRequestConfig)
+
+    if (response.data.type.includes('application/json')) {
+      const text = await response.data.text()
+      try {
+        const data = JSON.parse(text) as Partial<ApiResponse<unknown>>
+        MsgError(data.message || text)
+      } catch {
+        MsgError(text)
+      }
+      throw new Error('Response is not a valid file')
+    }
+
+    const blob = new Blob([response.data], { type: 'application/octet-stream' })
+    const link = document.createElement('a')
+    link.href = URL.createObjectURL(blob)
+    link.download = extractFilename(response.headers['content-disposition']) || fileName
+    link.click()
+    URL.revokeObjectURL(link.href)
+    return true
+  } finally {
+    finishLoading(loading)
+  }
+}
+
 /** 发送 POST 请求。 */
 export function post<TData = unknown, T = unknown>(
   url: string,
@@ -136,20 +231,6 @@ export function post<TData = unknown, T = unknown>(
   return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
 }
 
-/** 发送返回文件 Blob 的 POST 请求。 */
-export async function postBlob<TData = unknown>(
-  url: string,
-  data?: TData,
-  loading?: LoadingTarget,
-) {
-  startLoading(loading)
-  try {
-    const response = await request.post<Blob>(url, data, { responseType: 'blob' })
-    return response.data
-  } finally {
-    finishLoading(loading)
-  }
-}
 
 /** 发送 PUT 请求。 */
 export function put<TData = unknown, T = unknown>(

@@ -94,6 +94,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
   `putRole` 和 `deleteKnowledge`。
 - 前缀与实际请求方法保持一致：查询使用 `get`，创建和业务动作使用 `post`，完整更新使用
   `put`，删除使用 `delete`。局部更新接口真实采用 PATCH 时使用 `patch`。
+- 文件导出是直接触发浏览器下载的业务动作，使用 `exportXxx` 命名，例如 `exportTool`。
 - HTTP 方法前缀后必须带有明确的业务名称，不导出 `get`、`post`、`list`、`detail`、`login`
   或 `logout` 等缺少请求方式或业务含义的名称。
 - 函数名不追加 `Api` 后缀，所属业务域由目录和文件名表达。
@@ -104,9 +105,10 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - Admin Router 与请求客户端直接读取 `window.MaxKB` 运行时路径配置；`Window` 和
   `MaxKBRuntimeConfig` 的全局类型统一声明在根目录 `env.d.ts`。
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
-  `post`、`put`、`del` 请求封装。
+  `post`、`put` 和 `del` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
-- 文件下载接口使用 `postBlob` 获取原始 `Blob`，由调用页面负责命名并触发浏览器下载。
+- GET 文件导出使用 `getExportFile`，由请求层统一获取 Blob、解析 `Content-Disposition` 文件名
+  并触发浏览器下载；业务 API 只需传入默认文件名、接口地址和可选请求参数。
 - 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
   提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
   非提示类失败处理可以按需保留失败分支。
