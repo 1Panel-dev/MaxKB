@@ -53,7 +53,15 @@ export default {
   status: {
     label: 'Status',
     enableSuccess: 'Successful',
-    disableSuccess: 'Successful'
+    disableSuccess: 'Successful',
+    published: 'Published',
+    unpublished: 'Unpublished',
+    success: 'Successful',
+    fail: 'Failed',
+    all: 'All',
+    STARTED: 'Running',
+    REVOKED: 'Cancelled',
+    REVOKE: 'Cancelling',
   },
   param: {
     outputParam: 'Output Parameters',
