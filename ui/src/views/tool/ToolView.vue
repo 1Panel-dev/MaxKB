@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
+import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
+import SharedApi from '@/api/admin/workspace/shared'
 import type { OptionItem, RequestParams, ToolType, ToolItem, FolderItem } from '@/api/types'
 import { FOLDER_SOURCE, TOOL_SCOPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
-import { MsgConfirm, MsgSuccess } from '@/utils/message'
+
 import ToolCard from './components/ToolCard.vue'
+import ToolCreateDropdown from './components/ToolCreateDropdown.vue'
 
 /* 当前文件夹 */
 
@@ -17,7 +20,7 @@ const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARE
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
   currentFolder.value = folder
-  if (folderChanged) infiniteScrollRef.value?.reset()
+  if (folderChanged) refreshTool()
 }
 // 新建文件夹
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -40,58 +43,47 @@ const searchFields = computed(() => [
 ])
 const toolQuery = ref<RequestParams>()
 function loadCreatorOptions(keyword: string) {
-  return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
+  const requestApi = isShared.value ? CommonSystemApi : CommonApi
+  return requestApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
     creatorOptions.value = users.map(({ id, nick_name }) => ({ label: nick_name, value: id }))
   })
 }
 
 function handleSearchChange(query?: RequestParams) {
   toolQuery.value = query
-  infiniteScrollRef.value?.reset()
+  refreshTool()
 }
 
 const toolType = ref<ToolType | ''>('')
 
-function handleToolTypeChange() {
-  infiniteScrollRef.value?.reset()
-}
-
 function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
-  return ToolApi.getToolPage(pagination, {
+  const request = isShared.value ? SharedApi : ToolApi
+  const folderId = isShared.value
+    ? {}
+    : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
+  return request.getToolPage(pagination, {
     ...toolQuery.value,
     scope: TOOL_SCOPE.WORKSPACE,
-    folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL,
     tool_type: toolType.value,
+    ...folderId,
   })
 }
 
 /* 工具维护 */
-const loading = ref(false)
-function handleToolStatusChange(tool: ToolItem, active: boolean) {
-  loading.value = true
-  return ToolApi.putTool(tool.id, { is_active: active })
-    .then(() => {
-      tool.is_active = active
-      MsgSuccess(active ? '启用成功' : '禁用成功')
-    })
-    .finally(() => {
-      loading.value = false
-    })
+const toolOperationLoading = ref(false)
+
+function refreshTool() {
+  infiniteScrollRef.value?.reset()
 }
 
-function handleDeleteTool(tool: ToolItem) {
-  MsgConfirm(`确认删除工具“${tool.name}”？`, '删除后无法恢复，请谨慎操作。')
-    .then(() => {
-      loading.value = true
-      return ToolApi.deleteTool(tool.id).then(() => {
-        MsgSuccess('删除成功')
-        return infiniteScrollRef.value?.reset()
-      })
-    })
-    .catch(() => {})
-    .finally(() => {
-      loading.value = false
-    })
+function handleToolUpdate(tool: ToolItem) {
+  const toolIndex = toolsData.value.findIndex((item) => item.id === tool.id)
+  if (toolIndex >= 0) toolsData.value.splice(toolIndex, 1, tool)
+}
+
+function handleDeleteTool(toolId: string) {
+  const toolIndex = toolsData.value.findIndex((item) => item.id === toolId)
+  if (toolIndex >= 0) toolsData.value.splice(toolIndex, 1)
 }
 </script>
 
@@ -126,7 +118,7 @@ function handleDeleteTool(tool: ToolItem) {
             class="w-30!"
             :empty-values="[null, undefined]"
             :value-on-clear="null"
-            @change="handleToolTypeChange"
+            @change="refreshTool"
           >
             <el-option
               v-for="option in TOOL_TYPE_OPTIONS"
@@ -136,13 +128,26 @@ function handleDeleteTool(tool: ToolItem) {
             />
           </el-select>
         </div>
-        <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+        <div class="flex items-center gap-3">
+          <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <ToolCreateDropdown
+            v-if="!isShared"
+            :folder-id="currentFolder.id"
+            @refresh="refreshTool"
+          />
+        </div>
       </component>
-      <div v-loading="loading">
+      <div v-loading="toolOperationLoading" class="min-h-0 flex-1">
         <MkInfiniteScroll ref="infiniteScrollRef" v-model="toolsData" :load="loadToolsPage">
           <div v-if="toolsData.length" class="mk-resource-card-grid">
             <template v-for="tool in toolsData" :key="tool.id">
-              <ToolCard :shared="isShared" :tool="tool" />
+              <ToolCard
+                v-model:loading="toolOperationLoading"
+                :shared="isShared"
+                :tool="tool"
+                @delete="handleDeleteTool"
+                @update="handleToolUpdate"
+              />
             </template>
           </div>
           <MkEmpty v-else class="mt-24" />

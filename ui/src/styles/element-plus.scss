@@ -300,6 +300,9 @@
     padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4)
       calc(var(--spacing) * 6);
   }
+  &__title {
+    font-weight: 500;
+  }
   &__close-btn {
     padding: calc(var(--spacing) * 1);
     color: var(--el-text-color-regular);
@@ -431,7 +434,6 @@
   }
   &__btns {
     padding: 0;
-    gap: calc(var(--spacing) * 3);
   }
 }
 

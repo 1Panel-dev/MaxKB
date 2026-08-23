@@ -181,11 +181,11 @@ export const systemRoutes: RouteRecordRaw = {
         },
       ],
     },
-    {
-      path: 'logs',
-      name: 'system-logs',
-      component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
-      meta: { title: '操作日志', icon: 'icon-setting', order: 60 },
-    },
+    // {
+    //   path: 'logs',
+    //   name: 'system-logs',
+    //   component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
+    //   meta: { title: '操作日志', icon: 'icon-setting', order: 60 },
+    // },
   ],
 }
