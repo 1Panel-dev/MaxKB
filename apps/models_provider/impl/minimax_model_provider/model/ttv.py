@@ -1,6 +1,6 @@
 # coding=utf-8
 import time
-from typing import Dict, Optional
+from typing import ClassVar, Dict, Optional
 
 import requests
 
@@ -19,15 +19,15 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     max_retries: int = 3
     retry_delay: int = 10  # 秒
 
-    DEFAULT_API_BASE = "https://api.minimaxi.com/v1"
-    REQUEST_TIMEOUT = (10, 120)  # (连接超时, 读取超时)
-    MAX_POLL_ATTEMPTS = 60  # 最多轮询 60 次（约 10 分钟）
+    DEFAULT_API_BASE: ClassVar[str] = "https://api.minimaxi.com/v1"
+    REQUEST_TIMEOUT: ClassVar[tuple] = (10, 120)  # (连接超时, 读取超时)
+    MAX_POLL_ATTEMPTS: ClassVar[int] = 60  # 最多轮询 60 次（约 10 分钟）
 
     # V2 (MiniMax-H3) 专用参数
-    V2_EXTRA_FIELDS = ("resolution", "duration", "ratio", "callback_url")
-    SUCCESS_STATUSES = frozenset({"succeeded", "Success"})
-    FAIL_STATUSES = frozenset({"failed", "Fail", "cancelled", "Cancel"})
-    ERROR_KEYS = ("error_message", "error", "detail", "message", "msg")
+    V2_EXTRA_FIELDS: ClassVar[tuple] = ("resolution", "duration", "ratio", "callback_url")
+    SUCCESS_STATUSES: ClassVar[frozenset] = frozenset({"succeeded", "Success"})
+    FAIL_STATUSES: ClassVar[frozenset] = frozenset({"failed", "Fail", "cancelled", "Cancel"})
+    ERROR_KEYS: ClassVar[tuple] = ("error_message", "error", "detail", "message", "msg")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
