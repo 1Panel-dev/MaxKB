@@ -3,10 +3,13 @@ import { ref, useTemplateRef } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
+import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import ToolFormDrawer from '@/views/tool/create-form/ToolFormDrawer.vue'
 
 defineOptions({ name: 'ToolCreateDropdown' })
+
+const { user } = useStore()
 
 const props = defineProps<{
   folderId: string
@@ -27,36 +30,25 @@ function handleOpenToolForm() {
   toolFormDrawerRef.value?.open()
 }
 
-function handleRefresh() {
-  emit('refresh')
-}
-
 /* 导入创建 */
 const elUploadRef = ref<UploadInstance>()
 function handleImportCreate(file: UploadFile) {
   if (!file.raw) return
   ToolApi.postToolImport(file.raw, props.folderId)
     .then(() => {
-      MsgSuccess('导入成功')
-      // TODO：疑问
-      //  return user.profile().then(() => {
-      //     getList()
-      //   })
-      // .catch((e: any) => {
-      //   if (e.code === 400) {
-      //     MsgConfirm(t('common.tip'), t('views.application.tip.professionalMessage'), {
-      //       cancelButtonText: t('common.confirm'),
-      //       confirmButtonText: t('common.professional'),
-      //     }).then(() => {
-      //       window.open('https://maxkb.cn/pricing.html', '_blank')
-      //     })
-      //   }
-      // })
-      emit('refresh')
+      return user.loadCurrentUser().then(() => {
+        MsgSuccess('导入成功')
+        handleRefresh()
+      })
     })
     .finally(() => {
       elUploadRef.value?.clearFiles()
     })
+}
+
+// 发送刷新列表
+function handleRefresh() {
+  emit('refresh')
 }
 </script>
 

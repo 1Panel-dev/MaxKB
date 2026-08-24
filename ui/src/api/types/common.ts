@@ -16,10 +16,15 @@ export interface OptionItem<Value extends boolean | number | string = string | n
   [key: string]: unknown
 }
 
-
 export interface ExportError {
   response: {
     status: number
     data: Blob
   }
+}
+
+export interface WorkspaceMemberOption {
+  id: string
+  nick_name: string
+  roles?: string[]
 }

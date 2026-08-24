@@ -3,9 +3,12 @@ import { reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import FolderApi from '@/api/admin/workspace/folder'
 import type { FolderItem, FolderSource } from '@/api/types'
+import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'FolderFormDialog' })
+
+const { user } = useStore()
 
 const props = defineProps<{
   title: string
@@ -41,9 +44,12 @@ function handleSubmit() {
 
     return request
       .then((folder) => {
-        MsgSuccess(isEdit ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh', folder, isEdit)
+        const refreshCurrentUser = isEdit ? Promise.resolve() : user.loadCurrentUser()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          emit('refresh', folder, isEdit)
+        })
       })
       .finally(() => {
         loading.value = false

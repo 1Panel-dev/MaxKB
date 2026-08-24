@@ -95,6 +95,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `model/ModelView.vue`                                           | 工作空间模型目录与模型卡片页面     |
 | `system/SystemView.vue`                                         | System 模块通用占位页面            |
 | `system/identity/groups/UserGroupListView.vue`                  | 用户组列表页面                     |
+| `system/identity/resource-authorization/ResourceAuthorizationView.vue` | 工作空间成员的分类资源授权页面 |
 | `system/identity/roles/RoleListView.vue`                        | 角色列表页面                       |
 | `system/identity/users/UserListView.vue`                        | 用户列表页面                       |
 | `system/identity/workspaces/WorkspaceListView.vue`              | 工作空间列表页面                   |

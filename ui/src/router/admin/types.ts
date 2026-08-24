@@ -1,5 +1,7 @@
 /** Admin Router 的业务范围和路由元信息声明。 */
 
+import type { ResourceAuthorizationType } from '@/api/types'
+
 export type RouteScope = 'workspace' | 'system'
 
 declare module 'vue-router' {
@@ -13,6 +15,8 @@ declare module 'vue-router' {
     icon?: string
     order?: number
     hidden?: boolean
+    /** 系统资源授权页面当前管理的资源类型。 */
+    resource?: ResourceAuthorizationType
     title?: string
   }
 }

@@ -58,6 +58,18 @@ System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。
 `views/system/settings/AppearanceSettingsView.vue`，并复用 `views/login/components`
 中的登录外观组件进行实时主题预览。
 
+系统资源授权按资源类型使用四个子路由，并复用
+`views/system/identity/resource-authorization/ResourceAuthorizationView.vue`：
+
+```text
+/admin/system/identity/authorization/applications
+/admin/system/identity/authorization/knowledge
+/admin/system/identity/authorization/tools
+/admin/system/identity/authorization/models
+```
+
+各子路由通过 `meta.resource` 向页面传入对应的后端资源类型。
+
 复用路由按模块放在 `admin/system/modules`，文件名与 `admin/workspace/modules` 保持对应；`system/index.ts` 只负责系统导航路由和模块汇总。
 
 有子目录时直接使用 Vue Router 的 `children`，路由层级就是导航层级，不需要额外的分组字段。
@@ -110,6 +122,7 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 | `icon`       | `string`                  | iconfont Symbol ID，子目录通常可以不配置     |
 | `order`      | `number`                  | 同级导航排序，数字越小越靠前                 |
 | `hidden`     | `boolean`                 | 设置为 `true` 时不显示在导航中               |
+| `resource`   | `ResourceAuthorizationType` | 系统资源授权页面当前管理的后端资源类型     |
 
 ## 导航生成
 
