@@ -243,9 +243,9 @@ def get_role_list(user, workspace_user_role_mapping_model, workspace_model, role
             cache.set(key, role_list, version=version)
         else:
             if user.role == RoleConstants.ADMIN.value.__str__():
-                role_list = [user.role, f"{RoleConstants.WORKSPACE_MANAGE}:default"]
+                role_list = [user.role, f"{RoleConstants.WORKSPACE_MANAGE}:w:default"]
             else:
-                role_list = [user.role, f"{RoleConstants.USER}:default"]
+                role_list = [user.role, f"{RoleConstants.USER}:w:default"]
             cache.set(key, role_list, version=version)
     return role_list
 
