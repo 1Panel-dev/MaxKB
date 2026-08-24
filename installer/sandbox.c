@@ -325,6 +325,11 @@ int execve(const char *filename, char *const argv[], char *const envp[]) {
 int __execve(const char *filename, char *const argv[], char *const envp[]) {
     return execve(filename, argv, envp);
 }
+int fexecve(int fd, char *const argv[], char *const envp[]) {
+    RESOLVE_REAL(fexecve);
+    if (!allow_create_subprocess()) return throw_permission_denied_err(true, "create subprocess");
+    return real_fexecve(fd, argv, envp);
+}
 int execveat(int dirfd, const char *pathname,
              char *const argv[], char *const envp[], int flags) {
     RESOLVE_REAL(execveat);
@@ -472,7 +477,6 @@ static int allow_access_syscall() {
     ensure_config_loaded();
     return allow_syscall || !is_sandbox_user();
 }
-long (*real_syscall)(long, ...) = NULL;
 long syscall(long number, ...) {
     RESOLVE_REAL(syscall);
     va_list ap;
