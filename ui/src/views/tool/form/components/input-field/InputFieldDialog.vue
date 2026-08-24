@@ -38,13 +38,8 @@ function handleSubmit() {
   formRef.value?.validate((valid) => {
     if (!valid) return
     emit('refresh', structuredClone(toRaw(inputFieldForm)))
-    close()
+    visible.value = false
   })
-}
-
-function close() {
-  visible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -59,7 +54,7 @@ function resetData() {
   formRef.value?.clearValidate()
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>
@@ -110,7 +105,7 @@ defineExpose({ open, close })
       /></el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="handleSubmit">{{ isEdit ? '保存' : '添加' }}</el-button>
     </template>
   </MkDialog>

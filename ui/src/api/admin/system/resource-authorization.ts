@@ -6,20 +6,23 @@ import type {
   ResourcePermissionPayload,
 } from '@/api/types'
 
-const prefix = (workspaceId: string, userId: string, resource: ResourceAuthorizationType) =>
-  `/workspace/${workspaceId}/user_resource_permission/user/${userId}/resource/${resource}`
+/** 系统管理资源授权 */
+const prefix = (workspaceId: string) => `/workspace/${workspaceId}/user_resource_permission`
 
-/** 获取工作空间成员对指定类型资源的权限列表。 */
+/** 获取指定空间、指定用户、指定资源类型的权限列表。 */
 const getUserResourcePermissions = (
   workspaceId: string,
   userId: string,
   resource: ResourceAuthorizationType,
   query?: RequestParams,
 ) => {
-  return get<ResourcePermissionItem[]>(prefix(workspaceId, userId, resource), query)
+  return get<ResourcePermissionItem[]>(
+    `${prefix(workspaceId)}/user/${userId}/resource/${resource}`,
+    query,
+  )
 }
 
-/** 更新工作空间成员对指定类型资源的权限。 */
+/** 更新指定空间、指定用户、指定资源类型的权限列表。 */
 const putUserResourcePermissions = (
   workspaceId: string,
   userId: string,
@@ -27,7 +30,7 @@ const putUserResourcePermissions = (
   permissions: ResourcePermissionPayload[],
 ) => {
   return put<ResourcePermissionPayload[], ResourcePermissionPayload[]>(
-    prefix(workspaceId, userId, resource),
+    `${prefix(workspaceId)}/user/${userId}/resource/${resource}`,
     permissions,
   )
 }

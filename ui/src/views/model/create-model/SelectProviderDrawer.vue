@@ -35,13 +35,8 @@ function loadModelProviders() {
   })
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
-
 function handleProviderSelect(provider: ModelProviderItem) {
-  close()
+  visible.value = false
   emit('select', provider)
 }
 
@@ -60,7 +55,7 @@ function handleModelTypeChange() {
   //   })
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>

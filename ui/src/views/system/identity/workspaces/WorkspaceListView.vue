@@ -266,7 +266,7 @@ onMounted(() => loadWorkspaceOptions())
           :row-key="getWorkspaceMemberRowKey"
           :isSearching="Boolean(memberSearchQuery)"
         >
-          <el-table-column type="selection" width="64" />
+          <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" label="姓名" />
           <el-table-column prop="username" label="用户名" />
           <el-table-column prop="role_name" label="角色" class-name="border-l!" />

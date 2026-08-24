@@ -90,11 +90,6 @@ function open(provider: ModelProviderItem) {
   loadModelTypes(provider)
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
-
 function handleProviderSelect(provider: ModelProviderItem) {
   loadModelTypes(provider)
 }
@@ -146,7 +141,7 @@ function handleBaseModelChange() {
 }
 
 function handleBack() {
-  close()
+  visible.value = false
   emit('back')
 }
 
@@ -161,7 +156,7 @@ function handleSubmit() {
     })
       .then(() => {
         MsgSuccess('创建成功')
-        close()
+        visible.value = false
         emit('refresh')
       })
       .finally(() => {
@@ -170,7 +165,7 @@ function handleSubmit() {
   })
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>
@@ -295,7 +290,7 @@ defineExpose({ open, close })
     </MkViewLayout>
 
     <template #footer>
-      <el-button :disabled="loading" @click="close">取消</el-button>
+      <el-button :disabled="loading" @click="visible = false">取消</el-button>
       <el-button :disabled="loading" @click="handleBack">上一步</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">保存</el-button>
     </template>

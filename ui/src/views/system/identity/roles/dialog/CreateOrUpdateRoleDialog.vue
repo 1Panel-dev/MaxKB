@@ -30,7 +30,7 @@ function submit() {
       .then((role) => {
         MsgSuccess(roleForm.role_id ? '重命名成功' : '创建成功')
         emit('refresh', role)
-        close()
+        visible.value = false
       })
       .finally(() => {
         loading.value = false
@@ -46,10 +46,6 @@ function open(role?: RoleItem) {
   visible.value = true
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
 function resetData() {
   roleForm.role_id = undefined
   roleForm.role_name = ''
@@ -87,7 +83,7 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">{{
         roleForm.role_id ? '保存' : '创建'
       }}</el-button>

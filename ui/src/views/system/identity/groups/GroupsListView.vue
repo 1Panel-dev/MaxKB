@@ -15,69 +15,23 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
+import { useStore } from '@/stores'
+const { auth } = useStore()
 
-/* 成员列表相关 */
-const loadingMembers = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-})
-const memberSearchQuery = ref<RequestParams>()
-const memberSearchFields: OptionItem<string>[] = [
-  { label: '用户名', value: 'username' },
-  { label: '姓名', value: 'nick_name' },
-]
-const userGroupMembers = ref<SystemUserGroupMember[]>([])
-function handleMemberSearch(query?: RequestParams) {
-  memberSearchQuery.value = query
-  paginationConfig.value.currentPage = 1
-  loadUserGroupMembers()
+/* 选择工作空间列表 */
+const selectedWorkspaceId = ref('default')
+const workspaceOptions = ref<WorkspaceItem[]>([])
+const loadingView = ref(false)
+
+function handleWorkspaceSelect(workspace: WorkspaceItem) {
+  selectedWorkspaceId.value = workspace.id ?? 'default'
+  loadUserGroups()
 }
 
-const selectedGroupMembers = ref<SystemUserGroupMember[]>([])
-function handleMemberSelectionChange(selection: unknown[]) {
-  selectedGroupMembers.value = selection as SystemUserGroupMember[]
-}
-
-/* 添加成员drawer */
-const memberDialogRef =
-  useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
-
-function handleOpenMemberDialog() {
-  memberDialogRef.value?.open()
-}
-
-function handleRemoveMembers(member?: SystemUserGroupMember) {
-  const group = currentGroup.value
-  const members = member ? [member] : selectedGroupMembers.value
-  if (!group || !members.length) return
-
-  const targetName = member ? member.nick_name || member.username : ''
-  const title = member
-    ? `是否移除成员：${targetName}？`
-    : `是否移除选中的 ${members.length} 个成员？`
-  MsgConfirm(title, '', { confirmButtonText: '移除' })
-    .then(() => {
-      return UserGroupsApi.postRemoveSystemUserGroupMembers(
-        selectedWorkspaceId.value,
-        group.id,
-        members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
-      ).then(() => {
-        MsgSuccess('移除成功')
-        const removedRelationIds = new Set(
-          members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
-        )
-        userGroupMembers.value = userGroupMembers.value.filter(
-          ({ system_user_group_relation_id }) =>
-            !removedRelationIds.has(system_user_group_relation_id),
-        )
-        paginationConfig.value.total = userGroupMembers.value.length
-        selectedGroupMembers.value = []
-        loadUserGroups()
-      })
-    })
-    .catch(() => {})
+function loadWorkspaceOptions() {
+  return WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
+    workspaceOptions.value = workspaces
+  })
 }
 
 /* 选择用户组列表 */
@@ -167,39 +121,83 @@ function loadUserGroupMembers(reset = false) {
     })
 }
 
-/* 选择工作空间列表 */
-const selectedWorkspaceId = ref('default')
-const workspaceOptions = ref<WorkspaceItem[]>([])
-const loadingView = ref(false)
-
-function handleWorkspaceSelect(workspace: WorkspaceItem) {
-  selectedWorkspaceId.value = workspace.id ?? 'default'
-  loadUserGroups()
+/* 成员列表相关 */
+const loadingMembers = ref(false)
+const paginationConfig = ref({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0,
+})
+const memberSearchQuery = ref<RequestParams>()
+const memberSearchFields: OptionItem<string>[] = [
+  { label: '用户名', value: 'username' },
+  { label: '姓名', value: 'nick_name' },
+]
+const userGroupMembers = ref<SystemUserGroupMember[]>([])
+function handleMemberSearch(query?: RequestParams) {
+  memberSearchQuery.value = query
+  paginationConfig.value.currentPage = 1
+  loadUserGroupMembers()
 }
 
-function loadWorkspaceOptions() {
+const selectedGroupMembers = ref<SystemUserGroupMember[]>([])
+function handleMemberSelectionChange(selection: unknown[]) {
+  selectedGroupMembers.value = selection as SystemUserGroupMember[]
+}
+
+/* 添加成员drawer */
+const memberDialogRef =
+  useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
+
+function handleOpenMemberDialog() {
+  memberDialogRef.value?.open()
+}
+
+function handleRemoveMembers(member?: SystemUserGroupMember) {
+  const group = currentGroup.value
+  const members = member ? [member] : selectedGroupMembers.value
+  if (!group || !members.length) return
+
+  const targetName = member ? member.nick_name || member.username : ''
+  const title = member
+    ? `是否移除成员：${targetName}？`
+    : `是否移除选中的 ${members.length} 个成员？`
+  MsgConfirm(title, '', { confirmButtonText: '移除' })
+    .then(() => {
+      return UserGroupsApi.postRemoveSystemUserGroupMembers(
+        selectedWorkspaceId.value,
+        group.id,
+        members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
+      ).then(() => {
+        MsgSuccess('移除成功')
+        const removedRelationIds = new Set(
+          members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
+        )
+        userGroupMembers.value = userGroupMembers.value.filter(
+          ({ system_user_group_relation_id }) =>
+            !removedRelationIds.has(system_user_group_relation_id),
+        )
+        paginationConfig.value.total = userGroupMembers.value.length
+        selectedGroupMembers.value = []
+        loadUserGroups()
+      })
+    })
+    .catch(() => {})
+}
+
+onMounted(() => {
   loadingView.value = true
-  return WorkspaceApi.getSystemWorkspaceList()
-    .then((workspaces) => {
-      workspaceOptions.value = workspaces
-
-      if (!workspaceOptions.value.some(({ id }) => id === selectedWorkspaceId.value)) {
-        selectedWorkspaceId.value = workspaceOptions.value[0]?.id ?? 'default'
-      }
-
-      return loadUserGroups()
-    })
-    .finally(() => {
+  Promise.all(auth.isEE ? [loadWorkspaceOptions(), loadUserGroups()] : [loadUserGroups()]).finally(
+    () => {
       loadingView.value = false
-    })
-}
-
-onMounted(() => loadWorkspaceOptions())
+    },
+  )
+})
 </script>
 
 <template>
   <MkViewLayout class="system-identity-groups" :loading="loadingView">
-    <template #top>
+    <template #top v-if="auth.isEE">
       <WorkspaceDropdown
         v-model="selectedWorkspaceId"
         :options="workspaceOptions"

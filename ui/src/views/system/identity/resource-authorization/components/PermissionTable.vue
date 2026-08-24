@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref, useTemplateRef, watch } from 'vue'
 import ProviderApi from '@/api/admin/workspace/model/provider'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type {
@@ -13,13 +13,12 @@ import type {
 } from '@/api/types'
 import { resetUrl } from '@/utils/common'
 import { getPermissionOptions } from '../constants'
+import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 
 defineOptions({ name: 'ResourcePermissionTable' })
 
 const props = defineProps<{
-  allowRole: boolean
   data: ResourcePermissionItem[]
-  editable: boolean
   resourceType: ResourceAuthorizationType
 }>()
 const emit = defineEmits<{
@@ -30,7 +29,8 @@ const permissionSearchFields = computed<OptionItem<string>[]>(() => [
   { label: '名称', value: 'name' },
   {
     label: '权限',
-    options: getPermissionOptions({ allowRole: props.allowRole }),
+    multiple: true,
+    options: getPermissionOptions(),
     value: 'permission',
   },
 ])
@@ -43,15 +43,15 @@ function handleSearch(query?: RequestParams) {
 
 function filterResourceTree(resources: ResourcePermissionItem[]): ResourcePermissionItem[] {
   const name = typeof searchQuery.value?.name === 'string' ? searchQuery.value.name.trim() : ''
-  const permission = searchQuery.value?.permission as ResourcePermission | undefined
-  if (!name && !permission) return resources
+  const permissions = searchQuery.value?.permission as ResourcePermission[] | undefined
+  if (!name && !permissions?.length) return resources
 
   return resources.flatMap((resource) => {
     const children = filterResourceTree(resource.children ?? [])
     const matchesName = name
       ? resource.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
       : true
-    const matchesPermission = permission ? resource.permission === permission : true
+    const matchesPermission = permissions?.length ? permissions.includes(resource.permission) : true
 
     return (matchesName && matchesPermission) || children.length ? [{ ...resource, children }] : []
   })
@@ -75,37 +75,6 @@ const expandedResourceIds = computed(() => {
 })
 
 /* 权限选项 */
-function getRowPermissionOptions(resource: ResourcePermissionItem) {
-  const isFolder = resource.resource_type === 'folder'
-  return getPermissionOptions({
-    allowRole: props.allowRole,
-    isFolder,
-    isRootFolder: isFolder && resource.folder_id === null,
-  })
-}
-
-const selectedResources = ref<ResourcePermissionItem[]>([])
-const tableRef = ref<{ clearSelection: () => void }>()
-const batchPermissionOptions = computed(() => {
-  const hasRootFolder = selectedResources.value.some(
-    ({ folder_id, resource_type }) => resource_type === 'folder' && folder_id === null,
-  )
-  const hasFolder = selectedResources.value.some(({ resource_type }) => resource_type === 'folder')
-  return getPermissionOptions({
-    allowRole: props.allowRole,
-    isFolder: hasFolder,
-    isRootFolder: hasRootFolder,
-  })
-})
-
-function handleSelectionChange(selection: unknown[]) {
-  selectedResources.value = selection as ResourcePermissionItem[]
-}
-
-/* 单项授权的目录级联 */
-function collectDescendants(resource: ResourcePermissionItem): ResourcePermissionItem[] {
-  return (resource.children ?? []).flatMap((child) => [child, ...collectDescendants(child)])
-}
 
 function flattenResources(resources: ResourcePermissionItem[]): ResourcePermissionItem[] {
   return resources.flatMap((resource) => [resource, ...flattenResources(resource.children ?? [])])
@@ -132,7 +101,7 @@ function buildPermissionPayload(permission: ResourcePermission, resource: Resour
   ])
 
   if (permission === RESOURCE_PERMISSION.NOT_AUTH && resource.resource_type === 'folder') {
-    collectDescendants(resource).forEach(({ id }) => {
+    flattenResources(resource.children ?? []).forEach(({ id }) => {
       payloadMap.set(id, { permission: RESOURCE_PERMISSION.NOT_AUTH, target_id: id })
     })
   } else if (permission !== RESOURCE_PERMISSION.NOT_AUTH) {
@@ -149,35 +118,31 @@ function handlePermissionChange(permission: ResourcePermission, resource: Resour
 }
 
 /* 批量授权 */
-const batchDialogVisible = ref(false)
-const batchPermission = ref<ResourcePermission>()
+const tableRef = ref<{ clearSelection: () => void }>()
+const batchSelectedResources = ref<ResourcePermissionItem[]>([])
 
-function resetBatchDialog() {
-  batchPermission.value = undefined
+function handleSelectionChange(selection: unknown[]) {
+  batchSelectedResources.value = selection as ResourcePermissionItem[]
 }
+
+const batchPermissionDialogRef = useTemplateRef<InstanceType<typeof BatchSetPermissionDialog>>(
+  'batchPermissionDialogRef',
+)
 
 function handleOpenBatchDialog() {
-  if (selectedResources.value.length) batchDialogVisible.value = true
+  batchPermissionDialogRef.value?.open()
 }
 
-function handleCloseBatchDialog() {
-  batchDialogVisible.value = false
-  resetBatchDialog()
-}
-
-function handleBatchSubmit() {
-  if (!batchPermission.value) return
-
+function handleBatchSubmit(permission: ResourcePermission) {
   const payloadMap = new Map<string, ResourcePermissionPayload>()
-  selectedResources.value.forEach((resource) => {
-    buildPermissionPayload(batchPermission.value!, resource).forEach((payload, id) => {
+  batchSelectedResources.value.forEach((resource) => {
+    buildPermissionPayload(permission, resource).forEach((payload, id) => {
       payloadMap.set(id, payload)
     })
   })
   emit('submit', [...payloadMap.values()])
   tableRef.value?.clearSelection()
-  selectedResources.value = []
-  handleCloseBatchDialog()
+  batchSelectedResources.value = []
 }
 
 /* 模型供应商图标 */
@@ -200,7 +165,15 @@ watch(
 
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
-    <div class="mb-4 flex justify-end">
+    <div class="mb-4 flex-between">
+      <el-button
+        type="primary"
+        :disabled="batchSelectedResources.length === 0"
+        @click="handleOpenBatchDialog"
+      >
+        <MkIcon name="icon-lock" />
+        <span>配置权限</span>
+      </el-button>
       <MkComplexSearch :fields="permissionSearchFields" @change="handleSearch" />
     </div>
 
@@ -208,18 +181,18 @@ watch(
       ref="tableRef"
       :data="filteredResources"
       :expand-row-keys="expandedResourceIds"
-      :max-table-height="250"
+      :max-table-height="300"
       show-overflow-tooltip
       @selection-change="handleSelectionChange"
     >
-      <el-table-column v-if="editable" type="selection" width="48" reserve-selection />
-      <el-table-column label="名称" min-width="260" prop="name">
+      <el-table-column type="selection" width="40" reserve-selection />
+      <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <div class="flex min-w-0 items-center gap-2">
             <MkIcon
               v-if="row.resource_type === 'folder'"
               name="icon_file-folder_colorful"
-              :size="20"
+              :size="18"
             />
             <span
               v-else-if="resourceType === RESOURCE_TYPE.MODEL"
@@ -232,73 +205,43 @@ watch(
               :size="20"
               :type="row.tool_type ?? undefined"
             />
+
             <el-avatar
-              v-else-if="resourceType === RESOURCE_TYPE.APPLICATION && row.icon"
+              v-else-if="resourceType === RESOURCE_TYPE.APPLICATION"
               class="bg-transparent!"
               shape="square"
               :size="20"
             >
-              <img :src="resetUrl(row.icon)" alt="" />
+              <img :src="resetUrl(row?.icon, true)" />
             </el-avatar>
-            <MkIcon
-              v-else
-              :name="
-                resourceType === RESOURCE_TYPE.KNOWLEDGE
-                  ? 'icon_book_filled'
-                  : 'icon_robot_filled'
-              "
-              :size="20"
-              class="text-primary!"
-            />
             <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           </div>
         </template>
       </el-table-column>
-      <el-table-column label="权限" min-width="360">
+      <el-table-column label="操作权限" width="450">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <el-radio-group
-            :disabled="!editable"
             :model-value="row.permission"
             @change="handlePermissionChange($event as ResourcePermission, row)"
           >
-            <el-radio
-              v-for="permissionOption in getRowPermissionOptions(row)"
+            <template
+              v-for="permissionOption in getPermissionOptions()"
               :key="permissionOption.value"
-              :value="permissionOption.value"
             >
-              {{ permissionOption.label }}
-            </el-radio>
+              <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
+            </template>
           </el-radio-group>
         </template>
       </el-table-column>
-
-      <template #footer-batch-actions>
-        <el-button type="primary" @click="handleOpenBatchDialog">配置权限</el-button>
-      </template>
     </MkTable>
 
-    <MkDialog v-model="batchDialogVisible" title="配置权限" width="480" @closed="resetBatchDialog">
-      <el-radio-group v-model="batchPermission" class="flex! flex-col! items-stretch! gap-3">
-        <el-radio
-          v-for="permissionOption in batchPermissionOptions"
-          :key="permissionOption.value"
-          :value="permissionOption.value"
-          class="m-0! h-auto! items-start!"
-        >
-          <div>
-            <p>{{ permissionOption.label }}</p>
-            <p v-if="permissionOption.description" class="text-N600">
-              {{ permissionOption.description }}
-            </p>
-          </div>
-        </el-radio>
-      </el-radio-group>
-      <template #footer>
-        <el-button @click="handleCloseBatchDialog">取消</el-button>
-        <el-button type="primary" :disabled="!batchPermission" @click="handleBatchSubmit">
-          确认
-        </el-button>
-      </template>
-    </MkDialog>
+    <BatchSetPermissionDialog ref="batchPermissionDialogRef" @submit="handleBatchSubmit" />
   </div>
 </template>
+
+<style scoped lang="scss">
+:deep(.resource-name-column .cell) {
+  align-items: center;
+  display: flex;
+}
+</style>

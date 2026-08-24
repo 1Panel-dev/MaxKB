@@ -5,7 +5,7 @@ import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vu
 import { useStore } from '@/stores'
 import type { WorkspaceItem } from '@/api/types'
 
-defineOptions({ name: 'WorkspaceDropdown' })
+defineOptions({ name: 'HeaderWorkspaceDropdown' })
 const router = useRouter()
 const route = useRoute()
 const { user } = useStore()

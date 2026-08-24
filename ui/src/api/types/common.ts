@@ -23,7 +23,7 @@ export interface ExportError {
   }
 }
 
-export interface WorkspaceMemberOption {
+export interface CommonUserOption {
   id: string
   nick_name: string
   roles?: string[]

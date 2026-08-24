@@ -5,7 +5,7 @@ import ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import ToolFormDrawer from '@/views/tool/create-form/ToolFormDrawer.vue'
+import ToolFormDrawer from '@/views/tool/form/ToolFormDrawer.vue'
 
 defineOptions({ name: 'ToolCreateDropdown' })
 

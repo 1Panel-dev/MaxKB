@@ -76,7 +76,7 @@ function submitImportUsers() {
           `成功导入 ${result.success_count} 个用户${conflictMessage ? `，${conflictMessage}` : ''}`,
         )
         emit('refresh')
-        close()
+        dialogVisible.value = false
       })
       .finally(() => {
         importing.value = false
@@ -87,11 +87,6 @@ function submitImportUsers() {
 function open() {
   dialogVisible.value = true
   loadSyncTypes()
-}
-
-function close() {
-  dialogVisible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -137,7 +132,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" :loading="importing" @click="submitImportUsers">导入</el-button>
     </template>
   </MkDialog>
