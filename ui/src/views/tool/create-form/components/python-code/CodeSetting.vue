@@ -1,14 +1,9 @@
 <script setup lang="ts">
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
+import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 
 defineOptions({ name: 'ToolCodeSetting' })
 
 const code = defineModel<string>({ required: true })
-
-function lintToolCode(sourceCode: string) {
-  return ToolApi.postToolPylint(sourceCode)
-}
 </script>
 
 <template>
@@ -25,14 +20,14 @@ function lintToolCode(sourceCode: string) {
     </div>
 
     <el-form-item prop="code">
-      <CodemirrorEditor v-model="code" :lint="lintToolCode" title="工具内容（Python）">
+      <PythonCodeEditor v-model="code" title="工具内容（Python）">
         <template #header-extra>
           <el-button link type="primary">
             <MkIcon name="icon_star" />
             <span>生成</span>
           </el-button>
         </template>
-      </CodemirrorEditor>
+      </PythonCodeEditor>
     </el-form-item>
   </section>
 </template>

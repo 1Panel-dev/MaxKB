@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from 'vue-router'
+import { RESOURCE_TYPE } from '@/api/enums'
 import { systemApplicationRoutes } from './modules/application'
 import { systemKnowledgeRoutes } from './modules/knowledge'
 
@@ -56,8 +57,54 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'authorization',
           name: 'system-authorization',
-          component: () => import('@/views/system/SystemView.vue'),
+          redirect: { name: 'system-authorization-applications' },
           meta: { title: '资源授权', order: 50 },
+          children: [
+            {
+              path: 'applications',
+              name: 'system-authorization-applications',
+              component: () =>
+                import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
+              meta: {
+                title: '智能体',
+                order: 10,
+                resource: RESOURCE_TYPE.APPLICATION,
+              },
+            },
+            {
+              path: 'knowledge',
+              name: 'system-authorization-knowledge',
+              component: () =>
+                import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
+              meta: {
+                title: '知识库',
+                order: 20,
+                resource: RESOURCE_TYPE.KNOWLEDGE,
+              },
+            },
+            {
+              path: 'tools',
+              name: 'system-authorization-tools',
+              component: () =>
+                import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
+              meta: {
+                title: '工具',
+                order: 30,
+                resource: RESOURCE_TYPE.TOOL,
+              },
+            },
+            {
+              path: 'models',
+              name: 'system-authorization-models',
+              component: () =>
+                import('@/views/system/identity/resource-authorization/ResourceAuthorizationView.vue'),
+              meta: {
+                title: '模型',
+                order: 40,
+                resource: RESOURCE_TYPE.MODEL,
+              },
+            },
+          ],
         },
       ],
     },

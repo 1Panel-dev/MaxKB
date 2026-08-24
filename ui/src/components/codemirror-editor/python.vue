@@ -4,15 +4,13 @@ import type { EditorState } from '@codemirror/state'
 import { linter, type Diagnostic } from '@codemirror/lint'
 import { python } from '@codemirror/lang-python'
 import { Codemirror } from 'vue-codemirror'
-import type { CodeLintIssue } from './types'
+import ToolApi from '@/api/admin/workspace/tool/tool'
+import type { ToolPylintIssue } from '@/api/types'
 
-defineOptions({ name: 'CodemirrorEditor', inheritAttrs: false })
+defineOptions({ name: 'PythonCodeEditor', inheritAttrs: false })
 
 const code = defineModel<string>({ required: true })
-const props = defineProps<{
-  lint?: (code: string) => Promise<CodeLintIssue[]>
-  title?: string
-}>()
+defineProps<{ title?: string }>()
 
 const emit = defineEmits<{
   submitDialog: [code: string]
@@ -29,7 +27,7 @@ function getDocumentPosition(state: EditorState, line: number, column: number) {
   return documentLine.from + safeColumn
 }
 
-function createDiagnostic(state: EditorState, issue: CodeLintIssue): Diagnostic {
+function createDiagnostic(state: EditorState, issue: ToolPylintIssue): Diagnostic {
   const from = getDocumentPosition(state, issue.line, issue.column)
   const endPosition = getDocumentPosition(
     state,
@@ -48,10 +46,9 @@ function createDiagnostic(state: EditorState, issue: CodeLintIssue): Diagnostic 
 const codeLinter = linter(
   async (view) => {
     const lintSource = view.state.doc.toString()
-    if (!props.lint || !lintSource.trim()) return []
+    if (!lintSource.trim()) return []
 
-    return props
-      .lint(lintSource)
+    return ToolApi.postToolPylint(lintSource)
       .then((issues) => {
         if (lintSource !== view.state.doc.toString()) return []
         return issues.slice(0, 50).map((issue) => createDiagnostic(view.state, issue))

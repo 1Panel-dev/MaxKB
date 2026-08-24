@@ -85,8 +85,8 @@ src/components/
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
 ├── codemirror-editor/
-│   ├── index.vue                 # 支持异步诊断和全屏编辑的代码编辑器
-│   └── types.ts                  # 编辑器行列诊断类型
+│   ├── python.vue                # 内置 pylint 诊断和全屏编辑的 Python 编辑器
+│   └── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
 └── mk-source-card/
 │   ├── index.vue                 # 来源资源的统一卡片结构，手动导入
 │   ├── mk-source-card-action.vue # 卡片悬浮操作容器
@@ -99,7 +99,8 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
-import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
+import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
+import JsonInput from '@/components/codemirror-editor/Json.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
@@ -116,7 +117,8 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 - 跨页面复用且依赖业务类型、固定业务接口或领域交互的组件放入 `business/<component-name>`，
   由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
 - 不依赖固定业务的共享组合 UI 组件放在 `components/<component-name>`，由使用方手动导入。
-- 一个公共组件使用一个 kebab-case 目录，入口统一为 `index.vue`。
+- 一个公共组件默认使用一个 kebab-case 目录，入口统一为 `index.vue`；`codemirror-editor` 按语言
+  提供 `python.vue` 和 `Json.vue` 两个专用入口。
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应
   `mk-icon/index.vue`。
 - `index.vue` 必须通过 `defineOptions({ name: 'ComponentName' })` 声明多单词组件名，避免
@@ -495,25 +497,36 @@ const paginationConfig = ref({
 
 ## 手动导入组件
 
-### CodemirrorEditor
+### PythonCodeEditor
 
-基于 CodeMirror 6 的代码编辑器，当前内置 Python 语法和 One Dark 主题。通过 `v-model` 管理代码，
-通过 `lint` 传入异步检查函数；检查结果使用 `CodeLintIssue` 的行、列、结束位置、严重程度和消息
-生成编辑器诊断，组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
+基于 CodeMirror 6 的 Python 代码编辑器，通过 `v-model` 管理代码，并在组件内部调用工具 pylint
+接口生成诊断。组件最多展示 50 条诊断，并在代码停止输入 500ms 后检查。编辑器提供内置全屏
 入口；全屏确认时更新 `v-model` 并触发 `submit-dialog`，`header-extra` 插槽用于添加全屏标题栏操作。
 
 ```vue
 <script setup lang="ts">
-import CodemirrorEditor from '@/components/codemirror-editor/index.vue'
+import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 
 const code = defineModel<string>({ required: true })
-
-function lintCode(sourceCode: string) {
-  return ToolApi.postToolPylint(sourceCode)
-}
 </script>
 
-<CodemirrorEditor v-model="code" :lint="lintCode" title="工具内容（Python）" />
+<PythonCodeEditor v-model="code" title="工具内容（Python）" />
+```
+
+### JsonInput
+
+JSON 专用输入框，通过 `v-model` 接收并回传解析后的 JSON 值，内置 JSON 语法诊断、格式化和全屏
+编辑。组件暴露 `validateRules`，可直接接入 Element Plus 表单自定义校验器；无法解析的输入不会
+覆盖最后一次有效的 `v-model` 值。
+
+```vue
+<script setup lang="ts">
+import JsonInput from '@/components/codemirror-editor/Json.vue'
+
+const config = defineModel<unknown>({ required: true })
+</script>
+
+<JsonInput v-model="config" title="配置（JSON）" />
 ```
 
 ### MkSourceCard
@@ -722,13 +735,13 @@ Workspace 的文件夹虚拟树业务组件。组件根据 `workspaceId` 和 `so
 
 ```vue
 <script setup lang="ts">
-import { FOLDER_SOURCE } from '@/api/types'
+import { RESOURCE_TYPE } from '@/api/enums'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 </script>
 
 <FolderTree
   v-model="currentFolderId"
-  :source="FOLDER_SOURCE.TOOL"
+  :source="RESOURCE_TYPE.TOOL"
   :workspace-id="workspaceId"
   @select="handleFolderSelect"
 >

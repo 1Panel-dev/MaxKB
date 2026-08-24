@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import CommonSystemApi from '@/api/admin/system/common'
-import type { SystemUserOption } from '@/api/types'
+import type { WorkspaceMemberOption } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
 const props = defineProps<{
@@ -22,7 +22,7 @@ const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 
 /* 成员选项 */
 const optionsLoading = ref(false)
-const userOptions = ref<SystemUserOption[]>([])
+const userOptions = ref<WorkspaceMemberOption[]>([])
 let searchTimer: ReturnType<typeof setTimeout> | null = null
 function loadUserOptions(query?: string) {
   optionsLoading.value = true

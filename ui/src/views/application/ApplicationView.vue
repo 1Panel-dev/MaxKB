@@ -3,13 +3,13 @@ import { computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
 import ApplicationApi from '@/api/admin/workspace/application'
 import type { ApplicationDetail, FolderItem, OptionItem, RequestParams } from '@/api/types'
-import { FOLDER_SOURCE } from '@/api/enums'
+import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import ApplicationCard from './components/ApplicationCard.vue'
 
 /* 当前文件夹 */
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.APPLICATION].all })
+const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all })
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
@@ -78,7 +78,7 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
 
       <FolderTree
         ref="folderTreeRef"
-        :source="FOLDER_SOURCE.APPLICATION"
+        :source="RESOURCE_TYPE.APPLICATION"
         @select="handleFolderSelect"
         draggable
       >

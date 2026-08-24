@@ -2,20 +2,20 @@
 import { reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
+import { useRouter } from 'vue-router'
 import UserManageApi from '@/api/admin/system/user-manage'
+import type { SystemUser, UpdatePasswordForm } from '@/api/types'
 import { useStore } from '@/stores'
-import type { UpdatePasswordForm,SystemUser } from '@/api/types'
-import {  MsgSuccess } from '@/utils/message'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })
-
-
 
 const emit = defineEmits<{
   refresh: []
 }>()
 
-const { auth } = useStore()
+const router = useRouter()
+const { auth, user } = useStore()
 
 const dialogVisible = ref(false)
 const passwordSubmitting = ref(false)
@@ -70,6 +70,11 @@ async function submitPassword() {
     return UserManageApi.putUserPassword(userId.value, { encryptedData })
       .then(() => {
         MsgSuccess('密码修改成功')
+
+        if (userId.value === user.userInfo?.id) {
+          auth.clearToken()
+          return router.push({ name: 'login' }).then(() => undefined)
+        }
         emit('refresh')
         close()
       })

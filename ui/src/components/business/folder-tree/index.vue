@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import FolderApi from '@/api/admin/workspace/folder'
 import type { FolderSource, FolderItem } from '@/api/types'
-import { FOLDER_SOURCE } from '@/api/enums'
+import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_SORT, type FolderSort } from './types'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -345,7 +345,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
 
     <div class="px-4 mb-1">
       <MkListItem
-        v-if="source !== FOLDER_SOURCE.APPLICATION"
+        v-if="source !== RESOURCE_TYPE.APPLICATION"
         :active="currentNodeKey === folderEntries.shared.id"
         @click="handleFolderClick(folderEntries.shared)"
       >

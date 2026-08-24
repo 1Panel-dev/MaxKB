@@ -5,7 +5,7 @@ import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
 import type { OptionItem, RequestParams, ToolType, ToolItem, FolderItem } from '@/api/types'
-import { FOLDER_SOURCE, TOOL_SCOPE } from '@/api/enums'
+import { RESOURCE_TYPE, TOOL_SCOPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 
@@ -14,7 +14,7 @@ import ToolCreateDropdown from './components/ToolCreateDropdown.vue'
 
 /* 当前文件夹 */
 
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[FOLDER_SOURCE.TOOL].all })
+const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.TOOL].all })
 const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARED)
 
 function handleFolderSelect(folder: FolderItem) {
@@ -101,7 +101,7 @@ function handleDeleteTool(toolId: string) {
 
       <FolderTree
         ref="folderTreeRef"
-        :source="FOLDER_SOURCE.TOOL"
+        :source="RESOURCE_TYPE.TOOL"
         @select="handleFolderSelect"
         draggable
       >
