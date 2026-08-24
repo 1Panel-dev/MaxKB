@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, useTemplateRef } from 'vue'
-
-import { set } from 'lodash'
+import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
+import ModelSelect from '@/components/business/model-select/index.vue'
+import { groupBy, set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
 import type { BaseNodeModel } from '@logicflow/core'
+import { useWorkflowStore } from '@/workflow-canvas/store'
+import type { ModelItem } from '@/api/types'
 
 defineOptions({ name: 'WorkflowAiChatNode' })
 const getModel = inject('getModel') as () => BaseNodeModel
+const apiType = (inject('apiType') as string) || 'workspace'
 const model = getModel()
 interface AiChatNodeForm {
   model_id: string
@@ -47,8 +50,22 @@ function validate() {
     formRef.value?.validate(),
   ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
-
-onMounted(() => set(model, 'validate', validate))
+const store = useWorkflowStore(apiType)
+const modelList = ref<Array<ModelItem>>([])
+const providerOptions = ref<Array<any>>([])
+onMounted(() => {
+  set(model, 'validate', validate)
+  store
+    .getModelList({
+      model_type: 'LLM',
+    })
+    .then((data) => {
+      modelList.value = data
+    })
+  store.getProviderList().then((data) => {
+    providerOptions.value = data
+  })
+})
 </script>
 
 <template>
@@ -88,7 +105,13 @@ onMounted(() => set(model, 'validate', validate))
           class="w-full"
           placeholder="请选择变量"
         />
-        <el-input v-else v-model="formData.model_id" placeholder="请输入 AI 模型 ID" />
+        <ModelSelect
+          v-else
+          placeholder="请输入 AI 模型 ID"
+          :options="modelList"
+          :provider-options="providerOptions"
+          v-model="formData.model_id"
+        ></ModelSelect>
       </el-form-item>
 
       <el-form-item label="系统提示词">

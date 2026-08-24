@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { Check } from '@element-plus/icons-vue'
-import ProviderApi from '@/api/admin/workspace/model/provider'
 import { MODEL_STATUS } from '@/api/enums'
 import type { ModelProviderItem, ModelItem } from '@/api/types'
-
+import { groupBy } from 'lodash'
 defineOptions({
   name: 'ModelSelect',
   inheritAttrs: false,
 })
-
-type ModelOptions = Record<string, ModelItem[]>
 
 interface ModelOptionGroup {
   icon: string
@@ -21,23 +18,24 @@ interface ModelOptionGroup {
 
 const props = withDefaults(
   defineProps<{
-    modelType?: string
     modelValue: string
-    options: ModelOptions | null
+    options: ModelItem[]
+    providerOptions: ModelProviderItem[]
   }>(),
   {
-    modelType: '',
     modelValue: '',
-    options: null,
+    options: () => [],
+    providerOptions: () => [],
   },
 )
-
+const _options = computed(() => {
+  return groupBy(props.options, 'provider')
+})
 const emit = defineEmits<{
   change: [modelId: string]
   'update:modelValue': [modelId: string]
 }>()
 
-const providerOptions = ref<ModelProviderItem[]>([])
 const loading = ref(false)
 
 const selectedModelId = computed({
@@ -50,10 +48,10 @@ const selectedModelId = computed({
 
 const modelOptionGroups = computed<ModelOptionGroup[]>(() => {
   const providerMap = new Map(
-    providerOptions.value.map((provider) => [provider.provider, provider]),
+    props.providerOptions.map((provider) => [provider.provider, provider]),
   )
 
-  return Object.entries(props.options ?? {}).map(([provider, models]) => {
+  return Object.entries(_options.value ?? {}).map(([provider, models]) => {
     const providerOption = providerMap.get(provider)
     return {
       icon: providerOption?.icon ?? '',
@@ -74,25 +72,6 @@ const selectedProviderIcon = computed(
       models.some(({ id }) => id === selectedModelId.value),
     )?.icon ?? '',
 )
-
-function loadProviderOptions() {
-  loading.value = true
-
-  return ProviderApi.getProviderList()
-    .then((providers) => {
-      providerOptions.value = providers
-    })
-    .catch(() => {
-      providerOptions.value = []
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-onMounted(() => {
-  loadProviderOptions()
-})
 </script>
 
 <template>

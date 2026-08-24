@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { BaseEdgeModel } from '@logicflow/core'
-
-const props = defineProps<{ model: BaseEdgeModel }>()
+import { inject } from 'vue'
+const getModel = inject('getModel') as () => BaseEdgeModel
+const model = getModel()
 const deleteEdge = () => {
-  props.model.graphModel.deleteEdgeById(props.model.id)
+  model.graphModel.deleteEdgeById(model.id)
 }
 </script>
 <template>
-  <div class="custom-edge cursor" @mouseup.stop @click.stop v-show="props.model.isHovered">
+  <div class="custom-edge cursor" @mouseup.stop @click.stop v-show="model.isHovered">
     <svg
       @click="deleteEdge"
       width="22"
