@@ -28,8 +28,8 @@ const props = withDefaults(
 const nodeModules = import.meta.glob<{ default: LogicFlow.RegisterConfig }>('./nodes/**/index.ts', {
   eager: true,
 })
-const workflow_mode = inject('workflowMode') || WorkflowMode.Application
-const loop_workflow_mode = inject('loopWorkflowMode') || WorkflowMode.ApplicationLoop
+const workflow_mode = inject('workflowMode', WorkflowMode.Application)
+const loop_workflow_mode = inject('loopWorkflowMode', WorkflowMode.ApplicationLoop)
 
 const TeleportContainer = getTeleport()
 const lf = shallowRef<LogicFlow>()
@@ -69,7 +69,6 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   })
 
   initDefaultShortcut(lf.value, lf.value.graphModel)
-  console.log(Object.values(nodeModules).map(({ default: node }) => node))
   lf.value.batchRegister([...Object.values(nodeModules).map(({ default: node }) => node), AppEdge])
   lf.value.setDefaultEdgeType('app-edge')
   lf.value.render(data ? data : {})
@@ -82,6 +81,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     getGraph: () => graph,
     workflowMode: workflow_mode,
     loopWorkflowMode: loop_workflow_mode,
+    apiType: 'workspace',
   })
   lf.value.graphModel.eventCenter.on('delete_edge', (edgeIds: string[]) => {
     edgeIds.forEach((edgeId) => lf.value?.deleteEdge(edgeId))

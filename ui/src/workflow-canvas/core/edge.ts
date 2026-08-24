@@ -6,8 +6,7 @@ import {
   type GraphModel,
 } from '@logicflow/core'
 import type { App } from 'vue'
-import { createApp, h as vh } from 'vue'
-import { isActive, connect, disconnect } from './teleport'
+import { connect, disconnect } from './teleport'
 import CustomLine from './CustomLine.vue'
 
 function isMouseInElement(element: Element, event: PointerEvent) {
@@ -47,25 +46,12 @@ class CustomEdge2 extends BezierEdge {
   protected renderVueComponent(root: HTMLDivElement) {
     this.unmountVueComponent()
     this.root = root
-    const { graphModel } = this.props
     if (root) {
-      if (isActive()) {
-        connect(
-          this.targetId(),
-          CustomLine,
-          root,
-          this.props.model,
-          graphModel,
-          (node: BaseEdgeModel, graph: GraphModel) => {
-            return { model: node, graph }
-          },
-        )
-      } else {
-        this.customLineApp = createApp({
-          render: () => vh(CustomLine, { model: this.props.model }),
-        })
-        this.customLineApp?.mount(root)
-      }
+      connect(this.targetId(), CustomLine, root, () => {
+        return {
+          getModel: () => this.props.model,
+        }
+      })
     }
   }
   protected targetId() {
@@ -78,9 +64,7 @@ class CustomEdge2 extends BezierEdge {
     if (super.componentWillUnmount) {
       super.componentWillUnmount()
     }
-    if (isActive()) {
-      disconnect(this.targetId())
-    }
+    disconnect(this.targetId())
     this.unmountVueComponent()
   }
   /**

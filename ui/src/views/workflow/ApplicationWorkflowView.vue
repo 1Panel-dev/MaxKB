@@ -46,6 +46,10 @@ function handleSave() {
       loading.value = false
     })
 }
+const defaultWorkflow = {
+  nodes: [],
+  deges: [],
+}
 
 function loadApplicationDetail() {
   loading.value = true
