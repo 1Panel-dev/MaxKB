@@ -34,7 +34,7 @@ function submit() {
       .then(() => {
         MsgSuccess('保存成功')
         emit('refresh')
-        close()
+        visible.value = false
       })
       .finally(() => {
         loading.value = false
@@ -47,7 +47,6 @@ function handleValidatePlatform() {
   loading.value = true
   return AuthScanApi.postValidateQrLoginPlatform(form)
     .then((res) => {
-      // TODO: 校验判断有误
       res ? MsgSuccess('校验成功') : MsgError('校验失败')
     })
     .finally(() => {
@@ -58,11 +57,6 @@ function handleValidatePlatform() {
 function open(platform: QrLoginPlatformPayload) {
   Object.assign(form, platform, { config: { ...platform.config } })
   visible.value = true
-}
-
-function close() {
-  visible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -98,7 +92,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button @click="handleValidatePlatform">校验</el-button>
       <el-button type="primary" @click="submit">保存</el-button>
     </template>

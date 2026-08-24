@@ -100,7 +100,7 @@ function submitBatchSetUserRoles() {
       .then(() => {
         MsgSuccess('设置成功')
         emit('refresh')
-        close()
+        dialogVisible.value = false
       })
       .finally(() => {
         submitting.value = false
@@ -112,11 +112,6 @@ function open(userIds: string[]) {
   batchRoleForm.ids = [...userIds]
   dialogVisible.value = true
   loadRoleSettingOptions()
-}
-
-function close() {
-  dialogVisible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -229,7 +224,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" :loading="submitting" @click="submitBatchSetUserRoles">
         保存
       </el-button>

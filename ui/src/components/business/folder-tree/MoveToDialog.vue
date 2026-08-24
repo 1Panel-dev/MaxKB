@@ -69,7 +69,7 @@ function handleSubmit() {
 //   })
 //     .then((updatedFolder) => {
 //       MsgSuccess('移动成功')
-//       moveFolderDialogRef.value?.close()
+//       visible.value = false
 //       return loadFolders().then(() => emit('moved', updatedFolder))
 //     })
 //     .finally(() => {
@@ -82,17 +82,13 @@ function open(folder: WorkspaceFolder) {
   visible.value = true
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
 function resetData() {
   movingFolder.value = undefined
   searchKeyword.value = ''
   selectedTargetId.value = ''
 }
 
-defineExpose({ close, open })
+defineExpose({ open })
 </script>
 
 <template>
@@ -103,7 +99,7 @@ defineExpose({ close, open })
       @select="handleTargetSelect"
     />
     <template #footer>
-      <el-button :disabled="loading" @click="close">取消</el-button>
+      <el-button :disabled="loading" @click="visible = false">取消</el-button>
       <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">
         确定
       </el-button>

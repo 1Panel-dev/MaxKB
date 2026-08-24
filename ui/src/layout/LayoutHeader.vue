@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router'
 
 import AvatarDropdown from './avatar-dropdown/index.vue'
-import WorkspaceDropdown from './workspace-dropdown/index.vue'
+import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
 import { isWorkspace, isSystem } from '@/router/admin/utils'
 import type { LayoutMode } from './types'
 const router = useRouter()
@@ -30,7 +30,7 @@ function switchMode() {
       <div class="flex items-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
-        <WorkspaceDropdown v-if="isWorkspace(mode)" />
+        <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
         <span v-if="isSystem(mode)" class="text-lg">系统管理</span>
       </div>
     </div>

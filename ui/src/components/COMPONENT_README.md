@@ -220,16 +220,18 @@ Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus
 ```
 
 业务 Dialog 和 Drawer 的状态生命周期保持一致：`open()` 先调用 `resetData()`，再回填编辑数据并
-显示浮层；`close()` 先关闭浮层，再调用 `resetData()`；组件同时监听 `closed` 调用
-`resetData()`，确保点击右上角关闭按钮时也完成清理。`resetData()` 应统一重置表单、提交状态、
-临时选项和表单校验，不把清理逻辑散落在 `open()`、取消按钮或提交成功回调中。
+显示浮层；取消、提交成功或其他关闭操作直接将 `v-model` 绑定的可见状态设为 `false`，不额外定义或
+向父组件暴露 `close()`；组件统一监听 `closed` 调用 `resetData()`，确保所有关闭路径都在关闭动画
+结束后完成清理。`resetData()` 应统一重置表单、提交状态、临时选项和表单校验，不把清理逻辑散落在
+`open()`、取消按钮或提交成功回调中。
 
 ### MkComplexSearch
 
 用于在多个字段之间切换搜索条件。`fields` 中的基础字段使用 `@/api/types` 中的
 `OptionItem<string>`；字段包含 `options` 时使用下拉选择，否则使用文本输入。选项字段配置
 `remoteMethod` 后自动启用远程搜索，并由该方法异步加载当前字段的选项。输入或选择完成时，`change` 返回
-`{ [field]: value }`；切换字段或清空条件时返回 `undefined`。
+`{ [field]: value }`；选项字段配置 `multiple: true` 时启用多选并返回值数组。切换字段或清空条件时
+返回 `undefined`。
 
 ```vue
 <MkComplexSearch
@@ -238,6 +240,7 @@ Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus
     {
       label: '状态',
       value: 'enabled',
+      multiple: true,
       options: [
         { label: '启用', value: true },
         { label: '禁用', value: false },

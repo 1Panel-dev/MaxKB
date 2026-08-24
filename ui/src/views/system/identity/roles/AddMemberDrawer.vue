@@ -81,17 +81,12 @@ function submit() {
       .then(() => {
         MsgSuccess('添加成功')
         emit('refresh')
-        close()
+        visible.value = false
       })
       .finally(() => {
         loading.value = false
       })
   })
-}
-
-function close() {
-  visible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -189,7 +184,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
     </template>
   </MkDrawer>

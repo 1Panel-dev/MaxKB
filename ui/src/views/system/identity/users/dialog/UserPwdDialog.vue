@@ -76,17 +76,12 @@ async function submitPassword() {
           return router.push({ name: 'login' }).then(() => undefined)
         }
         emit('refresh')
-        close()
+        dialogVisible.value = false
       })
       .finally(() => {
         passwordSubmitting.value = false
       })
   })
-}
-
-function close() {
-  dialogVisible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -131,7 +126,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="dialogVisible = false">取消</el-button>
       <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
         保存
       </el-button>

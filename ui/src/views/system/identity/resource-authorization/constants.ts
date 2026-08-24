@@ -1,5 +1,7 @@
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type { OptionItem, ResourceAuthorizationType, ResourcePermission } from '@/api/types'
+import { useStore } from '@/stores'
+const { auth } = useStore()
 
 export const RESOURCE_AUTHORIZATION_LABELS: Record<ResourceAuthorizationType, string> = {
   [RESOURCE_TYPE.APPLICATION]: '智能体',
@@ -12,15 +14,7 @@ interface PermissionOption extends OptionItem<ResourcePermission> {
   description: string
 }
 
-export function getPermissionOptions({
-  allowRole,
-  isFolder = false,
-  isRootFolder = false,
-}: {
-  allowRole: boolean
-  isFolder?: boolean
-  isRootFolder?: boolean
-}): PermissionOption[] {
+export function getPermissionOptions(): PermissionOption[] {
   const permissionOptions: PermissionOption[] = [
     {
       description: '',
@@ -33,22 +27,18 @@ export function getPermissionOptions({
       value: RESOURCE_PERMISSION.VIEW,
     },
     {
-      description: '可对该资源进行修改和删除操作',
+      description: '可对该资源进行删改操作',
       label: '管理',
       value: RESOURCE_PERMISSION.MANAGE,
     },
-  ]
-
-  if (isRootFolder) {
-    return permissionOptions.filter(({ value }) => value !== RESOURCE_PERMISSION.NOT_AUTH)
-  }
-
-  if (allowRole && !isFolder) {
-    permissionOptions.push({
-      description: '根据用户角色决定对该资源的操作权限',
+    {
+      description: '根据用户角色中的权限授权用户对该资源的操作权限',
       label: '按用户角色',
       value: RESOURCE_PERMISSION.ROLE,
-    })
+    },
+  ]
+  if (auth.isCE) {
+    return permissionOptions.filter((item) => item.value !== RESOURCE_PERMISSION.ROLE)
   }
 
   return permissionOptions

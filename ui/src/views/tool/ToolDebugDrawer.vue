@@ -89,11 +89,6 @@ function open(tool: ToolPayload) {
   nextTick(() => formRef.value?.clearValidate())
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
-
 function getInitFieldType(field: ToolInitField) {
   if (field.input_type === 'PasswordInput') return 'password'
   if (field.input_type === 'JsonInput') return 'textarea'
@@ -130,7 +125,7 @@ function handleRun() {
   })
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>
@@ -145,7 +140,7 @@ defineExpose({ open, close })
   >
     <template #header>
       <div class="flex items-center gap-1">
-        <el-button link @click="close">
+        <el-button link @click="visible = false">
           <MkIcon :icon="Back" :size="20" />
         </el-button>
         <h4>调试</h4>
@@ -222,7 +217,7 @@ defineExpose({ open, close })
     </section>
 
     <template #footer>
-      <el-button @click="close">返回</el-button>
+      <el-button @click="visible = false">返回</el-button>
       <el-button type="primary" :loading="loading" @click="handleRun">运行</el-button>
     </template>
   </MkDrawer>

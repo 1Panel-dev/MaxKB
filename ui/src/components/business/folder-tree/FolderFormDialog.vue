@@ -72,10 +72,6 @@ function open(id: string, folder?: FolderItem) {
   visible.value = true
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
 function resetData() {
   editId.value = ''
   folderForm.desc = ''
@@ -84,7 +80,7 @@ function resetData() {
   folderFormRef.value?.clearValidate()
 }
 
-defineExpose({ close, open })
+defineExpose({ open })
 </script>
 
 <template>
@@ -120,7 +116,7 @@ defineExpose({ close, open })
     </el-form>
 
     <template #footer>
-      <el-button :disabled="loading" @click="close">取消</el-button>
+      <el-button :disabled="loading" @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>

@@ -61,7 +61,7 @@ function handleSubmit() {
     request
       .then(() => {
         MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        close()
+        visible.value = false
         emit('refresh')
       })
       .finally(() => {
@@ -92,20 +92,17 @@ function open(tool?: ToolItem) {
 
 function handleBeforeClose() {
   if (JSON.stringify(toolForm) === originalForm.value) {
-    close()
+    visible.value = false
     return
   }
   MsgConfirm('提示？', '当前的更改尚未保存，确认退出吗？', {
     confirmButtonText: '确认',
     confirmButtonType: 'primary',
   })
-    .then(() => close())
+    .then(() => {
+      visible.value = false
+    })
     .catch(() => {})
-}
-
-function close() {
-  visible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -123,7 +120,7 @@ function resetData() {
   formRef.value?.clearValidate()
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>
@@ -146,7 +143,7 @@ defineExpose({ open, close })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
-          <!-- // TODO -->
+          <!-- // TODO 头像 统一修改组件-->
           <ToolIcon :size="32" />
           <el-input
             v-model="toolForm.name"

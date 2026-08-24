@@ -60,42 +60,7 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
-/*
-  标题前带竖线样式
-*/
-.mk-title-decoration {
-  position: relative;
-  padding-left: 10px;
-  &:before {
-    position: absolute;
-    left: 2px;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 2px;
-    height: 67%;
-    content: '';
-    background: var(--el-color-primary);
-  }
-}
-
-/*
-  必填文字的星号
-*/
-.mk-required {
-  &:after {
-    content: '*';
-    color: var(--el-color-danger);
-    margin-left: 4px;
-  }
-}
-
-// 资源的card grid布局
-.mk-resource-card-grid {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-}
-
+// Codemirror 编辑器
 .cm-editor {
   --el-scrollbar-bg-color: var(--el-text-color-secondary);
   --el-scrollbar-hover-bg-color: var(--el-text-color-secondary);
@@ -146,6 +111,68 @@ h6 {
     border: none;
   }
   &.cm-focused {
-    outline: none!important;
+    outline: none !important;
+  }
+}
+
+/*
+  标题前带竖线样式
+*/
+.mk-title-decoration {
+  position: relative;
+  padding-left: 10px;
+  &:before {
+    position: absolute;
+    left: 2px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 2px;
+    height: 67%;
+    content: '';
+    background: var(--el-color-primary);
+  }
+}
+
+/*
+  必填文字的星号
+*/
+.mk-required {
+  &:after {
+    content: '*';
+    color: var(--el-color-danger);
+    margin-left: 4px;
+  }
+}
+
+// 资源的card grid布局
+.mk-resource-card-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+
+// radio-group 垂直排列
+.vertical-radio-group {
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--spacing) * 3);
+  width: 100%;
+
+  :deep(.el-radio) {
+    align-items: flex-start;
+    height: auto;
+    margin-right: 0;
+    white-space: normal;
+  }
+
+  :deep(.el-radio__input) {
+    margin-top: 3px;
+  }
+
+  :deep(.el-radio__label) {
+    line-height: var(--mk-line-height-base);
+    min-width: 0;
+    padding-left: calc(var(--spacing) * 2);
   }
 }

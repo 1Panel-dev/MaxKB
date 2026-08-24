@@ -42,11 +42,6 @@ function open(field?: ToolInitField) {
   nextTick(() => formRef.value?.clearValidate())
 }
 
-function close() {
-  visible.value = false
-  resetData()
-}
-
 function resetData() {
   isEdit.value = false
   Object.assign(initFieldForm, {
@@ -65,11 +60,11 @@ function handleSubmit() {
     if (!valid) return
 
     emit('refresh', structuredClone(toRaw(initFieldForm)))
-    close()
+    visible.value = false
   })
 }
 
-defineExpose({ open, close })
+defineExpose({ open })
 </script>
 
 <template>
@@ -114,7 +109,7 @@ defineExpose({ open, close })
       <el-form-item label="必填"><el-switch v-model="initFieldForm.required" /></el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="handleSubmit">{{ isEdit ? '保存' : '添加' }}</el-button>
     </template>
   </MkDialog>

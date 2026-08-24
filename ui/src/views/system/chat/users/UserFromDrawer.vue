@@ -94,7 +94,7 @@ async function submitUser() {
           .then(() => {
             MsgSuccess('编辑成功')
             emit('refresh', false)
-            close()
+            drawerVisible.value = false
           })
           .finally(() => {
             userSubmitting.value = false
@@ -111,7 +111,7 @@ async function submitUser() {
           .then(() => {
             MsgSuccess('创建成功')
             emit('refresh', true)
-            close()
+            drawerVisible.value = false
           })
           .finally(() => {
             userSubmitting.value = false
@@ -138,11 +138,6 @@ function open(user?: ChatUser) {
     loadDefaultPassword()
   }
   drawerVisible.value = true
-}
-
-function close() {
-  drawerVisible.value = false
-  resetData()
 }
 
 function resetData() {
@@ -239,7 +234,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="close">取消</el-button>
+      <el-button @click="drawerVisible = false">取消</el-button>
       <el-button :loading="userSubmitting" type="primary" @click="submitUser">
         {{ submitText }}
       </el-button>

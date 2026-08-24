@@ -5,8 +5,11 @@ import type { OptionItem } from '@/api/types'
 defineOptions({ name: 'MkComplexSearch' })
 
 interface ComplexSearchField extends OptionItem<string> {
+  multiple?: boolean
   remoteMethod?: (query: string) => Promise<unknown> | void
 }
+
+type SearchValue = boolean | number | string
 
 const props = withDefaults(
   defineProps<{
@@ -15,7 +18,7 @@ const props = withDefaults(
   {},
 )
 const emit = defineEmits<{
-  change: [value: Record<string, boolean | number | string> | undefined]
+  change: [value: Record<string, SearchValue | SearchValue[]> | undefined]
 }>()
 
 // 异步搜索
@@ -37,21 +40,23 @@ function handleRemoteSearch(query: string) {
   )
 }
 
-const searchValue = ref('')
 const searchField = ref(props.fields[0]?.value ?? '')
+const searchValue = ref<SearchValue | SearchValue[]>(props.fields[0]?.multiple ? [] : '')
 
 const activeField = computed(() => props.fields.find(({ value }) => value === searchField.value))
 
 function handleFieldChange() {
-  const shouldClearSearch = searchValue.value !== '' && searchValue.value !== undefined
+  const shouldClearSearch = Array.isArray(searchValue.value)
+    ? searchValue.value.length > 0
+    : searchValue.value !== ''
   remoteRequestId += 1
   remoteLoading.value = false
-  searchValue.value = ''
+  searchValue.value = activeField.value?.multiple ? [] : ''
   if (shouldClearSearch) emit('change', undefined)
 }
 
 function handleChange() {
-  if (searchValue.value === '' || searchValue.value === undefined) {
+  if (searchValue.value === '' || (Array.isArray(searchValue.value) && !searchValue.value.length)) {
     emit('change', undefined)
   } else {
     emit('change', { [searchField.value]: searchValue.value })
@@ -82,8 +87,11 @@ function handleChange() {
       class="mk-complex-search__value w-50!"
       clearable
       :loading="remoteLoading"
+      :multiple="activeField.multiple"
       placeholder="请选择"
       filterable
+      collapse-tags
+      collapse-tags-tooltip
       reserve-keyword
       :remote="Boolean(activeField.remoteMethod)"
       :remote-method="handleRemoteSearch"
