@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@antv/layout": "^2.0.0",
+    "@codemirror/lang-json": "^6.0.2",
     "@codemirror/lang-python": "^6.2.1",
     "@codemirror/lint": "^6.9.7",
     "@codemirror/state": "^6.7.1",
