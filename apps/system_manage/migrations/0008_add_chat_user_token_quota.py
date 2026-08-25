@@ -5,27 +5,24 @@ from django.db import migrations, models
 
 
 def migrate_historical_tokens(apps, schema_editor):
-    ChatRecord = apps.get_model('application', 'ChatRecord')
-    Chat = apps.get_model('application', 'Chat')
-    ChatUserTokenQuota = apps.get_model('system_manage', 'ChatUserTokenQuota')
+    ChatRecord = apps.get_model("application", "ChatRecord")
+    Chat = apps.get_model("application", "Chat")
+    ChatUserTokenQuota = apps.get_model("system_manage", "ChatUserTokenQuota")
 
-    chat_user_map = {
-        str(c['id']): str(c['chat_user_id'])
-        for c in Chat.objects.values('id', 'chat_user_id').iterator()
-    }
+    chat_user_map = {str(c["id"]): str(c["chat_user_id"]) for c in Chat.objects.values("id", "chat_user_id").iterator()}
     user_totals = {}
     queryset = ChatRecord.objects.filter(message_tokens__isnull=False) | ChatRecord.objects.filter(
-        answer_tokens__isnull=False)
-    for record in queryset.values('chat_id', 'message_tokens', 'answer_tokens').iterator(chunk_size=5000):
-        user_id = chat_user_map.get(str(record['chat_id']))
+        answer_tokens__isnull=False
+    )
+    for record in queryset.values("chat_id", "message_tokens", "answer_tokens").iterator(chunk_size=5000):
+        user_id = chat_user_map.get(str(record["chat_id"]))
         if not user_id:
             continue
-        tokens = (record['message_tokens'] or 0) + (record['answer_tokens'] or 0)
+        tokens = (record["message_tokens"] or 0) + (record["answer_tokens"] or 0)
         user_totals[user_id] = user_totals.get(user_id, 0) + tokens
 
     objs = [
-        ChatUserTokenQuota(user_id=uid, total_tokens=total, used_tokens=total)
-        for uid, total in user_totals.items()
+        ChatUserTokenQuota(user_id=uid, total_tokens=total, used_tokens=total) for uid, total in user_totals.items()
     ]
     if objs:
         ChatUserTokenQuota.objects.bulk_create(objs, batch_size=500)
