@@ -1,5 +1,6 @@
 /** API 枚举值的唯一公共入口。 */
 export * from './application'
+export * from './chat-user'
 export * from './login'
 export * from './system-role'
 export * from './model'
