@@ -189,8 +189,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'authentication',
           name: 'system-chat-authentication',
-          component: () =>
-            import('@/views/system/chat/authentication/AuthenticationView.vue'),
+          component: () => import('@/views/system/chat/authentication/AuthenticationView.vue'),
           meta: { title: '对话用户认证', order: 30 },
         },
         {
@@ -210,8 +209,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'authentication',
           name: 'system-login-authentication',
-          component: () =>
-            import('@/views/system/settings/authentication/AuthenticationView.vue'),
+          component: () => import('@/views/system/settings/authentication/AuthenticationView.vue'),
           meta: { title: '系统用户认证', order: 10 },
         },
         {
@@ -228,11 +226,16 @@ export const systemRoutes: RouteRecordRaw = {
         },
       ],
     },
-    // {
-    //   path: 'logs',
-    //   name: 'system-logs',
-    //   component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
-    //   meta: { title: '操作日志', icon: 'icon-setting', order: 60 },
-    // },
+    {
+      path: 'logs',
+      name: 'system-logs',
+      component: () => import('@/views/system/operate-logs/OperateLogListView.vue'),
+      meta: {
+        title: '操作日志',
+        icon: 'icon_logs_outlined',
+        activeIcon: 'icon_logs_filled',
+        order: 60,
+      },
+    },
   ],
 }

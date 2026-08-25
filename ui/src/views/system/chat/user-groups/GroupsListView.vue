@@ -200,7 +200,6 @@ onMounted(() => loadChatUserGroups())
           @current-change="loadGroupMembers()"
           @size-change="loadGroupMembers()"
           @selection-change="handleBatchSelectionChange"
-          :isSearching="Boolean(memberQuery)"
           :max-table-height="280"
         >
           <el-table-column type="selection" width="40" />

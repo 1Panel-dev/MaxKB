@@ -78,9 +78,13 @@ src/components/
 │   │   └── index.vue             # 布尔状态图标和文案
 │   ├── mk-table/
 │   │   ├── index.vue             # 表格、分页、列宽拖拽和批量操作
+│   │   ├── mk-table-filter.vue   # 表头多选筛选器
 │   │   └── mk-table-more-dropdown.vue # 表格操作列 More 下拉菜单
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
+├── mk-date-range/
+│   ├── index.vue                 # 日期预设与自定义日期区间组合筛选器，手动导入
+│   └── types.ts                  # 日期筛选结果类型
 ├── mk-search-list/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 ├── mk-form-list/
@@ -100,6 +104,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 ```ts
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
+import MkDateRange from '@/components/mk-date-range/index.vue'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
@@ -472,7 +477,26 @@ const paginationConfig = ref({
 
 `maxTableHeight` 表示窗口中除表格外需要扣除的高度，默认为 `250`；组件会在窗口尺寸变化时
 重新计算 `max-height`。传入 `resizable` 后启用列宽拖拽，并隐藏为拖拽借用的原生边框视觉。
-需要显示 Element Plus 原生边框时直接使用 `el-table`。
+`resizable` 采用白名单式启用：只有需求明确指定的页面级表格才能开启；未明确指定的表格，以及
+Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启。需要显示 Element Plus 原生边框
+时直接使用 `el-table`。
+
+表头需要多选筛选时使用 `MkTableFilter`。`label` 设置表头文案，`options` 接收
+`OptionItem<string>[]`，`v-model` 绑定已选值；初始不选择任何选项，确认或重置后通过 `change`
+返回筛选值。过长的选项文案会显示省略号，悬停时可查看完整文案。
+
+```vue
+<el-table-column prop="menu" min-width="140">
+  <template #header>
+    <MkTableFilter
+      v-model="selectedMenus"
+      label="操作菜单"
+      :options="menuOptions"
+      @change="loadRecords()"
+    />
+  </template>
+</el-table-column>
+```
 
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
 按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`。其他 Dropdown 属性和事件通过
@@ -512,6 +536,31 @@ const paginationConfig = ref({
 ```
 
 ## 手动导入组件
+
+### MkDateRange
+
+组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
+`change` 返回 `{ startTime, endTime }`；组件挂载时不主动触发 `change`。预设日期的 `endTime` 为
+空字符串，自定义日期清空时两个字段均为空字符串。组件不绑定具体接口字段，使用方负责初始化
+默认查询参数，并将筛选结果映射为业务查询参数。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import MkDateRange from '@/components/mk-date-range/index.vue'
+import type { MkDateRangeValue } from '@/components/mk-date-range/types'
+import { beforeDay } from '@/utils/time'
+
+const dateQuery = ref({ start_time: beforeDay(7), end_time: '' })
+
+function handleDateRangeChange({ startTime, endTime }: MkDateRangeValue) {
+  dateQuery.value = { start_time: startTime, end_time: endTime }
+  loadRecords()
+}
+</script>
+
+<MkDateRange @change="handleDateRangeChange" />
+```
 
 ### PythonCodeEditor
 

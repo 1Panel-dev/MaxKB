@@ -262,7 +262,6 @@ onMounted(() => loadWorkspaceOptions())
           :span-method="objectSpanMethod"
           :max-table-height="280"
           :row-key="getWorkspaceMemberRowKey"
-          :isSearching="Boolean(memberSearchQuery)"
         >
           <el-table-column type="selection" width="40" />
           <el-table-column prop="nick_name" label="姓名" />

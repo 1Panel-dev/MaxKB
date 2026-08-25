@@ -166,7 +166,6 @@ onMounted(() => loadSystemUsers())
         @current-change="loadSystemUsers()"
         @size-change="loadSystemUsers()"
         @selection-change="handleBatchSelectionChange"
-        :isSearching="Boolean(systemUserQuery)"
       >
         <el-table-column type="selection" width="40" />
         <el-table-column prop="nick_name" label="姓名" min-width="150" show-overflow-tooltip />

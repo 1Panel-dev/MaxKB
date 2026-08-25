@@ -60,6 +60,25 @@ h6 {
   line-height: var(--mk-line-height-base);
 }
 
+// 状态圆点
+.mk-dot-danger {
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  height: 6px;
+  width: 6px;
+  background-color: var(--mk-danger);
+}
+
+.mk-dot-success {
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+  height: 6px;
+  width: 6px;
+  background-color: var(--mk-success);
+}
+
 // Codemirror 编辑器
 .cm-editor {
   --el-scrollbar-bg-color: var(--el-text-color-secondary);

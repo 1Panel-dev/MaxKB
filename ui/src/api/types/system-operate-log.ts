@@ -22,13 +22,3 @@ export interface OperateLogMenuOption {
   menu: string
   menu_label: string
 }
-
-export interface OperateLogQuery extends RequestParams {
-  end_time?: string
-  ip_address?: string
-  menu?: string
-  start_time?: string
-  status?: string
-  user?: string
-  workspace_ids?: string
-}
