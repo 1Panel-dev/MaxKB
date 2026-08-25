@@ -8,12 +8,14 @@ defineSlots<{
 
 <template>
   <MkDropdown trigger="click" placement="bottom-end" :teleported="false">
-    <el-button class="-mb-[2px] -mr-1"  text>
+    <el-button class="-mb-[2px] -mr-1" text>
       <MkIcon name="icon_more_outlined" />
     </el-button>
 
     <template #dropdown>
-      <slot />
+      <MkDropdownMenu>
+        <slot />
+      </MkDropdownMenu>
     </template>
   </MkDropdown>
 </template>

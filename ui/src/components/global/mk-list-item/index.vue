@@ -56,7 +56,9 @@ const slotRow = computed(() => row as T)
           <MkIcon name="icon_more_outlined" />
         </el-button>
         <template #dropdown>
-          <slot name="action-dropdown" :row="slotRow" :index="index" />
+          <MkDropdownMenu>
+            <slot name="action-dropdown" :row="slotRow" :index="index" />
+          </MkDropdownMenu>
         </template>
       </MkDropdown>
       <slot v-else name="action" :row="slotRow" :index="index" />

@@ -397,24 +397,22 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
         </template>
 
         <template v-if="canEdit" #action-dropdown="{ row }">
-          <MkDropdownMenu>
-            <MkDropdownItem @click="handleOpenCreateChildFolder(row)">
-              <template #icon><MkIcon name="icon_add-folder_outlined" /></template>
-              <span>创建子文件夹</span>
-            </MkDropdownItem>
-            <MkDropdownItem @click="handleOpenEditFolder(row)">
-              <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>编辑</span>
-            </MkDropdownItem>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="a-icon_move2_outlined" /></template>
-              <span>移动到</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided @click="handleDeleteFolder(row)">
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem @click="handleOpenCreateChildFolder(row)">
+            <template #icon><MkIcon name="icon_add-folder_outlined" /></template>
+            <span>创建子文件夹</span>
+          </MkDropdownItem>
+          <MkDropdownItem @click="handleOpenEditFolder(row)">
+            <template #icon><MkIcon name="icon_edit_outlined" /></template>
+            <span>编辑</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="a-icon_move2_outlined" /></template>
+            <span>移动到</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided @click="handleDeleteFolder(row)">
+            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+            <span>删除</span>
+          </MkDropdownItem>
         </template>
       </VirtualizedTree>
     </div>

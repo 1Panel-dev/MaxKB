@@ -10,6 +10,7 @@ import UserFromDrawer from './UserFromDrawer.vue'
 import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserGroupDialog from './dialog/BatchSetUserGroupDialog.vue'
+import QuotaSettingsDialog from './dialog/QuotaSettingsDialog.vue'
 
 /* 添加编辑用户表单drawer */
 const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
@@ -83,6 +84,13 @@ const userPwdDialogRef = ref<InstanceType<typeof UserPwdDialog>>()
 
 function handleOpenUserPwdDialog(chatUser: ChatUser) {
   userPwdDialogRef.value?.open(chatUser)
+}
+
+/* 配额设置dialog */
+const quotaSettingsDialogRef = ref<InstanceType<typeof QuotaSettingsDialog>>()
+
+function handleOpenQuotaSettingsDialog(chatUser: ChatUser) {
+  quotaSettingsDialogRef.value?.open(chatUser.id)
 }
 
 /* 修改用户状态 */
@@ -241,11 +249,21 @@ onMounted(() => loadChatUsers())
                     <mk-icon name="icon-key_outlined"></mk-icon>
                   </el-button>
                 </el-tooltip>
-                <el-tooltip content="删除" placement="top">
-                  <el-button type="primary" text @click.stop="deleteUser(row)">
-                    <mk-icon name="icon_delete-trash_outlined"></mk-icon>
-                  </el-button>
-                </el-tooltip>
+                <!-- 更多 -->
+                <MkTableMoreDropdown>
+                  <MkDropdownItem @click="handleOpenQuotaSettingsDialog(row)">
+                    <template #icon>
+                      <MkIcon name="icon_edit_outlined" />
+                    </template>
+                    <span>配额设置</span>
+                  </MkDropdownItem>
+                  <MkDropdownItem divided @click="deleteUser(row)">
+                    <template #icon>
+                      <MkIcon name="icon_delete-trash_outlined" />
+                    </template>
+                    <span>删除</span>
+                  </MkDropdownItem>
+                </MkTableMoreDropdown>
               </div>
             </div>
           </template>
@@ -264,4 +282,5 @@ onMounted(() => loadChatUsers())
   <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
   <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
   <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
+  <QuotaSettingsDialog ref="quotaSettingsDialogRef" />
 </template>

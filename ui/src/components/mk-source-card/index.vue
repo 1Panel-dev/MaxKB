@@ -20,9 +20,7 @@ import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
  *   <component :is="Action">
  *     <el-switch v-model="active" size="small" />
  *     <component :is="ActionDropdown">
- *       <MkDropdownMenu>
- *         <MkDropdownItem>编辑</MkDropdownItem>
- *       </MkDropdownMenu>
+ *       <MkDropdownItem>编辑</MkDropdownItem>
  *     </component>
  *   </component>
  * </template>
@@ -30,7 +28,7 @@ import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
 defineOptions({ name: 'MkSourceCard' })
 
 const props = defineProps<{
-  create_time?: string  //创建日期
+  create_time?: string //创建日期
   nick_name?: string // 创建者
   title: string
 }>()

@@ -72,24 +72,22 @@ const errMessage = computed(() => {
     <template #footer="{ Action, ActionDropdown }">
       <component :is="Action" v-if="!props.shared">
         <component :is="ActionDropdown">
-          <MkDropdownMenu>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>编辑</span>
-            </MkDropdownItem>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="icon_preferences_outlined" /></template>
-              <span>模型参数设置</span>
-            </MkDropdownItem>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
-              <span>资源授权</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided>
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_edit_outlined" /></template>
+            <span>编辑</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_preferences_outlined" /></template>
+            <span>模型参数设置</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
+            <span>资源授权</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided>
+            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+            <span>删除</span>
+          </MkDropdownItem>
         </component>
       </component>
     </template>

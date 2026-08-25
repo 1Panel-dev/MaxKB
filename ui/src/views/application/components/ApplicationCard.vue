@@ -70,12 +70,10 @@ function handleSettingApplication(event: MouseEvent) {
       <component :is="Action">
         <el-divider direction="vertical" />
         <component :is="ActionDropdown">
-          <MkDropdownMenu>
-            <MkDropdownItem @click="handleSettingApplication">
-              <template #icon><MkIcon name="icon-setting" /></template>
-              <span>设置</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem @click="handleSettingApplication">
+            <template #icon><MkIcon name="icon-setting" /></template>
+            <span>设置</span>
+          </MkDropdownItem>
         </component>
       </component>
     </template>
