@@ -1731,6 +1731,11 @@ msgstr "该邮箱未注册，请先注册"
 msgid "The verification code is incorrect or the verification code has expired"
 msgstr "验证码不正确或已过期"
 
+#: apps/users/serializers/user.py:79
+#: apps/users/serializers/user.py:90
+msgid "Too many verification code attempts, please request a new code"
+msgstr "验证码错误次数过多，请重新获取验证码"
+
 #: apps/common/constants/exception_code_constants.py:39
 msgid "The username has been registered, please log in directly"
 msgstr "用户名已注册，请直接登录"
