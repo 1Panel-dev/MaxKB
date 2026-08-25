@@ -88,6 +88,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
 | `home/HomeView.vue`                                                    | Workspace 首页                         |
+| `knowledge/KnowledgeView.vue`                                          | 工作空间知识库目录与知识库卡片页面     |
 | `knowledge/KnowledgeDetailView.vue`                                    | 知识库详情页面                         |
 | `knowledge/DocumentDetailView.vue`                                     | 知识库文档详情页面                     |
 | `login/LoginView.vue`                                                  | Admin 登录页面                         |
@@ -100,7 +101,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/identity/users/UserListView.vue`                               | 用户列表页面                           |
 | `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                       |
 | `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面             |
-| `system/chat/users/UserListView.vue`                                   | 对话用户列表及用户导入管理页面         |
+| `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面   |
 | `system/settings/AppearanceSettingsView.vue`                           | 系统外观设置和登录外观预览页面         |
 | `system/settings/authentication/AuthenticationSettingsView.vue`        | 系统登录及认证源配置页面               |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面             |

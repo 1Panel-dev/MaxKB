@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute } from 'vue-router'
-import ApplicationApi from '@/api/admin/workspace/application'
+import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import { MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { nodeDict } from '@/workflow-canvas/config/node-mapping'

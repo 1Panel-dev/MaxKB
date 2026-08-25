@@ -213,20 +213,18 @@ onMounted(() => loadWorkspaceOptions())
         @click="handleWorkspaceSelect"
       >
         <template #action-dropdown="{ row: workspace }">
-          <MkDropdownMenu>
-            <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
-              <template #icon>
-                <MkIcon name="icon_edit_outlined" />
-              </template>
-              <span>重命名</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided @click="handleWorkspaceDelete(workspace)">
-              <template #icon>
-                <MkIcon name="icon_delete-trash_outlined" />
-              </template>
-              <span>删除</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
+            <template #icon>
+              <MkIcon name="icon_edit_outlined" />
+            </template>
+            <span>重命名</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided @click="handleWorkspaceDelete(workspace)">
+            <template #icon>
+              <MkIcon name="icon_delete-trash_outlined" />
+            </template>
+            <span>删除</span>
+          </MkDropdownItem>
         </template>
       </MkSearchList>
     </template>

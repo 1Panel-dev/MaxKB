@@ -192,7 +192,7 @@ defineExpose({ clearSelection, tableRef })
     </div>
 
     <footer
-      v-if="selectedRows.length > 0 && $slots.footerBatchActions"
+      v-if="selectedRows.length > 0 && $slots['footer-batch-actions']"
       class="sticky -mb-6 -ml-6 bottom-0 z-10 mt-auto flex shrink-0 items-center border-t bg-white px-6 py-4"
     >
       <div class="mr-4 flex items-center gap-3">

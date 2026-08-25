@@ -46,6 +46,7 @@ export const useThemeStore = defineStore('theme', {
 
     /** 保存主题信息并同步项目运行时颜色变量。 */
     applyThemeInfo(themeInfo: ThemeInfo) {
+      // TODO: 主题还未实现
       this.themeInfo = { ...DEFAULT_THEME_INFO, ...themeInfo }
       const themeColor = this.themeInfo.theme || DEFAULT_THEME_COLOR
       const rootStyle = document.documentElement.style

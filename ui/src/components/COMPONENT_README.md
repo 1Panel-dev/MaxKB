@@ -77,7 +77,8 @@ src/components/
 │   ├── mk-status-label/
 │   │   └── index.vue             # 布尔状态图标和文案
 │   ├── mk-table/
-│   │   └── index.vue             # 表格、分页、列宽拖拽和批量操作
+│   │   ├── index.vue             # 表格、分页、列宽拖拽和批量操作
+│   │   └── mk-table-more-dropdown.vue # 表格操作列 More 下拉菜单
 │   └── mk-tag-group/
 │       └── index.vue             # 标签折叠和剩余标签浮层
 ├── mk-search-list/
@@ -409,7 +410,8 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 
 数据驱动使用时传入 `row`。`label-field` 默认读取 `name`，`index` 默认为 `0`；未提供默认插槽时
 组件显示对应字段文本。`action` 和 `action-dropdown` 插槽需要配合 `row` 使用，并接收 `row`、
-`index`。
+`index`。`action-dropdown` 由组件统一渲染 More 触发器、`MkDropdown` 和 `MkDropdownMenu`，插槽中
+直接放置 `MkDropdownItem`。
 
 ```vue
 <MkListItem :active="currentRole?.id === role.id" :row="role" @click="selectRole(role)" />
@@ -471,6 +473,17 @@ const paginationConfig = ref({
 `maxTableHeight` 表示窗口中除表格外需要扣除的高度，默认为 `250`；组件会在窗口尺寸变化时
 重新计算 `max-height`。传入 `resizable` 后启用列宽拖拽，并隐藏为拖拽借用的原生边框视觉。
 需要显示 Element Plus 原生边框时直接使用 `el-table`。
+
+表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
+按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`。其他 Dropdown 属性和事件通过
+`$attrs` 传入，菜单容器样式通过 `menu-class` 设置。
+
+```vue
+<MkTableMoreDropdown menu-class="w-40">
+  <MkDropdownItem>配额设置</MkDropdownItem>
+  <MkDropdownItem divided @click="deleteUser(row)">删除</MkDropdownItem>
+</MkTableMoreDropdown>
+```
 
 包含 `type="selection"` 的选择列时，选择数据会显示页面底部操作栏。批量按钮放入
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
@@ -539,7 +552,8 @@ const config = defineModel<unknown>({ required: true })
 `footer` 插槽作为左侧常驻内容并始终贴在卡片底部；无论是否传入内容，底部都会保留固定位置。
 `footer` 作用域提供 `Action` 和 `ActionDropdown`。左侧常驻内容与 `Action` 写在同一个插槽内；
 `Action` 是卡片悬浮或内部获得焦点时显示的右侧操作容器，可以只放开关或按钮。
-需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，下拉菜单内容写入其默认插槽。
+需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，组件会统一渲染 `MkDropdownMenu`，默认
+插槽中直接放置 `MkDropdownItem`。
 需要自定义头部时可
 通过 `icon`、`title`、`subtitle` 和 `tag` 插槽覆盖对应区域；`title` 插槽提供 `{ title }`，
 便于在保留标题文案的同时追加状态图标等内容。
@@ -561,10 +575,8 @@ import MkSourceCard from '@/components/mk-source-card/index.vue'
     <component :is="Action">
       <el-switch size="small" />
       <component :is="ActionDropdown">
-        <MkDropdownMenu>
-          <MkDropdownItem>编辑</MkDropdownItem>
-          <MkDropdownItem>删除</MkDropdownItem>
-        </MkDropdownMenu>
+        <MkDropdownItem>编辑</MkDropdownItem>
+        <MkDropdownItem>删除</MkDropdownItem>
       </component>
     </component>
   </template>
@@ -654,7 +666,7 @@ Props 和模型：
 - `data` 应传入全量数据；组件内的 50 条分批仅用于控制 DOM 渲染数量，不替代后端分页。
 - 搜索词或数据源变化时，渲染范围和滚动位置会重置到第一批。
 - 提供 `action-dropdown` 时，组件内部使用固定 More 按钮和点击型、非 Teleport 的
-  `MkDropdown`。
+  `MkDropdown`，并统一包裹 `MkDropdownMenu`；插槽中直接放置 `MkDropdownItem`。
 - `action` 和 `action-dropdown` 二选一；同时提供时优先渲染 `action-dropdown`，不渲染 `action`。
 
 #### 默认字段示例
@@ -711,11 +723,9 @@ function selectItem(item: SearchListItem, index: number) {
     <span :class="{ 'font-medium': active }">{{ workspace.displayName }}</span>
   </template>
   <template #action-dropdown="{ row: workspace }">
-    <MkDropdownMenu>
-      <MkDropdownItem @click="editWorkspace(workspace)">
-        编辑 {{ workspace.displayName }}
-      </MkDropdownItem>
-    </MkDropdownMenu>
+    <MkDropdownItem @click="editWorkspace(workspace)">
+      编辑 {{ workspace.displayName }}
+    </MkDropdownItem>
   </template>
 </MkSearchList>
 ```

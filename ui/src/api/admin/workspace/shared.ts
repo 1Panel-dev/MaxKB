@@ -1,6 +1,6 @@
 import { get } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { RequestParams, ModelItem, ToolItem } from '@/api/types'
+import type { KnowledgeItem, RequestParams, ModelItem, ToolItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -15,10 +15,22 @@ const getModelList = (query?: RequestParams) => {
 
 /** 获取工作空间共享的工具列表。 */
 const getToolPage = (page: ParamsPage, query?: RequestParams) => {
-  return get<ResponsePage<ToolItem>>(`${getPrefix()}/tool/${page.currentPage}/${page.pageSize}`, query)
+  return get<ResponsePage<ToolItem>>(
+    `${getPrefix()}/tool/${page.currentPage}/${page.pageSize}`,
+    query,
+  )
+}
+
+/** 获取工作空间共享的知识库列表。 */
+const getKnowledgePage = (page: ParamsPage, query?: RequestParams) => {
+  return get<ResponsePage<KnowledgeItem>>(
+    `${getPrefix()}/knowledge/${page.currentPage}/${page.pageSize}`,
+    query,
+  )
 }
 
 export default {
+  getKnowledgePage,
   getModelList,
   getToolPage,
 }

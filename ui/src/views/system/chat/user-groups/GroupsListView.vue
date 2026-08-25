@@ -160,16 +160,14 @@ onMounted(() => loadChatUserGroups())
         @click="handleGroupSelect"
       >
         <template #action-dropdown="{ row }">
-          <MkDropdownMenu>
-            <MkDropdownItem @click="handleOpenGroupDialog(row)">
-              <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>重命名</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided @click="deleteGroup(row)">
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem @click="handleOpenGroupDialog(row)">
+            <template #icon><MkIcon name="icon_edit_outlined" /></template>
+            <span>重命名</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided @click="deleteGroup(row)">
+            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+            <span>删除</span>
+          </MkDropdownItem>
         </template>
       </MkSearchList>
     </template>

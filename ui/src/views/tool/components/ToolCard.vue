@@ -137,32 +137,30 @@ function handleExportTool(tool: ToolItem) {
         />
         <el-divider direction="vertical" />
         <component :is="ActionDropdown">
-          <MkDropdownMenu>
-            <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.CUSTOM">
-              <template #icon><MkIcon name="icon_edit_outlined" /></template>
-              <span>编辑</span>
-            </MkDropdownItem>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="icon_assigned_outlined" /></template>
-              <span>资源授权</span>
-            </MkDropdownItem>
-            <MkDropdownItem @click="emit('copy', tool)">
-              <template #icon><mk-icon name="icon_copy_outlined"></mk-icon></template>
-              <span>复制</span>
-            </MkDropdownItem>
-            <MkDropdownItem>
-              <template #icon><MkIcon name="icon_move2_outlined" /></template>
-              <span>移动到</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided @click="handleExportTool(tool)">
-              <template #icon><MkIcon name="icon_export_outlined" /></template>
-              <span>导出</span>
-            </MkDropdownItem>
-            <MkDropdownItem divided @click="handleDeleteTool">
-              <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-              <span>删除</span>
-            </MkDropdownItem>
-          </MkDropdownMenu>
+          <MkDropdownItem v-if="tool.tool_type === TOOL_TYPE.CUSTOM">
+            <template #icon><MkIcon name="icon_edit_outlined" /></template>
+            <span>编辑</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_assigned_outlined" /></template>
+            <span>资源授权</span>
+          </MkDropdownItem>
+          <MkDropdownItem @click="emit('copy', tool)">
+            <template #icon><mk-icon name="icon_copy_outlined"></mk-icon></template>
+            <span>复制</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_move2_outlined" /></template>
+            <span>移动到</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided @click="handleExportTool(tool)">
+            <template #icon><MkIcon name="icon_export_outlined" /></template>
+            <span>导出</span>
+          </MkDropdownItem>
+          <MkDropdownItem divided @click="handleDeleteTool">
+            <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
+            <span>删除</span>
+          </MkDropdownItem>
         </component>
       </component>
     </template>

@@ -1,5 +1,5 @@
-import { get, put } from '../core/request'
-import type { ParamsPage, ResponsePage } from '../core/types'
+import { get, put } from '../../core/request'
+import type { ParamsPage, ResponsePage } from '../../core/types'
 import type {
   ApplicationDetail,
   ApplicationFormPayload,

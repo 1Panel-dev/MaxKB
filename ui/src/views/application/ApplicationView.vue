@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
-import ApplicationApi from '@/api/admin/workspace/application'
+import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import type { ApplicationDetail, FolderItem, OptionItem, RequestParams } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'

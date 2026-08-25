@@ -16,7 +16,7 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
       {
         path: '',
         name: 'workspace-knowledge-list',
-        component: () => import('@/views/home/HomeView.vue'),
+        component: () => import('@/views/knowledge/KnowledgeView.vue'),
         meta: { title: '知识库列表', hidden: true },
       },
       {
