@@ -8732,7 +8732,6 @@ msgstr ""
 msgid "generate prompt"
 msgstr ""
 
-
 msgid "Watermark"
 msgstr ""
 
@@ -9604,4 +9603,46 @@ msgid "The token quota for the current period has been exhausted. Please contact
 msgstr ""
 
 msgid "Get portal historical conversation by page"
+msgstr ""
+
+msgid "Too many verification code attempts, please try again later"
+msgstr ""
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language: zh / en, auto detected when omitted"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:22
+msgid "Auto detect"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:23
+msgid "Chinese"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "Audio encoding"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "pcm / wav / ogg / mp3, auto detected when omitted"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:34
+msgid "Auto"
+msgstr ""
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:76
+msgid "Tokenhub sync_transcribe endpoint"
 msgstr ""
