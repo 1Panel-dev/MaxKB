@@ -10,11 +10,12 @@ from models_provider.impl.tencent_model_provider.credential.embedding import Ten
 from models_provider.impl.tencent_model_provider.credential.image import TencentVisionModelCredential
 from models_provider.impl.tencent_model_provider.credential.llm import TencentLLMModelCredential
 from models_provider.impl.tencent_model_provider.credential.stt import TencentSTTModelCredential
+from models_provider.impl.tencent_model_provider.credential.tokenhub_stt import TencentTokenhubSTTModelCredential
 from models_provider.impl.tencent_model_provider.credential.tti import TencentTTIModelCredential
 from models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
 from models_provider.impl.tencent_model_provider.model.image import TencentVision
 from models_provider.impl.tencent_model_provider.model.llm import TencentModel
-from models_provider.impl.tencent_model_provider.model.stt import TencentSpeechToText
+from models_provider.impl.tencent_model_provider.model.stt import TencentSpeechToText, TencentWandSpeechToText
 from models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
@@ -78,6 +79,18 @@ def _initialize_model_info():
             ModelTypeConst.STT,
             TencentSTTModelCredential,
             TencentSpeechToText),
+        _create_model_info(
+            'wand-asr-v1',
+            _('Tencent WAND ASR online recognition, supports long audio/video. Outputs text with sentence-level timestamps.'),
+            ModelTypeConst.STT,
+            TencentTokenhubSTTModelCredential,
+            TencentWandSpeechToText),
+        _create_model_info(
+            'hy-asr-3.0-preview',
+            _('Tencent Hunyuan ASR 3.0 (preview) online recognition. Accepts the same request/response format as wand-asr-v1.'),
+            ModelTypeConst.STT,
+            TencentTokenhubSTTModelCredential,
+            TencentWandSpeechToText),
     ]
 
     tencent_embedding_model_info = _create_model_info(
@@ -124,6 +137,12 @@ class TencentModelProvider(IModelProvider):
 
     def get_model_info_manage(self):
         return self._model_info_manage
+
+    def get_model(self, model_type, model_name, model_credential, **model_kwargs):
+        # STT 模型：模型名不以 asr- 开头的一律走 Tencent Tokenhub WAND 识别
+        if model_type == ModelTypeConst.STT.name and not model_name.startswith('asr-'):
+            return TencentWandSpeechToText.new_instance(model_type, model_name, model_credential, **model_kwargs)
+        return super().get_model(model_type, model_name, model_credential, **model_kwargs)
 
     def get_model_provide_info(self):
         icon_path = _get_tencent_icon_path()
