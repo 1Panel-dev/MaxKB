@@ -98,6 +98,31 @@ async function getResponseErrorMessage(error: unknown) {
   return responseData?.message
 }
 
+async function downloadExportResponse(
+  response: AxiosResponse<Blob>,
+  fileName: string,
+  mimeType = 'application/octet-stream',
+) {
+  if (response.data.type.includes('application/json')) {
+    const text = await response.data.text()
+    try {
+      const data = JSON.parse(text) as Partial<ApiResponse<unknown>>
+      MsgError(data.message || text)
+    } catch {
+      MsgError(text)
+    }
+    throw new Error('Response is not a valid file')
+  }
+
+  const blob = new Blob([response.data], { type: mimeType })
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  link.download = extractFilename(response.headers['content-disposition']) || fileName
+  link.click()
+  URL.revokeObjectURL(link.href)
+  return true
+}
+
 export const request = axios.create({
   baseURL: `${ADMIN_BASE_PATH.replace(/\/+$/, '')}/api`,
   timeout: DEFAULT_TIMEOUT,
@@ -197,24 +222,29 @@ export async function getExportFile(
       skipGlobalErrorMessage: true,
     } as ExportRequestConfig)
 
-    if (response.data.type.includes('application/json')) {
-      const text = await response.data.text()
-      try {
-        const data = JSON.parse(text) as Partial<ApiResponse<unknown>>
-        MsgError(data.message || text)
-      } catch {
-        MsgError(text)
-      }
-      throw new Error('Response is not a valid file')
-    }
+    return downloadExportResponse(response, fileName)
+  } finally {
+    finishLoading(loading)
+  }
+}
 
-    const blob = new Blob([response.data], { type: 'application/octet-stream' })
-    const link = document.createElement('a')
-    link.href = URL.createObjectURL(blob)
-    link.download = extractFilename(response.headers['content-disposition']) || fileName
-    link.click()
-    URL.revokeObjectURL(link.href)
-    return true
+/** 发送 POST 请求并将 Blob 响应下载为 Excel 文件。 */
+export async function postExportExcel<TData = unknown>(
+  fileName: string,
+  url: string,
+  params?: RequestParams,
+  data?: TData,
+  loading?: LoadingTarget,
+): Promise<boolean> {
+  startLoading(loading)
+  try {
+    const response = await request.post<Blob>(url, data, {
+      params,
+      responseType: 'blob',
+      skipGlobalErrorMessage: true,
+    } as ExportRequestConfig)
+
+    return downloadExportResponse(response, fileName, 'application/vnd.ms-excel')
   } finally {
     finishLoading(loading)
   }
@@ -230,7 +260,6 @@ export function post<TData = unknown, T = unknown>(
 ) {
   return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
 }
-
 
 /** 发送 PUT 请求。 */
 export function put<TData = unknown, T = unknown>(

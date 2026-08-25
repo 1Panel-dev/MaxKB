@@ -170,6 +170,18 @@ CSS 自定义属性同样按变量名排序。嵌套选择器、伪类和媒体�
 </div>
 ```
 
+## 状态圆点
+
+成功与失败状态的圆点样式统一由 `app.scss` 提供。根据业务状态使用 `mk-dot-success` 或
+`mk-dot-danger`，文字和圆点的布局继续由使用方通过 Tailwind 组合。
+
+```html
+<span class="inline-flex items-center gap-2">
+  <span class="mk-dot-success"></span>
+  <span>成功</span>
+</span>
+```
+
 ## Tailwind 中的 `p`（padding）
 
 - Tailwind 默认间距标尺中，`1` 个单位等于 `0.25rem`。

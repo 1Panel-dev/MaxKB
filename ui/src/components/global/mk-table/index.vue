@@ -18,8 +18,7 @@ const props = withDefaults(
     data?: unknown[]
     maxTableHeight?: number
     paginationConfig?: PaginationConfig
-    resizable?: boolean
-    isSearching?: boolean
+    resizable?: boolean // 非指定表格禁止开启
   }>(),
   {
     data: () => [],
@@ -68,51 +67,6 @@ function clearSelection() {
   selectedRows.value = []
 }
 
-/**
- * 列宽拖拽
- * resizable 借用 Element Plus border 开启拖拽交互，并补充固定在列边界的 Hover 提示线。
- */
-const tableRootRef = ref<HTMLElement>()
-const resizeHoverStyle = ref<{ height: string; left: string; top: string }>()
-
-function clearResizeHover() {
-  resizeHoverStyle.value = undefined
-}
-
-function handleTableMouseMove(event: MouseEvent) {
-  if (!props.resizable) {
-    clearResizeHover()
-    return
-  }
-
-  const resizeProxy = tableRootRef.value?.querySelector('.el-table__column-resize-proxy')
-
-  if (resizeProxy instanceof HTMLElement && resizeProxy.style.display !== 'none') {
-    clearResizeHover()
-    return
-  }
-
-  const target = event.target instanceof Element ? event.target.closest('th.el-table__cell') : null
-
-  if (document.body.style.cursor !== 'col-resize' || !(target instanceof HTMLElement)) {
-    clearResizeHover()
-    return
-  }
-
-  const rootRect = tableRootRef.value?.getBoundingClientRect()
-  const targetRect = target.getBoundingClientRect()
-
-  if (!rootRect) {
-    return
-  }
-
-  resizeHoverStyle.value = {
-    height: `${targetRect.height}px`,
-    left: `${targetRect.right - rootRect.left}px`,
-    top: `${targetRect.top - rootRect.top}px`,
-  }
-}
-
 /** 分页 */
 function handleCurrentPageChange(currentPage: number) {
   if (!props.paginationConfig) {
@@ -152,12 +106,7 @@ defineExpose({ clearSelection, tableRef })
 </script>
 
 <template>
-  <div
-    ref="tableRootRef"
-    class="mk-table relative flex w-full min-h-0 flex-1 flex-col"
-    @mouseleave="clearResizeHover"
-    @mousemove="handleTableMouseMove"
-  >
+  <div class="mk-table relative flex w-full min-h-0 flex-1 flex-col">
     <el-table
       ref="tableRef"
       :class="{ 'mk-table__resizable--borderless': props.resizable }"
@@ -170,12 +119,6 @@ defineExpose({ clearSelection, tableRef })
     >
       <slot />
     </el-table>
-
-    <div
-      v-if="props.resizable && resizeHoverStyle"
-      class="mk-table__resize-hover-indicator"
-      :style="resizeHoverStyle"
-    />
 
     <div class="mt-4 flex justify-end" v-if="props.paginationConfig">
       <el-pagination
@@ -212,6 +155,8 @@ defineExpose({ clearSelection, tableRef })
 
 <style scoped lang="scss">
 :deep(.mk-table__resizable--borderless) {
+  border: none !important;
+
   &,
   &::after,
   &::before,
@@ -223,14 +168,21 @@ defineExpose({ clearSelection, tableRef })
   .el-table__border-left-patch {
     display: none;
   }
-}
 
-.mk-table__resize-hover-indicator {
-  background-color: color-mix(in srgb, var(--mk-primary) 20%, transparent);
-  pointer-events: none;
-  position: absolute;
-  transform: translateX(-50%);
-  width: 6px;
-  z-index: 10;
+  .el-table__header-wrapper:hover th.el-table__cell:not(:last-child)::after {
+    background-color: var(--mk-N300);
+    content: '';
+    height: 22px;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2px;
+    z-index: 1;
+  }
+  .el-table__column-resize-proxy {
+    border-left: 2px solid var(--el-color-primary);
+  }
 }
 </style>

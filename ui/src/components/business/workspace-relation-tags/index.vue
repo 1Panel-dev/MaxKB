@@ -22,7 +22,7 @@ const tableData = computed(() => {
     <template #reference>
       <MkTagGroup :tags="tags" popover-disabled class="cursor-pointer" />
     </template>
-    <div class="px-3 py-2">
+    <div class="p-6">
       <MkTable :data="tableData" max-height="300">
         <template v-for="(label, prop) in tableRenderParams" :key="prop">
           <el-table-column

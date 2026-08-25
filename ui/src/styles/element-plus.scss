@@ -54,6 +54,9 @@
   height: auto;
   padding: 7px 11px;
   line-height: 16px;
+  &--small {
+    padding: 5px 11px;
+  }
   &:not(.is-link, .is-text, .is-circle) {
     min-width: 80px;
   }
@@ -244,6 +247,13 @@
 }
 
 /* dialog */
+.el-date-editor {
+  .el-range__icon {
+    color: var(--mk-N600);
+  }
+}
+
+/* dialog */
 .el-dialog {
   --el-dialog-padding-primary: 24px;
   --el-dialog-title-font-size: 16px;
@@ -274,6 +284,7 @@
   &__body {
     padding-top: var(--el-dialog-padding-primary);
     padding-bottom: var(--el-dialog-padding-primary);
+    color: var(--el-text-color-primary);
   }
   &__footer {
     padding: 0;
@@ -508,6 +519,9 @@
 /* popover */
 .el-popover {
   --el-popover-border-radius: var(--el-border-radius-base);
+  &.el-popper {
+    padding: 0;
+  }
 }
 
 /* popper */
@@ -536,7 +550,7 @@
       translate: 0 8px;
     }
   }
-  &.el-tooltip:not(.el-select__popper, .el-dropdown__popper, .el-popover, .el-cascader__dropdown) {
+  &.el-tooltip.is-dark {
     max-width: 320px;
   }
 }

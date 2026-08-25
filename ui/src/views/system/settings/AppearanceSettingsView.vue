@@ -203,8 +203,8 @@ const selectTheme = (themeOption: ThemeOption) => {
     padding: 2px calc(var(--spacing) * 2);
 
     &.active {
-      background: rgb(var(--mk-primary-rgb) / 10%);
-      color: var(--mk-primary);
+      // background: rgb(var(--mk-primary-rgb) / 10%);
+      // color: var(--mk-primary);
     }
   }
 }

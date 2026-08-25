@@ -12,7 +12,7 @@ src/utils/
 ├── clipboard.ts          # 剪贴板文本复制和成功反馈
 ├── message.ts            # Element Plus 全局消息提示的统一封装
 ├── number.ts             # 跨页面复用的数字计算、转换和格式化函数
-├── time.ts               # 跨页面复用的日期时间格式化函数
+├── time.ts               # 跨页面复用的日期时间计算与格式化函数
 └── use-responsive.ts     # 需要同步组件状态时使用的响应式屏幕判断
 ```
 

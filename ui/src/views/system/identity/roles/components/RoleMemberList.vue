@@ -98,7 +98,6 @@ watch(
       v-model:pagination-config="paginationConfig"
       v-loading="loading"
       :data="members"
-      :isSearching="Boolean(searchQuery)"
       @current-change="loadMembers()"
       @size-change="loadMembers()"
       :max-table-height="290"

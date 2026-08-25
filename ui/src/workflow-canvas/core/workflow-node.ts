@@ -78,7 +78,7 @@ export class WorkflowNodeView extends HtmlNode {
       [
         createLogicFlowElement('div', {
           className: 'h-5 w-5 cursor-pointer rounded-full border-2 border-primary bg-white',
-          style: connected ? { background: 'var(--mk-primary)' } : {},
+          style: connected ? { background: 'var(--el-color-primary)' } : {},
           onClick: () => {
             if (type === 'right') {
               const nodeModel = this.props.model as unknown as WorkflowNodeModel

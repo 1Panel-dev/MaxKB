@@ -24,14 +24,15 @@ withDefaults(
     <el-popover
       :disabled="popoverDisabled"
       placement="bottom-start"
-      :persistent="false"
+      popper-class="mk-tag-group__popper"
       trigger="hover"
+      :popper-style="{ maxWidth: '250px', width: 'auto' }"
       v-if="tags?.length > 1"
     >
       <template #reference>
         <el-tag type="info" class="cursor-pointer">+{{ tags.length - 1 }}</el-tag>
       </template>
-      <div class="flex-wrap gap-1">
+      <div class="flex-wrap gap-2 px-4 py-3">
         <el-tag v-for="tag in tags.slice(1)" :key="tag" type="info" :title="tag">
           {{ tag }}
         </el-tag>
@@ -40,4 +41,8 @@ withDefaults(
   </span>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:global(.el-popper.el-popover.mk-tag-group__popper .el-popper__arrow) {
+  display: block;
+}
+</style>

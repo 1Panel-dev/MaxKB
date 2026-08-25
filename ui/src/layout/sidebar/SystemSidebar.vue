@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router'
 import { getChildRouteList } from '@/router/admin/utils'
+import type { LayoutMenuItem } from '../types'
 
 const props = defineProps<{
   collapsed?: boolean
@@ -13,6 +14,14 @@ const emit = defineEmits<{
 const route = useRoute()
 const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
+
+const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) =>
+  route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
+
+const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
+  isSystemMenuActive(systemMenuItem)
+    ? (systemMenuItem.activeIcon ?? systemMenuItem.icon)
+    : systemMenuItem.icon
 </script>
 <template>
   <div class="mk-system-sidebar flex h-full flex-col">
@@ -34,7 +43,7 @@ const systemMenuItems = getChildRouteList('system')
             popper-class="mk-system-sidebar-menu-popper"
           >
             <template #title>
-              <MkIcon v-if="item.icon" :name="item.icon" :size="18" />
+              <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
               <span>{{ item.label }}</span>
             </template>
             <el-menu-item-group>
@@ -52,7 +61,7 @@ const systemMenuItems = getChildRouteList('system')
           </el-sub-menu>
           <!-- 无子菜单 -->
           <el-menu-item v-else :index="item.route ? router.resolve(item.route).path : item.name">
-            <MkIcon v-if="item.icon" :name="item.icon" :size="18" />
+            <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
             <template #title>{{ item.label }}</template>
           </el-menu-item>
         </template>
