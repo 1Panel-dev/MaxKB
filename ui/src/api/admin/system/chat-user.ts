@@ -1,10 +1,14 @@
 import { del, get, post, put } from '../core/request'
 import type { ParamsPage, ResponsePage, PasswordRequest } from '../core/types'
 import type {
+  BatchSetChatUserQuotaRequest,
+  BatchSetChatUserQuotaResult,
   BatchSetChatUserGroupsRequest,
   ChatUserBase,
   ChatUser,
   ChatUserPayload,
+  ChatUserQuota,
+  ChatUserQuotaPayload,
   ChatUserSyncResult,
   ChatUserUpdateRequest,
   RequestParams,
@@ -55,6 +59,24 @@ const postBatchSetChatUserGroups = (request: BatchSetChatUserGroupsRequest) => {
   return post<BatchSetChatUserGroupsRequest, boolean>(`${prefix}/batch_add_group`, request)
 }
 
+/** 获取对话用户 Token 配额。 */
+const getChatUserQuota = (userId: string) => {
+  return get<ChatUserQuota>(`${prefix}/${userId}/quota`)
+}
+
+/** 设置对话用户 Token 配额。 */
+const postChatUserQuota = (userId: string, payload: ChatUserQuotaPayload) => {
+  return post<ChatUserQuotaPayload, ChatUserQuota>(`${prefix}/${userId}/quota`, payload)
+}
+
+/** 批量设置对话用户 Token 配额。 */
+const postBatchSetChatUserQuota = (request: BatchSetChatUserQuotaRequest) => {
+  return post<BatchSetChatUserQuotaRequest, BatchSetChatUserQuotaResult>(
+    `${prefix}/batch_quota`,
+    request,
+  )
+}
+
 /** 获取可导入的对话用户来源。 */
 const getChatUserSyncTypes = () => {
   return get<string[]>(`${prefix}/sync/types`)
@@ -67,12 +89,15 @@ const postSyncChatUsers = (syncType: string) => {
 
 export default {
   deleteChatUser,
+  getChatUserQuota,
   getChatUserPage,
   getChatUser,
   getChatUserSyncTypes,
   postBatchDeleteChatUsers,
   postBatchSetChatUserGroups,
+  postBatchSetChatUserQuota,
   postChatUser,
+  postChatUserQuota,
   postSyncChatUsers,
   putChatUser,
   putChatUserPassword,

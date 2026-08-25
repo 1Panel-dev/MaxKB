@@ -2,7 +2,7 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserApi from '@/api/admin/system/chat-user'
 import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
-import { LOGIN_METHOD } from '@/api/enums'
+import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -56,6 +56,32 @@ const searchFields: OptionItem<string>[] = [
   },
 ]
 const chatUserQuery = ref<RequestParams>()
+
+function formatTokenAmount(value?: number | null) {
+  if (typeof value !== 'number' || Number.isNaN(value)) return '-'
+  const units = ['', 'K', 'M', 'B', 'T']
+  let unitIndex = 0
+  let num = value
+  let abs = Math.abs(value)
+  while (abs >= 1000 && unitIndex < units.length - 1) {
+    num /= 1000
+    abs /= 1000
+    unitIndex++
+  }
+  if (unitIndex === 0) return String(Math.round(num))
+  return `${num.toFixed(1)}${units[unitIndex]}`
+}
+
+function formatPeriodEnd(value?: string | null) {
+  return value ? datetimeFormat(value) : '-'
+}
+
+function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
+  if (!tokenQuota) return '-'
+  const used = formatTokenAmount(tokenQuota.used_tokens)
+  if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / ∞`
+  return `${used} / ${formatTokenAmount(tokenQuota.token_limit)}`
+}
 
 function handleSearchChange(query?: RequestParams) {
   chatUserQuery.value = query
@@ -155,6 +181,10 @@ function openBatchSetUserGroupDialog() {
   batchSetUserGroupDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
 }
 
+function openBatchQuotaSettingsDialog() {
+  quotaSettingsDialogRef.value?.open(batchSelectedUsers.value.map(({ id }) => id))
+}
+
 onMounted(() => loadChatUsers())
 </script>
 
@@ -221,6 +251,18 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
+        <el-table-column label="Tokens使用量/总量" min-width="150">
+          <template #default="{ row }">
+            {{ formatQuotaUsage(row.token_quota) }}
+          </template>
+        </el-table-column>
+
+        <el-table-column label="Tokens到期时间" min-width="180">
+          <template #default="{ row }">
+            {{ formatPeriodEnd(row.token_quota?.period_end) }}
+          </template>
+        </el-table-column>
+
         <el-table-column label="创建时间" width="180">
           <template #default="{ row }">
             {{ datetimeFormat(row.create_time) }}
@@ -272,6 +314,9 @@ onMounted(() => loadChatUsers())
           <el-button type="primary" plain @click="openBatchSetUserGroupDialog">
             设置用户组
           </el-button>
+          <el-button type="primary" plain @click="openBatchQuotaSettingsDialog">
+            配额设置
+          </el-button>
           <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>
@@ -281,5 +326,5 @@ onMounted(() => loadChatUsers())
   <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadChatUsers(true)" />
   <UserPwdDialog ref="userPwdDialogRef" @refresh="loadChatUsers(false)" />
   <BatchSetUserGroupDialog ref="batchSetUserGroupDialogRef" @refresh="loadChatUsers(false)" />
-  <QuotaSettingsDialog ref="quotaSettingsDialogRef" />
+  <QuotaSettingsDialog ref="quotaSettingsDialogRef" @refresh="loadChatUsers" />
 </template>
