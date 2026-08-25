@@ -8,7 +8,6 @@ import type {
 
 /** 系统管理资源授权 */
 const prefix = (workspaceId: string) => `/workspace/${workspaceId}/user_resource_permission`
-
 /** 获取指定空间、指定用户、指定资源类型的权限列表。 */
 const getUserResourcePermissions = (
   workspaceId: string,
@@ -34,6 +33,7 @@ const putUserResourcePermissions = (
     permissions,
   )
 }
+
 
 export default {
   getUserResourcePermissions,

@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends Record<string, unknown> = Record<string, unknown>">
+<script setup lang="ts" generic="T extends object = Record<string, unknown>">
 import { computed } from 'vue'
 
 defineOptions({ name: 'MkListItem' })

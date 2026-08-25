@@ -1,4 +1,4 @@
-<script setup lang="ts" generic="T extends Record<string, unknown>">
+<script setup lang="ts" generic="T extends object">
 import type { ScrollbarDirection, ScrollbarInstance } from 'element-plus'
 import { computed, nextTick, ref, watch } from 'vue'
 
