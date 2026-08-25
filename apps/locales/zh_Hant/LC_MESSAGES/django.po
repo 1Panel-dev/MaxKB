@@ -9516,3 +9516,43 @@ msgstr "分詞索引"
 
 msgid "Authorize to Workspace"
 msgstr "授權工作空間"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language"
+msgstr "識別語言"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language: zh / en, auto detected when omitted"
+msgstr "識別語言：zh / en，缺省時自動檢測"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:22
+msgid "Auto detect"
+msgstr "自動檢測"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:23
+msgid "Chinese"
+msgstr "中文"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "Audio encoding"
+msgstr "音頻編碼"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "pcm / wav / ogg / mp3, auto detected when omitted"
+msgstr "pcm / wav / ogg / mp3，缺省時自動檢測"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:34
+msgid "Auto"
+msgstr "自動"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:76
+msgid "Tokenhub sync_transcribe endpoint"
+msgstr "Tokenhub 同步轉寫接口地址"
+

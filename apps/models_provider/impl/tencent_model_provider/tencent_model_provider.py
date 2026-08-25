@@ -81,13 +81,13 @@ def _initialize_model_info():
             TencentSpeechToText),
         _create_model_info(
             'wand-asr-v1',
-            _('Tencent WAND ASR online recognition, supports long audio/video. Outputs text with sentence-level timestamps.'),
+            _(''),
             ModelTypeConst.STT,
             TencentTokenhubSTTModelCredential,
             TencentWandSpeechToText),
         _create_model_info(
             'hy-asr-3.0-preview',
-            _('Tencent Hunyuan ASR 3.0 (preview) online recognition. Accepts the same request/response format as wand-asr-v1.'),
+            _(''),
             ModelTypeConst.STT,
             TencentTokenhubSTTModelCredential,
             TencentWandSpeechToText),

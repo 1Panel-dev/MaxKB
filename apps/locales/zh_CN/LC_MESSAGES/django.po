@@ -9516,3 +9516,53 @@ msgstr "分词索引"
 
 msgid "Authorize to Workspace"
 msgstr "授权工作空间"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language"
+msgstr "识别语言"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:18
+msgid "Recognition language: zh / en, auto detected when omitted"
+msgstr "识别语言：zh / en，缺省时自动检测"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:22
+msgid "Auto detect"
+msgstr "自动检测"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:23
+msgid "Chinese"
+msgstr "中文"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "Audio encoding"
+msgstr "音频编码"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:30
+msgid "pcm / wav / ogg / mp3, auto detected when omitted"
+msgstr "pcm / wav / ogg / mp3，缺省时自动检测"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:34
+msgid "Auto"
+msgstr "自动"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:76
+msgid "Tokenhub sync_transcribe endpoint"
+msgstr "Tokenhub 同步转写接口地址"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:84
+msgid "Tencent WAND ASR online recognition, supports long audio/video. Outputs text with sentence-level timestamps."
+msgstr "腾讯混元 WAND 在线语音识别，支持长音视频。输出带句级时间戳的文本。"
+
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:90
+msgid "Tencent Hunyuan ASR 3.0 (preview) online recognition. Accepts the same request/response format as wand-asr-v1."
+msgstr "腾讯混元语音识别 3.0（预览版）在线识别。请求/响应格式与 wand-asr-v1 一致。"
+
