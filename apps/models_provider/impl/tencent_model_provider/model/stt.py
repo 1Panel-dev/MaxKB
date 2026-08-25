@@ -2,7 +2,9 @@ import base64
 import json
 import os
 import traceback
-from typing import Dict
+
+import requests
+from typing import Dict, Optional
 
 from tencentcloud.asr.v20190614 import asr_client, models
 from tencentcloud.common import credential
@@ -82,3 +84,72 @@ class TencentSpeechToText(MaxKBBaseModel, BaseSpeechToText):
         except TencentCloudSDKException as err:
             maxkb_logger.error(f":Error: {str(err)}: {traceback.format_exc()}")
             raise err
+
+
+DEFAULT_WAND_BASE_URL = 'https://tokenhub.tencentmaas.com/v1/wand/asrproxy/sync_transcribe'
+
+
+class TencentWandSpeechToText(MaxKBBaseModel, BaseSpeechToText):
+    api_key: str
+    model: str
+    params: dict
+    base_url: Optional[str] = DEFAULT_WAND_BASE_URL
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.api_key = kwargs.get('api_key')
+        self.model = kwargs.get('model')
+        self.params = kwargs.get('params') or {}
+        self.base_url = kwargs.get('base_url') or DEFAULT_WAND_BASE_URL
+
+    @staticmethod
+    def is_cache_model():
+        return False
+
+    @staticmethod
+    def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        instance_kwargs = {
+            "api_key": model_credential.get('api_key'),
+            "model": model_name,
+            "params": model_kwargs,
+            **model_kwargs,
+        }
+        base_url = model_credential.get('base_url')
+        if base_url:
+            instance_kwargs["base_url"] = base_url
+        return TencentWandSpeechToText(**instance_kwargs)
+
+    def check_auth(self):
+        cwd = os.path.dirname(os.path.abspath(__file__))
+        with open(f'{cwd}/iat_mp3_16k.mp3', 'rb') as f:
+            self.speech_to_text(f)
+
+    def speech_to_text(self, audio_file):
+        try:
+            payload = {"model": self.model}
+            # 仅使用上传音频文件的 base64 data，不提供 input_url 兜底
+            audio_data = audio_file.read()
+            payload["data"] = base64.b64encode(audio_data).decode('utf-8')
+            for key in ("source", "voice_encode_format"):
+                if self.params.get(key):
+                    payload[key] = self.params[key]
+
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            }
+            response = requests.post(self.base_url, headers=headers, json=payload, timeout=300)
+            response.raise_for_status()
+            result = response.json()
+            if result.get("status") != "completed":
+                maxkb_logger.error(f"WAND ASR task not completed: {result}")
+                raise Exception(f"WAND ASR task not completed: {result}")
+            output = result.get("output") or {}
+            text = output.get("text")
+            if not text:
+                sentences = output.get("sentences") or []
+                text = " ".join([s.get('text', '') for s in sentences if s.get('text')])
+            return text
+        except Exception as e:
+            maxkb_logger.error(f"WAND ASR Error: {str(e)}: {traceback.format_exc()}")
+            raise e
