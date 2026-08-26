@@ -1,10 +1,6 @@
-import { get, put } from '../../core/request'
+import { get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type {
-  ApplicationDetail,
-  ApplicationFormPayload,
-  RequestParams,
-} from '@/api/types'
+import type { ApplicationDetail, ApplicationFormPayload, RequestParams } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -25,6 +21,13 @@ const getApplicationDetail = (applicationId: string) => {
   return get<ApplicationDetail>(`${getPrefix()}/${applicationId}`)
 }
 
+/** 导入智能体文件并创建工作空间智能体。 */
+const postApplicationImport = (file: File, folderId: string) => {
+  const payload = new FormData()
+  payload.append('file', file)
+  return post<FormData, ApplicationDetail>(`${getPrefix()}/folder/${folderId}/import`, payload)
+}
+
 /** 保存工作空间智能体配置。 */
 const putApplication = (applicationId: string, data: ApplicationFormPayload) => {
   return put<ApplicationFormPayload, ApplicationDetail>(`${getPrefix()}/${applicationId}`, data)
@@ -33,5 +36,6 @@ const putApplication = (applicationId: string, data: ApplicationFormPayload) => 
 export default {
   getApplicationPage,
   getApplicationDetail,
+  postApplicationImport,
   putApplication,
 }

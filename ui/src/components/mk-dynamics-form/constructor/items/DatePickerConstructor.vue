@@ -62,7 +62,6 @@
 </template>
 <script setup lang="ts">
 import { computed, onBeforeMount } from 'vue'
-import moment from 'moment'
 const type_list = [
   {
     label: '年',

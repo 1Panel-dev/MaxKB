@@ -29,6 +29,12 @@ const router = createRouter({
       component: () => import('@/views/error/NotFoundView.vue'),
       meta: { title: '页面不存在' },
     },
+    {
+      path: '/demo/dynamics-form',
+      name: '/demo-dynamics-form',
+      component: () => import('@/components/mk-dynamics-form/Demo.vue'),
+      meta: { title: '动态表单演示' },
+    },
   ],
 })
 
