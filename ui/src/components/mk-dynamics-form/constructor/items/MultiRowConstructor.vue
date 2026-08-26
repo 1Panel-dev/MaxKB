@@ -2,7 +2,7 @@
 import type { MkDynamicFormValue } from '../../type'
 import { computed, onMounted, inject } from 'vue'
 import MultiRow from '@/components/mk-dynamics-form/items/MultiRow.vue'
-import VariableCascader from '../VariableCascader.vue'
+import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 const getModel = inject('getModel') as MkDynamicFormValue
 
@@ -144,9 +144,9 @@ onMounted(() => {
     prop="option_list"
     :rules="[default_ref_variables_value_rule]"
   >
-    <VariableCascader
+    <NodeCascader
       ref="nodeCascaderRef"
-      :variable-source="model"
+      :nodeModel="model"
       class="w-full"
       placeholder="请选择变量"
       v-model="formValue.option_list"

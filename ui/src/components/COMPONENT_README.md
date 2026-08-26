@@ -849,8 +849,7 @@ const formValue = ref<DynamicFormRecord>({})
 </template>
 ```
 
-公开入口包含 `MkDynamicsForm`、`MkDynamicsFormConstructor`、`dynamicFormTypeOptions`、
-`visibilityCompareOptions` 和组件专用类型。`FormItem.vue`、`items/`、`constructor/items/` 与
+公开入口包含 `MkDynamicsForm`、`MkDynamicsFormConstructor`、`dynamicFormTypeOptions` 和组件专用类型。`FormItem.vue`、`items/`、`constructor/items/` 与
 `constructor/visibility/` 均为内部实现，业务代码不应深层导入。
 
 `MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、

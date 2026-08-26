@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
 import { computed, onMounted, ref, inject } from 'vue'
-import VariableCascader from '../VariableCascader.vue'
+import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import JsonInput from '@/components/mk-dynamics-form/items/JsonInput.vue'
 const props = defineProps<{
   modelValue: MkDynamicFormValue
@@ -138,12 +137,12 @@ onMounted(() => {
     prop="default_value"
     :rules="[default_ref_variables_value_rule]"
   >
-    <VariableCascader
+    <NodeCascader
       ref="nodeCascaderRef"
-      :variable-source="model"
+      :nodeModel="model"
       class="w-full"
       placeholder="请选择变量"
-      v-model="formValue.default_value"
+      v-model="formValue.option_list"
     />
   </el-form-item>
 
