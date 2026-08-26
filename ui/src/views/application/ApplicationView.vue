@@ -7,6 +7,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import ApplicationCard from './components/ApplicationCard.vue'
+import ApplicationCreateDropdown from './components/ApplicationCreateDropdown.vue'
 
 /* 当前文件夹 */
 const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all })
@@ -56,6 +57,10 @@ function handleSearchChange(query?: RequestParams) {
   infiniteScrollRef.value?.reset()
 }
 
+function handleRefreshApplications() {
+  infiniteScrollRef.value?.reset()
+}
+
 function loadApplicationPage(pagination: { currentPage: number; pageSize: number }) {
   return ApplicationApi.getApplicationPage(pagination, {
     ...applicationQuery.value,
@@ -91,18 +96,10 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
 
-          <MkDropdown trigger="click" placement="bottom-end">
-            <el-button type="primary">
-              <span>创建</span>
-            </el-button>
-            <template #dropdown>
-              <MkDropdownMenu class="w-48">
-                <MkDropdownItem>创建简易智能体</MkDropdownItem>
-                <MkDropdownItem>创建高级智能体</MkDropdownItem>
-                <MkDropdownItem divided>导入智能体</MkDropdownItem>
-              </MkDropdownMenu>
-            </template>
-          </MkDropdown>
+          <ApplicationCreateDropdown
+            :folder-id="currentFolder.id"
+            @refresh="handleRefreshApplications"
+          />
         </div>
       </component>
 
