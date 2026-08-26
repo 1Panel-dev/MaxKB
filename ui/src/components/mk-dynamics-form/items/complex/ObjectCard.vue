@@ -1,30 +1,15 @@
-<template>
-  <el-card :style="style">
-    <DynamicsForm
-      :read-only="view"
-      :style="formStyle"
-      ref="dynamicsFormRef"
-      v-model="data"
-      :other-params="other"
-      :render_data="formField.children ? formField.children : []"
-      v-bind="$attrs"
-      :parent_field="formField.field"
-      label-position="top"
-      require-asterisk-position="right"
-    ></DynamicsForm>
-  </el-card>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const props = defineProps<{
-  modelValue?: any
-  formValue?: any
+  modelValue?: MkDynamicFormValue
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -72,4 +57,20 @@ defineExpose({
   validate,
 })
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  <el-card :style="style">
+    <DynamicsForm
+      :read-only="view"
+      :style="formStyle"
+      ref="dynamicsFormRef"
+      v-model="data"
+      :other-params="other"
+      :render-data="formField.children ? formField.children : []"
+      v-bind="$attrs"
+      :parent-field="formField.field"
+      label-position="top"
+      require-asterisk-position="right"
+    ></DynamicsForm>
+  </el-card>
+</template>

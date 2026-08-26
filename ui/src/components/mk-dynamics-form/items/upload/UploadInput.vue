@@ -1,3 +1,128 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+import { computed, inject, ref, useAttrs } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { FormField } from '@/components/mk-dynamics-form/type'
+import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
+
+import { useFormDisabled } from 'element-plus'
+const inputDisabled = useFormDisabled()
+const attrs = useAttrs() as MkDynamicFormValue
+const upload = inject('upload') as MkDynamicFormValue
+const props = withDefaults(
+  defineProps<{ modelValue?: MkDynamicFormValue; formField: FormField }>(),
+  {
+    modelValue: () => [],
+  },
+)
+const emit = defineEmits(['update:modelValue'])
+
+const typeList: MkDynamicFormValue = {
+  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
+  table: ['xlsx', 'xls', 'csv'],
+  QA: ['xlsx', 'csv', 'xls', 'zip'],
+}
+const fileType = (name: string) => {
+  const suffix = name.split('.')
+  return suffix[suffix.length - 1] || 'MkDynamicFormValue'
+}
+
+const getImgUrl = (name: string) => {
+  const list = Object.values(typeList).flat()
+  const type = list.includes(fileType(name).toLowerCase())
+    ? fileType(name).toLowerCase()
+    : 'MkDynamicFormValue'
+  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
+}
+function formatSize(sizeInBytes: number) {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  let size = sizeInBytes
+  let unitIndex = 0
+
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024
+    unitIndex++
+  }
+
+  return size.toFixed(2) + ' ' + units[unitIndex]
+}
+
+const deleteFile = (file: MkDynamicFormValue) => {
+  if (inputDisabled.value) {
+    return
+  }
+  fileArray.value = fileArray.value.filter((f: MkDynamicFormValue) => f.uid !== file.uid)
+  emit('update:modelValue', fileArray.value)
+}
+
+const model_value = computed({
+  get: () => {
+    if (!props.modelValue) {
+      emit('update:modelValue', [])
+    }
+    return props.modelValue
+  },
+  set: (v: Array<MkDynamicFormValue>) => {
+    emit('update:modelValue', v)
+  },
+})
+const fileArray = ref<MkDynamicFormValue>([])
+
+const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
+const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
+const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
+const ofType = (exts: string[]) => (f: MkDynamicFormValue) =>
+  exts.includes(fileType(f?.name || '').toUpperCase())
+
+const files_with_url = computed(() =>
+  (model_value.value || []).map((f: MkDynamicFormValue) => ({
+    ...f,
+    url: f.url || getFileUrl(f.file_id),
+  })),
+)
+const image_list = computed(() => files_with_url.value.filter(ofType(imageExtensions)))
+const audio_list = computed(() => files_with_url.value.filter(ofType(audioExtensions)))
+const video_list = computed(() => files_with_url.value.filter(ofType(videoExtensions)))
+// 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
+const download_list = computed(() =>
+  files_with_url.value.filter(
+    (f: MkDynamicFormValue) =>
+      !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f),
+  ),
+)
+
+function downloadFile(item: MkDynamicFormValue) {
+  downloadByURL(item.url, item.name)
+}
+
+const loading = ref<boolean>(false)
+
+const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFormValue>) => {
+  fileList.splice(fileList.indexOf(file), 1)
+  if (fileArray.value.find((f: MkDynamicFormValue) => f.name === file.name)) {
+    ElMessage.warning('文件名重复')
+
+    return
+  }
+  const max_file_size = (props.formField as MkDynamicFormValue).max_file_size
+  if (file.size / 1024 / 1024 > max_file_size) {
+    ElMessage.warning('文件大小不能超过 ' + max_file_size + 'MB')
+    return
+  }
+
+  if (fileList.length > attrs.limit) {
+    ElMessage.warning('最多只能上传 ' + attrs.limit + ' 个文件')
+    return
+  }
+  upload(file.raw, loading).then((ok: MkDynamicFormValue) => {
+    const split_path = ok.data.split('/')
+    const file_id = split_path[split_path.length - 1]
+    fileArray.value?.push({ name: file.name, file_id, size: file.size })
+    emit('update:modelValue', fileArray.value)
+  })
+}
+</script>
+
 <template>
   <el-upload
     style="width: 100%"
@@ -5,7 +130,9 @@
     action="#"
     v-bind="$attrs"
     :auto-upload="false"
-    :on-change="(file: any, fileList: any) => uploadFile(file, fileList)"
+    :on-change="
+      (file: MkDynamicFormValue, fileList: MkDynamicFormValue) => uploadFile(file, fileList)
+    "
     v-model:file-list="model_value"
     multiple
     :show-file-list="false"
@@ -103,121 +230,6 @@
     </div>
   </div>
 </template>
-<script setup lang="ts">
-import { computed, inject, ref, useAttrs } from 'vue'
-import { ElMessage } from 'element-plus'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
-
-import { useFormDisabled } from 'element-plus'
-const inputDisabled = useFormDisabled()
-const attrs = useAttrs() as any
-const upload = inject('upload') as any
-const props = withDefaults(defineProps<{ modelValue?: any; formField: FormField }>(), {
-  modelValue: () => [],
-})
-const emit = defineEmits(['update:modelValue'])
-
-const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
-  table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls', 'zip'],
-}
-const fileType = (name: string) => {
-  const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'unknown'
-}
-
-const getImgUrl = (name: string) => {
-  const list = Object.values(typeList).flat()
-  const type = list.includes(fileType(name).toLowerCase())
-    ? fileType(name).toLowerCase()
-    : 'unknown'
-  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
-}
-function formatSize(sizeInBytes: number) {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let size = sizeInBytes
-  let unitIndex = 0
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
-    unitIndex++
-  }
-
-  return size.toFixed(2) + ' ' + units[unitIndex]
-}
-
-const deleteFile = (file: any) => {
-  if (inputDisabled.value) {
-    return
-  }
-  fileArray.value = fileArray.value.filter((f: any) => f.uid != file.uid)
-  emit('update:modelValue', fileArray.value)
-}
-
-const model_value = computed({
-  get: () => {
-    if (!props.modelValue) {
-      emit('update:modelValue', [])
-    }
-    return props.modelValue
-  },
-  set: (v: Array<any>) => {
-    emit('update:modelValue', v)
-  },
-})
-const fileArray = ref<any>([])
-
-const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
-const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
-const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-const ofType = (exts: string[]) => (f: any) => exts.includes(fileType(f?.name || '').toUpperCase())
-
-const files_with_url = computed(() =>
-  (model_value.value || []).map((f: any) => ({ ...f, url: f.url || getFileUrl(f.file_id) })),
-)
-const image_list = computed(() => files_with_url.value.filter(ofType(imageExtensions)))
-const audio_list = computed(() => files_with_url.value.filter(ofType(audioExtensions)))
-const video_list = computed(() => files_with_url.value.filter(ofType(videoExtensions)))
-// 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
-const download_list = computed(() =>
-  files_with_url.value.filter(
-    (f: any) => !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f),
-  ),
-)
-
-function downloadFile(item: any) {
-  downloadByURL(item.url, item.name)
-}
-
-const loading = ref<boolean>(false)
-
-const uploadFile = async (file: any, fileList: Array<any>) => {
-  fileList.splice(fileList.indexOf(file), 1)
-  if (fileArray.value.find((f: any) => f.name === file.name)) {
-    ElMessage.warning('文件名重复')
-
-    return
-  }
-  const max_file_size = (props.formField as any).max_file_size
-  if (file.size / 1024 / 1024 > max_file_size) {
-    ElMessage.warning('文件大小不能超过 ' + max_file_size + 'MB')
-    return
-  }
-
-  if (fileList.length > attrs.limit) {
-    ElMessage.warning('最多只能上传 ' + attrs.limit + ' 个文件')
-    return
-  }
-  upload(file.raw, loading).then((ok: any) => {
-    const split_path = ok.data.split('/')
-    const file_id = split_path[split_path.length - 1]
-    fileArray.value?.push({ name: file.name, file_id, size: file.size })
-    emit('update:modelValue', fileArray.value)
-  })
-}
-</script>
 <style lang="scss" scoped>
 /* hover 显示下载按钮，样式照抄 question-content/index.vue */
 .download-file {

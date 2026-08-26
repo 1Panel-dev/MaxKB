@@ -1,3 +1,38 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+import { Setting } from '@element-plus/icons-vue'
+import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
+import { ref } from 'vue'
+import { cloneDeep } from 'lodash'
+const props = defineProps<{
+  label: MkDynamicFormValue
+  modelValue?: MkDynamicFormValue
+  formValue: MkDynamicFormValue
+  view?: boolean
+}>()
+const emit = defineEmits(['update:modelValue'])
+const dialogVisible = ref<boolean>(false)
+const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
+const form_data = ref<MkDynamicFormValue>(undefined)
+const open = () => {
+  if (props.modelValue) {
+    form_data.value = cloneDeep(props.modelValue)
+  }
+  dialogVisible.value = true
+}
+const close = () => {
+  dialogVisible.value = false
+  form_data.value = undefined
+}
+const submit = () => {
+  dynamicsFormRef.value?.validate().then(() => {
+    dialogVisible.value = false
+    emit('update:modelValue', form_data.value)
+    form_data.value = undefined
+  })
+}
+</script>
+
 <template>
   <div class="flex-between w-full my-required">
     <div>
@@ -23,7 +58,7 @@
       <DynamicsForm
         :read-only="view"
         ref="dynamicsFormRef"
-        :render_data="label.children ? label.children : []"
+        :render-data="label.children ? label.children : []"
         label-position="top"
         v-model="form_data"
         require-asterisk-position="right"
@@ -38,37 +73,3 @@
     </el-dialog>
   </div>
 </template>
-<script setup lang="ts">
-import { Setting } from '@element-plus/icons-vue'
-import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
-import { ref } from 'vue'
-import { cloneDeep } from 'lodash'
-const props = defineProps<{
-  label: any
-  modelValue?: any
-  formValue: any
-  view?: boolean
-}>()
-const emit = defineEmits(['update:modelValue'])
-const dialogVisible = ref<boolean>(false)
-const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
-const form_data = ref<any>(undefined)
-const open = () => {
-  if (props.modelValue) {
-    form_data.value = cloneDeep(props.modelValue)
-  }
-  dialogVisible.value = true
-}
-const close = () => {
-  dialogVisible.value = false
-  form_data.value = undefined
-}
-const submit = () => {
-  dynamicsFormRef.value?.validate().then(() => {
-    dialogVisible.value = false
-    emit('update:modelValue', form_data.value)
-    form_data.value = undefined
-  })
-}
-</script>
-<style lang="scss" scoped></style>

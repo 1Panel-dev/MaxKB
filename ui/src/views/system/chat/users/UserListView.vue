@@ -6,6 +6,7 @@ import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { datetimeFormat } from '@/utils/time'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import { formatTokenNumber } from '@/utils/number'
 import UserFromDrawer from './UserFromDrawer.vue'
 import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
@@ -57,30 +58,11 @@ const searchFields: OptionItem<string>[] = [
 ]
 const chatUserQuery = ref<RequestParams>()
 
-function formatTokenAmount(value?: number | null) {
-  if (typeof value !== 'number' || Number.isNaN(value)) return '-'
-  const units = ['', 'K', 'M', 'B', 'T']
-  let unitIndex = 0
-  let num = value
-  let abs = Math.abs(value)
-  while (abs >= 1000 && unitIndex < units.length - 1) {
-    num /= 1000
-    abs /= 1000
-    unitIndex++
-  }
-  if (unitIndex === 0) return String(Math.round(num))
-  return `${num.toFixed(1)}${units[unitIndex]}`
-}
-
-function formatPeriodEnd(value?: string | null) {
-  return value ? datetimeFormat(value) : '-'
-}
-
 function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
   if (!tokenQuota) return '-'
-  const used = formatTokenAmount(tokenQuota.used_tokens)
-  if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / ∞`
-  return `${used} / ${formatTokenAmount(tokenQuota.token_limit)}`
+  const used = formatTokenNumber(tokenQuota.used_tokens)
+  if (tokenQuota.quota_type === QUOTA_TYPE.UNLIMITED) return `${used} / 不限`
+  return `${used} / ${formatTokenNumber(tokenQuota.token_limit)}`
 }
 
 function handleSearchChange(query?: RequestParams) {
@@ -241,7 +223,7 @@ onMounted(() => loadChatUsers())
           </template>
         </el-table-column>
 
-        <el-table-column label="用户来源">
+        <el-table-column label="用户来源" width="120">
           <template #default="{ row }">
             {{
               row.source === LOGIN_METHOD.LOCAL
@@ -259,7 +241,7 @@ onMounted(() => loadChatUsers())
 
         <el-table-column label="Tokens到期时间" min-width="180">
           <template #default="{ row }">
-            {{ formatPeriodEnd(row.token_quota?.period_end) }}
+            {{ row.token_quota?.period_end ? datetimeFormat(row.token_quota?.period_end) : '-' }}
           </template>
         </el-table-column>
 

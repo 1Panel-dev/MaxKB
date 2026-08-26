@@ -1,18 +1,7 @@
-<template>
-  <el-row> </el-row>
-</template>
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import _ from 'lodash'
-
-const props = defineProps<{
-  formValue?: any
-  formfieldList?: Array<FormField>
-  field: string
-  otherParams: any
-  formField: FormField
-  view?: boolean
-}>()
+defineOptions({ name: 'DynamicFormRowLayout' })
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  <el-row />
+</template>

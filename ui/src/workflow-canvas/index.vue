@@ -49,7 +49,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     adjustEdgeStartAndEnd: false,
     background: { backgroundColor: '#f5f6f7' },
     grid: {
-      size: 10,
+      size: 20,
       type: 'dot',
       config: { color: '#DEE0E3', thickness: 1 },
     },

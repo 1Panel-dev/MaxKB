@@ -85,6 +85,14 @@ src/components/
 ├── mk-date-range/
 │   ├── index.vue                 # 日期预设与自定义日期区间组合筛选器，手动导入
 │   └── types.ts                  # 日期筛选结果类型
+├── mk-dynamics-form/
+│   ├── index.ts                  # 动态表单、表单配置器及组件内类型的公开入口
+│   ├── index.vue                 # 根据字段配置渲染和校验动态表单
+│   ├── type.ts                   # 组件内部及调用方共享的字段配置类型
+│   ├── enums.ts                  # 字段类型和显隐比较选项
+│   ├── FormItem.vue              # 字段组件调度层，仅供组件内部使用
+│   ├── items/                    # 运行时字段实现，仅供组件内部使用
+│   └── constructor/              # 字段配置器、变量选择器及配置项实现
 ├── mk-search-list/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 ├── mk-form-list/
@@ -108,6 +116,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkDateRange from '@/components/mk-date-range/index.vue'
+import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
@@ -810,6 +819,47 @@ function selectItem(item: SearchListItem, index: number) {
 自定义主体内容，`action-dropdown` 负责每行的下拉菜单内容，由组件显示固定 More 按钮。
 `props` 中未传的字段保留默认值，例如只传
 `:props="{ label: 'title' }"` 时，唯一值字段仍为 `id`。
+
+### MkDynamicsForm、MkDynamicsFormConstructor
+
+`MkDynamicsForm` 根据字段配置渲染动态表单，统一维护字段值、默认值、显隐规则和表单校验；
+`MkDynamicsFormConstructor` 用于新增或编辑单个字段配置。该组件族位于 `components` 直属目录，
+使用方必须从 `@/components/mk-dynamics-form` 手动导入，不安装为 Vue 插件，也不全局注册其内部
+字段组件。
+
+组件专用类型和选项常量维护在 `mk-dynamics-form/type.ts` 与 `mk-dynamics-form/enums.ts`，不放入
+项目级 `api/types`、`api/enums` 或 `constants`。使用方统一从组件 `index.ts` 获取公开组件、类型
+和字段类型选项，不深层导入内部文件。
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+import {
+  MkDynamicsForm,
+  type DynamicFormRecord,
+  type FormField,
+} from '@/components/mk-dynamics-form'
+
+const formFields = ref<FormField[]>([])
+const formValue = ref<DynamicFormRecord>({})
+</script>
+
+<template>
+  <MkDynamicsForm v-model="formValue" :render-data="formFields" />
+</template>
+```
+
+公开入口包含 `MkDynamicsForm`、`MkDynamicsFormConstructor`、`dynamicFormTypeOptions`、
+`visibilityCompareOptions` 和组件专用类型。`FormItem.vue`、`items/`、`constructor/items/` 与
+`constructor/visibility/` 均为内部实现，业务代码不应深层导入。
+
+`MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、
+`defaultItemWidth` 和 `parentField`，公开 `validate()`、`render()`、`initDefaultData()` 与
+`ruleFormRef`。`MkDynamicsFormConstructor` 接收 `modelValue`、`fieldTypeOptions`、
+`enableVisibility` 和 `leftOptions`，公开 `validate()`、`getData()` 与 `render()`。
+
+字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
+输入不得作为脚本传入。
 
 ## 跨页面业务组件
 

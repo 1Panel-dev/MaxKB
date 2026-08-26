@@ -1,40 +1,25 @@
-<template>
-  <div class="multi_row">
-    <div
-      v-for="item in option_list"
-      :key="item.value"
-      class="item"
-      :class="[
-        inputDisabled ? 'is-disabled' : '',
-        _value.includes(item[valueField]) ? 'active' : '',
-      ]"
-      @click="selected(item[valueField])"
-    >
-      {{ item[textField] }}
-    </div>
-  </div>
-</template>
-<script lang="ts" setup>
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../type'
 import { computed, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 const props = defineProps<{
-  formValue?: any
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: any
+  modelValue?: MkDynamicFormValue
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
 const selected = (activeValue: string | number) => {
   if (_value.value.includes(activeValue)) {
     emit(
       'update:modelValue',
-      props.modelValue.filter((i: any) => i != activeValue),
+      props.modelValue.filter((i: MkDynamicFormValue) => i !== activeValue),
     )
   } else {
     emit('update:modelValue', reset(activeValue))
@@ -67,6 +52,23 @@ const option_list = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 </script>
+
+<template>
+  <div class="multi_row">
+    <div
+      v-for="item in option_list"
+      :key="item.value"
+      class="item"
+      :class="[
+        inputDisabled ? 'is-disabled' : '',
+        _value.includes(item[valueField]) ? 'active' : '',
+      ]"
+      @click="selected(item[valueField])"
+    >
+      {{ item[textField] }}
+    </div>
+  </div>
+</template>
 <style lang="scss" scoped>
 .multi_row {
   // height: 32px;

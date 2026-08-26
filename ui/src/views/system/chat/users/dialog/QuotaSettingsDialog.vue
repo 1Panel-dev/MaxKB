@@ -19,6 +19,7 @@ interface QuotaSettingsForm {
   tokenLimit: number
 }
 
+
 const periodTypeOptions: Array<{ label: string; value: PeriodType }> = [
   { label: '天', value: PERIOD_TYPE.DAY },
   { label: '周', value: PERIOD_TYPE.WEEK },
@@ -42,44 +43,6 @@ const quotaSettingsRules: FormRules<QuotaSettingsForm> = {
   tokenLimit: [{ required: true, message: '请输入 Tokens 上限', trigger: 'change' }],
 }
 
-function resetForm() {
-  Object.assign(quotaSettingsForm, {
-    periodType: PERIOD_TYPE.MONTH,
-    periodValue: 1,
-    quotaType: QUOTA_TYPE.UNLIMITED,
-    tokenLimit: 10_000_000,
-  })
-}
-
-async function loadQuota(userId: string) {
-  loading.value = true
-  try {
-    const quota = await ChatUserApi.getChatUserQuota(userId)
-    // 避免快速切换用户时旧响应覆盖新用户表单
-    if (pendingUserIds.value.length !== 1 || pendingUserIds.value[0] !== userId) return
-    Object.assign(quotaSettingsForm, {
-      quotaType: quota.quota_type,
-      periodType: quota.period_type ?? PERIOD_TYPE.MONTH,
-      periodValue: quota.period_value ?? 1,
-      tokenLimit: quota.token_limit ?? 10_000_000,
-    })
-  } catch {
-    // 请求层已提示错误；保留默认表单，用户可自行设置后再保存
-  } finally {
-    loading.value = false
-  }
-}
-
-async function open(chatUserIdOrIds: string | string[]) {
-  const ids = Array.isArray(chatUserIdOrIds) ? chatUserIdOrIds : [chatUserIdOrIds]
-  pendingUserIds.value = ids
-  resetForm()
-  dialogVisible.value = true
-  quotaSettingsFormRef.value?.clearValidate()
-  if (ids.length === 1) {
-    await loadQuota(ids[0]!)
-  }
-}
 
 function buildPayload(): ChatUserQuotaPayload {
   if (quotaSettingsForm.quotaType === QUOTA_TYPE.UNLIMITED) {
@@ -118,6 +81,45 @@ function submitQuotaSettings() {
       .finally(() => {
         submitting.value = false
       })
+  })
+}
+
+
+async function loadQuota(userId: string) {
+  loading.value = true
+  try {
+    const quota = await ChatUserApi.getChatUserQuota(userId)
+    // 避免快速切换用户时旧响应覆盖新用户表单
+    if (pendingUserIds.value.length !== 1 || pendingUserIds.value[0] !== userId) return
+    Object.assign(quotaSettingsForm, {
+      quotaType: quota.quota_type,
+      periodType: quota.period_type ?? PERIOD_TYPE.MONTH,
+      periodValue: quota.period_value ?? 1,
+      tokenLimit: quota.token_limit ?? 10_000_000,
+    })
+  } catch {
+    // 请求层已提示错误；保留默认表单，用户可自行设置后再保存
+  } finally {
+    loading.value = false
+  }
+}
+
+
+async function open(chatUserIdOrIds: string | string[]) {
+  const ids = Array.isArray(chatUserIdOrIds) ? chatUserIdOrIds : [chatUserIdOrIds]
+  pendingUserIds.value = ids
+  dialogVisible.value = true
+  if (ids.length === 1) {
+    await loadQuota(ids[0]!)
+  }
+}
+
+function resetForm() {
+  Object.assign(quotaSettingsForm, {
+    periodType: PERIOD_TYPE.MONTH,
+    periodValue: 1,
+    quotaType: QUOTA_TYPE.UNLIMITED,
+    tokenLimit: 10_000_000,
   })
 }
 

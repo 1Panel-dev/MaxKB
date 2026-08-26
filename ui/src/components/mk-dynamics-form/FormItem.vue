@@ -1,38 +1,3 @@
-<template>
-  <el-form-item
-    v-loading="loading"
-    :style="formItemStyle"
-    :prop="formfield.field"
-    :key="formfield.field"
-    :rules="rules"
-    :class="formfield.required_asterisk ? 'hide-asterisk' : ''"
-  >
-    <template #label v-if="formfield.label">
-      <FormItemLabel v-if="isString(formfield.label)" :form-field="formfield"></FormItemLabel>
-      <component
-        v-else-if="getComponent(formfield.label.input_type)"
-        :is="getComponent(formfield.label.input_type)"
-        :label="formfield.label"
-        v-model="labelValue"
-        :form-value="formValue"
-        v-bind="label_attrs"
-      ></component>
-    </template>
-    <component
-      v-if="getComponent(formfield.input_type)"
-      ref="componentFormRef"
-      :view="view"
-      v-model="itemValue"
-      :is="getComponent(formfield.input_type)"
-      :form-field="formfield"
-      :other-params="otherParams"
-      :style="componentStyle"
-      :field="formfield.field"
-      v-bind="attrs"
-      :formfield-list="formfieldList"
-    ></component>
-  </el-form-item>
-</template>
 <script setup lang="ts">
 import { ref, computed, onMounted, type Ref } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
@@ -231,6 +196,41 @@ const validate = () => {
 }
 defineExpose({ validate })
 </script>
+<template>
+  <el-form-item
+    v-loading="loading"
+    :style="formItemStyle"
+    :prop="formfield.field"
+    :key="formfield.field"
+    :rules="rules"
+    :class="formfield.required_asterisk ? 'hide-asterisk' : ''"
+  >
+    <template #label v-if="formfield.label">
+      <FormItemLabel v-if="isString(formfield.label)" :form-field="formfield"></FormItemLabel>
+      <component
+        v-else-if="getComponent(formfield.label.input_type)"
+        :is="getComponent(formfield.label.input_type)"
+        :label="formfield.label"
+        v-model="labelValue"
+        :form-value="formValue"
+        v-bind="label_attrs"
+      ></component>
+    </template>
+    <component
+      v-if="getComponent(formfield.input_type)"
+      ref="componentFormRef"
+      :view="view"
+      v-model="itemValue"
+      :is="getComponent(formfield.input_type)"
+      :form-field="formfield"
+      :other-params="otherParams"
+      :style="componentStyle"
+      :field="formfield.field"
+      v-bind="attrs"
+      :formfield-list="formfieldList"
+    ></component>
+  </el-form-item>
+</template>
 <style lang="scss" scoped>
 .hide-asterisk {
   ::after {

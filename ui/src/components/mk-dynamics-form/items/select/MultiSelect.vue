@@ -1,40 +1,15 @@
-<template>
-  <el-select
-    class="m-2"
-    multiple
-    filterable
-    allow-create
-    clearable
-    default-first-option
-    :reserve-keyword="false"
-    v-bind="$attrs"
-    v-model="_modelValue"
-  >
-    <template #header v-if="$attrs.popperHeader">
-      <SelectHeader :header="$attrs.popperHeader" />
-    </template>
-    <el-option
-      v-for="(item, index) in option_list"
-      :key="index"
-      :label="label(item)"
-      :value="item[valueField]"
-    >
-    </el-option>
-  </el-select>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
-import { computed, ref } from 'vue'
-import _ from 'lodash'
-const rowTemp = ref<any>()
+import { computed } from 'vue'
 
 const props = defineProps<{
-  modelValue?: Array<any>
-  formValue?: any
+  modelValue?: Array<MkDynamicFormValue>
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -64,8 +39,32 @@ const option_list = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 
-const label = (option: any) => {
+const label = (option: MkDynamicFormValue) => {
   return option[textField.value]
 }
 </script>
-<style lang="scss"></style>
+
+<template>
+  <el-select
+    class="m-2"
+    multiple
+    filterable
+    allow-create
+    clearable
+    default-first-option
+    :reserve-keyword="false"
+    v-bind="$attrs"
+    v-model="_modelValue"
+  >
+    <template #header v-if="$attrs.popperHeader">
+      <SelectHeader :header="$attrs.popperHeader" />
+    </template>
+    <el-option
+      v-for="(item, index) in option_list"
+      :key="index"
+      :label="label(item)"
+      :value="item[valueField]"
+    >
+    </el-option>
+  </el-select>
+</template>

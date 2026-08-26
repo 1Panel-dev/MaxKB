@@ -1,11 +1,11 @@
-<template>
-  {{ formField.label }}
-</template>
 <script setup lang="ts">
 import type { FormField } from '@/components/mk-dynamics-form/type'
-const props = defineProps<{
+defineProps<{
   // 表单Item
   formField: FormField
 }>()
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  {{ formField.label }}
+</template>

@@ -1,37 +1,3 @@
-<template>
-  <el-form
-    @submit.prevent
-    ref="ruleFormRef"
-    label-width="130px"
-    label-suffix=":"
-    v-loading="loading"
-    v-bind="$attrs"
-    label-position="top"
-    require-asterisk-position="right"
-  >
-    <slot :form_value="formValue"></slot>
-    <template v-for="item in formFieldList" :key="item.field">
-      <FormItem
-        ref="formFieldRef"
-        :key="item.field"
-        v-if="show(item)"
-        @change="change(item, $event)"
-        @changeLabel="changeLabel(item, $event)"
-        v-bind:modelValue="formValue[item.field]"
-        :formfield="item"
-        :trigger="trigger"
-        :view="view"
-        :initDefaultData="initDefaultData"
-        :defaultItemWidth="defaultItemWidth"
-        :other-params="otherParams"
-        :form-value="formValue"
-        :formfield-list="formFieldList"
-        :parent_field="parent_field"
-      >
-      </FormItem>
-    </template>
-  </el-form>
-</template>
 <script lang="ts" setup>
 import type { Dict } from '@/api/types/common'
 import FormItem from '@/components/mk-dynamics-form/FormItem.vue'
@@ -116,10 +82,34 @@ const compareHandlers: Record<CompareOptions, (left: any, right: any) => boolean
   not_contain: (l, r) => !containImpl(l, r),
   is_true: (l) => l === true,
   is_not_true: (l) => l !== true,
-  gt: (l, r) => numOrStrCmp(l, r, (a, b) => a > b, (a, b) => a > b),
-  ge: (l, r) => numOrStrCmp(l, r, (a, b) => a >= b, (a, b) => a >= b),
-  lt: (l, r) => numOrStrCmp(l, r, (a, b) => a < b, (a, b) => a < b),
-  le: (l, r) => numOrStrCmp(l, r, (a, b) => a <= b, (a, b) => a <= b),
+  gt: (l, r) =>
+    numOrStrCmp(
+      l,
+      r,
+      (a, b) => a > b,
+      (a, b) => a > b,
+    ),
+  ge: (l, r) =>
+    numOrStrCmp(
+      l,
+      r,
+      (a, b) => a >= b,
+      (a, b) => a >= b,
+    ),
+  lt: (l, r) =>
+    numOrStrCmp(
+      l,
+      r,
+      (a, b) => a < b,
+      (a, b) => a < b,
+    ),
+  le: (l, r) =>
+    numOrStrCmp(
+      l,
+      r,
+      (a, b) => a <= b,
+      (a, b) => a <= b,
+    ),
 }
 
 const compareByOp = (left: any, op: CompareOptions, right: any): boolean => {
@@ -141,7 +131,10 @@ const lookupLeft = (cond: VisibilityCondition, values: Dict<any>): any => {
 /**
  * 对单条 visibility_rules 求值，返回该字段是否可见。
  */
-const evaluateVisibility = (rules: VisibilityRules | null | undefined, values: Dict<any>): boolean => {
+const evaluateVisibility = (
+  rules: VisibilityRules | null | undefined,
+  values: Dict<any>,
+): boolean => {
   if (!rules || !rules.conditions || rules.conditions.length === 0) {
     return true
   }
@@ -396,4 +389,37 @@ defineExpose({
   ruleFormRef,
 })
 </script>
-<style lang="scss" scoped></style>
+<template>
+  <el-form
+    @submit.prevent
+    ref="ruleFormRef"
+    label-width="130px"
+    label-suffix=":"
+    v-loading="loading"
+    v-bind="$attrs"
+    label-position="top"
+    require-asterisk-position="right"
+  >
+    <slot :form_value="formValue"></slot>
+    <template v-for="item in formFieldList" :key="item.field">
+      <FormItem
+        ref="formFieldRef"
+        :key="item.field"
+        v-if="show(item)"
+        @change="change(item, $event)"
+        @changeLabel="changeLabel(item, $event)"
+        v-bind:modelValue="formValue[item.field]"
+        :formfield="item"
+        :trigger="trigger"
+        :view="view"
+        :initDefaultData="initDefaultData"
+        :defaultItemWidth="defaultItemWidth"
+        :other-params="otherParams"
+        :form-value="formValue"
+        :formfield-list="formFieldList"
+        :parent_field="parent_field"
+      >
+      </FormItem>
+    </template>
+  </el-form>
+</template>

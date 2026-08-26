@@ -33,9 +33,18 @@ const putApplication = (applicationId: string, data: ApplicationFormPayload) => 
   return put<ApplicationFormPayload, ApplicationDetail>(`${getPrefix()}/${applicationId}`, data)
 }
 
+/** 发布工作空间智能体。 */
+const putApplicationPublish = (applicationId: string) => {
+  return put<Record<string, never>, ApplicationDetail>(
+    `${getPrefix()}/${applicationId}/publish`,
+    {},
+  )
+}
+
 export default {
   getApplicationPage,
   getApplicationDetail,
   postApplicationImport,
   putApplication,
+  putApplicationPublish,
 }

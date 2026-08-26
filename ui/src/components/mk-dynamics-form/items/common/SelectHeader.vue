@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+defineProps<{
+  header: MkDynamicFormValue
+}>()
+</script>
+
 <template>
   <div
     v-if="header"
@@ -17,11 +24,6 @@
     </el-tooltip>
   </div>
 </template>
-<script setup lang="ts">
-defineProps<{
-  header: any
-}>()
-</script>
 <style lang="scss">
 .el-select-dropdown__header {
   border-bottom: none;

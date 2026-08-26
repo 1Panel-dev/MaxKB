@@ -1,90 +1,8 @@
-<template>
-  <el-form-item
-    label="是否带输入框"
-    required
-    prop="showInput"
-    @click.prevent
-  >
-    <el-switch v-model="formValue.showInput" />
-  </el-form-item>
-  <el-form-item label="取值范围" required>
-    <el-col :span="11" style="padding-left: 0">
-      <el-form-item
-        :rules="[
-          {
-            required: true,
-            message: '最小值必填',
-            trigger: 'change',
-          },
-        ]"
-        prop="min"
-      >
-        <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right"
-      /></el-form-item>
-    </el-col>
-    <el-col :span="2" class="text-center">
-      <span class="text-gray-500">-</span>
-    </el-col>
-    <el-col :span="11">
-      <el-form-item
-        :rules="[
-          {
-            required: true,
-            message: '最大值必填',
-            trigger: 'change',
-          },
-        ]"
-        prop="max"
-        ><el-input-number
-          prop="max"
-          style="width: 100%"
-          v-model="formValue.max"
-          :min="formValue.min > formValue.max ? formValue.min : undefined"
-          controls-position="right"
-      /></el-form-item>
-    </el-col>
-  </el-form-item>
-  <el-col :span="11" style="padding-left: 0">
-    <el-form-item
-      label="步长值"
-      required
-      prop="step"
-      :rules="step_rules"
-    >
-      <el-input-number
-        style="width: 100%"
-        v-model="formValue.step"
-        :min="0"
-        controls-position="right"
-      />
-    </el-form-item>
-  </el-col>
-
-  <el-form-item
-    label="默认值"
-    :required="formValue.required"
-    prop="default_value"
-    :rules="
-      formValue.required
-        ? [{ required: true, message: '为必填属性' }]
-        : []
-    "
-  >
-    <el-slider
-      v-model="formValue.default_value"
-      :show-input="formValue.showInput"
-      :show-input-controls="false"
-      :max="formValue.max"
-      :min="formValue.min"
-      :step="formValue.step == 0 ? 0.1 : formValue.step"
-      :precision="formValue.precision"
-    />
-  </el-form-item>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, onBeforeMount, watch } from 'vue'
 const props = defineProps<{
-  modelValue: any
+  modelValue: MkDynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -128,7 +46,7 @@ watch(
     }
   },
 )
-const rander = (form_data: any) => {
+const render = (form_data: MkDynamicFormValue) => {
   const attrs = form_data.attrs
   formValue.value.option_list = form_data.option_list
   formValue.value.min = attrs.min
@@ -140,7 +58,11 @@ const rander = (form_data: any) => {
 const step_rules = [
   {
     required: true,
-    validator: (rule: any, value: any, callback: any) => {
+    validator: (
+      rule: MkDynamicFormValue,
+      value: MkDynamicFormValue,
+      callback: MkDynamicFormValue,
+    ) => {
       if (value === 0) {
         callback(new Error('步长不能为 0'))
         return false
@@ -155,7 +77,7 @@ const step_rules = [
     trigger: 'blur',
   },
 ]
-defineExpose({ getData, rander })
+defineExpose({ getData, render })
 onBeforeMount(() => {
   formValue.value.min = 0
   formValue.value.max = 20
@@ -164,5 +86,73 @@ onBeforeMount(() => {
   formValue.value.showInput = true
 })
 </script>
-<style lang="scss">
-</style>
+
+<template>
+  <el-form-item label="是否带输入框" required prop="showInput" @click.prevent>
+    <el-switch v-model="formValue.showInput" />
+  </el-form-item>
+  <el-form-item label="取值范围" required>
+    <el-col :span="11" style="padding-left: 0">
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最小值必填',
+            trigger: 'change',
+          },
+        ]"
+        prop="min"
+      >
+        <el-input-number style="width: 100%" v-model="formValue.min" controls-position="right"
+      /></el-form-item>
+    </el-col>
+    <el-col :span="2" class="text-center">
+      <span class="text-gray-500">-</span>
+    </el-col>
+    <el-col :span="11">
+      <el-form-item
+        :rules="[
+          {
+            required: true,
+            message: '最大值必填',
+            trigger: 'change',
+          },
+        ]"
+        prop="max"
+        ><el-input-number
+          prop="max"
+          style="width: 100%"
+          v-model="formValue.max"
+          :min="formValue.min > formValue.max ? formValue.min : undefined"
+          controls-position="right"
+      /></el-form-item>
+    </el-col>
+  </el-form-item>
+  <el-col :span="11" style="padding-left: 0">
+    <el-form-item label="步长值" required prop="step" :rules="step_rules">
+      <el-input-number
+        style="width: 100%"
+        v-model="formValue.step"
+        :min="0"
+        controls-position="right"
+      />
+    </el-form-item>
+  </el-col>
+
+  <el-form-item
+    label="默认值"
+    :required="formValue.required"
+    prop="default_value"
+    :rules="formValue.required ? [{ required: true, message: '为必填属性' }] : []"
+  >
+    <el-slider
+      v-model="formValue.default_value"
+      :show-input="formValue.showInput"
+      :show-input-controls="false"
+      :max="formValue.max"
+      :min="formValue.min"
+      :step="formValue.step === 0 ? 0.1 : formValue.step"
+      :precision="formValue.precision"
+    />
+  </el-form-item>
+</template>

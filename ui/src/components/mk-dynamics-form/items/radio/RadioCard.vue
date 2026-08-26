@@ -1,27 +1,5 @@
-<template>
-  <div class="radio-card" :style="radioContentStyle">
-    <el-row :gutter="12" class="w-full">
-      <template v-for="(item, index) in option_list" :key="index">
-        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
-          <el-card
-            :key="item.value"
-            class="item break-all"
-            shadow="never"
-            style="--el-card-padding: 12px 16px"
-            :class="[
-              inputDisabled ? 'is-disabled' : '',
-              modelValue == item[valueField] ? 'active' : '',
-            ]"
-            @click="inputDisabled ? () => {} : selected(item[valueField])"
-            :innerHTML="item[textField] ? item[textField] : '\u200D'"
-          >
-          </el-card>
-        </el-col>
-      </template>
-    </el-row>
-  </div>
-</template>
-<script lang="ts" setup>
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, ref, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
@@ -29,14 +7,14 @@ import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 
 const props = defineProps<{
-  formValue?: any
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: any
+  modelValue?: MkDynamicFormValue
   disabled?: boolean
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
@@ -73,6 +51,30 @@ const option_list = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 </script>
+
+<template>
+  <div class="radio-card" :style="radioContentStyle">
+    <el-row :gutter="12" class="w-full">
+      <template v-for="(item, index) in option_list" :key="index">
+        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
+          <el-card
+            :key="item.value"
+            class="item break-all"
+            shadow="never"
+            style="--el-card-padding: 12px 16px"
+            :class="[
+              inputDisabled ? 'is-disabled' : '',
+              modelValue === item[valueField] ? 'active' : '',
+            ]"
+            @click="inputDisabled ? () => {} : selected(item[valueField])"
+            :innerHTML="item[textField] ? item[textField] : '\u200D'"
+          >
+          </el-card>
+        </el-col>
+      </template>
+    </el-row>
+  </div>
+</template>
 <style lang="scss" scoped>
 .radio-card {
   display: flex;

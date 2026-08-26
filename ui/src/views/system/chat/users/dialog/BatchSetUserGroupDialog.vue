@@ -62,8 +62,8 @@ function submitBatchSetUserGroups() {
 
 function open(userIds: string[]) {
   batchGroupForm.ids = [...userIds]
-  dialogVisible.value = true
   loadUserGroupOptions()
+  dialogVisible.value = true
 }
 
 function resetData() {

@@ -4,8 +4,14 @@ import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import ThemeSettingApi from '@/api/admin/system/theme-setting'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import {
+  DEFAULT_PLATFORM_SETTING,
+  DEFAULT_THEME_COLOR,
+  DEFAULT_THEME_SETTING,
+  THEME_OPTIONS,
+} from '@/constants/theme'
 import { useStore } from '@/stores'
-import { MsgError, MsgSuccess } from '@/utils/message'
+import { MsgError } from '@/utils/message'
 import LoginPreview from './LoginPreview.vue'
 
 type ThemeImageField = 'icon' | 'loginImage' | 'loginLogo'
@@ -26,33 +32,18 @@ interface ThemeSettingForm {
   userManualUrl: string
 }
 
-interface ThemeOption {
-  color: string
-  label: string
-}
-
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024
 const IMAGE_TYPES = ['image/gif', 'image/jpeg', 'image/png']
-const defaultThemeSetting: ThemeSettingForm = {
-  forumUrl: '',
-  icon: '',
-  loginImage: '',
-  loginLogo: '',
-  projectUrl: '',
-  showForum: true,
-  showProject: true,
-  showUserManual: true,
-  slogan: '强大易用的企业级智能体平台',
-  theme: DEFAULT_THEME_COLOR,
-  title: 'MaxKB',
-  userManualUrl: '',
+const DEFAULT_THEME_SETTING_FORM: ThemeSettingForm = {
+  ...DEFAULT_THEME_SETTING,
+  ...DEFAULT_PLATFORM_SETTING,
 }
 
 const { theme } = useStore()
 const themeFormRef = useTemplateRef<FormInstance>('themeFormRef')
 const loading = ref(false)
-const savedThemeSetting = ref<ThemeSettingForm>({ ...defaultThemeSetting })
-const themeSetting = reactive<ThemeSettingForm>({ ...defaultThemeSetting })
+const savedThemeSetting = ref<ThemeSettingForm>({ ...DEFAULT_THEME_SETTING_FORM })
+const themeSetting = reactive<ThemeSettingForm>({ ...DEFAULT_THEME_SETTING_FORM })
 const selectedTheme = ref(DEFAULT_THEME_COLOR)
 const customThemeColor = ref(DEFAULT_THEME_COLOR)
 const formRules: FormRules<ThemeSettingForm> = {
@@ -72,8 +63,9 @@ function toThemeInfo(setting: ThemeSettingForm): ThemeInfo {
 }
 
 function syncThemeSelection(themeColor: string) {
-  const presetTheme = themeOptions.find((option) => option.color === themeColor)
-  selectedTheme.value = presetTheme?.color ?? 'custom'
+  const normalizedThemeColor = themeColor.trim().toLowerCase()
+  const presetTheme = THEME_OPTIONS.find((option) => option.value === normalizedThemeColor)
+  selectedTheme.value = presetTheme?.value ?? 'custom'
   customThemeColor.value = themeColor
 }
 
@@ -128,23 +120,16 @@ function handleAbandonChanges() {
 
 function handleRestoreLoginDefaults() {
   Object.assign(themeSetting, {
-    icon: defaultThemeSetting.icon,
-    loginImage: defaultThemeSetting.loginImage,
-    loginLogo: defaultThemeSetting.loginLogo,
-    slogan: defaultThemeSetting.slogan,
-    title: defaultThemeSetting.title,
+    icon: DEFAULT_THEME_SETTING.icon,
+    loginImage: DEFAULT_THEME_SETTING.loginImage,
+    loginLogo: DEFAULT_THEME_SETTING.loginLogo,
+    slogan: DEFAULT_THEME_SETTING.slogan,
+    title: DEFAULT_THEME_SETTING.title,
   })
 }
 
 function handleRestorePlatformDefaults() {
-  Object.assign(themeSetting, {
-    forumUrl: defaultThemeSetting.forumUrl,
-    projectUrl: defaultThemeSetting.projectUrl,
-    showForum: defaultThemeSetting.showForum,
-    showProject: defaultThemeSetting.showProject,
-    showUserManual: defaultThemeSetting.showUserManual,
-    userManualUrl: defaultThemeSetting.userManualUrl,
-  })
+  Object.assign(themeSetting, DEFAULT_PLATFORM_SETTING)
 }
 
 /* 图片上传 */
@@ -180,13 +165,13 @@ function handleLoginImageChange(file: UploadFile) {
       <h5 class="mb-4">平台主题色</h5>
       <el-radio-group v-model="selectedTheme" @change="handleThemeChange">
         <el-radio-button
-          v-for="themeOption in themeOptions"
-          :key="themeOption.color"
+          v-for="themeOption in THEME_OPTIONS"
+          :key="themeOption.value"
           :label="themeOption.label"
-          :value="themeOption.color"
+          :value="themeOption.value"
         >
           <span class="inline-flex items-center gap-2">
-            <span class="theme-color-dot" :style="{ backgroundColor: themeOption.color }"></span>
+            <span class="theme-color-dot" :style="{ backgroundColor: themeOption.value }"></span>
             {{ themeOption.label }}
           </span>
         </el-radio-button>
