@@ -212,12 +212,12 @@ export const systemRoutes: RouteRecordRaw = {
           component: () => import('@/views/system/settings/authentication/AuthenticationView.vue'),
           meta: { title: '系统用户认证', order: 10 },
         },
-        {
-          path: 'appearance',
-          name: 'system-appearance',
-          component: () => import('@/views/system/settings/AppearanceSettingsView.vue'),
-          meta: { title: '外观设置', order: 20 },
-        },
+        // {
+        //   path: 'theme',
+        //   name: 'system-theme',
+        //   component: () => import('@/views/system/settings/theme/ThemeSettingView.vue'),
+        //   meta: { title: '外观设置', order: 20 },
+        // },
         {
           path: 'email',
           name: 'system-email',

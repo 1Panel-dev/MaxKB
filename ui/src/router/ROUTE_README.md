@@ -54,20 +54,6 @@ System 使用 `AppLayout`，左侧导航根据 `scope: 'system'` 对应路由的
 
 System 根地址为 `/admin/system`，默认进入首页 `/admin/system/home`。需要复用 Workspace 详情页面时，在 System 路由树中注册独立路由名并复用同一个页面组件，以保留访问来源。
 
-系统外观设置页面地址为 `/admin/system/settings/appearance`，使用
-`views/system/settings/AppearanceSettingsView.vue`，并复用 `views/login/components`
-中的登录外观组件进行实时主题预览。
-
-系统资源授权按资源类型使用四个子路由，并复用
-`views/system/identity/resource-authorization/ResourceAuthorizationView.vue`：
-
-```text
-/admin/system/identity/authorization/applications
-/admin/system/identity/authorization/knowledge
-/admin/system/identity/authorization/tools
-/admin/system/identity/authorization/models
-```
-
 各子路由通过 `meta.resource` 向页面传入对应的后端资源类型。
 
 复用路由按模块放在 `admin/system/modules`，文件名与 `admin/workspace/modules` 保持对应；`system/index.ts` 只负责系统导航路由和模块汇总。
@@ -100,9 +86,10 @@ Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
    导航清理地址栏中的 token。
 4. 访问非公开路由且没有 token 时跳转到 `login`，并通过 `redirect` 查询参数保留原地址。
-5. 访问受保护页面时加载或复用平台公开信息和主题，使刷新页面也能恢复版本与外观状态。
-6. token 有效但当前用户尚未加载时，通过用户 Store 加载当前用户及语言；加载失败
-   时清除登录状态并返回登录页。
+5. token 有效但当前用户尚未加载时，统一加载平台基础档案和当前用户；专业版或
+   企业版同时加载服务端外观主题，其他版本恢复默认主题，使刷新页面也能恢复版本、用户和
+   外观状态。
+6. 登录态档案加载失败时清除登录状态并返回登录页。
 7. 导航完成后根据 `route.meta.title` 更新浏览器标题。
 
 ### Chat
@@ -113,16 +100,16 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段         | 类型                      | 说明                                         |
-| ------------ | ------------------------- | -------------------------------------------- |
-| `scope`      | `'workspace' \| 'system'` | 标记生成哪一套框架导航，只配置在布局根路由上 |
-| `activeIcon` | `string`                  | 菜单激活状态的 iconfont Symbol ID            |
-| `activeMenu` | `string`                  | 进入子页面时需要保持激活的侧栏菜单路径       |
-| `title`      | `string`                  | 页面标题，同时作为导航名称                   |
-| `icon`       | `string`                  | iconfont Symbol ID，子目录通常可以不配置     |
-| `order`      | `number`                  | 同级导航排序，数字越小越靠前                 |
-| `hidden`     | `boolean`                 | 设置为 `true` 时不显示在导航中               |
-| `resource`   | `ResourceAuthorizationType` | 系统资源授权页面当前管理的后端资源类型     |
+| 字段         | 类型                        | 说明                                         |
+| ------------ | --------------------------- | -------------------------------------------- |
+| `scope`      | `'workspace' \| 'system'`   | 标记生成哪一套框架导航，只配置在布局根路由上 |
+| `activeIcon` | `string`                    | 菜单激活状态的 iconfont Symbol ID            |
+| `activeMenu` | `string`                    | 进入子页面时需要保持激活的侧栏菜单路径       |
+| `title`      | `string`                    | 页面标题，同时作为导航名称                   |
+| `icon`       | `string`                    | iconfont Symbol ID，子目录通常可以不配置     |
+| `order`      | `number`                    | 同级导航排序，数字越小越靠前                 |
+| `hidden`     | `boolean`                   | 设置为 `true` 时不显示在导航中               |
+| `resource`   | `ResourceAuthorizationType` | 系统资源授权页面当前管理的后端资源类型       |
 
 ## 导航生成
 

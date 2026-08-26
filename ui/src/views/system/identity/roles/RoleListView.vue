@@ -124,7 +124,7 @@ onMounted(() => loadRoles())
               >
                 <template #default>
                   <span class="min-w-0 truncate" :title="role.role_name">{{ role.role_name }}</span>
-                  <el-tag type="info" size="small" class="ml-[6px] text-N600!" v-if="role.internal"
+                  <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal"
                     >系</el-tag
                   >
                 </template>
@@ -150,7 +150,7 @@ onMounted(() => loadRoles())
             <h4 class="min-w-0 truncate" :title="currentRole.role_name">
               {{ currentRole.role_name }}
             </h4>
-            <el-tag type="info" size="small" class="shrink-0 text-N600!">
+            <el-tag type="info" size="small" class="shrink-0">
               {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag
             >
             <el-divider class="shrink-0" direction="vertical" />

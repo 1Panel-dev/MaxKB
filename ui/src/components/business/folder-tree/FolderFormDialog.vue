@@ -8,7 +8,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'FolderFormDialog' })
 
-const { user } = useStore()
+const { auth } = useStore()
 
 const props = defineProps<{
   title: string
@@ -44,7 +44,7 @@ function handleSubmit() {
 
     return request
       .then((folder) => {
-        const refreshCurrentUser = isEdit ? Promise.resolve() : user.loadCurrentUser()
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
         return refreshCurrentUser.then(() => {
           MsgSuccess(isEdit ? '保存成功' : '创建成功')
           visible.value = false

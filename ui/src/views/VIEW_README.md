@@ -102,7 +102,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `system/identity/workspaces/WorkspaceListView.vue`                     | 工作空间列表页面                       |
 | `system/chat/user-groups/GroupsListView.vue`                           | 对话用户组及组成员管理页面             |
 | `system/chat/users/UserListView.vue`                                   | 对话用户列表、配额及用户导入管理页面   |
-| `system/settings/AppearanceSettingsView.vue`                           | 系统外观设置和登录外观预览页面         |
+| `system/settings/theme/ThemeSettingsView.vue`                           | 系统外观设置和登录外观预览页面         |
 | `system/settings/authentication/AuthenticationSettingsView.vue`        | 系统登录及认证源配置页面               |
 | `system/settings/email/EmailSettingsView.vue`                          | 系统邮件 SMTP 服务配置页面             |
 | `system/operate-logs/OperateLogListView.vue`                           | 系统操作日志查询与清理页面             |

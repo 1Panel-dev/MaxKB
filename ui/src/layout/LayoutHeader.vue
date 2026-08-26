@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 
 import AvatarDropdown from './avatar-dropdown/index.vue'
 import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
+import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import { isWorkspace, isSystem } from '@/router/admin/utils'
 import type { LayoutMode } from './types'
 const router = useRouter()
@@ -26,7 +27,7 @@ function switchMode() {
 <template>
   <header class="flex-between h-header px-6">
     <div class="flex items-center">
-      <img src="@/assets/logo/MaxKB-logo.svg" class="h-9 max-w-none shrink-0" />
+      <LogoFull class="h-9 shrink-0" />
       <div class="flex items-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->

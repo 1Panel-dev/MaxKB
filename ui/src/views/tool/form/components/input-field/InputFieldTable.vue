@@ -45,7 +45,7 @@ function handleDeleteInputField(index: number) {
       <el-table-column label="参数" prop="name" min-width="140" />
       <el-table-column label="数据类型" prop="type" min-width="100">
         <template #default="{ row }">
-          <el-tag size="small" type="info" class="info-tag">{{ row.type }}</el-tag>
+          <el-tag size="small" type="info">{{ row.type }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column label="来源" min-width="100">

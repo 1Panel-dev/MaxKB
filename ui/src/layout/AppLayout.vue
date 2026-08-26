@@ -11,7 +11,7 @@ const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
 </script>
 
 <template>
-  <div class="mk-layout h-screen overflow-hidden bg-layout-gradient">
+  <div class="mk-layout h-screen overflow-hidden">
     <LayoutHeader :mode="mode"> </LayoutHeader>
     <div class="flex">
       <LayoutSidebar :mode="mode" />
@@ -26,6 +26,8 @@ const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
 
 <style scoped lang="scss">
 .mk-layout {
+  background: rgb(var(--mk-primary-rgb) / 5%);
+
   &__main {
     box-shadow: 0px 0px 4px 0px rgb(var(--mk-N900-rgb) / 2%);
   }

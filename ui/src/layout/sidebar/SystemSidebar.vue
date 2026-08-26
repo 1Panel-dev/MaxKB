@@ -199,7 +199,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
 
 .el-popper.mk-system-sidebar-menu-popper {
   background-color: var(--mk-N200);
-  background-image: var(--mk-layout-gradient);
+  background-image: rgb(var(--mk-primary-rgb) / 5%);
   border-radius: var(--el-border-radius-base);
   .el-menu {
     padding: calc(var(--spacing) * 2);

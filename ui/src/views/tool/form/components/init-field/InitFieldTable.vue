@@ -49,7 +49,7 @@ function handleDeleteInitField(index: number) {
       <el-table-column label="参数" prop="field" min-width="140" />
       <el-table-column label="组件类型" min-width="120">
         <template #default="{ row }">
-          <el-tag size="small" type="info" class="info-tag">
+          <el-tag size="small" type="info">
             {{ initFieldTypeOptions.find((option) => option.value === row.input_type)?.label }}
           </el-tag>
         </template>

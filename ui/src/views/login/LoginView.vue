@@ -9,7 +9,7 @@ import AccountLogin from './modes/AccountLogin.vue'
 import QrCodeLogin from './modes/QrCodeLogin.vue'
 import { qrCodeLoginMethods } from './constants'
 
-const { auth, theme } = useStore()
+const { auth } = useStore()
 
 const isLoading = ref(true)
 const loginConfig = ref<LoginConfig>({
@@ -50,10 +50,10 @@ const showLoginModeSwitch = computed(
 onBeforeMount(() => {
   isLoading.value = true
   auth
-    .loadBaseProfile()
+    .loadPlatformProfile()
     .then(() => {
       if (auth.isPE || auth.isEE) {
-        const loginConfigRequest = BaseInfoApi.getLoginConfig().then((config) => {
+        return BaseInfoApi.getLoginConfig().then((config) => {
           if (Object.keys(config).length > 0) {
             loginConfig.value = config
           } else {
@@ -64,17 +64,13 @@ onBeforeMount(() => {
             }
           }
         })
-        const themeRequest = theme.loadThemeInfo()
-        return Promise.all([themeRequest, loginConfigRequest])
       }
-
       loginConfig.value = {
         max_attempts: 1,
         default_value: LOGIN_METHOD.LOCAL,
         login_methods: [LOGIN_METHOD.LOCAL],
       }
     })
-
     .finally(() => {
       isLoading.value = false
     })

@@ -15,8 +15,7 @@
   --color-N600: var(--mk-N600);
   --color-N900: var(--mk-N900);
   /* background images */
-  --background-image-layout-gradient: var(--mk-layout-gradient);
-  --background-image-primary-gradient: var(--mk-primary-gradient);
+  /* --background-image-layout-gradient: var(--mk-layout-gradient); */
 
   /* spacing */
   --spacing-header: var(--mk-header-height);
@@ -49,6 +48,11 @@
   ::file-selector-button {
     border-color: var(--el-border-color);
   }
+}
+
+/* 默认主题使用渐变，自定义主题使用纯色 */
+@utility bg-primary-gradient {
+  background: var(--mk-primary-gradient);
 }
 
 /* layout utilities */

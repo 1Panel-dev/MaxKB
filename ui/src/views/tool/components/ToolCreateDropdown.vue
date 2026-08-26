@@ -9,7 +9,7 @@ import ToolFormDrawer from '@/views/tool/form/ToolFormDrawer.vue'
 
 defineOptions({ name: 'ToolCreateDropdown' })
 
-const { user } = useStore()
+const { auth } = useStore()
 
 const props = defineProps<{
   folderId: string
@@ -36,7 +36,7 @@ function handleImportCreate(file: UploadFile) {
   if (!file.raw) return
   ToolApi.postToolImport(file.raw, props.folderId)
     .then(() => {
-      return user.loadCurrentUser().then(() => {
+      return auth.loadAuthBaseProfile().then(() => {
         MsgSuccess('导入成功')
         handleRefresh()
       })

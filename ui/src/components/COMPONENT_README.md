@@ -89,6 +89,9 @@ src/components/
 │   └── index.vue                 # 搜索框与剩余空间滚动列表，手动导入
 ├── mk-form-list/
 │   └── index.vue                 # 可动态增删的表单行列表，手动导入
+├── mk-logo/
+│   ├── LogoFull.vue              # 带产品名称的完整 Logo，手动导入
+│   └── LogoIcon.vue              # 不带产品名称的图形 Logo，手动导入
 ├── codemirror-editor/
 │   ├── python.vue                # 内置 pylint 诊断和全屏编辑的 Python 编辑器
 │   └── Json.vue                  # 支持格式化、语法诊断和全屏编辑的 JSON 输入框
@@ -105,6 +108,8 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkDateRange from '@/components/mk-date-range/index.vue'
+import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
 import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
@@ -124,7 +129,8 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
   由使用方手动导入。业务组件不使用 `Mk` 前缀，也不再按 Workspace 等上级领域增加额外目录。
 - 不依赖固定业务的共享组合 UI 组件放在 `components/<component-name>`，由使用方手动导入。
 - 一个公共组件默认使用一个 kebab-case 目录，入口统一为 `index.vue`；`codemirror-editor` 按语言
-  提供 `python.vue` 和 `Json.vue` 两个专用入口。
+  提供 `python.vue` 和 `Json.vue` 两个专用入口，`mk-logo` 按完整 Logo 与图形 Logo 提供
+  `LogoFull.vue` 和 `LogoIcon.vue` 两个专用入口。
 - 组件名使用 PascalCase；目录名使用 kebab-case，例如 `MkIcon` 对应
   `mk-icon/index.vue`。
 - `index.vue` 必须通过 `defineOptions({ name: 'ComponentName' })` 声明多单词组件名，避免
@@ -537,6 +543,27 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 ## 手动导入组件
 
+### LogoFull、LogoIcon
+
+`LogoFull` 展示带产品名称的完整 Logo，`LogoIcon` 展示不带产品名称的图形 Logo，使用时分别从
+`@/components/mk-logo/LogoFull.vue` 和 `@/components/mk-logo/LogoIcon.vue` 显式导入。两个组件在
+默认主题下展示内置蓝紫渐变 Logo，自定义主题下使用 Theme Store 中的当前主题色。`LogoFull`
+还会优先展示 Theme Store 中配置的 `loginLogo`。两个组件都只接收可选的 `height`，其余主题与
+Logo 数据统一从 Theme Store 获取。
+
+```vue
+<script setup lang="ts">
+import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
+</script>
+
+<template>
+  <LogoFull />
+  <LogoFull height="36" />
+  <LogoIcon class="h-8" />
+</template>
+```
+
 ### MkDateRange
 
 组合日期预设下拉框和自定义日期区间选择器。默认显示“过去 7 天”，仅在用户修改筛选条件时通过
@@ -875,7 +902,8 @@ import WorkspaceRelationTags from '@/components/business/workspace-relation-tags
 ## 新增公共组件
 
 1. 根据使用范围选择 `global`、`components` 直属目录、`components/business` 或所属功能目录。
-2. 在 `<component-name>/index.vue` 创建组件，并声明多单词组件名。
+2. 默认在 `<component-name>/index.vue` 创建组件并声明多单词组件名；已有多入口约定的目录按其
+   专用入口文件组织。
 3. 使用类型化 Props、Emits 和 Slots。
 4. `global` 组件在模板中直接使用；其他共享组件由使用方从具体路径导入。
 5. 更新本文档中的目录树和组件说明。

@@ -1,24 +1,18 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { CSSProperties } from 'vue'
-import defaultBackgroundImage from '@/assets/mk_login_background.png'
+import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import { defaultThemeSetting, getThemeImg } from '@/constants/theme'
+import { useStore } from '@/stores'
+import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
 
 defineOptions({ name: 'LoginLayout' })
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
-    backgroundImage?: string
     preview?: boolean
-    themeColor?: string
-    websiteName?: string
-    welcomeText?: string
   }>(),
   {
-    backgroundImage: defaultBackgroundImage,
     preview: false,
-    themeColor: '#3370ff',
-    websiteName: 'MaxKB',
-    welcomeText: '强大易用的企业级智能体平台',
   },
 )
 
@@ -26,26 +20,29 @@ defineSlots<{
   default: () => unknown
 }>()
 
-const backgroundStyle = computed<CSSProperties>(() => ({
-  backgroundImage: `url("${props.backgroundImage}")`,
-}))
+const { theme } = useStore()
+
+const customLoginImage = computed(() => theme.themeInfo?.loginImage?.trim() ?? '')
+const showDefaultThemeAnimation = computed(() => !customLoginImage.value && theme.isDefaultTheme)
+const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.themeInfo?.theme))
 </script>
 
 <template>
   <div class="login-layout">
-    <div class="login-background" :style="backgroundStyle"></div>
+    <div class="login-background"></div>
 
     <header class="login-header flex-between">
       <div class="flex items-center gap-4">
-        <img src="@/assets/logo/MaxKB-logo.svg" />
-        <el-divider direction="vertical" v-if="welcomeText" />
-        <span class="text-lg">{{ welcomeText }}</span>
+        <LogoFull height="38" />
+        <el-divider direction="vertical" v-if="theme.themeInfo?.slogan" />
+        <span class="text-lg">{{ theme.themeInfo?.slogan || defaultThemeSetting.slogan }}</span>
       </div>
     </header>
 
     <el-row class="login-main" align="middle">
       <el-col :xs="0" :sm="0" :md="13" :lg="13" class="login-decoration">
-        <img src="@/assets/login-theme/default.png" alt="" />
+        <DefaultThemeAnimation v-if="showDefaultThemeAnimation" />
+        <img v-else :src="loginImage" alt="" class="w-full object-contain" />
       </el-col>
 
       <el-col :xs="24" :sm="24" :md="11" :lg="11" class="flex-center!">
@@ -66,6 +63,13 @@ const backgroundStyle = computed<CSSProperties>(() => ({
 }
 
 .login-background {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(var(--mk-primary-rgb) / 5%) 20%,
+    rgba(var(--mk-primary-rgb) / 10%) 100%
+  );
+
   background-position: center;
   background-size: cover;
   inset: 0;
@@ -90,6 +94,5 @@ const backgroundStyle = computed<CSSProperties>(() => ({
   --el-card-padding: 40px;
   height: 526px;
   position: relative;
-
 }
 </style>
