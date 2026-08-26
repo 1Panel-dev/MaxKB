@@ -77,7 +77,7 @@ async function open(chatUserIdOrIds: string | string[]) {
   dialogVisible.value = true
   quotaSettingsFormRef.value?.clearValidate()
   if (ids.length === 1) {
-    await loadQuota(ids[0])
+    await loadQuota(ids[0]!)
   }
 }
 
@@ -104,9 +104,10 @@ function submitQuotaSettings() {
 
     submitting.value = true
     const payload = buildPayload()
-    const request = pendingUserIds.value.length === 1
-      ? ChatUserApi.postChatUserQuota(pendingUserIds.value[0], payload)
-      : ChatUserApi.postBatchSetChatUserQuota({ ...payload, user_ids: pendingUserIds.value })
+    const request =
+      pendingUserIds.value.length === 1
+        ? ChatUserApi.postChatUserQuota(pendingUserIds.value[0]!, payload)
+        : ChatUserApi.postBatchSetChatUserQuota({ ...payload, user_ids: pendingUserIds.value })
 
     request
       .then(() => {
