@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
 import { ref, onMounted } from 'vue'
 import { randomId } from '@/utils/common'
 import type { VisibilityRules } from '../../type'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
-import { visibilityCompareOptions } from '../../enums'
+import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
 import type { LeftOptions } from '../type'
 
@@ -100,7 +99,7 @@ function render(rules: VisibilityRules | null) {
         const fieldConfig = getFieldConfig(cond.field, props.leftOptions)
         const isTreeMultiple = fieldType === 'TreeSelect' && fieldConfig?.attrs?.multiple
         const allowed = isTreeMultiple ? ['contain', 'not_contain'] : getAllowedOps(fieldType)
-        cond._ops = visibilityCompareOptions.filter((op) => allowed.includes(op.value))
+        cond._ops = compareList.filter((op) => allowed.includes(op.value))
         cond._fieldType = fieldType
         cond._options = fieldConfig?.option_list ?? []
         cond._treeData = fieldConfig?.attrs?.data ?? []

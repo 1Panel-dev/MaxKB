@@ -4,7 +4,7 @@ import { onMounted, ref, nextTick } from 'vue'
 import { dynamicFormTypeOptions} from '@/components/mk-dynamics-form/constant'
 import VisibilityConstructor from './visibility/index.vue'
 import BasicInfoConstructor from './BasicInfoConstructor.vue'
-import { type LeftOptions } from './type.ts'
+import { type LeftOptions } from '../type.ts'
 
 // $attrs（label-position 等）显式透传给 BasicInfoConstructor 的 el-form
 defineOptions({ inheritAttrs: false })

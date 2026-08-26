@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { MkDynamicFormValue } from '../../type'
 import { computed, onMounted, inject } from 'vue'
-import VariableCascader from '../VariableCascader.vue'
+import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 const getModel = inject('getModel') as MkDynamicFormValue
 
 const assignment_method_option_list = computed(() => {
@@ -142,9 +142,9 @@ onMounted(() => {
     prop="option_list"
     :rules="[default_ref_variables_value_rule]"
   >
-    <VariableCascader
+    <NodeCascader
       ref="nodeCascaderRef"
-      :variable-source="model"
+      :nodeModel="model"
       class="w-full"
       placeholder="请选择变量"
       v-model="formValue.option_list"

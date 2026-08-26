@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
 import { computed, onMounted, inject } from 'vue'
 import RadioRow from '@/components/mk-dynamics-form/items/radio/RadioRow.vue'
-import VariableCascader from '../VariableCascader.vue'
+import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-const getModel = inject('getModel') as MkDynamicFormValue
+const getModel = inject('getModel') as any
 
 const assignment_method_option_list = computed(() => {
   const option_list = [
@@ -30,7 +29,7 @@ const model = computed(() => {
   }
 })
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: any
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -44,11 +43,7 @@ const formValue = computed({
 
 const default_ref_variables_value_rule = {
   required: true,
-  validator: (
-    rule: MkDynamicFormValue,
-    value: MkDynamicFormValue,
-    callback: MkDynamicFormValue,
-  ) => {
+  validator: (rule: any, value: any, callback: any) => {
     if (!(Array.isArray(value) && value.length > 1)) {
       callback('引用变量必填')
     }
@@ -144,9 +139,9 @@ onMounted(() => {
     prop="option_list"
     :rules="[default_ref_variables_value_rule]"
   >
-    <VariableCascader
+    <NodeCascader
       ref="nodeCascaderRef"
-      :variable-source="model"
+      :nodeModel="model"
       class="w-full"
       placeholder="请选择变量"
       v-model="formValue.option_list"

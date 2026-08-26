@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
-import { visibilityCompareOptions } from '../../enums'
+import { compareList } from '@/workflow-canvas/config/constants'
 import FieldSelector from './FieldSelector.vue'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
 import type { LeftOptions } from '../type'
@@ -26,7 +25,7 @@ function onFieldChange() {
   const isTreeMultiple = fieldType === 'TreeSelect' && fieldConfig?.attrs?.multiple
   const allowed = isTreeMultiple ? ['contain', 'not_contain'] : getAllowedOps(fieldType)
 
-  condition.value._ops = visibilityCompareOptions.filter((op) => allowed.includes(op.value))
+  condition.value._ops = compareList.filter((op) => allowed.includes(op.value))
   condition.value._fieldType = fieldType
   condition.value._options = fieldConfig?.option_list ?? []
   condition.value._treeData = fieldConfig?.attrs?.data ?? []
@@ -64,7 +63,7 @@ function onFieldChange() {
           placeholder="请选择比较方式"
         >
           <el-option
-            v-for="op in condition._ops || visibilityCompareOptions"
+            v-for="op in condition._ops || compareList"
             :key="op.value"
             :label="op.label"
             :value="op.value"
