@@ -126,6 +126,7 @@ const redirectExternalLogin = async (method: LoginMethod, needConfirm: boolean) 
   if (needConfirm) {
     return MsgConfirm('跳转提示', '即将跳转至外部认证页面，是否继续？', {
       confirmButtonText: '跳转',
+      confirmButtonType: 'primary',
     })
       .then(() => {
         window.location.href = redirectUrl

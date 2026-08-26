@@ -48,7 +48,7 @@ function handleDeleteKnowledge() {
     </template>
 
     <template #tag>
-      <el-tag v-if="shared" size="small" type="info" class="text-N600!">共享</el-tag>
+      <el-tag v-if="shared" size="small" type="info">共享</el-tag>
     </template>
 
     <p class="line-clamp-2" :title="knowledge.desc ?? undefined">

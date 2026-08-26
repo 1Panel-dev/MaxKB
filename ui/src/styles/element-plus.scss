@@ -8,6 +8,7 @@
   --el-color-primary-light-7: color-mix(in srgb, var(--mk-primary) 30%, white);
   --el-color-primary-light-8: color-mix(in srgb, var(--mk-primary) 20%, white);
   --el-color-primary-light-9: color-mix(in srgb, var(--mk-primary) 10%, white);
+  --el-color-primary-dark-2: color-mix(in srgb, var(--mk-primary) 85%, black);
   --el-color-danger: var(--mk-danger);
   --el-color-danger-light-1: color-mix(in srgb, var(--mk-danger) 85%, white);
   --el-color-danger-light-3: color-mix(in srgb, var(--mk-danger) 70%, white);
@@ -17,7 +18,7 @@
   --el-color-danger-light-7: color-mix(in srgb, var(--mk-danger) 30%, white);
   --el-color-danger-light-8: color-mix(in srgb, var(--mk-danger) 20%, white);
   --el-color-danger-light-9: color-mix(in srgb, var(--mk-danger) 10%, white);
-  --el-color-danger-dark-1: color-mix(in srgb, var(--mk-danger) 85%, black);
+  --el-color-danger-dark-2: color-mix(in srgb, var(--mk-danger) 85%, black);
   --el-color-success: var(--mk-success);
   --el-color-success-light-1: color-mix(in srgb, var(--mk-success) 85%, white);
   --el-color-success-light-3: color-mix(in srgb, var(--mk-success) 70%, white);
@@ -27,9 +28,9 @@
   --el-color-success-light-7: color-mix(in srgb, var(--mk-success) 30%, white);
   --el-color-success-light-8: color-mix(in srgb, var(--mk-success) 20%, white);
   --el-color-success-light-9: color-mix(in srgb, var(--mk-success) 10%, white);
-  --el-color-success-dark-1: color-mix(in srgb, var(--mk-success) 85%, black);
+  --el-color-success-dark-2: color-mix(in srgb, var(--mk-success) 85%, black);
   --el-color-warning: var(--mk-warning);
-  --el-color-warning-dark-1: color-mix(in srgb, var(--mk-warning) 85%, black);
+  --el-color-warning-dark-2: color-mix(in srgb, var(--mk-warning) 85%, black);
   --el-border-color: var(--mk-N350);
   --el-border-radius-base: 6px;
   --el-border-radius-round: 16px;
@@ -44,6 +45,7 @@
 
 /* avatar */
 .el-avatar {
+  // icon使用蓝色是固定的, 不能随主题变化
   --el-avatar-bg-color: #3370ff;
   flex-shrink: 0;
 }
@@ -54,6 +56,7 @@
   height: auto;
   padding: 7px 11px;
   line-height: 16px;
+
   &--small {
     padding: 5px 11px;
   }
@@ -74,6 +77,8 @@
     --el-button-hover-border-color: var(--el-border-color);
     --el-button-hover-text-color: var(--el-text-color-primary);
     --el-button-text-color: var(--el-text-color-primary);
+  }
+  &:active {
   }
 
   &--large {
@@ -137,6 +142,7 @@
     --el-button-active-text-color: white !important;
     --el-button-hover-text-color: white !important;
     --el-button-text-color: white !important;
+    background: var(--mk-primary-gradient);
     border: none;
     padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3) !important;
   }
@@ -645,7 +651,7 @@
     &.is-selected {
       font-weight: 400;
       &::after {
-        background-color: var(--mk-primary);
+        background-color: var(--el-color-primary);
         content: '';
         width: 16px;
         -webkit-mask: url("data:image/svg+xml,%3Csvg viewBox='0 0 1024 1024' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M406.656 706.944 195.84 496.256a32 32 0 1 0-45.248 45.248l256 256 512-512a32 32 0 0 0-45.248-45.248L406.592 706.944Z'/%3E%3C/svg%3E")
@@ -805,7 +811,7 @@
 .el-table {
   --el-table-header-bg-color: var(--mk-N100);
   --el-table-text-color: var(--el-text-color-primary);
-  --el-table-row-hover-bg-color: color-mix(in srgb, var(--mk-primary) 4%, white);
+  --el-table-row-hover-bg-color: color-mix(in srgb, var(--el-color-primary) 4%, white);
   --el-table-border-color: var(--mk-N300);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 
@@ -893,26 +899,31 @@
   }
 
   &--info {
-    --el-tag-text-color: var(--el-text-color-primary) !important;
+    --el-tag-text-color: var(--el-text-color-regular) !important;
     --el-tag-bg-color: var(--mk-N900-transparent-10) !important;
   }
   &--success {
-    --el-tag-text-color: var(--el-color-success-dark-1) !important;
+    --el-tag-text-color: var(--el-color-success-dark-2) !important;
     --el-tag-bg-color: rgb(var(--mk-success-rgb) / 20%) !important;
   }
   &--danger {
-    --el-tag-text-color: var(--el-color-danger-dark-1) !important;
+    --el-tag-text-color: var(--el-color-danger-dark-2) !important;
     --el-tag-bg-color: rgb(var(--mk-danger-rgb) / 20%) !important;
   }
   &--warning {
-    --el-tag-text-color: var(--el-color-warning-dark-1) !important;
+    --el-tag-text-color: var(--el-color-warning-dark-2) !important;
     --el-tag-bg-color: rgb(var(--mk-warning-rgb) / 20%) !important;
   }
-  // primary tag不能随主题色变化 颜色值不能改变
   &--primary {
-    --el-tag-text-color: #2b5fd9 !important;
-    --el-tag-bg-color: rgba(51, 112, 255, 0.2) !important;
+    --el-tag-text-color: var(--el-color-primary-dark-2);
+    --el-tag-bg-color: rgba(var(--mk-primary-rgb) / 20%);
   }
+  &--default {
+    // 默认 tag不能随主题色变化 颜色值不能改变
+    --el-tag-text-color: #2b5fd9;
+    --el-tag-bg-color: rgba(51, 112, 255, 0.2);
+  }
+
   &__close {
     .el-icon {
       color: var(--el-text-color-regular);

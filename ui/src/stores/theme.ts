@@ -3,56 +3,67 @@
 import { defineStore } from 'pinia'
 import BaseInfoApi from '@/api/admin/auth/base-info'
 import type { ThemeInfo } from '@/api/admin/auth/types'
+import { DEFAULT_THEME_COLOR } from '@/constants'
 
-const DEFAULT_THEME_COLOR = '#3370ff'
-const DEFAULT_THEME_INFO: ThemeInfo = {
-  showForum: true,
-  showProject: true,
-  showUserManual: true,
-  theme: DEFAULT_THEME_COLOR,
-  title: 'MaxKB',
+function normalizeThemeColor(themeColor?: string) {
+  const normalizedColor = themeColor?.trim().toLowerCase()
+  return normalizedColor && /^#[\da-f]{6}$/.test(normalizedColor)
+    ? normalizedColor
+    : DEFAULT_THEME_COLOR
 }
 
-function getRgbChannels(hexColor: string) {
-  const normalizedColor = hexColor.replace('#', '')
-  if (!/^[\da-f]{6}$/i.test(normalizedColor)) return null
+function getRgbChannels(themeColor: string) {
+  const normalizedColor = themeColor.slice(1)
   return [0, 2, 4]
     .map((index) => Number.parseInt(normalizedColor.slice(index, index + 2), 16))
     .join(' ')
 }
 
 interface ThemeState {
-  themeInfo: ThemeInfo
+  themeInfo: ThemeInfo | null
 }
 
 export const useThemeStore = defineStore('theme', {
   state: (): ThemeState => ({
-    themeInfo: { ...DEFAULT_THEME_INFO },
+    themeInfo: null,
   }),
+  getters: {
+    isDefaultTheme: (state) =>
+      !state.themeInfo?.theme || state.themeInfo.theme === DEFAULT_THEME_COLOR, // 是默认主题
+  },
 
   actions: {
     /** 加载、保存并应用服务端外观主题。 */
     loadThemeInfo() {
       return BaseInfoApi.getThemeInfo().then((themeInfo) => {
-        this.applyThemeInfo(themeInfo)
-        return this.themeInfo
+        return this.setTheme(themeInfo)
       })
     },
 
     /** 恢复并应用社区版或请求失败时使用的默认主题。 */
-    applyDefaultTheme() {
-      this.applyThemeInfo(DEFAULT_THEME_INFO)
+    resetTheme() {
+      return this.setTheme({ theme: DEFAULT_THEME_COLOR })
     },
 
     /** 保存主题信息并同步项目运行时颜色变量。 */
-    applyThemeInfo(themeInfo: ThemeInfo) {
-      // TODO: 主题还未实现
-      this.themeInfo = { ...DEFAULT_THEME_INFO, ...themeInfo }
-      const themeColor = this.themeInfo.theme || DEFAULT_THEME_COLOR
+    setTheme(themeInfo: ThemeInfo) {
+      const themeColor = normalizeThemeColor(themeInfo.theme)
+      const isDefaultTheme = themeColor === DEFAULT_THEME_COLOR
+      const appliedThemeInfo = { ...themeInfo, theme: themeColor }
       const rootStyle = document.documentElement.style
+
+      this.themeInfo = appliedThemeInfo
       rootStyle.setProperty('--mk-primary', themeColor)
-      const rgbChannels = getRgbChannels(themeColor)
-      if (rgbChannels) rootStyle.setProperty('--mk-primary-rgb', rgbChannels)
+      rootStyle.setProperty('--mk-primary-rgb', getRgbChannels(themeColor))
+      if (isDefaultTheme) {
+        rootStyle.removeProperty('--mk-primary-gradient')
+        rootStyle.removeProperty('--mk-primary-gradient-end')
+      } else {
+        rootStyle.setProperty('--mk-primary-gradient', themeColor)
+        rootStyle.setProperty('--mk-primary-gradient-end', themeColor)
+      }
+
+      return appliedThemeInfo
     },
   },
 })

@@ -1,7 +1,12 @@
 @font-face {
   font-display: swap;
   font-family: AlibabaPuHuiTi;
-  src: url('./font/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');
+  src:
+    url('./font/AlibabaPuHuiTi-3-55-Regular.woff') format('woff'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.ttf') format('truetype'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.eot') format('eot'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.otf') format('opentype'),
+    url('./font/AlibabaPuHuiTi-3-55-Regular.woff2') format('woff2');
 }
 
 * {
@@ -15,7 +20,9 @@ body,
 }
 
 body {
-  background: var(--mk-N200);
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  background: var(--mk-N100);
   color: var(--el-text-color-primary);
   font-family: 'PingFang SC', AlibabaPuHuiTi !important;
   font-size: var(--mk-font-size-base);

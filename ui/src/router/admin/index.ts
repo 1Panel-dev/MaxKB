@@ -45,15 +45,13 @@ router.beforeEach(async (to) => {
       auth.clearToken()
       return { name: 'login', query: { redirect: to.fullPath } }
     }
-    await auth.loadBaseProfile()
     if (!user.userInfo) {
-      await user.loadCurrentUser()
+      await auth.loadAuthBaseProfile()
     }
   }
 })
 
 router.afterEach((to) => {
-  document.title = to.meta.title ? `${to.meta.title} - MaxKB` : 'MaxKB'
   NProgress.done()
 })
 

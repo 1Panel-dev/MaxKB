@@ -48,7 +48,7 @@ const errMessage = computed(() => {
       </el-tooltip>
     </template>
     <template #tag>
-      <el-tag v-if="props.shared" size="small" type="info" class="text-N600!">共享</el-tag>
+      <el-tag v-if="props.shared" size="small" type="info">共享</el-tag>
     </template>
 
     <ul class="flex flex-col gap-2">

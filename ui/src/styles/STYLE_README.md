@@ -252,12 +252,23 @@ Tailwind 类。
 :root {
   --mk-primary: #3370ff;
   --mk-primary-gradient-end: #7f3bf5;
+  --mk-primary-gradient: linear-gradient(
+    180deg,
+    var(--mk-primary) 0%,
+    var(--mk-primary-gradient-end) 100%
+  );
   --mk-primary-rgb: 51 112 255;
 }
 ```
 
 修改主题色时，修改 `--mk-primary`。如果代码使用了 RGB 通道变量，也要同步修改 `--mk-primary-rgb`：
-`--mk-primary-gradient-end` 是默认主题渐变的终点颜色，供 CSS 背景和 SVG 渐变共同使用。
+`--mk-primary-gradient` 是 CSS 渐变背景入口，`--mk-primary-gradient-end` 是 SVG 渐变终点。
+
+运行时主题统一通过 Theme Store 的 `setTheme()` 更新。默认主题移除运行时的渐变变量覆盖，使用
+`variables.scss` 中的蓝紫渐变；非默认主题将 `--mk-primary-gradient` 和
+`--mk-primary-gradient-end` 都设为当前主题色，使 CSS 背景和 SVG 渐变统一显示为纯色。业务代码
+不要直接写这些变量，也不要绕过项目变量写入 Element Plus 的 `--el-*` 主题变量。Element Plus
+色阶继续由 `element-plus.scss` 基于 `--mk-primary` 映射生成。
 
 普通 CSS 中直接使用：
 
@@ -329,6 +340,7 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 
 渐变值属于背景图片，不能注册到只接受普通颜色的 `--color-*` 命名空间。需要使用 `--background-image-*`：
 
+例如：
 ```css
 @theme {
   --background-image-layout-gradient: var(--mk-layout-gradient);
@@ -340,6 +352,17 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 ```html
 <div class="bg-layout-gradient">页面布局</div>
 ```
+
+`--mk-primary-gradient` 在默认主题下是渐变、非默认主题下是纯色，不能注册为只生成
+`background-image` 的 Token。项目通过自定义 Utility 使用 `background` 简写同时兼容两种值：
+
+```css
+@utility bg-primary-gradient {
+  background: var(--mk-primary-gradient);
+}
+```
+
+需要主题渐变或主题纯色自动切换的背景统一使用 `bg-primary-gradient`。
 
 ### Element Plus
 

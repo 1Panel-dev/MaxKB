@@ -50,7 +50,7 @@ function handleSettingApplication(event: MouseEvent) {
 
     <template #tag>
       <el-tag v-if="isWorkFlow(application.type)" type="warning" size="small"> 高级 </el-tag>
-      <el-tag v-else type="primary" size="small"> 简易 </el-tag>
+      <el-tag v-else type="default" size="small"> 简易 </el-tag>
     </template>
 
     <p class="line-clamp-2" :title="application?.desc ?? undefined">

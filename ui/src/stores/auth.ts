@@ -5,6 +5,7 @@ import BaseInfoApi from '@/api/admin/auth/base-info'
 import ExternalLoginApi from '@/api/admin/auth/external-login'
 import LoginApi from '@/api/admin/auth/login'
 import type { BaseProfile, LoginRequest } from '@/api/admin/auth/types'
+import { useThemeStore } from './theme'
 import { useUserStore } from './user'
 
 const TOKEN_STORAGE_KEY = 'token'
@@ -63,6 +64,31 @@ export const useAuthStore = defineStore('auth', {
       return BaseInfoApi.getBaseProfile().then((baseProfile) => {
         this.baseProfile = baseProfile
         return baseProfile
+      })
+    },
+
+    /** 加载公开平台档案，并按版本加载服务端主题或恢复默认主题。 */
+    loadPlatformProfile() {
+      return this.loadBaseProfile().then((baseProfile) => {
+        const theme = useThemeStore()
+        if (this.isPE || this.isEE) {
+          return theme.loadThemeInfo().then(() => baseProfile)
+        }
+
+        theme.resetTheme()
+        return baseProfile
+      })
+    },
+
+    /** 加载登录态档案；当前用户始终与基础档案和版本对应的主题一起刷新。 */
+    loadAuthBaseProfile() {
+      return this.loadBaseProfile().then(() => {
+        const currentUserRequest = useUserStore().loadCurrentUser()
+        const theme = useThemeStore()
+        const themeRequest =
+          this.isPE || this.isEE ? theme.loadThemeInfo() : Promise.resolve(theme.resetTheme())
+
+        return Promise.all([currentUserRequest, themeRequest]).then(([currentUser]) => currentUser)
       })
     },
 
