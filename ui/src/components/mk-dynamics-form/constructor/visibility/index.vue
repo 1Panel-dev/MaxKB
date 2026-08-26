@@ -28,7 +28,7 @@
     </el-scrollbar>
 
     <el-button link type="primary" @click="addCondition">
-      <AppIcon iconName="app-add-outlined" class="mr-4" />
+      <MkIcon name="icon_add_outlined" class="mr-4" />
       添加
     </el-button>
   </div>
@@ -36,11 +36,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { randomId } from '@/utils/common'
-import type { VisibilityRules } from './index'
-import { inferFieldType, getAllowedOps, getFieldConfig } from './field-type'
+import type { VisibilityRules } from '../../type'
+import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
-import type { LeftOptions } from '../constructor/type'
+import type { LeftOptions } from '../type'
 const props = defineProps<{
   initialValue?: VisibilityRules | null
   leftOptions?: Array<LeftOptions>
@@ -102,13 +102,12 @@ function getData(): VisibilityRules | null {
   return {
     action: formData.value.action,
     condition: formData.value.condition,
-    node_id: selfScope?.value,
-    node_name: selfScope?.label,
     conditions: conds
       .filter((c) => c.field[0] && c.field[1] && c.compare)
       .map((c) => ({
         id: c.id,
         field: c.field,
+        self: c.field[0] === selfScope?.value, // 左值是否取自本表单字段
         compare: c.compare,
         value: c.value,
         // _ops, _fieldType, _options 不持久化
@@ -116,7 +115,7 @@ function getData(): VisibilityRules | null {
   }
 }
 
-function restore(rules: VisibilityRules | null) {
+function rander(rules: VisibilityRules | null) {
   if (rules && rules.conditions?.length) {
     formData.value.action = rules.action
     formData.value.condition = rules.condition
@@ -159,6 +158,6 @@ onMounted(() => {
   ]
 })
 
-defineExpose({ getData, restore, validate })
+defineExpose({ getData, rander, validate })
 </script>
 <style lang="scss" scoped></style>

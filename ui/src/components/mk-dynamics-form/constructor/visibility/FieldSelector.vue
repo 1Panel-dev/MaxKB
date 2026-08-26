@@ -20,7 +20,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { LeftOptions } from '../constructor/type'
+import type { LeftOptions } from '../type'
 const props = defineProps<{
   modelValue: Array<any>
   leftOptions?: Array<LeftOptions>

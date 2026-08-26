@@ -24,7 +24,7 @@
             class="pr-8"
           />
           <el-button link type="primary" @click="openAddRootDialog">
-            <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+            <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>
           </el-button>
         </div>
       </div>
@@ -47,17 +47,17 @@
             <div>
               <span class="mr-4" v-if="node.level < 5">
                 <el-button link @click.stop="openAddChildDialog(data)">
-                  <AppIcon iconName="app-add-outlined" class="color-secondary"></AppIcon>
+                  <MkIcon name="icon_add_outlined" class="color-secondary"></MkIcon>
                 </el-button>
               </span>
               <span class="mr-4">
                 <el-button link @click.stop="openEditDialog(data)">
-                  <AppIcon iconName="app-edit" class="color-secondary"></AppIcon>
+                  <MkIcon name="icon_edit_outlined" class="color-secondary"></MkIcon>
                 </el-button>
               </span>
               <span>
                 <el-button link @click.stop="handleDelete(data)">
-                  <AppIcon iconName="app-delete" class="color-secondary"></AppIcon>
+                  <MkIcon name="icon_delete-trash_outlined" class="color-secondary"></MkIcon>
                 </el-button>
               </span>
             </div>
@@ -142,14 +142,14 @@
               @click="removeAddRow(index)"
               :style="{ marginTop: index === 0 ? '35px' : '12px' }"
             >
-              <AppIcon iconName="app-delete"></AppIcon>
+              <MkIcon name="icon_delete-trash_outlined"></MkIcon>
             </el-button>
           </el-col>
         </template>
       </el-row>
     </el-scrollbar>
     <el-button link type="primary" @click="appendAddRow">
-      <AppIcon iconName="app-add-outlined" class="mr-4" />
+      <MkIcon name="icon_add_outlined" class="mr-4" />
       添加
     </el-button>
     <template #footer>

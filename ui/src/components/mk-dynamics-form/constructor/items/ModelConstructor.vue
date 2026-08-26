@@ -99,7 +99,7 @@
       </el-select>
       <div class="ml-8">
         <el-button @click="openParamSetting" @refreshForm="handleParamRefresh">
-          <AppIcon iconName="app-operation" class="color-secondary"></AppIcon>
+          <MkIcon :icon="Operation" class="color-secondary"></MkIcon>
         </el-button>
       </div>
     </div>
@@ -108,6 +108,7 @@
   <!-- <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="handleParamRefresh" /> -->
 </template>
 <script setup lang="ts">
+import { Operation } from '@element-plus/icons-vue'
 import { computed, onMounted, inject, ref } from 'vue'
 
 // import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'

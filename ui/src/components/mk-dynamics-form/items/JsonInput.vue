@@ -16,7 +16,7 @@
     </div>
     <div class="function-CodemirrorEditor__footer">
       <el-button text type="info" @click="openCodemirrorDialog" class="magnify">
-        <AppIcon iconName="app-magnify" style="font-size: 16px"></AppIcon>
+        <MkIcon name="icon_magnify_outlined" style="font-size: 16px"></MkIcon>
       </el-button>
     </div>
     <!-- Codemirror 弹出层 -->

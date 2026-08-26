@@ -1,357 +1,204 @@
 <template>
-  <div style="width: 1024px">
-    <DynamicsForm
-      v-model="form_data"
-      :model="form_data"
-      :render_data="damo_data"
-      ref="dynamicsFormRef"
-      :other-params="{ current_workspace_id: 'default' }"
-    >
-      <template #default="scope">
-        <el-form-item label="其他字段">
-          <el-input v-model="scope.form_value['zha']" /> </el-form-item
-      ></template>
-    </DynamicsForm>
-    <el-button @click="click">点我校验</el-button>
+  <div class="p-16" style="height: calc(100vh - 120px)">
+    <el-row :gutter="16" style="height: 100%">
+      <el-col :span="12">
+        <el-card shadow="never" style="height: 100%">
+        <template #header>
+          <div class="flex-between">
+            <span class="font-bold">表单字段列表</span>
+            <el-button type="primary" link @click="openAddDialog">
+              <MkIcon name="icon_add_outlined" class="mr-4" />
+              添加
+            </el-button>
+          </div>
+        </template>
+        <el-table :data="formItemList" style="width: 100%" row-key="field" v-if="formItemList.length > 0">
+          <el-table-column prop="field" label="参数" width="120">
+            <template #default="{ row }">
+              <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="label" label="显示名称">
+            <template #default="{ row }">
+              <span :title="getLabel(row)" class="ellipsis-1">{{ getLabel(row) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="input_type" label="组件类型" width="100">
+            <template #default="{ row }">
+              <el-tag size="small" type="info">{{ getTypeLabel(row.input_type) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="required" label="必填" width="70" align="center">
+            <template #default="{ row }">
+              <el-switch size="small" v-model="row.required" disabled />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="100" align="center">
+            <template #default="{ row, $index }">
+              <el-button type="primary" text @click="openEditDialog(row, $index)">
+                <MkIcon name="icon_edit_outlined" />
+              </el-button>
+              <el-button type="danger" text @click="deleteField($index)">
+                <MkIcon name="icon_delete-trash_outlined" />
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-empty v-else description="暂无字段，请点击添加" />
+      </el-card>
+    </el-col>
+    <el-col :span="12">
+      <el-card shadow="never" style="height: 100%">
+        <template #header>
+          <div class="flex-between">
+            <span class="font-bold">表单预览</span>
+            <el-button type="primary" @click="validateForm">校验</el-button>
+          </div>
+        </template>
+        <DynamicsForm
+          v-if="formItemList.length > 0"
+          label-position="top"
+          require-asterisk-position="right"
+          v-model="formData"
+          :model="formData"
+          :render_data="formItemList"
+          ref="dynamicsFormRef"
+        />
+        <el-empty v-else description="请先添加表单字段" />
+      </el-card>
+    </el-col>
+  </el-row>
   </div>
-</template>
-<script setup lang="ts">
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
-import { ref } from 'vue'
-import type { Dict } from '@/api/types/common'
 
-const damo_data: Array<FormField> = [
-  {
-    field: 'aaa',
-    input_type: 'Tree',
-    attrs: {
-      lazy: true,
-      url: '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/019aa0bb-552d-73a3-b0c6-1809eaedb139/get_file_list',
-    },
-    label: '',
-  },
-  {
-    field: 'aa',
-    input_type: 'LocalFileUpload',
-    attrs: {
-      file_count_limit: 10,
-      file_size_limit: 10,
-      file_type_list: ['TXT'],
-    },
-    label: '',
-  },
-  {
-    field: 'name',
-    input_type: 'PasswordInput',
-    label: {
-      label: '用戶名',
-      input_type: 'SettingLabel',
-      field: 'name_setting',
-      relation_show_field_dict: {
-        name: {
-          values: ['01993837-5b09-7f20-9360-801d11d43d28'],
-        },
-      },
-      relation_trigger_field_dict: {
-        name: {
-          values: ['01993837-5b09-7f20-9360-801d11d43d28'],
-          request:
-            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
-          url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
-        },
-      },
-      children: [],
-    },
-    required: false,
-  },
-  { field: 'json_text', input_type: 'JsonInput', label: 'aa', required: false },
-  {
-    field: 'array_object_card_field',
-    input_type: 'ArrayObjectCard',
-    label: '測試',
-    trigger_type: 'CHILD_FORMS',
-    attrs: { 'label-width': '120px', 'label-suffix': ':ssss', 'label-position': 'top' },
-    required: false,
-    children: [
-      { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
-      { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
-    ],
-  },
-  {
-    field: 'maxkb_tokens',
-    input_type: 'Slider',
-    default_value: 1,
-    attrs: {
-      min: 0,
-      max: 10,
-      step: 1,
-      precision: 1,
-      'show-input-controls': false,
-      'show-input': true,
-    },
-    label: { label: '温度', attrs: { tooltip: 'sss' }, input_type: 'TooltipLabel' },
-  },
-  {
-    field: 'object_card_field',
-    input_type: 'ObjectCard',
-    label: '測試',
-    trigger_type: 'CHILD_FORMS',
-    attrs: { 'label-width': '120px', 'label-suffix': ':ssss', 'label-position': 'left' },
-    required: false,
-    children: [
-      { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
-      { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
-    ],
-  },
-  {
-    field: 'tab_card_field',
-    input_type: 'TabCard',
-    label: '測試',
-    trigger_type: 'CHILD_FORMS',
-    attrs: { 'label-width': '120px', 'label-suffix': ':ssss', 'label-position': 'left' },
-    required: false,
-    props_info: { tabs_label: '用户' },
-    children: [
-      { field: 'name1', input_type: 'TextInput', label: '用戶名1' },
-      { field: 'name2', input_type: 'TextInput', label: '用戶名2' },
-      { field: 'name3', input_type: 'TextInput', label: '用戶名3' },
-    ],
-  },
-  {
-    field: 'single_select_field',
-    input_type: 'SingleSelect',
-    text_field: 'name',
-    value_field: 'id',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    required_asterisk: true,
-    label: {
-      label: '测试单选',
-      input_type: 'SettingLabel',
-      field: 'name_setting',
-      relation_show_field_dict: {
-        single_select_field: {
-          values: [],
-        },
-      },
-      relation_trigger_field_dict: {
-        single_select_field: {
-          values: [],
-          request:
-            'self.children=()=>request.get(extra.renderTemplate(trigger_setting.url)).then(ok=>{return ok})',
-          url: '/workspace/${current_workspace_id}/model/${trigger_value}/model_params_form',
-        },
-      },
-      children: [],
-    },
-    relation_trigger_field_dict: {
-      name: {
-        values: [],
-        url: '/workspace/${current_workspace_id}/model_list?model_type=LLM',
-        change_field: 'option_list',
-      },
-    },
-  },
-  {
-    field: 'multi_select_field',
-    input_type: 'MultiSelect',
-    default_value: ['test1'],
-    relation_show_field_dict: {
-      'object_card_field.name1': [],
-    },
-    label: '测试多选下拉',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-      },
-      {
-        key: '测试1',
-        value: 'test1',
-      },
-    ],
-  },
-  {
-    field: 'radio_field',
-    input_type: 'Radio',
-    label: '测试单选',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-      },
-      {
-        key: '测试1',
-        value: 'test1',
-      },
-    ],
-  },
-  {
-    field: 'radio_button_field',
-    input_type: 'RadioButton',
-    label: '测试单选',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-      },
-      {
-        key: '测试1',
-        value: 'test1',
-      },
-    ],
-  },
-  {
-    field: 'radio_card_field',
-    input_type: 'RadioCard',
-    label: '测试单选1',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-      },
-      {
-        key: '测试111111',
-        value: 'test1',
-      },
-    ],
-  },
-  {
-    field: 'table_radio_field',
-    input_type: 'TableRadio',
-    label: '表格单选',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    props_info: {
-      active_msg: '当前选中',
-      table_columns: [
-        {
-          property: '`${row.key}${row.number}`',
-          label: '名称',
-          type: 'eval',
-        },
-        {
-          property: 'ProgressTableItem',
-          label: '数值',
-          type: 'component',
-          value_field: 'number',
-          attrs: {
-            color: [
-              { color: '#f56c6c', percentage: 20 },
-              { color: '#e6a23c', percentage: 40 },
-              { color: '#5cb87a', percentage: 60 },
-              { color: '#1989fa', percentage: 80 },
-              { color: '#6f7ad3', percentage: 100 },
-            ],
-          },
-          props_info: {
-            view_card: [
-              {
-                type: 'eval',
-                title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
-              },
-              {
-                type: 'eval',
-                title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
-              },
-            ],
-          },
-        },
-      ],
-      style: { width: '500px' },
-    },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-        number: 10,
-      },
-      {
-        key: '测试111111',
-        value: 'test1',
-        number: 100,
-      },
-    ],
-  },
-  {
-    field: 'table_checkbox_field',
-    input_type: 'TableCheckbox',
-    label: '表格多选',
-    required: true,
-    attrs: { placeholder: '请选择' },
-    props_info: {
-      active_msg: '当前选中',
-      table_columns: [
-        {
-          property: '`${row.key}${row.number}`',
-          label: '名称',
-          type: 'eval',
-        },
-        {
-          property: 'ProgressTableItem',
-          label: '数值',
-          type: 'component',
-          value_field: 'number',
-          attrs: {
-            color: [
-              { color: '#f56c6c', percentage: 20 },
-              { color: '#e6a23c', percentage: 40 },
-              { color: '#5cb87a', percentage: 60 },
-              { color: '#1989fa', percentage: 80 },
-              { color: '#6f7ad3', percentage: 100 },
-            ],
-          },
-          props_info: {
-            view_card: [
-              {
-                type: 'eval',
-                title: '测试',
-                value_field:
-                  '`${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`',
-              },
-              {
-                type: 'eval',
-                title: '名称',
-                value_field: '`${row.key}&nbsp;&nbsp;&nbsp;`',
-              },
-            ],
-          },
-        },
-      ],
-      style: { width: '500px' },
-    },
-    option_list: [
-      {
-        key: '测试',
-        value: 'test',
-        number: 10,
-      },
-      {
-        key: '测试111111',
-        value: 'test1',
-        number: 100,
-      },
-    ],
-  },
-]
-const form_data = ref<Dict<any>>({})
+  <!-- 添加/编辑字段弹窗 -->
+  <el-dialog
+    v-model="dialogVisible"
+    :title="isEdit ? '编辑字段' : '添加字段'"
+    width="600px"
+    append-to-body
+    destroy-on-close
+  >
+    <DynamicsFormConstructor
+      v-model="currentField"
+      label-position="top"
+      require-asterisk-position="right"
+      :enableVisibility="true"
+      :leftOptions="leftOptions"
+      ref="constructorRef"
+    />
+    <template #footer>
+      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="submitField">确定</el-button>
+    </template>
+  </el-dialog>
+</template>
+
+<script setup lang="ts">
+import { ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import DynamicsFormConstructor from '@/components/mk-dynamics-form/constructor/index.vue'
+import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
+import type { LeftOptions } from '@/components/mk-dynamics-form/constructor/type'
+import { input_type_list } from '@/components/mk-dynamics-form/constructor/data'
+
+const constructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
-const click = () => {
-  dynamicsFormRef.value?.validate()
+
+const formItemList = ref<Array<any>>([])
+const formData = ref<any>({})
+const dialogVisible = ref(false)
+const isEdit = ref(false)
+const editIndex = ref(-1)
+const currentField = ref<any>({})
+
+// 「当前表单」作用域的可引用字段，根据已配置字段动态生成
+const leftOptions = computed<Array<LeftOptions>>(() => [
+  {
+    label: '当前表单',
+    value: 'self-form',
+    self: true,
+    children: formItemList.value
+      .filter((_, index) => index !== editIndex.value) // 排除正在编辑的字段，避免自引用
+      .map((item) => ({
+        label: getLabel(item),
+        value: item.field,
+        input_type: item.input_type,
+        option_list: item.option_list,
+        attrs: item.attrs,
+      })),
+  },
+])
+
+const getLabel = (row: any) => {
+  if (row.label && row.label.input_type === 'TooltipLabel') {
+    return row.label.label
+  }
+  return row.label || ''
+}
+
+const getTypeLabel = (inputType: string) => {
+  const item = input_type_list.find((i) => i.value === inputType)
+  return item ? item.label : inputType
+}
+
+const openAddDialog = () => {
+  isEdit.value = false
+  editIndex.value = -1
+  currentField.value = {}
+  dialogVisible.value = true
+}
+
+const openEditDialog = (row: any, index: number) => {
+  isEdit.value = true
+  editIndex.value = index
+  currentField.value = { ...row }
+  dialogVisible.value = true
+}
+
+const deleteField = (index: number) => {
+  formItemList.value.splice(index, 1)
+}
+
+const submitField = async () => {
+  try {
+    await constructorRef.value?.validate()
+    const data = constructorRef.value?.getData()
+    if (!data) return
+
+    // 检查字段名是否重复
+    const isDuplicate = formItemList.value.some(
+      (item, index) => item.field === data.field && index !== editIndex.value
+    )
+    if (isDuplicate) {
+      ElMessage.error(`参数 "${data.field}" 已存在`)
+      return
+    }
+
+    if (isEdit.value && editIndex.value >= 0) {
+      formItemList.value.splice(editIndex.value, 1, data)
+    } else {
+      formItemList.value.push(data)
+    }
+    dialogVisible.value = false
+  } catch (e) {
+    // 验证失败
+  }
+}
+
+const validateForm = async () => {
+  try {
+    await dynamicsFormRef.value?.validate()
+    ElMessage.success('校验通过')
+  } catch (e) {
+    ElMessage.error('校验失败')
+  }
 }
 </script>
-<style lang="scss" scoped></style>
+
+<style lang="scss" scoped>
+.ellipsis-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style>

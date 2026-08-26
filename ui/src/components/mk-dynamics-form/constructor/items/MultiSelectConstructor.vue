@@ -31,7 +31,7 @@
                 value: 值 必填<br />
                 default: 是否为默认值
               </template>
-              <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+              <MkIcon name="icon_warning_filled" class="app-warning-icon ml-4"></MkIcon>
             </el-tooltip>
           </span>
         </el-radio>
@@ -58,7 +58,7 @@
       <div class="flex-between">
         选项值
         <el-button link type="primary" @click.stop="addOption()">
-          <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon>
+          <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>
           添加
         </el-button>
       </div>
@@ -92,7 +92,7 @@
       </el-col>
       <el-col :span="1">
         <el-button link class="ml-8" @click.stop="delOption($index)">
-          <AppIcon iconName="app-delete"></AppIcon>
+          <MkIcon name="icon_delete-trash_outlined"></MkIcon>
         </el-button>
       </el-col>
     </el-row>

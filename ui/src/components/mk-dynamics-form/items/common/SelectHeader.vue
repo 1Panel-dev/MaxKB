@@ -9,11 +9,11 @@
       <template #content>
         <div style="max-width: 200px">{{ header.tooltip }}</div>
       </template>
-      <AppIcon
-        iconName="app-warning"
+      <MkIcon
+        name="icon_warning_filled"
         class="app-warning-icon"
         style="margin-left: 4px; flex-shrink: 0"
-      ></AppIcon>
+      ></MkIcon>
     </el-tooltip>
   </div>
 </template>
