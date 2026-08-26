@@ -47,7 +47,6 @@ export interface DynamicFormField {
   input_type?: string
   label: string | DynamicFormLabel
   option_list?: Record<string, unknown>[]
-  relation_show_field_dict?: Record<string, unknown[]>
   required?: boolean
   text_field?: string
   value_field?: string

@@ -69,7 +69,7 @@
         }"
       />
       <el-button v-else class="button-new-tag" size="small" @click="showInput">
-        <AppIcon iconName="app-add-outlined" class="mr-4"></AppIcon
+        <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon
         >添加扩展名
       </el-button>
     </el-space>

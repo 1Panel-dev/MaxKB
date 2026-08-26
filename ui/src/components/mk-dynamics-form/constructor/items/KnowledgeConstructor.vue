@@ -31,7 +31,7 @@
         </div>
         <div>
           <el-button type="primary" link @click.stop="openAddKnowledgeDialog">
-            <AppIcon iconName="app-add-outlined"></AppIcon>
+            <MkIcon name="icon_add_outlined"></MkIcon>
           </el-button>
         </div>
       </div>

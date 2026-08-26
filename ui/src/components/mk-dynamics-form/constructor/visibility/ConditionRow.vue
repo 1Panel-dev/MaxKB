@@ -82,7 +82,7 @@
     </el-col>
     <el-col :span="1">
       <el-button link type="info" @click="$emit('delete')" class="mt-4">
-        <AppIcon iconName="app-delete" />
+        <MkIcon name="icon_delete-trash_outlined" />
       </el-button>
     </el-col>
   </el-row>
@@ -90,8 +90,8 @@
 <script setup lang="ts">
 import { compareList } from '@/workflow-canvas/config/constants'
 import FieldSelector from './FieldSelector.vue'
-import { inferFieldType, getAllowedOps, getFieldConfig } from './field-type'
-import type { LeftOptions } from '../constructor/type'
+import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
+import type { LeftOptions } from '../type'
 
 const props = defineProps<{
   cond: any

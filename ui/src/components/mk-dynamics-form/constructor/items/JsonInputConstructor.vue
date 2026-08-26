@@ -22,7 +22,7 @@
                 变量的值必须符合:
                 JSON 格式
               </template>
-              <AppIcon iconName="app-warning" class="app-warning-icon ml-4"></AppIcon>
+              <MkIcon name="icon_warning_filled" class="app-warning-icon ml-4"></MkIcon>
             </el-tooltip>
           </span>
         </el-radio>

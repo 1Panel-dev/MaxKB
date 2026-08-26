@@ -38,7 +38,7 @@
         <el-icon class="color-danger ml-4" size="18"><WarningFilled /></el-icon>
         <span class="ml-4"> 失败 {{ errorCount }} 个文件 </span>
         <el-button v-if="retryList.length" text @click="retryAll">
-          <AppIcon iconName="app-refresh"></AppIcon>
+          <MkIcon :icon="Refresh"></MkIcon>
           重试
         </el-button>
       </span>
@@ -79,10 +79,10 @@
               </div>
               <div class="flex align-center">
                 <el-button v-if="item.canRetry" text @click="uploadFile(item)">
-                  <AppIcon iconName="app-refresh"></AppIcon>
+                  <MkIcon :icon="Refresh"></MkIcon>
                 </el-button>
                 <el-button text @click="deleteFile(item)">
-                  <AppIcon iconName="app-delete"></AppIcon>
+                  <MkIcon name="icon_delete-trash_outlined"></MkIcon>
                 </el-button>
               </div>
             </div>
@@ -100,6 +100,7 @@
   </div>
 </template>
 <script setup lang="ts">
+import { Refresh } from '@element-plus/icons-vue'
 import { computed, useAttrs, nextTick, inject, ref, reactive } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { MsgError } from '@/utils/message'

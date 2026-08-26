@@ -16,13 +16,13 @@
       ></DynamicsForm>
       <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
         <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
-          <AppIcon iconName="app-delete"></AppIcon>
+          <MkIcon name="icon_delete-trash_outlined"></MkIcon>
         </el-button>
       </el-tooltip>
     </el-card>
     <el-card shadow="never" class="card-add box-card" @click="add_card">
       <div class="flex-center">
-        <AppIcon iconName="app-add-outlined" class="add-icon layout-bg p-8 border-r-6" />
+        <MkIcon name="icon_add_outlined" class="add-icon layout-bg p-8 border-r-6" />
         <span>{{ add_msg }}</span>
       </div>
     </el-card>

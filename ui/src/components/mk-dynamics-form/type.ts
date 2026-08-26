@@ -128,7 +128,7 @@ export interface VisibilityCondition {
   leftValue?: any
 }
 
-interface VisibilityRule {
+export interface VisibilityRules {
   action: 'show' | 'hide'
   condition: 'and' | 'or'
   conditions: VisibilityCondition[]
@@ -160,7 +160,7 @@ interface FormField {
   /**
    * 显隐设置
    */
-  visibility_rules?: Array<VisibilityRule>
+  visibility_rules?: VisibilityRules
   /**
    * {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
    */

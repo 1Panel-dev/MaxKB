@@ -30,7 +30,7 @@
             <div class="ellipsis-1" :title="formatSize(file.size)">{{ formatSize(file.size) }}</div>
 
             <el-button link class="ml-8" @click="deleteFile(file)" v-if="!inputDisabled">
-              <AppIcon iconName="app-delete"></AppIcon>
+              <MkIcon name="icon_delete-trash_outlined"></MkIcon>
             </el-button>
           </div>
         </div>

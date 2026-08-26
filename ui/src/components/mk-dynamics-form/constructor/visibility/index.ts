@@ -1,4 +1,4 @@
-import type { LeftOptions } from '../constructor/type'
+import type { LeftOptions } from '../type'
 
 export type InferredFieldType = string | undefined
 

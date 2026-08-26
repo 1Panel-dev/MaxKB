@@ -41,7 +41,7 @@ import type { FormInstance } from 'element-plus'
 import type { ApiResponse } from '@/api/admin/core/types'
 import _ from 'lodash'
 import { get, post, put, del } from '@/api/admin/core/request'
-import { computeVisibilityMap } from './visibility'
+import type { CompareOptions, VisibilityCondition, VisibilityRules } from './type'
 const request = {
   get,
   post,
@@ -82,33 +82,107 @@ const ruleFormRef = ref<FormInstance>()
 
 const formFieldRef = ref<Array<InstanceType<typeof FormItem>>>([])
 
-const visibilityMap = computed(() => computeVisibilityMap(formFieldList.value, formValue.value))
+// ===== 显隐规则求值 =====
+const containImpl = (source: any, target: any): boolean => {
+  if (Array.isArray(target)) {
+    return target.every((t) => containImpl(source, t))
+  }
+  const t = String(target)
+  if (typeof source === 'string') return source.includes(t)
+  if (Array.isArray(source)) return source.some((item) => String(item) === t)
+  return String(source).includes(t)
+}
+
+const numOrStrCmp = (
+  left: any,
+  right: any,
+  numFn: (a: number, b: number) => boolean,
+  strFn: (a: string, b: string) => boolean,
+): boolean => {
+  const a = Number(left)
+  const b = Number(right)
+  if (!Number.isNaN(a) && !Number.isNaN(b)) return numFn(a, b)
+  try {
+    return strFn(String(left), String(right))
+  } catch {
+    return false
+  }
+}
+
+const compareHandlers: Record<CompareOptions, (left: any, right: any) => boolean> = {
+  eq: (l, r) => String(l) === String(r),
+  not_eq: (l, r) => String(l) !== String(r),
+  contain: (l, r) => containImpl(l, r),
+  not_contain: (l, r) => !containImpl(l, r),
+  is_true: (l) => l === true,
+  is_not_true: (l) => l !== true,
+  gt: (l, r) => numOrStrCmp(l, r, (a, b) => a > b, (a, b) => a > b),
+  ge: (l, r) => numOrStrCmp(l, r, (a, b) => a >= b, (a, b) => a >= b),
+  lt: (l, r) => numOrStrCmp(l, r, (a, b) => a < b, (a, b) => a < b),
+  le: (l, r) => numOrStrCmp(l, r, (a, b) => a <= b, (a, b) => a <= b),
+}
+
+const compareByOp = (left: any, op: CompareOptions, right: any): boolean => {
+  const fn = compareHandlers[op]
+  if (!fn) throw new Error(`Unknown compare op: ${op}`)
+  return fn(left, right)
+}
+
+/**
+ * 取条件左值：self 为真时实时从本表单 formValue 取，否则用预填 leftValue。
+ */
+const lookupLeft = (cond: VisibilityCondition, values: Dict<any>): any => {
+  if (cond.self) {
+    return values?.[cond.field[1]]
+  }
+  return cond.leftValue
+}
+
+/**
+ * 对单条 visibility_rules 求值，返回该字段是否可见。
+ */
+const evaluateVisibility = (rules: VisibilityRules | null | undefined, values: Dict<any>): boolean => {
+  if (!rules || !rules.conditions || rules.conditions.length === 0) {
+    return true
+  }
+  const results = rules.conditions.map((cond) => {
+    const left = lookupLeft(cond, values)
+    if (left == null && cond.compare !== 'is_true' && cond.compare !== 'is_not_true') {
+      return false
+    }
+    return compareByOp(left, cond.compare as CompareOptions, cond.value)
+  })
+  const matched = rules.condition === 'or' ? results.some(Boolean) : results.every(Boolean)
+  return rules.action === 'show' ? matched : !matched
+}
+
+/**
+ * 单向扫描当前表单字段列表，计算显隐表。
+ * 前面字段被隐藏后其值置空，级联影响后续字段判定。
+ */
+const visibilityMap = computed<Dict<boolean>>(() => {
+  const copy: Dict<any> = { ...formValue.value }
+  const map: Dict<boolean> = {}
+  for (const field of formFieldList.value) {
+    if (!field.visibility_rules?.conditions?.length) {
+      map[field.field] = true
+      continue
+    }
+    const visible = evaluateVisibility(field.visibility_rules, copy)
+    map[field.field] = visible
+    if (!visible) {
+      copy[field.field] = null
+    }
+  }
+  return map
+})
 
 /**
  * 当前 field是否展示
  * @param field
  */
 const show = (field: FormField) => {
-  if (field.relation_show_field_dict) {
-    const keys: Array<string> = Object.keys(field.relation_show_field_dict)
-    for (const index in keys) {
-      const key: string = keys[index] as string
-      const v = _.get(formValue.value, key)
-      if (v && v !== undefined && v !== null) {
-        const values = field.relation_show_field_dict[key]
-        if (values && values.length > 0) {
-          return values.includes(v)
-        } else {
-          return true
-        }
-      } else {
-        return false
-      }
-    }
-  }
-
-  // new
-  if (field.visibility_rules?.node_id) {
+  if (field.visibility_rules?.conditions?.length) {
     return visibilityMap.value[field.field] ?? true
   }
 

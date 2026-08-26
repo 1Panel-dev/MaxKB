@@ -47,13 +47,14 @@
     </el-select>
     <el-divider direction="vertical" />
     <el-button text @click="openParamSetting" :disabled="!model_value?.model_id" class="mr-4">
-      <AppIcon iconName="app-operation" class="color-secondary" size="16"></AppIcon>
+      <MkIcon :icon="Operation" class="color-secondary" size="16"></MkIcon>
     </el-button>
   </div>
   <!-- todo 等待 模型设置dialog -->
   <!-- <AIModeParamSettingDialog ref="AIModeParamSettingDialogRef" @refresh="handleParamRefresh" /> -->
 </template>
 <script setup lang="ts">
+import { Operation } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import { groupBy, flatMap } from 'lodash'
 import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'

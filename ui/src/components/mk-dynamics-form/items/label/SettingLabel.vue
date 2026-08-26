@@ -8,10 +8,10 @@
       <template #content
         ><div style="max-width: 200px">{{ label.attrs.tooltip }}</div></template
       >
-      <AppIcon iconName="app-warning" class="app-warning-icon" style="flex-shrink: 0"></AppIcon>
+      <MkIcon name="icon_warning_filled" class="app-warning-icon" style="flex-shrink: 0"></MkIcon>
     </el-tooltip>
-    <el-button v-if="show(label)" type="primary" link @click="open()">
-      <AppIcon iconName="app-setting"></AppIcon>
+    <el-button type="primary" link @click="open()">
+      <MkIcon :icon="Setting"></MkIcon>
     </el-button>
     <el-dialog
       destroy-on-close
@@ -39,9 +39,10 @@
   </div>
 </template>
 <script setup lang="ts">
+import { Setting } from '@element-plus/icons-vue'
 import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
 import { ref } from 'vue'
-import { cloneDeep, get } from 'lodash'
+import { cloneDeep } from 'lodash'
 const props = defineProps<{
   label: any
   modelValue?: any
@@ -61,30 +62,6 @@ const open = () => {
 const close = () => {
   dialogVisible.value = false
   form_data.value = undefined
-}
-/**
- * 当前 field是否展示
- * @param field
- */
-const show = (field: any) => {
-  if (field.relation_show_field_dict) {
-    const keys = Object.keys(field.relation_show_field_dict)
-    for (const index in keys) {
-      const key = keys[index]
-      const v = get(props.formValue, key)
-      if (v && v !== undefined && v !== null) {
-        const values = field.relation_show_field_dict[key]
-        if (values && values.length > 0) {
-          return values.includes(v)
-        } else {
-          return true
-        }
-      } else {
-        return false
-      }
-    }
-  }
-  return true
 }
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
