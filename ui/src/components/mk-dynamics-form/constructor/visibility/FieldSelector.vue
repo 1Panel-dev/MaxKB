@@ -1,28 +1,9 @@
-<template>
-  <el-cascader
-    @wheel="wheel"
-    :teleported="true"
-    :options="options"
-    v-bind="$attrs"
-    v-model="data"
-    separator=" > "
-    clearable
-  >
-    <template #default="{ data }">
-      <span class="flex align-center" @wheel="wheel">
-        <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{
-          data.label
-        }}</span
-      >
-    </template>
-  </el-cascader>
-</template>
-
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { LeftOptions } from '../type'
 const props = defineProps<{
-  modelValue: Array<any>
+  modelValue: Array<MkDynamicFormValue>
   leftOptions?: Array<LeftOptions>
 }>()
 
@@ -38,7 +19,7 @@ const data = computed({
 })
 const options = computed<Array<LeftOptions>>(() => props.leftOptions ?? [])
 
-const wheel = (e: any) => {
+const wheel = (e: MkDynamicFormValue) => {
   if (e.ctrlKey === true) {
     e.preventDefault()
     return true
@@ -70,4 +51,23 @@ const validate = () => {
 
 defineExpose({ validate })
 </script>
-<style scoped></style>
+
+<template>
+  <el-cascader
+    @wheel="wheel"
+    :teleported="true"
+    :options="options"
+    v-bind="$attrs"
+    v-model="data"
+    separator=" > "
+    clearable
+  >
+    <template #default="{ data }">
+      <span class="flex align-center" @wheel="wheel">
+        <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{
+          data.label
+        }}</span
+      >
+    </template>
+  </el-cascader>
+</template>

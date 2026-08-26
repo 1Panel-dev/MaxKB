@@ -1,34 +1,7 @@
-<template>
-  <el-tabs v-if="enableVisibility" v-model="activeTab">
-    <el-tab-pane label="基本信息" name="basic">
-      <BasicInfoConstructor
-        ref="basicRef"
-        v-model="form_data"
-        :input-type-list="input_type_list"
-        v-bind="$attrs"
-      />
-    </el-tab-pane>
-    <el-tab-pane label="显隐设置" name="visibility">
-      <VisibilityConstructor
-        ref="visibilityRef"
-        :initialValue="visibility_rules"
-        :leftOptions="leftOptions"
-      />
-    </el-tab-pane>
-  </el-tabs>
-
-  <BasicInfoConstructor
-    v-else
-    ref="basicRef"
-    v-model="form_data"
-    :input-type-list="input_type_list"
-    v-bind="$attrs"
-  />
-</template>
 
 <script setup lang="ts">
 import { onMounted, ref, nextTick } from 'vue'
-import { input_type_list as input_type_list_data } from '@/components/mk-dynamics-form/constructor/data'
+import { dynamicFormTypeOptions} from '@/components/mk-dynamics-form/constant'
 import VisibilityConstructor from './visibility/index.vue'
 import BasicInfoConstructor from './BasicInfoConstructor.vue'
 import { type LeftOptions } from './type.ts'
@@ -48,7 +21,7 @@ const props = withDefaults(
   {
     enableVisibility: false,
     input_type_list: () =>
-      input_type_list_data.map((item) => ({
+      dynamicFormTypeOptions.map((item) => ({
         label: item.label,
         value: item.value + 'Constructor',
       })),
@@ -100,4 +73,31 @@ const rander = (data: any) => {
 
 defineExpose({ getData, validate, rander })
 </script>
-<style lang="scss"></style>
+
+<template>
+  <el-tabs v-if="enableVisibility" v-model="activeTab">
+    <el-tab-pane label="基本信息" name="basic">
+      <BasicInfoConstructor
+        ref="basicRef"
+        v-model="form_data"
+        :input-type-list="input_type_list"
+        v-bind="$attrs"
+      />
+    </el-tab-pane>
+    <el-tab-pane label="显隐设置" name="visibility">
+      <VisibilityConstructor
+        ref="visibilityRef"
+        :initialValue="visibility_rules"
+        :leftOptions="leftOptions"
+      />
+    </el-tab-pane>
+  </el-tabs>
+
+  <BasicInfoConstructor
+    v-else
+    ref="basicRef"
+    v-model="form_data"
+    :input-type-list="input_type_list"
+    v-bind="$attrs"
+  />
+</template>

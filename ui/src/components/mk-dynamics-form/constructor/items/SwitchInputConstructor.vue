@@ -1,28 +1,9 @@
-<template>
-  <el-form-item
-    label="默认值"
-    :required="formValue.required"
-    prop="default_value"
-    :rules="
-      formValue.required
-        ? [
-            {
-              required: true,
-              message: '默认值为必填属性',
-            },
-          ]
-        : []
-    "
-    @click.prevent
-  >
-    <el-switch v-model="formValue.default_value" />
-  </el-form-item>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, onMounted } from 'vue'
 
 const props = defineProps<{
-  modelValue: any
+  modelValue: MkDynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -43,12 +24,32 @@ const getData = () => {
   }
 }
 
-const rander = (form_data: any) => {
+const render = (form_data: MkDynamicFormValue) => {
   formValue.value.default_value = form_data.default_value || false
 }
-defineExpose({ getData, rander })
+defineExpose({ getData, render })
 onMounted(() => {
   formValue.value.default_value = false
 })
 </script>
-<style lang="scss"></style>
+
+<template>
+  <el-form-item
+    label="默认值"
+    :required="formValue.required"
+    prop="default_value"
+    :rules="
+      formValue.required
+        ? [
+            {
+              required: true,
+              message: '默认值为必填属性',
+            },
+          ]
+        : []
+    "
+    @click.prevent
+  >
+    <el-switch v-model="formValue.default_value" />
+  </el-form-item>
+</template>

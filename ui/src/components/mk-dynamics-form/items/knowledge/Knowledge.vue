@@ -1,36 +1,5 @@
-<template>
-  <div class="w-full">
-    <el-select
-      v-model="selectedIds"
-      multiple
-      v-bind="$attrs"
-      class="w-full"
-      :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
-    >
-      <template #header v-if="$attrs.popperHeader">
-        <SelectHeader :header="$attrs.popperHeader" />
-      </template>
-      <el-option v-for="item in availableList" :key="item.id" :label="item.name" :value="item.id">
-        <el-space :size="8">
-          <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />
-          <span>{{ item.name }}</span>
-        </el-space>
-      </el-option>
-      <template #label="{ label, value }">
-        <el-space :size="8">
-          <KnowledgeIcon
-            :type="relatedObject(availableList, value, 'id')?.type"
-            :size="14"
-            style="--el-avatar-border-radius: 4px"
-          />
-          <span>{{ label }}</span>
-        </el-space>
-      </template>
-    </el-select>
-  </div>
-</template>
-
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { FormField } from '../../type'
 
@@ -43,7 +12,7 @@ const props = withDefaults(
   { modelValue: () => [] },
 )
 
-defineOptions({ inheritAttrs: false })
+defineOptions({ name: 'DynamicFormKnowledge', inheritAttrs: false })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
@@ -58,7 +27,7 @@ const model_value = computed({
 })
 // 可用
 const availableList = computed(() => {
-  return (props.formField.attrs?.knowledge_list as any[]) || []
+  return (props.formField.attrs?.knowledge_list as MkDynamicFormValue[]) || []
 })
 
 const selectedIds = computed({
@@ -68,4 +37,35 @@ const selectedIds = computed({
   },
 })
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  <div class="w-full">
+    <el-select
+      v-model="selectedIds"
+      multiple
+      v-bind="$attrs"
+      class="w-full"
+      placeholder="请选择知识库"
+    >
+      <template #header v-if="$attrs.popperHeader">
+        <SelectHeader :header="$attrs.popperHeader" />
+      </template>
+      <el-option v-for="item in availableList" :key="item.id" :label="item.name" :value="item.id">
+        <el-space :size="8">
+          <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />
+          <span>{{ item.name }}</span>
+        </el-space>
+      </el-option>
+      <template #label="{ label, value }">
+        <el-space :size="8">
+          <KnowledgeIcon
+            :type="availableList.find((item) => item.id === value)?.type"
+            :size="14"
+            style="--el-avatar-border-radius: 4px"
+          />
+          <span>{{ label }}</span>
+        </el-space>
+      </template>
+    </el-select>
+  </div>
+</template>

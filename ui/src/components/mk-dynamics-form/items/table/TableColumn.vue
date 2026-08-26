@@ -1,22 +1,22 @@
-<template>
-  <component :is="column.property" v-bind="attrs" :column="column" :row="row"></component>
-</template>
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import _ from 'lodash'
+import type { MkDynamicFormValue } from '../../type'
+import { computed } from 'vue'
 const props = defineProps<{
   /**
    *表单渲染Item column
    */
-  column: any
+  column: MkDynamicFormValue
   /**
    * 这一行数据
    */
-  row: any
+  row: MkDynamicFormValue
 }>()
 
 const attrs = computed(() => {
   return props.column.attrs ? props.column.attrs : {}
 })
 </script>
-<style lang="scss" scoped></style>
+
+<template>
+  <component :is="column.property" v-bind="attrs" :column="column" :row="row"></component>
+</template>

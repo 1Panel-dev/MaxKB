@@ -1,38 +1,16 @@
-<template>
-  <el-select
-    filterable
-    :teleported="true"
-    popper-class="dynamics-single-select"
-    clearable
-    v-bind="$attrs"
-    v-model="_modelValue"
-  >
-    <template #header v-if="$attrs.popperHeader">
-      <SelectHeader :header="$attrs.popperHeader" />
-    </template>
-    <el-option
-      v-for="(item, index) in option_list"
-      :key="index"
-      teleported
-      :label="label(item)"
-      :value="item[valueField]"
-    >
-    </el-option>
-  </el-select>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
-import { computed, ref, useAttrs } from 'vue'
-import _ from 'lodash'
-const attrs = useAttrs() as any
+import { computed, useAttrs } from 'vue'
+const attrs = useAttrs() as MkDynamicFormValue
 
 const props = defineProps<{
   modelValue?: string
-  formValue?: any
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -60,7 +38,7 @@ const option_list = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 
-const label = (option: any) => {
+const label = (option: MkDynamicFormValue) => {
   //置空
   if (props.modelValue && option_list.value && !attrs['allow-create']) {
     const oldItem = option_list.value.find((item) => item[valueField.value] === props.modelValue)
@@ -72,6 +50,29 @@ const label = (option: any) => {
   return option[textField.value]
 }
 </script>
+
+<template>
+  <el-select
+    filterable
+    :teleported="true"
+    popper-class="dynamics-single-select"
+    clearable
+    v-bind="$attrs"
+    v-model="_modelValue"
+  >
+    <template #header v-if="$attrs.popperHeader">
+      <SelectHeader :header="$attrs.popperHeader" />
+    </template>
+    <el-option
+      v-for="(item, index) in option_list"
+      :key="index"
+      teleported
+      :label="label(item)"
+      :value="item[valueField]"
+    >
+    </el-option>
+  </el-select>
+</template>
 <style lang="scss">
 .dynamics-single-select {
   .el-select-dropdown {

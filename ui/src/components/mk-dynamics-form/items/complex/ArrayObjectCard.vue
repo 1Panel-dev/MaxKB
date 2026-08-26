@@ -1,57 +1,24 @@
-<template v-loading="_loading">
-  <div class="arrt-object-card flex w-full">
-    <el-card class="box-card" :style="style" v-for="(item, index) in _data" :key="index">
-      <DynamicsForm
-        :style="formStyle"
-        :view="view"
-        ref="ceFormRef"
-        v-model="_data[index]"
-        :model="_data[index]"
-        :other-params="other"
-        :render_data="render_data()"
-        v-bind="attr"
-        :parent_field="formField.field + '.' + index"
-        label-position="top"
-        require-asterisk-position="right"
-      ></DynamicsForm>
-      <el-tooltip effect="dark" :content="$t('common.delete')" placement="top">
-        <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
-          <MkIcon name="icon_delete-trash_outlined"></MkIcon>
-        </el-button>
-      </el-tooltip>
-    </el-card>
-    <el-card shadow="never" class="card-add box-card" @click="add_card">
-      <div class="flex-center">
-        <MkIcon name="icon_add_outlined" class="add-icon layout-bg p-8 border-r-6" />
-        <span>{{ add_msg }}</span>
-      </div>
-    </el-card>
-  </div>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
-import _ from 'lodash'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
-import type { ApiResponse } from '@/api/admin/core/types'
+import type { DynamicFormResponse, FormField } from '../../type'
+import DynamicsForm from '../../index.vue'
 const props = defineProps<{
-  modelValue?: Array<any>
-  formValue?: any
+  modelValue?: Array<MkDynamicFormValue>
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
 }>()
 
-const render_data = () => {
+const getChildFields = () => {
   return Promise.resolve({
-    code: 200,
-    message: '',
     data: props.formField.children as Array<FormField>,
-  } as ApiResponse<Array<FormField>>)
+  } satisfies DynamicFormResponse<Array<FormField>>)
 }
-const deleteKnowledge = (item: any) => {
+const deleteKnowledge = (item: MkDynamicFormValue) => {
   _data.value = _data.value.filter((row) => row !== item)
 }
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -59,7 +26,7 @@ const emit = defineEmits(['update:modelValue', 'change'])
 // 校验实例对象
 const dynamicsFormRef = ref<Array<InstanceType<typeof DynamicsForm>>>([])
 
-const _data = computed<Array<any>>({
+const _data = computed<Array<MkDynamicFormValue>>({
   get() {
     if (props.modelValue) {
       return props.modelValue
@@ -117,6 +84,37 @@ defineExpose({
   field: props.field,
 })
 </script>
+
+<template v-loading="_loading">
+  <div class="arrt-object-card flex w-full">
+    <el-card class="box-card" :style="style" v-for="(item, index) in _data" :key="index">
+      <DynamicsForm
+        :style="formStyle"
+        :view="view"
+        ref="ceFormRef"
+        v-model="_data[index]"
+        :model="_data[index]"
+        :other-params="other"
+        :render-data="getChildFields()"
+        v-bind="attr"
+        :parent-field="formField.field + '.' + index"
+        label-position="top"
+        require-asterisk-position="right"
+      ></DynamicsForm>
+      <el-tooltip effect="dark" content="删除" placement="top">
+        <el-button text @click.stop="deleteKnowledge(item)" class="delete-button">
+          <MkIcon name="icon_delete-trash_outlined"></MkIcon>
+        </el-button>
+      </el-tooltip>
+    </el-card>
+    <el-card shadow="never" class="card-add box-card" @click="add_card">
+      <div class="flex-center">
+        <MkIcon name="icon_add_outlined" class="add-icon layout-bg p-8 border-r-6" />
+        <span>{{ add_msg }}</span>
+      </div>
+    </el-card>
+  </div>
+</template>
 <style lang="scss" scoped>
 .arrt-object-card {
   .box-card {

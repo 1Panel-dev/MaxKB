@@ -1,57 +1,24 @@
-<template v-loading="_loading">
-  <div style="width: 100%">
-    <el-tabs v-model="activeTab" editable @edit="handleTabsEdit" type="card">
-      <el-tab-pane
-        v-for="(item, index) in _data"
-        :key="index"
-        :label="tabs_label + (index + 1)"
-        :name="index"
-      >
-        <template v-if="formField.children">
-          <el-card :style="style">
-            <DynamicsForm
-              :style="formStyle"
-              :view="view"
-              ref="ceFormRef"
-              v-model="_data[index]"
-              :model="_data[index]"
-              :other-params="other"
-              :render_data="render_data()"
-              v-bind="attr"
-              :parent_field="formField.field + '.' + index"
-              label-position="top"
-              require-asterisk-position="right"
-            ></DynamicsForm>
-          </el-card>
-        </template>
-      </el-tab-pane>
-    </el-tabs>
-  </div>
-</template>
 <script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
-import _ from 'lodash'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
-import type { ApiResponse } from '@/api/admin/core/types'
+import type { DynamicFormResponse, FormField } from '../../type'
+import DynamicsForm from '../../index.vue'
 import type { TabPaneName } from 'element-plus'
 
 const props = defineProps<{
-  modelValue?: Array<any>
-  formValue?: any
+  modelValue?: Array<MkDynamicFormValue>
+  formValue?: MkDynamicFormValue
   formfieldList?: Array<FormField>
   field: string
-  otherParams: any
+  otherParams: MkDynamicFormValue
   formField: FormField
   view?: boolean
 }>()
 
-const render_data = () => {
+const getChildFields = () => {
   return Promise.resolve({
-    code: 200,
-    message: '',
     data: props.formField.children as Array<FormField>,
-  } as ApiResponse<Array<FormField>>)
+  } satisfies DynamicFormResponse<Array<FormField>>)
 }
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -59,7 +26,7 @@ const emit = defineEmits(['update:modelValue', 'change'])
 // 校验实例对象
 const dynamicsFormRef = ref<Array<InstanceType<typeof DynamicsForm>>>([])
 
-const _data = computed<Array<any>>({
+const _data = computed<Array<MkDynamicFormValue>>({
   get() {
     if (props.modelValue) {
       return props.modelValue
@@ -113,7 +80,7 @@ const handleTabsEdit = (targetName: TabPaneName | undefined, action: 'remove' | 
     _data.value = [..._data.value, {}]
     activeTab.value = _data.value.length
   } else if (action === 'remove') {
-    const update_value = _data.value.filter((item, index) => index != targetName)
+    const update_value = _data.value.filter((item, index) => index !== targetName)
     _data.value = update_value
     activeTab.value = update_value.length - 1
   }
@@ -124,4 +91,34 @@ defineExpose({
   field: props.field,
 })
 </script>
-<style lang="scss" scoped></style>
+
+<template v-loading="_loading">
+  <div style="width: 100%">
+    <el-tabs v-model="activeTab" editable @edit="handleTabsEdit" type="card">
+      <el-tab-pane
+        v-for="(item, index) in _data"
+        :key="index"
+        :label="tabs_label + (index + 1)"
+        :name="index"
+      >
+        <template v-if="formField.children">
+          <el-card :style="style">
+            <DynamicsForm
+              :style="formStyle"
+              :view="view"
+              ref="ceFormRef"
+              v-model="_data[index]"
+              :model="_data[index]"
+              :other-params="other"
+              :render-data="getChildFields()"
+              v-bind="attr"
+              :parent-field="formField.field + '.' + index"
+              label-position="top"
+              require-asterisk-position="right"
+            ></DynamicsForm>
+          </el-card>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
+  </div>
+</template>

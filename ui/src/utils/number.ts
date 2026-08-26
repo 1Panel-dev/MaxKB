@@ -15,3 +15,21 @@ export function numberFormat(value: NullableNumber): string {
     ? toThousands(normalizedValue)
     : `${toThousands((normalizedValue / 1000).toFixed(1))}k`
 }
+
+
+/** 将有限数字缩写为最多带一位小数的 `K`、`M`、`B` 或 `T`，空值和无效数字返回 `-`。 */
+const TOKEN_NUMBER_UNITS = ['', 'K', 'M', 'B', 'T'] as const
+export function formatTokenNumber(value: NullableNumber): string {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return '-'
+
+  let compactValue = value
+  let unitIndex = 0
+
+  while (Math.abs(compactValue) >= 1000 && unitIndex < TOKEN_NUMBER_UNITS.length - 1) {
+    compactValue /= 1000
+    unitIndex += 1
+  }
+
+  if (unitIndex === 0) return String(Math.round(compactValue))
+  return `${compactValue.toFixed(1)}${TOKEN_NUMBER_UNITS[unitIndex]}`
+}

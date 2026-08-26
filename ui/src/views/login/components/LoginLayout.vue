@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import { defaultThemeSetting, getThemeImg } from '@/constants/theme'
+import { DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
 import { useStore } from '@/stores'
 import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
 
@@ -25,6 +25,7 @@ const { theme } = useStore()
 const customLoginImage = computed(() => theme.themeInfo?.loginImage?.trim() ?? '')
 const showDefaultThemeAnimation = computed(() => !customLoginImage.value && theme.isDefaultTheme)
 const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.themeInfo?.theme))
+
 </script>
 
 <template>
@@ -35,7 +36,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.th
       <div class="flex items-center gap-4">
         <LogoFull height="38" />
         <el-divider direction="vertical" v-if="theme.themeInfo?.slogan" />
-        <span class="text-lg">{{ theme.themeInfo?.slogan || defaultThemeSetting.slogan }}</span>
+        <span class="text-lg">{{ theme.themeInfo?.slogan || DEFAULT_THEME_SETTING.slogan }}</span>
       </div>
     </header>
 

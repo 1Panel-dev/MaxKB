@@ -1,3 +1,69 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+import { computed, reactive } from 'vue'
+import Knowledge from '../../items/knowledge/Knowledge.vue'
+import type { FormField } from '../../type'
+
+const props = defineProps<{
+  modelValue: MkDynamicFormValue
+}>()
+
+const emit = defineEmits(['update:modelValue'])
+
+const collapseData = reactive({
+  optional_knowledge: true,
+})
+const formValue = computed({
+  set: (item: MkDynamicFormValue) => {
+    emit('update:modelValue', item)
+  },
+  get: () => {
+    return props.modelValue || { knowledge_list: [], default_value: [] }
+  },
+})
+
+const formField = computed<FormField>(() => {
+  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as MkDynamicFormValue
+})
+
+const getData = () => {
+  const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: MkDynamicFormValue) => {
+    return {
+      id: k.id,
+      name: k.name,
+      type: k.type,
+      embedding_model_id: k.embedding_model_id,
+    }
+  })
+
+  return {
+    input_type: 'Knowledge',
+    default_value: formValue.value.default_value || [],
+    attrs: {
+      knowledge_list: knowledgeItemList,
+    },
+  }
+}
+
+const render = (form_data: MkDynamicFormValue) => {
+  formValue.value.default_value = form_data.default_value || []
+  formValue.value.knowledge_list = form_data.attrs?.knowledge_list || []
+}
+
+defineExpose({ getData, render })
+
+function removeKnowledge(id: string) {
+  formValue.value.knowledge_list = formValue.value.knowledge_list.filter(
+    (k: MkDynamicFormValue) => k.id !== id,
+  )
+  if (formValue.value.default_value) {
+    formValue.value.default_value = formValue.value.default_value.filter(
+      (k_id: string) => k_id !== id,
+    )
+  }
+}
+</script>
+
 <template>
   <el-form-item
     prop="knowledge_list"
@@ -28,11 +94,6 @@
           <span class="ml-4" v-if="formValue.knowledge_list?.length"
             >({{ formValue.knowledge_list.length }})</span
           >
-        </div>
-        <div>
-          <el-button type="primary" link @click.stop="openAddKnowledgeDialog">
-            <MkIcon name="icon_add_outlined"></MkIcon>
-          </el-button>
         </div>
       </div>
     </template>
@@ -70,94 +131,4 @@
       <Knowledge v-model="formValue.default_value" :form-field="formField" />
     </div>
   </el-form-item>
-  <!-- todo 这块缺少添加知识库的Dialog -->
-  <!-- <AddKnowledgeDialog
-    ref="AddKnowledgeDialogRef"
-    @addData="addKnowledge"
-    :data="formValue.knowledge_list"
-    :loading="knowledgeLoading"
-  /> -->
 </template>
-<script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
-// import AddKnowledgeDialog from '@/views/application/component/AddKnowledgeDialog.vue'
-import Knowledge from '../../items/knowledge/Knowledge.vue'
-import type { FormField } from '../../type'
-
-const props = defineProps<{
-  modelValue: any
-}>()
-
-const emit = defineEmits(['update:modelValue'])
-
-const collapseData = reactive({
-  optional_knowledge: true,
-})
-const knowledgeLoading = ref(false)
-
-const formValue = computed({
-  set: (item: any) => {
-    emit('update:modelValue', item)
-  },
-  get: () => {
-    return props.modelValue || { knowledge_list: [], default_value: [] }
-  },
-})
-
-const formField = computed<FormField>(() => {
-  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as any
-})
-
-const getData = () => {
-  const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: any) => {
-    return {
-      id: k.id,
-      name: k.name,
-      type: k.type,
-      embedding_model_id: k.embedding_model_id,
-    }
-  })
-
-  return {
-    input_type: 'Knowledge',
-    default_value: formValue.value.default_value || [],
-    attrs: {
-      knowledge_list: knowledgeItemList,
-    },
-  }
-}
-
-const rander = (form_data: any) => {
-  formValue.value.default_value = form_data.default_value || []
-  formValue.value.knowledge_list = form_data.attrs?.knowledge_list || []
-}
-
-defineExpose({ getData, rander })
-
-const AddKnowledgeDialogRef = ref<InstanceType<typeof AddKnowledgeDialog>>()
-
-function openAddKnowledgeDialog() {
-  const ids = formValue.value.knowledge_list?.map((k: any) => k.id) || []
-  AddKnowledgeDialogRef.value?.open(ids)
-}
-
-function addKnowledge(data: any[]) {
-  formValue.value.knowledge_list = data
-  if (formValue.value.default_value) {
-    const currentIds = data.map((k: any) => k.id)
-    formValue.value.default_value = formValue.value.default_value.filter((id: string) =>
-      currentIds.includes(id),
-    )
-  }
-}
-
-function removeKnowledge(id: string) {
-  formValue.value.knowledge_list = formValue.value.knowledge_list.filter((k: any) => k.id !== id)
-  if (formValue.value.default_value) {
-    formValue.value.default_value = formValue.value.default_value.filter(
-      (k_id: string) => k_id !== id,
-    )
-  }
-}
-</script>
-<style lang="scss" scoped></style>

@@ -1,3 +1,225 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+import { Refresh } from '@element-plus/icons-vue'
+import { computed, useAttrs, nextTick, inject, ref, reactive } from 'vue'
+import type { FormField } from '@/components/mk-dynamics-form/type'
+import { MsgError } from '@/utils/message'
+import type { UploadFiles } from 'element-plus'
+const upload = inject('upload') as MkDynamicFormValue
+const delFile = inject('delFile') as MkDynamicFormValue
+const attrs = useAttrs() as MkDynamicFormValue
+withDefaults(defineProps<{ modelValue?: MkDynamicFormValue; formField: FormField }>(), {
+  modelValue: () => [],
+})
+const onExceed = () => {
+  MsgError('单次上传最多 ' + file_count_limit.value + ' 个文件')
+}
+const emit = defineEmits(['update:modelValue'])
+
+const filesize = (size: number) => {
+  if (!size) return ''
+  const num = 1024.0
+  if (size < num) return size + 'B'
+  if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K' //kb
+  if (size < Math.pow(num, 3)) return (size / Math.pow(num, 2)).toFixed(2) + 'M' //M
+  if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + 'G' //G
+  return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
+}
+
+const typeList: MkDynamicFormValue = {
+  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
+  table: ['xlsx', 'xls', 'csv'],
+  QA: ['xlsx', 'csv', 'xls', 'zip'],
+}
+const fileType = (name: string) => {
+  const suffix = name.split('.')
+  return suffix[suffix.length - 1] || 'MkDynamicFormValue'
+}
+
+const getImgUrl = (name: string) => {
+  const list = Object.values(typeList).flat()
+  const type = list.includes(fileType(name).toLowerCase())
+    ? fileType(name).toLowerCase()
+    : 'MkDynamicFormValue'
+  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
+}
+
+const fileArray = ref<MkDynamicFormValue>([])
+
+const loading = ref(false)
+// 上传成功数量
+const successCount = computed(
+  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status !== 'uploading').length,
+)
+// 上传失败数量
+const errorCount = computed(
+  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'error').length,
+)
+// 上传中数量
+const uploadingCount = computed(
+  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'uploading').length,
+)
+// 可重新上传的失败项（网络错误等）
+const retryList = computed(() =>
+  fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'error' && i.canRetry),
+)
+
+const getFileStatusOrder = (item: MkDynamicFormValue) => {
+  if (item.status === 'error' && item.canRetry) return 0
+  if (item.status === 'error') return 1
+  if (item.status === 'uploading') return 2
+  return 3
+}
+const sortedFileArray = computed(() =>
+  fileArray.value
+    .map((item: MkDynamicFormValue, index: number) => ({ item, index }))
+    .sort(
+      (a: MkDynamicFormValue, b: MkDynamicFormValue) =>
+        getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
+    )
+    .map(({ item }: MkDynamicFormValue) => item),
+)
+// 重新上传所有可重试的失败文件
+const retryAll = () => {
+  retryList.value.forEach((i: MkDynamicFormValue) => uploadFile(i))
+}
+
+// 上传on-change事件
+const fileHandleChange = (file: MkDynamicFormValue, fileList: UploadFiles) => {
+  // 按文件唯一标识精确定位并移除当前文件
+  // 注意：不能使用 splice(-1, 1) 盲删末尾元素，文件夹上传时会误删正常文件而放走超限文件
+  const removeCurrentFile = () => {
+    const index = fileList.findIndex((item: MkDynamicFormValue) => item.uid === file.uid)
+    if (index !== -1) {
+      fileList.splice(index, 1)
+    }
+  }
+  if (fileArray.value.length >= file_count_limit.value) {
+    onExceed()
+    removeCurrentFile()
+    return false
+  }
+  const item = reactive({
+    uid: file.uid,
+    name: file.name,
+    size: file.size,
+    file_id: '',
+    percentage: 0,
+    status: 'uploading' as 'uploading' | 'success' | 'error',
+    errMsg: '',
+    canRetry: false,
+    raw: file.raw,
+    abort: null as null | (() => void),
+    aborted: false,
+  })
+
+  //1、判断文件大小是否合法，文件限制不能大于100M
+  const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
+  if (!isLimit) {
+    item.status = 'error'
+    item.errMsg = '大小超限'
+    // MsgError('每个文件最大' + file_size_limit.value + 'MB')
+    // fileList.splice(-1, 1) //移除当前超出大小的文件
+    fileArray.value?.push(item)
+    removeCurrentFile()
+    return false
+  }
+  if (!file_type_list.value.includes(fileType(file.name).toLocaleUpperCase())) {
+    if (file?.name !== '.DS_Store') {
+      MsgError('文件格式不支持')
+    }
+    removeCurrentFile()
+    return false
+  }
+
+  if (file?.size === 0) {
+    MsgError('文件不能为空')
+    removeCurrentFile()
+    return false
+  }
+
+  fileArray.value?.push(item)
+  removeCurrentFile()
+  uploadFile(item)
+}
+// 执行上传
+const uploadFile = (item: MkDynamicFormValue) => {
+  item.status = 'uploading'
+  item.percentage = 0
+  item.errMsg = ''
+  item.canRetry = false
+  item.aborted = false
+  const res: MkDynamicFormValue = upload(
+    item.raw,
+    (percent: number) => {
+      item.percentage = percent
+    },
+    loading,
+  )
+  // provider 返回 { request, abort } 时保存中断方法，删除时可中断上传
+  item.abort = typeof res?.abort === 'function' ? res.abort : null
+  const request: Promise<MkDynamicFormValue> = res?.then ? res : res?.request
+  request
+    .then((ok: MkDynamicFormValue) => {
+      const split_path = ok.data.split('/')
+      item.file_id = split_path[split_path.length - 1]
+      item.percentage = 100
+      item.status = 'success'
+      emit('update:modelValue', fileArray.value)
+    })
+    .catch(() => {
+      // 主动中断（删除）导致的失败不再标记错误
+      if (item.aborted) return
+      item.status = 'error'
+      item.errMsg = '网络失败'
+      item.canRetry = true
+    })
+}
+function deleteFile(item: MkDynamicFormValue) {
+  // 上传过程中删除则中断上传请求
+  if (item?.status === 'uploading' && typeof item.abort === 'function') {
+    item.aborted = true
+    item.abort()
+  } else if (item?.status === 'success' && item?.file_id) {
+    if (delFile) {
+      delFile(item.file_id)
+    }
+  }
+  const index = fileArray.value.indexOf(item)
+  if (index !== -1) {
+    fileArray.value.splice(index, 1)
+  }
+  emit('update:modelValue', fileArray.value)
+}
+
+const handlePreview = (bool: boolean) => {
+  let inputDom: MkDynamicFormValue = null
+  nextTick(() => {
+    if (document.querySelector('.el-upload__input') !== null) {
+      inputDom = document.querySelector('.el-upload__input')
+      inputDom.webkitdirectory = bool
+    }
+  })
+}
+const accept = computed(() => {
+  return (attrs.file_type_list || [])
+    .map((item: MkDynamicFormValue) => '.' + item.toLowerCase())
+    .join(',')
+})
+const file_type_list = computed(() => {
+  return attrs.file_type_list.map((item: MkDynamicFormValue) => item.toUpperCase()) || []
+})
+const formats = computed(() => {
+  return file_type_list.value.join('、')
+})
+const file_size_limit = computed(() => {
+  return attrs.file_size_limit || 50
+})
+const file_count_limit = computed(() => {
+  return attrs.file_count_limit || 100
+})
+</script>
+
 <template>
   <div class="w-full">
     <el-upload
@@ -99,220 +321,3 @@
     </el-row>
   </div>
 </template>
-<script setup lang="ts">
-import { Refresh } from '@element-plus/icons-vue'
-import { computed, useAttrs, nextTick, inject, ref, reactive } from 'vue'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import { MsgError } from '@/utils/message'
-import type { UploadFiles } from 'element-plus'
-const upload = inject('upload') as any
-const delFile = inject('delFile') as any
-const attrs = useAttrs() as any
-const props = withDefaults(defineProps<{ modelValue?: any; formField: FormField }>(), {
-  modelValue: () => [],
-})
-const onExceed = () => {
-  MsgError('单次上传最多 ' + file_count_limit.value + ' 个文件')
-}
-const emit = defineEmits(['update:modelValue'])
-
-const filesize = (size: number) => {
-  if (!size) return ''
-  const num = 1024.0
-  if (size < num) return size + 'B'
-  if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K' //kb
-  if (size < Math.pow(num, 3)) return (size / Math.pow(num, 2)).toFixed(2) + 'M' //M
-  if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + 'G' //G
-  return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
-}
-
-const typeList: any = {
-  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
-  table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls', 'zip'],
-}
-const fileType = (name: string) => {
-  const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'unknown'
-}
-
-const getImgUrl = (name: string) => {
-  const list = Object.values(typeList).flat()
-  const type = list.includes(fileType(name).toLowerCase())
-    ? fileType(name).toLowerCase()
-    : 'unknown'
-  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
-}
-
-const fileArray = ref<any>([])
-
-const loading = ref(false)
-// 上传成功数量
-const successCount = computed(
-  () => fileArray.value.filter((i: any) => i.status !== 'uploading').length,
-)
-// 上传失败数量
-const errorCount = computed(() => fileArray.value.filter((i: any) => i.status === 'error').length)
-// 上传中数量
-const uploadingCount = computed(
-  () => fileArray.value.filter((i: any) => i.status === 'uploading').length,
-)
-// 可重新上传的失败项（网络错误等）
-const retryList = computed(() =>
-  fileArray.value.filter((i: any) => i.status === 'error' && i.canRetry),
-)
-
-const getFileStatusOrder = (item: any) => {
-  if (item.status === 'error' && item.canRetry) return 0
-  if (item.status === 'error') return 1
-  if (item.status === 'uploading') return 2
-  return 3
-}
-const sortedFileArray = computed(() =>
-  fileArray.value
-    .map((item: any, index: number) => ({ item, index }))
-    .sort(
-      (a: any, b: any) =>
-        getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
-    )
-    .map(({ item }: any) => item),
-)
-// 重新上传所有可重试的失败文件
-const retryAll = () => {
-  retryList.value.forEach((i: any) => uploadFile(i))
-}
-
-// 上传on-change事件
-const fileHandleChange = (file: any, fileList: UploadFiles) => {
-  // 按文件唯一标识精确定位并移除当前文件
-  // 注意：不能使用 splice(-1, 1) 盲删末尾元素，文件夹上传时会误删正常文件而放走超限文件
-  const removeCurrentFile = () => {
-    const index = fileList.findIndex((item: any) => item.uid === file.uid)
-    if (index !== -1) {
-      fileList.splice(index, 1)
-    }
-  }
-  if (fileArray.value.length >= file_count_limit.value) {
-    onExceed()
-    removeCurrentFile()
-    return false
-  }
-  const item = reactive({
-    uid: file.uid,
-    name: file.name,
-    size: file.size,
-    file_id: '',
-    percentage: 0,
-    status: 'uploading' as 'uploading' | 'success' | 'error',
-    errMsg: '',
-    canRetry: false,
-    raw: file.raw,
-    abort: null as null | (() => void),
-    aborted: false,
-  })
-
-  //1、判断文件大小是否合法，文件限制不能大于100M
-  const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
-  if (!isLimit) {
-    item.status = 'error'
-    item.errMsg = '大小超限'
-    // MsgError('每个文件最大' + file_size_limit.value + 'MB')
-    // fileList.splice(-1, 1) //移除当前超出大小的文件
-    fileArray.value?.push(item)
-    removeCurrentFile()
-    return false
-  }
-  if (!file_type_list.value.includes(fileType(file.name).toLocaleUpperCase())) {
-    if (file?.name !== '.DS_Store') {
-      MsgError('文件格式不支持')
-    }
-    removeCurrentFile()
-    return false
-  }
-
-  if (file?.size === 0) {
-    MsgError('文件不能为空')
-    removeCurrentFile()
-    return false
-  }
-
-  fileArray.value?.push(item)
-  removeCurrentFile()
-  uploadFile(item)
-}
-// 执行上传
-const uploadFile = (item: any) => {
-  item.status = 'uploading'
-  item.percentage = 0
-  item.errMsg = ''
-  item.canRetry = false
-  item.aborted = false
-  const res: any = upload(
-    item.raw,
-    (percent: number) => {
-      item.percentage = percent
-    },
-    loading,
-  )
-  // provider 返回 { request, abort } 时保存中断方法，删除时可中断上传
-  item.abort = typeof res?.abort === 'function' ? res.abort : null
-  const request: Promise<any> = res?.then ? res : res?.request
-  request
-    .then((ok: any) => {
-      const split_path = ok.data.split('/')
-      item.file_id = split_path[split_path.length - 1]
-      item.percentage = 100
-      item.status = 'success'
-      emit('update:modelValue', fileArray.value)
-    })
-    .catch(() => {
-      // 主动中断（删除）导致的失败不再标记错误
-      if (item.aborted) return
-      item.status = 'error'
-      item.errMsg = '网络失败'
-      item.canRetry = true
-    })
-}
-function deleteFile(item: any) {
-  // 上传过程中删除则中断上传请求
-  if (item?.status === 'uploading' && typeof item.abort === 'function') {
-    item.aborted = true
-    item.abort()
-  } else if (item?.status === 'success' && item?.file_id) {
-    if (delFile) {
-      delFile(item.file_id)
-    }
-  }
-  const index = fileArray.value.indexOf(item)
-  if (index !== -1) {
-    fileArray.value.splice(index, 1)
-  }
-  emit('update:modelValue', fileArray.value)
-}
-
-const handlePreview = (bool: boolean) => {
-  let inputDom: any = null
-  nextTick(() => {
-    if (document.querySelector('.el-upload__input') != null) {
-      inputDom = document.querySelector('.el-upload__input')
-      inputDom.webkitdirectory = bool
-    }
-  })
-}
-const accept = computed(() => {
-  return (attrs.file_type_list || []).map((item: any) => '.' + item.toLowerCase()).join(',')
-})
-const file_type_list = computed(() => {
-  return attrs.file_type_list.map((item: any) => item.toUpperCase()) || []
-})
-const formats = computed(() => {
-  return file_type_list.value.join('、')
-})
-const file_size_limit = computed(() => {
-  return attrs.file_size_limit || 50
-})
-const file_count_limit = computed(() => {
-  return attrs.file_count_limit || 100
-})
-</script>
-<style lang="scss" scoped></style>

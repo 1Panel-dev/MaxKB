@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import type { MkDynamicFormValue } from '../../type'
+defineProps<{
+  label: MkDynamicFormValue
+}>()
+</script>
+
 <template>
   <div class="flex align-center" style="display: inline-flex">
     <div class="flex-between mr-4">
@@ -11,9 +18,3 @@
     </el-tooltip>
   </div>
 </template>
-<script setup lang="ts">
-defineProps<{
-  label: any
-}>()
-</script>
-<style lang="scss" scoped></style>
