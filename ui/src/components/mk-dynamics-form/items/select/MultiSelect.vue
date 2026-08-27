@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -46,7 +45,6 @@ const label = (option: DynamicFormValue) => {
 
 <template>
   <el-select
-    class="m-2"
     multiple
     filterable
     allow-create
@@ -56,9 +54,6 @@ const label = (option: DynamicFormValue) => {
     v-bind="$attrs"
     v-model="_modelValue"
   >
-    <template #header v-if="$attrs.popperHeader">
-      <SelectHeader :header="$attrs.popperHeader" />
-    </template>
     <el-option
       v-for="(item, index) in options"
       :key="index"

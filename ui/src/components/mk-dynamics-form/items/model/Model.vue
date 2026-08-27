@@ -2,7 +2,6 @@
 import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import { groupBy, flatMap } from 'lodash'
-import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
 import { relatedObject } from '@/utils/common'
 import type { FormField } from '../../type'
 import { providerList } from './provider-data'
@@ -65,9 +64,6 @@ const handleModelChange = (selectedId: string) => {
       v-bind="$attrs"
       popper-class="select-model"
     >
-      <template #header v-if="$attrs.popperHeader">
-        <SelectHeader :header="$attrs.popperHeader" />
-      </template>
       <el-option-group
         v-for="(modelList, providerName) in groupedOptions"
         :key="providerName"

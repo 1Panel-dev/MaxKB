@@ -1,11 +1,5 @@
-<script setup lang="ts">
-import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <el-tree-select v-bind="$attrs">
-    <template #header v-if="$attrs.popperHeader">
-      <SelectHeader :header="$attrs.popperHeader" />
-    </template>
-  </el-tree-select>
+  <el-tree-select v-bind="$attrs"> </el-tree-select>
 </template>

@@ -43,7 +43,7 @@ onMounted(() => {
         ? [
             {
               required: true,
-              message: '默认值为必填属性',
+              message: '请选择默认值',
             },
           ]
         : []

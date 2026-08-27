@@ -2,8 +2,6 @@
 import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { FormField } from '../../type'
-
-import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
 const props = withDefaults(
   defineProps<{
     modelValue?: string[]
@@ -47,9 +45,6 @@ const selectedIds = computed({
       class="w-full"
       placeholder="请选择知识库"
     >
-      <template #header v-if="$attrs.popperHeader">
-        <SelectHeader :header="$attrs.popperHeader" />
-      </template>
       <el-option v-for="item in availableList" :key="item.id" :label="item.name" :value="item.id">
         <el-space :size="8">
           <KnowledgeIcon :type="item.type" :size="20" style="--el-avatar-border-radius: 6px" />

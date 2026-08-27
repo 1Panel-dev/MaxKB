@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, inject } from 'vue'
+import MkFormList from '@/components/mk-form-list/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
-import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
+import type {
+  DynamicFormConstructorOption,
+  DynamicFormValidatorCallback,
+  DynamicFormValue,
+} from '../../type'
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
@@ -44,7 +49,7 @@ const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback('引用变量必填')
+      callback('请输入引用变量')
     }
 
     return true
@@ -55,12 +60,12 @@ const addOption = () => {
   formValue.value.option_list.push({ value: '', label: '' })
 }
 
-const delOption = (index: number) => {
-  const option = formValue.value.option_list[index]
-  if (option.value && formValue.value.default_value === option.value) {
-    formValue.value.default_value = ''
+const handleOptionRemove = (option: DynamicFormConstructorOption) => {
+  if (Array.isArray(formValue.value.default_value)) {
+    formValue.value.default_value = formValue.value.default_value.filter(
+      (value: DynamicFormValue) => value !== option.value,
+    )
   }
-  formValue.value.option_list.splice(index, 1)
 }
 
 const getData = () => {
@@ -94,42 +99,32 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item v-if="getModel">
-    <template #label>
-      <div class="flex-between">赋值方式</div>
-    </template>
+  <el-form-item v-if="getModel" label="赋值方式">
+    <!-- // TODO 赋值方式待调整 -->
+    <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
+      <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
+        <span class="flex align-center">
+          {{ item.label }}
 
-    <el-row class="w-full">
-      <el-radio-group @change="formValue.option_list = []" v-model="formValue.assignment_method">
-        <el-radio
-          :value="item.value"
-          size="large"
-          v-for="(item, index) in assignmentMethodOptions"
-          :key="index"
-        >
-          <span class="flex align-center">
-            {{ item.label }}
-
-            <el-tooltip effect="dark" placement="right" v-if="item.value === 'ref_variables'">
-              <template #content>
-                变量的值必须符合:<br />
-                [<br />
-                {<br />
-                "label": "xx",<br />
-                "value": "xx",<br />
-                "default": false<br />
-                }<br />
-                ]<br />
-                label: 标签 必填<br />
-                value: 值 必填<br />
-                default: 是否为默认值
-              </template>
-              <MkIcon name="icon_warning_filled" class="app-warning-icon ml-4"></MkIcon>
-            </el-tooltip>
-          </span>
-        </el-radio>
-      </el-radio-group>
-    </el-row>
+          <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
+            <template #content>
+              变量的值必须符合:<br />
+              [<br />
+              {<br />
+              "label": "xx",<br />
+              "value": "xx",<br />
+              "default": false<br />
+              }<br />
+              ]<br />
+              label: 标签 必填<br />
+              value: 值 必填<br />
+              default: 是否为默认值
+            </template>
+            <MkIcon name="icon_info_outlined"></MkIcon>
+          </el-tooltip>
+        </span>
+      </el-radio>
+    </el-radio-group>
   </el-form-item>
   <el-form-item
     v-if="formValue.assignment_method === 'ref_variables'"
@@ -146,44 +141,35 @@ onMounted(() => {
     />
   </el-form-item>
 
-  <el-form-item v-if="formValue.assignment_method === 'custom'">
-    <template #label>
-      <div class="flex-between">
-        选项值
-        <el-button link type="primary" @click.stop="addOption()">
-          <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>
-          添加
-        </el-button>
-      </div>
-    </template>
-    <el-row style="width: 100%" :gutter="10">
-      <el-col :span="10"> 标签 </el-col>
-      <el-col :span="12"> 选项值 </el-col>
-    </el-row>
-    <el-row
-      style="width: 100%"
-      v-for="(option, $index) in formValue.option_list"
-      :key="$index"
-      :gutter="10"
-      class="mb-8"
-    >
-      <el-col :span="10">
-        <el-input v-model="formValue.option_list[$index].label" placeholder="请输入选项标签" />
-      </el-col>
-      <el-col :span="12">
-        <el-input v-model="formValue.option_list[$index].value" placeholder="请输入选项值" />
-      </el-col>
-      <el-col :span="1">
-        <el-button link class="ml-8" @click.stop="delOption(Number($index))">
-          <MkIcon name="icon_delete-trash_outlined"></MkIcon>
-        </el-button>
-      </el-col>
-    </el-row>
-  </el-form-item>
+  <div v-if="formValue.assignment_method === 'custom'" class="mb-4">
+    <div class="flex-between mb-2">
+      <span>选项值</span>
+      <el-button text type="primary" @click.stop="addOption()">
+        <MkIcon name="icon_add_outlined"></MkIcon>
+      </el-button>
+    </div>
+
+    <div class="w-full rounded-md bg-N100 p-3">
+      <MkFormList
+        v-model="formValue.option_list"
+        :default-item="{ label: '', value: '' }"
+        :show-add-button="false"
+        @remove="handleOptionRemove"
+      >
+        <template #default="{ index, item: option }">
+          <el-form-item :label="index === 0 ? '标签' : ''" class="flex-1">
+            <el-input v-model="option.label" placeholder="请输入选项标签" />
+          </el-form-item>
+          <el-form-item :label="index === 0 ? '选项值' : ''" class="flex-1">
+            <el-input v-model="option.value" placeholder="请输入选项值" />
+          </el-form-item>
+        </template>
+      </MkFormList>
+    </div>
+  </div>
   <el-form-item
+    class="mk-hide-asterisk"
     v-if="formValue.assignment_method === 'custom'"
-    class="defaultValueItem"
-    label="默认值"
     :required="formValue.required"
     prop="default_value"
     :rules="
@@ -191,17 +177,19 @@ onMounted(() => {
         ? [
             {
               required: true,
-              message: '默认值为必填属性',
+              message: '请输入默认值',
             },
           ]
         : []
     "
   >
-    <div class="defaultValueCheckbox">
-      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
-    </div>
+    <template #label>
+      <div class="flex-between">
+        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <el-select
-      class="m-2"
       multiple
       collapse-tags
       filterable
@@ -209,7 +197,6 @@ onMounted(() => {
       :reserve-keyword="false"
       v-model="formValue.default_value"
       :teleported="false"
-      popper-class="custom-select-popper"
     >
       <el-option
         v-for="(option, index) in formValue.option_list"
@@ -220,13 +207,4 @@ onMounted(() => {
     </el-select>
   </el-form-item>
 </template>
-<style lang="scss" scoped>
-.defaultValueItem {
-  position: relative;
-  .defaultValueCheckbox {
-    position: absolute;
-    right: 0;
-    top: -35px;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

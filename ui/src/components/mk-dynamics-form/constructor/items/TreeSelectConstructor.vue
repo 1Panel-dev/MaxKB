@@ -313,21 +313,26 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
   </el-form-item>
 
   <el-form-item
-    class="defaultValueItem"
+    class="mk-hide-asterisk"
     :required="formValue.required"
     prop="default_value"
-    label="默认值"
     :rules="
       formValue.required
         ? [
             {
               required: true,
-              message: '默认值为必填属性',
+              message: '请输入默认值',
             },
           ]
         : []
     "
   >
+    <template #label>
+      <div class="flex-between">
+        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <el-tree-select
       v-model="formValue.default_value"
       :data="formValue.treeData"

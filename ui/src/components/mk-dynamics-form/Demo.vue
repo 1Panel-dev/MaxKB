@@ -177,7 +177,7 @@ const validateForm = async () => {
   </div>
 
   <!-- 添加/编辑字段弹窗 -->
-  <el-dialog
+  <MkDialog
     v-model="dialogVisible"
     :title="isEdit ? '编辑字段' : '添加字段'"
     width="600px"
@@ -196,5 +196,5 @@ const validateForm = async () => {
       <el-button @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" @click="submitField">确定</el-button>
     </template>
-  </el-dialog>
+  </MkDialog>
 </template>

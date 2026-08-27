@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
 import { computed, useAttrs } from 'vue'
 const attrs = useAttrs() as DynamicFormValue
 
@@ -52,17 +51,7 @@ const label = (option: DynamicFormValue) => {
 </script>
 
 <template>
-  <el-select
-    filterable
-    :teleported="true"
-    popper-class="dynamics-single-select"
-    clearable
-    v-bind="$attrs"
-    v-model="_modelValue"
-  >
-    <template #header v-if="$attrs.popperHeader">
-      <SelectHeader :header="$attrs.popperHeader" />
-    </template>
+  <el-select filterable :teleported="true" clearable v-bind="$attrs" v-model="_modelValue">
     <el-option
       v-for="(item, index) in options"
       :key="index"
@@ -73,10 +62,4 @@ const label = (option: DynamicFormValue) => {
     </el-option>
   </el-select>
 </template>
-<style lang="scss">
-.dynamics-single-select {
-  .el-select-dropdown {
-    max-width: 1px;
-  }
-}
-</style>
+<style lang="scss"></style>

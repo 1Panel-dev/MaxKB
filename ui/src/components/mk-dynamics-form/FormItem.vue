@@ -59,7 +59,7 @@ const emit = defineEmits<{
 }>()
 
 const loading = ref(false)
-const fieldComponentRef = ref<DynamicFieldComponent>()
+const componentFormRef = ref<DynamicFieldComponent>()
 const triggerSubscriptions: Array<{
   event: string
   handler: (value: unknown) => void
@@ -188,7 +188,7 @@ onBeforeUnmount(() => {
 
 function validate() {
   if (props.formField.trigger_type === 'CHILD_FORMS') {
-    return fieldComponentRef.value?.validate?.() ?? Promise.resolve()
+    return componentFormRef.value?.validate?.() ?? Promise.resolve()
   }
   return Promise.resolve()
 }
@@ -203,7 +203,6 @@ defineExpose({ validate })
     :style="formItemStyle"
     :prop="formField.field"
     :rules="validationRules"
-    :class="formField.required_asterisk ? 'hide-asterisk' : ''"
   >
     <template v-if="formField.label" #label>
       <FormItemLabel v-if="isString(formField.label)" :form-field="formField" />
@@ -219,7 +218,7 @@ defineExpose({ validate })
     <component
       :is="getFieldComponent(formField.input_type)"
       v-if="getFieldComponent(formField.input_type)"
-      ref="fieldComponentRef"
+      ref="componentFormRef"
       v-model="itemValue"
       :view="view"
       :form-field="formField"

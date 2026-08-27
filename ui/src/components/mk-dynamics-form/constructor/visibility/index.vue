@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { randomId } from '@/utils/common'
+import MkFormList from '@/components/mk-form-list/index.vue'
 import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
-import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
+import { inferFieldType, getAllowedOps, getFieldConfig } from './utils'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
 
@@ -13,28 +14,35 @@ const props = defineProps<{
   leftOptions?: VisibilityFieldOption[]
 }>()
 
+const defaultCondition: VisibilityConditionState = {
+  id: '',
+  field: ['', ''],
+  compare: '',
+  value: '',
+}
+
 const formData = ref({
   action: 'show' as 'show' | 'hide',
   condition: 'and' as 'and' | 'or',
-  conditions: [] as VisibilityConditionState[],
+  conditions: [
+    { ...defaultCondition, id: randomId(), field: ['', ''] },
+  ] as VisibilityConditionState[],
 })
 
-function addCondition() {
-  formData.value.conditions.push({
-    id: randomId(),
-    field: ['', ''] as [string, string],
-    compare: '',
-    value: '',
-  })
-}
-
-function removeCondition(idx: number) {
-  formData.value.conditions.splice(idx, 1)
-}
-
-function updateCondition(index: number, condition: VisibilityConditionState) {
-  formData.value.conditions.splice(index, 1, condition)
-}
+const conditionRows = computed<VisibilityConditionState[]>({
+  get: () => formData.value.conditions,
+  set: (conditions) => {
+    formData.value.conditions = conditions.map((condition) =>
+      condition.id
+        ? condition
+        : {
+            ...condition,
+            id: randomId(),
+            field: [...condition.field] as [string, string],
+          },
+    )
+  },
+})
 
 function validate(): Promise<void> {
   let hasError = false
@@ -118,30 +126,19 @@ function render(rules: VisibilityRules | null) {
   }
 }
 
-onMounted(() => {
-  formData.value.conditions = [
-    {
-      id: randomId(),
-      field: ['', ''] as [string, string],
-      compare: '',
-      value: '',
-    },
-  ]
-})
-
 defineExpose({ getData, render, validate })
 </script>
 
 <template>
-  <div>
-    <el-radio-group v-model="formData.action" class="mb-8">
+  <div class="flex flex-col gap-4 w-full">
+    <el-radio-group v-model="formData.action">
       <el-radio value="show">满足条件时显示</el-radio>
       <el-radio value="hide">满足条件时隐藏</el-radio>
     </el-radio-group>
 
-    <div class="flex align-center mb-8">
+    <div class="flex align-center gap-2">
       <span class="lighter">满足</span>
-      <el-select v-model="formData.condition" size="small" style="width: 60px; margin: 0 8px">
+      <el-select v-model="formData.condition" size="small" class="w-20!">
         <el-option label="且" value="and" />
         <el-option label="或" value="or" />
       </el-select>
@@ -149,21 +146,17 @@ defineExpose({ getData, render, validate })
     </div>
 
     <el-scrollbar>
-      <div style="max-height: calc(100vh - 319px)">
-        <ConditionRow
-          v-for="(cond, idx) in formData.conditions"
-          :key="cond.id"
-          :model-value="cond"
-          @update:model-value="updateCondition(idx, $event)"
-          :left-options="leftOptions"
-          @delete="removeCondition(idx)"
-        />
+      <div style="max-height: calc(100vh - 400px)">
+        <MkFormList
+          v-model="conditionRows"
+          :default-item="defaultCondition"
+          :first-row-has-label="false"
+        >
+          <template #default="{ item: condition }">
+            <ConditionRow :model-value="condition" :left-options="leftOptions" />
+          </template>
+        </MkFormList>
       </div>
     </el-scrollbar>
-
-    <el-button link type="primary" @click="addCondition">
-      <MkIcon name="icon_add_outlined" class="mr-4" />
-      添加
-    </el-button>
   </div>
 </template>
