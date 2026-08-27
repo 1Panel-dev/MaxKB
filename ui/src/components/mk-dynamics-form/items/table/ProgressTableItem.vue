@@ -1,39 +1,39 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 const props = defineProps<{
   /**
    *表单渲染Item column
    */
-  column: MkDynamicFormValue
+  column: DynamicFormValue
   /**
    * 这一行数据
    */
-  row: MkDynamicFormValue
+  row: DynamicFormValue
 }>()
-function evalF(text: string, row: MkDynamicFormValue) {
+function evalF(text: string, row: DynamicFormValue) {
   return new Function('row', `"use strict"; return (${text})`)(row)
 }
-const props_info = computed(() => {
+const fieldProps = computed(() => {
   return props.column.props_info ? props.column.props_info : {}
 })
-const text_field = computed(() => {
+const textField = computed(() => {
   return props.column.text_field ? props.column.text_field : 'key'
 })
-const value_field = computed(() => {
+const valueField = computed(() => {
   return props.column.value_field ? props.column.value_field : 'value'
 })
 
-const value_html = (view_card_item: MkDynamicFormValue) => {
-  if (view_card_item.type === 'eval') {
-    return evalF(view_card_item.value_field, props.row)
+const getCardValue = (viewCardItem: DynamicFormValue) => {
+  if (viewCardItem.type === 'eval') {
+    return evalF(viewCardItem.value_field, props.row)
   } else {
-    return props.row[view_card_item.value_field]
+    return props.row[viewCardItem.value_field]
   }
 }
 
-const view_card = computed(() => {
-  return props_info.value.view_card ? props_info.value.view_card : []
+const viewCards = computed(() => {
+  return fieldProps.value.view_card ? fieldProps.value.view_card : []
 })
 </script>
 
@@ -41,18 +41,18 @@ const view_card = computed(() => {
   <div class="progress-table-item">
     <el-popover
       placement="top-start"
-      :title="row[text_field]"
+      :title="row[textField]"
       :width="200"
       trigger="hover"
       :persistent="false"
     >
       <template #reference>
-        <el-progress v-bind="$attrs" :percentage="row[value_field]"></el-progress
+        <el-progress v-bind="$attrs" :percentage="row[valueField]"></el-progress
       ></template>
       <div>
-        <el-row v-for="(item, index) in view_card" :key="index">
+        <el-row v-for="(item, index) in viewCards" :key="index">
           <el-col :span="6">{{ item.title }}</el-col>
-          <el-col :span="18"> <span class="value" :innerHTML="value_html(item)"> </span></el-col>
+          <el-col :span="18"> <span class="value" :innerHTML="getCardValue(item)"> </span></el-col>
         </el-row>
       </div>
     </el-popover>

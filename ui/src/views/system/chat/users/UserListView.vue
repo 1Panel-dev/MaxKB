@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatUserApi from '@/api/admin/system/chat-user'
-import type { ChatUser, LoginMethod, OptionItem, RequestParams } from '@/api/types'
+import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { datetimeFormat } from '@/utils/time'
@@ -56,7 +56,7 @@ const searchFields: OptionItem<string>[] = [
     })),
   },
 ]
-const chatUserQuery = ref<RequestParams>()
+const chatUserQuery = ref<Dict<unknown>>()
 
 function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
   if (!tokenQuota) return '-'
@@ -65,7 +65,7 @@ function formatQuotaUsage(tokenQuota?: ChatUser['token_quota']) {
   return `${used} / ${formatTokenNumber(tokenQuota.token_limit)}`
 }
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   chatUserQuery.value = query
   paginationConfig.value.currentPage = 1
   loadChatUsers()

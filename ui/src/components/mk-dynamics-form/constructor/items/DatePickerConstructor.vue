@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, onBeforeMount } from 'vue'
-const type_list = [
+const dateTypeOptions = [
   {
     label: '年',
     value: 'year',
@@ -19,7 +19,7 @@ const type_list = [
     value: 'datetime',
   },
 ]
-const type_dict: MkDynamicFormValue = {
+const dateFormatOptions: DynamicFormValue = {
   year: [{ value: 'YYYY' }],
   month: [{ value: 'YYYY-MM' }],
   date: [{ value: 'YYYY-MM-DD' }],
@@ -38,12 +38,12 @@ const formatCurrentDate = (format: string) => {
     .replace('ss', padDatePart(now.getSeconds()))
 }
 
-const type_change = () => {
-  formValue.value.format = type_dict[formValue.value.type][0].value
+const handleDateTypeChange = () => {
+  formValue.value.format = dateFormatOptions[formValue.value.type][0].value
   formValue.value.default_value = formatCurrentDate(formValue.value.format)
 }
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -67,10 +67,10 @@ const getData = () => {
     show_default_value: formValue.value.show_default_value,
   }
 }
-const render = (form_data: MkDynamicFormValue) => {
-  formValue.value.type = form_data.attrs.type
-  formValue.value.format = form_data.attrs?.format
-  formValue.value.default_value = form_data.default_value
+const render = (formData: DynamicFormValue) => {
+  formValue.value.type = formData.attrs.type
+  formValue.value.format = formData.attrs?.format
+  formValue.value.default_value = formData.default_value
 }
 defineExpose({ getData, render })
 onBeforeMount(() => {
@@ -85,12 +85,12 @@ onBeforeMount(() => {
 
 <template>
   <el-form-item label="时间类型" required>
-    <el-select @change="type_change" v-model="formValue.type" placeholder="请选择时间类型">
+    <el-select @change="handleDateTypeChange" v-model="formValue.type" placeholder="请选择时间类型">
       <el-option
-        v-for="input_type in type_list"
-        :key="input_type.value"
-        :label="input_type.label"
-        :value="input_type.value"
+        v-for="inputTypeOption in dateTypeOptions"
+        :key="inputTypeOption.value"
+        :label="inputTypeOption.label"
+        :value="inputTypeOption.value"
       />
     </el-select>
   </el-form-item>
@@ -103,10 +103,10 @@ onBeforeMount(() => {
       placeholder="请选择格式"
     >
       <el-option
-        v-for="input_type in type_dict[formValue.type]"
-        :key="input_type.value"
-        :label="input_type.value"
-        :value="input_type.value"
+        v-for="inputTypeOption in dateFormatOptions[formValue.type]"
+        :key="inputTypeOption.value"
+        :label="inputTypeOption.value"
+        :value="inputTypeOption.value"
       />
     </el-select>
   </el-form-item>

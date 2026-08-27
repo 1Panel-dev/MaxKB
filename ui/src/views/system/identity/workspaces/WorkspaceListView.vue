@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
 import type { TableColumnCtx } from 'element-plus'
-import type { RequestParams, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
+import type { Dict, OptionItem, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
@@ -72,13 +72,13 @@ const paginationConfig = ref({
   pageSize: 20,
   total: 0,
 })
-const memberSearchQuery = ref<RequestParams>()
+const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'name' },
 ]
 const workspaceMembers = ref<WorkspaceMemberItem[]>([])
-function handleMemberSearch(query?: RequestParams) {
+function handleMemberSearch(query?: Dict<unknown>) {
   memberSearchQuery.value = query
   paginationConfig.value.currentPage = 1
   return loadWorkspaceMembers()

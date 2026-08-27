@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { compareList } from '@/workflow-canvas/config/constants'
+import type { VisibilityConditionState, VisibilityFieldOption } from '../../type'
 import FieldSelector from './FieldSelector.vue'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
-import type { LeftOptions } from '../type'
 
-const condition = defineModel<MkDynamicFormValue>({ required: true })
+const condition = defineModel<VisibilityConditionState>({ required: true })
 
 const props = defineProps<{
-  leftOptions?: Array<LeftOptions>
+  leftOptions?: VisibilityFieldOption[]
 }>()
 
 defineEmits<{

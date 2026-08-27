@@ -4,7 +4,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import KnowledgeApi from '@/api/admin/workspace/knowledge/knowledge'
 import SharedApi from '@/api/admin/workspace/shared'
-import type { FolderItem, KnowledgeItem, OptionItem, RequestParams } from '@/api/types'
+import type { Dict, FolderItem, KnowledgeItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
@@ -38,7 +38,7 @@ const searchFields = computed(() => [
     remoteMethod: loadCreatorOptions,
   },
 ])
-const knowledgeQuery = ref<RequestParams>()
+const knowledgeQuery = ref<Dict<unknown>>()
 
 function loadCreatorOptions(keyword: string) {
   const requestApi = isShared.value ? CommonSystemApi : CommonApi
@@ -47,7 +47,7 @@ function loadCreatorOptions(keyword: string) {
   })
 }
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   knowledgeQuery.value = query
   refreshKnowledge()
 }

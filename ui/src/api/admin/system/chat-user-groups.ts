@@ -1,11 +1,6 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type {
-  ChatUserGroupMember,
-  ChatUserGroupPayload,
-  ListItem,
-  RequestParams,
-} from '@/api/types'
+import type { ChatUserGroupMember, ChatUserGroupPayload, ListItem, Dict } from '@/api/types'
 
 const prefix = '/system/group'
 
@@ -25,7 +20,7 @@ const deleteChatUserGroup = (groupId: string) => {
 }
 
 /** 获取用户组成员分页列表。 */
-const getChatUserGroupMembers = (groupId: string, page: ParamsPage, query?: RequestParams) => {
+const getChatUserGroupMembers = (groupId: string, page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ChatUserGroupMember>>(
     `${prefix}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
     query,

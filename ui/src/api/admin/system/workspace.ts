@@ -2,7 +2,7 @@ import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   CreateWorkspaceMemberPayload,
-  RequestParams,
+  Dict,
   WorkspaceItem,
   WorkspaceMemberItem,
 } from '@/api/types'
@@ -18,7 +18,7 @@ const getSystemWorkspaceList = () => {
 /** 获取工作空间成员列表 **/
 // TODO 工作空间管理员接口 /workspace 未区分
 
-const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: RequestParams) => {
+const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<WorkspaceMemberItem>>(
     `${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`,
     query,

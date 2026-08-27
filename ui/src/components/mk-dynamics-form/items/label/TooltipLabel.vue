@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 defineProps<{
-  label: MkDynamicFormValue
+  label: DynamicFormValue
 }>()
 </script>
 

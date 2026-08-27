@@ -2,13 +2,7 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import ChatGroupsApi from '@/api/admin/system/chat-user-groups.ts'
 import { LOGIN_METHOD } from '@/api/enums'
-import type {
-  ListItem,
-  ChatUserGroupMember,
-  LoginMethod,
-  OptionItem,
-  RequestParams,
-} from '@/api/types'
+import type { ListItem, ChatUserGroupMember, LoginMethod, OptionItem, Dict } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import MkSearchList from '@/components/mk-search-list/index.vue'
@@ -72,7 +66,7 @@ function deleteGroup(group: ListItem) {
 const memberTableRef = useTemplateRef('memberTableRef')
 const membersLoading = ref(false)
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const memberQuery = ref<RequestParams>()
+const memberQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
@@ -97,7 +91,7 @@ function loadGroupMembers(resetPage = false) {
     })
 }
 
-function handleMemberSearch(query?: RequestParams) {
+function handleMemberSearch(query?: Dict<unknown>) {
   memberQuery.value = query
   loadGroupMembers(true)
 }

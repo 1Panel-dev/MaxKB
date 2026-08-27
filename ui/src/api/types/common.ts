@@ -1,6 +1,3 @@
-/** 多个公共组件共同使用的通用选项类型。 */
-export type RequestParams = Record<string, unknown>
-
 /** 键为字符串的通用字典类型。 */
 export type Dict<T> = Record<string, T>
 

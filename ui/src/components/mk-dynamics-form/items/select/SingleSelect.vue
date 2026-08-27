@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
 import { computed, useAttrs } from 'vue'
-const attrs = useAttrs() as MkDynamicFormValue
+const attrs = useAttrs() as DynamicFormValue
 
 const props = defineProps<{
   modelValue?: string
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -34,14 +34,14 @@ const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
 
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 
-const label = (option: MkDynamicFormValue) => {
+const label = (option: DynamicFormValue) => {
   //置空
-  if (props.modelValue && option_list.value && !attrs['allow-create']) {
-    const oldItem = option_list.value.find((item) => item[valueField.value] === props.modelValue)
+  if (props.modelValue && options.value && !attrs['allow-create']) {
+    const oldItem = options.value.find((item) => item[valueField.value] === props.modelValue)
     if (!oldItem) {
       emit('update:modelValue', undefined)
     }
@@ -64,7 +64,7 @@ const label = (option: MkDynamicFormValue) => {
       <SelectHeader :header="$attrs.popperHeader" />
     </template>
     <el-option
-      v-for="(item, index) in option_list"
+      v-for="(item, index) in options"
       :key="index"
       teleported
       :label="label(item)"

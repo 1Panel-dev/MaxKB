@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 defineProps<{
-  header: MkDynamicFormValue
+  header: DynamicFormValue
 }>()
 </script>
 
 <template>
-  <div
-    v-if="header"
-    style="font-size: 13px; color: #1f2329; padding: 2px 4px; display: flex; align-items: center"
-  >
+  <div v-if="header">
     <span>{{ header.label }}</span>
     <span v-if="header.required" style="color: #f54a45; margin-left: 4px">*</span>
     <el-tooltip v-if="header.tooltip" effect="dark" placement="right">
       <template #content>
-        <div style="max-width: 200px">{{ header.tooltip }}</div>
+        <div>{{ header.tooltip }}</div>
       </template>
       <MkIcon
         name="icon_warning_filled"
@@ -24,9 +21,4 @@ defineProps<{
     </el-tooltip>
   </div>
 </template>
-<style lang="scss">
-.el-select-dropdown__header {
-  border-bottom: none;
-  padding: 4px 8px 0;
-}
-</style>
+<style lang="scss"></style>

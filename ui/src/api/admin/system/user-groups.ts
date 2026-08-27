@@ -1,6 +1,6 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { SystemUserGroup, SystemUserGroupMember, RequestParams } from '@/api/types'
+import type { Dict, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 
 const prefix = (workspaceId: string) => `/system/workspace/${workspaceId}/user_group`
 
@@ -24,7 +24,7 @@ const getSystemUserGroupMembers = (
   workspaceId: string,
   groupId: string,
   page: ParamsPage,
-  query?: RequestParams,
+  query?: Dict<unknown>,
 ) => {
   return get<ResponsePage<SystemUserGroupMember>>(
     `${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,

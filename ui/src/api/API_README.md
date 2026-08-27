@@ -75,6 +75,8 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 
 - API 专用的请求参数、响应包装、请求配置和基础设施类型，放在对应 API 文件、资源目录的
   `types.ts`，或该 API 业务域的 `common.ts`。
+- 字符串键字典统一使用 `@/api/types` 导出的 `Dict<T>`；未收窄值类型的请求查询参数使用
+  `Dict<unknown>`，不再为相同结构声明额外别名。
 - `src/api/types` 只存放 API 与 View 或 Component 跨层共用的业务类型，使用方统一通过
   `import type { ... } from '@/api/types'` 导入，不写 `/index.ts`。
 - `src/api/types/index.ts` 只负责导出各业务域类型，不直接声明类型。

@@ -1,5 +1,3 @@
-import type { RequestParams } from './common'
-
 export interface OperateLogUser {
   email?: string
   username?: string

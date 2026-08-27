@@ -2,7 +2,7 @@
 import { ref, useTemplateRef, watch } from 'vue'
 import RoleApi from '@/api/admin/system/role'
 import { ROLE_TYPE } from '@/api/enums'
-import type { OptionItem, RequestParams, RoleItem, RoleMember } from '@/api/types'
+import type { Dict, OptionItem, RoleItem, RoleMember } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import AddMemberDrawer from '../AddMemberDrawer.vue'
 
@@ -10,7 +10,7 @@ const props = defineProps<{ currentRole: RoleItem }>()
 const loading = ref(false)
 const members = ref<RoleMember[]>([])
 const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
-const searchQuery = ref<RequestParams>()
+const searchQuery = ref<Dict<unknown>>()
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
@@ -29,7 +29,7 @@ function loadMembers(reset = false) {
     })
 }
 
-function handleSearch(query?: RequestParams) {
+function handleSearch(query?: Dict<unknown>) {
   searchQuery.value = query
   loadMembers(true)
 }

@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 
 const props = defineProps<{
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -20,18 +20,18 @@ const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
 
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 
-const label = (option: MkDynamicFormValue) => {
+const label = (option: DynamicFormValue) => {
   return option[textField.value]
 }
 </script>
 
 <template>
   <el-radio-group v-bind="$attrs">
-    <el-radio-button v-for="(item, index) in option_list" :key="index" :label="item[valueField]">
+    <el-radio-button v-for="(item, index) in options" :key="index" :label="item[valueField]">
       <div v-html="label(item)"></div>
     </el-radio-button>
   </el-radio-group>

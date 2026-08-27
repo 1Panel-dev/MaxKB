@@ -1,30 +1,32 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../type'
+import type { DynamicFormValue } from '../type'
 import { json, jsonParseLinter } from '@codemirror/lang-json'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { Codemirror } from 'vue-codemirror'
 import { linter } from '@codemirror/lint'
 import { computed, ref } from 'vue'
-const props = withDefaults(defineProps<{ modelValue?: MkDynamicFormValue }>(), {
-  modelValue: () => {},
+const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue }>(), {
+  modelValue: () => ({}),
 })
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: DynamicFormValue): void
+}>()
 
-const cache_model_value_str = ref<string>()
+const cachedModelValue = ref<string>()
 
-const model_value = computed({
+const modelValueProxy = computed({
   get: () => {
-    if (cache_model_value_str.value) {
-      return cache_model_value_str.value
+    if (cachedModelValue.value) {
+      return cachedModelValue.value
     }
-    return JSON.stringify(props.modelValue, null, 4)
+    return JSON.stringify(props.modelValue, null, 4) ?? '{}'
   },
   set: (v: string) => {
     if (!v) {
       emit('update:modelValue', JSON.parse('{}'))
     } else {
       try {
-        cache_model_value_str.value = v
+        cachedModelValue.value = v
         const result = JSON.parse(v)
         emit('update:modelValue', result)
       } catch {}
@@ -45,19 +47,19 @@ const dialogVisible = ref<boolean>(false)
 const cloneContent = ref<string>('')
 
 const openCodemirrorDialog = () => {
-  cloneContent.value = model_value.value
+  cloneContent.value = modelValueProxy.value
   dialogVisible.value = true
 }
 
 const format = () => {
   try {
-    const json_str = JSON.parse(model_value.value)
-    model_value.value = JSON.stringify(json_str, null, 4)
+    const jsonValue = JSON.parse(modelValueProxy.value)
+    modelValueProxy.value = JSON.stringify(jsonValue, null, 4)
   } catch {}
 }
 
 function submitDialog() {
-  model_value.value = cloneContent.value
+  modelValueProxy.value = cloneContent.value
   dialogVisible.value = false
 }
 /**
@@ -66,14 +68,14 @@ function submitDialog() {
  * @param value
  * @param callback
  */
-const validate_rules = (
-  rule: MkDynamicFormValue,
-  value: MkDynamicFormValue,
-  callback: MkDynamicFormValue,
+const validateRules = (
+  _rule: unknown,
+  _value: DynamicFormValue,
+  callback: (error?: Error) => void,
 ) => {
-  if (model_value.value) {
+  if (modelValueProxy.value) {
     try {
-      JSON.parse(model_value.value)
+      JSON.parse(modelValueProxy.value)
     } catch {
       callback(new Error('JSON 格式不正确'))
       return false
@@ -82,7 +84,7 @@ const validate_rules = (
   return true
 }
 
-defineExpose({ validate_rules: validate_rules })
+defineExpose({ validateRules })
 </script>
 
 <template>
@@ -90,7 +92,7 @@ defineExpose({ validate_rules: validate_rules })
     <Codemirror
       v-bind="$attrs"
       ref="cmRef"
-      v-model="model_value"
+      v-model="modelValueProxy"
       :extensions="extensions"
       :style="codemirrorStyle"
       :tab-size="4"

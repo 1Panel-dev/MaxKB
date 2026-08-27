@@ -3,7 +3,7 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import type {
-  RequestParams,
+  Dict,
   OptionItem,
   WorkspaceItem,
   SystemUserGroup,
@@ -128,13 +128,13 @@ const paginationConfig = ref({
   pageSize: 10,
   total: 0,
 })
-const memberSearchQuery = ref<RequestParams>()
+const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
   { label: '姓名', value: 'nick_name' },
 ]
 const userGroupMembers = ref<SystemUserGroupMember[]>([])
-function handleMemberSearch(query?: RequestParams) {
+function handleMemberSearch(query?: Dict<unknown>) {
   memberSearchQuery.value = query
   paginationConfig.value.currentPage = 1
   loadUserGroupMembers()

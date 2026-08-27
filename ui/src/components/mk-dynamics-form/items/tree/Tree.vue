@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, ref, useAttrs, nextTick, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { get, post, put, del } from '@/api/admin/core/request'
 import { cloneDeep } from 'lodash'
 import { formItemContextKey } from 'element-plus'
 import type { LoadFunction } from 'element-plus'
-const get_extra = inject('get_extra') as MkDynamicFormValue
+const getExtra = inject('get_extra') as DynamicFormValue
 const elFormItem = inject(formItemContextKey, void 0)
 const request = {
   get,
@@ -21,7 +21,7 @@ const allCheck = ref<boolean>(false)
 
 const handleAllCheckChange = (checked: boolean) => {
   if (checked) {
-    const nodes = Object.values(treeRef.value?.store.nodesMap || {}) as MkDynamicFormValue[]
+    const nodes = Object.values(treeRef.value?.store.nodesMap || {}) as DynamicFormValue[]
     nodes.forEach((node) => {
       if (!node.disabled) {
         treeRef.value?.setChecked(node.data, true, false)
@@ -41,42 +41,42 @@ const valueField = computed(() => {
 const childrenField = computed(() => {
   return props.formField.childrenField ? props.formField.childrenField : 'children'
 })
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 const propsData = computed(() => {
   return {
     label: textField,
     children: childrenField,
-    isLeaf: (data: MkDynamicFormValue) => data.leaf,
-    disabled: (data: MkDynamicFormValue) => data.disabled,
+    isLeaf: (data: DynamicFormValue) => data.leaf,
+    disabled: (data: DynamicFormValue) => data.disabled,
   }
 })
 
-const attrs = useAttrs() as MkDynamicFormValue
-const treeRef = ref<MkDynamicFormValue>(null)
-const request_call = new Function(
+const attrs = useAttrs() as DynamicFormValue
+const treeRef = ref<DynamicFormValue>(null)
+const requestCall = new Function(
   'request',
   'extra',
   'return  request.post(extra.url,extra.body,{},extra.loading).then(extra.then);',
 )
-function renderTemplate(template: string, data: MkDynamicFormValue) {
+function renderTemplate(template: string, data: DynamicFormValue) {
   return template.replace(/\$\{(\w+)\}/g, (match, key) => {
     return data[key] !== undefined ? data[key] : match
   })
 }
 
 const loadNode: LoadFunction = (node, resolve) => {
-  request_call(request, {
+  requestCall(request, {
     url: renderTemplate(
       '/workspace/${current_workspace_id}/knowledge/${current_knowledge_id}/datasource/tool/${current_tool_id}/' +
         attrs.fetch_list_function,
-      { ...props.otherParams, ...(get_extra ? get_extra() : {}) },
+      { ...props.otherParams, ...(getExtra ? getExtra() : {}) },
     ),
     body: { current_node: node.level === 0 ? undefined : node.data },
-    then: (res: MkDynamicFormValue) => {
+    then: (res: DynamicFormValue) => {
       resolve(res.data)
-      res.data.forEach((childNode: MkDynamicFormValue) => {
+      res.data.forEach((childNode: DynamicFormValue) => {
         if (childNode.is_exist) {
           treeRef.value?.setChecked(childNode.token, true, false)
         }
@@ -87,9 +87,9 @@ const loadNode: LoadFunction = (node, resolve) => {
 }
 const props = withDefaults(
   defineProps<{
-    modelValue?: MkDynamicFormValue
+    modelValue?: DynamicFormValue
     formField: FormField
-    otherParams: MkDynamicFormValue
+    otherParams: DynamicFormValue
   }>(),
   {
     modelValue: () => [],
@@ -98,19 +98,19 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
-const model_value = computed({
+const modelValueProxy = computed({
   get: () => {
     if (!props.modelValue) {
       emit('update:modelValue', [])
     }
     return props.modelValue
   },
-  set: (v: Array<MkDynamicFormValue>) => {
+  set: (v: DynamicFormValue[]) => {
     emit('update:modelValue', v)
   },
 })
 const change = () => {
-  model_value.value = cloneDeep(treeRef.value?.getCheckedNodes() || [])
+  modelValueProxy.value = cloneDeep(treeRef.value?.getCheckedNodes() || [])
   nextTick(() => {
     if (elFormItem?.validate) {
       elFormItem.validate('change')
@@ -135,7 +135,7 @@ const loading = ref<boolean>(false)
     <div style="height: calc(100vh - 450px)">
       <el-scrollbar>
         <el-tree
-          :data="option_list"
+          :data="options"
           @check-change="change"
           v-loading="loading"
           style="width: 100%"

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, ref, nextTick } from 'vue'
 import { ElMessage, type InputInstance } from 'element-plus'
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 
 const inputValue = ref('')
 
 const inputVisible = ref(false)
-const InputRef = ref<InputInstance>()
+const inputRef = ref<InputInstance>()
 const handleClose = (tag: string) => {
   formValue.value.accept.splice(formValue.value.accept.indexOf(tag), 1)
 }
@@ -17,7 +17,7 @@ const handleClose = (tag: string) => {
 const showInput = () => {
   inputVisible.value = true
   nextTick(() => {
-    InputRef.value!.input!.focus()
+    inputRef.value!.input!.focus()
   })
 }
 
@@ -42,19 +42,19 @@ const formValue = computed({
   },
 })
 
-const render = (form_data: MkDynamicFormValue) => {
+const render = (formData: DynamicFormValue) => {
   formValue.value.default_value = []
-  formValue.value.limit = form_data.attrs.limit || 3
-  formValue.value.max_file_size = form_data.max_file_size || 10
-  formValue.value.accept = form_data.attrs.accept
-    ? form_data.attrs.accept.split(',').map((item: string) => item.substring(1))
+  formValue.value.limit = formData.attrs.limit || 3
+  formValue.value.max_file_size = formData.max_file_size || 10
+  formValue.value.accept = formData.attrs.accept
+    ? formData.attrs.accept.split(',').map((item: string) => item.substring(1))
     : ['jpg']
 }
 const getData = () => {
   return {
     input_type: 'UploadInput',
     attrs: {
-      accept: formValue.value.accept.map((item: MkDynamicFormValue) => '.' + item).join(','),
+      accept: formValue.value.accept.map((item: DynamicFormValue) => '.' + item).join(','),
       limit: formValue.value.limit,
     },
     max_file_size: formValue.value.max_file_size,
@@ -136,7 +136,7 @@ onMounted(() => {
       </el-tag>
       <el-input
         v-if="inputVisible"
-        ref="InputRef"
+        ref="inputRef"
         v-model="inputValue"
         size="small"
         @keyup.enter="handleInputConfirm"

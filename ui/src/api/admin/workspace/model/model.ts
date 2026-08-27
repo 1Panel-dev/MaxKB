@@ -1,5 +1,5 @@
 import { del, get, post, put } from '../../core/request'
-import type { RequestParams, ModelPayload, ModelItem } from '@/api/types'
+import type { Dict, ModelPayload, ModelItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -8,7 +8,7 @@ const getPrefix = () => {
 }
 
 /** 获取工作空间模型列表。 */
-const getModelList = (query?: RequestParams) => {
+const getModelList = (query?: Dict<unknown>) => {
   return get<ModelItem[]>(getPrefix(), query)
 }
 

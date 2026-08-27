@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const props = defineProps<{
-  modelValue?: MkDynamicFormValue
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
-  otherParams: MkDynamicFormValue
+  modelValue?: DynamicFormValue
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
 }>()
@@ -35,14 +35,14 @@ const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
  * 组件样式
  */
 const formStyle = computed(() => {
-  return props_info.value.form_style ? props_info.value.form_style : {}
+  return fieldProps.value.form_style ? fieldProps.value.form_style : {}
 })
-const props_info = computed(() => {
+const fieldProps = computed(() => {
   return props.formField.props_info ? props.formField.props_info : {}
 })
 
 const style = computed(() => {
-  return props_info.value.style ? props_info.value.style : {}
+  return fieldProps.value.style ? fieldProps.value.style : {}
 })
 /**
  * 校验方法

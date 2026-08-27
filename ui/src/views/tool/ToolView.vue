@@ -4,7 +4,7 @@ import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
-import type { OptionItem, RequestParams, ToolType, ToolItem, FolderItem } from '@/api/types'
+import type { Dict, FolderItem, OptionItem, ToolItem, ToolType } from '@/api/types'
 import { RESOURCE_TYPE, TOOL_SCOPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
@@ -41,7 +41,7 @@ const searchFields = computed(() => [
     remoteMethod: loadCreatorOptions,
   },
 ])
-const toolQuery = ref<RequestParams>()
+const toolQuery = ref<Dict<unknown>>()
 function loadCreatorOptions(keyword: string) {
   const requestApi = isShared.value ? CommonSystemApi : CommonApi
   return requestApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -49,7 +49,7 @@ function loadCreatorOptions(keyword: string) {
   })
 }
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   toolQuery.value = query
   refreshTool()
 }

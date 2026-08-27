@@ -1,16 +1,16 @@
-import type { LeftOptions } from '../type'
+import type { VisibilityFieldOption } from '../../type'
 
 export type InferredFieldType = string | undefined
 
 export function inferFieldType(
-  fieldPath: [string, string] | Array<string>,
-  leftOptions?: Array<LeftOptions>,
+  fieldPath: [string, string] | string[],
+  leftOptions?: VisibilityFieldOption[],
 ): InferredFieldType {
   return getFieldConfig(fieldPath, leftOptions)?.input_type
 }
 
 // input_type → 允许的运算符（按设计文档表格）
-const TYPE_OP_MAP: Record<string, Array<string>> = {
+const TYPE_OP_MAP: Record<string, string[]> = {
   SwitchInput: ['is_true', 'is_not_true'],
 
   SingleSelect: ['eq', 'not_eq'],
@@ -45,7 +45,7 @@ const ALL_VISIBILITY_OPS = [
   'le',
 ]
 
-export function getAllowedOps(inputType: string | undefined): Array<string> {
+export function getAllowedOps(inputType: string | undefined): string[] {
   if (!inputType) return ALL_VISIBILITY_OPS
   return TYPE_OP_MAP[inputType] ?? ALL_VISIBILITY_OPS
 }
@@ -55,9 +55,9 @@ export function getAllowedOps(inputType: string | undefined): Array<string> {
  * 推不出 → 返回 undefined
  */
 export function getFieldConfig(
-  fieldPath: [string, string] | Array<string>,
-  leftOptions?: Array<LeftOptions>,
-): LeftOptions | undefined {
+  fieldPath: [string, string] | string[],
+  leftOptions?: VisibilityFieldOption[],
+): VisibilityFieldOption | undefined {
   if (!fieldPath || fieldPath.length < 2) return undefined
   const [scopeValue, fieldValue] = fieldPath
 

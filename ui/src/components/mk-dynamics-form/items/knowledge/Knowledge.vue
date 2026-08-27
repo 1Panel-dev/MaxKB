@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { FormField } from '../../type'
 
@@ -16,7 +16,7 @@ defineOptions({ name: 'DynamicFormKnowledge', inheritAttrs: false })
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
-const model_value = computed({
+const modelValueProxy = computed({
   get: () =>
     props.modelValue.filter((id: string) => availableList.value.some((item) => item.id === id)) ||
     [],
@@ -27,13 +27,13 @@ const model_value = computed({
 })
 // 可用
 const availableList = computed(() => {
-  return (props.formField.attrs?.knowledge_list as MkDynamicFormValue[]) || []
+  return (props.formField.attrs?.knowledge_list as DynamicFormValue[]) || []
 })
 
 const selectedIds = computed({
-  get: () => model_value.value || [],
+  get: () => modelValueProxy.value || [],
   set: (ids: string[]) => {
-    model_value.value = ids
+    modelValueProxy.value = ids
   },
 })
 </script>

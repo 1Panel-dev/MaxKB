@@ -1,7 +1,7 @@
 import { del, get, post, put } from '../core/request'
 import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
 import type {
-  RequestParams,
+  Dict,
   SystemUser,
   SystemUserPayload,
   SystemUserUpdateRequest,
@@ -12,7 +12,7 @@ import type {
 const prefix = '/user_manage'
 
 /** 获取系统用户分页列表。 */
-const getUserManagePage = (page: ParamsPage, query?: RequestParams) => {
+const getUserManagePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<SystemUser>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
 }
 
@@ -50,7 +50,6 @@ const postBatchSetUserRoles = (payload: BatchSetUserRolesRequest) => {
 const postBatchSetUserWorkspaceRoles = (payload: BatchSetUserWorkspaceRolesRequest) => {
   return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, payload)
 }
-
 
 export default {
   deleteUser,

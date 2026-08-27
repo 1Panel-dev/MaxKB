@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 const props = defineProps<{
   /**
    *表单渲染Item column
    */
-  column: MkDynamicFormValue
+  column: DynamicFormValue
   /**
    * 这一行数据
    */
-  row: MkDynamicFormValue
+  row: DynamicFormValue
 }>()
 
 const attrs = computed(() => {

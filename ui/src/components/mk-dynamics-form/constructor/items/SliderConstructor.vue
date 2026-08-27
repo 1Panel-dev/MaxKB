@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 import { computed, onBeforeMount, watch } from 'vue'
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -46,22 +46,22 @@ watch(
     }
   },
 )
-const render = (form_data: MkDynamicFormValue) => {
-  const attrs = form_data.attrs
-  formValue.value.option_list = form_data.option_list
+const render = (formData: DynamicFormValue) => {
+  const attrs = formData.attrs
+  formValue.value.option_list = formData.option_list
   formValue.value.min = attrs.min
   formValue.value.max = attrs.max
   formValue.value.step = attrs.step
   formValue.value.showInput = attrs['show-input']
-  formValue.value.default_value = form_data.default_value
+  formValue.value.default_value = formData.default_value
 }
-const step_rules = [
+const stepRules = [
   {
     required: true,
     validator: (
-      rule: MkDynamicFormValue,
-      value: MkDynamicFormValue,
-      callback: MkDynamicFormValue,
+      _rule: unknown,
+      value: DynamicFormValue,
+      callback: DynamicFormValidatorCallback,
     ) => {
       if (value === 0) {
         callback(new Error('步长不能为 0'))
@@ -129,7 +129,7 @@ onBeforeMount(() => {
     </el-col>
   </el-form-item>
   <el-col :span="11" style="padding-left: 0">
-    <el-form-item label="步长值" required prop="step" :rules="step_rules">
+    <el-form-item label="步长值" required prop="step" :rules="stepRules">
       <el-input-number
         style="width: 100%"
         v-model="formValue.step"

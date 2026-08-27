@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { computed, ref, watch } from 'vue'
 import { Search } from '@element-plus/icons-vue'
@@ -9,18 +9,18 @@ import _ from 'lodash'
 import TableColumn from '@/components/mk-dynamics-form/items/table/TableColumn.vue'
 const filterText = ref<string>('')
 const props = defineProps<{
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: Array<MkDynamicFormValue>
+  modelValue?: DynamicFormValue[]
 }>()
-const evalF: (text: string, row: MkDynamicFormValue) => string = (
+const evalF: (text: string, row: DynamicFormValue) => string = (
   text: string,
-  row: MkDynamicFormValue,
+  row: DynamicFormValue,
 ) => {
   return new Function('row', `"use strict"; return (${text})`)(row)
 }
@@ -28,7 +28,7 @@ const emit = defineEmits(['update:modelValue', 'change'])
 
 const multipleTableRef = ref<TableInstance>()
 
-const _data = computed({
+const localValue = computed({
   get() {
     return props.modelValue
   },
@@ -37,8 +37,8 @@ const _data = computed({
     emit('change', props.formField)
   },
 })
-const handleSelectionChange = (val: MkDynamicFormValue[]) => {
-  _data.value = val.map((row) => row[valueField.value])
+const handleSelectionChange = (val: DynamicFormValue[]) => {
+  localValue.value = val.map((row) => row[valueField.value])
 }
 
 const propsInfo = computed(() => {
@@ -55,7 +55,7 @@ const tableColumns = computed(() => {
   return propsInfo.value.table_columns ? propsInfo.value.table_columns : []
 })
 
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 
@@ -68,10 +68,10 @@ const valueField = computed(() => {
 })
 
 const tableData = computed(() => {
-  if (option_list.value) {
+  if (options.value) {
     if (filterText.value) {
-      return option_list.value.filter((item: MkDynamicFormValue) =>
-        tableColumns.value.some((c: MkDynamicFormValue) => {
+      return options.value.filter((item: DynamicFormValue) =>
+        tableColumns.value.some((c: DynamicFormValue) => {
           let v = ''
           if (c.type === 'eval') {
             v = evalF(c.property, item)
@@ -84,7 +84,7 @@ const tableData = computed(() => {
         }),
       )
     } else {
-      return option_list.value.filter((item: MkDynamicFormValue) => item[valueField.value])
+      return options.value.filter((item: DynamicFormValue) => item[valueField.value])
     }
   }
   return []
@@ -100,8 +100,8 @@ watch(
       const defaultItem = _.head(tableData.value)
       let defaultItemValue = _.get(defaultItem, valueField.value)
       if (props.modelValue) {
-        const row = option_list.value.find(
-          (f: MkDynamicFormValue) => f[valueField.value] === props.modelValue,
+        const row = options.value.find(
+          (f: DynamicFormValue) => f[valueField.value] === props.modelValue,
         )
         if (row) {
           defaultItemValue = row[valueField.value]
@@ -117,7 +117,7 @@ watch(
 
 const activeText = computed(() => {
   if (props.modelValue) {
-    const rows = option_list.value.filter((f: MkDynamicFormValue) =>
+    const rows = options.value.filter((f: DynamicFormValue) =>
       props.modelValue?.includes(f[valueField.value]),
     )
     if (rows) {

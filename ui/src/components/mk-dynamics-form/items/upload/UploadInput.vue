@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref, useAttrs } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormField } from '@/components/mk-dynamics-form/type'
@@ -7,31 +7,28 @@ import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
 
 import { useFormDisabled } from 'element-plus'
 const inputDisabled = useFormDisabled()
-const attrs = useAttrs() as MkDynamicFormValue
-const upload = inject('upload') as MkDynamicFormValue
-const props = withDefaults(
-  defineProps<{ modelValue?: MkDynamicFormValue; formField: FormField }>(),
-  {
-    modelValue: () => [],
-  },
-)
+const attrs = useAttrs() as DynamicFormValue
+const upload = inject('upload') as DynamicFormValue
+const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), {
+  modelValue: () => [],
+})
 const emit = defineEmits(['update:modelValue'])
 
-const typeList: MkDynamicFormValue = {
+const typeList: DynamicFormValue = {
   txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
   table: ['xlsx', 'xls', 'csv'],
   QA: ['xlsx', 'csv', 'xls', 'zip'],
 }
 const fileType = (name: string) => {
   const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'MkDynamicFormValue'
+  return suffix[suffix.length - 1] || 'DynamicFormValue'
 }
 
 const getImgUrl = (name: string) => {
   const list = Object.values(typeList).flat()
   const type = list.includes(fileType(name).toLowerCase())
     ? fileType(name).toLowerCase()
-    : 'MkDynamicFormValue'
+    : 'DynamicFormValue'
   return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
 function formatSize(sizeInBytes: number) {
@@ -47,66 +44,66 @@ function formatSize(sizeInBytes: number) {
   return size.toFixed(2) + ' ' + units[unitIndex]
 }
 
-const deleteFile = (file: MkDynamicFormValue) => {
+const deleteFile = (file: DynamicFormValue) => {
   if (inputDisabled.value) {
     return
   }
-  fileArray.value = fileArray.value.filter((f: MkDynamicFormValue) => f.uid !== file.uid)
+  fileArray.value = fileArray.value.filter((f: DynamicFormValue) => f.uid !== file.uid)
   emit('update:modelValue', fileArray.value)
 }
 
-const model_value = computed({
+const modelValueProxy = computed({
   get: () => {
     if (!props.modelValue) {
       emit('update:modelValue', [])
     }
     return props.modelValue
   },
-  set: (v: Array<MkDynamicFormValue>) => {
+  set: (v: DynamicFormValue[]) => {
     emit('update:modelValue', v)
   },
 })
-const fileArray = ref<MkDynamicFormValue>([])
+const fileArray = ref<DynamicFormValue>([])
 
 const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-const ofType = (exts: string[]) => (f: MkDynamicFormValue) =>
+const ofType = (exts: string[]) => (f: DynamicFormValue) =>
   exts.includes(fileType(f?.name || '').toUpperCase())
 
-const files_with_url = computed(() =>
-  (model_value.value || []).map((f: MkDynamicFormValue) => ({
+const filesWithUrl = computed(() =>
+  (modelValueProxy.value || []).map((f: DynamicFormValue) => ({
     ...f,
     url: f.url || getFileUrl(f.file_id),
   })),
 )
-const image_list = computed(() => files_with_url.value.filter(ofType(imageExtensions)))
-const audio_list = computed(() => files_with_url.value.filter(ofType(audioExtensions)))
-const video_list = computed(() => files_with_url.value.filter(ofType(videoExtensions)))
+const images = computed(() => filesWithUrl.value.filter(ofType(imageExtensions)))
+const audioFiles = computed(() => filesWithUrl.value.filter(ofType(audioExtensions)))
+const videoFiles = computed(() => filesWithUrl.value.filter(ofType(videoExtensions)))
 // 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
-const download_list = computed(() =>
-  files_with_url.value.filter(
-    (f: MkDynamicFormValue) =>
+const downloadFiles = computed(() =>
+  filesWithUrl.value.filter(
+    (f: DynamicFormValue) =>
       !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f),
   ),
 )
 
-function downloadFile(item: MkDynamicFormValue) {
+function downloadFile(item: DynamicFormValue) {
   downloadByURL(item.url, item.name)
 }
 
 const loading = ref<boolean>(false)
 
-const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFormValue>) => {
+const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) => {
   fileList.splice(fileList.indexOf(file), 1)
-  if (fileArray.value.find((f: MkDynamicFormValue) => f.name === file.name)) {
+  if (fileArray.value.find((f: DynamicFormValue) => f.name === file.name)) {
     ElMessage.warning('文件名重复')
 
     return
   }
-  const max_file_size = (props.formField as MkDynamicFormValue).max_file_size
-  if (file.size / 1024 / 1024 > max_file_size) {
-    ElMessage.warning('文件大小不能超过 ' + max_file_size + 'MB')
+  const maxFileSize = (props.formField as DynamicFormValue).max_file_size
+  if (file.size / 1024 / 1024 > maxFileSize) {
+    ElMessage.warning('文件大小不能超过 ' + maxFileSize + 'MB')
     return
   }
 
@@ -114,10 +111,10 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
     ElMessage.warning('最多只能上传 ' + attrs.limit + ' 个文件')
     return
   }
-  upload(file.raw, loading).then((ok: MkDynamicFormValue) => {
-    const split_path = ok.data.split('/')
-    const file_id = split_path[split_path.length - 1]
-    fileArray.value?.push({ name: file.name, file_id, size: file.size })
+  upload(file.raw, loading).then((ok: DynamicFormValue) => {
+    const pathSegments = ok.data.split('/')
+    const fileId = pathSegments[pathSegments.length - 1]
+    fileArray.value?.push({ name: file.name, file_id: fileId, size: file.size })
     emit('update:modelValue', fileArray.value)
   })
 }
@@ -130,17 +127,15 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
     action="#"
     v-bind="$attrs"
     :auto-upload="false"
-    :on-change="
-      (file: MkDynamicFormValue, fileList: MkDynamicFormValue) => uploadFile(file, fileList)
-    "
-    v-model:file-list="model_value"
+    :on-change="(file: DynamicFormValue, fileList: DynamicFormValue) => uploadFile(file, fileList)"
+    v-model:file-list="modelValueProxy"
     multiple
     :show-file-list="false"
   >
     <el-button type="primary">上传文件</el-button>
   </el-upload>
   <el-space wrap class="w-full media-file-width upload_content mt-16" v-if="!inputDisabled">
-    <template v-for="(file, index) in model_value" :key="index">
+    <template v-for="(file, index) in modelValueProxy" :key="index">
       <el-card style="--el-card-padding: 0" shadow="never">
         <div
           class="flex-between"
@@ -149,12 +144,12 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
         >
           <div class="flex align-center" style="width: 70%">
             <img :src="getImgUrl(file && file?.name)" alt="" width="24" class="mr-4" />
-            <span class="ellipsis-1" :title="file.name">
+            <span :title="file.name">
               {{ file.name }}
             </span>
           </div>
           <div class="flex align-center">
-            <div class="ellipsis-1" :title="formatSize(file.size)">{{ formatSize(file.size) }}</div>
+            <div :title="formatSize(file.size)">{{ formatSize(file.size) }}</div>
 
             <el-button link class="ml-8" @click="deleteFile(file)" v-if="!inputDisabled">
               <MkIcon name="icon_delete-trash_outlined"></MkIcon>
@@ -165,9 +160,9 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
     </template>
   </el-space>
   <div class="mt-8 w-full" v-else>
-    <div class="mb-8" v-if="download_list.length">
+    <div class="mb-8" v-if="downloadFiles.length">
       <el-space wrap class="w-full media-file-width upload_content">
-        <template v-for="(item, index) in download_list" :key="index">
+        <template v-for="(item, index) in downloadFiles" :key="index">
           <el-card shadow="never" style="--el-card-padding: 8px" class="download-file cursor">
             <div class="download-button flex align-center" @click="downloadFile(item)">
               <el-icon class="mr-4">
@@ -177,7 +172,7 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
             </div>
             <div class="show flex align-center">
               <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
-              <div class="ml-4 ellipsis-1" :title="item && item?.name">
+              <div class="ml-4" :title="item && item?.name">
                 {{ item && item?.name }}
               </div>
             </div>
@@ -185,16 +180,16 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
         </template>
       </el-space>
     </div>
-    <div class="mb-8" v-if="image_list.length">
+    <div class="mb-8" v-if="images.length">
       <el-space wrap>
-        <template v-for="(item, index) in image_list" :key="index">
+        <template v-for="(item, index) in images" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
             <el-image
               :src="item.url"
               :zoom-rate="1.2"
               :max-scale="7"
               :min-scale="0.2"
-              :preview-src-list="getAttrsArray(image_list, 'url')"
+              :preview-src-list="getAttrsArray(images, 'url')"
               :initial-index="index"
               alt=""
               fit="cover"
@@ -205,18 +200,18 @@ const uploadFile = async (file: MkDynamicFormValue, fileList: Array<MkDynamicFor
         </template>
       </el-space>
     </div>
-    <div class="mb-8" v-if="audio_list.length">
+    <div class="mb-8" v-if="audioFiles.length">
       <el-space wrap>
-        <template v-for="(item, index) in audio_list" :key="index">
+        <template v-for="(item, index) in audioFiles" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
             <audio :src="item.url" controls style="width: 350px; height: 43px" class="border-r-6" />
           </div>
         </template>
       </el-space>
     </div>
-    <div class="mb-8" v-if="video_list.length">
+    <div class="mb-8" v-if="videoFiles.length">
       <el-space wrap>
-        <template v-for="(item, index) in video_list" :key="index">
+        <template v-for="(item, index) in videoFiles" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
             <video
               :src="item.url"

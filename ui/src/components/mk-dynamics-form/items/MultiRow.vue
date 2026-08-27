@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../type'
+import type { DynamicFormValue } from '../type'
 import { computed, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 const props = defineProps<{
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: MkDynamicFormValue
+  modelValue?: DynamicFormValue
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
 const selected = (activeValue: string | number) => {
   if (_value.value.includes(activeValue)) {
     emit(
       'update:modelValue',
-      props.modelValue.filter((i: MkDynamicFormValue) => i !== activeValue),
+      props.modelValue.filter((i: DynamicFormValue) => i !== activeValue),
     )
   } else {
     emit('update:modelValue', reset(activeValue))
@@ -30,7 +30,7 @@ const selected = (activeValue: string | number) => {
 }
 const reset = (activeValue: string | number) => {
   const _result = props.modelValue ? [...props.modelValue, activeValue] : [activeValue]
-  return _result.filter((r) => option_value_list.value.includes(r))
+  return _result.filter((r) => optionValues.value.includes(r))
 }
 
 const _value = computed(() => {
@@ -45,10 +45,10 @@ const textField = computed(() => {
 const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
-const option_value_list = computed(() => {
-  return option_list.value.map((item) => item[valueField.value])
+const optionValues = computed(() => {
+  return options.value.map((item) => item[valueField.value])
 })
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 </script>
@@ -56,7 +56,7 @@ const option_list = computed(() => {
 <template>
   <div class="multi_row">
     <div
-      v-for="item in option_list"
+      v-for="item in options"
       :key="item.value"
       class="item"
       :class="[

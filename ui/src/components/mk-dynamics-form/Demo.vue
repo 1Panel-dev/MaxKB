@@ -1,31 +1,38 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import DynamicsFormConstructor from '@/components/mk-dynamics-form/constructor/index.vue'
-import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
-import type { LeftOptions } from '@/components/mk-dynamics-form/constructor/type'
-import { dynamicFormTypeOptions } from '@/components/mk-dynamics-form/constant'
+import type { Dict } from '@/api/types'
+import {
+  dynamicFormTypeOptions,
+  MkDynamicsForm,
+  MkDynamicsFormConstructor,
+  type DynamicFormValue,
+  type FormField,
+  type VisibilityFieldOption,
+} from '@/components/mk-dynamics-form'
 
-const constructorRef = ref<InstanceType<typeof DynamicsFormConstructor>>()
-const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
+defineOptions({ name: 'MkDynamicsFormDemo' })
 
-const formItemList = ref<Array<any>>([])
-const formData = ref<any>({})
+const constructorRef = ref<InstanceType<typeof MkDynamicsFormConstructor>>()
+const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
+
+const formFieldList = ref<FormField[]>([])
+const formData = ref<Dict<DynamicFormValue>>({})
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editIndex = ref(-1)
-const currentField = ref<any>({})
+const currentField = ref<Partial<FormField>>({})
 
 // 「当前表单」作用域的可引用字段，根据已配置字段动态生成
-const leftOptions = computed<Array<LeftOptions>>(() => [
+const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => [
   {
     label: '当前表单',
     value: 'self-form',
     self: true,
-    children: formItemList.value
+    children: formFieldList.value
       .filter((_, index) => index !== editIndex.value) // 排除正在编辑的字段，避免自引用
       .map((item) => ({
-        label: getLabel(item),
+        label: getFieldLabel(item),
         value: item.field,
         input_type: item.input_type,
         option_list: item.option_list,
@@ -34,9 +41,9 @@ const leftOptions = computed<Array<LeftOptions>>(() => [
   },
 ])
 
-const getLabel = (row: any) => {
-  if (row.label && row.label.input_type === 'TooltipLabel') {
-    return row.label.label
+const getFieldLabel = (row: FormField) => {
+  if (typeof row.label !== 'string') {
+    return row.label?.label || ''
   }
   return row.label || ''
 }
@@ -53,7 +60,7 @@ const openAddDialog = () => {
   dialogVisible.value = true
 }
 
-const openEditDialog = (row: any, index: number) => {
+const openEditDialog = (row: FormField, index: number) => {
   isEdit.value = true
   editIndex.value = index
   currentField.value = { ...row }
@@ -61,7 +68,7 @@ const openEditDialog = (row: any, index: number) => {
 }
 
 const deleteField = (index: number) => {
-  formItemList.value.splice(index, 1)
+  formFieldList.value.splice(index, 1)
 }
 
 const submitField = async () => {
@@ -71,7 +78,7 @@ const submitField = async () => {
     if (!data) return
 
     // 检查字段名是否重复
-    const isDuplicate = formItemList.value.some(
+    const isDuplicate = formFieldList.value.some(
       (item, index) => item.field === data.field && index !== editIndex.value,
     )
     if (isDuplicate) {
@@ -80,12 +87,12 @@ const submitField = async () => {
     }
 
     if (isEdit.value && editIndex.value >= 0) {
-      formItemList.value.splice(editIndex.value, 1, data)
+      formFieldList.value.splice(editIndex.value, 1, data)
     } else {
-      formItemList.value.push(data)
+      formFieldList.value.push(data)
     }
     dialogVisible.value = false
-  } catch (e) {
+  } catch {
     // 验证失败
   }
 }
@@ -94,7 +101,7 @@ const validateForm = async () => {
   try {
     await dynamicsFormRef.value?.validate()
     ElMessage.success('校验通过')
-  } catch (e) {
+  } catch {
     ElMessage.error('校验失败')
   }
 }
@@ -108,25 +115,17 @@ const validateForm = async () => {
             <div class="flex-between">
               <span class="font-bold">表单字段列表</span>
               <el-button type="primary" link @click="openAddDialog">
-                <MkIcon name="icon_add_outlined" class="mr-4" />
-                添加
+                <MkIcon name="icon_add_outlined" />
+                <span>添加</span>
               </el-button>
             </div>
           </template>
-          <el-table
-            :data="formItemList"
-            style="width: 100%"
-            row-key="field"
-            v-if="formItemList.length > 0"
-          >
-            <el-table-column prop="field" label="参数" width="120">
-              <template #default="{ row }">
-                <span :title="row.field" class="ellipsis-1">{{ row.field }}</span>
-              </template>
+          <el-table :data="formFieldList" row-key="field" v-if="formFieldList.length > 0">
+            <el-table-column prop="field" label="参数" width="120" show-overflow-tooltip>
             </el-table-column>
-            <el-table-column prop="label" label="显示名称">
+            <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
               <template #default="{ row }">
-                <span :title="getLabel(row)" class="ellipsis-1">{{ getLabel(row) }}</span>
+                <span>{{ getFieldLabel(row) }}</span>
               </template>
             </el-table-column>
             <el-table-column prop="input_type" label="组件类型" width="100">
@@ -161,14 +160,13 @@ const validateForm = async () => {
               <el-button type="primary" @click="validateForm">校验</el-button>
             </div>
           </template>
-          <DynamicsForm
-            v-if="formItemList.length > 0"
+          <MkDynamicsForm
+            v-if="formFieldList.length > 0"
+            ref="dynamicsFormRef"
+            v-model="formData"
+            :render-data="formFieldList"
             label-position="top"
             require-asterisk-position="right"
-            v-model="formData"
-            :model="formData"
-            :render_data="formItemList"
-            ref="dynamicsFormRef"
           />
           <el-empty v-else description="请先添加表单字段" />
         </el-card>
@@ -184,13 +182,13 @@ const validateForm = async () => {
     append-to-body
     destroy-on-close
   >
-    <DynamicsFormConstructor
+    <MkDynamicsFormConstructor
+      ref="constructorRef"
       v-model="currentField"
+      :enable-visibility="true"
+      :left-options="visibilityFieldOptions"
       label-position="top"
       require-asterisk-position="right"
-      :enableVisibility="true"
-      :leftOptions="leftOptions"
-      ref="constructorRef"
     />
     <template #footer>
       <el-button @click="dialogVisible = false">取消</el-button>

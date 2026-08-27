@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, ref, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
@@ -7,14 +7,14 @@ import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 
 const props = defineProps<{
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: MkDynamicFormValue
+  modelValue?: DynamicFormValue
   disabled?: boolean
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
@@ -47,7 +47,7 @@ const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
 
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 </script>
@@ -55,7 +55,7 @@ const option_list = computed(() => {
 <template>
   <div class="radio-card" :style="radioContentStyle">
     <el-row :gutter="12" class="w-full">
-      <template v-for="(item, index) in option_list" :key="index">
+      <template v-for="(item, index) in options" :key="index">
         <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
           <el-card
             :key="item.value"

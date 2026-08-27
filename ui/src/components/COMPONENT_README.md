@@ -827,21 +827,27 @@ function selectItem(item: SearchListItem, index: number) {
 使用方必须从 `@/components/mk-dynamics-form` 手动导入，不安装为 Vue 插件，也不全局注册其内部
 字段组件。
 
-组件专用类型和选项常量维护在 `mk-dynamics-form/type.ts` 与 `mk-dynamics-form/enums.ts`，不放入
+组件专用类型和选项常量维护在 `mk-dynamics-form/type.ts` 与 `mk-dynamics-form/constant.ts`，不放入
 项目级 `api/types`、`api/enums` 或 `constants`。使用方统一从组件 `index.ts` 获取公开组件、类型
 和字段类型选项，不深层导入内部文件。
+
+组件 TypeScript 类型使用 PascalCase 和单数语义，例如 `FormField`、`DynamicFormValue`、
+`VisibilityCompareOperator`；数组和集合变量使用复数业务名称。Vue 脚本中的 Props、事件参数和
+局部变量使用 camelCase，模板属性使用 kebab-case。`input_type`、`default_value`、
+`visibility_rules` 等服务端字段协议保持 snake_case，不在组件边界内改名。
 
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { Dict } from '@/api/types'
 import {
   MkDynamicsForm,
-  type DynamicFormRecord,
+  type DynamicFormValue,
   type FormField,
 } from '@/components/mk-dynamics-form'
 
 const formFields = ref<FormField[]>([])
-const formValue = ref<DynamicFormRecord>({})
+const formValue = ref<Dict<DynamicFormValue>>({})
 </script>
 
 <template>
@@ -855,7 +861,8 @@ const formValue = ref<DynamicFormRecord>({})
 `MkDynamicsForm` 的主要 Props 为 `modelValue`、`renderData`、`otherParams`、`view`、
 `defaultItemWidth` 和 `parentField`，公开 `validate()`、`render()`、`initDefaultData()` 与
 `ruleFormRef`。`MkDynamicsFormConstructor` 接收 `modelValue`、`fieldTypeOptions`、
-`enableVisibility` 和 `leftOptions`，公开 `validate()`、`getData()` 与 `render()`。
+`enableVisibility` 和 `leftOptions`，其中 `leftOptions` 使用 `VisibilityFieldOption[]`；公开
+`validate()`、`getData()` 与 `render()`。
 
 字段配置中的动态校验器和表格行表达式属于受信任的服务端协议，只允许加载可信配置；普通业务
 输入不得作为脚本传入。

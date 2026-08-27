@@ -1,7 +1,7 @@
-import type { ModelItem, ModelProviderItem, RequestParams } from '@/api/types'
+import type { Dict, ModelItem, ModelProviderItem } from '@/api/types'
 
 type ApiModule = {
-  getModelList: (query?: RequestParams) => Promise<ModelItem[]>
+  getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
   getProviderList: () => Promise<ModelProviderItem[]>
 }
 
@@ -32,7 +32,7 @@ export function useWorkflowStore(apiType: string): ApiModule {
   pendingMap.set(apiType, pending)
 
   return {
-    getModelList(query?: RequestParams): Promise<ModelItem[]> {
+    getModelList(query?: Dict<unknown>): Promise<ModelItem[]> {
       const key = `model:${JSON.stringify(query ?? {})}`
       if (cache.has(key)) return Promise.resolve(cache.get(key) as ModelItem[])
       if (pending.has(key)) return pending.get(key) as Promise<ModelItem[]>

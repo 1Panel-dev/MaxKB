@@ -5,7 +5,7 @@ import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type {
   ModelProviderItem,
   OptionItem,
-  RequestParams,
+  Dict,
   ResourceAuthorizationType,
   ResourcePermission,
   ResourcePermissionItem,
@@ -36,8 +36,8 @@ const permissionSearchFields = computed<OptionItem<string>[]>(() => [
 ])
 
 /* 搜索与展开 */
-const searchQuery = ref<RequestParams>()
-function handleSearch(query?: RequestParams) {
+const searchQuery = ref<Dict<unknown>>()
+function handleSearch(query?: Dict<unknown>) {
   searchQuery.value = query
 }
 
