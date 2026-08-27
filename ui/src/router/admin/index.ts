@@ -24,12 +24,6 @@ const router = createRouter({
     workspaceRoutes,
     systemRoutes,
     {
-      path: '/demo/dynamics-form',
-      name: 'demo-dynamics-form',
-      component: () => import('@/components/mk-dynamics-form/Demo.vue'),
-      meta: { title: '动态表单演示' },
-    },
-    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/error/NotFoundView.vue'),

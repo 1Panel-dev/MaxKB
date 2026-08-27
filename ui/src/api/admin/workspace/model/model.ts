@@ -36,6 +36,9 @@ const getModelMeta = (modelId: string) => {
 const deleteModel = (modelId: string) => {
   return del<undefined, boolean>(`${getPrefix()}/${modelId}`)
 }
+const getModelParamsForm = (modelId: string) => {
+  return get<ModelItem>(`${getPrefix()}/${modelId}/model_params_form`)
+}
 
 /** 暂停本地模型下载。 */
 const putPauseModelDownload = (modelId: string) => {
@@ -50,4 +53,5 @@ export default {
   postModel,
   putModel,
   putPauseModelDownload,
+  getModelParamsForm,
 }
