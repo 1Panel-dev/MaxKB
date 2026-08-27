@@ -199,7 +199,9 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column prop="user_group_names" width="180" label="用户组">
           <template #default="{ row }">
+            <span v-if="!row.user_group_names?.length">-</span>
             <WorkspaceRelationTags
+              v-else
               :table-render-params="{ property: '用户组', value: '工作空间' }"
               :tags="row.user_group_names"
               :tag-workspace="row.user_group_workspace"
