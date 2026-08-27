@@ -1,5 +1,3 @@
-
-
 export const dynamicFormTypeOptions = [
   { label: '文本框', value: 'TextInput' },
   { label: '多行文本框', value: 'TextareaInput' },
@@ -18,3 +16,6 @@ export const dynamicFormTypeOptions = [
   { label: '知识库', value: 'Knowledge' },
   { label: '树形选择器', value: 'TreeSelect' },
 ] as const
+
+export type DynamicFormInputType = (typeof dynamicFormTypeOptions)[number]['value']
+export type DynamicFormTypeOption = (typeof dynamicFormTypeOptions)[number]

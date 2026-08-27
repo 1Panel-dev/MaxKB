@@ -1,6 +1,6 @@
 import { get, put } from '../core/request'
 import type {
-  RequestParams,
+  Dict,
   ResourceAuthorizationType,
   ResourcePermissionItem,
   ResourcePermissionPayload,
@@ -13,7 +13,7 @@ const getUserResourcePermissions = (
   workspaceId: string,
   userId: string,
   resource: ResourceAuthorizationType,
-  query?: RequestParams,
+  query?: Dict<unknown>,
 ) => {
   return get<ResourcePermissionItem[]>(
     `${prefix(workspaceId)}/user/${userId}/resource/${resource}`,
@@ -33,7 +33,6 @@ const putUserResourcePermissions = (
     permissions,
   )
 }
-
 
 export default {
   getUserResourcePermissions,

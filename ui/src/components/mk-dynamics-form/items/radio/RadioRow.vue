@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
 const inputDisabled = useFormDisabled()
 const props = defineProps<{
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
   // 选中的值
-  modelValue?: MkDynamicFormValue
+  modelValue?: DynamicFormValue
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
 const selected = (activeValue: string | number) => {
@@ -31,7 +31,7 @@ const valueField = computed(() => {
   return props.formField.value_field ? props.formField.value_field : 'value'
 })
 
-const option_list = computed(() => {
+const options = computed(() => {
   return props.formField.option_list ? props.formField.option_list : []
 })
 </script>
@@ -39,7 +39,7 @@ const option_list = computed(() => {
 <template>
   <div class="radio-row">
     <div
-      v-for="item in option_list"
+      v-for="item in options"
       :key="item.value"
       class="item"
       :class="[inputDisabled ? 'is-disabled' : '', modelValue === item[valueField] ? 'active' : '']"

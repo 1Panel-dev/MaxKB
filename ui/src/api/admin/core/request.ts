@@ -9,7 +9,7 @@ import axios, {
 import router from '@/router/admin'
 import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
-import type { RequestParams } from '@/api/types'
+import type { Dict } from '@/api/types'
 import { MsgError } from '@/utils/message'
 
 const DEFAULT_TIMEOUT = 30 * 60 * 1_000 // 30 minutes
@@ -200,7 +200,7 @@ export async function promise<T>(
 /** 发送 GET 请求。 */
 export function get<T = unknown>(
   url: string,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   loading?: LoadingTarget,
   timeout?: number,
 ) {
@@ -211,7 +211,7 @@ export function get<T = unknown>(
 export async function getExportFile(
   fileName: string,
   url: string,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   loading?: LoadingTarget,
 ): Promise<boolean> {
   startLoading(loading)
@@ -232,7 +232,7 @@ export async function getExportFile(
 export async function postExportExcel<TData = unknown>(
   fileName: string,
   url: string,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   data?: TData,
   loading?: LoadingTarget,
 ): Promise<boolean> {
@@ -254,7 +254,7 @@ export async function postExportExcel<TData = unknown>(
 export function post<TData = unknown, T = unknown>(
   url: string,
   data?: TData,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   loading?: LoadingTarget,
   timeout?: number,
 ) {
@@ -265,7 +265,7 @@ export function post<TData = unknown, T = unknown>(
 export function put<TData = unknown, T = unknown>(
   url: string,
   data?: TData,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   loading?: LoadingTarget,
   timeout?: number,
 ) {
@@ -275,7 +275,7 @@ export function put<TData = unknown, T = unknown>(
 /** 发送 DELETE 请求。 */
 export function del<TData = unknown, T = unknown>(
   url: string,
-  params?: RequestParams,
+  params?: Dict<unknown>,
   data?: TData,
   loading?: LoadingTarget,
   timeout?: number,

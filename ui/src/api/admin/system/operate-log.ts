@@ -1,11 +1,11 @@
 import { postExportExcel, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type { OperateLog, OperateLogMenuOption, RequestParams } from '@/api/types'
+import type { Dict, OperateLog, OperateLogMenuOption } from '@/api/types'
 
 const prefix = '/operate_log'
 
 /** 获取操作日志分页列表。 */
-const getOperateLogPage = (page: ParamsPage, query: RequestParams) => {
+const getOperateLogPage = (page: ParamsPage, query: Dict<unknown>) => {
   return get<ResponsePage<OperateLog>>(`${prefix}/${page.currentPage}/${page.pageSize}`, query)
 }
 
@@ -15,7 +15,7 @@ const getOperateLogMenuOptions = () => {
 }
 
 /** 导出操作日志。 */
-const exportOperateLog = (query: RequestParams) => {
+const exportOperateLog = (query: Dict<unknown>) => {
   return postExportExcel('log.xlsx', `${prefix}/export/`, query)
 }
 

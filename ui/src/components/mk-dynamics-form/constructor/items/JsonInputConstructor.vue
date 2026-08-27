@@ -2,25 +2,26 @@
 import { computed, onMounted, ref, inject } from 'vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import JsonInput from '@/components/mk-dynamics-form/items/JsonInput.vue'
+import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
-const getModel = inject('getModel') as MkDynamicFormValue
+const getModel = inject<() => DynamicFormValue>('getModel')
 
-const assignment_method_option_list = computed(() => {
-  const option_list = [
+const assignmentMethodOptions = computed(() => {
+  const options = [
     {
       label: '自定义',
       value: 'custom',
     },
   ]
   if (getModel) {
-    option_list.push({
+    options.push({
       label: '引用变量',
       value: 'ref_variables',
     })
   }
-  return option_list
+  return options
 })
 
 const model = computed(() => {
@@ -49,7 +50,7 @@ const getData = () => {
         {
           required: formValue.value.required,
           validator: `validator = (rule, value, callback) => {
-            return componentFormRef.value?.validate_rules(rule, value, callback);
+            return componentFormRef.value?.validateRules(rule, value, callback);
 
 }`,
           trigger: 'blur',
@@ -62,25 +63,17 @@ const getData = () => {
   }
 }
 
-const default_value_rule = {
+const defaultValueRule = {
   required: true,
-  validator: (
-    rule: MkDynamicFormValue,
-    value: MkDynamicFormValue,
-    callback: MkDynamicFormValue,
-  ) => {
-    jsonInputRef.value?.validate_rules(rule, value, callback)
+  validator: (rule: unknown, value: DynamicFormValue, callback: (error?: Error) => void) => {
+    jsonInputRef.value?.validateRules(rule, value, callback)
     return true
   },
   trigger: 'blur',
 }
-const default_ref_variables_value_rule = {
+const referenceVariableRule = {
   required: true,
-  validator: (
-    rule: MkDynamicFormValue,
-    value: MkDynamicFormValue,
-    callback: MkDynamicFormValue,
-  ) => {
+  validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
       callback('引用变量必填')
     }
@@ -90,10 +83,10 @@ const default_ref_variables_value_rule = {
   trigger: 'blur',
 }
 
-const render = (form_data: MkDynamicFormValue) => {
-  formValue.value.default_value = form_data.default_value
+const render = (formData: DynamicFormValue) => {
+  formValue.value.default_value = formData.default_value
   formValue.value.default_value_assignment_method =
-    form_data.default_value_assignment_method || 'custom'
+    formData.default_value_assignment_method || 'custom'
 }
 defineExpose({ getData, render })
 onMounted(() => {
@@ -116,7 +109,7 @@ onMounted(() => {
         <el-radio
           :value="item.value"
           size="large"
-          v-for="(item, index) in assignment_method_option_list"
+          v-for="(item, index) in assignmentMethodOptions"
           :key="index"
         >
           <span class="flex align-center">
@@ -135,7 +128,7 @@ onMounted(() => {
     v-if="formValue.default_value_assignment_method === 'ref_variables'"
     :required="true"
     prop="default_value"
-    :rules="[default_ref_variables_value_rule]"
+    :rules="[referenceVariableRule]"
   >
     <NodeCascader
       ref="nodeCascaderRef"
@@ -152,7 +145,7 @@ onMounted(() => {
     :required="formValue.required"
     v-if="formValue.default_value_assignment_method === 'custom'"
     prop="default_value"
-    :rules="[default_value_rule]"
+    :rules="[defaultValueRule]"
   >
     <div class="defaultValueCheckbox">
       <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />

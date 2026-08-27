@@ -1,6 +1,6 @@
 import { del, get } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type { KnowledgeItem, RequestParams } from '@/api/types'
+import type { Dict, KnowledgeItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -9,7 +9,7 @@ const getPrefix = () => {
 }
 
 /** 获取工作空间知识库分页列表。 */
-const getKnowledgePage = (page: ParamsPage, query?: RequestParams) => {
+const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<KnowledgeItem>>(
     `${getPrefix()}/${page.currentPage}/${page.pageSize}`,
     query,

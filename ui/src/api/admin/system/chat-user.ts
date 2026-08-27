@@ -11,7 +11,7 @@ import type {
   ChatUserQuotaPayload,
   ChatUserSyncResult,
   ChatUserUpdateRequest,
-  RequestParams,
+  Dict,
 } from '@/api/types'
 
 const prefix = '/system/chat_user'
@@ -22,7 +22,7 @@ const getChatUser = () => {
 }
 
 /** 获取对话用户分页列表。 */
-const getChatUserPage = (page: ParamsPage, query?: RequestParams) => {
+const getChatUserPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ChatUser>>(
     `${prefix}/user_manage/${page.currentPage}/${page.pageSize}`,
     query,

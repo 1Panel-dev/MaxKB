@@ -1,5 +1,5 @@
 import { del, get, post, put } from '../core/request'
-import type { FolderSource, FolderItem, RequestParams, FolderPayload } from '@/api/types'
+import type { Dict, FolderSource, FolderItem, FolderPayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = (source: FolderSource) => {
@@ -8,7 +8,7 @@ const getPrefix = (source: FolderSource) => {
 }
 
 /** 获取指定资源模块的 Workspace 文件夹树。 */
-const getFolderTree = (source: FolderSource, query?: RequestParams) => {
+const getFolderTree = (source: FolderSource, query?: Dict<unknown>) => {
   return get<FolderItem[]>(getPrefix(source), query)
 }
 

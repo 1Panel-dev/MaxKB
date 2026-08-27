@@ -1,113 +1,26 @@
-import type { Dict } from '@/api/types/common'
+import type { CSSProperties } from 'vue'
+import type { Dict } from '@/api/types'
 
-interface ViewCardItem {
-  /**
-   * 类型
-   */
-  type: 'eval' | 'default'
-  /**
-   * 标题
-   */
-  title: string
-  /**
-   * 值 根据类型不一样 取值也不一样 default= row[value_field] eval `${parseFloat(row.number).toLocaleString("zh-CN",{style: "decimal",maximumFractionDigits:1})}%&nbsp;&nbsp;&nbsp;`
-   */
-  value_field: string
+/**
+ * 动态表单协议允许字段组件携带不同结构的值。
+ * 保留宽类型以兼容现有字段实现，具体组件应在边界处收窄。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type DynamicFormValue = any
+
+export type DynamicFormValidatorCallback = (error?: string | Error) => void
+
+export interface DynamicFormResponse<T> {
+  data: T
 }
 
-interface TableColumn {
-  /**
-   * 字段|组件名称|可计算的模板字符串
-   */
-  property: string
-  /**
-   *表头
-   */
-  label: string
-  /**
-   * 表数据字段
-   */
-  value_field?: string
+export type DynamicFormSource =
+  | string
+  | FormField[]
+  | Promise<FormField[] | DynamicFormResponse<FormField[]>>
+  | (() => Promise<FormField[] | DynamicFormResponse<FormField[]>>)
 
-  attrs?: Attrs
-  /**
-   * 类型
-   */
-  type: 'eval' | 'component' | 'default'
-
-  props_info?: PropsInfo
-}
-interface ColorItem {
-  /**
-   * 颜色#f56c6c
-   */
-  color: string
-  /**
-   * 进度
-   */
-  percentage: number
-}
-interface Attrs {
-  /**
-   * 提示语
-   */
-  placeholder?: string
-  /**
-   * 标签的长度，例如 '50px'。 作为 Form 直接子元素的 form-item 会继承该值。 可以使用 auto。
-   */
-  labelWidth?: string
-  /**
-   * 表单域标签的后缀
-   */
-  labelSuffix?: string
-  /**
-   * 星号的位置。
-   */
-  requireAsteriskPosition?: 'left' | 'right'
-
-  color?: Array<ColorItem>
-
-  [propName: string]: any
-}
-interface PropsInfo {
-  /**
-   * 表格选择的card
-   */
-  view_card?: Array<ViewCardItem>
-  /**
-   * 表格选择
-   */
-  table_columns?: Array<TableColumn>
-  /**
-   * 选中 message
-   */
-  active_msg?: string
-
-  /**
-   * 组件样式
-   */
-  style?: Dict<any>
-
-  /**
-   * el-form-item 样式
-   */
-  item_style?: Dict<any>
-  /**
-   * 表单校验 这个和element校验一样
-   */
-  rules?: Dict<any>
-  /**
-   * 默认 不为空校验提示
-   */
-  err_msg?: string
-  /**
-   *tabs的时候使用
-   */
-  tabs_label?: string
-
-  [propName: string]: any
-}
-export type CompareOptions =
+export type VisibilityCompareOperator =
   | 'eq'
   | 'not_eq'
   | 'contain'
@@ -121,11 +34,22 @@ export type CompareOptions =
 
 export interface VisibilityCondition {
   id: string
-  field: [string, string]
+  field: [scope: string, field: string]
   self?: boolean
-  compare: CompareOptions | ''
-  value: any
-  leftValue?: any
+  compare: VisibilityCompareOperator | ''
+  value: DynamicFormValue
+  leftValue?: DynamicFormValue
+}
+
+export interface VisibilityConditionState extends VisibilityCondition {
+  _fieldError?: string
+  _compareError?: string
+  _valueError?: string
+  _fieldType?: string
+  _ops?: Array<{ label: string; value: string }>
+  _options?: Dict<DynamicFormValue>[]
+  _treeData?: DynamicFormValue[]
+  _treeMultiple?: boolean
 }
 
 export interface VisibilityRules {
@@ -134,87 +58,118 @@ export interface VisibilityRules {
   conditions: VisibilityCondition[]
 }
 
-export interface FormField {
-  field: string
-  /**
-   * 输入框类型
-   */
-  input_type: string
-  /**
-   * 提示
-   */
-  label?: string | any
-  /**
-   * 是否 必填
-   */
-  required?: boolean
-  /**
-   * 默认值
-   */
-  default_value?: any
-  /**
-   * 是否显示默认值
-   */
-  show_default_value?: boolean
-
-  /**
-   * 显隐设置
-   */
-  visibility_rules?: VisibilityRules
-  /**
-   * {field:field_value_list} 表示在 field有值 ,并且值在field_value_list中才 执行函数获取 数据
-   */
-  relation_trigger_field_dict?: Dict<any>
-  /**
-   * 执行器类型  OPTION_LIST请求Option_list数据 CHILD_FORMS请求子表单
-   */
-  trigger_type?: 'OPTION_LIST' | 'CHILD_FORMS'
-  /**
-   * 前端attr数据
-   */
-  attrs?: Attrs
-  /**
-   * 其他额外信息
-   */
-  props_info?: PropsInfo
-  /**
-   * 下拉选字段field
-   */
-  text_field?: string
-  /**
-   * 下拉选 value
-   */
-  value_field?: string
-  /**
-   * 下拉选数据
-   */
-  option_list?: Array<any>
-  /**
-   * 供应商
-   */
-  provider?: string
-  /**
-   * 执行函数
-   */
-  method?: string
-
-  children?: Array<FormField>
-  required_asterisk?: boolean
-  [propName: string]: any
+export interface DynamicFormTriggerSetting extends Dict<DynamicFormValue> {
+  change?: string
+  change_field?: string
+  request?: string
+  url?: string
+  values?: DynamicFormValue[]
 }
 
+export type DynamicFormTriggerMap = Dict<DynamicFormTriggerSetting>
 
-export interface LeftOptions {
+export interface FormFieldLabel extends Dict<DynamicFormValue> {
+  attrs?: FormFieldAttributes
+  field?: string
+  input_type: string
+  label?: string
+  props_info?: FormFieldProps
+  relation_trigger_field_dict?: DynamicFormTriggerMap
+}
+
+export interface FormViewCardItem {
+  type: 'eval' | 'default'
+  title: string
+  value_field: string
+}
+
+export interface FormTableColumn {
+  property: string
+  label: string
+  value_field?: string
+  attrs?: FormFieldAttributes
+  type: 'eval' | 'component' | 'default'
+  props_info?: FormFieldProps
+}
+
+export interface FormProgressColor {
+  color: string
+  percentage: number
+}
+
+export interface FormFieldAttributes extends Dict<DynamicFormValue> {
+  placeholder?: string
+  labelWidth?: string
+  labelSuffix?: string
+  requireAsteriskPosition?: 'left' | 'right'
+  color?: FormProgressColor[]
+}
+
+export interface SerializedFormRule extends Dict<DynamicFormValue> {
+  validator?: string | ((...args: DynamicFormValue[]) => void)
+}
+
+export interface FormFieldProps extends Dict<DynamicFormValue> {
+  view_card?: FormViewCardItem[]
+  table_columns?: FormTableColumn[]
+  active_msg?: string
+  style?: CSSProperties
+  item_style?: CSSProperties
+  rules?: SerializedFormRule[]
+  err_msg?: string
+  tabs_label?: string
+}
+
+export interface FormField extends Dict<DynamicFormValue> {
+  field: string
+  input_type: string
+  label?: string | FormFieldLabel
+  required?: boolean
+  default_value?: DynamicFormValue
+  show_default_value?: boolean
+  visibility_rules?: VisibilityRules | null
+  relation_trigger_field_dict?: DynamicFormTriggerMap
+  trigger_type?: 'OPTION_LIST' | 'CHILD_FORMS'
+  attrs?: FormFieldAttributes
+  props_info?: FormFieldProps
+  text_field?: string
+  value_field?: string
+  option_list?: Dict<DynamicFormValue>[]
+  provider?: string
+  method?: string
+  children?: FormField[]
+  required_asterisk?: boolean
+}
+
+export interface DynamicFormConstructorState extends Dict<DynamicFormValue> {
+  label: string
+  field: string
+  tooltip: string
+  required: boolean
+  input_type: string
+  default_value?: DynamicFormValue
+  show_default_value?: boolean
+}
+
+export interface DynamicFormConstructorOption {
   label: string
   value: string
-  icon?: any
+}
+
+export interface DynamicFormConstructorExpose {
+  getData: () => Partial<FormField>
+  render: (field: FormField) => void
+  validate?: () => Promise<unknown>
+}
+
+export interface VisibilityFieldOption {
+  label: string
+  value: string
+  icon?: DynamicFormValue
   type?: string
   self?: boolean
-  children?: Array<LeftOptions>
-  /**
-   * 叶子字段配置,供 visibility 推断运算符与值编辑器
-   */
+  children?: VisibilityFieldOption[]
   input_type?: string
-  option_list?: Array<any>
-  attrs?: Record<string, any>
+  option_list?: Dict<DynamicFormValue>[]
+  attrs?: FormFieldAttributes
 }

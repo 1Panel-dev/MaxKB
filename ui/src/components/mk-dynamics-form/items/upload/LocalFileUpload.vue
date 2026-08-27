@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { Refresh } from '@element-plus/icons-vue'
 import { computed, useAttrs, nextTick, inject, ref, reactive } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { MsgError } from '@/utils/message'
 import type { UploadFiles } from 'element-plus'
-const upload = inject('upload') as MkDynamicFormValue
-const delFile = inject('delFile') as MkDynamicFormValue
-const attrs = useAttrs() as MkDynamicFormValue
-withDefaults(defineProps<{ modelValue?: MkDynamicFormValue; formField: FormField }>(), {
+const upload = inject('upload') as DynamicFormValue
+const delFile = inject('delFile') as DynamicFormValue
+const attrs = useAttrs() as DynamicFormValue
+withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), {
   modelValue: () => [],
 })
 const onExceed = () => {
-  MsgError('单次上传最多 ' + file_count_limit.value + ' 个文件')
+  MsgError('单次上传最多 ' + fileCountLimit.value + ' 个文件')
 }
 const emit = defineEmits(['update:modelValue'])
 
@@ -26,45 +26,45 @@ const filesize = (size: number) => {
   return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
 }
 
-const typeList: MkDynamicFormValue = {
+const typeList: DynamicFormValue = {
   txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
   table: ['xlsx', 'xls', 'csv'],
   QA: ['xlsx', 'csv', 'xls', 'zip'],
 }
 const fileType = (name: string) => {
   const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'MkDynamicFormValue'
+  return suffix[suffix.length - 1] || 'DynamicFormValue'
 }
 
 const getImgUrl = (name: string) => {
   const list = Object.values(typeList).flat()
   const type = list.includes(fileType(name).toLowerCase())
     ? fileType(name).toLowerCase()
-    : 'MkDynamicFormValue'
+    : 'DynamicFormValue'
   return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
 }
 
-const fileArray = ref<MkDynamicFormValue>([])
+const fileArray = ref<DynamicFormValue>([])
 
 const loading = ref(false)
 // 上传成功数量
 const successCount = computed(
-  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status !== 'uploading').length,
+  () => fileArray.value.filter((i: DynamicFormValue) => i.status !== 'uploading').length,
 )
 // 上传失败数量
 const errorCount = computed(
-  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'error').length,
+  () => fileArray.value.filter((i: DynamicFormValue) => i.status === 'error').length,
 )
 // 上传中数量
 const uploadingCount = computed(
-  () => fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'uploading').length,
+  () => fileArray.value.filter((i: DynamicFormValue) => i.status === 'uploading').length,
 )
 // 可重新上传的失败项（网络错误等）
 const retryList = computed(() =>
-  fileArray.value.filter((i: MkDynamicFormValue) => i.status === 'error' && i.canRetry),
+  fileArray.value.filter((i: DynamicFormValue) => i.status === 'error' && i.canRetry),
 )
 
-const getFileStatusOrder = (item: MkDynamicFormValue) => {
+const getFileStatusOrder = (item: DynamicFormValue) => {
   if (item.status === 'error' && item.canRetry) return 0
   if (item.status === 'error') return 1
   if (item.status === 'uploading') return 2
@@ -72,29 +72,29 @@ const getFileStatusOrder = (item: MkDynamicFormValue) => {
 }
 const sortedFileArray = computed(() =>
   fileArray.value
-    .map((item: MkDynamicFormValue, index: number) => ({ item, index }))
+    .map((item: DynamicFormValue, index: number) => ({ item, index }))
     .sort(
-      (a: MkDynamicFormValue, b: MkDynamicFormValue) =>
+      (a: DynamicFormValue, b: DynamicFormValue) =>
         getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
     )
-    .map(({ item }: MkDynamicFormValue) => item),
+    .map(({ item }: DynamicFormValue) => item),
 )
 // 重新上传所有可重试的失败文件
 const retryAll = () => {
-  retryList.value.forEach((i: MkDynamicFormValue) => uploadFile(i))
+  retryList.value.forEach((i: DynamicFormValue) => uploadFile(i))
 }
 
 // 上传on-change事件
-const fileHandleChange = (file: MkDynamicFormValue, fileList: UploadFiles) => {
+const fileHandleChange = (file: DynamicFormValue, fileList: UploadFiles) => {
   // 按文件唯一标识精确定位并移除当前文件
   // 注意：不能使用 splice(-1, 1) 盲删末尾元素，文件夹上传时会误删正常文件而放走超限文件
   const removeCurrentFile = () => {
-    const index = fileList.findIndex((item: MkDynamicFormValue) => item.uid === file.uid)
+    const index = fileList.findIndex((item: DynamicFormValue) => item.uid === file.uid)
     if (index !== -1) {
       fileList.splice(index, 1)
     }
   }
-  if (fileArray.value.length >= file_count_limit.value) {
+  if (fileArray.value.length >= fileCountLimit.value) {
     onExceed()
     removeCurrentFile()
     return false
@@ -114,17 +114,17 @@ const fileHandleChange = (file: MkDynamicFormValue, fileList: UploadFiles) => {
   })
 
   //1、判断文件大小是否合法，文件限制不能大于100M
-  const isLimit = file?.size / 1024 / 1024 < file_size_limit.value
+  const isLimit = file?.size / 1024 / 1024 < fileSizeLimit.value
   if (!isLimit) {
     item.status = 'error'
     item.errMsg = '大小超限'
-    // MsgError('每个文件最大' + file_size_limit.value + 'MB')
+    // MsgError('每个文件最大' + fileSizeLimit.value + 'MB')
     // fileList.splice(-1, 1) //移除当前超出大小的文件
     fileArray.value?.push(item)
     removeCurrentFile()
     return false
   }
-  if (!file_type_list.value.includes(fileType(file.name).toLocaleUpperCase())) {
+  if (!allowedFileTypes.value.includes(fileType(file.name).toLocaleUpperCase())) {
     if (file?.name !== '.DS_Store') {
       MsgError('文件格式不支持')
     }
@@ -143,13 +143,13 @@ const fileHandleChange = (file: MkDynamicFormValue, fileList: UploadFiles) => {
   uploadFile(item)
 }
 // 执行上传
-const uploadFile = (item: MkDynamicFormValue) => {
+const uploadFile = (item: DynamicFormValue) => {
   item.status = 'uploading'
   item.percentage = 0
   item.errMsg = ''
   item.canRetry = false
   item.aborted = false
-  const res: MkDynamicFormValue = upload(
+  const res: DynamicFormValue = upload(
     item.raw,
     (percent: number) => {
       item.percentage = percent
@@ -158,11 +158,11 @@ const uploadFile = (item: MkDynamicFormValue) => {
   )
   // provider 返回 { request, abort } 时保存中断方法，删除时可中断上传
   item.abort = typeof res?.abort === 'function' ? res.abort : null
-  const request: Promise<MkDynamicFormValue> = res?.then ? res : res?.request
+  const request: Promise<DynamicFormValue> = res?.then ? res : res?.request
   request
-    .then((ok: MkDynamicFormValue) => {
-      const split_path = ok.data.split('/')
-      item.file_id = split_path[split_path.length - 1]
+    .then((ok: DynamicFormValue) => {
+      const pathSegments = ok.data.split('/')
+      item.file_id = pathSegments[pathSegments.length - 1]
       item.percentage = 100
       item.status = 'success'
       emit('update:modelValue', fileArray.value)
@@ -175,7 +175,7 @@ const uploadFile = (item: MkDynamicFormValue) => {
       item.canRetry = true
     })
 }
-function deleteFile(item: MkDynamicFormValue) {
+function deleteFile(item: DynamicFormValue) {
   // 上传过程中删除则中断上传请求
   if (item?.status === 'uploading' && typeof item.abort === 'function') {
     item.aborted = true
@@ -193,7 +193,7 @@ function deleteFile(item: MkDynamicFormValue) {
 }
 
 const handlePreview = (bool: boolean) => {
-  let inputDom: MkDynamicFormValue = null
+  let inputDom: DynamicFormValue = null
   nextTick(() => {
     if (document.querySelector('.el-upload__input') !== null) {
       inputDom = document.querySelector('.el-upload__input')
@@ -203,19 +203,19 @@ const handlePreview = (bool: boolean) => {
 }
 const accept = computed(() => {
   return (attrs.file_type_list || [])
-    .map((item: MkDynamicFormValue) => '.' + item.toLowerCase())
+    .map((item: DynamicFormValue) => '.' + item.toLowerCase())
     .join(',')
 })
-const file_type_list = computed(() => {
-  return attrs.file_type_list.map((item: MkDynamicFormValue) => item.toUpperCase()) || []
+const allowedFileTypes = computed(() => {
+  return attrs.file_type_list.map((item: DynamicFormValue) => item.toUpperCase()) || []
 })
 const formats = computed(() => {
-  return file_type_list.value.join('、')
+  return allowedFileTypes.value.join('、')
 })
-const file_size_limit = computed(() => {
+const fileSizeLimit = computed(() => {
   return attrs.file_size_limit || 50
 })
-const file_count_limit = computed(() => {
+const fileCountLimit = computed(() => {
   return attrs.file_count_limit || 100
 })
 </script>
@@ -245,7 +245,7 @@ const file_count_limit = computed(() => {
           <em class="hover ml-4" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
         </p>
         <div class="upload__decoration">
-          <p>单次上传最多 {{ file_count_limit }} 个文件， 每个文件最大 {{ file_size_limit }} MB</p>
+          <p>单次上传最多 {{ fileCountLimit }} 个文件， 每个文件最大 {{ fileSizeLimit }} MB</p>
           <p>支持格式：{{ formats }}</p>
         </div>
       </div>
@@ -286,7 +286,7 @@ const file_count_limit = computed(() => {
               <div class="flex">
                 <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
                 <div class="ml-8">
-                  <p class="ellipsis-1" :title="item && item?.name">{{ item && item?.name }}</p>
+                  <p :title="item && item?.name">{{ item && item?.name }}</p>
                   <el-text type="info" size="small">
                     <template v-if="item.status === 'uploading'">
                       {{ filesize((item.size * item.percentage) / 100) }} /

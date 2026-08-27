@@ -3,7 +3,7 @@ import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import OperateLogApi from '@/api/admin/system/operate-log'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import MkDateRange from '@/components/mk-date-range/index.vue'
-import type { OptionItem, OperateLog, RequestParams } from '@/api/types'
+import type { Dict, OperateLog, OptionItem } from '@/api/types'
 import type { MkDateRangeValue } from '@/components/mk-date-range/types'
 import CleanStrategyDialog from './dialog/CleanStrategyDialog.vue'
 import OperateLogDetailDialog from './dialog/OperateLogDetailDialog.vue'
@@ -27,16 +27,16 @@ const searchFields: OptionItem<string>[] = [
     ],
   },
 ]
-const operateLogSearchQuery = ref<RequestParams>()
+const operateLogSearchQuery = ref<Dict<unknown>>()
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   operateLogSearchQuery.value = query
   paginationConfig.value.currentPage = 1
   loadOperateLogs()
 }
 
 // 时间筛选
-const operateLogDateQuery = ref<RequestParams>({
+const operateLogDateQuery = ref<Dict<unknown>>({
   start_time: beforeDay(7),
   end_time: '',
 })
@@ -85,7 +85,7 @@ function handleWorkspaceChange() {
   loadOperateLogs()
 }
 
-const operateLogQuery = computed<RequestParams>(() => ({
+const operateLogQuery = computed<Dict<unknown>>(() => ({
   ...operateLogDateQuery.value,
   ...operateLogSearchQuery.value,
   ...(selectedOperateMenus.value.length

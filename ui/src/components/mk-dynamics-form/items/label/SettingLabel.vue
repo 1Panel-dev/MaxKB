@@ -1,34 +1,34 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { Setting } from '@element-plus/icons-vue'
 import DynamicsForm from '@/components/mk-dynamics-form/index.vue'
 import { ref } from 'vue'
 import { cloneDeep } from 'lodash'
 const props = defineProps<{
-  label: MkDynamicFormValue
-  modelValue?: MkDynamicFormValue
-  formValue: MkDynamicFormValue
+  label: DynamicFormValue
+  modelValue?: DynamicFormValue
+  formValue: DynamicFormValue
   view?: boolean
 }>()
 const emit = defineEmits(['update:modelValue'])
 const dialogVisible = ref<boolean>(false)
 const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>>()
-const form_data = ref<MkDynamicFormValue>(undefined)
+const formData = ref<DynamicFormValue>(undefined)
 const open = () => {
   if (props.modelValue) {
-    form_data.value = cloneDeep(props.modelValue)
+    formData.value = cloneDeep(props.modelValue)
   }
   dialogVisible.value = true
 }
 const close = () => {
   dialogVisible.value = false
-  form_data.value = undefined
+  formData.value = undefined
 }
 const submit = () => {
   dynamicsFormRef.value?.validate().then(() => {
     dialogVisible.value = false
-    emit('update:modelValue', form_data.value)
-    form_data.value = undefined
+    emit('update:modelValue', formData.value)
+    formData.value = undefined
   })
 }
 </script>
@@ -60,9 +60,9 @@ const submit = () => {
         ref="dynamicsFormRef"
         :render-data="label.children ? label.children : []"
         label-position="top"
-        v-model="form_data"
+        v-model="formData"
         require-asterisk-position="right"
-        :model="form_data"
+        :model="formData"
       ></DynamicsForm>
       <template #footer>
         <div class="dialog-footer">

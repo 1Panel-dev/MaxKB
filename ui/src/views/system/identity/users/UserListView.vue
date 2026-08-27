@@ -3,7 +3,7 @@ import { onMounted, ref, useTemplateRef } from 'vue'
 import { useStore } from '@/stores'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { LOGIN_METHOD, ROLE_TYPE } from '@/api/enums'
-import type { LoginMethod, OptionItem, SystemUser, RequestParams } from '@/api/types'
+import type { Dict, LoginMethod, OptionItem, SystemUser } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
@@ -43,9 +43,9 @@ const searchFields: OptionItem<string>[] = [
     ],
   },
 ]
-const systemUserQuery = ref<RequestParams>()
+const systemUserQuery = ref<Dict<unknown>>()
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   systemUserQuery.value = query
   paginationConfig.value.currentPage = 1
   loadSystemUsers()

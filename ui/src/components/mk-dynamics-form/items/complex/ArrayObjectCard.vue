@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, ref } from 'vue'
 import type { DynamicFormResponse, FormField } from '../../type'
 import DynamicsForm from '../../index.vue'
 const props = defineProps<{
-  modelValue?: Array<MkDynamicFormValue>
-  formValue?: MkDynamicFormValue
-  formfieldList?: Array<FormField>
+  modelValue?: DynamicFormValue[]
+  formValue?: DynamicFormValue
+  formfieldList?: FormField[]
   field: string
-  otherParams: MkDynamicFormValue
+  otherParams: DynamicFormValue
   formField: FormField
   view?: boolean
 }>()
 
 const getChildFields = () => {
   return Promise.resolve({
-    data: props.formField.children as Array<FormField>,
-  } satisfies DynamicFormResponse<Array<FormField>>)
+    data: props.formField.children as FormField[],
+  } satisfies DynamicFormResponse<FormField[]>)
 }
-const deleteKnowledge = (item: MkDynamicFormValue) => {
-  _data.value = _data.value.filter((row) => row !== item)
+const deleteKnowledge = (item: DynamicFormValue) => {
+  localValue.value = localValue.value.filter((row) => row !== item)
 }
 const emit = defineEmits(['update:modelValue', 'change'])
 
 // 校验实例对象
-const dynamicsFormRef = ref<Array<InstanceType<typeof DynamicsForm>>>([])
+const dynamicsFormRef = ref<InstanceType<typeof DynamicsForm>[]>([])
 
-const _data = computed<Array<MkDynamicFormValue>>({
+const localValue = computed<DynamicFormValue[]>({
   get() {
     if (props.modelValue) {
       return props.modelValue
@@ -40,27 +40,27 @@ const _data = computed<Array<MkDynamicFormValue>>({
   },
 })
 
-const props_info = computed(() => {
+const fieldProps = computed(() => {
   return props.formField.props_info ? props.formField.props_info : {}
 })
-const add_msg = computed(() => {
-  return props_info.value.add_msg ? props_info.value.add_msg : '添加'
+const addMessage = computed(() => {
+  return fieldProps.value.add_msg ? fieldProps.value.add_msg : '添加'
 })
 /**
  * 添加一个card
  */
-const add_card = () => {
-  _data.value = [..._data.value, {}]
+const addCard = () => {
+  localValue.value = [...localValue.value, {}]
 }
 
 /**
  * 组件样式
  */
 const formStyle = computed(() => {
-  return props_info.value.form_style ? props_info.value.form_style : {}
+  return fieldProps.value.form_style ? fieldProps.value.form_style : {}
 })
 const style = computed(() => {
-  return props_info.value.style ? props_info.value.style : {}
+  return fieldProps.value.style ? fieldProps.value.style : {}
 })
 const attr = computed(() => {
   if (props.formField.attrs) {
@@ -87,13 +87,13 @@ defineExpose({
 
 <template v-loading="_loading">
   <div class="arrt-object-card flex w-full">
-    <el-card class="box-card" :style="style" v-for="(item, index) in _data" :key="index">
+    <el-card class="box-card" :style="style" v-for="(item, index) in localValue" :key="index">
       <DynamicsForm
         :style="formStyle"
         :view="view"
         ref="ceFormRef"
-        v-model="_data[index]"
-        :model="_data[index]"
+        v-model="localValue[index]"
+        :model="localValue[index]"
         :other-params="other"
         :render-data="getChildFields()"
         v-bind="attr"
@@ -107,10 +107,10 @@ defineExpose({
         </el-button>
       </el-tooltip>
     </el-card>
-    <el-card shadow="never" class="card-add box-card" @click="add_card">
+    <el-card shadow="never" class="card-add box-card" @click="addCard">
       <div class="flex-center">
         <MkIcon name="icon_add_outlined" class="add-icon layout-bg p-8 border-r-6" />
-        <span>{{ add_msg }}</span>
+        <span>{{ addMessage }}</span>
       </div>
     </el-card>
   </div>

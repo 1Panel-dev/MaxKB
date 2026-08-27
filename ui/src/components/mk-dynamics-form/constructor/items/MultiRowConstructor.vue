@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
 import { computed, onMounted, inject } from 'vue'
 import MultiRow from '@/components/mk-dynamics-form/items/MultiRow.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
-const getModel = inject('getModel') as MkDynamicFormValue
+const getModel = inject<() => DynamicFormValue>('getModel')
 
-const assignment_method_option_list = computed(() => {
-  const option_list = [
+const assignmentMethodOptions = computed(() => {
+  const options = [
     {
       label: '自定义',
       value: 'custom',
     },
   ]
   if (getModel) {
-    option_list.push({
+    options.push({
       label: '引用变量',
       value: 'ref_variables',
     })
   }
-  return option_list
+  return options
 })
 
 const model = computed(() => {
@@ -30,7 +30,7 @@ const model = computed(() => {
   }
 })
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -42,13 +42,9 @@ const formValue = computed({
   },
 })
 
-const default_ref_variables_value_rule = {
+const referenceVariableRule = {
   required: true,
-  validator: (
-    rule: MkDynamicFormValue,
-    value: MkDynamicFormValue,
-    callback: MkDynamicFormValue,
-  ) => {
+  validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
       callback('引用变量必填')
     }
@@ -82,10 +78,10 @@ const getData = () => {
     assignment_method: formValue.value.assignment_method || 'custom',
   }
 }
-const render = (form_data: MkDynamicFormValue) => {
-  formValue.value.option_list = form_data.option_list || []
-  formValue.value.default_value = form_data.default_value
-  formValue.value.assignment_method = form_data.assignment_method || 'custom'
+const render = (formData: DynamicFormValue) => {
+  formValue.value.option_list = formData.option_list || []
+  formValue.value.default_value = formData.default_value
+  formValue.value.assignment_method = formData.assignment_method || 'custom'
 }
 
 defineExpose({ getData, render })
@@ -111,7 +107,7 @@ onMounted(() => {
         <el-radio
           :value="item.value"
           size="large"
-          v-for="(item, index) in assignment_method_option_list"
+          v-for="(item, index) in assignmentMethodOptions"
           :key="index"
         >
           <span class="flex align-center">
@@ -142,7 +138,7 @@ onMounted(() => {
     v-if="formValue.assignment_method === 'ref_variables'"
     :required="true"
     prop="option_list"
-    :rules="[default_ref_variables_value_rule]"
+    :rules="[referenceVariableRule]"
   >
     <NodeCascader
       ref="nodeCascaderRef"

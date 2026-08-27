@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import { groupBy, flatMap } from 'lodash'
 import SelectHeader from '@/components/mk-dynamics-form/items/common/SelectHeader.vue'
@@ -13,7 +13,7 @@ const props = withDefaults(
   defineProps<{
     modelValue?: {
       model_id: string
-      model_params_setting: Record<string, MkDynamicFormValue>
+      model_params_setting: Record<string, DynamicFormValue>
     } | null
     formField: FormField
   }>(),
@@ -24,7 +24,7 @@ const props = withDefaults(
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
-const model_value = computed({
+const modelValueProxy = computed({
   get: () => props.modelValue,
   set: (value) => {
     emit('update:modelValue', value)
@@ -33,23 +33,23 @@ const model_value = computed({
 })
 
 const groupedOptions = computed(() => {
-  const list = (props.formField.attrs?.provider_list as MkDynamicFormValue[]) || []
+  const list = (props.formField.attrs?.provider_list as DynamicFormValue[]) || []
   return groupBy(list, 'provider')
 })
 
 const getModelProvider = computed(() => {
   return (id: string) => {
     const item = flatMap(groupedOptions.value)?.find(
-      (item: MkDynamicFormValue) => item.model_id === id,
+      (item: DynamicFormValue) => item.model_id === id,
     )
-    return (item as MkDynamicFormValue)?.provider || ''
+    return (item as DynamicFormValue)?.provider || ''
   }
 })
 
 const handleModelChange = (selectedId: string) => {
-  const list = (props.formField.attrs?.provider_list as MkDynamicFormValue[]) || []
+  const list = (props.formField.attrs?.provider_list as DynamicFormValue[]) || []
   const selectedItem = list.find((p) => p.model_id === selectedId)
-  model_value.value = {
+  modelValueProxy.value = {
     model_id: selectedId,
     model_params_setting: selectedItem?.model_params_setting || {},
   }
@@ -60,7 +60,7 @@ const handleModelChange = (selectedId: string) => {
   <div class="complex-select flex align-center w-full">
     <el-select
       class="complex-select__left"
-      :model-value="model_value?.model_id"
+      :model-value="modelValueProxy?.model_id"
       @change="handleModelChange"
       v-bind="$attrs"
       popper-class="select-model"

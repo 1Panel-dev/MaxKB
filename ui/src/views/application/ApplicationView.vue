@@ -2,7 +2,7 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
-import type { ApplicationDetail, FolderItem, OptionItem, RequestParams } from '@/api/types'
+import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
@@ -44,7 +44,7 @@ const searchFields = computed(() => [
     ],
   },
 ])
-const applicationQuery = ref<RequestParams>()
+const applicationQuery = ref<Dict<unknown>>()
 
 function loadCreatorOptions(keyword: string) {
   return CommonApi.getAllUsers(keyword ? { nick_name: keyword } : undefined).then((users) => {
@@ -52,7 +52,7 @@ function loadCreatorOptions(keyword: string) {
   })
 }
 
-function handleSearchChange(query?: RequestParams) {
+function handleSearchChange(query?: Dict<unknown>) {
   applicationQuery.value = query
   infiniteScrollRef.value?.reset()
 }

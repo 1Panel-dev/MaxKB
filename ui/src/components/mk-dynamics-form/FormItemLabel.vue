@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import type { FormField } from '@/components/mk-dynamics-form/type'
+import type { FormField } from './type'
+
+defineOptions({ name: 'MkDynamicsFormItemLabel' })
+
 defineProps<{
-  // 表单Item
   formField: FormField
 }>()
 </script>

@@ -1,240 +1,235 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, type Ref } from 'vue'
-import type { FormField } from '@/components/mk-dynamics-form/type'
-import FormItemLabel from './FormItemLabel.vue'
-import type { Dict } from '@/api/types/common'
-import bus from '@/utils/bus'
+import { computed, onBeforeUnmount, onMounted, ref, type Component, type Ref } from 'vue'
+import type { FormItemRule } from 'element-plus'
 import { get } from 'lodash'
+import type { Dict } from '@/api/types'
+import bus from '@/utils/bus'
+import FormItemLabel from './FormItemLabel.vue'
+import type {
+  DynamicFormTriggerMap,
+  DynamicFormTriggerSetting,
+  DynamicFormValue,
+  FormField,
+  FormFieldLabel,
+  SerializedFormRule,
+} from './type'
 
-// 批量注册表单项组件（包括子目录）
-const itemModules = import.meta.glob('./items/**/*.vue', { eager: true })
-const itemComponents: Record<string, any> = {}
+defineOptions({ name: 'MkDynamicsFormItem' })
+
+interface DynamicFieldComponent {
+  validate?: () => Promise<unknown>
+}
+
+const itemModules = import.meta.glob<{ default: Component }>('./items/**/*.vue', { eager: true })
+const itemComponents: Record<string, Component> = {}
+
 for (const [path, module] of Object.entries(itemModules)) {
-  const name = path.split('/').pop()?.replace('.vue', '') || ''
-  itemComponents[name] = (module as any).default
+  const componentName = path.split('/').pop()?.replace('.vue', '')
+  if (componentName) {
+    itemComponents[componentName] = module.default
+  }
 }
 
-const getComponent = (name: string) => {
-  return itemComponents[name] || null
+function getFieldComponent(name: string) {
+  return itemComponents[name]
 }
+
 const props = defineProps<{
-  // 双向绑定的值
-  modelValue: any
-
-  // 表单Item
-  formfield: FormField
-  // 是否只读
+  modelValue: DynamicFormValue
+  formField: FormField
   view: boolean
-  // 调用接口所需要的其他参数
-  otherParams: any
-  // 获取Options
+  otherParams: Dict<DynamicFormValue>
   trigger: (
-    trigger_field: string,
-    trigger_value: any,
-    trigger_setting: any,
-    self: any,
+    triggerField: string,
+    triggerValue: DynamicFormValue,
+    triggerSetting: DynamicFormTriggerSetting,
+    target: Dict<DynamicFormValue>,
     loading: Ref<boolean>,
   ) => void
-  // 初始化默认数据
-  initDefaultData: (formItem: FormField) => void
-  // 默认每个宽度
+  initDefaultData: (formField: FormField) => void
   defaultItemWidth: string
-  // 表单收集数据
-  formValue: Dict<any>
-
-  formfieldList: Array<FormField>
-
-  parent_field?: string
+  formValue: Dict<DynamicFormValue>
+  formFieldList: FormField[]
+  parentField?: string
 }>()
 
-const emit = defineEmits(['change', 'changeLabel'])
+const emit = defineEmits<{
+  change: [value: DynamicFormValue]
+  'change-label': [value: DynamicFormValue]
+}>()
 
-const loading = ref<boolean>(false)
+const loading = ref(false)
+const fieldComponentRef = ref<DynamicFieldComponent>()
+const triggerSubscriptions: Array<{
+  event: string
+  handler: (value: unknown) => void
+}> = []
 
-const isString = (value: any) => {
+function isString(value: unknown): value is string {
   return typeof value === 'string'
 }
+
+const fieldLabel = computed<FormFieldLabel | undefined>(() => {
+  return isString(props.formField.label) ? undefined : props.formField.label
+})
+
 const labelValue = computed({
   get: () => {
-    return props.formValue[props.formfield.label.field]
+    const field = fieldLabel.value?.field
+    return field ? props.formValue[field] : undefined
   },
-  set: (value: any) => {
-    emit('changeLabel', value)
-    bus.emit(props.formfield.label.field, value)
-  },
-})
-const itemValue = computed({
-  get: () => {
-    return props.modelValue
-  },
-  set: (value: any) => {
-    emit('change', value)
-    if (props.parent_field) {
-      bus.emit(props.parent_field + '.' + props.formfield.field, value)
-    } else {
-      bus.emit(props.formfield.field, value)
+  set: (value: DynamicFormValue) => {
+    const field = fieldLabel.value?.field
+    if (!field) {
+      return
     }
+    emit('change-label', value)
+    bus.emit(field, value)
   },
 })
-const componentFormRef = ref<any>()
-const label_attrs = computed(() => {
-  return props.formfield.label &&
-    typeof props.formfield.label !== 'string' &&
-    props.formfield.label.attrs
-    ? props.formfield.label.attrs
-    : {}
-})
-const props_info = computed(() => {
-  return props.formfield.props_info ? props.formfield.props_info : {}
-})
-/**
- * 表单 item style
- */
-const formItemStyle = computed(() => {
-  return props_info.value.item_style ? props_info.value.item_style : {}
+
+const itemValue = computed({
+  get: () => props.modelValue,
+  set: (value: DynamicFormValue) => {
+    emit('change', value)
+    const eventName = props.parentField
+      ? `${props.parentField}.${props.formField.field}`
+      : props.formField.field
+    bus.emit(eventName, value)
+  },
 })
 
-/**
- * 表单错误Msg
- */
-const errMsg = computed(() => {
-  return props_info.value.err_msg
-    ? props_info.value.err_msg
-    : isString(props.formfield.label)
-      ? props.formfield.label + ' 不能为空'
-      : props.formfield.label.label + ' 不能为空'
-})
-/**
- * 反序列化
- * @param rule
- */
-const to_rule = (rule: any) => {
-  if (rule.validator) {
-    // eslint-disable-next-line prefer-const, @typescript-eslint/no-unused-vars
-    let validator = (rule: any, value: string, callback: any) => {}
-    eval(rule.validator)
-    return { ...rule, validator }
+const labelAttrs = computed(() => fieldLabel.value?.attrs ?? {})
+const fieldProps = computed(() => props.formField.props_info ?? {})
+const formItemStyle = computed(() => fieldProps.value.item_style ?? {})
+const componentStyle = computed(() => fieldProps.value.style ?? {})
+const fieldAttrs = computed(() => props.formField.attrs ?? {})
+
+const errorMessage = computed(() => {
+  if (fieldProps.value.err_msg) {
+    return fieldProps.value.err_msg
   }
-  return rule
+  const label = isString(props.formField.label)
+    ? props.formField.label
+    : props.formField.label?.label
+  return `${label || props.formField.field} 不能为空`
+})
+
+function deserializeRule(rule: SerializedFormRule): FormItemRule {
+  if (typeof rule.validator !== 'string') {
+    return rule as FormItemRule
+  }
+
+  let validator: FormItemRule['validator']
+  // 动态校验器来自受信任的服务端字段协议。
+  eval(rule.validator)
+  return { ...rule, validator } as FormItemRule
 }
 
-/**
- * 校验
- */
-const rules = computed(() => {
-  return props_info.value.rules
-    ? props_info.value.rules.map(to_rule)
-    : {
-        message: errMsg.value,
-        trigger: props.formfield.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
-        required: props.formfield.required === false ? false : true,
-      }
+const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
+  if (fieldProps.value.rules) {
+    return fieldProps.value.rules.map(deserializeRule)
+  }
+  return {
+    message: errorMessage.value,
+    required: props.formField.required !== false,
+    trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
+  }
 })
 
-/**
- * 组件样式
- */
-const componentStyle = computed(() => {
-  return props_info.value.style ? props_info.value.style : {}
-})
+function executeInitialTriggers(
+  target: Dict<DynamicFormValue>,
+  triggerMap?: DynamicFormTriggerMap,
+) {
+  if (!triggerMap) {
+    return
+  }
 
-/**
- * 组件attrs
- */
-const attrs = computed(() => {
-  return props.formfield.attrs ? props.formfield.attrs : {}
-})
-const initTrigger = (self: any, trigger_field_dict?: Dict<any>) => {
-  if (trigger_field_dict) {
-    Object.keys(trigger_field_dict).forEach((key) => {
-      const setting = trigger_field_dict[key]
-      const triggerValues = setting['values']
-      const value = get(props.formValue, key)
-      if (triggerValues && triggerValues.length > 0) {
-        if (triggerValues.includes(value)) {
-          props.trigger(key, value, setting, self, loading)
-        }
-      } else {
-        props.trigger(key, value, setting, self, loading)
-      }
-    })
+  for (const [event, setting] of Object.entries(triggerMap)) {
+    const triggerValue = get(props.formValue, event)
+    if (!setting.values?.length || setting.values.includes(triggerValue)) {
+      props.trigger(event, triggerValue, setting, target, loading)
+    }
   }
 }
+
+function subscribeToTriggers(target: Dict<DynamicFormValue>, triggerMap?: DynamicFormTriggerMap) {
+  if (!triggerMap) {
+    return
+  }
+
+  for (const [event, setting] of Object.entries(triggerMap)) {
+    const handler = (value: unknown) => {
+      if (!setting.values?.length || setting.values.includes(value)) {
+        props.trigger(event, value, setting, target, loading)
+      }
+    }
+    bus.on(event, handler)
+    triggerSubscriptions.push({ event, handler })
+  }
+}
+
 onMounted(() => {
-  props.initDefaultData(props.formfield)
-  initTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
-  initTrigger(props.formfield.label, props.formfield.label?.relation_trigger_field_dict)
-  isString(props.formfield.label)
-    ? undefined
-    : onTrigger(props.formfield.label, props.formfield.label.relation_trigger_field_dict)
-  onTrigger(props.formfield, props.formfield.relation_trigger_field_dict)
-})
-const onTrigger = (self: any, trigger_field_dict?: Dict<any>) => {
-  if (trigger_field_dict) {
-    const keys = Object.keys(trigger_field_dict)
-    keys.forEach((key) => {
-      const setting = trigger_field_dict[key]
-      const values: Array<any> = setting.values
-      // 添加关系
-      bus.on(key, (v: any) => {
-        if (values && values.length > 0) {
-          if (values.includes(v)) {
-            props.trigger(key, v, setting, self, loading)
-          }
-        } else {
-          props.trigger(key, v, setting, self, loading)
-        }
-      })
-    })
+  props.initDefaultData(props.formField)
+  executeInitialTriggers(props.formField, props.formField.relation_trigger_field_dict)
+  subscribeToTriggers(props.formField, props.formField.relation_trigger_field_dict)
+
+  if (fieldLabel.value) {
+    executeInitialTriggers(fieldLabel.value, fieldLabel.value.relation_trigger_field_dict)
+    subscribeToTriggers(fieldLabel.value, fieldLabel.value.relation_trigger_field_dict)
   }
-}
-const validate = () => {
-  if (props.formfield.trigger_type === 'CHILD_FORMS' && componentFormRef.value) {
-    return componentFormRef.value.validate()
+})
+
+onBeforeUnmount(() => {
+  for (const { event, handler } of triggerSubscriptions) {
+    bus.off(event, handler)
+  }
+})
+
+function validate() {
+  if (props.formField.trigger_type === 'CHILD_FORMS') {
+    return fieldComponentRef.value?.validate?.() ?? Promise.resolve()
   }
   return Promise.resolve()
 }
+
 defineExpose({ validate })
 </script>
+
 <template>
   <el-form-item
     v-loading="loading"
+    :key="formField.field"
     :style="formItemStyle"
-    :prop="formfield.field"
-    :key="formfield.field"
-    :rules="rules"
-    :class="formfield.required_asterisk ? 'hide-asterisk' : ''"
+    :prop="formField.field"
+    :rules="validationRules"
+    :class="formField.required_asterisk ? 'hide-asterisk' : ''"
   >
-    <template #label v-if="formfield.label">
-      <FormItemLabel v-if="isString(formfield.label)" :form-field="formfield"></FormItemLabel>
+    <template v-if="formField.label" #label>
+      <FormItemLabel v-if="isString(formField.label)" :form-field="formField" />
       <component
-        v-else-if="getComponent(formfield.label.input_type)"
-        :is="getComponent(formfield.label.input_type)"
-        :label="formfield.label"
+        :is="getFieldComponent(fieldLabel.input_type)"
+        v-else-if="fieldLabel && getFieldComponent(fieldLabel.input_type)"
         v-model="labelValue"
+        :label="fieldLabel"
         :form-value="formValue"
-        v-bind="label_attrs"
-      ></component>
+        v-bind="labelAttrs"
+      />
     </template>
     <component
-      v-if="getComponent(formfield.input_type)"
-      ref="componentFormRef"
-      :view="view"
+      :is="getFieldComponent(formField.input_type)"
+      v-if="getFieldComponent(formField.input_type)"
+      ref="fieldComponentRef"
       v-model="itemValue"
-      :is="getComponent(formfield.input_type)"
-      :form-field="formfield"
+      :view="view"
+      :form-field="formField"
       :other-params="otherParams"
       :style="componentStyle"
-      :field="formfield.field"
-      v-bind="attrs"
-      :formfield-list="formfieldList"
-    ></component>
+      :field="formField.field"
+      :formfield-list="formFieldList"
+      v-bind="fieldAttrs"
+    />
   </el-form-item>
 </template>
-<style lang="scss" scoped>
-.hide-asterisk {
-  ::after {
-    display: none;
-  }
-}
-</style>
+
+<style lang="scss" scoped></style>

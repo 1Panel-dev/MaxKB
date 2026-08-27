@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, inject, ref } from 'vue'
-
 import { groupBy } from 'lodash'
+import ModelSelect from '@/components/business/model-select/index.vue'
 import { providerList as providerOptions } from '../../items/model/provider-data'
 import { relatedObject } from '@/utils/common'
 const modelTypeList = [
@@ -17,18 +17,18 @@ const modelTypeList = [
   { text: 'TTV', value: 'TTV' },
 ]
 const getSelectModelList =
-  inject<(params: { model_type: string }) => Promise<MkDynamicFormValue>>('getSelectModelList')
+  inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
 const getModelParamsForm =
-  inject<(modelId: string) => Promise<MkDynamicFormValue>>('getModelParamsForm')
+  inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
 
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 
 const emit = defineEmits(['update:modelValue'])
 
 const formValue = computed({
-  set: (item: MkDynamicFormValue) => {
+  set: (item: DynamicFormValue) => {
     emit('update:modelValue', item)
   },
   get: () => {
@@ -37,11 +37,11 @@ const formValue = computed({
 })
 
 const selectedIds = computed({
-  get: () => (formValue.value.provider_list || []).map((p: MkDynamicFormValue) => p.model_id),
+  get: () => (formValue.value.provider_list || []).map((p: DynamicFormValue) => p.model_id),
   set: (newIds: string[]) => {
     const oldList = formValue.value.provider_list || []
     const newList = newIds.map((id: string) => {
-      const existing = oldList.find((p: MkDynamicFormValue) => p.model_id === id)
+      const existing = oldList.find((p: DynamicFormValue) => p.model_id === id)
       return existing || { model_id: id, model_params_setting: {} }
     })
     formValue.value.provider_list = newList
@@ -52,7 +52,7 @@ const selectedIds = computed({
     }
 
     // find new model then get it default value
-    const oldIds = oldList.map((p: MkDynamicFormValue) => p.model_id)
+    const oldIds = oldList.map((p: DynamicFormValue) => p.model_id)
     const addedIds = newIds.filter((id: string) => !oldIds.includes(id))
     addedIds.forEach((id: string) => {
       fetchDefaultParams(id)
@@ -61,27 +61,27 @@ const selectedIds = computed({
 })
 
 const selectedModelsOptions = computed(() => {
-  const ids = (formValue.value.provider_list || []).map((p: MkDynamicFormValue) => p.model_id)
-  const filtered = rawModelOptions.value.filter((m: MkDynamicFormValue) => ids.includes(m.id))
+  const ids = (formValue.value.provider_list || []).map((p: DynamicFormValue) => p.model_id)
+  const filtered = rawModelOptions.value.filter((m: DynamicFormValue) => ids.includes(m.id))
   return groupBy(filtered, 'provider')
 })
 
 function fetchDefaultParams(modelId: string) {
   if (!getModelParamsForm) return
-  getModelParamsForm(modelId).then((res: MkDynamicFormValue) => {
+  getModelParamsForm(modelId).then((res: DynamicFormValue) => {
     const formFields = res?.data || []
     const defaults = (res?.data || [])
-      .map((item: MkDynamicFormValue) => {
+      .map((item: DynamicFormValue) => {
         if (item.show_default_value === false) {
           return { [item.field]: undefined }
         } else {
           return { [item.field]: item.default_value }
         }
       })
-      .reduce((x: MkDynamicFormValue, y: MkDynamicFormValue) => ({ ...x, ...y }), {})
+      .reduce((x: DynamicFormValue, y: DynamicFormValue) => ({ ...x, ...y }), {})
     // update to model_params_setting
     const target = formValue.value.provider_list.find(
-      (p: MkDynamicFormValue) => p.model_id === modelId,
+      (p: DynamicFormValue) => p.model_id === modelId,
     )
     if (target) {
       target.model_params_setting = defaults
@@ -89,13 +89,13 @@ function fetchDefaultParams(modelId: string) {
     }
   })
 }
-const rawModelOptions = ref<MkDynamicFormValue[]>([])
-const groupedModelOptions = ref<Record<string, MkDynamicFormValue[]>>({})
+const rawModelOptions = ref<DynamicFormValue[]>([])
+const groupedModelOptions = ref<Record<string, DynamicFormValue[]>>({})
 
 const fetchModelByType = (type: string) => {
   if (!type || !getSelectModelList) return
 
-  getSelectModelList({ model_type: type }).then((res: MkDynamicFormValue) => {
+  getSelectModelList({ model_type: type }).then((res: DynamicFormValue) => {
     rawModelOptions.value = res?.data || []
 
     groupedModelOptions.value = groupBy(res?.data, 'provider')
@@ -115,14 +115,12 @@ const handleModelTypeChange = (val: string) => {
 }
 
 const getModelInfo = (modelId: string) => {
-  return rawModelOptions.value.find((item: MkDynamicFormValue) => item.id === modelId)
+  return rawModelOptions.value.find((item: DynamicFormValue) => item.id === modelId)
 }
 
 // default_value 赋值
 const getProviderItem = (modelId: string) => {
-  const found = formValue.value.provider_list.find(
-    (p: MkDynamicFormValue) => p.model_id === modelId,
-  )
+  const found = formValue.value.provider_list.find((p: DynamicFormValue) => p.model_id === modelId)
   if (found) {
     const rest = { ...found }
     delete rest.model_form_field
@@ -132,7 +130,7 @@ const getProviderItem = (modelId: string) => {
 }
 
 const getData = () => {
-  const providerList = (formValue.value.provider_list || []).map((p: MkDynamicFormValue) => {
+  const providerList = (formValue.value.provider_list || []).map((p: DynamicFormValue) => {
     const modelInfo = getModelInfo(p.model_id)
     return {
       model_id: p.model_id,
@@ -152,13 +150,13 @@ const getData = () => {
   }
 }
 
-const render = (form_data: MkDynamicFormValue) => {
-  formValue.value.model_type = form_data.model_type
-  formValue.value.provider_list = form_data.attrs?.provider_list || []
-  formValue.value.default_value = form_data.default_value || {}
+const render = (formData: DynamicFormValue) => {
+  formValue.value.model_type = formData.model_type
+  formValue.value.provider_list = formData.attrs?.provider_list || []
+  formValue.value.default_value = formData.default_value || {}
 
-  if (form_data.model_type) {
-    fetchModelByType(form_data.model_type)
+  if (formData.model_type) {
+    fetchModelByType(formData.model_type)
   }
 }
 

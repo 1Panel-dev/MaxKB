@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, reactive } from 'vue'
 import Knowledge from '../../items/knowledge/Knowledge.vue'
 import type { FormField } from '../../type'
 
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 
 const emit = defineEmits(['update:modelValue'])
@@ -14,7 +14,7 @@ const collapseData = reactive({
   optional_knowledge: true,
 })
 const formValue = computed({
-  set: (item: MkDynamicFormValue) => {
+  set: (item: DynamicFormValue) => {
     emit('update:modelValue', item)
   },
   get: () => {
@@ -23,11 +23,11 @@ const formValue = computed({
 })
 
 const formField = computed<FormField>(() => {
-  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as MkDynamicFormValue
+  return { attrs: { knowledge_list: formValue.value.knowledge_list } } as DynamicFormValue
 })
 
 const getData = () => {
-  const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: MkDynamicFormValue) => {
+  const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: DynamicFormValue) => {
     return {
       id: k.id,
       name: k.name,
@@ -45,16 +45,16 @@ const getData = () => {
   }
 }
 
-const render = (form_data: MkDynamicFormValue) => {
-  formValue.value.default_value = form_data.default_value || []
-  formValue.value.knowledge_list = form_data.attrs?.knowledge_list || []
+const render = (formData: DynamicFormValue) => {
+  formValue.value.default_value = formData.default_value || []
+  formValue.value.knowledge_list = formData.attrs?.knowledge_list || []
 }
 
 defineExpose({ getData, render })
 
 function removeKnowledge(id: string) {
   formValue.value.knowledge_list = formValue.value.knowledge_list.filter(
-    (k: MkDynamicFormValue) => k.id !== id,
+    (k: DynamicFormValue) => k.id !== id,
   )
   if (formValue.value.default_value) {
     formValue.value.default_value = formValue.value.default_value.filter(

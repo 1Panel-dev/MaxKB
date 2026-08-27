@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { VisibilityFieldOption } from '../../type'
 import { computed } from 'vue'
-import type { LeftOptions } from '../type'
 const props = defineProps<{
-  modelValue: Array<MkDynamicFormValue>
-  leftOptions?: Array<LeftOptions>
+  modelValue: string[]
+  leftOptions?: VisibilityFieldOption[]
 }>()
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -17,14 +16,14 @@ const data = computed({
     return props.modelValue
   },
 })
-const options = computed<Array<LeftOptions>>(() => props.leftOptions ?? [])
+const options = computed<VisibilityFieldOption[]>(() => props.leftOptions ?? [])
 
-const wheel = (e: MkDynamicFormValue) => {
-  if (e.ctrlKey === true) {
-    e.preventDefault()
+const wheel = (event: WheelEvent) => {
+  if (event.ctrlKey) {
+    event.preventDefault()
     return true
   } else {
-    e.stopPropagation()
+    event.stopPropagation()
     return true
   }
 }

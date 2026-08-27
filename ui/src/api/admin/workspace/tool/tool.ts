@@ -1,12 +1,6 @@
 import { del, getExportFile, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
-import type {
-  RequestParams,
-  ToolDebugPayload,
-  ToolItem,
-  ToolPayload,
-  ToolPylintIssue,
-} from '@/api/types'
+import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -15,7 +9,7 @@ const getPrefix = () => {
 }
 
 /** 获取工具分页列表。 */
-const getToolPage = (page: ParamsPage, query?: RequestParams) => {
+const getToolPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ToolItem>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
 }
 

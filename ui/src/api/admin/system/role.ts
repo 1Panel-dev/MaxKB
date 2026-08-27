@@ -2,7 +2,7 @@ import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
 import type {
   CreateRoleMembersRequest,
-  RequestParams,
+  Dict,
   RoleItem,
   RoleMember,
   RolePermissionModule,
@@ -27,12 +27,10 @@ const deleteRole = (roleId: string) => {
   return del<boolean>(`${prefix}/${roleId}`)
 }
 
-
 /** 获取指定角色的权限配置。 */
 const getRolePermissionList = (roleId: string) => {
   return get<RolePermissionModule[]>(`${prefix}/${roleId}/permission`)
 }
-
 
 /** 保存指定角色的权限配置。 */
 const postRolePermissions = (roleId: string, permissions: SaveRolePermissionRequest[]) => {
@@ -40,7 +38,7 @@ const postRolePermissions = (roleId: string, permissions: SaveRolePermissionRequ
 }
 
 /** 获取指定角色的成员分页列表。 */
-const getRoleMemberList = (roleId: string, page: ParamsPage, query?: RequestParams) => {
+const getRoleMemberList = (roleId: string, page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<RoleMember>>(
     `${prefix}/${roleId}/user_list/${page.currentPage}/${page.pageSize}`,
     query,

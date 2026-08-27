@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, onMounted, ref, useTemplateRef } from 'vue'
-import ModelSelect from '@/components/business/model-select/index.vue'
 import { groupBy, set } from 'lodash'
 import type { FormInstance } from 'element-plus'
+import ModelSelect from '@/components/business/model-select/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
 import type { BaseNodeModel } from '@logicflow/core'

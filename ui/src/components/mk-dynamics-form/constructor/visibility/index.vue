@@ -1,23 +1,22 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { randomId } from '@/utils/common'
-import type { VisibilityRules } from '../../type'
+import type { VisibilityConditionState, VisibilityFieldOption, VisibilityRules } from '../../type'
 import { inferFieldType, getAllowedOps, getFieldConfig } from './index'
 import { compareList } from '@/workflow-canvas/config/constants'
 import ConditionRow from './ConditionRow.vue'
-import type { LeftOptions } from '../type'
 
 defineOptions({ name: 'MkDynamicsFormVisibilityConstructor' })
 
 const props = defineProps<{
   initialValue?: VisibilityRules | null
-  leftOptions?: Array<LeftOptions>
+  leftOptions?: VisibilityFieldOption[]
 }>()
 
 const formData = ref({
   action: 'show' as 'show' | 'hide',
   condition: 'and' as 'and' | 'or',
-  conditions: [] as Array<MkDynamicFormValue>,
+  conditions: [] as VisibilityConditionState[],
 })
 
 function addCondition() {
@@ -31,6 +30,10 @@ function addCondition() {
 
 function removeCondition(idx: number) {
   formData.value.conditions.splice(idx, 1)
+}
+
+function updateCondition(index: number, condition: VisibilityConditionState) {
+  formData.value.conditions.splice(index, 1, condition)
 }
 
 function validate(): Promise<void> {
@@ -150,7 +153,8 @@ defineExpose({ getData, render, validate })
         <ConditionRow
           v-for="(cond, idx) in formData.conditions"
           :key="cond.id"
-          v-model="formData.conditions[idx]"
+          :model-value="cond"
+          @update:model-value="updateCondition(idx, $event)"
           :left-options="leftOptions"
           @delete="removeCondition(idx)"
         />

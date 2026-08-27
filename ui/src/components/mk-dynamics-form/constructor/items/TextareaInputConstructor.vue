@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { MkDynamicFormValue } from '../../type'
+import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, watch } from 'vue'
 const props = defineProps<{
-  modelValue: MkDynamicFormValue
+  modelValue: DynamicFormValue
 }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
@@ -57,12 +57,12 @@ const getData = () => {
     },
   }
 }
-const render = (form_data: MkDynamicFormValue) => {
-  const attrs = form_data.attrs || {}
+const render = (formData: DynamicFormValue) => {
+  const attrs = formData.attrs || {}
   formValue.value.minlength = attrs.minlength
   formValue.value.maxlength = attrs.maxlength
-  formValue.value.default_value = form_data.default_value
-  formValue.value.show_default_value = form_data.show_default_value
+  formValue.value.default_value = formData.default_value
+  formValue.value.show_default_value = formData.show_default_value
 }
 const rules = computed(() => [
   {
