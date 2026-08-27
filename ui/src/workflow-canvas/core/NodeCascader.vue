@@ -73,7 +73,7 @@ function refreshOptions(visible = true) {
 }
 
 function validate() {
-  if (selectedValue.value.length === 0) return Promise.reject('引用变量必填')
+  if (selectedValue.value.length === 0) return Promise.reject('请输入引用变量')
   if (selectedValue.value.length < 2) return Promise.reject('引用变量错误')
 
   const [nodeId, fieldValue] = selectedValue.value

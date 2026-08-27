@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { VisibilityFieldOption } from '../../type'
 import { computed } from 'vue'
+import type { VisibilityFieldOption } from '../../type'
+import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 const props = defineProps<{
   modelValue: string[]
   leftOptions?: VisibilityFieldOption[]
@@ -17,16 +18,6 @@ const data = computed({
   },
 })
 const options = computed<VisibilityFieldOption[]>(() => props.leftOptions ?? [])
-
-const wheel = (event: WheelEvent) => {
-  if (event.ctrlKey) {
-    event.preventDefault()
-    return true
-  } else {
-    event.stopPropagation()
-    return true
-  }
-}
 
 const validate = () => {
   if (!data.value || data.value.length === 0) {
@@ -53,7 +44,7 @@ defineExpose({ validate })
 
 <template>
   <el-cascader
-    @wheel="wheel"
+    @wheel="handleNodeWheel"
     :teleported="true"
     :options="options"
     v-bind="$attrs"
@@ -62,7 +53,8 @@ defineExpose({ validate })
     clearable
   >
     <template #default="{ data }">
-      <span class="flex align-center" @wheel="wheel">
+      <span class="flex align-center" @wheel="handleNodeWheel">
+        <!-- // TODO 不确定icon -->
         <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{
           data.label
         }}</span

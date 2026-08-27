@@ -183,7 +183,7 @@ onMounted(() => {
     </el-form-item>
 
     <el-form-item label="账号登录验证码设置" required>
-      <el-card shadow="never" class="bg-N100! w-full">
+      <div class="w-full rounded-md bg-N100 p-4">
         <div class="flex items-center gap-2">
           <span>登录失败</span>
           <el-input-number
@@ -218,10 +218,10 @@ onMounted(() => {
           />
           <span>分钟</span>
         </div>
-      </el-card>
+      </div>
     </el-form-item>
     <p class="mb-2">第三方用户默认角色分配</p>
-    <el-card shadow="never" class="bg-N100!">
+    <div class="w-full rounded-md bg-N100 p-4">
       <el-form-item label="角色" prop="role_id">
         <el-select
           v-model="form.role_id"
@@ -273,7 +273,7 @@ onMounted(() => {
           />
         </el-select>
       </el-form-item>
-    </el-card>
+    </div>
     <el-button class="mt-4" type="primary" @click="submit">保存</el-button>
   </el-form>
 </template>

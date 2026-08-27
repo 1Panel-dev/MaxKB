@@ -14,7 +14,7 @@ defineProps<{
       <template #content
         ><div style="max-width: 200px">{{ label.attrs.tooltip }}</div></template
       >
-      <MkIcon name="icon_warning_filled" class="app-warning-icon" style="flex-shrink: 0"></MkIcon>
+      <MkIcon name="icon_info_outlined"></MkIcon>
     </el-tooltip>
   </div>
 </template>

@@ -94,7 +94,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `login/LoginView.vue`                                                  | Admin 登录页面                         |
 | `login/ForgotPasswordView.vue`                                         | 忘记密码页面                           |
 | `model/ModelView.vue`                                                  | 工作空间模型目录与模型卡片页面         |
-| `system/SystemView.vue`                                                | System 模块通用占位页面                |
+             |
 | `system/identity/groups/UserGroupListView.vue`                         | 用户组列表页面                         |
 | `system/identity/resource-authorization/ResourceAuthorizationView.vue` | 工作空间用户组与用户的分类资源授权页面 |
 | `system/identity/roles/RoleListView.vue`                               | 角色列表页面                           |

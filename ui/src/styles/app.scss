@@ -169,6 +169,14 @@ h6 {
     margin-left: 4px;
   }
 }
+/*
+  隐藏自带星号
+*/
+.mk-hide-asterisk {
+  .el-form-item__label::after {
+    display: none;
+  }
+}
 
 // 资源的card grid布局
 .mk-resource-card-grid {

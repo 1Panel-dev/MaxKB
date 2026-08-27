@@ -28,7 +28,7 @@ const getData = () => {
     props_info: {
       rules: [
         {
-          message: formValue.value.label + ' ' + '不能为空',
+          message: `请输入 ${formValue.value.label}`,
           trigger: 'blur',
           required: formValue.value.required,
         },
@@ -68,7 +68,7 @@ const stepRules = [
         return false
       }
       if (!value) {
-        callback(new Error('步长值必填'))
+        callback(new Error('请输入步长值'))
         return false
       }
 
@@ -91,6 +91,7 @@ onBeforeMount(() => {
   <el-form-item label="是否带输入框" required prop="showInput" @click.prevent>
     <el-switch v-model="formValue.showInput" />
   </el-form-item>
+  <!-- // TODO 待调整 -->
   <el-form-item label="取值范围" required>
     <el-col :span="11" style="padding-left: 0">
       <el-form-item

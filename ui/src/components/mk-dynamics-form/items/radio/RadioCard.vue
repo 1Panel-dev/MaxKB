@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DynamicFormValue } from '../../type'
-import { computed, ref, inject } from 'vue'
+import { computed, inject } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { useFormDisabled, formItemContextKey } from 'element-plus'
 
@@ -18,26 +18,32 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
-const selected = (activeValue: string | number) => {
+const emit = defineEmits<{
+  change: [value: DynamicFormValue]
+  'update:modelValue': [value: DynamicFormValue]
+}>()
+
+const isOptionActive = (optionValue: DynamicFormValue) => {
+  if (props.modelValue === optionValue) return true
+
+  return (
+    props.modelValue !== undefined &&
+    props.modelValue !== null &&
+    optionValue !== undefined &&
+    optionValue !== null &&
+    String(props.modelValue) === String(optionValue)
+  )
+}
+
+const selectOption = (activeValue: string | number) => {
+  if (inputDisabled.value) return
+
   emit('update:modelValue', activeValue)
+  emit('change', activeValue)
   if (elFormItem?.validate) {
     elFormItem.validate('change')
   }
 }
-const emit = defineEmits(['update:modelValue', 'change'])
-const width = ref<number>()
-const radioContentStyle = computed(() => {
-  if (width.value) {
-    if (width.value < 350) {
-      return { '--maxkb-radio-card-width': '316px' }
-    } else if (width.value > 770) {
-      return { '--maxkb-radio-card-width': '378px' }
-    } else {
-      return { '--maxkb-radio-card-width': '100%' }
-    }
-  }
-  return {}
-})
 
 const textField = computed(() => {
   return props.formField.text_field ? props.formField.text_field : 'key'
@@ -53,55 +59,18 @@ const options = computed(() => {
 </script>
 
 <template>
-  <div class="radio-card" :style="radioContentStyle">
-    <el-row :gutter="12" class="w-full">
-      <template v-for="(item, index) in options" :key="index">
-        <el-col :xs="24" :sm="24" :md="24" :lg="12" :xl="12">
-          <el-card
-            :key="item.value"
-            class="item break-all"
-            shadow="never"
-            style="--el-card-padding: 12px 16px"
-            :class="[
-              inputDisabled ? 'is-disabled' : '',
-              modelValue === item[valueField] ? 'active' : '',
-            ]"
-            @click="inputDisabled ? () => {} : selected(item[valueField])"
-            :innerHTML="item[textField] ? item[textField] : '\u200D'"
-          >
-          </el-card>
-        </el-col>
-      </template>
-    </el-row>
+  <div class="grid w-full grid-cols-1 gap-2 lg:grid-cols-2">
+    <div
+      v-for="(item, index) in options"
+      :key="item[valueField] ?? index"
+      class="cursor-pointer break-all rounded-md border px-4 py-[3px] text-center"
+      :class="[
+        inputDisabled ? 'cursor-not-allowed! bg-N100! text-N600!' : '',
+        isOptionActive(item[valueField]) ? 'border-primary! text-primary!' : '',
+      ]"
+      @click="selectOption(item[valueField])"
+    >
+      <span v-html="item[textField] || '\u200D'"></span>
+    </div>
   </div>
 </template>
-<style lang="scss" scoped>
-.radio-card {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
-  width: 100%;
-
-  .is-disabled {
-    border: 1px solid var(--el-card-border-color);
-    background-color: var(--el-fill-color-light);
-    color: var(--el-text-color-placeholder);
-    cursor: not-allowed;
-    &:hover {
-      cursor: not-allowed;
-    }
-  }
-  .active {
-    border: 1px solid var(--el-color-primary);
-    color: var(--el-color-primary);
-  }
-  .item {
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: var(--maxkb-radio-card-width, 100%);
-    margin: 4px;
-  }
-}
-</style>

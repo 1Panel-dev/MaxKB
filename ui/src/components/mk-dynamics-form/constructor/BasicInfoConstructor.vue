@@ -44,10 +44,9 @@ const ruleFormRef = ref<FormInstance>()
 const componentFormRef = ref<DynamicFormConstructorExpose>()
 
 const rules: FormRules<DynamicFormConstructorState> = {
-  label: [{ required: true, message: '显示名称 为必填属性' }],
-  field: [{ required: true, message: '参数 为必填属性' }],
-  required: [{ required: true, message: '是否必填 为必填属性' }],
-  input_type: [{ required: true, message: '组建类型 为必填属性' }],
+  label: [{ required: true, message: '请输入显示名称' }],
+  field: [{ required: true, message: '请输入参数' }],
+  input_type: [{ required: true, message: '请选择组件类型' }],
 }
 
 const validate = () => (ruleFormRef.value ? ruleFormRef.value.validate() : Promise.resolve())
@@ -102,7 +101,7 @@ const updateForm = (value: DynamicFormConstructorState) => {
 defineExpose({ validate, getData, render })
 </script>
 <template>
-  <el-form @submit.prevent ref="ruleFormRef" class="mb-24" label-width="auto" :model="form">
+  <el-form @submit.prevent ref="ruleFormRef" label-width="auto" :model="form">
     <el-form-item label="参数" :required="true" prop="field" :rules="rules.field">
       <el-input v-model="form.field" :maxlength="64" placeholder="请输入参数" show-word-limit />
     </el-form-item>
@@ -117,13 +116,7 @@ defineExpose({ validate, getData, render })
         placeholder="请输入参数提示说明"
       />
     </el-form-item>
-    <el-form-item
-      label="是否必填"
-      :required="true"
-      prop="required"
-      :rules="rules.required"
-      @click.prevent
-    >
+    <el-form-item label="是否必填" prop="required" @click.prevent>
       <el-switch v-model="form.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
     <el-form-item label="组件类型" :required="true" prop="input_type" :rules="rules.input_type">

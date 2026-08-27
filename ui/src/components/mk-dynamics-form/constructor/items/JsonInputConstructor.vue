@@ -75,7 +75,7 @@ const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
     if (!(Array.isArray(value) && value.length > 1)) {
-      callback('引用变量必填')
+      callback('请输入引用变量')
     }
 
     return true
@@ -99,30 +99,20 @@ onMounted(() => {
 </script>
 
 <template>
-  <el-form-item v-if="getModel">
-    <template #label>
-      <div class="flex-between">赋值方式</div>
-    </template>
+  <el-form-item v-if="getModel" label="赋值方式">
+    <!-- // TODO 赋值方式待调整 -->
+    <el-radio-group v-model="formValue.default_value_assignment_method">
+      <el-radio :value="item.value" v-for="(item, index) in assignmentMethodOptions" :key="index">
+        <span class="flex align-center">
+          {{ item.label }}
 
-    <el-row class="w-full">
-      <el-radio-group v-model="formValue.default_value_assignment_method">
-        <el-radio
-          :value="item.value"
-          size="large"
-          v-for="(item, index) in assignmentMethodOptions"
-          :key="index"
-        >
-          <span class="flex align-center">
-            {{ item.label }}
-
-            <el-tooltip effect="dark" placement="right" v-if="item.value === 'ref_variables'">
-              <template #content> 变量的值必须符合: JSON 格式 </template>
-              <MkIcon name="icon_warning_filled" class="app-warning-icon ml-4"></MkIcon>
-            </el-tooltip>
-          </span>
-        </el-radio>
-      </el-radio-group>
-    </el-row>
+          <el-tooltip placement="right" v-if="item.value === 'ref_variables'">
+            <template #content> 变量的值必须符合: JSON 格式 </template>
+            <MkIcon name="icon_info_outlined"></MkIcon>
+          </el-tooltip>
+        </span>
+      </el-radio>
+    </el-radio-group>
   </el-form-item>
   <el-form-item
     v-if="formValue.default_value_assignment_method === 'ref_variables'"
@@ -140,26 +130,20 @@ onMounted(() => {
   </el-form-item>
 
   <el-form-item
-    class="defaultValueItem"
-    label="默认值"
+    class="mk-hide-asterisk"
     :required="formValue.required"
     v-if="formValue.default_value_assignment_method === 'custom'"
     prop="default_value"
     :rules="[defaultValueRule]"
   >
-    <div class="defaultValueCheckbox">
-      <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
-    </div>
+    <template #label>
+      <div class="flex-between">
+        <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
+        <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
+      </div>
+    </template>
     <JsonInput ref="jsonInputRef" v-model="formValue.default_value"> </JsonInput>
   </el-form-item>
 </template>
-<style lang="scss" scoped>
-.defaultValueItem {
-  position: relative;
-  .defaultValueCheckbox {
-    position: absolute;
-    right: 0;
-    top: -35px;
-  }
-}
-</style>
+
+<style lang="scss" scoped></style>
