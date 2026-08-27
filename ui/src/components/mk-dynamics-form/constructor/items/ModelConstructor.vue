@@ -90,15 +90,12 @@ function fetchDefaultParams(modelId: string) {
   })
 }
 const rawModelOptions = ref<DynamicFormValue[]>([])
-const groupedModelOptions = ref<Record<string, DynamicFormValue[]>>({})
+const groupedModelOptions = ref<Record<string, any[]>>({})
 
 const fetchModelByType = (type: string) => {
   if (!type || !getSelectModelList) return
-
   getSelectModelList({ model_type: type }).then((res: DynamicFormValue) => {
-    rawModelOptions.value = res?.data || []
-
-    groupedModelOptions.value = groupBy(res?.data, 'provider')
+    rawModelOptions.value = res
   })
 }
 
@@ -201,7 +198,8 @@ defineExpose({ getData, render })
         multiple
         v-model="selectedIds"
         placeholder="请选择模型"
-        :options="groupedModelOptions"
+        :options="rawModelOptions"
+        :provider-options="providerOptions"
         :model-type="formValue.model_type"
       >
       </ModelSelect>

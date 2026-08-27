@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, provide } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Dict } from '@/api/types'
 import {
@@ -10,9 +10,11 @@ import {
   type FormField,
   type VisibilityFieldOption,
 } from '@/components/mk-dynamics-form'
+import modelAPI from '@/api/admin/workspace/model/model'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
-
+provide('getSelectModelList', modelAPI.getModelList)
+provide('getModelParamsForm', modelAPI.getModelParamsForm)
 const constructorRef = ref<InstanceType<typeof MkDynamicsFormConstructor>>()
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
 
