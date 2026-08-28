@@ -1,4 +1,5 @@
 import { createApp, reactive, type Component } from 'vue'
+import { cloneDeep } from 'lodash'
 import {
   h as createLogicFlowElement,
   HtmlNode,
@@ -42,7 +43,7 @@ export class WorkflowNodeView extends HtmlNode {
     const nodeModel = props.model as unknown as WorkflowNodeModel
     const definition = BasicComponentsNode[nodeModel.type as WorkflowNodeType]
     if (definition && !nodeModel.properties.config) {
-      nodeModel.properties.config = structuredClone(definition.properties.config ?? {})
+      nodeModel.properties.config = cloneDeep(definition.properties.config ?? {})
     }
     nodeModel.properties.stepName = this.getUniqueNodeName(
       props.graphModel,

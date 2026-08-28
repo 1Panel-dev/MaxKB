@@ -41,7 +41,7 @@ function handleDeleteInputField(index: number) {
         <span>添加</span>
       </el-button>
     </div>
-    <el-table :data="inputFields">
+    <MkTable :data="inputFields" size="small">
       <el-table-column label="参数" prop="name" min-width="140" />
       <el-table-column label="数据类型" prop="type" min-width="100">
         <template #default="{ row }">
@@ -68,7 +68,7 @@ function handleDeleteInputField(index: number) {
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </MkTable>
     <InputFieldDialog ref="inputFieldDialogRef" @refresh="handleAddInputField" />
   </section>
 </template>

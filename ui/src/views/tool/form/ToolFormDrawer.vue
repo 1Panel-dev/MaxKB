@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ToolInitField, ToolInputField, ToolItem } from '@/api/types'
 import ToolApi from '@/api/admin/workspace/tool/tool'
@@ -84,7 +85,7 @@ function handleOpenDebug() {
 function open(tool?: ToolItem) {
   if (tool) {
     editId.value = tool.id
-    Object.assign(toolForm, structuredClone(tool))
+    Object.assign(toolForm, cloneDeep(tool))
   }
   visible.value = true
   originalForm.value = JSON.stringify(toolForm)

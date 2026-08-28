@@ -44,7 +44,7 @@ export interface DynamicFormField {
   attrs?: Record<string, unknown>
   default_value?: unknown
   field: string
-  input_type?: string
+  input_type: string
   label: string | DynamicFormLabel
   option_list?: Record<string, unknown>[]
   required?: boolean
@@ -58,6 +58,7 @@ export interface DynamicFormLabel {
     tooltip?: string
     [key: string]: unknown
   }
+  input_type: string
   label: string
   type?: string
 }

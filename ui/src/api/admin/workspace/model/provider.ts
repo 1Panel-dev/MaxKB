@@ -1,5 +1,10 @@
 import { get } from '../../core/request'
-import type { BaseModelOption, DynamicFormField, ModelProviderItem, ModelTypeOption } from '@/api/types'
+import type {
+  BaseModelOption,
+  DynamicFormField,
+  ModelProviderItem,
+  ModelTypeOption,
+} from '@/api/types'
 
 const prefix = '/provider'
 
@@ -22,6 +27,16 @@ const getModelCreateForm = (provider: string, modelType: string, modelName: stri
   })
 }
 
+/** 获取基础模型的动态参数表单。 */
+const getBaseModelParamsForm = (provider: string, modelType: string, modelName: string) => {
+  return get<DynamicFormField[]>(`${prefix}/model_params_form`, {
+    model_name: modelName,
+    model_type: modelType,
+    provider,
+  })
+}
+
+
 /** 获取供应商支持的模型类型。 */
 const getModelTypeList = (provider: string) => {
   return get<ModelTypeOption[]>(`${prefix}/model_type_list`, { provider })
@@ -30,15 +45,6 @@ const getModelTypeList = (provider: string) => {
 /** 获取供应商指定类型下的基础模型。 */
 const getBaseModelList = (provider: string, modelType: string) => {
   return get<BaseModelOption[]>(`${prefix}/model_list`, {
-    model_type: modelType,
-    provider,
-  })
-}
-
-/** 获取基础模型的参数表单。 */
-const getBaseModelParamsForm = (provider: string, modelType: string, modelName: string) => {
-  return get<DynamicFormField[]>(`${prefix}/model_params_form`, {
-    model_name: modelName,
     model_type: modelType,
     provider,
   })

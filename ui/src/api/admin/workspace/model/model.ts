@@ -1,5 +1,5 @@
 import { del, get, post, put } from '../../core/request'
-import type { Dict, ModelPayload, ModelItem } from '@/api/types'
+import type { Dict, DynamicFormField, ModelPayload, ModelItem } from '@/api/types'
 import { getWorkspaceId } from '@/utils/workspace-context'
 
 const getPrefix = () => {
@@ -36,8 +36,15 @@ const getModelMeta = (modelId: string) => {
 const deleteModel = (modelId: string) => {
   return del<undefined, boolean>(`${getPrefix()}/${modelId}`)
 }
+
+/** 获取模型参数表单。 */
 const getModelParamsForm = (modelId: string) => {
-  return get<ModelItem>(`${getPrefix()}/${modelId}/model_params_form`)
+  return get<DynamicFormField[]>(`${getPrefix()}/${modelId}/model_params_form`)
+}
+
+/** 保存模型参数表单。 */
+const putModelParamsForm = (modelId: string, payload: DynamicFormField[]) => {
+  return put<DynamicFormField[], boolean>(`${getPrefix()}/${modelId}/model_params_form`, payload)
 }
 
 /** 暂停本地模型下载。 */
@@ -50,8 +57,9 @@ export default {
   getModelDetail,
   getModelList,
   getModelMeta,
+  getModelParamsForm,
   postModel,
   putModel,
+  putModelParamsForm,
   putPauseModelDownload,
-  getModelParamsForm,
 }

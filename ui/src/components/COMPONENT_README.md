@@ -176,7 +176,8 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 带标题触发器和展开过渡动画的内容折叠组件。组件内部维护展开状态，`default-expanded` 设置初始
 状态且默认为 `true`；点击标题行会切换状态，不向外回传展开状态。默认插槽放置折叠内容，标题
 默认使用 `title` 属性，也可通过 `label` 插槽自定义；标题触发层可通过 `trigger-class` 和
-`trigger-style` 自定义 class 和行内样式。
+`trigger-style` 自定义 class 和行内样式。指示图标默认显示在标题前，通过
+`indicator-position="after"` 可改为显示在标题后的线性上、下箭头。
 
 ```vue
 <MkCollapse title="系统管理员">
@@ -188,6 +189,11 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
     <strong>自定义标题</strong>
   </template>
   <div>折叠内容</div>
+</MkCollapse>
+
+<MkCollapse indicator-position="after">
+  <template #label><h6>高级设置</h6></template>
+  <div>高级设置内容</div>
 </MkCollapse>
 ```
 
@@ -343,16 +349,18 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 ### MkViewLayout
 
 路由页面的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title` Prop，未传入
-时读取当前路由的 `meta.title`。`aside` 和默认作用域插槽都提供 `title` 与对应区域的 `Header`
-包装组件；插槽未渲染 `Header` 时，组件会自动显示当前标题，页面需要添加操作区或自定义标题时
-再显式渲染 `Header`。Header 固定在主内容区顶部，其余默认插槽内容由组件统一放入
+时读取当前路由的 `meta.title`。`aside` 作用域插槽提供 `title` 和对应区域的 `Header` 包装组件，
+默认作用域插槽另外提供主内容区的 `Footer` 包装组件；插槽未渲染 `Header` 时，组件会自动显示当前
+标题，页面需要添加操作区或自定义标题时再显式渲染 `Header`。Header 固定在主内容区顶部，其余
+默认插槽内容由组件统一放入
 `el-scrollbar`，页面不要再为整个主内容区嵌套滚动容器；Tabs、树或其他局部区域需要独立滚动时
-仍可自行使用 `el-scrollbar`。页面可以在同一个插槽中组织标题、内容和空状态，并只写一次业务
-状态判断。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。页面加载状态通过
-`loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。默认插槽没有
-渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。`collapsible` 默认为
-`false`；传入后，展开状态仅在鼠标移入侧栏或焦点进入侧栏时显示收起按钮，收起状态始终显示展开
-按钮。收起时释放侧栏宽度，页面不需要自行维护折叠状态。
+仍可自行使用 `el-scrollbar`。渲染 `Footer` 后固定在主内容区底部，不占用左侧栏空间，适合放置页面
+或全高 Drawer 右侧内容的操作按钮。页面可以在同一个插槽中组织标题、内容、底栏和空状态，并只写
+一次业务状态判断。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。
+页面加载状态通过 `loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。
+默认插槽没有渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。`collapsible`
+默认为 `false`；传入后，展开状态仅在鼠标移入侧栏或焦点进入侧栏时显示收起按钮，收起状态始终显示
+展开按钮。收起时释放侧栏宽度，页面不需要自行维护折叠状态。
 
 主内容区固定保留 `px-6` 水平留白。内置滚动容器会抵消两侧留白，再为滚动内容补回 `24px`
 水平间距，使滚动条贴齐主区域右边界，并允许 `MkTable` 的底部操作栏延伸至完整主区域宽度。
@@ -371,12 +379,16 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
     </component>
     左侧列表
   </template>
-  <template #default="{ title, Header }">
+  <template #default="{ title, Footer, Header }">
     <template v-if="selectedItem">
       <component :is="Header">
         <h4>{{ title }}</h4>
       </component>
       右侧内容
+      <component :is="Footer">
+        <el-button>取消</el-button>
+        <el-button type="primary">保存</el-button>
+      </component>
     </template>
     <MkEmpty v-else />
   </template>
@@ -493,8 +505,10 @@ const paginationConfig = ref({
 `maxTableHeight` 表示窗口中除表格外需要扣除的高度，默认为 `250`；组件会在窗口尺寸变化时
 重新计算 `max-height`。传入 `resizable` 后启用列宽拖拽，并隐藏为拖拽借用的原生边框视觉。
 `resizable` 采用白名单式启用：只有需求明确指定的页面级表格才能开启；未明确指定的表格，以及
-Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启。需要显示 Element Plus 原生边框
-时直接使用 `el-table`。
+Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启。
+
+传入 `size="small"` 时，组件会为内部 `el-table` 添加 `small` class；组件仅提供该样式钩子，
+不内置对应样式。
 
 表头需要多选筛选时使用 `MkTableFilter`。`label` 设置表头文案，`options` 接收
 `OptionItem<string>[]`，`v-model` 绑定已选值；初始不选择任何选项，确认或重置后通过 `change`

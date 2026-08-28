@@ -155,9 +155,11 @@
 }
 .el-button + .el-button {
   &.is-link,
-  &.is-text,
   &.is-circle {
     margin-left: 0;
+  }
+  &.is-text {
+    margin-left: 4px;
   }
 }
 
@@ -260,8 +262,9 @@
 .el-dialog {
   --el-dialog-padding-primary: 24px;
   --el-dialog-title-font-size: 16px;
+  padding: 0;
   &__header {
-    padding-bottom: 0;
+    padding: var(--el-dialog-padding-primary);
   }
   &__headerbtn {
     right: 20px;
@@ -285,12 +288,10 @@
     font-weight: 500;
   }
   &__body {
-    padding-top: var(--el-dialog-padding-primary);
-    padding-bottom: var(--el-dialog-padding-primary);
     color: var(--el-text-color-primary);
   }
   &__footer {
-    padding: 0;
+    padding: var(--el-dialog-padding-primary);
   }
 }
 
@@ -826,6 +827,11 @@
   .cell {
     line-height: var(--mk-line-height-base);
     padding: calc(var(--spacing) * 3);
+  }
+  &.small {
+    .cell {
+      padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+    }
   }
 
   [class*='el-table__row--level'] .el-table__expand-icon {

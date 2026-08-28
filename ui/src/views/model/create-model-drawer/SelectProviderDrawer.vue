@@ -28,11 +28,16 @@ function open() {
 
 /* 供应商 */
 function loadModelProviders() {
-  return ProviderApi.getProviderList().then((providers) => {
-    providerOptions.value = [...providers].sort((left, right) =>
-      left.name.localeCompare(right.name),
-    )
-  })
+  loading.value = true
+  return ProviderApi.getProviderList()
+    .then((providers) => {
+      providerOptions.value = [...providers].sort((left, right) =>
+        left.name.localeCompare(right.name),
+      )
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 function handleProviderSelect(provider: ModelProviderItem) {
@@ -40,19 +45,19 @@ function handleProviderSelect(provider: ModelProviderItem) {
   emit('select', provider)
 }
 
-function handleModelTypeChange() {
-  // if (value === 'all') {
-  //   providerOptions.value = props.providers
-  //   return
-  // }
-  // loading.value = true
-  // ProviderApi.getProviderListByModelType(value)
-  //   .then((providers) => {
-  //     providerOptions.value = providers
-  //   })
-  //   .finally(() => {
-  //     loading.value = false
-  //   })
+function handleModelTypeChange(value: string) {
+  if (value === 'all') {
+    loadModelProviders()
+    return
+  }
+  loading.value = true
+  ProviderApi.getProviderListByModelType(value)
+    .then((providers) => {
+      providerOptions.value = providers
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 defineExpose({ open })
@@ -83,19 +88,20 @@ defineExpose({ open })
           />
         </el-select>
       </div>
+      <div v-loading="loading">
+        <div class="grid grid-cols-2 gap-4">
+          <template v-for="provider in providerOptions" :key="provider.provider">
+            <el-card shadow="hover" @click="handleProviderSelect(provider)">
+              <div class="flex">
+                <span class="h-6 w-6 shrink-0" :innerHTML="provider.icon" />
+                <span class="ml-3 font-medium">{{ provider.name }}</span>
+              </div>
+            </el-card>
+          </template>
+        </div>
 
-      <div v-loading="loading" class="grid grid-cols-2 gap-4">
-        <template v-for="provider in providerOptions" :key="provider.provider">
-          <el-card shadow="hover" @click="handleProviderSelect(provider)">
-            <div class="flex">
-              <span class="h-6 w-6 shrink-0" :innerHTML="provider.icon" />
-              <span class="ml-3 font-medium">{{ provider.name }}</span>
-            </div>
-          </el-card>
-        </template>
+        <MkEmpty v-if="!providerOptions.length" class="mt-24" />
       </div>
-
-      <MkEmpty v-if="!providerOptions.length" class="mt-24" />
     </div>
   </MkDrawer>
 </template>

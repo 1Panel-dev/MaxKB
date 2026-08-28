@@ -236,7 +236,7 @@ onMounted(() => loadSystemUsers())
                 />
               </span>
               <el-divider direction="vertical" />
-              <div class="flex gap-1">
+              <div class="flex">
                 <el-tooltip content="编辑" placement="top">
                   <el-button type="primary" text @click.stop="handleOpenUserFormDrawer(row)">
                     <mk-icon name="icon_edit_outlined"></mk-icon>

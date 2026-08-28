@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { inject, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
-
+import { cloneDeep } from 'lodash'
 import LogicFlow, { type GraphModel } from '@logicflow/core'
 import '@logicflow/core/dist/index.css'
 import { SelectionSelect } from '@logicflow/extension'
@@ -133,7 +133,7 @@ function onmousedown(shapeItem: ShapeItem) {
   if (shapeItem.type) {
     lf.value.dnd.startDrag({
       type: shapeItem.type,
-      properties: structuredClone(shapeItem.properties ?? {}),
+      properties: cloneDeep(shapeItem.properties ?? {}),
     })
   }
   shapeItem.callback?.(lf.value)
@@ -149,7 +149,7 @@ function addNode(shapeItem: ShapeItem) {
   )
   const newNode = lf.value.graphModel.addNode({
     type: shapeItem.type as string,
-    properties: structuredClone(shapeItem.properties ?? {}),
+    properties: cloneDeep(shapeItem.properties ?? {}),
     x: canvasOverlayPosition.x,
     y: canvasOverlayPosition.y,
   })

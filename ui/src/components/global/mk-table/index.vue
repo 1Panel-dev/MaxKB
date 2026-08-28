@@ -19,6 +19,7 @@ const props = withDefaults(
     maxTableHeight?: number
     paginationConfig?: PaginationConfig
     resizable?: boolean // 非指定表格禁止开启
+    size?: 'small'
   }>(),
   {
     data: () => [],
@@ -109,7 +110,10 @@ defineExpose({ clearSelection, tableRef })
   <div class="mk-table relative flex w-full min-h-0 flex-1 flex-col">
     <el-table
       ref="tableRef"
-      :class="{ 'mk-table__resizable--borderless': props.resizable }"
+      :class="{
+        'mk-table__resizable--borderless': props.resizable,
+        small: props.size === 'small',
+      }"
       :data="props.data"
       :max-height="tableHeight"
       row-key="id"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import { Back } from '@element-plus/icons-vue'
 import type { ToolDebugPayload, ToolInitField, ToolPayload } from '@/api/types'
@@ -71,8 +72,8 @@ function resetData() {
 function open(tool: ToolPayload) {
   resetData()
   debugForm.code = tool.code ?? ''
-  debugForm.input_field_list = structuredClone(tool.input_field_list ?? [])
-  debugForm.init_field_list = structuredClone(tool.init_field_list ?? [])
+  debugForm.input_field_list = cloneDeep(tool.input_field_list ?? [])
+  debugForm.init_field_list = cloneDeep(tool.init_field_list ?? [])
   const savedInitParams =
     typeof tool.init_params === 'object' && tool.init_params ? tool.init_params : {}
   debugForm.init_params = {
@@ -108,7 +109,7 @@ function handleRun() {
 
     loading.value = true
     showResult.value = false
-    ToolApi.postToolDebug(structuredClone(debugForm))
+    ToolApi.postToolDebug(cloneDeep(debugForm))
       .then((result) => {
         debugSucceeded.value = true
         debugResult.value = result
