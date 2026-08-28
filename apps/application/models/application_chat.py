@@ -65,9 +65,11 @@ class VoteReasonChoices(models.TextChoices):
     INCOMPLETE = 'incomplete', '内容不完善'
     OTHER = 'other', '其他'
 
+
 class ShareLinkType(models.TextChoices):
     PUBLIC = "PUBLIC", 'public'
     PRIVATE = "PRIVATE", 'private'
+
 
 class ChatSourceChoices(models.TextChoices):
     ONLINE = "ONLINE", "线上使用"
@@ -95,7 +97,7 @@ class ChatRecord(AppModelMixin):
     problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
     answer_text_list = ArrayField(verbose_name="改进标注列表",
-                                  base_field=models.JSONField()
+                                  base_field=models.JSONField(encoder=SystemEncoder)
                                   , default=list)
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
@@ -108,6 +110,11 @@ class ChatRecord(AppModelMixin):
     index = models.IntegerField(verbose_name="对话下标")
     source = models.JSONField(verbose_name="来源", default=dict)
     ip_address = models.CharField(max_length=128, verbose_name="ip地址", default='')
+
+    def save(self, *args, **kwargs):
+        self.problem_text = self.problem_text.replace('\\u0000', '')
+        self.answer_text = self.answer_text.replace('\\u0000', '')
+        return super().save(*args, **kwargs)
 
     def get_human_message(self):
         if 'problem_padding' in self.details:
@@ -143,10 +150,11 @@ class ApplicationChatUserStats(AppModelMixin):
             models.Index(fields=['application_id', 'chat_user_id']),
         ]
 
+
 class ChatShareLink(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-    application = models.ForeignKey(Application,on_delete=models.CASCADE)
+    application = models.ForeignKey(Application, on_delete=models.CASCADE)
     share_type = models.CharField(max_length=20, choices=ShareLinkType.choices, default=ShareLinkType.PUBLIC)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, db_constraint=False, blank=True, null=True)
     chat_record_ids = ArrayField(base_field=models.UUIDField(max_length=128))
@@ -155,11 +163,10 @@ class ChatShareLink(AppModelMixin):
         db_table = "application_chat_share_link"
 
 
-
 class ApplicationLongTermMemory(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     application = models.ForeignKey(Application, on_delete=models.CASCADE, db_constraint=False, verbose_name="所属应用")
-    chat_user_id = models.CharField( max_length=128, verbose_name="对话用户id", db_index=True)
+    chat_user_id = models.CharField(max_length=128, verbose_name="对话用户id", db_index=True)
     memory = models.TextField(verbose_name="长期记忆内容", default="")
 
     class Meta:
