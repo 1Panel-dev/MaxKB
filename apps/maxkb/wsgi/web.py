@@ -7,6 +7,7 @@
     @desc:
 """
 import builtins
+import csv
 import os
 import sys
 
@@ -33,6 +34,7 @@ builtins.__import__ = TorchBlocker()
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'maxkb.settings')
 os.environ['TIKTOKEN_CACHE_DIR'] = '/opt/maxkb-app/model/tokenizer/openai-tiktoken-cl100k-base'
+csv.field_size_limit(sys.maxsize)
 application = get_wsgi_application()
 
 
