@@ -10,7 +10,7 @@ class TencentVision(MaxKBBaseModel, BaseChatOpenAI):
         optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return TencentVision(
             model_name=model_name,
-            openai_api_base=model_credential.get("api_base") or "https://api.hunyuan.cloud.tencent.com/v1",
+            openai_api_base=model_credential.get("api_base") or "https://tokenhub.tencentmaas.com/v1",
             openai_api_key=model_credential.get("api_key"),
             # stream_options={"include_usage": True},
             streaming=True,

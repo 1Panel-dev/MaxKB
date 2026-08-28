@@ -1,90 +1,79 @@
 # coding=utf-8
 
-import json
-from typing import Dict
+import traceback
+from typing import Dict, Optional
 
+import requests
 from django.utils.translation import gettext as _
-from tencentcloud.common import credential
-from tencentcloud.common.exception.tencent_cloud_sdk_exception import TencentCloudSDKException
-from tencentcloud.common.profile.client_profile import ClientProfile
-from tencentcloud.common.profile.http_profile import HttpProfile
-from tencentcloud.hunyuan.v20230901 import hunyuan_client, models
 
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import MaxKBBaseModel
 from models_provider.impl.base_tti import BaseTextToImage
-from models_provider.impl.tencent_model_provider.model.hunyuan import ChatHunyuan
+
+
+DEFAULT_WAND_IMAGE_BASE_URL = "https://tokenhub.tencentmaas.com/v1/wand/hunyuan-image/v3-generation"
 
 
 class TencentTextToImageModel(MaxKBBaseModel, BaseTextToImage):
-    hunyuan_secret_id: str
-    hunyuan_secret_key: str
+    api_key: str
     model: str
     params: dict
+    base_url: Optional[str] = DEFAULT_WAND_IMAGE_BASE_URL
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.api_key = kwargs.get("api_key")
+        self.model = kwargs.get("model")
+        self.params = kwargs.get("params") or {}
+        self.base_url = kwargs.get("base_url") or DEFAULT_WAND_IMAGE_BASE_URL
 
     @staticmethod
     def is_cache_model():
         return False
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.hunyuan_secret_id = kwargs.get("hunyuan_secret_id")
-        self.hunyuan_secret_key = kwargs.get("hunyuan_secret_key")
-        self.model = kwargs.get("model_name")
-        self.params = kwargs.get("params")
-
     @staticmethod
     def new_instance(
         model_type: str, model_name: str, model_credential: Dict[str, object], **model_kwargs
     ) -> "TencentTextToImageModel":
-        optional_params = {"params": {"Style": "201", "Resolution": "768:768"}}
+        optional_params = {"params": {"size": "1024x1024"}}
         for key, value in model_kwargs.items():
             if key not in ["model_id", "use_local", "streaming"]:
                 optional_params["params"][key] = value
-        return TencentTextToImageModel(
-            model=model_name,
-            hunyuan_secret_id=model_credential.get("hunyuan_secret_id"),
-            hunyuan_secret_key=model_credential.get("hunyuan_secret_key"),
+        instance_kwargs = {
+            "api_key": model_credential.get("api_key"),
+            "model": model_name,
+            "params": optional_params["params"],
             **optional_params,
-        )
+        }
+        base_url = model_credential.get("base_url")
+        if base_url:
+            instance_kwargs["base_url"] = base_url
+        return TencentTextToImageModel(**instance_kwargs)
 
     def check_auth(self):
-        chat = ChatHunyuan(
-            hunyuan_app_id="111111",
-            hunyuan_secret_id=self.hunyuan_secret_id,
-            hunyuan_secret_key=self.hunyuan_secret_key,
-            model="hunyuan-standard",
-        )
-        res = chat.invoke(_("Hello"))
-        # print(res)
+        self.generate_image(_("Hello"), None)
 
     def generate_image(self, prompt: str, negative_prompt: str = None):
         try:
-            # 实例化一个认证对象，入参需要传入腾讯云账户 SecretId 和 SecretKey，此处还需注意密钥对的保密
-            # 代码泄露可能会导致 SecretId 和 SecretKey 泄露，并威胁账号下所有资源的安全性。以下代码示例仅供参考，建议采用更安全的方式来使用密钥，请参见：https://cloud.tencent.com/document/product/1278/85305
-            # 密钥可前往官网控制台 https://console.cloud.tencent.com/cam/capi 进行获取
-            cred = credential.Credential(self.hunyuan_secret_id, self.hunyuan_secret_key)
-            # 实例化一个http选项，可选的，没有特殊需求可以跳过
-            httpProfile = HttpProfile()
-            httpProfile.endpoint = "hunyuan.tencentcloudapi.com"
-
-            # 实例化一个client选项，可选的，没有特殊需求可以跳过
-            clientProfile = ClientProfile()
-            clientProfile.httpProfile = httpProfile
-            # 实例化要请求产品的client对象,clientProfile是可选的
-            client = hunyuan_client.HunyuanClient(cred, "ap-guangzhou", clientProfile)
-
-            # 实例化一个请求对象,每个接口都会对应一个request对象
-            req = models.TextToImageLiteRequest()
-            params = {"Prompt": prompt, "NegativePrompt": negative_prompt, "RspImgType": "url", **self.params}
-            req.from_json_string(json.dumps(params))
-
-            # 返回的resp是一个TextToImageLiteResponse的实例，与请求对象对应
-            resp = client.TextToImageLite(req)
+            payload = {"model": self.model, "prompt": prompt}
+            payload.update({key: value for key, value in self.params.items() if value not in (None, "")})
+            headers = {
+                "Authorization": f"Bearer {self.api_key}",
+                "Content-Type": "application/json",
+            }
+            response = requests.post(self.base_url, headers=headers, json=payload, timeout=300)
+            response.raise_for_status()
+            result = response.json()
+            data = result.get("data") or []
             file_urls = []
-
-            file_urls.append(resp.ResultImage)
+            for item in data:
+                url = item.get("url")
+                if url:
+                    file_urls.append(url)
+            if not file_urls:
+                maxkb_logger.error(f"Tencent Text to Image API returned no urls: {result}")
+                raise RuntimeError("Tencent Text to Image API returned no image urls")
             return file_urls
-        except TencentCloudSDKException as err:
-            maxkb_logger.error(f"Tencent Text to Image API call failed: {err}")
+        except requests.RequestException as err:
+            maxkb_logger.error(f"Tencent Text to Image API call failed: {err}: {traceback.format_exc()}")
             raise RuntimeError(f"Tencent Text to Image API call failed: {err}") from err
