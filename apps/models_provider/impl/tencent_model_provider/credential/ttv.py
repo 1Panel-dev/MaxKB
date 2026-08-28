@@ -9,82 +9,40 @@ from common.forms.switch_field import SwitchField
 from common.utils.logger import maxkb_logger
 from models_provider.base_model_provider import BaseModelCredential, ValidCode
 
-# 37 preset sizes from the TokenHub Hy-Image docs (width x height, area <= 1024x1024).
-_HY_IMAGE_SIZES = [
-    "2048x512",
-    "1984x512",
-    "1920x512",
-    "1856x512",
-    "1792x512",
-    "1728x512",
-    "1664x512",
-    "1600x512",
-    "1536x512",
-    "1472x576",
-    "1408x640",
-    "1344x704",
-    "1280x768",
-    "1216x832",
-    "1152x896",
-    "1088x960",
-    "1024x1024",
-    "960x1088",
-    "896x1152",
-    "832x1216",
-    "768x1280",
-    "704x1344",
-    "640x1408",
-    "576x1472",
-    "512x1536",
-    "512x1600",
-    "512x1664",
-    "512x1728",
-    "512x1792",
-    "512x1856",
-    "512x1920",
-    "512x1984",
-    "512x2048",
-    "768x1024",
-    "720x1280",
-    "1024x768",
-    "1280x720",
-]
 
-
-class TencentTTIModelParams(BaseForm):
-    size = forms.SingleSelect(
-        TooltipLabel(
-            _("Image size"),
-            _(
-                "Width and height must be in [512, 2048] and the area must not exceed 1024x1024. If not passed, the "
-                "model auto-selects the closest preset size."
-            ),
-        ),
+class TencentVideoModelParams(BaseForm):
+    resolution = forms.SingleSelect(
+        TooltipLabel(_("Resolution"), _("Output video resolution: 480p, 720p, 1080p.")),
         required=False,
-        default_value="1024x1024",
-        option_list=[{"value": value, "label": value} for value in _HY_IMAGE_SIZES],
+        default_value="720p",
+        option_list=[{"value": value, "label": value} for value in ["480p", "720p", "1080p"]],
         value_field="value",
         text_field="label",
     )
 
-    revise = SwitchField(
-        TooltipLabel(
-            _("Prompt rewrite"), _("Whether the model should rewrite and optimize the prompt before generation.")
-        ),
-        attrs={"active-value": True, "inactive-value": False},
-        default_value=True,
-    )
-
-    footnote = forms.TextInputField(
-        TooltipLabel(
-            _("Watermark footnote"), _("Custom watermark content, at most 16 characters, drawn in the bottom-right.")
-        ),
+    fps = forms.SingleSelect(
+        TooltipLabel(_("Frame rate"), _("Output video frame rate: 16, 24, 30.")),
         required=False,
-        default_value="",
+        default_value="30",
+        option_list=[{"value": value, "label": value} for value in ["16", "24", "30"]],
+        value_field="value",
+        text_field="label",
+    )
+
+    logo_add = SwitchField(
+        TooltipLabel(
+            _("Add logo"),
+            _(
+                "Whether to add the AI-generated logo to the video. 1: add logo; 0: no logo "
+                "(requires console approval for independent control)."
+            ),
+        ),
+        attrs={"active-value": 1, "inactive-value": 0},
+        default_value=1,
     )
 
 
-class TencentTTIModelCredential(BaseForm, BaseModelCredential):
+class TencentTTVModelCredential(BaseForm, BaseModelCredential):
     REQUIRED_FIELDS = ["api_key"]
 
     @classmethod
@@ -134,11 +92,16 @@ class TencentTTIModelCredential(BaseForm, BaseModelCredential):
         return {**model, "api_key": super().encryption(model.get("api_key", ""))}
 
     base_url = forms.TextInputField(
-        label=TooltipLabel(_("API URL"), _("TokenHub Hy-Image v3-generation endpoint")),
+        label=TooltipLabel(
+            _("API URL"),
+            _(
+                "TokenHub video endpoint. Use the base (e.g. https://tokenhub.tencentmaas.com/v1) or a full submit/query URL."
+            ),
+        ),
         required=False,
-        default_value="https://tokenhub.tencentmaas.com/v1/wand/hunyuan-image/v3-generation",
+        default_value="https://tokenhub.tencentmaas.com/v1",
     )
     api_key = forms.PasswordInputField(_("API Key"), required=True)
 
     def get_model_params_setting_form(self, model_name):
-        return TencentTTIModelParams()
+        return TencentVideoModelParams()

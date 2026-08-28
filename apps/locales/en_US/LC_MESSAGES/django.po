@@ -9646,3 +9646,90 @@ msgstr ""
 #: apps/models_provider/impl/tencent_model_provider/credential/tokenhub_stt.py:76
 msgid "Tokenhub sync_transcribe endpoint"
 msgstr ""
+
+msgid "Add logo"
+msgstr "Add logo"
+
+msgid "Custom watermark content, at most 16 characters, drawn in the bottom-right."
+msgstr "Custom watermark content, at most 16 characters, drawn in the bottom-right."
+
+msgid "Designed for Agent workloads, using a MoE architecture that supports interleaved thinking, structured output, Function Calling and Cache caching."
+msgstr "Designed for Agent workloads, using a MoE architecture that supports interleaved thinking, structured output, Function Calling and Cache caching."
+
+msgid "Frame rate"
+msgstr "Frame rate"
+
+msgid "Hunyuan HY-Video 1.5 image-to-video model."
+msgstr "Hunyuan HY-Video 1.5 image-to-video model."
+
+msgid "Hunyuan HY-Video 1.5 text-to-video model."
+msgstr "Hunyuan HY-Video 1.5 text-to-video model."
+
+msgid "Hunyuan Hy-Image 3.0 text-to-image model."
+msgstr "Hunyuan Hy-Image 3.0 text-to-image model."
+
+msgid "Hunyuan's latest role-playing model based on the Hunyuan model with role-playing scene fine-tuning."
+msgstr "Hunyuan's latest role-playing model based on the Hunyuan model with role-playing scene fine-tuning."
+
+msgid "Hunyuan's role-playing model with better basic effects in role-playing scenarios."
+msgstr "Hunyuan's role-playing model with better basic effects in role-playing scenarios."
+
+msgid "Output video frame rate: 16, 24, 30."
+msgstr "Output video frame rate: 16, 24, 30."
+
+msgid "Output video resolution: 480p, 720p, 1080p."
+msgstr "Output video resolution: 480p, 720p, 1080p."
+
+msgid "Prompt rewrite"
+msgstr "Prompt rewrite"
+
+msgid "Tencent Hybrid multilingual translation model."
+msgstr "Tencent Hybrid multilingual translation model."
+
+msgid "Tencent TokenHub multimodal embedding model, 2048 dimensions."
+msgstr "Tencent TokenHub multimodal embedding model, 2048 dimensions."
+
+msgid "Tencent TokenHub multimodal embedding model, 4096 dimensions."
+msgstr "Tencent TokenHub multimodal embedding model, 4096 dimensions."
+
+msgid "Tencent TokenHub text embedding model, 1024 dimensions."
+msgstr "Tencent TokenHub text embedding model, 1024 dimensions."
+
+msgid "Tencent TokenHub text embedding model, 2560 dimensions."
+msgstr "Tencent TokenHub text embedding model, 2560 dimensions."
+
+msgid "Tencent YT-Video 2.0 image-to-video model."
+msgstr "Tencent YT-Video 2.0 image-to-video model."
+
+msgid "The latest generation productivity model with upgraded Agent and complex task execution capabilities."
+msgstr "The latest generation productivity model with upgraded Agent and complex task execution capabilities."
+
+msgid "TokenHub Hy-Image v3-generation endpoint"
+msgstr "TokenHub Hy-Image v3-generation endpoint"
+
+msgid "TokenHub OpenAI compatible embeddings endpoint"
+msgstr "TokenHub OpenAI compatible embeddings endpoint"
+
+msgid "TokenHub OpenAI compatible endpoint"
+msgstr "TokenHub OpenAI compatible endpoint"
+
+msgid "TokenHub video endpoint. Use the base (e.g. https://tokenhub.tencentmaas.com/v1) or a full submit/query URL."
+msgstr "TokenHub video endpoint. Use the base (e.g. https://tokenhub.tencentmaas.com/v1) or a full submit/query URL."
+
+msgid "Tuned on real business scenarios, balancing effectiveness and cost-effectiveness, with reinforced Coding, long-text, reasoning and Agent capabilities."
+msgstr "Tuned on real business scenarios, balancing effectiveness and cost-effectiveness, with reinforced Coding, long-text, reasoning and Agent capabilities."
+
+msgid "Watermark footnote"
+msgstr "Watermark footnote"
+
+msgid "Whether the model should rewrite and optimize the prompt before generation."
+msgstr "Whether the model should rewrite and optimize the prompt before generation."
+
+msgid "Whether to add the AI-generated logo to the video. 1: add logo; 0: no logo (requires console approval for independent control)."
+msgstr "Whether to add the AI-generated logo to the video. 1: add logo; 0: no logo (requires console approval for independent control)."
+
+msgid "Width and height must be in [512, 2048] and the area must not exceed 1024x1024. If not passed, the model auto-selects the closest preset size."
+msgstr "Width and height must be in [512, 2048] and the area must not exceed 1024x1024. If not passed, the model auto-selects the closest preset size."
+
+msgid "api_key is required"
+msgstr "api_key is required"

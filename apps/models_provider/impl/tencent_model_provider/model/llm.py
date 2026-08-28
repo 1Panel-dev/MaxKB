@@ -1,51 +1,54 @@
 # coding=utf-8
 
-from typing import List, Dict, Optional, Any
+from typing import Dict, List
 
-from langchain_core.messages import BaseMessage
+from langchain_core.messages import BaseMessage, get_buffer_string
 
+from common.config.tokenizer_manage_config import TokenizerManage
 from models_provider.base_model_provider import MaxKBBaseModel
-from models_provider.impl.tencent_model_provider.model.hunyuan import ChatHunyuan
+from models_provider.impl.base_chat_open_ai import BaseChatOpenAI
 
 
-class TencentModel(MaxKBBaseModel, ChatHunyuan):
+def custom_get_token_ids(text: str):
+    tokenizer = TokenizerManage.get_tokenizer()
+    return tokenizer.encode(text)
+
+
+class TencentModel(MaxKBBaseModel, BaseChatOpenAI):
+    """Tencent TokenHub LLM model.
+
+    TokenHub aggregates Tencent Hunyuan and other providers behind an
+    OpenAI Chat Completions compatible API, see
+    https://cloud.tencent.com/document/product/1823/132252
+    """
+
     @staticmethod
     def is_cache_model():
         return False
 
-    def __init__(self, model_name: str, credentials: Dict[str, str], streaming: bool = False, **kwargs):
-        hunyuan_app_id = credentials.get("hunyuan_app_id")
-        hunyuan_secret_id = credentials.get("hunyuan_secret_id")
-        hunyuan_secret_key = credentials.get("hunyuan_secret_key")
-
-        optional_params = MaxKBBaseModel.filter_optional_params(kwargs)
-
-        if not all([hunyuan_app_id, hunyuan_secret_id, hunyuan_secret_key]):
-            raise ValueError(
-                "All of 'hunyuan_app_id', 'hunyuan_secret_id', and 'hunyuan_secret_key' must be provided in credentials."
-            )
-
-        super().__init__(
+    @staticmethod
+    def new_instance(model_type, model_name, model_credential: Dict[str, object], **model_kwargs):
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
+        streaming = model_kwargs.get("streaming", False)
+        return TencentModel(
             model=model_name,
-            hunyuan_app_id=hunyuan_app_id,
-            hunyuan_secret_id=hunyuan_secret_id,
-            hunyuan_secret_key=hunyuan_secret_key,
+            openai_api_base=model_credential.get("api_base"),
+            openai_api_key=model_credential.get("api_key"),
             streaming=streaming,
-            temperature=optional_params.get("temperature", 1.0),
+            custom_get_token_ids=custom_get_token_ids,
+            **optional_params,
         )
 
-    @staticmethod
-    def new_instance(
-        model_type: str, model_name: str, model_credential: Dict[str, object], **model_kwargs
-    ) -> "TencentModel":
-        streaming = model_kwargs.pop("streaming", False)
-        return TencentModel(model_name=model_name, credentials=model_credential, streaming=streaming, **model_kwargs)
-
-    def get_last_generation_info(self) -> Optional[Dict[str, Any]]:
-        return self.usage_metadata
-
     def get_num_tokens_from_messages(self, messages: List[BaseMessage]) -> int:
-        return self.usage_metadata.get("PromptTokens", 0)
+        try:
+            return super().get_num_tokens_from_messages(messages)
+        except Exception:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return sum([len(tokenizer.encode(get_buffer_string([m]))) for m in messages])
 
     def get_num_tokens(self, text: str) -> int:
-        return self.usage_metadata.get("CompletionTokens", 0)
+        try:
+            return super().get_num_tokens(text)
+        except Exception:
+            tokenizer = TokenizerManage.get_tokenizer()
+            return len(tokenizer.encode(text))
