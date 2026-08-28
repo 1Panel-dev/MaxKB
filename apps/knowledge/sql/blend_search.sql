@@ -14,7 +14,7 @@ FROM
 	(
 	SELECT DISTINCT ON
 		(vc.paragraph_id) vc.paragraph_id,
-		(1 - vc.distance + COALESCE(ts_rank_cd(e.search_vector, websearch_to_tsquery('simple', %s), 32), 0)) AS comprehensive_score
+		(1 - vc.distance + COALESCE(ts_rank_cd(e.search_vector, plainto_tsquery('simple', %s), 32), 0)) AS comprehensive_score
 	FROM
 		vector_top vc
 	JOIN embedding e ON e.id = vc.id
