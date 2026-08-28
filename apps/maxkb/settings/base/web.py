@@ -10,6 +10,7 @@ from pathlib import Path
 from ...const import CONFIG, PROJECT_DIR
 import os
 from django.utils.translation import gettext_lazy as _
+from django.core.management.utils import get_random_secret_key
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -18,10 +19,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = CONFIG.get('SECRET_KEY')
-if not SECRET_KEY:
-    raise RuntimeError(
-        "MAXKB_SECRET_KEY not configured, please provide it in the environment variable or configuration")
+SECRET_KEY = CONFIG.get('SECRET_KEY') or get_random_secret_key()
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.get_debug()
 
