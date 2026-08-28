@@ -46,6 +46,9 @@ export default {
     tips1: `开启后，从开启时间记录新对话并按周期生成记忆，可通过`,
     tips2: `变量在系统提示词中调用。
 关闭后，将清空对话用户的长期记忆，再次开启将重新从开启时点开始累积。`,
+    defaultModel: '默认模型',
+    custom: '自定义',
+    modelRequiredMessage: '请选择长期记忆模型',
   },
   form: {
     appName: {
@@ -119,6 +122,8 @@ export default {
       placeholder: '请选择语音识别模型',
       requiredMessage: '请选择语音输入模型',
       autoSend: '自动发送',
+      defaultModel: '默认模型',
+      custom: '自定义',
     },
     voicePlay: {
       label: '语音播放',
@@ -128,6 +133,8 @@ export default {
       browser: '浏览器播放(免费)',
       tts: 'TTS 模型',
       listeningTest: '试听',
+      defaultModel: '默认模型',
+      custom: '自定义',
     },
     reasoningContent: {
       label: '输出思考',

@@ -38,6 +38,10 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
         </el-button>
+        <el-button @click="toggleDefaultModelSetting" v-if="permissionPrecise.edit(id)">
+          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+          {{ $t('workflow.setting.defaultModelSetting') }}
+        </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.read()">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}
@@ -151,6 +155,14 @@
       @refresh="getDetail"
     />
     <DebugDrawer ref="debugDrawerRef"></DebugDrawer>
+    <DefaultModelSettingMenu
+      v-if="detail"
+      v-model="detail.default_model_setting"
+      :show="defaultModelSettingVisible"
+      :workflow-ref="workflowRef"
+      @save="saveTool(true)"
+      @close="clickoutsideDefaultModelSetting"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -165,7 +177,7 @@ import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import useStore from '@/stores'
-import { ToolWorkFlowInstance } from '@/workflow/common/validate'
+import { ToolWorkFlowInstance, validateWorkflowDefaultModels } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
 import { ComplexPermission, Permission } from '@/utils/permission/type'
@@ -176,6 +188,7 @@ import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import { toolBaseNode, toolStartNode } from '@/workflow/common/data'
 import TemplateStoreDialog from '@/views/tool-workflow/template-store/TemplateStoreDialog.vue'
 import DebugDrawer from './debug-drawer/DebugDrawer.vue'
+import DefaultModelSettingMenu from '@/components/workflow-dropdown-menu/default-model-setting/index.vue'
 provide('getResourceDetail', () => detail)
 provide('workflowMode', WorkflowMode.Tool)
 provide('loopWorkflowMode', WorkflowMode.ToolLoop)
@@ -220,6 +233,16 @@ const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
 const cloneWorkFlow = ref(null)
+
+const defaultModelSettingVisible = ref(false)
+
+function toggleDefaultModelSetting() {
+  defaultModelSettingVisible.value = !defaultModelSettingVisible.value
+}
+
+function clickoutsideDefaultModelSetting() {
+  defaultModelSettingVisible.value = false
+}
 
 const apiInputParams = ref([])
 
@@ -326,8 +349,13 @@ const publish = () => {
         MsgError(e.toString())
         return
       }
+      // 发布前拦截「节点选默认模型但该类别默认模型未配置」,与后端 publish 校验一致,提前于保存请求
+      validateWorkflowDefaultModels(workflow, detail.value?.default_model_setting || {})
       loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })
-        .putToolWorkflow(id, { work_flow: workflow })
+        .putToolWorkflow(id, {
+          work_flow: workflow,
+          default_model_setting: detail.value?.default_model_setting || {},
+        })
         .then(() => {
           return loadSharedApi({
             type: 'tool',
@@ -469,6 +497,7 @@ function getDetail() {
     .getToolById(id)
     .then((res: any) => {
       detail.value = res.data
+      detail.value.default_model_setting = res.data?.default_model_setting || {}
       saveTime.value = res.data?.update_time
 
       if (!detail.value.work_flow || !('nodes' in detail.value.work_flow)) {
@@ -487,6 +516,7 @@ function getDetail() {
 function saveTool(bool?: boolean, back?: boolean) {
   const obj = {
     work_flow: getGraphData(),
+    default_model_setting: detail.value?.default_model_setting || {},
   }
   loading.value = back || false
   loadSharedApi({ type: 'tool', isShared: isShared.value, systemType: apiType.value })

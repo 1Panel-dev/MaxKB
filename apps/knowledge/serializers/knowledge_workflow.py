@@ -21,7 +21,7 @@ from application.flow.i_step_node import KnowledgeWorkflowPostHandler
 from application.flow.knowledge_workflow_manage import KnowledgeWorkflowManage
 from application.flow.step_node import get_node
 from application.flow.tools import save_workflow_mapping
-from application.serializers.application import get_mcp_tools
+from application.serializers.application import get_mcp_tools, validate_workflow_default_models
 from common.constants.cache_version import Cache_Version
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -197,6 +197,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "workspace_id": self.data.get("workspace_id"),
                 "user_id": str(user.id),
                 **instance,
+                "default_model_setting": knowledge_workflow.default_model_setting,
             },
             KnowledgeWorkflowPostHandler(None, knowledge_action_id),
             is_the_task_interrupted=lambda: (
@@ -252,6 +253,7 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
                 "workspace_id": self.data.get("workspace_id"),
                 "user_id": str(user.id),
                 **instance,
+                "default_model_setting": knowledge_workflow_version.default_model_setting,
             },
             KnowledgeWorkflowPostHandler(None, knowledge_action_id),
             is_the_task_interrupted=lambda: (
@@ -462,8 +464,11 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 update_tool_map,
             )
             tool_model_list = [self.to_tool(tool, workspace_id, user_id) for tool in tool_list]
+            defaults = {"work_flow": work_flow}
+            if knowledge_workflow.get("default_model_setting") is not None:
+                defaults["default_model_setting"] = knowledge_workflow.get("default_model_setting")
             KnowledgeWorkflow.objects.filter(workspace_id=workspace_id, knowledge_id=knowledge_id).update_or_create(
-                knowledge_id=knowledge_id, workspace_id=workspace_id, defaults={"work_flow": work_flow}
+                knowledge_id=knowledge_id, workspace_id=workspace_id, defaults=defaults
             )
 
             if is_import_tool:
@@ -586,7 +591,12 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         @staticmethod
         def to_tool_dict(tool, tool_workflow_dict):
             if tool.tool_type == ToolType.WORKFLOW:
-                return {**ToolExportModelSerializer(tool).data, "work_flow": tool_workflow_dict.get(tool.id).work_flow}
+                tool_workflow = tool_workflow_dict.get(tool.id)
+                return {
+                    **ToolExportModelSerializer(tool).data,
+                    "work_flow": tool_workflow.work_flow,
+                    "default_model_setting": tool_workflow.default_model_setting,
+                }
             return ToolExportModelSerializer(tool).data
 
     class Operate(serializers.Serializer):
@@ -605,8 +615,10 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
                 .filter(knowledge_id=self.data.get("knowledge_id"), workspace_id=workspace_id)
                 .first()
             )
+            validate_workflow_default_models(knowledge_workflow.work_flow, knowledge_workflow.default_model_setting)
             work_flow_version = KnowledgeWorkflowVersion(
                 work_flow=knowledge_workflow.work_flow,
+                default_model_setting=knowledge_workflow.default_model_setting,
                 knowledge_id=self.data.get("knowledge_id"),
                 name=timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
                 publish_user_id=user_id,
@@ -622,15 +634,18 @@ class KnowledgeWorkflowSerializer(serializers.Serializer):
         def edit(self, instance: Dict):
             self.is_valid(raise_exception=True)
             if instance.get("work_flow"):
+                defaults = {"work_flow": instance.get("work_flow")}
+                if instance.get("default_model_setting") is not None:
+                    defaults["default_model_setting"] = instance.get("default_model_setting")
                 QuerySet(KnowledgeWorkflow).update_or_create(
                     knowledge_id=self.data.get("knowledge_id"),
                     create_defaults={
                         "id": uuid.uuid7(),
                         "knowledge_id": self.data.get("knowledge_id"),
                         "workspace_id": self.data.get("workspace_id"),
-                        "work_flow": instance.get("work_flow", {}),
+                        **defaults,
                     },
-                    defaults={"work_flow": instance.get("work_flow")},
+                    defaults=defaults,
                 )
                 update_resource_mapping_by_knowledge(self.data.get("knowledge_id"))
                 return self.one()

@@ -28,6 +28,7 @@ from application.serializers.application import (
     McpServersSerializer,
     get_mcp_tools,
     validate_bound_tool_permissions,
+    validate_workflow_default_models,
 )
 from application.serializers.common import ToolExecute
 from common.database_model_manage.database_model_manage import DatabaseModelManage
@@ -176,6 +177,7 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 "workspace_id": workspace_id,
                 "user_id": self.data.get("user_id"),
                 **{k: v for k, v in instance.items() if k not in identity_keys},
+                "default_model_setting": tool_workflow.default_model_setting,
             }
             work_flow_manage = ToolWorkflowManage(
                 Workflow.new_instance(tool_workflow.work_flow, WorkflowMode.TOOL),
@@ -209,8 +211,10 @@ class ToolWorkflowSerializer(serializers.Serializer):
             user = QuerySet(User).filter(id=user_id).first()
             tool_workflow = QuerySet(ToolWorkflow).filter(tool_id=self.data.get("tool_id")).first()
             workspace_id = tool_workflow.workspace_id
+            validate_workflow_default_models(tool_workflow.work_flow, tool_workflow.default_model_setting)
             work_flow_version = ToolWorkflowVersion(
                 work_flow=tool_workflow.work_flow,
+                default_model_setting=tool_workflow.default_model_setting,
                 tool_id=self.data.get("tool_id"),
                 name=timezone.localtime(timezone.now()).strftime("%Y-%m-%d %H:%M:%S"),
                 publish_user_id=user_id,
@@ -297,18 +301,21 @@ class ToolWorkflowSerializer(serializers.Serializer):
                 )
                 if not dependency:
                     raise Exception(gettext("There is a circular dependency in the tool workflow"))
+                defaults = {"work_flow": instance.get("work_flow")}
+                if instance.get("default_model_setting") is not None:
+                    defaults["default_model_setting"] = instance.get("default_model_setting")
                 QuerySet(ToolWorkflow).update_or_create(
                     tool_id=self.data.get("tool_id"),
                     create_defaults={
                         "id": uuid.uuid7(),
                         "tool_id": self.data.get("tool_id"),
                         "workspace_id": workflow_id,
-                        "work_flow": instance.get("work_flow", {}),
+                        **defaults,
                     },
                     defaults={
                         "tool_id": self.data.get("tool_id"),
                         "workspace_id": workflow_id,
-                        "work_flow": instance.get("work_flow"),
+                        **defaults,
                     },
                 )
                 # 当前用户可修改关联的知识库列表
@@ -477,13 +484,15 @@ class StoreToolWorkflow(serializers.Serializer):
 
 
 def update_resource_mapping_by_tool(tool_id: str, other_resource_mapping=None):
-    from application.flow.tools import get_instance_resource, save_workflow_mapping
+    from application.flow.tools import get_instance_resource, save_workflow_mapping, append_default_model_mapping
     from system_manage.models.resource_mapping import ResourceType
 
     if other_resource_mapping is None:
         other_resource_mapping = []
     tool = QuerySet(ToolWorkflow).filter(tool_id=tool_id).first()
     instance_mapping = get_instance_resource(tool, ResourceType.TOOL, str(tool_id), {})
+    instance_mapping = append_default_model_mapping(
+        instance_mapping, tool.default_model_setting, ResourceType.TOOL, str(tool_id))
     save_workflow_mapping(tool.work_flow, ResourceType.TOOL, str(tool_id), instance_mapping + other_resource_mapping)
 
     return

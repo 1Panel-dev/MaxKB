@@ -449,6 +449,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 k = QuerySet(KnowledgeWorkflow).filter(knowledge_id=knowledge_dict.get("id")).first()
                 if k:
                     workflow["work_flow"] = k.work_flow
+                    workflow["default_model_setting"] = k.default_model_setting
                     workflow["is_publish"] = k.is_publish
                     workflow["publish_time"] = k.publish_time
             return {

@@ -15,7 +15,7 @@
           :label="$t('workflow.nodes.imageUnderstandNode.model.label')"
           :prop="form_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
-            required: true,
+            required: form_data.model_id_type !== 'default',
             message:
               form_data.model_id_type === 'reference'
                 ? $t('workflow.variable.placeholder')
@@ -38,12 +38,13 @@
                 style="width: 85px"
                 @change="form_data.model_id_reference = []"
               >
+                <el-option :label="$t('dynamicsForm.ModelConstructor.defaultModel')" value="default" />
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
             </div>
           </template>
-          <div class="flex-between w-full" v-if="form_data.model_id_type !== 'reference'">
+          <div class="flex-between w-full" v-if="form_data.model_id_type === 'custom'">
             <ModelSelect
               @wheel="wheel"
               :teleported="false"
@@ -66,6 +67,11 @@
               </el-button>
             </div>
           </div>
+          <DefaultModelDisplay
+            v-else-if="form_data.model_id_type === 'default'"
+            type="IMAGE"
+            :options="modelOptions"
+          />
           <NodeCascader
             v-else
             ref="modelCascaderRef"
@@ -268,6 +274,7 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
 import { computed, onMounted, ref, inject } from 'vue'
 import { cloneDeep, groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
@@ -334,7 +341,7 @@ const defaultPrompt = `{{${t('workflow.nodes.startNode.label')}.question}}`
 
 const form = {
   model_id: '',
-  model_id_type: 'custom',
+  model_id_type: 'default',
   model_id_reference: [],
   system: '',
   prompt: defaultPrompt,

@@ -112,8 +112,8 @@ defineOptions({ name: 'ModelSelect' })
 const props = defineProps<{
   modelValue: any
   options: any
-  showFooter?: false
-  modelType?: ''
+  showFooter?: boolean
+  modelType?: string
 }>()
 
 const permissionPrecise = computed(() => {

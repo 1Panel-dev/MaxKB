@@ -15,7 +15,7 @@
           :label="$t('views.application.form.aiModel.label')"
           :prop="chat_data.model_id_type === 'reference' ? 'model_id_reference' : 'model_id'"
           :rules="{
-            required: true,
+            required: chat_data.model_id_type !== 'default',
             message:
               chat_data.model_id_type === 'reference'
                 ? $t('workflow.variable.placeholder')
@@ -38,12 +38,13 @@
                 style="width: 85px"
                 @change="chat_data.model_id_reference = []"
               >
+                <el-option :label="$t('dynamicsForm.ModelConstructor.defaultModel')" value="default" />
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
             </div>
           </template>
-          <div class="flex-between w-full" v-if="chat_data.model_id_type !== 'reference'">
+          <div class="flex-between w-full" v-if="chat_data.model_id_type === 'custom'">
             <ModelSelect
               @change="model_change"
               @wheel="wheel"
@@ -67,6 +68,11 @@
               </el-button>
             </div>
           </div>
+          <DefaultModelDisplay
+            v-else-if="chat_data.model_id_type === 'default'"
+            type="LLM"
+            :options="modelOptions"
+          />
           <NodeCascader
             v-else
             ref="nodeCascaderRef"
@@ -610,6 +616,7 @@
 <script setup lang="ts">
 import { cloneDeep, set, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import type { FormInstance } from 'element-plus'
 import { ref, computed, onMounted, inject, reactive } from 'vue'
@@ -693,7 +700,7 @@ const collapseData = reactive({
 
 const form = {
   model_id: '',
-  model_id_type: 'custom',
+  model_id_type: 'default',
   model_id_reference: [],
   system: '',
   prompt: defaultPrompt,

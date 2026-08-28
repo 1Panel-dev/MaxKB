@@ -51,6 +51,8 @@ export const baseNode = {
       desc: '',
       prologue: t('views.application.form.defaultPrologue'),
       tts_type: 'BROWSER',
+      stt_model_id_type: 'default',
+      long_term_model_id_type: 'default',
     },
     config: {},
     showNode: true,

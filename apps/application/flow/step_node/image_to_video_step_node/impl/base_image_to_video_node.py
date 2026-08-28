@@ -39,6 +39,11 @@ class BaseImageToVideoNode(IImageToVideoNode):
             if reference_data and isinstance(reference_data, dict):
                 model_id = reference_data.get('model_id', model_id)
                 model_params_setting = reference_data.get('model_params_setting')
+        elif model_id_type == 'default':
+            default_setting = self.workflow_manage.get_default_model_setting('ITV')
+            if default_setting.get('model_id'):
+                model_id = default_setting.get('model_id')
+            model_params_setting = default_setting.get('model_params_setting', model_params_setting)
         if model_id is None or model_id == '':
             raise Exception(_('Model is not allowed to be empty'))
         workspace_id = self.workflow_manage.get_body().get('workspace_id')

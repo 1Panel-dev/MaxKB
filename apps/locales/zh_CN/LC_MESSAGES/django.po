@@ -8812,6 +8812,9 @@ msgstr "文生视频"
 msgid "Image to Video"
 msgstr "图生视频"
 
+msgid "{node_name} selected the default model, but the default model of this type is not configured."
+msgstr "{node_name}选择了默认模型，但未配置该类默认模型"
+
 msgid "Authentication failed. Please verify that the parameters are correct"
 msgstr "认证失败，请检查参数是否正确"
 

@@ -45,6 +45,9 @@ export default {
     tips1: `開啟後，從開啟時間記錄新對話並按周期生成記憶，可通過`,
     tips2: `變數在系統提示詞中調用。
 關閉後，將清空對話用戶的長期記憶，再次開啟將重新從開啟時點開始累積。`,
+    defaultModel: '默認模型',
+    custom: '自訂',
+    modelRequiredMessage: '請選擇長期記憶模型',
   },
   form: {
     appName: {
@@ -118,6 +121,8 @@ export default {
       placeholder: '請選擇語音辨識模型',
       requiredMessage: '請選擇語音輸入模型',
       autoSend: '自動發送',
+      defaultModel: '默認模型',
+      custom: '自訂',
     },
     voicePlay: {
       label: '語音播放',
@@ -127,6 +132,8 @@ export default {
       browser: '瀏覽器播放(免費)',
       tts: 'TTS 模型',
       listeningTest: '試聽',
+      defaultModel: '默認模型',
+      custom: '自訂',
     },
     reasoningContent: {
       label: '輸出思考',

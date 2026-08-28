@@ -52,6 +52,9 @@ export default {
     tips1: `After enabling, new conversations will be recorded from the activation time and memory will be generated periodically, which can be called through`,
     tips2: `variables in the system prompt.
 After disabling, the long-term memory of the conversation users will be cleared, and re-enabling will resume accumulation from the activation point.`,
+    defaultModel: 'Default Model',
+    custom: 'Custom',
+    modelRequiredMessage: 'Please select a long-term memory model',
   },
   form: {
     appName: {
@@ -129,6 +132,8 @@ After disabling, the long-term memory of the conversation users will be cleared,
       placeholder: 'Please select a speech recognition model',
       requiredMessage: 'Please select a speech input model',
       autoSend: 'Automatic Sending',
+      defaultModel: 'Default Model',
+      custom: 'Custom',
     },
     voicePlay: {
       label: 'Voice Playback',
@@ -138,6 +143,8 @@ After disabling, the long-term memory of the conversation users will be cleared,
       browser: 'Browser Playback (free)',
       tts: 'TTS Model',
       listeningTest: 'Preview',
+      defaultModel: 'Default Model',
+      custom: 'Custom',
     },
     reasoningContent: {
       label: 'Output Thinking',

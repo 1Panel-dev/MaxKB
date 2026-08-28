@@ -32,6 +32,11 @@ class BaseSpeechToTextNode(ISpeechToTextNode):
             if reference_data and isinstance(reference_data, dict):
                 stt_model_id = reference_data.get('stt_model_id', reference_data.get('model_id', stt_model_id))
                 model_params_setting = reference_data.get('model_params_setting')
+        elif stt_model_id_type == 'default':
+            default_setting = self.workflow_manage.get_default_model_setting('STT')
+            if default_setting.get('model_id'):
+                stt_model_id = default_setting.get('model_id')
+            model_params_setting = default_setting.get('model_params_setting', model_params_setting)
 
         from django.utils.translation import gettext_lazy as _
 
