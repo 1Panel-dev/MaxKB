@@ -7,8 +7,8 @@ FROM
 	SELECT DISTINCT ON
 		("paragraph_id") ( similarity ),* ,similarity AS comprehensive_score
 	FROM
-		( SELECT *,ts_rank_cd(embedding.search_vector,websearch_to_tsquery('simple',%s),32) AS similarity  FROM embedding ${keywords_query}
-		AND COALESCE(search_vector @@ websearch_to_tsquery('simple',%s), false)) TEMP
+		( SELECT *,ts_rank_cd(embedding.search_vector,plainto_tsquery('simple',%s),32) AS similarity  FROM embedding ${keywords_query}
+		AND COALESCE(search_vector @@ plainto_tsquery('simple',%s), false)) TEMP
 	ORDER BY
 		paragraph_id,
 		similarity DESC
