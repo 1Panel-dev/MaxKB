@@ -159,8 +159,18 @@ def _remove_empty_lines(text):
 
 
 def markdown_to_plain_text(md: str) -> str:
+    # 先移除特定媒体标签（优先级高于通用 Markdown 和 HTML 处理）
+    text = re.sub(
+        r"<(audio|video)(?:\s+[^>]*)?>.*?</\1>",
+        "",
+        md,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+    text = re.sub(r"<img[^>]*>", "", text)  # 匹配图片标签
+    # 去除表单渲染
+    text = re.sub(r"<form_rander>.*?</form_rander>", "", text, flags=re.DOTALL)
     # 移除图片 ![alt](url)
-    text = re.sub(r"!\[.*?\]\(.*?\)", "", md)
+    text = re.sub(r"!\[.*?\]\(.*?\)", "", text)
     # 移除链接 [text](url)
     text = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text)
     # 移除 Markdown 标题符号 (#, ##, ###)
@@ -179,15 +189,8 @@ def markdown_to_plain_text(md: str) -> str:
     text = re.sub(r"\n{2,}", "\n", text)
     # 使用正则表达式去除所有 HTML 标签
     text = re.sub(r"<[^>]+>", "", text)
-    # 先移除特定媒体标签（优先级高于通用HTML标签移除）
-    text = re.sub(
-        r"<(?:audio|video)(?:\s+[^>]*)?>.*?(?:</(?:audio|video)>)?", "", text, flags=re.DOTALL | re.IGNORECASE
-    )
-    text = re.sub(r"<img[^>]*>", "", text)  # 匹配图片标签
     # 去除多余的空白字符（包括换行符、制表符等）
     text = re.sub(r"\s+", " ", text)
-    # 去除表单渲染
-    text = re.sub(r"<form_rander>.*?</form_rander>", "", text, flags=re.DOTALL)
     # 去除首尾空格
     text = text.strip()
     return text
