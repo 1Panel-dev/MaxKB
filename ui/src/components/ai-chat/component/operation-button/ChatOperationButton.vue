@@ -394,7 +394,7 @@ class AudioManage {
       this.statusList.push(AudioStatus.MOUNTED)
       this.tryList.push(1)
       index = this.textList.length - 1
-      if (this.ttsType === 'TTS') {
+      if (this.ttsType === 'TTS' || this.ttsType === 'DEFAULT' || this.ttsType === 'CUSTOM') {
         const audioElement: HTMLAudioElement = document.createElement('audio')
         audioElement.controls = false
         audioElement.hidden = true

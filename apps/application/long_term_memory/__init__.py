@@ -6,6 +6,7 @@ from django.db.models import Count, QuerySet
 from django.utils import timezone
 from langchain_core.messages import HumanMessage
 
+from application.flow.common import get_base_node_model
 from application.models import Chat, ChatRecord, Application, ApplicationLongTermMemory
 from common.utils.logger import maxkb_logger
 from models_provider.tools import get_model_instance_by_model_workspace_id
@@ -138,8 +139,7 @@ def _get_long_term_config(application, chat_user_id):
         return {
             'trigger_type': node_data.get('long_term_trigger_type'),
             'trigger_setting': node_data.get('long_term_trigger_setting') or {'rounds': 10},
-            'model_id': node_data.get('long_term_model_id'),
-            'model_params': node_data.get('long_term_model_params_setting') or {},
+            **get_base_node_model(application, 'LLM'),
         }
     else:
         if not application.long_term_enable:

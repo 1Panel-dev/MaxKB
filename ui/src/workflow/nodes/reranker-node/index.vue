@@ -128,7 +128,7 @@
               : 'reranker_model_id'
           "
           :rules="{
-            required: true,
+            required: form_data.reranker_model_id_type !== 'default',
             message:
               form_data.reranker_model_id_type === 'reference'
                 ? $t('workflow.variable.placeholder')
@@ -151,12 +151,13 @@
                 style="width: 85px"
                 @change="form_data.reranker_model_id_reference = []"
               >
+                <el-option :label="$t('dynamicsForm.ModelConstructor.defaultModel')" value="default" />
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
             </div>
           </template>
-          <div class="flex-between w-full" v-if="form_data.reranker_model_id_type !== 'reference'">
+          <div class="flex-between w-full" v-if="form_data.reranker_model_id_type === 'custom'">
             <ModelSelect
               @wheel="wheel"
               :teleported="false"
@@ -168,6 +169,11 @@
               :model-type="'RERANKER'"
             ></ModelSelect>
           </div>
+          <DefaultModelDisplay
+            v-else-if="form_data.reranker_model_id_type === 'default'"
+            type="RERANKER"
+            :options="modelOptions"
+          />
           <NodeCascader
             v-else
             ref="modelCascaderRef"
@@ -194,6 +200,7 @@
 <script setup lang="ts">
 import { set, cloneDeep, groupBy } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
 import ParamSettingDialog from './ParamSettingDialog.vue'
 import { ref, computed, onMounted, inject } from 'vue'
@@ -222,7 +229,7 @@ const ParamSettingDialogRef = ref<InstanceType<typeof ParamSettingDialog>>()
 const form = {
   reranker_reference_list: [[]],
   reranker_model_id: '',
-  reranker_model_id_type: 'custom',
+  reranker_model_id_type: 'default',
   reranker_model_id_reference: [],
   question_reference_address: [],
   reranker_setting: {

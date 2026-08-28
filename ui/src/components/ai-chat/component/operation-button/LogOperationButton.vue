@@ -250,7 +250,7 @@ const playAnswerTextPart = () => {
     }
     // 调用浏览器的朗读功能
     window.speechSynthesis.speak(utterance.value)
-  } else if (props.tts_type === 'TTS') {
+  } else if (props.tts_type === 'TTS' || props.tts_type === 'DEFAULT' || props.tts_type === 'CUSTOM') {
     // 恢复上次暂停的播放
     if (audioPlayer.value && audioPlayer.value[currentAudioIndex.value]?.src) {
       audioPlayer.value[currentAudioIndex.value].play()
@@ -301,7 +301,7 @@ const playAnswerTextPart = () => {
 
 const pausePlayAnswerText = () => {
   audioPlayerStatus.value = false
-  if (props.tts_type === 'TTS') {
+  if (props.tts_type === 'TTS' || props.tts_type === 'DEFAULT' || props.tts_type === 'CUSTOM') {
     if (audioPlayer.value) {
       audioPlayer.value?.forEach((item) => {
         item.pause()

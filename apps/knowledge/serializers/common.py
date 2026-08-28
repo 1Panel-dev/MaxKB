@@ -16,7 +16,12 @@ from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from application.flow.tools import save_workflow_mapping, get_instance_resource, knowledge_instance_field_call_dict
+from application.flow.tools import (
+    save_workflow_mapping,
+    get_instance_resource,
+    knowledge_instance_field_call_dict,
+    append_default_model_mapping,
+)
 from common.config.embedding_config import ModelManage
 from common.db.search import native_search
 from common.db.sql_execute import sql_execute, update_execute
@@ -296,6 +301,9 @@ def update_resource_mapping_by_knowledge(knowledge_id: str):
             knowledge_id=knowledge_id).order_by(
             '-create_time')[0:1].first()
         if knowledge_workflow:
+            instance_mapping = append_default_model_mapping(
+                instance_mapping, knowledge_workflow.default_model_setting,
+                ResourceType.KNOWLEDGE, str(knowledge_id))
             save_workflow_mapping(knowledge_workflow.work_flow, ResourceType.KNOWLEDGE,
                                   str(knowledge_id), instance_mapping)
             return

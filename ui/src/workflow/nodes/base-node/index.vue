@@ -77,7 +77,21 @@
             </div>
           </div>
         </template>
-        <div v-if="form_data.long_term_enable" class="flex-between w-full">
+        <div v-if="form_data.long_term_enable" class="w-full">
+          <el-radio-group v-model="form_data.long_term_model_id_type" class="mb-8">
+            <el-radio :label="$t('views.application.longTermMemory.defaultModel')" value="default" />
+            <el-radio :label="$t('views.application.longTermMemory.custom')" value="custom" />
+          </el-radio-group>
+        </div>
+        <DefaultModelDisplay
+          v-if="form_data.long_term_enable && form_data.long_term_model_id_type === 'default'"
+          type="LLM"
+          :options="modelOptions"
+        />
+        <div
+          v-if="form_data.long_term_enable && form_data.long_term_model_id_type === 'custom'"
+          class="flex-between w-full"
+        >
           <ModelSelect
             v-model="form_data.long_term_model_id"
             :placeholder="$t('views.application.form.aiModel.placeholder')"
@@ -152,9 +166,20 @@
             </div>
           </div>
         </template>
+        <div v-show="form_data.stt_model_enable" class="w-full">
+          <el-radio-group v-model="form_data.stt_model_id_type">
+            <el-radio :label="$t('views.application.form.voiceInput.defaultModel')" value="default" />
+            <el-radio :label="$t('views.application.form.voiceInput.custom')" value="custom" />
+          </el-radio-group>
+        </div>
+        <DefaultModelDisplay
+          v-show="form_data.stt_model_enable && form_data.stt_model_id_type === 'default'"
+          type="STT"
+          :options="sttModelOptions"
+        />
         <ModelSelect
           @wheel="wheel"
-          v-show="form_data.stt_model_enable"
+          v-show="form_data.stt_model_enable && form_data.stt_model_id_type === 'custom'"
           v-model="form_data.stt_model_id"
           :placeholder="$t('views.application.form.voiceInput.placeholder')"
           :options="sttModelOptions"
@@ -183,13 +208,19 @@
         <div class="w-full">
           <el-radio-group v-model="form_data.tts_type" v-show="form_data.tts_model_enable">
             <el-radio :label="$t('views.application.form.voicePlay.browser')" value="BROWSER" />
-            <el-radio :label="$t('views.application.form.voicePlay.tts')" value="TTS" />
+            <el-radio :label="$t('views.application.form.voicePlay.defaultModel')" value="DEFAULT" />
+            <el-radio :label="$t('views.application.form.voicePlay.custom')" value="CUSTOM" />
           </el-radio-group>
         </div>
+        <DefaultModelDisplay
+          v-if="form_data.tts_model_enable && form_data.tts_type === 'DEFAULT'"
+          type="TTS"
+          :options="ttsModelOptions"
+        />
         <div class="flex-between w-full">
           <ModelSelect
             @wheel="wheel"
-            v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
+            v-if="form_data.tts_type === 'CUSTOM' && form_data.tts_model_enable"
             v-model="form_data.tts_model_id"
             :placeholder="$t('views.application.form.voicePlay.placeholder')"
             :options="ttsModelOptions"
@@ -200,7 +231,7 @@
           ></ModelSelect>
 
           <el-button
-            v-if="form_data.tts_type === 'TTS' && form_data.tts_model_enable"
+            v-if="form_data.tts_type === 'CUSTOM' && form_data.tts_model_enable"
             @click="openTTSParamSettingDialog"
             :disabled="!form_data.tts_model_id"
             class="ml-8"
@@ -228,6 +259,7 @@
 <script setup lang="ts">
 import { groupBy, set } from 'lodash'
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
 import type { FormInstance } from 'element-plus'
 import { computed, inject, nextTick, onMounted, provide, ref } from 'vue'
 import { MsgSuccess } from '@/utils/message'
@@ -311,18 +343,32 @@ const baseNodeFormRef = ref<FormInstance>()
 const validate = () => {
   if (
     form_data.value.tts_model_enable &&
-    !form_data.value.tts_model_id &&
-    form_data.value.tts_type === 'TTS'
+    form_data.value.tts_type === 'CUSTOM' &&
+    !form_data.value.tts_model_id
   ) {
     return Promise.reject({
       node: props.nodeModel,
       errMessage: t('views.application.form.voicePlay.requiredMessage'),
     })
   }
-  if (form_data.value.stt_model_enable && !form_data.value.stt_model_id) {
+  if (
+    form_data.value.stt_model_enable &&
+    form_data.value.stt_model_id_type === 'custom' &&
+    !form_data.value.stt_model_id
+  ) {
     return Promise.reject({
       node: props.nodeModel,
       errMessage: t('views.application.form.voiceInput.requiredMessage'),
+    })
+  }
+  if (
+    form_data.value.long_term_enable &&
+    form_data.value.long_term_model_id_type === 'custom' &&
+    !form_data.value.long_term_model_id
+  ) {
+    return Promise.reject({
+      node: props.nodeModel,
+      errMessage: t('views.application.longTermMemory.modelRequiredMessage'),
     })
   }
 
@@ -408,6 +454,9 @@ function ttsModelChange() {
 }
 
 function ttsModelEnableChange() {
+  if (form_data.value.tts_model_enable && !form_data.value.tts_type) {
+    form_data.value.tts_type = 'BROWSER'
+  }
   if (!form_data.value.tts_model_enable) {
     form_data.value.tts_model_id = ''
     form_data.value.tts_type = 'BROWSER'
@@ -415,6 +464,9 @@ function ttsModelEnableChange() {
 }
 
 function sttModelEnableChange() {
+  if (form_data.value.stt_model_enable && form_data.value.stt_model_id_type === undefined) {
+    form_data.value.stt_model_id_type = 'default'
+  }
   if (!form_data.value.stt_model_enable) {
     form_data.value.stt_model_id = ''
   }
@@ -473,6 +525,9 @@ const long_term_model_change = (model_id?: string) => {
 }
 
 function switchLongTerm() {
+  if (form_data.value.long_term_enable && form_data.value.long_term_model_id_type === undefined) {
+    form_data.value.long_term_model_id_type = 'default'
+  }
   props.nodeModel.graphModel.eventCenter.emit('refreshLongTermConfig')
 }
 
@@ -531,8 +586,17 @@ function getSelectModel() {
 
 onMounted(() => {
   set(props.nodeModel, 'validate', validate)
-  if (!props.nodeModel.properties.node_data.tts_type) {
-    set(props.nodeModel.properties.node_data, 'tts_type', 'BROWSER')
+  const nd = props.nodeModel.properties.node_data
+  if (!nd.tts_type) {
+    set(nd, 'tts_type', 'BROWSER')
+  } else if (nd.tts_type === 'TTS') {
+    set(nd, 'tts_type', 'CUSTOM')
+  }
+  if (nd.stt_model_id_type === undefined) {
+    set(nd, 'stt_model_id_type', nd.stt_model_id ? 'custom' : 'default')
+  }
+  if (nd.long_term_model_id_type === undefined) {
+    set(nd, 'long_term_model_id_type', nd.long_term_model_id ? 'custom' : 'default')
   }
   getTTSModel()
   getSTTModel()

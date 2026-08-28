@@ -249,7 +249,8 @@ class Workflow:
         node_list = [node for node in self.nodes if (
                 node.type == 'ai-chat-node' or node.type == 'question-node' or node.type == 'parameter-extraction-node')]
         for node in node_list:
-            if (node.properties.get('node_data', {}).get('model_id_type') or 'custom') == 'reference':
+            model_id_type = node.properties.get('node_data', {}).get('model_id_type') or 'custom'
+            if model_id_type in ('reference', 'default'):
                 continue
             model = QuerySet(Model).filter(id=node.properties.get('node_data', {}).get('model_id')).first()
             if model is None:
@@ -282,3 +283,44 @@ class Workflow:
             raise AppApiException(500, _('Basic information node is required'))
         if len(base_node_list) > 1:
             raise AppApiException(500, _('There can only be one basic information node'))
+
+
+def get_base_node_model(application, model_type):
+    """
+    解析基本信息节点(base-node)实际使用的模型配置。
+    model_type: 'STT' | 'TTS' | 'LLM'(长期记忆)。
+    WORK_FLOW 应用读 base-node node_data 的模式字段;default/DEFAULT 时取 default_model_setting;
+    SIMPLE 应用(无 base-node)回退到顶层模型字段。
+    返回 {'model_id', 'model_params'}。
+    """
+    mode_field = {'STT': 'stt_model_id_type', 'TTS': 'tts_type', 'LLM': 'long_term_model_id_type'}[model_type]
+    model_field = {'STT': 'stt_model_id', 'TTS': 'tts_model_id', 'LLM': 'long_term_model_id'}[model_type]
+    param_field = {
+        'STT': 'stt_model_params_setting',
+        'TTS': 'tts_model_params_setting',
+        'LLM': 'long_term_model_params_setting',
+    }[model_type]
+    node_data = None
+    for node in ((getattr(application, 'work_flow', None) or {}).get('nodes') or []):
+        if node.get('id') == 'base-node':
+            node_data = (node.get('properties') or {}).get('node_data') or {}
+            break
+    if node_data is None:
+        return {
+            'model_id': getattr(application, model_field, None),
+            'model_params': getattr(application, param_field, None) or {},
+        }
+    mode = node_data.get(mode_field)
+    if mode == 'default' or mode == 'DEFAULT':
+        default_setting = (application.default_model_setting or {}).get(model_type, {}) or {}
+        return {
+            'model_id': default_setting.get('model_id'),
+            'model_params': default_setting.get('model_params_setting') or {},
+        }
+    if model_type == 'TTS' and mode == 'BROWSER':
+        # 浏览器播放不使用 TTS 模型,残留 model_id 不参与解析
+        return {'model_id': None, 'model_params': {}}
+    return {
+        'model_id': node_data.get(model_field),
+        'model_params': node_data.get(param_field) or {},
+    }

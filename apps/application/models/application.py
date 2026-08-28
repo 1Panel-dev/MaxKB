@@ -111,6 +111,7 @@ class Application(AppModelMixin):
     long_term_model_params_setting = models.JSONField(verbose_name="长期记忆模型参数相关设置", default=dict)
     long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
     long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
+    default_model_setting = models.JSONField(verbose_name="默认模型设置", default=dict)
 
     @staticmethod
     def get_default_model_prompt():
@@ -193,6 +194,7 @@ class ApplicationVersion(AppModelMixin):
     long_term_trigger_type = models.CharField(verbose_name='长期记忆触发类型', default='ROUND')
     long_term_trigger_setting = models.JSONField(verbose_name='长期记忆触发配置', default=dict)
     knowledge_ids = models.JSONField(verbose_name="数据集id列表", default=list)
+    default_model_setting = models.JSONField(verbose_name="默认模型设置", default=dict)
 
     class Meta:
         db_table = "application_version"

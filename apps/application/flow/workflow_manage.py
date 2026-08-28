@@ -831,3 +831,32 @@ class WorkflowManage:
 
     def get_source_id(self):
         return self.params.get('application_id')
+
+    def get_application(self):
+        """获取当前应用的 Application 实例(仅 APPLICATION 模式有;其余模式返回 None)"""
+        if self.work_flow_post_handler is None:
+            return None
+        chat_info = getattr(self.work_flow_post_handler, 'chat_info', None)
+        if chat_info is None:
+            return None
+        return getattr(chat_info, 'application', None)
+
+    def get_default_model_setting(self, model_type):
+        """获取指定模型类别的默认模型配置 {model_id, model_params_setting,...};未配置返回 {}"""
+        setting = self._load_default_model_setting()
+        return (setting or {}).get(model_type, {}) or {}
+
+    def _load_default_model_setting(self):
+        """按执行来源读取 default_model_setting(params 透传),每次 run 缓存一次;Application 回退 chat_info.application。"""
+        if getattr(self, '_default_model_setting', None) is not None:
+            return self._default_model_setting
+        setting = self.params.get('default_model_setting')
+        if setting is None:
+            application = self.get_application()
+            setting = getattr(application, 'default_model_setting', {}) or {}
+        self._default_model_setting = setting
+        return setting
+
+    def get_default_model_id(self, model_type):
+        """获取指定模型类别的默认模型 id;未配置返回 None"""
+        return self.get_default_model_setting(model_type).get('model_id')

@@ -17,7 +17,7 @@
             form_data.stt_model_id_type === 'reference' ? 'stt_model_id_reference' : 'stt_model_id'
           "
           :rules="{
-            required: true,
+            required: form_data.stt_model_id_type !== 'default',
             message:
               form_data.stt_model_id_type === 'reference'
                 ? $t('workflow.variable.placeholder')
@@ -40,12 +40,13 @@
                 style="width: 85px"
                 @change="form_data.stt_model_id_reference = []"
               >
+                <el-option :label="$t('dynamicsForm.ModelConstructor.defaultModel')" value="default" />
                 <el-option :label="$t('workflow.variable.Referencing')" value="reference" />
                 <el-option :label="$t('common.custom')" value="custom" />
               </el-select>
             </div>
           </template>
-          <div class="flex-between w-full" v-if="form_data.stt_model_id_type !== 'reference'">
+          <div class="flex-between w-full" v-if="form_data.stt_model_id_type === 'custom'">
             <ModelSelect
               @wheel="wheel"
               :teleported="false"
@@ -65,6 +66,11 @@
               </el-button>
             </div>
           </div>
+          <DefaultModelDisplay
+            v-else-if="form_data.stt_model_id_type === 'default'"
+            type="STT"
+            :options="modelOptions"
+          />
           <NodeCascader
             v-else
             ref="modelCascaderRef"
@@ -143,6 +149,7 @@
 
 <script setup lang="ts">
 import NodeContainer from '@/workflow/common/NodeContainer.vue'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
 import { computed, onMounted, ref, inject } from 'vue'
 import { groupBy, set } from 'lodash'
 import NodeCascader from '@/workflow/common/NodeCascader.vue'
@@ -203,7 +210,7 @@ const wheel = (e: any) => {
 
 const form = {
   stt_model_id: '',
-  stt_model_id_type: 'custom',
+  stt_model_id_type: 'default',
   stt_model_id_reference: [],
   is_result: true,
   audio_list: [],

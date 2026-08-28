@@ -816,6 +816,34 @@ async def anext_async(agen):
     return await agen.__anext__()
 
 
+def _get_node_model_id(node, model_field, mode_field):
+    """节点为 default/reference 模式时不返回节点内 model_id(运行时才解析,避免脏映射)。"""
+    node_data = (node.get("properties") or {}).get("node_data") or {}
+    if node_data.get(mode_field) in ("default", "reference"):
+        return None
+    return node_data.get(model_field)
+
+
+# base-node 三类模型:mode 判定与 validate_workflow_default_models/get_base_node_model 保持一致
+# (stt/长期记忆用 'default'/'reference',tts 用大写 'DEFAULT'/'BROWSER')
+_base_node_model_specs = (
+    ("stt_model_id_type", ("default", "reference"), "stt_model_enable", "stt_model_id"),
+    ("tts_type", ("DEFAULT", "BROWSER"), "tts_model_enable", "tts_model_id"),
+    ("long_term_model_id_type", ("default", "reference"), "long_term_enable", "long_term_model_id"),
+)
+
+
+def _get_base_node_model_ids(node):
+    """返回 base-node node_data 中实际自定义的 STT/TTS/长期记忆 model_id(default/BROWSER 时运行时解析,不映射)。"""
+    node_data = (node.get("properties") or {}).get("node_data") or {}
+    model_ids = []
+    for mode_field, skip_modes, enable_field, model_field in _base_node_model_specs:
+        if node_data.get(enable_field) and node_data.get(mode_field) not in skip_modes:
+            if node_data.get(model_field):
+                model_ids.append(node_data.get(model_field))
+    return model_ids
+
+
 target_source_node_mapping = {
     "TOOL": {
         "tool-lib-node": lambda n: [n.get("properties").get("node_data").get("tool_lib_id")],
@@ -828,17 +856,18 @@ target_source_node_mapping = {
         "tool-workflow-lib-node": lambda n: [n.get("properties").get("node_data").get("tool_lib_id")],
     },
     "MODEL": {
-        "ai-chat-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "question-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "speech-to-text-node": lambda n: [n.get("properties").get("node_data").get("stt_model_id")],
-        "text-to-speech-node": lambda n: [n.get("properties").get("node_data").get("tts_model_id")],
-        "image-to-video-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "image-generate-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "intent-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "image-understand-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "parameter-extraction-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "video-understand-node": lambda n: [n.get("properties").get("node_data").get("model_id")],
-        "reranker-node": lambda n: [n.get("properties").get("node_data").get("reranker_model_id")],
+        "ai-chat-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "question-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "speech-to-text-node": lambda n: [v for v in [_get_node_model_id(n, 'stt_model_id', 'stt_model_id_type')] if v],
+        "text-to-speech-node": lambda n: [v for v in [_get_node_model_id(n, 'tts_model_id', 'tts_model_id_type')] if v],
+        "image-to-video-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "image-generate-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "intent-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "image-understand-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "parameter-extraction-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "video-understand-node": lambda n: [v for v in [_get_node_model_id(n, 'model_id', 'model_id_type')] if v],
+        "reranker-node": lambda n: [v for v in [_get_node_model_id(n, 'reranker_model_id', 'reranker_model_id_type')] if v],
+        "base-node": _get_base_node_model_ids,
     },
     "KNOWLEDGE": {
         "search-knowledge-node": lambda n: n.get("properties").get("node_data").get("knowledge_id_list"),
@@ -905,6 +934,7 @@ application_instance_field_call_dict = {
         lambda instance: [instance.long_term_model_id] if instance.long_term_model_id else [],
         lambda instance: [instance.tts_model_id] if instance.tts_model_id else [],
         lambda instance: [instance.stt_model_id] if instance.stt_model_id else [],
+        lambda instance: [v.get('model_id') for v in (instance.default_model_setting or {}).values() if (v or {}).get('model_id')],
     ],
 }
 knowledge_instance_field_call_dict = {
@@ -926,6 +956,22 @@ def get_instance_resource(instance, source_type, source_id, instance_field_call_
                     )
                 )
     return response
+
+
+def append_default_model_mapping(instance_mapping, default_model_setting, source_type, source_id):
+    """把 default_model_setting 各类别 model_id 追加为 MODEL 资源映射(方案A),返回追加后的列表。"""
+    from system_manage.models.resource_mapping import ResourceMapping, ResourceType
+
+    for value in (default_model_setting or {}).values():
+        model_id = (value or {}).get('model_id')
+        if model_id:
+            instance_mapping.append(
+                ResourceMapping(
+                    source_type=source_type, target_type=ResourceType.MODEL,
+                    source_id=str(source_id), target_id=model_id,
+                )
+            )
+    return instance_mapping
 
 
 def save_workflow_mapping(workflow, source_type, source_id, other_resource_mapping=None):
@@ -1058,6 +1104,7 @@ def get_workflow_func(source_type, source_id, tool, qv, workspace_id, user_id=No
                 "workspace_id": workspace_id,
                 "user_id": user_id,
                 **kwargs,
+                "default_model_setting": qv.default_model_setting,
             },
             ToolWorkflowPostHandler(took_execute, tool_id),
             is_the_task_interrupted=lambda: False,

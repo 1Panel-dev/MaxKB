@@ -399,3 +399,68 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
     }
   }
 }
+
+// 节点类型 -> 默认模型类别(与后端 NODE_DEFAULT_MODEL_TYPE 保持一致)
+const NODE_DEFAULT_MODEL_TYPE: Record<string, string> = {
+  'ai-chat-node': 'LLM',
+  'question-node': 'LLM',
+  'intent-node': 'LLM',
+  'parameter-extraction-node': 'LLM',
+  'image-understand-node': 'IMAGE',
+  'video-understand-node': 'IMAGE',
+  'image-generate-node': 'TTI',
+  'text-to-video-node': 'TTV',
+  'image-to-video-node': 'ITV',
+  'speech-to-text-node': 'STT',
+  'text-to-speech-node': 'TTS',
+  'reranker-node': 'RERANKER',
+}
+
+/**
+ * 与后端 validate_workflow_default_models 对齐:
+ * 节点选择「默认模型」但对应类别默认模型未配置时,发布前拦截。
+ * 抛出 { node, errMessage },由发布流程外层 catch 展示,与「自定义模型为空」等节点校验一致。
+ */
+export function validateWorkflowDefaultModels(work_flow: any, default_model_setting: any) {
+  const setting = default_model_setting || {}
+  const hasModel = (type: string) => !!((setting[type] || {}) as any).model_id
+  const errMessage = t('workflow.setting.defaultModelRequired')
+
+  const walk = (nodes: any[]) => {
+    for (const node of nodes || []) {
+      const nd = node?.properties?.node_data || {}
+      const nodeType = node?.type
+      if (nodeType === 'base-node') {
+        // base-node 只有 default/custom(tts 另有 BROWSER)
+        if (nd.stt_model_enable && nd.stt_model_id_type === 'default' && !hasModel('STT')) {
+          throw { node, errMessage }
+        }
+        if (nd.tts_model_enable && nd.tts_type === 'DEFAULT' && !hasModel('TTS')) {
+          throw { node, errMessage }
+        }
+        if (nd.long_term_enable && nd.long_term_model_id_type === 'default' && !hasModel('LLM')) {
+          throw { node, errMessage }
+        }
+        continue
+      }
+      const modelType = NODE_DEFAULT_MODEL_TYPE[nodeType]
+      if (modelType) {
+        const typeKey =
+          nodeType === 'reranker-node'
+            ? 'reranker_model_id_type'
+            : nodeType === 'speech-to-text-node'
+              ? 'stt_model_id_type'
+              : nodeType === 'text-to-speech-node'
+                ? 'tts_model_id_type'
+                : 'model_id_type'
+        if ((nd[typeKey] || 'custom') === 'default' && !hasModel(modelType)) {
+          throw { node, errMessage }
+        }
+      }
+      if (nodeType === 'loop-node' && nd.loop_body?.nodes) {
+        walk(nd.loop_body.nodes)
+      }
+    }
+  }
+  walk(work_flow?.nodes)
+}

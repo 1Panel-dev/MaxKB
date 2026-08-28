@@ -21,7 +21,7 @@ from typing import Dict, List
 
 import requests
 import uuid_utils.compat as uuid
-from application.flow.common import Workflow
+from application.flow.common import Workflow, get_base_node_model
 from application.long_term_memory import schedule_extract_long_term_memory
 from application.models.application import Application, ApplicationFolder, ApplicationTypeChoices, ApplicationVersion
 from application.models.application_access_token import ApplicationAccessToken
@@ -78,6 +78,77 @@ def _walk_workflow_nodes(work_flow, collector):
         collector(node_data)
         if node.get("type") == "loop-node":
             _walk_workflow_nodes(node_data.get("loop_body"), collector)
+
+
+# 节点类型 -> 默认模型类别(与 ModelTypeConst code 对应)
+NODE_DEFAULT_MODEL_TYPE = {
+    "ai-chat-node": "LLM",
+    "question-node": "LLM",
+    "intent-node": "LLM",
+    "parameter-extraction-node": "LLM",
+    "image-understand-node": "IMAGE",
+    "video-understand-node": "IMAGE",
+    "image-generate-node": "TTI",
+    "text-to-video-node": "TTV",
+    "image-to-video-node": "ITV",
+    "speech-to-text-node": "STT",
+    "text-to-speech-node": "TTS",
+    "reranker-node": "RERANKER",
+}
+
+
+def validate_workflow_default_models(work_flow, default_model_setting):
+    """发布前校验:节点选择「默认模型」但对应类别默认模型未配置时,禁止发布并定位。"""
+    if not work_flow:
+        return
+    for node in work_flow.get("nodes", []) or []:
+        properties = node.get("properties") or {}
+        node_data = properties.get("node_data") or {}
+        node_type = node.get("type")
+        node_name = properties.get("stepName") or node_data.get("name") or node_type
+        model_type = NODE_DEFAULT_MODEL_TYPE.get(node_type)
+        if node_type == 'base-node':
+            for mode_field, default_mode, enable_field, default_model_type in (
+                ('stt_model_id_type', 'default', 'stt_model_enable', 'STT'),
+                ('tts_type', 'DEFAULT', 'tts_model_enable', 'TTS'),
+                ('long_term_model_id_type', 'default', 'long_term_enable', 'LLM'),
+            ):
+                if (node_data.get(mode_field) == default_mode and node_data.get(enable_field)
+                        and not ((default_model_setting or {}).get(default_model_type, {}) or {}).get('model_id')):
+                    raise AppApiException(
+                        500,
+                        _(
+                            "{node_name} selected the default model, but the default model "
+                            "of this type is not configured."
+                        ).format(node_name=node_name),
+                    )
+        if model_type is not None:
+            # 取该节点实际使用的 model_id_type 字段(custom/reference/default)
+            type_key = (
+                "reranker_model_id_type"
+                if node_type == "reranker-node"
+                else (
+                    "stt_model_id_type"
+                    if node_type == "speech-to-text-node"
+                    else (
+                        "tts_model_id_type"
+                        if node_type == "text-to-speech-node"
+                        else "model_id_type"
+                    )
+                )
+            )
+            if (node_data.get(type_key) or "custom") == "default" and not (
+                (default_model_setting or {}).get(model_type, {}) or {}
+            ).get("model_id"):
+                raise AppApiException(
+                    500,
+                    _(
+                        "{node_name} selected the default model, but the default model "
+                        "of this type is not configured."
+                    ).format(node_name=node_name),
+                )
+        if node_type == "loop-node":
+            validate_workflow_default_models(node_data.get("loop_body"), default_model_setting)
 
 
 def get_bound_tool_ids(instance: Dict) -> List[str]:
@@ -1229,6 +1300,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             "skill_tool_ids": "skill_tool_ids",
             "mcp_output_enable": "mcp_output_enable",
             "type": "type",
+            "default_model_setting": "default_model_setting",
         }
 
         for version_field, app_field in update_field_dict.items():
@@ -1250,6 +1322,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             if work_flow is None:
                 raise AppApiException(500, _("work_flow is a required field"))
             Workflow.new_instance(work_flow).is_valid()
+            validate_workflow_default_models(work_flow, application.default_model_setting)
             base_node = get_base_node_work_flow(work_flow)
             if base_node is not None:
                 node_data = base_node.get("properties").get("node_data")
@@ -1449,6 +1522,7 @@ class ApplicationOperateSerializer(serializers.Serializer):
             "long_term_model_params_setting",
             "long_term_trigger_setting",
             "long_term_trigger_type",
+            "default_model_setting",
             "problem_optimization_prompt",
             "clean_time",
             "file_clean_time",
@@ -1739,8 +1813,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 QuerySet(ApplicationVersion).filter(application_id=application_id).order_by("-create_time").first()
             )
         if application.stt_model_enable:
+            config = get_base_node_model(application, 'STT')
             model = get_model_instance_by_model_workspace_id(
-                application.stt_model_id, application.workspace_id, **application.stt_model_params_setting
+                config['model_id'], application.workspace_id, **config['model_params']
             )
             text = model.speech_to_text(instance.get("file"))
             return text
@@ -1757,8 +1832,9 @@ class ApplicationOperateSerializer(serializers.Serializer):
                 QuerySet(ApplicationVersion).filter(application_id=application_id).order_by("-create_time").first()
             )
         if application.tts_model_enable:
+            config = get_base_node_model(application, 'TTS')
             model = get_model_instance_by_model_workspace_id(
-                application.tts_model_id, application.workspace_id, **application.tts_model_params_setting
+                config['model_id'], application.workspace_id, **config['model_params']
             )
             content = _remove_empty_lines(instance.get("text", ""))
 

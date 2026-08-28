@@ -38,6 +38,13 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
         </el-button>
+        <el-button
+          @click="toggleDefaultModelSetting"
+          v-if="permissionPrecise.edit(id)"
+        >
+          <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
+          {{ $t('workflow.setting.defaultModelSetting') }}
+        </el-button>
         <el-button @click="clickShowDebug" :disabled="showDebug" v-if="permissionPrecise.debug(id)">
           <AppIcon iconName="app-debug-outlined" class="mr-4"></AppIcon>
           {{ $t('common.debug') }}
@@ -151,6 +158,14 @@
       source="work_flow"
       @refresh="getDetail"
     />
+    <DefaultModelSettingMenu
+      v-if="detail"
+      v-model="detail.default_model_setting"
+      :show="defaultModelSettingVisible"
+      :workflow-ref="workflowRef"
+      @save="saveApplication(true)"
+      @close="clickoutsideDefaultModelSetting"
+    />
   </div>
 </template>
 <script setup lang="ts">
@@ -159,13 +174,14 @@ import { useRouter, useRoute } from 'vue-router'
 import type { Action } from 'element-plus'
 import Workflow from '@/workflow/index.vue'
 import DropdownMenu from '@/components/workflow-dropdown-menu/index.vue'
+import DefaultModelSettingMenu from '@/components/workflow-dropdown-menu/default-model-setting/index.vue'
 import PublishHistory from '@/views/application-workflow/component/PublishHistory.vue'
 import { isAppIcon, resetUrl } from '@/utils/common'
 import { MsgSuccess, MsgError, MsgConfirm } from '@/utils/message'
 import { datetimeFormat } from '@/utils/time'
 import { mapToUrlParams } from '@/utils/application'
 import useStore from '@/stores'
-import { WorkFlowInstance } from '@/workflow/common/validate'
+import { WorkFlowInstance, validateWorkflowDefaultModels } from '@/workflow/common/validate'
 import { hasPermission } from '@/utils/permission'
 import { t } from '@/locales'
 import { ComplexPermission } from '@/utils/permission/type'
@@ -214,6 +230,18 @@ const showHistory = ref(false)
 const disablePublic = ref(false)
 const currentVersion = ref<any>({})
 const cloneWorkFlow = ref(null)
+
+// ===== 默认模型设置 =====
+const defaultModelSettingVisible = ref(false)
+
+function toggleDefaultModelSetting() {
+  defaultModelSettingVisible.value = !defaultModelSettingVisible.value
+}
+
+function clickoutsideDefaultModelSetting() {
+  defaultModelSettingVisible.value = false
+}
+// ===== 默认模型设置 End =====
 
 const apiInputParams = ref([])
 
@@ -328,8 +356,14 @@ const publish = () => {
         MsgError(e.toString())
         return
       }
+      // 发布前拦截「节点选默认模型但该类别默认模型未配置」,与后端 publish 校验一致,提前于保存请求
+      validateWorkflowDefaultModels(workflow, detail.value?.default_model_setting || {})
       loadSharedApi({ type: 'application', systemType: apiType.value })
-        .putApplication(id, { work_flow: workflow }, loading)
+        .putApplication(
+          id,
+          { work_flow: workflow, default_model_setting: detail.value?.default_model_setting || {} },
+          loading,
+        )
         .then(() => {
           return loadSharedApi({ type: 'application', systemType: apiType.value }).publish(
             id,
@@ -493,6 +527,7 @@ function getDetail() {
 function saveApplication(bool?: boolean, back?: boolean) {
   const obj = {
     work_flow: getGraphData(),
+    default_model_setting: detail.value?.default_model_setting || {},
   }
   loading.value = back || false
   loadSharedApi({ type: 'application', systemType: apiType.value })
@@ -731,6 +766,24 @@ onBeforeUnmount(() => {
 @media only screen and (max-height: 680px) {
   .workflow-debug-container {
     height: 600px;
+  }
+}
+
+.apply-to-all-confirm {
+  .el-message-box__title {
+    justify-content: flex-start;
+  }
+
+  .el-message-box__container {
+    justify-content: flex-start;
+  }
+
+  .el-message-box__content {
+    text-align: left;
+  }
+
+  .el-message-box__btns {
+    justify-content: flex-end;
   }
 }
 </style>
