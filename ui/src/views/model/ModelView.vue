@@ -8,9 +8,8 @@ import CommonSystemApi from '@/api/admin/system/common'
 import SharedApi from '@/api/admin/workspace/shared.ts'
 import ProviderApi from '@/api/admin/workspace/model/provider'
 import ModelCard from './components/ModelCard.vue'
+import ModelCreateButton from './components/ModelCreateButton.vue'
 import ModelProvider from './components/ModelProvider.vue'
-import CreateModelDrawer from './create-model/CreateModelDrawer.vue'
-import SelectProviderDrawer from './create-model/SelectProviderDrawer.vue'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
   icon: '',
@@ -27,10 +26,15 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 
 const isShared = computed(() => currentProvider.value.provider === 'shared')
 
-const getModelIcon = computed(
-  () => (model: ModelItem) =>
-    modelProviders.value.find(({ provider }) => provider === model.provider)?.icon ?? '',
-)
+function getModelProvider(model: ModelItem): ModelProviderItem {
+  return (
+    modelProviders.value.find(({ provider }) => provider === model.provider) ?? {
+      icon: '',
+      name: model.provider,
+      provider: model.provider,
+    }
+  )
+}
 
 /* 搜索 */
 const searchFields = computed(() => [
@@ -95,21 +99,6 @@ function handleProviderSelect(provider: ModelProviderItem) {
   loadModels()
 }
 
-/* 创建模型 */
-const selectProviderDrawerRef = ref<InstanceType<typeof SelectProviderDrawer>>()
-const createModelDrawerRef = ref<InstanceType<typeof CreateModelDrawer>>()
-function handleOpenCreateModel() {
-  selectProviderDrawerRef.value?.open()
-}
-
-function handleCreateProviderSelect(provider: ModelProviderItem) {
-  createModelDrawerRef.value?.open(provider)
-}
-
-function handleBackToProviderSelect() {
-  selectProviderDrawerRef.value?.open()
-}
-
 onMounted(() => {
   Promise.all([loadModelProviders(), loadModels()])
 })
@@ -130,38 +119,29 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button type="primary" class="ml-3" @click="handleOpenCreateModel">
-            <MkIcon name="icon_add_outlined" />
-            <span>添加模型</span>
-          </el-button>
+          <ModelCreateButton
+            v-if="!isShared"
+            :current-provider="currentProvider"
+            :providers="modelProviders"
+            @refresh="loadModels"
+          />
         </div>
       </component>
       <div v-loading="loading">
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
-          <ModelCard
-            v-for="model in ModelItems"
-            :key="model.id"
-            :model="model"
-            :icon="getModelIcon(model)"
-            :shared="isShared"
-          />
+          <template v-for="model in ModelItems" :key="model.id">
+            <ModelCard
+              :model="model"
+              :provider="getModelProvider(model)"
+              :refresh="loadModels"
+              :shared="isShared"
+            />
+          </template>
         </div>
         <MkEmpty v-else class="mt-24" />
       </div>
     </template>
   </MkViewLayout>
-  <SelectProviderDrawer
-    v-if="!isShared"
-    ref="selectProviderDrawerRef"
-    @select="handleCreateProviderSelect"
-  />
-  <CreateModelDrawer
-    v-if="!isShared"
-    ref="createModelDrawerRef"
-    :providers="modelProviders"
-    @back="handleBackToProviderSelect"
-    @refresh="loadModels"
-  />
 </template>
 
 <style scoped lang="scss"></style>

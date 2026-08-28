@@ -6,15 +6,10 @@ defineProps<{
 </script>
 
 <template>
-  <div class="flex align-center" style="display: inline-flex">
-    <div class="flex-between mr-4">
-      <span>{{ label.label }}</span>
-    </div>
-    <el-tooltip v-if="label.attrs.tooltip" effect="dark" placement="right">
-      <template #content
-        ><div style="max-width: 200px">{{ label.attrs.tooltip }}</div></template
-      >
-      <MkIcon name="icon_info_outlined"></MkIcon>
+  <div class="inline-flex items-center gap-2">
+    <span>{{ label.label }}</span>
+    <el-tooltip v-if="label.attrs.tooltip" :content="label.attrs.tooltip" placement="right">
+      <MkIcon name="icon_info_outlined" class="text-N600!"></MkIcon>
     </el-tooltip>
   </div>
 </template>

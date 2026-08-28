@@ -1,6 +1,10 @@
 <script setup lang="ts">
 defineOptions({ name: 'MkDialog', inheritAttrs: false })
 
+const props = defineProps<{
+  contentClass?: string
+}>()
+
 const visible = defineModel<boolean>({ default: false })
 
 defineSlots<{
@@ -36,7 +40,7 @@ defineSlots<{
     </template>
 
     <el-scrollbar>
-      <div style="max-height: calc(100vh - 272px)">
+      <div class="px-6" :class="props.contentClass" style="max-height: calc(100vh - 272px)">
         <slot />
       </div>
     </el-scrollbar>

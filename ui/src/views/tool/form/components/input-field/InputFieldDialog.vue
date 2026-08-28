@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, reactive, ref, toRaw } from 'vue'
+import { nextTick, reactive, ref } from 'vue'
+import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { ToolInputField, ToolInputFieldType } from '@/api/types'
 
@@ -27,7 +28,7 @@ const formRules: FormRules<ToolInputField> = {
 function open(field?: ToolInputField) {
   if (field) {
     isEdit.value = true
-    Object.assign(inputFieldForm, structuredClone(toRaw(field)))
+    Object.assign(inputFieldForm, cloneDeep(field))
   }
 
   visible.value = true
@@ -37,7 +38,7 @@ function open(field?: ToolInputField) {
 function handleSubmit() {
   formRef.value?.validate((valid) => {
     if (!valid) return
-    emit('refresh', structuredClone(toRaw(inputFieldForm)))
+    emit('refresh', cloneDeep(inputFieldForm))
     visible.value = false
   })
 }

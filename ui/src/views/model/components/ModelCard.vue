@@ -1,16 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
 
-import type { ModelItem } from '@/api/types'
+import type { ModelItem, ModelProviderItem } from '@/api/types'
 import { MODEL_STATUS } from '@/api/enums'
 import { MODEL_TYPE_LABELS } from '@/constants'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
+import EditModelDrawer from '../EditModelDrawer.vue'
+import ParamSettingDrawer from '../ParamSettingDrawer.vue'
+import ModelDownloadStatus from './ModelDownloadStatus.vue'
 
 defineOptions({ name: 'ModelCard' })
 
 const props = defineProps<{
-  icon: string
   model: ModelItem
+  provider: ModelProviderItem
+  refresh: () => Promise<void>
   shared: boolean
 }>()
 
@@ -23,16 +27,33 @@ const errMessage = computed(() => {
   }
   return ''
 })
+
+/* 编辑 */
+const editModelDrawerRef =
+  useTemplateRef<InstanceType<typeof EditModelDrawer>>('editModelDrawerRef')
+
+function handleOpenEditModel() {
+  editModelDrawerRef.value?.open(props.provider, props.model)
+}
+
+/* 模型参数设置 */
+const paramSettingDrawerRef =
+  useTemplateRef<InstanceType<typeof ParamSettingDrawer>>('paramSettingDrawerRef')
+
+function handleOpenParamSetting() {
+  paramSettingDrawerRef.value?.open(props.model)
+}
 </script>
 
 <template>
   <MkSourceCard
+    class="relative overflow-hidden"
     :title="model.name"
     :nick_name="model.nick_name || '-'"
     :create_time="model.create_time"
   >
     <template #icon>
-      <span class="block h-6 w-6" :innerHTML="icon" />
+      <span class="block h-6 w-6" :innerHTML="provider.icon" />
     </template>
     <template #title="{ title }">
       <h6 class="min-w-0 truncate" :title="title">{{ title }}</h6>
@@ -68,21 +89,31 @@ const errMessage = computed(() => {
         </span>
       </li>
     </ul>
+    <!-- 下载状态 -->
+    <ModelDownloadStatus
+      v-if="model.status === MODEL_STATUS.DOWNLOAD"
+      :model="model"
+      :refresh="refresh"
+    />
 
     <template #footer="{ Action, ActionDropdown }">
-      <component :is="Action" v-if="!props.shared">
+      <component :is="Action" v-if="!shared">
         <component :is="ActionDropdown">
-          <MkDropdownItem>
+          <MkDropdownItem @click="handleOpenEditModel">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
             <span>编辑</span>
           </MkDropdownItem>
-          <MkDropdownItem>
+          <MkDropdownItem @click="handleOpenParamSetting" v-if="model.model_type !== 'RERANKER'">
             <template #icon><MkIcon name="icon_preferences_outlined" /></template>
             <span>模型参数设置</span>
           </MkDropdownItem>
           <MkDropdownItem>
             <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
             <span>资源授权</span>
+          </MkDropdownItem>
+          <MkDropdownItem>
+            <template #icon><MkIcon name="icon_passkeys_outlined" /></template>
+            <span>查看关联资源</span>
           </MkDropdownItem>
           <MkDropdownItem divided>
             <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
@@ -92,4 +123,6 @@ const errMessage = computed(() => {
       </component>
     </template>
   </MkSourceCard>
+  <EditModelDrawer v-if="!shared" ref="editModelDrawerRef" @refresh="refresh" />
+  <ParamSettingDrawer v-if="!shared" ref="paramSettingDrawerRef" />
 </template>

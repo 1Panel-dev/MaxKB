@@ -86,6 +86,30 @@ h6 {
   background-color: var(--mk-success);
 }
 
+// 进行中动态点
+.mk-dotting::after {
+  animation: download-dotting 1.5s steps(4, end) infinite;
+  content: '';
+  display: inline-block;
+  text-align: left;
+  width: 18px;
+}
+
+@keyframes download-dotting {
+  25% {
+    content: '.';
+  }
+
+  50% {
+    content: '..';
+  }
+
+  75%,
+  100% {
+    content: '...';
+  }
+}
+
 // Codemirror 编辑器
 .cm-editor {
   --el-scrollbar-bg-color: var(--el-text-color-secondary);

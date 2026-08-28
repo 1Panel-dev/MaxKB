@@ -17,12 +17,12 @@ const moduleRoutes: RouteRecordRaw[] = [
   ...toolRoutes,
   ...modelRoutes,
   ...triggerRoutes,
-  {
-    path: 'demo-dynamics-form',
-    name: 'demo-dynamics-form',
-    component: () => import('@/components/mk-dynamics-form/Demo.vue'),
-    meta: { title: '动态表单演示' },
-  },
+  // {
+  //   path: 'demo-dynamics-form',
+  //   name: 'demo-dynamics-form',
+  //   component: () => import('@/components/mk-dynamics-form/Demo.vue'),
+  //   meta: { title: '动态表单演示' },
+  // },
 ]
 
 export const workspaceRoutes: RouteRecordRaw = {

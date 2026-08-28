@@ -45,7 +45,7 @@ function handleDeleteInitField(index: number) {
         <span>添加</span>
       </el-button>
     </div>
-    <el-table :data="initFields">
+    <MkTable :data="initFields" size="small">
       <el-table-column label="参数" prop="field" min-width="140" />
       <el-table-column label="组件类型" min-width="120">
         <template #default="{ row }">
@@ -69,7 +69,7 @@ function handleDeleteInitField(index: number) {
           </el-button>
         </template>
       </el-table-column>
-    </el-table>
+    </MkTable>
     <InitFieldDialog ref="initFieldDialogRef" @refresh="handleAddInitField" />
   </section>
 </template>

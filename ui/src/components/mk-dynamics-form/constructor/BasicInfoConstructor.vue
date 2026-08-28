@@ -101,11 +101,17 @@ const updateForm = (value: DynamicFormConstructorState) => {
 defineExpose({ validate, getData, render })
 </script>
 <template>
-  <el-form @submit.prevent ref="ruleFormRef" label-width="auto" :model="form">
-    <el-form-item label="参数" :required="true" prop="field" :rules="rules.field">
+  <el-form
+    @submit.prevent
+    ref="ruleFormRef"
+    label-position="top"
+    require-asterisk-position="right"
+    :model="form"
+  >
+    <el-form-item label="参数" prop="field" :rules="rules.field">
       <el-input v-model="form.field" :maxlength="64" placeholder="请输入参数" show-word-limit />
     </el-form-item>
-    <el-form-item label="显示名称" :required="true" prop="label" :rules="rules.label">
+    <el-form-item label="显示名称" prop="label" :rules="rules.label">
       <el-input v-model="form.label" :maxlength="64" show-word-limit placeholder="请输入显示名称" />
     </el-form-item>
     <el-form-item label="参数提示说明">
@@ -119,7 +125,7 @@ defineExpose({ validate, getData, render })
     <el-form-item label="是否必填" prop="required" @click.prevent>
       <el-switch v-model="form.required" :active-value="true" :inactive-value="false" />
     </el-form-item>
-    <el-form-item label="组件类型" :required="true" prop="input_type" :rules="rules.input_type">
+    <el-form-item label="组件类型" prop="input_type" :rules="rules.input_type">
       <el-select v-model="form.input_type" placeholder="请选择组件类型">
         <el-option
           v-for="item in inputTypeList"
