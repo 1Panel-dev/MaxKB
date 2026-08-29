@@ -9,7 +9,7 @@ import {
   type RoleFactory,
 } from './common'
 import { useStore } from '@/stores'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 export type PermissionInput =
   | Role
@@ -22,8 +22,9 @@ export type PermissionInput =
 /** 判断单个权限项，对应 run 的 hasPermissionChild。 */
 const hasPermissionChild = (permission: PermissionInput, ctx?: PermissionContext): boolean => {
   const { user } = useStore()
-  const roles = user.roleSet
-  const permissions = user.permissionMap
+  // Store 初始化或热更新切换期间 Getter 可能短暂不可用，按空权限处理。
+  const roles = user.roleSet ?? new Set<string>()
+  const permissions = user.permissionMap ?? new Map<string, bigint>()
 
   if (!permission) {
     return true

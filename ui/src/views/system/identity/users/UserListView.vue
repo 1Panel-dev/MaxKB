@@ -147,7 +147,7 @@ onMounted(() => loadSystemUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button class="ml-3">
+          <el-button plain class="ml-3">
             <MkIcon name="icon_import_outlined" />
             <span>导入用户</span>
           </el-button>

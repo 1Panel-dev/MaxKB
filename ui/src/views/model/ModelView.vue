@@ -6,10 +6,15 @@ import CommonApi from '@/api/admin/workspace/common'
 import ModelApi from '@/api/admin/workspace/model/model'
 import CommonSystemApi from '@/api/admin/system/common'
 import SharedApi from '@/api/admin/workspace/shared.ts'
-import ProviderApi from '@/api/admin/workspace/model/provider'
-import ModelCard from './components/ModelCard.vue'
-import ModelCreateButton from './components/ModelCreateButton.vue'
+import ProviderApi from '@/api/admin/model-provider.ts'
+import ModelCard from './model-card/index.vue'
+import ModelCreateButton from './create-model/ModelCreateButton.vue'
 import ModelProvider from './components/ModelProvider.vue'
+import {
+  DeleteModelAction,
+  EditModelAction,
+  ParamSettingAction,
+} from './model-card/action-dropdown'
 
 const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
   icon: '',
@@ -131,11 +136,35 @@ onMounted(() => {
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <template v-for="model in ModelItems" :key="model.id">
             <ModelCard
+              :api="ModelApi"
               :model="model"
               :provider="getModelProvider(model)"
               :refresh="loadModels"
               :shared="isShared"
-            />
+              :disabled="isShared"
+            >
+              <template #action-dropdown>
+                <EditModelAction
+                  label="编辑"
+                  :api="ModelApi"
+                  :model="model"
+                  :provider="getModelProvider(model)"
+                  @refresh="loadModels"
+                />
+                <ParamSettingAction
+                  v-if="model.model_type !== 'RERANKER'"
+                  label="模型参数设置"
+                  :api="ModelApi"
+                  :model="model"
+                />
+                <DeleteModelAction
+                  label="删除"
+                  :api="ModelApi"
+                  :model="model"
+                  @refresh="loadModels"
+                />
+              </template>
+            </ModelCard>
           </template>
         </div>
         <MkEmpty v-else class="mt-24" />

@@ -88,7 +88,7 @@ const handleResetPassword = async () => {
       <el-form-item prop="verificationCode">
         <div class="flex w-full gap-3">
           <el-input v-model="forgotPasswordForm.verificationCode" placeholder="请输入验证码" />
-          <el-button class="w-35 shrink-0">获取验证码</el-button>
+          <el-button plain class="w-35 shrink-0">获取验证码</el-button>
         </div>
       </el-form-item>
 

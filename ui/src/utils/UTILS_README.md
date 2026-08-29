@@ -12,8 +12,10 @@ src/utils/
 ├── clipboard.ts          # 剪贴板文本复制和成功反馈
 ├── message.ts            # Element Plus 全局消息提示的统一封装
 ├── number.ts             # 跨页面复用的数字计算、转换和格式化函数
+├── resource-context.ts   # 当前路由的资源范围和工作空间上下文判断
 ├── time.ts               # 跨页面复用的日期时间计算与格式化函数
-└── use-responsive.ts     # 需要同步组件状态时使用的响应式屏幕判断
+├── use-responsive.ts     # 需要同步组件状态时使用的响应式屏幕判断
+└── vnode.ts              # Vue 插槽 VNode 的可渲染内容判断
 ```
 
 ## 使用约定
@@ -27,6 +29,21 @@ src/utils/
 - 不要为了统一导出而新增只做二次转发的 `index.ts`，使用方从具体文件直接导入。
 - 依赖 Vue 响应式状态或生命周期的通用组合式函数可以使用 `use-*.ts` 命名。
 - 仅改变样式的响应式需求优先使用 Tailwind；只有需要改变组件状态时才使用响应式工具函数。
+
+## 资源上下文
+
+`application`、`knowledge`、`model`、`tool` 是使用资源上下文的四类特殊资源。工作空间 id 和这
+四类资源的当前路由范围统一通过 `resource-context.ts` 读取。Workspace API、权限等非组件代码使用
+`getWorkspaceId()` 获取当前工作空间；页面和组件使用 `isWorkspaceResource()`、
+`isSystemResource()`、`isSystemSharedResource()` 区分 Workspace、System 资源管理和 System 共享
+资源。资源范围只读取路由 `meta.resourceScope`，不要根据 path 或路由名称重复判断，也不要把这些
+判断扩展到普通 System 页面。
+
+## VNode 插槽内容判断
+
+组件需要根据插槽是否存在真实渲染内容决定是否显示触发器或操作区时，使用
+`vnode.ts` 导出的 `hasRenderableSlotContent()`。该函数会递归检查 Fragment，并忽略空白文本、
+注释和空 Fragment；不要仅通过 `$slots.xxx` 判断带 `v-if` 的条件插槽是否有可见内容。
 
 ## 消息提示
 

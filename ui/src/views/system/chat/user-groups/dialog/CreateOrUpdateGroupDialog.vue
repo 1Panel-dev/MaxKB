@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatGroupsApi from '@/api/admin/system/chat-user-groups'
+import ChatGroupsApi from '@/api/admin/system/chat-user/chat-user-groups'
 import type { ListItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
@@ -69,7 +69,7 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">
         {{ groupForm.id ? '保存' : '创建' }}
       </el-button>

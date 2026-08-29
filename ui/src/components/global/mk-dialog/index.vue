@@ -18,6 +18,7 @@ defineSlots<{
 <template>
   <el-dialog
     v-model="visible"
+    :append-to-body="true"
     :close-on-click-modal="false"
     :close-on-press-escape="false"
     :destroy-on-close="true"

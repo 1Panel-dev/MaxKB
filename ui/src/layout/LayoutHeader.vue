@@ -3,8 +3,8 @@ import { useRouter } from 'vue-router'
 
 import AvatarDropdown from './avatar-dropdown/index.vue'
 import HeaderWorkspaceDropdown from './header-workspace-dropdown/index.vue'
+import { isSystem, isWorkspace } from './utils'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import { isWorkspace, isSystem } from '@/router/admin/utils'
 import type { LayoutMode } from './types'
 const router = useRouter()
 const props = withDefaults(

@@ -89,9 +89,13 @@ watch(
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
     <div class="flex-between mb-4">
-      <el-button type="primary" @click="handleOpenAddMemberDrawer">
-        <MkIcon name="icon_add_outlined" />添加成员
-      </el-button>
+      <div>
+        <!-- 添加成员 -->
+        <el-button type="primary" @click="handleOpenAddMemberDrawer">
+          <MkIcon name="icon_add_outlined" />添加成员
+        </el-button>
+      </div>
+
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
     </div>
     <MkTable

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
+import ChatUserAuthApi from '@/api/admin/system/chat-user/chat-user-auth'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -101,7 +101,7 @@ onMounted(() => loadSetting())
     </el-form-item>
     <div>
       <el-button type="primary" @click="submit('save')">保存</el-button>
-      <el-button @click="submit('test')">测试连接</el-button>
+      <el-button plain @click="submit('test')">测试连接</el-button>
     </div>
   </el-form>
 </template>

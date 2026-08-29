@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import ChatGroupsApi from '@/api/admin/system/chat-user-groups.ts'
+import ChatGroupsApi from '@/api/admin/system/chat-user/chat-user-groups'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { ListItem, ChatUserGroupMember, LoginMethod, OptionItem, Dict } from '@/api/types'
 import { LOGIN_METHOD_LABELS } from '@/constants'
@@ -179,10 +179,13 @@ onMounted(() => loadChatUserGroups())
         </component>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" @click="handleOpenMemberDialog">
-            <MkIcon name="icon_add_outlined" />
-            <span>添加成员</span>
-          </el-button>
+          <div>
+            <el-button type="primary" @click="handleOpenMemberDialog">
+              <MkIcon name="icon_add_outlined" />
+              <span>添加成员</span>
+            </el-button>
+          </div>
+
           <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
         </div>
 

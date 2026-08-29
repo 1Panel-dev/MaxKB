@@ -1,7 +1,7 @@
 import { del, getExportFile, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()
@@ -41,6 +41,18 @@ const postToolImport = (file: File, folderId: string) => {
   return post<FormData, ToolItem>(`${getPrefix()}/import`, payload)
 }
 
+/** 上传 Skill 压缩包并返回临时文件 ID。 */
+const postSkillFile = (file: File) => {
+  const payload = new FormData()
+  payload.append('file', file)
+  return post<FormData, string>(`${getPrefix()}/upload_skill_file`, payload)
+}
+
+/** 下载 Skill 工具的压缩包。 */
+const downloadSkillFile = (toolId: string, fileName: string) => {
+  return getExportFile(fileName, `${getPrefix()}/${toolId}/download_skill_file`)
+}
+
 /** 导出工作空间工具文件。 */
 const exportTool = (toolId: string, toolName: string) => {
   return getExportFile(`${toolName}.tool`, `${getPrefix()}/${toolId}/export`)
@@ -56,7 +68,7 @@ const postToolPylint = (code: string) => {
 //   return postStream(`${p}${getPrefix()}/generate_code`, data)
 // }
 
-/** 调试自定义工具代码并返回运行结果。 */
+/** 调试普通工具代码并返回运行结果。 */
 const postToolDebug = (payload: ToolDebugPayload) => {
   return post<ToolDebugPayload, unknown>(`${getPrefix()}/debug`, payload)
 }
@@ -86,10 +98,12 @@ export default {
   exportTool,
   deleteTool,
   getToolDetail,
+  downloadSkillFile,
 
   postTool,
   postToolDebug,
   postToolImport,
+  postSkillFile,
   postToolPylint,
   postToolTestConnection,
   putBatchDeleteTools,

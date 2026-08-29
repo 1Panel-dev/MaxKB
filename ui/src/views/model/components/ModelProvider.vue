@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ModelProviderItem } from '@/api/types'
+import { isWorkspaceResource } from '@/utils/resource-context'
 
 defineOptions({ name: 'ModelProvider' })
 
@@ -45,24 +46,26 @@ function handleProviderSelect(provider: ModelProviderItem) {
 
 <template>
   <div class="px-4">
-    <MkListItem
-      class="-mt-2"
-      :active="modelValue.provider === SHARED_MODEL_PROVIDER.provider"
-      @click="handleProviderSelect(SHARED_MODEL_PROVIDER)"
-    >
-      <MkIcon
-        :name="
-          modelValue.provider === SHARED_MODEL_PROVIDER.provider
-            ? 'icon_folder-share_filled'
-            : 'icon_folder_outlined'
-        "
-        :size="18"
-        class="mr-2"
-      />
-      <span>共享模型</span>
-    </MkListItem>
+    <template v-if="isWorkspaceResource()">
+      <MkListItem
+        class="-mt-2"
+        :active="modelValue.provider === SHARED_MODEL_PROVIDER.provider"
+        @click="handleProviderSelect(SHARED_MODEL_PROVIDER)"
+      >
+        <MkIcon
+          :name="
+            modelValue.provider === SHARED_MODEL_PROVIDER.provider
+              ? 'icon_folder-share_filled'
+              : 'icon_folder_outlined'
+          "
+          :size="18"
+          class="mr-2"
+        />
+        <span>共享模型</span>
+      </MkListItem>
 
-    <el-divider class="my-1!" />
+      <el-divider class="my-1!" />
+    </template>
 
     <MkListItem
       :active="modelValue.provider === ALL_MODEL_PROVIDER.provider"

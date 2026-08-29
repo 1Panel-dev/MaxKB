@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import ChatUserApi from '@/api/admin/system/chat-user'
+import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
 import type { ChatUserSyncConflict, OptionItem, LoginMethod } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD } from '@/api/enums'
@@ -132,7 +132,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <el-button type="primary" :loading="importing" @click="submitImportUsers">导入</el-button>
     </template>
   </MkDialog>

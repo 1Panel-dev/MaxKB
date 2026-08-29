@@ -126,7 +126,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
         保存
       </el-button>

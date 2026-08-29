@@ -112,7 +112,12 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'resource',
       name: 'system-resource',
       redirect: { name: 'system-resource-applications' },
-      meta: { title: '资源管理', icon: 'icon-setting', order: 20 },
+      meta: {
+        title: '资源管理',
+        icon: 'icon-setting',
+        order: 20,
+        resourceScope: 'system-resource',
+      },
       children: [
         {
           path: 'applications',
@@ -146,7 +151,12 @@ export const systemRoutes: RouteRecordRaw = {
       path: 'share',
       name: 'system-share',
       redirect: { name: 'system-shared-knowledge' },
-      meta: { title: '共享资源', icon: 'icon-setting', order: 30 },
+      meta: {
+        title: '共享资源',
+        icon: 'icon-setting',
+        order: 30,
+        resourceScope: 'system-shared',
+      },
       children: [
         {
           path: 'knowledge',
@@ -157,7 +167,7 @@ export const systemRoutes: RouteRecordRaw = {
         {
           path: 'models',
           name: 'system-shared-models',
-          component: () => import('@/views/system/SystemView.vue'),
+          component: () => import('@/views/system/shared-resources/SharedModelview.vue'),
           meta: { title: '模型', order: 20 },
         },
         {

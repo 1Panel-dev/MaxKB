@@ -187,7 +187,7 @@ onMounted(() => {
         <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
       </div>
     </template>
-    <el-select v-model="formValue.default_value" :teleported="false">
+    <el-select v-model="formValue.default_value">
       <el-option
         v-for="(option, index) in formValue.option_list"
         :key="index"

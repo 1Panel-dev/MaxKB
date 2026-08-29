@@ -21,7 +21,7 @@ const handleSelect = (nodeType: WorkflowNodeType) => {
 
 <template>
   <div v-click-outside="() => (popoverVisible = false)" class="relative">
-    <el-button @click="popoverVisible = !popoverVisible"> 添加组件 </el-button>
+    <el-button plain @click="popoverVisible = !popoverVisible"> 添加组件 </el-button>
 
     <el-collapse-transition>
       <NodeMenu

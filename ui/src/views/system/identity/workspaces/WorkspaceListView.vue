@@ -245,10 +245,14 @@ onMounted(() => loadWorkspaceOptions())
         </component>
 
         <div class="flex-between mb-4">
-          <el-button type="primary" @click="handleOpenAddMemberDrawer">
-            <MkIcon name="icon_add_outlined" />
-            <span>添加成员</span>
-          </el-button>
+          <div>
+            <!-- 添加成员 -->
+            <el-button type="primary" @click="handleOpenAddMemberDrawer">
+              <MkIcon name="icon_add_outlined" />
+              <span>添加成员</span>
+            </el-button>
+          </div>
+
           <MkComplexSearch :fields="memberSearchFields" @change="handleMemberSearch" />
         </div>
 

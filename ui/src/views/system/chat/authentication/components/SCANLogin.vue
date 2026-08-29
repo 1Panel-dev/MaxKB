@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import ChatUserAuthScanApi from '@/api/admin/system/chat-user-auth-scan'
+import ChatUserAuthScanApi from '@/api/admin/system/chat-user/chat-user-auth-scan'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
@@ -123,7 +123,7 @@ onMounted(loadQrPlatforms)
             <span>{{ platform.isActive ? '已启用' : '已关闭' }}</span>
             <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
           </div>
-          <el-button v-else type="primary" @click="handleEditPlatform(platform)">接入</el-button>
+          <el-button  v-else type="primary" @click="handleEditPlatform(platform)">接入</el-button>
         </div>
         <div class="border-t" v-if="platform.isValid">
           <div class="py-4 grid grid-cols-2 gap-x-6 gap-y-4">
@@ -136,7 +136,7 @@ onMounted(loadQrPlatforms)
           </div>
 
           <el-button type="primary" @click="handleEditPlatform(platform)">编辑</el-button>
-          <el-button @click="handleValidatePlatform(platform)">校验</el-button>
+          <el-button plain @click="handleValidatePlatform(platform)">校验</el-button>
         </div>
       </el-card>
     </template>

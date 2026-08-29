@@ -60,7 +60,7 @@ defineExpose({ open })
     </div>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit">
         确认
       </el-button>

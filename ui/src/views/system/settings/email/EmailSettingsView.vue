@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { EmailSettingPayload } from '@/api/types'
-import EmailSettingApi from '@/api/admin/system/email-setting'
+import EmailSettingApi from '@/api/admin/system/settings/email-setting'
 import { MsgSuccess } from '@/utils/message'
 
 const defaultEmailSetting: EmailSettingPayload = {
@@ -102,7 +102,7 @@ onMounted(() => loadEmailSetting())
       </el-form-item>
 
       <el-button type="primary" @click="submitEmailSetting('save')">保存</el-button>
-      <el-button @click="submitEmailSetting('test')">测试连接</el-button>
+      <el-button plain @click="submitEmailSetting('test')">测试连接</el-button>
     </el-form>
   </MkViewLayout>
 </template>

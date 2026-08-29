@@ -1,5 +1,6 @@
 <script setup lang="ts" generic="T extends object = Record<string, unknown>">
-import { computed } from 'vue'
+import { computed, useSlots } from 'vue'
+import { hasRenderableSlotContent } from '@/utils/vnode'
 
 defineOptions({ name: 'MkListItem' })
 
@@ -31,6 +32,11 @@ const itemLabel = computed(() => {
   return String(row[field] ?? '')
 })
 const slotRow = computed(() => row as T)
+const slots = useSlots()
+
+const hasActionDropdown = computed(() =>
+  hasRenderableSlotContent(slots['action-dropdown']?.({ row: slotRow.value, index })),
+)
 </script>
 
 <template>
@@ -46,12 +52,12 @@ const slotRow = computed(() => row as T)
     </slot>
     <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
     <div
-      v-if="$slots.action || $slots['action-dropdown']"
+      v-if="$slots.action || hasActionDropdown"
       class="group-hover-visible ml-auto flex shrink-0 items-center font-normal text-N900"
       @click.stop
       @keydown.stop
     >
-      <MkDropdown v-if="$slots['action-dropdown']" trigger="click" :teleported="false">
+      <MkDropdown v-if="hasActionDropdown" trigger="click" :teleported="false">
         <el-button class="-mr-1" text>
           <MkIcon name="icon_more_outlined" />
         </el-button>

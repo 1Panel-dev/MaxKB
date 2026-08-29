@@ -1,6 +1,6 @@
 import { get } from '../core/request'
 import type { Dict, WorkspaceUserOption } from '@/api/types'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 /** 获取当前工作空间下的用户选项。 */
 const getAllUsers = (query?: Dict<unknown>) => {

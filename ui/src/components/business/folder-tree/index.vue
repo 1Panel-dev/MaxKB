@@ -9,7 +9,7 @@ import { MsgSuccess, MsgConfirm } from '@/utils/message'
 import VirtualizedTree from './VirtualizedTree.vue'
 import FolderFormDialog from './FolderFormDialog.vue'
 import { useStore } from '@/stores'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 defineOptions({ name: 'FolderTree' })
 
@@ -344,24 +344,25 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
     </div>
 
     <div class="px-4 mb-1">
-      <MkListItem
-        v-if="source !== RESOURCE_TYPE.APPLICATION"
-        :active="currentNodeKey === folderEntries.shared.id"
-        @click="handleFolderClick(folderEntries.shared)"
-      >
-        <MkIcon
-          :name="
-            currentNodeKey === folderEntries.shared.id
-              ? 'icon_folder-share_filled'
-              : 'icon_folder_outlined'
-          "
-          :size="18"
-          class="mr-2"
-        />
-        <span>{{ folderEntries.shared.name }}</span>
-      </MkListItem>
+      <div v-if="source !== RESOURCE_TYPE.APPLICATION">
+        <MkListItem
+          :active="currentNodeKey === folderEntries.shared.id"
+          @click="handleFolderClick(folderEntries.shared)"
+        >
+          <MkIcon
+            :name="
+              currentNodeKey === folderEntries.shared.id
+                ? 'icon_folder-share_filled'
+                : 'icon_folder_outlined'
+            "
+            :size="18"
+            class="mr-2"
+          />
+          <span>{{ folderEntries.shared.name }}</span>
+        </MkListItem>
 
-      <el-divider class="my-1!" />
+        <el-divider class="my-1!" />
+      </div>
 
       <MkListItem
         :active="currentNodeKey === folderEntries.all.id"

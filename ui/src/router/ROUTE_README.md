@@ -11,7 +11,7 @@ src/router/
 ├── ROUTE_README.md
 ├── admin/
 │   ├── index.ts                 # Admin Router、拦截器、导航目录生成
-│   ├── utils.ts                 # Scope、导航目录等公共路由工具
+│   ├── utils.ts                 # 导航目录等公共路由工具
 │   ├── types.ts                 # RouteMeta 类型扩展
 │   ├── login/
 │   │   └── index.ts             # 登录等无框架页面
@@ -100,16 +100,17 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段         | 类型                        | 说明                                         |
-| ------------ | --------------------------- | -------------------------------------------- |
-| `scope`      | `'workspace' \| 'system'`   | 标记生成哪一套框架导航，只配置在布局根路由上 |
-| `activeIcon` | `string`                    | 菜单激活状态的 iconfont Symbol ID            |
-| `activeMenu` | `string`                    | 进入子页面时需要保持激活的侧栏菜单路径       |
-| `title`      | `string`                    | 页面标题，同时作为导航名称                   |
-| `icon`       | `string`                    | iconfont Symbol ID，子目录通常可以不配置     |
-| `order`      | `number`                    | 同级导航排序，数字越小越靠前                 |
-| `hidden`     | `boolean`                   | 设置为 `true` 时不显示在导航中               |
-| `resource`   | `ResourceAuthorizationType` | 系统资源授权页面当前管理的后端资源类型       |
+| 字段            | 类型                                                  | 说明                                                   |
+| --------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| `scope`         | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
+| `resourceScope` | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
+| `activeIcon`    | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
+| `activeMenu`    | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
+| `title`         | `string`                                              | 页面标题，同时作为导航名称                             |
+| `icon`          | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
+| `order`         | `number`                                              | 同级导航排序，数字越小越靠前                           |
+| `hidden`        | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
+| `resource`      | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
 
 ## 导航生成
 
@@ -135,15 +136,15 @@ System 侧栏默认使用当前页面的 `route.path` 匹配菜单激活项。Wo
 
 ## Scope 来源判断
 
-页面不要重复判断 `route.meta.scope`，统一使用 `admin/utils.ts`：
+Layout 对 Workspace、System 模式的判断统一维护在 `src/layout/utils.ts`：
 
 ```ts
-import { isSystem, isWorkspace } from '@/router/admin/utils'
+import { isSystem, isWorkspace } from '@/layout/utils'
 ```
 
 `scope` 来自 Vue Router 合并后的路由 `meta`。Workspace、System 子页面会分别继承根路由的 `workspace`、`system`。
 
-`getRouteScope`、`useRouteScope` 和 `getChildRouteList` 都属于公共路由工具，统一维护在 `admin/utils.ts`，并通过 `@/router/admin` 对外导出。
+`getChildRouteList` 属于公共路由工具，继续维护在 `admin/utils.ts`；仅供 Layout 使用的模式判断不要放入 Router。
 
 路由对象是响应式的，不要在 setup 顶层解构 `route.meta.scope`，否则切换路由后 Scope 不会更新。需要响应路由变化时，应在 `computed` 中读取：
 
@@ -152,7 +153,22 @@ const route = useRoute()
 const mode = computed(() => route.meta.scope ?? 'workspace')
 ```
 
-## Application 和 Knowledge 路由层级
+## 资源范围判断
+
+`application`、`knowledge`、`model`、`tool` 是需要跨资源范围维护的四类特殊资源。
+`resourceScope` 只用于区分这四类资源在 Workspace、System 资源管理和 System 共享资源中的接口与
+展示差异，不作为所有业务页面的通用模式字段。Workspace 在布局根路由配置 `workspace`；System
+的“资源管理”和“共享资源”分别在对应父路由配置 `system-resource`、`system-shared`，子路由通过
+Vue Router 的 meta 合并自动继承。
+
+业务页面和组件统一使用 `src/utils/resource-context.ts` 中的 `isWorkspaceResource()`、
+`isSystemResource()` 和 `isSystemSharedResource()` 判断当前资源范围，不根据 path 或路由名称重复
+判断。非资源页面不配置 `resourceScope`。
+
+`resourceScope` 负责表达当前路由语义，页面据此决定展示和选用哪个业务 API；卡片、Action、
+Drawer、Dialog 不根据 path、路由名称或 Scope 自行维护 API 映射。
+
+## 业务路由层级
 
 Workspace 页面：
 
@@ -179,7 +195,19 @@ System 复用页面（仅替换根前缀）：
 /admin/system/knowledge/:knowledgeId/document/:documentId
 ```
 
-两套详情路由使用不同的路由名称并复用相同页面组件。除 `/workspace`、`/system` 根前缀外，后续模块路径保持一致。页面通过 `isSystem`、`isWorkspace` 处理返回地址、权限和操作差异。
+两套详情路由使用不同的路由名称并复用相同页面组件。除 `/workspace`、`/system` 根前缀外，后续模块路径保持一致。
+
+System 共享资源页面：
+
+```text
+/admin/system/share/knowledge
+/admin/system/share/models
+/admin/system/share/tools
+```
+
+共享资源路由是 System 导航的一部分，继续在 `admin/system/index.ts` 的 `share` 子路由中维护。
+已实现的共享资源页面放在 `views/system/shared-resources/`，由页面处理 System 范围的查询和操作，
+可按需复用 Workspace 对应资源的卡片等展示组件。
 
 ## 一级导航示例
 

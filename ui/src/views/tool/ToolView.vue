@@ -1,16 +1,31 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { onMounted, computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
 import CommonSystemApi from '@/api/admin/system/common'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
-import type { Dict, FolderItem, OptionItem, ToolItem, ToolType } from '@/api/types'
+import ToolStoreApi from '@/api/admin/tool-store.ts'
+import type {
+  Dict,
+  FolderItem,
+  OptionItem,
+  ToolItem,
+  ToolStoreResponse,
+  ToolType,
+} from '@/api/types'
 import { RESOURCE_TYPE, TOOL_SCOPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
-
-import ToolCard from './components/ToolCard.vue'
-import ToolCreateDropdown from './components/ToolCreateDropdown.vue'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import ToolCard from './tool-card/index.vue'
+import {
+  CopyToolAction,
+  DeleteToolAction,
+  EditToolAction,
+  ExportToolAction,
+} from './tool-card/action-dropdown'
+import CreateToolDropdown from './components/CreateToolDropdown.vue'
+import ToolStoreOpenButton from './tool-store/ToolStoreOpenButton.vue'
 
 /* 当前文件夹 */
 
@@ -20,7 +35,10 @@ const isShared = computed(() => currentFolder.value.id === FOLDER_ENTRY_ID.SHARE
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
   currentFolder.value = folder
-  if (folderChanged) refreshTool()
+  if (folderChanged) {
+    cancelBatchSelection()
+    refreshTool()
+  }
 }
 // 新建文件夹
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -69,11 +87,21 @@ function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
   })
 }
 
+// 加载工具商店
+const storeTools = ref<ToolStoreResponse['apps']>([])
+
+function loadStoreTools() {
+  ToolStoreApi.getStoreToolList({ name: '' }).then((res) => {
+    storeTools.value = res.apps
+  })
+}
+
 /* 工具维护 */
 const toolOperationLoading = ref(false)
 
 function refreshTool() {
-  infiniteScrollRef.value?.reset()
+  selectedToolIds.value = []
+  return infiniteScrollRef.value?.reset()
 }
 
 function handleToolUpdate(tool: ToolItem) {
@@ -85,6 +113,54 @@ function handleDeleteTool(toolId: string) {
   const toolIndex = toolsData.value.findIndex((item) => item.id === toolId)
   if (toolIndex >= 0) toolsData.value.splice(toolIndex, 1)
 }
+
+/* 批量选择与操作 */
+const batchSelectionMode = ref(false)
+const selectedToolIds = ref<string[]>([])
+const selectedToolCount = computed(() => selectedToolIds.value.length)
+const toolIds = computed(() => toolsData.value.map(({ id }) => id))
+
+function toggleBatchSelection() {
+  batchSelectionMode.value = !batchSelectionMode.value
+  selectedToolIds.value = []
+}
+
+function cancelBatchSelection() {
+  batchSelectionMode.value = false
+  selectedToolIds.value = []
+}
+
+function handleToolSelect(toolId: string, selected: boolean) {
+  if (selected) {
+    if (!selectedToolIds.value.includes(toolId)) selectedToolIds.value.push(toolId)
+    return
+  }
+
+  selectedToolIds.value = selectedToolIds.value.filter((id) => id !== toolId)
+}
+
+function handleBatchDelete() {
+  if (!selectedToolCount.value) return
+  const toolIds = [...selectedToolIds.value]
+
+  MsgConfirm(`是否批量删除 ${toolIds.length} 个工具？`, '删除后无法恢复，请谨慎操作。')
+    .then(() => {
+      toolOperationLoading.value = true
+      return ToolApi.putBatchDeleteTools(toolIds).then(() => {
+        MsgSuccess('删除成功')
+        cancelBatchSelection()
+        return refreshTool()
+      })
+    })
+    .catch(() => {})
+    .finally(() => {
+      toolOperationLoading.value = false
+    })
+}
+
+onMounted(() => {
+  loadStoreTools()
+})
 </script>
 
 <template>
@@ -108,7 +184,7 @@ function handleDeleteTool(toolId: string) {
       </FolderTree>
     </template>
 
-    <template #default="{ Header }">
+    <template #default="{ Footer, Header }">
       <component :is="Header">
         <div class="flex min-w-0 flex-1 items-center gap-4">
           <h4 class="min-w-0 truncate" :title="currentFolder?.name">{{ currentFolder?.name }}</h4>
@@ -130,11 +206,24 @@ function handleDeleteTool(toolId: string) {
         </div>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ToolCreateDropdown
-            v-if="!isShared"
-            :folder-id="currentFolder.id"
-            @refresh="refreshTool"
-          />
+          <template v-if="!isShared">
+            <span>
+              <el-button
+                v-if="toolsData.length"
+                :type="batchSelectionMode ? 'primary' : undefined"
+                plain
+                @click="toggleBatchSelection"
+              >
+                <MkIcon name="icon_Batch_outlined" />
+                <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+              </el-button>
+            </span>
+
+            <template v-if="!batchSelectionMode">
+              <ToolStoreOpenButton :folder-id="currentFolder.id" @refresh="refreshTool" />
+              <CreateToolDropdown :folder-id="currentFolder.id" @refresh="refreshTool" />
+            </template>
+          </template>
         </div>
       </component>
       <div v-loading="toolOperationLoading" class="min-h-0 flex-1">
@@ -143,16 +232,59 @@ function handleDeleteTool(toolId: string) {
             <template v-for="tool in toolsData" :key="tool.id">
               <ToolCard
                 v-model:loading="toolOperationLoading"
+                :api="ToolApi"
+                :disabled="isShared"
+                :selectable="batchSelectionMode"
+                :selected="selectedToolIds.includes(tool.id)"
                 :shared="isShared"
+                :store-tools="storeTools"
                 :tool="tool"
-                @delete="handleDeleteTool"
+                @selected="handleToolSelect(tool.id, $event)"
                 @update="handleToolUpdate"
-              />
+              >
+                <template #action-dropdown>
+                  <EditToolAction
+                    label="编辑"
+                    :api="ToolApi"
+                    :store-tools="storeTools"
+                    :tool="tool"
+                    @refresh="refreshTool"
+                  />
+                  <CopyToolAction label="复制" :tool="tool" />
+                  <ExportToolAction
+                    v-model:loading="toolOperationLoading"
+                    label="导出"
+                    :api="ToolApi"
+                    :tool="tool"
+                  />
+                  <DeleteToolAction
+                    v-model:loading="toolOperationLoading"
+                    label="删除"
+                    :api="ToolApi"
+                    :tool="tool"
+                    @delete="handleDeleteTool"
+                  />
+                </template>
+              </ToolCard>
             </template>
           </div>
           <MkEmpty v-else class="mt-24" />
         </MkInfiniteScroll>
       </div>
+
+      <component
+        :is="Footer"
+        v-if="batchSelectionMode"
+        v-model:batch-selection="selectedToolIds"
+        :batch-values="toolIds"
+        @batch-cancel="cancelBatchSelection"
+      >
+        <template #footer-batch-actions>
+          <el-button type="danger" plain :disabled="!selectedToolCount" @click="handleBatchDelete">
+            删除
+          </el-button>
+        </template>
+      </component>
     </template>
   </MkViewLayout>
 </template>

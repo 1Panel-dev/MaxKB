@@ -250,7 +250,7 @@ onMounted(() => {
 
       <div class="flex shrink-0 items-center gap-3">
         <WorkflowComponentMenu @select="handleAddNode" />
-        <el-button
+        <el-button plain
           :loading="saving && !publishing"
           :disabled="loading || saving || publishing"
           @click="handleSave"

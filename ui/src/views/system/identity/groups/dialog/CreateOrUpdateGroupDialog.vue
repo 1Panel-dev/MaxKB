@@ -73,7 +73,7 @@ defineExpose({ open })
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">
         {{ groupForm.id ? '保存' : '创建' }}
       </el-button>

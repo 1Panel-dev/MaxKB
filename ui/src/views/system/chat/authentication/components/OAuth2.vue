@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserAuthApi from '@/api/admin/system/chat-user-auth'
+import ChatUserAuthApi from '@/api/admin/system/chat-user/chat-user-auth'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { AuthProviderSettingPayload } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'

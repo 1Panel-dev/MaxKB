@@ -2,7 +2,7 @@
 import { reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserApi from '@/api/admin/system/chat-user'
+import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
 import { useStore } from '@/stores'
 import type { ChatUser, UpdatePasswordForm } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -119,7 +119,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
         保存
       </el-button>
