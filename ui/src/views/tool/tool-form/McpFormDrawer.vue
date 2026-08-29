@@ -5,9 +5,12 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolPayload } from '@/api/types'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'McpToolFormDrawer' })
+defineOptions({ name: 'McpFormDrawer' })
+
+const { auth } = useStore()
 
 const props = defineProps<{
   api: typeof ToolApi
@@ -18,6 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   closed: []
   refresh: []
+  update: [tool: ToolItem]
 }>()
 
 interface McpFormModel {
@@ -29,7 +33,7 @@ interface McpFormModel {
 
 const mcpServerExample = `{
   "math": {
-    "url": "https://your-server.example.com/sse",
+    "url": "your_server",
     "transport": "sse"
   }
 }`
@@ -41,7 +45,7 @@ const editId = ref<string>()
 const originalForm = ref('')
 const mcpForm = reactive<McpFormModel>({ code: '', desc: '', icon: '', name: '' })
 const formRules: FormRules<McpFormModel> = {
-  code: [{ required: true, message: '请输入 MCP Server 配置', trigger: 'blur' }],
+  code: [{ required: true, message: '请输入 MCP Server Config', trigger: 'blur' }],
   name: [{ required: true, message: '请输入 MCP 名称', trigger: 'blur' }],
 }
 
@@ -51,7 +55,7 @@ function isValidConfig() {
     if (!config || typeof config !== 'object' || Array.isArray(config)) throw new Error()
     return true
   } catch {
-    MsgError('请输入正确的 MCP Server JSON 配置')
+    MsgError('请输入正确的 MCP Server Config')
     return false
   }
 }
@@ -65,15 +69,21 @@ function handleSubmit() {
       tool_type: TOOL_TYPE.MCP,
     }
     loading.value = true
-    const request = editId.value
-      ? props.api.putTool(editId.value, payload)
+    const currentEditId = editId.value
+    const isEdit = Boolean(currentEditId)
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
       : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
-      .then(() => {
-        MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh')
+      .then((savedTool) => {
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          if (isEdit) emit('update', savedTool)
+          else emit('refresh')
+        })
       })
       .finally(() => {
         loading.value = false
@@ -104,26 +114,29 @@ function fillMcpForm(tool: ToolItem) {
   })
 }
 
-function open(tool?: ToolItem) {
+function open(tool?: ToolItem, asCopy = false) {
   resetData()
   visible.value = true
   originalForm.value = JSON.stringify(mcpForm)
   if (!tool) return
+
+  if (asCopy) {
+    fillMcpForm(tool)
+    originalForm.value = JSON.stringify(mcpForm)
+    return
+  }
 
   editId.value = tool.id
   formLoading.value = true
   props.api
     .getToolDetail(tool.id)
     .then((toolDetail) => {
-      if (editId.value !== tool.id || !visible.value) return
       fillMcpForm(toolDetail)
       originalForm.value = JSON.stringify(mcpForm)
     })
-    .catch(() => {
-      if (editId.value === tool.id) visible.value = false
-    })
+
     .finally(() => {
-      if (editId.value === tool.id) formLoading.value = false
+      formLoading.value = false
     })
 }
 
@@ -179,6 +192,7 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
+          <!-- // TODO修改头像 -->
           <ToolIcon :icon="mcpForm.icon" :size="32" :type="TOOL_TYPE.MCP" />
           <el-input
             v-model="mcpForm.name"
@@ -194,15 +208,20 @@ defineExpose({ open })
           v-model="mcpForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入描述"
+          placeholder="请输入"
           show-word-limit
           type="textarea"
           @blur="mcpForm.desc = mcpForm.desc.trim()"
         />
       </el-form-item>
 
-      <h4 class="mk-title-decoration mk-required mb-4">MCP Server</h4>
-      <el-form-item label="MCP Server 配置（JSON）" prop="code">
+      <h4 class="mk-title-decoration mb-4">MCP 服务</h4>
+      <el-form-item prop="code" class="mk-hide-asterisk">
+        <template #label>
+          <span class="mk-required"> MCP Server Config </span>
+
+          <span class="text-N600"> （仅支持 SSE、Streamable HTTP 调用方式）</span>
+        </template>
         <el-input
           v-model="mcpForm.code"
           :autosize="{ minRows: 8 }"
@@ -213,10 +232,10 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
+      <el-button plain :disabled="loading" @click="handleBeforeClose">取消</el-button>
       <el-button plain :disabled="loading || formLoading" @click="handleTestConnection">
         测试连接
       </el-button>
-      <el-button plain :disabled="loading" @click="handleBeforeClose">取消</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>

@@ -11,7 +11,7 @@ import type {
   ResourcePermissionItem,
   ResourcePermissionPayload,
 } from '@/api/types'
-import { resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/icon'
 import { getPermissionOptions } from '../constants'
 import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 

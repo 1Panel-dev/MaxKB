@@ -6,16 +6,7 @@ export function randomId() {
   return nanoid()
 }
 
-/*
-  icon url
-*/
-export const resetUrl = (url?: string | null, useDefault?: boolean) => {
-  const sourceUrl = url || (useDefault ? './favicon.ico' : '')
-  if (sourceUrl && sourceUrl.startsWith('./')) {
-    return `${window.MaxKB?.prefix}/${sourceUrl.substring(2)}`
-  }
-  return sourceUrl
-}
+
 export const relatedObject = (list: Array<Record<string, unknown>>, val: unknown, attr: string) => {
   const filterData = list.find((item) => item[attr] === val)
   return filterData || null

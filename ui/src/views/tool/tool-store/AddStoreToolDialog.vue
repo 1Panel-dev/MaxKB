@@ -6,6 +6,7 @@ import type { ToolStoreItem } from '@/api/types'
 defineOptions({ name: 'AddStoreToolDialog' })
 
 const emit = defineEmits<{
+  closed: []
   submit: [tool: ToolStoreItem, name: string]
 }>()
 
@@ -15,6 +16,7 @@ interface AddStoreToolForm {
 
 const formRef = ref<FormInstance>()
 const visible = ref(false)
+const isEdit = ref(false)
 const currentTool = ref<ToolStoreItem>()
 const addToolForm = reactive<AddStoreToolForm>({ name: '' })
 const formRules: FormRules<AddStoreToolForm> = {
@@ -29,23 +31,31 @@ function handleSubmit() {
   })
 }
 
-function open(tool: ToolStoreItem) {
+function open(tool: ToolStoreItem, edit = false) {
   currentTool.value = tool
+  isEdit.value = edit
   addToolForm.name = tool.name
   visible.value = true
 }
 
-function resetData() {
+function handleClosed() {
   currentTool.value = undefined
+  isEdit.value = false
   addToolForm.name = ''
   formRef.value?.clearValidate()
+  emit('closed')
 }
 
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="添加工具" width="450" @closed="resetData">
+  <MkDialog
+    v-model="visible"
+    :title="isEdit ? '编辑工具' : '添加工具'"
+    width="450"
+    @closed="handleClosed"
+  >
     <el-form
       ref="formRef"
       :model="addToolForm"
@@ -67,7 +77,9 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="handleSubmit">添加</el-button>
+      <el-button type="primary" @click="handleSubmit">
+        {{ isEdit ? '保存' : '添加' }}
+      </el-button>
     </template>
   </MkDialog>
 </template>

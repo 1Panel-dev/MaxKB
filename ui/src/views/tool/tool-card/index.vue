@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { nextTick, ref, useTemplateRef } from 'vue'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolStoreResponse } from '@/api/types'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
+import InitParamDialog from './InitParamDialog.vue'
 import UpdateVersionButton from './UpdateVersionButton.vue'
 
 defineOptions({ name: 'ToolCard' })
@@ -30,6 +32,10 @@ defineSlots<{
   'action-dropdown'?: () => unknown
 }>()
 
+const initParamDialogMounted = ref(false)
+const initParamDialogRef =
+  useTemplateRef<InstanceType<typeof InitParamDialog>>('initParamDialogRef')
+
 function handleToolStatusChange() {
   if (props.tool.is_active) {
     return MsgConfirm(
@@ -52,7 +58,8 @@ function handleToolStatusChange() {
       }
 
       if (hasMissingInitParams(toolDetail)) {
-        // TODO 打开参数配置
+        initParamDialogMounted.value = true
+        void nextTick(() => initParamDialogRef.value?.open(toolDetail, !props.tool.is_active))
         return false
       }
 
@@ -87,6 +94,10 @@ function updateToolStatus(active: boolean) {
     })
     .catch(() => false)
     .finally(() => (loading.value = false))
+}
+
+function handleInitParamDialogClosed() {
+  initParamDialogMounted.value = false
 }
 </script>
 
@@ -144,4 +155,12 @@ function updateToolStatus(active: boolean) {
       </component>
     </template>
   </MkSourceCard>
+
+  <InitParamDialog
+    v-if="initParamDialogMounted"
+    ref="initParamDialogRef"
+    :api="api"
+    @closed="handleInitParamDialogClosed"
+    @update="emit('update', $event)"
+  />
 </template>

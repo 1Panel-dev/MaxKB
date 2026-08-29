@@ -1,4 +1,4 @@
-import { del, getExportFile, get, post, put } from '../../core/request'
+import { del, downloadRequest, getExportFile, get, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, ToolDebugPayload, ToolItem, ToolPayload, ToolPylintIssue } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
@@ -28,6 +28,21 @@ const putTool = (toolId: string, payload: ToolPayload) => {
   return put<ToolPayload, ToolItem>(`${getPrefix()}/${toolId}`, payload)
 }
 
+/** 检查工作空间工具的 Python 代码。 */
+const postToolPylint = (code: string) => {
+  return post<{ code: string }, ToolPylintIssue[]>(`${getPrefix()}/pylint`, { code })
+}
+
+// const generateCode = (data: any) => {
+//   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
+//   return postStream(`${p}${getPrefix()}/generate_code`, data)
+// }
+
+/** 调试普通工具代码并返回运行结果。 */
+const postToolDebug = (payload: ToolDebugPayload) => {
+  return post<ToolDebugPayload, unknown>(`${getPrefix()}/debug`, payload)
+}
+
 /** 获取工具详情。 */
 const getToolDetail = (toolId: string) => {
   return get<ToolItem>(`${getPrefix()}/${toolId}`)
@@ -42,35 +57,20 @@ const postToolImport = (file: File, folderId: string) => {
 }
 
 /** 上传 Skill 压缩包并返回临时文件 ID。 */
-const postSkillFile = (file: File) => {
+const putUploadSkillFile = (file: File) => {
   const payload = new FormData()
   payload.append('file', file)
-  return post<FormData, string>(`${getPrefix()}/upload_skill_file`, payload)
+  return put<FormData, string>(`${getPrefix()}/upload_skill_file`, payload)
 }
 
 /** 下载 Skill 工具的压缩包。 */
-const downloadSkillFile = (toolId: string, fileName: string) => {
-  return getExportFile(fileName, `${getPrefix()}/${toolId}/download_skill_file`)
+const downloadSkillFile = (toolId: string) => {
+  return downloadRequest(`${getPrefix()}/${toolId}/download_skill_file`, 'GET')
 }
 
 /** 导出工作空间工具文件。 */
 const exportTool = (toolId: string, toolName: string) => {
   return getExportFile(`${toolName}.tool`, `${getPrefix()}/${toolId}/export`)
-}
-
-/** 检查工作空间工具的 Python 代码。 */
-const postToolPylint = (code: string) => {
-  return post<{ code: string }, ToolPylintIssue[]>(`${getPrefix()}/pylint`, { code })
-}
-
-// const generateCode = (data: any) => {
-//   const p = (window.MaxKB?.prefix ? window.MaxKB?.prefix : '/admin') + '/api'
-//   return postStream(`${p}${getPrefix()}/generate_code`, data)
-// }
-
-/** 调试普通工具代码并返回运行结果。 */
-const postToolDebug = (payload: ToolDebugPayload) => {
-  return post<ToolDebugPayload, unknown>(`${getPrefix()}/debug`, payload)
 }
 
 /** 测试工具配置是否可连接。 */
@@ -103,7 +103,7 @@ export default {
   postTool,
   postToolDebug,
   postToolImport,
-  postSkillFile,
+  putUploadSkillFile,
   postToolPylint,
   postToolTestConnection,
   putBatchDeleteTools,

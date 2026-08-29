@@ -82,19 +82,21 @@ System 共享资源的四类特殊资源。它们统一遵循以下页面组织�
 ```text
 src/views/tool/
 ├── ToolView.vue
+├── McpConfigDialog.vue           # MCP 工具配置查看弹窗
 ├── components/                    # 工具创建与编辑共用的表单片段
 │   ├── ToolCreateDropdown.vue     # 工具创建入口
 │   ├── init-field/
 │   ├── input-field/
 │   └── python-code/
 ├── tool-form/                     # 各类型工具创建、编辑表单
-│   ├── tool-custom/
-│   ├── tool-data-source/
-│   ├── tool-mcp/
-│   ├── tool-skills/
-│   └── tool-workflow/
+│   ├── DataSourceFormDrawer.vue
+│   ├── McpFormDrawer.vue
+│   ├── SkillToolFormDrawer.vue
+│   ├── WorkflowFormDialog.vue
+│   └── tool-custom/
 ├── tool-card/
 │   ├── index.vue                  # 工具卡片展示与操作插槽
+│   ├── InitParamDialog.vue        # 启用工具前配置启动参数
 │   ├── UpdateVersionButton.vue    # 根据页面传入的商店数据检测并更新工具版本
 │   └── action-dropdown/           # 工作空间工具菜单 Action
 │       ├── index.ts
@@ -108,10 +110,14 @@ src/views/tool/
 
 各类型表单只维护本类型特有字段和流程，并统一放在 `tool/tool-form/`；创建入口和编辑 Action
 共同复用这些表单。启动参数、输入参数、Python 内容等已有表单片段应从 `tool/components/` 复用，
-不在类型目录中重复实现。工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
-操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，各类型表单完成保存后通过事件通知列表刷新
-或更新，不把不同工具类型的字段重新合并到一个通用表单中。需要请求的 Action 和表单接收页面传入
-的完整 Tool API，不额外维护逐方法接口类型。工具启用状态属于固定的卡片内交互，由 `ToolCard`
+不在类型目录中重复实现。`ToolCodeSetting` 的生成入口默认隐藏，只由普通自定义工具表单通过
+`showGenerate` 显式开启。工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
+操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单。各类型表单创建成功后通过 `refresh` 事件
+刷新列表，编辑成功后通过 `update` 事件返回接口响应的完整工具数据，由页面局部更新对应卡片；不要
+把不同工具类型的字段重新合并到一个通用表单中。所有调用 `postTool` 创建工具的流程在接口成功后
+先调用 `auth.loadAuthBaseProfile()` 刷新当前用户基础资料，再执行成功提示和页面刷新；`putTool` 编辑
+流程不触发该刷新。需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外维护逐方法接口
+类型。工具启用状态属于固定的卡片内交互，由 `ToolCard`
 使用页面传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态和
 批量删除流程由 `ToolView` 管理；`ToolCard` 只把选择模式与选中状态传给 `MkSourceCard`。
 工具商店列表由 `ToolView` 统一加载并经 `ToolCard` 传给 `UpdateVersionButton`，卡片和更新按钮

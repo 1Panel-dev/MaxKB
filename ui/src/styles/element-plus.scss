@@ -442,6 +442,9 @@
     width: 100% !important;
     color: var(--el-text-color-primary);
   }
+  &__content {
+    line-height: 22px;
+  }
 }
 
 /* input */
@@ -991,5 +994,18 @@
   }
   .el-icon {
     font-size: 14px;
+  }
+}
+
+/* upload */
+.el-upload {
+  --el-upload-dragger-padding-horizontal: 40px;
+  --el-upload-dragger-padding-vertical: 32px;
+  &__text {
+    line-height: 22px;
+    color: var(--el-text-color-primary) !important;
+    em:hover {
+      color: var(--el-color-primary-light-5);
+    }
   }
 }

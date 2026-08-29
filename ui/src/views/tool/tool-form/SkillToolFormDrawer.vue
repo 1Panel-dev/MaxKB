@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import type {
-  FormInstance,
-  FormRules,
-  UploadFile,
-  UploadFiles,
-  UploadInstance,
-  UploadUserFile,
-} from 'element-plus'
+import { Download } from '@element-plus/icons-vue'
+import type { FormInstance, FormRules, UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField, ToolItem, ToolPayload } from '@/api/types'
+import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
-import InitFieldTable from '../../components/init-field/InitFieldTable.vue'
+
+import InitFieldTable from '../components/init-field/InitFieldTable.vue'
 
 defineOptions({ name: 'SkillToolFormDrawer' })
+
+const { auth } = useStore()
 
 const props = defineProps<{
   api: typeof ToolApi
@@ -26,6 +25,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   closed: []
   refresh: []
+  update: [tool: ToolItem]
 }>()
 
 interface SkillFormModel {
@@ -39,7 +39,7 @@ interface SkillFormModel {
 
 const maxFileSizeMb = 100
 const formRef = ref<FormInstance>()
-const uploadRef = useTemplateRef<UploadInstance>('uploadRef')
+const uploadRef = useTemplateRef<InstanceType<typeof MkDragUpload>>('uploadRef')
 const visible = ref(false)
 const loading = ref(false)
 const formLoading = ref(false)
@@ -79,7 +79,7 @@ function handleFileChange(file: UploadFile, fileList: UploadFiles) {
   skillForm.fileList = fileList.slice(-1)
   loading.value = true
   props.api
-    .postSkillFile(file.raw)
+    .putUploadSkillFile(file.raw)
     .then((fileId) => {
       skillForm.code = fileId
       formRef.value?.validateField('fileList').catch(() => {})
@@ -95,11 +95,16 @@ function handleFileChange(file: UploadFile, fileList: UploadFiles) {
 
 function handleDownload() {
   if (!editId.value) return
-  const fileName = skillForm.fileList[0]?.name || `${skillForm.name}.zip`
+
   loading.value = true
-  props.api.downloadSkillFile(editId.value, fileName).finally(() => {
+  props.api.downloadSkillFile(editId.value).finally(() => {
     loading.value = false
   })
+}
+
+function handleRemoveFile() {
+  skillForm.code = ''
+  formRef.value?.validateField('fileList').catch(() => {})
 }
 
 function handleSubmit() {
@@ -115,15 +120,21 @@ function handleSubmit() {
       tool_type: TOOL_TYPE.SKILL,
     }
     loading.value = true
-    const request = editId.value
-      ? props.api.putTool(editId.value, payload)
+    const currentEditId = editId.value
+    const isEdit = Boolean(currentEditId)
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
       : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
-      .then(() => {
-        MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh')
+      .then((savedTool) => {
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          if (isEdit) emit('update', savedTool)
+          else emit('refresh')
+        })
       })
       .finally(() => {
         loading.value = false
@@ -142,26 +153,29 @@ function fillSkillForm(tool: ToolItem) {
   })
 }
 
-function open(tool?: ToolItem) {
+function open(tool?: ToolItem, asCopy = false) {
   resetData()
   visible.value = true
   originalForm.value = JSON.stringify(skillForm)
   if (!tool) return
+
+  if (asCopy) {
+    fillSkillForm(tool)
+    originalForm.value = JSON.stringify(skillForm)
+    return
+  }
 
   editId.value = tool.id
   formLoading.value = true
   props.api
     .getToolDetail(tool.id)
     .then((toolDetail) => {
-      if (editId.value !== tool.id || !visible.value) return
       fillSkillForm(toolDetail)
       originalForm.value = JSON.stringify(skillForm)
     })
-    .catch(() => {
-      if (editId.value === tool.id) visible.value = false
-    })
+
     .finally(() => {
-      if (editId.value === tool.id) formLoading.value = false
+      formLoading.value = false
     })
 }
 
@@ -202,12 +216,6 @@ function handleClosed() {
   emit('closed')
 }
 
-function formatFileSize(size?: number) {
-  if (!size) return '0 KB'
-  if (size < 1024 * 1024) return `${Math.ceil(size / 1024)} KB`
-  return `${(size / 1024 / 1024).toFixed(1)} MB`
-}
-
 defineExpose({ open })
 </script>
 
@@ -231,6 +239,7 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
+          <!-- // TODO 头像修改 -->
           <ToolIcon :icon="skillForm.icon" :size="32" :type="TOOL_TYPE.SKILL" />
           <el-input
             v-model="skillForm.name"
@@ -246,7 +255,7 @@ defineExpose({ open })
           v-model="skillForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入描述"
+          placeholder="请输入"
           show-word-limit
           type="textarea"
           @blur="skillForm.desc = skillForm.desc.trim()"
@@ -258,53 +267,21 @@ defineExpose({ open })
       <section>
         <h4 class="mk-title-decoration mk-required mb-4">Skill 文件</h4>
         <el-form-item prop="fileList">
-          <div v-if="skillForm.fileList.length" class="w-full">
-            <div class="flex items-center gap-3 rounded-md border border-N200 px-3 py-2">
-              <ToolIcon :size="32" :type="TOOL_TYPE.SKILL" />
-              <div class="min-w-0 flex-1">
-                <p class="truncate" :title="skillForm.fileList[0]?.name">
-                  {{ skillForm.fileList[0]?.name }}
-                </p>
-                <span class="text-sm text-N600">
-                  {{ formatFileSize(skillForm.fileList[0]?.size) }}
-                </span>
-              </div>
-            </div>
-            <div class="mt-2 flex gap-3">
-              <el-upload
-                ref="uploadRef"
-                v-model:file-list="skillForm.fileList"
-                action="#"
-                accept=".zip"
-                :auto-upload="false"
-                :on-change="handleFileChange"
-                :show-file-list="false"
-              >
-                <el-button link type="primary">重新上传</el-button>
-              </el-upload>
-              <el-button v-if="editId" link type="primary" @click="handleDownload">
-                下载
-              </el-button>
-            </div>
-          </div>
-          <el-upload
-            v-else
+          <MkDragUpload
             ref="uploadRef"
-            v-model:file-list="skillForm.fileList"
-            action="#"
+            v-model="skillForm.fileList"
             accept=".zip"
-            class="w-full"
-            drag
-            :auto-upload="false"
-            :on-change="handleFileChange"
-            :show-file-list="false"
+            :disabled="loading"
+            :tip-text="`支持格式：ZIP，大小不超过 ${maxFileSizeMb} MB`"
+            @change="handleFileChange"
+            @remove="handleRemoveFile"
           >
-            <img src="@/assets/empty/no-data.svg" alt="" />
-            <div class="el-upload__text">将 ZIP 文件拖到此处，或<em>点击上传</em></div>
-            <template #tip>
-              <span class="text-N600">仅支持 ZIP，文件大小不超过 {{ maxFileSizeMb }} MB</span>
+            <template #download>
+              <el-button v-if="editId" :disabled="loading" link @click="handleDownload">
+                <MkIcon :icon="Download" :size="16" class="text-N600" />
+              </el-button>
             </template>
-          </el-upload>
+          </MkDragUpload>
         </el-form-item>
       </section>
     </el-form>

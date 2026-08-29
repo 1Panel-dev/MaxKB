@@ -5,12 +5,15 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField, ToolInputField, ToolItem, ToolPayload } from '@/api/types'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
-import InitFieldTable from '../../components/init-field/InitFieldTable.vue'
-import InputFieldTable from '../../components/input-field/InputFieldTable.vue'
-import ToolCodeSetting from '../../components/python-code/CodeSetting.vue'
+import InitFieldTable from '../components/init-field/InitFieldTable.vue'
+import InputFieldTable from '../components/input-field/InputFieldTable.vue'
+import ToolCodeSetting from '../components/python-code/CodeSetting.vue'
 
-defineOptions({ name: 'DataSourceToolFormDrawer' })
+defineOptions({ name: 'DataSourceFormDrawer' })
+
+const { auth } = useStore()
 
 const props = defineProps<{
   api: typeof ToolApi
@@ -21,6 +24,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   closed: []
   refresh: []
+  update: [tool: ToolItem]
 }>()
 
 interface DataSourceFormModel {
@@ -74,15 +78,21 @@ function handleSubmit() {
       tool_type: TOOL_TYPE.DATA_SOURCE,
     }
     loading.value = true
-    const request = editId.value
-      ? props.api.putTool(editId.value, payload)
+    const currentEditId = editId.value
+    const isEdit = Boolean(currentEditId)
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
       : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
-      .then(() => {
-        MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh')
+      .then((savedTool) => {
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          if (isEdit) emit('update', savedTool)
+          else emit('refresh')
+        })
       })
       .finally(() => {
         loading.value = false
@@ -101,26 +111,29 @@ function fillDataSourceForm(tool: ToolItem) {
   })
 }
 
-function open(tool?: ToolItem) {
+function open(tool?: ToolItem, asCopy = false) {
   resetData()
   visible.value = true
   originalForm.value = JSON.stringify(dataSourceForm)
   if (!tool) return
+
+  if (asCopy) {
+    fillDataSourceForm(tool)
+    originalForm.value = JSON.stringify(dataSourceForm)
+    return
+  }
 
   editId.value = tool.id
   formLoading.value = true
   props.api
     .getToolDetail(tool.id)
     .then((toolDetail) => {
-      if (editId.value !== tool.id || !visible.value) return
       fillDataSourceForm(toolDetail)
       originalForm.value = JSON.stringify(dataSourceForm)
     })
-    .catch(() => {
-      if (editId.value === tool.id) visible.value = false
-    })
+
     .finally(() => {
-      if (editId.value === tool.id) formLoading.value = false
+      formLoading.value = false
     })
 }
 
@@ -183,6 +196,7 @@ defineExpose({ open })
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
+          <!-- // TODO 修改头像 -->
           <ToolIcon :icon="dataSourceForm.icon" :size="32" :type="TOOL_TYPE.DATA_SOURCE" />
           <el-input
             v-model="dataSourceForm.name"
@@ -198,7 +212,7 @@ defineExpose({ open })
           v-model="dataSourceForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入描述"
+          placeholder="请输入"
           show-word-limit
           type="textarea"
           @blur="dataSourceForm.desc = dataSourceForm.desc.trim()"

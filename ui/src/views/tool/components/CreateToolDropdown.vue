@@ -6,10 +6,10 @@ import { TOOL_TYPE } from '@/api/enums'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import ToolFormDrawer from '../tool-form/tool-custom/ToolFormDrawer.vue'
-import WorkflowFormDialog from '../tool-form/tool-workflow/WorkflowFormDialog.vue'
-import SkillToolFormDrawer from '../tool-form/tool-skills/SkillToolFormDrawer.vue'
-import McpToolFormDrawer from '../tool-form/tool-mcp/McpToolFormDrawer.vue'
-import DataSourceToolFormDrawer from '../tool-form/tool-data-source/DataSourceToolFormDrawer.vue'
+import DataSourceFormDrawer from '../tool-form/DataSourceFormDrawer.vue'
+import McpFormDrawer from '../tool-form/McpFormDrawer.vue'
+import SkillToolFormDrawer from '../tool-form/SkillToolFormDrawer.vue'
+import WorkflowFormDialog from '../tool-form/WorkflowFormDialog.vue'
 
 defineOptions({ name: 'ToolCreateDropdown' })
 
@@ -34,11 +34,9 @@ const workflowFormDialogRef =
   useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
 const skillToolFormDrawerRef =
   useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
-const mcpToolFormDrawerRef =
-  useTemplateRef<InstanceType<typeof McpToolFormDrawer>>('mcpToolFormDrawerRef')
-const dataSourceToolFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceToolFormDrawer>>(
-  'dataSourceToolFormDrawerRef',
-)
+const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcpFormDrawerRef')
+const dataSourceFormDrawerRef =
+  useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
 
 function handleOpenToolForm() {
   toolFormDrawerRef.value?.open()
@@ -53,11 +51,11 @@ function handleOpenSkillForm() {
 }
 
 function handleOpenMcpForm() {
-  mcpToolFormDrawerRef.value?.open()
+  mcpFormDrawerRef.value?.open()
 }
 
 function handleOpenDataSourceForm() {
-  dataSourceToolFormDrawerRef.value?.open()
+  dataSourceFormDrawerRef.value?.open()
 }
 
 /* 导入创建 */
@@ -155,15 +153,15 @@ function handleRefresh() {
     :folder-id="folderId"
     @refresh="handleRefresh"
   />
-  <McpToolFormDrawer
-    ref="mcpToolFormDrawerRef"
+  <McpFormDrawer
+    ref="mcpFormDrawerRef"
     title="创建 MCP"
     :api="ToolApi"
     :folder-id="folderId"
     @refresh="handleRefresh"
   />
-  <DataSourceToolFormDrawer
-    ref="dataSourceToolFormDrawerRef"
+  <DataSourceFormDrawer
+    ref="dataSourceFormDrawerRef"
     title="创建数据源"
     :api="ToolApi"
     :folder-id="folderId"

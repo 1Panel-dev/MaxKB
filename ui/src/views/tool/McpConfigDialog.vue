@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import type { ToolItem } from '@/api/types'
 import { copyText } from '@/utils/clipboard'
 
-defineOptions({ name: 'McpToolConfigDialog' })
+defineOptions({ name: 'McpConfigDialog' })
 
 const visible = ref(false)
 const config = ref('')

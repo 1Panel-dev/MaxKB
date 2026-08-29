@@ -134,11 +134,11 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - Admin Router 与请求客户端直接读取 `window.MaxKB` 运行时路径配置；`Window` 和
   `MaxKBRuntimeConfig` 的全局类型统一声明在根目录 `env.d.ts`。
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
-  `post`、`put` 和 `del` 请求封装。
+  `post`、`put`、`del` 和 Blob 文件 `downloadRequest` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
 - GET 文件导出使用 `getExportFile`；需要通过 POST 同时传递查询参数和可选请求体的 Excel 导出
-  使用 `postExportExcel`。请求层统一获取 Blob、解析 `Content-Disposition` 文件名并触发浏览器
-  下载；业务 API 只需传入默认文件名、接口地址及业务参数。
+  使用 `postExportExcel`；Skill 压缩包等指定请求方法的文件下载使用 `downloadRequest`。请求层统一
+  获取 Blob、解析 `Content-Disposition` 文件名并触发浏览器下载；业务 API 只需传入接口地址及业务参数。
 - 业务代码通过 `api.method().then(...)` 处理接口成功后的状态变化；通用接口错误由请求层统一
   提示，不在调用处重复使用 `try/catch` 或 `.catch()` 提示相同错误。只有业务降级、状态恢复等
   非提示类失败处理可以按需保留失败分支。

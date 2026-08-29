@@ -5,9 +5,12 @@ import type { FormInstance, FormRules } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolPayload } from '@/api/types'
+import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'WorkflowFormDialog' })
+
+const { auth } = useStore()
 
 const props = defineProps<{
   api: typeof ToolApi
@@ -18,6 +21,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   closed: []
   refresh: []
+  update: [tool: ToolItem]
 }>()
 
 interface WorkflowFormModel {
@@ -42,15 +46,6 @@ const formRules: FormRules<WorkflowFormModel> = {
   name: [{ required: true, message: '请输入工作流名称', trigger: 'blur' }],
 }
 
-function fillWorkflowForm(tool: ToolItem) {
-  Object.assign(workflowForm, {
-    desc: tool.desc ?? '',
-    icon: tool.icon ?? '',
-    name: tool.name,
-    work_flow: cloneDeep(tool.work_flow ?? {}),
-  })
-}
-
 function handleSubmit() {
   formRef.value?.validate((valid) => {
     if (!valid) return
@@ -61,15 +56,21 @@ function handleSubmit() {
       tool_type: TOOL_TYPE.WORKFLOW,
     }
     loading.value = true
-    const request = editId.value
-      ? props.api.putTool(editId.value, payload)
+    const currentEditId = editId.value
+    const isEdit = Boolean(currentEditId)
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
       : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
-      .then(() => {
-        MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh')
+      .then((savedTool) => {
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          if (isEdit) emit('update', savedTool)
+          else emit('refresh') // TODO 跳转到工具工作流画布
+        })
       })
       .finally(() => {
         loading.value = false
@@ -77,23 +78,35 @@ function handleSubmit() {
   })
 }
 
-function open(tool?: ToolItem) {
+function fillWorkflowForm(tool: ToolItem) {
+  Object.assign(workflowForm, {
+    desc: tool.desc ?? '',
+    icon: tool.icon ?? '',
+    name: tool.name,
+    work_flow: cloneDeep(tool.work_flow ?? {}),
+  })
+}
+
+function open(tool?: ToolItem, asCopy = false) {
   resetData()
   visible.value = true
   if (!tool) return
+
+  if (asCopy) {
+    fillWorkflowForm(tool)
+    return
+  }
 
   editId.value = tool.id
   formLoading.value = true
   props.api
     .getToolDetail(tool.id)
     .then((toolDetail) => {
-      if (editId.value === tool.id && visible.value) fillWorkflowForm(toolDetail)
+      fillWorkflowForm(toolDetail)
     })
-    .catch(() => {
-      if (editId.value === tool.id) visible.value = false
-    })
+
     .finally(() => {
-      if (editId.value === tool.id) formLoading.value = false
+      formLoading.value = false
     })
 }
 
@@ -119,7 +132,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" append-to-body :title="title" width="550" @closed="handleClosed">
+  <MkDialog v-model="visible" :title="title" @closed="handleClosed">
     <el-form
       ref="formRef"
       v-loading="formLoading"
@@ -131,6 +144,7 @@ defineExpose({ open })
     >
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
+          <!-- // TODO 编辑icon 统一处理 -->
           <ToolIcon :icon="workflowForm.icon" :size="32" :type="TOOL_TYPE.WORKFLOW" />
           <el-input
             v-model="workflowForm.name"
@@ -146,7 +160,7 @@ defineExpose({ open })
           v-model="workflowForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入描述"
+          placeholder="请输入"
           show-word-limit
           type="textarea"
           @blur="workflowForm.desc = workflowForm.desc.trim()"

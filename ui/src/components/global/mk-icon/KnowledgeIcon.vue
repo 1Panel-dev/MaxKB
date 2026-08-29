@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/icon'
 defineOptions({ name: 'KnowledgeIcon' })
 withDefaults(
   defineProps<{
