@@ -1,7 +1,7 @@
 import { del, get } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { Dict, KnowledgeItem } from '@/api/types'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef, watch } from 'vue'
-import ProviderApi from '@/api/admin/workspace/model/provider'
+import ProviderApi from '@/api/admin/model-provider.ts'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
 import type {
   ModelProviderItem,
@@ -166,14 +166,18 @@ watch(
 <template>
   <div class="flex min-h-0 flex-1 flex-col">
     <div class="mb-4 flex-between">
-      <el-button
-        type="primary"
-        :disabled="batchSelectedResources.length === 0"
-        @click="handleOpenBatchDialog"
-      >
-        <MkIcon name="icon-lock" />
-        <span>配置权限</span>
-      </el-button>
+      <div>
+        <!-- 配置权限 -->
+        <el-button
+          type="primary"
+          :disabled="batchSelectedResources.length === 0"
+          @click="handleOpenBatchDialog"
+        >
+          <MkIcon name="icon-lock" />
+          <span>配置权限</span>
+        </el-button>
+      </div>
+
       <MkComplexSearch :fields="permissionSearchFields" @change="handleSearch" />
     </div>
 

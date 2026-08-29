@@ -12,7 +12,9 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    KnowledgeIcon: typeof import('./components/global/mk-icon/KnowledgeIcon.vue')['default']
     LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
+    LayoutBatchFooter: typeof import('./components/global/mk-view-layout/layout-batch-footer.vue')['default']
     MkCollapse: typeof import('./components/global/mk-collapse/index.vue')['default']
     MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
     MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']
@@ -40,7 +42,9 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const KnowledgeIcon: typeof import('./components/global/mk-icon/KnowledgeIcon.vue')['default']
   const LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
+  const LayoutBatchFooter: typeof import('./components/global/mk-view-layout/layout-batch-footer.vue')['default']
   const MkCollapse: typeof import('./components/global/mk-collapse/index.vue')['default']
   const MkComplexSearch: typeof import('./components/global/mk-complex-search/index.vue')['default']
   const MkDialog: typeof import('./components/global/mk-dialog/index.vue')['default']

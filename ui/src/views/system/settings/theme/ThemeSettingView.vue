@@ -2,7 +2,7 @@
 import { computed, reactive, ref, useTemplateRef } from 'vue'
 import type { FormInstance, FormRules, UploadFile } from 'element-plus'
 import type { ThemeInfo } from '@/api/admin/auth/types'
-import ThemeSettingApi from '@/api/admin/system/theme-setting'
+import ThemeSettingApi from '@/api/admin/system/settings/theme-setting'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import {
   DEFAULT_PLATFORM_SETTING,

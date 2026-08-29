@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import ChatUserApi from '@/api/admin/system/chat-user'
+import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
 import type { ChatUser, Dict, LoginMethod, OptionItem } from '@/api/types'
 import { LOGIN_METHOD, QUOTA_TYPE } from '@/api/enums'
 import { LOGIN_METHOD_LABELS } from '@/constants'
@@ -177,7 +177,7 @@ onMounted(() => loadChatUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button class="ml-3" @click="handleOpenImportUsersDialog">
+          <el-button plain class="ml-3" @click="handleOpenImportUsersDialog">
             <MkIcon name="icon_import_outlined" />
             <span>导入用户</span>
           </el-button>
@@ -273,7 +273,7 @@ onMounted(() => loadChatUsers())
                   </el-button>
                 </el-tooltip>
                 <!-- 更多 -->
-                <MkTableMoreDropdown>
+                <MkTableMoreDropdown class="ml-1">
                   <MkDropdownItem @click="handleOpenQuotaSettingsDialog(row)">
                     <template #icon>
                       <MkIcon name="icon_edit_outlined" />

@@ -377,6 +377,9 @@ Tailwind v4 的 `border` 只设置边框宽度和样式，不提供 `--tw-border
 
 `element-plus.scss` 已将 `--el-color-primary` 映射到 `--mk-primary`，按钮、链接、选中态等 Element Plus 组件会自动使用主题色。
 
+所有 `el-button` 的 `:active` 和 `.is-active` 视觉统一复用各自的 hover 样式，不额外加深背景、
+边框或文字颜色；普通、plain、text、link、circle 及各语义类型按钮均遵循该规则。
+
 Element Plus 所需的 `light-3` 至 `light-9` 和 `dark-2` 色阶使用 `color-mix()` 根据主题色生成。业务代码通常不需要直接修改 `--el-color-primary-*`。
 
 项目内所有 Select 下拉弹层统一隐藏 Popper 箭头，并将 Element Plus 默认的 `12px` 偏移回收

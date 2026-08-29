@@ -6,21 +6,32 @@ Admin API；Chat 目录作为独立体系预留。
 ```text
 src/api/
 ├── admin/
-│   ├── core/             # Admin 请求基础能力
-│   │   ├── request.ts    # Axios 实例、HTTP 方法与统一响应解包
-│   │   └── types.ts      # Admin 请求协议和 loading 类型
-│   ├── auth/             # Admin 登录认证接口
-│   │   └── types.ts      # 认证 API 与认证 Store 共用类型
-│   ├── workspace/        # 工作空间业务接口
-│   └── system/           # 系统管理业务接口
-├── chat/                 # Chat 独立请求体系，当前预留
-├── enums/                # 后端固定枚举值
-│   ├── index.ts          # API 枚举值的唯一导入入口
-│   └── <domain>.ts       # 按明确业务域拆分的枚举值
-├── types/                # API 与 View/Component 共用的业务类型
-│   ├── index.ts          # API 公共类型的唯一导入入口
-│   ├── common.ts         # 多个 API 业务域共用的基础类型
-│   └── <domain>.ts       # 按明确业务域拆分的共享类型
+│   ├── auth/                         # Admin 登录认证与当前用户接口
+│   │   └── types.ts                  # 认证 API 与认证 Store 共用类型
+│   ├── core/                         # Admin 请求基础能力
+│   │   ├── request.ts                # Axios 实例、HTTP 方法与统一响应解包
+│   │   └── types.ts                  # Admin 请求协议和 loading 类型
+│   ├── system/                       # 系统管理业务接口
+│   │   ├── chat-user/                # 对话用户、用户组及认证接口
+│   │   ├── settings/                 # 登录认证、邮件与外观设置接口
+│   │   ├── shared-resources/         # System 共享资源接口
+│   │   └── <resource>.ts             # 其他 System 单资源接口
+│   ├── workspace/                    # 工作空间业务接口
+│   │   ├── application/              # 智能体接口
+│   │   ├── knowledge/                # 知识库接口
+│   │   ├── model/                    # 模型接口
+│   │   ├── tool/                     # 工具及工具商店接口
+│   │   └── <resource>.ts             # 工作空间公共资源接口
+│   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口
+├── chat/                             # Chat 独立请求体系，当前预留
+│   └── README.md                     # Chat API 边界与后续实现说明
+├── enums/                            # 后端固定枚举值
+│   ├── index.ts                      # API 枚举值的唯一导入入口
+│   └── <domain>.ts                   # 按明确业务域拆分的枚举值
+├── types/                            # API 与 View/Component 共用的业务类型
+│   ├── index.ts                      # API 公共类型的唯一导入入口
+│   ├── common.ts                     # 多个 API 业务域共用的基础类型
+│   └── <domain>.ts                   # 按明确业务域拆分的共享类型
 └── API_README.md
 ```
 
@@ -35,9 +46,12 @@ src/api/
 
 ## 业务接口组织
 
-- 业务 API 按一级业务域、二级资源文件归类，例如 `workspace/agent.ts` 和
-  `system/workspace.ts`。
-- 一类资源的增删改查放在同一个文件，不创建同名业务文件夹或汇总所有业务接口的 `api.ts`。
+- 业务 API 先按 Admin 入口下的 `auth`、`workspace`、`system` 等一级业务域归类。Workspace 和
+  System 内部可继续按明确的功能域建立子目录，例如 `workspace/application/`、
+  `workspace/tool/`、`system/chat-user/` 和 `system/settings/`；不需要分组的单资源接口直接放在
+  所属一级业务域下。
+- 一类资源的增删改查放在同一个最终资源文件中。调用方直接导入该文件，不为业务目录创建聚合
+  入口，也不创建汇总所有业务接口的 `api.ts`。
 - 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
   或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
 - 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
@@ -47,7 +61,20 @@ src/api/
   `admin/core/request.ts` 等请求基础设施可按职责提供具名导出。
   例如从 `login.ts` 使用 `import LoginApi from '@/api/admin/auth/login'`，再调用
   `LoginApi.postLogin()`；System Workspace API 使用
-  `import WorkspaceApi from '@/api/admin/system/workspace'`。
+  `import WorkspaceApi from '@/api/admin/system/workspace'`；System 登录设置使用
+  `import AuthSettingApi from '@/api/admin/system/settings/auth-setting'`。
+
+### 四类特殊资源 API
+
+`application`、`knowledge`、`model`、`tool` 是需要同时考虑 Workspace、System 资源管理和
+System 共享资源的四类特殊资源。其接口按真实后端边界分别维护在 `admin/workspace/` 与
+`admin/system/` 下，不把不同范围的 URL 合并为页面侧 API Map，也不让卡片或 Action 根据路由拼接
+System 接口地址。
+
+页面根据路由 `resourceScope` 选择当前范围的完整业务 API 对象，并将其传给需要请求的 Card
+Action、Drawer 或 Dialog。复用方直接使用 `typeof XxxApi` 约束完整 API 对象；不要为每组 Action
+额外维护逐方法接口，例如 `ModelActionApi`，也不要使用不断扩展的 `Pick<typeof XxxApi, ...>`。
+仅展示数据的组件不接收 API。
 
 ## 枚举与类型组织
 

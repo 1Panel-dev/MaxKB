@@ -19,7 +19,7 @@ defineExpose({ open })
     <pre class="whitespace-pre-wrap break-words p-4">{{ formattedDetails }}</pre>
 
     <template #footer>
-      <el-button @click="visible = false">关闭</el-button>
+      <el-button plain @click="visible = false">关闭</el-button>
     </template>
   </MkDialog>
 </template>

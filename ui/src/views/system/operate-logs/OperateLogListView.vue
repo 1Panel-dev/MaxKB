@@ -150,11 +150,11 @@ onMounted(() => {
         <div class="flex items-center">
           <MkDateRange class="mr-3" @change="handleDateFilterChange" />
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" class="mr-3" />
-          <el-button @click="handleExport">
+          <el-button plain @click="handleExport">
             <MkIcon name="icon_export_outlined" />
             <span>导出</span>
           </el-button>
-          <el-button @click="handleOpenCleanStrategy">
+          <el-button plain @click="handleOpenCleanStrategy">
             <MkIcon name="icon_clear_outlined" />
             <span>清除策略</span>
           </el-button>

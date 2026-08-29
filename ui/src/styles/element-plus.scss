@@ -43,6 +43,21 @@
   --el-disabled-text-color: var(--mk-N400);
 }
 
+/* alert */
+.el-alert {
+  &--error {
+    --el-alert-bg-color: var(--el-color-danger-light-8);
+    --el-color-error: var(--el-color-danger);
+  }
+  &--success {
+    --el-alert-bg-color: var(--el-color-success-light-8);
+    --el-color-error: var(--el-color-success);
+  }
+  &__title {
+    color: var(--el-text-color-primary);
+  }
+}
+
 /* avatar */
 .el-avatar {
   // icon使用蓝色是固定的, 不能随主题变化
@@ -52,33 +67,22 @@
 
 /* button */
 .el-button {
+  --el-button-active-bg-color: var(--el-button-hover-bg-color);
+  --el-button-active-border-color: var(--el-button-hover-border-color);
+  --el-button-active-text-color: var(--el-button-hover-text-color) !important;
   --el-button-font-weight: 400 !important;
   height: auto;
   padding: 7px 11px;
   line-height: 16px;
+  &:focus-visible {
+    outline: none;
+  }
 
   &--small {
     padding: 5px 11px;
   }
   &:not(.is-link, .is-text, .is-circle) {
     min-width: 80px;
-  }
-  &:not(
-    .el-button--primary,
-    .el-button--success,
-    .el-button--warning,
-    .el-button--danger,
-    .el-button--info,
-    .is-link,
-    .is-plain,
-    .is-text
-  ) {
-    --el-button-hover-bg-color: var(--mk-N100);
-    --el-button-hover-border-color: var(--el-border-color);
-    --el-button-hover-text-color: var(--el-text-color-primary);
-    --el-button-text-color: var(--el-text-color-primary);
-  }
-  &:active {
   }
 
   &--large {
@@ -91,50 +95,93 @@
   &.is-text {
     line-height: 18px;
     padding: calc(var(--spacing) * 1);
-    &:not(.is-disabled):hover {
-      background: var(--mk-N900-transparent-10);
+    &:not(.is-disabled) {
+      &:hover,
+      &:active,
+      &.is-active {
+        background: var(--mk-N900-transparent-10);
+      }
     }
   }
   &.is-link {
     padding: 0;
+    &:not(.is-disabled) {
+      &:active,
+      &.is-active {
+        color: var(--el-button-hover-link-text-color);
+      }
+    }
   }
   &.is-circle {
     height: var(--el-button-size);
-    &:hover {
+    &:hover,
+    &:active,
+    &.is-active {
       box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
       color: var(--el-text-color-primary);
       background: transparent;
       border-color: var(--el-border-color);
     }
   }
+  &.is-text.is-has-bg:not(.is-disabled) {
+    &:active,
+    &.is-active {
+      background: var(--el-fill-color);
+    }
+  }
   &.is-plain {
     --el-button-bg-color: transparent !important;
+    --el-button-text-color: var(--el-text-color-primary);
+    --el-button-hover-bg-color: var(--mk-N100);
+    --el-button-hover-border-color: var(--el-border-color);
+    --el-button-hover-text-color: var(--el-text-color-primary);
+    &.is-disabled,
+    &.is-disabled:hover {
+      color: var(--mk-N400);
+      background: transparent;
+      border-color: var(--mk-N350);
+    }
   }
   &.is-disabled {
     --el-button-disabled-bg-color: var(--mk-N400);
     --el-button-disabled-border-color: var(--mk-N400);
+    --el-button-disabled-text-color: white;
   }
   &--primary {
     --el-button-hover-bg-color: var(--el-color-primary-light-1);
     --el-button-hover-border-color: var(--el-color-primary-light-1);
     &.is-text {
-      &:not(.is-disabled):hover {
-        background: rgb(var(--mk-primary-rgb) / 10%);
+      &:not(.is-disabled) {
+        &:hover,
+        &:active,
+        &.is-active {
+          background: rgb(var(--mk-primary-rgb) / 10%);
+        }
       }
     }
     &.is-plain {
+      --el-button-text-color: var(--el-color-primary);
       --el-button-border-color: var(--el-color-primary) !important;
       --el-button-hover-bg-color: var(--el-color-primary-light-8);
       --el-button-hover-text-color: var(--el-color-primary) !important;
+      --el-button-hover-border-color: var(--el-color-primary);
     }
   }
   &--danger {
     --el-button-hover-bg-color: var(--el-color-danger-light-1);
     --el-button-hover-border-color: var(--el-color-danger-light-1);
     &.is-plain {
+      --el-button-text-color: var(--el-color-danger);
       --el-button-border-color: var(--el-color-danger) !important;
       --el-button-hover-bg-color: var(--el-color-danger-light-8);
       --el-button-hover-text-color: var(--el-color-danger) !important;
+      --el-button-hover-border-color: var(--el-color-danger);
+    }
+  }
+  &--text:not(.is-disabled) {
+    &:active,
+    &.is-active {
+      color: var(--el-color-primary-light-3);
     }
   }
   // 自定义maxkb渐变色按钮
@@ -886,7 +933,7 @@
 /* tag */
 .el-tag {
   max-width: 115px;
-  border: none;
+
   padding: 0 6px;
   font-weight: 400 !important;
   &__content {
@@ -900,31 +947,41 @@
   &--small {
     padding: 4px;
   }
+  &--plain {
+    &.el-tag--info {
+      --el-tag-border-color: rgb(var(--mk-primary-rgb) / 10%);
+      --el-tag-text-color: var(--mk-N600);
+      font-weight: 500 !important;
+    }
+  }
 
-  &--info {
-    --el-tag-text-color: var(--el-text-color-regular) !important;
-    --el-tag-bg-color: var(--mk-N900-transparent-10) !important;
-  }
-  &--success {
-    --el-tag-text-color: var(--el-color-success-dark-2) !important;
-    --el-tag-bg-color: rgb(var(--mk-success-rgb) / 20%) !important;
-  }
-  &--danger {
-    --el-tag-text-color: var(--el-color-danger-dark-2) !important;
-    --el-tag-bg-color: rgb(var(--mk-danger-rgb) / 20%) !important;
-  }
-  &--warning {
-    --el-tag-text-color: var(--el-color-warning-dark-2) !important;
-    --el-tag-bg-color: rgb(var(--mk-warning-rgb) / 20%) !important;
-  }
-  &--primary {
-    --el-tag-text-color: var(--el-color-primary-dark-2);
-    --el-tag-bg-color: rgba(var(--mk-primary-rgb) / 20%);
-  }
-  &--default {
-    // 默认 tag不能随主题色变化 颜色值不能改变
-    --el-tag-text-color: #2b5fd9;
-    --el-tag-bg-color: rgba(51, 112, 255, 0.2);
+  &:not(.el-tag--plain) {
+    border: none;
+    &.el-tag--info {
+      --el-tag-text-color: var(--el-text-color-regular) !important;
+      --el-tag-bg-color: var(--mk-N900-transparent-10) !important;
+    }
+    &.el-tag--success {
+      --el-tag-text-color: var(--el-color-success-dark-2) !important;
+      --el-tag-bg-color: rgb(var(--mk-success-rgb) / 20%) !important;
+    }
+    &.el-tag--danger {
+      --el-tag-text-color: var(--el-color-danger-dark-2) !important;
+      --el-tag-bg-color: rgb(var(--mk-danger-rgb) / 20%) !important;
+    }
+    &.el-tag--warning {
+      --el-tag-text-color: var(--el-color-warning-dark-2) !important;
+      --el-tag-bg-color: rgb(var(--mk-warning-rgb) / 20%) !important;
+    }
+    &.el-tag--primary {
+      --el-tag-text-color: var(--el-color-primary-dark-2);
+      --el-tag-bg-color: rgba(var(--mk-primary-rgb) / 20%);
+    }
+    &.el-tag--default {
+      // 默认 tag不能随主题色变化 颜色值不能改变
+      --el-tag-text-color: #2b5fd9;
+      --el-tag-bg-color: rgba(51, 112, 255, 0.2);
+    }
   }
 
   &__close {

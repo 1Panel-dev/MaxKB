@@ -45,7 +45,7 @@ defineExpose({ open })
       </el-radio>
     </el-radio-group>
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" :disabled="!permission" @click="handleSubmit">确认</el-button>
     </template>
   </MkDialog>

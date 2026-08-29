@@ -71,6 +71,7 @@ src/components/
 │   │   └── index.vue             # 列表与业务分组列表复用的行结构
 │   ├── mk-view-layout/
 │   │   ├── index.vue             # 路由页面标题、操作区和内容区统一结构
+│   │   ├── layout-batch-footer.vue # 页面与表格共用的批量选择底栏
 │   │   └── layout-aside.vue      # 页面可选左侧栏结构
 │   ├── mk-search-input/
 │   │   └── index.vue             # 带默认搜索图标的输入框
@@ -230,7 +231,8 @@ ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条
 
 ### MkDrawer
 
-全局抽屉组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。通过
+全局抽屉组件，默认通过 Element Plus 的 `append-to-body` 挂载到 `body`，避免受到父级容器的定位、
+层级和隐藏状态影响；统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。通过
 `content-class` 可以覆盖内容容器样式；全高布局可传入 `content-class="h-full p-0"`，再由
 `MkViewLayout` 管理内边距和滚动区域。默认显示关闭按钮、关闭时销毁内容，同时禁止点击遮罩或按
 Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus Drawer 的其他属性和事件通过
@@ -365,6 +367,13 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 主内容区固定保留 `px-6` 水平留白。内置滚动容器会抵消两侧留白，再为滚动内容补回 `24px`
 水平间距，使滚动条贴齐主区域右边界，并允许 `MkTable` 的底部操作栏延伸至完整主区域宽度。
 
+卡片等非表格列表需要批量操作时，页面在批量选择模式下渲染 `Footer`，通过
+`v-model:batch-selection` 绑定选中项唯一值数组，`batch-values` 传入当前列表全部唯一值，并提供
+`footer-batch-actions` 插槽中的业务按钮；布局会复用 `LayoutBatchFooter`，统一显示全选、半选、
+已选数量和取消按钮。点击取消会清空选择，并由 `Footer` 触发 `batch-cancel`。未提供
+`footer-batch-actions` 时，`Footer` 仍渲染普通底栏。`footer-batch-actions` 作用域同时提供
+`batchSelection`，业务按钮需要当前选择时可以直接读取。
+
 ```vue
 <MkViewLayout :loading="loading" collapsible>
   <template #aside>左侧列表</template>
@@ -391,6 +400,32 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
       </component>
     </template>
     <MkEmpty v-else />
+  </template>
+</MkViewLayout>
+```
+
+```vue
+<MkViewLayout>
+  <template #default="{ Footer }">
+    <ResourceCard
+      v-for="resource in resources"
+      :key="resource.id"
+      :selectable="batchSelectionMode"
+      :selected="selectedResourceIds.includes(resource.id)"
+    />
+
+    <component
+      :is="Footer"
+      v-if="batchSelectionMode"
+      v-model:batch-selection="selectedResourceIds"
+      :batch-values="resourceIds"
+      @batch-cancel="batchSelectionMode = false"
+    >
+      <template #footer-batch-actions="{ batchSelection }">
+        <el-button type="primary" plain>移动到</el-button>
+        <el-button type="danger" plain :disabled="!batchSelection.length">删除</el-button>
+      </template>
+    </component>
   </template>
 </MkViewLayout>
 ```
@@ -443,7 +478,7 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 数据驱动使用时传入 `row`。`label-field` 默认读取 `name`，`index` 默认为 `0`；未提供默认插槽时
 组件显示对应字段文本。`action` 和 `action-dropdown` 插槽需要配合 `row` 使用，并接收 `row`、
 `index`。`action-dropdown` 由组件统一渲染 More 触发器、`MkDropdown` 和 `MkDropdownMenu`，插槽中
-直接放置 `MkDropdownItem`。
+直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项均未渲染时，不显示 More 触发器。
 
 ```vue
 <MkListItem :active="currentRole?.id === role.id" :row="role" @click="selectRole(role)" />
@@ -528,8 +563,9 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 ```
 
 表格操作列需要 More 菜单时使用 `MkTableMoreDropdown`。组件统一提供点击型、右下定位的 More
-按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`。其他 Dropdown 属性和事件通过
-`$attrs` 传入，菜单容器样式通过 `menu-class` 设置。
+按钮以及 `MkDropdownMenu`，默认插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项
+均未渲染时，不显示 More 触发器。其他 Dropdown 属性和事件通过 `$attrs` 传入，菜单容器样式通过
+`menu-class` 设置。
 
 ```vue
 <MkTableMoreDropdown menu-class="w-40">
@@ -540,8 +576,8 @@ Dialog、Drawer、Popover、嵌套区域等其他大、小表格均禁止开启�
 
 包含 `type="selection"` 的选择列时，选择数据会显示页面底部操作栏。批量按钮放入
 `footer-batch-actions` 插槽，当前选择通过 `selection-change` 返回。组件暴露 `tableRef` 和
-`clearSelection()`。操作栏在 `MkViewLayout` 的主内容滚动区域内吸附于页面底部，不随表格内容
-滚出可视区域。
+`clearSelection()`。操作栏与 `MkViewLayout` 复用 `LayoutBatchFooter`，统一全选、半选、数量和
+取消行为；它在主内容滚动区域内吸附于页面底部，不随表格内容滚出可视区域。
 
 ```vue
 <MkTable :data="systemUsers" @selection-change="selectedUsers = $event">
@@ -652,7 +688,15 @@ const config = defineModel<unknown>({ required: true })
 `footer` 作用域提供 `Action` 和 `ActionDropdown`。左侧常驻内容与 `Action` 写在同一个插槽内；
 `Action` 是卡片悬浮或内部获得焦点时显示的右侧操作容器，可以只放开关或按钮。
 需要 More 菜单时，再将 `ActionDropdown` 放入 `Action`，组件会统一渲染 `MkDropdownMenu`，默认
-插槽中直接放置 `MkDropdownItem`。
+插槽中直接放置 `MkDropdownItem`；插槽为空，或其中的条件菜单项均未渲染时，不显示 More 触发器。
+`ActionDropdown` 固定开启 `persistent`，避免菜单关闭后销毁由菜单项管理的 Drawer 或 Dialog；
+浮层本身应在打开时按需挂载，并在 `closed` 后卸载，避免每张卡片都长期保留隐藏的浮层节点。
+传入 `selectable` 后，卡片进入选择模式：复选框固定在右上角，`tag` 插槽仍正常渲染并为复选框
+预留位置；点击卡片或复选框会通过 `selected` 事件返回新的选择状态，页面通过 `selected` Prop
+传回当前状态，选中卡片统一显示主题色边框和浅色背景。业务内容需要在选择模式下由复选框替代时，
+由业务卡片根据 `selectable` 控制该内容是否渲染；例如工具卡片选择时隐藏“更新版本”入口。
+选择模式下，`MkSourceCard` 提供的 `Action` 不渲染任何内容，业务卡片不需要重复判断
+`selectable`；选择集合、全选、批量接口和页面底部操作栏仍由使用页面管理。
 需要自定义头部时可
 通过 `icon`、`title`、`subtitle` 和 `tag` 插槽覆盖对应区域；`title` 插槽提供 `{ title }`，
 便于在保留标题文案的同时追加状态图标等内容。
@@ -679,6 +723,19 @@ import MkSourceCard from '@/components/mk-source-card/index.vue'
       </component>
     </component>
   </template>
+</MkSourceCard>
+```
+
+批量选择模式由页面显式控制：
+
+```vue
+<MkSourceCard
+  :selectable="batchSelectionMode"
+  :selected="selected"
+  title="工作流工具"
+  @selected="selected = $event"
+>
+  <p>工具描述</p>
 </MkSourceCard>
 ```
 
@@ -768,8 +825,10 @@ Props 和模型：
 - `data` 应传入全量数据；组件内的 50 条分批仅用于控制 DOM 渲染数量，不替代后端分页。
 - 搜索词或数据源变化时，渲染范围和滚动位置会重置到第一批。
 - 提供 `action-dropdown` 时，组件内部使用固定 More 按钮和点击型、非 Teleport 的
-  `MkDropdown`，并统一包裹 `MkDropdownMenu`；插槽中直接放置 `MkDropdownItem`。
-- `action` 和 `action-dropdown` 二选一；同时提供时优先渲染 `action-dropdown`，不渲染 `action`。
+  `MkDropdown`，并统一包裹 `MkDropdownMenu`；插槽中直接放置 `MkDropdownItem`，无可渲染菜单项时
+  不显示 More 触发器。
+- `action` 和 `action-dropdown` 二选一；同时提供且下拉插槽有可渲染菜单项时优先渲染
+  `action-dropdown`，否则渲染 `action`。
 
 #### 默认字段示例
 

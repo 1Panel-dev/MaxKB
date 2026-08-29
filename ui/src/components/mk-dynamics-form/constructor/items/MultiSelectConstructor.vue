@@ -196,7 +196,6 @@ onMounted(() => {
       clearable
       :reserve-keyword="false"
       v-model="formValue.default_value"
-      :teleported="false"
     >
       <el-option
         v-for="(option, index) in formValue.option_list"

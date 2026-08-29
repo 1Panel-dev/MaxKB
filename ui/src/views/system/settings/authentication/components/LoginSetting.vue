@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, useTemplateRef } from 'vue'
 import CurrentUserApi from '@/api/admin/auth/current-user'
-import AuthSettingApi from '@/api/admin/system/auth-setting'
+import AuthSettingApi from '@/api/admin/system/settings/auth-setting'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import type { ListItem, LoginAuthSettingPayload, SystemUserGroup, LoginMethod } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'

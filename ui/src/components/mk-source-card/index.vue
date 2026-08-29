@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { h, type FunctionalComponent } from 'vue'
 import { dateFormat } from '@/utils/time'
 import MkSourceCardAction from './mk-source-card-action.vue'
 import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
@@ -27,16 +28,28 @@ import MkSourceCardActionDropdown from './mk-source-card-action-dropdown.vue'
  */
 defineOptions({ name: 'MkSourceCard' })
 
-const props = defineProps<{
-  create_time?: string //创建日期
-  nick_name?: string // 创建者
-  title: string
+const props = withDefaults(
+  defineProps<{
+    create_time?: string //创建日期
+    nick_name?: string // 创建者
+    selectable?: boolean
+    selected?: boolean
+    title: string
+  }>(),
+  {
+    selectable: false,
+    selected: false,
+  },
+)
+
+const emit = defineEmits<{
+  selected: [selected: boolean]
 }>()
 
 const slots = defineSlots<{
   default?: () => unknown
   footer?: (props: {
-    Action: typeof MkSourceCardAction
+    Action: FunctionalComponent
     ActionDropdown: typeof MkSourceCardActionDropdown
   }) => unknown
   icon?: () => unknown
@@ -44,11 +57,37 @@ const slots = defineSlots<{
   tag?: () => unknown
   title?: (props: { title: string }) => unknown
 }>()
+
+const SourceCardAction: FunctionalComponent = (_, { slots }) =>
+  props.selectable ? null : h(MkSourceCardAction, null, slots)
+
+function handleSelect() {
+  if (props.selectable) emit('selected', !props.selected)
+}
+
+function handleSelectedChange(selected: boolean | string | number) {
+  emit('selected', Boolean(selected))
+}
 </script>
 
 <template>
-  <el-card shadow="hover" class="mk-source-card group" body-class="flex h-full flex-col">
-    <header class="flex-between items-start gap-2">
+  <el-card
+    :class="{
+      'cursor-pointer': props.selectable,
+      'border-primary! bg-primary/10!': props.selectable && props.selected,
+    }"
+    :role="props.selectable ? 'checkbox' : undefined"
+    :tabindex="props.selectable ? 0 : undefined"
+    shadow="hover"
+    class="mk-source-card group relative"
+    body-class="flex h-full flex-col"
+    @click="handleSelect"
+  >
+    <div v-if="props.selectable" class="absolute top-4 right-4 z-10" @click.stop @keydown.stop>
+      <el-checkbox :model-value="props.selected" @change="handleSelectedChange" />
+    </div>
+
+    <header class="flex-between items-start gap-2" :class="{ 'pr-7': props.selectable }">
       <div class="flex min-w-0 flex-1 items-center gap-3">
         <div v-if="slots.icon" class="shrink-0">
           <slot name="icon" />
@@ -78,11 +117,7 @@ const slots = defineSlots<{
     </div>
 
     <footer class="flex items-center gap-2">
-      <slot
-        name="footer"
-        :Action="MkSourceCardAction"
-        :ActionDropdown="MkSourceCardActionDropdown"
-      />
+      <slot name="footer" :Action="SourceCardAction" :ActionDropdown="MkSourceCardActionDropdown" />
     </footer>
   </el-card>
 </template>

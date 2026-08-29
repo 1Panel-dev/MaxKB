@@ -1,6 +1,6 @@
 import { del, get, post, put } from '../../core/request'
 import type { Dict, DynamicFormField, ModelPayload, ModelItem } from '@/api/types'
-import { getWorkspaceId } from '@/utils/workspace-context'
+import { getWorkspaceId } from '@/utils/resource-context'
 
 const getPrefix = () => {
   const workspaceId = getWorkspaceId()

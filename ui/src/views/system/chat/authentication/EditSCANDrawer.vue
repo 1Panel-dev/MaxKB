@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref, useTemplateRef } from 'vue'
-import ChatUserAuthScanApi from '@/api/admin/system/chat-user-auth-scan'
+import ChatUserAuthScanApi from '@/api/admin/system/chat-user/chat-user-auth-scan'
 import type { QrLoginPlatformPayload } from '@/api/types'
 import type { FormInstance, FormRules } from 'element-plus'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
@@ -92,8 +92,8 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
-      <el-button @click="handleValidatePlatform">校验</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
+      <el-button plain @click="handleValidatePlatform">校验</el-button>
       <el-button type="primary" @click="submit">保存</el-button>
     </template>
   </MkDrawer>

@@ -67,7 +67,7 @@ ui/
 │   │   └── <component-name>/   # Less-frequent shared components imported explicitly
 │   ├── constants/             # Cross-feature constants grouped by domain
 │   │   └── CONSTANT_README.md # Shared constant placement and naming rules
-│   ├── layout/                # Shared application shells, headers, sidebars, and layout types
+│   ├── layout/                # Shared application shells, headers, sidebars, types, and helpers
 │   ├── locales/               # Reserved for internationalization messages and locale setup
 │   ├── workflow-canvas/       # LogicFlow canvas and workflow domain components
 │   │   ├── component/         # Reusable workflow canvas UI
@@ -124,6 +124,10 @@ Structural responsibilities:
   through `useStore()`. Store modules may import a specific Store directly when coordinating state
   internally to avoid circular access through the aggregate entry.
 - Put functions shared by most pages or multiple business modules in `utils/`; detailed placement, file organization, and naming rules are maintained in `src/utils/UTILS_README.md`.
+- Treat application, knowledge, model, and tool as the four special resource domains that can span
+  Workspace, System resource management, and System shared resources. Their route scope, API
+  selection, reusable cards, and context-specific Actions follow `ROUTE_README.md`,
+  `API_README.md`, and `VIEW_README.md`; do not extend this three-scope pattern to ordinary pages.
 - Import source assets through `src/assets/`; use `public/` only when a file must retain its original filename and URL.
 
 ## Entry Points

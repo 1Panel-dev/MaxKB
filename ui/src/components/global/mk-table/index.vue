@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import type { TableInstance } from 'element-plus'
+import LayoutBatchFooter from '../mk-view-layout/layout-batch-footer.vue'
 
 defineOptions({ name: 'MkTable', inheritAttrs: false })
 
@@ -50,9 +51,6 @@ function updateTableHeight() {
 /** 选择操作栏 */
 const selectedRows = ref<unknown[]>([])
 const isAllRowsSelected = computed(() => tableRef.value?.store.states.isAllSelected.value ?? false)
-const isSelectionIndeterminate = computed(
-  () => selectedRows.value.length > 0 && !isAllRowsSelected.value,
-)
 
 function handleSelectionChange(selection: unknown[]) {
   selectedRows.value = selection
@@ -138,22 +136,17 @@ defineExpose({ clearSelection, tableRef })
       />
     </div>
 
-    <footer
+    <LayoutBatchFooter
       v-if="selectedRows.length > 0 && $slots['footer-batch-actions']"
-      class="sticky -mb-6 -ml-6 bottom-0 z-10 mt-auto flex shrink-0 items-center border-t bg-white px-6 py-4"
+      :all-selected="isAllRowsSelected"
+      :selected-count="selectedRows.length"
+      :total="props.data.length"
+      class="sticky -mx-6 -mb-6 bottom-0 z-10 mt-auto"
+      @cancel="clearSelection"
+      @select-all="handleToggleAllSelection"
     >
-      <div class="mr-4 flex items-center gap-3">
-        <el-checkbox
-          :indeterminate="isSelectionIndeterminate"
-          :model-value="isAllRowsSelected"
-          @change="handleToggleAllSelection"
-        />
-        <span>已选 {{ selectedRows.length }}/{{ props.data.length }}</span>
-      </div>
-
       <slot name="footer-batch-actions" />
-      <el-button text type="primary" class="shrink-0 ml-3!" @click="clearSelection">取消</el-button>
-    </footer>
+    </LayoutBatchFooter>
   </div>
 </template>
 

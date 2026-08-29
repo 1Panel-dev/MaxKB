@@ -337,7 +337,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="drawerVisible = false">取消</el-button>
+      <el-button plain @click="drawerVisible = false">取消</el-button>
       <el-button :loading="userSubmitting" type="primary" @click="submitUser">
         {{ submitText }}
       </el-button>

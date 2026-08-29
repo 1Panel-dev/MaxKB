@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
-import ChatUserApi from '@/api/admin/system/chat-user'
+import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
 import { PERIOD_TYPE, QUOTA_TYPE } from '@/api/enums'
 import type { ChatUserQuotaPayload, PeriodType, QuotaType } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
@@ -188,7 +188,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="dialogVisible = false">取消</el-button>
+      <el-button plain @click="dialogVisible = false">取消</el-button>
       <el-button :loading="submitting" type="primary" @click="submitQuotaSettings">确定</el-button>
     </template>
   </MkDialog>

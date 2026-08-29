@@ -1,10 +1,36 @@
 <script setup lang="ts">
-import { computed, Fragment, h, isVNode, type FunctionalComponent, type VNode, useSlots } from 'vue'
+import {
+  computed,
+  Fragment,
+  h,
+  isVNode,
+  type FunctionalComponent,
+  type VNode,
+  type VNodeChild,
+  useSlots,
+} from 'vue'
 import { useRoute } from 'vue-router'
 import { ElScrollbar } from 'element-plus'
 import LayoutAside from './layout-aside.vue'
+import LayoutBatchFooter from './layout-batch-footer.vue'
 
 defineOptions({ name: 'MkViewLayout', inheritAttrs: false })
+
+type BatchSelectionValue = string | number
+interface LayoutFooterProps {
+  batchSelection?: BatchSelectionValue[]
+  batchValues?: BatchSelectionValue[]
+}
+
+type LayoutFooterEmits = {
+  'batch-cancel': []
+  'update:batchSelection': [values: BatchSelectionValue[]]
+}
+
+type LayoutFooterSlots = {
+  default?: () => VNodeChild
+  'footer-batch-actions'?: (props: { batchSelection: BatchSelectionValue[] }) => VNodeChild
+}
 
 const props = withDefaults(
   defineProps<{
@@ -45,12 +71,47 @@ function flattenSlotNodes(children: unknown): VNode[] {
 const LayoutHeader: FunctionalComponent = (_, { slots }) =>
   h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, slots.default?.())
 
-const LayoutFooter: FunctionalComponent = (_, { slots }) =>
-  h(
+const LayoutFooter: FunctionalComponent<LayoutFooterProps, LayoutFooterEmits, LayoutFooterSlots> = (
+  footerProps,
+  { emit: emitFooter, slots },
+) => {
+  const batchActions = slots['footer-batch-actions']
+
+  if (batchActions) {
+    const batchSelection = footerProps.batchSelection ?? []
+    const batchValues = footerProps.batchValues ?? []
+    const selectedValues = new Set(batchSelection)
+    const selectedCount = batchValues.filter((value) => selectedValues.has(value)).length
+    const allSelected = batchValues.length > 0 && selectedCount === batchValues.length
+
+    return h(
+      LayoutBatchFooter,
+      {
+        allSelected,
+        class: '-mx-6 -mb-6',
+        selectedCount,
+        total: batchValues.length,
+        onCancel: () => {
+          emitFooter('update:batchSelection', [])
+          emitFooter('batch-cancel')
+        },
+        onSelectAll: (selected: boolean) => {
+          emitFooter('update:batchSelection', selected ? [...batchValues] : [])
+        },
+      },
+      { default: () => batchActions({ batchSelection }) },
+    )
+  }
+
+  return h(
     'footer',
     { class: '-mx-6 -mb-6 flex shrink-0 justify-end border-t px-6 py-4' },
-    slots.default?.(),
+    slots.default?.() ?? undefined,
   )
+}
+
+LayoutFooter.props = ['batchSelection', 'batchValues']
+LayoutFooter.emits = ['batch-cancel', 'update:batchSelection']
 
 const LayoutContent: FunctionalComponent = () => {
   const contentNodes = flattenSlotNodes(
@@ -66,7 +127,6 @@ const LayoutContent: FunctionalComponent = () => {
     : title.value
       ? [h('header', { class: 'flex-between shrink-0 py-4 gap-4' }, [h('h4', title.value)])]
       : []
-
   return [
     ...headerNodes,
     h(

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { computed, useSlots } from 'vue'
+import { hasRenderableSlotContent } from '@/utils/vnode'
+
 defineOptions({ name: 'MkTableMoreDropdown', inheritAttrs: false })
 
 defineProps<{
@@ -9,11 +12,19 @@ defineSlots<{
   /** 表格 More 菜单项，仅使用 MkDropdownItem */
   default(): unknown
 }>()
+
+const slots = useSlots()
+const hasDropdownItems = computed(() => hasRenderableSlotContent(slots.default?.()))
 </script>
 
 <template>
-  <MkDropdown trigger="click" placement="bottom-end" v-bind="$attrs">
-    <el-button aria-label="更多操作" type="primary" text @click.stop>
+  <MkDropdown
+    v-if="hasDropdownItems"
+    trigger="click"
+    placement="bottom-end"
+    v-bind="$attrs"
+  >
+    <el-button type="primary" text @click.stop>
       <MkIcon name="icon_more_outlined" />
     </el-button>
 

@@ -2,8 +2,8 @@
 import { computed, reactive, ref } from 'vue'
 import JSEncrypt from 'jsencrypt'
 import CommonSystemApi from '@/api/admin/system/common'
-import ChatUserApi from '@/api/admin/system/chat-user'
-import ChatUserGroupsApi from '@/api/admin/system/chat-user-groups'
+import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
+import ChatUserGroupsApi from '@/api/admin/system/chat-user/chat-user-groups'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
@@ -234,7 +234,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="drawerVisible = false">取消</el-button>
+      <el-button plain @click="drawerVisible = false">取消</el-button>
       <el-button :loading="userSubmitting" type="primary" @click="submitUser">
         {{ submitText }}
       </el-button>

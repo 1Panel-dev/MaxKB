@@ -184,7 +184,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button @click="visible = false">取消</el-button>
+      <el-button plain @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="submit">添加</el-button>
     </template>
   </MkDrawer>

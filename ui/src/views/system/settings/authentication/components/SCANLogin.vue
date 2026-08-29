@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, useTemplateRef } from 'vue'
-import AuthScanApi from '@/api/admin/system/auth-scan-setting'
+import AuthScanApi from '@/api/admin/system/settings/auth-scan-setting'
 import type { QrCodeProvider, QrLoginPlatform, QrLoginPlatformPayload } from '@/api/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import { LOGIN_METHOD_LABELS, SCAN_FIELD_LABELS } from '@/constants'
@@ -136,7 +136,7 @@ onMounted(loadQrPlatforms)
           </div>
 
           <el-button type="primary" @click="handleEditPlatform(platform)">编辑</el-button>
-          <el-button @click="handleValidatePlatform(platform)">校验</el-button>
+          <el-button plain @click="handleValidatePlatform(platform)">校验</el-button>
         </div>
       </el-card>
     </template>
