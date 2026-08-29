@@ -4,12 +4,13 @@ import type ToolApi from '@/api/admin/workspace/tool/tool'
 import type { ToolItem, ToolStoreItem, ToolStoreResponse } from '@/api/types'
 import { TOOL_TYPE } from '@/api/enums'
 import ToolFormDrawer from '@/views/tool/tool-form/tool-custom/ToolFormDrawer.vue'
-import DataSourceToolFormDrawer from '@/views/tool/tool-form/tool-data-source/DataSourceToolFormDrawer.vue'
-import McpToolFormDrawer from '@/views/tool/tool-form/tool-mcp/McpToolFormDrawer.vue'
-import SkillToolFormDrawer from '@/views/tool/tool-form/tool-skills/SkillToolFormDrawer.vue'
-import WorkflowFormDialog from '@/views/tool/tool-form/tool-workflow/WorkflowFormDialog.vue'
+import DataSourceFormDrawer from '@/views/tool/tool-form/DataSourceFormDrawer.vue'
+import McpFormDrawer from '@/views/tool/tool-form/McpFormDrawer.vue'
+import SkillToolFormDrawer from '@/views/tool/tool-form/SkillToolFormDrawer.vue'
+import WorkflowFormDialog from '@/views/tool/tool-form/WorkflowFormDialog.vue'
 import ToolStoreDetailDrawer from '@/views/tool/tool-store/ToolStoreDetailDrawer.vue'
-import AddInternalToolDialog from './AddInternalToolDialog.vue'
+import AddStoreToolDialog from '@/views/tool/tool-store/AddStoreToolDialog.vue'
+import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'EditToolAction' })
 
@@ -21,32 +22,51 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  refresh: []
+  update: [tool: ToolItem]
 }>()
 
 const formMounted = ref(false)
-const addInternalToolDialogRef = useTemplateRef<InstanceType<typeof AddInternalToolDialog>>(
-  'addInternalToolDialogRef',
-)
+const addStoreToolDialogRef =
+  useTemplateRef<InstanceType<typeof AddStoreToolDialog>>('addStoreToolDialogRef')
 const toolStoreDetailDrawerRef = useTemplateRef<InstanceType<typeof ToolStoreDetailDrawer>>(
   'toolStoreDetailDrawerRef',
 )
 const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
-const dataSourceToolFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceToolFormDrawer>>(
-  'dataSourceToolFormDrawerRef',
-)
-const mcpToolFormDrawerRef =
-  useTemplateRef<InstanceType<typeof McpToolFormDrawer>>('mcpToolFormDrawerRef')
+const dataSourceFormDrawerRef =
+  useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
+const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcpFormDrawerRef')
 const skillToolFormDrawerRef =
   useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
 const workflowFormDialogRef =
   useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
 
+function handleOpenStoreToolDialog(tool: ToolItem, isEdit?: boolean) {
+  addStoreToolDialogRef.value?.open(
+    {
+      desc: tool.desc,
+      icon: tool.icon,
+      id: tool.id,
+      name: tool.name,
+      source: 'store',
+      tool_type: tool.tool_type,
+      version: tool.version,
+    },
+    isEdit,
+  )
+}
+
+function handleEditStoreTool(tool: ToolStoreItem, name: string) {
+  props.api.putTool(tool.id, { name }).then((updatedTool) => {
+    MsgSuccess('保存成功')
+    emit('update', updatedTool)
+  })
+}
+
 function handleOpenToolForm() {
   // 模板转换而来的工具只允许修改名称。
   if (props.tool.template_id) {
     formMounted.value = true
-    addInternalToolDialogRef.value?.open(props.tool)
+    void nextTick(() => handleOpenStoreToolDialog(props.tool, true))
     return
   }
 
@@ -74,8 +94,8 @@ function handleOpenToolForm() {
   void nextTick(() => {
     const formRefMap = {
       [TOOL_TYPE.CUSTOM]: toolFormDrawerRef,
-      [TOOL_TYPE.DATA_SOURCE]: dataSourceToolFormDrawerRef,
-      [TOOL_TYPE.MCP]: mcpToolFormDrawerRef,
+      [TOOL_TYPE.DATA_SOURCE]: dataSourceFormDrawerRef,
+      [TOOL_TYPE.MCP]: mcpFormDrawerRef,
       [TOOL_TYPE.SKILL]: skillToolFormDrawerRef,
       [TOOL_TYPE.WORKFLOW]: workflowFormDialogRef,
     }
@@ -95,12 +115,11 @@ function handleFormClosed() {
   </MkDropdownItem>
 
   <template v-if="formMounted">
-    <AddInternalToolDialog
+    <AddStoreToolDialog
       v-if="tool.template_id"
-      ref="addInternalToolDialogRef"
-      :api="api"
+      ref="addStoreToolDialogRef"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @submit="handleEditStoreTool"
     />
     <ToolStoreDetailDrawer
       v-else-if="tool.version"
@@ -115,25 +134,25 @@ function handleFormClosed() {
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @update="emit('update', $event)"
     />
-    <DataSourceToolFormDrawer
+    <DataSourceFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.DATA_SOURCE"
-      ref="dataSourceToolFormDrawerRef"
+      ref="dataSourceFormDrawerRef"
       title="编辑数据源"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @update="emit('update', $event)"
     />
-    <McpToolFormDrawer
+    <McpFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.MCP"
-      ref="mcpToolFormDrawerRef"
+      ref="mcpFormDrawerRef"
       title="编辑 MCP"
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @update="emit('update', $event)"
     />
     <SkillToolFormDrawer
       v-else-if="tool.tool_type === TOOL_TYPE.SKILL"
@@ -142,7 +161,7 @@ function handleFormClosed() {
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @update="emit('update', $event)"
     />
     <WorkflowFormDialog
       v-else-if="tool.tool_type === TOOL_TYPE.WORKFLOW"
@@ -151,7 +170,7 @@ function handleFormClosed() {
       :api="api"
       :folder-id="tool.folder_id ?? ''"
       @closed="handleFormClosed"
-      @refresh="emit('refresh')"
+      @update="emit('update', $event)"
     />
   </template>
 </template>

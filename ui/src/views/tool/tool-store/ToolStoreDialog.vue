@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { computed, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, useTemplateRef } from 'vue'
 import ToolStoreApi from '@/api/admin/tool-store'
 import ToolApi from '@/api/admin/workspace/tool/tool'
 import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
+import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
-import { resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/icon'
 import ToolStoreCard from './ToolStoreCard.vue'
 import ToolStoreDetailDrawer from './ToolStoreDetailDrawer.vue'
 import AddStoreToolDialog from './AddStoreToolDialog.vue'
 
 defineOptions({ name: 'ToolStoreDialog' })
+
+const { auth } = useStore()
 
 const emit = defineEmits<{
   refresh: []
@@ -28,14 +31,17 @@ const DEFAULT_CATEGORY_TITLES: Record<string, string> = {
   other: '其他',
   web_search: '联网搜索',
 }
+const DEFAULT_CATEGORY_IDS = ['web_search', 'database_search']
 
 const visible = ref(false)
 const loading = ref(false)
 const addingToolId = ref<string>()
+const activeCategoryId = ref('')
 const folderId = ref('default')
 const searchKeyword = ref('')
 const storeTools = ref<ToolStoreItem[]>([])
 const storeTags = ref<ToolStoreTag[]>([])
+const hasSearchKeyword = computed(() => Boolean(searchKeyword.value.trim()))
 
 const categoryTitles = computed(() => {
   return storeTags.value.reduce<Record<string, string>>(
@@ -51,11 +57,16 @@ const toolStoreCategories = computed<ToolStoreCategory[]>(() => {
     categoryMap.set(categoryId, [...(categoryMap.get(categoryId) ?? []), tool])
   })
 
-  return Array.from(categoryMap, ([id, tools]) => ({
-    id,
-    title: categoryTitles.value[id] ?? id,
-    tools,
-  }))
+  const categoryIds = [
+    ...DEFAULT_CATEGORY_IDS,
+    ...storeTags.value.map(({ key }) => key),
+    ...Array.from(categoryMap.keys()),
+  ].filter((categoryId, index, categories) => categories.indexOf(categoryId) === index)
+
+  return categoryIds.flatMap((id) => {
+    const tools = categoryMap.get(id)
+    return tools?.length ? [{ id, title: categoryTitles.value[id] ?? id, tools }] : []
+  })
 })
 
 function getStoreToolType(label?: string | null): ToolType {
@@ -93,6 +104,10 @@ function loadStoreTools() {
       }))
       storeTags.value = storeResponse.additionalProperties.tags
       storeTools.value = [...internalTools.map(normalizeInternalTool), ...appStoreTools]
+      return nextTick(() => {
+        activeCategoryId.value = toolStoreCategories.value[0]?.id ?? ''
+        contentScrollbarRef.value?.setScrollTop(0)
+      })
     })
     .finally(() => {
       loading.value = false
@@ -103,16 +118,33 @@ function open(targetFolderId: string) {
   folderId.value = targetFolderId || 'default'
   searchKeyword.value = ''
   storeTools.value = []
+  activeCategoryId.value = ''
   visible.value = true
   loadStoreTools()
 }
 
 /* 商店分类与详情 */
+const contentScrollbarRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>(
+  'contentScrollbarRef',
+)
+
 function handleCategorySelect(categoryId: string) {
-  document.getElementById(`tool-store-category-${categoryId}`)?.scrollIntoView({
-    behavior: 'smooth',
-    block: 'start',
+  const categoryElement = document.getElementById(`tool-store-category-${categoryId}`)
+  if (!categoryElement) return
+
+  activeCategoryId.value = categoryId
+  contentScrollbarRef.value?.setScrollTop(Math.max(categoryElement.offsetTop - 24, 0))
+}
+
+function handleContentScroll({ scrollTop }: { scrollTop: number }) {
+  let nextActiveCategoryId = toolStoreCategories.value[0]?.id ?? ''
+  toolStoreCategories.value.forEach((category) => {
+    const categoryElement = document.getElementById(`tool-store-category-${category.id}`)
+    if (categoryElement && categoryElement.offsetTop <= scrollTop + 32) {
+      nextActiveCategoryId = category.id
+    }
   })
+  activeCategoryId.value = nextActiveCategoryId
 }
 
 const detailDrawerRef =
@@ -142,10 +174,12 @@ function handleAddTool(tool: ToolStoreItem, name: string) {
   addingToolId.value = tool.id
   const commonPayload = { folder_id: folderId.value, name }
   let request: Promise<unknown>
+  let shouldRefreshCurrentUser = false
 
   if (tool.source === 'internal') {
     request = WorkspaceToolStoreApi.postInternalTool(tool.id, commonPayload)
   } else if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
+    shouldRefreshCurrentUser = true
     request = ToolApi.postTool({
       ...commonPayload,
       code: '{}',
@@ -165,9 +199,14 @@ function handleAddTool(tool: ToolStoreItem, name: string) {
 
   request
     .then(() => {
-      MsgSuccess('添加成功')
-      visible.value = false
-      emit('refresh')
+      const refreshCurrentUser = shouldRefreshCurrentUser
+        ? auth.loadAuthBaseProfile()
+        : Promise.resolve()
+      return refreshCurrentUser.then(() => {
+        MsgSuccess('添加成功')
+        visible.value = false
+        emit('refresh')
+      })
     })
     .finally(() => {
       addingToolId.value = undefined
@@ -180,18 +219,35 @@ defineExpose({ open })
 <template>
   <MkDialog
     v-model="visible"
+    align-center
     class="tool-store-dialog"
-    content-class="p-0!"
+    content-class="max-h-none! p-0!"
     title="工具商店"
     width="1200"
   >
+    <template #header="{ titleId }">
+      <div class="relative flex items-center">
+        <h4 :id="titleId">工具商店</h4>
+        <MkSearchInput
+          v-model="searchKeyword"
+          class="absolute left-1/2 w-80! -translate-x-1/2"
+          placeholder="搜索"
+          @change="loadStoreTools"
+          @keyup.enter="loadStoreTools"
+        />
+      </div>
+    </template>
+
     <div class="tool-store-layout flex min-h-0">
-      <aside v-if="!searchKeyword" class="w-52 shrink-0 border-r border-N200 bg-N100 p-3">
+      <aside v-if="!hasSearchKeyword" class="w-60 shrink-0 border-r border-N200 p-4">
         <el-scrollbar>
           <el-button
             v-for="category in toolStoreCategories"
             :key="category.id"
-            class="mb-1 w-full justify-start!"
+            :class="
+              activeCategoryId === category.id ? 'bg-primary/10! text-primary!' : 'text-N900!'
+            "
+            class="mb-1 h-10! w-full justify-start! rounded-md px-3!"
             text
             @click="handleCategorySelect(category.id)"
           >
@@ -201,23 +257,18 @@ defineExpose({ open })
       </aside>
 
       <main class="flex min-w-0 flex-1 flex-col">
-        <div class="flex justify-end border-b border-N200 px-6 py-3">
-          <MkSearchInput
-            v-model="searchKeyword"
-            class="w-70!"
-            placeholder="搜索工具"
-            @change="loadStoreTools"
-            @keyup.enter="loadStoreTools"
-          />
-        </div>
-
-        <el-scrollbar v-loading="loading" class="min-h-0 flex-1">
+        <el-scrollbar
+          ref="contentScrollbarRef"
+          v-loading="loading"
+          class="min-h-0 flex-1"
+          @scroll="handleContentScroll"
+        >
           <div class="p-6">
             <template v-if="storeTools.length">
-              <div v-if="searchKeyword" class="mb-4">
+              <div v-if="hasSearchKeyword" class="mb-4">
                 找到 <strong class="text-primary">{{ storeTools.length }}</strong> 个相关工具
               </div>
-              <div v-if="searchKeyword" class="mk-resource-card-grid">
+              <div v-if="hasSearchKeyword" class="tool-store-search-grid">
                 <ToolStoreCard
                   v-for="tool in storeTools"
                   :key="`${tool.source}-${tool.id}`"
@@ -235,8 +286,8 @@ defineExpose({ open })
                   :key="category.id"
                   class="mb-8 scroll-mt-4"
                 >
-                  <h4 class="mk-title-decoration mb-4">{{ category.title }}</h4>
-                  <div class="mk-resource-card-grid">
+                  <h4 class="mb-4">{{ category.title }}</h4>
+                  <div class="tool-store-card-grid">
                     <ToolStoreCard
                       v-for="tool in category.tools"
                       :key="`${tool.source}-${tool.id}`"
@@ -262,7 +313,34 @@ defineExpose({ open })
 </template>
 
 <style scoped lang="scss">
+.tool-store-card-grid {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+}
+
 .tool-store-layout {
-  height: min(680px, calc(100vh - 220px));
+  height: min(724px, calc(100vh - 120px));
+}
+
+.tool-store-search-grid {
+  display: grid;
+  gap: calc(var(--spacing) * 4);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
+}
+</style>
+
+<style lang="scss">
+.tool-store-dialog {
+  max-width: calc(100vw - 48px);
+
+  .el-dialog__header {
+    border-bottom: 1px solid var(--mk-N200);
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 6);
+  }
+
+  .el-dialog__headerbtn {
+    top: 14px;
+  }
 }
 </style>

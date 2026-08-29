@@ -4,6 +4,9 @@ import { computed, inject, ref, useAttrs } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
+import { getFileExtension, getFileIconUrl } from '@/utils/icon'
+import { formatFileSize } from '@/utils/number'
+
 
 import { useFormDisabled } from 'element-plus'
 const inputDisabled = useFormDisabled()
@@ -14,35 +17,6 @@ const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formFiel
 })
 const emit = defineEmits(['update:modelValue'])
 
-const typeList: DynamicFormValue = {
-  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
-  table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls', 'zip'],
-}
-const fileType = (name: string) => {
-  const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'DynamicFormValue'
-}
-
-const getImgUrl = (name: string) => {
-  const list = Object.values(typeList).flat()
-  const type = list.includes(fileType(name).toLowerCase())
-    ? fileType(name).toLowerCase()
-    : 'DynamicFormValue'
-  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
-}
-function formatSize(sizeInBytes: number) {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB']
-  let size = sizeInBytes
-  let unitIndex = 0
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024
-    unitIndex++
-  }
-
-  return size.toFixed(2) + ' ' + units[unitIndex]
-}
 
 const deleteFile = (file: DynamicFormValue) => {
   if (inputDisabled.value) {
@@ -69,7 +43,7 @@ const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
 const ofType = (exts: string[]) => (f: DynamicFormValue) =>
-  exts.includes(fileType(f?.name || '').toUpperCase())
+  exts.includes(getFileExtension(f?.name || '').toUpperCase())
 
 const filesWithUrl = computed(() =>
   (modelValueProxy.value || []).map((f: DynamicFormValue) => ({
@@ -143,13 +117,13 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
           style="padding: 0 8px 0 8px"
         >
           <div class="flex align-center" style="width: 70%">
-            <img :src="getImgUrl(file && file?.name)" alt="" width="24" class="mr-4" />
+            <img :src="getFileIconUrl(file?.name || '')" alt="" width="24" class="mr-4" />
             <span :title="file.name">
               {{ file.name }}
             </span>
           </div>
           <div class="flex align-center">
-            <div :title="formatSize(file.size)">{{ formatSize(file.size) }}</div>
+            <div :title="formatFileSize(file.size)">{{ formatFileSize(file.size) }}</div>
 
             <el-button link class="ml-8" @click="deleteFile(file)" v-if="!inputDisabled">
               <MkIcon name="icon_delete-trash_outlined"></MkIcon>
@@ -171,7 +145,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
               下载
             </div>
             <div class="show flex align-center">
-              <img :src="getImgUrl(item && item?.name)" alt="" width="24" />
+              <img :src="getFileIconUrl(item?.name || '')" alt="" width="24" />
               <div class="ml-4" :title="item && item?.name">
                 {{ item && item?.name }}
               </div>

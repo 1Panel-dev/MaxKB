@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolType } from '@/api/types'
-import { resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/icon'
 
 defineOptions({ name: 'ToolIcon' })
 

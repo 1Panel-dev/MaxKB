@@ -3,6 +3,8 @@ import type { DynamicFormValue } from '../../type'
 import { Refresh } from '@element-plus/icons-vue'
 import { computed, useAttrs, nextTick, inject, ref, reactive } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
+import { getFileExtension, getFileIconUrl } from '@/utils/icon'
+import { formatFileSize } from '@/utils/number'
 import { MsgError } from '@/utils/message'
 import type { UploadFiles } from 'element-plus'
 const upload = inject('upload') as DynamicFormValue
@@ -15,34 +17,6 @@ const onExceed = () => {
   MsgError('单次上传最多 ' + fileCountLimit.value + ' 个文件')
 }
 const emit = defineEmits(['update:modelValue'])
-
-const filesize = (size: number) => {
-  if (!size) return ''
-  const num = 1024.0
-  if (size < num) return size + 'B'
-  if (size < Math.pow(num, 2)) return (size / num).toFixed(2) + 'K' //kb
-  if (size < Math.pow(num, 3)) return (size / Math.pow(num, 2)).toFixed(2) + 'M' //M
-  if (size < Math.pow(num, 4)) return (size / Math.pow(num, 3)).toFixed(2) + 'G' //G
-  return (size / Math.pow(num, 4)).toFixed(2) + 'T' //T
-}
-
-const typeList: DynamicFormValue = {
-  txt: ['txt', 'pdf', 'docx', 'md', 'html', 'zip', 'xlsx', 'xls', 'csv'],
-  table: ['xlsx', 'xls', 'csv'],
-  QA: ['xlsx', 'csv', 'xls', 'zip'],
-}
-const fileType = (name: string) => {
-  const suffix = name.split('.')
-  return suffix[suffix.length - 1] || 'DynamicFormValue'
-}
-
-const getImgUrl = (name: string) => {
-  const list = Object.values(typeList).flat()
-  const type = list.includes(fileType(name).toLowerCase())
-    ? fileType(name).toLowerCase()
-    : 'DynamicFormValue'
-  return new URL(`../assets/fileType/${type}-icon.svg`, import.meta.url).href
-}
 
 const fileArray = ref<DynamicFormValue>([])
 
@@ -124,7 +98,7 @@ const fileHandleChange = (file: DynamicFormValue, fileList: UploadFiles) => {
     removeCurrentFile()
     return false
   }
-  if (!allowedFileTypes.value.includes(fileType(file.name).toLocaleUpperCase())) {
+  if (!allowedFileTypes.value.includes(getFileExtension(file.name).toUpperCase())) {
     if (file?.name !== '.DS_Store') {
       MsgError('文件格式不支持')
     }
@@ -237,14 +211,17 @@ const fileCountLimit = computed(() => {
       :on-change="fileHandleChange"
       @click.prevent="handlePreview(false)"
     >
-      <img src="@/assets/empty/no-data.svg" alt="" />
+      <div class="text-center mb-2">
+        <img class="mx-auto" src="@/assets/mk_icon_upload.svg" alt="" />
+      </div>
+
       <div class="el-upload__text">
         <p>
           将文件拖到此处，或
-          <em class="hover" @click.prevent="handlePreview(false)"> 点击上传 </em>
-          <em class="hover ml-4" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
+          <em @click.prevent="handlePreview(false)"> 点击上传 </em>
+          <em class="ml-4" @click.prevent="handlePreview(true)"> 选择文件夹 </em>
         </p>
-        <div class="upload__decoration">
+        <div class="text-N600">
           <p>单次上传最多 {{ fileCountLimit }} 个文件， 每个文件最大 {{ fileSizeLimit }} MB</p>
           <p>支持格式：{{ formats }}</p>
         </div>
@@ -284,15 +261,15 @@ const fileCountLimit = computed(() => {
           >
             <div class="flex-between">
               <div class="flex">
-                <img :src="getImgUrl(item && item?.name)" alt="" width="40" />
+                <img :src="getFileIconUrl(item?.name || '')" alt="" width="40" />
                 <div class="ml-8">
                   <p :title="item && item?.name">{{ item && item?.name }}</p>
                   <el-text type="info" size="small">
                     <template v-if="item.status === 'uploading'">
-                      {{ filesize((item.size * item.percentage) / 100) }} /
-                      {{ filesize(item.size) || '0K' }}
+                      {{ formatFileSize((item.size * item.percentage) / 100) }} /
+                      {{ formatFileSize(item.size) || '0K' }}
                     </template>
-                    <template v-else>{{ filesize(item && item?.size) || '0K' }}</template>
+                    <template v-else>{{ formatFileSize(item && item?.size) || '0K' }}</template>
                   </el-text>
                   <el-text class="ml-8" v-if="item.status === 'error'" type="danger" size="small">
                     {{ item.errMsg }}

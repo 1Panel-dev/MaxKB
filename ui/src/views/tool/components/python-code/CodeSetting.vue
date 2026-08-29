@@ -3,6 +3,10 @@ import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 
 defineOptions({ name: 'ToolCodeSetting' })
 
+withDefaults(defineProps<{ showGenerate?: boolean }>(), {
+  showGenerate: false,
+})
+
 const code = defineModel<string>({ required: true })
 </script>
 
@@ -14,7 +18,7 @@ const code = defineModel<string>({ required: true })
         <span class="text-N600">使用工具时不显示</span>
       </div>
       <!-- // TODO: 生成功能 -->
-      <el-button link type="primary">
+      <el-button v-if="showGenerate" link type="primary">
         <MkIcon name="icon_star" />
         <span>生成</span>
       </el-button>
@@ -22,7 +26,7 @@ const code = defineModel<string>({ required: true })
 
     <el-form-item prop="code">
       <PythonCodeEditor v-model="code" title="工具内容（Python）">
-        <template #header-extra>
+        <template v-if="showGenerate" #header-extra>
           <!-- // TODO: 生成功能 -->
           <el-button link type="primary">
             <MkIcon name="icon_star" />

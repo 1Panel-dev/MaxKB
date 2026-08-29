@@ -207,6 +207,31 @@ export function get<T = unknown>(
   return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }), loading)
 }
 
+/** 发送指定方法的 Blob 请求并触发浏览器下载。 */
+export async function downloadRequest(
+  url: string,
+  method: string,
+  data?: unknown,
+  params?: Dict<unknown>,
+  loading?: LoadingTarget,
+): Promise<boolean> {
+  startLoading(loading)
+  try {
+    const response = await request.request<Blob>({
+      url,
+      method,
+      data,
+      params,
+      responseType: 'blob',
+      skipGlobalErrorMessage: true,
+    } as ExportRequestConfig)
+
+    return downloadExportResponse(response, 'download')
+  } finally {
+    finishLoading(loading)
+  }
+}
+
 /** 发送 GET 请求并将 Blob 响应下载为文件。 */
 export async function getExportFile(
   fileName: string,

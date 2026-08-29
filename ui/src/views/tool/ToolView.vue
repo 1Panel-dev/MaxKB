@@ -248,9 +248,15 @@ onMounted(() => {
                     :api="ToolApi"
                     :store-tools="storeTools"
                     :tool="tool"
+                    @update="handleToolUpdate"
+                  />
+                  <CopyToolAction
+                    v-model:loading="toolOperationLoading"
+                    label="复制"
+                    :api="ToolApi"
+                    :tool="tool"
                     @refresh="refreshTool"
                   />
-                  <CopyToolAction label="复制" :tool="tool" />
                   <ExportToolAction
                     v-model:loading="toolOperationLoading"
                     label="导出"

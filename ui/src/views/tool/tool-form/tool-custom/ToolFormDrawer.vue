@@ -4,6 +4,7 @@ import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
 import type { DynamicFormField, ToolInputField, ToolItem, ToolPayload } from '@/api/types'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
+import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
 import InitFieldTable from '../../components/init-field/InitFieldTable.vue'
@@ -11,6 +12,8 @@ import InputFieldTable from '../../components/input-field/InputFieldTable.vue'
 import ToolCodeSetting from '../../components/python-code/CodeSetting.vue'
 
 defineOptions({ name: 'ToolFormDrawer' })
+
+const { auth } = useStore()
 
 const props = defineProps<{
   api: typeof ToolApi
@@ -21,6 +24,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   closed: []
   refresh: []
+  update: [tool: ToolItem]
 }>()
 
 interface ToolFormModel {
@@ -59,15 +63,21 @@ function handleSubmit() {
 
     loading.value = true
     const payload: ToolPayload = cloneDeep(toolForm)
-    const request = editId.value
-      ? props.api.putTool(editId.value, payload)
+    const currentEditId = editId.value
+    const isEdit = Boolean(currentEditId)
+    const request = currentEditId
+      ? props.api.putTool(currentEditId, payload)
       : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
-      .then(() => {
-        MsgSuccess(editId.value ? '保存成功' : '创建成功')
-        visible.value = false
-        emit('refresh')
+      .then((savedTool) => {
+        const refreshCurrentUser = isEdit ? Promise.resolve() : auth.loadAuthBaseProfile()
+        return refreshCurrentUser.then(() => {
+          MsgSuccess(isEdit ? '保存成功' : '创建成功')
+          visible.value = false
+          if (isEdit) emit('update', savedTool)
+          else emit('refresh')
+        })
       })
       .finally(() => {
         loading.value = false
@@ -82,23 +92,34 @@ function handleOpenDebug() {
   debugDrawerRef.value?.open(toolForm)
 }
 
-function open(tool?: ToolItem) {
+function fillToolForm(tool: ToolItem) {
+  Object.assign(toolForm, {
+    code: tool.code ?? '',
+    desc: tool.desc ?? '',
+    icon: tool.icon ?? '',
+    init_field_list: cloneDeep(tool.init_field_list ?? []),
+    input_field_list: cloneDeep(tool.input_field_list ?? []),
+    name: tool.name,
+  })
+}
+
+function open(tool?: ToolItem, asCopy = false) {
+  resetData()
   originalForm.value = JSON.stringify(toolForm)
   if (tool) {
+    if (asCopy) {
+      fillToolForm(tool)
+      originalForm.value = JSON.stringify(toolForm)
+      visible.value = true
+      return
+    }
+
     editId.value = tool.id
     formLoading.value = true
     props.api
       .getToolDetail(tool.id)
       .then((toolDetail) => {
-        if (editId.value !== tool.id || !visible.value) return
-        Object.assign(toolForm, {
-          code: toolDetail.code ?? '',
-          desc: toolDetail.desc ?? '',
-          icon: toolDetail.icon ?? '',
-          init_field_list: cloneDeep(toolDetail.init_field_list ?? []),
-          input_field_list: cloneDeep(toolDetail.input_field_list ?? []),
-          name: toolDetail.name,
-        })
+        fillToolForm(toolDetail)
         originalForm.value = JSON.stringify(toolForm)
       })
       .finally(() => {
@@ -184,7 +205,7 @@ defineExpose({ open })
           v-model="toolForm.desc"
           :autosize="{ minRows: 3 }"
           maxlength="128"
-          placeholder="请输入描述"
+          placeholder="请输入"
           show-word-limit
           type="textarea"
           @blur="toolForm.desc = toolForm.desc.trim()"
@@ -196,7 +217,7 @@ defineExpose({ open })
       <!-- 输入参数 -->
       <InputFieldTable v-model="toolForm.input_field_list" class="mb-6" />
 
-      <ToolCodeSetting v-model="toolForm.code" class="mb-6" />
+      <ToolCodeSetting v-model="toolForm.code" class="mb-6" show-generate />
       <section>
         <div class="mb-4 flex items-center gap-2">
           <h4 class="mk-title-decoration">输出参数</h4>

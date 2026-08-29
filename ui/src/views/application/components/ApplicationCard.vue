@@ -3,7 +3,7 @@ import { useRouter, useRoute } from 'vue-router'
 
 import type { ApplicationDetail } from '@/api/types'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
-import { resetUrl } from '@/utils/common'
+import { resetUrl } from '@/utils/icon'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
 

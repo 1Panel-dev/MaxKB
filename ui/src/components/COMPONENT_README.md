@@ -86,6 +86,8 @@ src/components/
 ├── mk-date-range/
 │   ├── index.vue                 # 日期预设与自定义日期区间组合筛选器，手动导入
 │   └── types.ts                  # 日期筛选结果类型
+├── mk-drag-upload/
+│   └── index.vue                 # 拖拽上传与已选文件卡片，手动导入
 ├── mk-dynamics-form/
 │   ├── index.ts                  # 动态表单、表单配置器及组件内类型的公开入口
 │   ├── index.vue                 # 根据字段配置渲染和校验动态表单
@@ -117,6 +119,7 @@ Vue 模板中使用，不需要手动导入。其他共享组件必须从具体�
 import MkSearchList from '@/components/mk-search-list/index.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import MkDateRange from '@/components/mk-date-range/index.vue'
+import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { MkDynamicsForm, MkDynamicsFormConstructor } from '@/components/mk-dynamics-form'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
@@ -646,6 +649,32 @@ function handleDateRangeChange({ startTime, endTime }: MkDateRangeValue) {
 </script>
 
 <MkDateRange @change="handleDateRangeChange" />
+```
+
+### MkDragUpload
+
+组合拖拽选择区和已选文件卡片，通过 `v-model` 管理 Element Plus `UploadUserFile[]`。`accept`
+直接传给上传控件；`dragText`、`selectText`、`tipText` 和 `replaceText` 可替换展示文案。组件只负责
+文件选择与展示，使用方通过 `change` 执行校验和上传，通过 `remove` 清理业务数据；`download`
+作用域插槽提供当前文件，由使用方按业务需要放置下载按钮。组件暴露 `clearFiles()`，用于请求失败
+或表单重置时清空上传控件内部状态。
+
+```vue
+<script setup lang="ts">
+import MkDragUpload from '@/components/mk-drag-upload/index.vue'
+</script>
+
+<MkDragUpload
+  v-model="fileList"
+  accept=".zip"
+  tip-text="支持格式：ZIP，大小不超过 100 MB"
+  @change="handleFileChange"
+  @remove="handleFileRemove"
+>
+  <template #download="{ file }">
+    <el-button link @click="handleDownload(file)">下载</el-button>
+  </template>
+</MkDragUpload>
 ```
 
 ### PythonCodeEditor
