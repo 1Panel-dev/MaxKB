@@ -10,7 +10,14 @@ import ModelDownloadStatus from './ModelDownloadStatus.vue'
 
 defineOptions({ name: 'ModelCard' })
 
-const props = defineProps<{ api: typeof ModelApi; disabled?: boolean; model: ModelItem; provider: ModelProviderItem; refresh: () => Promise<void>; shared: boolean }>()
+const props = defineProps<{
+  api: typeof ModelApi
+  disabled?: boolean
+  model: ModelItem
+  provider: ModelProviderItem
+  refresh: () => Promise<void>
+  shared: boolean
+}>()
 
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
 
@@ -44,7 +51,7 @@ const errMessage = computed(() => {
       <el-tag v-if="props.shared" size="small" type="info">共享</el-tag>
     </template>
 
-    <ul class="flex flex-col gap-2">
+    <ul class="space-y-2">
       <li class="flex gap-4">
         <span class="shrink-0">模型类型</span>
         <span class="min-w-0 flex-1 truncate text-N900" :title="MODEL_TYPE_LABELS[model.model_type] ?? model.model_type">

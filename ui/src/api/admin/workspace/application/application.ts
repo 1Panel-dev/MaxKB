@@ -1,4 +1,4 @@
-import { get, post, put } from '../../core/request'
+import { del, get, getExportFile, post, put } from '../../core/request'
 import type { ParamsPage, ResponsePage } from '../../core/types'
 import type { ApplicationDetail, ApplicationFormPayload, Dict } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
@@ -18,6 +18,16 @@ const getApplicationDetail = (applicationId: string) => {
   return get<ApplicationDetail>(`${getPrefix()}/${applicationId}`)
 }
 
+/** 删除工作空间智能体。 */
+const deleteApplication = (applicationId: string) => {
+  return del<undefined, boolean>(`${getPrefix()}/${applicationId}`)
+}
+
+/** 导出工作空间智能体文件。 */
+const exportApplication = (applicationId: string, applicationName: string) => {
+  return getExportFile(`${applicationName}.mk`, `${getPrefix()}/${applicationId}/export`)
+}
+
 /** 导入智能体文件并创建工作空间智能体。 */
 const postApplicationImport = (file: File, folderId: string) => {
   const payload = new FormData()
@@ -30,9 +40,35 @@ const putApplication = (applicationId: string, data: ApplicationFormPayload) => 
   return put<ApplicationFormPayload, ApplicationDetail>(`${getPrefix()}/${applicationId}`, data)
 }
 
+/** 移动工作空间智能体。 */
+const putMoveApplication = (applicationId: string, folderId: string) => {
+  return put<Record<string, never>, boolean>(`${getPrefix()}/${applicationId}/move/${folderId}`, {})
+}
+
+/** 批量删除工作空间智能体。 */
+const putBatchDeleteApplications = (applicationIds: string[]) => {
+  return put<{ id_list: string[] }, boolean>(`${getPrefix()}/batch_delete`, { id_list: applicationIds })
+}
+
+/** 批量移动工作空间智能体。 */
+const putBatchMoveApplications = (applicationIds: string[], folderId: string) => {
+  return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, { folder_id: folderId, id_list: applicationIds })
+}
+
 /** 发布工作空间智能体。 */
 const putApplicationPublish = (applicationId: string) => {
   return put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {})
 }
 
-export default { getApplicationPage, getApplicationDetail, postApplicationImport, putApplication, putApplicationPublish }
+export default {
+  getApplicationPage,
+  getApplicationDetail,
+  deleteApplication,
+  exportApplication,
+  postApplicationImport,
+  putApplication,
+  putMoveApplication,
+  putBatchDeleteApplications,
+  putBatchMoveApplications,
+  putApplicationPublish,
+}

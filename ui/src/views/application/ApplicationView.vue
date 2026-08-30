@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
 import CommonApi from '@/api/admin/workspace/common'
-import ApplicationApi from '@/api/admin/workspace/application/application.ts'
+import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
-import ApplicationCard from './components/ApplicationCard.vue'
+import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
+import ApplicationCard from './application-card/ApplicationCard.vue'
+import { DeleteApplicationAction, ExportApplicationAction, MoveApplicationAction, SettingApplicationAction } from './application-card/action-dropdown'
 import ApplicationCreateDropdown from './components/ApplicationCreateDropdown.vue'
 
 /* 当前文件夹 */
@@ -15,10 +18,14 @@ const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICAT
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
   currentFolder.value = folder
-  if (folderChanged) infiniteScrollRef.value?.reset()
+  if (folderChanged) {
+    cancelBatchSelection()
+    refreshApplications()
+  }
 }
-// 新建文件夹
+
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
+
 function handleCreateFolder() {
   folderTreeRef.value?.openCreate()
 }
@@ -49,15 +56,93 @@ function loadCreatorOptions(keyword: string) {
 
 function handleSearchChange(query?: Dict<unknown>) {
   applicationQuery.value = query
-  infiniteScrollRef.value?.reset()
-}
-
-function handleRefreshApplications() {
-  infiniteScrollRef.value?.reset()
+  refreshApplications()
 }
 
 function loadApplicationPage(pagination: { currentPage: number; pageSize: number }) {
   return ApplicationApi.getApplicationPage(pagination, { ...applicationQuery.value, folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL })
+}
+
+/* 智能体维护 */
+const applicationOperationLoading = ref(false)
+
+function refreshApplications() {
+  selectedApplicationIds.value = []
+  return infiniteScrollRef.value?.reset()
+}
+
+function handleDeleteApplication(applicationId: string) {
+  const applicationIndex = applicationData.value.findIndex(({ id }) => id === applicationId)
+  if (applicationIndex >= 0) applicationData.value.splice(applicationIndex, 1)
+}
+
+/* 批量选择与操作 */
+const batchSelectionMode = ref(false)
+const selectedApplicationIds = ref<string[]>([])
+const selectedApplicationCount = computed(() => selectedApplicationIds.value.length)
+const applicationIds = computed(() => applicationData.value.map(({ id }) => id))
+const batchMoveToDialogRef = useTemplateRef<{ close: () => void; open: (currentFolderId?: string) => void }>('batchMoveToDialogRef')
+
+function toggleBatchSelection() {
+  batchSelectionMode.value = !batchSelectionMode.value
+  selectedApplicationIds.value = []
+}
+
+function cancelBatchSelection() {
+  batchSelectionMode.value = false
+  selectedApplicationIds.value = []
+}
+
+function handleApplicationSelect(applicationId: string, selected: boolean) {
+  if (selected) {
+    if (!selectedApplicationIds.value.includes(applicationId)) selectedApplicationIds.value.push(applicationId)
+    return
+  }
+
+  selectedApplicationIds.value = selectedApplicationIds.value.filter((id) => id !== applicationId)
+}
+
+function handleOpenBatchMove() {
+  if (!selectedApplicationCount.value) return
+  batchMoveToDialogRef.value?.open(currentFolder.value.id)
+}
+
+// 批量移动
+function handleBatchMove(targetFolderId: string) {
+  if (applicationOperationLoading.value || !selectedApplicationCount.value) return
+  const applicationIds = [...selectedApplicationIds.value]
+
+  applicationOperationLoading.value = true
+  return ApplicationApi.putBatchMoveApplications(applicationIds, targetFolderId)
+    .then(() => {
+      MsgSuccess('移动成功')
+      batchMoveToDialogRef.value?.close()
+      cancelBatchSelection()
+      return refreshApplications()
+    })
+    .finally(() => {
+      applicationOperationLoading.value = false
+    })
+}
+
+// 批量操作
+function handleBatchDelete() {
+  if (!selectedApplicationCount.value) return
+  const applicationIds = [...selectedApplicationIds.value]
+
+  MsgConfirm(`是否批量删除 ${applicationIds.length} 个智能体？`, '删除后无法恢复，请谨慎操作。')
+    .then(() => {
+      applicationOperationLoading.value = true
+      return ApplicationApi.putBatchDeleteApplications(applicationIds).then(() => {
+        MsgSuccess('删除成功')
+        cancelBatchSelection()
+        return refreshApplications()
+      })
+    })
+    .catch(() => {})
+    .finally(() => {
+      applicationOperationLoading.value = false
+    })
 }
 </script>
 
@@ -73,27 +158,78 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
         </el-tooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.APPLICATION" @select="handleFolderSelect" :show-shared="false" draggable> </FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.APPLICATION" :show-shared="false" draggable @select="handleFolderSelect" />
     </template>
 
-    <template #default="{ Header }">
+    <template #default="{ Footer, Header }">
       <component :is="Header">
         <h4 class="min-w-0 truncate" :title="currentFolder.name">{{ currentFolder.name }}</h4>
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
+          <el-button v-if="applicationData.length" :type="batchSelectionMode ? 'primary' : undefined" plain @click="toggleBatchSelection">
+            <MkIcon name="icon_Batch_outlined" />
+            <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
+          </el-button>
 
-          <ApplicationCreateDropdown :folder-id="currentFolder.id" @refresh="handleRefreshApplications" />
+          <ApplicationCreateDropdown v-if="!batchSelectionMode" :folder-id="currentFolder.id" @refresh="refreshApplications" />
         </div>
       </component>
 
-      <MkInfiniteScroll ref="infiniteScrollRef" v-model="applicationData" :load="loadApplicationPage">
-        <div v-if="applicationData.length" class="mk-resource-card-grid">
-          <template v-for="application in applicationData" :key="application.id">
-            <ApplicationCard :application="application" />
-          </template>
-        </div>
-        <MkEmpty v-else class="mt-24" />
-      </MkInfiniteScroll>
+      <div v-loading="applicationOperationLoading" class="min-h-0 flex-1">
+        <MkInfiniteScroll ref="infiniteScrollRef" v-model="applicationData" :load="loadApplicationPage">
+          <div v-if="applicationData.length" class="mk-resource-card-grid">
+            <template v-for="application in applicationData" :key="application.id">
+              <ApplicationCard
+                :application="application"
+                :selectable="batchSelectionMode"
+                :selected="selectedApplicationIds.includes(application.id)"
+                @selected="handleApplicationSelect(application.id, $event)"
+              >
+                <template #action-dropdown>
+                  <SettingApplicationAction label="设置" :application="application" />
+                  <MoveApplicationAction
+                    v-model:loading="applicationOperationLoading"
+                    label="移动到"
+                    :api="ApplicationApi"
+                    :application="application"
+                    :current-folder-id="currentFolder.id"
+                    @delete="handleDeleteApplication"
+                  />
+                  <ExportApplicationAction
+                    v-model:loading="applicationOperationLoading"
+                    label="导出"
+                    :api="ApplicationApi"
+                    :application="application"
+                  />
+                  <DeleteApplicationAction
+                    v-model:loading="applicationOperationLoading"
+                    label="删除"
+                    :api="ApplicationApi"
+                    :application="application"
+                    @delete="handleDeleteApplication"
+                  />
+                </template>
+              </ApplicationCard>
+            </template>
+          </div>
+          <MkEmpty v-else class="mt-24" />
+        </MkInfiniteScroll>
+      </div>
+
+      <component
+        :is="Footer"
+        v-if="batchSelectionMode"
+        v-model:batch-selection="selectedApplicationIds"
+        :batch-values="applicationIds"
+        @batch-cancel="cancelBatchSelection"
+      >
+        <template #footer-batch-actions>
+          <el-button type="primary" plain :disabled="!selectedApplicationCount" @click="handleOpenBatchMove">移动到</el-button>
+          <el-button type="danger" plain :disabled="!selectedApplicationCount" @click="handleBatchDelete">删除</el-button>
+        </template>
+      </component>
     </template>
   </MkViewLayout>
+
+  <MoveToDialog ref="batchMoveToDialogRef" :loading="applicationOperationLoading" :source="RESOURCE_TYPE.APPLICATION" @submit="handleBatchMove" />
 </template>

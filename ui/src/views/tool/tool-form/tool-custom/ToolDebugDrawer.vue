@@ -151,9 +151,18 @@ defineExpose({ open })
 
     <section v-if="showResult" class="mt-4">
       <h4 class="mk-title-decoration mb-4">运行结果</h4>
-      <el-alert :closable="false" :title="debugSucceeded ? '运行成功' : '运行失败'" :type="debugSucceeded ? 'success' : 'error'" class="mb-4" show-icon />
+      <el-alert
+        :closable="false"
+        :title="debugSucceeded ? '运行成功' : '运行失败'"
+        :type="debugSucceeded ? 'success' : 'error'"
+        class="mb-4"
+        show-icon
+      />
       <p class="mb-2">输出</p>
-      <pre class="whitespace-pre-wrap rounded-md border p-2" :class="{ 'border-danger': !debugSucceeded }">{{ formattedResult }}</pre>
+
+      <el-card class="small whitespace-pre-wrap" shadow="never" :class="{ 'border-danger': !debugSucceeded }">
+        {{ formattedResult }}
+      </el-card>
     </section>
   </MkDrawer>
 </template>

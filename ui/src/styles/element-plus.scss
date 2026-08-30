@@ -158,7 +158,7 @@
       border-color: var(--mk-N350);
     }
   }
-  &.is-disabled {
+  &.is-disabled:not(.is-link, .is-text, .is-circle, .is-plain) {
     --el-button-disabled-bg-color: var(--mk-N400);
     --el-button-disabled-border-color: var(--mk-N400);
     --el-button-disabled-text-color: white;
@@ -232,6 +232,10 @@
   --el-card-border-color: var(--mk-N300);
   --el-card-padding: 16px;
   overflow: visible;
+  &.small {
+    --el-card-border-radius: 6px;
+    --el-card-padding: 8px 12px;
+  }
   &__body {
     overflow: inherit;
   }
@@ -676,12 +680,18 @@
 .el-radio-button {
   --el-radio-button-checked-bg-color: rgb(var(--mk-primary-rgb) / 10%);
   --el-radio-button-checked-text-color: var(--el-color-primary);
+
   &__inner {
     border: none !important;
     outline: none !important;
     padding: 5px 8px;
     font-weight: 400;
     border-radius: var(--el-border-radius-small) !important;
+    color: var(--el-text-color-primary);
+    &:hover {
+      background-color: rgb(var(--mk-N900-rgb) / 10%);
+      color: var(--el-text-color-primary);
+    }
   }
   &.is-active {
     .el-radio-button__inner {

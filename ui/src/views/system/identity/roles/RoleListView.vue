@@ -32,7 +32,8 @@ function loadRoles(selectedRoleId?: string) {
   return RoleApi.getRoleList()
     .then(({ internal_role, custom_role }) => {
       AllRoles.value = [...internal_role, ...custom_role]
-      currentRole.value = AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? internal_role[0]
+      currentRole.value =
+        AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? internal_role[0]
     })
     .finally(() => {
       loadingRoles.value = false
@@ -103,7 +104,7 @@ onMounted(() => loadRoles())
             :title="roleGroup.label"
             trigger-class="text-N500"
           >
-            <div class="flex flex-col gap-1">
+            <div class="space-y-1">
               <MkListItem
                 v-for="(role, roleIndex) in roleGroup.roles"
                 :key="role.id"
@@ -141,7 +142,9 @@ onMounted(() => loadRoles())
             </h4>
             <el-tag type="info" size="small" class="shrink-0"> {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
             <el-divider class="shrink-0" direction="vertical" />
-            <span class="flex shrink-0 items-center text-N500"> <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }} </span>
+            <span class="flex shrink-0 items-center text-N500">
+              <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }}
+            </span>
           </div>
           <el-radio-group v-model="currentTab">
             <el-radio-button value="permission" label="权限配置" />

@@ -2,12 +2,17 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
-import defaultLogo from '@/assets/mk-logo/MaxKB-logo.svg'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
+
 import { getThemeImg } from '@/constants/theme'
 
 type ThemeImageValue = File | string
-type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & { icon?: ThemeImageValue; loginImage?: ThemeImageValue; loginLogo?: ThemeImageValue }
+type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
+  icon?: ThemeImageValue
+  loginImage?: ThemeImageValue
+  loginLogo?: ThemeImageValue
+}
 
 defineOptions({ name: 'ThemeLoginPreview' })
 
@@ -35,10 +40,7 @@ function useImageSource(source: () => ThemeImageValue | undefined, fallback: () 
 }
 
 const defaultLoginImage = computed(() => getThemeImg(props.data.theme))
-const websiteIcon = useImageSource(
-  () => props.data.icon,
-  () => defaultLogo,
-)
+
 const loginLogo = useImageSource(
   () => props.data.loginLogo,
   () => '',
@@ -50,10 +52,10 @@ const loginImage = useImageSource(
 </script>
 
 <template>
-  <div class="login-preview overflow-hidden rounded-md border">
+  <div class="login-preview overflow-hidden rounded-md">
     <div class="browser-bar flex items-end px-2">
       <div class="browser-tab flex items-center gap-2 rounded-t-md bg-white px-3">
-        <img :src="websiteIcon" alt="" class="h-4 w-4 object-contain" />
+        <LogoIcon class="h-4" />
         <span class="min-w-0 flex-1 truncate" :title="data.title || 'MaxKB'">
           {{ data.title || 'MaxKB' }}
         </span>

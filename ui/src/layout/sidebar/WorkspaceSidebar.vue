@@ -18,7 +18,7 @@ function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-1 p-1">
+  <div class="space-y-1 p-1">
     <div
       v-for="workspaceMenuItem in workspaceMenuItems"
       :key="workspaceMenuItem.name"
