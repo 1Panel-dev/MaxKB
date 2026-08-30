@@ -77,7 +77,10 @@ function handleLogout() {
               </template>
             </MkDropdown>
           </MkDropdownItem>
-          <MkDropdownItem divided :icon="Setting" @click="handleLogout">退出登录</MkDropdownItem>
+          <MkDropdownItem divided @click="handleLogout">
+            <template #icon><MkIcon name="icon_logout_outlined" /></template>
+            <span>退出登录</span>
+          </MkDropdownItem>
         </MkDropdownMenu>
       </div>
     </template>

@@ -1,37 +1,37 @@
 <script setup lang="ts">
 import { nextTick, ref, useTemplateRef } from 'vue'
-import type ToolApi from '@/api/admin/workspace/tool/tool'
-import type { ToolItem } from '@/api/types'
+import type ApplicationApi from '@/api/admin/workspace/application/application'
+import type { ApplicationDetail } from '@/api/types'
 import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_ENTRY_ID } from '@/constants'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgSuccess } from '@/utils/message'
 
-defineOptions({ name: 'MoveToolAction' })
+defineOptions({ name: 'MoveApplicationAction' })
 
-const props = defineProps<{ api: typeof ToolApi; currentFolderId: string; label: string; tool: ToolItem }>()
+const props = defineProps<{ api: typeof ApplicationApi; application: ApplicationDetail; currentFolderId: string; label: string }>()
 
 const loading = defineModel<boolean>('loading', { default: false })
 
-const emit = defineEmits<{ delete: [toolId: string] }>()
+const emit = defineEmits<{ delete: [applicationId: string] }>()
 
 const dialogMounted = ref(false)
 const moveToDialogRef = useTemplateRef<{ close: () => void; open: (currentFolderId?: string) => void }>('moveToDialogRef')
 
-function handleOpenMoveTool() {
+function handleOpenMoveApplication() {
   dialogMounted.value = true
-  return nextTick(() => moveToDialogRef.value?.open(props.tool.folder_id))
+  return nextTick(() => moveToDialogRef.value?.open(props.application.folder_id))
 }
 
-function handleMoveTool(targetFolderId: string) {
+function handleMoveApplication(targetFolderId: string) {
   if (loading.value) return
   loading.value = true
   return props.api
-    .putTool(props.tool.id, { folder_id: targetFolderId })
+    .putMoveApplication(props.application.id, targetFolderId)
     .then(() => {
       MsgSuccess('移动成功')
       moveToDialogRef.value?.close()
-      if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.tool.id)
+      if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.application.id)
     })
     .finally(() => {
       loading.value = false
@@ -44,7 +44,7 @@ function handleDialogClosed() {
 </script>
 
 <template>
-  <MkDropdownItem @click="handleOpenMoveTool">
+  <MkDropdownItem @click="handleOpenMoveApplication">
     <template #icon><MkIcon name="icon_move2_outlined" /></template>
     <span>{{ label }}</span>
   </MkDropdownItem>
@@ -53,8 +53,8 @@ function handleDialogClosed() {
     v-if="dialogMounted"
     ref="moveToDialogRef"
     :loading="loading"
-    :source="RESOURCE_TYPE.TOOL"
+    :source="RESOURCE_TYPE.APPLICATION"
     @closed="handleDialogClosed"
-    @submit="handleMoveTool"
+    @submit="handleMoveApplication"
   />
 </template>

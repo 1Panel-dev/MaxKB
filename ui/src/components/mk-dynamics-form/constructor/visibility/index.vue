@@ -22,7 +22,9 @@ const formData = ref({
 const conditionRows = computed<VisibilityConditionState[]>({
   get: () => formData.value.conditions,
   set: (conditions) => {
-    formData.value.conditions = conditions.map((condition) => (condition.id ? condition : { ...condition, id: randomId(), field: [...condition.field] as [string, string] }))
+    formData.value.conditions = conditions.map((condition) =>
+      condition.id ? condition : { ...condition, id: randomId(), field: [...condition.field] as [string, string] },
+    )
   },
 })
 
@@ -78,7 +80,12 @@ function render(rules: VisibilityRules | null) {
   if (rules && rules.conditions?.length) {
     formData.value.action = rules.action
     formData.value.condition = rules.condition
-    formData.value.conditions = rules.conditions.map((c) => ({ id: c.id || randomId(), field: [c.field[0], c.field[1]], compare: c.compare, value: c.value }))
+    formData.value.conditions = rules.conditions.map((c) => ({
+      id: c.id || randomId(),
+      field: [c.field[0], c.field[1]],
+      compare: c.compare,
+      value: c.value,
+    }))
     formData.value.conditions.forEach((cond) => {
       if (cond.field && cond.field[0] && cond.field[1]) {
         const fieldType = inferFieldType(cond.field, props.leftOptions)
@@ -105,7 +112,7 @@ defineExpose({ getData, render, validate })
 </script>
 
 <template>
-  <div class="flex flex-col gap-4 w-full">
+  <div class="w-full space-y-4">
     <el-radio-group v-model="formData.action">
       <el-radio value="show">满足条件时显示</el-radio>
       <el-radio value="hide">满足条件时隐藏</el-radio>

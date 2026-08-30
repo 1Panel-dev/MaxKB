@@ -77,6 +77,29 @@ System 共享资源的四类特殊资源。它们统一遵循以下页面组织�
 
 这套三范围资源规则只适用于上述四类特殊资源，不扩展到普通 System 设置、身份管理或其他页面。
 
+当前智能体列表按卡片展示、菜单 Action 和页面批量流程分层维护：
+
+```text
+src/views/application/
+├── ApplicationView.vue
+├── application-card/
+│   ├── ApplicationCard.vue        # 智能体卡片展示、选择状态和 Action 插槽
+│   └── action-dropdown/
+│       ├── index.ts
+│       ├── DeleteApplicationAction.vue
+│       ├── ExportApplicationAction.vue
+│       ├── MoveApplicationAction.vue
+│       └── SettingApplicationAction.vue
+├── components/
+│   └── ApplicationCreateDropdown.vue
+└── template.ts
+```
+
+`ApplicationCard` 只维护展示内容、批量选择状态和 `action-dropdown` 插槽；`ApplicationView` 组合
+设置、移动、导出和删除 Action，并管理批量选择、批量移动和批量删除流程。需要请求的 Action 接收
+页面传入的完整 Application API。单项移动在具体目录中通过 `delete` 通知页面局部移除卡片，在
+“全部智能体”中保留卡片；移动弹窗复用公共 `MoveToDialog`。
+
 当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
 `tool-form/component/` 中：
 

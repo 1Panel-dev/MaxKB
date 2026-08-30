@@ -97,7 +97,7 @@ function selectRow(row: T, index: number) {
     <MkSearchInput v-model="searchKeyword" class="shrink-0 px-4" />
 
     <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 px-4 py-2" @end-reached="loadMore">
-      <div v-if="filteredData.length" class="flex flex-col gap-1">
+      <div v-if="filteredData.length" class="space-y-1">
         <template v-for="(row, index) in renderData" :key="String(row[valueField] ?? index)">
           <MkListItem :active="currentValue === row[valueField]" :index="index" :label-field="labelField" :row="row" @click="selectRow(row, index)">
             <template v-if="$slots.default" #default="slotProps">

@@ -15,7 +15,15 @@ const MoveToDialog = defineAsyncComponent(() => import('./MoveToDialog.vue'))
 defineOptions({ name: 'FolderTree' })
 
 const props = withDefaults(
-  defineProps<{ canEdit?: boolean; disabledFolderIds?: string[]; draggable?: boolean; rootLabel?: string; showAll?: boolean; showShared?: boolean; source: FolderSource }>(),
+  defineProps<{
+    canEdit?: boolean
+    disabledFolderIds?: string[]
+    draggable?: boolean
+    rootLabel?: string
+    showAll?: boolean
+    showShared?: boolean
+    source: FolderSource
+  }>(),
   { canEdit: true, disabledFolderIds: () => [], draggable: false, rootLabel: '', showAll: true, showShared: true },
 )
 
@@ -92,10 +100,13 @@ function sortFolders(folders: FolderItem[], parentId: string, positionCache = re
     [FOLDER_SORT.CREATE_TIME_DESC]: (left, right) => new Date(right.create_time ?? 0).getTime() - new Date(left.create_time ?? 0).getTime(),
     [FOLDER_SORT.NAME_ASC]: (left, right) => left.name.localeCompare(right.name),
     [FOLDER_SORT.NAME_DESC]: (left, right) => right.name.localeCompare(left.name),
-    [FOLDER_SORT.CUSTOM]: (left, right) => (customPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (customPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
+    [FOLDER_SORT.CUSTOM]: (left, right) =>
+      (customPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (customPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
   }
 
-  return [...folders].sort(compareMethods[currentSort.value]).map((folder) => ({ ...folder, children: sortFolders(folder.children ?? [], folder.id, positionCache) }))
+  return [...folders]
+    .sort(compareMethods[currentSort.value])
+    .map((folder) => ({ ...folder, children: sortFolders(folder.children ?? [], folder.id, positionCache) }))
 }
 
 function readCustomPositions(): Record<string, Record<string, number>> {
@@ -109,7 +120,9 @@ function writeCustomPositions(positionCache: Record<string, Record<string, numbe
 
 function collectCustomPositions(parentId: string, folders: FolderItem[], positionCache: Record<string, Record<string, number>>) {
   const savedPositions = positionCache[parentId] ?? {}
-  const orderedFolders = [...folders].sort((left, right) => (savedPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (savedPositions[right.id] ?? Number.MAX_SAFE_INTEGER))
+  const orderedFolders = [...folders].sort(
+    (left, right) => (savedPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (savedPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
+  )
 
   positionCache[parentId] = Object.fromEntries(orderedFolders.map((folder, index) => [folder.id, index + 1]))
   orderedFolders.forEach((folder) => {
@@ -261,7 +274,8 @@ function getFolderDeleteContext(folder: FolderItem) {
   // 顶级文件夹按当前展示顺序回退到下一个、上一个或“全部”。
   const siblingFolders = sortTreeData.value
   const folderIndex = siblingFolders.findIndex(({ id }) => id === deletedFolder.id)
-  const targetFolder = folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
+  const targetFolder =
+    folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
   return { positionCache, targetFolder }
 }
 
@@ -311,7 +325,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
     <div class="flex shrink-0 items-center gap-2 px-4 pb-2">
       <MkSearchInput v-model="searchKeyword" class="min-w-0 flex-1" />
       <MkDropdown trigger="click" placement="bottom-end">
-        <el-button class="shrink-0 min-w-8! w-8!">
+        <el-button plain class="shrink-0 min-w-8! w-8!">
           <MkIcon name="icon_moments-categories_outlined" />
         </el-button>
         <template #dropdown>
