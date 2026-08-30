@@ -5,14 +5,7 @@ import { get } from 'lodash'
 import type { Dict } from '@/api/types'
 import bus from '@/utils/bus'
 import FormItemLabel from './FormItemLabel.vue'
-import type {
-  DynamicFormTriggerMap,
-  DynamicFormTriggerSetting,
-  DynamicFormValue,
-  FormField,
-  FormFieldLabel,
-  SerializedFormRule,
-} from './type'
+import type { DynamicFormTriggerMap, DynamicFormTriggerSetting, DynamicFormValue, FormField, FormFieldLabel, SerializedFormRule } from './type'
 
 defineOptions({ name: 'MkDynamicsFormItem' })
 
@@ -39,13 +32,7 @@ const props = defineProps<{
   formField: FormField
   view: boolean
   otherParams: Dict<DynamicFormValue>
-  trigger: (
-    triggerField: string,
-    triggerValue: DynamicFormValue,
-    triggerSetting: DynamicFormTriggerSetting,
-    target: Dict<DynamicFormValue>,
-    loading: Ref<boolean>,
-  ) => void
+  trigger: (triggerField: string, triggerValue: DynamicFormValue, triggerSetting: DynamicFormTriggerSetting, target: Dict<DynamicFormValue>, loading: Ref<boolean>) => void
   initDefaultData: (formField: FormField) => void
   defaultItemWidth: string
   formValue: Dict<DynamicFormValue>
@@ -53,17 +40,11 @@ const props = defineProps<{
   parentField?: string
 }>()
 
-const emit = defineEmits<{
-  change: [value: DynamicFormValue]
-  'change-label': [value: DynamicFormValue]
-}>()
+const emit = defineEmits<{ change: [value: DynamicFormValue]; 'change-label': [value: DynamicFormValue] }>()
 
 const loading = ref(false)
 const componentFormRef = ref<DynamicFieldComponent>()
-const triggerSubscriptions: Array<{
-  event: string
-  handler: (value: unknown) => void
-}> = []
+const triggerSubscriptions: Array<{ event: string; handler: (value: unknown) => void }> = []
 
 function isString(value: unknown): value is string {
   return typeof value === 'string'
@@ -92,9 +73,7 @@ const itemValue = computed({
   get: () => props.modelValue,
   set: (value: DynamicFormValue) => {
     emit('change', value)
-    const eventName = props.parentField
-      ? `${props.parentField}.${props.formField.field}`
-      : props.formField.field
+    const eventName = props.parentField ? `${props.parentField}.${props.formField.field}` : props.formField.field
     bus.emit(eventName, value)
   },
 })
@@ -109,9 +88,7 @@ const errorMessage = computed(() => {
   if (fieldProps.value.err_msg) {
     return fieldProps.value.err_msg
   }
-  const label = isString(props.formField.label)
-    ? props.formField.label
-    : props.formField.label?.label
+  const label = isString(props.formField.label) ? props.formField.label : props.formField.label?.label
   return `${label || props.formField.field} 不能为空`
 })
 
@@ -130,17 +107,10 @@ const validationRules = computed<FormItemRule | FormItemRule[]>(() => {
   if (fieldProps.value.rules) {
     return fieldProps.value.rules.map(deserializeRule)
   }
-  return {
-    message: errorMessage.value,
-    required: props.formField.required !== false,
-    trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'],
-  }
+  return { message: errorMessage.value, required: props.formField.required !== false, trigger: props.formField.input_type === 'Slider' ? 'blur' : ['blur', 'change'] }
 })
 
-function executeInitialTriggers(
-  target: Dict<DynamicFormValue>,
-  triggerMap?: DynamicFormTriggerMap,
-) {
+function executeInitialTriggers(target: Dict<DynamicFormValue>, triggerMap?: DynamicFormTriggerMap) {
   if (!triggerMap) {
     return
   }
@@ -203,6 +173,7 @@ defineExpose({ validate })
     :style="formItemStyle"
     :prop="formField.field"
     :rules="validationRules"
+    :class="fieldLabel && getFieldComponent(fieldLabel.input_type) ? 'mk-hide-asterisk' : ''"
   >
     <template v-if="formField.label" #label>
       <FormItemLabel v-if="isString(formField.label)" :form-field="formField" />
@@ -213,6 +184,7 @@ defineExpose({ validate })
         :label="fieldLabel"
         :form-value="formValue"
         v-bind="labelAttrs"
+        :required="formField.required !== false"
       />
     </template>
     <component

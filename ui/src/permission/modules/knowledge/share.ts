@@ -74,8 +74,7 @@ const share = {
   knowledgeChatUserEdit: () => canSys(P.SHARED_KNOWLEDGE_CHAT_USER_EDIT),
 
   // —— 组合：进入知识库 ——
-  jumpRead: () =>
-    canSys(P.SHARED_KNOWLEDGE_DOCUMENT_READ) || canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ),
+  jumpRead: () => canSys(P.SHARED_KNOWLEDGE_DOCUMENT_READ) || canSys(P.SHARED_KNOWLEDGE_WORKFLOW_READ),
 }
 
 export default share

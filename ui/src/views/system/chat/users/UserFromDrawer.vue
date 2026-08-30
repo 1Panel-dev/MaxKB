@@ -23,14 +23,7 @@ const drawerVisible = ref(false)
 const isEdit = ref(false)
 const editingUserId = ref('')
 const userSubmitting = ref(false)
-const userForm = reactive<ChatUserPayload>({
-  email: '',
-  nick_name: '',
-  password: '',
-  phone: '',
-  user_group_ids: [],
-  username: '',
-})
+const userForm = reactive<ChatUserPayload>({ email: '', nick_name: '', password: '', phone: '', user_group_ids: [], username: '' })
 
 const drawerTitle = computed(() => (isEdit.value ? '编辑用户' : '创建用户'))
 const submitText = computed(() => (isEdit.value ? '保存' : '创建'))
@@ -46,14 +39,7 @@ const userFormRules = reactive<FormRules<ChatUserPayload>>({
   ],
   email: [{ type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }],
   phone: [{ pattern: /^1[3-9]\d{9}$/, message: '请输入正确的手机号', trigger: 'blur' }],
-  user_group_ids: [
-    {
-      type: 'array',
-      required: true,
-      message: '请选择用户组',
-      trigger: 'change',
-    },
-  ],
+  user_group_ids: [{ type: 'array', required: true, message: '请选择用户组', trigger: 'change' }],
 })
 
 /* 用户组选项 */
@@ -85,12 +71,7 @@ async function submitUser() {
       userSubmitting.value = true
 
       if (isEdit.value) {
-        ChatUserApi.putChatUser(editingUserId.value, {
-          email: userForm.email,
-          nick_name: userForm.nick_name,
-          phone: userForm.phone,
-          user_group_ids: userForm.user_group_ids,
-        })
+        ChatUserApi.putChatUser(editingUserId.value, { email: userForm.email, nick_name: userForm.nick_name, phone: userForm.phone, user_group_ids: userForm.user_group_ids })
           .then(() => {
             MsgSuccess('编辑成功')
             emit('refresh', false)
@@ -103,11 +84,7 @@ async function submitUser() {
         const encryptor = new JSEncrypt()
         encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
-        ChatUserApi.postChatUser({
-          ...userForm,
-          encrypted: true,
-          password: encryptedPassword as string,
-        })
+        ChatUserApi.postChatUser({ ...userForm, encrypted: true, password: encryptedPassword as string })
           .then(() => {
             MsgSuccess('创建成功')
             emit('refresh', true)
@@ -123,13 +100,7 @@ async function submitUser() {
 
 function open(user?: ChatUser) {
   if (user) {
-    Object.assign(userForm, {
-      username: user.username,
-      email: user.email ?? '',
-      nick_name: user.nick_name,
-      phone: user.phone ?? '',
-      user_group_ids: [...user.user_group_ids],
-    })
+    Object.assign(userForm, { username: user.username, email: user.email ?? '', nick_name: user.nick_name, phone: user.phone ?? '', user_group_ids: [...user.user_group_ids] })
     editingUserId.value = user.id
     isEdit.value = true
   }
@@ -141,14 +112,7 @@ function open(user?: ChatUser) {
 }
 
 function resetData() {
-  Object.assign(userForm, {
-    email: '',
-    nick_name: '',
-    password: '',
-    phone: '',
-    user_group_ids: [],
-    username: '',
-  })
+  Object.assign(userForm, { email: '', nick_name: '', password: '', phone: '', user_group_ids: [], username: '' })
   isEdit.value = false
   editingUserId.value = ''
   userSubmitting.value = false
@@ -162,33 +126,14 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form
-      ref="userFormRef"
-      :model="userForm"
-      :rules="userFormRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent="submitUser"
-    >
+    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent="submitUser">
       <section>
         <h4 class="mk-title-decoration mb-4">基本信息</h4>
         <el-form-item label="用户名" prop="username">
-          <el-input
-            v-model="userForm.username"
-            :disabled="isEdit"
-            maxlength="64"
-            minlength="4"
-            placeholder="请输入用户名"
-            show-word-limit
-          />
+          <el-input v-model="userForm.username" :disabled="isEdit" maxlength="64" minlength="4" placeholder="请输入用户名" show-word-limit />
         </el-form-item>
         <el-form-item label="姓名" prop="nick_name">
-          <el-input
-            v-model="userForm.nick_name"
-            maxlength="64"
-            placeholder="请输入姓名"
-            show-word-limit
-          />
+          <el-input v-model="userForm.nick_name" maxlength="64" placeholder="请输入姓名" show-word-limit />
         </el-form-item>
 
         <el-form-item label="邮箱" prop="email">
@@ -212,22 +157,8 @@ defineExpose({ open })
       <section>
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
         <el-form-item label="用户组" prop="user_group_ids">
-          <el-select
-            v-model="userForm.user_group_ids"
-            class="w-full"
-            :loading="userGroupOptionsLoading"
-            clearable
-            filterable
-            multiple
-            placeholder="请选择用户组"
-            fit-input-width
-          >
-            <el-option
-              v-for="userGroup in userGroupOptions"
-              :key="userGroup.id"
-              :label="userGroup.name"
-              :value="userGroup.id"
-            />
+          <el-select v-model="userForm.user_group_ids" class="w-full" :loading="userGroupOptionsLoading" clearable filterable multiple placeholder="请选择用户组" fit-input-width>
+            <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
           </el-select>
         </el-form-item>
       </section>

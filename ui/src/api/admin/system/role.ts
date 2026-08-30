@@ -1,14 +1,6 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type {
-  CreateRoleMembersRequest,
-  Dict,
-  RoleItem,
-  RoleMember,
-  RolePermissionModule,
-  RolePayload,
-  SaveRolePermissionRequest,
-} from '@/api/types'
+import type { CreateRoleMembersRequest, Dict, RoleItem, RoleMember, RolePermissionModule, RolePayload, SaveRolePermissionRequest } from '@/api/types'
 
 const prefix = '/system/role'
 
@@ -39,10 +31,7 @@ const postRolePermissions = (roleId: string, permissions: SaveRolePermissionRequ
 
 /** 获取指定角色的成员分页列表。 */
 const getRoleMemberList = (roleId: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<RoleMember>>(
-    `${prefix}/${roleId}/user_list/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+  return get<ResponsePage<RoleMember>>(`${prefix}/${roleId}/user_list/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 为指定角色添加成员。 */
@@ -55,13 +44,4 @@ const deleteRoleMember = (roleId: string, userRelationId: string) => {
   return del<boolean>(`${prefix}/${roleId}/remove_member/${userRelationId}`)
 }
 
-export default {
-  deleteRole,
-  deleteRoleMember,
-  getRoleList,
-  getRoleMemberList,
-  getRolePermissionList,
-  postRole,
-  postRoleMembers,
-  postRolePermissions,
-}
+export default { deleteRole, deleteRoleMember, getRoleList, getRoleMemberList, getRolePermissionList, postRole, postRoleMembers, postRolePermissions }

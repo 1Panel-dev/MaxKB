@@ -5,20 +5,9 @@ export const knowledgeRoutes: RouteRecordRaw[] = [
     path: 'knowledge',
     name: 'workspace-knowledge',
     redirect: { name: 'workspace-knowledge-list' },
-    meta: {
-      title: '知识库',
-      activeMenu: 'workspace-knowledge',
-      icon: 'icon_book_outlined',
-      activeIcon: 'icon_book_filled',
-      order: 30,
-    },
+    meta: { title: '知识库', activeMenu: 'workspace-knowledge', icon: 'icon_book_outlined', activeIcon: 'icon_book_filled', order: 30 },
     children: [
-      {
-        path: '',
-        name: 'workspace-knowledge-list',
-        component: () => import('@/views/knowledge/KnowledgeView.vue'),
-        meta: { title: '知识库列表', hidden: true },
-      },
+      { path: '', name: 'workspace-knowledge-list', component: () => import('@/views/knowledge/KnowledgeView.vue'), meta: { title: '知识库列表', hidden: true } },
       {
         path: ':knowledgeId',
         name: 'workspace-knowledge-detail',

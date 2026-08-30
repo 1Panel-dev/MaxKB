@@ -10,9 +10,7 @@ import type { UploadFiles } from 'element-plus'
 const upload = inject('upload') as DynamicFormValue
 const delFile = inject('delFile') as DynamicFormValue
 const attrs = useAttrs() as DynamicFormValue
-withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), {
-  modelValue: () => [],
-})
+withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), { modelValue: () => [] })
 const onExceed = () => {
   MsgError('单次上传最多 ' + fileCountLimit.value + ' 个文件')
 }
@@ -22,21 +20,13 @@ const fileArray = ref<DynamicFormValue>([])
 
 const loading = ref(false)
 // 上传成功数量
-const successCount = computed(
-  () => fileArray.value.filter((i: DynamicFormValue) => i.status !== 'uploading').length,
-)
+const successCount = computed(() => fileArray.value.filter((i: DynamicFormValue) => i.status !== 'uploading').length)
 // 上传失败数量
-const errorCount = computed(
-  () => fileArray.value.filter((i: DynamicFormValue) => i.status === 'error').length,
-)
+const errorCount = computed(() => fileArray.value.filter((i: DynamicFormValue) => i.status === 'error').length)
 // 上传中数量
-const uploadingCount = computed(
-  () => fileArray.value.filter((i: DynamicFormValue) => i.status === 'uploading').length,
-)
+const uploadingCount = computed(() => fileArray.value.filter((i: DynamicFormValue) => i.status === 'uploading').length)
 // 可重新上传的失败项（网络错误等）
-const retryList = computed(() =>
-  fileArray.value.filter((i: DynamicFormValue) => i.status === 'error' && i.canRetry),
-)
+const retryList = computed(() => fileArray.value.filter((i: DynamicFormValue) => i.status === 'error' && i.canRetry))
 
 const getFileStatusOrder = (item: DynamicFormValue) => {
   if (item.status === 'error' && item.canRetry) return 0
@@ -47,10 +37,7 @@ const getFileStatusOrder = (item: DynamicFormValue) => {
 const sortedFileArray = computed(() =>
   fileArray.value
     .map((item: DynamicFormValue, index: number) => ({ item, index }))
-    .sort(
-      (a: DynamicFormValue, b: DynamicFormValue) =>
-        getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index,
-    )
+    .sort((a: DynamicFormValue, b: DynamicFormValue) => getFileStatusOrder(a.item) - getFileStatusOrder(b.item) || a.index - b.index)
     .map(({ item }: DynamicFormValue) => item),
 )
 // 重新上传所有可重试的失败文件
@@ -176,9 +163,7 @@ const handlePreview = (bool: boolean) => {
   })
 }
 const accept = computed(() => {
-  return (attrs.file_type_list || [])
-    .map((item: DynamicFormValue) => '.' + item.toLowerCase())
-    .join(',')
+  return (attrs.file_type_list || []).map((item: DynamicFormValue) => '.' + item.toLowerCase()).join(',')
 })
 const allowedFileTypes = computed(() => {
   return attrs.file_type_list.map((item: DynamicFormValue) => item.toUpperCase()) || []
@@ -251,12 +236,7 @@ const fileCountLimit = computed(() => {
         <el-col :span="12" class="mb-8">
           <el-card
             shadow="never"
-            style="
-              --el-card-padding: 8px 12px;
-              line-height: normal;
-              position: relative;
-              overflow: hidden;
-            "
+            style="--el-card-padding: 8px 12px; line-height: normal; position: relative; overflow: hidden"
             :class="item.status === 'error' ? 'border-danger' : ''"
           >
             <div class="flex-between">
@@ -285,13 +265,7 @@ const fileCountLimit = computed(() => {
                 </el-button>
               </div>
             </div>
-            <el-progress
-              v-if="item.status === 'uploading'"
-              class="card-progress"
-              :percentage="item.percentage"
-              :stroke-width="4"
-              :show-text="false"
-            />
+            <el-progress v-if="item.status === 'uploading'" class="card-progress" :percentage="item.percentage" :stroke-width="4" :show-text="false" />
           </el-card>
         </el-col>
       </template>

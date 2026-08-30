@@ -32,17 +32,10 @@ const props = withDefaults(
     parentField?: string
     modelValue?: Dict<DynamicFormValue>
   }>(),
-  {
-    defaultItemWidth: '75%',
-    modelValue: () => ({}),
-    otherParams: () => ({}),
-    view: false,
-  },
+  { defaultItemWidth: '75%', modelValue: () => ({}), otherParams: () => ({}), view: false },
 )
 
-const emit = defineEmits<{
-  'update:modelValue': [value: Dict<DynamicFormValue>]
-}>()
+const emit = defineEmits<{ 'update:modelValue': [value: Dict<DynamicFormValue>] }>()
 
 const request = { del, get, post, put }
 const formValue = ref<Dict<DynamicFormValue>>(cloneDeep(props.modelValue))
@@ -80,10 +73,7 @@ function compareNumberOrString(
   return compareString(String(left), String(right))
 }
 
-const visibilityCompareHandlers: Record<
-  VisibilityCompareOperator,
-  (left: DynamicFormValue, right: DynamicFormValue) => boolean
-> = {
+const visibilityCompareHandlers: Record<VisibilityCompareOperator, (left: DynamicFormValue, right: DynamicFormValue) => boolean> = {
   contain: containsValue,
   eq: (left, right) => String(left) === String(right),
   ge: (left, right) =>
@@ -120,17 +110,11 @@ const visibilityCompareHandlers: Record<
   not_eq: (left, right) => String(left) !== String(right),
 }
 
-function getVisibilityConditionValue(
-  condition: VisibilityCondition,
-  values: Dict<DynamicFormValue>,
-): DynamicFormValue {
+function getVisibilityConditionValue(condition: VisibilityCondition, values: Dict<DynamicFormValue>): DynamicFormValue {
   return condition.self ? values[condition.field[1]] : condition.leftValue
 }
 
-function evaluateVisibility(
-  rules: VisibilityRules | null | undefined,
-  values: Dict<DynamicFormValue>,
-): boolean {
+function evaluateVisibility(rules: VisibilityRules | null | undefined, values: Dict<DynamicFormValue>): boolean {
   if (!rules?.conditions.length) {
     return true
   }
@@ -140,11 +124,7 @@ function evaluateVisibility(
       return false
     }
     const leftValue = getVisibilityConditionValue(condition, values)
-    if (
-      leftValue == null &&
-      condition.compare !== 'is_true' &&
-      condition.compare !== 'is_not_true'
-    ) {
+    if (leftValue == null && condition.compare !== 'is_true' && condition.compare !== 'is_not_true') {
       return false
     }
     return visibilityCompareHandlers[condition.compare](leftValue, condition.value)
@@ -214,13 +194,7 @@ function triggerFieldRequest(
   target: Dict<DynamicFormValue>,
   requestLoading: Ref<boolean>,
 ) {
-  const executeRequest = new Function(
-    'self',
-    'triggerSetting',
-    'request',
-    'extra',
-    triggerSetting.request || 'return request.get(extra.renderTemplate(triggerSetting.url));',
-  ) as (
+  const executeRequest = new Function('self', 'triggerSetting', 'request', 'extra', triggerSetting.request || 'return request.get(extra.renderTemplate(triggerSetting.url));') as (
     self: Dict<DynamicFormValue>,
     setting: DynamicFormTriggerSetting,
     requestHelpers: typeof request,
@@ -229,8 +203,7 @@ function triggerFieldRequest(
 
   const requestPromise = executeRequest(target, triggerSetting, request, {
     loading: requestLoading,
-    renderTemplate: (url: string) =>
-      renderTemplate(url, { trigger_value: triggerValue, ...props.otherParams }),
+    renderTemplate: (url: string) => renderTemplate(url, { trigger_value: triggerValue, ...props.otherParams }),
   })
 
   if (!triggerSetting.change && !triggerSetting.change_field) {
@@ -248,27 +221,15 @@ function triggerFieldRequest(
           ...response.data.shared_model.map((model) => ({ ...model, type: 'share' })),
           ...response.data.model.map((model) => ({ ...model, type: 'workspace' }))
         ];`,
-    ) as (
-      self: Dict<DynamicFormValue>,
-      setting: DynamicFormTriggerSetting,
-      response: DynamicFormValue,
-      extra: Dict<DynamicFormValue>,
-    ) => void
+    ) as (self: Dict<DynamicFormValue>, setting: DynamicFormTriggerSetting, response: DynamicFormValue, extra: Dict<DynamicFormValue>) => void
 
-    applyResponse(target, triggerSetting, response, {
-      formData: formValue.value,
-      getDefault: getFormDefaultValue,
-    })
+    applyResponse(target, triggerSetting, response, { formData: formValue.value, getDefault: getFormDefaultValue })
   })
 }
 
 function initializeFieldDefault(field: FormField) {
   const currentValue = formValue.value[field.field]
-  if (
-    field.show_default_value === true &&
-    (currentValue === undefined || currentValue === null) &&
-    field.default_value !== undefined
-  ) {
+  if (field.show_default_value === true && (currentValue === undefined || currentValue === null) && field.default_value !== undefined) {
     formValue.value[field.field] = cloneDeep(field.default_value)
   }
 }
@@ -278,15 +239,10 @@ function hasValidOptionValue(field: FormField, value: DynamicFormValue) {
     return true
   }
   const selectedValues = Array.isArray(value) ? value : [value]
-  return selectedValues.every((selectedValue) =>
-    field.option_list?.some((option) => option[field.value_field as string] === selectedValue),
-  )
+  return selectedValues.every((selectedValue) => field.option_list?.some((option) => option[field.value_field as string] === selectedValue))
 }
 
-function getFormDefaultValue(
-  fields: FormField[],
-  initialValue: Dict<DynamicFormValue> = {},
-): Dict<DynamicFormValue> {
+function getFormDefaultValue(fields: FormField[], initialValue: Dict<DynamicFormValue> = {}): Dict<DynamicFormValue> {
   const value = { ...initialValue }
 
   for (const field of fields) {
@@ -334,30 +290,14 @@ async function validate() {
     }
   }
 
-  return Promise.all([
-    ...formItemRefs.value.map((item) => item.validate()),
-    ruleFormRef.value?.validate() ?? Promise.resolve(),
-  ])
+  return Promise.all([...formItemRefs.value.map((item) => item.validate()), ruleFormRef.value?.validate() ?? Promise.resolve()])
 }
 
-defineExpose({
-  initDefaultData: initializeFieldDefault,
-  render,
-  ruleFormRef,
-  validate,
-})
+defineExpose({ initDefaultData: initializeFieldDefault, render, ruleFormRef, validate })
 </script>
 
 <template>
-  <el-form
-    ref="ruleFormRef"
-    v-loading="loading"
-    :model="formValue"
-    label-position="top"
-    require-asterisk-position="right"
-    v-bind="$attrs"
-    @submit.prevent
-  >
+  <el-form ref="ruleFormRef" v-loading="loading" :model="formValue" label-position="top" require-asterisk-position="right" v-bind="$attrs" @submit.prevent>
     <slot :form-value="formValue" />
     <template v-for="field in formFieldList" :key="field.field">
       <FormItem

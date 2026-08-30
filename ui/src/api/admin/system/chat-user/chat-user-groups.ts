@@ -21,31 +21,17 @@ const deleteChatUserGroup = (groupId: string) => {
 
 /** 获取用户组成员分页列表。 */
 const getChatUserGroupMembers = (groupId: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<ChatUserGroupMember>>(
-    `${prefix}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+  return get<ResponsePage<ChatUserGroupMember>>(`${prefix}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 添加对话用户组成员。 */
 const postChatUserGroupMembers = (groupId: string, userIds: string[]) => {
-  return post<{ user_ids: string[] }, boolean>(`${prefix}/${groupId}/add_member`, {
-    user_ids: userIds,
-  })
+  return post<{ user_ids: string[] }, boolean>(`${prefix}/${groupId}/add_member`, { user_ids: userIds })
 }
 
 /** 移除对话用户组成员。 */
 const postRemoveChatUserGroupMembers = (groupId: string, relationIds: string[]) => {
-  return post<{ group_relation_ids: string[] }, boolean>(`${prefix}/${groupId}/remove_member`, {
-    group_relation_ids: relationIds,
-  })
+  return post<{ group_relation_ids: string[] }, boolean>(`${prefix}/${groupId}/remove_member`, { group_relation_ids: relationIds })
 }
 
-export default {
-  deleteChatUserGroup,
-  getChatUserGroupMembers,
-  getChatUserGroups,
-  postChatUserGroup,
-  postChatUserGroupMembers,
-  postRemoveChatUserGroupMembers,
-}
+export default { deleteChatUserGroup, getChatUserGroupMembers, getChatUserGroups, postChatUserGroup, postChatUserGroupMembers, postRemoveChatUserGroupMembers }

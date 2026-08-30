@@ -53,8 +53,7 @@ const system = {
   chatLogAddKnowledge: () => canSys(P.RESOURCE_APPLICATION_CHAT_LOG_ADD_KNOWLEDGE),
 
   // —— 组合：跳转/进入应用 ——
-  jumpRead: () =>
-    canSys(P.RESOURCE_APPLICATION_OVERVIEW_READ) || canSys(P.RESOURCE_APPLICATION_READ),
+  jumpRead: () => canSys(P.RESOURCE_APPLICATION_OVERVIEW_READ) || canSys(P.RESOURCE_APPLICATION_READ),
 }
 
 export default system

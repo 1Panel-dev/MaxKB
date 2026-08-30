@@ -6,18 +6,13 @@ import CommonSystemApi from '@/api/admin/system/common'
 import type { CommonUserOption } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
-const props = defineProps<{
-  workspaceId: string
-  currentGroup?: { id: string; name: string }
-}>()
+const props = defineProps<{ workspaceId: string; currentGroup?: { id: string; name: string } }>()
 const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
-const formRules: FormRules = {
-  userIds: [{ required: true, message: '请选择用户', trigger: 'change' }],
-}
+const formRules: FormRules = { userIds: [{ required: true, message: '请选择用户', trigger: 'change' }] }
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
 
 /* 成员选项 */
@@ -99,12 +94,7 @@ defineExpose({ open })
           :loading="optionsLoading"
           placeholder="请选择用户名或姓名"
         >
-          <el-option
-            v-for="user in userOptions"
-            :key="user.id"
-            :label="user.nick_name"
-            :value="user.id"
-          />
+          <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>
     </el-form>

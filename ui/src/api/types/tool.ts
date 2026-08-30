@@ -122,9 +122,7 @@ export interface ToolStoreItem {
 }
 
 export interface ToolStoreResponse {
-  additionalProperties: {
-    tags: ToolStoreTag[]
-  }
+  additionalProperties: { tags: ToolStoreTag[] }
   apps: Omit<ToolStoreItem, 'source' | 'tool_type'>[]
 }
 

@@ -17,10 +17,7 @@ export interface OptionItem<Value extends boolean | number | string = string | n
 }
 
 export interface ExportError {
-  response: {
-    status: number
-    data: Blob
-  }
+  response: { status: number; data: Blob }
 }
 
 export interface CommonUserOption {

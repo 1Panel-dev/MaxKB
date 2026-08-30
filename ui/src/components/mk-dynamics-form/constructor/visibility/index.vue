@@ -9,38 +9,20 @@ import ConditionRow from './ConditionRow.vue'
 
 defineOptions({ name: 'MkDynamicsFormVisibilityConstructor' })
 
-const props = defineProps<{
-  initialValue?: VisibilityRules | null
-  leftOptions?: VisibilityFieldOption[]
-}>()
+const props = defineProps<{ initialValue?: VisibilityRules | null; leftOptions?: VisibilityFieldOption[] }>()
 
-const defaultCondition: VisibilityConditionState = {
-  id: '',
-  field: ['', ''],
-  compare: '',
-  value: '',
-}
+const defaultCondition: VisibilityConditionState = { id: '', field: ['', ''], compare: '', value: '' }
 
 const formData = ref({
   action: 'show' as 'show' | 'hide',
   condition: 'and' as 'and' | 'or',
-  conditions: [
-    { ...defaultCondition, id: randomId(), field: ['', ''] },
-  ] as VisibilityConditionState[],
+  conditions: [{ ...defaultCondition, id: randomId(), field: ['', ''] }] as VisibilityConditionState[],
 })
 
 const conditionRows = computed<VisibilityConditionState[]>({
   get: () => formData.value.conditions,
   set: (conditions) => {
-    formData.value.conditions = conditions.map((condition) =>
-      condition.id
-        ? condition
-        : {
-            ...condition,
-            id: randomId(),
-            field: [...condition.field] as [string, string],
-          },
-    )
+    formData.value.conditions = conditions.map((condition) => (condition.id ? condition : { ...condition, id: randomId(), field: [...condition.field] as [string, string] }))
   },
 })
 
@@ -62,9 +44,7 @@ function validate(): Promise<void> {
       cond._compareError = '请选择比较方式'
       hasError = true
     }
-    const isEmpty = Array.isArray(cond.value)
-      ? cond.value.length === 0
-      : !cond.value && cond.value !== 0
+    const isEmpty = Array.isArray(cond.value) ? cond.value.length === 0 : !cond.value && cond.value !== 0
     if (!['is_true', 'is_not_true'].includes(cond.compare) && isEmpty) {
       cond._valueError = '请输入比较值'
       hasError = true
@@ -98,12 +78,7 @@ function render(rules: VisibilityRules | null) {
   if (rules && rules.conditions?.length) {
     formData.value.action = rules.action
     formData.value.condition = rules.condition
-    formData.value.conditions = rules.conditions.map((c) => ({
-      id: c.id || randomId(),
-      field: [c.field[0], c.field[1]],
-      compare: c.compare,
-      value: c.value,
-    }))
+    formData.value.conditions = rules.conditions.map((c) => ({ id: c.id || randomId(), field: [c.field[0], c.field[1]], compare: c.compare, value: c.value }))
     formData.value.conditions.forEach((cond) => {
       if (cond.field && cond.field[0] && cond.field[1]) {
         const fieldType = inferFieldType(cond.field, props.leftOptions)
@@ -147,11 +122,7 @@ defineExpose({ getData, render, validate })
 
     <el-scrollbar>
       <div style="max-height: calc(100vh - 400px)">
-        <MkFormList
-          v-model="conditionRows"
-          :default-item="defaultCondition"
-          :first-row-has-label="false"
-        >
+        <MkFormList v-model="conditionRows" :default-item="defaultCondition" :first-row-has-label="false">
           <template #default="{ item: condition }">
             <ConditionRow :model-value="condition" :left-options="leftOptions" />
           </template>

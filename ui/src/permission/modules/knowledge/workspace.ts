@@ -78,8 +78,7 @@ const workspace = {
   hitTest: () => false,
 
   // —— 组合：进入知识库 ——
-  jumpRead: (id: string) =>
-    canRes(P.KNOWLEDGE_DOCUMENT_READ, id) || canRes(P.KNOWLEDGE_WORKFLOW_READ, id),
+  jumpRead: (id: string) => canRes(P.KNOWLEDGE_DOCUMENT_READ, id) || canRes(P.KNOWLEDGE_WORKFLOW_READ, id),
 }
 
 export default workspace

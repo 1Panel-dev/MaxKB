@@ -31,12 +31,7 @@ const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infini
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
-  {
-    label: '创建者',
-    value: 'create_user',
-    options: creatorOptions.value,
-    remoteMethod: loadCreatorOptions,
-  },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 const knowledgeQuery = ref<Dict<unknown>>()
 
@@ -54,13 +49,8 @@ function handleSearchChange(query?: Dict<unknown>) {
 
 function loadKnowledgePage(pagination: { currentPage: number; pageSize: number }) {
   const request = isShared.value ? SharedApi : KnowledgeApi
-  const folderId = isShared.value
-    ? {}
-    : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
-  return request.getKnowledgePage(pagination, {
-    ...knowledgeQuery.value,
-    ...folderId,
-  })
+  const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
+  return request.getKnowledgePage(pagination, { ...knowledgeQuery.value, ...folderId })
 }
 
 /* 知识库维护 */
@@ -88,12 +78,7 @@ function handleDeleteKnowledge(knowledgeId: string) {
         </el-tooltip>
       </component>
 
-      <FolderTree
-        ref="folderTreeRef"
-        :source="RESOURCE_TYPE.KNOWLEDGE"
-        draggable
-        @select="handleFolderSelect"
-      />
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.KNOWLEDGE" draggable @select="handleFolderSelect" />
     </template>
 
     <template #default="{ Header }">
@@ -123,12 +108,7 @@ function handleDeleteKnowledge(knowledgeId: string) {
         <MkInfiniteScroll ref="infiniteScrollRef" v-model="knowledgeData" :load="loadKnowledgePage">
           <div v-if="knowledgeData.length" class="mk-resource-card-grid">
             <template v-for="knowledge in knowledgeData" :key="knowledge.id">
-              <KnowledgeCard
-                v-model:loading="knowledgeOperationLoading"
-                :knowledge="knowledge"
-                :shared="isShared"
-                @delete="handleDeleteKnowledge"
-              />
+              <KnowledgeCard v-model:loading="knowledgeOperationLoading" :knowledge="knowledge" :shared="isShared" @delete="handleDeleteKnowledge" />
             </template>
           </div>
           <MkEmpty v-else class="mt-24" />

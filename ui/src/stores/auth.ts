@@ -16,20 +16,12 @@ interface AuthState {
 }
 
 export const useAuthStore = defineStore('auth', {
-  state: (): AuthState => ({
-    baseProfile: null,
-    token: localStorage.getItem(TOKEN_STORAGE_KEY) ?? '',
-  }),
+  state: (): AuthState => ({ baseProfile: null, token: localStorage.getItem(TOKEN_STORAGE_KEY) ?? '' }),
 
   getters: {
     isAuthenticated: (state) => Boolean(state.token),
     showXpack: (state) => Boolean(state.baseProfile && state.baseProfile.edition !== 'CE'),
-    isExpire: (state) =>
-      Boolean(
-        state.baseProfile &&
-        state.baseProfile.edition !== 'CE' &&
-        !state.baseProfile.license_is_valid,
-      ),
+    isExpire: (state) => Boolean(state.baseProfile && state.baseProfile.edition !== 'CE' && !state.baseProfile.license_is_valid),
     isCE: (state) => state.baseProfile?.edition === 'CE', // 社区版
     isPE: (state) => state.baseProfile?.edition === 'PE' && state.baseProfile.license_is_valid, // 专业版
     isEE: (state) => state.baseProfile?.edition === 'EE' && state.baseProfile.license_is_valid, // 企业版
@@ -45,16 +37,12 @@ export const useAuthStore = defineStore('auth', {
     },
 
     asyncLoginWithDingTalk(code: string, fromClient = false) {
-      const loginRequest = fromClient
-        ? ExternalLoginApi.getDingTalkOauthCallback(code)
-        : ExternalLoginApi.getDingTalkCallback(code)
+      const loginRequest = fromClient ? ExternalLoginApi.getDingTalkOauthCallback(code) : ExternalLoginApi.getDingTalkCallback(code)
       return loginRequest.then((response) => this.setToken(response.token))
     },
 
     asyncLoginWithLark(code: string) {
-      return ExternalLoginApi.getLarkOauthCallback(code).then((response) =>
-        this.setToken(response.token),
-      )
+      return ExternalLoginApi.getLarkOauthCallback(code).then((response) => this.setToken(response.token))
     },
 
     /** 加载并缓存登录前所需的平台公开档案。 */
@@ -85,8 +73,7 @@ export const useAuthStore = defineStore('auth', {
       return this.loadBaseProfile().then(() => {
         const currentUserRequest = useUserStore().loadCurrentUser()
         const theme = useThemeStore()
-        const themeRequest =
-          this.isPE || this.isEE ? theme.loadThemeInfo() : Promise.resolve(theme.resetTheme())
+        const themeRequest = this.isPE || this.isEE ? theme.loadThemeInfo() : Promise.resolve(theme.resetTheme())
 
         return Promise.all([currentUserRequest, themeRequest]).then(([currentUser]) => currentUser)
       })

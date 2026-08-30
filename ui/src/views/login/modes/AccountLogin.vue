@@ -19,9 +19,7 @@ interface AccountLoginForm {
 
 defineOptions({ name: 'AccountLogin' })
 
-const props = defineProps<{
-  loginConfig?: LoginConfig
-}>()
+const props = defineProps<{ loginConfig?: LoginConfig }>()
 
 const route = useRoute()
 const router = useRouter()
@@ -33,15 +31,9 @@ const loginMethod = ref<LoginMethod>(props.loginConfig?.default_value ?? LOGIN_M
 const accountLoginMethods = computed(() => {
   let loginMethods = [...(props.loginConfig?.login_methods ?? [])]
   if (loginMethods.includes(LOGIN_METHOD.LOCAL)) {
-    loginMethods = [
-      LOGIN_METHOD.LOCAL,
-      ...loginMethods.filter((method) => method !== LOGIN_METHOD.LOCAL),
-    ]
+    loginMethods = [LOGIN_METHOD.LOCAL, ...loginMethods.filter((method) => method !== LOGIN_METHOD.LOCAL)]
   } else if (loginMethods.includes(LOGIN_METHOD.LDAP)) {
-    loginMethods = [
-      LOGIN_METHOD.LDAP,
-      ...loginMethods.filter((method) => method !== LOGIN_METHOD.LDAP),
-    ]
+    loginMethods = [LOGIN_METHOD.LDAP, ...loginMethods.filter((method) => method !== LOGIN_METHOD.LDAP)]
   }
   if (loginMethods.length === 1 && loginMethods[0] === LOGIN_METHOD.LOCAL) return []
 
@@ -49,11 +41,7 @@ const accountLoginMethods = computed(() => {
 })
 
 const accountLoginFormRef = ref<FormInstance>()
-const accountLoginForm = reactive<AccountLoginForm>({
-  captcha: '',
-  password: '',
-  username: '',
-})
+const accountLoginForm = reactive<AccountLoginForm>({ captcha: '', password: '', username: '' })
 
 const accountLoginRules = reactive<FormRules<AccountLoginForm>>({
   captcha: [{ required: false, message: '请输入验证码', trigger: 'blur' }],
@@ -86,10 +74,7 @@ const handleLogin = async () => {
         }
 
         auth
-          .asyncLogin({
-            encryptedData,
-            username: accountLoginForm.username,
-          })
+          .asyncLogin({ encryptedData, username: accountLoginForm.username })
           .then(() => {
             router.push({ name: 'workspace-home', params: { workspaceId: 'default' } })
           })
@@ -124,10 +109,7 @@ const redirectExternalLogin = async (method: LoginMethod, needConfirm: boolean) 
   const redirectUrl = await getExternalLoginUrl(method)
   if (!redirectUrl) return
   if (needConfirm) {
-    return MsgConfirm('跳转提示', '即将跳转至外部认证页面，是否继续？', {
-      confirmButtonText: '跳转',
-      confirmButtonType: 'primary',
-    })
+    return MsgConfirm('跳转提示', '即将跳转至外部认证页面，是否继续？', { confirmButtonText: '跳转', confirmButtonType: 'primary' })
       .then(() => {
         window.location.href = redirectUrl
       })
@@ -170,12 +152,7 @@ onMounted(() => {
   const loginMethods = accountLoginMethods.value
   if (route.query.login_mode !== 'manual') {
     const loginMethod = loginMethods[0]
-    if (
-      loginMethod &&
-      [LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some(
-        (authType) => authType === loginMethod,
-      )
-    ) {
+    if (loginMethod && [LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.SAML2].some((authType) => authType === loginMethod)) {
       void redirectExternalLogin(loginMethod, false)
     }
   }
@@ -189,71 +166,30 @@ onMounted(() => {
         {{ loginMethod === LOGIN_METHOD.LDAP ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
       </h2>
 
-      <el-form
-        ref="accountLoginFormRef"
-        :model="accountLoginForm"
-        :rules="accountLoginRules"
-        class="login-form"
-        @submit.prevent="handleLogin"
-        size="large"
-      >
+      <el-form ref="accountLoginFormRef" :model="accountLoginForm" :rules="accountLoginRules" class="login-form" @submit.prevent="handleLogin" size="large">
         <el-form-item prop="username">
-          <el-input
-            v-model="accountLoginForm.username"
-            placeholder="请输入用户名"
-            @blur="refreshCaptcha"
-          />
+          <el-input v-model="accountLoginForm.username" placeholder="请输入用户名" @blur="refreshCaptcha" />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input
-            v-model="accountLoginForm.password"
-            placeholder="请输入密码"
-            show-password
-            type="password"
-          />
+          <el-input v-model="accountLoginForm.password" placeholder="请输入密码" show-password type="password" />
         </el-form-item>
         <div v-if="loginMethod !== LOGIN_METHOD.LDAP && identifyCode" class="flex gap-2">
           <el-form-item prop="captcha" class="flex-1">
-            <el-input
-              v-model="accountLoginForm.captcha"
-              autocomplete="off"
-              placeholder="请输入验证码"
-            />
+            <el-input v-model="accountLoginForm.captcha" autocomplete="off" placeholder="请输入验证码" />
           </el-form-item>
-          <img
-            :src="identifyCode"
-            alt="验证码"
-            class="w-35 h-10 cursor-pointer border"
-            @click="refreshCaptcha"
-          />
+          <img :src="identifyCode" alt="验证码" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
         </div>
         <el-form-item>
-          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full"
-            >登录</el-button
-          >
+          <el-button :loading="isSubmitting" native-type="submit" type="primary" class="w-full">登录</el-button>
         </el-form-item>
       </el-form>
-      <el-button
-        size="default"
-        class="mt-3"
-        link
-        type="primary"
-        @click="router.push({ name: 'forgot-password' })"
-      >
-        忘记密码？
-      </el-button>
+      <el-button size="default" class="mt-3" link type="primary" @click="router.push({ name: 'forgot-password' })"> 忘记密码？ </el-button>
     </div>
     <div v-if="accountLoginMethods.length" class="third-login flex-col-center gap-4">
       <el-divider>其他登录方式</el-divider>
       <div class="flex gap-4">
         <template v-for="method in accountLoginMethods" :key="method">
-          <el-button
-            circle
-            size="large"
-            class="text-xs! font-medium!"
-            @click="selectLoginMethod(method)"
-            v-if="loginMethod !== method"
-          >
+          <el-button circle size="large" class="text-xs! font-medium!" @click="selectLoginMethod(method)" v-if="loginMethod !== method">
             <MkIcon v-if="method === LOGIN_METHOD.LOCAL" name="icon_pc_outlined" :size="22.5" />
             <span v-else>{{ method }}</span>
           </el-button>

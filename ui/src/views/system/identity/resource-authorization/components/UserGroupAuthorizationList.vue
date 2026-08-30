@@ -4,13 +4,8 @@ import MkSearchList from '@/components/mk-search-list/index.vue'
 
 defineOptions({ name: 'UserGroupAuthorizationList' })
 
-defineProps<{
-  activeId: string
-  userGroups: SystemUserGroup[]
-}>()
-const emit = defineEmits<{
-  select: [userGroup: SystemUserGroup]
-}>()
+defineProps<{ activeId: string; userGroups: SystemUserGroup[] }>()
+const emit = defineEmits<{ select: [userGroup: SystemUserGroup] }>()
 
 function handleUserGroupSelect(userGroup: SystemUserGroup) {
   emit('select', userGroup)
@@ -18,12 +13,7 @@ function handleUserGroupSelect(userGroup: SystemUserGroup) {
 </script>
 
 <template>
-  <MkSearchList
-    :data="userGroups"
-    :default-active="activeId"
-    :props="{ label: 'name', value: 'id' }"
-    @click="handleUserGroupSelect"
-  >
+  <MkSearchList :data="userGroups" :default-active="activeId" :props="{ label: 'name', value: 'id' }" @click="handleUserGroupSelect">
     <template #default="{ row }">
       <div class="flex min-w-0 flex-1 items-center gap-2">
         <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>

@@ -13,10 +13,7 @@ withDefaults(
     /** 当前项是否选中，仅在 selectable 为 true 时生效 */
     selected?: boolean
   }>(),
-  {
-    selectable: false,
-    selected: false,
-  },
+  { selectable: false, selected: false },
 )
 
 defineSlots<{
@@ -28,11 +25,7 @@ defineSlots<{
 </script>
 
 <template>
-  <el-dropdown-item
-    class="mk-dropdown-item flex items-center"
-    :class="{ 'text-primary!': selectable && selected }"
-    v-bind="$attrs"
-  >
+  <el-dropdown-item class="mk-dropdown-item flex items-center" :class="{ 'text-primary!': selectable && selected }" v-bind="$attrs">
     <span v-if="icon || $slots.icon" class="flex shrink-0 items-center text-N600!">
       <slot name="icon">
         <MkIcon v-if="icon" :icon="icon" />

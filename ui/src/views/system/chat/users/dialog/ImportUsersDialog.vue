@@ -9,9 +9,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'ImportUsersDialog' })
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 interface ImportUsersForm {
   syncType: string
@@ -23,9 +21,7 @@ const importing = ref(false)
 const importUsersFormRef = ref<FormInstance>()
 const syncTypeOptions = ref<OptionItem<string>[]>([])
 const importUsersForm = reactive<ImportUsersForm>({ syncType: '' })
-const importUsersFormRules: FormRules<ImportUsersForm> = {
-  syncType: [{ required: true, message: '请选择用户来源', trigger: 'change' }],
-}
+const importUsersFormRules: FormRules<ImportUsersForm> = { syncType: [{ required: true, message: '请选择用户来源', trigger: 'change' }] }
 
 /* 获取导入用户的来源类型 */
 const syncTypesLoading = ref(false)
@@ -33,13 +29,7 @@ function loadSyncTypes() {
   syncTypesLoading.value = true
   return ChatUserApi.getChatUserSyncTypes()
     .then((syncTypes) => {
-      syncTypeOptions.value = syncTypes.map((syncType) => ({
-        label:
-          syncType === LOGIN_METHOD.LOCAL
-            ? '系统用户'
-            : LOGIN_METHOD_LABELS[syncType as LoginMethod],
-        value: syncType,
-      }))
+      syncTypeOptions.value = syncTypes.map((syncType) => ({ label: syncType === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[syncType as LoginMethod], value: syncType }))
       importUsersForm.syncType = syncTypeOptions.value[0]?.value ?? ''
     })
     .finally(() => {
@@ -50,12 +40,7 @@ function loadSyncTypes() {
 function formatConflictMessage(conflicts: ChatUserSyncConflict[]) {
   return conflicts
     .map((conflict) => {
-      const conflictLabel =
-        conflict.type === 'username'
-          ? '用户名已存在'
-          : conflict.type === 'nick_name'
-            ? '姓名已存在'
-            : `${conflict.type} 冲突`
+      const conflictLabel = conflict.type === 'username' ? '用户名已存在' : conflict.type === 'nick_name' ? '姓名已存在' : `${conflict.type} 冲突`
       return `${conflictLabel}：${conflict.users.join('、')}`
     })
     .join('；')
@@ -72,9 +57,7 @@ function submitImportUsers() {
     return ChatUserApi.postSyncChatUsers(importUsersForm.syncType)
       .then((result) => {
         const conflictMessage = formatConflictMessage(result.conflict_users ?? [])
-        MsgSuccess(
-          `成功导入 ${result.success_count} 个用户${conflictMessage ? `，${conflictMessage}` : ''}`,
-        )
+        MsgSuccess(`成功导入 ${result.success_count} 个用户${conflictMessage ? `，${conflictMessage}` : ''}`)
         emit('refresh')
         dialogVisible.value = false
       })
@@ -102,9 +85,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="导入用户" @closed="resetData">
-    <template #subtitle>
-      从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。
-    </template>
+    <template #subtitle> 从已配置的用户来源同步对话用户，已存在的用户名或姓名不会重复导入。 </template>
 
     <el-form
       ref="importUsersFormRef"
@@ -115,18 +96,8 @@ defineExpose({ open })
       @submit.prevent="submitImportUsers"
     >
       <el-form-item label="用户来源" prop="syncType">
-        <el-select
-          v-model="importUsersForm.syncType"
-          class="w-full"
-          :loading="syncTypesLoading"
-          placeholder="请选择用户来源"
-        >
-          <el-option
-            v-for="syncTypeOption in syncTypeOptions"
-            :key="syncTypeOption.value"
-            :label="syncTypeOption.label"
-            :value="syncTypeOption.value"
-          />
+        <el-select v-model="importUsersForm.syncType" class="w-full" :loading="syncTypesLoading" placeholder="请选择用户来源">
+          <el-option v-for="syncTypeOption in syncTypeOptions" :key="syncTypeOption.value" :label="syncTypeOption.label" :value="syncTypeOption.value" />
         </el-select>
       </el-form-item>
     </el-form>

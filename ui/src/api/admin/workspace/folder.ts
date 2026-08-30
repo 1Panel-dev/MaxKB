@@ -27,9 +27,4 @@ const deleteFolder = (folderId: string, source: FolderSource) => {
   return del<boolean>(`${getPrefix(source)}/${folderId}`)
 }
 
-export default {
-  deleteFolder,
-  getFolderTree,
-  postFolder,
-  putFolder,
-}
+export default { deleteFolder, getFolderTree, postFolder, putFolder }

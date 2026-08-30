@@ -4,20 +4,8 @@ import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
 
 export default {
-  application: {
-    read: () => canSys(P.APPLICATION_RESOURCE_PERMISSION_READ),
-    edit: () => canSys(P.APPLICATION_RESOURCE_PERMISSION_EDIT),
-  },
-  knowledge: {
-    read: () => canSys(P.KNOWLEDGE_RESOURCE_PERMISSION_READ),
-    edit: () => canSys(P.KNOWLEDGE_RESOURCE_PERMISSION_EDIT),
-  },
-  tool: {
-    read: () => canSys(P.TOOL_RESOURCE_PERMISSION_READ),
-    edit: () => canSys(P.TOOL_RESOURCE_PERMISSION_EDIT),
-  },
-  model: {
-    read: () => canSys(P.MODEL_RESOURCE_PERMISSION_READ),
-    edit: () => canSys(P.MODEL_RESOURCE_PERMISSION_EDIT),
-  },
+  application: { read: () => canSys(P.APPLICATION_RESOURCE_PERMISSION_READ), edit: () => canSys(P.APPLICATION_RESOURCE_PERMISSION_EDIT) },
+  knowledge: { read: () => canSys(P.KNOWLEDGE_RESOURCE_PERMISSION_READ), edit: () => canSys(P.KNOWLEDGE_RESOURCE_PERMISSION_EDIT) },
+  tool: { read: () => canSys(P.TOOL_RESOURCE_PERMISSION_READ), edit: () => canSys(P.TOOL_RESOURCE_PERMISSION_EDIT) },
+  model: { read: () => canSys(P.MODEL_RESOURCE_PERMISSION_READ), edit: () => canSys(P.MODEL_RESOURCE_PERMISSION_EDIT) },
 }

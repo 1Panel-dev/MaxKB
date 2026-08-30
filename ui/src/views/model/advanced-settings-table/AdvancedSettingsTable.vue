@@ -10,8 +10,7 @@ defineOptions({ name: 'ModelAdvancedSettings' })
 const modelParams = defineModel<DynamicFormField[]>({ required: true })
 
 const currentIndex = ref<number>()
-const modelParamDialogRef =
-  useTemplateRef<InstanceType<typeof ModelParamDialog>>('modelParamDialogRef')
+const modelParamDialogRef = useTemplateRef<InstanceType<typeof ModelParamDialog>>('modelParamDialogRef')
 
 function handleOpenParamDialog(field?: DynamicFormField, index?: number) {
   currentIndex.value = index
@@ -23,28 +22,17 @@ function getTypeLabel(inputType: string) {
 }
 
 function handleSubmitParam(field: FormField) {
-  const label =
-    typeof field.label === 'object'
-      ? { ...field.label, label: field.label.label ?? field.field }
-      : (field.label ?? field.field)
-  const modelParam: DynamicFormField = {
-    ...field,
-    label,
-  }
-  const duplicateField = modelParams.value.some(
-    (param, index) => param.field === modelParam.field && index !== currentIndex.value,
-  )
+  const label = typeof field.label === 'object' ? { ...field.label, label: field.label.label ?? field.field } : (field.label ?? field.field)
+  const modelParam: DynamicFormField = { ...field, label }
+  const duplicateField = modelParams.value.some((param, index) => param.field === modelParam.field && index !== currentIndex.value)
   if (duplicateField) {
     MsgError(`参数“${modelParam.field}”已存在`)
     return
   }
 
-  const modelParamLabel =
-    typeof modelParam.label === 'string' ? modelParam.label : modelParam.label.label
+  const modelParamLabel = typeof modelParam.label === 'string' ? modelParam.label : modelParam.label.label
   const duplicateLabel = modelParams.value.some(
-    (param, index) =>
-      (typeof param.label === 'string' ? param.label : param.label.label) === modelParamLabel &&
-      index !== currentIndex.value,
+    (param, index) => (typeof param.label === 'string' ? param.label : param.label.label) === modelParamLabel && index !== currentIndex.value,
   )
   if (duplicateLabel) {
     MsgError(`显示名称“${modelParamLabel}”已存在`)
@@ -53,9 +41,10 @@ function handleSubmitParam(field: FormField) {
 
   if (currentIndex.value === undefined) {
     modelParams.value.push(modelParam)
-    return
+  } else {
+    modelParams.value.splice(currentIndex.value, 1, modelParam)
   }
-  modelParams.value.splice(currentIndex.value, 1, modelParam)
+  modelParamDialogRef.value?.close()
 }
 
 function handleDeleteParam(index: number) {
@@ -77,9 +66,7 @@ function handleDeleteParam(index: number) {
     <el-table-column label="参数" prop="field" min-width="130" show-overflow-tooltip />
     <el-table-column label="显示名称" min-width="130" show-overflow-tooltip>
       <template #default="{ row }">
-        <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{
-          row.label.label
-        }}</span>
+        <span v-if="row.label && row.label.input_type === 'TooltipLabel'">{{ row.label.label }}</span>
         <span v-else>{{ row.label }}</span>
       </template>
     </el-table-column>

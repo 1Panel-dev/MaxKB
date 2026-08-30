@@ -29,10 +29,4 @@ const postOperateLogCleanTime = (cleanTime: number) => {
   return post<{ clean_time: number }, boolean>(`${prefix}/save`, { clean_time: cleanTime })
 }
 
-export default {
-  exportOperateLog,
-  getOperateLogCleanTime,
-  getOperateLogMenuOptions,
-  getOperateLogPage,
-  postOperateLogCleanTime,
-}
+export default { exportOperateLog, getOperateLogCleanTime, getOperateLogMenuOptions, getOperateLogPage, postOperateLogCleanTime }

@@ -80,17 +80,12 @@ const postToolTestConnection = (payload: ToolPayload) => {
 
 /** 批量删除工作空间工具。 */
 const putBatchDeleteTools = (toolIds: string[]) => {
-  return put<{ id_list: string[] }, boolean>(`${getPrefix()}/batch_delete`, {
-    id_list: toolIds,
-  })
+  return put<{ id_list: string[] }, boolean>(`${getPrefix()}/batch_delete`, { id_list: toolIds })
 }
 
 /** 批量移动工作空间工具。 */
 const putBatchMoveTools = (toolIds: string[], folderId: string) => {
-  return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, {
-    folder_id: folderId,
-    id_list: toolIds,
-  })
+  return put<{ folder_id: string; id_list: string[] }, boolean>(`${getPrefix()}/batch_move`, { folder_id: folderId, id_list: toolIds })
 }
 
 export default {

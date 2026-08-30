@@ -6,20 +6,13 @@ import SelectProviderDrawer from './SelectProviderDrawer.vue'
 
 defineOptions({ name: 'ModelCreate' })
 
-const props = defineProps<{
-  currentProvider: ModelProviderItem
-  providers: ModelProviderItem[]
-}>()
+const props = defineProps<{ currentProvider: ModelProviderItem; providers: ModelProviderItem[] }>()
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 /* 创建模型 */
-const selectProviderDrawerRef =
-  useTemplateRef<InstanceType<typeof SelectProviderDrawer>>('selectProviderDrawerRef')
-const createModelDrawerRef =
-  useTemplateRef<InstanceType<typeof CreateModelDrawer>>('createModelDrawerRef')
+const selectProviderDrawerRef = useTemplateRef<InstanceType<typeof SelectProviderDrawer>>('selectProviderDrawerRef')
+const createModelDrawerRef = useTemplateRef<InstanceType<typeof CreateModelDrawer>>('createModelDrawerRef')
 
 function handleOpenCreateModel() {
   if (props.currentProvider.provider !== 'all') {
@@ -44,10 +37,5 @@ function handleBackToProviderSelect() {
     <span>添加模型</span>
   </el-button>
   <SelectProviderDrawer ref="selectProviderDrawerRef" @select="handleCreateProviderSelect" />
-  <CreateModelDrawer
-    ref="createModelDrawerRef"
-    :providers="providers"
-    @back="handleBackToProviderSelect"
-    @refresh="emit('refresh')"
-  />
+  <CreateModelDrawer ref="createModelDrawerRef" :providers="providers" @back="handleBackToProviderSelect" @refresh="emit('refresh')" />
 </template>

@@ -10,12 +10,7 @@ import { copyText } from '@/utils/clipboard'
 import { MsgSuccess } from '@/utils/message'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import UserGroupSetting from './components/UserGroupSetting.vue'
-import type {
-  ListItem,
-  SystemUser,
-  SystemUserPayload,
-  SystemUserRoleAssignment,
-} from '@/api/types/index.ts'
+import type { ListItem, SystemUser, SystemUserPayload, SystemUserRoleAssignment } from '@/api/types/index.ts'
 import type { FormInstance, FormRules } from 'element-plus'
 
 defineOptions({ name: 'UserFromDrawer' })
@@ -132,11 +127,7 @@ async function submitUser() {
         const encryptor = new JSEncrypt()
         encryptor.setPublicKey(auth.baseProfile?.rsa ?? '')
         const encryptedPassword = encryptor.encrypt(userForm.password as string)
-        UserManageApi.postUser({
-          ...userForm,
-          encrypted: true,
-          password: encryptedPassword as string,
-        })
+        UserManageApi.postUser({ ...userForm, encrypted: true, password: encryptedPassword as string })
           .then(() => {
             MsgSuccess('创建成功')
             emit('refresh', true)
@@ -160,10 +151,7 @@ function open(user?: SystemUser) {
       nick_name: user.nick_name,
       phone: user.phone,
       role_setting: user.role_setting?.length
-        ? user.role_setting.map((item: SystemUserRoleAssignment) => ({
-            ...item,
-            workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids,
-          }))
+        ? user.role_setting.map((item: SystemUserRoleAssignment) => ({ ...item, workspace_ids: item.workspace_ids.includes('None') ? [] : item.workspace_ids }))
         : [{ role_id: '', workspace_ids: [] }],
       user_group_ids: user.user_group_ids ?? [],
     })
@@ -202,33 +190,14 @@ defineExpose({ open })
 
 <template>
   <MkDrawer v-model="drawerVisible" :title="drawerTitle" @closed="resetData">
-    <el-form
-      ref="userFormRef"
-      :model="userForm"
-      :rules="userFormRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent="submitUser"
-    >
+    <el-form ref="userFormRef" :model="userForm" :rules="userFormRules" label-position="top" require-asterisk-position="right" @submit.prevent="submitUser">
       <section>
         <h4 class="mk-title-decoration mb-4">基本信息</h4>
         <el-form-item label="用户名" prop="username">
-          <el-input
-            v-model="userForm.username"
-            :disabled="isEdit"
-            maxlength="64"
-            minlength="4"
-            placeholder="请输入用户名"
-            show-word-limit
-          />
+          <el-input v-model="userForm.username" :disabled="isEdit" maxlength="64" minlength="4" placeholder="请输入用户名" show-word-limit />
         </el-form-item>
         <el-form-item label="姓名" prop="nick_name">
-          <el-input
-            v-model="userForm.nick_name"
-            maxlength="64"
-            placeholder="请输入姓名"
-            show-word-limit
-          />
+          <el-input v-model="userForm.nick_name" maxlength="64" placeholder="请输入姓名" show-word-limit />
         </el-form-item>
 
         <el-form-item label="邮箱" prop="email">
@@ -251,21 +220,13 @@ defineExpose({ open })
       </section>
       <section v-if="auth.isEE || auth.isPE">
         <h4 class="mk-title-decoration mb-4 mt-4">角色设置</h4>
-        <MkFormList
-          v-model="userForm.role_setting"
-          add-text="添加角色"
-          :default-item="{ role_id: '', workspace_ids: [] }"
-        >
+        <MkFormList v-model="userForm.role_setting" add-text="添加角色" :default-item="{ role_id: '', workspace_ids: [] }">
           <template #default="{ index, item: roleAssignment }">
             <el-form-item
               class="flex-1"
               :label="index === 0 ? '角色' : ''"
               :prop="`role_setting.${index}.role_id`"
-              :rules="{
-                required: true,
-                message: '请选择角色',
-                trigger: 'change',
-              }"
+              :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
             >
               <el-select
                 v-model="roleAssignment.role_id"
@@ -276,13 +237,7 @@ defineExpose({ open })
                 fit-input-width
                 @change="handleRoleChange(roleAssignment, index)"
               >
-                <el-option
-                  v-for="roleOption in roleOptions"
-                  :key="roleOption.id"
-                  :label="roleOption.name"
-                  :title="roleOption.name"
-                  :value="roleOption.id"
-                />
+                <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
               </el-select>
             </el-form-item>
 
@@ -292,13 +247,7 @@ defineExpose({ open })
               class="flex-1"
               :label="index === 0 ? '工作空间' : ''"
               :prop="`role_setting.${index}.workspace_ids`"
-              :rules="{
-                required: !isAdminRole(roleAssignment.role_id),
-                type: 'array',
-                min: 1,
-                message: '请选择工作空间',
-                trigger: 'change',
-              }"
+              :rules="{ required: !isAdminRole(roleAssignment.role_id), type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }"
             >
               <el-select
                 v-model="roleAssignment.workspace_ids"
@@ -328,11 +277,7 @@ defineExpose({ open })
       </section>
       <section v-if="selectedWorkspaceIds.length">
         <h4 class="mk-title-decoration mb-4 mt-4">用户组</h4>
-        <UserGroupSetting
-          v-model="userForm.user_group_ids"
-          :workspace-ids="selectedWorkspaceIds"
-          :workspace-options="workspaceOptions"
-        />
+        <UserGroupSetting v-model="userForm.user_group_ids" :workspace-ids="selectedWorkspaceIds" :workspace-options="workspaceOptions" />
       </section>
     </el-form>
 

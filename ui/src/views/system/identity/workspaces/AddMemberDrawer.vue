@@ -4,31 +4,20 @@ import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import CommonSystemApi from '@/api/admin/system/common'
 import WorkspaceApi from '@/api/admin/system/workspace'
-import type {
-  CreateWorkspaceMemberPayload,
-  ListItem,
-  SystemUserOption,
-  WorkspaceItem,
-} from '@/api/types'
+import type { CreateWorkspaceMemberPayload, ListItem, SystemUserOption, WorkspaceItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 import MkFormList from '@/components/mk-form-list/index.vue'
 
 defineOptions({ name: 'AddWorkspaceMemberDrawer' })
 
-const props = defineProps<{
-  currentWorkspace?: WorkspaceItem
-}>()
+const props = defineProps<{ currentWorkspace?: WorkspaceItem }>()
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)
 const loading = ref(false)
 const formRef = ref<FormInstance>()
-const memberForm = reactive<{ members: CreateWorkspaceMemberPayload[] }>({
-  members: [],
-})
+const memberForm = reactive<{ members: CreateWorkspaceMemberPayload[] }>({ members: [] })
 
 /* 成员与角色选项 */
 const userOptions = ref<SystemUserOption[]>([])
@@ -42,9 +31,7 @@ function loadUserOptions(keyword = '') {
     .then((users) => {
       const selectedUserIds = new Set(memberForm.members.flatMap(({ user_ids }) => user_ids))
       const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
-      userOptions.value = [
-        ...new Map([...selectedUserOptions, ...users].map((user) => [user.id, user])).values(),
-      ]
+      userOptions.value = [...new Map([...selectedUserOptions, ...users].map((user) => [user.id, user])).values()]
     })
     .finally(() => {
       userOptionsLoading.value = false
@@ -78,10 +65,7 @@ function submit() {
     loading.value = true
     WorkspaceApi.postWorkspaceMembers(
       workspaceId,
-      memberForm.members.map((member) => ({
-        role_ids: [...member.role_ids],
-        user_ids: [...member.user_ids],
-      })),
+      memberForm.members.map((member) => ({ role_ids: [...member.role_ids], user_ids: [...member.user_ids] })),
     )
       .then(() => {
         MsgSuccess('添加成功')
@@ -110,23 +94,13 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" label-position="top">
-      <MkFormList
-        v-model="memberForm.members"
-        add-text="添加成员"
-        :default-item="{ role_ids: [], user_ids: [] }"
-      >
+      <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ role_ids: [], user_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item
             class="flex-1"
             :label="index === 0 ? '成员' : ''"
             :prop="`members.${index}.user_ids`"
-            :rules="{
-              required: true,
-              type: 'array',
-              min: 1,
-              message: '请选择成员',
-              trigger: 'change',
-            }"
+            :rules="{ required: true, type: 'array', min: 1, message: '请选择成员', trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.user_ids"
@@ -155,13 +129,7 @@ defineExpose({ open })
             class="flex-1"
             :label="index === 0 ? '角色' : ''"
             :prop="`members.${index}.role_ids`"
-            :rules="{
-              required: true,
-              type: 'array',
-              min: 1,
-              message: '请选择角色',
-              trigger: 'change',
-            }"
+            :rules="{ required: true, type: 'array', min: 1, message: '请选择角色', trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.role_ids"
@@ -174,13 +142,7 @@ defineExpose({ open })
               placeholder="请选择角色"
               :reserve-keyword="false"
             >
-              <el-option
-                v-for="roleOption in roleOptions"
-                :key="roleOption.id"
-                :label="roleOption.name"
-                :title="roleOption.name"
-                :value="roleOption.id"
-              />
+              <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
             </el-select>
           </el-form-item>
         </template>

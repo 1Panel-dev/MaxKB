@@ -15,21 +15,9 @@ interface QrLoginPlatformView extends QrLoginPlatformPayload {
   logo: string
 }
 
-const platformDefinitions: {
-  configKeys: string[]
-  key: QrCodeProvider
-  logo: string
-}[] = [
-  {
-    key: LOGIN_METHOD.WECOM,
-    logo: enterpriseWechatLogo,
-    configKeys: ['corp_id', 'agent_id', 'app_secret'],
-  },
-  {
-    key: LOGIN_METHOD.DINGTALK,
-    logo: dingtalkLogo,
-    configKeys: ['corp_id', 'app_key', 'app_secret'],
-  },
+const platformDefinitions: { configKeys: string[]; key: QrCodeProvider; logo: string }[] = [
+  { key: LOGIN_METHOD.WECOM, logo: enterpriseWechatLogo, configKeys: ['corp_id', 'agent_id', 'app_secret'] },
+  { key: LOGIN_METHOD.DINGTALK, logo: dingtalkLogo, configKeys: ['corp_id', 'app_key', 'app_secret'] },
   { key: LOGIN_METHOD.LARK, logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
 ]
 
@@ -70,11 +58,7 @@ function loadQrPlatforms() {
 /* 改变状态 */
 function handlePlatformStatusChange(platform: QrLoginPlatformView) {
   loading.value = true
-  return ChatUserAuthScanApi.postQrLoginPlatform({
-    key: platform.key,
-    config: platform.config,
-    isActive: platform.isActive,
-  })
+  return ChatUserAuthScanApi.postQrLoginPlatform({ key: platform.key, config: platform.config, isActive: platform.isActive })
     .then(() => MsgSuccess('保存成功'))
     .catch((error) => {
       platform.isActive = !platform.isActive
@@ -123,7 +107,7 @@ onMounted(loadQrPlatforms)
             <span>{{ platform.isActive ? '已启用' : '已关闭' }}</span>
             <el-switch v-model="platform.isActive" @change="handlePlatformStatusChange(platform)" />
           </div>
-          <el-button  v-else type="primary" @click="handleEditPlatform(platform)">接入</el-button>
+          <el-button v-else type="primary" @click="handleEditPlatform(platform)">接入</el-button>
         </div>
         <div class="border-t" v-if="platform.isValid">
           <div class="py-4 grid grid-cols-2 gap-x-6 gap-y-4">

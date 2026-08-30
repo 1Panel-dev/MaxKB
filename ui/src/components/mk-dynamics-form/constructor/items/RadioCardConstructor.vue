@@ -3,26 +3,13 @@ import { computed, onMounted, inject } from 'vue'
 import RadioCard from '@/components/mk-dynamics-form/items/radio/RadioCard.vue'
 import MkFormList from '@/components/mk-form-list/index.vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
-import type {
-  DynamicFormConstructorOption,
-  DynamicFormValidatorCallback,
-  DynamicFormValue,
-  FormField,
-} from '../../type'
+import type { DynamicFormConstructorOption, DynamicFormValidatorCallback, DynamicFormValue, FormField } from '../../type'
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
-  const options = [
-    {
-      label: '自定义',
-      value: 'custom',
-    },
-  ]
+  const options = [{ label: '自定义', value: 'custom' }]
   if (getModel) {
-    options.push({
-      label: '引用变量',
-      value: 'ref_variables',
-    })
+    options.push({ label: '引用变量', value: 'ref_variables' })
   }
   return options
 })
@@ -34,9 +21,7 @@ const model = computed(() => {
     return null
   }
 })
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
   set: (item) => {
@@ -46,12 +31,7 @@ const formValue = computed({
     return props.modelValue
   },
 })
-const hasOptionValue = computed(
-  () =>
-    formValue.value.option_list?.some((option: DynamicFormConstructorOption) =>
-      Boolean(option.value),
-    ) ?? false,
-)
+const hasOptionValue = computed(() => formValue.value.option_list?.some((option: DynamicFormConstructorOption) => Boolean(option.value)) ?? false)
 const referenceVariableRule = {
   required: true,
   validator: (_rule: unknown, value: DynamicFormValue, callback: DynamicFormValidatorCallback) => {
@@ -133,19 +113,8 @@ onMounted(() => {
       </el-radio>
     </el-radio-group>
   </el-form-item>
-  <el-form-item
-    v-if="formValue.assignment_method === 'ref_variables'"
-    :required="true"
-    prop="option_list"
-    :rules="[referenceVariableRule]"
-  >
-    <NodeCascader
-      ref="nodeCascaderRef"
-      :nodeModel="model"
-      class="w-full"
-      placeholder="请选择变量"
-      v-model="formValue.option_list"
-    />
+  <el-form-item v-if="formValue.assignment_method === 'ref_variables'" :required="true" prop="option_list" :rules="[referenceVariableRule]">
+    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" class="w-full" placeholder="请选择变量" v-model="formValue.option_list" />
   </el-form-item>
   <div v-if="formValue.assignment_method === 'custom'" class="mb-4">
     <div class="flex-between mb-2">
@@ -156,12 +125,7 @@ onMounted(() => {
     </div>
 
     <div class="w-full rounded-md bg-N100 p-3">
-      <MkFormList
-        v-model="formValue.option_list"
-        :default-item="{ label: '', value: '' }"
-        :show-add-button="false"
-        @remove="handleOptionRemove"
-      >
+      <MkFormList v-model="formValue.option_list" :default-item="{ label: '', value: '' }" :show-add-button="false" @remove="handleOptionRemove">
         <template #default="{ index, item: option }">
           <el-form-item :label="index === 0 ? '标签' : ''" class="flex-1">
             <el-input v-model="option.label" placeholder="请输入选项标签" />
@@ -179,16 +143,7 @@ onMounted(() => {
     v-if="formValue.assignment_method === 'custom' && hasOptionValue"
     :required="formValue.required"
     prop="default_value"
-    :rules="
-      formValue.required
-        ? [
-            {
-              required: true,
-              message: '请输入默认值',
-            },
-          ]
-        : []
-    "
+    :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []"
   >
     <template #label>
       <div class="flex-between">
@@ -196,13 +151,7 @@ onMounted(() => {
         <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
       </div>
     </template>
-    <RadioCard
-      :form-field="formField"
-      v-model="formValue.default_value"
-      :other-params="{}"
-      field="default_value"
-    >
-    </RadioCard>
+    <RadioCard :form-field="formField" v-model="formValue.default_value" :other-params="{}" field="default_value"> </RadioCard>
   </el-form-item>
 </template>
 <style lang="scss" scoped></style>

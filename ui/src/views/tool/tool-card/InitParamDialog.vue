@@ -8,37 +8,32 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'InitParamDialog' })
 
-const props = defineProps<{
-  api: typeof ToolApi
-}>()
+const props = defineProps<{ api: typeof ToolApi }>()
 
-const emit = defineEmits<{
-  closed: []
-  update: [tool: ToolItem]
-}>()
+const emit = defineEmits<{ closed: []; update: [tool: ToolItem] }>()
 
 const dynamicsFormRef = useTemplateRef<InstanceType<typeof MkDynamicsForm>>('dynamicsFormRef')
 const visible = ref(false)
 const loading = ref(false)
 const toolDetail = ref<ToolItem>()
 const targetActive = ref(false)
+const enableAfterSave = ref(false)
 const initParams = ref<Dict<DynamicFormValue>>({})
 
 function resetData() {
   toolDetail.value = undefined
   targetActive.value = false
+  enableAfterSave.value = false
   initParams.value = {}
   loading.value = false
 }
 
-function open(tool: ToolItem, active: boolean) {
+function open(tool: ToolItem, active = tool.is_active, shouldEnableAfterSave = false) {
   resetData()
   toolDetail.value = cloneDeep(tool)
   targetActive.value = active
-  initParams.value =
-    typeof tool.init_params === 'object' && tool.init_params && !Array.isArray(tool.init_params)
-      ? cloneDeep(tool.init_params)
-      : {}
+  enableAfterSave.value = shouldEnableAfterSave
+  initParams.value = typeof tool.init_params === 'object' && tool.init_params && !Array.isArray(tool.init_params) ? cloneDeep(tool.init_params) : {}
   visible.value = true
 }
 
@@ -49,12 +44,9 @@ function handleSubmit() {
   dynamicsFormRef.value?.validate().then(() => {
     loading.value = true
     return props.api
-      .putTool(currentTool.id, {
-        init_params: cloneDeep(initParams.value),
-        is_active: targetActive.value,
-      })
+      .putTool(currentTool.id, { init_params: cloneDeep(initParams.value), is_active: targetActive.value })
       .then((updatedTool) => {
-        MsgSuccess(targetActive.value ? '启用成功' : '保存成功')
+        MsgSuccess(enableAfterSave.value ? '启用成功' : '保存成功')
         emit('update', updatedTool)
         visible.value = false
       })
@@ -73,19 +65,13 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="配置启动参数" width="600" @closed="handleClosed">
-    <MkDynamicsForm
-      v-if="toolDetail"
-      ref="dynamicsFormRef"
-      v-model="initParams"
-      :render-data="toolDetail.init_field_list ?? []"
-      default-item-width="100%"
-    />
+  <MkDialog v-model="visible" title="配置启动参数" @closed="handleClosed">
+    <MkDynamicsForm v-if="toolDetail" ref="dynamicsFormRef" v-model="initParams" :render-data="toolDetail.init_field_list ?? []" />
 
     <template #footer>
       <el-button :disabled="loading" plain @click="visible = false">取消</el-button>
       <el-button type="primary" :loading="loading" @click="handleSubmit">
-        {{ targetActive ? '保存并启用' : '保存' }}
+        {{ enableAfterSave ? '保存并启用' : '保存' }}
       </el-button>
     </template>
   </MkDialog>

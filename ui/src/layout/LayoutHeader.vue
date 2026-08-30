@@ -7,20 +7,9 @@ import { isSystem, isWorkspace } from './utils'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import type { LayoutMode } from './types'
 const router = useRouter()
-const props = withDefaults(
-  defineProps<{
-    mode?: LayoutMode
-  }>(),
-  {
-    mode: 'workspace',
-  },
-)
+const props = withDefaults(defineProps<{ mode?: LayoutMode }>(), { mode: 'workspace' })
 function switchMode() {
-  router.push(
-    isWorkspace(props.mode)
-      ? { name: 'system-home' }
-      : { name: 'workspace-home', params: { workspaceId: 'default' } },
-  )
+  router.push(isWorkspace(props.mode) ? { name: 'system-home' } : { name: 'workspace-home', params: { workspaceId: 'default' } })
 }
 </script>
 

@@ -12,16 +12,10 @@ const props = withDefaults(
     triggerClass?: HTMLAttributes['class']
     triggerStyle?: HTMLAttributes['style']
   }>(),
-  {
-    defaultExpanded: true,
-    indicatorPosition: 'before',
-  },
+  { defaultExpanded: true, indicatorPosition: 'before' },
 )
 
-defineSlots<{
-  default?: () => unknown
-  label?: () => unknown
-}>()
+defineSlots<{ default?: () => unknown; label?: () => unknown }>()
 
 const expanded = ref(props.defaultExpanded)
 </script>
@@ -30,24 +24,12 @@ const expanded = ref(props.defaultExpanded)
   <section>
     <div class="py-2" :class="triggerClass" :style="triggerStyle" @click="expanded = !expanded">
       <div class="flex w-full cursor-pointer items-center gap-2 text-left">
-        <MkIcon
-          v-if="indicatorPosition === 'before'"
-          :icon="CaretBottom"
-          :size="14"
-          class="transition-transform text-N600!"
-          :class="{ '-rotate-90': !expanded }"
-        />
+        <MkIcon v-if="indicatorPosition === 'before'" :icon="CaretBottom" :size="14" class="transition-transform text-N600!" :class="{ '-rotate-90': !expanded }" />
         <slot name="label">
           <span>{{ title }}</span>
         </slot>
 
-        <MkIcon
-          v-if="indicatorPosition === 'after'"
-          name="icon_down_outlined"
-          :size="16"
-          class="transition-transform text-N600!"
-          :class="{ '-rotate-180': expanded }"
-        />
+        <MkIcon v-if="indicatorPosition === 'after'" name="icon_down_outlined" :size="16" class="transition-transform text-N600!" :class="{ '-rotate-180': expanded }" />
       </div>
     </div>
     <el-collapse-transition>

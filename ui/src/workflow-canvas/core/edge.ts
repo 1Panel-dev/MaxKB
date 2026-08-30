@@ -1,22 +1,11 @@
-import {
-  BezierEdge,
-  BezierEdgeModel,
-  h,
-  type BaseEdgeModel,
-  type GraphModel,
-} from '@logicflow/core'
+import { BezierEdge, BezierEdgeModel, h, type BaseEdgeModel, type GraphModel } from '@logicflow/core'
 import type { App } from 'vue'
 import { connect, disconnect } from './teleport'
 import CustomLine from './CustomLine.vue'
 
 function isMouseInElement(element: Element, event: PointerEvent) {
   const rect = element.getBoundingClientRect()
-  return (
-    event.clientX >= rect.left &&
-    event.clientX <= rect.right &&
-    event.clientY >= rect.top &&
-    event.clientY <= rect.bottom
-  )
+  return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
 }
 const DEFAULT_WIDTH = 32
 const DEFAULT_HEIGHT = 32
@@ -32,8 +21,7 @@ class CustomEdge2 extends BezierEdge {
 
       this.props.graphModel.clearSelectElements()
       this.props.model.isSelected = true
-      const element =
-        event.target.parentElement?.parentElement?.querySelector('.lf-custom-edge-wrapper')
+      const element = event.target.parentElement?.parentElement?.querySelector('.lf-custom-edge-wrapper')
       if (element && isMouseInElement(element, event)) {
         this.props.model.graphModel.deleteEdgeById(this.props.model.id)
       }
@@ -48,9 +36,7 @@ class CustomEdge2 extends BezierEdge {
     this.root = root
     if (root) {
       connect(this.targetId(), CustomLine, root, () => {
-        return {
-          getModel: () => this.props.model,
-        }
+        return { getModel: () => this.props.model }
       })
     }
   }
@@ -88,27 +74,10 @@ class CustomEdge2 extends BezierEdge {
     const { customWidth = DEFAULT_WIDTH, customHeight = DEFAULT_HEIGHT } = model.getProperties()
     const { startPoint, endPoint, path, isAnimation, arrowConfig } = model
     const animationStyle = model.getEdgeAnimationStyle()
-    const {
-      strokeDasharray,
-      stroke,
-      strokeDashoffset,
-      animationName,
-      animationDuration,
-      animationIterationCount,
-      animationTimingFunction,
-      animationDirection,
-    } = animationStyle
-    const positionData = {
-      x: (startPoint.x + endPoint.x - customWidth) / 2,
-      y: (startPoint.y + endPoint.y - customHeight) / 2,
-      width: customWidth,
-      height: customHeight,
-    }
+    const { strokeDasharray, stroke, strokeDashoffset, animationName, animationDuration, animationIterationCount, animationTimingFunction, animationDirection } = animationStyle
+    const positionData = { x: (startPoint.x + endPoint.x - customWidth) / 2, y: (startPoint.y + endPoint.y - customHeight) / 2, width: customWidth, height: customHeight }
     const style = model.getEdgeStyle()
-    const wrapperStyle = {
-      width: customWidth,
-      height: customHeight,
-    }
+    const wrapperStyle = { width: customWidth, height: customHeight }
 
     setTimeout(() => {
       const s = document.getElementById(id)
@@ -127,36 +96,12 @@ class CustomEdge2 extends BezierEdge {
         ...style,
         ...arrowConfig,
         ...(isAnimation
-          ? {
-              strokeDasharray,
-              stroke,
-              style: {
-                strokeDashoffset,
-                animationName,
-                animationDuration,
-                animationIterationCount,
-                animationTimingFunction,
-                animationDirection,
-              },
-            }
+          ? { strokeDasharray, stroke, style: { strokeDashoffset, animationName, animationDuration, animationIterationCount, animationTimingFunction, animationDirection } }
           : {}),
       }),
-      h(
-        'foreignObject',
-        {
-          ...positionData,
-          y: positionData.y + 5,
-          x: positionData.x + 5,
-          style: {},
-        },
-        [
-          h('div', {
-            id,
-            style: { ...wrapperStyle },
-            className: 'lf-custom-edge-wrapper',
-          }),
-        ],
-      ),
+      h('foreignObject', { ...positionData, y: positionData.y + 5, x: positionData.x + 5, style: {} }, [
+        h('div', { id, style: { ...wrapperStyle }, className: 'lf-custom-edge-wrapper' }),
+      ]),
     ])
   }
 }
@@ -193,24 +138,14 @@ class CustomEdgeModel2 extends BezierEdgeModel {
    */
   updatePathByAnchor() {
     const sourceNodeModel = this.graphModel.getNodeModelById(this.sourceNodeId)
-    const sourceAnchor = sourceNodeModel
-      ?.getDefaultAnchor()
-      .find((anchor) => anchor.id === this.sourceAnchorId)
+    const sourceAnchor = sourceNodeModel?.getDefaultAnchor().find((anchor) => anchor.id === this.sourceAnchorId)
 
     const targetNodeModel = this.graphModel.getNodeModelById(this.targetNodeId)
-    const targetAnchor = targetNodeModel
-      ?.getDefaultAnchor()
-      .find((anchor) => anchor.id === this.targetAnchorId)
+    const targetAnchor = targetNodeModel?.getDefaultAnchor().find((anchor) => anchor.id === this.targetAnchorId)
     if (sourceAnchor && targetAnchor) {
-      const startPoint = {
-        x: sourceAnchor.x,
-        y: sourceAnchor.y,
-      }
+      const startPoint = { x: sourceAnchor.x, y: sourceAnchor.y }
       this.updateStartPoint(startPoint)
-      const endPoint = {
-        x: targetAnchor.x,
-        y: targetAnchor.y,
-      }
+      const endPoint = { x: targetAnchor.x, y: targetAnchor.y }
 
       this.updateEndPoint(endPoint)
     }
@@ -226,8 +161,4 @@ class CustomEdgeModel2 extends BezierEdgeModel {
   }
 }
 
-export default {
-  type: 'app-edge',
-  view: CustomEdge2,
-  model: CustomEdgeModel2,
-}
+export default { type: 'app-edge', view: CustomEdge2, model: CustomEdgeModel2 }

@@ -22,14 +22,4 @@ export const compareList = [
   { value: 'wildcard', label: '通配符匹配' },
 ]
 
-export const fileTooltip = JSON.stringify(
-  [
-    {
-      name: 'File Name',
-      url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
-      file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4',
-    },
-  ],
-  null,
-  2,
-)
+export const fileTooltip = JSON.stringify([{ name: 'File Name', url: './oss/file/019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4', file_id: '019d8ac3-e2c6-7ff2-8956-c9c98f0e11f4' }], null, 2)

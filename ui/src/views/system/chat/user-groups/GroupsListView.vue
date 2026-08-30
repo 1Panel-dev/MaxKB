@@ -10,8 +10,7 @@ import CreateGroupMemberDialog from './dialog/CreateGroupMemberDialog.vue'
 import CreateOrUpdateGroupDialog from './dialog/CreateOrUpdateGroupDialog.vue'
 
 /* 添加用户组表单dialog */
-const groupDialogRef =
-  useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
+const groupDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
 
 function handleOpenGroupDialog(group?: ListItem) {
   groupDialogRef.value?.open(group)
@@ -97,8 +96,7 @@ function handleMemberSearch(query?: Dict<unknown>) {
 }
 
 /* 添加成员drawer */
-const memberDialogRef =
-  useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
+const memberDialogRef = useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
 
 function handleOpenMemberDialog() {
   memberDialogRef.value?.open()
@@ -111,22 +109,16 @@ function handleBatchSelectionChange(selection: unknown[]) {
 }
 
 function handleRemoveMembers(member?: ChatUserGroupMember) {
-  const title = member
-    ? `是否移除成员：${member?.nick_name}？`
-    : `是否移除选中的 ${batchSelectedMembers.value.length} 个成员？`
+  const title = member ? `是否移除成员：${member?.nick_name}？` : `是否移除选中的 ${batchSelectedMembers.value.length} 个成员？`
   MsgConfirm(title, '', { confirmButtonText: '移除' })
     .then(() => {
       membersLoading.value = true
-      const relationIds = batchSelectedMembers.value.map(
-        ({ user_group_relation_id }) => user_group_relation_id,
-      )
-      return ChatGroupsApi.postRemoveChatUserGroupMembers(currentGroup.value!.id, relationIds).then(
-        async () => {
-          MsgSuccess('移除成功')
-          await loadGroupMembers()
-          memberTableRef.value?.clearSelection()
-        },
-      )
+      const relationIds = batchSelectedMembers.value.map(({ user_group_relation_id }) => user_group_relation_id)
+      return ChatGroupsApi.postRemoveChatUserGroupMembers(currentGroup.value!.id, relationIds).then(async () => {
+        MsgSuccess('移除成功')
+        await loadGroupMembers()
+        memberTableRef.value?.clearSelection()
+      })
     })
     .catch(() => {})
     .finally(() => {
@@ -148,11 +140,7 @@ onMounted(() => loadChatUserGroups())
           </el-button>
         </el-tooltip>
       </component>
-      <MkSearchList
-        :data="chatUserGroups"
-        :default-active="currentGroup?.id"
-        @click="handleGroupSelect"
-      >
+      <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleGroupSelect">
         <template #action-dropdown="{ row }">
           <MkDropdownItem @click="handleOpenGroupDialog(row)">
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
@@ -204,11 +192,7 @@ onMounted(() => loadChatUserGroups())
           <el-table-column prop="username" label="用户名" show-overflow-tooltip />
           <el-table-column prop="source" label="用户来源">
             <template #default="{ row }">
-              {{
-                row.source === LOGIN_METHOD.LOCAL
-                  ? '系统用户'
-                  : LOGIN_METHOD_LABELS[row.source as LoginMethod]
-              }}
+              {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
             </template>
           </el-table-column>
           <el-table-column label="操作" width="70" fixed="right">
@@ -230,9 +214,5 @@ onMounted(() => loadChatUserGroups())
   </MkViewLayout>
 
   <CreateOrUpdateGroupDialog ref="groupDialogRef" @refresh="loadChatUserGroups" />
-  <CreateGroupMemberDialog
-    ref="memberDialogRef"
-    :current-group="currentGroup"
-    @refresh="loadGroupMembers(true)"
-  />
+  <CreateGroupMemberDialog ref="memberDialogRef" :current-group="currentGroup" @refresh="loadGroupMembers(true)" />
 </template>

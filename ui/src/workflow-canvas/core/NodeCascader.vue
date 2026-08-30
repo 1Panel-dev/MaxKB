@@ -10,55 +10,26 @@ import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowNodeCascader', inheritAttrs: false })
 
-type WorkflowGraphModel = WorkflowNodeModel['graphModel'] & {
-  getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[]
-}
+type WorkflowGraphModel = WorkflowNodeModel['graphModel'] & { getUpNodeFieldList?: (containSelf: boolean, useCache: boolean) => WorkflowNodeField[] }
 
-const props = withDefaults(
-  defineProps<{
-    global?: boolean
-    modelValue: string[]
-    nodeModel: BaseNodeModel
-  }>(),
-  { global: false },
-)
+const props = withDefaults(defineProps<{ global?: boolean; modelValue: string[]; nodeModel: BaseNodeModel }>(), { global: false })
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string[]]
-}>()
+const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
 
 const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
 const options = ref<WorkflowNodeField[]>([])
 
-const selectedValue = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
-})
+const selectedValue = computed({ get: () => props.modelValue, set: (value) => emit('update:modelValue', value) })
 
 const getOptionsValue = () => {
-  if (
-    [WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop, WorkflowMode.ToolLoop].includes(
-      workflowMode,
-    )
-  ) {
+  if ([WorkflowMode.ApplicationLoop, WorkflowMode.KnowledgeLoop, WorkflowMode.ToolLoop].includes(workflowMode)) {
     return props.global
-      ? getUpNodeFieldList(false, true).filter(
-          (field) =>
-            ['global', 'chat', 'output', 'loop'].includes(field.value) &&
-            Boolean(field.children?.length),
-        )
+      ? getUpNodeFieldList(false, true).filter((field) => ['global', 'chat', 'output', 'loop'].includes(field.value) && Boolean(field.children?.length))
       : getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
   } else {
     return props.global
-      ? props.nodeModel
-          .getUpNodeFieldList(false, true)
-          .filter(
-            (field) =>
-              ['global', 'chat', 'output'].includes(field.value) && Boolean(field.children?.length),
-          )
-      : props.nodeModel
-          .getUpNodeFieldList(false, true)
-          .filter((field) => Boolean(field.children?.length))
+      ? props.nodeModel.getUpNodeFieldList(false, true).filter((field) => ['global', 'chat', 'output'].includes(field.value) && Boolean(field.children?.length))
+      : props.nodeModel.getUpNodeFieldList(false, true).filter((field) => Boolean(field.children?.length))
   }
 }
 
@@ -92,25 +63,10 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-cascader
-    v-model="selectedValue"
-    v-bind="$attrs"
-    :options="options"
-    :teleported="false"
-    clearable
-    separator=" > "
-    @visible-change="refreshOptions"
-    @wheel.stop
-  >
+  <el-cascader v-model="selectedValue" v-bind="$attrs" :options="options" :teleported="false" clearable separator=" > " @visible-change="refreshOptions" @wheel.stop>
     <template #default="{ data }">
       <span class="flex align-center" @wheel="handleNodeWheel">
-        <component
-          :is="iconComponent(`${data.type}-icon`)"
-          class="mr-8"
-          :size="18"
-          :item="data"
-          style="--el-avatar-border-radius: 6px"
-        />{{ data.label }}</span
+        <component :is="iconComponent(`${data.type}-icon`)" class="mr-8" :size="18" :item="data" style="--el-avatar-border-radius: 6px" />{{ data.label }}</span
       >
     </template>
   </el-cascader>

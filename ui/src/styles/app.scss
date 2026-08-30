@@ -140,12 +140,7 @@ h6 {
   }
 
   &:hover {
-    scrollbar-color: color-mix(
-        in srgb,
-        var(--el-scrollbar-bg-color) calc(var(--el-scrollbar-opacity) * 100%),
-        transparent
-      )
-      transparent;
+    scrollbar-color: color-mix(in srgb, var(--el-scrollbar-bg-color) calc(var(--el-scrollbar-opacity) * 100%), transparent) transparent;
   }
 
   &:hover::-webkit-scrollbar-thumb {
@@ -207,6 +202,11 @@ h6 {
   display: grid;
   gap: 16px;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}
+.mk-resource-card-grid-sm {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
 // radio-group 垂直排列

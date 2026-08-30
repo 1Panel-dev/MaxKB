@@ -6,10 +6,7 @@ import type { CascaderNode, CascaderOption, CascaderProps } from 'element-plus'
 
 defineOptions({ name: 'UserGroupSetting' })
 
-const props = defineProps<{
-  workspaceIds: string[]
-  workspaceOptions: ListItem[]
-}>()
+const props = defineProps<{ workspaceIds: string[]; workspaceOptions: ListItem[] }>()
 
 const userGroupIds = defineModel<string[] | undefined>({ required: true })
 
@@ -28,17 +25,11 @@ const cascaderProps: CascaderProps = {
 }
 
 function getWorkspaceUserGroups(workspaceId: string) {
-  return UserGroupsApi.getSystemUserGroups(workspaceId).then((userGroups) =>
-    userGroups.map((userGroup) => ({ ...userGroup, leaf: true })),
-  )
+  return UserGroupsApi.getSystemUserGroups(workspaceId).then((userGroups) => userGroups.map((userGroup) => ({ ...userGroup, leaf: true })))
 }
 
 // 展开级联第一列时，按工作空间异步加载第二列用户组。
-function loadWorkspaceUserGroups(
-  node: CascaderNode,
-  resolve: (options: CascaderOption[]) => void,
-  reject: () => void,
-) {
+function loadWorkspaceUserGroups(node: CascaderNode, resolve: (options: CascaderOption[]) => void, reject: () => void) {
   if (node.level !== 1) {
     resolve([])
     return
@@ -55,42 +46,23 @@ function refreshUserGroupOptions() {
     return
   }
 
-  const preloadRequest = userGroupIds.value?.length
-    ? Promise.all(props.workspaceIds.map(getWorkspaceUserGroups))
-    : Promise.resolve([])
+  const preloadRequest = userGroupIds.value?.length ? Promise.all(props.workspaceIds.map(getWorkspaceUserGroups)) : Promise.resolve([])
 
   preloadRequest.then((workspaceUserGroups) => {
     userGroupOptions.value = props.workspaceOptions
       .filter(({ id }) => props.workspaceIds.includes(id))
-      .map((workspace) => ({
-        ...workspace,
-        children: workspaceUserGroups[props.workspaceIds.indexOf(workspace.id)],
-        leaf: false,
-      }))
+      .map((workspace) => ({ ...workspace, children: workspaceUserGroups[props.workspaceIds.indexOf(workspace.id)], leaf: false }))
 
     const availableUserGroupIds = workspaceUserGroups.flat().map(({ id }) => String(id))
-    userGroupIds.value = (userGroupIds.value ?? []).filter((id) =>
-      availableUserGroupIds.includes(id),
-    )
+    userGroupIds.value = (userGroupIds.value ?? []).filter((id) => availableUserGroupIds.includes(id))
   })
 }
 
-watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroupOptions, {
-  deep: true,
-  immediate: true,
-})
+watch([() => props.workspaceIds, () => props.workspaceOptions], refreshUserGroupOptions, { deep: true, immediate: true })
 </script>
 
 <template>
   <el-form-item>
-    <el-cascader
-      v-model="userGroupIds"
-      class="w-full"
-      :options="userGroupOptions"
-      :props="cascaderProps"
-      :show-all-levels="false"
-      clearable
-      placeholder="请选择用户组"
-    />
+    <el-cascader v-model="userGroupIds" class="w-full" :options="userGroupOptions" :props="cascaderProps" :show-all-levels="false" clearable placeholder="请选择用户组" />
   </el-form-item>
 </template>

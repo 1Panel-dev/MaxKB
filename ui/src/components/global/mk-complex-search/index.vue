@@ -11,15 +11,8 @@ interface ComplexSearchField extends OptionItem<string> {
 
 type SearchValue = boolean | number | string
 
-const props = withDefaults(
-  defineProps<{
-    fields: ComplexSearchField[]
-  }>(),
-  {},
-)
-const emit = defineEmits<{
-  change: [value: Record<string, SearchValue | SearchValue[]> | undefined]
-}>()
+const props = withDefaults(defineProps<{ fields: ComplexSearchField[] }>(), {})
+const emit = defineEmits<{ change: [value: Record<string, SearchValue | SearchValue[]> | undefined] }>()
 
 // 异步搜索
 const remoteLoading = ref(false)
@@ -46,9 +39,7 @@ const searchValue = ref<SearchValue | SearchValue[]>(props.fields[0]?.multiple ?
 const activeField = computed(() => props.fields.find(({ value }) => value === searchField.value))
 
 function handleFieldChange() {
-  const shouldClearSearch = Array.isArray(searchValue.value)
-    ? searchValue.value.length > 0
-    : searchValue.value !== ''
+  const shouldClearSearch = Array.isArray(searchValue.value) ? searchValue.value.length > 0 : searchValue.value !== ''
   remoteRequestId += 1
   remoteLoading.value = false
   searchValue.value = activeField.value?.multiple ? [] : ''
@@ -66,18 +57,8 @@ function handleChange() {
 
 <template>
   <div class="mk-complex-search flex">
-    <el-select
-      v-model="searchField"
-      class="mk-complex-search__field w-26!"
-      @change="handleFieldChange"
-      :persistent="false"
-    >
-      <el-option
-        v-for="field in fields"
-        :key="field.value"
-        :label="field.label"
-        :value="field.value"
-      />
+    <el-select v-model="searchField" class="mk-complex-search__field w-26!" @change="handleFieldChange" :persistent="false">
+      <el-option v-for="field in fields" :key="field.value" :label="field.label" :value="field.value" />
     </el-select>
 
     <el-select
@@ -98,24 +79,10 @@ function handleChange() {
       @change="handleChange"
       :persistent="false"
     >
-      <el-option
-        v-for="(option, index) in activeField.options ?? []"
-        :key="index"
-        :disabled="option.disabled"
-        :label="option.label"
-        :value="option.value"
-      />
+      <el-option v-for="(option, index) in activeField.options ?? []" :key="index" :disabled="option.disabled" :label="option.label" :value="option.value" />
     </el-select>
 
-    <el-input
-      v-else
-      :key="activeField?.value"
-      v-model="searchValue"
-      class="mk-complex-search__value w-50!"
-      clearable
-      placeholder="请输入"
-      @change="handleChange"
-    />
+    <el-input v-else :key="activeField?.value" v-model="searchValue" class="mk-complex-search__value w-50!" clearable placeholder="请输入" @change="handleChange" />
   </div>
 </template>
 

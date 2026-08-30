@@ -25,12 +25,7 @@ const nodeCascaderRef = useTemplateRef<InstanceType<typeof NodeCascader>>('nodeC
 const formData = computed<ReplyNodeForm>({
   get: () => {
     if (!model.properties.node_data) {
-      model.properties.node_data = {
-        content: '',
-        fields: [],
-        is_result: true,
-        reply_type: 'content',
-      }
+      model.properties.node_data = { content: '', fields: [], is_result: true, reply_type: 'content' }
     }
     return model.properties.node_data as ReplyNodeForm
   },
@@ -38,12 +33,9 @@ const formData = computed<ReplyNodeForm>({
 })
 
 function validate() {
-  return Promise.all([
-    formData.value.reply_type === 'referencing'
-      ? nodeCascaderRef.value?.validate()
-      : Promise.resolve(),
-    formRef.value?.validate(),
-  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
+  return Promise.all([formData.value.reply_type === 'referencing' ? nodeCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
+    Promise.reject({ node: model, errMessage: error }),
+  )
 }
 
 onMounted(() => {
@@ -68,14 +60,7 @@ onMounted(() => {
           </div>
         </template>
 
-        <NodeCascader
-          v-if="formData.reply_type === 'referencing'"
-          ref="nodeCascaderRef"
-          v-model="formData.fields"
-          :node-model="model"
-          class="w-full"
-          placeholder="请选择变量"
-        />
+        <NodeCascader v-if="formData.reply_type === 'referencing'" ref="nodeCascaderRef" v-model="formData.fields" :node-model="model" class="w-full" placeholder="请选择变量" />
         <el-input v-else v-model="formData.content" :rows="5" type="textarea" />
       </el-form-item>
 

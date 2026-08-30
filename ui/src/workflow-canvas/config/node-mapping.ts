@@ -3,11 +3,7 @@ import type { ToolType } from '@/api/types'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import * as NodeData from './node-data'
 interface WorkflowModelNode {
-  properties?: {
-    node_data?: {
-      tool_type?: ToolType
-    }
-  }
+  properties?: { node_data?: { tool_type?: ToolType } }
   type: WorkflowNodeType
 }
 type WorkflowNodeMatcher = (node: unknown) => boolean
@@ -15,21 +11,15 @@ export const workflowModelDict: Record<WorkflowMode, WorkflowNodeMatcher> = {
   [WorkflowMode.Application]: (value) => {
     const node = value as WorkflowModelNode
     return (
-      [
-        WorkflowNodeType.Application,
-        WorkflowNodeType.ToolWorkflowLib,
-        WorkflowNodeType.ToolLib,
-      ].includes(node.type) && node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
+      [WorkflowNodeType.Application, WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
     )
   },
   [WorkflowMode.ApplicationLoop]: (value) => {
     const node = value as WorkflowModelNode
     return (
-      [
-        WorkflowNodeType.Application,
-        WorkflowNodeType.ToolWorkflowLib,
-        WorkflowNodeType.ToolLib,
-      ].includes(node.type) && node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
+      [WorkflowNodeType.Application, WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) &&
+      node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
     )
   },
   [WorkflowMode.Knowledge]: (value) => {
@@ -38,24 +28,15 @@ export const workflowModelDict: Record<WorkflowMode, WorkflowNodeMatcher> = {
   },
   [WorkflowMode.KnowledgeLoop]: (value) => {
     const node = value as WorkflowModelNode
-    return (
-      [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) &&
-      node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
-    )
+    return [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) && node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
   },
   [WorkflowMode.Tool]: (value) => {
     const node = value as WorkflowModelNode
-    return (
-      [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) &&
-      node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
-    )
+    return [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) && node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
   },
   [WorkflowMode.ToolLoop]: (value) => {
     const node = value as WorkflowModelNode
-    return (
-      [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) &&
-      node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
-    )
+    return [WorkflowNodeType.ToolWorkflowLib, WorkflowNodeType.ToolLib].includes(node.type) && node?.properties?.node_data?.tool_type !== TOOL_TYPE.DATA_SOURCE
   },
 }
 export const nodeDict: Partial<Record<WorkflowNodeType, Record<string, any>>> = {
@@ -100,9 +81,7 @@ export const nodeDict: Partial<Record<WorkflowNodeType, Record<string, any>>> = 
   [WorkflowNodeType.ToolBaseNode]: NodeData.toolBaseNode,
   [WorkflowNodeType.ToolStartNode]: NodeData.toolStartNode,
 }
-export const BasicComponentsNode: Partial<
-  Record<WorkflowNodeType, typeof NodeData.aiChatNode | typeof NodeData.replyNode>
-> = {
+export const BasicComponentsNode: Partial<Record<WorkflowNodeType, typeof NodeData.aiChatNode | typeof NodeData.replyNode>> = {
   [WorkflowNodeType.AiChat]: NodeData.aiChatNode,
   [WorkflowNodeType.Reply]: NodeData.replyNode,
 }

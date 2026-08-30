@@ -6,9 +6,7 @@ import ChatUserApi from '@/api/admin/system/chat-user/chat-user'
 import type { ChatUserBase, ListItem } from '@/api/types'
 import { MsgSuccess } from '@/utils/message'
 
-const props = defineProps<{
-  currentGroup?: ListItem
-}>()
+const props = defineProps<{ currentGroup?: ListItem }>()
 const emit = defineEmits<{ refresh: [] }>()
 
 const visible = ref(false)
@@ -17,9 +15,7 @@ const optionsLoading = ref(false)
 const formRef = ref<FormInstance>()
 const userOptions = ref<ChatUserBase[]>([])
 const memberForm = reactive<{ userIds: string[] }>({ userIds: [] })
-const formRules: FormRules = {
-  userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }],
-}
+const formRules: FormRules = { userIds: [{ required: true, message: '请选择对话用户', trigger: 'change' }] }
 
 function open() {
   visible.value = true
@@ -68,22 +64,8 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" :rules="formRules" label-position="top">
       <el-form-item label="对话用户" prop="userIds">
-        <el-select
-          v-model="memberForm.userIds"
-          class="w-full"
-          filterable
-          multiple
-          collapse-tags
-          collapse-tags-tooltip
-          :loading="optionsLoading"
-          placeholder="请选择用户名或姓名"
-        >
-          <el-option
-            v-for="user in userOptions"
-            :key="user.id"
-            :label="user.nick_name"
-            :value="user.id"
-          />
+        <el-select v-model="memberForm.userIds" class="w-full" filterable multiple collapse-tags collapse-tags-tooltip :loading="optionsLoading" placeholder="请选择用户名或姓名">
+          <el-option v-for="user in userOptions" :key="user.id" :label="user.nick_name" :value="user.id" />
         </el-select>
       </el-form-item>
     </el-form>

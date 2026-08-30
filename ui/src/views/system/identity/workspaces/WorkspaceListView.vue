@@ -9,8 +9,7 @@ import AddMemberDrawer from './AddMemberDrawer.vue'
 import CreateOrUpdateWorkspaceDialog from './dialog/CreateOrUpdateWorkspaceDialog.vue'
 
 /* 添加工作空间表单dialog */
-const workspaceDialogRef =
-  useTemplateRef<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>('workspaceDialogRef')
+const workspaceDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateWorkspaceDialog>>('workspaceDialogRef')
 
 function handleOpenWorkspaceDialog(workspace?: WorkspaceItem) {
   workspaceDialogRef.value?.open(workspace)
@@ -26,8 +25,7 @@ function loadWorkspaceOptions(preferredWorkspaceId?: string) {
   return WorkspaceApi.getSystemWorkspaceList()
     .then((workspaces) => {
       workspacesList.value = workspaces
-      currentWorkspace.value =
-        workspaces.find(({ id }) => id === preferredWorkspaceId) ?? workspaces[0]
+      currentWorkspace.value = workspaces.find(({ id }) => id === preferredWorkspaceId) ?? workspaces[0]
       paginationConfig.value.currentPage = 1
       return loadWorkspaceMembers()
     })
@@ -48,10 +46,7 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
 
   WorkspaceApi.getWorkspaceDeleteCheck(workspace.id)
     .then(() =>
-      MsgConfirm(
-        `确认删除${workspace.name}？`,
-        '删除后，该空间下的成员都会被移除，请谨慎操作。',
-      ).then(() => {
+      MsgConfirm(`确认删除${workspace.name}？`, '删除后，该空间下的成员都会被移除，请谨慎操作。').then(() => {
         workspaceLoading.value = true
         return WorkspaceApi.deleteWorkspace(workspace.id as string).then(() => {
           MsgSuccess('删除成功')
@@ -67,11 +62,7 @@ function handleWorkspaceDelete(workspace: WorkspaceItem) {
 
 /* 成员列表相关 */
 const workspaceMembersLoading = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
@@ -92,11 +83,7 @@ function loadWorkspaceMembers() {
     return Promise.resolve()
   }
   workspaceMembersLoading.value = true
-  return WorkspaceApi.getWorkspaceMemberList(
-    workspaceId,
-    paginationConfig.value,
-    memberSearchQuery.value,
-  )
+  return WorkspaceApi.getWorkspaceMemberList(workspaceId, paginationConfig.value, memberSearchQuery.value)
     .then((res) => {
       workspaceMembers.value = res.records
       paginationConfig.value.total = res.total
@@ -107,18 +94,8 @@ function loadWorkspaceMembers() {
 }
 
 /** 同一用户的选择框、姓名和用户名按连续记录合并。 */
-function objectSpanMethod({
-  column,
-  row,
-  rowIndex,
-}: {
-  row: WorkspaceMemberItem
-  column: TableColumnCtx<WorkspaceMemberItem>
-  rowIndex: number
-  columnIndex: number
-}) {
-  const shouldMerge =
-    column.type === 'selection' || column.property === 'nick_name' || column.property === 'username'
+function objectSpanMethod({ column, row, rowIndex }: { row: WorkspaceMemberItem; column: TableColumnCtx<WorkspaceMemberItem>; rowIndex: number; columnIndex: number }) {
+  const shouldMerge = column.type === 'selection' || column.property === 'nick_name' || column.property === 'username'
   if (!shouldMerge) return
 
   const userId = row.user_id
@@ -134,8 +111,7 @@ function getWorkspaceMemberRowKey(member: WorkspaceMemberItem) {
 }
 
 /* 添加成员drawer */
-const addMemberDrawerRef =
-  useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
+const addMemberDrawerRef = useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
 
 function handleOpenAddMemberDrawer() {
   addMemberDrawerRef.value?.open()
@@ -149,12 +125,10 @@ function handleRemoveMember(member: WorkspaceMemberItem) {
   MsgConfirm(`是否移除成员：${member.nick_name}？`)
     .then(() => {
       workspaceMembersLoading.value = true
-      return WorkspaceApi.postRemoveWorkspaceMember(workspaceId, member.user_relation_id).then(
-        () => {
-          MsgSuccess('移除成功')
-          return loadWorkspaceMembers()
-        },
-      )
+      return WorkspaceApi.postRemoveWorkspaceMember(workspaceId, member.user_relation_id).then(() => {
+        MsgSuccess('移除成功')
+        return loadWorkspaceMembers()
+      })
     })
     .catch(() => {})
     .finally(() => {
@@ -207,11 +181,7 @@ onMounted(() => loadWorkspaceOptions())
           </el-button>
         </el-tooltip>
       </component>
-      <MkSearchList
-        :data="workspacesList"
-        :default-active="currentWorkspace?.id"
-        @click="handleWorkspaceSelect"
-      >
+      <MkSearchList :data="workspacesList" :default-active="currentWorkspace?.id" @click="handleWorkspaceSelect">
         <template #action-dropdown="{ row: workspace }">
           <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
             <template #icon>
@@ -290,9 +260,5 @@ onMounted(() => loadWorkspaceOptions())
     </template>
   </MkViewLayout>
   <CreateOrUpdateWorkspaceDialog ref="workspaceDialogRef" @refresh="loadWorkspaceOptions" />
-  <AddMemberDrawer
-    ref="addMemberDrawerRef"
-    :current-workspace="currentWorkspace"
-    @refresh="loadWorkspaceOptions"
-  />
+  <AddMemberDrawer ref="addMemberDrawerRef" :current-workspace="currentWorkspace" @refresh="loadWorkspaceOptions" />
 </template>

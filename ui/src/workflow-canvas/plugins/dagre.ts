@@ -2,21 +2,9 @@ import type LogicFlow from '@logicflow/core'
 import type { BaseEdgeModel, BaseNodeModel } from '@logicflow/core'
 import { DagreLayout, type DagreLayoutOptions } from '@antv/layout'
 
-type DagreNodeData = {
-  id: string
-  model: BaseNodeModel
-  size: {
-    height: number
-    width: number
-  }
-}
+type DagreNodeData = { id: string; model: BaseNodeModel; size: { height: number; width: number } }
 
-type DagreEdgeData = {
-  id: string
-  model: BaseEdgeModel
-  source: string
-  target: string
-}
+type DagreEdgeData = { id: string; model: BaseEdgeModel; source: string; target: string }
 
 export default class Dagre {
   static pluginName = 'dagre'
@@ -62,20 +50,8 @@ export default class Dagre {
 
     const layoutInstance = new DagreLayout(layoutOptions)
     await layoutInstance.execute({
-      nodes: nodes.map<DagreNodeData>((node) => ({
-        id: node.id,
-        size: {
-          width: node.width,
-          height: node.height,
-        },
-        model: node,
-      })),
-      edges: edges.map<DagreEdgeData>((edge) => ({
-        id: edge.id,
-        source: edge.sourceNodeId,
-        target: edge.targetNodeId,
-        model: edge,
-      })),
+      nodes: nodes.map<DagreNodeData>((node) => ({ id: node.id, size: { width: node.width, height: node.height }, model: node })),
+      edges: edges.map<DagreEdgeData>((edge) => ({ id: edge.id, source: edge.sourceNodeId, target: edge.targetNodeId, model: edge })),
     })
     layoutInstance.forEachNode((node) => {
       const { model } = node._original as DagreNodeData

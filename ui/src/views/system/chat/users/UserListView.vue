@@ -30,11 +30,7 @@ function handleOpenImportUsersDialog() {
 /* 列表查询相关 */
 const userTableRef = useTemplateRef('userTableRef')
 const chatUsersLoading = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const chatUsersData = ref<ChatUser[]>([])
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
@@ -50,10 +46,7 @@ const searchFields: OptionItem<string>[] = [
   {
     label: '用户来源',
     value: 'source',
-    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({
-      label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label,
-      value,
-    })),
+    options: Object.entries(LOGIN_METHOD_LABELS).map(([value, label]) => ({ label: value === LOGIN_METHOD.LOCAL ? '本地创建' : label, value })),
   },
 ]
 const chatUserQuery = ref<Dict<unknown>>()
@@ -105,9 +98,7 @@ function handleOpenQuotaSettingsDialog(chatUser: ChatUser) {
 function handleChangeStatus(user: ChatUser) {
   const nextActive = !user.is_active
 
-  return ChatUserApi.putChatUser(user.id, {
-    is_active: nextActive,
-  })
+  return ChatUserApi.putChatUser(user.id, { is_active: nextActive })
     .then(() => {
       MsgSuccess(nextActive ? '启用成功' : '禁用成功')
       return true
@@ -225,11 +216,7 @@ onMounted(() => loadChatUsers())
 
         <el-table-column label="用户来源" width="120">
           <template #default="{ row }">
-            {{
-              row.source === LOGIN_METHOD.LOCAL
-                ? '本地创建'
-                : LOGIN_METHOD_LABELS[row.source as LoginMethod]
-            }}
+            {{ row.source === LOGIN_METHOD.LOCAL ? '本地创建' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
           </template>
         </el-table-column>
 
@@ -254,11 +241,7 @@ onMounted(() => loadChatUsers())
           <template #default="{ row }">
             <div class="flex items-center gap-3">
               <span @click.stop>
-                <el-switch
-                  v-model="row.is_active"
-                  size="small"
-                  :before-change="() => handleChangeStatus(row)"
-                />
+                <el-switch v-model="row.is_active" size="small" :before-change="() => handleChangeStatus(row)" />
               </span>
               <el-divider direction="vertical" />
               <div class="flex">
@@ -293,12 +276,8 @@ onMounted(() => loadChatUsers())
         </el-table-column>
 
         <template #footer-batch-actions>
-          <el-button type="primary" plain @click="openBatchSetUserGroupDialog">
-            设置用户组
-          </el-button>
-          <el-button type="primary" plain @click="openBatchQuotaSettingsDialog">
-            配额设置
-          </el-button>
+          <el-button type="primary" plain @click="openBatchSetUserGroupDialog"> 设置用户组 </el-button>
+          <el-button type="primary" plain @click="openBatchQuotaSettingsDialog"> 配额设置 </el-button>
           <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>

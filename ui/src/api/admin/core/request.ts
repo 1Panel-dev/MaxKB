@@ -1,11 +1,6 @@
 /** 提供 Admin API 的 Axios 实例与常用 HTTP 请求封装。 */
 
-import axios, {
-  AxiosHeaders,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  type InternalAxiosRequestConfig,
-} from 'axios'
+import axios, { AxiosHeaders, type AxiosRequestConfig, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
 import router from '@/router/admin'
 import { useStore } from '@/stores'
 import type { ApiResponse, LoadingTarget } from './types'
@@ -98,11 +93,7 @@ async function getResponseErrorMessage(error: unknown) {
   return responseData?.message
 }
 
-async function downloadExportResponse(
-  response: AxiosResponse<Blob>,
-  fileName: string,
-  mimeType = 'application/octet-stream',
-) {
+async function downloadExportResponse(response: AxiosResponse<Blob>, fileName: string, mimeType = 'application/octet-stream') {
   if (response.data.type.includes('application/json')) {
     const text = await response.data.text()
     try {
@@ -123,11 +114,7 @@ async function downloadExportResponse(
   return true
 }
 
-export const request = axios.create({
-  baseURL: `${ADMIN_BASE_PATH.replace(/\/+$/, '')}/api`,
-  timeout: DEFAULT_TIMEOUT,
-  withCredentials: false,
-})
+export const request = axios.create({ baseURL: `${ADMIN_BASE_PATH.replace(/\/+$/, '')}/api`, timeout: DEFAULT_TIMEOUT, withCredentials: false })
 
 request.interceptors.request.use(setRequestHeaders)
 
@@ -151,8 +138,7 @@ request.interceptors.response.use(
     const requestUrl = error.config?.url ?? ''
     const status = error.response?.status
     const responseMessage = await getResponseErrorMessage(error)
-    const skipGlobalErrorMessage = (error.config as ExportRequestConfig | undefined)
-      ?.skipGlobalErrorMessage
+    const skipGlobalErrorMessage = (error.config as ExportRequestConfig | undefined)?.skipGlobalErrorMessage
 
     if (error.code === 'ECONNABORTED') {
       MsgError(error.message)
@@ -169,11 +155,7 @@ request.interceptors.response.use(
     if (status === 403) {
       MsgError(responseMessage || 'No permission to access')
     }
-    if (
-      error.code !== 'ECONNABORTED' &&
-      ![401, 403, 404].includes(status ?? 0) &&
-      !skipGlobalErrorMessage
-    ) {
+    if (error.code !== 'ECONNABORTED' && ![401, 403, 404].includes(status ?? 0) && !skipGlobalErrorMessage) {
       MsgError(responseMessage || error.message)
     }
 
@@ -184,10 +166,7 @@ request.interceptors.response.use(
 /**
  * 统一解包标准 API 响应，并同步可选的 loading 状态。
  */
-export async function promise<T>(
-  requestPromise: Promise<AxiosResponse<ApiResponse<T>>>,
-  loading?: LoadingTarget,
-) {
+export async function promise<T>(requestPromise: Promise<AxiosResponse<ApiResponse<T>>>, loading?: LoadingTarget) {
   startLoading(loading)
   try {
     const response = await requestPromise
@@ -198,33 +177,15 @@ export async function promise<T>(
 }
 
 /** 发送 GET 请求。 */
-export function get<T = unknown>(
-  url: string,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-  timeout?: number,
-) {
+export function get<T = unknown>(url: string, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
   return promise<T>(request.get<ApiResponse<T>>(url, { params, timeout }), loading)
 }
 
 /** 发送指定方法的 Blob 请求并触发浏览器下载。 */
-export async function downloadRequest(
-  url: string,
-  method: string,
-  data?: unknown,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-): Promise<boolean> {
+export async function downloadRequest(url: string, method: string, data?: unknown, params?: Dict<unknown>, loading?: LoadingTarget): Promise<boolean> {
   startLoading(loading)
   try {
-    const response = await request.request<Blob>({
-      url,
-      method,
-      data,
-      params,
-      responseType: 'blob',
-      skipGlobalErrorMessage: true,
-    } as ExportRequestConfig)
+    const response = await request.request<Blob>({ url, method, data, params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
 
     return downloadExportResponse(response, 'download')
   } finally {
@@ -233,19 +194,10 @@ export async function downloadRequest(
 }
 
 /** 发送 GET 请求并将 Blob 响应下载为文件。 */
-export async function getExportFile(
-  fileName: string,
-  url: string,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-): Promise<boolean> {
+export async function getExportFile(fileName: string, url: string, params?: Dict<unknown>, loading?: LoadingTarget): Promise<boolean> {
   startLoading(loading)
   try {
-    const response = await request.get<Blob>(url, {
-      params,
-      responseType: 'blob',
-      skipGlobalErrorMessage: true,
-    } as ExportRequestConfig)
+    const response = await request.get<Blob>(url, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
 
     return downloadExportResponse(response, fileName)
   } finally {
@@ -254,20 +206,10 @@ export async function getExportFile(
 }
 
 /** 发送 POST 请求并将 Blob 响应下载为 Excel 文件。 */
-export async function postExportExcel<TData = unknown>(
-  fileName: string,
-  url: string,
-  params?: Dict<unknown>,
-  data?: TData,
-  loading?: LoadingTarget,
-): Promise<boolean> {
+export async function postExportExcel<TData = unknown>(fileName: string, url: string, params?: Dict<unknown>, data?: TData, loading?: LoadingTarget): Promise<boolean> {
   startLoading(loading)
   try {
-    const response = await request.post<Blob>(url, data, {
-      params,
-      responseType: 'blob',
-      skipGlobalErrorMessage: true,
-    } as ExportRequestConfig)
+    const response = await request.post<Blob>(url, data, { params, responseType: 'blob', skipGlobalErrorMessage: true } as ExportRequestConfig)
 
     return downloadExportResponse(response, fileName, 'application/vnd.ms-excel')
   } finally {
@@ -276,35 +218,17 @@ export async function postExportExcel<TData = unknown>(
 }
 
 /** 发送 POST 请求。 */
-export function post<TData = unknown, T = unknown>(
-  url: string,
-  data?: TData,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-  timeout?: number,
-) {
+export function post<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
   return promise<T>(request.post<ApiResponse<T>>(url, data, { params, timeout }), loading)
 }
 
 /** 发送 PUT 请求。 */
-export function put<TData = unknown, T = unknown>(
-  url: string,
-  data?: TData,
-  params?: Dict<unknown>,
-  loading?: LoadingTarget,
-  timeout?: number,
-) {
+export function put<TData = unknown, T = unknown>(url: string, data?: TData, params?: Dict<unknown>, loading?: LoadingTarget, timeout?: number) {
   return promise<T>(request.put<ApiResponse<T>>(url, data, { params, timeout }), loading)
 }
 
 /** 发送 DELETE 请求。 */
-export function del<TData = unknown, T = unknown>(
-  url: string,
-  params?: Dict<unknown>,
-  data?: TData,
-  loading?: LoadingTarget,
-  timeout?: number,
-) {
+export function del<TData = unknown, T = unknown>(url: string, params?: Dict<unknown>, data?: TData, loading?: LoadingTarget, timeout?: number) {
   return promise<T>(request.delete<ApiResponse<T>>(url, { params, data, timeout }), loading)
 }
 

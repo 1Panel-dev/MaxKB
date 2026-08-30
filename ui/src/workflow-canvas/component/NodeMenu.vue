@@ -7,9 +7,7 @@ import { WorkflowNodeType } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'NodeMenu' })
 
-const emit = defineEmits<{
-  select: [nodeType: WorkflowNodeType]
-}>()
+const emit = defineEmits<{ select: [nodeType: WorkflowNodeType] }>()
 
 type WorkflowComponentTab = 'basic' | 'tool' | 'application'
 
@@ -23,24 +21,9 @@ const workflowComponentTabs: Array<{ label: string; value: WorkflowComponentTab 
 ]
 
 const workflowComponentOptions = [
-  {
-    icon: aiChatIcon,
-    iconClass: 'bg-primary-gradient',
-    label: 'AI 对话',
-    value: WorkflowNodeType.AiChat,
-  },
-  {
-    icon: replyIcon,
-    iconClass: 'bg-warning',
-    label: '指定回复',
-    value: WorkflowNodeType.Reply,
-  },
-] satisfies Array<{
-  icon: string
-  iconClass: string
-  label: string
-  value: WorkflowNodeType
-}>
+  { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: 'AI 对话', value: WorkflowNodeType.AiChat },
+  { icon: replyIcon, iconClass: 'bg-warning', label: '指定回复', value: WorkflowNodeType.Reply },
+] satisfies Array<{ icon: string; iconClass: string; label: string; value: WorkflowNodeType }>
 
 const filteredComponentOptions = computed(() => {
   if (activeTab.value !== 'basic') return []
@@ -48,19 +31,12 @@ const filteredComponentOptions = computed(() => {
   const keyword = searchKeyword.value.trim().toLocaleLowerCase()
   if (!keyword) return workflowComponentOptions
 
-  return workflowComponentOptions.filter((componentOption) =>
-    componentOption.label.toLocaleLowerCase().includes(keyword),
-  )
+  return workflowComponentOptions.filter((componentOption) => componentOption.label.toLocaleLowerCase().includes(keyword))
 })
 </script>
 
 <template>
-  <div
-    class="w-[402px] overflow-hidden rounded-md border border-N300 bg-white shadow-lg"
-    @click.stop
-    @mousedown.stop
-    @mousemove.stop
-  >
+  <div class="w-[402px] overflow-hidden rounded-md border border-N300 bg-white shadow-lg" @click.stop @mousedown.stop @mousemove.stop>
     <div class="flex h-11 items-stretch gap-7 border-b border-N300 px-4" role="tablist">
       <button
         v-for="componentTab in workflowComponentTabs"
@@ -73,10 +49,7 @@ const filteredComponentOptions = computed(() => {
         @click="activeTab = componentTab.value"
       >
         {{ componentTab.label }}
-        <span
-          v-if="activeTab === componentTab.value"
-          class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
-        />
+        <span v-if="activeTab === componentTab.value" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />
       </button>
     </div>
 
@@ -93,10 +66,7 @@ const filteredComponentOptions = computed(() => {
             class="flex h-10 items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary"
             @click="emit('select', componentOption.value)"
           >
-            <span
-              class="flex size-6 shrink-0 items-center justify-center rounded-md"
-              :class="componentOption.iconClass"
-            >
+            <span class="flex size-6 shrink-0 items-center justify-center rounded-md" :class="componentOption.iconClass">
               <img :src="componentOption.icon" alt="" class="size-4" />
             </span>
             <span>{{ componentOption.label }}</span>

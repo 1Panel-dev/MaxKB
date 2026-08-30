@@ -26,10 +26,4 @@ const getStoreApplicationList = (query?: Dict<unknown>) => {
   return get<unknown>('/workspace/store/application_template', query)
 }
 
-export default {
-  getInternalToolList,
-  getStoreApplicationList,
-  getStoreKnowledgeList,
-  getStoreToolList,
-  getStoreToolWorkflowList,
-}
+export default { getInternalToolList, getStoreApplicationList, getStoreKnowledgeList, getStoreToolList, getStoreToolWorkflowList }

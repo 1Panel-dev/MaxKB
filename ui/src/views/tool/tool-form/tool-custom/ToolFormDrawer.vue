@@ -7,25 +7,17 @@ import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ToolDebugDrawer from './ToolDebugDrawer.vue'
-import InitFieldTable from '../../components/init-field/InitFieldTable.vue'
-import InputFieldTable from '../../components/input-field/InputFieldTable.vue'
-import ToolCodeSetting from '../../components/python-code/CodeSetting.vue'
+import InitFieldTable from '../component/init-field/InitFieldTable.vue'
+import InputFieldTable from '../component/input-field/InputFieldTable.vue'
+import ToolCodeSetting from '../component/python-code/CodeSetting.vue'
 
 defineOptions({ name: 'ToolFormDrawer' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  api: typeof ToolApi
-  title: string
-  folderId: string
-}>()
+const props = defineProps<{ api: typeof ToolApi; title: string; folderId: string }>()
 
-const emit = defineEmits<{
-  closed: []
-  refresh: []
-  update: [tool: ToolItem]
-}>()
+const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
 interface ToolFormModel {
   desc: string
@@ -44,14 +36,7 @@ const formLoading = ref(false)
 const editId = ref<string>()
 const originalForm = ref('')
 
-const toolForm = reactive<ToolFormModel>({
-  name: '',
-  desc: '',
-  code: '',
-  icon: '',
-  init_field_list: [],
-  input_field_list: [],
-})
+const toolForm = reactive<ToolFormModel>({ name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [] })
 const formRules: FormRules<ToolFormModel> = {
   code: [{ required: true, message: '请输入工具内容', trigger: 'blur' }],
   name: [{ required: true, message: '请输入工具名称', trigger: 'blur' }],
@@ -65,9 +50,7 @@ function handleSubmit() {
     const payload: ToolPayload = cloneDeep(toolForm)
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : props.api.postTool({ ...payload, folder_id: props.folderId || null })
+    const request = currentEditId ? props.api.putTool(currentEditId, payload) : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
       .then((savedTool) => {
@@ -104,13 +87,12 @@ function fillToolForm(tool: ToolItem) {
 }
 
 function open(tool?: ToolItem, asCopy = false) {
-  resetData()
+  visible.value = true
   originalForm.value = JSON.stringify(toolForm)
   if (tool) {
     if (asCopy) {
       fillToolForm(tool)
       originalForm.value = JSON.stringify(toolForm)
-      visible.value = true
       return
     }
 
@@ -135,10 +117,7 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示？', '当前的更改尚未保存，确认退出吗？', {
-    confirmButtonText: '确认',
-    confirmButtonType: 'primary',
-  })
+  MsgConfirm('提示？', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
     .then(() => {
       visible.value = false
     })
@@ -146,14 +125,7 @@ function handleBeforeClose() {
 }
 
 function resetData() {
-  Object.assign(toolForm, {
-    name: '',
-    desc: '',
-    code: '',
-    icon: '',
-    init_field_list: [],
-    input_field_list: [],
-  })
+  Object.assign(toolForm, { name: '', desc: '', code: '', icon: '', init_field_list: [], input_field_list: [] })
   editId.value = undefined
   originalForm.value = ''
   loading.value = false
@@ -170,34 +142,14 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    :before-close="handleBeforeClose"
-    :title="title"
-    size="60%"
-    @closed="handleClosed"
-  >
-    <el-form
-      ref="formRef"
-      v-loading="formLoading"
-      :model="toolForm"
-      :rules="formRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+  <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
+    <el-form ref="formRef" v-loading="formLoading" :model="toolForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO 头像 统一修改组件-->
           <ToolIcon :size="32" />
-          <el-input
-            v-model="toolForm.name"
-            maxlength="64"
-            placeholder="请输入工具名称"
-            show-word-limit
-            @blur="toolForm.name = toolForm.name.trim()"
-          />
+          <el-input v-model="toolForm.name" maxlength="64" placeholder="请输入工具名称" show-word-limit @blur="toolForm.name = toolForm.name.trim()" />
         </div>
       </el-form-item>
       <el-form-item label="描述">
@@ -228,9 +180,7 @@ defineExpose({ open })
     </el-form>
 
     <template #footer>
-      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose"
-        >取消</el-button
-      >
+      <el-button plain :disabled="loading || formLoading" @click="handleBeforeClose">取消</el-button>
       <el-button plain :disabled="loading || formLoading" @click="handleOpenDebug">调试</el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}

@@ -11,10 +11,7 @@ let messageHandler: ((event: MessageEvent) => void) | undefined
 
 const initialize = async () => {
   if (!props.config.app_key) return
-  await loadLoginScript(
-    'https://lf-package-cn.feishucdn.com/obj/feishu-static/lark/passport/qrcode/LarkSSOSDKWebQRCode-1.0.3.js',
-    'lark-login-sdk',
-  )
+  await loadLoginScript('https://lf-package-cn.feishucdn.com/obj/feishu-static/lark/passport/qrcode/LarkSSOSDKWebQRCode-1.0.3.js', 'lark-login-sdk')
   await nextTick()
   if (!window.QRLogin) throw new Error('飞书扫码 SDK 加载失败')
 
@@ -26,13 +23,7 @@ const initialize = async () => {
     response_type: 'code',
     state: 'fit2cloud-lark-qr',
   }).toString()
-  const qrLogin = window.QRLogin({
-    goto: authorizeUrl.toString(),
-    height: '266',
-    id: 'lark-qr-code',
-    style: 'width:280px;height:280px;margin:0 auto;',
-    width: '266',
-  })
+  const qrLogin = window.QRLogin({ goto: authorizeUrl.toString(), height: '266', id: 'lark-qr-code', style: 'width:280px;height:280px;margin:0 auto;', width: '266' })
 
   if (messageHandler) window.removeEventListener('message', messageHandler)
   messageHandler = (event) => {

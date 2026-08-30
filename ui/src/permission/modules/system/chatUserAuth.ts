@@ -3,6 +3,4 @@
 import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
 
-export default {
-  edit: () => canSys(P.CHAT_USER_AUTH_EDIT),
-}
+export default { edit: () => canSys(P.CHAT_USER_AUTH_EDIT) }

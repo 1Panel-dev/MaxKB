@@ -13,24 +13,16 @@ const componentProps = withDefaults(
     /** 下拉菜单数据 */
     options: TOption[]
     /** 将业务数据的字段名映射为组件的展示字段和唯一值字段 */
-    props?: {
-      label?: keyof TOption & string
-      value?: keyof TOption & string
-    }
+    props?: { label?: keyof TOption & string; value?: keyof TOption & string }
     /** 没有匹配结果时显示的文字 */
     emptyText?: string
   }>(),
-  {
-    emptyText: '暂无匹配结果',
-    props: () => ({}),
-  },
+  { emptyText: '暂无匹配结果', props: () => ({}) },
 )
 
 /** 当前选中菜单项的 value */
 const selectedValue = defineModel<string | number>({ required: true })
-const emit = defineEmits<{
-  select: [option: TOption]
-}>()
+const emit = defineEmits<{ select: [option: TOption] }>()
 const searchKeyword = ref('')
 const labelField = computed(() => componentProps.props.label ?? ('label' as keyof TOption & string))
 const valueField = computed(() => componentProps.props.value ?? ('value' as keyof TOption & string))
@@ -44,20 +36,14 @@ function getOptionValue(option: TOption) {
   return typeof value === 'string' || typeof value === 'number' ? value : String(value ?? '')
 }
 
-const selectedOption = computed(() =>
-  componentProps.options.find((option) => getOptionValue(option) === selectedValue.value),
-)
-const selectedText = computed(() =>
-  selectedOption.value === undefined ? '' : getOptionLabel(selectedOption.value),
-)
+const selectedOption = computed(() => componentProps.options.find((option) => getOptionValue(option) === selectedValue.value))
+const selectedText = computed(() => (selectedOption.value === undefined ? '' : getOptionLabel(selectedOption.value)))
 
 const filteredOptions = computed(() => {
   const normalizedKeyword = searchKeyword.value.trim().toLocaleLowerCase()
   if (!normalizedKeyword) return componentProps.options
 
-  return componentProps.options.filter((option) =>
-    getOptionLabel(option).toLocaleLowerCase().includes(normalizedKeyword),
-  )
+  return componentProps.options.filter((option) => getOptionLabel(option).toLocaleLowerCase().includes(normalizedKeyword))
 })
 
 defineSlots<{
@@ -78,12 +64,7 @@ function handleItemClick(option: TOption) {
 </script>
 
 <template>
-  <MkDropdown
-    class="mk-filterable-dropdown"
-    trigger="click"
-    placement="bottom-start"
-    @visible-change="handleVisibleChange"
-  >
+  <MkDropdown class="mk-filterable-dropdown" trigger="click" placement="bottom-start" @visible-change="handleVisibleChange">
     <slot :selected-option="selectedOption" :text="selectedText" />
 
     <template #dropdown>

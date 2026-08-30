@@ -5,9 +5,7 @@ import { getPermissionOptions } from '../constants'
 
 defineOptions({ name: 'BatchSetPermissionDialog' })
 
-const emit = defineEmits<{
-  submit: [permission: ResourcePermission]
-}>()
+const emit = defineEmits<{ submit: [permission: ResourcePermission] }>()
 
 const visible = ref(false)
 const permission = ref<ResourcePermission>()
@@ -33,11 +31,7 @@ defineExpose({ open })
 <template>
   <MkDialog v-model="visible" title="配置权限" @closed="resetData">
     <el-radio-group v-model="permission" class="vertical-radio-group">
-      <el-radio
-        v-for="permissionOption in getPermissionOptions()"
-        :key="permissionOption.value"
-        :value="permissionOption.value"
-      >
+      <el-radio v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value" :value="permissionOption.value">
         <p>{{ permissionOption.label }}</p>
         <p v-if="permissionOption.description" class="text-N500 mt-1">
           {{ permissionOption.description }}

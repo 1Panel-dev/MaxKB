@@ -8,9 +8,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'QuotaSettingsDialog' })
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 interface QuotaSettingsForm {
   periodType: PeriodType
@@ -18,7 +16,6 @@ interface QuotaSettingsForm {
   quotaType: QuotaType
   tokenLimit: number
 }
-
 
 const periodTypeOptions: Array<{ label: string; value: PeriodType }> = [
   { label: '天', value: PERIOD_TYPE.DAY },
@@ -32,33 +29,17 @@ const loading = ref(false)
 const submitting = ref(false)
 const pendingUserIds = ref<string[]>([])
 
-const quotaSettingsForm = reactive<QuotaSettingsForm>({
-  periodType: PERIOD_TYPE.MONTH,
-  periodValue: 1,
-  quotaType: QUOTA_TYPE.UNLIMITED,
-  tokenLimit: 10_000_000,
-})
+const quotaSettingsForm = reactive<QuotaSettingsForm>({ periodType: PERIOD_TYPE.MONTH, periodValue: 1, quotaType: QUOTA_TYPE.UNLIMITED, tokenLimit: 10_000_000 })
 const quotaSettingsRules: FormRules<QuotaSettingsForm> = {
   periodValue: [{ required: true, message: '请输入周期', trigger: 'change' }],
   tokenLimit: [{ required: true, message: '请输入 Tokens 上限', trigger: 'change' }],
 }
 
-
 function buildPayload(): ChatUserQuotaPayload {
   if (quotaSettingsForm.quotaType === QUOTA_TYPE.UNLIMITED) {
-    return {
-      quota_type: QUOTA_TYPE.UNLIMITED,
-      period_type: null,
-      period_value: null,
-      token_limit: null,
-    }
+    return { quota_type: QUOTA_TYPE.UNLIMITED, period_type: null, period_value: null, token_limit: null }
   }
-  return {
-    quota_type: QUOTA_TYPE.PERIODIC,
-    period_type: quotaSettingsForm.periodType,
-    period_value: quotaSettingsForm.periodValue,
-    token_limit: quotaSettingsForm.tokenLimit,
-  }
+  return { quota_type: QUOTA_TYPE.PERIODIC, period_type: quotaSettingsForm.periodType, period_value: quotaSettingsForm.periodValue, token_limit: quotaSettingsForm.tokenLimit }
 }
 
 function submitQuotaSettings() {
@@ -84,7 +65,6 @@ function submitQuotaSettings() {
   })
 }
 
-
 async function loadQuota(userId: string) {
   loading.value = true
   try {
@@ -104,7 +84,6 @@ async function loadQuota(userId: string) {
   }
 }
 
-
 async function open(chatUserIdOrIds: string | string[]) {
   const ids = Array.isArray(chatUserIdOrIds) ? chatUserIdOrIds : [chatUserIdOrIds]
   pendingUserIds.value = ids
@@ -115,12 +94,7 @@ async function open(chatUserIdOrIds: string | string[]) {
 }
 
 function resetForm() {
-  Object.assign(quotaSettingsForm, {
-    periodType: PERIOD_TYPE.MONTH,
-    periodValue: 1,
-    quotaType: QUOTA_TYPE.UNLIMITED,
-    tokenLimit: 10_000_000,
-  })
+  Object.assign(quotaSettingsForm, { periodType: PERIOD_TYPE.MONTH, periodValue: 1, quotaType: QUOTA_TYPE.UNLIMITED, tokenLimit: 10_000_000 })
 }
 
 function resetData() {
@@ -156,33 +130,15 @@ defineExpose({ open })
         <el-form-item label="周期" prop="periodValue">
           <div class="flex items-center gap-2">
             <span>每</span>
-            <el-input-number
-              v-model="quotaSettingsForm.periodValue"
-              :min="1"
-              :max="365"
-              class="w-40!"
-              align="left"
-              controls-position="right"
-            />
+            <el-input-number v-model="quotaSettingsForm.periodValue" :min="1" :max="365" class="w-40!" align="left" controls-position="right" />
             <el-select v-model="quotaSettingsForm.periodType" class="w-40!">
-              <el-option
-                v-for="periodType in periodTypeOptions"
-                :key="periodType.value"
-                :label="periodType.label"
-                :value="periodType.value"
-              />
+              <el-option v-for="periodType in periodTypeOptions" :key="periodType.value" :label="periodType.label" :value="periodType.value" />
             </el-select>
           </div>
         </el-form-item>
 
         <el-form-item label="Tokens 上限（单位：K）" prop="tokenLimit">
-          <el-input-number
-            v-model="quotaSettingsForm.tokenLimit"
-            class="w-full!"
-            :min="1"
-            align="left"
-            controls-position="right"
-          />
+          <el-input-number v-model="quotaSettingsForm.tokenLimit" class="w-full!" :min="1" align="left" controls-position="right" />
         </el-form-item>
       </template>
     </el-form>

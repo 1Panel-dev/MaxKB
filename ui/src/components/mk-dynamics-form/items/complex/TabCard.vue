@@ -16,9 +16,7 @@ const props = defineProps<{
 }>()
 
 const getChildFields = () => {
-  return Promise.resolve({
-    data: props.formField.children as FormField[],
-  } satisfies DynamicFormResponse<FormField[]>)
+  return Promise.resolve({ data: props.formField.children as FormField[] } satisfies DynamicFormResponse<FormField[]>)
 }
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -86,21 +84,13 @@ const handleTabsEdit = (targetName: TabPaneName | undefined, action: 'remove' | 
   }
 }
 
-defineExpose({
-  validate,
-  field: props.field,
-})
+defineExpose({ validate, field: props.field })
 </script>
 
 <template v-loading="_loading">
   <div style="width: 100%">
     <el-tabs v-model="activeTab" editable @edit="handleTabsEdit" type="card">
-      <el-tab-pane
-        v-for="(item, index) in localValue"
-        :key="index"
-        :label="tabsLabel + (index + 1)"
-        :name="index"
-      >
+      <el-tab-pane v-for="(item, index) in localValue" :key="index" :label="tabsLabel + (index + 1)" :name="index">
         <template v-if="formField.children">
           <el-card :style="style">
             <DynamicsForm

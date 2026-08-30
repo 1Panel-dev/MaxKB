@@ -18,8 +18,4 @@ const putValidateQrLoginPlatform = (payload: QrLoginPlatformPayload) => {
   return put<QrLoginPlatformPayload, boolean>(prefix, payload)
 }
 
-export default {
-  getQrLoginPlatforms,
-  postQrLoginPlatform,
-  putValidateQrLoginPlatform,
-}
+export default { getQrLoginPlatforms, postQrLoginPlatform, putValidateQrLoginPlatform }

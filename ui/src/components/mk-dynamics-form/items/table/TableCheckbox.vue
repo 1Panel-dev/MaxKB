@@ -18,10 +18,7 @@ const props = defineProps<{
   // 选中的值
   modelValue?: DynamicFormValue[]
 }>()
-const evalF: (text: string, row: DynamicFormValue) => string = (
-  text: string,
-  row: DynamicFormValue,
-) => {
+const evalF: (text: string, row: DynamicFormValue) => string = (text: string, row: DynamicFormValue) => {
   return new Function('row', `"use strict"; return (${text})`)(row)
 }
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -100,9 +97,7 @@ watch(
       const defaultItem = _.head(tableData.value)
       let defaultItemValue = _.get(defaultItem, valueField.value)
       if (props.modelValue) {
-        const row = options.value.find(
-          (f: DynamicFormValue) => f[valueField.value] === props.modelValue,
-        )
+        const row = options.value.find((f: DynamicFormValue) => f[valueField.value] === props.modelValue)
         if (row) {
           defaultItemValue = row[valueField.value]
         }
@@ -117,9 +112,7 @@ watch(
 
 const activeText = computed(() => {
   if (props.modelValue) {
-    const rows = options.value.filter((f: DynamicFormValue) =>
-      props.modelValue?.includes(f[valueField.value]),
-    )
+    const rows = options.value.filter((f: DynamicFormValue) => props.modelValue?.includes(f[valueField.value]))
     if (rows) {
       if (rows.length > 3) {
         return (
@@ -142,41 +135,21 @@ const activeText = computed(() => {
     <div class="header">
       <div class="title">{{ title }}</div>
 
-      <el-input
-        v-model="filterText"
-        :validate-event="false"
-        placeholder="请输入关键词搜索"
-        class="input-with-select"
-        style="--el-color-danger: #c0c4cc"
-        clearable
-      >
+      <el-input v-model="filterText" :validate-event="false" placeholder="请输入关键词搜索" class="input-with-select" style="--el-color-danger: #c0c4cc" clearable>
         <template #prepend>
           <el-button :icon="Search" />
         </template>
       </el-input>
     </div>
 
-    <el-table
-      ref="multipleTableRef"
-      :data="tableData"
-      highlight-current-row
-      style="width: 100%; height: 100%; --el-bg-color: #f5f6f7"
-      @selection-change="handleSelectionChange"
-    >
+    <el-table ref="multipleTableRef" :data="tableData" highlight-current-row style="width: 100%; height: 100%; --el-bg-color: #f5f6f7" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" />
-      <el-table-column
-        v-for="(column, index) in tableColumns"
-        :key="index"
-        v-bind="column"
-        :label="column.label"
-      >
+      <el-table-column v-for="(column, index) in tableColumns" :key="index" v-bind="column" :label="column.label">
         <template #default="scope">
           <template v-if="column.type === 'component'">
             <TableColumn :column="column" :row="scope.row"></TableColumn>
           </template>
-          <template v-else-if="column.type === 'eval'">
-            <span v-html="evalF(column.property, scope.row)"></span
-          ></template>
+          <template v-else-if="column.type === 'eval'"> <span v-html="evalF(column.property, scope.row)"></span></template>
           <template v-else>
             <span>{{ scope.row[column.property] }}</span></template
           >

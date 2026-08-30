@@ -2,10 +2,7 @@ import type { VisibilityFieldOption } from '../../type'
 
 export type InferredFieldType = string | undefined
 
-export function inferFieldType(
-  fieldPath: [string, string] | string[],
-  leftOptions?: VisibilityFieldOption[],
-): InferredFieldType {
+export function inferFieldType(fieldPath: [string, string] | string[], leftOptions?: VisibilityFieldOption[]): InferredFieldType {
   return getFieldConfig(fieldPath, leftOptions)?.input_type
 }
 
@@ -32,18 +29,7 @@ const TYPE_OP_MAP: Record<string, string[]> = {
   Slider: ['eq', 'not_eq', 'gt', 'ge', 'lt', 'le'],
 }
 
-const ALL_VISIBILITY_OPS = [
-  'eq',
-  'not_eq',
-  'contain',
-  'not_contain',
-  'is_true',
-  'is_not_true',
-  'gt',
-  'ge',
-  'lt',
-  'le',
-]
+const ALL_VISIBILITY_OPS = ['eq', 'not_eq', 'contain', 'not_contain', 'is_true', 'is_not_true', 'gt', 'ge', 'lt', 'le']
 
 export function getAllowedOps(inputType: string | undefined): string[] {
   if (!inputType) return ALL_VISIBILITY_OPS
@@ -54,10 +40,7 @@ export function getAllowedOps(inputType: string | undefined): string[] {
  * 根据 [scope_value, field_value] 在 leftOptions 树里取回叶子字段配置。
  * 推不出 → 返回 undefined
  */
-export function getFieldConfig(
-  fieldPath: [string, string] | string[],
-  leftOptions?: VisibilityFieldOption[],
-): VisibilityFieldOption | undefined {
+export function getFieldConfig(fieldPath: [string, string] | string[], leftOptions?: VisibilityFieldOption[]): VisibilityFieldOption | undefined {
   if (!fieldPath || fieldPath.length < 2) return undefined
   const [scopeValue, fieldValue] = fieldPath
 

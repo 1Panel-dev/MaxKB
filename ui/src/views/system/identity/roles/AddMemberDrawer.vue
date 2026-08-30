@@ -34,9 +34,7 @@ function loadUserOptions(keyword = '') {
     .then((users) => {
       const selectedUserIds = new Set(memberForm.members.flatMap(({ user_ids }) => user_ids))
       const selectedUserOptions = userOptions.value.filter(({ id }) => selectedUserIds.has(id))
-      userOptions.value = [
-        ...new Map([...selectedUserOptions, ...users].map((user) => [user.id, user])).values(),
-      ]
+      userOptions.value = [...new Map([...selectedUserOptions, ...users].map((user) => [user.id, user])).values()]
     })
     .finally(() => {
       userOptionsLoading.value = false
@@ -68,12 +66,7 @@ function submit() {
 
     const members = memberForm.members.map((member) => ({
       user_ids: [...member.user_ids],
-      workspace_ids:
-        props.currentRole.type === ROLE_TYPE.ADMIN
-          ? ['None']
-          : auth.isPE
-            ? ['default']
-            : [...(member.workspace_ids ?? [])],
+      workspace_ids: props.currentRole.type === ROLE_TYPE.ADMIN ? ['None'] : auth.isPE ? ['default'] : [...(member.workspace_ids ?? [])],
     }))
 
     loading.value = true
@@ -105,23 +98,13 @@ defineExpose({ open })
 <template>
   <MkDrawer v-model="visible" title="添加成员" @closed="resetData">
     <el-form ref="formRef" :model="memberForm" label-position="top">
-      <MkFormList
-        v-model="memberForm.members"
-        add-text="添加成员"
-        :default-item="{ user_ids: [], workspace_ids: [] }"
-      >
+      <MkFormList v-model="memberForm.members" add-text="添加成员" :default-item="{ user_ids: [], workspace_ids: [] }">
         <template #default="{ index, item: memberSetting }">
           <el-form-item
             class="flex-1"
             :label="index === 0 ? '成员' : ''"
             :prop="`members.${index}.user_ids`"
-            :rules="{
-              required: true,
-              type: 'array',
-              min: 1,
-              message: '请选择成员',
-              trigger: 'change',
-            }"
+            :rules="{ required: true, type: 'array', min: 1, message: '请选择成员', trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.user_ids"
@@ -151,13 +134,7 @@ defineExpose({ open })
             class="flex-1"
             :label="index === 0 ? '工作空间' : ''"
             :prop="`members.${index}.workspace_ids`"
-            :rules="{
-              required: true,
-              type: 'array',
-              min: 1,
-              message: '请选择工作空间',
-              trigger: 'change',
-            }"
+            :rules="{ required: true, type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }"
           >
             <el-select
               v-model="memberSetting.workspace_ids"

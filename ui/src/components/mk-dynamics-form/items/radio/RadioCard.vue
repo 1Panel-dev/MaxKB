@@ -18,21 +18,12 @@ const props = defineProps<{
   disabled?: boolean
 }>()
 const elFormItem = inject(formItemContextKey, void 0)
-const emit = defineEmits<{
-  change: [value: DynamicFormValue]
-  'update:modelValue': [value: DynamicFormValue]
-}>()
+const emit = defineEmits<{ change: [value: DynamicFormValue]; 'update:modelValue': [value: DynamicFormValue] }>()
 
 const isOptionActive = (optionValue: DynamicFormValue) => {
   if (props.modelValue === optionValue) return true
 
-  return (
-    props.modelValue !== undefined &&
-    props.modelValue !== null &&
-    optionValue !== undefined &&
-    optionValue !== null &&
-    String(props.modelValue) === String(optionValue)
-  )
+  return props.modelValue !== undefined && props.modelValue !== null && optionValue !== undefined && optionValue !== null && String(props.modelValue) === String(optionValue)
 }
 
 const selectOption = (activeValue: string | number) => {
@@ -64,10 +55,7 @@ const options = computed(() => {
       v-for="(item, index) in options"
       :key="item[valueField] ?? index"
       class="cursor-pointer break-all rounded-md border px-4 py-[3px] text-center"
-      :class="[
-        inputDisabled ? 'cursor-not-allowed! bg-N100! text-N600!' : '',
-        isOptionActive(item[valueField]) ? 'border-primary! text-primary!' : '',
-      ]"
+      :class="[inputDisabled ? 'cursor-not-allowed! bg-N100! text-N600!' : '', isOptionActive(item[valueField]) ? 'border-primary! text-primary!' : '']"
       @click="selectOption(item[valueField])"
     >
       <span v-html="item[textField] || '\u200D'"></span>

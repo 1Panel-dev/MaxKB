@@ -9,19 +9,9 @@ type ProvideFactory<NodeModel extends TeleportNodeModel> = () => TeleportProvide
 let active = false
 const teleportItems = reactive<Record<string, Component>>({})
 
-export function connect<NodeModel extends TeleportNodeModel>(
-  id: string,
-  component: Component,
-  container: HTMLDivElement,
-  get_provide: ProvideFactory<NodeModel>,
-) {
+export function connect<NodeModel extends TeleportNodeModel>(id: string, component: Component, container: HTMLDivElement, get_provide: ProvideFactory<NodeModel>) {
   if (active) {
-    teleportItems[id] = markRaw(
-      defineComponent({
-        render: () => h(Teleport, { to: container }, [h(component)]),
-        provide: () => get_provide(),
-      }),
-    )
+    teleportItems[id] = markRaw(defineComponent({ render: () => h(Teleport, { to: container }, [h(component)]), provide: () => get_provide() }))
   }
 }
 
@@ -50,12 +40,7 @@ export function getTeleport(): Component {
   active = true
 
   return defineComponent({
-    props: {
-      flowId: {
-        type: String,
-        required: true,
-      },
-    },
+    props: { flowId: { type: String, required: true } },
     setup(props) {
       return () => {
         const children: Component[] = []

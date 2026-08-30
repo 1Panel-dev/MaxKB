@@ -27,19 +27,10 @@ watch(
 function handleWorkspaceSelect(workspace: WorkspaceItem) {
   const workspaceId = workspace.id ?? 'default'
   if (workspaceId === route.params.workspaceId || !route.name) return
-  void router.push({
-    name: route.name,
-    params: { ...route.params, workspaceId },
-    query: route.query,
-    hash: route.hash,
-  })
+  void router.push({ name: route.name, params: { ...route.params, workspaceId }, query: route.query, hash: route.hash })
 }
 </script>
 
 <template>
-  <WorkspaceDropdown
-    v-model="selectedWorkspace"
-    :options="workspaceOptions"
-    @select="handleWorkspaceSelect"
-  />
+  <WorkspaceDropdown v-model="selectedWorkspace" :options="workspaceOptions" @select="handleWorkspaceSelect" />
 </template>

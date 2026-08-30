@@ -15,21 +15,9 @@ interface QrLoginPlatformView extends QrLoginPlatformPayload {
   logo: string
 }
 
-const platformDefinitions: {
-  configKeys: string[]
-  key: QrCodeProvider
-  logo: string
-}[] = [
-  {
-    key: LOGIN_METHOD.WECOM,
-    logo: enterpriseWechatLogo,
-    configKeys: ['corp_id', 'agent_id', 'app_secret'],
-  },
-  {
-    key: LOGIN_METHOD.DINGTALK,
-    logo: dingtalkLogo,
-    configKeys: ['corp_id', 'app_key', 'app_secret'],
-  },
+const platformDefinitions: { configKeys: string[]; key: QrCodeProvider; logo: string }[] = [
+  { key: LOGIN_METHOD.WECOM, logo: enterpriseWechatLogo, configKeys: ['corp_id', 'agent_id', 'app_secret'] },
+  { key: LOGIN_METHOD.DINGTALK, logo: dingtalkLogo, configKeys: ['corp_id', 'app_key', 'app_secret'] },
   { key: LOGIN_METHOD.LARK, logo: larkLogo, configKeys: ['app_key', 'app_secret'] },
 ]
 
@@ -70,11 +58,7 @@ function loadQrPlatforms() {
 /* 改变状态 */
 function handlePlatformStatusChange(platform: QrLoginPlatformView) {
   loading.value = true
-  return AuthScanApi.putQrLoginPlatform({
-    key: platform.key,
-    config: platform.config,
-    isActive: platform.isActive,
-  })
+  return AuthScanApi.putQrLoginPlatform({ key: platform.key, config: platform.config, isActive: platform.isActive })
     .then(() => MsgSuccess('保存成功'))
     .catch((error) => {
       platform.isActive = !platform.isActive

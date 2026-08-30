@@ -53,9 +53,7 @@ function validate() {
   }
   return Promise.resolve()
 }
-defineExpose({
-  validate,
-})
+defineExpose({ validate })
 </script>
 
 <template>

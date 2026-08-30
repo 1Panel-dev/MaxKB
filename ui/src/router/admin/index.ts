@@ -8,12 +8,7 @@ import { workflowRoutes } from './workflow'
 
 const ADMIN_BASE_PATH = window.MaxKB?.prefix || import.meta.env.VITE_BASE_PATH || '/admin/'
 
-NProgress.configure({
-  minimum: 0.3,
-  showSpinner: false,
-  speed: 500,
-  trickleSpeed: 200,
-})
+NProgress.configure({ minimum: 0.3, showSpinner: false, speed: 500, trickleSpeed: 200 })
 
 const router = createRouter({
   history: createWebHistory(ADMIN_BASE_PATH),
@@ -23,12 +18,7 @@ const router = createRouter({
     ...workflowRoutes,
     workspaceRoutes,
     systemRoutes,
-    {
-      path: '/:pathMatch(.*)*',
-      name: 'not-found',
-      component: () => import('@/views/error/NotFoundView.vue'),
-      meta: { title: '页面不存在' },
-    },
+    { path: '/:pathMatch(.*)*', name: 'not-found', component: () => import('@/views/error/NotFoundView.vue'), meta: { title: '页面不存在' } },
   ],
 })
 

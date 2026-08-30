@@ -18,9 +18,7 @@ const props = defineProps<{ currentRole: RoleItem }>()
 const loading = ref(false)
 const permissionData = ref<PermissionTableRow[]>([])
 const disabled = computed(() => props.currentRole.internal)
-const permissionTableKey = computed(
-  () => `${props.currentRole.id}:${disabled.value ? 'readonly' : 'editable'}`,
-)
+const permissionTableKey = computed(() => `${props.currentRole.id}:${disabled.value ? 'readonly' : 'editable'}`)
 
 function loadPermissions() {
   loading.value = true
@@ -33,38 +31,18 @@ function loadPermissions() {
 
 function transformPermissions(modules: RolePermissionModule[]) {
   return modules.flatMap((module) =>
-    module.children.map((feature) => ({
-      id: `${module.id}:${feature.id}`,
-      moduleId: module.id,
-      module: module.name,
-      name: feature.name,
-      permissions: feature.permission,
-    })),
+    module.children.map((feature) => ({ id: `${module.id}:${feature.id}`, moduleId: module.id, module: module.name, name: feature.name, permissions: feature.permission })),
   )
 }
 
-function permissionTableSpan({
-  row,
-  rowIndex,
-  columnIndex,
-}: {
-  row: PermissionTableRow
-  rowIndex: number
-  columnIndex: number
-}) {
+function permissionTableSpan({ row, rowIndex, columnIndex }: { row: PermissionTableRow; rowIndex: number; columnIndex: number }) {
   if (columnIndex !== 0) return [1, 1]
   const firstRowIndex = permissionData.value.findIndex(({ moduleId }) => moduleId === row.moduleId)
-  return rowIndex === firstRowIndex
-    ? [permissionData.value.filter(({ moduleId }) => moduleId === row.moduleId).length, 1]
-    : [0, 0]
+  return rowIndex === firstRowIndex ? [permissionData.value.filter(({ moduleId }) => moduleId === row.moduleId).length, 1] : [0, 0]
 }
 
 /* 单项权限与查看权限联动 */
-function handlePermissionChange(
-  value: boolean,
-  permission: RolePermission,
-  row: PermissionTableRow,
-) {
+function handlePermissionChange(value: boolean, permission: RolePermission, row: PermissionTableRow) {
   permission.enable = value
   if (row.permissions.some(({ id }) => id.includes('OTHER'))) return
   const readPermission = row.permissions.find(({ id }) => /:READ$/.test(id))
@@ -77,10 +55,7 @@ function handlePermissionChange(
 /* 行选择与全表选择 */
 function getPermissionState(permissions: RolePermission[]) {
   const checkedCount = permissions.filter(({ enable }) => enable).length
-  return {
-    checked: permissions.length > 0 && checkedCount === permissions.length,
-    indeterminate: checkedCount > 0 && checkedCount < permissions.length,
-  }
+  return { checked: permissions.length > 0 && checkedCount === permissions.length, indeterminate: checkedCount > 0 && checkedCount < permissions.length }
 }
 
 function handleRowChange(value: boolean, row: PermissionTableRow) {
@@ -89,9 +64,7 @@ function handleRowChange(value: boolean, row: PermissionTableRow) {
   })
 }
 
-const allPermissions = computed(() =>
-  permissionData.value.flatMap(({ permissions }) => permissions),
-)
+const allPermissions = computed(() => permissionData.value.flatMap(({ permissions }) => permissions))
 const allPermissionState = computed(() => getPermissionState(allPermissions.value))
 
 function handleCheckAll(value: boolean) {
@@ -101,9 +74,7 @@ function handleCheckAll(value: boolean) {
 /* 权限配置保存 */
 function handleSave() {
   loading.value = true
-  const permissions = permissionData.value.flatMap((row) =>
-    row.permissions.map(({ id, enable }) => ({ id, enable })),
-  )
+  const permissions = permissionData.value.flatMap((row) => row.permissions.map(({ id, enable }) => ({ id, enable })))
   RoleApi.postRolePermissions(props.currentRole.id, permissions)
     .then(() => MsgSuccess('保存成功'))
     .finally(() => {
@@ -131,29 +102,16 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
         <template #default="{ row }">
           <div class="flex-wrap">
             <template v-for="permission in row.permissions" :key="permission.id">
-              <el-checkbox
-                v-model="permission.enable"
-                :disabled="disabled"
-                class="w-30"
-                @change="(value: boolean) => handlePermissionChange(value, permission, row)"
-                >{{ permission.name }}</el-checkbox
-              >
+              <el-checkbox v-model="permission.enable" :disabled="disabled" class="w-30" @change="(value: boolean) => handlePermissionChange(value, permission, row)">{{
+                permission.name
+              }}</el-checkbox>
             </template>
           </div>
         </template>
       </el-table-column>
-      <el-table-column
-        class-name="permission-checkbox-column"
-        label-class-name="permission-checkbox-column"
-        :width="60"
-      >
+      <el-table-column class-name="permission-checkbox-column" label-class-name="permission-checkbox-column" :width="60">
         <template #header>
-          <el-checkbox
-            :model-value="allPermissionState.checked"
-            :indeterminate="allPermissionState.indeterminate"
-            :disabled="disabled"
-            @change="handleCheckAll"
-          />
+          <el-checkbox :model-value="allPermissionState.checked" :indeterminate="allPermissionState.indeterminate" :disabled="disabled" @change="handleCheckAll" />
         </template>
 
         <template #default="{ row }">
@@ -167,10 +125,7 @@ watch(() => props.currentRole.id, loadPermissions, { immediate: true })
       </el-table-column>
     </MkTable>
 
-    <footer
-      v-if="!disabled"
-      class="sticky -mb-6 -ml-6 -mr-6 bottom-0 z-10 mt-auto flex shrink-0 justify-end border-t bg-white px-6 py-4"
-    >
+    <footer v-if="!disabled" class="sticky -mb-6 -ml-6 -mr-6 bottom-0 z-10 mt-auto flex shrink-0 justify-end border-t bg-white px-6 py-4">
       <el-button type="primary" :loading="loading" @click="handleSave">保存</el-button>
     </footer>
   </div>

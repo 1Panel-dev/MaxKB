@@ -3,25 +3,17 @@ import { useRoute, useRouter } from 'vue-router'
 import { getChildRouteList } from '@/router/admin/utils'
 import type { LayoutMenuItem } from '../types'
 
-const props = defineProps<{
-  collapsed?: boolean
-}>()
+const props = defineProps<{ collapsed?: boolean }>()
 
-const emit = defineEmits<{
-  toggle: []
-}>()
+const emit = defineEmits<{ toggle: [] }>()
 
 const route = useRoute()
 const router = useRouter()
 const systemMenuItems = getChildRouteList('system')
 
-const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) =>
-  route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
+const isSystemMenuActive = (systemMenuItem: LayoutMenuItem) => route.matched.some((matchedRoute) => matchedRoute.name === systemMenuItem.name)
 
-const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
-  isSystemMenuActive(systemMenuItem)
-    ? (systemMenuItem.activeIcon ?? systemMenuItem.icon)
-    : systemMenuItem.icon
+const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) => (isSystemMenuActive(systemMenuItem) ? (systemMenuItem.activeIcon ?? systemMenuItem.icon) : systemMenuItem.icon)
 </script>
 <template>
   <div class="mk-system-sidebar flex h-full flex-col">
@@ -37,11 +29,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
       >
         <template v-for="item in systemMenuItems" :key="item.name">
           <!-- 有子菜单 -->
-          <el-sub-menu
-            v-if="item.children?.length && item.route"
-            :index="router.resolve(item.route).path"
-            popper-class="mk-system-sidebar-menu-popper"
-          >
+          <el-sub-menu v-if="item.children?.length && item.route" :index="router.resolve(item.route).path" popper-class="mk-system-sidebar-menu-popper">
             <template #title>
               <MkIcon v-if="item.icon" :name="getSystemMenuIcon(item)" :size="18" />
               <span>{{ item.label }}</span>
@@ -50,11 +38,7 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
               <template #title v-if="props.collapsed"
                 ><span>{{ item.label }}</span></template
               >
-              <el-menu-item
-                v-for="child in item.children"
-                :key="child.name"
-                :index="child.route ? router.resolve(child.route).path : child.name"
-              >
+              <el-menu-item v-for="child in item.children" :key="child.name" :index="child.route ? router.resolve(child.route).path : child.name">
                 {{ child.label }}
               </el-menu-item>
             </el-menu-item-group>
@@ -79,17 +63,8 @@ const getSystemMenuIcon = (systemMenuItem: LayoutMenuItem) =>
         class="mk-system-sidebar-toggle flex w-full cursor-pointer items-center gap-2 rounded-md"
         @click="emit('toggle')"
       >
-        <MkIcon
-          name="icon_side-fold_outlined"
-          :size="18"
-          :class="props.collapsed && 'rotate-180'"
-        />
-        <span
-          class="whitespace-nowrap transition-opacity duration-100"
-          :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'"
-        >
-          收起导航
-        </span>
+        <MkIcon name="icon_side-fold_outlined" :size="18" :class="props.collapsed && 'rotate-180'" />
+        <span class="whitespace-nowrap transition-opacity duration-100" :class="props.collapsed ? 'opacity-0' : 'delay-200 opacity-100'"> 收起导航 </span>
       </button>
     </div>
   </div>

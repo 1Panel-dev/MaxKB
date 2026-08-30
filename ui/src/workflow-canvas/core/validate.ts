@@ -8,18 +8,12 @@ interface WorkflowBranch {
 
 interface WorkflowValidationNodeProperties extends LogicFlow.PropertiesType {
   kind?: WorkflowKind
-  node_data?: {
-    branch?: WorkflowBranch[]
-    loop_body?: WorkflowGraphData
-  }
+  node_data?: { branch?: WorkflowBranch[]; loop_body?: WorkflowGraphData }
   status?: number
   stepName?: string
 }
 
-type WorkflowValidationNode = LogicFlow.NodeData & {
-  properties: WorkflowValidationNodeProperties
-  type: WorkflowNodeType
-}
+type WorkflowValidationNode = LogicFlow.NodeData & { properties: WorkflowValidationNodeProperties; type: WorkflowNodeType }
 
 type WorkflowValidationEdge = LogicFlow.EdgeData
 
@@ -94,9 +88,7 @@ export class WorkFlowInstance {
    * 校验开始节点
    */
   is_valid_start_node() {
-    const start_node_list = this.nodes.filter(
-      (item) => item.id === WorkflowNodeType.Start || item.id === WorkflowNodeType.LoopStartNode,
-    )
+    const start_node_list = this.nodes.filter((item) => item.id === WorkflowNodeType.Start || item.id === WorkflowNodeType.LoopStartNode)
     if (start_node_list.length == 0) {
       throw '开始节点必填'
     } else if (start_node_list.length > 1) {
@@ -138,10 +130,7 @@ export class WorkFlowInstance {
    */
   get_start_node() {
     const start_node_list = this.nodes.filter(
-      (item) =>
-        item.id === WorkflowNodeType.Start ||
-        item.id === WorkflowNodeType.LoopStartNode ||
-        item.id === WorkflowNodeType.ToolStartNode,
+      (item) => item.id === WorkflowNodeType.Start || item.id === WorkflowNodeType.LoopStartNode || item.id === WorkflowNodeType.ToolStartNode,
     )
     return start_node_list[0]
   }
@@ -181,10 +170,7 @@ export class WorkFlowInstance {
     const notInWorkFlowNodes = this.nodes
       .filter(
         (node) =>
-          node.id !== WorkflowNodeType.Start &&
-          node.id !== WorkflowNodeType.Base &&
-          node.type !== WorkflowNodeType.ToolBaseNode &&
-          node.type !== WorkflowNodeType.ToolStartNode,
+          node.id !== WorkflowNodeType.Start && node.id !== WorkflowNodeType.Base && node.type !== WorkflowNodeType.ToolBaseNode && node.type !== WorkflowNodeType.ToolStartNode,
       )
       .filter((node) => !this.workFlowNodes.includes(node))
     if (notInWorkFlowNodes.length > 0) {
@@ -200,9 +186,7 @@ export class WorkFlowInstance {
    */
   get_next_nodes(node: WorkflowValidationNode) {
     const edge_list = this.edges.filter((edge) => edge.sourceNodeId == node.id)
-    const node_list = edge_list
-      .map((edge) => this.nodes.filter((node) => node.id == edge.targetNodeId))
-      .reduce((x, y) => [...x, ...y], [])
+    const node_list = edge_list.map((edge) => this.nodes.filter((node) => node.id == edge.targetNodeId)).reduce((x, y) => [...x, ...y], [])
     const end = end_nodes_dict[this.workflowModel]
     if (node_list.length == 0 && !end.includes(node.type)) {
       throw '不存在的下一个节点'
@@ -257,9 +241,7 @@ export class WorkFlowInstance {
 }
 export class ToolWorkFlowInstance extends WorkFlowInstance {
   is_valid_start_node() {
-    const start_node_list = this.nodes.filter(
-      (item) => item.type === WorkflowNodeType.ToolStartNode,
-    )
+    const start_node_list = this.nodes.filter((item) => item.type === WorkflowNodeType.ToolStartNode)
 
     if (start_node_list.length == 0) {
       throw '开始节点必填'
@@ -315,12 +297,7 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
     })
 
     const notInWorkFlowNodes = this.nodes
-      .filter(
-        (node) =>
-          node.id !== WorkflowNodeType.KnowledgeBase &&
-          node.type !== WorkflowNodeType.LoopStartNode &&
-          node.properties.kind !== WorkflowKind.DataSource,
-      )
+      .filter((node) => node.id !== WorkflowNodeType.KnowledgeBase && node.type !== WorkflowNodeType.LoopStartNode && node.properties.kind !== WorkflowKind.DataSource)
       .filter((node) => !this.workFlowNodes.includes(node))
     if (notInWorkFlowNodes.length > 0) {
       throw `未在流程中的节点:${notInWorkFlowNodes.map((node) => node.properties.stepName).join('，')}`
@@ -330,11 +307,7 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
 
   is_valid_nodes() {
     for (const node of this.nodes) {
-      if (
-        node.type !== WorkflowNodeType.KnowledgeBase &&
-        node.type !== WorkflowNodeType.LoopStartNode &&
-        node.properties.kind !== WorkflowKind.DataSource
-      ) {
+      if (node.type !== WorkflowNodeType.KnowledgeBase && node.type !== WorkflowNodeType.LoopStartNode && node.properties.kind !== WorkflowKind.DataSource) {
         if (!this.edges.some((edge) => edge.targetNodeId === node.id)) {
           throw `未在流程中的节点:${node.properties.stepName}`
         }
@@ -373,9 +346,7 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
    */
   get_next_nodes(node: WorkflowValidationNode) {
     const edge_list = this.edges.filter((edge) => edge.sourceNodeId == node.id)
-    const node_list = edge_list
-      .map((edge) => this.nodes.filter((node) => node.id == edge.targetNodeId))
-      .reduce((x, y) => [...x, ...y], [])
+    const node_list = edge_list.map((edge) => this.nodes.filter((node) => node.id == edge.targetNodeId)).reduce((x, y) => [...x, ...y], [])
 
     return node_list
   }
@@ -410,10 +381,7 @@ export class KnowledgeWorkFlowInstance extends WorkFlowInstance {
         if (node.type == WorkflowNodeType.LoopNode) {
           const loopBody = node.properties.node_data?.loop_body
           if (loopBody) {
-            const end_nodes = new KnowledgeWorkFlowInstance(
-              loopBody,
-              WorkflowMode.KnowledgeLoop,
-            ).get_end_nodes()
+            const end_nodes = new KnowledgeWorkFlowInstance(loopBody, WorkflowMode.KnowledgeLoop).get_end_nodes()
             if (!end_nodes.every((n) => end.includes(n.type))) {
               throw `${node.properties.stepName} 节点不能当做结束节点`
             }

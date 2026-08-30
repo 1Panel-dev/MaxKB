@@ -10,9 +10,7 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'UserPwdDialog' })
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 const router = useRouter()
 const { auth, user } = useStore()
@@ -22,10 +20,7 @@ const passwordSubmitting = ref(false)
 
 const userId = ref('')
 const userPasswordFormRef = ref<FormInstance>()
-const userPasswordForm = reactive<UpdatePasswordForm>({
-  password: '',
-  re_password: '',
-})
+const userPasswordForm = reactive<UpdatePasswordForm>({ password: '', re_password: '' })
 
 function validateConfirmPassword(_rule: unknown, value: string, callback: (error?: Error) => void) {
   if (!value) {
@@ -40,12 +35,7 @@ function validateConfirmPassword(_rule: unknown, value: string, callback: (error
 const userPasswordRules = reactive<FormRules<UpdatePasswordForm>>({
   password: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
-    {
-      min: 6,
-      max: 20,
-      message: '长度应为 6-20 个字符',
-      trigger: 'blur',
-    },
+    { min: 6, max: 20, message: '长度应为 6-20 个字符', trigger: 'blur' },
   ],
   re_password: [{ validator: validateConfirmPassword, trigger: 'blur' }],
 })
@@ -95,41 +85,18 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="修改用户密码" @closed="resetData">
-    <el-form
-      ref="userPasswordFormRef"
-      :model="userPasswordForm"
-      :rules="userPasswordRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form ref="userPasswordFormRef" :model="userPasswordForm" :rules="userPasswordRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="新密码" prop="password">
-        <el-input
-          v-model="userPasswordForm.password"
-          autocomplete="new-password"
-          maxlength="20"
-          placeholder="请输入新密码"
-          show-password
-          type="password"
-        />
+        <el-input v-model="userPasswordForm.password" autocomplete="new-password" maxlength="20" placeholder="请输入新密码" show-password type="password" />
       </el-form-item>
       <el-form-item label="确认密码" prop="re_password">
-        <el-input
-          v-model="userPasswordForm.re_password"
-          autocomplete="new-password"
-          maxlength="20"
-          placeholder="请再次输入新密码"
-          show-password
-          type="password"
-        />
+        <el-input v-model="userPasswordForm.re_password" autocomplete="new-password" maxlength="20" placeholder="请再次输入新密码" show-password type="password" />
       </el-form-item>
     </el-form>
 
     <template #footer>
       <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword">
-        保存
-      </el-button>
+      <el-button :loading="passwordSubmitting" type="primary" @click="submitPassword"> 保存 </el-button>
     </template>
   </MkDialog>
 </template>

@@ -33,24 +33,14 @@ class CustomEdgeModel2 extends BezierEdgeModel {
   updatePathByAnchor() {
     // TODO
     const sourceNodeModel = this.graphModel.getNodeModelById(this.sourceNodeId)
-    const sourceAnchor = sourceNodeModel
-      ?.getDefaultAnchor()
-      .find((anchor) => anchor.id === this.sourceAnchorId)
+    const sourceAnchor = sourceNodeModel?.getDefaultAnchor().find((anchor) => anchor.id === this.sourceAnchorId)
 
     const targetNodeModel = this.graphModel.getNodeModelById(this.targetNodeId)
-    const targetAnchor = targetNodeModel
-      ?.getDefaultAnchor()
-      .find((anchor) => anchor.id === this.targetAnchorId)
+    const targetAnchor = targetNodeModel?.getDefaultAnchor().find((anchor) => anchor.id === this.targetAnchorId)
     if (sourceAnchor && targetAnchor) {
-      const startPoint = {
-        x: sourceAnchor.x,
-        y: sourceAnchor.y - 10,
-      }
+      const startPoint = { x: sourceAnchor.x, y: sourceAnchor.y - 10 }
       this.updateStartPoint(startPoint)
-      const endPoint = {
-        x: targetAnchor.x,
-        y: targetAnchor.y + 3,
-      }
+      const endPoint = { x: targetAnchor.x, y: targetAnchor.y + 3 }
 
       this.updateEndPoint(endPoint)
     }
@@ -66,8 +56,4 @@ class CustomEdgeModel2 extends BezierEdgeModel {
   }
 }
 
-export default {
-  type: 'loop-edge',
-  view: BezierEdge,
-  model: CustomEdgeModel2,
-}
+export default { type: 'loop-edge', view: BezierEdge, model: CustomEdgeModel2 }

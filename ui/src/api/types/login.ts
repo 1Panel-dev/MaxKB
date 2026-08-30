@@ -10,10 +10,7 @@ export interface LoginConfig {
   max_attempts: number
 }
 
-export type QrCodeProvider = Extract<
-  LoginMethod,
-  typeof LOGIN_METHOD.DINGTALK | typeof LOGIN_METHOD.LARK | typeof LOGIN_METHOD.WECOM
->
+export type QrCodeProvider = Extract<LoginMethod, typeof LOGIN_METHOD.DINGTALK | typeof LOGIN_METHOD.LARK | typeof LOGIN_METHOD.WECOM>
 
 export interface QrCodeConfig {
   agent_id?: string

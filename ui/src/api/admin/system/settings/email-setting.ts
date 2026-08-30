@@ -18,8 +18,4 @@ const putEmailSetting = (payload: EmailSettingPayload) => {
   return put<EmailSettingPayload, boolean>(prefix, payload)
 }
 
-export default {
-  getEmailSetting,
-  postEmailSettingTest,
-  putEmailSetting,
-}
+export default { getEmailSetting, postEmailSettingTest, putEmailSetting }

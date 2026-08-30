@@ -32,8 +32,7 @@ const system = {
   hitTest: () => canSys(P.RESOURCE_KNOWLEDGE_HIT_TEST),
 
   // —— 文档 ——
-  docRead: () =>
-    canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) || canSys(P.RESOURCE_KNOWLEDGE_WORKFLOW_READ),
+  docRead: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_READ) || canSys(P.RESOURCE_KNOWLEDGE_WORKFLOW_READ),
   docCreate: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_CREATE),
   docEdit: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_EDIT),
   docDelete: () => canSys(P.RESOURCE_KNOWLEDGE_DOCUMENT_DELETE),

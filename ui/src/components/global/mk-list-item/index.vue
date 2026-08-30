@@ -4,21 +4,9 @@ import { hasRenderableSlotContent } from '@/utils/vnode'
 
 defineOptions({ name: 'MkListItem' })
 
-const {
-  active = false,
-  index = 0,
-  labelField,
-  row,
-} = defineProps<{
-  active?: boolean
-  index?: number
-  labelField?: keyof T & string
-  row?: T
-}>()
+const { active = false, index = 0, labelField, row } = defineProps<{ active?: boolean; index?: number; labelField?: keyof T & string; row?: T }>()
 
-const emit = defineEmits<{
-  click: []
-}>()
+const emit = defineEmits<{ click: [] }>()
 
 defineSlots<{
   action(props: { row: T; index: number }): unknown
@@ -34,9 +22,7 @@ const itemLabel = computed(() => {
 const slotRow = computed(() => row as T)
 const slots = useSlots()
 
-const hasActionDropdown = computed(() =>
-  hasRenderableSlotContent(slots['action-dropdown']?.({ row: slotRow.value, index })),
-)
+const hasActionDropdown = computed(() => hasRenderableSlotContent(slots['action-dropdown']?.({ row: slotRow.value, index })))
 </script>
 
 <template>
@@ -51,12 +37,7 @@ const hasActionDropdown = computed(() =>
       </span>
     </slot>
     <!-- 操作区保留布局宽度，hover/focus 时显示，并阻止触发行点击。 -->
-    <div
-      v-if="$slots.action || hasActionDropdown"
-      class="group-hover-visible ml-auto flex shrink-0 items-center font-normal text-N900"
-      @click.stop
-      @keydown.stop
-    >
+    <div v-if="$slots.action || hasActionDropdown" class="group-hover-visible ml-auto flex shrink-0 items-center font-normal text-N900" @click.stop @keydown.stop>
       <MkDropdown v-if="hasActionDropdown" trigger="click" :teleported="false">
         <el-button class="-mr-1" text>
           <MkIcon name="icon_more_outlined" />

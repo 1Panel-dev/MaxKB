@@ -16,8 +16,7 @@ export function formatFileSize(bytes: NullableNumber): string {
     unitIndex += 1
   }
 
-  const formattedSize =
-    unitIndex === 0 ? Math.round(normalizedSize) : Number(normalizedSize.toFixed(1))
+  const formattedSize = unitIndex === 0 ? Math.round(normalizedSize) : Number(normalizedSize.toFixed(1))
   return `${formattedSize} ${FILE_SIZE_UNITS[unitIndex]}`
 }
 
@@ -30,9 +29,7 @@ export function toThousands(value: NullableNumber | string): string {
 export function numberFormat(value: NullableNumber): string {
   const normalizedValue = value ?? 0
 
-  return normalizedValue < 1000
-    ? toThousands(normalizedValue)
-    : `${toThousands((normalizedValue / 1000).toFixed(1))}k`
+  return normalizedValue < 1000 ? toThousands(normalizedValue) : `${toThousands((normalizedValue / 1000).toFixed(1))}k`
 }
 
 /** 将有限数字缩写为最多带一位小数的 `K`、`M`、`B` 或 `T`，空值和无效数字返回 `-`。 */

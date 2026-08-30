@@ -24,8 +24,7 @@ function handleLogout() {
   LoginApi.postLogout().then(() => {
     auth.clearToken()
     router.push(
-      loginMode &&
-        ([LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2] as string[]).includes(loginMode)
+      loginMode && ([LOGIN_METHOD.CAS, LOGIN_METHOD.OIDC, LOGIN_METHOD.OAUTH2] as string[]).includes(loginMode)
         ? { name: 'login', query: { login_mode: 'manual' } }
         : { name: 'login' },
     )

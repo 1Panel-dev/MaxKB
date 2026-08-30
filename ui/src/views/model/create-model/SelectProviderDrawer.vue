@@ -6,9 +6,7 @@ import { MODEL_TYPE_LABELS } from '@/constants'
 
 defineOptions({ name: 'SelectProviderDrawer' })
 
-const emit = defineEmits<{
-  select: [provider: ModelProviderItem]
-}>()
+const emit = defineEmits<{ select: [provider: ModelProviderItem] }>()
 
 const visible = ref(false)
 const modelType = ref('all')
@@ -31,9 +29,7 @@ function loadModelProviders() {
   loading.value = true
   return ProviderApi.getProviderList()
     .then((providers) => {
-      providerOptions.value = [...providers].sort((left, right) =>
-        left.name.localeCompare(right.name),
-      )
+      providerOptions.value = [...providers].sort((left, right) => left.name.localeCompare(right.name))
     })
     .finally(() => {
       loading.value = false
@@ -80,12 +76,7 @@ defineExpose({ open })
         <h4>选择供应商</h4>
         <el-select v-model="modelType" class="w-45!" @change="handleModelTypeChange">
           <el-option label="全部模型" value="all" />
-          <el-option
-            v-for="(label, value) in MODEL_TYPE_LABELS"
-            :key="value"
-            :label="label"
-            :value="value"
-          />
+          <el-option v-for="(label, value) in MODEL_TYPE_LABELS" :key="value" :label="label" :value="value" />
         </el-select>
       </div>
       <div v-loading="loading">

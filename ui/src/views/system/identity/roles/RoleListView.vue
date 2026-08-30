@@ -22,9 +22,7 @@ const roleGroups = computed(() => {
   const keyword = filterText.value.trim().toLowerCase()
   return (Object.keys(ROLE_TYPE_LABELS) as RoleType[]).map((type) => ({
     label: ROLE_TYPE_LABELS[type],
-    roles: AllRoles.value.filter(
-      (role) => role.type === type && (!keyword || role.role_name.toLowerCase().includes(keyword)),
-    ),
+    roles: AllRoles.value.filter((role) => role.type === type && (!keyword || role.role_name.toLowerCase().includes(keyword))),
     type,
   }))
 })
@@ -34,10 +32,7 @@ function loadRoles(selectedRoleId?: string) {
   return RoleApi.getRoleList()
     .then(({ internal_role, custom_role }) => {
       AllRoles.value = [...internal_role, ...custom_role]
-      currentRole.value =
-        AllRoles.value.find(({ id }) => id === selectedRoleId) ??
-        AllRoles.value.find(({ id }) => id === currentRole.value?.id) ??
-        internal_role[0]
+      currentRole.value = AllRoles.value.find(({ id }) => id === selectedRoleId) ?? AllRoles.value.find(({ id }) => id === currentRole.value?.id) ?? internal_role[0]
     })
     .finally(() => {
       loadingRoles.value = false
@@ -49,11 +44,7 @@ function handleRoleSelect(role: RoleItem) {
 }
 
 // 默认展开的角色组
-const DEFAULT_EXPANDED_ROLE_TYPES = new Set<RoleType>([
-  ROLE_TYPE.ADMIN,
-  ROLE_TYPE.WORKSPACE_MANAGE,
-  ROLE_TYPE.USER,
-])
+const DEFAULT_EXPANDED_ROLE_TYPES = new Set<RoleType>([ROLE_TYPE.ADMIN, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.USER])
 function isRoleGroupDefaultExpanded(roleType: RoleType) {
   return DEFAULT_EXPANDED_ROLE_TYPES.has(roleType)
 }
@@ -124,9 +115,7 @@ onMounted(() => loadRoles())
               >
                 <template #default>
                   <span class="min-w-0 truncate" :title="role.role_name">{{ role.role_name }}</span>
-                  <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal"
-                    >系</el-tag
-                  >
+                  <el-tag type="info" size="small" class="ml-[6px]" v-if="role.internal">系</el-tag>
                 </template>
                 <template v-if="!role.internal" #action-dropdown>
                   <MkDropdownItem @click="handleOpenRoleDialog(role)">
@@ -150,13 +139,9 @@ onMounted(() => loadRoles())
             <h4 class="min-w-0 truncate" :title="currentRole.role_name">
               {{ currentRole.role_name }}
             </h4>
-            <el-tag type="info" size="small" class="shrink-0">
-              {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag
-            >
+            <el-tag type="info" size="small" class="shrink-0"> {{ currentRole.internal ? '系' : ROLE_TYPE_LABELS[currentRole.type] }}</el-tag>
             <el-divider class="shrink-0" direction="vertical" />
-            <span class="flex shrink-0 items-center text-N500">
-              <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }}
-            </span>
+            <span class="flex shrink-0 items-center text-N500"> <MkIcon name="icon_member_filled" class="mr-1" />{{ currentRole.user_count ?? 0 }} </span>
           </div>
           <el-radio-group v-model="currentTab">
             <el-radio-button value="permission" label="权限配置" />
@@ -164,10 +149,7 @@ onMounted(() => loadRoles())
           </el-radio-group>
         </component>
         <!-- 权限配置 -->
-        <RolePermissionConfiguration
-          v-if="currentTab === 'permission'"
-          :current-role="currentRole"
-        />
+        <RolePermissionConfiguration v-if="currentTab === 'permission'" :current-role="currentRole" />
         <!-- 成员 -->
         <RoleMemberList v-else :current-role="currentRole" />
       </template>

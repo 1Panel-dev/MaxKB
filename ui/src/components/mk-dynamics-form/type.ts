@@ -14,23 +14,9 @@ export interface DynamicFormResponse<T> {
   data: T
 }
 
-export type DynamicFormSource =
-  | string
-  | FormField[]
-  | Promise<FormField[] | DynamicFormResponse<FormField[]>>
-  | (() => Promise<FormField[] | DynamicFormResponse<FormField[]>>)
+export type DynamicFormSource = string | FormField[] | Promise<FormField[] | DynamicFormResponse<FormField[]>> | (() => Promise<FormField[] | DynamicFormResponse<FormField[]>>)
 
-export type VisibilityCompareOperator =
-  | 'eq'
-  | 'not_eq'
-  | 'contain'
-  | 'not_contain'
-  | 'is_true'
-  | 'is_not_true'
-  | 'gt'
-  | 'ge'
-  | 'lt'
-  | 'le'
+export type VisibilityCompareOperator = 'eq' | 'not_eq' | 'contain' | 'not_contain' | 'is_true' | 'is_not_true' | 'gt' | 'ge' | 'lt' | 'le'
 
 export interface VisibilityCondition {
   id: string

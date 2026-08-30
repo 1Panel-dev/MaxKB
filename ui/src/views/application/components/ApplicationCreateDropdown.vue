@@ -11,14 +11,9 @@ defineOptions({ name: 'ApplicationCreateDropdown' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  folderId: string
-}>()
+const props = defineProps<{ folderId: string }>()
 
-const emit = defineEmits<{
-  create: [type: ApplicationType]
-  refresh: []
-}>()
+const emit = defineEmits<{ create: [type: ApplicationType]; refresh: [] }>()
 
 defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
@@ -61,11 +56,7 @@ function handleRefresh() {
         <MkDropdownItem class="py-2!">
           <template #icon>
             <el-avatar shape="square" :size="24">
-              <img
-                style="width: 65%"
-                src="@/assets/application/icon_simple_application.svg"
-                alt=""
-              />
+              <img style="width: 65%" src="@/assets/application/icon_simple_application.svg" alt="" />
             </el-avatar>
           </template>
           <div class="min-w-0">
@@ -76,30 +67,15 @@ function handleRefresh() {
         <MkDropdownItem class="py-2!">
           <template #icon>
             <el-avatar shape="square" class="bg-warning! -mt-5!" :size="24">
-              <img
-                style="width: 65%"
-                src="@/assets/application/icon_workflow_application.svg"
-                alt=""
-              />
+              <img style="width: 65%" src="@/assets/application/icon_workflow_application.svg" alt="" />
             </el-avatar>
           </template>
           <div class="min-w-0">
             <p class="leading-5">高级智能体</p>
-            <p class="whitespace-normal text-sm text-N500">
-              使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体
-            </p>
+            <p class="whitespace-normal text-sm text-N500">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
-        <el-upload
-          ref="elUploadRef"
-          action="#"
-          :auto-upload="false"
-          class="w-full"
-          :file-list="[]"
-          :limit="1"
-          :on-change="handleImportCreate"
-          :show-file-list="false"
-        >
+        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="w-full" :file-list="[]" :limit="1" :on-change="handleImportCreate" :show-file-list="false">
           <MkDropdownItem class="py-2!">
             <template #icon>
               <img class="size-7" src="@/assets/mk_icon_import.svg" alt="" />

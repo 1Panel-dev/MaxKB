@@ -1,24 +1,13 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef } from 'vue'
+import { computed, nextTick, ref, shallowRef, useTemplateRef } from 'vue'
 import ToolStoreApi from '@/api/admin/tool-store'
-import ToolApi from '@/api/admin/workspace/tool/tool'
-import WorkspaceToolStoreApi from '@/api/admin/workspace/tool/store'
 import { TOOL_TYPE } from '@/api/enums'
 import type { ToolItem, ToolStoreItem, ToolStoreTag, ToolType } from '@/api/types'
-import { useStore } from '@/stores'
-import { MsgSuccess } from '@/utils/message'
-import { resetUrl } from '@/utils/icon'
-import ToolStoreCard from './ToolStoreCard.vue'
-import ToolStoreDetailDrawer from './ToolStoreDetailDrawer.vue'
-import AddStoreToolDialog from './AddStoreToolDialog.vue'
+import ToolStoreCard from './component/ToolStoreCard.vue'
 
 defineOptions({ name: 'ToolStoreDialog' })
 
-const { auth } = useStore()
-
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 interface ToolStoreCategory {
   id: string
@@ -26,28 +15,23 @@ interface ToolStoreCategory {
   tools: ToolStoreItem[]
 }
 
-const DEFAULT_CATEGORY_TITLES: Record<string, string> = {
-  database_search: '数据库查询',
-  other: '其他',
-  web_search: '联网搜索',
-}
+const DEFAULT_CATEGORY_TITLES: Record<string, string> = { database_search: '数据库查询', other: '其他', web_search: '联网搜索' }
 const DEFAULT_CATEGORY_IDS = ['web_search', 'database_search']
+const TOOL_STORE_CATEGORY_ANCHOR_PREFIX = '#tool-store-category-'
 
 const visible = ref(false)
 const loading = ref(false)
-const addingToolId = ref<string>()
 const activeCategoryId = ref('')
+const appliedSearchKeyword = ref('')
 const folderId = ref('default')
 const searchKeyword = ref('')
 const storeTools = ref<ToolStoreItem[]>([])
 const storeTags = ref<ToolStoreTag[]>([])
-const hasSearchKeyword = computed(() => Boolean(searchKeyword.value.trim()))
+const hasSearchKeyword = computed(() => Boolean(appliedSearchKeyword.value))
+let storeToolsLoadSequence = 0
 
 const categoryTitles = computed(() => {
-  return storeTags.value.reduce<Record<string, string>>(
-    (titles, tag) => ({ ...titles, [tag.key]: tag.name }),
-    { ...DEFAULT_CATEGORY_TITLES },
-  )
+  return storeTags.value.reduce<Record<string, string>>((titles, tag) => ({ ...titles, [tag.key]: tag.name }), { ...DEFAULT_CATEGORY_TITLES })
 })
 
 const toolStoreCategories = computed<ToolStoreCategory[]>(() => {
@@ -57,11 +41,9 @@ const toolStoreCategories = computed<ToolStoreCategory[]>(() => {
     categoryMap.set(categoryId, [...(categoryMap.get(categoryId) ?? []), tool])
   })
 
-  const categoryIds = [
-    ...DEFAULT_CATEGORY_IDS,
-    ...storeTags.value.map(({ key }) => key),
-    ...Array.from(categoryMap.keys()),
-  ].filter((categoryId, index, categories) => categories.indexOf(categoryId) === index)
+  const categoryIds = [...DEFAULT_CATEGORY_IDS, ...storeTags.value.map(({ key }) => key), ...Array.from(categoryMap.keys())].filter(
+    (categoryId, index, categories) => categories.indexOf(categoryId) === index,
+  )
 
   return categoryIds.flatMap((id) => {
     const tools = categoryMap.get(id)
@@ -77,25 +59,20 @@ function getStoreToolType(label?: string | null): ToolType {
 }
 
 function normalizeInternalTool(tool: ToolItem): ToolStoreItem {
-  return {
-    desc: tool.desc,
-    icon: tool.icon,
-    id: tool.id,
-    label: tool.label,
-    name: tool.name,
-    source: 'internal',
-    tool_type: TOOL_TYPE.INTERNAL,
-    version: tool.version,
-  }
+  return { desc: tool.desc, icon: tool.icon, id: tool.id, label: tool.label, name: tool.name, source: 'internal', tool_type: TOOL_TYPE.INTERNAL, version: tool.version }
 }
 
 function loadStoreTools() {
+  const currentLoadSequence = ++storeToolsLoadSequence
   loading.value = true
   storeTools.value = []
-  const query = searchKeyword.value.trim() ? { name: searchKeyword.value.trim() } : undefined
+  appliedSearchKeyword.value = searchKeyword.value.trim()
+  const query = appliedSearchKeyword.value ? { name: appliedSearchKeyword.value } : undefined
 
   Promise.all([ToolStoreApi.getInternalToolList(query), ToolStoreApi.getStoreToolList(query)])
     .then(([internalTools, storeResponse]) => {
+      if (currentLoadSequence !== storeToolsLoadSequence) return
+
       const appStoreTools: ToolStoreItem[] = storeResponse.apps.map((tool) => ({
         ...tool,
         desc: tool.description ?? tool.desc,
@@ -105,242 +82,112 @@ function loadStoreTools() {
       storeTags.value = storeResponse.additionalProperties.tags
       storeTools.value = [...internalTools.map(normalizeInternalTool), ...appStoreTools]
       return nextTick(() => {
+        contentScrollContainer.value = storeLayoutRef.value?.getScrollContainer()
         activeCategoryId.value = toolStoreCategories.value[0]?.id ?? ''
-        contentScrollbarRef.value?.setScrollTop(0)
+        storeLayoutRef.value?.setScrollTop(0)
       })
     })
     .finally(() => {
-      loading.value = false
+      if (currentLoadSequence === storeToolsLoadSequence) loading.value = false
     })
 }
 
 function open(targetFolderId: string) {
   folderId.value = targetFolderId || 'default'
   searchKeyword.value = ''
+  appliedSearchKeyword.value = ''
   storeTools.value = []
   activeCategoryId.value = ''
+  contentScrollContainer.value = undefined
   visible.value = true
   loadStoreTools()
 }
 
-/* 商店分类与详情 */
-const contentScrollbarRef = useTemplateRef<{ setScrollTop: (scrollTop: number) => void }>(
-  'contentScrollbarRef',
-)
+/* 锚点 */
+const contentScrollContainer = shallowRef<HTMLElement>()
+const storeLayoutRef = useTemplateRef<{ getScrollContainer: () => HTMLElement | undefined; setScrollTop: (scrollTop: number) => void }>('storeLayoutRef')
 
-function handleCategorySelect(categoryId: string) {
-  const categoryElement = document.getElementById(`tool-store-category-${categoryId}`)
-  if (!categoryElement) return
-
-  activeCategoryId.value = categoryId
-  contentScrollbarRef.value?.setScrollTop(Math.max(categoryElement.offsetTop - 24, 0))
+function handleCategoryAnchorChange(href: string) {
+  activeCategoryId.value = href.slice(TOOL_STORE_CATEGORY_ANCHOR_PREFIX.length)
 }
 
-function handleContentScroll({ scrollTop }: { scrollTop: number }) {
-  let nextActiveCategoryId = toolStoreCategories.value[0]?.id ?? ''
-  toolStoreCategories.value.forEach((category) => {
-    const categoryElement = document.getElementById(`tool-store-category-${category.id}`)
-    if (categoryElement && categoryElement.offsetTop <= scrollTop + 32) {
-      nextActiveCategoryId = category.id
-    }
-  })
-  activeCategoryId.value = nextActiveCategoryId
+function handleCategoryAnchorClick(event: MouseEvent) {
+  event.preventDefault()
 }
 
-const detailDrawerRef =
-  useTemplateRef<InstanceType<typeof ToolStoreDetailDrawer>>('detailDrawerRef')
-
-function handleOpenDetail(tool: ToolStoreItem) {
-  if (tool.source !== 'internal' || !tool.icon?.includes('icon.png')) {
-    detailDrawerRef.value?.open(tool)
-    return
-  }
-
-  const detailUrl = resetUrl(tool.icon.replace('icon.png', 'detail.md'))
-  fetch(detailUrl)
-    .then((response) => (response.ok ? response.text() : Promise.reject(response)))
-    .then((content) => detailDrawerRef.value?.open(tool, content))
-    .catch(() => detailDrawerRef.value?.open(tool))
+function handleAddSuccess() {
+  visible.value = false
+  emit('refresh')
 }
 
-/* 添加商店工具 */
-const addToolDialogRef = useTemplateRef<InstanceType<typeof AddStoreToolDialog>>('addToolDialogRef')
-
-function handleOpenAddTool(tool: ToolStoreItem) {
-  addToolDialogRef.value?.open(tool)
-}
-
-function handleAddTool(tool: ToolStoreItem, name: string) {
-  addingToolId.value = tool.id
-  const commonPayload = { folder_id: folderId.value, name }
-  let request: Promise<unknown>
-  let shouldRefreshCurrentUser = false
-
-  if (tool.source === 'internal') {
-    request = WorkspaceToolStoreApi.postInternalTool(tool.id, commonPayload)
-  } else if (tool.tool_type === TOOL_TYPE.WORKFLOW) {
-    shouldRefreshCurrentUser = true
-    request = ToolApi.postTool({
-      ...commonPayload,
-      code: '{}',
-      tool_type: TOOL_TYPE.WORKFLOW,
-      work_flow_template: tool,
-    })
-  } else {
-    request = WorkspaceToolStoreApi.postStoreTool(tool.id, {
-      ...commonPayload,
-      download_callback_url: tool.downloadCallbackUrl ?? '',
-      download_url: tool.downloadUrl ?? '',
-      icon: tool.icon ?? '',
-      label: tool.label ?? '',
-      versions: tool.versions ?? [],
-    })
-  }
-
-  request
-    .then(() => {
-      const refreshCurrentUser = shouldRefreshCurrentUser
-        ? auth.loadAuthBaseProfile()
-        : Promise.resolve()
-      return refreshCurrentUser.then(() => {
-        MsgSuccess('添加成功')
-        visible.value = false
-        emit('refresh')
-      })
-    })
-    .finally(() => {
-      addingToolId.value = undefined
-    })
+function handleClosed() {
+  storeToolsLoadSequence++
+  loading.value = false
 }
 
 defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog
-    v-model="visible"
-    align-center
-    class="tool-store-dialog"
-    content-class="max-h-none! p-0!"
-    title="工具商店"
-    width="1200"
-  >
+  <MkDialog v-model="visible" align-center class="mk-aside-content-dialog" title="工具商店" width="1200" @closed="handleClosed">
     <template #header="{ titleId }">
       <div class="relative flex items-center">
         <h4 :id="titleId">工具商店</h4>
-        <MkSearchInput
-          v-model="searchKeyword"
-          class="absolute left-1/2 w-80! -translate-x-1/2"
-          placeholder="搜索"
-          @change="loadStoreTools"
-          @keyup.enter="loadStoreTools"
-        />
+        <MkSearchInput v-model="searchKeyword" class="absolute left-1/2 w-80! -translate-x-1/2" placeholder="搜索" @change="loadStoreTools" />
       </div>
     </template>
 
-    <div class="tool-store-layout flex min-h-0">
-      <aside v-if="!hasSearchKeyword" class="w-60 shrink-0 border-r border-N200 p-4">
-        <el-scrollbar>
-          <el-button
-            v-for="category in toolStoreCategories"
-            :key="category.id"
-            :class="
-              activeCategoryId === category.id ? 'bg-primary/10! text-primary!' : 'text-N900!'
-            "
-            class="mb-1 h-10! w-full justify-start! rounded-md px-3!"
-            text
-            @click="handleCategorySelect(category.id)"
+    <MkViewLayout ref="storeLayoutRef" :loading="loading" title="">
+      <template #aside>
+        <el-scrollbar class="min-h-0 flex-1">
+          <el-anchor
+            v-if="!hasSearchKeyword"
+            class="px-4 py-2"
+            :container="contentScrollContainer"
+            :marker="false"
+            :offset="24"
+            select-scroll-top
+            @change="handleCategoryAnchorChange"
+            @click="handleCategoryAnchorClick"
           >
-            {{ category.title }}
-          </el-button>
+            <el-anchor-link v-for="category in toolStoreCategories" :key="category.id" :href="`${TOOL_STORE_CATEGORY_ANCHOR_PREFIX}${category.id}`">
+              <MkListItem :active="activeCategoryId === category.id">
+                {{ category.title }}
+              </MkListItem>
+            </el-anchor-link>
+          </el-anchor>
         </el-scrollbar>
-      </aside>
+      </template>
 
-      <main class="flex min-w-0 flex-1 flex-col">
-        <el-scrollbar
-          ref="contentScrollbarRef"
-          v-loading="loading"
-          class="min-h-0 flex-1"
-          @scroll="handleContentScroll"
-        >
-          <div class="p-6">
-            <template v-if="storeTools.length">
-              <div v-if="hasSearchKeyword" class="mb-4">
-                找到 <strong class="text-primary">{{ storeTools.length }}</strong> 个相关工具
-              </div>
-              <div v-if="hasSearchKeyword" class="tool-store-search-grid">
-                <ToolStoreCard
-                  v-for="tool in storeTools"
-                  :key="`${tool.source}-${tool.id}`"
-                  :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'"
-                  :loading="addingToolId === tool.id"
-                  :tool="tool"
-                  @add="handleOpenAddTool(tool)"
-                  @detail="handleOpenDetail(tool)"
-                />
-              </div>
-              <template v-else>
-                <section
-                  v-for="category in toolStoreCategories"
-                  :id="`tool-store-category-${category.id}`"
-                  :key="category.id"
-                  class="mb-8 scroll-mt-4"
-                >
-                  <h4 class="mb-4">{{ category.title }}</h4>
-                  <div class="tool-store-card-grid">
-                    <ToolStoreCard
-                      v-for="tool in category.tools"
-                      :key="`${tool.source}-${tool.id}`"
-                      :category-title="category.title"
-                      :loading="addingToolId === tool.id"
-                      :tool="tool"
-                      @add="handleOpenAddTool(tool)"
-                      @detail="handleOpenDetail(tool)"
-                    />
-                  </div>
-                </section>
-              </template>
-            </template>
-            <MkEmpty v-else class="mt-24" />
+      <div class="pt-4">
+        <!-- 搜索之后的 -->
+        <template v-if="hasSearchKeyword && !loading">
+          <div class="mb-4 font-semibold">
+            找到 <span class="text-primary">{{ storeTools.length }}</span> 个相关工具
           </div>
-        </el-scrollbar>
-      </main>
-    </div>
-  </MkDialog>
 
-  <ToolStoreDetailDrawer ref="detailDrawerRef" @add="handleOpenAddTool" />
-  <AddStoreToolDialog ref="addToolDialogRef" @submit="handleAddTool" />
+          <div class="mk-resource-card-grid-sm">
+            <template v-for="tool in storeTools" :key="`${tool.source}-${tool.id}`">
+              <ToolStoreCard :category-title="categoryTitles[tool.label || 'other'] ?? tool.label ?? '其他'" :folder-id="folderId" :tool="tool" @refresh="handleAddSuccess" />
+            </template>
+          </div>
+          <MkEmpty v-if="!storeTools.length" type="search" />
+        </template>
+        <!-- 未搜索 -->
+        <template v-else-if="storeTools.length">
+          <section v-for="category in toolStoreCategories" :id="`tool-store-category-${category.id}`" :key="category.id" class="mb-8 scroll-mt-4">
+            <h4 class="mb-4">{{ category.title }}</h4>
+            <div class="mk-resource-card-grid-sm">
+              <template v-for="tool in category.tools" :key="`${tool.source}-${tool.id}`">
+                <ToolStoreCard :category-title="category.title" :folder-id="folderId" :tool="tool" @refresh="handleAddSuccess" />
+              </template>
+            </div>
+          </section>
+        </template>
+        <MkEmpty v-else-if="!loading" class="mt-24" />
+      </div>
+    </MkViewLayout>
+  </MkDialog>
 </template>
 
-<style scoped lang="scss">
-.tool-store-card-grid {
-  display: grid;
-  gap: calc(var(--spacing) * 4);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-}
-
-.tool-store-layout {
-  height: min(724px, calc(100vh - 120px));
-}
-
-.tool-store-search-grid {
-  display: grid;
-  gap: calc(var(--spacing) * 4);
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr));
-}
-</style>
-
-<style lang="scss">
-.tool-store-dialog {
-  max-width: calc(100vw - 48px);
-
-  .el-dialog__header {
-    border-bottom: 1px solid var(--mk-N200);
-    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 6);
-  }
-
-  .el-dialog__headerbtn {
-    top: 14px;
-  }
-}
-</style>
+<style scoped lang="scss"></style>

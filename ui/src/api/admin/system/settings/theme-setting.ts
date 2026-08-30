@@ -6,6 +6,4 @@ const putThemeSetting = (payload: FormData) => {
   return put<FormData, boolean>('/settings/theme', payload)
 }
 
-export default {
-  putThemeSetting,
-}
+export default { putThemeSetting }

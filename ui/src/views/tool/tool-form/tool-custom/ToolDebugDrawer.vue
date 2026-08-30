@@ -8,9 +8,7 @@ import { MkDynamicsForm } from '@/components/mk-dynamics-form'
 
 defineOptions({ name: 'ToolDebugDrawer' })
 
-const props = defineProps<{
-  api: typeof ToolApi
-}>()
+const props = defineProps<{ api: typeof ToolApi }>()
 
 const formRef = ref<FormInstance>()
 const dynamicsFormRef = ref<InstanceType<typeof MkDynamicsForm>>()
@@ -20,22 +18,14 @@ const showResult = ref(false)
 const debugSucceeded = ref(false)
 const debugResult = ref<unknown>()
 
-const debugForm = reactive<ToolDebugPayload>({
-  code: '',
-  debug_field_list: [],
-  init_field_list: [],
-  init_params: {},
-  input_field_list: [],
-})
+const debugForm = reactive<ToolDebugPayload>({ code: '', debug_field_list: [], init_field_list: [], init_params: {}, input_field_list: [] })
 
 const formRules = computed<FormRules>(() => {
   const rules: FormRules = {}
 
   debugForm.debug_field_list.forEach((field, index) => {
     if (field.is_required) {
-      rules[`debug_field_list.${index}.value`] = [
-        { required: true, message: `请输入${field.name}`, trigger: 'blur' },
-      ]
+      rules[`debug_field_list.${index}.value`] = [{ required: true, message: `请输入${field.name}`, trigger: 'blur' }]
     }
   })
   return rules
@@ -59,13 +49,9 @@ function open(tool: ToolPayload) {
   debugForm.code = tool.code ?? ''
   debugForm.input_field_list = cloneDeep(tool.input_field_list ?? [])
   debugForm.init_field_list = cloneDeep(tool.init_field_list ?? [])
-  const savedInitParams =
-    typeof tool.init_params === 'object' && tool.init_params ? tool.init_params : {}
+  const savedInitParams = typeof tool.init_params === 'object' && tool.init_params ? tool.init_params : {}
   debugForm.init_params = cloneDeep(savedInitParams)
-  debugForm.debug_field_list = debugForm.input_field_list.map((field) => ({
-    ...field,
-    value: '',
-  }))
+  debugForm.debug_field_list = debugForm.input_field_list.map((field) => ({ ...field, value: '' }))
   visible.value = true
 }
 
@@ -77,10 +63,7 @@ function getErrorMessage(error: unknown) {
 }
 
 function handleRun() {
-  Promise.all([
-    dynamicsFormRef.value?.validate() ?? Promise.resolve(),
-    formRef.value?.validate() ?? Promise.resolve(true),
-  ])
+  Promise.all([dynamicsFormRef.value?.validate() ?? Promise.resolve(), formRef.value?.validate() ?? Promise.resolve(true)])
     .then(() => {
       loading.value = true
       showResult.value = false
@@ -121,15 +104,7 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    append-to-body
-    class="tool-debug-drawer"
-    :modal="false"
-    :show-close="false"
-    size="60%"
-    @closed="resetData"
-  >
+  <MkDrawer v-model="visible" append-to-body class="tool-debug-drawer" :modal="false" :show-close="false" size="60%" @closed="resetData">
     <template #header>
       <div class="-ml-2 flex items-center">
         <el-button class="mr-1" text @click="visible = false">
@@ -142,11 +117,7 @@ defineExpose({ open })
     <section v-if="debugForm.init_field_list.length" class="mb-6">
       <h4 class="mk-title-decoration mb-4">启动参数</h4>
 
-      <MkDynamicsForm
-        ref="dynamicsFormRef"
-        v-model="debugForm.init_params"
-        :render-data="debugForm.init_field_list"
-      />
+      <MkDynamicsForm ref="dynamicsFormRef" v-model="debugForm.init_params" :render-data="debugForm.init_field_list" />
     </section>
 
     <section v-if="debugForm.debug_field_list.length" class="mb-6">
@@ -162,11 +133,7 @@ defineExpose({ open })
         require-asterisk-position="right"
         @submit.prevent
       >
-        <el-form-item
-          v-for="(field, index) in debugForm.debug_field_list"
-          :key="`${field.name}-${index}`"
-          :prop="`debug_field_list.${index}.value`"
-        >
+        <el-form-item v-for="(field, index) in debugForm.debug_field_list" :key="`${field.name}-${index}`" :prop="`debug_field_list.${index}.value`">
           <template #label>
             <span class="inline-flex items-center gap-2">
               <span :class="field.is_required ? 'mk-required' : ''">
@@ -184,19 +151,9 @@ defineExpose({ open })
 
     <section v-if="showResult" class="mt-4">
       <h4 class="mk-title-decoration mb-4">运行结果</h4>
-      <el-alert
-        :closable="false"
-        :title="debugSucceeded ? '运行成功' : '运行失败'"
-        :type="debugSucceeded ? 'success' : 'error'"
-        class="mb-4"
-        show-icon
-      />
+      <el-alert :closable="false" :title="debugSucceeded ? '运行成功' : '运行失败'" :type="debugSucceeded ? 'success' : 'error'" class="mb-4" show-icon />
       <p class="mb-2">输出</p>
-      <pre
-        class="whitespace-pre-wrap rounded-md border p-2"
-        :class="{ 'border-danger': !debugSucceeded }"
-        >{{ formattedResult }}</pre
-      >
+      <pre class="whitespace-pre-wrap rounded-md border p-2" :class="{ 'border-danger': !debugSucceeded }">{{ formattedResult }}</pre>
     </section>
   </MkDrawer>
 </template>

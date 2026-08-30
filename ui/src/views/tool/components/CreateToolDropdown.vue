@@ -15,13 +15,9 @@ defineOptions({ name: 'ToolCreateDropdown' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  folderId: string
-}>()
+const props = defineProps<{ folderId: string }>()
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
@@ -30,13 +26,10 @@ defineSlots<{
 
 /* 工具创建表单 */
 const toolFormDrawerRef = useTemplateRef<InstanceType<typeof ToolFormDrawer>>('toolFormDrawerRef')
-const workflowFormDialogRef =
-  useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
-const skillToolFormDrawerRef =
-  useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
+const workflowFormDialogRef = useTemplateRef<InstanceType<typeof WorkflowFormDialog>>('workflowFormDialogRef')
+const skillToolFormDrawerRef = useTemplateRef<InstanceType<typeof SkillToolFormDrawer>>('skillToolFormDrawerRef')
 const mcpFormDrawerRef = useTemplateRef<InstanceType<typeof McpFormDrawer>>('mcpFormDrawerRef')
-const dataSourceFormDrawerRef =
-  useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
+const dataSourceFormDrawerRef = useTemplateRef<InstanceType<typeof DataSourceFormDrawer>>('dataSourceFormDrawerRef')
 
 function handleOpenToolForm() {
   toolFormDrawerRef.value?.open()
@@ -111,17 +104,7 @@ function handleRefresh() {
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
           <span>数据源</span>
         </MkDropdownItem>
-        <el-upload
-          ref="elUploadRef"
-          action="#"
-          :auto-upload="false"
-          class="w-full"
-          :file-list="[]"
-          :limit="1"
-          multiple
-          :on-change="handleImportCreate"
-          :show-file-list="false"
-        >
+        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="w-full" :file-list="[]" :limit="1" multiple :on-change="handleImportCreate" :show-file-list="false">
           <MkDropdownItem class="py-2!">
             <template #icon>
               <img src="@/assets/mk_icon_import.svg" alt="" />
@@ -132,39 +115,9 @@ function handleRefresh() {
       </MkDropdownMenu>
     </template>
   </MkDropdown>
-  <ToolFormDrawer
-    ref="toolFormDrawerRef"
-    title="创建工具"
-    :api="ToolApi"
-    :folder-id="folderId"
-    @refresh="handleRefresh"
-  />
-  <WorkflowFormDialog
-    ref="workflowFormDialogRef"
-    title="创建工作流"
-    :api="ToolApi"
-    :folder-id="folderId"
-    @refresh="handleRefresh"
-  />
-  <SkillToolFormDrawer
-    ref="skillToolFormDrawerRef"
-    title="创建 Skill"
-    :api="ToolApi"
-    :folder-id="folderId"
-    @refresh="handleRefresh"
-  />
-  <McpFormDrawer
-    ref="mcpFormDrawerRef"
-    title="创建 MCP"
-    :api="ToolApi"
-    :folder-id="folderId"
-    @refresh="handleRefresh"
-  />
-  <DataSourceFormDrawer
-    ref="dataSourceFormDrawerRef"
-    title="创建数据源"
-    :api="ToolApi"
-    :folder-id="folderId"
-    @refresh="handleRefresh"
-  />
+  <ToolFormDrawer ref="toolFormDrawerRef" title="创建工具" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
+  <WorkflowFormDialog ref="workflowFormDialogRef" title="创建工作流" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
+  <SkillToolFormDrawer ref="skillToolFormDrawerRef" title="创建 Skill" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
+  <McpFormDrawer ref="mcpFormDrawerRef" title="创建 MCP" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
+  <DataSourceFormDrawer ref="dataSourceFormDrawerRef" title="创建数据源" :api="ToolApi" :folder-id="folderId" @refresh="handleRefresh" />
 </template>

@@ -3,17 +3,7 @@ import { SuccessFilled } from '@element-plus/icons-vue'
 
 defineOptions({ name: 'MkStatusLabel' })
 
-withDefaults(
-  defineProps<{
-    active: boolean
-    activeText?: string
-    inactiveText?: string
-  }>(),
-  {
-    activeText: '已启用',
-    inactiveText: '已禁用',
-  },
-)
+withDefaults(defineProps<{ active: boolean; activeText?: string; inactiveText?: string }>(), { activeText: '已启用', inactiveText: '已禁用' })
 </script>
 
 <template>

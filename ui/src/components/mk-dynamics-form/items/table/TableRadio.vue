@@ -94,9 +94,7 @@ watch(
       const defaultItem = _.head(tableData.value)
       let defaultItemValue = _.get(defaultItem, valueField.value)
       if (props.modelValue) {
-        const row = options.value.find(
-          (f: DynamicFormValue) => f[valueField.value] === props.modelValue,
-        )
+        const row = options.value.find((f: DynamicFormValue) => f[valueField.value] === props.modelValue)
         if (row) {
           defaultItemValue = row[valueField.value]
         }
@@ -111,9 +109,7 @@ watch(
 
 const activeText = computed(() => {
   if (props.modelValue) {
-    const row = options.value.find(
-      (f: DynamicFormValue) => f[valueField.value] === props.modelValue,
-    )
+    const row = options.value.find((f: DynamicFormValue) => f[valueField.value] === props.modelValue)
     return row?.[textField.value]
   }
   return props.modelValue
@@ -125,14 +121,7 @@ const activeText = computed(() => {
     <div class="header">
       <div class="title">{{ title }}</div>
 
-      <el-input
-        v-model="filterText"
-        :validate-event="false"
-        placeholder="请输入关键词搜索"
-        class="input-with-select"
-        style="--el-color-danger: #c0c4cc"
-        clearable
-      >
+      <el-input v-model="filterText" :validate-event="false" placeholder="请输入关键词搜索" class="input-with-select" style="--el-color-danger: #c0c4cc" clearable>
         <template #prepend>
           <el-button :icon="Search" />
         </template>
@@ -151,19 +140,12 @@ const activeText = computed(() => {
           <input type="radio" :checked="localValue === scope.row[valueField]" />
         </template>
       </el-table-column>
-      <el-table-column
-        v-for="(column, index) in tableColumns"
-        v-bind="column"
-        :label="column.label"
-        :key="index"
-      >
+      <el-table-column v-for="(column, index) in tableColumns" v-bind="column" :label="column.label" :key="index">
         <template #default="scope">
           <template v-if="column.type === 'component'">
             <TableColumn :column="column" :row="scope.row"></TableColumn>
           </template>
-          <template v-else-if="column.type === 'eval'">
-            <span v-html="evalF(column.property, scope.row)"></span
-          ></template>
+          <template v-else-if="column.type === 'eval'"> <span v-html="evalF(column.property, scope.row)"></span></template>
           <template v-else>
             <span>{{ scope.row[column.property] }}</span></template
           >

@@ -1,11 +1,6 @@
 import { del, get, post } from '../core/request'
 import type { ParamsPage, ResponsePage } from '../core/types'
-import type {
-  CreateWorkspaceMemberPayload,
-  Dict,
-  WorkspaceItem,
-  WorkspaceMemberItem,
-} from '@/api/types'
+import type { CreateWorkspaceMemberPayload, Dict, WorkspaceItem, WorkspaceMemberItem } from '@/api/types'
 
 const prefix = '/system/workspace'
 
@@ -19,10 +14,7 @@ const getSystemWorkspaceList = () => {
 // TODO 工作空间管理员接口 /workspace 未区分
 
 const getWorkspaceMemberList = (workspace_id: string, page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<WorkspaceMemberItem>>(
-    `${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+  return get<ResponsePage<WorkspaceMemberItem>>(`${prefix}/${workspace_id}/user_list/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 新建或更新工作空间。 */
@@ -42,10 +34,7 @@ const deleteWorkspace = (workspaceId: string) => {
 
 /** 新增工作空间成员。 */
 const postWorkspaceMembers = (workspaceId: string, members: CreateWorkspaceMemberPayload[]) => {
-  return post<CreateWorkspaceMemberPayload[], boolean>(
-    `${prefix}/${workspaceId}/add_member`,
-    members,
-  )
+  return post<CreateWorkspaceMemberPayload[], boolean>(`${prefix}/${workspaceId}/add_member`, members)
 }
 
 /** 移除工作空间成员。 */
@@ -61,10 +50,7 @@ export interface WorkspaceBatchRemoveResult {
 
 /** 批量移除工作空间成员。 */
 const postBatchRemoveWorkspaceMembers = (workspaceId: string, userRelationIds: string[]) => {
-  return post<{ user_relation_ids: string[] }, WorkspaceBatchRemoveResult>(
-    `${prefix}/${workspaceId}/batch_remove_member`,
-    { user_relation_ids: userRelationIds },
-  )
+  return post<{ user_relation_ids: string[] }, WorkspaceBatchRemoveResult>(`${prefix}/${workspaceId}/batch_remove_member`, { user_relation_ids: userRelationIds })
 }
 
 export default {

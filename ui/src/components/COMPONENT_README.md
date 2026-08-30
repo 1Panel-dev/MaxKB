@@ -37,7 +37,7 @@ src/components/
 │   ├── folder-tree/              # Workspace 文件夹虚拟树及固定 CRUD 业务
 │   │   ├── index.vue
 │   │   ├── FolderFormDialog.vue
-│   │   ├── MoveFolderDialog.vue
+│   │   ├── MoveToDialog.vue
 │   │   ├── VirtualizedTree.vue
 │   │   └── types.ts
 │   ├── model-select/
@@ -127,6 +127,7 @@ import PythonCodeEditor from '@/components/codemirror-editor/python.vue'
 import JsonInput from '@/components/codemirror-editor/Json.vue'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
 import FolderTree from '@/components/business/folder-tree/index.vue'
+import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
@@ -214,12 +215,12 @@ Element Plus 使用 `ElOnlyChild` 处理浮层触发器。`el-tooltip`、`el-pop
 
 ### MkDialog
 
-全局对话框组件，统一使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6` 内边距。默认显示关闭
-按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以通过同名 Props
-覆盖。Element Plus Dialog 的其他属性和事件通过 `$attrs` 透传，`header`、`subtitle`、默认和
-`footer` 插槽保持可用。`subtitle` 位于标题下方的 Header 区域，并统一使用
-`mb-6 text-sm text-N600` 样式；仅使用 `subtitle` 时，组件仍会按照 Element Plus 原生的标题
-ID 和样式类渲染 `title`。内容区域超出最大高度后显示滚动条。
+全局对话框组件，Header 高度统一为 `60px`，使用 `el-scrollbar` 包裹内容并为默认插槽提供 `p-6`
+内边距。默认显示关闭按钮、关闭时销毁内容，同时禁止点击遮罩或按 Escape 关闭；这些默认行为可以
+通过同名 Props 覆盖。Element Plus Dialog 的其他属性和事件通过 `$attrs` 透传，`header`、
+`subtitle`、默认和 `footer` 插槽保持可用。`subtitle` 位于标题下方的 Header 区域，并统一使用
+`mt-2 text-N600` 样式；仅使用 `subtitle` 时，组件仍会按照 Element Plus 原生的标题 ID 和样式类
+渲染 `title`。内容区域超出最大高度后显示滚动条。
 
 ```vue
 <MkDialog v-model="visible" title="创建工作空间" width="600">
@@ -252,10 +253,11 @@ Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus
 ```
 
 业务 Dialog 和 Drawer 的状态生命周期保持一致：`open()` 先调用 `resetData()`，再回填编辑数据并
-显示浮层；取消、提交成功或其他关闭操作直接将 `v-model` 绑定的可见状态设为 `false`，不额外定义或
-向父组件暴露 `close()`；组件统一监听 `closed` 调用 `resetData()`，确保所有关闭路径都在关闭动画
-结束后完成清理。`resetData()` 应统一重置表单、提交状态、临时选项和表单校验，不把清理逻辑散落在
-`open()`、取消按钮或提交成功回调中。
+显示浮层；取消、提交成功或其他关闭操作通常直接将 `v-model` 绑定的可见状态设为 `false`。当浮层
+只负责收集数据，而提交数据的接收校验或异步请求由父组件负责时，可以向父组件暴露 `close()`，由
+父组件在数据接收或请求成功后关闭浮层，校验拒绝或请求失败时保持浮层打开。组件统一监听 `closed`
+调用 `resetData()`，确保所有关闭路径都在关闭动画结束后完成清理。`resetData()` 应统一重置表单、
+提交状态、临时选项和表单校验，不把清理逻辑散落在 `open()`、取消按钮或提交成功回调中。
 
 ### MkComplexSearch
 
@@ -285,12 +287,7 @@ Escape 关闭；这些默认行为可以通过同名 Props 覆盖。Element Plus
 <MkComplexSearch
   :fields="[
     { label: '名称', value: 'name' },
-    {
-      label: '创建者',
-      value: 'create_user',
-      options: creatorOptions,
-      remoteMethod: loadCreatorOptions,
-    },
+    { label: '创建者', value: 'create_user', options: creatorOptions, remoteMethod: loadCreatorOptions },
   ]"
   @change="loadResources($event)"
 />
@@ -336,12 +333,7 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 当前原始选项；选择后先更新 `v-model`，再通过 `select` 返回未经转换的原始选项。
 
 ```vue
-<MkFilterableDropdown
-  v-model="selectedWorkspaceId"
-  :options="workspaces"
-  :props="{ label: 'name', value: 'id' }"
-  @select="handleWorkspaceSelect"
->
+<MkFilterableDropdown v-model="selectedWorkspaceId" :options="workspaces" :props="{ label: 'name', value: 'id' }" @select="handleWorkspaceSelect">
   <template #default="{ text }">
     <button type="button">{{ text }}</button>
   </template>
@@ -353,8 +345,9 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 ### MkViewLayout
 
-路由页面的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title` Prop，未传入
-时读取当前路由的 `meta.title`。`aside` 作用域插槽提供 `title` 和对应区域的 `Header` 包装组件，
+路由页面及全高浮层的通用内容结构，统一提供满高弹性布局及可选左侧栏。标题优先使用 `title`
+Prop，未传入时读取当前路由的 `meta.title`；显式传入 `title=""` 可隐藏默认标题。`aside`
+作用域插槽提供 `title` 和对应区域的 `Header` 包装组件，
 默认作用域插槽另外提供主内容区的 `Footer` 包装组件；插槽未渲染 `Header` 时，组件会自动显示当前
 标题，页面需要添加操作区或自定义标题时再显式渲染 `Header`。Header 固定在主内容区顶部，其余
 默认插槽内容由组件统一放入
@@ -363,6 +356,9 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 或全高 Drawer 右侧内容的操作按钮。页面可以在同一个插槽中组织标题、内容、底栏和空状态，并只写
 一次业务状态判断。传入 `aside` 插槽后才会渲染左侧栏；左右结构上方的独立内容放入 `top` 插槽。
 页面加载状态通过 `loading` Prop 传入，由组件将 Element Plus Loading 遮罩绑定到整个布局根节点。
+主内容区滚动时通过 `scroll` 事件返回 `scrollTop` 和 `scrollLeft`；需要由分类导航等外部交互定位
+主内容时，通过组件 Ref 调用公开的 `setScrollTop()`。`getScrollContainer()` 返回主内容区实际滚动
+元素，可传给 `el-anchor` 等需要显式滚动容器的组件。
 默认插槽没有渲染 `Header` 时会自动显示当前标题；显式渲染后则由页面控制标题内容。`collapsible`
 默认为 `false`；传入后，展开状态仅在鼠标移入侧栏或焦点进入侧栏时显示收起按钮，收起状态始终显示
 展开按钮。收起时释放侧栏宽度，页面不需要自行维护折叠状态。
@@ -516,12 +512,7 @@ Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载
 分页配置可省略；省略时不显示分页器。`pageSizes` 默认为 `[10, 20, 50, 100]`：
 
 ```ts
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  pageSizes: [10, 20, 50, 100],
-  total: 0,
-})
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, pageSizes: [10, 20, 50, 100], total: 0 })
 ```
 
 使用 `v-model:pagination-config` 接收页码和每页数量变化，也可以监听 `current-change` 和
@@ -529,13 +520,7 @@ const paginationConfig = ref({
 `size-change` 中重新加载数据，不要重复修改页码。
 
 ```vue
-<MkTable
-  v-model:pagination-config="paginationConfig"
-  :data="currentPageUsers"
-  :max-table-height="280"
-  resizable
-  row-key="id"
->
+<MkTable v-model:pagination-config="paginationConfig" :data="currentPageUsers" :max-table-height="280" resizable row-key="id">
   <el-table-column prop="name" label="姓名" />
 </MkTable>
 ```
@@ -664,13 +649,7 @@ function handleDateRangeChange({ startTime, endTime }: MkDateRangeValue) {
 import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 </script>
 
-<MkDragUpload
-  v-model="fileList"
-  accept=".zip"
-  tip-text="支持格式：ZIP，大小不超过 100 MB"
-  @change="handleFileChange"
-  @remove="handleFileRemove"
->
+<MkDragUpload v-model="fileList" accept=".zip" tip-text="支持格式：ZIP，大小不超过 100 MB" @change="handleFileChange" @remove="handleFileRemove">
   <template #download="{ file }">
     <el-button link @click="handleDownload(file)">下载</el-button>
   </template>
@@ -758,12 +737,7 @@ import MkSourceCard from '@/components/mk-source-card/index.vue'
 批量选择模式由页面显式控制：
 
 ```vue
-<MkSourceCard
-  :selectable="batchSelectionMode"
-  :selected="selected"
-  title="工作流工具"
-  @selected="selected = $event"
->
+<MkSourceCard :selectable="batchSelectionMode" :selected="selected" title="工作流工具" @selected="selected = $event">
   <p>工具描述</p>
 </MkSourceCard>
 ```
@@ -795,11 +769,7 @@ import MkFormList from '@/components/mk-form-list/index.vue'
 const roleSettings = defineModel<{ roleId: string; workspaceIds: string[] }[]>({ required: true })
 </script>
 
-<MkFormList
-  v-model="roleSettings"
-  add-text="添加角色"
-  :default-item="{ roleId: '', workspaceIds: [] }"
->
+<MkFormList v-model="roleSettings" add-text="添加角色" :default-item="{ roleId: '', workspaceIds: [] }">
   <template #default="{ index, item }">
     <el-form-item
       class="flex-1"
@@ -903,12 +873,7 @@ function selectItem(item: SearchListItem, index: number) {
 业务数据不使用 `name/id` 时，通过 `props.label` 和 `props.value` 指定替代字段。
 
 ```vue
-<MkSearchList
-  v-model="searchKeyword"
-  :data="workspaces"
-  :props="{ label: 'displayName', value: 'workspaceId' }"
-  @click="selectWorkspace"
->
+<MkSearchList v-model="searchKeyword" :data="workspaces" :props="{ label: 'displayName', value: 'workspaceId' }" @click="selectWorkspace">
   <template #row="{ row: workspace, active }">
     <span :class="{ 'font-medium': active }">{{ workspace.displayName }}</span>
   </template>
@@ -945,11 +910,7 @@ function selectItem(item: SearchListItem, index: number) {
 <script setup lang="ts">
 import { ref } from 'vue'
 import type { Dict } from '@/api/types'
-import {
-  MkDynamicsForm,
-  type DynamicFormValue,
-  type FormField,
-} from '@/components/mk-dynamics-form'
+import { MkDynamicsForm, type DynamicFormValue, type FormField } from '@/components/mk-dynamics-form'
 
 const formFields = ref<FormField[]>([])
 const formValue = ref<Dict<DynamicFormValue>>({})
@@ -979,9 +940,10 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 
 ### FolderTree
 
-Workspace 的文件夹虚拟树业务组件。组件根据 `workspaceId` 和 `source` 调用统一文件夹接口，负责
+Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文和 `source` 调用统一文件夹接口，负责
 文件夹树查询、搜索、排序、创建、编辑、移动和删除。通过 `v-model` 控制当前文件夹 ID，选择
-文件夹时触发 `select`；`beforeTree` 插槽用于“全部”“共享”等不属于文件夹接口的固定入口。
+文件夹时触发 `select`。`showAll`、`showShared` 分别控制全部和共享入口，`rootLabel` 可覆盖根入口
+文案，`disabledFolderIds` 用于只选场景中禁用指定节点。
 
 ```vue
 <script setup lang="ts">
@@ -989,19 +951,25 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 </script>
 
-<FolderTree
-  v-model="currentFolderId"
-  :source="RESOURCE_TYPE.TOOL"
-  :workspace-id="workspaceId"
-  @select="handleFolderSelect"
->
-  <template #beforeTree>全部工具、共享工具等固定入口</template>
-</FolderTree>
+<FolderTree v-model="currentFolderId" :source="RESOURCE_TYPE.TOOL" draggable @select="handleFolderSelect" />
 ```
 
 页面顶部需要触发根目录创建时，通过页面语义处理方法调用组件暴露的 `openCreate()`；外部数据变化
-后可调用 `refresh()` 重新加载文件夹树。`VirtualizedTree.vue` 基于 `@he-tree/vue` 的 `Draggable`
-实现虚拟渲染和拖拽交互，只负责树 UI，不调用 API；不要替换为 Element Plus `el-tree-v2`。
+后可调用 `refresh()` 重新加载文件夹树。`MoveToDialog.vue` 每次打开都会重新挂载内部 `FolderTree`，
+加载最新目录并复用相同的搜索和排序能力。
+`VirtualizedTree.vue` 基于 `@he-tree/vue` 的 `Draggable` 实现虚拟渲染和拖拽交互，只负责树 UI，
+不调用 API；不要替换为 Element Plus `el-tree-v2`。
+
+### MoveToDialog
+
+可复用的文件夹移动对话框。传入资源 `source` 和请求状态 `loading`，通过组件 Ref 调用
+`open(currentFolderId)`。对话框每次打开都会重新查询文件夹树，并复用 `FolderTree` 的搜索与排序；
+确认后通过 `submit` 返回目标文件夹 ID，使用方自行维护待移动资源，完成请求后调用 `close()`
+关闭弹窗。
+
+```vue
+<MoveToDialog ref="moveToDialogRef" :loading="submitting" :source="RESOURCE_TYPE.TOOL" @submit="handleMoveFolder" />
+```
 
 ### ModelSelect
 
@@ -1014,13 +982,7 @@ import FolderTree from '@/components/business/folder-tree/index.vue'
 import ModelSelect from '@/components/business/model-select/index.vue'
 </script>
 
-<ModelSelect
-  v-model="selectedModelId"
-  model-type="LLM"
-  :options="modelOptions"
-  placeholder="请选择模型"
-  @change="handleModelChange"
-/>
+<ModelSelect v-model="selectedModelId" model-type="LLM" :options="modelOptions" placeholder="请选择模型" @change="handleModelChange" />
 ```
 
 ### WorkspaceDropdown
@@ -1034,11 +996,7 @@ import ModelSelect from '@/components/business/model-select/index.vue'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 </script>
 
-<WorkspaceDropdown
-  v-model="selectedWorkspaceId"
-  :options="workspaceOptions"
-  @select="handleWorkspaceSelect"
-/>
+<WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
 ```
 
 ### WorkspaceRelationTags
@@ -1053,11 +1011,7 @@ import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vu
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 </script>
 
-<WorkspaceRelationTags
-  :table-render-params="{ property: '角色', value: '工作空间' }"
-  :tags="user.role_name"
-  :tag-workspace="user.role_workspace"
-/>
+<WorkspaceRelationTags :table-render-params="{ property: '角色', value: '工作空间' }" :tags="user.role_name" :tag-workspace="user.role_workspace" />
 ```
 
 ## 新增公共组件

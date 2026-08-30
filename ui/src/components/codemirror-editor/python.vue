@@ -12,13 +12,9 @@ defineOptions({ name: 'PythonCodeEditor', inheritAttrs: false })
 const code = defineModel<string>({ required: true })
 defineProps<{ title?: string }>()
 
-const emit = defineEmits<{
-  submitDialog: [code: string]
-}>()
+const emit = defineEmits<{ submitDialog: [code: string] }>()
 
-defineSlots<{
-  'header-extra'?(): unknown
-}>()
+defineSlots<{ 'header-extra'?(): unknown }>()
 
 function getDocumentPosition(state: EditorState, line: number, column: number) {
   const safeLine = Math.max(1, Math.min(line, state.doc.lines))
@@ -29,18 +25,9 @@ function getDocumentPosition(state: EditorState, line: number, column: number) {
 
 function createDiagnostic(state: EditorState, issue: ToolPylintIssue): Diagnostic {
   const from = getDocumentPosition(state, issue.line, issue.column)
-  const endPosition = getDocumentPosition(
-    state,
-    issue.endLine ?? issue.line,
-    issue.endColumn ?? issue.column + 1,
-  )
+  const endPosition = getDocumentPosition(state, issue.endLine ?? issue.line, issue.endColumn ?? issue.column + 1)
 
-  return {
-    from: Math.min(from, endPosition),
-    message: issue.message,
-    severity: issue.type,
-    to: Math.max(from, endPosition),
-  }
+  return { from: Math.min(from, endPosition), message: issue.message, severity: issue.type, to: Math.max(from, endPosition) }
 }
 
 const codeLinter = linter(
@@ -96,13 +83,7 @@ function submitEditorDialog() {
       </div>
     </template>
 
-    <Codemirror
-      v-model="dialogCode"
-      autofocus
-      :extensions="extensions"
-      style="height: calc(100vh - 160px) !important"
-      :tab-size="4"
-    />
+    <Codemirror v-model="dialogCode" autofocus :extensions="extensions" style="height: calc(100vh - 160px) !important" :tab-size="4" />
 
     <template #footer>
       <el-button type="primary" @click="submitEditorDialog">确定</el-button>

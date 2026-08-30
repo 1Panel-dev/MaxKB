@@ -8,9 +8,7 @@ defineOptions({ name: 'MkDateRange' })
 
 type DatePreset = 7 | 30 | 90 | 183 | 'custom'
 
-const emit = defineEmits<{
-  change: [value: MkDateRangeValue]
-}>()
+const emit = defineEmits<{ change: [value: MkDateRangeValue] }>()
 
 const datePresetOptions: OptionItem<DatePreset>[] = [
   { label: '过去 7 天', value: 7 },
@@ -28,22 +26,14 @@ function handleDatePresetChange(preset: DatePreset) {
 }
 
 function handleCustomDateRangeChange() {
-  emit('change', {
-    startTime: customDateRange.value[0] ?? '',
-    endTime: customDateRange.value[1] ?? '',
-  })
+  emit('change', { startTime: customDateRange.value[0] ?? '', endTime: customDateRange.value[1] ?? '' })
 }
 </script>
 
 <template>
   <div class="flex gap-3">
     <el-select v-model="datePreset" class="w-30!" @change="handleDatePresetChange">
-      <el-option
-        v-for="option in datePresetOptions"
-        :key="option.value"
-        :label="option.label"
-        :value="option.value"
-      />
+      <el-option v-for="option in datePresetOptions" :key="option.value" :label="option.label" :value="option.value" />
     </el-select>
     <el-date-picker
       v-if="datePreset === 'custom'"

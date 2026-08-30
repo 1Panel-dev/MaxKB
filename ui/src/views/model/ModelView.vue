@@ -7,20 +7,12 @@ import ModelApi from '@/api/admin/workspace/model/model'
 import CommonSystemApi from '@/api/admin/system/common'
 import SharedApi from '@/api/admin/workspace/shared.ts'
 import ProviderApi from '@/api/admin/model-provider.ts'
-import ModelCard from './model-card/index.vue'
+import ModelCard from './model-card/ModelCard.vue'
 import ModelCreateButton from './create-model/ModelCreateButton.vue'
 import ModelProvider from './components/ModelProvider.vue'
-import {
-  DeleteModelAction,
-  EditModelAction,
-  ParamSettingAction,
-} from './model-card/action-dropdown'
+import { DeleteModelAction, EditModelAction, ParamSettingAction } from './model-card/action-dropdown'
 
-const DEFAULT_MODEL_PROVIDER: ModelProviderItem = {
-  icon: '',
-  name: '全部模型',
-  provider: 'all',
-}
+const DEFAULT_MODEL_PROVIDER: ModelProviderItem = { icon: '', name: '全部模型', provider: 'all' }
 
 const loading = ref(false)
 const currentProvider = ref<ModelProviderItem>(DEFAULT_MODEL_PROVIDER)
@@ -32,29 +24,14 @@ const creatorOptions = ref<OptionItem<string>[]>([])
 const isShared = computed(() => currentProvider.value.provider === 'shared')
 
 function getModelProvider(model: ModelItem): ModelProviderItem {
-  return (
-    modelProviders.value.find(({ provider }) => provider === model.provider) ?? {
-      icon: '',
-      name: model.provider,
-      provider: model.provider,
-    }
-  )
+  return modelProviders.value.find(({ provider }) => provider === model.provider) ?? { icon: '', name: model.provider, provider: model.provider }
 }
 
 /* 搜索 */
 const searchFields = computed(() => [
   { label: '模型名称', value: 'name' },
-  {
-    label: '模型类型',
-    value: 'model_type',
-    options: Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ label, value })),
-  },
-  {
-    label: '创建者',
-    value: 'create_user',
-    options: creatorOptions.value,
-    remoteMethod: loadCreatorOptions,
-  },
+  { label: '模型类型', value: 'model_type', options: Object.entries(MODEL_TYPE_LABELS).map(([value, label]) => ({ label, value })) },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
 ])
 
 function loadCreatorOptions(keyword: string) {
@@ -74,14 +51,9 @@ function loadModels() {
   loading.value = true
 
   const provider = currentProvider.value.provider
-  const query = {
-    ...modelQuery.value,
-    ...(provider !== 'all' && provider !== 'shared' ? { provider } : {}),
-  }
+  const query = { ...modelQuery.value, ...(provider !== 'all' && provider !== 'shared' ? { provider } : {}) }
 
-  const request = isShared.value
-    ? SharedApi.getModelList(modelQuery.value)
-    : ModelApi.getModelList(query)
+  const request = isShared.value ? SharedApi.getModelList(modelQuery.value) : ModelApi.getModelList(query)
 
   return request
     .then((models) => {
@@ -112,11 +84,7 @@ onMounted(() => {
 <template>
   <MkViewLayout class="workspace-model-view" collapsible>
     <template #aside>
-      <ModelProvider
-        :model-value="currentProvider"
-        :providers="modelProviders"
-        @update:model-value="handleProviderSelect"
-      />
+      <ModelProvider :model-value="currentProvider" :providers="modelProviders" @update:model-value="handleProviderSelect" />
     </template>
 
     <template #default="{ Header }">
@@ -124,45 +92,20 @@ onMounted(() => {
         <h4>{{ currentProvider.name }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <ModelCreateButton
-            v-if="!isShared"
-            :current-provider="currentProvider"
-            :providers="modelProviders"
-            @refresh="loadModels"
-          />
+          <ModelCreateButton v-if="!isShared" :current-provider="currentProvider" :providers="modelProviders" @refresh="loadModels" />
         </div>
       </component>
       <div v-loading="loading">
         <div v-if="ModelItems.length" class="mk-resource-card-grid">
           <template v-for="model in ModelItems" :key="model.id">
-            <ModelCard
-              :api="ModelApi"
-              :model="model"
-              :provider="getModelProvider(model)"
-              :refresh="loadModels"
-              :shared="isShared"
-              :disabled="isShared"
-            >
+            <ModelCard :api="ModelApi" :model="model" :provider="getModelProvider(model)" :refresh="loadModels" :shared="isShared" :disabled="isShared">
               <template #action-dropdown>
-                <EditModelAction
-                  label="编辑"
-                  :api="ModelApi"
-                  :model="model"
-                  :provider="getModelProvider(model)"
-                  @refresh="loadModels"
-                />
-                <ParamSettingAction
-                  v-if="model.model_type !== 'RERANKER'"
-                  label="模型参数设置"
-                  :api="ModelApi"
-                  :model="model"
-                />
-                <DeleteModelAction
-                  label="删除"
-                  :api="ModelApi"
-                  :model="model"
-                  @refresh="loadModels"
-                />
+                <EditModelAction label="编辑" :api="ModelApi" :model="model" :provider="getModelProvider(model)" @refresh="loadModels" />
+                <ParamSettingAction v-if="model.model_type !== 'RERANKER'" label="模型参数设置" :api="ModelApi" :model="model" />
+                <!-- // TODO: 资源授权-统一处理-->
+                <!-- // TODO: 查看关联资源-->
+
+                <DeleteModelAction label="删除" :api="ModelApi" :model="model" @refresh="loadModels" />
               </template>
             </ModelCard>
           </template>

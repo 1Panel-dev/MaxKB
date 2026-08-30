@@ -5,8 +5,7 @@ const SMALL_SCREEN_MEDIA_QUERY = '(width < 48rem)'
 
 /** 判断当前浏览器视口是否处于小屏布局，并在跨越断点时更新。 */
 export function useIsSmallScreen() {
-  const mediaQuery =
-    typeof window === 'undefined' ? undefined : window.matchMedia(SMALL_SCREEN_MEDIA_QUERY)
+  const mediaQuery = typeof window === 'undefined' ? undefined : window.matchMedia(SMALL_SCREEN_MEDIA_QUERY)
   const isSmallScreen = ref(mediaQuery?.matches ?? false)
 
   function syncIsSmallScreen(event: MediaQueryListEvent) {

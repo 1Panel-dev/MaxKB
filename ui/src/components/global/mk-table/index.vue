@@ -22,11 +22,7 @@ const props = withDefaults(
     resizable?: boolean // 非指定表格禁止开启
     size?: 'small'
   }>(),
-  {
-    data: () => [],
-    maxTableHeight: 250,
-    resizable: false,
-  },
+  { data: () => [], maxTableHeight: 250, resizable: false },
 )
 
 const emit = defineEmits<{
@@ -43,9 +39,7 @@ const paginationPageSizes = computed(() => props.paginationConfig?.pageSizes ?? 
 /** 表格高度 */
 const tableHeight = ref(window.innerHeight - props.maxTableHeight)
 function updateTableHeight() {
-  tableHeight.value = props.paginationConfig
-    ? window.innerHeight - props.maxTableHeight
-    : window.innerHeight - props.maxTableHeight + 50
+  tableHeight.value = props.paginationConfig ? window.innerHeight - props.maxTableHeight : window.innerHeight - props.maxTableHeight + 50
 }
 
 /** 选择操作栏 */
@@ -72,10 +66,7 @@ function handleCurrentPageChange(currentPage: number) {
     return
   }
 
-  emit('update:paginationConfig', {
-    ...props.paginationConfig,
-    currentPage,
-  })
+  emit('update:paginationConfig', { ...props.paginationConfig, currentPage })
   emit('current-change', currentPage)
 }
 
@@ -84,11 +75,7 @@ function handlePageSizeChange(pageSize: number) {
     return
   }
 
-  emit('update:paginationConfig', {
-    ...props.paginationConfig,
-    currentPage: 1,
-    pageSize,
-  })
+  emit('update:paginationConfig', { ...props.paginationConfig, currentPage: 1, pageSize })
   emit('size-change', pageSize)
 }
 
@@ -108,10 +95,7 @@ defineExpose({ clearSelection, tableRef })
   <div class="mk-table relative flex w-full min-h-0 flex-1 flex-col">
     <el-table
       ref="tableRef"
-      :class="{
-        'mk-table__resizable--borderless': props.resizable,
-        small: props.size === 'small',
-      }"
+      :class="{ 'mk-table__resizable--borderless': props.resizable, small: props.size === 'small' }"
       :data="props.data"
       :max-height="tableHeight"
       row-key="id"

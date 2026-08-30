@@ -8,6 +8,4 @@ const getAllUsers = (query?: Dict<unknown>) => {
   return get<WorkspaceUserOption[]>(`/workspace/${workspaceId}/user_list`, query)
 }
 
-export default {
-  getAllUsers,
-}
+export default { getAllUsers }

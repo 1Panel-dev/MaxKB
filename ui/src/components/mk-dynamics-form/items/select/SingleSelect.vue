@@ -52,14 +52,7 @@ const label = (option: DynamicFormValue) => {
 
 <template>
   <el-select filterable :teleported="true" clearable v-bind="$attrs" v-model="_modelValue">
-    <el-option
-      v-for="(item, index) in options"
-      :key="index"
-      teleported
-      :label="label(item)"
-      :value="item[valueField]"
-    >
-    </el-option>
+    <el-option v-for="(item, index) in options" :key="index" teleported :label="label(item)" :value="item[valueField]"> </el-option>
   </el-select>
 </template>
 <style lang="scss"></style>

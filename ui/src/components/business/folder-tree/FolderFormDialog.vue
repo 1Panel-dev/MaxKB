@@ -10,27 +10,16 @@ defineOptions({ name: 'FolderFormDialog' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  title: string
-  source: FolderSource
-}>()
+const props = defineProps<{ title: string; source: FolderSource }>()
 
-const emit = defineEmits<{
-  refresh: [folder: FolderItem, isEdit: boolean]
-}>()
+const emit = defineEmits<{ refresh: [folder: FolderItem, isEdit: boolean] }>()
 
 const folderFormRef = useTemplateRef<FormInstance>('folderFormRef')
 const visible = ref(false)
 const editId = ref('')
-const folderForm = reactive({
-  desc: '',
-  name: '',
-  parent_id: '',
-})
+const folderForm = reactive({ desc: '', name: '', parent_id: '' })
 
-const rules: FormRules<typeof folderForm> = {
-  name: [{ message: '请输入文件夹名称', required: true, trigger: 'blur' }],
-}
+const rules: FormRules<typeof folderForm> = { name: [{ message: '请输入文件夹名称', required: true, trigger: 'blur' }] }
 
 const loading = ref(false)
 function handleSubmit() {
@@ -38,9 +27,7 @@ function handleSubmit() {
     if (!valid) return
     loading.value = true
     const isEdit = Boolean(editId.value)
-    const request = isEdit
-      ? FolderApi.putFolder(editId.value, props.source, folderForm)
-      : FolderApi.postFolder(props.source, folderForm)
+    const request = isEdit ? FolderApi.putFolder(editId.value, props.source, folderForm) : FolderApi.postFolder(props.source, folderForm)
 
     return request
       .then((folder) => {
@@ -85,22 +72,9 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="visible" :title="title" @closed="resetData">
-    <el-form
-      ref="folderFormRef"
-      :model="folderForm"
-      :rules="rules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+    <el-form ref="folderFormRef" :model="folderForm" :rules="rules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <el-form-item label="名称" prop="name">
-        <el-input
-          v-model="folderForm.name"
-          maxlength="64"
-          placeholder="请输入名称"
-          show-word-limit
-          @blur="folderForm.name = folderForm.name.trim()"
-        />
+        <el-input v-model="folderForm.name" maxlength="64" placeholder="请输入名称" show-word-limit @blur="folderForm.name = folderForm.name.trim()" />
       </el-form-item>
       <el-form-item label="描述" prop="desc">
         <el-input

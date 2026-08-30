@@ -23,10 +23,7 @@ const getChatUser = () => {
 
 /** 获取对话用户分页列表。 */
 const getChatUserPage = (page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<ChatUser>>(
-    `${prefix}/user_manage/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+  return get<ResponsePage<ChatUser>>(`${prefix}/user_manage/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 创建对话用户。 */
@@ -71,10 +68,7 @@ const postChatUserQuota = (userId: string, payload: ChatUserQuotaPayload) => {
 
 /** 批量设置对话用户 Token 配额。 */
 const postBatchSetChatUserQuota = (request: BatchSetChatUserQuotaRequest) => {
-  return post<BatchSetChatUserQuotaRequest, BatchSetChatUserQuotaResult>(
-    `${prefix}/batch_quota`,
-    request,
-  )
+  return post<BatchSetChatUserQuotaRequest, BatchSetChatUserQuotaResult>(`${prefix}/batch_quota`, request)
 }
 
 /** 获取可导入的对话用户来源。 */

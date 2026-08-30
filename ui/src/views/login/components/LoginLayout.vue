@@ -7,25 +7,15 @@ import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
 
 defineOptions({ name: 'LoginLayout' })
 
-withDefaults(
-  defineProps<{
-    preview?: boolean
-  }>(),
-  {
-    preview: false,
-  },
-)
+withDefaults(defineProps<{ preview?: boolean }>(), { preview: false })
 
-defineSlots<{
-  default: () => unknown
-}>()
+defineSlots<{ default: () => unknown }>()
 
 const { theme } = useStore()
 
 const customLoginImage = computed(() => theme.themeInfo?.loginImage?.trim() ?? '')
 const showDefaultThemeAnimation = computed(() => !customLoginImage.value && theme.isDefaultTheme)
 const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.themeInfo?.theme))
-
 </script>
 
 <template>
@@ -64,12 +54,7 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.th
 }
 
 .login-background {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(var(--mk-primary-rgb) / 5%) 20%,
-    rgba(var(--mk-primary-rgb) / 10%) 100%
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(var(--mk-primary-rgb) / 5%) 20%, rgba(var(--mk-primary-rgb) / 10%) 100%);
 
   background-position: center;
   background-size: cover;

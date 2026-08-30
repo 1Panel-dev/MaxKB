@@ -9,22 +9,14 @@
  * 复杂/特殊按钮可绕过这里，直接用 core 的 hasPermission + 常量自行组合。
  */
 
-import {
-  hasPermission,
-  buildBasePermission,
-  buildBaseResourcePermission,
-  RoleConstants,
-  Compare,
-} from './core'
+import { hasPermission, buildBasePermission, buildBaseResourcePermission, RoleConstants, Compare } from './core'
 import type { Permission } from './core/common'
 
 /** 工作空间级：命中权限位 / 系统管理员 / 该空间管理员 即可。workspaceId 内部取当前路由。 */
 export const can = (p: Permission): boolean => hasPermission(buildBasePermission(p))
 
 /** 工作空间资源级：命中该资源权限位 / 系统管理员 / 该空间管理员 即可。 */
-export const canRes = (p: Permission, id: string): boolean =>
-  hasPermission(buildBaseResourcePermission(p, id))
+export const canRes = (p: Permission, id: string): boolean => hasPermission(buildBaseResourcePermission(p, id))
 
 /** 系统级：命中系统管理员 或 该系统权限位 即可（系统页无 workspace/resource 上下文）。 */
-export const canSys = (p: Permission): boolean =>
-  hasPermission([RoleConstants.ADMIN, p], Compare.OR)
+export const canSys = (p: Permission): boolean => hasPermission([RoleConstants.ADMIN, p], Compare.OR)

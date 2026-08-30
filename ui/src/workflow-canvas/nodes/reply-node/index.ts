@@ -8,8 +8,4 @@ class ReplyNodeView extends WorkflowNodeView {
   }
 }
 
-export default {
-  type: WorkflowNodeType.Reply,
-  model: WorkflowNodeModel,
-  view: ReplyNodeView,
-}
+export default { type: WorkflowNodeType.Reply, model: WorkflowNodeModel, view: ReplyNodeView }

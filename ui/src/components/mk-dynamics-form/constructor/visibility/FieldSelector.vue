@@ -2,10 +2,7 @@
 import { computed } from 'vue'
 import type { VisibilityFieldOption } from '../../type'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
-const props = defineProps<{
-  modelValue: string[]
-  leftOptions?: VisibilityFieldOption[]
-}>()
+const props = defineProps<{ modelValue: string[]; leftOptions?: VisibilityFieldOption[] }>()
 
 const emit = defineEmits(['update:modelValue', 'change'])
 const data = computed({
@@ -43,21 +40,11 @@ defineExpose({ validate })
 </script>
 
 <template>
-  <el-cascader
-    @wheel="handleNodeWheel"
-    :teleported="true"
-    :options="options"
-    v-bind="$attrs"
-    v-model="data"
-    separator=" > "
-    clearable
-  >
+  <el-cascader @wheel="handleNodeWheel" :teleported="true" :options="options" v-bind="$attrs" v-model="data" separator=" > " clearable>
     <template #default="{ data }">
       <span class="flex align-center" @wheel="handleNodeWheel">
         <!-- // TODO 不确定icon -->
-        <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{
-          data.label
-        }}</span
+        <component v-if="data.icon" :is="data.icon" class="mr-8" :size="18" :item="data" />{{ data.label }}</span
       >
     </template>
   </el-cascader>

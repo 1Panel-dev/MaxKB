@@ -33,8 +33,7 @@ function focusCurrentNode() {
 
 function searchNext(direction: 1 | -1) {
   if (!matchedNodes.value.length) return
-  currentIndex.value =
-    (currentIndex.value + direction + matchedNodes.value.length) % matchedNodes.value.length
+  currentIndex.value = (currentIndex.value + direction + matchedNodes.value.length) % matchedNodes.value.length
   focusCurrentNode()
 }
 
@@ -73,17 +72,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
       <MkIcon :icon="Search" />
     </el-button>
 
-    <div
-      v-else
-      class="flex w-[360px] items-center gap-1 rounded-lg border border-N300 bg-white p-2 shadow-sm"
-    >
-      <el-input
-        ref="searchInputRef"
-        v-model="searchKeyword"
-        clearable
-        placeholder="搜索节点名称"
-        @keyup.enter="searchNext(1)"
-      />
+    <div v-else class="flex w-[360px] items-center gap-1 rounded-lg border border-N300 bg-white p-2 shadow-sm">
+      <el-input ref="searchInputRef" v-model="searchKeyword" clearable placeholder="搜索节点名称" @keyup.enter="searchNext(1)" />
       <span class="shrink-0 text-N600">
         {{ matchedNodes.length ? `${currentIndex + 1}/${matchedNodes.length}` : '无结果' }}
       </span>

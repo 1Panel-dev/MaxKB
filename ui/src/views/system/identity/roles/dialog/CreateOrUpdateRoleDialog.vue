@@ -16,11 +16,7 @@ const rules: FormRules<RolePayload> = {
   role_name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }],
   role_type: [{ required: true, message: '请选择继承角色', trigger: 'change' }],
 }
-const roleTypeOptions = ref<RoleType[]>([
-  ROLE_TYPE.ADMIN,
-  ROLE_TYPE.WORKSPACE_MANAGE,
-  ROLE_TYPE.USER,
-])
+const roleTypeOptions = ref<RoleType[]>([ROLE_TYPE.ADMIN, ROLE_TYPE.WORKSPACE_MANAGE, ROLE_TYPE.USER])
 
 function submit() {
   formRef.value?.validate((valid) => {
@@ -57,36 +53,20 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDialog
-    v-model="visible"
-    :title="roleForm.role_id ? '重命名角色' : '创建角色'"
-    @closed="resetData"
-  >
+  <MkDialog v-model="visible" :title="roleForm.role_id ? '重命名角色' : '创建角色'" @closed="resetData">
     <el-form ref="formRef" :model="roleForm" :rules="rules" label-position="top">
       <el-form-item label="角色名称" prop="role_name">
-        <el-input
-          v-model="roleForm.role_name"
-          maxlength="64"
-          show-word-limit
-          placeholder="请输入角色名称"
-        />
+        <el-input v-model="roleForm.role_name" maxlength="64" show-word-limit placeholder="请输入角色名称" />
       </el-form-item>
       <el-form-item v-if="!roleForm.role_id" label="继承角色" prop="role_type">
         <el-select v-model="roleForm.role_type" placeholder="请选择角色">
-          <el-option
-            v-for="option in roleTypeOptions"
-            :key="option"
-            :value="option"
-            :label="ROLE_TYPE_LABELS[option]"
-          />
+          <el-option v-for="option in roleTypeOptions" :key="option" :value="option" :label="ROLE_TYPE_LABELS[option]" />
         </el-select>
       </el-form-item>
     </el-form>
     <template #footer>
       <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="loading" @click="submit">{{
-        roleForm.role_id ? '保存' : '创建'
-      }}</el-button>
+      <el-button type="primary" :loading="loading" @click="submit">{{ roleForm.role_id ? '保存' : '创建' }}</el-button>
     </template>
   </MkDialog>
 </template>

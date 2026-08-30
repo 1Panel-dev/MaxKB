@@ -3,23 +3,13 @@ import { computed, onMounted, ref, inject } from 'vue'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
 import JsonInput from '@/components/mk-dynamics-form/items/JsonInput.vue'
 import type { DynamicFormValidatorCallback, DynamicFormValue } from '../../type'
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 const getModel = inject<() => DynamicFormValue>('getModel')
 
 const assignmentMethodOptions = computed(() => {
-  const options = [
-    {
-      label: '自定义',
-      value: 'custom',
-    },
-  ]
+  const options = [{ label: '自定义', value: 'custom' }]
   if (getModel) {
-    options.push({
-      label: '引用变量',
-      value: 'ref_variables',
-    })
+    options.push({ label: '引用变量', value: 'ref_variables' })
   }
   return options
 })
@@ -85,8 +75,7 @@ const referenceVariableRule = {
 
 const render = (formData: DynamicFormValue) => {
   formValue.value.default_value = formData.default_value
-  formValue.value.default_value_assignment_method =
-    formData.default_value_assignment_method || 'custom'
+  formValue.value.default_value_assignment_method = formData.default_value_assignment_method || 'custom'
 }
 defineExpose({ getData, render })
 onMounted(() => {
@@ -114,19 +103,8 @@ onMounted(() => {
       </el-radio>
     </el-radio-group>
   </el-form-item>
-  <el-form-item
-    v-if="formValue.default_value_assignment_method === 'ref_variables'"
-    :required="true"
-    prop="default_value"
-    :rules="[referenceVariableRule]"
-  >
-    <NodeCascader
-      ref="nodeCascaderRef"
-      :nodeModel="model"
-      class="w-full"
-      placeholder="请选择变量"
-      v-model="formValue.option_list"
-    />
+  <el-form-item v-if="formValue.default_value_assignment_method === 'ref_variables'" :required="true" prop="default_value" :rules="[referenceVariableRule]">
+    <NodeCascader ref="nodeCascaderRef" :nodeModel="model" class="w-full" placeholder="请选择变量" v-model="formValue.option_list" />
   </el-form-item>
 
   <el-form-item

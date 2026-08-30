@@ -14,9 +14,7 @@ const props = defineProps<{
 }>()
 
 const getChildFields = () => {
-  return Promise.resolve({
-    data: props.formField.children as FormField[],
-  } satisfies DynamicFormResponse<FormField[]>)
+  return Promise.resolve({ data: props.formField.children as FormField[] } satisfies DynamicFormResponse<FormField[]>)
 }
 const deleteKnowledge = (item: DynamicFormValue) => {
   localValue.value = localValue.value.filter((row) => row !== item)
@@ -79,10 +77,7 @@ const other = computed(() => {
   return { ...(props.formValue ? props.formValue : {}), ...props.otherParams }
 })
 
-defineExpose({
-  validate,
-  field: props.field,
-})
+defineExpose({ validate, field: props.field })
 </script>
 
 <template v-loading="_loading">

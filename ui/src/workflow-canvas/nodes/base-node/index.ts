@@ -15,8 +15,4 @@ class BaseNodeModel extends WorkflowNodeModel {
   }
 }
 
-export default {
-  type: WorkflowNodeType.Base,
-  model: BaseNodeModel,
-  view: BaseNodeView,
-}
+export default { type: WorkflowNodeType.Base, model: BaseNodeModel, view: BaseNodeView }
