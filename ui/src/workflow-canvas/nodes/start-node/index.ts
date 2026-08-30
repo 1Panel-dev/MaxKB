@@ -8,8 +8,4 @@ class StartNodeView extends WorkflowNodeView {
   }
 }
 
-export default {
-  type: WorkflowNodeType.Start,
-  model: WorkflowNodeModel,
-  view: StartNodeView,
-}
+export default { type: WorkflowNodeType.Start, model: WorkflowNodeModel, view: StartNodeView }

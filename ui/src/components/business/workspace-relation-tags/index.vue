@@ -3,17 +3,10 @@ import { computed } from 'vue'
 
 defineOptions({ name: 'WorkspaceRelationTags' })
 
-const props = defineProps<{
-  tableRenderParams: Record<'property' | 'value', string>
-  tags?: string[]
-  tagWorkspace?: Record<string, string[]>
-}>()
+const props = defineProps<{ tableRenderParams: Record<'property' | 'value', string>; tags?: string[]; tagWorkspace?: Record<string, string[]> }>()
 
 const tableData = computed(() => {
-  return Object.entries(props.tagWorkspace ?? {}).map(([tagName, workspaces]) => ({
-    property: tagName,
-    value: workspaces[0] === 'None' ? '-' : workspaces.join(', '),
-  }))
+  return Object.entries(props.tagWorkspace ?? {}).map(([tagName, workspaces]) => ({ property: tagName, value: workspaces[0] === 'None' ? '-' : workspaces.join(', ') }))
 })
 </script>
 
@@ -25,11 +18,7 @@ const tableData = computed(() => {
     <div class="p-6">
       <MkTable :data="tableData" max-height="300" size="small">
         <template v-for="(label, prop) in tableRenderParams" :key="prop">
-          <el-table-column
-            :label="label"
-            :prop="prop"
-            :show-overflow-tooltip="{ appendTo: 'body' }"
-          />
+          <el-table-column :label="label" :prop="prop" :show-overflow-tooltip="{ appendTo: 'body' }" />
         </template>
       </MkTable>
     </div>

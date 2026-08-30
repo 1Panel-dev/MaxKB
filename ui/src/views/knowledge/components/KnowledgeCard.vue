@@ -7,15 +7,10 @@ import { numberFormat } from '@/utils/number'
 
 defineOptions({ name: 'KnowledgeCard' })
 
-const props = defineProps<{
-  knowledge: KnowledgeItem
-  shared: boolean
-}>()
+const props = defineProps<{ knowledge: KnowledgeItem; shared: boolean }>()
 const loading = defineModel<boolean>('loading', { default: false })
 
-const emit = defineEmits<{
-  delete: [knowledgeId: string]
-}>()
+const emit = defineEmits<{ delete: [knowledgeId: string] }>()
 
 /* 删除知识库 */
 function handleDeleteKnowledge() {
@@ -36,11 +31,7 @@ function handleDeleteKnowledge() {
 </script>
 
 <template>
-  <MkSourceCard
-    :create_time="knowledge.create_time"
-    :nick_name="knowledge.nick_name || '-'"
-    :title="knowledge.name"
-  >
+  <MkSourceCard :create_time="knowledge.create_time" :nick_name="knowledge.nick_name || '-'" :title="knowledge.name">
     <template #icon>
       <span class="flex size-8 items-center justify-center rounded-md bg-primary/10 text-primary">
         <MkIcon name="icon_book_filled" :size="20" />

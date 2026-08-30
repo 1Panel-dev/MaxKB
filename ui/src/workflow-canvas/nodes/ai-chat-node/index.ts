@@ -8,8 +8,4 @@ class AiChatNodeView extends WorkflowNodeView {
   }
 }
 
-export default {
-  type: WorkflowNodeType.AiChat,
-  model: WorkflowNodeModel,
-  view: AiChatNodeView,
-}
+export default { type: WorkflowNodeType.AiChat, model: WorkflowNodeModel, view: AiChatNodeView }

@@ -1,28 +1,16 @@
 <script setup lang="ts" generic="T">
 defineOptions({ name: 'MkFormList' })
 
-const props = withDefaults(
-  defineProps<{
-    addText?: string
-    defaultItem: T
-    firstRowHasLabel?: boolean
-    showAddButton?: boolean
-  }>(),
-  {
-    addText: '添加',
-    firstRowHasLabel: true,
-    showAddButton: true,
-  },
-)
+const props = withDefaults(defineProps<{ addText?: string; defaultItem: T; firstRowHasLabel?: boolean; showAddButton?: boolean }>(), {
+  addText: '添加',
+  firstRowHasLabel: true,
+  showAddButton: true,
+})
 const formRows = defineModel<T[]>({ required: true })
 
-const emit = defineEmits<{
-  remove: [item: T, index: number]
-}>()
+const emit = defineEmits<{ remove: [item: T, index: number] }>()
 
-defineSlots<{
-  default(props: { index: number; item: T }): unknown
-}>()
+defineSlots<{ default(props: { index: number; item: T }): unknown }>()
 
 function addRow() {
   formRows.value = [...formRows.value, props.defaultItem]
@@ -39,10 +27,7 @@ function removeRow(index: number) {
 <template>
   <div v-for="(item, index) in formRows" :key="index" class="flex w-full gap-2">
     <slot :index="index" :item="item" />
-    <el-form-item
-      class="shrink-0"
-      :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : '-mt-4'"
-    >
+    <el-form-item class="shrink-0" :class="firstRowHasLabel ? (index === 0 ? 'mt-8' : 'mt-0.5') : '-mt-4'">
       <el-button :disabled="formRows.length === 1" text @click="removeRow(index)">
         <MkIcon name="icon_delete-trash_outlined" class="text-N600" />
       </el-button>

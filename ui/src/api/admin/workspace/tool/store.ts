@@ -1,10 +1,5 @@
 import { post } from '../../core/request'
-import type {
-  AddInternalToolPayload,
-  AddStoreToolPayload,
-  ToolItem,
-  UpdateStoreToolPayload,
-} from '@/api/types'
+import type { AddInternalToolPayload, AddStoreToolPayload, ToolItem, UpdateStoreToolPayload } from '@/api/types'
 import { getWorkspaceId } from '@/utils/resource-context'
 
 const getToolPrefix = () => {
@@ -14,10 +9,7 @@ const getToolPrefix = () => {
 
 /** 将系统内置工具添加到当前工作空间。 */
 const postInternalTool = (toolId: string, payload: AddInternalToolPayload) => {
-  return post<AddInternalToolPayload, ToolItem>(
-    `${getToolPrefix()}/${toolId}/add_internal_tool`,
-    payload,
-  )
+  return post<AddInternalToolPayload, ToolItem>(`${getToolPrefix()}/${toolId}/add_internal_tool`, payload)
 }
 
 /** 将商店工具添加到当前工作空间。 */
@@ -27,14 +19,7 @@ const postStoreTool = (toolId: string, payload: AddStoreToolPayload) => {
 
 /** 将工作空间中的商店工具更新到最新版本。 */
 const postStoreToolUpdate = (toolId: string, payload: UpdateStoreToolPayload) => {
-  return post<UpdateStoreToolPayload, ToolItem>(
-    `${getToolPrefix()}/${toolId}/update_store_tool`,
-    payload,
-  )
+  return post<UpdateStoreToolPayload, ToolItem>(`${getToolPrefix()}/${toolId}/update_store_tool`, payload)
 }
 
-export default {
-  postInternalTool,
-  postStoreTool,
-  postStoreToolUpdate,
-}
+export default { postInternalTool, postStoreTool, postStoreToolUpdate }

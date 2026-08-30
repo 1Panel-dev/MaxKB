@@ -261,11 +261,7 @@ Tailwind 类。
 :root {
   --mk-primary: #3370ff;
   --mk-primary-gradient-end: #7f3bf5;
-  --mk-primary-gradient: linear-gradient(
-    180deg,
-    var(--mk-primary) 0%,
-    var(--mk-primary-gradient-end) 100%
-  );
+  --mk-primary-gradient: linear-gradient(180deg, var(--mk-primary) 0%, var(--mk-primary-gradient-end) 100%);
   --mk-primary-rgb: 51 112 255;
 }
 ```

@@ -25,22 +25,13 @@ interface DropTargetInfo {
   siblings?: FolderStat[]
 }
 
-const props = withDefaults(
-  defineProps<{
-    canEdit?: boolean
-    currentNodeKey?: string
-    data?: FolderItem[]
-    draggable?: boolean
-    filterText?: string
-  }>(),
-  {
-    canEdit: true,
-    currentNodeKey: '',
-    data: () => [],
-    draggable: false,
-    filterText: '',
-  },
-)
+const props = withDefaults(defineProps<{ canEdit?: boolean; currentNodeKey?: string; data?: FolderTreeNode[]; draggable?: boolean; filterText?: string }>(), {
+  canEdit: true,
+  currentNodeKey: '',
+  data: () => [],
+  draggable: false,
+  filterText: '',
+})
 
 const emit = defineEmits<{
   create: [folder: FolderItem]
@@ -65,9 +56,7 @@ function filterFolders(folders: FolderTreeNode[], keyword: string): FolderTreeNo
   }, [])
 }
 
-const filteredTreeData = computed(() =>
-  filterFolders(props.data as FolderTreeNode[], props.filterText.trim().toLocaleLowerCase()),
-)
+const filteredTreeData = computed(() => filterFolders(props.data as FolderTreeNode[], props.filterText.trim().toLocaleLowerCase()))
 
 // 点击展开或选择
 function handleNodeClick(stat: FolderStat) {
@@ -79,10 +68,7 @@ function handleNodeClick(stat: FolderStat) {
   emit('nodeClick', stat.data)
 }
 function containsCurrentFolder(folder: FolderTreeNode): boolean {
-  return (
-    folder.id === props.currentNodeKey ||
-    Boolean(folder.children?.some((child) => containsCurrentFolder(child)))
-  )
+  return folder.id === props.currentNodeKey || Boolean(folder.children?.some((child) => containsCurrentFolder(child)))
 }
 
 function handleStat<T extends FolderStat>(stat: T): T {
@@ -98,10 +84,7 @@ function buildNodeDropArgs() {
 
   const parent = targetInfo.parent ?? null
   const siblings = targetInfo.siblings ?? []
-  let newIndex =
-    typeof targetInfo.indexBeforeDrop === 'number'
-      ? targetInfo.indexBeforeDrop
-      : siblings.indexOf(draggingNode)
+  let newIndex = typeof targetInfo.indexBeforeDrop === 'number' ? targetInfo.indexBeforeDrop : siblings.indexOf(draggingNode)
 
   if (newIndex < 0) newIndex = siblings.indexOf(draggingNode)
 
@@ -140,7 +123,7 @@ function handleAfterDrop() {
     :disableDrop="!draggable"
   >
     <template #default="{ node, stat }: { node: FolderTreeNode; stat: FolderStat }">
-      <MkListItem :class="currentNodeKey === node.id ? 'is-current' : ''" class="mk-tree-node">
+      <MkListItem :class="{ 'is-current': currentNodeKey === node.id, 'cursor-not-allowed! text-N400': node.disabled }" class="mk-tree-node">
         <template #default>
           <MkIcon
             @click.stop="stat.open = !stat.open"

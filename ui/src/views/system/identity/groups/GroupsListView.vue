@@ -2,13 +2,7 @@
 import { onMounted, ref, useTemplateRef } from 'vue'
 import WorkspaceApi from '@/api/admin/system/workspace'
 import UserGroupsApi from '@/api/admin/system/user-groups'
-import type {
-  Dict,
-  OptionItem,
-  WorkspaceItem,
-  SystemUserGroup,
-  SystemUserGroupMember,
-} from '@/api/types'
+import type { Dict, OptionItem, WorkspaceItem, SystemUserGroup, SystemUserGroupMember } from '@/api/types'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
 import MkSearchList from '@/components/mk-search-list/index.vue'
@@ -61,8 +55,7 @@ function handleGroupSelect(group: SystemUserGroup) {
 }
 
 /* 新增、重命名用户组 */
-const groupDialogRef =
-  useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
+const groupDialogRef = useTemplateRef<InstanceType<typeof CreateOrUpdateGroupDialog>>('groupDialogRef')
 
 function handleOpenGroupDialog(group?: SystemUserGroup) {
   groupDialogRef.value?.open(group)
@@ -106,12 +99,7 @@ function loadUserGroupMembers(reset = false) {
 
   const { currentPage, pageSize } = paginationConfig.value
   loadingMembers.value = true
-  UserGroupsApi.getSystemUserGroupMembers(
-    selectedWorkspaceId.value,
-    currentGroup.value.id,
-    { currentPage, pageSize },
-    memberSearchQuery.value,
-  )
+  UserGroupsApi.getSystemUserGroupMembers(selectedWorkspaceId.value, currentGroup.value.id, { currentPage, pageSize }, memberSearchQuery.value)
     .then(({ total, records }) => {
       userGroupMembers.value = records
       paginationConfig.value.total = total
@@ -123,11 +111,7 @@ function loadUserGroupMembers(reset = false) {
 
 /* 成员列表相关 */
 const loadingMembers = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 10,
-  total: 0,
-})
+const paginationConfig = ref({ currentPage: 1, pageSize: 10, total: 0 })
 const memberSearchQuery = ref<Dict<unknown>>()
 const memberSearchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
@@ -146,8 +130,7 @@ function handleMemberSelectionChange(selection: unknown[]) {
 }
 
 /* 添加成员drawer */
-const memberDialogRef =
-  useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
+const memberDialogRef = useTemplateRef<InstanceType<typeof CreateGroupMemberDialog>>('memberDialogRef')
 
 function handleOpenMemberDialog() {
   memberDialogRef.value?.open()
@@ -159,9 +142,7 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
   if (!group || !members.length) return
 
   const targetName = member ? member.nick_name || member.username : ''
-  const title = member
-    ? `是否移除成员：${targetName}？`
-    : `是否移除选中的 ${members.length} 个成员？`
+  const title = member ? `是否移除成员：${targetName}？` : `是否移除选中的 ${members.length} 个成员？`
   MsgConfirm(title, '', { confirmButtonText: '移除' })
     .then(() => {
       return UserGroupsApi.postRemoveSystemUserGroupMembers(
@@ -170,13 +151,8 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
         members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
       ).then(() => {
         MsgSuccess('移除成功')
-        const removedRelationIds = new Set(
-          members.map(({ system_user_group_relation_id }) => system_user_group_relation_id),
-        )
-        userGroupMembers.value = userGroupMembers.value.filter(
-          ({ system_user_group_relation_id }) =>
-            !removedRelationIds.has(system_user_group_relation_id),
-        )
+        const removedRelationIds = new Set(members.map(({ system_user_group_relation_id }) => system_user_group_relation_id))
+        userGroupMembers.value = userGroupMembers.value.filter(({ system_user_group_relation_id }) => !removedRelationIds.has(system_user_group_relation_id))
         paginationConfig.value.total = userGroupMembers.value.length
         selectedGroupMembers.value = []
         loadUserGroups()
@@ -187,22 +163,16 @@ function handleRemoveMembers(member?: SystemUserGroupMember) {
 
 onMounted(() => {
   loadingView.value = true
-  Promise.all(auth.isEE ? [loadWorkspaceOptions(), loadUserGroups()] : [loadUserGroups()]).finally(
-    () => {
-      loadingView.value = false
-    },
-  )
+  Promise.all(auth.isEE ? [loadWorkspaceOptions(), loadUserGroups()] : [loadUserGroups()]).finally(() => {
+    loadingView.value = false
+  })
 })
 </script>
 
 <template>
   <MkViewLayout class="system-identity-groups" :loading="loadingView">
     <template #top v-if="auth.isEE">
-      <WorkspaceDropdown
-        v-model="selectedWorkspaceId"
-        :options="workspaceOptions"
-        @select="handleWorkspaceSelect"
-      />
+      <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
     </template>
     <template #aside="{ title, Header }">
       <component :is="Header">
@@ -213,12 +183,7 @@ onMounted(() => {
           </el-button>
         </el-tooltip>
       </component>
-      <MkSearchList
-        v-loading="loadingGroups"
-        :data="userGroups"
-        :default-active="currentGroup?.id"
-        @click="handleGroupSelect"
-      >
+      <MkSearchList v-loading="loadingGroups" :data="userGroups" :default-active="currentGroup?.id" @click="handleGroupSelect">
         <template #action-dropdown="{ row }">
           <MkDropdownItem @click="handleOpenGroupDialog(row)">
             <template #icon>
@@ -272,10 +237,7 @@ onMounted(() => {
           <el-table-column prop="username" label="用户名" min-width="198" show-overflow-tooltip />
           <el-table-column label="角色" min-width="198">
             <template #default="{ row }">
-              <WorkspaceRelationTags
-                :table-render-params="{ property: '角色', value: '工作空间' }"
-                :tags="row.roles"
-              />
+              <WorkspaceRelationTags :table-render-params="{ property: '角色', value: '工作空间' }" :tags="row.roles" />
             </template>
           </el-table-column>
           <el-table-column prop="source" label="用户来源" min-width="198" show-overflow-tooltip />
@@ -296,15 +258,6 @@ onMounted(() => {
       <MkEmpty v-else class="flex-1" />
     </template>
   </MkViewLayout>
-  <CreateOrUpdateGroupDialog
-    ref="groupDialogRef"
-    :workspace-id="selectedWorkspaceId"
-    @refresh="handleGroupSaved"
-  />
-  <CreateGroupMemberDialog
-    ref="memberDialogRef"
-    :workspace-id="selectedWorkspaceId"
-    :current-group="currentGroup"
-    @refresh="loadUserGroupMembers(true)"
-  />
+  <CreateOrUpdateGroupDialog ref="groupDialogRef" :workspace-id="selectedWorkspaceId" @refresh="handleGroupSaved" />
+  <CreateGroupMemberDialog ref="memberDialogRef" :workspace-id="selectedWorkspaceId" :current-group="currentGroup" @refresh="loadUserGroupMembers(true)" />
 </template>

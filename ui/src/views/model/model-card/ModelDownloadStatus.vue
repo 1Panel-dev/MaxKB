@@ -6,11 +6,7 @@ import { MODEL_STATUS } from '@/api/enums'
 
 defineOptions({ name: 'ModelDownloadStatus' })
 
-const props = defineProps<{
-  api: typeof ModelApi
-  model: ModelItem
-  refresh: () => Promise<void>
-}>()
+const props = defineProps<{ api: typeof ModelApi; model: ModelItem; refresh: () => Promise<void> }>()
 
 const cancelLoading = ref(false)
 let downloadTimer: ReturnType<typeof setInterval> | undefined
@@ -51,17 +47,9 @@ onBeforeUnmount(() => stopDownloadPolling())
 
 <template>
   <div class="model-download-status bg-white/94">
-    <div
-      v-loading="true"
-      aria-label="下载中"
-      class="download-spinner h-7 w-7"
-      element-loading-background="transparent"
-      role="status"
-    ></div>
+    <div v-loading="true" aria-label="下载中" class="download-spinner h-7 w-7" element-loading-background="transparent" role="status"></div>
     <span class="mk-dotting my-2 ml-2 text-N600">下载中</span>
-    <el-button text type="primary" :loading="cancelLoading" @click.stop="handleCancelDownload">
-      取消下载
-    </el-button>
+    <el-button text type="primary" :loading="cancelLoading" @click.stop="handleCancelDownload"> 取消下载 </el-button>
   </div>
 </template>
 

@@ -13,10 +13,7 @@ export function getChildRouteList(scope: RouteScope): LayoutMenuItem[] {
   const createMenuItems = (routes: readonly RouteRecordRaw[]): LayoutMenuItem[] => {
     return routes
       .filter((route) => route.name && route.meta?.title && route.meta.hidden !== true)
-      .sort(
-        (a, b) =>
-          (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER),
-      )
+      .sort((a, b) => (a.meta?.order ?? Number.MAX_SAFE_INTEGER) - (b.meta?.order ?? Number.MAX_SAFE_INTEGER))
       .map((route) => {
         const children = route.children ? createMenuItems(route.children) : []
 

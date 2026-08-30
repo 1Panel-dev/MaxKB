@@ -1,33 +1,28 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import defaultLogo from '@/assets/mk-logo/MaxKB-logo.svg'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import { getThemeImg } from '@/constants/theme'
 
 type ThemeImageValue = File | string
-type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
-  icon?: ThemeImageValue
-  loginImage?: ThemeImageValue
-  loginLogo?: ThemeImageValue
-}
+type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & { icon?: ThemeImageValue; loginImage?: ThemeImageValue; loginLogo?: ThemeImageValue }
 
 defineOptions({ name: 'ThemeLoginPreview' })
 
-const props = defineProps<{
-  data: ThemePreviewData
-}>()
+const props = defineProps<{ data: ThemePreviewData }>()
 
-function useImageSource(source: () => ThemeImageValue | undefined, fallback: string) {
-  const imageSource = ref(fallback)
+function useImageSource(source: () => ThemeImageValue | undefined, fallback: () => string) {
+  const imageSource = ref(fallback())
   let objectUrl: string | undefined
 
   watch(
-    source,
-    (value) => {
+    () => [source(), fallback()] as const,
+    ([value, fallbackValue]) => {
       if (objectUrl) URL.revokeObjectURL(objectUrl)
       objectUrl = value instanceof File ? URL.createObjectURL(value) : undefined
-      imageSource.value = objectUrl ?? (typeof value === 'string' && value ? value : fallback)
+      imageSource.value = objectUrl ?? (typeof value === 'string' && value ? value : fallbackValue)
     },
     { immediate: true },
   )
@@ -39,8 +34,19 @@ function useImageSource(source: () => ThemeImageValue | undefined, fallback: str
   return imageSource
 }
 
-const websiteIcon = useImageSource(() => props.data.icon, defaultLogo)
-const loginLogo = useImageSource(() => props.data.loginLogo, '')
+const defaultLoginImage = computed(() => getThemeImg(props.data.theme))
+const websiteIcon = useImageSource(
+  () => props.data.icon,
+  () => defaultLogo,
+)
+const loginLogo = useImageSource(
+  () => props.data.loginLogo,
+  () => '',
+)
+const loginImage = useImageSource(
+  () => props.data.loginImage,
+  () => defaultLoginImage.value,
+)
 </script>
 
 <template>
@@ -57,19 +63,14 @@ const loginLogo = useImageSource(() => props.data.loginLogo, '')
 
     <div class="preview-page relative overflow-hidden">
       <header class="preview-header flex items-center gap-3">
-        <img
-          v-if="loginLogo"
-          :src="loginLogo"
-          alt="MaxKB"
-          class="h-8 max-w-40 object-contain object-left"
-        />
+        <img v-if="loginLogo" :src="loginLogo" alt="MaxKB" class="h-8 max-w-40 object-contain object-left" />
         <LogoFull v-else class="h-8 max-w-40" />
         <el-divider v-if="data.slogan" direction="vertical" />
         <span class="truncate text-N600" :title="data.slogan || ''">{{ data.slogan }}</span>
       </header>
 
-      <div class="preview-content grid h-full grid-cols-2 items-center gap-8 px-10 pt-10">
-        <!-- <img :src="defaultDecoration" alt="" class="w-full object-contain" /> -->
+      <div class="preview-content grid h-full items-center gap-8 px-10 pt-10">
+        <img :src="loginImage" alt="" class="w-full object-contain" />
         <el-card class="preview-login-card">
           <h3 class="mb-6">登录</h3>
           <el-input class="mb-4" placeholder="请输入用户名" size="large" />
@@ -95,6 +96,7 @@ const loginLogo = useImageSource(() => props.data.loginLogo, '')
 }
 
 .preview-content {
+  grid-template-columns: 13fr 11fr;
   position: relative;
   z-index: 1;
 }
@@ -115,8 +117,7 @@ const loginLogo = useImageSource(() => props.data.loginLogo, '')
 }
 
 .preview-page {
-  background-position: center;
-  background-size: cover;
+  background: linear-gradient(180deg, rgb(255 255 255 / 5%) 0%, rgb(var(--mk-primary-rgb) / 5%) 20%, rgb(var(--mk-primary-rgb) / 10%) 100%);
   height: 420px;
 }
 </style>

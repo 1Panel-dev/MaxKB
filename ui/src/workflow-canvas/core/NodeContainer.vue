@@ -22,43 +22,24 @@ interface ResizeSize {
 
 type NodeContainerProperties = {
   condition?: boolean | 'AND' | 'OR'
-  config?: {
-    fields?: WorkflowNodeField[]
-    output_title?: string
-  }
+  config?: { fields?: WorkflowNodeField[]; output_title?: string }
   disabled?: boolean
   enableException?: boolean
   kind?: WorkflowKind
-  node_data?: {
-    name?: string
-  }
+  node_data?: { name?: string }
   showNode?: boolean
   status?: number
   stepName?: string
 }
 
-const props = withDefaults(
-  defineProps<{
-    exceptionNodeList?: string[]
-  }>(),
-  {
-    exceptionNodeList: () => [
-      WorkflowNodeType.AiChat,
-      WorkflowNodeType.VideoUnderstandNode,
-      WorkflowNodeType.ImageGenerateNode,
-      WorkflowNodeType.ImageUnderstandNode,
-    ],
-  },
-)
+const props = withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
+  exceptionNodeList: () => [WorkflowNodeType.AiChat, WorkflowNodeType.VideoUnderstandNode, WorkflowNodeType.ImageGenerateNode, WorkflowNodeType.ImageUnderstandNode],
+})
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
 const nodeProperties = computed(() => model.properties as unknown as NodeContainerProperties)
 
-const height = ref<{
-  stepContainerHeight: number
-  inputContainerHeight: number
-  outputContainerHeight: number
-}>({
+const height = ref<{ stepContainerHeight: number; inputContainerHeight: number; outputContainerHeight: number }>({
   stepContainerHeight: 0,
   inputContainerHeight: 0,
   outputContainerHeight: 0,
@@ -66,9 +47,7 @@ const height = ref<{
 const showAnchor = ref(false)
 const anchorData = ref<Model.AnchorConfig>()
 const dropdownMenuStyle = computed(() => {
-  return {
-    top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px',
-  }
+  return { top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px' }
 })
 const nodeDisabled = computed({
   get: () => {
@@ -86,9 +65,7 @@ const nodeEnabled = computed({
 })
 const titleFormRef = useTemplateRef<FormInstance>('titleFormRef')
 const nodeNameDialogVisible = ref(false)
-const form = ref<NodeNameForm>({
-  title: '',
-})
+const form = ref<NodeNameForm>({ title: '' })
 
 const condition = computed({
   set: (v) => {
@@ -123,11 +100,7 @@ const node_status = computed(() => {
 })
 
 const sourceName = computed(() => {
-  if (
-    [WorkflowNodeType.Application, WorkflowNodeType.ToolLib].includes(
-      String(model.type) as WorkflowNodeType,
-    )
-  ) {
+  if ([WorkflowNodeType.Application, WorkflowNodeType.ToolLib].includes(String(model.type) as WorkflowNodeType)) {
     return nodeProperties.value.node_data?.name || ''
   }
   return ''
@@ -141,11 +114,7 @@ const editName = async (formEl: FormInstance | null | undefined) => {
   if (!formEl) return
   await formEl.validate((valid) => {
     if (valid) {
-      if (
-        !model.graphModel.nodes
-          .filter((node) => node.id !== model.id)
-          .some((node) => node.properties.stepName === form.value.title)
-      ) {
+      if (!model.graphModel.nodes.filter((node) => node.id !== model.id).some((node) => node.properties.stepName === form.value.title)) {
         set(model.properties, 'stepName', form.value.title)
         model.clearNextNodeField(true)
         nodeNameDialogVisible.value = false
@@ -175,10 +144,7 @@ const copyNode = () => {
   model.graphModel.toFront(cloneNode.id)
 }
 const deleteNode = () => {
-  MsgConfirm('提示', '确定删除当前节点吗？', {
-    confirmButtonText: '确定',
-    confirmButtonClass: 'danger',
-  }).then(() => {
+  MsgConfirm('提示', '确定删除当前节点吗？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
     if (String(model.type) === WorkflowNodeType.LoopNode) {
       const next = model.graphModel.getNodeOutgoingNode(model.id)
       next.forEach((nextNode) => {
@@ -206,19 +172,8 @@ function clickNodes(nodeType: WorkflowNodeType) {
   if (!item || !anchor) return
 
   const width = Number((item.properties as { width?: number }).width ?? 214)
-  const newModel = model.graphModel.addNode({
-    type: item.type,
-    properties: item.properties,
-    x: anchor.x + width / 2 + 200,
-    y: anchor.y - item.height,
-  })
-  newModel.graphModel.addEdge({
-    type: 'app-edge',
-    sourceNodeId: model.id,
-    sourceAnchorId: anchor.id,
-    targetNodeId: model.id,
-    targetAnchorId: model.id + '_left',
-  })
+  const newModel = model.graphModel.addNode({ type: item.type, properties: item.properties, x: anchor.x + width / 2 + 200, y: anchor.y - item.height })
+  newModel.graphModel.addEdge({ type: 'app-edge', sourceNodeId: model.id, sourceAnchorId: anchor.id, targetNodeId: model.id, targetAnchorId: model.id + '_left' })
 
   closeNodeMenu()
 }
@@ -237,12 +192,7 @@ const enable_exception = computed({
 const nodeFields = computed(() => {
   if (nodeProperties.value.config?.fields) {
     const fields = nodeProperties.value.config.fields.map((field) => {
-      return {
-        label: field.label,
-        value: field.value,
-        globeLabel: `{{${model.properties.stepName}.${field.value}}}`,
-        globeValue: `{{context['${model.id}'].${field.value}}}`,
-      }
+      return { label: field.label, value: field.value, globeLabel: `{{${model.properties.stepName}.${field.value}}}`, globeValue: `{{context['${model.id}'].${field.value}}}` }
     })
     return fields
   }
@@ -255,20 +205,13 @@ const output_title = computed(() => {
 
 const abnormalNodeFields = computed(() => {
   return [
-    {
-      label: '异常信息',
-      value: 'exception_message',
-      globeLabel: `{{${model.properties.stepName}.exception_message}}`,
-      globeValue: `{{context['${model.id}'].exception_message}}`,
-    },
+    { label: '异常信息', value: 'exception_message', globeLabel: `{{${model.properties.stepName}.exception_message}}`, globeValue: `{{context['${model.id}'].exception_message}}` },
   ]
 })
 watch(enable_exception, () => {
   model.graphModel.eventCenter.emit(
     'delete_edge',
-    model.outgoing.edges
-      .filter((item) => item.sourceAnchorId === `${model.id}_exception_right`)
-      .map((item) => item.id),
+    model.outgoing.edges.filter((item) => item.sourceAnchorId === `${model.id}_exception_right`).map((item) => item.id),
   )
 })
 
@@ -344,9 +287,7 @@ const highlightedStepName = (contentText: string) => {
     for (let i = 0; i < wordsArray.length; i++) {
       const word = wordsArray[i]
       if (word && keyWord.value.includes(word)) {
-        wordsArray[i] = currentKeyWord.value
-          ? `<span style='background: #FF8800;'>${word}</span>`
-          : `<span style='background: #FFC60A;'>${word}</span>`
+        wordsArray[i] = currentKeyWord.value ? `<span style='background: #FF8800;'>${word}</span>` : `<span style='background: #FFC60A;'>${word}</span>`
       }
     }
     res = wordsArray.join('')
@@ -384,47 +325,19 @@ onBeforeUnmount(() => {
 </script>
 <template>
   <div class="workflow-node-container relative overflow-visible p-4" @mousedown="mousedown">
-    <div
-      class="step-container overflow-visible rounded-lg border-2 border-white bg-white p-4"
-      :class="{ isSelected: model.isSelected, error: node_status !== 200 }"
-    >
+    <div class="step-container overflow-visible rounded-lg border-2 border-white bg-white p-4" :class="{ isSelected: model.isSelected, error: node_status !== 200 }">
       <div ref="containerRef">
         <div class="flex-between">
-          <div
-            class="flex w-[69%] items-center"
-            @dragstart.prevent
-            @drag.prevent
-            @dragover.prevent
-            @dragend.prevent
-          >
-            <component
-              :is="iconComponent(`${model.type}-icon`)"
-              class="mr-2"
-              :size="24"
-              :item="model?.properties.node_data"
-              style="--el-avatar-border-radius: 6px"
-            />
-            <h4
-              class="truncate break-all"
-              :title="String(model.properties.stepName ?? '')"
-              v-html="highlightedStepName(String(model.properties.stepName ?? ''))"
-            ></h4>
+          <div class="flex w-[69%] items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
+            <component :is="iconComponent(`${model.type}-icon`)" class="mr-2" :size="24" :item="model?.properties.node_data" style="--el-avatar-border-radius: 6px" />
+            <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')" v-html="highlightedStepName(String(model.properties.stepName ?? ''))"></h4>
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
-              <MkIcon
-                :icon="ArrowDownBold"
-                class="text-N600 transition-transform"
-                :class="showNode ? 'rotate-180' : ''"
-              />
+              <MkIcon :icon="ArrowDownBold" class="text-N600 transition-transform" :class="showNode ? 'rotate-180' : ''" />
             </el-button>
-            <MkDropdown
-              v-if="showConditionOperate(String(model.type))"
-              :teleported="false"
-              trigger="click"
-              placement="bottom-start"
-            >
+            <MkDropdown v-if="showConditionOperate(String(model.type))" :teleported="false" trigger="click" placement="bottom-start">
               <el-button text>
                 <span>条件</span>
               </el-button>
@@ -459,8 +372,7 @@ onBeforeUnmount(() => {
                   <template
                     v-if="
                       !(
-                        (String(model.type) == WorkflowNodeType.ToolLib &&
-                          nodeProperties.kind == WorkflowKind.DataSource) ||
+                        (String(model.type) == WorkflowNodeType.ToolLib && nodeProperties.kind == WorkflowKind.DataSource) ||
                         String(model.type) == WorkflowNodeType.DataSourceLocalNode ||
                         String(model.type) == WorkflowNodeType.DataSourceWebNode
                       )
@@ -487,31 +399,12 @@ onBeforeUnmount(() => {
           </div>
         </div>
         <el-collapse-transition>
-          <div
-            v-show="showNode"
-            class="mt-4"
-            @pointermove.stop
-            @pointerenter.stop
-            @mousedown.stop
-            @keydown.stop
-            @click.stop
-          >
-            <el-alert
-              v-if="nodeDisabled"
-              class="mb-4"
-              title="该节点已被禁用"
-              type="error"
-              show-icon
-              :closable="false"
-            />
+          <div v-show="showNode" class="mt-4" @pointermove.stop @pointerenter.stop @mousedown.stop @keydown.stop @click.stop>
+            <el-alert v-if="nodeDisabled" class="mb-4" title="该节点已被禁用" type="error" show-icon :closable="false" />
             <el-alert
               v-if="node_status != 200"
               class="mb-4"
-              :title="
-                String(model.type) === WorkflowNodeType.Application
-                  ? '该智能体不可用'
-                  : '该工具不可用'
-              "
+              :title="String(model.type) === WorkflowNodeType.Application ? '该智能体不可用' : '该工具不可用'"
               type="error"
               show-icon
               :closable="false"
@@ -529,18 +422,9 @@ onBeforeUnmount(() => {
               </div>
               <div class="rounded-md bg-N100 px-3 py-1 text-N600">
                 <template v-for="(item, index) in nodeFields" :key="index">
-                  <div
-                    class="flex-between my-2"
-                    @mouseenter="showicon = index"
-                    @mouseleave="showicon = null"
-                  >
+                  <div class="flex-between my-2" @mouseenter="showicon = index" @mouseleave="showicon = null">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip
-                      effect="dark"
-                      content="复制参数"
-                      placement="top"
-                      v-if="showicon === index"
-                    >
+                    <el-tooltip effect="dark" content="复制参数" placement="top" v-if="showicon === index">
                       <el-button class="p-0!" link @click="copyText(item.globeLabel)">
                         <MkIcon name="icon_copy_outlined" />
                       </el-button>
@@ -551,18 +435,9 @@ onBeforeUnmount(() => {
 
               <div v-if="enable_exception" class="mt-2 rounded-md bg-N100 px-3 py-1 text-N600">
                 <template v-for="(item, index) in abnormalNodeFields" :key="index">
-                  <div
-                    class="flex-between my-2"
-                    @mouseenter="showicon = 'abnormal' + index"
-                    @mouseleave="showicon = null"
-                  >
+                  <div class="flex-between my-2" @mouseenter="showicon = 'abnormal' + index" @mouseleave="showicon = null">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip
-                      effect="dark"
-                      content="复制参数"
-                      placement="top"
-                      v-if="showicon === 'abnormal' + index"
-                    >
+                    <el-tooltip effect="dark" content="复制参数" placement="top" v-if="showicon === 'abnormal' + index">
                       <el-button class="p-0!" link @click="copyText(item.globeLabel)">
                         <MkIcon name="icon_copy_outlined" />
                       </el-button>
@@ -592,16 +467,7 @@ onBeforeUnmount(() => {
 
     <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body @submit.prevent>
       <el-form ref="titleFormRef" :model="form" label-position="top">
-        <el-form-item
-          prop="title"
-          :rules="[
-            {
-              required: true,
-              message: '请输入',
-              trigger: 'blur',
-            },
-          ]"
-        >
+        <el-form-item prop="title" :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
           <el-input v-model="form.title" @blur="form.title = form.title.trim()" />
         </el-form-item>
       </el-form>

@@ -1,23 +1,8 @@
-import {
-  Role,
-  RoleConstants,
-  Compare,
-  Permission,
-  AggregatePermission,
-  type PermissionContext,
-  type PermissionFactory,
-  type RoleFactory,
-} from './common'
+import { Role, RoleConstants, Compare, Permission, AggregatePermission, type PermissionContext, type PermissionFactory, type RoleFactory } from './common'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 
-export type PermissionInput =
-  | Role
-  | string
-  | Permission
-  | PermissionFactory
-  | RoleFactory
-  | AggregatePermission
+export type PermissionInput = Role | string | Permission | PermissionFactory | RoleFactory | AggregatePermission
 
 /** 判断单个权限项，对应 run 的 hasPermissionChild。 */
 const hasPermissionChild = (permission: PermissionInput, ctx?: PermissionContext): boolean => {
@@ -60,15 +45,9 @@ const hasPermissionChild = (permission: PermissionInput, ctx?: PermissionContext
  * @param compare 数组语义：OR = 命中其一即可，AND = 需全部命中，默认 OR
  * @param ctx 资源级/工作空间级权限所需上下文（workspaceId / resourceId）
  */
-export const hasPermission = (
-  permission: PermissionInput | PermissionInput[],
-  compare: Compare = Compare.OR,
-  ctx?: PermissionContext,
-): boolean => {
+export const hasPermission = (permission: PermissionInput | PermissionInput[], compare: Compare = Compare.OR, ctx?: PermissionContext): boolean => {
   if (Array.isArray(permission)) {
-    return compare === Compare.OR
-      ? permission.some((item) => hasPermissionChild(item, ctx))
-      : permission.every((item) => hasPermissionChild(item, ctx))
+    return compare === Compare.OR ? permission.some((item) => hasPermissionChild(item, ctx)) : permission.every((item) => hasPermissionChild(item, ctx))
   }
   return hasPermissionChild(permission, ctx)
 }
@@ -77,10 +56,7 @@ export const hasPermission = (
  * 工作空间维度基础权限：命中权限位 / 系统管理员 / 该空间管理员 即可。
  * @param workspaceId 默认取当前路由的 workspaceId。
  */
-export const buildBasePermission = (
-  permission: Permission,
-  workspaceId: string | undefined = getWorkspaceId(),
-): AggregatePermission =>
+export const buildBasePermission = (permission: Permission, workspaceId: string | undefined = getWorkspaceId()): AggregatePermission =>
   AggregatePermission.builder()
     .addPermission(permission.newWorkspacePermission(workspaceId))
     .addRole(RoleConstants.ADMIN)
@@ -93,11 +69,7 @@ export const buildBasePermission = (
  * resourceId 为 'root' 时退化为工作空间维度。
  * @param workspaceId 默认取当前路由的 workspaceId。
  */
-export const buildBaseResourcePermission = (
-  permission: Permission,
-  resourceId: string,
-  workspaceId: string | undefined = getWorkspaceId(),
-): AggregatePermission =>
+export const buildBaseResourcePermission = (permission: Permission, resourceId: string, workspaceId: string | undefined = getWorkspaceId()): AggregatePermission =>
   resourceId === 'root'
     ? buildBasePermission(permission, workspaceId)
     : AggregatePermission.builder()

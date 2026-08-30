@@ -10,9 +10,7 @@ defineOptions({ name: 'JsonInput', inheritAttrs: false })
 const modelValue = defineModel<unknown>({ required: true })
 const props = withDefaults(defineProps<{ title?: string }>(), { title: 'JSON' })
 
-const emit = defineEmits<{
-  submitDialog: [value: unknown]
-}>()
+const emit = defineEmits<{ submitDialog: [value: unknown] }>()
 
 const extensions = [json(), linter(jsonParseLinter())]
 
@@ -112,13 +110,7 @@ defineExpose({ format, validateRules })
   </div>
 
   <MkDialog v-model="dialogVisible" :title="props.title" append-to-body fullscreen>
-    <Codemirror
-      v-model="dialogContent"
-      :extensions="extensions"
-      :tab-size="4"
-      autofocus
-      style="height: calc(100vh - 160px)"
-    />
+    <Codemirror v-model="dialogContent" :extensions="extensions" :tab-size="4" autofocus style="height: calc(100vh - 160px)" />
 
     <template #footer>
       <el-button @click="closeEditorDialog">取消</el-button>

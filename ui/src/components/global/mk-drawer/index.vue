@@ -1,17 +1,11 @@
 <script setup lang="ts">
 defineOptions({ name: 'MkDrawer', inheritAttrs: false })
 
-const props = defineProps<{
-  contentClass?: string
-}>()
+const props = defineProps<{ contentClass?: string }>()
 
 const visible = defineModel<boolean>({ default: false })
 
-defineSlots<{
-  default(): unknown
-  footer(): unknown
-  header(): unknown
-}>()
+defineSlots<{ default(): unknown; footer(): unknown; header(): unknown }>()
 </script>
 
 <template>

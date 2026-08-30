@@ -29,12 +29,7 @@ const infiniteScrollRef = useTemplateRef<{ reset: () => Promise<void> }>('infini
 const creatorOptions = ref<OptionItem<string>[]>([])
 const searchFields = computed(() => [
   { label: '名称', value: 'name' },
-  {
-    label: '创建者',
-    value: 'create_user',
-    options: creatorOptions.value,
-    remoteMethod: loadCreatorOptions,
-  },
+  { label: '创建者', value: 'create_user', options: creatorOptions.value, remoteMethod: loadCreatorOptions },
   {
     label: '发布状态',
     value: 'publish_status',
@@ -62,10 +57,7 @@ function handleRefreshApplications() {
 }
 
 function loadApplicationPage(pagination: { currentPage: number; pageSize: number }) {
-  return ApplicationApi.getApplicationPage(pagination, {
-    ...applicationQuery.value,
-    folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL,
-  })
+  return ApplicationApi.getApplicationPage(pagination, { ...applicationQuery.value, folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL })
 }
 </script>
 
@@ -81,13 +73,7 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
         </el-tooltip>
       </component>
 
-      <FolderTree
-        ref="folderTreeRef"
-        :source="RESOURCE_TYPE.APPLICATION"
-        @select="handleFolderSelect"
-        draggable
-      >
-      </FolderTree>
+      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.APPLICATION" @select="handleFolderSelect" :show-shared="false" draggable> </FolderTree>
     </template>
 
     <template #default="{ Header }">
@@ -96,18 +82,11 @@ function loadApplicationPage(pagination: { currentPage: number; pageSize: number
         <div class="flex items-center gap-3">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
 
-          <ApplicationCreateDropdown
-            :folder-id="currentFolder.id"
-            @refresh="handleRefreshApplications"
-          />
+          <ApplicationCreateDropdown :folder-id="currentFolder.id" @refresh="handleRefreshApplications" />
         </div>
       </component>
 
-      <MkInfiniteScroll
-        ref="infiniteScrollRef"
-        v-model="applicationData"
-        :load="loadApplicationPage"
-      >
+      <MkInfiniteScroll ref="infiniteScrollRef" v-model="applicationData" :load="loadApplicationPage">
         <div v-if="applicationData.length" class="mk-resource-card-grid">
           <template v-for="application in applicationData" :key="application.id">
             <ApplicationCard :application="application" />

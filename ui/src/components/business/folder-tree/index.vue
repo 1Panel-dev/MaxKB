@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, defineAsyncComponent, onMounted, ref, useTemplateRef } from 'vue'
 import FolderApi from '@/api/admin/workspace/folder'
 import type { FolderSource, FolderItem } from '@/api/types'
-import { RESOURCE_TYPE } from '@/api/enums'
 import { FOLDER_SORT, type FolderSort } from './types'
 import { FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import { MsgSuccess, MsgConfirm } from '@/utils/message'
@@ -11,25 +10,26 @@ import FolderFormDialog from './FolderFormDialog.vue'
 import { useStore } from '@/stores'
 import { getWorkspaceId } from '@/utils/resource-context'
 
+const MoveToDialog = defineAsyncComponent(() => import('./MoveToDialog.vue'))
+
 defineOptions({ name: 'FolderTree' })
 
 const props = withDefaults(
-  defineProps<{
-    canEdit?: boolean
-    source: FolderSource
-    draggable?: boolean
-  }>(),
-  {
-    canEdit: true,
-  },
+  defineProps<{ canEdit?: boolean; disabledFolderIds?: string[]; draggable?: boolean; rootLabel?: string; showAll?: boolean; showShared?: boolean; source: FolderSource }>(),
+  { canEdit: true, disabledFolderIds: () => [], draggable: false, rootLabel: '', showAll: true, showShared: true },
 )
 
-const emit = defineEmits<{
-  select: [folder: FolderItem]
-}>()
+const currentNodeKey = defineModel<string>({ default: FOLDER_ENTRY_ID.ALL })
+
+const emit = defineEmits<{ select: [folder: FolderItem] }>()
 
 const folderEntries = computed(() => FOLDER_ENTRIES[props.source])
-const currentNodeKey = ref<string>(FOLDER_ENTRY_ID.ALL)
+const rootFolderEntry = computed(() => ({ ...folderEntries.value.all, name: props.rootLabel || folderEntries.value.all.name }))
+
+interface SelectableFolderItem extends Omit<FolderItem, 'children'> {
+  children?: SelectableFolderItem[]
+  disabled?: boolean
+}
 
 const loading = ref(false)
 const folderTreeData = ref<FolderItem[]>([])
@@ -74,56 +74,44 @@ const sortTreeData = computed(() => {
   return sortFolders(folderTreeData.value, FOLDER_ENTRY_ID.ALL)
 })
 
-function sortFolders(
-  folders: FolderItem[],
-  parentId: string,
-  positionCache = readCustomPositions(),
-): FolderItem[] {
-  const customPositions = positionCache[parentId] ?? {}
-  const compareMethods: Record<FolderSort, (left: FolderItem, right: FolderItem) => number> = {
-    [FOLDER_SORT.CREATE_TIME_ASC]: (left, right) =>
-      new Date(left.create_time ?? 0).getTime() - new Date(right.create_time ?? 0).getTime(),
-    [FOLDER_SORT.CREATE_TIME_DESC]: (left, right) =>
-      new Date(right.create_time ?? 0).getTime() - new Date(left.create_time ?? 0).getTime(),
-    [FOLDER_SORT.NAME_ASC]: (left, right) => left.name.localeCompare(right.name),
-    [FOLDER_SORT.NAME_DESC]: (left, right) => right.name.localeCompare(left.name),
-    [FOLDER_SORT.CUSTOM]: (left, right) =>
-      (customPositions[left.id] ?? Number.MAX_SAFE_INTEGER) -
-      (customPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
+const selectableTreeData = computed<SelectableFolderItem[]>(() => {
+  const disabledFolderIds = new Set(props.disabledFolderIds)
+  if (!disabledFolderIds.size) return sortTreeData.value
+
+  function mapDisabledFolders(folders: FolderItem[]): SelectableFolderItem[] {
+    return folders.map((folder) => ({ ...folder, children: mapDisabledFolders(folder.children ?? []), disabled: disabledFolderIds.has(folder.id) }))
   }
 
-  return [...folders].sort(compareMethods[currentSort.value]).map((folder) => ({
-    ...folder,
-    children: sortFolders(folder.children ?? [], folder.id, positionCache),
-  }))
+  return mapDisabledFolders(sortTreeData.value)
+})
+
+function sortFolders(folders: FolderItem[], parentId: string, positionCache = readCustomPositions()): FolderItem[] {
+  const customPositions = positionCache[parentId] ?? {}
+  const compareMethods: Record<FolderSort, (left: FolderItem, right: FolderItem) => number> = {
+    [FOLDER_SORT.CREATE_TIME_ASC]: (left, right) => new Date(left.create_time ?? 0).getTime() - new Date(right.create_time ?? 0).getTime(),
+    [FOLDER_SORT.CREATE_TIME_DESC]: (left, right) => new Date(right.create_time ?? 0).getTime() - new Date(left.create_time ?? 0).getTime(),
+    [FOLDER_SORT.NAME_ASC]: (left, right) => left.name.localeCompare(right.name),
+    [FOLDER_SORT.NAME_DESC]: (left, right) => right.name.localeCompare(left.name),
+    [FOLDER_SORT.CUSTOM]: (left, right) => (customPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (customPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
+  }
+
+  return [...folders].sort(compareMethods[currentSort.value]).map((folder) => ({ ...folder, children: sortFolders(folder.children ?? [], folder.id, positionCache) }))
 }
 
 function readCustomPositions(): Record<string, Record<string, number>> {
   const savedPositions = localStorage.getItem(CUSTOM_FOLDER_SORT)
-  return savedPositions
-    ? (JSON.parse(savedPositions) as Record<string, Record<string, number>>)
-    : {}
+  return savedPositions ? (JSON.parse(savedPositions) as Record<string, Record<string, number>>) : {}
 }
 
 function writeCustomPositions(positionCache: Record<string, Record<string, number>>) {
   localStorage.setItem(CUSTOM_FOLDER_SORT, JSON.stringify(positionCache))
 }
 
-function collectCustomPositions(
-  parentId: string,
-  folders: FolderItem[],
-  positionCache: Record<string, Record<string, number>>,
-) {
+function collectCustomPositions(parentId: string, folders: FolderItem[], positionCache: Record<string, Record<string, number>>) {
   const savedPositions = positionCache[parentId] ?? {}
-  const orderedFolders = [...folders].sort(
-    (left, right) =>
-      (savedPositions[left.id] ?? Number.MAX_SAFE_INTEGER) -
-      (savedPositions[right.id] ?? Number.MAX_SAFE_INTEGER),
-  )
+  const orderedFolders = [...folders].sort((left, right) => (savedPositions[left.id] ?? Number.MAX_SAFE_INTEGER) - (savedPositions[right.id] ?? Number.MAX_SAFE_INTEGER))
 
-  positionCache[parentId] = Object.fromEntries(
-    orderedFolders.map((folder, index) => [folder.id, index + 1]),
-  )
+  positionCache[parentId] = Object.fromEntries(orderedFolders.map((folder, index) => [folder.id, index + 1]))
   orderedFolders.forEach((folder) => {
     collectCustomPositions(folder.id, folder.children ?? [], positionCache)
   })
@@ -142,11 +130,7 @@ function handleSortSelect(sort: FolderSort) {
 }
 
 /* 拖拽 */
-function findSiblingFolders(
-  parentId: string,
-  folders = folderTreeData.value,
-  currentParentId: string = FOLDER_ENTRY_ID.ALL,
-): FolderItem[] {
+function findSiblingFolders(parentId: string, folders = folderTreeData.value, currentParentId: string = FOLDER_ENTRY_ID.ALL): FolderItem[] {
   if (currentParentId === parentId) return sortFolders(folders, currentParentId)
 
   for (const folder of folders) {
@@ -156,12 +140,7 @@ function findSiblingFolders(
   return []
 }
 
-function saveSiblingOrder(
-  draggingFolder: FolderItem,
-  targetFolder: FolderItem,
-  dropType: 'after' | 'before' | 'inner',
-  parentId: string,
-) {
+function saveSiblingOrder(draggingFolder: FolderItem, targetFolder: FolderItem, dropType: 'after' | 'before' | 'inner', parentId: string) {
   const siblingIds = findSiblingFolders(parentId)
     .map(({ id }) => id)
     .filter((id) => id !== draggingFolder.id)
@@ -174,14 +153,9 @@ function saveSiblingOrder(
   writeCustomPositions(positionCache)
 }
 
-function handleFolderDrop(
-  draggingFolder: FolderItem,
-  targetFolder: FolderItem,
-  dropType: 'after' | 'before' | 'inner',
-) {
+function handleFolderDrop(draggingFolder: FolderItem, targetFolder: FolderItem, dropType: 'after' | 'before' | 'inner') {
   const currentParentId = draggingFolder.parent_id ?? FOLDER_ENTRY_ID.ALL
-  const targetParentId =
-    (dropType === 'inner' ? targetFolder.id : targetFolder.parent_id) ?? FOLDER_ENTRY_ID.ALL
+  const targetParentId = (dropType === 'inner' ? targetFolder.id : targetFolder.parent_id) ?? FOLDER_ENTRY_ID.ALL
 
   if (currentParentId === targetParentId) {
     saveSiblingOrder(draggingFolder, targetFolder, dropType, targetParentId)
@@ -189,9 +163,7 @@ function handleFolderDrop(
   }
 
   loading.value = true
-  return FolderApi.putFolder(draggingFolder.id, props.source, {
-    parent_id: targetParentId,
-  })
+  return FolderApi.putFolder(draggingFolder.id, props.source, { parent_id: targetParentId })
     .then(() => {
       MsgSuccess('移动成功')
       return loadFolders()
@@ -203,8 +175,7 @@ function handleFolderDrop(
 }
 
 /* 文件夹表单 */
-const folderFormDialogRef =
-  useTemplateRef<InstanceType<typeof FolderFormDialog>>('folderFormDialogRef')
+const folderFormDialogRef = useTemplateRef<InstanceType<typeof FolderFormDialog>>('folderFormDialogRef')
 const formTitle = ref('')
 
 function handleOpenCreateFolder() {
@@ -290,22 +261,39 @@ function getFolderDeleteContext(folder: FolderItem) {
   // 顶级文件夹按当前展示顺序回退到下一个、上一个或“全部”。
   const siblingFolders = sortTreeData.value
   const folderIndex = siblingFolders.findIndex(({ id }) => id === deletedFolder.id)
-  const targetFolder =
-    folderIndex < 0
-      ? folderEntries.value.all
-      : (siblingFolders[folderIndex + 1] ??
-        siblingFolders[folderIndex - 1] ??
-        folderEntries.value.all)
+  const targetFolder = folderIndex < 0 ? folderEntries.value.all : (siblingFolders[folderIndex + 1] ?? siblingFolders[folderIndex - 1] ?? folderEntries.value.all)
   return { positionCache, targetFolder }
 }
 
-// /* 文件夹移动 */
-// const moveFolderDialogRef =
-//   useTemplateRef<InstanceType<typeof MoveFolderDialog>>('moveFolderDialogRef')
+/* 文件夹移动 */
+const moveToDialogRef = useTemplateRef<{ close: () => void; open: (currentFolderId?: string) => void }>('moveToDialogRef')
+const moveSubmitting = ref(false)
+const movingFolder = ref<FolderItem>()
 
-// function handleOpenMoveFolder(folder: FolderItem) {
-//   moveFolderDialogRef.value?.open(folder)
-// }
+function handleOpenMoveFolder(folder: FolderItem) {
+  movingFolder.value = folder
+  moveToDialogRef.value?.open(folder.parent_id ?? FOLDER_ENTRY_ID.ALL)
+}
+
+function handleMoveFolder(targetFolderId: string) {
+  if (moveSubmitting.value || !movingFolder.value) return
+  const folder = movingFolder.value
+  moveSubmitting.value = true
+  return FolderApi.putFolder(folder.id, props.source, { parent_id: targetFolderId })
+    .then((updatedFolder) => {
+      MsgSuccess('移动成功')
+      moveToDialogRef.value?.close()
+      movingFolder.value = undefined
+      return loadFolders().then(() => {
+        if (updatedFolder.id === currentNodeKey.value) {
+          handleFolderClick(findFolderById(folderTreeData.value, updatedFolder.id) ?? updatedFolder)
+        }
+      })
+    })
+    .finally(() => {
+      moveSubmitting.value = false
+    })
+}
 
 onMounted(() => {
   const savedSort = localStorage.getItem(FOLDER_SORT_TYPE)
@@ -343,39 +331,19 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
       </MkDropdown>
     </div>
 
-    <div class="px-4 mb-1">
-      <div v-if="source !== RESOURCE_TYPE.APPLICATION">
-        <MkListItem
-          :active="currentNodeKey === folderEntries.shared.id"
-          @click="handleFolderClick(folderEntries.shared)"
-        >
-          <MkIcon
-            :name="
-              currentNodeKey === folderEntries.shared.id
-                ? 'icon_folder-share_filled'
-                : 'icon_folder_outlined'
-            "
-            :size="18"
-            class="mr-2"
-          />
+    <div v-if="showShared || showAll" class="px-4 mb-1">
+      <div v-if="showShared">
+        <MkListItem :active="currentNodeKey === folderEntries.shared.id" @click="handleFolderClick(folderEntries.shared)">
+          <MkIcon :name="currentNodeKey === folderEntries.shared.id ? 'icon_folder-share_filled' : 'icon_folder_outlined'" :size="18" class="mr-2" />
           <span>{{ folderEntries.shared.name }}</span>
         </MkListItem>
 
         <el-divider class="my-1!" />
       </div>
 
-      <MkListItem
-        :active="currentNodeKey === folderEntries.all.id"
-        @click="handleFolderClick(folderEntries.all)"
-      >
-        <MkIcon
-          :name="
-            currentNodeKey === folderEntries.all.id ? 'icon_card_filled' : 'icon_card_outlined'
-          "
-          :size="18"
-          class="mr-2"
-        />
-        <span>{{ folderEntries.all.name }}</span>
+      <MkListItem v-if="showAll" :active="currentNodeKey === rootFolderEntry.id" @click="handleFolderClick(rootFolderEntry)">
+        <MkIcon :name="currentNodeKey === rootFolderEntry.id ? 'icon_card_filled' : 'icon_card_outlined'" :size="18" class="mr-2" />
+        <span>{{ rootFolderEntry.name }}</span>
       </MkListItem>
     </div>
 
@@ -383,7 +351,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
       <VirtualizedTree
         :currentNodeKey="currentNodeKey"
         :canEdit="canEdit"
-        :data="sortTreeData"
+        :data="selectableTreeData"
         :filter-text="searchKeyword"
         @node-drop="handleFolderDrop"
         @node-click="handleFolderClick"
@@ -406,8 +374,8 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
             <template #icon><MkIcon name="icon_edit_outlined" /></template>
             <span>编辑</span>
           </MkDropdownItem>
-          <MkDropdownItem>
-            <template #icon><MkIcon name="a-icon_move2_outlined" /></template>
+          <MkDropdownItem @click="handleOpenMoveFolder(row)">
+            <template #icon><MkIcon name="icon_move2_outlined" /></template>
             <span>移动到</span>
           </MkDropdownItem>
           <MkDropdownItem divided @click="handleDeleteFolder(row)">
@@ -418,18 +386,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
       </VirtualizedTree>
     </div>
 
-    <FolderFormDialog
-      ref="folderFormDialogRef"
-      :title="formTitle"
-      :source="props.source"
-      @refresh="handleFolderRefresh"
-    />
-    <!--
-    <MoveFolderDialog
-      ref="moveFolderDialogRef"
-      :folders="folderTree"
-      :loading="loading"
-      @submit="handleMoveFolder"
-    /> -->
+    <FolderFormDialog ref="folderFormDialogRef" :title="formTitle" :source="props.source" @refresh="handleFolderRefresh" />
+    <MoveToDialog v-if="canEdit" ref="moveToDialogRef" :loading="moveSubmitting" :source="props.source" @submit="handleMoveFolder" />
   </div>
 </template>

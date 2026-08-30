@@ -19,8 +19,4 @@ const getCurrentUserRoleList = () => {
   return get<ListItem[]>('/role_list/current_user')
 }
 
-export default {
-  getCurrentUserInfo,
-  getCurrentUserRoleList,
-  getCurrentUserWorkspaceList,
-}
+export default { getCurrentUserInfo, getCurrentUserRoleList, getCurrentUserWorkspaceList }

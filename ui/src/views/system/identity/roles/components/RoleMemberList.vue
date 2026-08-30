@@ -36,8 +36,7 @@ function handleSearch(query?: Dict<unknown>) {
 
 // 添加成员
 
-const addMemberDrawerRef =
-  useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
+const addMemberDrawerRef = useTemplateRef<InstanceType<typeof AddMemberDrawer>>('addMemberDrawerRef')
 function handleOpenAddMemberDrawer() {
   addMemberDrawerRef.value?.open()
 }
@@ -91,9 +90,7 @@ watch(
     <div class="flex-between mb-4">
       <div>
         <!-- 添加成员 -->
-        <el-button type="primary" @click="handleOpenAddMemberDrawer">
-          <MkIcon name="icon_add_outlined" />添加成员
-        </el-button>
+        <el-button type="primary" @click="handleOpenAddMemberDrawer"> <MkIcon name="icon_add_outlined" />添加成员 </el-button>
       </div>
 
       <MkComplexSearch :fields="searchFields" @change="handleSearch" />
@@ -110,19 +107,11 @@ watch(
       <el-table-column type="selection" width="40" />
       <el-table-column prop="nick_name" label="姓名" min-width="180" show-overflow-tooltip />
       <el-table-column prop="username" label="用户名" min-width="180" show-overflow-tooltip />
-      <el-table-column
-        v-if="currentRole.type !== ROLE_TYPE.ADMIN"
-        prop="workspace_name"
-        label="工作空间"
-        min-width="180"
-        show-overflow-tooltip
-      />
+      <el-table-column v-if="currentRole.type !== ROLE_TYPE.ADMIN" prop="workspace_name" label="工作空间" min-width="180" show-overflow-tooltip />
       <el-table-column label="操作" width="70" fixed="right">
         <template #default="{ row }">
           <el-tooltip content="移除" placement="top">
-            <el-button type="primary" text @click="handleRemoveMember(row)"
-              ><MkIcon name="icon_assigned_outlined"
-            /></el-button>
+            <el-button type="primary" text @click="handleRemoveMember(row)"><MkIcon name="icon_assigned_outlined" /></el-button>
           </el-tooltip>
         </template>
       </el-table-column>
@@ -131,9 +120,5 @@ watch(
       </template>
     </MkTable>
   </div>
-  <AddMemberDrawer
-    ref="addMemberDrawerRef"
-    :current-role="currentRole"
-    @refresh="handleMemberAdded"
-  />
+  <AddMemberDrawer ref="addMemberDrawerRef" :current-role="currentRole" @refresh="handleMemberAdded" />
 </template>

@@ -43,5 +43,3 @@ export const resetUrl = (url?: string | null, useDefault?: boolean) => {
   }
   return sourceUrl
 }
-
-

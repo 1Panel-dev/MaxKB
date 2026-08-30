@@ -19,8 +19,4 @@ const getThemeInfo = () => {
   return get<ThemeInfo>('/display/info')
 }
 
-export default {
-  getLoginConfig,
-  getBaseProfile,
-  getThemeInfo,
-}
+export default { getLoginConfig, getBaseProfile, getThemeInfo }

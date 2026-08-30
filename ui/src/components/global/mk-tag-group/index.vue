@@ -8,10 +8,7 @@ withDefaults(
     /** 标签文字 */
     tags?: string[]
   }>(),
-  {
-    popoverDisabled: false,
-    tags: () => [],
-  },
+  { popoverDisabled: false, tags: () => [] },
 )
 </script>
 

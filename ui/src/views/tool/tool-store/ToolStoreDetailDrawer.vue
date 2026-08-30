@@ -4,19 +4,9 @@ import type { ToolStoreItem } from '@/api/types'
 
 defineOptions({ name: 'ToolStoreDetailDrawer' })
 
-const props = withDefaults(
-  defineProps<{
-    showAdd?: boolean
-  }>(),
-  {
-    showAdd: true,
-  },
-)
+const props = withDefaults(defineProps<{ showAdd?: boolean }>(), { showAdd: true })
 
-const emit = defineEmits<{
-  add: [tool: ToolStoreItem]
-  closed: []
-}>()
+const emit = defineEmits<{ add: [tool: ToolStoreItem]; closed: [] }>()
 
 const visible = ref(false)
 const detailContent = ref('')
@@ -44,9 +34,9 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer v-model="visible" title="工具详情" size="60%" @closed="resetData">
+  <MkDrawer v-model="visible" title="详情" size="60%" @closed="resetData">
     <template v-if="toolDetail">
-      <div class="mb-6 flex-between gap-4 border-b border-N200 pb-6">
+      <div class="mb-6 flex-between gap-4 border-b pb-6">
         <div class="flex min-w-0 items-center gap-4">
           <ToolIcon :icon="toolDetail.icon" :size="64" :type="toolDetail.tool_type" />
           <div class="min-w-0">
@@ -54,17 +44,12 @@ defineExpose({ open })
             <p class="mt-2 text-N600">{{ toolDetail.desc }}</p>
           </div>
         </div>
-        <el-button v-if="props.showAdd" type="primary" @click="handleAdd">添加</el-button>
+        <el-button v-if="props.showAdd" type="primary" @click="handleAdd">应用</el-button>
       </div>
-      <pre class="tool-store-readme whitespace-pre-wrap text-sm">{{ detailContent }}</pre>
+      <!-- // TODO 换成markdown -->
+      <pre class="whitespace-pre-wrap text-sm">{{ detailContent }}</pre>
     </template>
   </MkDrawer>
 </template>
 
-<style scoped lang="scss">
-.tool-store-readme {
-  color: var(--mk-N900);
-  font-family: inherit;
-  line-height: var(--mk-line-height-base);
-}
-</style>
+<style scoped lang="scss"></style>

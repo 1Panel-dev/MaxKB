@@ -15,10 +15,7 @@ import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
 
-const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
-  nodes: cloneDeep(defaultNodes),
-  edges: [],
-}
+const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = { nodes: cloneDeep(defaultNodes), edges: [] }
 
 const route = useRoute()
 const router = useRouter()
@@ -32,11 +29,7 @@ function toShapeItem(nodeType: WorkflowNodeType): ShapeItem | undefined {
   const node = nodeDict[nodeType]
   if (!node) return
 
-  return {
-    type: node.type,
-    properties: node.properties,
-    text: node.text,
-  }
+  return { type: node.type, properties: node.properties, text: node.text }
 }
 
 function handleAddNode(nodeType: WorkflowNodeType) {
@@ -95,9 +88,7 @@ function loadApplicationDetail() {
       applicationDetail.value = application
       saveTime.value = application.update_time
 
-      const workflow = application.work_flow?.nodes?.length
-        ? application.work_flow
-        : DEFAULT_WORKFLOW
+      const workflow = application.work_flow?.nodes?.length ? application.work_flow : DEFAULT_WORKFLOW
       workflowRef.value?.render(cloneDeep(workflow))
 
       return nextTick().then(() => {
@@ -243,20 +234,12 @@ onMounted(() => {
         <h4 class="max-w-[300px] truncate" :title="applicationDetail?.name">
           {{ applicationDetail?.name }}
         </h4>
-        <span v-if="saveTime" class="shrink-0 text-sm text-N600">
-          保存于 {{ datetimeFormat(saveTime) }}
-        </span>
+        <span v-if="saveTime" class="shrink-0 text-sm text-N600"> 保存于 {{ datetimeFormat(saveTime) }} </span>
       </div>
 
       <div class="flex shrink-0 items-center gap-3">
         <WorkflowComponentMenu @select="handleAddNode" />
-        <el-button plain
-          :loading="saving && !publishing"
-          :disabled="loading || saving || publishing"
-          @click="handleSave"
-        >
-          保存
-        </el-button>
+        <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
         <!-- <el-button
           v-if="canPublish"
           type="primary"

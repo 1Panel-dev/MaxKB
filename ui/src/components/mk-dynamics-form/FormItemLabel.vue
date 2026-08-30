@@ -3,9 +3,7 @@ import type { FormField } from './type'
 
 defineOptions({ name: 'MkDynamicsFormItemLabel' })
 
-defineProps<{
-  formField: FormField
-}>()
+defineProps<{ formField: FormField }>()
 </script>
 
 <template>

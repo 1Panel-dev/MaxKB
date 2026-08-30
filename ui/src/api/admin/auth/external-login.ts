@@ -33,11 +33,4 @@ const getLarkOauthCallback = (code: string) => {
   return get<LoginResponse>('/lark/oauth2', { code })
 }
 
-export default {
-  getDingTalkCallback,
-  getDingTalkOauthCallback,
-  getExternalAuthSetting,
-  getLarkOauthCallback,
-  getQrCodeSources,
-  getSamlLoginUrl,
-}
+export default { getDingTalkCallback, getDingTalkOauthCallback, getExternalAuthSetting, getLarkOauthCallback, getQrCodeSources, getSamlLoginUrl }

@@ -6,15 +6,7 @@ import CommonSystemApi from '@/api/admin/system/common'
 import UserGroupsApi from '@/api/admin/system/user-groups'
 import ResourceAuthorizationApi from '@/api/admin/system/resource-authorization'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
-import type {
-  ResourceAuthorizationType,
-  ResourcePermissionItem,
-  ResourcePermissionPayload,
-  CommonUserOption,
-  OptionItem,
-  SystemUserGroup,
-  WorkspaceItem,
-} from '@/api/types'
+import type { ResourceAuthorizationType, ResourcePermissionItem, ResourcePermissionPayload, CommonUserOption, OptionItem, SystemUserGroup, WorkspaceItem } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import WorkspaceDropdown from '@/components/business/workspace-dropdown/index.vue'
@@ -26,15 +18,11 @@ import { RESOURCE_AUTHORIZATION_LABELS } from './constants'
 const { auth } = useStore()
 const route = useRoute()
 
-const resourceType = ref<ResourceAuthorizationType>(
-  (route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION,
-)
-const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [
-  RESOURCE_TYPE.APPLICATION,
-  RESOURCE_TYPE.KNOWLEDGE,
-  RESOURCE_TYPE.TOOL,
-  RESOURCE_TYPE.MODEL,
-].map((value) => ({ label: RESOURCE_AUTHORIZATION_LABELS[value], value }))
+const resourceType = ref<ResourceAuthorizationType>((route.meta.resource as ResourceAuthorizationType) ?? RESOURCE_TYPE.APPLICATION)
+const resourceTypeOptions: OptionItem<ResourceAuthorizationType>[] = [RESOURCE_TYPE.APPLICATION, RESOURCE_TYPE.KNOWLEDGE, RESOURCE_TYPE.TOOL, RESOURCE_TYPE.MODEL].map((value) => ({
+  label: RESOURCE_AUTHORIZATION_LABELS[value],
+  value,
+}))
 
 /* 选择工作空间列表 */
 const loadingView = ref(false)
@@ -63,10 +51,7 @@ const selectedUserGroupId = ref('')
 const selectedUserId = ref('')
 
 function loadAuthorizationTargets() {
-  return Promise.all([
-    UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value),
-    CommonSystemApi.getWorkspaceMembers(selectedWorkspaceId.value),
-  ]).then(([groups, users]) => {
+  return Promise.all([UserGroupsApi.getSystemUserGroups(selectedWorkspaceId.value), CommonSystemApi.getWorkspaceMembers(selectedWorkspaceId.value)]).then(([groups, users]) => {
     userGroups.value = groups
     workspaceMembers.value = users
     selectedUserGroupId.value = groups[0]?.id ?? ''
@@ -94,8 +79,7 @@ const loadingPermissions = ref(false)
 const resourcePermissions = ref<ResourcePermissionItem[]>([])
 
 function loadResourcePermissions() {
-  const targetId =
-    targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
+  const targetId = targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
 
   if (!targetId) {
     resourcePermissions.value = []
@@ -105,16 +89,8 @@ function loadResourcePermissions() {
   loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
-      ? ResourceAuthorizationApi.getUserResourcePermissions(
-          selectedWorkspaceId.value,
-          targetId,
-          resourceType.value,
-        )
-      : ResourceAuthorizationApi.getUserResourcePermissions(
-          selectedWorkspaceId.value,
-          targetId,
-          resourceType.value,
-        )
+      ? ResourceAuthorizationApi.getUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
+      : ResourceAuthorizationApi.getUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value)
 
   return permissionRequest
     .then((permissions) => {
@@ -131,10 +107,7 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
   const resources = resourceItems.map((resource) => ({
     ...resource,
     children: [] as ResourcePermissionItem[],
-    permission:
-      !resource.folder_id && resource.permission === RESOURCE_PERMISSION.NOT_AUTH
-        ? RESOURCE_PERMISSION.VIEW
-        : resource.permission,
+    permission: !resource.folder_id && resource.permission === RESOURCE_PERMISSION.NOT_AUTH ? RESOURCE_PERMISSION.VIEW : resource.permission,
   }))
   const resourceMap = new Map(resources.map((resource) => [resource.id, resource]))
 
@@ -156,26 +129,15 @@ function buildResourceTree(resourceItems: ResourcePermissionItem[]) {
 /* 保存权限 */
 
 function handlePermissionsSubmit(permissions: ResourcePermissionPayload[]) {
-  const targetId =
-    targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
+  const targetId = targetType.value === 'user-group' ? selectedUserGroupId.value : selectedUserId.value
 
   if (!targetId) return
 
   loadingPermissions.value = true
   const permissionRequest =
     targetType.value === 'user-group'
-      ? ResourceAuthorizationApi.putUserResourcePermissions(
-          selectedWorkspaceId.value,
-          targetId,
-          resourceType.value,
-          permissions,
-        )
-      : ResourceAuthorizationApi.putUserResourcePermissions(
-          selectedWorkspaceId.value,
-          targetId,
-          resourceType.value,
-          permissions,
-        )
+      ? ResourceAuthorizationApi.putUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value, permissions)
+      : ResourceAuthorizationApi.putUserResourcePermissions(selectedWorkspaceId.value, targetId, resourceType.value, permissions)
 
   permissionRequest
     .then(() => {
@@ -189,9 +151,7 @@ function handlePermissionsSubmit(permissions: ResourcePermissionPayload[]) {
 
 onMounted(() => {
   loadingView.value = true
-  Promise.all(
-    auth.isEE ? [loadWorkspaceOptions(), loadAuthorizationTargets()] : [loadAuthorizationTargets()],
-  ).finally(() => {
+  Promise.all(auth.isEE ? [loadWorkspaceOptions(), loadAuthorizationTargets()] : [loadAuthorizationTargets()]).finally(() => {
     loadingView.value = false
   })
 })
@@ -200,11 +160,7 @@ onMounted(() => {
 <template>
   <MkViewLayout class="system-resource-authorization" :loading="loadingView">
     <template #top v-if="auth.isEE">
-      <WorkspaceDropdown
-        v-model="selectedWorkspaceId"
-        :options="workspaceOptions"
-        @select="handleWorkspaceSelect"
-      />
+      <WorkspaceDropdown v-model="selectedWorkspaceId" :options="workspaceOptions" @select="handleWorkspaceSelect" />
     </template>
 
     <template #aside="{ Header }">
@@ -215,45 +171,21 @@ onMounted(() => {
         </el-tabs>
       </component>
 
-      <UserGroupAuthorizationList
-        v-if="targetType === 'user-group'"
-        :active-id="selectedUserGroupId"
-        :user-groups="userGroups"
-        @select="handleUserGroupSelect"
-      />
-      <UserAuthorizationList
-        v-else
-        :active-id="selectedUserId"
-        :users="workspaceMembers"
-        @select="handleUserSelect"
-      />
+      <UserGroupAuthorizationList v-if="targetType === 'user-group'" :active-id="selectedUserGroupId" :user-groups="userGroups" @select="handleUserGroupSelect" />
+      <UserAuthorizationList v-else :active-id="selectedUserId" :users="workspaceMembers" @select="handleUserSelect" />
     </template>
 
     <template #default="{ Header }">
       <component :is="Header">
-        <div  class="w-full">
+        <div class="w-full">
           <h4 class="mb-4">资源权限配置</h4>
-          <el-tabs
-            v-model="resourceType"
-            class="w-full"
-            @tab-change="loadResourcePermissions"
-          >
-            <el-tab-pane
-              v-for="resourceTypeOption in resourceTypeOptions"
-              :key="resourceTypeOption.value"
-              :label="resourceTypeOption.label"
-              :name="resourceTypeOption.value"
-            />
+          <el-tabs v-model="resourceType" class="w-full" @tab-change="loadResourcePermissions">
+            <el-tab-pane v-for="resourceTypeOption in resourceTypeOptions" :key="resourceTypeOption.value" :label="resourceTypeOption.label" :name="resourceTypeOption.value" />
           </el-tabs>
         </div>
       </component>
 
-      <PermissionTable
-        v-loading="loadingPermissions"
-        :data="resourcePermissions"
-        :resource-type="resourceType"
-        @submit="handlePermissionsSubmit"
-      />
+      <PermissionTable v-loading="loadingPermissions" :data="resourcePermissions" :resource-type="resourceType" @submit="handlePermissionsSubmit" />
     </template>
   </MkViewLayout>
 </template>

@@ -4,11 +4,7 @@ import type { FormInstance } from 'element-plus'
 import CurrentUserApi from '@/api/admin/auth/current-user'
 import UserManageApi from '@/api/admin/system/user-manage'
 import { ROLE_TYPE } from '@/api/enums'
-import type {
-  ListItem,
-  BatchSetUserWorkspaceRolesRequest,
-  SystemUserRoleAssignment,
-} from '@/api/types'
+import type { ListItem, BatchSetUserWorkspaceRolesRequest, SystemUserRoleAssignment } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import MkFormList from '@/components/mk-form-list/index.vue'
@@ -17,20 +13,14 @@ defineOptions({ name: 'BatchSetUserRoleDialog' })
 
 const { auth } = useStore()
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 const batchRoleFormRef = ref<FormInstance>()
 const dialogVisible = ref(false)
 
 const submitting = ref(false)
 
-const batchRoleForm = reactive<BatchSetUserWorkspaceRolesRequest>({
-  ids: [],
-  is_append: true,
-  role_setting: [{ role_id: '', workspace_ids: [] }],
-})
+const batchRoleForm = reactive<BatchSetUserWorkspaceRolesRequest>({ ids: [], is_append: true, role_setting: [{ role_id: '', workspace_ids: [] }] })
 
 /* 角色与工作空间选项 */
 const roleSettingOptionsLoading = ref(false)
@@ -83,11 +73,7 @@ function submitBatchSetUserRoles() {
           is_append: batchRoleForm.is_append,
           role_setting: batchRoleForm.role_setting.map((assignment) => ({
             ...assignment,
-            workspace_ids:
-              roleOptions.value.find(({ id }) => id === assignment.role_id)?.type ===
-              ROLE_TYPE.ADMIN
-                ? ['None']
-                : assignment.workspace_ids,
+            workspace_ids: roleOptions.value.find(({ id }) => id === assignment.role_id)?.type === ROLE_TYPE.ADMIN ? ['None'] : assignment.workspace_ids,
           })),
         })
       : UserManageApi.postBatchSetUserRoles({
@@ -115,11 +101,7 @@ function open(userIds: string[]) {
 }
 
 function resetData() {
-  Object.assign(batchRoleForm, {
-    ids: [],
-    is_append: true,
-    role_setting: [{ role_id: '', workspace_ids: [] }],
-  })
+  Object.assign(batchRoleForm, { ids: [], is_append: true, role_setting: [{ role_id: '', workspace_ids: [] }] })
   roleSettingOptionsLoading.value = false
   submitting.value = false
   roleOptions.value = []
@@ -132,13 +114,7 @@ defineExpose({ open })
 
 <template>
   <MkDialog v-model="dialogVisible" title="设置角色" align-center @closed="resetData">
-    <el-form
-      ref="batchRoleFormRef"
-      :model="batchRoleForm"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent="submitBatchSetUserRoles"
-    >
+    <el-form ref="batchRoleFormRef" :model="batchRoleForm" label-position="top" require-asterisk-position="right" @submit.prevent="submitBatchSetUserRoles">
       <el-form-item label="设置方式">
         <el-radio-group v-model="batchRoleForm.is_append">
           <el-radio :value="true">追加</el-radio>
@@ -146,22 +122,13 @@ defineExpose({ open })
         </el-radio-group>
       </el-form-item>
 
-      <MkFormList
-        v-if="auth.isEE || auth.isPE"
-        v-model="batchRoleForm.role_setting"
-        add-text="添加角色"
-        :default-item="{ role_id: '', workspace_ids: [] }"
-      >
+      <MkFormList v-if="auth.isEE || auth.isPE" v-model="batchRoleForm.role_setting" add-text="添加角色" :default-item="{ role_id: '', workspace_ids: [] }">
         <template #default="{ index, item: roleAssignment }">
           <el-form-item
             class="flex-1"
             :label="index === 0 ? '角色' : ''"
             :prop="`role_setting.${index}.role_id`"
-            :rules="{
-              required: true,
-              message: '请选择角色',
-              trigger: 'change',
-            }"
+            :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
           >
             <el-select
               v-model="roleAssignment.role_id"
@@ -172,13 +139,7 @@ defineExpose({ open })
               fit-input-width
               @change="handleRoleChange(roleAssignment, index)"
             >
-              <el-option
-                v-for="roleOption in roleOptions"
-                :key="roleOption.id"
-                :label="roleOption.name"
-                :title="roleOption.name"
-                :value="roleOption.id"
-              />
+              <el-option v-for="roleOption in roleOptions" :key="roleOption.id" :label="roleOption.name" :title="roleOption.name" :value="roleOption.id" />
             </el-select>
           </el-form-item>
 
@@ -188,13 +149,7 @@ defineExpose({ open })
             class="flex-1"
             :label="index === 0 ? '工作空间' : ''"
             :prop="`role_setting.${index}.workspace_ids`"
-            :rules="{
-              required: !isAdminRole(roleAssignment.role_id),
-              type: 'array',
-              min: 1,
-              message: '请选择工作空间',
-              trigger: 'change',
-            }"
+            :rules="{ required: !isAdminRole(roleAssignment.role_id), type: 'array', min: 1, message: '请选择工作空间', trigger: 'change' }"
           >
             <el-select
               v-model="roleAssignment.workspace_ids"
@@ -225,9 +180,7 @@ defineExpose({ open })
 
     <template #footer>
       <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserRoles">
-        保存
-      </el-button>
+      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserRoles"> 保存 </el-button>
     </template>
   </MkDialog>
 </template>

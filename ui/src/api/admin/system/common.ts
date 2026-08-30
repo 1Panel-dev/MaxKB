@@ -16,8 +16,4 @@ const getWorkspaceMembers = (workspaceId: string, query?: Dict<unknown>) => {
   return get<CommonUserOption[]>(`/workspace/${workspaceId}/user_member`, query)
 }
 
-export default {
-  getDefaultPassword,
-  getAllUsers,
-  getWorkspaceMembers,
-}
+export default { getDefaultPassword, getAllUsers, getWorkspaceMembers }

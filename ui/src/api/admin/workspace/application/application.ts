@@ -10,10 +10,7 @@ const getPrefix = () => {
 
 /** 获取工作空间智能体列表。 */
 const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>) => {
-  return get<ResponsePage<ApplicationDetail>>(
-    `${getPrefix()}/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+  return get<ResponsePage<ApplicationDetail>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 获取工作空间智能体详情。 */
@@ -35,16 +32,7 @@ const putApplication = (applicationId: string, data: ApplicationFormPayload) => 
 
 /** 发布工作空间智能体。 */
 const putApplicationPublish = (applicationId: string) => {
-  return put<Record<string, never>, ApplicationDetail>(
-    `${getPrefix()}/${applicationId}/publish`,
-    {},
-  )
+  return put<Record<string, never>, ApplicationDetail>(`${getPrefix()}/${applicationId}/publish`, {})
 }
 
-export default {
-  getApplicationPage,
-  getApplicationDetail,
-  postApplicationImport,
-  putApplication,
-  putApplicationPublish,
-}
+export default { getApplicationPage, getApplicationDetail, postApplicationImport, putApplication, putApplicationPublish }

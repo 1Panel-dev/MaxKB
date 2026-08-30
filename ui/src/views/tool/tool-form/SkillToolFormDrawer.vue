@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { reactive, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
-import { Download } from '@element-plus/icons-vue'
 import type { FormInstance, FormRules, UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 import type ToolApi from '@/api/admin/workspace/tool/tool'
 import { TOOL_TYPE } from '@/api/enums'
@@ -10,23 +9,15 @@ import MkDragUpload from '@/components/mk-drag-upload/index.vue'
 import { useStore } from '@/stores'
 import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
 
-import InitFieldTable from '../components/init-field/InitFieldTable.vue'
+import InitFieldTable from './component/init-field/InitFieldTable.vue'
 
 defineOptions({ name: 'SkillToolFormDrawer' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  api: typeof ToolApi
-  folderId: string
-  title: string
-}>()
+const props = defineProps<{ api: typeof ToolApi; folderId: string; title: string }>()
 
-const emit = defineEmits<{
-  closed: []
-  refresh: []
-  update: [tool: ToolItem]
-}>()
+const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
 interface SkillFormModel {
   code: string
@@ -45,14 +36,7 @@ const loading = ref(false)
 const formLoading = ref(false)
 const editId = ref<string>()
 const originalForm = ref('')
-const skillForm = reactive<SkillFormModel>({
-  code: '',
-  desc: '',
-  fileList: [],
-  icon: '',
-  init_field_list: [],
-  name: '',
-})
+const skillForm = reactive<SkillFormModel>({ code: '', desc: '', fileList: [], icon: '', init_field_list: [], name: '' })
 const formRules: FormRules<SkillFormModel> = {
   fileList: [{ required: true, message: '请上传 Skill ZIP 文件', trigger: 'change' }],
   name: [{ required: true, message: '请输入 Skill 名称', trigger: 'blur' }],
@@ -122,9 +106,7 @@ function handleSubmit() {
     loading.value = true
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : props.api.postTool({ ...payload, folder_id: props.folderId || null })
+    const request = currentEditId ? props.api.putTool(currentEditId, payload) : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
       .then((savedTool) => {
@@ -154,7 +136,6 @@ function fillSkillForm(tool: ToolItem) {
 }
 
 function open(tool?: ToolItem, asCopy = false) {
-  resetData()
   visible.value = true
   originalForm.value = JSON.stringify(skillForm)
   if (!tool) return
@@ -184,10 +165,7 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', {
-    confirmButtonText: '确认',
-    confirmButtonType: 'primary',
-  })
+  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
     .then(() => {
       visible.value = false
     })
@@ -195,14 +173,7 @@ function handleBeforeClose() {
 }
 
 function resetData() {
-  Object.assign(skillForm, {
-    code: '',
-    desc: '',
-    fileList: [],
-    icon: '',
-    init_field_list: [],
-    name: '',
-  })
+  Object.assign(skillForm, { code: '', desc: '', fileList: [], icon: '', init_field_list: [], name: '' })
   editId.value = undefined
   originalForm.value = ''
   loading.value = false
@@ -220,34 +191,14 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    :before-close="handleBeforeClose"
-    :title="title"
-    size="60%"
-    @closed="handleClosed"
-  >
-    <el-form
-      ref="formRef"
-      v-loading="formLoading"
-      :model="skillForm"
-      :rules="formRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+  <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
+    <el-form ref="formRef" v-loading="formLoading" :model="skillForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO 头像修改 -->
           <ToolIcon :icon="skillForm.icon" :size="32" :type="TOOL_TYPE.SKILL" />
-          <el-input
-            v-model="skillForm.name"
-            maxlength="64"
-            placeholder="请输入 Skill 名称"
-            show-word-limit
-            @blur="skillForm.name = skillForm.name.trim()"
-          />
+          <el-input v-model="skillForm.name" maxlength="64" placeholder="请输入 Skill 名称" show-word-limit @blur="skillForm.name = skillForm.name.trim()" />
         </div>
       </el-form-item>
       <el-form-item label="描述">
@@ -278,7 +229,7 @@ defineExpose({ open })
           >
             <template #download>
               <el-button v-if="editId" :disabled="loading" link @click="handleDownload">
-                <MkIcon :icon="Download" :size="16" class="text-N600" />
+                <MkIcon name="icon_download_outlined" :size="16" class="text-N600" />
               </el-button>
             </template>
           </MkDragUpload>

@@ -15,9 +15,9 @@
   `Dialog.vue` 结尾，例如 `UserPwdDialog.vue`。
 - 页面使用的 Drawer 放在当前功能目录中，文件使用 `PascalCase` 并以 `Drawer.vue` 结尾，
   例如 `AddMemberDrawer.vue`。Drawer 不放入 `components/` 或 `dialog/`。
-- 卡片 Action 独占且由 Action 自主管理的 Drawer 或 Dialog，与 Action 一起放入
-  `<card-name>/action-dropdown/<action-name>/`；页面通过卡片的 `action-dropdown` 插槽组合操作，
-  不直接导入或调用这些浮层。
+- 卡片的单文件 Action 直接放入 `<card-name>/action-dropdown/`；Action 独占且由 Action 自主管理
+  Drawer、Dialog 或其他配套文件时，一起放入 `<card-name>/action-dropdown/<action-name>-action/`。
+  页面通过卡片的 `action-dropdown` 插槽组合操作，不直接导入或调用这些浮层。
 - 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
   共同功能目录中。
 - 不要为了复用一个页面内部实现而提前移动到 `src/components`。
@@ -71,71 +71,92 @@ System 共享资源的四类特殊资源。它们统一遵循以下页面组织�
 - 多个范围共用的 Action 跟随基础资源卡片维护；仅供 Workspace 使用的 Action 留在对应基础资源
   目录；仅供 System 资源管理或 System 共享资源使用的 Action 放在对应 System 页面功能目录的
   `<resource>-card/action-dropdown/`。
-- 每个菜单 Action 使用独立业务目录。Action 独占的 Drawer 或 Dialog 与 Action 放在同一目录，
-  点击时按需挂载，并在 `closed` 后卸载；多个 Action 共用的浮层才提升到最近共同功能目录。
+- 单文件菜单 Action 直接放在 `action-dropdown/`；包含专属 Drawer、Dialog 或其他配套文件的 Action
+  使用 `<action-name>-action/` 业务目录。专属浮层点击时按需挂载，并在 `closed` 后卸载；多个 Action
+  共用的浮层才提升到最近共同功能目录。
 
 这套三范围资源规则只适用于上述四类特殊资源，不扩展到普通 System 设置、身份管理或其他页面。
 
-当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在工具功能目录的
-`components/` 中：
+当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
+`tool-form/component/` 中：
 
 ```text
 src/views/tool/
 ├── ToolView.vue
-├── McpConfigDialog.vue           # MCP 工具配置查看弹窗
-├── components/                    # 工具创建与编辑共用的表单片段
-│   ├── ToolCreateDropdown.vue     # 工具创建入口
-│   ├── init-field/
-│   ├── input-field/
-│   └── python-code/
+├── components/
+│   ├── CreateToolDropdown.vue     # 工具创建入口
+│   └── OpenToolStoreButton.vue    # 工具商店入口
 ├── tool-form/                     # 各类型工具创建、编辑表单
 │   ├── DataSourceFormDrawer.vue
 │   ├── McpFormDrawer.vue
 │   ├── SkillToolFormDrawer.vue
+│   ├── StoreToolFormDialog.vue
 │   ├── WorkflowFormDialog.vue
+│   ├── component/                 # 工具表单共用片段
+│   │   ├── init-field/
+│   │   ├── input-field/
+│   │   └── python-code/
 │   └── tool-custom/
 ├── tool-card/
-│   ├── index.vue                  # 工具卡片展示与操作插槽
-│   ├── InitParamDialog.vue        # 启用工具前配置启动参数
+│   ├── ToolCard.vue               # 工具卡片展示与操作插槽
+│   ├── InitParamDialog.vue        # 配置工具启动参数
+│   ├── ToolStatusSwitch.vue       # 工具启停及启动参数配置入口
 │   ├── UpdateVersionButton.vue    # 根据页面传入的商店数据检测并更新工具版本
 │   └── action-dropdown/           # 工作空间工具菜单 Action
 │       ├── index.ts
-│       ├── copy-tool/
-│       ├── delete-tool/
-│       ├── edit-tool/
-│       └── export-tool/
-└── tool-store/                    # 工具商店入口、详情与添加流程
-    └── ToolStoreOpenButton.vue    # 工具商店入口
+│       ├── CopyToolAction.vue
+│       ├── DeleteToolAction.vue
+│       ├── EditToolAction.vue
+│       ├── ExportToolAction.vue
+│       ├── InitParamAction.vue
+│       ├── MoveToolAction.vue
+│       └── mcp-config-action/
+│           ├── McpConfigAction.vue
+│           └── McpConfigDialog.vue # MCP 工具配置查看弹窗
+└── tool-store/                    # 工具商店列表、详情与添加流程
+    ├── component/
+    │   └── ToolStoreCard.vue      # 商店工具卡片及详情、添加入口
+    ├── ToolStoreDetailDrawer.vue  # 商店工具详情
+    └── ToolStoreDialog.vue        # 商店分类、查询及添加成功后的列表刷新
 ```
 
 各类型表单只维护本类型特有字段和流程，并统一放在 `tool/tool-form/`；创建入口和编辑 Action
-共同复用这些表单。启动参数、输入参数、Python 内容等已有表单片段应从 `tool/components/` 复用，
+共同复用这些表单。启动参数、输入参数、Python 内容等已有表单片段应从
+`tool/tool-form/component/` 复用，
 不在类型目录中重复实现。`ToolCodeSetting` 的生成入口默认隐藏，只由普通自定义工具表单通过
 `showGenerate` 显式开启。工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
-操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单。各类型表单创建成功后通过 `refresh` 事件
+操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，启动参数 Action 获取工具详情后打开
+`InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。各类型表单创建成功后通过 `refresh` 事件
 刷新列表，编辑成功后通过 `update` 事件返回接口响应的完整工具数据，由页面局部更新对应卡片；不要
 把不同工具类型的字段重新合并到一个通用表单中。所有调用 `postTool` 创建工具的流程在接口成功后
 先调用 `auth.loadAuthBaseProfile()` 刷新当前用户基础资料，再执行成功提示和页面刷新；`putTool` 编辑
-流程不触发该刷新。需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外维护逐方法接口
-类型。工具启用状态属于固定的卡片内交互，由 `ToolCard`
-使用页面传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态和
-批量删除流程由 `ToolView` 管理；`ToolCard` 只把选择模式与选中状态传给 `MkSourceCard`。
+流程不触发该刷新。跨资源范围复用且需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外
+维护逐方法接口类型；固定服务于 Workspace 工具商店的 `StoreToolFormDialog` 直接内聚对应请求。
+工具启用状态属于固定的卡片内交互，由 `ToolStatusSwitch`
+使用卡片传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态、
+批量移动和批量删除流程由 `ToolView` 管理；`MoveToolAction` 复用公共 `MoveToDialog` 完成单个工具移动，
+在具体目录中通过 `delete` 通知页面局部移除卡片，在“全部工具”中保留卡片。`ToolCard` 只把选择模式与选中状态传给 `MkSourceCard`。
 工具商店列表由 `ToolView` 统一加载并经 `ToolCard` 传给 `UpdateVersionButton`，卡片和更新按钮
-不重复请求商店列表。
+不重复请求商店列表。`ToolStoreCard` 负责详情和添加入口，并在操作触发时按需挂载
+`ToolStoreDetailDrawer` 与 `StoreToolFormDialog`；`StoreToolFormDialog` 直接根据打开时的新增或编辑
+上下文完成请求并管理提交状态。新增时由打开方提供目标 `folderId`，
+成功后只发出无数据的 `refresh` 事件；编辑成功后通过 `update` 返回接口响应的完整工具数据。
+`ToolStoreCard` 只负责打开表单并转发刷新通知，`ToolStoreDialog` 据此关闭商店并刷新列表，外层不再
+传递工具和名称等提交数据。
 
 System 共享资源页面统一放在 `views/system/shared-resources/`。页面负责 System 范围的资源查询、
 筛选和页面动作；资源卡片、供应商列表等可复用展示能力继续使用对应 Workspace 功能目录中的
 组件，不在共享资源目录复制实现。两个页面共用的资源卡片 Action 跟随对应 Workspace 功能维护；
 只被 Workspace 页面使用的 Action 保留在 Workspace 功能目录，只被 System 共享资源页面使用的
-Action 放入 `views/system/shared-resources/<card-name>/action-dropdown/`。每个 Action 使用独立业务目录，
-对应的菜单文案由使用页面通过 `label` 显式传入。
+Action 放入 `views/system/shared-resources/<card-name>/action-dropdown/`。Action 目录结构遵循单文件
+扁平放置、多文件使用 `<action-name>-action/` 的规则，对应的菜单文案由使用页面通过 `label` 显式传入。
 
 ```text
 src/views/system/shared-resources/
 ├── SharedModelview.vue
 └── model-card/action-dropdown/
     ├── index.ts
-    └── shared-model-info/
+    └── shared-model-info-action/
         ├── SharedModelInfoAction.vue
         └── SharedModelInfoDrawer.vue
 ```

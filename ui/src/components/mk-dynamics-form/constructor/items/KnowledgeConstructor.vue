@@ -4,15 +4,11 @@ import { computed, reactive } from 'vue'
 import Knowledge from '../../items/knowledge/Knowledge.vue'
 import type { FormField } from '../../type'
 
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 
 const emit = defineEmits(['update:modelValue'])
 
-const collapseData = reactive({
-  optional_knowledge: true,
-})
+const collapseData = reactive({ optional_knowledge: true })
 const formValue = computed({
   set: (item: DynamicFormValue) => {
     emit('update:modelValue', item)
@@ -28,21 +24,10 @@ const formField = computed<FormField>(() => {
 
 const getData = () => {
   const knowledgeItemList = (formValue.value.knowledge_list || []).map((k: DynamicFormValue) => {
-    return {
-      id: k.id,
-      name: k.name,
-      type: k.type,
-      embedding_model_id: k.embedding_model_id,
-    }
+    return { id: k.id, name: k.name, type: k.type, embedding_model_id: k.embedding_model_id }
   })
 
-  return {
-    input_type: 'Knowledge',
-    default_value: formValue.value.default_value || [],
-    attrs: {
-      knowledge_list: knowledgeItemList,
-    },
-  }
+  return { input_type: 'Knowledge', default_value: formValue.value.default_value || [], attrs: { knowledge_list: knowledgeItemList } }
 }
 
 const render = (formData: DynamicFormValue) => {
@@ -53,47 +38,26 @@ const render = (formData: DynamicFormValue) => {
 defineExpose({ getData, render })
 
 function removeKnowledge(id: string) {
-  formValue.value.knowledge_list = formValue.value.knowledge_list.filter(
-    (k: DynamicFormValue) => k.id !== id,
-  )
+  formValue.value.knowledge_list = formValue.value.knowledge_list.filter((k: DynamicFormValue) => k.id !== id)
   if (formValue.value.default_value) {
-    formValue.value.default_value = formValue.value.default_value.filter(
-      (k_id: string) => k_id !== id,
-    )
+    formValue.value.default_value = formValue.value.default_value.filter((k_id: string) => k_id !== id)
   }
 }
 </script>
 
 <template>
-  <el-form-item
-    prop="knowledge_list"
-    :rules="[
-      {
-        message: '请选择可选知识库',
-        type: 'array',
-        min: 1,
-      },
-    ]"
-  >
+  <el-form-item prop="knowledge_list" :rules="[{ message: '请选择可选知识库', type: 'array', min: 1 }]">
     <template #label>
-      <div
-        class="flex-between mb-12 cursor"
-        @click="collapseData.optional_knowledge = !collapseData.optional_knowledge"
-      >
+      <div class="flex-between mb-12 cursor" @click="collapseData.optional_knowledge = !collapseData.optional_knowledge">
         <div class="flex align-center">
-          <el-icon
-            class="mr-8 arrow-icon"
-            :class="collapseData.optional_knowledge ? 'rotate-90' : ''"
-          >
+          <el-icon class="mr-8 arrow-icon" :class="collapseData.optional_knowledge ? 'rotate-90' : ''">
             <CaretRight />
           </el-icon>
           <span class="lighter"
             >可选知识库
             <span class="color-danger">*</span>
           </span>
-          <span class="ml-4" v-if="formValue.knowledge_list?.length"
-            >({{ formValue.knowledge_list.length }})</span
-          >
+          <span class="ml-4" v-if="formValue.knowledge_list?.length">({{ formValue.knowledge_list.length }})</span>
         </div>
       </div>
     </template>
@@ -102,12 +66,7 @@ function removeKnowledge(id: string) {
         <template v-for="(item, index) in formValue.knowledge_list" :key="index">
           <div class="flex-between border border-r-6 white-bg mb-8" style="padding: 3px 12px">
             <div class="flex align-center" style="width: 80%">
-              <KnowledgeIcon
-                :type="item.type"
-                class="mr-8"
-                :size="20"
-                style="--el-avatar-border-radius: 6px"
-              />
+              <KnowledgeIcon :type="item.type" class="mr-8" :size="20" style="--el-avatar-border-radius: 6px" />
 
               <span class="ellipsis cursor" :title="item.name"> {{ item.name }}</span>
             </div>

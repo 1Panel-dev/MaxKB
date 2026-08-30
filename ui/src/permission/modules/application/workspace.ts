@@ -49,8 +49,7 @@ const workspace = {
   chatLogAddKnowledge: (id: string) => canRes(P.APPLICATION_CHAT_LOG_ADD_KNOWLEDGE, id),
 
   // —— 组合：跳转/进入应用（概览读 或 应用读 皆可）——
-  jumpRead: (id: string) =>
-    canRes(P.APPLICATION_OVERVIEW_READ, id) || canRes(P.APPLICATION_READ, id),
+  jumpRead: (id: string) => canRes(P.APPLICATION_OVERVIEW_READ, id) || canRes(P.APPLICATION_READ, id),
 }
 
 export default workspace

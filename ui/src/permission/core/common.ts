@@ -252,15 +252,7 @@ export class Permission {
     if (!ctx?.workspaceId && !ctx?.resourceId) {
       return this
     }
-    return new Permission(
-      this.group,
-      this.subGroup,
-      this.operate,
-      this.bitIndex,
-      ctx?.workspaceId,
-      ctx?.resourceId,
-      this.flag,
-    )
+    return new Permission(this.group, this.subGroup, this.operate, this.bitIndex, ctx?.workspaceId, ctx?.resourceId, this.flag)
   }
 
   /** 派生带 workspaceId 的工作空间级权限副本，对应后端 `get_workspace_permission`。 */
@@ -270,49 +262,24 @@ export class Permission {
 
   /** 派生带 workspaceId + resourceId 的资源级权限副本。 */
   newResourcePermission(workspaceId?: string, resourceId?: string): Permission {
-    return new Permission(
-      this.group,
-      this.subGroup,
-      this.operate,
-      this.bitIndex,
-      workspaceId,
-      resourceId,
-    )
+    return new Permission(this.group, this.subGroup, this.operate, this.bitIndex, workspaceId, resourceId)
   }
 
   // —— 工厂：对应后端 PermissionConstants 上的 get_workspace_*_permission ——
 
   /** 仅工作空间维度（无资源 id），对应 `get_workspace_permission`。 */
   getWorkspacePermission(): PermissionFactory {
-    return (ctx) =>
-      new Permission(this.group, this.subGroup, this.operate, this.bitIndex, ctx?.workspaceId)
+    return (ctx) => new Permission(this.group, this.subGroup, this.operate, this.bitIndex, ctx?.workspaceId)
   }
 
   /** 工作空间 + 资源维度，对应 `get_workspace_{knowledge,application,...}_permission`。 */
   getWorkspaceResourcePermission(): PermissionFactory {
-    return (ctx) =>
-      new Permission(
-        this.group,
-        this.subGroup,
-        this.operate,
-        this.bitIndex,
-        ctx?.workspaceId,
-        ctx?.resourceId,
-      )
+    return (ctx) => new Permission(this.group, this.subGroup, this.operate, this.bitIndex, ctx?.workspaceId, ctx?.resourceId)
   }
 
   /** 工作空间管理员特权，对应 `get_workspace_permission_workspace_manage_role`。 */
   getWorkspaceManageFlagPermission(): PermissionFactory {
-    return (ctx) =>
-      new Permission(
-        this.group,
-        this.subGroup,
-        this.operate,
-        this.bitIndex,
-        ctx?.workspaceId,
-        undefined,
-        RoleConstants.WORKSPACE_MANAGE.name,
-      )
+    return (ctx) => new Permission(this.group, this.subGroup, this.operate, this.bitIndex, ctx?.workspaceId, undefined, RoleConstants.WORKSPACE_MANAGE.name)
   }
 }
 
@@ -344,18 +311,9 @@ export class AggregatePermission {
     return new AggregatePermissionBuilder()
   }
 
-  hasPermission(
-    userRoles: Set<string>,
-    userPermissions: Map<string, bigint>,
-    ctx?: PermissionContext,
-  ): boolean {
+  hasPermission(userRoles: Set<string>, userPermissions: Map<string, bigint>, ctx?: PermissionContext): boolean {
     // 无任何约束 => 放行（对应后端五集合全空的判断）
-    if (
-      this.permissionCalls.length === 0 &&
-      this.permissionConstants.length === 0 &&
-      this.aggregatePermissions.length === 0 &&
-      this.roles.length === 0
-    ) {
+    if (this.permissionCalls.length === 0 && this.permissionConstants.length === 0 && this.aggregatePermissions.length === 0 && this.roles.length === 0) {
       return true
     }
 

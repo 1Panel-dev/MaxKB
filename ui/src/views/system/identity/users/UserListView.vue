@@ -24,11 +24,7 @@ function handleOpenUserFormDrawer(systemUser?: SystemUser) {
 /* 列表查询相关 */
 const userTableRef = useTemplateRef('userTableRef')
 const systemUsersLoading = ref(false)
-const paginationConfig = ref({
-  currentPage: 1,
-  pageSize: 20,
-  total: 0,
-})
+const paginationConfig = ref({ currentPage: 1, pageSize: 20, total: 0 })
 const systemUsersData = ref<SystemUser[]>([])
 const searchFields: OptionItem<string>[] = [
   { label: '用户名', value: 'username' },
@@ -78,9 +74,7 @@ function handleOpenUserPwdDialog(systemUser: SystemUser) {
 function handleChangeStatus(systemUser: SystemUser) {
   const nextActive = !systemUser.is_active
 
-  return UserManageApi.putUser(systemUser.id, {
-    is_active: nextActive,
-  })
+  return UserManageApi.putUser(systemUser.id, { is_active: nextActive })
     .then(() => {
       MsgSuccess(nextActive ? '启用成功' : '禁用成功')
       return true
@@ -90,10 +84,7 @@ function handleChangeStatus(systemUser: SystemUser) {
 
 /* 删除用户*/
 function deleteUser(user: SystemUser) {
-  MsgConfirm(
-    `确定删除用户“${user.username}”吗？`,
-    '删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。',
-  )
+  MsgConfirm(`确定删除用户“${user.username}”吗？`, '删除用户，该用户创建的资源（智能体、知识库、模型）不会删除，请谨慎操作。')
     .then(() => {
       systemUsersLoading.value = true
       return UserManageApi.deleteUser(user.id).then(() => {
@@ -189,33 +180,20 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
           <template #default="{ row }">
-            <WorkspaceRelationTags
-              :table-render-params="{ property: '角色', value: '工作空间' }"
-              :tags="row.role_name"
-              :tag-workspace="row.role_workspace"
-            />
+            <WorkspaceRelationTags :table-render-params="{ property: '角色', value: '工作空间' }" :tags="row.role_name" :tag-workspace="row.role_workspace" />
           </template>
         </el-table-column>
 
         <el-table-column prop="user_group_names" width="180" label="用户组">
           <template #default="{ row }">
             <span v-if="!row.user_group_names?.length">-</span>
-            <WorkspaceRelationTags
-              v-else
-              :table-render-params="{ property: '用户组', value: '工作空间' }"
-              :tags="row.user_group_names"
-              :tag-workspace="row.user_group_workspace"
-            />
+            <WorkspaceRelationTags v-else :table-render-params="{ property: '用户组', value: '工作空间' }" :tags="row.user_group_names" :tag-workspace="row.user_group_workspace" />
           </template>
         </el-table-column>
 
         <el-table-column label="用户来源">
           <template #default="{ row }">
-            {{
-              row.source === LOGIN_METHOD.LOCAL
-                ? '系统用户'
-                : LOGIN_METHOD_LABELS[row.source as LoginMethod]
-            }}
+            {{ row.source === LOGIN_METHOD.LOCAL ? '系统用户' : LOGIN_METHOD_LABELS[row.source as LoginMethod] }}
           </template>
         </el-table-column>
 
@@ -258,14 +236,7 @@ onMounted(() => loadSystemUsers())
         </el-table-column>
 
         <template #footer-batch-actions>
-          <el-button
-            v-if="auth.isEE || auth.isPE"
-            type="primary"
-            plain
-            @click="openBatchSetUserRoleDialog"
-          >
-            设置角色
-          </el-button>
+          <el-button v-if="auth.isEE || auth.isPE" type="primary" plain @click="openBatchSetUserRoleDialog"> 设置角色 </el-button>
           <el-button type="danger" plain @click="handleBatchDelete">删除</el-button>
         </template>
       </MkTable>

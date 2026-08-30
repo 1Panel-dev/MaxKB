@@ -17,10 +17,7 @@ interface UserState {
 }
 
 export const useUserStore = defineStore('user', {
-  state: (): UserState => ({
-    language: getDefaultLanguage(),
-    userInfo: null,
-  }),
+  state: (): UserState => ({ language: getDefaultLanguage(), userInfo: null }),
 
   getters: {
     is_admin: (state) => state.userInfo?.role.includes(ROLE_TYPE.ADMIN) ?? false,

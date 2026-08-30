@@ -7,16 +7,12 @@ import { downloadByURL, getAttrsArray, getFileUrl } from '@/utils/common'
 import { getFileExtension, getFileIconUrl } from '@/utils/icon'
 import { formatFileSize } from '@/utils/number'
 
-
 import { useFormDisabled } from 'element-plus'
 const inputDisabled = useFormDisabled()
 const attrs = useAttrs() as DynamicFormValue
 const upload = inject('upload') as DynamicFormValue
-const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), {
-  modelValue: () => [],
-})
+const props = withDefaults(defineProps<{ modelValue?: DynamicFormValue; formField: FormField }>(), { modelValue: () => [] })
 const emit = defineEmits(['update:modelValue'])
-
 
 const deleteFile = (file: DynamicFormValue) => {
   if (inputDisabled.value) {
@@ -42,25 +38,14 @@ const fileArray = ref<DynamicFormValue>([])
 const imageExtensions = ['JPG', 'JPEG', 'PNG', 'GIF', 'BMP']
 const videoExtensions = ['MP4', 'AVI', 'MKV', 'MOV', 'FLV', 'WMV']
 const audioExtensions = ['MP3', 'WAV', 'OGG', 'AAC', 'M4A']
-const ofType = (exts: string[]) => (f: DynamicFormValue) =>
-  exts.includes(getFileExtension(f?.name || '').toUpperCase())
+const ofType = (exts: string[]) => (f: DynamicFormValue) => exts.includes(getFileExtension(f?.name || '').toUpperCase())
 
-const filesWithUrl = computed(() =>
-  (modelValueProxy.value || []).map((f: DynamicFormValue) => ({
-    ...f,
-    url: f.url || getFileUrl(f.file_id),
-  })),
-)
+const filesWithUrl = computed(() => (modelValueProxy.value || []).map((f: DynamicFormValue) => ({ ...f, url: f.url || getFileUrl(f.file_id) })))
 const images = computed(() => filesWithUrl.value.filter(ofType(imageExtensions)))
 const audioFiles = computed(() => filesWithUrl.value.filter(ofType(audioExtensions)))
 const videoFiles = computed(() => filesWithUrl.value.filter(ofType(videoExtensions)))
 // 非图片/音频/视频的（文档、压缩包等）统一走下载卡片
-const downloadFiles = computed(() =>
-  filesWithUrl.value.filter(
-    (f: DynamicFormValue) =>
-      !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f),
-  ),
-)
+const downloadFiles = computed(() => filesWithUrl.value.filter((f: DynamicFormValue) => !ofType([...imageExtensions, ...audioExtensions, ...videoExtensions])(f)))
 
 function downloadFile(item: DynamicFormValue) {
   downloadByURL(item.url, item.name)
@@ -111,11 +96,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
   <el-space wrap class="w-full media-file-width upload_content mt-16" v-if="!inputDisabled">
     <template v-for="(file, index) in modelValueProxy" :key="index">
       <el-card style="--el-card-padding: 0" shadow="never">
-        <div
-          class="flex-between"
-          :class="[inputDisabled ? 'is-disabled' : '']"
-          style="padding: 0 8px 0 8px"
-        >
+        <div class="flex-between" :class="[inputDisabled ? 'is-disabled' : '']" style="padding: 0 8px 0 8px">
           <div class="flex align-center" style="width: 70%">
             <img :src="getFileIconUrl(file?.name || '')" alt="" width="24" class="mr-4" />
             <span :title="file.name">
@@ -187,12 +168,7 @@ const uploadFile = async (file: DynamicFormValue, fileList: DynamicFormValue[]) 
       <el-space wrap>
         <template v-for="(item, index) in videoFiles" :key="index">
           <div class="file cursor border-r-6" v-if="item.url">
-            <video
-              :src="item.url"
-              style="width: 170px; display: block"
-              class="border-r-6"
-              controls
-            />
+            <video :src="item.url" style="width: 170px; display: block" class="border-r-6" controls />
           </div>
         </template>
       </el-space>

@@ -6,7 +6,6 @@ export function randomId() {
   return nanoid()
 }
 
-
 export const relatedObject = (list: Array<Record<string, unknown>>, val: unknown, attr: string) => {
   const filterData = list.find((item) => item[attr] === val)
   return filterData || null

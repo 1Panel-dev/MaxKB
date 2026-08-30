@@ -41,10 +41,7 @@ function submitEmailSetting(action: 'save' | 'test') {
     if (!valid) return
 
     loading.value = true
-    const request =
-      action === 'test'
-        ? EmailSettingApi.postEmailSettingTest(emailSetting)
-        : EmailSettingApi.putEmailSetting(emailSetting)
+    const request = action === 'test' ? EmailSettingApi.postEmailSettingTest(emailSetting) : EmailSettingApi.putEmailSetting(emailSetting)
 
     request
       .then(() => MsgSuccess(action === 'test' ? '测试成功' : '保存成功'))
@@ -59,14 +56,7 @@ onMounted(() => loadEmailSetting())
 
 <template>
   <MkViewLayout class="system-settings-email" :loading="loading">
-    <el-form
-      class="max-w-200"
-      ref="emailFormRef"
-      :model="emailSetting"
-      :rules="rules"
-      label-position="top"
-      require-asterisk-position="right"
-    >
+    <el-form class="max-w-200" ref="emailFormRef" :model="emailSetting" :rules="rules" label-position="top" require-asterisk-position="right">
       <el-form-item label="SMTP Host" prop="email_host">
         <el-input v-model="emailSetting.email_host" placeholder="请输入 SMTP Host" />
       </el-form-item>
@@ -81,12 +71,7 @@ onMounted(() => loadEmailSetting())
         <el-input v-model="emailSetting.from_email" type="email" placeholder="请输入发件人邮箱" />
       </el-form-item>
       <el-form-item label="密码" prop="email_host_password">
-        <el-input
-          v-model="emailSetting.email_host_password"
-          type="password"
-          show-password
-          placeholder="请输入发件人密码"
-        />
+        <el-input v-model="emailSetting.email_host_password" type="password" show-password placeholder="请输入发件人密码" />
       </el-form-item>
       <el-form-item>
         <div class="flex flex-col">

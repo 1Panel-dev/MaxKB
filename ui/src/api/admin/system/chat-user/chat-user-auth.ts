@@ -17,8 +17,4 @@ const postAuthSettingConnection = (payload: AuthProviderSettingPayload) => {
 const putAuthSetting = (authType: AuthProviderType, payload: AuthProviderSettingPayload) => {
   return put<AuthProviderSettingPayload, boolean>(`${prefix}/${authType}/info`, payload)
 }
-export default {
-  getAuthSetting,
-  postAuthSettingConnection,
-  putAuthSetting,
-}
+export default { getAuthSetting, postAuthSettingConnection, putAuthSetting }

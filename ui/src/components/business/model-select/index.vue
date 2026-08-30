@@ -4,10 +4,7 @@ import { Check } from '@element-plus/icons-vue'
 import { MODEL_STATUS } from '@/api/enums'
 import type { ModelProviderItem, ModelItem } from '@/api/types'
 import { groupBy } from 'lodash'
-defineOptions({
-  name: 'ModelSelect',
-  inheritAttrs: false,
-})
+defineOptions({ name: 'ModelSelect', inheritAttrs: false })
 
 interface ModelOptionGroup {
   icon: string
@@ -16,25 +13,15 @@ interface ModelOptionGroup {
   provider: string
 }
 
-const props = withDefaults(
-  defineProps<{
-    modelValue: string
-    options: ModelItem[]
-    providerOptions: ModelProviderItem[]
-  }>(),
-  {
-    modelValue: '',
-    options: () => [],
-    providerOptions: () => [],
-  },
-)
+const props = withDefaults(defineProps<{ modelValue: string; options: ModelItem[]; providerOptions: ModelProviderItem[] }>(), {
+  modelValue: '',
+  options: () => [],
+  providerOptions: () => [],
+})
 const _options = computed(() => {
   return groupBy(props.options, 'provider')
 })
-const emit = defineEmits<{
-  change: [modelId: string]
-  'update:modelValue': [modelId: string]
-}>()
+const emit = defineEmits<{ change: [modelId: string]; 'update:modelValue': [modelId: string] }>()
 
 const loading = ref(false)
 
@@ -47,50 +34,26 @@ const selectedModelId = computed({
 })
 
 const modelOptionGroups = computed<ModelOptionGroup[]>(() => {
-  const providerMap = new Map(
-    props.providerOptions.map((provider) => [provider.provider, provider]),
-  )
+  const providerMap = new Map(props.providerOptions.map((provider) => [provider.provider, provider]))
 
   return Object.entries(_options.value ?? {}).map(([provider, models]) => {
     const providerOption = providerMap.get(provider)
     return {
       icon: providerOption?.icon ?? '',
-      models: [...models].sort(
-        (left, right) =>
-          Number(right.status === MODEL_STATUS.SUCCESS) -
-          Number(left.status === MODEL_STATUS.SUCCESS),
-      ),
+      models: [...models].sort((left, right) => Number(right.status === MODEL_STATUS.SUCCESS) - Number(left.status === MODEL_STATUS.SUCCESS)),
       name: providerOption?.name ?? provider,
       provider,
     }
   })
 })
 
-const selectedProviderIcon = computed(
-  () =>
-    modelOptionGroups.value.find(({ models }) =>
-      models.some(({ id }) => id === selectedModelId.value),
-    )?.icon ?? '',
-)
+const selectedProviderIcon = computed(() => modelOptionGroups.value.find(({ models }) => models.some(({ id }) => id === selectedModelId.value))?.icon ?? '')
 </script>
 
 <template>
-  <el-select
-    v-model="selectedModelId"
-    v-bind="$attrs"
-    class="w-full"
-    clearable
-    filterable
-    :loading="loading"
-  >
+  <el-select v-model="selectedModelId" v-bind="$attrs" class="w-full" clearable filterable :loading="loading">
     <el-option-group v-for="group in modelOptionGroups" :key="group.provider" :label="group.name">
-      <el-option
-        v-for="model in group.models"
-        :key="model.id"
-        :disabled="model.status !== MODEL_STATUS.SUCCESS"
-        :label="model.name"
-        :value="model.id"
-      >
+      <el-option v-for="model in group.models" :key="model.id" :disabled="model.status !== MODEL_STATUS.SUCCESS" :label="model.name" :value="model.id">
         <div class="flex h-full items-center gap-2">
           <span class="h-5 w-5 shrink-0" v-html="group.icon" />
           <span class="min-w-0 flex-1 truncate" :title="model.name">{{ model.name }}</span>

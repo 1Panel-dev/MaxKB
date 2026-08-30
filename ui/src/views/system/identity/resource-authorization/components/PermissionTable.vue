@@ -2,37 +2,19 @@
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import ProviderApi from '@/api/admin/model-provider.ts'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
-import type {
-  ModelProviderItem,
-  OptionItem,
-  Dict,
-  ResourceAuthorizationType,
-  ResourcePermission,
-  ResourcePermissionItem,
-  ResourcePermissionPayload,
-} from '@/api/types'
+import type { ModelProviderItem, OptionItem, Dict, ResourceAuthorizationType, ResourcePermission, ResourcePermissionItem, ResourcePermissionPayload } from '@/api/types'
 import { resetUrl } from '@/utils/icon'
 import { getPermissionOptions } from '../constants'
 import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 
 defineOptions({ name: 'ResourcePermissionTable' })
 
-const props = defineProps<{
-  data: ResourcePermissionItem[]
-  resourceType: ResourceAuthorizationType
-}>()
-const emit = defineEmits<{
-  submit: [permissions: ResourcePermissionPayload[]]
-}>()
+const props = defineProps<{ data: ResourcePermissionItem[]; resourceType: ResourceAuthorizationType }>()
+const emit = defineEmits<{ submit: [permissions: ResourcePermissionPayload[]] }>()
 
 const permissionSearchFields = computed<OptionItem<string>[]>(() => [
   { label: '名称', value: 'name' },
-  {
-    label: '权限',
-    multiple: true,
-    options: getPermissionOptions(),
-    value: 'permission',
-  },
+  { label: '权限', multiple: true, options: getPermissionOptions(), value: 'permission' },
 ])
 
 /* 搜索与展开 */
@@ -48,9 +30,7 @@ function filterResourceTree(resources: ResourcePermissionItem[]): ResourcePermis
 
   return resources.flatMap((resource) => {
     const children = filterResourceTree(resource.children ?? [])
-    const matchesName = name
-      ? resource.name.toLocaleLowerCase().includes(name.toLocaleLowerCase())
-      : true
+    const matchesName = name ? resource.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()) : true
     const matchesPermission = permissions?.length ? permissions.includes(resource.permission) : true
 
     return (matchesName && matchesPermission) || children.length ? [{ ...resource, children }] : []
@@ -96,9 +76,7 @@ function collectUnauthorizedAncestors(folderId: string | null) {
 }
 
 function buildPermissionPayload(permission: ResourcePermission, resource: ResourcePermissionItem) {
-  const payloadMap = new Map<string, ResourcePermissionPayload>([
-    [resource.id, { permission, target_id: resource.id }],
-  ])
+  const payloadMap = new Map<string, ResourcePermissionPayload>([[resource.id, { permission, target_id: resource.id }]])
 
   if (permission === RESOURCE_PERMISSION.NOT_AUTH && resource.resource_type === 'folder') {
     flattenResources(resource.children ?? []).forEach(({ id }) => {
@@ -125,9 +103,7 @@ function handleSelectionChange(selection: unknown[]) {
   batchSelectedResources.value = selection as ResourcePermissionItem[]
 }
 
-const batchPermissionDialogRef = useTemplateRef<InstanceType<typeof BatchSetPermissionDialog>>(
-  'batchPermissionDialogRef',
-)
+const batchPermissionDialogRef = useTemplateRef<InstanceType<typeof BatchSetPermissionDialog>>('batchPermissionDialogRef')
 
 function handleOpenBatchDialog() {
   batchPermissionDialogRef.value?.open()
@@ -168,11 +144,7 @@ watch(
     <div class="mb-4 flex-between">
       <div>
         <!-- 配置权限 -->
-        <el-button
-          type="primary"
-          :disabled="batchSelectedResources.length === 0"
-          @click="handleOpenBatchDialog"
-        >
+        <el-button type="primary" :disabled="batchSelectedResources.length === 0" @click="handleOpenBatchDialog">
           <MkIcon name="icon-lock" />
           <span>配置权限</span>
         </el-button>
@@ -193,29 +165,11 @@ watch(
       <el-table-column class-name="resource-name-column" label="名称" min-width="260" prop="name">
         <template #default="{ row }: { row: ResourcePermissionItem }">
           <div class="flex min-w-0 items-center gap-2">
-            <MkIcon
-              v-if="row.resource_type === 'folder'"
-              name="icon_file-folder_colorful"
-              :size="18"
-            />
-            <span
-              v-else-if="resourceType === RESOURCE_TYPE.MODEL"
-              class="block h-5 w-5 shrink-0"
-              :innerHTML="getModelProviderIcon(row)"
-            />
-            <ToolIcon
-              v-else-if="resourceType === RESOURCE_TYPE.TOOL"
-              :icon="row.icon ?? undefined"
-              :size="20"
-              :type="row.tool_type ?? undefined"
-            />
+            <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
+            <span v-else-if="resourceType === RESOURCE_TYPE.MODEL" class="block h-5 w-5 shrink-0" :innerHTML="getModelProviderIcon(row)" />
+            <ToolIcon v-else-if="resourceType === RESOURCE_TYPE.TOOL" :icon="row.icon ?? undefined" :size="20" :type="row.tool_type ?? undefined" />
 
-            <el-avatar
-              v-else-if="resourceType === RESOURCE_TYPE.APPLICATION"
-              class="bg-transparent!"
-              shape="square"
-              :size="20"
-            >
+            <el-avatar v-else-if="resourceType === RESOURCE_TYPE.APPLICATION" class="bg-transparent!" shape="square" :size="20">
               <img :src="resetUrl(row?.icon, true)" />
             </el-avatar>
             <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
@@ -224,14 +178,8 @@ watch(
       </el-table-column>
       <el-table-column label="操作权限" width="450">
         <template #default="{ row }: { row: ResourcePermissionItem }">
-          <el-radio-group
-            :model-value="row.permission"
-            @change="handlePermissionChange($event as ResourcePermission, row)"
-          >
-            <template
-              v-for="permissionOption in getPermissionOptions()"
-              :key="permissionOption.value"
-            >
+          <el-radio-group :model-value="row.permission" @change="handlePermissionChange($event as ResourcePermission, row)">
+            <template v-for="permissionOption in getPermissionOptions()" :key="permissionOption.value">
               <el-radio :value="permissionOption.value">{{ permissionOption.label }}</el-radio>
             </template>
           </el-radio-group>

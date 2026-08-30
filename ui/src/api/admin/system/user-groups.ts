@@ -20,43 +20,18 @@ const deleteSystemUserGroup = (workspaceId: string, groupId: string) => {
 }
 
 /** 获取指定系统用户组的成员分页列表。 */
-const getSystemUserGroupMembers = (
-  workspaceId: string,
-  groupId: string,
-  page: ParamsPage,
-  query?: Dict<unknown>,
-) => {
-  return get<ResponsePage<SystemUserGroupMember>>(
-    `${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`,
-    query,
-  )
+const getSystemUserGroupMembers = (workspaceId: string, groupId: string, page: ParamsPage, query?: Dict<unknown>) => {
+  return get<ResponsePage<SystemUserGroupMember>>(`${prefix(workspaceId)}/${groupId}/user_list/${page.currentPage}/${page.pageSize}`, query)
 }
 
 /** 向指定系统用户组添加成员。 */
 const postSystemUserGroupMembers = (workspaceId: string, groupId: string, userIds: string[]) => {
-  return post<{ user_ids: string[] }, boolean>(`${prefix(workspaceId)}/${groupId}/add_member`, {
-    user_ids: userIds,
-  })
+  return post<{ user_ids: string[] }, boolean>(`${prefix(workspaceId)}/${groupId}/add_member`, { user_ids: userIds })
 }
 
 /** 从指定系统用户组移除成员。 */
-const postRemoveSystemUserGroupMembers = (
-  workspaceId: string,
-  groupId: string,
-  relationIds: string[],
-) => {
-  return del<{ group_relation_ids: string[] }, boolean>(
-    `${prefix(workspaceId)}/${groupId}/remove_member`,
-    undefined,
-    { group_relation_ids: relationIds },
-  )
+const postRemoveSystemUserGroupMembers = (workspaceId: string, groupId: string, relationIds: string[]) => {
+  return del<{ group_relation_ids: string[] }, boolean>(`${prefix(workspaceId)}/${groupId}/remove_member`, undefined, { group_relation_ids: relationIds })
 }
 
-export default {
-  deleteSystemUserGroup,
-  getSystemUserGroupMembers,
-  getSystemUserGroups,
-  postRemoveSystemUserGroupMembers,
-  postSystemUserGroup,
-  postSystemUserGroupMembers,
-}
+export default { deleteSystemUserGroup, getSystemUserGroupMembers, getSystemUserGroups, postRemoveSystemUserGroupMembers, postSystemUserGroup, postSystemUserGroupMembers }

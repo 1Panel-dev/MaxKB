@@ -9,14 +9,7 @@ const deleteEdge = () => {
 </script>
 <template>
   <div class="custom-edge cursor" @mouseup.stop @click.stop v-show="model.isHovered">
-    <svg
-      @click="deleteEdge"
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg @click="deleteEdge" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M12 23.0001C5.925 23.0001 1 18.0751 1 12.0001C1 5.92512 5.925 1.00012 12 1.00012C18.075 1.00012 23 5.92512 23 12.0001C23 18.0751 18.075 23.0001 12 23.0001Z"
         fill="#3370FF"

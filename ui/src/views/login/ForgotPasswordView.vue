@@ -16,18 +16,9 @@ defineOptions({ name: 'ForgotPasswordView' })
 const router = useRouter()
 
 const forgotPasswordFormRef = ref<FormInstance>()
-const forgotPasswordForm = reactive<ForgotPasswordForm>({
-  confirmPassword: '',
-  email: '',
-  password: '',
-  verificationCode: '',
-})
+const forgotPasswordForm = reactive<ForgotPasswordForm>({ confirmPassword: '', email: '', password: '', verificationCode: '' })
 
-const validateConfirmPassword = (
-  _rule: unknown,
-  value: string,
-  callback: (error?: Error) => void,
-) => {
+const validateConfirmPassword = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
   if (!value) {
     callback(new Error('请输入确认密码'))
   } else if (value !== forgotPasswordForm.password) {
@@ -69,20 +60,9 @@ const handleResetPassword = async () => {
 
     <h2 class="mt-4">修改密码</h2>
 
-    <el-form
-      ref="forgotPasswordFormRef"
-      :model="forgotPasswordForm"
-      :rules="forgotPasswordRules"
-      class="mt-4"
-      @submit.prevent="handleResetPassword"
-      size="large"
-    >
+    <el-form ref="forgotPasswordFormRef" :model="forgotPasswordForm" :rules="forgotPasswordRules" class="mt-4" @submit.prevent="handleResetPassword" size="large">
       <el-form-item prop="email">
-        <el-input
-          v-model="forgotPasswordForm.email"
-          autocomplete="email"
-          placeholder="请输入邮箱"
-        />
+        <el-input v-model="forgotPasswordForm.email" autocomplete="email" placeholder="请输入邮箱" />
       </el-form-item>
 
       <el-form-item prop="verificationCode">
@@ -93,25 +73,11 @@ const handleResetPassword = async () => {
       </el-form-item>
 
       <el-form-item prop="password">
-        <el-input
-          v-model="forgotPasswordForm.password"
-          autocomplete="new-password"
-          maxlength="30"
-          placeholder="请输入6-30位密码"
-          show-password
-          type="password"
-        />
+        <el-input v-model="forgotPasswordForm.password" autocomplete="new-password" maxlength="30" placeholder="请输入6-30位密码" show-password type="password" />
       </el-form-item>
 
       <el-form-item prop="confirmPassword">
-        <el-input
-          v-model="forgotPasswordForm.confirmPassword"
-          autocomplete="new-password"
-          maxlength="30"
-          placeholder="请输入确认密码"
-          show-password
-          type="password"
-        />
+        <el-input v-model="forgotPasswordForm.confirmPassword" autocomplete="new-password" maxlength="30" placeholder="请输入确认密码" show-password type="password" />
       </el-form-item>
 
       <el-button native-type="submit" type="primary" class="w-full">修改密码</el-button>

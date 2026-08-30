@@ -7,33 +7,18 @@ import { formatFileSize } from '@/utils/number'
 
 defineOptions({ name: 'MkDragUpload' })
 
-withDefaults(
-  defineProps<{
-    accept?: string
-    disabled?: boolean
-    dragText?: string
-    replaceText?: string
-    selectText?: string
-    tipText?: string
-  }>(),
-  {
-    accept: '',
-    disabled: false,
-    dragText: '将文件拖至此区域或',
-    replaceText: '更换文件',
-    selectText: '选择文件上传',
-    tipText: '',
-  },
-)
+withDefaults(defineProps<{ accept?: string; disabled?: boolean; dragText?: string; replaceText?: string; selectText?: string; tipText?: string }>(), {
+  accept: '',
+  disabled: false,
+  dragText: '将文件拖至此区域或',
+  replaceText: '更换文件',
+  selectText: '选择文件上传',
+  tipText: '',
+})
 
-const emit = defineEmits<{
-  change: [file: UploadFile, fileList: UploadFiles]
-  remove: [file: UploadUserFile]
-}>()
+const emit = defineEmits<{ change: [file: UploadFile, fileList: UploadFiles]; remove: [file: UploadUserFile] }>()
 
-defineSlots<{
-  download?(props: { file: UploadUserFile }): unknown
-}>()
+defineSlots<{ download?(props: { file: UploadUserFile }): unknown }>()
 
 const fileList = defineModel<UploadUserFile[]>({ required: true })
 const uploadRef = useTemplateRef<UploadInstance>('uploadRef')

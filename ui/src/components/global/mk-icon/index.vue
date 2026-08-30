@@ -33,9 +33,7 @@ const props = withDefaults(
     size?: number | string
     color?: string
   }>(),
-  {
-    size: 16,
-  },
+  { size: 16 },
 )
 
 const gradientId = useId()

@@ -3,14 +3,7 @@ import type { DynamicFormValue } from '../../type'
 import { computed } from 'vue'
 import type { FormField } from '@/components/mk-dynamics-form/type'
 
-const props = defineProps<{
-  formValue?: DynamicFormValue
-  formfieldList?: FormField[]
-  field: string
-  otherParams: DynamicFormValue
-  formField: FormField
-  view?: boolean
-}>()
+const props = defineProps<{ formValue?: DynamicFormValue; formfieldList?: FormField[]; field: string; otherParams: DynamicFormValue; formField: FormField; view?: boolean }>()
 
 const textField = computed(() => {
   return props.formField.text_field ? props.formField.text_field : 'key'

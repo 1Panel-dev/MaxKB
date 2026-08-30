@@ -36,10 +36,7 @@ function handleSearchChange(query?: Dict<unknown>) {
 }
 
 // 时间筛选
-const operateLogDateQuery = ref<Dict<unknown>>({
-  start_time: beforeDay(7),
-  end_time: '',
-})
+const operateLogDateQuery = ref<Dict<unknown>>({ start_time: beforeDay(7), end_time: '' })
 
 function handleDateFilterChange({ startTime, endTime }: MkDateRangeValue) {
   operateLogDateQuery.value = { start_time: startTime, end_time: endTime }
@@ -74,9 +71,7 @@ function loadWorkspaceOptions() {
   if (!auth.isEE) return Promise.resolve()
 
   return WorkspaceApi.getSystemWorkspaceList().then((workspaces) => {
-    workspaceOptions.value = workspaces.flatMap(({ id, name }) =>
-      id ? [{ label: name, value: id }] : [],
-    )
+    workspaceOptions.value = workspaces.flatMap(({ id, name }) => (id ? [{ label: name, value: id }] : []))
   })
 }
 
@@ -88,12 +83,8 @@ function handleWorkspaceChange() {
 const operateLogQuery = computed<Dict<unknown>>(() => ({
   ...operateLogDateQuery.value,
   ...operateLogSearchQuery.value,
-  ...(selectedOperateMenus.value.length
-    ? { menu: JSON.stringify(selectedOperateMenus.value) }
-    : {}),
-  ...(selectedWorkspaceIds.value.length
-    ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) }
-    : {}),
+  ...(selectedOperateMenus.value.length ? { menu: JSON.stringify(selectedOperateMenus.value) } : {}),
+  ...(selectedWorkspaceIds.value.length ? { workspace_ids: JSON.stringify(selectedWorkspaceIds.value) } : {}),
 }))
 
 function loadOperateLogs(resetQuery = false) {
@@ -113,15 +104,13 @@ function loadOperateLogs(resetQuery = false) {
 }
 
 /* API详情 */
-const detailDialogRef =
-  useTemplateRef<InstanceType<typeof OperateLogDetailDialog>>('detailDialogRef')
+const detailDialogRef = useTemplateRef<InstanceType<typeof OperateLogDetailDialog>>('detailDialogRef')
 
 function handleOpenDetail(log: OperateLog) {
   detailDialogRef.value?.open(log)
 }
 /* 清除策略 */
-const cleanStrategyDialogRef =
-  useTemplateRef<InstanceType<typeof CleanStrategyDialog>>('cleanStrategyDialogRef')
+const cleanStrategyDialogRef = useTemplateRef<InstanceType<typeof CleanStrategyDialog>>('cleanStrategyDialogRef')
 
 function handleOpenCleanStrategy() {
   cleanStrategyDialogRef.value?.open()
@@ -171,31 +160,18 @@ onMounted(() => {
       >
         <el-table-column prop="menu" min-width="140" show-overflow-tooltip>
           <template #header>
-            <MkTableFilter
-              v-model="selectedOperateMenus"
-              label="操作菜单"
-              :options="operateMenuOptions"
-              @change="handleOperateMenuChange"
-            />
+            <MkTableFilter v-model="selectedOperateMenus" label="操作菜单" :options="operateMenuOptions" @change="handleOperateMenuChange" />
           </template>
         </el-table-column>
         <el-table-column label="操作详情" min-width="220" show-overflow-tooltip>
-          <template #default="{ row }">
-            {{ row.operate
-            }}{{ row.operation_object?.name ? `【${row.operation_object.name}】` : '' }}
-          </template>
+          <template #default="{ row }"> {{ row.operate }}{{ row.operation_object?.name ? `【${row.operation_object.name}】` : '' }} </template>
         </el-table-column>
         <el-table-column label="操作用户" min-width="130" show-overflow-tooltip>
           <template #default="{ row }">{{ row.user?.username || '-' }}</template>
         </el-table-column>
         <el-table-column v-if="auth.isEE" min-width="160">
           <template #header>
-            <MkTableFilter
-              v-model="selectedWorkspaceIds"
-              label="工作空间"
-              :options="workspaceOptions"
-              @change="handleWorkspaceChange"
-            />
+            <MkTableFilter v-model="selectedWorkspaceIds" label="工作空间" :options="workspaceOptions" @change="handleWorkspaceChange" />
           </template>
           <template #default="{ row }">{{ row.workspace_name || '-' }}</template>
         </el-table-column>

@@ -4,22 +4,13 @@ import type { WorkspaceItem } from '@/api/types'
 
 defineOptions({ name: 'WorkspaceDropdown' })
 
-const props = defineProps<{
-  options: WorkspaceItem[]
-}>()
+const props = defineProps<{ options: WorkspaceItem[] }>()
 const selectedWorkspaceId = defineModel<string>({ required: true })
-const emit = defineEmits<{
-  select: [option: WorkspaceItem]
-}>()
+const emit = defineEmits<{ select: [option: WorkspaceItem] }>()
 </script>
 
 <template>
-  <MkFilterableDropdown
-    v-model="selectedWorkspaceId"
-    :options="props.options"
-    :props="{ label: 'name', value: 'id' }"
-    @select="emit('select', $event)"
-  >
+  <MkFilterableDropdown v-model="selectedWorkspaceId" :options="props.options" :props="{ label: 'name', value: 'id' }" @select="emit('select', $event)">
     <template #default="{ text }">
       <el-button text class="flex max-w-50 items-center gap-1 rounded-md px-2! py-[7px]!">
         <MkIcon name="icon_moments-categories_outlined" class="mr-1" />

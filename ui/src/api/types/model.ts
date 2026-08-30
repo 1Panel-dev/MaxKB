@@ -54,10 +54,7 @@ export interface DynamicFormField {
 }
 
 export interface DynamicFormLabel {
-  attrs?: {
-    tooltip?: string
-    [key: string]: unknown
-  }
+  attrs?: { tooltip?: string; [key: string]: unknown }
   input_type: string
   label: string
   type?: string

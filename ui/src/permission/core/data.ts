@@ -8,8 +8,7 @@
 
 import { Permission, Group, Operate } from './common'
 
-const p = (group: Group, subGroup: Group, operate: Operate, bitIndex: number) =>
-  new Permission(group, subGroup, operate, bitIndex)
+const p = (group: Group, subGroup: Group, operate: Operate, bitIndex: number) => new Permission(group, subGroup, operate, bitIndex)
 
 export const PermissionConstants = {
   // ==================== HOMEPAGE ====================

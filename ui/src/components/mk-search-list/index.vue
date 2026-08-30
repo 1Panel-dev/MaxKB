@@ -28,21 +28,12 @@ const componentProps = withDefaults(
     /** 列表为空或无搜索结果时的提示 */
     emptyText?: string
     /** 将业务数据的字段名映射为组件的展示字段和唯一值字段 */
-    props?: {
-      label?: keyof T & string
-      value?: keyof T & string
-    }
+    props?: { label?: keyof T & string; value?: keyof T & string }
   }>(),
-  {
-    defaultActive: '',
-    emptyText: '暂无数据',
-    props: () => ({}),
-  },
+  { defaultActive: '', emptyText: '暂无数据', props: () => ({}) },
 )
 
-const emit = defineEmits<{
-  click: [row: T, index: number]
-}>()
+const emit = defineEmits<{ click: [row: T, index: number] }>()
 
 defineSlots<{
   action(props: { row: T; index: number }): unknown
@@ -108,13 +99,7 @@ function selectRow(row: T, index: number) {
     <el-scrollbar ref="scrollbarRef" class="min-h-0 flex-1 px-4 py-2" @end-reached="loadMore">
       <div v-if="filteredData.length" class="flex flex-col gap-1">
         <template v-for="(row, index) in renderData" :key="String(row[valueField] ?? index)">
-          <MkListItem
-            :active="currentValue === row[valueField]"
-            :index="index"
-            :label-field="labelField"
-            :row="row"
-            @click="selectRow(row, index)"
-          >
+          <MkListItem :active="currentValue === row[valueField]" :index="index" :label-field="labelField" :row="row" @click="selectRow(row, index)">
             <template v-if="$slots.default" #default="slotProps">
               <slot v-bind="slotProps" />
             </template>

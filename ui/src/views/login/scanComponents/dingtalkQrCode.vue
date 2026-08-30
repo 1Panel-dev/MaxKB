@@ -14,10 +14,7 @@ const { auth } = useStore()
 
 const initialize = async () => {
   if (!props.config.app_key || !props.config.corp_id) return
-  await loadLoginScript(
-    'https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js',
-    'dingtalk-login-sdk',
-  )
+  await loadLoginScript('https://g.alicdn.com/dingding/h5-dingtalk-login/0.21.0/ddlogin.js', 'dingtalk-login-sdk')
   await nextTick()
   if (!window.DTFrameLogin) throw new Error('钉钉扫码 SDK 加载失败')
   window.DTFrameLogin(

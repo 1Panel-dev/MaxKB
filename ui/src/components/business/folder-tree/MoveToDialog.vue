@@ -1,108 +1,78 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import type { WorkspaceFolder } from '@/api/types'
-import type { FolderMoveSubmit } from './types.ts'
+import type { FolderSource } from '@/api/types'
+import { FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from './index.vue'
 
-defineOptions({ name: 'MoveFolderDialog' })
+defineOptions({ name: 'MoveToDialog' })
 
-const props = defineProps<{
-  folders: WorkspaceFolder[]
-  loading: boolean
-}>()
+withDefaults(defineProps<{ loading?: boolean; source: FolderSource }>(), { loading: false })
 
-const emit = defineEmits<{
-  submit: [form: FolderMoveSubmit]
-}>()
-
-interface MoveFolderNode extends Omit<WorkspaceFolder, 'children'> {
-  children?: MoveFolderNode[]
-  disabled?: boolean
-}
+const emit = defineEmits<{ submit: [targetFolderId: string] }>()
 
 const visible = ref(false)
-const movingFolder = ref<WorkspaceFolder>()
-const selectedTargetId = ref('')
-const searchKeyword = ref('')
+const selectedTargetId = ref<string>(FOLDER_ENTRY_ID.ALL)
 
-const canSubmit = computed(
-  () => Boolean(selectedTargetId.value) && selectedTargetId.value !== movingFolder.value?.parent_id,
-)
+const canSubmit = computed(() => Boolean(selectedTargetId.value) && selectedTargetId.value !== FOLDER_ENTRY_ID.ALL)
 
-const moveFolders = computed<MoveFolderNode[]>(() => {
-  const disabledFolderIds = new Set<string>()
-
-  function collectDisabledFolders(folder: WorkspaceFolder) {
-    disabledFolderIds.add(folder.id)
-    folder.children?.forEach(collectDisabledFolders)
-  }
-
-  if (movingFolder.value) collectDisabledFolders(movingFolder.value)
-
-  function mapFolders(folders: WorkspaceFolder[]): MoveFolderNode[] {
-    return folders.map((folder) => ({
-      ...folder,
-      children: mapFolders(folder.children ?? []),
-      disabled: disabledFolderIds.has(folder.id),
-    }))
-  }
-
-  return mapFolders(props.folders)
-})
-
-function handleTargetSelect(folder: WorkspaceFolder) {
-  selectedTargetId.value = folder.id
-}
-
+/* 移动提交 */
 function handleSubmit() {
-  if (!movingFolder.value || !canSubmit.value) return
-  emit('submit', {
-    folder: movingFolder.value,
-    targetFolderId: selectedTargetId.value,
-  })
+  if (!canSubmit.value) return
+  emit('submit', selectedTargetId.value)
 }
 
-// function handleMoveFolder({ folder, targetFolderId }: FolderMoveSubmit) {
-//   submiting.value = true
-//   return FolderApi.putFolder(workspaceId, props.source, folder.id, {
-//     parent_id: targetFolderId,
-//   })
-//     .then((updatedFolder) => {
-//       MsgSuccess('移动成功')
-//       visible.value = false
-//       return loadFolders().then(() => emit('moved', updatedFolder))
-//     })
-//     .finally(() => {
-//       submiting.value = false
-//     })
-// }
-
-function open(folder: WorkspaceFolder) {
-  movingFolder.value = folder
+function open(currentFolderId = FOLDER_ENTRY_ID.ALL) {
+  selectedTargetId.value = currentFolderId
   visible.value = true
 }
 
 function resetData() {
-  movingFolder.value = undefined
-  searchKeyword.value = ''
-  selectedTargetId.value = ''
+  selectedTargetId.value = FOLDER_ENTRY_ID.ALL
 }
 
-defineExpose({ open })
+function close() {
+  visible.value = false
+}
+
+defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog v-model="visible" title="移动到" @closed="resetData">
-    <FolderTree
-      :current-node-key="selectedTargetId"
-      :data="moveFolders"
-      @select="handleTargetSelect"
-    />
+  <MkDialog align-center v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" :show-close="!loading" @closed="resetData">
+    <FolderTree v-model="selectedTargetId" class="move-to-dialog__folder-tree" :can-edit="false" :show-all="false" :show-shared="false" :source="source" />
+
     <template #footer>
       <el-button :disabled="loading" @click="visible = false">取消</el-button>
-      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit">
-        确定
-      </el-button>
+      <el-button type="primary" :disabled="!canSubmit" :loading="loading" @click="handleSubmit"> 确定 </el-button>
     </template>
   </MkDialog>
 </template>
+
+<style lang="scss">
+.move-to-dialog {
+  .move-to-dialog__content {
+    display: flex;
+    flex-direction: column;
+    height: min(600px, calc(100vh - 272px));
+    overflow: hidden;
+  }
+
+  .move-to-dialog__folder-tree {
+    > div:first-child {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    > div:nth-child(2) {
+      overflow: hidden;
+      border: var(--el-border);
+      border-radius: var(--el-border-radius-base);
+    }
+
+    .mk-virtualized-tree {
+      padding: calc(var(--spacing) * 2);
+      padding-right: 0;
+    }
+  }
+}
+</style>

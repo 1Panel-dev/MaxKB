@@ -4,45 +4,16 @@ import { useStore } from '@/stores'
 
 defineOptions({ name: 'LogoFull', inheritAttrs: false })
 
-withDefaults(
-  defineProps<{
-    height?: number | string
-  }>(),
-  {
-    height: 30,
-  },
-)
+withDefaults(defineProps<{ height?: number | string }>(), { height: 30 })
 
 const attrs = useAttrs()
 const { theme } = useStore()
 </script>
 
 <template>
-  <img
-    v-if="theme.themeInfo?.loginLogo"
-    v-bind="attrs"
-    alt="MaxKB"
-    :height="height"
-    :src="theme.themeInfo.loginLogo"
-    class="max-w-none object-contain object-left"
-  />
-  <img
-    v-else-if="theme.isDefaultTheme"
-    v-bind="attrs"
-    alt="MaxKB"
-    :height="height"
-    src="@/assets/mk-logo/MaxKB-logo.svg"
-    class="max-w-none"
-  />
-  <svg
-    v-else
-    v-bind="attrs"
-    :height="height"
-    aria-hidden="true"
-    class="max-w-none text-primary"
-    viewBox="0 0 122 36"
-    xmlns="http://www.w3.org/2000/svg"
-  >
+  <img v-if="theme.themeInfo?.loginLogo" v-bind="attrs" alt="MaxKB" :height="height" :src="theme.themeInfo.loginLogo" class="max-w-none object-contain object-left" />
+  <img v-else-if="theme.isDefaultTheme" v-bind="attrs" alt="MaxKB" :height="height" src="@/assets/mk-logo/MaxKB-logo.svg" class="max-w-none" />
+  <svg v-else v-bind="attrs" :height="height" aria-hidden="true" class="max-w-none text-primary" viewBox="0 0 122 36" xmlns="http://www.w3.org/2000/svg">
     <path
       d="M75.3094 19.0805V27.05H71.8274L71.8109 26.2436C70.5933 26.8762 69.4033 27.1925 68.2412 27.1923H67.8972C66.7033 27.1923 65.7546 26.7337 65.051 25.8166C64.5855 25.1007 64.342 24.2631 64.3513 23.4092V23.3143C64.3513 21.7489 64.9008 20.7092 65.9997 20.1953C66.4505 19.8949 67.5929 19.7447 69.4271 19.7447H71.3008V19.3058C71.3008 18.4045 71.1703 17.8867 70.9094 17.7523C70.6249 17.5388 70.1228 17.4321 69.4033 17.4321H65.6678L65.7312 14.2396L70.032 14.1233C72.5857 14.1233 74.1669 14.7558 74.7758 16.0208C75.1315 16.756 75.3094 17.7759 75.3094 19.0805ZM68.6032 22.3901C68.4844 22.5315 68.3597 22.9902 68.3597 23.3143C68.3597 24.0259 68.7234 24.3817 69.4508 24.3817C69.8855 24.3817 70.5022 24.2038 71.3008 23.848V22.1112C71.3008 22.1112 69.0361 21.875 68.6032 22.3901Z"
       fill="currentColor"

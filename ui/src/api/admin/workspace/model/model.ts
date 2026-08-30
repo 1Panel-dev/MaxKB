@@ -52,14 +52,4 @@ const putPauseModelDownload = (modelId: string) => {
   return put<undefined, boolean>(`${getPrefix()}/${modelId}/pause_download`)
 }
 
-export default {
-  deleteModel,
-  getModelDetail,
-  getModelList,
-  getModelMeta,
-  getModelParamsForm,
-  postModel,
-  putModel,
-  putModelParamsForm,
-  putPauseModelDownload,
-}
+export default { deleteModel, getModelDetail, getModelList, getModelMeta, getModelParamsForm, postModel, putModel, putModelParamsForm, putPauseModelDownload }

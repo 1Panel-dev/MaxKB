@@ -1,25 +1,10 @@
 <script setup lang="ts">
-defineOptions({
-  name: 'MkSearchInput',
-  inheritAttrs: false,
-})
+defineOptions({ name: 'MkSearchInput', inheritAttrs: false })
 
-const props = withDefaults(
-  defineProps<{
-    placeholder?: string
-  }>(),
-  {
-    placeholder: '搜索',
-  },
-)
+const props = withDefaults(defineProps<{ placeholder?: string }>(), { placeholder: '搜索' })
 const searchKeyword = defineModel<string | number>({ default: '' })
 
-defineSlots<{
-  append?(): unknown
-  prefix?(): unknown
-  prepend?(): unknown
-  suffix?(): unknown
-}>()
+defineSlots<{ append?(): unknown; prefix?(): unknown; prepend?(): unknown; suffix?(): unknown }>()
 </script>
 
 <template>

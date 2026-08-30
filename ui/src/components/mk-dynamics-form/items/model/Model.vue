@@ -8,18 +8,9 @@ import { providerList } from './provider-data'
 
 defineOptions({ name: 'DynamicFormModel' })
 
-const props = withDefaults(
-  defineProps<{
-    modelValue?: {
-      model_id: string
-      model_params_setting: Record<string, DynamicFormValue>
-    } | null
-    formField: FormField
-  }>(),
-  {
-    modelValue: null,
-  },
-)
+const props = withDefaults(defineProps<{ modelValue?: { model_id: string; model_params_setting: Record<string, DynamicFormValue> } | null; formField: FormField }>(), {
+  modelValue: null,
+})
 
 const emit = defineEmits(['update:modelValue', 'change'])
 
@@ -38,9 +29,7 @@ const groupedOptions = computed(() => {
 
 const getModelProvider = computed(() => {
   return (id: string) => {
-    const item = flatMap(groupedOptions.value)?.find(
-      (item: DynamicFormValue) => item.model_id === id,
-    )
+    const item = flatMap(groupedOptions.value)?.find((item: DynamicFormValue) => item.model_id === id)
     return (item as DynamicFormValue)?.provider || ''
   }
 })
@@ -48,55 +37,24 @@ const getModelProvider = computed(() => {
 const handleModelChange = (selectedId: string) => {
   const list = (props.formField.attrs?.provider_list as DynamicFormValue[]) || []
   const selectedItem = list.find((p) => p.model_id === selectedId)
-  modelValueProxy.value = {
-    model_id: selectedId,
-    model_params_setting: selectedItem?.model_params_setting || {},
-  }
+  modelValueProxy.value = { model_id: selectedId, model_params_setting: selectedItem?.model_params_setting || {} }
 }
 </script>
 
 <template>
   <div class="complex-select flex align-center w-full">
-    <el-select
-      class="complex-select__left"
-      :model-value="modelValueProxy?.model_id"
-      @change="handleModelChange"
-      v-bind="$attrs"
-      popper-class="select-model"
-    >
-      <el-option-group
-        v-for="(modelList, providerName) in groupedOptions"
-        :key="providerName"
-        :label="relatedObject(providerList, String(providerName), 'provider')?.name"
-      >
-        <el-option
-          v-for="item in modelList"
-          :key="item.model_id"
-          :label="item.model_name"
-          :value="item.model_id"
-        >
+    <el-select class="complex-select__left" :model-value="modelValueProxy?.model_id" @change="handleModelChange" v-bind="$attrs" popper-class="select-model">
+      <el-option-group v-for="(modelList, providerName) in groupedOptions" :key="providerName" :label="relatedObject(providerList, String(providerName), 'provider')?.name">
+        <el-option v-for="item in modelList" :key="item.model_id" :label="item.model_name" :value="item.model_id">
           <el-space :size="8">
-            <span
-              :innerHTML="
-                String(relatedObject(providerList, String(providerName), 'provider')?.icon ?? '')
-              "
-              class="select-model-icon"
-              style="margin-top: -7px"
-            >
-            </span>
+            <span :innerHTML="String(relatedObject(providerList, String(providerName), 'provider')?.icon ?? '')" class="select-model-icon" style="margin-top: -7px"> </span>
             <span>{{ item.model_name }}</span>
           </el-space>
         </el-option>
       </el-option-group>
       <template #label="{ label, value }">
         <el-space :size="8" v-if="value">
-          <span
-            class="select-model-icon"
-            :innerHTML="
-              String(relatedObject(providerList, getModelProvider(value), 'provider')?.icon ?? '')
-            "
-          >
-          </span>
+          <span class="select-model-icon" :innerHTML="String(relatedObject(providerList, getModelProvider(value), 'provider')?.icon ?? '')"> </span>
           <span>
             <span>{{ label }}</span>
           </span>

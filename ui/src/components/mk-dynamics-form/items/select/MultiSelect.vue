@@ -44,22 +44,7 @@ const label = (option: DynamicFormValue) => {
 </script>
 
 <template>
-  <el-select
-    multiple
-    filterable
-    allow-create
-    clearable
-    default-first-option
-    :reserve-keyword="false"
-    v-bind="$attrs"
-    v-model="_modelValue"
-  >
-    <el-option
-      v-for="(item, index) in options"
-      :key="index"
-      :label="label(item)"
-      :value="item[valueField]"
-    >
-    </el-option>
+  <el-select multiple filterable allow-create clearable default-first-option :reserve-keyword="false" v-bind="$attrs" v-model="_modelValue">
+    <el-option v-for="(item, index) in options" :key="index" :label="label(item)" :value="item[valueField]"> </el-option>
   </el-select>
 </template>

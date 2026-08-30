@@ -1,13 +1,6 @@
 import { del, get, post, put } from '../core/request'
 import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
-import type {
-  Dict,
-  SystemUser,
-  SystemUserPayload,
-  SystemUserUpdateRequest,
-  BatchSetUserRolesRequest,
-  BatchSetUserWorkspaceRolesRequest,
-} from '@/api/types'
+import type { Dict, SystemUser, SystemUserPayload, SystemUserUpdateRequest, BatchSetUserRolesRequest, BatchSetUserWorkspaceRolesRequest } from '@/api/types'
 
 const prefix = '/user_manage'
 
@@ -51,13 +44,4 @@ const postBatchSetUserWorkspaceRoles = (payload: BatchSetUserWorkspaceRolesReque
   return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, payload)
 }
 
-export default {
-  deleteUser,
-  getUserManagePage,
-  postUser,
-  postBatchDeleteUsers,
-  postBatchSetUserRoles,
-  postBatchSetUserWorkspaceRoles,
-  putUser,
-  putUserPassword,
-}
+export default { deleteUser, getUserManagePage, postUser, postBatchDeleteUsers, postBatchSetUserRoles, postBatchSetUserWorkspaceRoles, putUser, putUserPassword }

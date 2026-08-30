@@ -58,6 +58,22 @@
   }
 }
 
+/* anchor */
+.el-anchor {
+  --el-anchor-font-size: 14px;
+  --el-anchor-color: var(--mk-N900);
+  font-weight: 500;
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing) * 1);
+    padding-left: 0 !important;
+  }
+  &__link {
+    padding: 0;
+  }
+}
+
 /* avatar */
 .el-avatar {
   // icon使用蓝色是固定的, 不能随主题变化
@@ -119,7 +135,7 @@
     &.is-active {
       box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
       color: var(--el-text-color-primary);
-      background: transparent;
+      background: white;
       border-color: var(--el-border-color);
     }
   }
@@ -311,11 +327,14 @@
   --el-dialog-title-font-size: 16px;
   padding: 0;
   &__header {
-    padding: var(--el-dialog-padding-primary);
+    align-items: center;
+    display: flex;
+    height: 60px;
+    padding: 0 var(--el-dialog-padding-primary);
   }
   &__headerbtn {
     right: 20px;
-    top: 20px;
+    top: 16px;
     width: 28px;
     height: 28px;
     padding: 4px;
@@ -336,9 +355,26 @@
   }
   &__body {
     color: var(--el-text-color-primary);
+    padding-bottom: var(--el-dialog-padding-primary);
   }
   &__footer {
     padding: var(--el-dialog-padding-primary);
+    padding-top: 0;
+  }
+  .dialog-content {
+    max-height: calc(100vh - 272px);
+  }
+  //  专属带侧边栏结构的dialog
+  &.mk-aside-content-dialog {
+    .el-dialog__body {
+      padding: 0;
+      border-top: var(--el-border);
+    }
+    .dialog-content {
+      padding: 0;
+      max-height: none;
+      height: calc(100vh - 180px);
+    }
   }
 }
 
@@ -364,8 +400,7 @@
     position: relative;
     border-bottom: 1px solid var(--el-border-color);
     margin: 0;
-    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4)
-      calc(var(--spacing) * 6);
+    padding: calc(var(--spacing) * 4) calc(var(--spacing) * 5) calc(var(--spacing) * 4) calc(var(--spacing) * 6);
   }
   &__title {
     font-weight: 500;
@@ -994,6 +1029,14 @@
   }
   .el-icon {
     font-size: 14px;
+  }
+}
+
+/* textarea */
+.el-textarea {
+  &:has(.el-input__inner[readonly]) {
+    --el-input-focus-border-color: var(--el-input-border-color);
+    --el-input-hover-border-color: var(--el-input-border-color);
   }
 }
 

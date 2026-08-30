@@ -36,30 +36,21 @@ const props = withDefaults(
     selected?: boolean
     title: string
   }>(),
-  {
-    selectable: false,
-    selected: false,
-  },
+  { selectable: false, selected: false },
 )
 
-const emit = defineEmits<{
-  selected: [selected: boolean]
-}>()
+const emit = defineEmits<{ selected: [selected: boolean] }>()
 
 const slots = defineSlots<{
   default?: () => unknown
-  footer?: (props: {
-    Action: FunctionalComponent
-    ActionDropdown: typeof MkSourceCardActionDropdown
-  }) => unknown
+  footer?: (props: { Action: FunctionalComponent; ActionDropdown: typeof MkSourceCardActionDropdown }) => unknown
   icon?: () => unknown
   subtitle?: () => unknown
   tag?: () => unknown
   title?: (props: { title: string }) => unknown
 }>()
 
-const SourceCardAction: FunctionalComponent = (_, { slots }) =>
-  props.selectable ? null : h(MkSourceCardAction, null, slots)
+const SourceCardAction: FunctionalComponent = (_, { slots }) => (props.selectable ? null : h(MkSourceCardAction, null, slots))
 
 function handleSelect() {
   if (props.selectable) emit('selected', !props.selected)
@@ -72,10 +63,7 @@ function handleSelectedChange(selected: boolean | string | number) {
 
 <template>
   <el-card
-    :class="{
-      'cursor-pointer': props.selectable,
-      'border-primary! bg-primary/10!': props.selectable && props.selected,
-    }"
+    :class="{ 'cursor-pointer': props.selectable, 'border-primary! bg-primary/10!': props.selectable && props.selected }"
     :role="props.selectable ? 'checkbox' : undefined"
     :tabindex="props.selectable ? 0 : undefined"
     shadow="hover"

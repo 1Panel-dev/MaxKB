@@ -3,9 +3,7 @@ import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, reactive } from 'vue'
 
 import { ElMessage, ElMessageBox } from 'element-plus'
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 const emit = defineEmits(['update:modelValue'])
 const formValue = computed({
   set: (item) => {
@@ -56,37 +54,19 @@ interface AddFormItem {
 
 type AddMode = 'root' | 'child'
 
-const treeProps = {
-  children: 'children',
-  label: 'label',
-}
+const treeProps = { children: 'children', label: 'label' }
 
-const addDialog = reactive<{
-  visible: boolean
-  mode: AddMode
-  parentNode: TreeNode | null
-  formList: AddFormItem[]
-}>({
+const addDialog = reactive<{ visible: boolean; mode: AddMode; parentNode: TreeNode | null; formList: AddFormItem[] }>({
   visible: false,
   mode: 'root',
   parentNode: null,
   formList: [],
 })
 
-const editDialog = reactive<{
-  visible: boolean
-  targetNode: TreeNode | null
-  form: {
-    label: string
-    value: string
-  }
-}>({
+const editDialog = reactive<{ visible: boolean; targetNode: TreeNode | null; form: { label: string; value: string } }>({
   visible: false,
   targetNode: null,
-  form: {
-    label: '',
-    value: '',
-  },
+  form: { label: '', value: '' },
 })
 
 function createId(): string {
@@ -94,11 +74,7 @@ function createId(): string {
 }
 
 function createEmptyRow(): AddFormItem {
-  return {
-    key: createId(),
-    label: '',
-    value: '',
-  }
+  return { key: createId(), label: '', value: '' }
 }
 
 /* -------------------- 添加 -------------------- */
@@ -134,23 +110,14 @@ function closeAddDialog() {
 }
 
 function submitAdd() {
-  const validList = addDialog.formList
-    .map((item) => ({
-      label: item.label.trim(),
-      value: item.value.trim(),
-    }))
-    .filter((item) => item.label && item.value)
+  const validList = addDialog.formList.map((item) => ({ label: item.label.trim(), value: item.value.trim() })).filter((item) => item.label && item.value)
 
   if (!validList.length) {
     ElMessage.warning('请至少填写一条完整数据')
     return
   }
 
-  const newNodes: TreeNode[] = validList.map((item) => ({
-    id: createId(),
-    label: item.label,
-    value: item.value,
-  }))
+  const newNodes: TreeNode[] = validList.map((item) => ({ id: createId(), label: item.label, value: item.value }))
 
   if (addDialog.mode === 'root') {
     formValue.value.treeData.push(...newNodes)
@@ -211,9 +178,7 @@ function submitEdit() {
 /* -------------------- 删除 -------------------- */
 
 function handleDelete(node: TreeNode) {
-  ElMessageBox.confirm(`确定删除「${node.label}」吗？`, '提示', {
-    type: 'warning',
-  })
+  ElMessageBox.confirm(`确定删除「${node.label}」吗？`, '提示', { type: 'warning' })
     .then(() => {
       const removed = removeNodeById(formValue.value.treeData, node.id)
       if (removed) {
@@ -249,17 +214,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
 </script>
 
 <template>
-  <el-form-item
-    prop="treeData"
-    :rules="[
-      {
-        message: '选项必填',
-        blur: 'change',
-        type: 'array',
-        min: 1,
-      },
-    ]"
-  >
+  <el-form-item prop="treeData" :rules="[{ message: '选项必填', blur: 'change', type: 'array', min: 1 }]">
     <template #label>
       <div class="flex-between">
         <span>
@@ -275,14 +230,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
       </div>
     </template>
     <el-card shadow="never" class="border-r-6 w-full" style="--el-card-padding: 8px">
-      <el-tree
-        :data="formValue.treeData"
-        node-key="id"
-        default-expand-all
-        :expand-on-click-node="false"
-        :props="treeProps"
-        class="option-tree"
-      >
+      <el-tree :data="formValue.treeData" node-key="id" default-expand-all :expand-on-click-node="false" :props="treeProps" class="option-tree">
         <template #default="{ data, node }">
           <div class="flex-between w-full">
             <div class="ellipsis" :title="`${data.label}-${data.value}`" style="max-width: 350px">
@@ -312,34 +260,14 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
     </el-card>
   </el-form-item>
 
-  <el-form-item
-    class="mk-hide-asterisk"
-    :required="formValue.required"
-    prop="default_value"
-    :rules="
-      formValue.required
-        ? [
-            {
-              required: true,
-              message: '请输入默认值',
-            },
-          ]
-        : []
-    "
-  >
+  <el-form-item class="mk-hide-asterisk" :required="formValue.required" prop="default_value" :rules="formValue.required ? [{ required: true, message: '请输入默认值' }] : []">
     <template #label>
       <div class="flex-between">
         <span :class="formValue.required ? 'mk-required' : ''">默认值</span>
         <el-checkbox v-model="formValue.show_default_value" label="显示默认值" />
       </div>
     </template>
-    <el-tree-select
-      v-model="formValue.default_value"
-      :data="formValue.treeData"
-      :multiple="formValue.multiple"
-      :render-after-expand="false"
-      style="width: 100%"
-    />
+    <el-tree-select v-model="formValue.default_value" :data="formValue.treeData" :multiple="formValue.multiple" :render-after-expand="false" style="width: 100%" />
   </el-form-item>
   <!-- 添加弹窗 -->
   <el-dialog
@@ -360,12 +288,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
                 {{ index === 0 ? '标签' : '' }}
                 <span class="color-danger" v-if="index === 0"> *</span>
               </template>
-              <el-input
-                v-model.trim="item.label"
-                class="w-full"
-                placeholder="请输入选项标签"
-                maxlength="50"
-              ></el-input>
+              <el-input v-model.trim="item.label" class="w-full" placeholder="请输入选项标签" maxlength="50"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="11">
@@ -374,20 +297,11 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
                 {{ index === 0 ? '选项值' : '' }}
                 <span class="color-danger" v-if="index === 0">*</span>
               </template>
-              <el-input
-                v-model.trim="item.value"
-                placeholder="请输入选项值"
-                maxlength="100"
-              ></el-input>
+              <el-input v-model.trim="item.value" placeholder="请输入选项值" maxlength="100"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="1">
-            <el-button
-              :disabled="addDialog.formList.length === 1"
-              link
-              @click="removeAddRow(index)"
-              :style="{ marginTop: index === 0 ? '35px' : '12px' }"
-            >
+            <el-button :disabled="addDialog.formList.length === 1" link @click="removeAddRow(index)" :style="{ marginTop: index === 0 ? '35px' : '12px' }">
               <MkIcon name="icon_delete-trash_outlined"></MkIcon>
             </el-button>
           </el-col>
@@ -405,15 +319,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
   </el-dialog>
 
   <!-- 编辑弹窗 -->
-  <el-dialog
-    v-model="editDialog.visible"
-    title="编辑"
-    width="520px"
-    destroy-on-close
-    label-position="top"
-    require-asterisk-position="right"
-    @submit.prevent
-  >
+  <el-dialog v-model="editDialog.visible" title="编辑" width="520px" destroy-on-close label-position="top" require-asterisk-position="right" @submit.prevent>
     <el-row :gutter="8">
       <el-col :span="12">
         <el-form-item>
@@ -421,11 +327,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
             标签
             <span class="color-danger"> *</span>
           </template>
-          <el-input
-            v-model.trim="editDialog.form.label"
-            placeholder="请输入选项标签"
-            maxlength="50"
-          />
+          <el-input v-model.trim="editDialog.form.label" placeholder="请输入选项标签" maxlength="50" />
         </el-form-item>
       </el-col>
       <el-col :span="12">
@@ -434,11 +336,7 @@ function removeNodeById(list: TreeNode[], targetId: string): boolean {
             选项值
             <span class="color-danger">*</span>
           </template>
-          <el-input
-            v-model.trim="editDialog.form.value"
-            placeholder="请输入选项值"
-            maxlength="100"
-          />
+          <el-input v-model.trim="editDialog.form.value" placeholder="请输入选项值" maxlength="100" />
         </el-form-item>
       </el-col>
     </el-row>

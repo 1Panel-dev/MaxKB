@@ -16,14 +16,10 @@ const modelTypeList = [
   { text: 'ITV', value: 'ITV' },
   { text: 'TTV', value: 'TTV' },
 ]
-const getSelectModelList =
-  inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
-const getModelParamsForm =
-  inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
+const getSelectModelList = inject<(params: { model_type: string }) => Promise<DynamicFormValue>>('getSelectModelList')
+const getModelParamsForm = inject<(modelId: string) => Promise<DynamicFormValue>>('getModelParamsForm')
 
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 
 const emit = defineEmits(['update:modelValue'])
 
@@ -80,9 +76,7 @@ function fetchDefaultParams(modelId: string) {
       })
       .reduce((x: DynamicFormValue, y: DynamicFormValue) => ({ ...x, ...y }), {})
     // update to model_params_setting
-    const target = formValue.value.provider_list.find(
-      (p: DynamicFormValue) => p.model_id === modelId,
-    )
+    const target = formValue.value.provider_list.find((p: DynamicFormValue) => p.model_id === modelId)
     if (target) {
       target.model_params_setting = defaults
       target.model_form_field = formFields
@@ -137,14 +131,7 @@ const getData = () => {
       model_form_field: p.model_form_field || [],
     }
   })
-  return {
-    input_type: 'Model',
-    model_type: formValue.value.model_type,
-    default_value: formValue.value.default_value,
-    attrs: {
-      provider_list: providerList,
-    },
-  }
+  return { input_type: 'Model', model_type: formValue.value.model_type, default_value: formValue.value.default_value, attrs: { provider_list: providerList } }
 }
 
 const render = (formData: DynamicFormValue) => {
@@ -161,47 +148,15 @@ defineExpose({ getData, render })
 </script>
 
 <template>
-  <el-form-item
-    label="模型类型"
-    required
-    prop="model_type"
-    :rules="[{ required: true, message: '请选择模型类型' }]"
-  >
-    <el-select
-      v-model="formValue.model_type"
-      placeholder="请选择模型类型"
-      @change="handleModelTypeChange"
-    >
-      <el-option
-        v-for="item in modelTypeList"
-        :key="item.value"
-        :label="item.text"
-        :value="item.value"
-      />
+  <el-form-item label="模型类型" required prop="model_type" :rules="[{ required: true, message: '请选择模型类型' }]">
+    <el-select v-model="formValue.model_type" placeholder="请选择模型类型" @change="handleModelTypeChange">
+      <el-option v-for="item in modelTypeList" :key="item.value" :label="item.text" :value="item.value" />
     </el-select>
   </el-form-item>
 
-  <el-form-item
-    label="可选模型"
-    required
-    prop="provider_list"
-    :rules="[
-      {
-        required: true,
-        message: '请选择模型',
-        type: 'array',
-      },
-    ]"
-  >
+  <el-form-item label="可选模型" required prop="provider_list" :rules="[{ required: true, message: '请选择模型', type: 'array' }]">
     <div class="flex-between w-full">
-      <ModelSelect
-        multiple
-        v-model="selectedIds"
-        placeholder="请选择模型"
-        :options="rawModelOptions"
-        :provider-options="providerOptions"
-        :model-type="formValue.model_type"
-      >
+      <ModelSelect multiple v-model="selectedIds" placeholder="请选择模型" :options="rawModelOptions" :provider-options="providerOptions" :model-type="formValue.model_type">
       </ModelSelect>
     </div>
   </el-form-item>
@@ -209,16 +164,7 @@ defineExpose({ getData, render })
     label="默认模型"
     prop="default_value.model_id"
     :required="formValue.required"
-    :rules="
-      formValue.required
-        ? [
-            {
-              required: true,
-              message: '请选择模型',
-            },
-          ]
-        : []
-    "
+    :rules="formValue.required ? [{ required: true, message: '请选择模型' }] : []"
     v-if="formValue.provider_list && formValue.provider_list.length > 0"
   >
     <div class="flex-between w-full">
@@ -228,38 +174,16 @@ defineExpose({ getData, render })
           :key="providerName"
           :label="relatedObject(providerOptions, String(providerName), 'provider')?.name"
         >
-          <el-option
-            v-for="item in modelList"
-            :key="item.id"
-            :label="item.name"
-            :value="getProviderItem(item.id)"
-          >
+          <el-option v-for="item in modelList" :key="item.id" :label="item.name" :value="getProviderItem(item.id)">
             <el-space :size="8">
-              <span
-                :innerHTML="
-                  String(
-                    relatedObject(providerOptions, String(providerName), 'provider')?.icon ?? '',
-                  )
-                "
-                class="select-model-icon"
-                style="margin-top: -7px"
-              ></span>
+              <span :innerHTML="String(relatedObject(providerOptions, String(providerName), 'provider')?.icon ?? '')" class="select-model-icon" style="margin-top: -7px"></span>
               <span>{{ item.name }}</span>
             </el-space>
           </el-option>
         </el-option-group>
         <template #label="{ label, value }">
           <el-space :size="8" v-if="value?.model_id">
-            <span
-              class="select-model-icon"
-              :innerHTML="
-                String(
-                  relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')
-                    ?.icon ?? '',
-                )
-              "
-            >
-            </span>
+            <span class="select-model-icon" :innerHTML="String(relatedObject(providerOptions, getModelInfo(value.model_id)?.provider, 'provider')?.icon ?? '')"> </span>
             <span>
               <span>{{ label }}</span>
             </span>

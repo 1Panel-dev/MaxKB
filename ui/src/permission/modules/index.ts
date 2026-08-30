@@ -11,10 +11,4 @@ import tool from './tool'
 import model from './model'
 import system from './system'
 
-export default {
-  application,
-  knowledge,
-  tool,
-  model,
-  ...system,
-}
+export default { application, knowledge, tool, model, ...system }

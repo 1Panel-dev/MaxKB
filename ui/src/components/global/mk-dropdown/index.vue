@@ -5,17 +5,11 @@ import type { Options } from '@popperjs/core'
 
 defineOptions({ name: 'MkDropdown', inheritAttrs: false })
 
-withDefaults(
-  defineProps<{
-    popperOptions?: Partial<Options>
-    persistent?: boolean
-  }>(),
-  {
-    popperOptions: () => ({}),
-    persistent: false,
-    /* 非必要不开启，调试时可临时开启 */
-  },
-)
+withDefaults(defineProps<{ popperOptions?: Partial<Options>; persistent?: boolean }>(), {
+  popperOptions: () => ({}),
+  persistent: false,
+  /* 非必要不开启，调试时可临时开启 */
+})
 
 const dropdownRef = ref<DropdownInstance>()
 

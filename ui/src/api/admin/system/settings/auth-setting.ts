@@ -28,10 +28,4 @@ const putLoginSetting = (payload: LoginAuthSettingPayload) => {
   return put<LoginAuthSettingPayload, boolean>(`${prefix}/setting`, payload)
 }
 
-export default {
-  getAuthSetting,
-  getLoginSetting,
-  postAuthSettingConnection,
-  putAuthSetting,
-  putLoginSetting,
-}
+export default { getAuthSetting, getLoginSetting, postAuthSettingConnection, putAuthSetting, putLoginSetting }

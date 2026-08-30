@@ -5,9 +5,7 @@ import type { DynamicFormValue } from '../type'
 
 defineOptions({ name: 'DynamicFormJsonInput', inheritAttrs: false })
 
-const modelValue = defineModel<DynamicFormValue>({
-  default: () => ({}),
-})
+const modelValue = defineModel<DynamicFormValue>({ default: () => ({}) })
 
 const jsonEditorRef = ref<InstanceType<typeof JsonEditor>>()
 

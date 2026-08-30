@@ -14,20 +14,11 @@ import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { type ShapeItem } from '@/workflow-canvas/types'
 defineOptions({ name: 'MkWorkflow' })
 
-type CanvasWorkflowNodeModel = WorkflowNodeModel & {
-  set_loop_body?: () => void
-}
+type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
 
-const props = withDefaults(
-  defineProps<{
-    data?: LogicFlow.GraphConfigData | null
-  }>(),
-  { data: null },
-)
+const props = withDefaults(defineProps<{ data?: LogicFlow.GraphConfigData | null }>(), { data: null })
 
-const nodeModules = import.meta.glob<{ default: LogicFlow.RegisterConfig }>('./nodes/**/index.ts', {
-  eager: true,
-})
+const nodeModules = import.meta.glob<{ default: LogicFlow.RegisterConfig }>('./nodes/**/index.ts', { eager: true })
 const workflow_mode = inject('workflowMode', WorkflowMode.Application)
 const loop_workflow_mode = inject('loopWorkflowMode', WorkflowMode.ApplicationLoop)
 
@@ -48,19 +39,13 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     adjustEdge: false,
     adjustEdgeStartAndEnd: false,
     background: { backgroundColor: '#f5f6f7' },
-    grid: {
-      size: 20,
-      type: 'dot',
-      config: { color: '#DEE0E3', thickness: 1 },
-    },
+    grid: { size: 20, type: 'dot', config: { color: '#DEE0E3', thickness: 1 } },
     keyboard: { enabled: true },
     isSilentMode: false,
     container,
   })
 
-  lf.value.setTheme({
-    bezier: { stroke: '#afafaf', strokeWidth: 1 },
-  })
+  lf.value.setTheme({ bezier: { stroke: '#afafaf', strokeWidth: 1 } })
   lf.value.on('graph:rendered', () => {
     flowId.value = lf.value?.graphModel.flowId ?? ''
   })
@@ -73,10 +58,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   lf.value.setDefaultEdgeType('app-edge')
   lf.value.render(data ? data : {})
 
-  lf.value.graphModel.get_provide = (
-    model: LogicFlow.NodeData | null,
-    graph: GraphModel | null,
-  ) => ({
+  lf.value.graphModel.get_provide = (model: LogicFlow.NodeData | null, graph: GraphModel | null) => ({
     getModel: () => model,
     getGraph: () => graph,
     workflowMode: workflow_mode,
@@ -110,10 +92,7 @@ function getGraphData(): LogicFlow.GraphData | undefined {
   })
 
   const normalizedGraphData = lf.value.getGraphData() as LogicFlow.GraphData
-  return {
-    nodes: normalizedGraphData.nodes.filter((node) => node.type !== WorkflowNodeType.LoopBodyNode),
-    edges: graphData.edges.filter((edge) => edge.type !== 'loop-edge'),
-  }
+  return { nodes: normalizedGraphData.nodes.filter((node) => node.type !== WorkflowNodeType.LoopBodyNode), edges: graphData.edges.filter((edge) => edge.type !== 'loop-edge') }
 }
 
 function render(data: LogicFlow.GraphConfigData) {
@@ -122,19 +101,14 @@ function render(data: LogicFlow.GraphConfigData) {
 
 function validate() {
   if (!lf.value) return Promise.resolve([])
-  return Promise.all(
-    lf.value.graphModel.nodes.map((node) => (node as unknown as WorkflowNodeModel).validate?.()),
-  )
+  return Promise.all(lf.value.graphModel.nodes.map((node) => (node as unknown as WorkflowNodeModel).validate?.()))
 }
 
 function onmousedown(shapeItem: ShapeItem) {
   if (!lf.value) return
 
   if (shapeItem.type) {
-    lf.value.dnd.startDrag({
-      type: shapeItem.type,
-      properties: cloneDeep(shapeItem.properties ?? {}),
-    })
+    lf.value.dnd.startDrag({ type: shapeItem.type, properties: cloneDeep(shapeItem.properties ?? {}) })
   }
   shapeItem.callback?.(lf.value)
 }
@@ -143,10 +117,7 @@ function addNode(shapeItem: ShapeItem) {
   if (!lf.value) return
   lf.value.clearSelectElements()
   const containerRect = lf.value.container.getBoundingClientRect()
-  const { canvasOverlayPosition } = lf.value.getPointByClient(
-    containerRect.left + containerRect.width / 2,
-    containerRect.top + containerRect.height / 2,
-  )
+  const { canvasOverlayPosition } = lf.value.getPointByClient(containerRect.left + containerRect.width / 2, containerRect.top + containerRect.height / 2)
   const newNode = lf.value.graphModel.addNode({
     type: shapeItem.type as string,
     properties: cloneDeep(shapeItem.properties ?? {}),
@@ -173,16 +144,7 @@ onBeforeUnmount(() => {
   disconnectAll()
 })
 
-defineExpose({
-  onmousedown,
-  validate,
-  getGraphData,
-  addNode,
-  clearGraphData,
-  renderGraphData,
-  render,
-  fitView,
-})
+defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, renderGraphData, render, fitView })
 </script>
 
 <template>

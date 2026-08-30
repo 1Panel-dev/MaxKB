@@ -9,15 +9,11 @@ const router = useRouter()
 const workspaceMenuItems = getChildRouteList('workspace')
 const workspaceActiveMenuName = computed(() => route.meta.activeMenu ?? String(route.name ?? ''))
 
-const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) =>
-  workspaceMenuItem.name === workspaceActiveMenuName.value
+const isWorkspaceMenuActive = (workspaceMenuItem: LayoutMenuItem) => workspaceMenuItem.name === workspaceActiveMenuName.value
 
 function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
   if (!workspaceMenuItem.route) return
-  void router.push({
-    name: workspaceMenuItem.name,
-    params: { workspaceId: route.params.workspaceId },
-  })
+  void router.push({ name: workspaceMenuItem.name, params: { workspaceId: route.params.workspaceId } })
 }
 </script>
 
@@ -32,11 +28,7 @@ function navigateToWorkspaceMenu(workspaceMenuItem: LayoutMenuItem) {
     >
       <MkIcon
         v-if="workspaceMenuItem.icon"
-        :name="
-          isWorkspaceMenuActive(workspaceMenuItem)
-            ? (workspaceMenuItem.activeIcon ?? workspaceMenuItem.icon)
-            : workspaceMenuItem.icon
-        "
+        :name="isWorkspaceMenuActive(workspaceMenuItem) ? (workspaceMenuItem.activeIcon ?? workspaceMenuItem.icon) : workspaceMenuItem.icon"
         :gradient="isWorkspaceMenuActive(workspaceMenuItem)"
       />
       <span class="mt-[2px]">{{ workspaceMenuItem.label }}</span>

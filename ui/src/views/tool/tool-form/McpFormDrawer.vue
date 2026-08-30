@@ -12,17 +12,9 @@ defineOptions({ name: 'McpFormDrawer' })
 
 const { auth } = useStore()
 
-const props = defineProps<{
-  api: typeof ToolApi
-  folderId: string
-  title: string
-}>()
+const props = defineProps<{ api: typeof ToolApi; folderId: string; title: string }>()
 
-const emit = defineEmits<{
-  closed: []
-  refresh: []
-  update: [tool: ToolItem]
-}>()
+const emit = defineEmits<{ closed: []; refresh: []; update: [tool: ToolItem] }>()
 
 interface McpFormModel {
   code: string
@@ -64,16 +56,11 @@ function handleSubmit() {
   formRef.value?.validate((valid) => {
     if (!valid || !isValidConfig()) return
 
-    const payload: ToolPayload = {
-      ...cloneDeep(mcpForm),
-      tool_type: TOOL_TYPE.MCP,
-    }
+    const payload: ToolPayload = { ...cloneDeep(mcpForm), tool_type: TOOL_TYPE.MCP }
     loading.value = true
     const currentEditId = editId.value
     const isEdit = Boolean(currentEditId)
-    const request = currentEditId
-      ? props.api.putTool(currentEditId, payload)
-      : props.api.postTool({ ...payload, folder_id: props.folderId || null })
+    const request = currentEditId ? props.api.putTool(currentEditId, payload) : props.api.postTool({ ...payload, folder_id: props.folderId || null })
 
     request
       .then((savedTool) => {
@@ -106,16 +93,10 @@ function handleTestConnection() {
 }
 
 function fillMcpForm(tool: ToolItem) {
-  Object.assign(mcpForm, {
-    code: tool.code ?? '',
-    desc: tool.desc ?? '',
-    icon: tool.icon ?? '',
-    name: tool.name,
-  })
+  Object.assign(mcpForm, { code: tool.code ?? '', desc: tool.desc ?? '', icon: tool.icon ?? '', name: tool.name })
 }
 
 function open(tool?: ToolItem, asCopy = false) {
-  resetData()
   visible.value = true
   originalForm.value = JSON.stringify(mcpForm)
   if (!tool) return
@@ -145,10 +126,7 @@ function handleBeforeClose() {
     visible.value = false
     return
   }
-  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', {
-    confirmButtonText: '确认',
-    confirmButtonType: 'primary',
-  })
+  MsgConfirm('提示', '当前的更改尚未保存，确认退出吗？', { confirmButtonText: '确认', confirmButtonType: 'primary' })
     .then(() => {
       visible.value = false
     })
@@ -173,34 +151,14 @@ defineExpose({ open })
 </script>
 
 <template>
-  <MkDrawer
-    v-model="visible"
-    :before-close="handleBeforeClose"
-    :title="title"
-    size="60%"
-    @closed="handleClosed"
-  >
-    <el-form
-      ref="formRef"
-      v-loading="formLoading"
-      :model="mcpForm"
-      :rules="formRules"
-      label-position="top"
-      require-asterisk-position="right"
-      @submit.prevent
-    >
+  <MkDrawer v-model="visible" :before-close="handleBeforeClose" :title="title" size="60%" @closed="handleClosed">
+    <el-form ref="formRef" v-loading="formLoading" :model="mcpForm" :rules="formRules" label-position="top" require-asterisk-position="right" @submit.prevent>
       <h4 class="mk-title-decoration mb-4">基本信息</h4>
       <el-form-item label="名称" prop="name">
         <div class="flex w-full items-center gap-3">
           <!-- // TODO修改头像 -->
           <ToolIcon :icon="mcpForm.icon" :size="32" :type="TOOL_TYPE.MCP" />
-          <el-input
-            v-model="mcpForm.name"
-            maxlength="64"
-            placeholder="请输入 MCP 名称"
-            show-word-limit
-            @blur="mcpForm.name = mcpForm.name.trim()"
-          />
+          <el-input v-model="mcpForm.name" maxlength="64" placeholder="请输入 MCP 名称" show-word-limit @blur="mcpForm.name = mcpForm.name.trim()" />
         </div>
       </el-form-item>
       <el-form-item label="描述">
@@ -222,20 +180,13 @@ defineExpose({ open })
 
           <span class="text-N600"> （仅支持 SSE、Streamable HTTP 调用方式）</span>
         </template>
-        <el-input
-          v-model="mcpForm.code"
-          :autosize="{ minRows: 8 }"
-          :placeholder="mcpServerExample"
-          type="textarea"
-        />
+        <el-input v-model="mcpForm.code" :autosize="{ minRows: 8 }" :placeholder="mcpServerExample" type="textarea" />
       </el-form-item>
     </el-form>
 
     <template #footer>
       <el-button plain :disabled="loading" @click="handleBeforeClose">取消</el-button>
-      <el-button plain :disabled="loading || formLoading" @click="handleTestConnection">
-        测试连接
-      </el-button>
+      <el-button plain :disabled="loading || formLoading" @click="handleTestConnection"> 测试连接 </el-button>
       <el-button type="primary" :disabled="formLoading" :loading="loading" @click="handleSubmit">
         {{ editId ? '保存' : '创建' }}
       </el-button>

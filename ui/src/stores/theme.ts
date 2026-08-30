@@ -7,16 +7,12 @@ import { DEFAULT_THEME_COLOR } from '@/constants'
 
 function normalizeThemeColor(themeColor?: string) {
   const normalizedColor = themeColor?.trim().toLowerCase()
-  return normalizedColor && /^#[\da-f]{6}$/.test(normalizedColor)
-    ? normalizedColor
-    : DEFAULT_THEME_COLOR
+  return normalizedColor && /^#[\da-f]{6}$/.test(normalizedColor) ? normalizedColor : DEFAULT_THEME_COLOR
 }
 
 function getRgbChannels(themeColor: string) {
   const normalizedColor = themeColor.slice(1)
-  return [0, 2, 4]
-    .map((index) => Number.parseInt(normalizedColor.slice(index, index + 2), 16))
-    .join(' ')
+  return [0, 2, 4].map((index) => Number.parseInt(normalizedColor.slice(index, index + 2), 16)).join(' ')
 }
 
 interface ThemeState {
@@ -24,12 +20,9 @@ interface ThemeState {
 }
 
 export const useThemeStore = defineStore('theme', {
-  state: (): ThemeState => ({
-    themeInfo: null,
-  }),
+  state: (): ThemeState => ({ themeInfo: null }),
   getters: {
-    isDefaultTheme: (state) =>
-      !state.themeInfo?.theme || state.themeInfo.theme === DEFAULT_THEME_COLOR, // 是默认主题
+    isDefaultTheme: (state) => !state.themeInfo?.theme || state.themeInfo.theme === DEFAULT_THEME_COLOR, // 是默认主题
   },
 
   actions: {

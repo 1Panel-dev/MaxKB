@@ -60,10 +60,7 @@ const options = computed(() => {
       v-for="item in options"
       :key="item.value"
       class="item"
-      :class="[
-        inputDisabled ? 'is-disabled' : '',
-        _value.includes(item[valueField]) ? 'active' : '',
-      ]"
+      :class="[inputDisabled ? 'is-disabled' : '', _value.includes(item[valueField]) ? 'active' : '']"
       @click="selected(item[valueField])"
     >
       {{ item[textField] }}

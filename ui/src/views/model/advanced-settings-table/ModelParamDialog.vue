@@ -5,15 +5,12 @@ import { MkDynamicsFormConstructor, type FormField } from '@/components/mk-dynam
 
 defineOptions({ name: 'ModelParamDialog' })
 
-const emit = defineEmits<{
-  submit: [field: FormField]
-}>()
+const emit = defineEmits<{ submit: [field: FormField] }>()
 
 const visible = ref(false)
 const editing = ref(false)
 const currentField = ref<Partial<FormField>>({})
-const constructorRef =
-  useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
+const constructorRef = useTemplateRef<InstanceType<typeof MkDynamicsFormConstructor>>('constructorRef')
 
 function resetData() {
   editing.value = false
@@ -35,20 +32,18 @@ function handleSubmit() {
     if (!field) return
 
     emit('submit', field)
-    visible.value = false
   })
 }
 
-defineExpose({ open })
+function close() {
+  visible.value = false
+}
+
+defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog
-    v-model="visible"
-    :title="editing ? '编辑参数' : '添加参数'"
-    @closed="resetData"
-    align-center
-  >
+  <MkDialog v-model="visible" :title="editing ? '编辑参数' : '添加参数'" @closed="resetData" align-center>
     <MkDynamicsFormConstructor ref="constructorRef" v-model="currentField" />
 
     <template #footer>

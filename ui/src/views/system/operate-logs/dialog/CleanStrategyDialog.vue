@@ -47,23 +47,13 @@ defineExpose({ open })
   <MkDialog v-model="visible" title="清除策略" @closed="resetData">
     <div v-loading="loading" class="flex items-center gap-2">
       <span>删除</span>
-      <el-input-number
-        v-model="days"
-        class="w-40!"
-        controls-position="right"
-        :min="1"
-        :max="100000"
-        :value-on-clear="1"
-        step-strictly
-      />
+      <el-input-number v-model="days" class="w-40!" controls-position="right" :min="1" :max="100000" :value-on-clear="1" step-strictly />
       <span>天之前的对话记录</span>
     </div>
 
     <template #footer>
       <el-button plain @click="visible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit">
-        确认
-      </el-button>
+      <el-button type="primary" :loading="submitting" :disabled="loading" @click="handleSubmit"> 确认 </el-button>
     </template>
   </MkDialog>
 </template>

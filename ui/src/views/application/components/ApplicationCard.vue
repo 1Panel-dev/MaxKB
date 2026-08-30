@@ -15,17 +15,12 @@ const {
   params: { workspaceId },
 } = route
 
-const props = defineProps<{
-  application: ApplicationDetail
-}>()
+const props = defineProps<{ application: ApplicationDetail }>()
 
 function handleSettingApplication(event: MouseEvent) {
   event.stopPropagation()
   if (isWorkFlow(props.application.type)) {
-    const workflowRoute = {
-      name: 'workflow-application',
-      params: { workspaceId, applicationId: props.application.id },
-    } as const
+    const workflowRoute = { name: 'workflow-application', params: { workspaceId, applicationId: props.application.id } } as const
 
     if (event.ctrlKey || event.metaKey) {
       window.open(router.resolve(workflowRoute).href)
@@ -37,11 +32,7 @@ function handleSettingApplication(event: MouseEvent) {
 </script>
 
 <template>
-  <MkSourceCard
-    :create_time="application.create_time"
-    :nick_name="application.nick_name || '-'"
-    :title="application.name"
-  >
+  <MkSourceCard :create_time="application.create_time" :nick_name="application.nick_name || '-'" :title="application.name">
     <template #icon>
       <el-avatar class="bg-transparent!" shape="square" :size="24">
         <img :src="resetUrl(application?.icon, true)" />

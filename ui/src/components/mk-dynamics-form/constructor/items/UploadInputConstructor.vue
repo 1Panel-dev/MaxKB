@@ -2,9 +2,7 @@
 import type { DynamicFormValue } from '../../type'
 import { computed, onMounted, ref, nextTick } from 'vue'
 import { ElMessage, type InputInstance } from 'element-plus'
-const props = defineProps<{
-  modelValue: DynamicFormValue
-}>()
+const props = defineProps<{ modelValue: DynamicFormValue }>()
 
 const inputValue = ref('')
 
@@ -46,17 +44,12 @@ const render = (formData: DynamicFormValue) => {
   formValue.value.default_value = []
   formValue.value.limit = formData.attrs.limit || 3
   formValue.value.max_file_size = formData.max_file_size || 10
-  formValue.value.accept = formData.attrs.accept
-    ? formData.attrs.accept.split(',').map((item: string) => item.substring(1))
-    : ['jpg']
+  formValue.value.accept = formData.attrs.accept ? formData.attrs.accept.split(',').map((item: string) => item.substring(1)) : ['jpg']
 }
 const getData = () => {
   return {
     input_type: 'UploadInput',
-    attrs: {
-      accept: formValue.value.accept.map((item: DynamicFormValue) => '.' + item).join(','),
-      limit: formValue.value.limit,
-    },
+    attrs: { accept: formValue.value.accept.map((item: DynamicFormValue) => '.' + item).join(','), limit: formValue.value.limit },
     max_file_size: formValue.value.max_file_size,
     default_value: [],
     show_default_value: formValue.value.show_default_value,
@@ -81,58 +74,17 @@ onMounted(() => {
     <el-input-number
       style="width: 100%"
       v-model="formValue.limit"
-      :rules="[
-        {
-          required: true,
-          message: '单次上传最多文件数必填',
-          trigger: 'change',
-        },
-      ]"
+      :rules="[{ required: true, message: '单次上传最多文件数必填', trigger: 'change' }]"
       :min="0"
       controls-position="right"
     />
   </el-form-item>
-  <el-form-item
-    label="每个文件最大(MB)"
-    required
-    prop="max_file_size"
-    :rules="[
-      {
-        required: true,
-        message: '每个文件最大(MB)必填',
-        trigger: 'change',
-      },
-    ]"
-  >
-    <el-input-number
-      style="width: 100%"
-      v-model="formValue.max_file_size"
-      :min="0"
-      controls-position="right"
-    />
+  <el-form-item label="每个文件最大(MB)" required prop="max_file_size" :rules="[{ required: true, message: '每个文件最大(MB)必填', trigger: 'change' }]">
+    <el-input-number style="width: 100%" v-model="formValue.max_file_size" :min="0" controls-position="right" />
   </el-form-item>
-  <el-form-item
-    label="文件类型"
-    required
-    prop="accept"
-    :rules="[
-      {
-        required: true,
-        message: '文件类型必填',
-        trigger: 'change',
-      },
-    ]"
-  >
+  <el-form-item label="文件类型" required prop="accept" :rules="[{ required: true, message: '文件类型必填', trigger: 'change' }]">
     <el-space wrap :size="6" class="mt-4">
-      <el-tag
-        v-for="tag in formValue.accept"
-        :key="tag"
-        closable
-        :disable-transitions="false"
-        @close="handleClose(tag)"
-        type="info"
-        effect="plain"
-      >
+      <el-tag v-for="tag in formValue.accept" :key="tag" closable :disable-transitions="false" @close="handleClose(tag)" type="info" effect="plain">
         {{ tag }}
       </el-tag>
       <el-input
@@ -142,13 +94,9 @@ onMounted(() => {
         size="small"
         @keyup.enter="handleInputConfirm"
         @blur="handleInputConfirm"
-        :style="{
-          '--el-input-border-radius': '4px',
-        }"
+        :style="{ '--el-input-border-radius': '4px' }"
       />
-      <el-button v-else class="button-new-tag" size="small" @click="showInput">
-        <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>添加扩展名
-      </el-button>
+      <el-button v-else class="button-new-tag" size="small" @click="showInput"> <MkIcon name="icon_add_outlined" class="mr-4"></MkIcon>添加扩展名 </el-button>
     </el-space>
   </el-form-item>
 </template>

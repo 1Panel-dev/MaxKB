@@ -1,16 +1,7 @@
 <script setup lang="ts">
 import { resetUrl } from '@/utils/icon'
 defineOptions({ name: 'KnowledgeIcon' })
-withDefaults(
-  defineProps<{
-    icon?: string
-    size?: number | string
-    type?: KnowledgeType
-  }>(),
-  {
-    size: 24,
-  },
-)
+withDefaults(defineProps<{ icon?: string; size?: number | string; type?: KnowledgeType }>(), { size: 24 })
 </script>
 <template>
   <el-avatar v-if="icon" class="bg-transparent!" shape="square" :size="size">

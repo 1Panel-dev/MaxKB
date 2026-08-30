@@ -2,14 +2,7 @@
 import { ref, computed, provide } from 'vue'
 import { ElMessage } from 'element-plus'
 import type { Dict } from '@/api/types'
-import {
-  dynamicFormTypeOptions,
-  MkDynamicsForm,
-  MkDynamicsFormConstructor,
-  type DynamicFormValue,
-  type FormField,
-  type VisibilityFieldOption,
-} from '@/components/mk-dynamics-form'
+import { dynamicFormTypeOptions, MkDynamicsForm, MkDynamicsFormConstructor, type DynamicFormValue, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import modelAPI from '@/api/admin/workspace/model/model'
 
 defineOptions({ name: 'MkDynamicsFormDemo' })
@@ -33,13 +26,7 @@ const visibilityFieldOptions = computed<VisibilityFieldOption[]>(() => [
     self: true,
     children: formFieldList.value
       .filter((_, index) => index !== editIndex.value) // 排除正在编辑的字段，避免自引用
-      .map((item) => ({
-        label: getFieldLabel(item),
-        value: item.field,
-        input_type: item.input_type,
-        option_list: item.option_list,
-        attrs: item.attrs,
-      })),
+      .map((item) => ({ label: getFieldLabel(item), value: item.field, input_type: item.input_type, option_list: item.option_list, attrs: item.attrs })),
   },
 ])
 
@@ -80,9 +67,7 @@ const submitField = async () => {
     if (!data) return
 
     // 检查字段名是否重复
-    const isDuplicate = formFieldList.value.some(
-      (item, index) => item.field === data.field && index !== editIndex.value,
-    )
+    const isDuplicate = formFieldList.value.some((item, index) => item.field === data.field && index !== editIndex.value)
     if (isDuplicate) {
       ElMessage.error(`参数 "${data.field}" 已存在`)
       return
@@ -123,8 +108,7 @@ const validateForm = async () => {
             </div>
           </template>
           <el-table :data="formFieldList" row-key="field" v-if="formFieldList.length > 0">
-            <el-table-column prop="field" label="参数" width="120" show-overflow-tooltip>
-            </el-table-column>
+            <el-table-column prop="field" label="参数" width="120" show-overflow-tooltip> </el-table-column>
             <el-table-column prop="label" label="显示名称" show-overflow-tooltip>
               <template #default="{ row }">
                 <span>{{ getFieldLabel(row) }}</span>
@@ -177,13 +161,7 @@ const validateForm = async () => {
   </div>
 
   <!-- 添加/编辑字段弹窗 -->
-  <MkDialog
-    v-model="dialogVisible"
-    :title="isEdit ? '编辑字段' : '添加字段'"
-    width="600px"
-    append-to-body
-    destroy-on-close
-  >
+  <MkDialog v-model="dialogVisible" :title="isEdit ? '编辑字段' : '添加字段'" width="600px" append-to-body destroy-on-close>
     <MkDynamicsFormConstructor
       ref="constructorRef"
       v-model="currentField"

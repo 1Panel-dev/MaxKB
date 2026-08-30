@@ -3,7 +3,4 @@
 import { canSys } from '../../policy'
 import { PermissionConstants as P } from '../../core'
 
-export default {
-  read: () => canSys(P.APPEARANCE_SETTINGS_READ),
-  edit: () => canSys(P.APPEARANCE_SETTINGS_EDIT),
-}
+export default { read: () => canSys(P.APPEARANCE_SETTINGS_READ), edit: () => canSys(P.APPEARANCE_SETTINGS_EDIT) }

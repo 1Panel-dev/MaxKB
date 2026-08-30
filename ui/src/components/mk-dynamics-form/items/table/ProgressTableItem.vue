@@ -39,16 +39,8 @@ const viewCards = computed(() => {
 
 <template>
   <div class="progress-table-item">
-    <el-popover
-      placement="top-start"
-      :title="row[textField]"
-      :width="200"
-      trigger="hover"
-      :persistent="false"
-    >
-      <template #reference>
-        <el-progress v-bind="$attrs" :percentage="row[valueField]"></el-progress
-      ></template>
+    <el-popover placement="top-start" :title="row[textField]" :width="200" trigger="hover" :persistent="false">
+      <template #reference> <el-progress v-bind="$attrs" :percentage="row[valueField]"></el-progress></template>
       <div>
         <el-row v-for="(item, index) in viewCards" :key="index">
           <el-col :span="6">{{ item.title }}</el-col>

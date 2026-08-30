@@ -8,25 +8,15 @@ import { MsgSuccess } from '@/utils/message'
 
 defineOptions({ name: 'BatchSetUserGroupDialog' })
 
-const emit = defineEmits<{
-  refresh: []
-}>()
+const emit = defineEmits<{ refresh: [] }>()
 
 const batchGroupFormRef = ref<FormInstance>()
 const dialogVisible = ref(false)
 const submitting = ref(false)
 const userGroupOptionsLoading = ref(false)
 const userGroupOptions = ref<ListItem[]>([])
-const batchGroupForm = reactive<BatchSetChatUserGroupsRequest>({
-  ids: [],
-  is_append: true,
-  user_group_ids: [],
-})
-const batchGroupFormRules: FormRules<BatchSetChatUserGroupsRequest> = {
-  user_group_ids: [
-    { required: true, type: 'array', min: 1, message: '请选择用户组', trigger: 'change' },
-  ],
-}
+const batchGroupForm = reactive<BatchSetChatUserGroupsRequest>({ ids: [], is_append: true, user_group_ids: [] })
+const batchGroupFormRules: FormRules<BatchSetChatUserGroupsRequest> = { user_group_ids: [{ required: true, type: 'array', min: 1, message: '请选择用户组', trigger: 'change' }] }
 
 /* 用户组选项 */
 function loadUserGroupOptions() {
@@ -104,21 +94,14 @@ defineExpose({ open })
           placeholder="请选择用户组"
           fit-input-width
         >
-          <el-option
-            v-for="userGroup in userGroupOptions"
-            :key="userGroup.id"
-            :label="userGroup.name"
-            :value="userGroup.id"
-          />
+          <el-option v-for="userGroup in userGroupOptions" :key="userGroup.id" :label="userGroup.name" :value="userGroup.id" />
         </el-select>
       </el-form-item>
     </el-form>
 
     <template #footer>
       <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups">
-        保存
-      </el-button>
+      <el-button type="primary" :loading="submitting" @click="submitBatchSetUserGroups"> 保存 </el-button>
     </template>
   </MkDialog>
 </template>

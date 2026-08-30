@@ -9,18 +9,9 @@ import { workflowModelDict } from '@/workflow-canvas/config/node-mapping'
 import { getMenuNodes } from '@/workflow-canvas/config/menu'
 let activeCanvasId: string | null = null
 type Point = { x: number; y: number }
-type WorkflowGraphModel = GraphModel & {
-  get_provide: (
-    node: LogicFlow.NodeData | null,
-    graph: GraphModel | null,
-  ) => { workflowMode: WorkflowMode }
-}
+type WorkflowGraphModel = GraphModel & { get_provide: (node: LogicFlow.NodeData | null, graph: GraphModel | null) => { workflowMode: WorkflowMode } }
 
-const lastMouse = {
-  x: 0,
-  y: 0,
-  hasValue: false,
-}
+const lastMouse = { x: 0, y: 0, hasValue: false }
 let selected: LogicFlow.GraphData | null = null
 const bindMousePosition = (lf: LogicFlow) => {
   const updateMouse = (e: MouseEvent) => {
@@ -109,9 +100,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       selected = null
       return true
     }
-    const base_nodes = elements.nodes.filter(
-      (node) => node.type === WorkflowNodeType.Start || node.type === WorkflowNodeType.Base,
-    )
+    const base_nodes = elements.nodes.filter((node) => node.type === WorkflowNodeType.Start || node.type === WorkflowNodeType.Base)
     if (base_nodes.length > 0) {
       MsgError(base_nodes[0]?.properties?.stepName + '不能被复制')
       return
@@ -165,11 +154,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
         edge.text.y += dy
       }
       if (Array.isArray(edge.pointsList)) {
-        edge.pointsList = edge.pointsList.map((p: Point) => ({
-          ...p,
-          x: p.x + dx,
-          y: p.y + dy,
-        }))
+        edge.pointsList = edge.pointsList.map((p: Point) => ({ ...p, x: p.x + dx, y: p.y + dy }))
       }
     }
   }
@@ -228,10 +213,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
         moveData(data, 40, 40)
       } else {
         // LogicFlow 文档里 getPointByClient 会把页面坐标转成画布坐标
-        const point = lf.graphModel.getPointByClient({
-          x: lastMouse.x,
-          y: lastMouse.y,
-        })
+        const point = lf.graphModel.getPointByClient({ x: lastMouse.x, y: lastMouse.y })
         const mouseCanvasX = point.canvasOverlayPosition.x
         const mouseCanvasY = point.canvasOverlayPosition.y
 
@@ -241,10 +223,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
         moveData(data, mouseCanvasX - centerX, mouseCanvasY - centerY)
       }
 
-      selected.nodes = selected.nodes.filter(
-        (node) =>
-          menuNodeTypes.has(node.type as WorkflowNodeType) || workflowModelDict[workflowMode](node),
-      )
+      selected.nodes = selected.nodes.filter((node) => menuNodeTypes.has(node.type as WorkflowNodeType) || workflowModelDict[workflowMode](node))
       lf.clearSelectElements()
       const addElements = lf.addElements(selected, CHILDREN_TRANSLATION_DISTANCE)
       if (!addElements) return true
@@ -305,9 +284,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       return
     }
     if (elements.edges.length > 0 && elements.nodes.length == 0) {
-      elements.edges
-        .filter((edge) => !['loop-edge'].includes(edge.type || ''))
-        .forEach((edge) => lf.deleteEdge(edge.id))
+      elements.edges.filter((edge) => !['loop-edge'].includes(edge.type || '')).forEach((edge) => lf.deleteEdge(edge.id))
       return
     }
     const protectedNodeTypes: string[] = [
@@ -324,10 +301,7 @@ export function initDefaultShortcut(lf: LogicFlow, graph: GraphModel) {
       MsgError(`${nodes[0]?.properties?.stepName}节点不允许删除`)
       return
     }
-    MsgConfirm('提示', '确定删除选中的节点和连线吗？', {
-      confirmButtonText: '确定',
-      confirmButtonClass: 'danger',
-    }).then(() => {
+    MsgConfirm('提示', '确定删除选中的节点和连线吗？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
       if (!keyboardOptions?.enabled) return true
       if (graph.textEditElement) return true
 

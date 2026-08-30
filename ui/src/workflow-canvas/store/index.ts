@@ -1,13 +1,8 @@
 import type { Dict, ModelItem, ModelProviderItem } from '@/api/types'
 
-type ApiModule = {
-  getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>
-  getProviderList: () => Promise<ModelProviderItem[]>
-}
+type ApiModule = { getModelList: (query?: Dict<unknown>) => Promise<ModelItem[]>; getProviderList: () => Promise<ModelProviderItem[]> }
 
-const apiModules = import.meta.glob<{ default: ApiModule }>('./api/*/index.ts', {
-  eager: true,
-})
+const apiModules = import.meta.glob<{ default: ApiModule }>('./api/*/index.ts', { eager: true })
 
 const apiMap = Object.fromEntries(
   Object.entries(apiModules).map(([path, mod]) => {
