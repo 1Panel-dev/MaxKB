@@ -14,12 +14,25 @@ import uuid
 from django.core.files.uploadedfile import InMemoryUploadedFile, TemporaryUploadedFile
 
 
+def strip_nul(obj):
+    if isinstance(obj, str):
+        return obj.replace('\x00', '')  # 注意是 '\x00'，真正的空字符
+    if isinstance(obj, dict):
+        return {k: strip_nul(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [strip_nul(x) for x in obj]
+    return obj
+
+
 class SystemEncoder(json.JSONEncoder):
     def encode(self, obj):
         # 先序列化为字符串
-        json_str = super().encode(obj)
-        # 移除所有空字符
-        json_str = json_str.replace('\\u0000', '')
+        r = obj
+        try:
+            r = strip_nul(obj)
+        except:
+            pass
+        json_str = super().encode(strip_nul(r))
         return json_str
 
     def default(self, obj):

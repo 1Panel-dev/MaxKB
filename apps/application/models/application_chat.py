@@ -112,8 +112,8 @@ class ChatRecord(AppModelMixin):
     ip_address = models.CharField(max_length=128, verbose_name="ip地址", default='')
 
     def save(self, *args, **kwargs):
-        self.problem_text = self.problem_text.replace('\\u0000', '')
-        self.answer_text = self.answer_text.replace('\\u0000', '')
+        self.problem_text = self.problem_text.replace('\x00', '')
+        self.answer_text = self.answer_text.replace('\x00', '')
         return super().save(*args, **kwargs)
 
     def get_human_message(self):
