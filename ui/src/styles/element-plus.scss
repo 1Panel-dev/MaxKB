@@ -331,10 +331,7 @@
   --el-dialog-title-font-size: 16px;
   padding: 0;
   &__header {
-    align-items: center;
-    display: flex;
-    height: 60px;
-    padding: 0 var(--el-dialog-padding-primary);
+    padding: var(--el-dialog-padding-primary);
   }
   &__headerbtn {
     right: 20px;
@@ -370,6 +367,12 @@
   }
   //  专属带侧边栏结构的dialog
   &.mk-aside-content-dialog {
+    .el-dialog__header {
+      align-items: center;
+      display: flex;
+      height: 60px;
+      padding: 0 var(--el-dialog-padding-primary);
+    }
     .el-dialog__body {
       padding: 0;
       border-top: var(--el-border);

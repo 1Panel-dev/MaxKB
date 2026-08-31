@@ -2,10 +2,12 @@
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { Close } from '@element-plus/icons-vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
-import LogoFull from '@/components/mk-logo/LogoFull.vue'
+import { LOGIN_METHOD } from '@/api/enums'
+import type { LoginConfig } from '@/api/types'
 import LogoIcon from '@/components/mk-logo/LogoIcon.vue'
-
 import { getThemeImg } from '@/constants/theme'
+import LoginLayout from '@/views/login/components/LoginLayout.vue'
+import AccountLogin from '@/views/login/modes/AccountLogin.vue'
 
 type ThemeImageValue = File | string
 type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
@@ -17,6 +19,11 @@ type ThemePreviewData = Omit<ThemeInfo, 'icon' | 'loginImage' | 'loginLogo'> & {
 defineOptions({ name: 'ThemeLoginPreview' })
 
 const props = defineProps<{ data: ThemePreviewData }>()
+const previewLoginConfig: LoginConfig = {
+  default_value: LOGIN_METHOD.LOCAL,
+  login_methods: [LOGIN_METHOD.LOCAL, LOGIN_METHOD.LDAP, LOGIN_METHOD.CAS, LOGIN_METHOD.OAUTH2, LOGIN_METHOD.OIDC],
+  max_attempts: 1,
+}
 
 function useImageSource(source: () => ThemeImageValue | undefined, fallback: () => string) {
   const imageSource = ref(fallback())
@@ -41,6 +48,10 @@ function useImageSource(source: () => ThemeImageValue | undefined, fallback: () 
 
 const defaultLoginImage = computed(() => getThemeImg(props.data.theme))
 
+const websiteIcon = useImageSource(
+  () => props.data.icon,
+  () => '',
+)
 const loginLogo = useImageSource(
   () => props.data.loginLogo,
   () => '',
@@ -49,43 +60,40 @@ const loginImage = useImageSource(
   () => props.data.loginImage,
   () => defaultLoginImage.value,
 )
+const previewThemeInfo = computed<ThemeInfo>(() => ({
+  ...props.data,
+  icon: websiteIcon.value,
+  loginImage: loginImage.value,
+  loginLogo: loginLogo.value,
+}))
 </script>
 
 <template>
   <div class="login-preview overflow-hidden rounded-md">
     <div class="browser-bar flex items-end px-2">
-      <div class="browser-tab flex items-center gap-2 rounded-t-md bg-white px-3">
-        <LogoIcon class="h-4" />
-        <span class="min-w-0 flex-1 truncate" :title="data.title || 'MaxKB'">
+      <div class="browser-tab flex items-center gap-2 rounded-t-md bg-white px-2">
+        <img v-if="websiteIcon" :src="websiteIcon" alt="" class="size-4 object-contain" />
+        <LogoIcon v-else class="h-4" />
+        <span class="min-w-0 flex-1 truncate font-semibold text-sm" :title="data.title || 'MaxKB'">
           {{ data.title || 'MaxKB' }}
         </span>
-        <el-icon :size="12"><Close /></el-icon>
+        <MkIcon name="icon_close_outlined" :size="12" />
       </div>
     </div>
 
     <div class="preview-page relative overflow-hidden">
-      <header class="preview-header flex items-center gap-3">
-        <img v-if="loginLogo" :src="loginLogo" alt="MaxKB" class="h-8 max-w-40 object-contain object-left" />
-        <LogoFull v-else class="h-8 max-w-40" />
-        <el-divider v-if="data.slogan" direction="vertical" />
-        <span class="truncate text-N600" :title="data.slogan || ''">{{ data.slogan }}</span>
-      </header>
-
-      <div class="preview-content grid h-full items-center gap-8 px-10 pt-10">
-        <img :src="loginImage" alt="" class="w-full object-contain" />
-        <el-card class="preview-login-card">
-          <h3 class="mb-6">登录</h3>
-          <el-input class="mb-4" placeholder="请输入用户名" size="large" />
-          <el-input class="mb-4" placeholder="请输入密码" size="large" type="password" />
-          <el-button class="w-full" size="large" type="primary">登录</el-button>
-          <el-button class="mt-2 !ml-0" link type="primary">忘记密码？</el-button>
-        </el-card>
+      <div class="preview-scale" inert>
+        <LoginLayout preview :theme-info="previewThemeInfo">
+          <AccountLogin preview :login-config="previewLoginConfig" />
+        </LoginLayout>
       </div>
+      <div class="preview-mask absolute inset-0" aria-hidden="true"></div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+/* browser */
 .browser-bar {
   background: var(--mk-N200);
   height: 36px;
@@ -94,32 +102,22 @@ const loginImage = useImageSource(
 .browser-tab {
   height: 30px;
   max-width: 220px;
-  width: 40%;
 }
 
-.preview-content {
-  grid-template-columns: 13fr 11fr;
-  position: relative;
-  z-index: 1;
-}
-
-.preview-header {
-  left: 24px;
+/* preview */
+.preview-mask {
   position: absolute;
-  right: 24px;
-  top: 16px;
-  z-index: 2;
-}
-
-.preview-login-card {
-  --el-card-padding: 24px;
-  justify-self: end;
-  max-width: 320px;
-  width: 100%;
+  z-index: 20;
 }
 
 .preview-page {
-  background: linear-gradient(180deg, rgb(255 255 255 / 5%) 0%, rgb(var(--mk-primary-rgb) / 5%) 20%, rgb(var(--mk-primary-rgb) / 10%) 100%);
   height: 420px;
+}
+
+.preview-scale {
+  height: 840px;
+  transform: scale(0.5);
+  transform-origin: left top;
+  width: 200%;
 }
 </style>

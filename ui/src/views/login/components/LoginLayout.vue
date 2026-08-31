@@ -1,32 +1,36 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { ThemeInfo } from '@/api/admin/auth/types'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
-import { DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
+import { DEFAULT_THEME_COLOR, DEFAULT_THEME_SETTING, getThemeImg } from '@/constants'
 import { useStore } from '@/stores'
 import DefaultThemeAnimation from './DefaultThemeAnimation.vue'
 
 defineOptions({ name: 'LoginLayout' })
 
-withDefaults(defineProps<{ preview?: boolean }>(), { preview: false })
+const props = withDefaults(defineProps<{ preview?: boolean; themeInfo?: ThemeInfo }>(), { preview: false })
 
 defineSlots<{ default: () => unknown }>()
 
 const { theme } = useStore()
 
-const customLoginImage = computed(() => theme.themeInfo?.loginImage?.trim() ?? '')
-const showDefaultThemeAnimation = computed(() => !customLoginImage.value && theme.isDefaultTheme)
-const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.themeInfo?.theme))
+const layoutThemeInfo = computed(() => props.themeInfo ?? theme.themeInfo)
+const customLoginImage = computed(() => layoutThemeInfo.value?.loginImage?.trim() ?? '')
+const isDefaultTheme = computed(() => !layoutThemeInfo.value?.theme || layoutThemeInfo.value.theme === DEFAULT_THEME_COLOR)
+const showDefaultThemeAnimation = computed(() => !props.preview && !customLoginImage.value && isDefaultTheme.value)
+const loginImage = computed(() => customLoginImage.value || getThemeImg(layoutThemeInfo.value?.theme))
 </script>
 
 <template>
-  <div class="login-layout">
+  <div class="login-layout" :class="{ 'is-preview': preview }">
     <div class="login-background"></div>
 
     <header class="login-header flex-between">
       <div class="flex items-center gap-4">
-        <LogoFull height="38" />
-        <el-divider direction="vertical" v-if="theme.themeInfo?.slogan" />
-        <span class="text-lg">{{ theme.themeInfo?.slogan || DEFAULT_THEME_SETTING.slogan }}</span>
+        <img v-if="layoutThemeInfo?.loginLogo" :src="layoutThemeInfo.loginLogo" alt="MaxKB" class="h-9.5 max-w-50 object-contain object-left" />
+        <LogoFull v-else height="38" />
+        <el-divider v-if="layoutThemeInfo?.slogan" direction="vertical" />
+        <span class="text-lg">{{ layoutThemeInfo?.slogan ?? DEFAULT_THEME_SETTING.slogan }}</span>
       </div>
     </header>
 
@@ -51,6 +55,15 @@ const loginImage = computed(() => customLoginImage.value || getThemeImg(theme.th
   min-height: 100vh;
   overflow: hidden;
   position: relative;
+
+  &.is-preview {
+    height: 100%;
+    min-height: 0;
+
+    .login-main {
+      height: 100%;
+    }
+  }
 }
 
 .login-background {

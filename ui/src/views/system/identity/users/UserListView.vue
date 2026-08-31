@@ -9,6 +9,7 @@ import { datetimeFormat } from '@/utils/time'
 import { LOGIN_METHOD_LABELS } from '@/constants/auth.ts'
 import WorkspaceRelationTags from '@/components/business/workspace-relation-tags/index.vue'
 import UserFromDrawer from './UserFromDrawer.vue'
+import ImportUsersDialog from './dialog/ImportUsersDialog.vue'
 import UserPwdDialog from './dialog/UserPwdDialog.vue'
 import BatchSetUserRoleDialog from './dialog/BatchSetUserRoleDialog.vue'
 
@@ -19,6 +20,13 @@ const userFormDrawerRef = ref<InstanceType<typeof UserFromDrawer>>()
 
 function handleOpenUserFormDrawer(systemUser?: SystemUser) {
   userFormDrawerRef.value?.open(systemUser)
+}
+
+/* 导入用户 */
+const importUsersDialogRef = ref<InstanceType<typeof ImportUsersDialog>>()
+
+function handleOpenImportUsersDialog() {
+  importUsersDialogRef.value?.open()
 }
 
 /* 列表查询相关 */
@@ -138,7 +146,7 @@ onMounted(() => loadSystemUsers())
         <h4>{{ title }}</h4>
         <div class="flex items-center">
           <MkComplexSearch :fields="searchFields" @change="handleSearchChange" />
-          <el-button plain class="ml-3">
+          <el-button plain class="ml-3" @click="handleOpenImportUsersDialog">
             <MkIcon name="icon_import_outlined" />
             <span>导入用户</span>
           </el-button>
@@ -180,14 +188,23 @@ onMounted(() => loadSystemUsers())
 
         <el-table-column v-if="auth.isEE || auth.isPE" prop="role_name" width="180" label="角色">
           <template #default="{ row }">
-            <WorkspaceRelationTags :table-render-params="{ property: '角色', value: '工作空间' }" :tags="row.role_name" :tag-workspace="row.role_workspace" />
+            <WorkspaceRelationTags
+              :table-render-params="{ property: '角色', value: '工作空间' }"
+              :tags="row.role_name"
+              :tag-workspace="row.role_workspace"
+            />
           </template>
         </el-table-column>
 
         <el-table-column prop="user_group_names" width="180" label="用户组">
           <template #default="{ row }">
             <span v-if="!row.user_group_names?.length">-</span>
-            <WorkspaceRelationTags v-else :table-render-params="{ property: '用户组', value: '工作空间' }" :tags="row.user_group_names" :tag-workspace="row.user_group_workspace" />
+            <WorkspaceRelationTags
+              v-else
+              :table-render-params="{ property: '用户组', value: '工作空间' }"
+              :tags="row.user_group_names"
+              :tag-workspace="row.user_group_workspace"
+            />
           </template>
         </el-table-column>
 
@@ -243,6 +260,7 @@ onMounted(() => loadSystemUsers())
     </template>
   </MkViewLayout>
   <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
+  <ImportUsersDialog ref="importUsersDialogRef" />
   <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
   <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
 </template>

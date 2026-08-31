@@ -15,16 +15,24 @@ const isLoading = ref(true)
 const loginConfig = ref<LoginConfig>({ default_value: LOGIN_METHOD.LOCAL, login_methods: [LOGIN_METHOD.LOCAL], max_attempts: 1 })
 const loginMode = ref<'account' | 'qr-code'>('account')
 
-const qrCodeProviders = computed(() => (loginConfig.value.login_methods ?? []).filter((method): method is QrCodeProvider => qrCodeLoginMethods.includes(method as QrCodeProvider)))
-const accountLoginMethods = computed(() => (loginConfig.value.login_methods ?? []).filter((method) => !qrCodeLoginMethods.includes(method as QrCodeProvider)))
+const qrCodeProviders = computed(() =>
+  (loginConfig.value.login_methods ?? []).filter((method): method is QrCodeProvider => qrCodeLoginMethods.includes(method as QrCodeProvider)),
+)
+const accountLoginMethods = computed(() =>
+  (loginConfig.value.login_methods ?? []).filter((method) => !qrCodeLoginMethods.includes(method as QrCodeProvider)),
+)
 const accountLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
-  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider) ? LOGIN_METHOD.LOCAL : loginConfig.value.default_value,
+  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
+    ? LOGIN_METHOD.LOCAL
+    : loginConfig.value.default_value,
   login_methods: accountLoginMethods.value,
 }))
 const qrCodeLoginConfig = computed<LoginConfig>(() => ({
   ...loginConfig.value,
-  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider) ? loginConfig.value.default_value : LOGIN_METHOD.WECOM,
+  default_value: qrCodeLoginMethods.includes(loginConfig.value.default_value as QrCodeProvider)
+    ? loginConfig.value.default_value
+    : LOGIN_METHOD.WECOM,
   login_methods: qrCodeProviders.value,
 }))
 const showLoginModeSwitch = computed(() => accountLoginMethods.value.length > 0 && qrCodeProviders.value.length > 0)

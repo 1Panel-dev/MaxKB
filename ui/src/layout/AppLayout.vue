@@ -7,16 +7,19 @@ import LayoutSidebar from './LayoutSidebar.vue'
 
 const route = useRoute()
 
+withDefaults(defineProps<{ preview?: boolean }>(), { preview: false })
+
 const mode = computed<LayoutMode>(() => route.meta.scope ?? 'workspace')
 </script>
 
 <template>
-  <div class="mk-layout h-screen overflow-hidden">
-    <LayoutHeader :mode="mode"> </LayoutHeader>
+  <div class="mk-layout overflow-hidden" :class="preview ? 'h-full' : 'h-screen'">
+    <LayoutHeader :mode="preview ? 'workspace' : mode" :preview="preview" />
     <div class="flex">
-      <LayoutSidebar :mode="mode" />
+      <aside v-if="preview" class="h-layout-content w-sidebar"></aside>
+      <LayoutSidebar v-else :mode="mode" />
       <main class="mk-layout__main h-layout-content w-full overflow-hidden rounded-tl-xl bg-white transition-[margin] duration-200">
-        <RouterView />
+        <RouterView v-if="!preview" />
       </main>
     </div>
   </div>

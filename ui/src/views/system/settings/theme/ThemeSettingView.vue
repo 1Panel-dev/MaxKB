@@ -194,7 +194,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
         <div class="flex-between">
           <h6>平台登录设置</h6>
 
-          <el-button text type="primary" class="-mt-1 -mr-1" @click="handleRestoreLoginDefaults">恢复默认</el-button>
+          <el-button text type="primary" class="-mr-1" @click="handleRestoreLoginDefaults">恢复默认</el-button>
         </div>
 
         <div class="theme-setting-grid grid gap-6">
@@ -216,10 +216,10 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
                   </el-button>
                 </el-upload>
               </div>
-              <p class="text-N600">{{ imageSetting.description }}</p>
+              <p class="text-sm text-N500">{{ imageSetting.description }}</p>
             </el-card>
             <el-form ref="themeFormRef" :model="themeSetting" :rules="formRules" label-position="top" require-asterisk-position="right">
-              <el-form-item label="网站名称" prop="title">
+              <el-form-item class="mb-2!" label="网站名称" prop="title">
                 <el-input v-model="themeSetting.title" maxlength="128" placeholder="请输入网站名称" show-word-limit />
               </el-form-item>
               <el-form-item label="欢迎语" prop="slogan">
@@ -227,13 +227,13 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
               </el-form-item>
             </el-form>
           </div>
-          <span>预览页默认为 MaxKB 登录界面，支持自定义设置</span>
+          <span class="text-N500">预览页默认为 MaxKB 登录界面，支持自定义设置</span>
         </div>
 
         <el-divider class="mb-4!" />
         <div class="flex-between">
           <h6>平台设置</h6>
-          <el-button text type="primary" class="-mt-1 -mr-1" @click="handleRestorePlatformDefaults">恢复默认</el-button>
+          <el-button text type="primary" class="-mr-1" @click="handleRestorePlatformDefaults">恢复默认</el-button>
         </div>
 
         <div class="theme-setting-grid grid gap-6">
@@ -273,7 +273,7 @@ onBeforeUnmount(() => theme.setTheme(toThemeInfo(savedThemeSetting.value)))
               />
             </div>
           </div>
-          <span>预览页默认为 MaxKB 平台界面，支持自定义设置</span>
+          <span class="text-N500">预览页默认为 MaxKB 平台界面，支持自定义设置</span>
         </div>
       </div>
 

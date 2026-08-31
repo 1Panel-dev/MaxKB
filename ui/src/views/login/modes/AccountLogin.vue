@@ -19,7 +19,7 @@ interface AccountLoginForm {
 
 defineOptions({ name: 'AccountLogin' })
 
-const props = defineProps<{ loginConfig?: LoginConfig }>()
+const props = withDefaults(defineProps<{ loginConfig?: LoginConfig; preview?: boolean }>(), { preview: false })
 
 const route = useRoute()
 const router = useRouter()
@@ -50,6 +50,7 @@ const accountLoginRules = reactive<FormRules<AccountLoginForm>>({
 })
 
 const handleLogin = async () => {
+  if (props.preview) return
   if (!accountLoginFormRef.value) return
 
   await accountLoginFormRef.value.validate((valid) => {
@@ -88,6 +89,7 @@ const handleLogin = async () => {
 }
 
 const refreshCaptcha = () => {
+  if (props.preview) return
   if (loginMethod.value === LOGIN_METHOD.LDAP) return
   LoginApi.getCaptcha(accountLoginForm.username).then((res) => {
     identifyCode.value = res.captcha
@@ -95,6 +97,7 @@ const refreshCaptcha = () => {
 }
 
 const selectLoginMethod = (method: LoginMethod) => {
+  if (props.preview) return
   if (method !== LOGIN_METHOD.LOCAL && method !== LOGIN_METHOD.LDAP) {
     void redirectExternalLogin(method, true)
     return
@@ -149,6 +152,7 @@ const getExternalLoginUrl = (authType: LoginMethod): Promise<string> => {
 }
 
 onMounted(() => {
+  if (props.preview) return
   const loginMethods = accountLoginMethods.value
   if (route.query.login_mode !== 'manual') {
     const loginMethod = loginMethods[0]
@@ -160,22 +164,45 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-full flex-col">
+  <div class="account-login flex h-full flex-col" :class="{ 'is-preview': preview }">
     <div class="min-h-0 flex-1">
       <h2 class="mb-4">
         {{ loginMethod === LOGIN_METHOD.LDAP ? 'LDAP 登录' : LOGIN_METHOD_LABELS[loginMethod] }}
       </h2>
 
-      <el-form ref="accountLoginFormRef" :model="accountLoginForm" :rules="accountLoginRules" class="login-form" @submit.prevent="handleLogin" size="large">
+      <el-form
+        ref="accountLoginFormRef"
+        :model="accountLoginForm"
+        :rules="accountLoginRules"
+        :autocomplete="preview ? 'off' : undefined"
+        class="login-form"
+        size="large"
+        @submit.prevent="handleLogin"
+      >
         <el-form-item prop="username">
-          <el-input v-model="accountLoginForm.username" placeholder="请输入用户名" @blur="refreshCaptcha" />
+          <el-input
+            v-model="accountLoginForm.username"
+            :autocomplete="preview ? 'off' : 'username'"
+            :disabled="preview"
+            :readonly="preview"
+            placeholder="请输入用户名"
+            @blur="refreshCaptcha"
+          />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="accountLoginForm.password" placeholder="请输入密码" show-password type="password" />
+          <el-input
+            v-model="accountLoginForm.password"
+            :autocomplete="preview ? 'new-password' : 'current-password'"
+            :disabled="preview"
+            :readonly="preview"
+            placeholder="请输入密码"
+            show-password
+            type="password"
+          />
         </el-form-item>
         <div v-if="loginMethod !== LOGIN_METHOD.LDAP && identifyCode" class="flex gap-2">
           <el-form-item prop="captcha" class="flex-1">
-            <el-input v-model="accountLoginForm.captcha" autocomplete="off" placeholder="请输入验证码" />
+            <el-input v-model="accountLoginForm.captcha" autocomplete="off" :disabled="preview" placeholder="请输入验证码" :readonly="preview" />
           </el-form-item>
           <img :src="identifyCode" alt="验证码" class="w-35 h-10 cursor-pointer border" @click="refreshCaptcha" />
         </div>
@@ -199,4 +226,10 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.account-login.is-preview :deep(.el-input.is-disabled) {
+  .el-input__wrapper {
+    background-color: var(--el-fill-color-blank);
+  }
+}
+</style>
