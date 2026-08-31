@@ -11,6 +11,7 @@ from django.db import models
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
 
+from common.encoder.encoder import SystemEncoder
 from common.mixins.app_model_mixin import AppModelMixin
 from knowledge.models import Knowledge
 from models_provider.models import Model
@@ -75,7 +76,7 @@ class Application(AppModelMixin):
     stt_model_params_setting = models.JSONField(verbose_name="STT模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
-    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict, encoder=SystemEncoder)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
     problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
@@ -160,7 +161,7 @@ class ApplicationVersion(AppModelMixin):
     stt_model_params_setting = models.JSONField(verbose_name="STT模型参数相关设置", default=dict)
     problem_optimization = models.BooleanField(verbose_name="问题优化", default=False)
     icon = models.CharField(max_length=256, verbose_name="应用icon", default="./favicon.ico")
-    work_flow = models.JSONField(verbose_name="工作流数据", default=dict)
+    work_flow = models.JSONField(verbose_name="工作流数据", default=dict, encoder=SystemEncoder)
     type = models.CharField(verbose_name="应用类型", choices=ApplicationTypeChoices.choices,
                             default=ApplicationTypeChoices.SIMPLE, max_length=256)
     problem_optimization_prompt = models.CharField(verbose_name="问题优化提示词", max_length=102400, blank=True,
