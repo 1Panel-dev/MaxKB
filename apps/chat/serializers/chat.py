@@ -297,7 +297,8 @@ class ChatSerializers(serializers.Serializer):
 
     def is_valid_chat_id(self, chat_info: ChatInfo):
         if self.data.get('application_id') is not None and self.data.get('application_id') != str(
-                chat_info.application_id):
+                chat_info.application_id) and self.data.get('chat_user_id') is not None and self.data.get(
+            'chat_user_id') != str(chat_info.chat_user_id):
             raise ChatException(500, _("Conversation does not exist"))
 
     def is_valid_intraday_access_num(self):
