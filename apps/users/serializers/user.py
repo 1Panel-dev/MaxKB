@@ -1154,9 +1154,10 @@ class SendEmailSerializer(serializers.Serializer):
         code_cache_key = self.data.get('email') + ":" + self.data.get("type")
         code_cache_key_lock = code_cache_key + "_lock"
         ttl = cache.ttl(code_cache_key_lock, version=version)
-        if ttl is not None and ttl > 0:
+        seconds = ttl.total_seconds() if isinstance(ttl, datetime.timedelta) else ttl
+        if seconds is not None and seconds > 0:
             raise AppApiException(500, _("Do not send emails again within {seconds} seconds").format(
-                seconds=int(ttl.total_seconds())))
+                seconds=int(seconds)))
         # 若邮箱处于验证码锁定冷却期，拒绝继续发送，避免验证码邮件轰炸
         lock_cache_key = code_cache_key + "_locked"
         if cache.get(get_key(lock_cache_key), version=version):
