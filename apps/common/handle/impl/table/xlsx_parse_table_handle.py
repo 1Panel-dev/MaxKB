@@ -6,7 +6,7 @@ import traceback
 from openpyxl import load_workbook
 
 from common.handle.base_parse_table_handle import BaseParseTableHandle
-from common.handle.impl.common_handle import xlsx_embed_cells_images
+from common.handle.impl.common_handle import xlsx_embed_cells_images, validate_xlsx_buffer
 from common.handle.impl.xlsx_utils import iter_sheet_content_rows
 from common.utils.logger import maxkb_logger
 
@@ -61,6 +61,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
     def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
+            validate_xlsx_buffer(io.BytesIO(buffer))
             wb = load_workbook(io.BytesIO(buffer))
             try:
                 image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
