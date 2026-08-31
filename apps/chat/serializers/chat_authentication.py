@@ -14,7 +14,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, ChatUserType, Application, ApplicationVersion
-from application.serializers.application import ApplicationSerializerModel
 from common.auth.common import ChatUserToken, ChatAuthentication, FileToken
 from common.constants.authentication_type import AuthenticationType
 from common.constants.cache_version import Cache_Version
@@ -162,19 +161,28 @@ class ApplicationProfileSerializer(serializers.Serializer):
                                             'chat_background': application_setting.chat_background}
         base_node = [node for node in ((application.work_flow or {}).get('nodes', []) or []) if
                      node.get('id') == 'base-node']
-        return {**ApplicationSerializerModel(application).data,
-                'stt_model_id': application.stt_model_id,
-                'tts_model_id': application.tts_model_id,
-                'stt_model_enable': application.stt_model_enable,
-                'tts_model_enable': application.tts_model_enable,
-                'tts_type': application.tts_type,
-                'tts_autoplay': application.tts_autoplay,
-                'stt_autosend': application.stt_autosend,
-                'file_upload_enable': application.file_upload_enable,
-                'file_upload_setting': application.file_upload_setting,
-                'work_flow': {'nodes': base_node} if base_node else None,
-                'show_source': application_access_token.show_source,
-                'show_exec': application_access_token.show_exec,
-                'show_share': True,
-                'language': application_access_token.language,
-                **application_setting_dict}
+        return {
+            'id': application.id,
+            'name': application.name,
+            'desc': application.desc,
+            'prologue': application.prologue,
+            'icon': application.icon,
+            'type': application.type,
+            'dialogue_number': application.dialogue_number,
+            'problem_optimization': application.problem_optimization,
+            'stt_model_id': application.stt_model_id,
+            'tts_model_id': application.tts_model_id,
+            'stt_model_enable': application.stt_model_enable,
+            'tts_model_enable': application.tts_model_enable,
+            'tts_type': application.tts_type,
+            'tts_autoplay': application.tts_autoplay,
+            'stt_autosend': application.stt_autosend,
+            'file_upload_enable': application.file_upload_enable,
+            'file_upload_setting': application.file_upload_setting,
+            'work_flow': {'nodes': base_node} if base_node else None,
+            'show_source': application_access_token.show_source,
+            'show_exec': application_access_token.show_exec,
+            'show_share': True,
+            'language': application_access_token.language,
+            **application_setting_dict,
+        }
