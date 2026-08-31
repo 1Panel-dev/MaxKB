@@ -73,8 +73,8 @@ provide(
   (file: any, onProgress?: (percent: number, event: any) => void, loading?: Ref<boolean>) => {
     return applicationApi.postUploadFileProgress(
       file,
-      id as string,
-      'KNOWLEDGE',
+      'TEMPORARY_120_MINUTE',
+      'TEMPORARY_120_MINUTE',
       onProgress,
       loading,
     )
