@@ -71,6 +71,7 @@
           :multiple="cond._treeMultiple"
           :render-after-expand="false"
           clearable
+          filterable
           :placeholder="$t('workflow.nodes.conditionNode.valueMessage')"
         />
 
