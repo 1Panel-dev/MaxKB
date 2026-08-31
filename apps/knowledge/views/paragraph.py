@@ -4,8 +4,9 @@ from rest_framework.views import APIView
 from rest_framework.views import Request
 
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
+from common.auth.authentication import has_permissions, get_is_permissions
 from common.constants.permission_constants import PermissionConstants, RoleConstants, ViewPermission, CompareConstants
+from common.exception.app_exception import AppUnauthorizedFailed
 from common.log.log import log
 from common.result import result
 from common.utils.common import query_params_to_single_dict
@@ -125,6 +126,15 @@ class ParagraphView(APIView):
         )
         def put(self, request: Request, workspace_id: str, knowledge_id: str, document_id: str,
                 target_knowledge_id: str, target_document_id):
+            is_permissions = get_is_permissions(request, workspace_id=workspace_id, knowledge_id=target_knowledge_id)
+            if not is_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_knowledge_permission(),
+                                  PermissionConstants.KNOWLEDGE_DOCUMENT_EDIT.get_workspace_permission_workspace_manage_role(),
+                                  RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                                  ViewPermission([RoleConstants.USER.get_workspace_role()],
+                                                 [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                                                 CompareConstants.AND),
+                                  ):
+                raise AppUnauthorizedFailed(403, _('No permission to access'))
             return result.success(
                 ParagraphSerializers.Migrate(data={
                     'workspace_id': workspace_id,

@@ -1,6 +1,8 @@
 from common.auth import TokenAuth
-from common.auth.authentication import has_permissions
-from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission
+from common.auth.authentication import has_permissions, get_is_permissions
+from common.constants.permission_constants import CompareConstants, PermissionConstants, RoleConstants, ViewPermission, \
+    Permission
+from common.exception.app_exception import AppUnauthorizedFailed
 from common.log.log import log
 from common.result import result
 from django.utils.translation import gettext_lazy as _
@@ -243,9 +245,9 @@ class DocumentView(APIView):
             split_data = {"file": request.FILES.getlist("file")}
             request_data = request.data
             if (
-                "patterns" in request.data
-                and request.data.get("patterns") is not None
-                and len(request.data.get("patterns")) > 0
+                    "patterns" in request.data
+                    and request.data.get("patterns") is not None
+                    and len(request.data.get("patterns")) > 0
             ):
                 split_data.__setitem__("patterns", request_data.getlist("patterns"))
             if "limit" in request.data:
@@ -1175,6 +1177,17 @@ class DocumentView(APIView):
             ),
         )
         def put(self, request: Request, workspace_id, knowledge_id: str, target_knowledge_id: str):
+            is_permissions = get_is_permissions(request, workspace_id=workspace_id, knowledge_id=target_knowledge_id)
+            if not is_permissions(PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_knowledge_permission(),
+                                  PermissionConstants.KNOWLEDGE_DOCUMENT_CREATE.get_workspace_permission_workspace_manage_role(),
+                                  RoleConstants.WORKSPACE_MANAGE.get_workspace_role(),
+                                  ViewPermission(
+                                      [RoleConstants.USER.get_workspace_role()],
+                                      [PermissionConstants.KNOWLEDGE.get_workspace_knowledge_permission()],
+                                      CompareConstants.AND,
+                                  )):
+                raise AppUnauthorizedFailed(403, _('No permission to access'))
+
             return result.success(
                 DocumentSerializers.Migrate(
                     data={
