@@ -15,6 +15,7 @@
           node-key="id"
           lazy
           :load="loadTree"
+          filterable
           :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
         >
           <template #default="{ data }">
@@ -55,10 +56,11 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
+
 const route = useRoute()
 const {
   params: { id }, // id为knowledgeID
@@ -106,10 +108,10 @@ const loadTree = async (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
   const folder_id = node.level === 0 ? user.getWorkspaceId() : node.data.id
   const obj =
-   apiType.value === 'systemManage'
+    apiType.value === 'systemManage'
       ? {
           workspace_id: props.workspaceId,
-          folder_id:  node.level === 0 ? props.workspaceId : node.data.id,
+          folder_id: node.level === 0 ? props.workspaceId : node.data.id,
         }
       : {
           folder_id: folder_id,
