@@ -15,7 +15,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     api_key: str
     api_base: str
     model_name: str
-    params: dict
+    params: dict = {}
     max_retries: int = 3
     retry_delay: int = 10  # 秒
 
@@ -37,8 +37,6 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         self.params = kwargs.get("params", {}) or {}
         self.max_retries = kwargs.get("max_retries", 3)
         self.retry_delay = kwargs.get("retry_delay", 10)
-        # 显式参数可覆盖自动探测（params.api_version: 'v1' / 'v2'）
-        self.api_version = self.params.get("api_version", "auto")
         self._session = self._build_session()
 
     @staticmethod
@@ -73,13 +71,7 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
     # ---------- API 版本探测 / URL 构建 ----------
 
     def _detect_api_version(self) -> str:
-        """探测当前使用 V1 还是 V2 (MiniMax-H3)。"""
-        if self.api_version in ("v1", "v2"):
-            return self.api_version
-        # 模型名包含 H3 -> V2
-        if self.model_name and "H3" in self.model_name.upper():
-            return "v2"
-        # api_base 路径包含 /v2 -> V2
+        """根据 api_base 路径判断当前使用 V1 还是 V2 (MiniMax-H3)。"""
         base_path = self.api_base.split("://", 1)[-1] if "://" in self.api_base else self.api_base
         if "/v2" in base_path:
             return "v2"
@@ -228,8 +220,8 @@ class GenerationVideoModel(MaxKBBaseModel, BaseGenerationVideo):
         elif first_frame_url:
             payload["first_frame_image"] = first_frame_url
 
-        # 合并额外参数（duration, resolution 等），跳过版本探测专用字段
-        payload.update({k: v for k, v in self.params.items() if k != "api_version"})
+        # 合并额外参数（duration, resolution 等）
+        payload.update(self.params)
 
         maxkb_logger.info(f"提交视频生成任务(V1)，模型: {self.model_name}")
         response_data = self._request("POST", base_url, json=payload)

@@ -67,6 +67,12 @@ class IModelProvider(ABC):
                 api_base = model_credential.api_base
                 if hasattr(api_base, "default_value") and not api_base.default_value:
                     api_base.default_value = "https://dashscope.aliyuncs.com/api/v1"
+        # MiniMax H3 视频模型固定走 v2 API
+        if model_type in ("TTV", "ITV") and model_name.upper().startswith(("MiniMax-H3")):
+            if hasattr(model_credential, "api_base"):
+                api_base = model_credential.api_base
+                if hasattr(api_base, "default_value"):
+                    api_base.default_value = "https://api.minimaxi.com/v2"
         return model_credential
 
     def get_model_params(self, model_type, model_name):
