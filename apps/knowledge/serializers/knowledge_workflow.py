@@ -265,6 +265,18 @@ class KnowledgeWorkflowActionSerializer(serializers.Serializer):
             ),
         )
         work_flow_manage.run()
+        # 需要把文件改成永久文件
+        data_source = instance.get("data_source") or {}
+        file_ids = [item.get("file_id") for item in data_source.get("file_list") or [] if item.get("file_id")]
+        knowledge_id = str(self.data.get("knowledge_id"))
+        file_list = list(QuerySet(File).filter(id__in=file_ids))
+        for file in file_list:
+            meta = dict(file.meta or {})
+            meta.update(debug=False, knowledge_id=knowledge_id)
+            file.source_type = FileSourceType.KNOWLEDGE.value
+            file.source_id = knowledge_id
+            file.meta = meta
+        QuerySet(File).bulk_update(file_list, ["source_type", "source_id", "meta"])
         return {
             "id": knowledge_action_id,
             "knowledge_id": self.data.get("knowledge_id"),
