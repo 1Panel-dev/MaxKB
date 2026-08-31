@@ -110,13 +110,23 @@ class ProblemSerializers(serializers.Serializer):
                 BatchAssociation(data=instance).is_valid(knowledge_id=self.data.get('knowledge_id'),
                                                          raise_exception=True)
             knowledge_id = self.data.get('knowledge_id')
-            paragraph_list = instance.get('paragraph_list')
-            problem_id_list = instance.get('problem_id_list')
-            problem_list = QuerySet(Problem).filter(id__in=problem_id_list)
+            paragraph_list = instance.get('paragraph_list') or []
+            problem_id_list = instance.get('problem_id_list') or []
+            paragraph_id_list = [p.get('paragraph_id') for p in paragraph_list]
+
+            # 校验目标段落都属于当前知识库, 防止跨知识库关联并回读他人内容
+            if QuerySet(Paragraph).filter(
+                    id__in=paragraph_id_list, knowledge_id=knowledge_id
+            ).count() != len(set(paragraph_id_list)):
+                raise AppApiException(500, _('Paragraph does not exist'))
+            # 仅允许关联当前知识库下的问题
+            problem_list = QuerySet(Problem).filter(id__in=problem_id_list, knowledge_id=knowledge_id)
+            if problem_list.count() != len(set(problem_id_list)):
+                raise AppApiException(500, _('Problem does not exist'))
 
             exits_problem_paragraph_mapping = QuerySet(
                 ProblemParagraphMapping
-            ).filter(problem_id__in=problem_id_list, paragraph_id__in=[p.get('paragraph_id') for p in paragraph_list])
+            ).filter(problem_id__in=problem_id_list, paragraph_id__in=paragraph_id_list)
 
             problem_paragraph_mapping_list = [
                 (problem_paragraph_mapping, problem) for problem_paragraph_mapping, problem in
@@ -177,7 +187,9 @@ class ProblemSerializers(serializers.Serializer):
             if problem_paragraph_mapping is None or len(problem_paragraph_mapping) == 0:
                 return []
             return native_search(
-                QuerySet(Paragraph).filter(id__in=[row.paragraph_id for row in problem_paragraph_mapping]),
+                QuerySet(Paragraph).filter(
+                    knowledge_id=self.data.get("knowledge_id"),
+                    id__in=[row.paragraph_id for row in problem_paragraph_mapping]),
                 select_string=get_file_content(
                     os.path.join(PROJECT_DIR, "apps", "knowledge", 'sql', 'list_paragraph.sql')))
 
