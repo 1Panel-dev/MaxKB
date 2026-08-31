@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { cloneDeep } from 'lodash'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
+import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import type { ApplicationDetail } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
@@ -12,10 +12,14 @@ import WorkflowCanvas from '@/workflow-canvas/index.vue'
 import { defaultNodes, nodeDict } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
 import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
+import Conversation from '@/components/conversation/index.vue'
 
 defineOptions({ name: 'ApplicationWorkflowView' })
 
-const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = { nodes: cloneDeep(defaultNodes), edges: [] }
+const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
+  nodes: structuredClone(defaultNodes),
+  edges: [],
+}
 
 const route = useRoute()
 const router = useRouter()
@@ -29,7 +33,11 @@ function toShapeItem(nodeType: WorkflowNodeType): ShapeItem | undefined {
   const node = nodeDict[nodeType]
   if (!node) return
 
-  return { type: node.type, properties: node.properties, text: node.text }
+  return {
+    type: node.type,
+    properties: node.properties,
+    text: node.text,
+  }
 }
 
 function handleAddNode(nodeType: WorkflowNodeType) {
@@ -45,12 +53,32 @@ const saving = ref(false)
 const savedWorkflow = ref<LogicFlow.GraphData>()
 const saveTime = ref<Date | string>()
 
+/* 调试对话 */
+const debugVisible = ref(false)
+const debugExpanded = ref(false)
+
+function closeDebug() {
+  debugVisible.value = false
+  debugExpanded.value = false
+}
+
+function handleDebug() {
+  // 未保存的画布改动先落库，保证调试对话命中最新的工作流。
+  if (hasUnsavedChanges()) {
+    saveApplication(undefined, false).then(() => {
+      debugVisible.value = true
+    })
+    return
+  }
+  debugVisible.value = true
+}
+
 function getGraphData() {
   return workflowRef.value?.getGraphData()
 }
 
 function setSavedWorkflow(graphData: LogicFlow.GraphData) {
-  savedWorkflow.value = cloneDeep(graphData)
+  savedWorkflow.value = structuredClone(graphData)
 }
 
 function hasUnsavedChanges() {
@@ -89,7 +117,7 @@ function loadApplicationDetail() {
       saveTime.value = application.update_time
 
       const workflow = application.work_flow?.nodes?.length ? application.work_flow : DEFAULT_WORKFLOW
-      workflowRef.value?.render(cloneDeep(workflow))
+      workflowRef.value?.render(structuredClone(workflow))
 
       return nextTick().then(() => {
         const graphData = getGraphData()
@@ -239,7 +267,8 @@ onMounted(() => {
 
       <div class="flex shrink-0 items-center gap-3">
         <WorkflowComponentMenu @select="handleAddNode" />
-        <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+        <el-button :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+        <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
         <!-- <el-button
           v-if="canPublish"
           type="primary"
@@ -273,5 +302,100 @@ onMounted(() => {
     </header>
     <!-- 主画布 -->
     <WorkflowCanvas ref="workflowRef" class="min-h-0 flex-1" />
+
+    <!-- 调试对话：右侧悬浮面板 -->
+    <transition name="debug-panel">
+      <div v-if="debugVisible" class="workflow-debug-panel" :class="{ expanded: debugExpanded }">
+        <div class="debug-panel-actions">
+          <button type="button" class="debug-panel-btn" :aria-label="debugExpanded ? '还原' : '放大'" @click="debugExpanded = !debugExpanded">
+            <MkIcon :icon="debugExpanded ? Aim : FullScreen" :size="16" />
+          </button>
+          <button type="button" class="debug-panel-btn" aria-label="关闭调试" @click="closeDebug">
+            <MkIcon :icon="Close" :size="16" />
+          </button>
+        </div>
+        <Conversation :defaultOpen='false' type="DEBUG" class="h-full" />
+      </div>
+    </transition>
   </main>
 </template>
+
+<style scoped>
+.workflow-debug-panel {
+  position: absolute;
+  top: calc(var(--mk-header-height) + 12px);
+  right: 12px;
+  bottom: 12px;
+  width: 460px;
+  max-width: calc(100vw - 24px);
+  z-index: 20;
+  background: var(--mk-N0, #fff);
+  border: 1px solid var(--mk-N200, #dcdfe6);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition:
+    width 0.25s ease,
+    top 0.25s ease,
+    right 0.25s ease,
+    bottom 0.25s ease,
+    border-radius 0.25s ease;
+}
+
+/* 放大：宽度占视口 50%，高度 100% */
+.workflow-debug-panel.expanded {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50vw;
+  max-width: 100vw;
+  border-radius: 0;
+}
+
+/* 面板内的对话框自带移动端样式：小屏下会把输入框 fixed 到整个视口。
+   这里把它约束回面板内部，避免输入框脱离面板铺满视口。 */
+.workflow-debug-panel :deep(.panel-input) {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+}
+
+.debug-panel-actions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.debug-panel-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--mk-N600, #606266);
+  cursor: pointer;
+}
+.debug-panel-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.debug-panel-enter-active,
+.debug-panel-leave-active {
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+}
+.debug-panel-enter-from,
+.debug-panel-leave-to {
+  transform: translateX(16px);
+  opacity: 0;
+}
+</style>

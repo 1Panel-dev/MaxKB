@@ -166,11 +166,32 @@ def get_post_handler(chat_info: ChatInfo):
 
 class DebugChatSerializers(serializers.Serializer):
     chat_id = serializers.UUIDField(required=True, label=_("Conversation ID"))
+    # 以下字段用于「缓存缺失时按前端提供的 chat_id 现开会话」（open-if-missing）
+    workspace_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Workspace ID"))
+    application_id = serializers.UUIDField(required=False, allow_null=True, label=_("Application ID"))
+    chat_user_id = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Client id"))
+    chat_user_type = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("Client Type"))
+    ip_address = serializers.CharField(required=False, allow_null=True, allow_blank=True, label=_("IP Address"))
+    source = serializers.JSONField(required=False, allow_null=True, label=_("Source"))
 
     def chat(self, instance: dict, base_to_response: BaseToResponse = SystemToResponse()):
         self.is_valid(raise_exception=True)
         chat_id = self.data.get("chat_id")
         chat_info: ChatInfo = ChatInfo.get_cache(chat_id)
+        if chat_info is None:
+            # 前端本地生成的 chat_id 首次发消息时，缓存里还没有会话，按该 id 现开一个 debug 会话。
+            OpenChatSerializers(
+                data={
+                    "workspace_id": self.data.get("workspace_id"),
+                    "application_id": self.data.get("application_id"),
+                    "chat_user_id": self.data.get("chat_user_id"),
+                    "chat_user_type": self.data.get("chat_user_type"),
+                    "ip_address": self.data.get("ip_address"),
+                    "source": self.data.get("source"),
+                    "debug": True,
+                }
+            ).open(chat_id=str(chat_id))
+            chat_info = ChatInfo.get_cache(chat_id)
         application = QuerySet(Application).filter(id=chat_info.application_id).first()
         chat_info.application = application
         return ChatSerializers(
@@ -1006,7 +1027,7 @@ class OpenChatSerializers(serializers.Serializer):
         if not query_set.exists():
             raise AppApiException(500, gettext("Application does not exist"))
 
-    def open(self):
+    def open(self, chat_id=None):
         self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
         application = QuerySet(Application).get(id=application_id)
@@ -1018,11 +1039,11 @@ class OpenChatSerializers(serializers.Serializer):
             if application_version is None:
                 raise AppApiException(500, _("The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE:
-            return self.open_simple(application)
+            return self.open_simple(application, chat_id)
         else:
-            return self.open_work_flow(application)
+            return self.open_work_flow(application, chat_id)
 
-    def open_work_flow(self, application):
+    def open_work_flow(self, application, chat_id=None):
         self.is_valid(raise_exception=True)
         application_id = self.data.get("application_id")
         chat_user_id = self.data.get("chat_user_id")
@@ -1030,13 +1051,13 @@ class OpenChatSerializers(serializers.Serializer):
         ip_address = self.data.get("ip_address")
         source = self.data.get("source")
         debug = self.data.get("debug")
-        chat_id = str(uuid.uuid7())
+        chat_id = chat_id or str(uuid.uuid7())
         chat_info = ChatInfo(chat_id, chat_user_id, chat_user_type, ip_address, source, [], [], application_id, debug)
         chat_info.save_chat()
         chat_info.set_cache()
         return chat_id
 
-    def open_simple(self, application):
+    def open_simple(self, application, chat_id=None):
         application_id = self.data.get("application_id")
         chat_user_id = self.data.get("chat_user_id")
         chat_user_type = self.data.get("chat_user_type")
@@ -1056,7 +1077,7 @@ class OpenChatSerializers(serializers.Serializer):
             )
             knowledge_id_list = application_version.knowledge_ids
 
-        chat_id = str(uuid.uuid7())
+        chat_id = chat_id or str(uuid.uuid7())
         chat_info = ChatInfo(
             chat_id,
             chat_user_id,

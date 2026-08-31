@@ -183,7 +183,6 @@ class WorkflowManage:
         工作流输出结束的时候调用
         @return: None
         """
-        self.details = self.get_details()
         self.call_back.on_complete(self, error)
 
     def get_parameters(self):
@@ -193,7 +192,7 @@ class WorkflowManage:
         """
         return self.parameters
 
-    def get_details(self, position: Position = None, old_details=None):
+    def get_details(self, position: Dict = None, old_details=None):
         """
         获取所有节点的运行详情
         @param position: 位置信息，用于表单节点等需要断点续跑的场景
@@ -205,10 +204,10 @@ class WorkflowManage:
         if old_details and position:
             for index, value in enumerate(old_details):
                 details_result.append(value)
-                if position.id == value.get("node_id"):
+                if position.get("id") == value.get("node_id"):
                     position_index = index
         for index, node in enumerate(self.nodes):
-            if node.node.id == position.id and index == 0:
+            if position is not None and node.node.id == position.get("id") and index == 0:
                 details = node.get_details(
                     index + position_index, position=position, old_details=old_details[position_index]
                 )

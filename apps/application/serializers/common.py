@@ -400,61 +400,60 @@ class ChatInfo:
                 break
         if is_save:
             self.chat_record_list.append(chat_record)
-        if not self.debug:
-            if not QuerySet(Chat).filter(id=self.chat_id).exists():
-                Chat(
-                    id=self.chat_id,
-                    application_id=self.application_id,
-                    abstract=chat_record.problem_text[0:1024],
-                    chat_user_id=self.chat_user_id,
-                    chat_user_type=self.chat_user_type,
-                    ip_address=self.ip_address,
-                    source=self.source,
-                    asker=self.get_chat_user(),
-                ).save()
-            else:
-                QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
-            # 记录Token消耗
-            total_tokens = (chat_record.message_tokens or 0) + (chat_record.answer_tokens or 0)
-            if total_tokens > 0:
-                ChatUserTokenQuota.consume(self.chat_user_id, total_tokens)
-            # 插入会话记录
-            QuerySet(ChatRecord).update_or_create(
-                id=chat_record.id,
-                create_defaults={
-                    "id": chat_record.id,
-                    "chat_id": chat_record.chat_id,
-                    "vote_status": chat_record.vote_status,
-                    "problem_text": chat_record.problem_text,
-                    "answer_text": chat_record.answer_text,
-                    "answer_text_list": chat_record.answer_text_list,
-                    "message_tokens": chat_record.message_tokens,
-                    "answer_tokens": chat_record.answer_tokens,
-                    "const": chat_record.const,
-                    "details": chat_record.details,
-                    "improve_paragraph_id_list": chat_record.improve_paragraph_id_list,
-                    "run_time": chat_record.run_time,
-                    "source": chat_record.source,
-                    "ip_address": chat_record.ip_address or "",
-                    "index": chat_record.index,
-                },
-                defaults={
-                    "vote_status": chat_record.vote_status,
-                    "problem_text": chat_record.problem_text,
-                    "answer_text": chat_record.answer_text,
-                    "answer_text_list": chat_record.answer_text_list,
-                    "message_tokens": chat_record.message_tokens,
-                    "answer_tokens": chat_record.answer_tokens,
-                    "const": chat_record.const,
-                    "details": chat_record.details,
-                    "improve_paragraph_id_list": chat_record.improve_paragraph_id_list,
-                    "run_time": chat_record.run_time,
-                    "index": chat_record.index,
-                    "source": chat_record.source,
-                    "ip_address": chat_record.ip_address or "",
-                },
-            )
-            ChatCountSerializer(data={"chat_id": self.chat_id}).update_chat()
+        if not QuerySet(Chat).filter(id=self.chat_id).exists():
+            Chat(
+                id=self.chat_id,
+                application_id=self.application_id,
+                abstract=chat_record.problem_text[0:1024],
+                chat_user_id=self.chat_user_id,
+                chat_user_type=self.chat_user_type,
+                ip_address=self.ip_address,
+                source=self.source,
+                asker=self.get_chat_user(),
+            ).save()
+        else:
+            QuerySet(Chat).filter(id=self.chat_id).update(update_time=timezone.now())
+        # 记录Token消耗
+        total_tokens = (chat_record.message_tokens or 0) + (chat_record.answer_tokens or 0)
+        if total_tokens > 0:
+            ChatUserTokenQuota.consume(self.chat_user_id, total_tokens)
+        # 插入会话记录
+        QuerySet(ChatRecord).update_or_create(
+            id=chat_record.id,
+            create_defaults={
+                "id": chat_record.id,
+                "chat_id": chat_record.chat_id,
+                "vote_status": chat_record.vote_status,
+                "problem_text": chat_record.problem_text,
+                "answer_text": chat_record.answer_text,
+                "answer_text_list": chat_record.answer_text_list,
+                "message_tokens": chat_record.message_tokens,
+                "answer_tokens": chat_record.answer_tokens,
+                "const": chat_record.const,
+                "details": chat_record.details,
+                "improve_paragraph_id_list": chat_record.improve_paragraph_id_list,
+                "run_time": chat_record.run_time,
+                "source": chat_record.source,
+                "ip_address": chat_record.ip_address or "",
+                "index": chat_record.index,
+            },
+            defaults={
+                "vote_status": chat_record.vote_status,
+                "problem_text": chat_record.problem_text,
+                "answer_text": chat_record.answer_text,
+                "answer_text_list": chat_record.answer_text_list,
+                "message_tokens": chat_record.message_tokens,
+                "answer_tokens": chat_record.answer_tokens,
+                "const": chat_record.const,
+                "details": chat_record.details,
+                "improve_paragraph_id_list": chat_record.improve_paragraph_id_list,
+                "run_time": chat_record.run_time,
+                "index": chat_record.index,
+                "source": chat_record.source,
+                "ip_address": chat_record.ip_address or "",
+            },
+        )
+        ChatCountSerializer(data={"chat_id": self.chat_id}).update_chat()
 
     def to_dict(self):
 
