@@ -7,7 +7,7 @@ import { isSystem, isWorkspace } from './utils'
 import LogoFull from '@/components/mk-logo/LogoFull.vue'
 import type { LayoutMode } from './types'
 const router = useRouter()
-const props = withDefaults(defineProps<{ mode?: LayoutMode }>(), { mode: 'workspace' })
+const props = withDefaults(defineProps<{ mode?: LayoutMode; preview?: boolean }>(), { mode: 'workspace', preview: false })
 function switchMode() {
   router.push(isWorkspace(props.mode) ? { name: 'system-home' } : { name: 'workspace-home', params: { workspaceId: 'default' } })
 }
@@ -17,7 +17,7 @@ function switchMode() {
   <header class="flex-between h-header px-6">
     <div class="flex items-center">
       <LogoFull class="h-9 shrink-0" />
-      <div class="flex items-center gap-5 ml-5">
+      <div v-if="!preview" class="flex items-center gap-5 ml-5">
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
         <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
@@ -26,7 +26,7 @@ function switchMode() {
     </div>
 
     <div class="flex items-center gap-5">
-      <el-button class="bg-primary-gradient" round>
+      <el-button v-if="!preview" class="bg-primary-gradient" round>
         <MkIcon name="icon_launch_outlined" />
         <span>升级</span>
       </el-button>

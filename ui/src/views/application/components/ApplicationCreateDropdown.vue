@@ -72,7 +72,7 @@ function handleRefresh() {
           </template>
           <div class="min-w-0">
             <p class="leading-5">高级智能体</p>
-            <p class="whitespace-normal text-sm text-N500">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
+            <p class="text-sm text-N500">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
         <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="w-full" :file-list="[]" :limit="1" :on-change="handleImportCreate" :show-file-list="false">
