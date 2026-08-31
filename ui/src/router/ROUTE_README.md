@@ -80,8 +80,9 @@ Admin 使用末尾 catch-all 路由 `not-found` 渲染 `views/error/NotFoundView
 
 Admin Router 在 `admin/index.ts` 中统一处理导航初始化：
 
-1. 导航开始时调用 `NProgress.start()`，导航完成或发生路由错误时调用
-   `NProgress.done()`；统一关闭 Spinner，视觉样式由 `styles/nprogress.scss` 维护。
+1. 路由 path 变化时调用 `NProgress.start()`；同一路径只更新 query 或 hash 时不启动顶部进度条。
+   导航完成或发生路由错误时调用 `NProgress.done()`；统一关闭 Spinner，视觉样式由
+   `styles/nprogress.scss` 维护。
 2. `login`、`forgot-password`、`not-found` 为公开路由，不校验登录状态。
 3. URL 查询参数包含 `token` 时，先写入 Admin 认证 Store，用于外部认证回跳，然后使用替换
    导航清理地址栏中的 token。
@@ -100,17 +101,18 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 
 路由扩展字段定义在 `admin/types.ts`：
 
-| 字段            | 类型                                                  | 说明                                                   |
-| --------------- | ----------------------------------------------------- | ------------------------------------------------------ |
-| `scope`         | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
-| `resourceScope` | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
-| `activeIcon`    | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
-| `activeMenu`    | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
-| `title`         | `string`                                              | 页面标题，同时作为导航名称                             |
-| `icon`          | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
-| `order`         | `number`                                              | 同级导航排序，数字越小越靠前                           |
-| `hidden`        | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
-| `resource`      | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
+| 字段               | 类型                                                  | 说明                                                   |
+| ------------------ | ----------------------------------------------------- | ------------------------------------------------------ |
+| `scope`            | `'workspace' \| 'system'`                             | 标记生成哪一套框架导航，只配置在布局根路由上           |
+| `resourceScope`    | `'workspace' \| 'system-resource' \| 'system-shared'` | 标记页面使用的资源范围，由对应资源父路由配置并向下继承 |
+| `activeIcon`       | `string`                                              | 菜单激活状态的 iconfont Symbol ID                      |
+| `activeMenu`       | `string`                                              | 进入子页面时需要保持激活的侧栏菜单路径                 |
+| `detailActiveMenu` | `string`                                              | 更深层详情页面需要保持激活的二级菜单路由名称           |
+| `title`            | `string`                                              | 页面标题，同时作为导航名称                             |
+| `icon`             | `string`                                              | iconfont Symbol ID，子目录通常可以不配置               |
+| `order`            | `number`                                              | 同级导航排序，数字越小越靠前                           |
+| `hidden`           | `boolean`                                             | 设置为 `true` 时不显示在导航中                         |
+| `resource`         | `ResourceAuthorizationType`                           | 系统资源授权页面当前管理的后端资源类型                 |
 
 ## 导航生成
 
@@ -123,6 +125,13 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 5. 排除没有名称、没有标题或设置了 `hidden: true` 的路由。
 
 `WorkspaceSidebar` 和 `SystemSidebar` 分别调用该方法，不需要在页面组件中维护菜单数组。
+
+资源详情页面统一使用 `ResourceDetailLayout`。`admin/utils.ts` 中的
+`getMatchedChildRouteList(route)` 根据当前匹配路由找到所属详情父路由，并复用与
+`getChildRouteList(scope)` 相同的过滤、排序和菜单字段转换逻辑生成二级导航。详情子路由通过
+`title`、`icon`、`activeIcon` 和 `order` 配置二级菜单；更深层页面通过
+`detailActiveMenu` 指定需要保持激活的二级菜单路由名称，不配置 `parentPath` 或 `parentName`。
+`ResourceDetailLayout` 切换二级菜单时保留当前 query，详情容器返回列表时也应透传来源 query。
 
 路由导航图标统一使用 `src/assets/iconfont.js` 中的完整 Symbol ID 字符串，并由
 `MkIcon` 的 `name` 属性渲染。需要在菜单激活后切换图标时，通过 `activeIcon` 配置激活状态
@@ -177,13 +186,18 @@ Workspace 页面：
 /admin/workspace/:workspaceId/model
 
 /admin/workspace/:workspaceId/application
-/admin/workspace/:workspaceId/application/:applicationId
-/admin/workspace/:workspaceId/application/:applicationId/edit
+/admin/workspace/:workspaceId/application/:applicationId/:type/overview
+/admin/workspace/:workspaceId/application/:applicationId/:type/setting
 
 /admin/workspace/:workspaceId/knowledge
 /admin/workspace/:workspaceId/knowledge/:knowledgeId
 /admin/workspace/:workspaceId/knowledge/:knowledgeId/document/:documentId
 ```
+
+智能体详情路由的 `type` 来自当前 `ApplicationDetail.type`；卡片概览和简易智能体设置等详情入口
+必须与 `applicationId` 一并传入该参数。高级智能体设置继续进入独立的 Workflow 路由。
+智能体列表使用可选的 `folderId` query 保存当前文件夹；进入详情时继续携带该 query，返回列表后
+由 `FolderTree` 恢复选中项。`folderId` 是列表来源状态，不作为详情 path 参数。
 
 System 复用页面（仅替换根前缀）：
 
@@ -267,6 +281,10 @@ System 共享资源页面：
   },
 }
 ```
+
+使用 `ResourceDetailLayout` 的详情路由只在详情父路由配置 `hidden: true`；需要显示在二级导航中的
+直接子路由继续配置 `title`、`icon` 和 `order`，不要再配置 `hidden: true`。一级导航生成时会排除
+整个详情父路由，详情布局则读取该父路由的直接子路由生成自己的二级导航。
 
 ## 新增路由约定
 

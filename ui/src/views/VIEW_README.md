@@ -9,15 +9,15 @@
   代码放在同一目录或其子目录中，不要把多个无关页面平铺在上级目录。
 - 路由级 Vue 组件统一使用 `PascalCase` 并以 `View.vue` 结尾，例如
   `UserListView.vue`。
-- 页面拆分出的普通子组件统一放在当前功能目录的 `components/` 中，不与路由页面、Dialog 或
-  Drawer 混放。
-- 页面使用的 Dialog 统一放在当前功能目录的 `dialog/` 中，文件使用 `PascalCase` 并以
-  `Dialog.vue` 结尾，例如 `UserPwdDialog.vue`。
+- 页面拆分出的普通子组件统一放在当前功能目录的 `components/` 中，不与路由页面或 Drawer
+  混放。属于同一业务流程的入口、Dialog 和配套组件可以使用职责明确的业务目录集中维护，例如
+  `create-application/`；Dialog 文件使用 `PascalCase` 并以 `Dialog.vue` 结尾。
 - 页面使用的 Drawer 放在当前功能目录中，文件使用 `PascalCase` 并以 `Drawer.vue` 结尾，
-  例如 `AddMemberDrawer.vue`。Drawer 不放入 `components/` 或 `dialog/`。
-- 卡片的单文件 Action 直接放入 `<card-name>/action-dropdown/`；Action 独占且由 Action 自主管理
-  Drawer、Dialog 或其他配套文件时，一起放入 `<card-name>/action-dropdown/<action-name>-action/`。
-  页面通过卡片的 `action-dropdown` 插槽组合操作，不直接导入或调用这些浮层。
+  例如 `AddMemberDrawer.vue`。Drawer 不放入 `components/`。
+- `action-dropdown/` 目录目前只优先用于 `application`、`knowledge`、`model`、`tool` 四类特殊
+  资源，用于维护跨 Workspace、System 资源管理或 System 共享资源复用的卡片 Action。其他业务
+  暂不主动创建这类目录，操作入口和配套流程优先留在所属页面或组件中；出现明确的跨范围共享需求
+  后再评估是否采用相同结构。
 - 仅供一个页面使用的代码放在该页面功能目录；同一功能下多个页面复用的代码放在它们最近的
   共同功能目录中。
 - 不要为了复用一个页面内部实现而提前移动到 `src/components`。
@@ -49,9 +49,8 @@ src/views/<feature>/<page>/
 ├── FeatureEditDrawer.vue         # 页面抽屉，统一以 Drawer.vue 结尾
 ├── components/                   # 页面拆分出的普通子组件
 │   └── FeatureSetting.vue
-├── dialog/                       # 页面弹窗，统一放在独立目录
-│   ├── CreateFeatureDialog.vue   # 创建弹窗，统一以 Dialog.vue 结尾
-│   └── DeleteFeatureDialog.vue   # 删除弹窗
+├── create-feature/               # 创建流程的入口、弹窗和配套组件
+│   └── CreateFeatureDialog.vue
 └── constants.ts                  # 仅供该功能使用的常量
 ```
 
@@ -90,15 +89,31 @@ src/views/application/
 │       ├── ExportApplicationAction.vue
 │       ├── MoveApplicationAction.vue
 │       └── SettingApplicationAction.vue
-├── components/
-│   └── ApplicationCreateDropdown.vue
+├── create-application/
+│   ├── AdvancedCreateDialog.vue      # 高级智能体创建弹窗
+│   ├── CreateApplicationDropdown.vue # 简易、高级和导入创建入口
+│   └── SimpleCreateDialog.vue        # 简易智能体创建弹窗
 └── template.ts
+
+src/views/application-detail/
+├── WorkspaceApplicationDetail.vue # 提供工作空间智能体详情上下文并组合资源详情布局
+├── context.ts                      # 智能体详情子路由共享数据与刷新能力
+├── overview/
+│   └── OverviewView.vue             # 智能体概览内容
+└── setting/
+    └── SimpleSettingView.vue        # 简易智能体设置内容
 ```
 
 `ApplicationCard` 只维护展示内容、批量选择状态和 `action-dropdown` 插槽；`ApplicationView` 组合
 设置、移动、导出和删除 Action，并管理批量选择、批量移动和批量删除流程。需要请求的 Action 接收
 页面传入的完整 Application API。单项移动在具体目录中通过 `delete` 通知页面局部移除卡片，在
-“全部智能体”中保留卡片；移动弹窗复用公共 `MoveToDialog`。
+“全部智能体”中保留卡片；移动弹窗复用公共 `MoveToDialog`。非批量选择状态点击卡片时，卡片通过
+`open` 事件通知 `ApplicationView` 进入详情路由。列表通过 `folderId` query 保存当前文件夹，进入详情
+和返回列表时保持该 query。`WorkspaceApplicationDetail` 负责工作空间智能体详情上下文，共享的返回
+入口、二级导航和右侧子路由结构由 `layout/ResourceDetailLayout.vue` 维护。详情子路由通过
+`useApplicationDetailContext()` 读取只读详情；接口返回完整详情时调用 `replaceApplicationDetail()`
+局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
+菜单不会重新挂载详情容器，也不会自动重复请求详情。
 
 当前工具页面按工具类型组织维护表单，共用的参数和代码设置保留在
 `tool-form/component/` 中：
@@ -214,6 +229,9 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | 页面                                                                   | 功能说明                               |
 | ---------------------------------------------------------------------- | -------------------------------------- |
 | `application/ApplicationView.vue`                                      | 工作空间智能体目录与智能体卡片页面     |
+| `application-detail/WorkspaceApplicationDetail.vue`                    | 工作空间智能体详情上下文与资源详情布局 |
+| `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
+| `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
 | `workflow/ApplicationWorkflowView.vue`                                 | 智能体工作流页面头部与全屏画布         |
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |

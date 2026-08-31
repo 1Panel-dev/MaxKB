@@ -209,6 +209,14 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
+// 资源菜单的导入按钮
+.mk-import-button {
+  width: 100%;
+  .el-upload {
+    width: 100%;
+  }
+}
+
 // radio-group 垂直排列
 .vertical-radio-group {
   align-items: stretch;

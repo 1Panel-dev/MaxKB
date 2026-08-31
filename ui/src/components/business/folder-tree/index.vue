@@ -29,7 +29,7 @@ const props = withDefaults(
 
 const currentNodeKey = defineModel<string>({ default: FOLDER_ENTRY_ID.ALL })
 
-const emit = defineEmits<{ select: [folder: FolderItem] }>()
+const emit = defineEmits<{ loaded: [folder?: FolderItem]; select: [folder: FolderItem] }>()
 
 const folderEntries = computed(() => FOLDER_ENTRIES[props.source])
 const rootFolderEntry = computed(() => ({ ...folderEntries.value.all, name: props.rootLabel || folderEntries.value.all.name }))
@@ -250,6 +250,13 @@ function findFolderById(folders: FolderItem[], folderId: string): FolderItem | u
   }
 }
 
+function resolveCurrentFolder() {
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.ALL && props.showAll) return rootFolderEntry.value
+  if (currentNodeKey.value === FOLDER_ENTRY_ID.SHARED && props.showShared) return folderEntries.value.shared
+
+  return findFolderById(folderTreeData.value, currentNodeKey.value) ?? (props.showAll ? rootFolderEntry.value : sortTreeData.value[0])
+}
+
 function getFolderDeleteContext(folder: FolderItem) {
   const deletedFolder = findFolderById(folderTreeData.value, folder.id) ?? folder
   const positionCache = readCustomPositions()
@@ -314,7 +321,11 @@ onMounted(() => {
   if (Object.values(FOLDER_SORT).includes(savedSort as FolderSort)) {
     currentSort.value = savedSort as FolderSort
   }
-  loadFolders()
+  void loadFolders().then(() => {
+    const currentFolder = resolveCurrentFolder()
+    if (currentFolder) currentNodeKey.value = currentFolder.id
+    emit('loaded', currentFolder)
+  })
 })
 
 defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })

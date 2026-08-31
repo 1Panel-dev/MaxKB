@@ -104,8 +104,8 @@ function handleRefresh() {
           <template #icon><ToolIcon :type="TOOL_TYPE.DATA_SOURCE" /></template>
           <span>数据源</span>
         </MkDropdownItem>
-        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="w-full" :file-list="[]" :limit="1" multiple :on-change="handleImportCreate" :show-file-list="false">
-          <MkDropdownItem class="py-2!">
+        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="mk-import-button" :file-list="[]" :limit="1" multiple :on-change="handleImportCreate" :show-file-list="false">
+          <MkDropdownItem class="w-full py-2!">
             <template #icon>
               <img src="@/assets/mk_icon_import.svg" alt="" />
             </template>
