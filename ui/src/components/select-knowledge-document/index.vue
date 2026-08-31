@@ -15,6 +15,7 @@
         node-key="id"
         lazy
         :load="loadTree"
+        filterable
         :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
         @change="changeKnowledge"
       >
@@ -60,16 +61,19 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import useStore from '@/stores'
 import { t } from '@/locales'
-const props = withDefaults(defineProps<{
-  data?: any,
-  postKnowledgeHandler?: (knowledge_list:Array<any>) => Array<any>
-  apiType: 'systemShare' | 'workspace' | 'systemManage'
-  isApplication?: boolean,
-  workspaceId?: string,
-}>(), {
-  postKnowledgeHandler: (k_l: Array<any>) => k_l,
-  data: () => null
-})
+const props = withDefaults(
+  defineProps<{
+    data?: any
+    postKnowledgeHandler?: (knowledge_list: Array<any>) => Array<any>
+    apiType: 'systemShare' | 'workspace' | 'systemManage'
+    isApplication?: boolean
+    workspaceId?: string
+  }>(),
+  {
+    postKnowledgeHandler: (k_l: Array<any>) => k_l,
+    data: () => null,
+  },
+)
 
 const { user } = useStore()
 
@@ -101,21 +105,19 @@ const defaultProps = {
 
 const loadTree = async (node: any, resolve: any) => {
   if (node.isLeaf) return resolve([])
-  const folder_id = node.level === 0
-    ? (props.workspaceId || user.getWorkspaceId())
-    : node.data.id
+  const folder_id = node.level === 0 ? props.workspaceId || user.getWorkspaceId() : node.data.id
   const obj =
-   props.apiType === 'systemManage'
+    props.apiType === 'systemManage'
       ? {
           workspace_id: props.workspaceId,
-          folder_id:  folder_id,
+          folder_id: folder_id,
         }
       : {
           folder_id: folder_id,
         }
   await loadSharedApi({ type: 'knowledge', systemType: props.apiType })
     .getKnowledgeList(obj, optionLoading)
-    .then((ok: any)=>ok.data)
+    .then((ok: any) => ok.data)
     .then(props.postKnowledgeHandler)
     .then((res: any) => {
       resolve(res)

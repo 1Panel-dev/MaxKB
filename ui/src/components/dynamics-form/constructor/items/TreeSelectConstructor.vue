@@ -88,6 +88,7 @@
       :data="formValue.treeData"
       :multiple="formValue.multiple"
       :render-after-expand="false"
+      filterable
       style="width: 100%"
     />
   </el-form-item>
