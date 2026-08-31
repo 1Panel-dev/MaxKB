@@ -7,11 +7,15 @@ import { dateFormat } from '@/utils/time'
 
 defineOptions({ name: 'ApplicationCard' })
 
-defineProps<{ application: ApplicationDetail; selectable?: boolean; selected?: boolean }>()
+const props = defineProps<{ application: ApplicationDetail; selectable?: boolean; selected?: boolean }>()
 
-const emit = defineEmits<{ selected: [selected: boolean] }>()
+const emit = defineEmits<{ open: []; selected: [selected: boolean] }>()
 
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
+
+function handleOpen() {
+  if (!props.selectable) emit('open')
+}
 </script>
 
 <template>
@@ -21,6 +25,8 @@ defineSlots<{ 'action-dropdown'?: () => unknown }>()
     :selectable="selectable"
     :selected="selected"
     :title="application.name"
+    :class="{ 'cursor-pointer': !selectable }"
+    @click="handleOpen"
     @selected="emit('selected', $event)"
   >
     <template #icon>

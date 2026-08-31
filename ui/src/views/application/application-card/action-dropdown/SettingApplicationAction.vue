@@ -12,7 +12,18 @@ const route = useRoute()
 
 function handleSettingApplication(event: MouseEvent) {
   event.stopPropagation()
-  if (!isWorkFlow(props.application.type)) return
+  if (!isWorkFlow(props.application.type)) {
+    void router.push({
+      name: 'workspace-application-simple-setting',
+      params: {
+        applicationId: props.application.id,
+        type: props.application.type,
+        workspaceId: route.params.workspaceId,
+      },
+      query: route.query,
+    })
+    return
+  }
 
   const workflowRoute = {
     name: 'workflow-application',

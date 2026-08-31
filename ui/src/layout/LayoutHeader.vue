@@ -21,7 +21,7 @@ function switchMode() {
         <el-divider direction="vertical" />
         <!-- 企业版: 工作空间下拉框 -->
         <HeaderWorkspaceDropdown v-if="isWorkspace(mode)" />
-        <span v-if="isSystem(mode)" class="text-lg">系统管理</span>
+        <span v-if="isSystem(mode)">系统管理</span>
       </div>
     </div>
 

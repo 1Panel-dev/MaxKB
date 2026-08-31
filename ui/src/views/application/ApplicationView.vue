@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import CommonApi from '@/api/admin/workspace/common'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail, Dict, FolderItem, OptionItem } from '@/api/types'
@@ -10,18 +11,37 @@ import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
 import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import ApplicationCard from './application-card/ApplicationCard.vue'
 import { DeleteApplicationAction, ExportApplicationAction, MoveApplicationAction, SettingApplicationAction } from './application-card/action-dropdown'
-import ApplicationCreateDropdown from './components/ApplicationCreateDropdown.vue'
+import CreateApplicationDropdown from './create-application/CreateApplicationDropdown.vue'
+
+const route = useRoute()
+const router = useRouter()
 
 /* 当前文件夹 */
-const currentFolder = ref<FolderItem>({ ...FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all })
+const allApplicationsFolder = FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all
+const routeFolderId = typeof route.query.folderId === 'string' && route.query.folderId ? route.query.folderId : FOLDER_ENTRY_ID.ALL
+const currentFolderId = ref(routeFolderId)
+const currentFolder = ref<FolderItem>({ ...allApplicationsFolder, id: currentFolderId.value })
+
+function syncFolderQuery(folderId: string) {
+  const folderIdQuery = folderId === FOLDER_ENTRY_ID.ALL ? undefined : folderId
+  if (route.query.folderId === folderIdQuery) return
+
+  void router.replace({ query: { ...route.query, folderId: folderIdQuery } })
+}
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
+  currentFolderId.value = folder.id
   currentFolder.value = folder
+  syncFolderQuery(folder.id)
   if (folderChanged) {
     cancelBatchSelection()
     refreshApplications()
   }
+}
+
+function handleFolderLoaded(folder?: FolderItem) {
+  handleFolderSelect(folder ?? allApplicationsFolder)
 }
 
 const folderTreeRef = useTemplateRef<InstanceType<typeof FolderTree>>('folderTreeRef')
@@ -74,6 +94,14 @@ function refreshApplications() {
 function handleDeleteApplication(applicationId: string) {
   const applicationIndex = applicationData.value.findIndex(({ id }) => id === applicationId)
   if (applicationIndex >= 0) applicationData.value.splice(applicationIndex, 1)
+}
+
+function handleOpenApplication(application: ApplicationDetail) {
+  void router.push({
+    name: 'workspace-application-detail',
+    params: { applicationId: application.id, type: application.type, workspaceId: route.params.workspaceId },
+    query: route.query,
+  })
 }
 
 /* 批量选择与操作 */
@@ -158,7 +186,15 @@ function handleBatchDelete() {
         </el-tooltip>
       </component>
 
-      <FolderTree ref="folderTreeRef" :source="RESOURCE_TYPE.APPLICATION" :show-shared="false" draggable @select="handleFolderSelect" />
+      <FolderTree
+        ref="folderTreeRef"
+        v-model="currentFolderId"
+        :source="RESOURCE_TYPE.APPLICATION"
+        :show-shared="false"
+        draggable
+        @loaded="handleFolderLoaded"
+        @select="handleFolderSelect"
+      />
     </template>
 
     <template #default="{ Footer, Header }">
@@ -171,7 +207,7 @@ function handleBatchDelete() {
             <span>{{ batchSelectionMode ? '取消选择' : '批量选择' }}</span>
           </el-button>
 
-          <ApplicationCreateDropdown v-if="!batchSelectionMode" :folder-id="currentFolder.id" @refresh="refreshApplications" />
+          <CreateApplicationDropdown v-if="!batchSelectionMode" :folder-id="currentFolder.id" @refresh="refreshApplications" />
         </div>
       </component>
 
@@ -183,6 +219,7 @@ function handleBatchDelete() {
                 :application="application"
                 :selectable="batchSelectionMode"
                 :selected="selectedApplicationIds.includes(application.id)"
+                @open="handleOpenApplication(application)"
                 @selected="handleApplicationSelect(application.id, $event)"
               >
                 <template #action-dropdown>

@@ -14,6 +14,8 @@ declare module 'vue-router' {
     activeIcon?: string
     /** 侧栏需要保持激活的菜单路径 */
     activeMenu?: string
+    /** 资源详情页需要保持激活的二级菜单路由名称。 */
+    detailActiveMenu?: string
     /** iconfont Symbol ID */
     icon?: string
     order?: number

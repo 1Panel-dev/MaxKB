@@ -22,8 +22,8 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to) => {
-  NProgress.start()
+router.beforeEach(async (to, from) => {
+  if (to.path !== from.path) NProgress.start()
   const notAuthRouteNameList = ['login', 'forgot-password', 'not-found']
   const { auth, user } = useStore()
 

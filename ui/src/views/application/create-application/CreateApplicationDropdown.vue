@@ -1,13 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, useTemplateRef } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import { APPLICATION_TYPE } from '@/api/enums'
 import type { ApplicationType } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
+import AdvancedCreateDialog from './AdvancedCreateDialog.vue'
+import SimpleCreateDialog from './SimpleCreateDialog.vue'
 
-defineOptions({ name: 'ApplicationCreateDropdown' })
+defineOptions({ name: 'CreateApplicationDropdown' })
 
 const { auth } = useStore()
 
@@ -19,6 +21,22 @@ defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
   trigger?(): unknown
 }>()
+
+/* 智能体创建表单 */
+const simpleCreateDialogRef = useTemplateRef<InstanceType<typeof SimpleCreateDialog>>('simpleCreateDialogRef')
+const advancedCreateDialogRef = useTemplateRef<InstanceType<typeof AdvancedCreateDialog>>('advancedCreateDialogRef')
+
+function handleOpenSimpleApplicationCreate() {
+  simpleCreateDialogRef.value?.open()
+}
+
+function handleOpenAdvancedApplicationCreate() {
+  advancedCreateDialogRef.value?.open()
+}
+
+function handleCreate(type: ApplicationType) {
+  emit('create', type)
+}
 
 /* 导入创建 */
 const elUploadRef = ref<UploadInstance>()
@@ -53,7 +71,7 @@ function handleRefresh() {
 
     <template #dropdown>
       <MkDropdownMenu class="w-77!">
-        <MkDropdownItem class="py-2!">
+        <MkDropdownItem class="py-2!" @click="handleOpenSimpleApplicationCreate">
           <template #icon>
             <el-avatar shape="square" :size="24">
               <img style="width: 65%" src="@/assets/application/icon_simple_application.svg" alt="" />
@@ -61,10 +79,10 @@ function handleRefresh() {
           </template>
           <div class="min-w-0">
             <p>简易智能体</p>
-            <p class="text-sm text-N500">通过表单设置方式，快速搭建基础功能的智能体</p>
+            <p class="text-sm text-N500 whitespace-normal">通过表单设置方式，快速搭建基础功能的智能体</p>
           </div>
         </MkDropdownItem>
-        <MkDropdownItem class="py-2!">
+        <MkDropdownItem class="py-2!" @click="handleOpenAdvancedApplicationCreate">
           <template #icon>
             <el-avatar shape="square" class="bg-warning! -mt-5!" :size="24">
               <img style="width: 65%" src="@/assets/application/icon_workflow_application.svg" alt="" />
@@ -72,11 +90,20 @@ function handleRefresh() {
           </template>
           <div class="min-w-0">
             <p class="leading-5">高级智能体</p>
-            <p class="text-sm text-N500">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
+            <p class="text-sm text-N500 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
-        <el-upload ref="elUploadRef" action="#" :auto-upload="false" class="w-full" :file-list="[]" :limit="1" :on-change="handleImportCreate" :show-file-list="false">
-          <MkDropdownItem class="py-2!">
+        <el-upload
+          ref="elUploadRef"
+          action="#"
+          :auto-upload="false"
+          class="mk-import-button"
+          :file-list="[]"
+          :limit="1"
+          :on-change="handleImportCreate"
+          :show-file-list="false"
+        >
+          <MkDropdownItem class="w-full py-2!">
             <template #icon>
               <img class="size-7" src="@/assets/mk_icon_import.svg" alt="" />
             </template>
@@ -86,4 +113,7 @@ function handleRefresh() {
       </MkDropdownMenu>
     </template>
   </MkDropdown>
+
+  <SimpleCreateDialog ref="simpleCreateDialogRef" @submit="handleCreate(APPLICATION_TYPE.SIMPLE)" />
+  <AdvancedCreateDialog ref="advancedCreateDialogRef" @submit="handleCreate(APPLICATION_TYPE.WORK_FLOW)" />
 </template>

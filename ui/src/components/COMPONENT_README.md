@@ -941,9 +941,10 @@ const formValue = ref<Dict<DynamicFormValue>>({})
 ### FolderTree
 
 Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文和 `source` 调用统一文件夹接口，负责
-文件夹树查询、搜索、排序、创建、编辑、移动和删除。通过 `v-model` 控制当前文件夹 ID，选择
-文件夹时触发 `select`。`showAll`、`showShared` 分别控制全部和共享入口，`rootLabel` 可覆盖根入口
-文案，`disabledFolderIds` 用于只选场景中禁用指定节点。
+文件夹树查询、搜索、排序、创建、编辑、移动和删除。通过 `v-model` 控制当前文件夹 ID，首次加载
+完成后通过 `loaded` 返回该 ID 对应的完整文件夹，选择文件夹时触发 `select`。传入的 ID 不存在时，
+优先回退到“全部”入口，否则回退到首个可用文件夹。`showAll`、`showShared` 分别控制全部和共享入口，
+`rootLabel` 可覆盖根入口文案，`disabledFolderIds` 用于只选场景中禁用指定节点。
 
 ```vue
 <script setup lang="ts">
@@ -951,7 +952,7 @@ import { RESOURCE_TYPE } from '@/api/enums'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 </script>
 
-<FolderTree v-model="currentFolderId" :source="RESOURCE_TYPE.TOOL" draggable @select="handleFolderSelect" />
+<FolderTree v-model="currentFolderId" :source="RESOURCE_TYPE.TOOL" draggable @loaded="handleFolderLoaded" @select="handleFolderSelect" />
 ```
 
 页面顶部需要触发根目录创建时，通过页面语义处理方法调用组件暴露的 `openCreate()`；外部数据变化
