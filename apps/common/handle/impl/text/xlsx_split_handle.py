@@ -14,7 +14,7 @@ import openpyxl
 from openpyxl import load_workbook
 
 from common.handle.base_split_handle import BaseSplitHandle
-from common.handle.impl.common_handle import xlsx_embed_cells_images
+from common.handle.impl.common_handle import xlsx_embed_cells_images, validate_xlsx_buffer
 from common.handle.impl.xlsx_utils import iter_sheet_content_rows
 from common.utils.logger import maxkb_logger
 
@@ -109,6 +109,7 @@ class XlsxSplitHandle(BaseSplitHandle):
     def handle(self, file, pattern_list: List, with_filter: bool, limit: int, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
+            validate_xlsx_buffer(io.BytesIO(buffer))
             if type(limit) is str:
                 limit = int(limit)
             workbook = openpyxl.load_workbook(io.BytesIO(buffer))
