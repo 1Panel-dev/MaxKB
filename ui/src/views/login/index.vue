@@ -425,48 +425,7 @@ function changeMode(val: string, needMessage: boolean = true) {
   loginFormRef.value?.clearValidate()
 }
 
-// onBeforeMount(() => {
-//   loading.value = true
-//   user.asyncGetProfile().then((res) => {
-//     // 企业版和专业版：第三方登录
-//     if (user.isPE() || user.isEE()) {
-//       login
-//         .getAuthType()
-//         .then((res) => {
-//           //如果结果包含LDAP，把LDAP放在第一个
-//           const ldapIndex = res.indexOf('LDAP')
-//           if (ldapIndex !== -1) {
-//             const [ldap] = res.splice(ldapIndex, 1)
-//             res.unshift(ldap)
-//           }
-//           modeList.value = [...modeList.value, ...res]
-//         })
-//         .finally(() => (loading.value = false))
-//       login
-//         .getQrType()
-//         .then((res) => {
-//           if (res.length > 0) {
-//             modeList.value = ['QR_CODE', ...modeList.value]
-//             QrList.value = res
-//             QrList.value.forEach((item) => {
-//               orgOptions.value.push({
-//                 key: item,
-//                 value:
-//                   item === 'wecom'
-//                     ? t('views.system.authentication.scanTheQRCode.wecom')
-//                     : item === 'dingtalk'
-//                       ? t('views.system.authentication.scanTheQRCode.dingtalk')
-//                       : t('views.system.authentication.scanTheQRCode.lark'),
-//               })
-//             })
-//           }
-//         })
-//         .finally(() => (loading.value = false))
-//     } else {
-//       loading.value = false
-//     }
-//   })
-// })
+
 declare const window: any
 
 onMounted(() => {
