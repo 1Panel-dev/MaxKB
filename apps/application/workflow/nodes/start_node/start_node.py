@@ -93,15 +93,16 @@ class StarNode(INode):
         for key, value in node_variable.items():
             self.write_context(key, value)
 
+        # 全局变量统一放进 context['global']，与 reset_variable / get_reference_field 的引用约定一致
         for key, value in workflow_variable.items():
-            self.workflow_manage.context[key] = value
+            self.workflow_manage.write_context("global", key, value)
 
         config = self.node.properties.get("config", {})
         if config:
             for field in config.get("globalFields", []):
                 key = field.get("value")
                 if key:
-                    self.workflow_manage.context[key] = workflow_variable.get(key, "")
+                    self.workflow_manage.write_context("global", key, workflow_variable.get(key, ""))
 
     def get_details(self, index: int = 0, position: dict = None, old_details: dict = None, **kwargs):
         details = super().get_details(index, position, old_details, **kwargs)
