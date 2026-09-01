@@ -1,6 +1,6 @@
-import { del, get, post, put } from '../core/request'
+import { del, get, getExportFile, post, put } from '../core/request'
 import type { ResponsePage, ParamsPage, PasswordRequest } from '../core/types'
-import type { Dict, SystemUser, SystemUserPayload, SystemUserUpdateRequest, BatchSetUserRolesRequest, BatchSetUserWorkspaceRolesRequest } from '@/api/types'
+import type { Dict, SystemUser, SystemUserPayload, SystemUserUpdateRequest, BatchSetUserRolesRequest, BatchSetUserWorkspaceRolesRequest, ChatUserSyncResult } from '@/api/types'
 
 const prefix = '/user_manage'
 
@@ -44,4 +44,25 @@ const postBatchSetUserWorkspaceRoles = (payload: BatchSetUserWorkspaceRolesReque
   return post<BatchSetUserWorkspaceRolesRequest, boolean>(`${prefix}/batch/add_role_ee`, payload)
 }
 
-export default { deleteUser, getUserManagePage, postUser, postBatchDeleteUsers, postBatchSetUserRoles, postBatchSetUserWorkspaceRoles, putUser, putUserPassword }
+
+/** 下载系统用户导入模板。 */
+const getUserManageImportTemplate = () => {
+  return getExportFile('user_import_template.xlsx', `${prefix}/template/export`)
+}
+
+/** 获取可导入的系统用户来源。 */
+const getUserManageSyncTypes = () => {
+  return get<string[]>(`${prefix}/sync/types`)
+}
+
+/** 从指定来源同步系统用户（file 来源需携带 xlsx 文件）。 */
+const postSyncSystemUsers = (syncType: string, syncFile?: File, workspaceId?: string, roleId?: string, defaultGroupId?: string) => {
+  const payload = new FormData()
+  if (workspaceId) payload.append('workspace_id', workspaceId)
+  if (roleId) payload.append('role_id', roleId)
+  if (defaultGroupId) payload.append('default_group_id', defaultGroupId)
+  if (syncFile) payload.append('xlsx_file', syncFile)
+  return post<FormData, ChatUserSyncResult>(`${prefix}/sync/${syncType}`, payload)
+}
+
+export default { deleteUser, getUserManageImportTemplate, getUserManagePage, getUserManageSyncTypes, postUser, postBatchDeleteUsers, postBatchSetUserRoles, postBatchSetUserWorkspaceRoles, postSyncSystemUsers, putUser, putUserPassword }
