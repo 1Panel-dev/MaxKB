@@ -17,7 +17,6 @@ from models_provider.impl.ollama_model_provider.ollama_model_provider import Oll
 from models_provider.impl.openai_model_provider.openai_model_provider import OpenAIModelProvider
 from models_provider.impl.regolo_model_provider.regolo_model_provider import RegoloModelProvider
 from models_provider.impl.siliconCloud_model_provider.siliconCloud_model_provider import SiliconCloudModelProvider
-from models_provider.impl.tencent_cloud_model_provider.tencent_cloud_model_provider import TencentCloudModelProvider
 from models_provider.impl.tencent_model_provider.tencent_model_provider import TencentModelProvider
 from models_provider.impl.vllm_model_provider.vllm_model_provider import VllmModelProvider
 from models_provider.impl.volcanic_engine_model_provider.volcanic_engine_model_provider import (
@@ -42,7 +41,6 @@ class ModelProvideConstants(Enum):
     model_gemini_provider = GeminiModelProvider()
     model_volcanic_engine_provider = VolcanicEngineModelProvider()
     model_tencent_provider = TencentModelProvider()
-    model_tencent_cloud_provider = TencentCloudModelProvider()
     model_aws_bedrock_provider = BedrockModelProvider()
     model_local_provider = LocalModelProvider()
     model_xinference_provider = XinferenceModelProvider()
