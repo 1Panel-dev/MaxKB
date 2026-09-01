@@ -4,7 +4,6 @@ import { useRoute, useRouter } from 'vue-router'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import type { ApplicationDetail } from '@/api/types'
 import ResourceDetailLayout from '@/layout/ResourceDetailLayout.vue'
-import { resetUrl } from '@/utils/icon'
 import { applicationDetailContextKey } from './context'
 
 defineOptions({ name: 'WorkspaceApplicationDetail' })
@@ -63,9 +62,7 @@ watch(
 <template>
   <ResourceDetailLayout :loading="loading" @back="navigateToApplicationList">
     <template #resource-header>
-      <el-avatar class="shrink-0 bg-transparent!" shape="square" :size="24">
-        <img :src="resetUrl(application?.icon, true)" />
-      </el-avatar>
+      <ApplicationIcon :icon="application?.icon" />
       <h6 class="min-w-0 truncate" :title="application?.name">{{ application?.name }}</h6>
     </template>
   </ResourceDetailLayout>

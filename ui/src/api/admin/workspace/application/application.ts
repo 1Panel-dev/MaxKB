@@ -35,6 +35,11 @@ const postApplicationImport = (file: File, folderId: string) => {
   return post<FormData, ApplicationDetail>(`${getPrefix()}/folder/${folderId}/import`, payload)
 }
 
+/** 创建工作空间智能体。 */
+const postApplication = (data: ApplicationFormPayload) => {
+  return post<ApplicationFormPayload, ApplicationDetail>(getPrefix(), data)
+}
+
 /** 保存工作空间智能体配置。 */
 const putApplication = (applicationId: string, data: ApplicationFormPayload) => {
   return put<ApplicationFormPayload, ApplicationDetail>(`${getPrefix()}/${applicationId}`, data)
@@ -65,6 +70,7 @@ export default {
   getApplicationDetail,
   deleteApplication,
   exportApplication,
+  postApplication,
   postApplicationImport,
   putApplication,
   putMoveApplication,

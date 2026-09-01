@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
 import { Aim, Close, FullScreen } from '@element-plus/icons-vue'
+import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import type { ApplicationDetail } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
@@ -17,7 +18,7 @@ import Conversation from '@/components/conversation/index.vue'
 defineOptions({ name: 'ApplicationWorkflowView' })
 
 const DEFAULT_WORKFLOW: LogicFlow.GraphConfigData = {
-  nodes: structuredClone(defaultNodes),
+  nodes: cloneDeep(defaultNodes),
   edges: [],
 }
 
@@ -78,7 +79,7 @@ function getGraphData() {
 }
 
 function setSavedWorkflow(graphData: LogicFlow.GraphData) {
-  savedWorkflow.value = structuredClone(graphData)
+  savedWorkflow.value = cloneDeep(graphData)
 }
 
 function hasUnsavedChanges() {
@@ -117,7 +118,7 @@ function loadApplicationDetail() {
       saveTime.value = application.update_time
 
       const workflow = application.work_flow?.nodes?.length ? application.work_flow : DEFAULT_WORKFLOW
-      workflowRef.value?.render(structuredClone(workflow))
+      workflowRef.value?.render(cloneDeep(workflow))
 
       return nextTick().then(() => {
         const graphData = getGraphData()

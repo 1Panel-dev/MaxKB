@@ -2,8 +2,15 @@
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import ProviderApi from '@/api/admin/model-provider.ts'
 import { RESOURCE_TYPE, RESOURCE_PERMISSION } from '@/api/enums'
-import type { ModelProviderItem, OptionItem, Dict, ResourceAuthorizationType, ResourcePermission, ResourcePermissionItem, ResourcePermissionPayload } from '@/api/types'
-import { resetUrl } from '@/utils/icon'
+import type {
+  ModelProviderItem,
+  OptionItem,
+  Dict,
+  ResourceAuthorizationType,
+  ResourcePermission,
+  ResourcePermissionItem,
+  ResourcePermissionPayload,
+} from '@/api/types'
 import { getPermissionOptions } from '../constants'
 import BatchSetPermissionDialog from '../dialog/BatchSetPermissionDialog.vue'
 
@@ -168,10 +175,7 @@ watch(
             <MkIcon v-if="row.resource_type === 'folder'" name="icon_file-folder_colorful" :size="18" />
             <span v-else-if="resourceType === RESOURCE_TYPE.MODEL" class="block h-5 w-5 shrink-0" :innerHTML="getModelProviderIcon(row)" />
             <ToolIcon v-else-if="resourceType === RESOURCE_TYPE.TOOL" :icon="row.icon ?? undefined" :size="20" :type="row.tool_type ?? undefined" />
-
-            <el-avatar v-else-if="resourceType === RESOURCE_TYPE.APPLICATION" class="bg-transparent!" shape="square" :size="20">
-              <img :src="resetUrl(row?.icon, true)" />
-            </el-avatar>
+            <ApplicationIcon v-else-if="resourceType === RESOURCE_TYPE.APPLICATION" :icon="row?.icon ?? undefined" :size="20" />
             <span class="min-w-0 truncate" :title="row.name">{{ row.name }}</span>
           </div>
         </template>

@@ -2,8 +2,6 @@
 import { ref, useTemplateRef } from 'vue'
 import type { UploadFile, UploadInstance } from 'element-plus'
 import ApplicationApi from '@/api/admin/workspace/application/application'
-import { APPLICATION_TYPE } from '@/api/enums'
-import type { ApplicationType } from '@/api/types'
 import { useStore } from '@/stores'
 import { MsgSuccess } from '@/utils/message'
 import AdvancedCreateDialog from './AdvancedCreateDialog.vue'
@@ -15,7 +13,7 @@ const { auth } = useStore()
 
 const props = defineProps<{ folderId: string }>()
 
-const emit = defineEmits<{ create: [type: ApplicationType]; refresh: [] }>()
+const emit = defineEmits<{ refresh: [] }>()
 
 defineSlots<{
   /** 创建菜单触发器，只能渲染一个有效根节点 */
@@ -32,10 +30,6 @@ function handleOpenSimpleApplicationCreate() {
 
 function handleOpenAdvancedApplicationCreate() {
   advancedCreateDialogRef.value?.open()
-}
-
-function handleCreate(type: ApplicationType) {
-  emit('create', type)
 }
 
 /* 导入创建 */
@@ -93,6 +87,18 @@ function handleRefresh() {
             <p class="text-sm text-N500 whitespace-normal">使用低代码拖拉拽方式，灵活编排复杂逻辑、功能丰富的智能体</p>
           </div>
         </MkDropdownItem>
+        <MkDropdownItem class="py-2!" @click="handleOpenAdvancedApplicationCreate">
+          <template #icon>
+            <el-avatar class="ai-avatar-gradient" shape="square" :size="24">
+              <img src="@/assets/workflow/icon_ai_chat.svg" style="width: 75%" alt="" />
+            </el-avatar>
+          </template>
+          <div class="min-w-0">
+            <p class="leading-5">AI 创建</p>
+            <p class="text-sm text-N500 whitespace-normal">根据描述，AI 自动生成工作流</p>
+          </div>
+        </MkDropdownItem>
+
         <el-upload
           ref="elUploadRef"
           action="#"
@@ -114,6 +120,6 @@ function handleRefresh() {
     </template>
   </MkDropdown>
 
-  <SimpleCreateDialog ref="simpleCreateDialogRef" @submit="handleCreate(APPLICATION_TYPE.SIMPLE)" />
-  <AdvancedCreateDialog ref="advancedCreateDialogRef" @submit="handleCreate(APPLICATION_TYPE.WORK_FLOW)" />
+  <SimpleCreateDialog ref="simpleCreateDialogRef" :folder-id="folderId" @refresh="handleRefresh" />
+  <AdvancedCreateDialog ref="advancedCreateDialogRef" :folder-id="folderId" @refresh="handleRefresh" />
 </template>

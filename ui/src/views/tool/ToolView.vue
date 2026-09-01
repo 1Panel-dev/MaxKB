@@ -216,7 +216,7 @@ onMounted(() => {
       </component>
       <div v-loading="toolOperationLoading" class="min-h-0 flex-1">
         <MkInfiniteScroll ref="infiniteScrollRef" v-model="toolsData" :load="loadToolsPage">
-          <div v-if="toolsData.length" class="mk-resource-card-grid">
+          <div class="mk-resource-card-grid">
             <template v-for="tool in toolsData" :key="tool.id">
               <ToolCard
                 v-model:loading="toolOperationLoading"
@@ -269,7 +269,9 @@ onMounted(() => {
               </ToolCard>
             </template>
           </div>
-          <MkEmpty v-else class="mt-24" />
+          <template #empty>
+            <MkEmpty class="mt-24" />
+          </template>
         </MkInfiniteScroll>
       </div>
 

@@ -190,6 +190,7 @@ Keep these behaviors:
 
 - Prefer existing project structure and naming.
 - Keep UI code typed and data-driven.
+- Use Lodash `cloneDeep` for deep cloning; do not use `structuredClone`.
 - Explicitly import APIs used from Vue, Vue Router, and Pinia; do not restore API auto import.
 - Name business variables after their domain and purpose. Avoid context-free collection names such as
   `items` or `list` when a name such as `systemMenuItems` makes the contents clear.

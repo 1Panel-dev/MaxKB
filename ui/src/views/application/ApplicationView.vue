@@ -213,7 +213,7 @@ function handleBatchDelete() {
 
       <div v-loading="applicationOperationLoading" class="min-h-0 flex-1">
         <MkInfiniteScroll ref="infiniteScrollRef" v-model="applicationData" :load="loadApplicationPage">
-          <div v-if="applicationData.length" class="mk-resource-card-grid">
+          <div class="mk-resource-card-grid">
             <template v-for="application in applicationData" :key="application.id">
               <ApplicationCard
                 :application="application"
@@ -249,7 +249,9 @@ function handleBatchDelete() {
               </ApplicationCard>
             </template>
           </div>
-          <MkEmpty v-else class="mt-24" />
+          <template #empty>
+            <MkEmpty class="mt-24" />
+          </template>
         </MkInfiniteScroll>
       </div>
 
