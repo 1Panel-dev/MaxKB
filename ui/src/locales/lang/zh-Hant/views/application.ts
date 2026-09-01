@@ -48,6 +48,7 @@ export default {
     defaultModel: '默認模型',
     custom: '自訂',
     modelRequiredMessage: '請選擇長期記憶模型',
+    modelSettingTip: '模型可在「長期記憶設定」中設定',
   },
   form: {
     appName: {

@@ -78,40 +78,9 @@
           </div>
         </template>
         <div v-if="form_data.long_term_enable" class="w-full">
-          <el-radio-group v-model="form_data.long_term_model_id_type" class="mb-8">
-            <el-radio :label="$t('views.application.longTermMemory.defaultModel')" value="default" />
-            <el-radio :label="$t('views.application.longTermMemory.custom')" value="custom" />
-          </el-radio-group>
-        </div>
-        <DefaultModelDisplay
-          v-if="form_data.long_term_enable && form_data.long_term_model_id_type === 'default'"
-          type="LLM"
-          :options="modelOptions"
-        />
-        <div
-          v-if="form_data.long_term_enable && form_data.long_term_model_id_type === 'custom'"
-          class="flex-between w-full"
-        >
-          <ModelSelect
-            v-model="form_data.long_term_model_id"
-            :placeholder="$t('views.application.form.aiModel.placeholder')"
-            :options="modelOptions"
-            @change="long_term_model_change"
-            @submitModel="getSelectModel"
-            showFooter
-            :model-type="'LLM'"
-          >
-          </ModelSelect>
-          <el-button
-            class="ml-8"
-            :disabled="!form_data.long_term_model_id"
-            @click="openLongTermParamSettingDialog"
-            @refreshForm="refreshParam"
-          >
-            <el-icon>
-              <Operation />
-            </el-icon>
-          </el-button>
+          <el-text type="info" class="color-secondary font-small">
+            {{ $t('views.application.longTermMemory.modelSettingTip') }}
+          </el-text>
         </div>
       </el-form-item>
       <el-form-item>
@@ -249,10 +218,6 @@
       :node-model="nodeModel"
       @refresh="refreshFileUploadForm"
     />
-    <AIModeParamSettingDialog
-      ref="LongTermModeParamSettingDialogRef"
-      @refresh="refreshLongTermForm"
-    />
     <LongTermSettingDialog ref="LongTermSettingDialogRef" @refresh="submitLongTermSettingDialog" />
   </NodeContainer>
 </template>
@@ -272,7 +237,6 @@ import ChatFieldTable from './component/ChatFieldTable.vue'
 import { useRoute } from 'vue-router'
 import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
 import AppIcon from '@/components/app-icon/AppIcon.vue'
-import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
 import LongTermSettingDialog from '@/views/application/component/LongTermSettingDialog.vue'
 
 const getResourceDetail = inject('getResourceDetail') as any
@@ -511,18 +475,7 @@ const refreshFileUploadForm = (data: any) => {
   form_data.value.file_upload_setting = data
 }
 
-const LongTermModeParamSettingDialogRef = ref()
 const LongTermSettingDialogRef = ref()
-const modelOptions = ref<any>(null)
-const loading = ref(false)
-const long_term_model_change = (model_id?: string) => {
-  form_data.value.long_term_model_id = model_id
-  if (model_id) {
-    LongTermModeParamSettingDialogRef.value?.reset_default(model_id, id)
-  } else {
-    refreshLongTermForm({})
-  }
-}
 
 function switchLongTerm() {
   if (form_data.value.long_term_enable && form_data.value.long_term_model_id_type === undefined) {
@@ -532,56 +485,28 @@ function switchLongTerm() {
 }
 
 function openLongTermConfigDialog() {
-  LongTermSettingDialogRef.value?.open(
-    form_data.value.long_term_trigger_type,
-    form_data.value.long_term_trigger_setting,
-  )
+  LongTermSettingDialogRef.value?.open({
+    trigger_type: form_data.value.long_term_trigger_type,
+    trigger_setting: form_data.value.long_term_trigger_setting,
+    long_term_model_id_type: form_data.value.long_term_model_id_type,
+    long_term_model_id: form_data.value.long_term_model_id,
+    model_params_setting: form_data.value.long_term_model_params_setting,
+    application_id: id,
+    workspace_id: form_data.value?.workspace_id,
+    model_setting_enable: true,
+  })
 }
 
 function submitLongTermSettingDialog(data: any) {
   form_data.value.long_term_trigger_type = data.trigger_type
   form_data.value.long_term_trigger_setting = data.trigger_setting
-}
-
-function refreshLongTermForm(data: any) {
-  form_data.value.long_term_model_params_setting = data
-}
-
-function openLongTermParamSettingDialog() {
-  if (form_data.value.long_term_model_id) {
-    LongTermModeParamSettingDialogRef.value?.open(
-      form_data.value.long_term_model_id,
-      id,
-      form_data.value.long_term_model_params_setting,
-    )
-  }
+  form_data.value.long_term_model_id_type = data.long_term_model_id_type
+  form_data.value.long_term_model_id = data.long_term_model_id
+  form_data.value.long_term_model_params_setting = data.long_term_model_params_setting
 }
 
 function refreshParam(data: any) {
   form_data.value = { ...form_data.value, ...data }
-}
-
-function getSelectModel() {
-  loading.value = true
-
-  const obj =
-    apiType.value === 'systemManage'
-      ? {
-          model_type: 'LLM',
-          workspace_id: form_data.value?.workspace_id,
-        }
-      : {
-          model_type: 'LLM',
-        }
-  loadSharedApi({ type: 'model', systemType: apiType.value })
-    .getSelectModelList(obj)
-    .then((res: any) => {
-      modelOptions.value = groupBy(res?.data, 'provider')
-      loading.value = false
-    })
-    .catch(() => {
-      loading.value = false
-    })
 }
 
 onMounted(() => {
@@ -600,7 +525,6 @@ onMounted(() => {
   }
   getTTSModel()
   getSTTModel()
-  getSelectModel()
 })
 </script>
 <style lang="scss" scoped></style>

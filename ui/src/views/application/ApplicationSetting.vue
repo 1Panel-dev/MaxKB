@@ -1216,10 +1216,10 @@ const openParamSettingDialog = () => {
 }
 
 function openLongTermConfigDialog() {
-  LongTermSettingDialogRef.value?.open(
-    applicationForm.value.long_term_trigger_type,
-    applicationForm.value.long_term_trigger_setting,
-  )
+  LongTermSettingDialogRef.value?.open({
+    trigger_type: applicationForm.value.long_term_trigger_type,
+    trigger_setting: applicationForm.value.long_term_trigger_setting,
+  })
 }
 
 function switchLongTerm() {

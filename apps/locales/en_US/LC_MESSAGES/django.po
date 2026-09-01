@@ -8691,6 +8691,9 @@ msgstr ""
 msgid "{node_name} selected the default model, but the default model of this type is not configured."
 msgstr ""
 
+msgid "{node_name} Node, the default model for {model_type_label} is not configured"
+msgstr ""
+
 msgid "Authentication failed. Please verify that the parameters are correct"
 msgstr ""
 

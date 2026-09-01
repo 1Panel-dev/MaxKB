@@ -58,8 +58,7 @@ class BaseTextToSpeechNode(ITextToSpeechNode):
                 model_params_setting = reference_data.get('model_params_setting')
         elif tts_model_id_type == 'default':
             default_setting = self.workflow_manage.get_default_model_setting('TTS')
-            if default_setting.get('model_id'):
-                tts_model_id = default_setting.get('model_id')
+            tts_model_id = default_setting.get('model_id')
             model_params_setting = default_setting.get('model_params_setting', model_params_setting)
 
         from django.utils.translation import gettext_lazy as _

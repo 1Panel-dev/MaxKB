@@ -49,6 +49,7 @@ export default {
     defaultModel: '默认模型',
     custom: '自定义',
     modelRequiredMessage: '请选择长期记忆模型',
+    modelSettingTip: '模型可在「长期记忆设置」中配置',
   },
   form: {
     appName: {

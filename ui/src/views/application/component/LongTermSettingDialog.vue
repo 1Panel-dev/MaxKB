@@ -16,6 +16,48 @@
       @submit.prevent
     >
       <el-form-item
+        v-if="modelSettingEnable"
+        :label="$t('views.application.longTermMemory.title')"
+        prop="long_term_model_id"
+        :rules="modelIdRules"
+      >
+        <div class="w-full">
+          <el-radio-group v-model="form.long_term_model_id_type" class="mb-8">
+            <el-radio
+              :label="$t('views.application.longTermMemory.defaultModel')"
+              value="default"
+            />
+            <el-radio :label="$t('views.application.longTermMemory.custom')" value="custom" />
+          </el-radio-group>
+        </div>
+        <DefaultModelDisplay
+          v-if="form.long_term_model_id_type === 'default'"
+          type="LLM"
+          :options="modelOptions"
+        />
+        <div v-else class="flex-between w-full">
+          <ModelSelect
+            v-model="form.long_term_model_id"
+            :placeholder="$t('views.application.form.aiModel.placeholder')"
+            :options="modelOptions"
+            @change="long_term_model_change"
+            @submitModel="getSelectModel"
+            showFooter
+            :model-type="'LLM'"
+          >
+          </ModelSelect>
+          <el-button
+            class="ml-8"
+            :disabled="!form.long_term_model_id"
+            @click="openLongTermParamSettingDialog"
+          >
+            <el-icon>
+              <Operation />
+            </el-icon>
+          </el-button>
+        </div>
+      </el-form-item>
+      <el-form-item
         :label="$t('views.application.longTermMemory.triggerType')"
         prop="trigger_type"
         :rules="{
@@ -121,6 +163,11 @@
       </el-form-item>
     </el-form>
 
+    <AIModeParamSettingDialog
+      ref="longTermModeParamSettingDialogRef"
+      @refresh="refreshModelParams"
+    />
+
     <template #footer>
       <span class="dialog-footer">
         <el-button @click.prevent="dialogVisible = false">{{ $t('common.cancel') }}</el-button>
@@ -136,18 +183,36 @@
 import { computed, ref } from 'vue'
 import { triggerCycleOptions } from '@/utils/trigger.ts'
 import { t } from '@/locales'
-import { cloneDeep } from 'lodash'
+import { cloneDeep, groupBy } from 'lodash'
 import { isValidCron } from 'cron-validator'
+import { useRoute } from 'vue-router'
+import { loadSharedApi } from '@/utils/dynamics-api/shared-api'
+import DefaultModelDisplay from '@/workflow/common/DefaultModelDisplay.vue'
+import AIModeParamSettingDialog from '@/views/application/component/AIModeParamSettingDialog.vue'
+
+const route = useRoute()
+const apiType = computed(() => {
+  if (route.path.includes('resource-management')) {
+    return 'systemManage'
+  } else {
+    return 'workspace'
+  }
+})
 
 const emit = defineEmits(['refresh'])
 const dialogVisible = ref(false)
 const paramFormRef = ref()
 const loading = ref(false)
+const modelOptions = ref<any>(null)
+const longTermModeParamSettingDialogRef = ref()
+const modelSettingEnable = ref(false)
 const form = ref<any>({
   trigger_type: 'ROUND',
   trigger_setting: {
     rounds: 10,
   },
+  long_term_model_id_type: 'default',
+  long_term_model_id: '',
 })
 
 const lastPresetSetting = ref<any>(null)
@@ -155,6 +220,58 @@ const cronError = ref('')
 
 const changeTriggerType = (type: string) => {
   form.value.trigger_type = type
+}
+
+const modelIdRules = computed(() => ({
+  validator: (rule: any, value: any, callback: any) => {
+    if (form.value.long_term_model_id_type === 'custom' && !form.value.long_term_model_id) {
+      callback(new Error(t('views.application.longTermMemory.modelRequiredMessage')))
+    } else {
+      callback()
+    }
+  },
+  trigger: 'change',
+}))
+
+function getSelectModel() {
+  const obj =
+    apiType.value === 'systemManage'
+      ? {
+          model_type: 'LLM',
+          workspace_id: form.value?.workspace_id,
+        }
+      : {
+          model_type: 'LLM',
+        }
+  loadSharedApi({ type: 'model', systemType: apiType.value })
+    .getSelectModelList(obj)
+    .then((res: any) => {
+      modelOptions.value = groupBy(res?.data, 'provider')
+    })
+    .catch(() => {})
+}
+
+const long_term_model_change = (model_id?: string) => {
+  form.value.long_term_model_id = model_id
+  if (model_id) {
+    longTermModeParamSettingDialogRef.value?.reset_default(model_id, form.value.application_id)
+  } else {
+    form.value.long_term_model_params_setting = {}
+  }
+}
+
+function refreshModelParams(data: any) {
+  form.value.long_term_model_params_setting = data
+}
+
+function openLongTermParamSettingDialog() {
+  if (form.value.long_term_model_id) {
+    longTermModeParamSettingDialogRef.value?.open(
+      form.value.long_term_model_id,
+      form.value.application_id,
+      form.value.long_term_model_params_setting,
+    )
+  }
 }
 
 const validateCron = () => {
@@ -244,14 +361,24 @@ const scheduled = computed({
   },
 })
 
-const open = (trigger_type: any, trigger_setting: any) => {
+const open = (data: any) => {
   dialogVisible.value = true
+  const { trigger_type, trigger_setting, long_term_model_id_type, long_term_model_id, model_params_setting, application_id, workspace_id, model_setting_enable } = data || {}
+  modelSettingEnable.value = model_setting_enable ?? false
+  form.value.application_id = application_id
+  form.value.workspace_id = workspace_id
+  form.value.long_term_model_id_type = long_term_model_id_type ?? 'default'
+  form.value.long_term_model_id = long_term_model_id
+  form.value.long_term_model_params_setting = model_params_setting
   if (trigger_setting && trigger_setting.rounds) {
     form.value.trigger_setting = trigger_setting
   } else {
     form.value.trigger_setting = { rounds: 10 }
   }
   form.value.trigger_type = trigger_type ?? 'ROUND'
+  if (modelSettingEnable.value) {
+    getSelectModel()
+  }
 }
 
 const submit = () => {

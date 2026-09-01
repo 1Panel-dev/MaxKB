@@ -8815,6 +8815,9 @@ msgstr "图生视频"
 msgid "{node_name} selected the default model, but the default model of this type is not configured."
 msgstr "{node_name}选择了默认模型，但未配置该类默认模型"
 
+msgid "{node_name} Node, the default model for {model_type_label} is not configured"
+msgstr "{node_name} 节点，{model_type_label}的默认模型未配置"
+
 msgid "Authentication failed. Please verify that the parameters are correct"
 msgstr "认证失败，请检查参数是否正确"
 

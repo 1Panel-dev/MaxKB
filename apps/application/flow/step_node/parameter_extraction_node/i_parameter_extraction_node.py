@@ -49,8 +49,7 @@ class IParameterExtractionNode(INode):
                 model_params_setting = reference_data.get('model_params_setting')
         elif model_id_type == 'default':
             default_setting = self.workflow_manage.get_default_model_setting('LLM')
-            if default_setting.get('model_id'):
-                model_id = default_setting.get('model_id')
+            model_id = default_setting.get('model_id')
             model_params_setting = default_setting.get('model_params_setting', model_params_setting)
 
         input_variable = self.workflow_manage.get_reference_field(

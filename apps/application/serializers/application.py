@@ -54,6 +54,7 @@ from knowledge.serializers.knowledge import KnowledgeModelSerializer, KnowledgeS
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
+from models_provider.base_model_provider import ModelTypeConst
 from models_provider.models import Model
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from rest_framework import serializers, status
@@ -97,6 +98,17 @@ NODE_DEFAULT_MODEL_TYPE = {
 }
 
 
+def _default_model_not_configured_message(node_name: str, model_type: str) -> str:
+    """节点选了默认模型但该类别默认模型未配置时的报错,与前端「{节点名称}节点，{模型类别}的默认模型未配置」文案一致。"""
+    try:
+        model_type_label = str(ModelTypeConst[model_type].value['message'])
+    except Exception:
+        model_type_label = model_type
+    return _(
+        "{node_name} Node, the default model for {model_type_label} is not configured"
+    ).format(node_name=node_name, model_type_label=model_type_label)
+
+
 def validate_workflow_default_models(work_flow, default_model_setting):
     """发布前校验:节点选择「默认模型」但对应类别默认模型未配置时,禁止发布并定位。"""
     if not work_flow:
@@ -117,10 +129,7 @@ def validate_workflow_default_models(work_flow, default_model_setting):
                         and not ((default_model_setting or {}).get(default_model_type, {}) or {}).get('model_id')):
                     raise AppApiException(
                         500,
-                        _(
-                            "{node_name} selected the default model, but the default model "
-                            "of this type is not configured."
-                        ).format(node_name=node_name),
+                        _default_model_not_configured_message(node_name, default_model_type),
                     )
         if model_type is not None:
             # 取该节点实际使用的 model_id_type 字段(custom/reference/default)
@@ -142,10 +151,7 @@ def validate_workflow_default_models(work_flow, default_model_setting):
             ).get("model_id"):
                 raise AppApiException(
                     500,
-                    _(
-                        "{node_name} selected the default model, but the default model "
-                        "of this type is not configured."
-                    ).format(node_name=node_name),
+                    _default_model_not_configured_message(node_name, model_type),
                 )
         if node_type == "loop-node":
             validate_workflow_default_models(node_data.get("loop_body"), default_model_setting)
@@ -465,6 +471,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
             required=False, allow_null=True, allow_blank=True, max_length=102400, label=_("Opening remarks")
         )
         folder_id = serializers.CharField(required=True, label=_("folder id"))
+        default_model_setting = serializers.DictField(required=False, label=_("Default model settings"))
 
         @staticmethod
         def to_application_model(user_id: str, workspace_id: str, application: Dict):
@@ -497,6 +504,7 @@ class ApplicationCreateSerializer(serializers.Serializer):
                 file_upload_enable=application.get("file_upload_enable", False),
                 file_upload_setting=application.get("file_upload_setting", {}),
                 work_flow=default_workflow,
+                default_model_setting=application.get("default_model_setting") or {},
             )
 
     class SimplateRequest(serializers.Serializer):

@@ -182,6 +182,31 @@ const fitView = () => {
   })
 }
 
+/**
+ * 定位并高亮画布上的问题节点(发布/节点校验失败时调用,配合外层 MsgError 使用)。
+ * 支持顶层节点与 loop 嵌套节点:嵌套节点会先定位到所属顶层 loop 节点。
+ * @param node graph_data 中的节点(含 id)
+ */
+const highlightNode = (node: any) => {
+  const graphModel = lf.value?.graphModel
+  if (!graphModel || !node?.id) return
+  const nodeModel = graphModel.getNodeModelById(node.id)
+  if (nodeModel) {
+    graphModel.selectNodeById(node.id)
+    graphModel.transformModel.focusOn(nodeModel.x, nodeModel.y, nodeModel.width, nodeModel.height)
+    return
+  }
+  // 节点位于 loop-body 内时,定位到所属顶层 loop 节点
+  for (const topNode of graphModel.nodes || []) {
+    const loopBody = (topNode.properties?.node_data || {}).loop_body?.nodes || []
+    if (loopBody.some((n: any) => n.id === node.id)) {
+      graphModel.selectNodeById(topNode.id)
+      graphModel.transformModel.focusOn(topNode.x, topNode.y, topNode.width, topNode.height)
+      return
+    }
+  }
+}
+
 defineExpose({
   onmousedown,
   validate,
@@ -191,6 +216,7 @@ defineExpose({
   renderGraphData,
   render,
   fitView,
+  highlightNode,
 })
 </script>
 <style lang="scss">

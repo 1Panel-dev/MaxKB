@@ -524,7 +524,12 @@ class ToolSerializer(serializers.Serializer):
                 }
             ).auth_resource(str(tool_id))
             if instance.get("tool_type") == ToolType.WORKFLOW:
-                ToolWorkflow(id=uuid.uuid7(), tool_id=tool_id, work_flow=instance.get("work_flow", {})).save()
+                ToolWorkflow(
+                    id=uuid.uuid7(),
+                    tool_id=tool_id,
+                    work_flow=instance.get("work_flow", {}),
+                    default_model_setting=instance.get("default_model_setting") or {},
+                ).save()
             # 如果是SKILL类型的工具，修改file表中对应的记录
             if instance.get("tool_type") == ToolType.SKILL:
                 file_id = instance.get("code")
