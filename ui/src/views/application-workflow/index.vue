@@ -40,7 +40,7 @@
         </el-button>
         <el-button
           @click="toggleDefaultModelSetting"
-          v-if="permissionPrecise.edit(id)"
+          v-if="permissionPrecise.debug(id)"
         >
           <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
           {{ $t('workflow.setting.defaultModelSetting') }}
@@ -163,6 +163,7 @@
       v-model="detail.default_model_setting"
       :show="defaultModelSettingVisible"
       :workflow-ref="workflowRef"
+      :readonly="!permissionPrecise.edit(id)"
       @save="saveApplication(true)"
       @close="clickoutsideDefaultModelSetting"
     />
@@ -399,6 +400,7 @@ const publish = () => {
         .catch((res: any) => {
           const node = res.node
           const err_message = res.errMessage
+          workflowRef.value?.highlightNode(node)
           if (typeof err_message == 'string') {
             MsgError(
               res.node.properties?.stepName +
@@ -418,6 +420,7 @@ const publish = () => {
     .catch((res: any) => {
       const node = res.node
       const err_message = res.errMessage
+      workflowRef.value?.highlightNode(node)
       if (typeof err_message == 'string') {
         MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {

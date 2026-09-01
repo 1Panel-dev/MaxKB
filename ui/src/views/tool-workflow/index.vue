@@ -38,7 +38,7 @@
           <AppIcon iconName="app-add-outlined" class="mr-4" />
           {{ $t('workflow.setting.addComponent') }}
         </el-button>
-        <el-button @click="toggleDefaultModelSetting" v-if="permissionPrecise.edit(id)">
+        <el-button @click="toggleDefaultModelSetting" v-if="permissionPrecise.read()">
           <AppIcon iconName="app-setting" class="mr-4"></AppIcon>
           {{ $t('workflow.setting.defaultModelSetting') }}
         </el-button>
@@ -160,6 +160,7 @@
       v-model="detail.default_model_setting"
       :show="defaultModelSettingVisible"
       :workflow-ref="workflowRef"
+      :readonly="!permissionPrecise.edit(id)"
       @save="saveTool(true)"
       @close="clickoutsideDefaultModelSetting"
     />
@@ -371,6 +372,7 @@ const publish = () => {
           console.log(res)
           const node = res.node
           const err_message = res.errMessage
+          workflowRef.value?.highlightNode(node)
           if (typeof err_message == 'string') {
             MsgError(
               res.node.properties?.stepName +
@@ -390,6 +392,7 @@ const publish = () => {
     .catch((res: any) => {
       const node = res.node
       const err_message = res.errMessage
+      workflowRef.value?.highlightNode(node)
       if (typeof err_message == 'string') {
         MsgError(res.node.properties?.stepName + ` ${t('workflow.node')}，` + err_message)
       } else {

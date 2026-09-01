@@ -9,15 +9,19 @@
     :close-on-click-modal="false"
     :close-on-press-escape="false"
   >
-    <DynamicsForm
-      v-model="form_data"
-      :model="form_data"
-      label-position="top"
-      require-asterisk-position="right"
-      :render_data="model_form_field"
-      ref="dynamicsFormRef"
-    >
-    </DynamicsForm>
+    <!-- loading 遮罩:getModelParamsForm 异步期间(loading=true)以遮罩盖住 body,
+         避免 show 到 render() 之间闪现上一次打开的模型参数内容/空白 -->
+    <div v-loading="loading" class="param-setting-dialog-body">
+      <DynamicsForm
+        v-model="form_data"
+        :model="form_data"
+        label-position="top"
+        require-asterisk-position="right"
+        :render_data="model_form_field"
+        ref="dynamicsFormRef"
+      >
+      </DynamicsForm>
+    </div>
 
     <template #footer>
       <span class="dialog-footer">
@@ -73,6 +77,9 @@ const open = (
   model_setting_data?: any,
   model_form_field_list?: Array<any>,
 ) => {
+  // 先清空旧的字段/值,再显示弹窗,避免 destroy-on-close 重挂载时 onBeforeMount
+  // 用上一次打开的 model_form_field 渲染出旧参数内容(不同模型类别切换时尤甚),等异步取数完成 render() 才修正
+  model_form_field.value = []
   dialogVisible.value = true
 
   modelID.value = model_id
@@ -122,4 +129,8 @@ const submit = async () => {
 defineExpose({ open, reset_default })
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.param-setting-dialog-body {
+  min-height: 120px;
+}
+</style>

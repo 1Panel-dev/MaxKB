@@ -55,6 +55,7 @@ After disabling, the long-term memory of the conversation users will be cleared,
     defaultModel: 'Default Model',
     custom: 'Custom',
     modelRequiredMessage: 'Please select a long-term memory model',
+    modelSettingTip: 'The model can be configured in "Long-Term Memory Settings"',
   },
   form: {
     appName: {

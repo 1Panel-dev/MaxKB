@@ -75,8 +75,7 @@ class IRerankerNode(INode):
                                                        reference_data.get('model_id', reranker_model_id))
         elif reranker_model_id_type == 'default':
             default_setting = self.workflow_manage.get_default_model_setting('RERANKER')
-            if default_setting.get('model_id'):
-                reranker_model_id = default_setting.get('model_id')
+            reranker_model_id = default_setting.get('model_id')
         if reranker_model_id is None or reranker_model_id == '':
             raise Exception(_('Model is not allowed to be empty'))
 

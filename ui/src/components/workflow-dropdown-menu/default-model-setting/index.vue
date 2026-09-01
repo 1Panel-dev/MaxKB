@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="show"
+    v-if="show"
     v-click-outside="handleClickOutside"
     class="default-model-setting-menu workflow-dropdown-menu border border-r-6 white-bg"
   >
@@ -18,11 +18,12 @@
               @change="(val: any) => handleModelChange(item.type, val)"
               showFooter
               clearable
+              :disabled="readonly"
               style="flex: 1; min-width: 0"
             />
             <el-button
               class="ml-8"
-              :disabled="!modelSetting[item.type].model_id"
+              :disabled="readonly || !modelSetting[item.type].model_id || item.type === 'RERANKER'"
               @click="openModelParam(item)"
               icon="Operation"
             />
@@ -31,10 +32,10 @@
       </el-form>
     </el-scrollbar>
     <div class="flex-between p-12">
-      <el-button @click="applyDefaultModelToAll">
+      <el-button :disabled="readonly" @click="applyDefaultModelToAll">
         {{ $t('workflow.setting.applyToAll') }}
       </el-button>
-      <el-button type="primary" @click="handleSave">
+      <el-button type="primary" :disabled="readonly || !hasChanges" @click="handleSave">
         {{ $t('common.save') }}
       </el-button>
     </div>
@@ -54,6 +55,7 @@ const props = defineProps({
   modelValue: { type: Object, default: () => ({}) },
   show: { type: Boolean, default: false },
   workflowRef: { type: Object, default: null },
+  readonly: { type: Boolean, default: false },
 })
 const emit = defineEmits(['update:modelValue', 'save', 'close'])
 
@@ -99,6 +101,8 @@ watch(
       loadModelOptions(type)
     }
   },
+  // 面板改为 v-if 挂载:每次打开都是全新实例,watch 需 immediate 在挂载时即同步暂存副本
+  { immediate: true },
 )
 
 function loadModelOptions(type: string) {
@@ -115,9 +119,8 @@ function loadModelOptions(type: string) {
 
 function handleModelChange(type: string, _val: any) {
   modelSetting.value[type].model_params_setting = {}
-  // 改动实时同步到父层 detail.default_model_setting,使「未点面板保存就发布」也能带上本次编辑;
-  // 节点上的 DefaultModelDisplay 也会随之实时更新
-  emit('update:modelValue', { ...modelSetting.value })
+  // 只改动面板内的暂存副本 modelSetting,不实时同步到父层 detail.default_model_setting;
+  // 未点「保存」前,节点默认模型模式不会取到未持久化的配置(发布校验/调试行为一致)
 }
 
 function openModelParam(item: { type: string }) {
@@ -131,12 +134,40 @@ function refreshModelParam(paramData: any) {
   const type = currentModelType.value
   if (modelSetting.value[type]?.model_id) {
     modelSetting.value[type].model_params_setting = paramData
-    emit('update:modelValue', { ...modelSetting.value })
+  }
+}
+
+// 暂存副本与已持久化的 detail.default_model_setting(props.modelValue)是否有实质差异。
+// modelSetting 固定含全部 8 个类别(未配置为 {}),而 props.modelValue 仅含已配置类别,
+// 故不能直接整对象序列化比较;按类别比较 model_id 与参数即可。
+// 只读时无任何可编辑操作,hasChanges 恒为 false。
+const hasChanges = computed(
+  () =>
+    !props.readonly &&
+    defaultModelTypes.some(({ type }) => {
+      const cur = modelSetting.value[type] || {}
+      const base = (props.modelValue || {})[type] || {}
+      return (
+        (cur.model_id || '') !== (base.model_id || '') ||
+        JSON.stringify(cur.model_params_setting || {}) !== JSON.stringify(base.model_params_setting || {})
+      )
+    }),
+)
+
+function commitSetting() {
+  emit('update:modelValue', { ...modelSetting.value })
+}
+
+// 将暂存副本重置为已持久化的配置(用于「不保存」丢弃暂存)。
+function resetSetting() {
+  modelSetting.value = { ...EMPTY_SETTING }
+  for (const { type } of defaultModelTypes) {
+    modelSetting.value[type] = JSON.parse(JSON.stringify((props.modelValue as any)?.[type] || {}))
   }
 }
 
 function handleSave() {
-  emit('update:modelValue', { ...modelSetting.value })
+  commitSetting()
   emit('save')
 }
 
@@ -197,13 +228,45 @@ function applyDefaultModelToAll() {
   })
 }
 
-function handleClickOutside(e: MouseEvent, _e2?: MouseEvent) {
+async function handleClickOutside(e: MouseEvent, _e2?: MouseEvent) {
+  // 面板用 v-show 隐藏(未卸载),v-click-outside 的监听仍常驻 document;
+  // 隐藏后点击任意处不应再触发关闭/确认逻辑。
+  if (!props.show) return
   const target = e.target as HTMLElement | null
   // ModelSelect 下拉(popper-class select-model)与参数弹窗(el-dialog append-to-body 及其 .el-overlay 遮罩)
   // 都 teleport 到 body,不在面板 DOM 树内,v-click-outside 会误判为"面板外点击"。
-  // 此处显式排除:点击这两类浮层内(含弹窗遮罩)视为面板内交互,不关闭。
+  // 此处显式排除:点击这两类浮层内(含弹窗遮罩、确认弹窗)视为面板内交互,不关闭。
   if (target && (target.closest('.select-model') || target.closest('.el-overlay'))) return
-  emit('close')
+  if (!hasChanges.value) {
+    // 无未保存修改,直接关闭
+    emit('close')
+    return
+  }
+  // 有未保存修改,弹确认:「保存修改」/「不保存」/「取消(关闭弹窗)」
+  try {
+    const action = await MsgConfirm(
+      t('common.tip'),
+      t('workflow.setting.defaultModelSettingUnsaved'),
+      {
+        type: 'warning',
+        confirmButtonText: t('workflow.setting.saveChanges'),
+        cancelButtonText: t('workflow.setting.discardChanges'),
+        distinguishCancelAndClose: true,
+      },
+    )
+    // 保存修改并关闭
+    if (action === 'confirm') {
+      commitSetting()
+      emit('save')
+      emit('close')
+    }
+  } catch (action: any) {
+    // cancel → 选择「不保存」,丢弃暂存修改,关闭面板;close → 取消,保持面板打开
+    if (action === 'close') return
+    // 丢弃暂存,重置为已持久化配置,避免隐藏后 hasChanges 残留导致再次点击又弹确认
+    resetSetting()
+    emit('close')
+  }
 }
 </script>
 <style lang="scss">

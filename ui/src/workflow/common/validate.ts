@@ -419,12 +419,19 @@ const NODE_DEFAULT_MODEL_TYPE: Record<string, string> = {
 /**
  * 与后端 validate_workflow_default_models 对齐:
  * 节点选择「默认模型」但对应类别默认模型未配置时,发布前拦截。
- * 抛出 { node, errMessage },由发布流程外层 catch 展示,与「自定义模型为空」等节点校验一致。
+ * 抛出 { node, errMessage },由发布流程外层 catch 拼上节点名称展示,与后端文案一致。
  */
 export function validateWorkflowDefaultModels(work_flow: any, default_model_setting: any) {
   const setting = default_model_setting || {}
   const hasModel = (type: string) => !!((setting[type] || {}) as any).model_id
-  const errMessage = t('workflow.setting.defaultModelRequired')
+  const modelTypeLabel = (type: string) => t(`workflow.setting.modelType.${type}`) || type
+  // 与后端 _default_model_not_configured_message 结尾一致:「{模型类别}的默认模型未配置」
+  const defaultModelErr = (node: any, type: string) => {
+    return {
+      node,
+      errMessage: t('workflow.setting.defaultModelMissing', { modelType: modelTypeLabel(type) }),
+    }
+  }
 
   const walk = (nodes: any[]) => {
     for (const node of nodes || []) {
@@ -433,13 +440,13 @@ export function validateWorkflowDefaultModels(work_flow: any, default_model_sett
       if (nodeType === 'base-node') {
         // base-node 只有 default/custom(tts 另有 BROWSER)
         if (nd.stt_model_enable && nd.stt_model_id_type === 'default' && !hasModel('STT')) {
-          throw { node, errMessage }
+          throw defaultModelErr(node, 'STT')
         }
         if (nd.tts_model_enable && nd.tts_type === 'DEFAULT' && !hasModel('TTS')) {
-          throw { node, errMessage }
+          throw defaultModelErr(node, 'TTS')
         }
         if (nd.long_term_enable && nd.long_term_model_id_type === 'default' && !hasModel('LLM')) {
-          throw { node, errMessage }
+          throw defaultModelErr(node, 'LLM')
         }
         continue
       }
@@ -454,7 +461,7 @@ export function validateWorkflowDefaultModels(work_flow: any, default_model_sett
                 ? 'tts_model_id_type'
                 : 'model_id_type'
         if ((nd[typeKey] || 'custom') === 'default' && !hasModel(modelType)) {
-          throw { node, errMessage }
+          throw defaultModelErr(node, modelType)
         }
       }
       if (nodeType === 'loop-node' && nd.loop_body?.nodes) {
