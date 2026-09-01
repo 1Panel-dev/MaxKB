@@ -92,7 +92,10 @@ function getGraphData(): LogicFlow.GraphData | undefined {
   })
 
   const normalizedGraphData = lf.value.getGraphData() as LogicFlow.GraphData
-  return { nodes: normalizedGraphData.nodes.filter((node) => node.type !== WorkflowNodeType.LoopBodyNode), edges: graphData.edges.filter((edge) => edge.type !== 'loop-edge') }
+  return {
+    nodes: normalizedGraphData.nodes.filter((node) => node.type !== WorkflowNodeType.LoopBodyNode),
+    edges: graphData.edges.filter((edge) => edge.type !== 'loop-edge'),
+  }
 }
 
 function render(data: LogicFlow.GraphConfigData) {
@@ -117,7 +120,10 @@ function addNode(shapeItem: ShapeItem) {
   if (!lf.value) return
   lf.value.clearSelectElements()
   const containerRect = lf.value.container.getBoundingClientRect()
-  const { canvasOverlayPosition } = lf.value.getPointByClient(containerRect.left + containerRect.width / 2, containerRect.top + containerRect.height / 2)
+  const { canvasOverlayPosition } = lf.value.getPointByClient(
+    containerRect.left + containerRect.width / 2,
+    containerRect.top + containerRect.height / 2,
+  )
   const newNode = lf.value.graphModel.addNode({
     type: shapeItem.type as string,
     properties: cloneDeep(shapeItem.properties ?? {}),
@@ -157,3 +163,7 @@ defineExpose({ onmousedown, validate, getGraphData, addNode, clearGraphData, ren
     <!-- <NodeSearch :lf="lf" ref="nodeSearchRef"></NodeSearch> -->
   </div>
 </template>
+
+<style lang="scss">
+@use './style.scss';
+</style>

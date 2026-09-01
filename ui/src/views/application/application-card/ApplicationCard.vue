@@ -52,6 +52,9 @@ function handleOpen() {
       </template>
 
       <component :is="Action">
+        <el-button text>
+          <MkIcon name="icon_new-chat_outlined" />
+        </el-button>
         <el-divider direction="vertical" />
         <component :is="ActionDropdown">
           <slot name="action-dropdown" />

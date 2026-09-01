@@ -27,6 +27,7 @@ src/workflow-canvas/
 ├── nodes/              # 已迁入节点的注册文件和 Vue 实现
 ├── plugins/            # 仅供画布使用的 LogicFlow 插件
 ├── index.vue           # 画布入口组件 WorkflowCanvas
+├── style.scss          # 画布内 LogicFlow 全局样式覆盖
 ├── types.ts            # 画布协议类型和枚举
 └── README.md           # 本文档
 ```
@@ -37,6 +38,11 @@ src/workflow-canvas/
 通用结构与交互能力，属于核心代码；连线、快捷键、公共校验、Teleport 和节点公共工具也放在
 这里。只有某项行为是全部或大多数节点都必须遵守的画布规则时，才修改 `core`。新增普通节点
 不应要求调整核心层。
+
+节点内需要跟随画布缩放的浮层应保留 `teleported="false"`。如果浮层可能与后绘制的 SVG 锚点
+重叠，使用 `core/utils.ts` 的 `createAnchorGuard()`，通过唯一 key 同步各浮层的
+`visible-change` 状态，并在节点组件卸载时调用 `reset()`；不要通过 Teleport 到 `body` 或增加
+`z-index` 绕过画布的缩放和 SVG 绘制顺序。
 
 ### `config/`
 

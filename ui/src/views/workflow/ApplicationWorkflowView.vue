@@ -268,7 +268,7 @@ onMounted(() => {
 
       <div class="flex shrink-0 items-center gap-3">
         <WorkflowComponentMenu @select="handleAddNode" />
-        <el-button :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
+        <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
         <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
         <!-- <el-button
           v-if="canPublish"

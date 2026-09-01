@@ -3,10 +3,9 @@ import { WorkflowKind, WorkflowNodeType } from '@/workflow-canvas/types'
 export const startNode = {
   id: WorkflowNodeType.Start,
   type: WorkflowNodeType.Start,
-  x: 480,
-  y: 3340,
+  x: 846,
+  y: 2600,
   properties: {
-    height: 364,
     stepName: '开始',
     config: {
       fields: [{ label: '用户问题', value: 'question' }],
@@ -26,10 +25,9 @@ export const baseNode = {
   id: WorkflowNodeType.Base,
   type: WorkflowNodeType.Base,
   x: 360,
-  y: 2761.3875,
+  y: 2600,
   text: '',
   properties: {
-    height: 728.375,
     stepName: '基本信息',
     input_field_list: [],
     node_data: {
@@ -49,10 +47,9 @@ export const knowledgeBaseNode = {
   id: WorkflowNodeType.KnowledgeBase,
   type: WorkflowNodeType.KnowledgeBase,
   x: 360,
-  y: 2761.3875,
+  y: 2600,
   text: '',
   properties: {
-    height: 728.375,
     stepName: '基本信息',
     input_field_list: [],
     node_data: {
@@ -72,11 +69,9 @@ export const toolBaseNode = {
   id: WorkflowNodeType.ToolBaseNode,
   type: WorkflowNodeType.ToolBaseNode,
   x: 360,
-  y: 2761.3875,
+  y: 2600,
   text: '',
   properties: {
-    width: 500,
-    height: 728.375,
     stepName: '基本信息',
     input_field_list: [],
     node_data: {},
@@ -90,11 +85,10 @@ export const toolBaseNode = {
 export const toolStartNode = {
   id: WorkflowNodeType.ToolStartNode,
   type: WorkflowNodeType.ToolStartNode,
-  x: 280,
-  y: 3301,
+  x: 946,
+  y: 2600,
   text: '',
   properties: {
-    height: 728.375,
     stepName: '开始',
     input_field_list: [],
     node_data: {},
@@ -102,6 +96,28 @@ export const toolStartNode = {
     showNode: true,
     user_input_config: { title: '用户输入' },
     user_input_field_list: [],
+  },
+}
+
+// 以上是默认基础节点
+
+/**
+ * ai对话节点配置数据
+ */
+export const aiChatNode = {
+  type: WorkflowNodeType.AiChat,
+  text: '与 AI 大模型进行对话',
+  label: 'AI 对话',
+  height: 340,
+  properties: {
+    stepName: 'AI 对话',
+    config: {
+      fields: [
+        { label: 'AI 回答内容', value: 'answer' },
+        { label: '思考过程', value: 'reasoning_content' },
+        { label: '历史聊天记录', value: 'history_message' },
+      ],
+    },
   },
 }
 
@@ -130,7 +146,12 @@ export const dataSourceWebNode = {
   y: 2761.3875,
   text: '输入根地址自动抓取 Web 数据（单链接对应单文档），输出含内容的文档列表',
   label: 'Web 站点',
-  properties: { kind: WorkflowKind.DataSource, height: 180, stepName: 'Web 站点', config: { fields: [{ label: '文档列表', value: 'document_list' }] } },
+  properties: {
+    kind: WorkflowKind.DataSource,
+    height: 180,
+    stepName: 'Web 站点',
+    config: { fields: [{ label: '文档列表', value: 'document_list' }] },
+  },
 }
 
 export const knowledgeWriteNode = {
@@ -139,26 +160,6 @@ export const knowledgeWriteNode = {
   label: '知识库写入',
   height: 100,
   properties: { stepName: '知识库写入', config: { fields: [] } },
-}
-
-/**
- * ai对话节点配置数据
- */
-export const aiChatNode = {
-  type: WorkflowNodeType.AiChat,
-  text: '与 AI 大模型进行对话',
-  label: 'AI 对话',
-  height: 340,
-  properties: {
-    stepName: 'AI 对话',
-    config: {
-      fields: [
-        { label: 'AI 回答内容', value: 'answer' },
-        { label: '思考过程', value: 'reasoning_content' },
-        { label: '历史聊天记录', value: 'history_message' },
-      ],
-    },
-  },
 }
 
 /**

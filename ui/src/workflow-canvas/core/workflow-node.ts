@@ -34,7 +34,11 @@ export class WorkflowNodeView extends HtmlNode {
     if (definition && !nodeModel.properties.config) {
       nodeModel.properties.config = cloneDeep(definition.properties.config ?? {})
     }
-    nodeModel.properties.stepName = this.getUniqueNodeName(props.graphModel, String(nodeModel.properties.stepName ?? definition?.label ?? nodeModel.type), nodeModel.id)
+    nodeModel.properties.stepName = this.getUniqueNodeName(
+      props.graphModel,
+      String(nodeModel.properties.stepName ?? definition?.label ?? nodeModel.type),
+      nodeModel.id,
+    )
   }
 
   private getUniqueNodeName(graphModel: GraphModel, baseName: string, nodeId: string) {
@@ -45,22 +49,39 @@ export class WorkflowNodeView extends HtmlNode {
     return nodeName
   }
 
+  getAnchors() {
+    if (!this.props.model.isHittable) return []
+    return super.getAnchors()
+  }
+
   getAnchorShape(anchorData?: Model.AnchorConfig) {
     if (!anchorData) return null
     const { x, y, type } = anchorData
-    const connected = this.props.graphModel.edges.some((edge) => (type === 'left' ? edge.targetAnchorId === anchorData.id : edge.sourceAnchorId === anchorData.id))
+    const connected = this.props.graphModel.edges.some((edge) =>
+      type === 'left' ? edge.targetAnchorId === anchorData.id : edge.sourceAnchorId === anchorData.id,
+    )
 
-    return createLogicFlowElement('foreignObject', { ...anchorData, x: x - 10, y: y - 10, width: 20, height: 20 }, [
-      createLogicFlowElement('div', {
-        className: 'h-5 w-5 cursor-pointer rounded-full border-2 border-primary bg-white',
-        style: connected ? { background: 'var(--el-color-primary)' } : {},
-        onClick: () => {
-          if (type === 'right') {
-            const nodeModel = this.props.model as unknown as WorkflowNodeModel
-            nodeModel.openNodeMenu?.(anchorData)
-          }
+    return createLogicFlowElement('foreignObject', { ...anchorData, x: x - 14, y: y - 14, width: 28, height: 28 }, [
+      createLogicFlowElement(
+        'div',
+        {
+          className: 'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-primary bg-white text-white',
+          style: connected ? {} : { background: 'var(--el-color-primary)' },
+          onClick: () => {
+            if (type === 'right') {
+              const nodeModel = this.props.model as unknown as WorkflowNodeModel
+              nodeModel.openNodeMenu?.(anchorData)
+            }
+          },
         },
-      }),
+        connected
+          ? []
+          : [
+              createLogicFlowElement('svg', { 'aria-hidden': 'true', className: 'h-4 w-4', fill: 'currentColor', focusable: 'false' }, [
+                createLogicFlowElement('use', { href: '#icon_add_outlined' }),
+              ]),
+            ],
+      ),
     ])
   }
 
@@ -74,7 +95,7 @@ export class WorkflowNodeView extends HtmlNode {
       this.renderVueComponent(node)
     }
   }
-  protected renderVueComponent(root: any) {
+  protected renderVueComponent(root: HTMLDivElement) {
     const { model, graphModel } = this.props
     if (root) {
       connect(this.targetId(), this.vueComponent, root, () => this.props.graphModel.get_provide(reactive(model), reactive(graphModel)))

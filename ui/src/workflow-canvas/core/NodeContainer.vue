@@ -1,39 +1,35 @@
 <script setup lang="ts">
 import type { BaseNodeModel, Model } from '@logicflow/core'
-import { ArrowDownBold, CircleCheck } from '@element-plus/icons-vue'
-import type { FormInstance } from 'element-plus'
-import { computed, inject, onBeforeUnmount, onMounted, ref, useTemplateRef, watch } from 'vue'
+import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyText } from '@/utils/clipboard'
-import { WorkflowNodeType, WorkflowKind, type WorkflowNodeField } from '@/workflow-canvas/types'
-import { MsgError, MsgConfirm } from '@/utils/message'
+import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { BasicComponentsNode } from '@/workflow-canvas/config/node-mapping'
 import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
-import { handleNodeWheel } from '@/workflow-canvas/core/utils'
-
-interface NodeNameForm {
-  title: string
-}
+import NodeConditionDropdown from '@/workflow-canvas/component/NodeConditionDropdown.vue'
+import NodeOperateDropdown from '@/workflow-canvas/component/NodeOperateDropdown.vue'
+import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
 
 interface ResizeSize {
   height: number
 }
 
 type NodeContainerProperties = {
-  condition?: boolean | 'AND' | 'OR'
   config?: { fields?: WorkflowNodeField[]; output_title?: string }
   disabled?: boolean
   enableException?: boolean
-  kind?: WorkflowKind
-  node_data?: { name?: string }
   showNode?: boolean
   status?: number
-  stepName?: string
 }
 
-const props = withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
-  exceptionNodeList: () => [WorkflowNodeType.AiChat, WorkflowNodeType.VideoUnderstandNode, WorkflowNodeType.ImageGenerateNode, WorkflowNodeType.ImageUnderstandNode],
+withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
+  exceptionNodeList: () => [
+    WorkflowNodeType.AiChat,
+    WorkflowNodeType.VideoUnderstandNode,
+    WorkflowNodeType.ImageGenerateNode,
+    WorkflowNodeType.ImageUnderstandNode,
+  ],
 })
 const getModel = inject('getModel') as () => BaseNodeModel
 const model = getModel()
@@ -57,28 +53,8 @@ const nodeDisabled = computed({
     set(model.properties, 'disabled', v)
   },
 })
-const nodeEnabled = computed({
-  get: () => !nodeDisabled.value,
-  set: (v: boolean) => {
-    nodeDisabled.value = !v
-  },
-})
-const titleFormRef = useTemplateRef<FormInstance>('titleFormRef')
-const nodeNameDialogVisible = ref(false)
-const form = ref<NodeNameForm>({ title: '' })
+const anchorGuard = createAnchorGuard(model)
 
-const condition = computed({
-  set: (v) => {
-    set(model.properties, 'condition', v)
-  },
-  get: () => {
-    if (model.properties.condition) {
-      return model.properties.condition
-    }
-    set(model.properties, 'condition', 'AND')
-    return true
-  },
-})
 const showNode = computed({
   set: (v) => {
     set(model.properties, 'showNode', v)
@@ -99,34 +75,7 @@ const node_status = computed(() => {
   return 200
 })
 
-const sourceName = computed(() => {
-  if ([WorkflowNodeType.Application, WorkflowNodeType.ToolLib].includes(String(model.type) as WorkflowNodeType)) {
-    return nodeProperties.value.node_data?.name || ''
-  }
-  return ''
-})
-
-function renameNode() {
-  form.value.title = String(model.properties.stepName ?? '')
-  nodeNameDialogVisible.value = true
-}
-const editName = async (formEl: FormInstance | null | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid) => {
-    if (valid) {
-      if (!model.graphModel.nodes.filter((node) => node.id !== model.id).some((node) => node.properties.stepName === form.value.title)) {
-        set(model.properties, 'stepName', form.value.title)
-        model.clearNextNodeField(true)
-        nodeNameDialogVisible.value = false
-        formEl.resetFields()
-      } else {
-        MsgError('节点名称已存在！')
-      }
-    }
-  })
-}
-
-const mousedown = (event?: MouseEvent) => {
+const handleNodeMousedown = (event?: MouseEvent) => {
   if (!event?.shiftKey) {
     model.graphModel.clearSelectElements()
   }
@@ -135,28 +84,6 @@ const mousedown = (event?: MouseEvent) => {
   model.graphModel.toFront(model.id)
 }
 const showicon = ref<number | string | null>(null)
-const copyNode = () => {
-  model.graphModel.clearSelectElements()
-  const cloneNode = model.graphModel.cloneNode(model.id)
-  if (!cloneNode) return
-  set(cloneNode, 'isSelected', true)
-  set(cloneNode, 'isHovered', true)
-  model.graphModel.toFront(cloneNode.id)
-}
-const deleteNode = () => {
-  MsgConfirm('提示', '确定删除当前节点吗？', { confirmButtonText: '确定', confirmButtonClass: 'danger' }).then(() => {
-    if (String(model.type) === WorkflowNodeType.LoopNode) {
-      const next = model.graphModel.getNodeOutgoingNode(model.id)
-      next.forEach((nextNode) => {
-        if (String(nextNode.type) === WorkflowNodeType.LoopBodyNode) {
-          model.graphModel.deleteNode(nextNode.id)
-        }
-      })
-    }
-    model.graphModel.deleteNode(model.id)
-  })
-  model.graphModel.eventCenter.emit('delete_node', undefined)
-}
 const resizeStepContainer = (wh: ResizeSize) => {
   if (wh.height) {
     if (!model.virtual) {
@@ -172,8 +99,19 @@ function clickNodes(nodeType: WorkflowNodeType) {
   if (!item || !anchor) return
 
   const width = Number((item.properties as { width?: number }).width ?? 214)
-  const newModel = model.graphModel.addNode({ type: item.type, properties: item.properties, x: anchor.x + width / 2 + 200, y: anchor.y - item.height })
-  newModel.graphModel.addEdge({ type: 'app-edge', sourceNodeId: model.id, sourceAnchorId: anchor.id, targetNodeId: model.id, targetAnchorId: model.id + '_left' })
+  const newModel = model.graphModel.addNode({
+    type: item.type,
+    properties: item.properties,
+    x: anchor.x + width / 2 + 200,
+    y: anchor.y - item.height,
+  })
+  newModel.graphModel.addEdge({
+    type: 'app-edge',
+    sourceNodeId: model.id,
+    sourceAnchorId: anchor.id,
+    targetNodeId: model.id,
+    targetAnchorId: model.id + '_left',
+  })
 
   closeNodeMenu()
 }
@@ -192,7 +130,12 @@ const enable_exception = computed({
 const nodeFields = computed(() => {
   if (nodeProperties.value.config?.fields) {
     const fields = nodeProperties.value.config.fields.map((field) => {
-      return { label: field.label, value: field.value, globeLabel: `{{${model.properties.stepName}.${field.value}}}`, globeValue: `{{context['${model.id}'].${field.value}}}` }
+      return {
+        label: field.label,
+        value: field.value,
+        globeLabel: `{{${model.properties.stepName}.${field.value}}}`,
+        globeValue: `{{context['${model.id}'].${field.value}}}`,
+      }
     })
     return fields
   }
@@ -205,7 +148,12 @@ const output_title = computed(() => {
 
 const abnormalNodeFields = computed(() => {
   return [
-    { label: '异常信息', value: 'exception_message', globeLabel: `{{${model.properties.stepName}.exception_message}}`, globeValue: `{{context['${model.id}'].exception_message}}` },
+    {
+      label: '异常信息',
+      value: 'exception_message',
+      globeLabel: `{{${model.properties.stepName}.exception_message}}`,
+      globeValue: `{{context['${model.id}'].exception_message}}`,
+    },
   ]
 })
 watch(enable_exception, () => {
@@ -215,31 +163,6 @@ watch(enable_exception, () => {
   )
 })
 
-function showOperate(type: string) {
-  return ![
-    WorkflowNodeType.Start,
-    WorkflowNodeType.Base,
-    WorkflowNodeType.KnowledgeBase,
-    WorkflowNodeType.LoopStartNode.toString(),
-    WorkflowNodeType.ToolBaseNode,
-    WorkflowNodeType.ToolStartNode,
-  ].includes(type)
-}
-
-function showConditionOperate(type: string) {
-  return (
-    ![
-      WorkflowNodeType.Start,
-      WorkflowNodeType.Base,
-      WorkflowNodeType.ToolBaseNode,
-      WorkflowNodeType.ToolStartNode,
-      WorkflowNodeType.KnowledgeBase,
-      WorkflowNodeType.LoopStartNode.toString(),
-      WorkflowNodeType.DataSourceLocalNode,
-      WorkflowNodeType.DataSourceWebNode,
-    ].includes(type) && nodeProperties.value.kind != WorkflowKind.DataSource
-  )
-}
 const openNodeMenu = (anchorValue: Model.AnchorConfig) => {
   showAnchor.value = true
   anchorData.value = anchorValue
@@ -287,7 +210,9 @@ const highlightedStepName = (contentText: string) => {
     for (let i = 0; i < wordsArray.length; i++) {
       const word = wordsArray[i]
       if (word && keyWord.value.includes(word)) {
-        wordsArray[i] = currentKeyWord.value ? `<span style='background: #FF8800;'>${word}</span>` : `<span style='background: #FFC60A;'>${word}</span>`
+        wordsArray[i] = currentKeyWord.value
+          ? `<span style='background: #FF8800;'>${word}</span>`
+          : `<span style='background: #FFC60A;'>${word}</span>`
       }
     }
     res = wordsArray.join('')
@@ -321,94 +246,47 @@ const containerRef = ref<HTMLElement>()
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
+  anchorGuard.reset()
 })
 </script>
 <template>
-  <div class="workflow-node-container relative overflow-visible p-4" @mousedown="mousedown">
-    <div class="step-container overflow-visible rounded-lg border-2 border-white bg-white p-4" :class="{ isSelected: model.isSelected, error: node_status !== 200 }">
+  <div class="workflow-node-container relative overflow-visible" @mousedown="handleNodeMousedown">
+    <div
+      class="step-container shadow-sm overflow-visible rounded-xl border-2 border-white bg-white p-4"
+      :class="{ isSelected: model.isSelected, error: node_status !== 200 }"
+    >
       <div ref="containerRef">
         <div class="flex-between">
-          <div class="flex w-[69%] items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
-            <component :is="iconComponent(`${model.type}-icon`)" class="mr-2" :size="24" :item="model?.properties.node_data" style="--el-avatar-border-radius: 6px" />
-            <h4 class="truncate break-all" :title="String(model.properties.stepName ?? '')" v-html="highlightedStepName(String(model.properties.stepName ?? ''))"></h4>
+          <div class="flex items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
+            <component :is="iconComponent(`${model.type}-icon`)" class="mr-2" :size="24" :item="model?.properties.node_data" />
+            <h4
+              class="truncate break-all"
+              :title="String(model.properties.stepName ?? '')"
+              v-html="highlightedStepName(String(model.properties.stepName ?? ''))"
+            ></h4>
           </div>
 
           <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
-              <MkIcon :icon="ArrowDownBold" class="text-N600 transition-transform" :class="showNode ? 'rotate-180' : ''" />
+              <MkIcon name="icon_down_outlined" />
             </el-button>
-            <MkDropdown v-if="showConditionOperate(String(model.type))" :teleported="false" trigger="click" placement="bottom-start">
-              <el-button text>
-                <span>条件</span>
-              </el-button>
-              <template #dropdown>
-                <div class="w-[280px] px-4 py-3">
-                  <h5>执行条件</h5>
-                  <p class="mt-2 text-N600">
-                    <span>前置</span>
-                    <el-select v-model="condition" class="mx-2 w-[60px]" size="small">
-                      <el-option label="所有" value="AND" />
-                      <el-option label="任一" value="OR" />
-                    </el-select>
-                    <span>连线节点执行完，执行当前节点</span>
-                  </p>
-                </div>
-              </template>
-            </MkDropdown>
-            <MkDropdown v-if="showOperate(String(model.type))" :teleported="false" trigger="click">
-              <el-button text>
-                <MkIcon name="icon_more_outlined" class="text-N600" />
-              </el-button>
-              <template #dropdown>
-                <MkDropdownMenu class="min-w-36">
-                  <MkDropdownItem class="p-2" @click="renameNode">
-                    <template #icon><MkIcon name="icon_edit_outlined" /></template>
-                    重命名
-                  </MkDropdownItem>
-                  <MkDropdownItem class="p-2" @click="copyNode">
-                    <template #icon><MkIcon name="icon_copy_outlined" /></template>
-                    复制
-                  </MkDropdownItem>
-                  <template
-                    v-if="
-                      !(
-                        (String(model.type) == WorkflowNodeType.ToolLib && nodeProperties.kind == WorkflowKind.DataSource) ||
-                        String(model.type) == WorkflowNodeType.DataSourceLocalNode ||
-                        String(model.type) == WorkflowNodeType.DataSourceWebNode
-                      )
-                    "
-                  >
-                    <div class="flex-between p-2" @click.stop>
-                      <MkIcon :icon="CircleCheck" class="text-N600" />
-                      <span class="mr-4">启用状态</span>
-                      <el-switch v-model="nodeEnabled" size="small" />
-                    </div>
-                  </template>
-
-                  <MkDropdownItem class="border-t border-N300 p-2" @click="deleteNode">
-                    <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
-                    删除
-                  </MkDropdownItem>
-                  <div v-if="sourceName" class="border-t border-N300 p-2" @click.stop>
-                    <div class="text-sm text-N600">来源</div>
-                    <div class="mt-1 break-all text-N600">{{ sourceName }}</div>
-                  </div>
-                </MkDropdownMenu>
-              </template>
-            </MkDropdown>
+            <NodeConditionDropdown :model="model" @visible-change="anchorGuard.setOverlayVisible('condition', $event)" />
+            <NodeOperateDropdown :model="model" @visible-change="anchorGuard.setOverlayVisible('operate', $event)" />
           </div>
         </div>
+
+        <el-alert v-if="nodeDisabled" class="mt-4!" title="该节点已禁用" type="error" show-icon :closable="false" />
+        <el-alert
+          v-if="node_status != 200"
+          class="mt-4!"
+          :title="String(model.type) === WorkflowNodeType.Application ? '该智能体不可用' : '该工具不可用'"
+          type="error"
+          show-icon
+          :closable="false"
+        />
+
         <el-collapse-transition>
           <div v-show="showNode" class="mt-4" @pointermove.stop @pointerenter.stop @mousedown.stop @keydown.stop @click.stop>
-            <el-alert v-if="nodeDisabled" class="mb-4" title="该节点已被禁用" type="error" show-icon :closable="false" />
-            <el-alert
-              v-if="node_status != 200"
-              class="mb-4"
-              :title="String(model.type) === WorkflowNodeType.Application ? '该智能体不可用' : '该工具不可用'"
-              type="error"
-              show-icon
-              :closable="false"
-            />
             <slot />
             <template v-if="nodeFields.length > 0">
               <div class="flex-between">
@@ -459,33 +337,19 @@ onBeforeUnmount(() => {
         @mousedown.stop
         @click.stop
         @wheel="handleNodeWheel"
-        style="left: 100%; transform: translate(0, -50%)"
+        style="left: 105%; transform: translate(0, -50%)"
         :style="dropdownMenuStyle"
         @select="clickNodes"
       />
     </el-collapse-transition>
-
-    <MkDialog v-model="nodeNameDialogVisible" title="节点名称" append-to-body @submit.prevent>
-      <el-form ref="titleFormRef" :model="form" label-position="top">
-        <el-form-item prop="title" :rules="[{ required: true, message: '请输入', trigger: 'blur' }]">
-          <el-input v-model="form.title" @blur="form.title = form.title.trim()" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click.prevent="nodeNameDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="editName(titleFormRef)">保存</el-button>
-      </template>
-    </MkDialog>
   </div>
 </template>
 <style lang="scss" scoped>
 .workflow-node-container {
   .step-container {
     box-sizing: border-box;
-    box-shadow: 0 2px 4px 0 rgb(var(--mk-N900-rgb) / 12%);
-
     &:hover {
-      box-shadow: 0 6px 24px 0 rgb(var(--mk-N900-rgb) / 8%);
+      box-shadow: 0px 6px 24px 0px rgb(var(--mk-N900-rgb) / 8%);
     }
 
     &.isSelected {

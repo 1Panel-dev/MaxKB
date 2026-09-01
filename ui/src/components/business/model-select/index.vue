@@ -47,13 +47,21 @@ const modelOptionGroups = computed<ModelOptionGroup[]>(() => {
   })
 })
 
-const selectedProviderIcon = computed(() => modelOptionGroups.value.find(({ models }) => models.some(({ id }) => id === selectedModelId.value))?.icon ?? '')
+const selectedProviderIcon = computed(
+  () => modelOptionGroups.value.find(({ models }) => models.some(({ id }) => id === selectedModelId.value))?.icon ?? '',
+)
 </script>
 
 <template>
-  <el-select v-model="selectedModelId" v-bind="$attrs" class="w-full" clearable filterable :loading="loading">
+  <el-select v-model="selectedModelId" v-bind="$attrs" class="w-full" clearable filterable :loading="loading" :teleported="false">
     <el-option-group v-for="group in modelOptionGroups" :key="group.provider" :label="group.name">
-      <el-option v-for="model in group.models" :key="model.id" :disabled="model.status !== MODEL_STATUS.SUCCESS" :label="model.name" :value="model.id">
+      <el-option
+        v-for="model in group.models"
+        :key="model.id"
+        :disabled="model.status !== MODEL_STATUS.SUCCESS"
+        :label="model.name"
+        :value="model.id"
+      >
         <div class="flex h-full items-center gap-2">
           <span class="h-5 w-5 shrink-0" v-html="group.icon" />
           <span class="min-w-0 flex-1 truncate" :title="model.name">{{ model.name }}</span>
