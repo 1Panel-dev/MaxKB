@@ -489,7 +489,21 @@ class BaseChatNode(IChatNode):
         return chat_files
 
     def get_form_data(self):
-        return getattr(self.workflow_manage, "form_data", {})
+        """
+        获取当前会话的用户输入参数，用于透传给作为工具调用的子智能体。
+
+        循环工作流会创建独立的 WorkflowManage，并将自身的 form_data 初始化为
+        空字典，因此需要继续从父工作流中查找原始用户输入。
+        """
+        workflow_manage = self.workflow_manage
+        visited = set()
+        while workflow_manage is not None and id(workflow_manage) not in visited:
+            visited.add(id(workflow_manage))
+            form_data = getattr(workflow_manage, "form_data", None)
+            if isinstance(form_data, dict) and form_data:
+                return form_data.copy()
+            workflow_manage = getattr(workflow_manage, "parentWorkflowManage", None)
+        return {}
 
     def handle_variables(self, tool_params):
         # 处理参数中的变量

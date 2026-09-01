@@ -32,7 +32,7 @@ class MCPToolHandler:
         if not self.application:
             raise PermissionError("Application is not found or not published")
         self.chat_files = self.decode_chat_files(chat_files_header)
-        self.form_data = json.loads(base64.b64decode(form_data).decode("utf-8"))
+        self.form_data = self.decode_form_data(form_data)
 
     @staticmethod
     def decode_chat_files(chat_files_header):
@@ -52,6 +52,21 @@ class MCPToolHandler:
             for key, value in chat_files.items()
             if key in CHAT_FILE_LIST_FIELDS and isinstance(value, list) and len(value) > 0
         }
+
+    @staticmethod
+    def decode_form_data(form_data):
+        """
+        解析上层应用透传过来的表单数据
+        """
+        if not form_data:
+            return {}
+        try:
+            form_data = json.loads(base64.b64decode(form_data).decode("utf-8"))
+        except Exception:
+            return {}
+        if not isinstance(form_data, dict):
+            return {}
+        return form_data
 
     def initialize(self):
         return {
@@ -120,14 +135,27 @@ class MCPToolHandler:
             }
         ).open()
 
+    def build_form_data(self, message):
+        """
+        合并父应用透传参数与提示词中的 JSON 参数，提示词参数优先。
+        """
+        try:
+            message_form_data = json.loads(message or "{}")
+        except (TypeError, json.JSONDecodeError):
+            message_form_data = {}
+        if not isinstance(message_form_data, dict):
+            message_form_data = {}
+        return {**self.form_data, **message_form_data}
+
     def call_tool(self, params):
         args = params.get("arguments", {})
+        message = args.get("message")
 
         payload = {
-            "message": args.get("message"),
+            "message": message,
             "stream": True,
             "re_chat": False,
-            "form_data": self.form_data,
+            "form_data": self.build_form_data(message),
             **self.chat_files,
         }
         resp = ChatSerializers(
