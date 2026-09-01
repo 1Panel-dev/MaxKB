@@ -38,7 +38,7 @@ export interface ApplicationFormPayload {
   problem_optimization_prompt?: string
   icon?: string
   type?: ApplicationType
-  work_flow?: LogicFlow.GraphData
+  work_flow?: LogicFlow.GraphConfigData
   model_params_setting?: Record<string, unknown>
   tts_model_params_setting?: Record<string, unknown>
   stt_model_params_setting?: Record<string, unknown>

@@ -63,7 +63,7 @@ function handleSelectedChange(selected: boolean | string | number) {
 
 <template>
   <el-card
-    :class="{ 'cursor-pointer': props.selectable, 'border-primary! bg-primary/10!': props.selectable && props.selected }"
+    :class="{ 'cursor-pointer': props.selectable, active: props.selectable && props.selected }"
     :role="props.selectable ? 'checkbox' : undefined"
     :tabindex="props.selectable ? 0 : undefined"
     shadow="hover"
@@ -77,7 +77,7 @@ function handleSelectedChange(selected: boolean | string | number) {
 
     <header class="flex-between items-start gap-2" :class="{ 'pr-7': props.selectable }">
       <div class="flex min-w-0 flex-1 items-center gap-3">
-        <div v-if="slots.icon" class="shrink-0">
+        <div v-if="slots.icon" class="flex shrink-0">
           <slot name="icon" />
         </div>
         <div class="min-w-0 flex-1">
@@ -86,7 +86,7 @@ function handleSelectedChange(selected: boolean | string | number) {
               <h6 class="min-w-0 truncate" :title="props.title">{{ props.title }}</h6>
             </slot>
           </div>
-          <div class="text-sm text-N600">
+          <div class="text-sm text-N600" v-if="slots.subtitle || create_time || nick_name">
             <slot name="subtitle">
               <div class="flex gap-1">
                 <span>{{ props.nick_name }}</span>
@@ -114,5 +114,10 @@ function handleSelectedChange(selected: boolean | string | number) {
 .mk-source-card {
   min-width: 250px;
   min-height: 172px;
+
+  &.active {
+    background-color: rgb(var(--mk-primary-rgb) / 10%) !important;
+    border-color: var(--mk-primary) !important;
+  }
 }
 </style>

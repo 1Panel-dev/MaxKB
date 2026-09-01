@@ -64,6 +64,9 @@ src/components/
 │   ├── mk-filterable-dropdown/
 │   │   └── index.vue             # 带搜索过滤和滚动列表的下拉选择
 │   ├── mk-icon/
+│   │   ├── ApplicationIcon.vue   # 智能体头像与默认图标
+│   │   ├── KnowledgeIcon.vue     # 知识库类型与自定义图标
+│   │   ├── ToolIcon.vue          # 工具类型与自定义图标
 │   │   └── index.vue             # SVG Symbol 与 Element Plus 图标统一入口
 │   ├── mk-infinite-scroll/
 │   │   └── index.vue             # 分页列表滚动触底加载与结束状态
@@ -447,18 +450,30 @@ Prop，未传入时读取当前路由的 `meta.title`；显式传入 `title=""` 
 <MkIcon :icon="Setting" :size="20" />
 ```
 
+智能体、知识库和工具的资源图标分别使用自动注册的 `ApplicationIcon`、`KnowledgeIcon` 和
+`ToolIcon`。`ApplicationIcon` 在未传入 `icon` 时会回退到系统默认图标。
+
+```vue
+<ApplicationIcon :icon="application.icon" :size="24" />
+```
+
 ### MkInfiniteScroll
 
 分页列表的滚动触底加载组件，使用 `IntersectionObserver` 监听组件所在滚动区域的底部，不依赖
 Element Plus 的 `v-infinite-scroll`。组件通过 `v-model` 管理已经加载的列表数据，通过 `load`
 传入按页请求方法，并在内部管理页码、首次加载、数据追加、加载状态、结束状态和过期请求。请求
 方法接收 `{ currentPage, pageSize }`，返回包含 `records`、`current`、`size` 和 `total` 的分页结果。
-默认每页加载 20 条，可通过 `pageSize` 修改。组件挂载后自动加载第一页，之后只在底部哨兵随
+默认每页加载 30 条，可通过 `pageSize` 修改。组件挂载后自动加载第一页，之后只在底部哨兵随
 用户滚动进入可视区域时加载下一页。查询条件变化时通过组件暴露的 `reset()` 重新加载。
+首次加载或 `reset()` 请求第一页时，组件只显示加载状态；第一页完成且列表为空后才渲染 `empty`
+插槽，避免请求过程中短暂显示空状态。已有数据时继续渲染默认插槽，并在触底请求期间保留列表。
 
 ```vue
 <MkInfiniteScroll ref="infiniteScrollRef" v-model="resources" :load="loadResourcePage">
   <ResourceCard v-for="resource in resources" :key="resource.id" :resource="resource" />
+  <template #empty>
+    <MkEmpty />
+  </template>
 </MkInfiniteScroll>
 ```
 

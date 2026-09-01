@@ -23,7 +23,7 @@ export const applicationRoutes: RouteRecordRaw[] = [
             path: 'overview',
             name: 'workspace-application-detail',
             component: () => import('@/views/application-detail/overview/OverviewView.vue'),
-            meta: { title: '概览', icon: 'icon_screen_outlined', activeIcon: 'icon_screen_outlined', order: 10 },
+            meta: { title: '概览', icon: 'icon_screen_outlined', activeIcon: 'icon_screen_filled', order: 10 },
           },
           {
             path: 'setting',

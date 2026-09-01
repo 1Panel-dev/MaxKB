@@ -1,49 +1,90 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { cloneDeep } from 'lodash'
 import type { FormInstance, FormRules } from 'element-plus'
+import ApplicationApi from '@/api/admin/workspace/application/application'
+import { APPLICATION_TYPE } from '@/api/enums'
+import type { ApplicationFormPayload } from '@/api/types'
+import MkSourceCard from '@/components/mk-source-card/index.vue'
+import { useStore } from '@/stores'
+import { MsgSuccess } from '@/utils/message'
+import { applicationTemplate } from './template'
 
 defineOptions({ name: 'AdvancedCreateDialog' })
 
-type ApplicationTemplate = 'blank' | 'assistant'
+type ApplicationTemplateType = 'blank' | 'assistant'
 
 interface AdvancedApplicationDraft {
   desc: string
   name: string
-  template: ApplicationTemplate
 }
 
-const emit = defineEmits<{ submit: [draft: AdvancedApplicationDraft] }>()
+const { auth } = useStore()
+const route = useRoute()
+const router = useRouter()
+
+const props = defineProps<{ folderId: string }>()
+
+const emit = defineEmits<{ refresh: [] }>()
 
 const dialogVisible = ref(false)
-const selectedTemplate = ref<ApplicationTemplate>('blank')
+const loading = ref(false)
+const selectedTemplate = ref<ApplicationTemplateType>('blank')
 const applicationFormRef = ref<FormInstance>()
-const applicationForm = reactive<Omit<AdvancedApplicationDraft, 'template'>>({ desc: '', name: '' })
+const applicationForm = reactive<AdvancedApplicationDraft>({ desc: '', name: '' })
 const applicationFormRules: FormRules<typeof applicationForm> = {
   name: [{ required: true, message: '请输入智能体名称', trigger: 'blur' }],
 }
 const createDisabled = computed(() => !applicationForm.name.trim())
 
-function open() {
-  resetData()
-  dialogVisible.value = true
+function handleTemplateSelect(template: ApplicationTemplateType) {
+  selectedTemplate.value = template
 }
 
 function submit() {
   applicationFormRef.value?.validate((valid) => {
     if (!valid) return
 
-    emit('submit', {
+    const workflow = cloneDeep(applicationTemplate[selectedTemplate.value])
+    const baseNode = workflow.nodes?.find(({ id }) => id === 'base-node')
+    const prologue = (baseNode?.properties as { node_data?: { prologue?: string } } | undefined)?.node_data?.prologue
+    const payload: ApplicationFormPayload = {
       desc: applicationForm.desc.trim(),
+      folder_id: props.folderId,
       name: applicationForm.name.trim(),
-      template: selectedTemplate.value,
-    })
-    dialogVisible.value = false
+      prologue,
+      type: APPLICATION_TYPE.WORK_FLOW,
+      work_flow: workflow,
+    }
+
+    loading.value = true
+    ApplicationApi.postApplication(payload)
+      .then((application) => {
+        return auth.loadAuthBaseProfile().then(() => {
+          MsgSuccess('创建成功')
+          dialogVisible.value = false
+          emit('refresh')
+          return router.push({
+            name: 'workflow-application',
+            params: { applicationId: application.id, workspaceId: route.params.workspaceId },
+          })
+        })
+      })
+      .finally(() => {
+        loading.value = false
+      })
   })
+}
+
+function open() {
+  dialogVisible.value = true
 }
 
 function resetData() {
   Object.assign(applicationForm, { desc: '', name: '' })
   selectedTemplate.value = 'blank'
+  loading.value = false
   applicationFormRef.value?.clearValidate()
 }
 
@@ -54,7 +95,6 @@ defineExpose({ open })
   <MkDialog v-model="dialogVisible" title="创建高级智能体" align-center @closed="resetData">
     <el-form
       ref="applicationFormRef"
-      class="pt-5"
       :model="applicationForm"
       :rules="applicationFormRules"
       label-position="top"
@@ -74,7 +114,7 @@ defineExpose({ open })
       <el-form-item label="描述">
         <el-input
           v-model="applicationForm.desc"
-          maxlength="500"
+          maxlength="256"
           placeholder="描述该智能体的应用场景及用途，如：XXX 小助手回答用户提出的 XXX 产品使用问题"
           :rows="4"
           show-word-limit
@@ -83,43 +123,37 @@ defineExpose({ open })
         />
       </el-form-item>
 
-      <el-form-item label="模板" class="mb-0!">
+      <el-form-item label="模板">
         <div class="grid w-full grid-cols-2 gap-4">
-          <button
-            type="button"
-            class="flex h-38 items-center justify-center rounded-lg border text-lg transition-colors hover:border-primary"
-            :class="selectedTemplate === 'blank' ? 'border-primary bg-primary/[0.08]' : 'bg-white'"
-            @click="selectedTemplate = 'blank'"
+          <el-card
+            :class="selectedTemplate === 'blank' ? 'border-primary! bg-primary/10!' : ''"
+            shadow="hover"
+            @click="handleTemplateSelect('blank')"
           >
-            <MkIcon name="icon_add_outlined" :size="22" />
-            <span class="ml-2">空白创建</span>
-          </button>
+            <div class="flex h-full items-center justify-center gap-2">
+              <MkIcon name="icon_add_outlined" :size="16" />
+              <span>空白创建</span>
+            </div>
+          </el-card>
 
-          <button
-            type="button"
-            class="flex h-38 flex-col rounded-lg border p-4 text-left transition-colors hover:border-primary"
-            :class="selectedTemplate === 'assistant' ? 'border-primary bg-primary/[0.08]' : 'bg-white'"
-            @click="selectedTemplate = 'assistant'"
+          <MkSourceCard
+            class="min-h-0!"
+            :class="selectedTemplate === 'assistant' ? 'active' : ''"
+            title="知识库问答助手"
+            @click="handleTemplateSelect('assistant')"
           >
-            <span class="flex items-center gap-3">
-              <el-avatar shape="square" :size="24" class="bg-primary-gradient!">
-                <img style="width: 65%" src="@/assets/application/icon_simple_application.svg" alt="" />
-              </el-avatar>
-              <h6>知识库问答助手</h6>
-            </span>
-            <span class="mt-4 text-N600">将从知识库中检索到的知识作为已知信息，回答用户提出的问题。</span>
-            <span class="mt-auto flex items-center gap-2 text-N600">
-              <MkIcon name="icon_download_outlined" />
-              <span>204</span>
-            </span>
-          </button>
+            <template #icon>
+              <ApplicationIcon />
+            </template>
+            <p>将从知识库中检索到的知识作为已知信息，回答用户提出的问题。</p>
+          </MkSourceCard>
         </div>
       </el-form-item>
     </el-form>
 
     <template #footer>
-      <el-button plain @click="dialogVisible = false">取消</el-button>
-      <el-button type="primary" :disabled="createDisabled" @click="submit">创建</el-button>
+      <el-button plain :disabled="loading" @click="dialogVisible = false">取消</el-button>
+      <el-button type="primary" :disabled="createDisabled" :loading="loading" @click="submit">创建</el-button>
     </template>
   </MkDialog>
 </template>

@@ -79,6 +79,10 @@
   // icon使用蓝色是固定的, 不能随主题变化
   --el-avatar-bg-color: #3370ff;
   flex-shrink: 0;
+  // ai的icon是固定的, 不能随主题变化
+  &.ai-avatar-gradient {
+    background: linear-gradient(180deg, #3370ff 0%, #9258f7 100%) !important;
+  }
 }
 
 /* button */

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue'
-import { Close } from '@element-plus/icons-vue'
 import type { ThemeInfo } from '@/api/admin/auth/types'
 import { LOGIN_METHOD } from '@/api/enums'
 import type { LoginConfig } from '@/api/types'

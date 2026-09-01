@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { ApplicationDetail } from '@/api/types'
 import MkSourceCard from '@/components/mk-source-card/index.vue'
-import { resetUrl } from '@/utils/icon'
 import { isWorkFlow } from '@/utils/application'
 import { dateFormat } from '@/utils/time'
 
@@ -30,9 +29,7 @@ function handleOpen() {
     @selected="emit('selected', $event)"
   >
     <template #icon>
-      <el-avatar class="bg-transparent!" shape="square" :size="24">
-        <img :src="resetUrl(application.icon, true)" />
-      </el-avatar>
+      <ApplicationIcon :icon="application.icon" />
     </template>
 
     <template #tag>

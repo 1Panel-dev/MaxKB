@@ -12,6 +12,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    ApplicationIcon: typeof import('./components/global/mk-icon/ApplicationIcon.vue')['default']
     KnowledgeIcon: typeof import('./components/global/mk-icon/KnowledgeIcon.vue')['default']
     LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
     LayoutBatchFooter: typeof import('./components/global/mk-view-layout/layout-batch-footer.vue')['default']
@@ -42,6 +43,7 @@ declare module 'vue' {
 
 // For TSX support
 declare global {
+  const ApplicationIcon: typeof import('./components/global/mk-icon/ApplicationIcon.vue')['default']
   const KnowledgeIcon: typeof import('./components/global/mk-icon/KnowledgeIcon.vue')['default']
   const LayoutAside: typeof import('./components/global/mk-view-layout/layout-aside.vue')['default']
   const LayoutBatchFooter: typeof import('./components/global/mk-view-layout/layout-batch-footer.vue')['default']

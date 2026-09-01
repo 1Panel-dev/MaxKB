@@ -10,17 +10,22 @@ interface InfiniteScrollPagination {
 }
 
 const dataList = defineModel<T[]>({ required: true })
-const props = withDefaults(defineProps<{ load: (pagination: InfiniteScrollPagination) => Promise<ResponsePage<T>>; pageSize?: number }>(), { pageSize: 30 })
+const props = withDefaults(defineProps<{ load: (pagination: InfiniteScrollPagination) => Promise<ResponsePage<T>>; pageSize?: number }>(), {
+  pageSize: 30,
+})
 
-defineSlots<{ default?: () => unknown }>()
+defineSlots<{ default?: () => unknown; empty?: () => unknown }>()
 
 const triggerRef = ref<HTMLElement>()
 const loading = ref(false)
+const firstPageLoaded = ref(false)
 // 是否到可见区域。
 const isTriggerVisible = ref(false)
 
 const pagination = ref({ currentPage: 0, pageSize: props.pageSize, total: 0 })
-const finished = computed(() => pagination.value.currentPage > 0 && pagination.value.currentPage * pagination.value.pageSize >= pagination.value.total)
+const finished = computed(
+  () => pagination.value.currentPage > 0 && pagination.value.currentPage * pagination.value.pageSize >= pagination.value.total,
+)
 const showFinishedText = computed(() => finished.value && pagination.value.total > pagination.value.pageSize)
 // 查询条件快速变化时可能并发 reset，只有最新版本的请求可以更新列表。
 let requestVersion = 0
@@ -42,7 +47,10 @@ function loadPage(currentPage: number) {
     .catch(() => {})
     .finally(() => {
       // 旧请求不能关闭新请求正在显示的 loading。
-      if (currentRequestVersion === requestVersion) loading.value = false
+      if (currentRequestVersion === requestVersion) {
+        if (currentPage === 1) firstPageLoaded.value = true
+        loading.value = false
+      }
     })
 }
 
@@ -54,6 +62,7 @@ function tryLoadNextPage() {
 
 function reset() {
   // 搜索或筛选条件变化后清空旧数据，并从第一页重新查询。
+  firstPageLoaded.value = false
   dataList.value = []
   pagination.value = { currentPage: 0, pageSize: props.pageSize, total: 0 }
   return loadPage(1)
@@ -81,10 +90,11 @@ defineExpose({ reset })
 </script>
 
 <template>
-  <div v-loading="loading">
-    <slot />
+  <div v-loading="loading && !dataList.length" class="min-h-full">
+    <slot v-if="dataList.length" />
+    <slot v-else-if="firstPageLoaded" name="empty" />
     <div ref="triggerRef" aria-live="polite" class="flex-center py-4 shrink-0 text-sm text-N600">
-      <span v-if="loading">加载中...</span>
+      <span v-if="loading && dataList.length">加载中...</span>
       <span v-else-if="showFinishedText">没有更多了</span>
     </div>
   </div>

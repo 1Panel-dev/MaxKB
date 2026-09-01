@@ -106,12 +106,14 @@ function handleDeleteKnowledge(knowledgeId: string) {
 
       <div v-loading="knowledgeOperationLoading" class="min-h-0 flex-1">
         <MkInfiniteScroll ref="infiniteScrollRef" v-model="knowledgeData" :load="loadKnowledgePage">
-          <div v-if="knowledgeData.length" class="mk-resource-card-grid">
+          <div class="mk-resource-card-grid">
             <template v-for="knowledge in knowledgeData" :key="knowledge.id">
               <KnowledgeCard v-model:loading="knowledgeOperationLoading" :knowledge="knowledge" :shared="isShared" @delete="handleDeleteKnowledge" />
             </template>
           </div>
-          <MkEmpty v-else class="mt-24" />
+          <template #empty>
+            <MkEmpty class="mt-24" />
+          </template>
         </MkInfiniteScroll>
       </div>
     </template>
