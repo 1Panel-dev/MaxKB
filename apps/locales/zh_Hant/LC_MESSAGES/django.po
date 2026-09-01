@@ -9559,3 +9559,117 @@ msgstr "自動"
 msgid "Tokenhub sync_transcribe endpoint"
 msgstr "Tokenhub 同步轉寫接口地址"
 
+msgid "Add logo"
+msgstr "加入標示"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "Custom watermark content, at most 16 characters, drawn in the bottom-right."
+msgstr "自訂浮水印內容，最多16個字元，繪製在右下角。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Designed for Agent workloads, using a MoE architecture that supports interleaved thinking, structured output, Function Calling and Cache caching."
+msgstr "專為 Agent 場景設計，採用 MoE 架構，支援交織思考、結構化輸出、Function Calling 與 Cache 快取。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/ttv.py
+msgid "Frame rate"
+msgstr "幀率"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Hunyuan HY-Video 1.5 image-to-video model."
+msgstr "混元 HY-Video 1.5 圖生影片模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Hunyuan HY-Video 1.5 text-to-video model."
+msgstr "混元 HY-Video 1.5 文生影片模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Hunyuan Hy-Image 3.0 text-to-image model."
+msgstr "混元 Hy-Image 3.0 文生圖模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Hunyuan's latest role-playing model based on the Hunyuan model with role-playing scene fine-tuning."
+msgstr "基於混元模型並在角色扮演場景微調的最新角色扮演模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Hunyuan's role-playing model with better basic effects in role-playing scenarios."
+msgstr "在角色扮演場景中基礎效果更優的混元角色扮演模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/ttv.py
+msgid "Output video frame rate: 16, 24, 30."
+msgstr "輸出影片幀率：16、24、30。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/ttv.py
+msgid "Output video resolution: 480p, 720p, 1080p."
+msgstr "輸出影片解析度：480p、720p、1080p。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "Prompt rewrite"
+msgstr "提示詞改寫"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent Hybrid multilingual translation model."
+msgstr "騰訊混元多語言翻譯模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent TokenHub multimodal embedding model, 2048 dimensions."
+msgstr "騰訊 TokenHub 多模態向量模型，2048 維。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent TokenHub multimodal embedding model, 4096 dimensions."
+msgstr "騰訊 TokenHub 多模態向量模型，4096 維。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent TokenHub text embedding model, 1024 dimensions."
+msgstr "騰訊 TokenHub 文字向量模型，1024 維。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent TokenHub text embedding model, 2560 dimensions."
+msgstr "騰訊 TokenHub 文字向量模型，2560 維。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tencent YT-Video 2.0 image-to-video model."
+msgstr "騰訊 YT-Video 2.0 圖生影片模型。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "The latest generation productivity model with upgraded Agent and complex task execution capabilities."
+msgstr "採用全新一代生產力模型，升級了 Agent 與複雜任務執行能力。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "TokenHub Hy-Image v3-generation endpoint"
+msgstr "TokenHub Hy-Image v3-generation 介面"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/embedding.py
+msgid "TokenHub OpenAI compatible embeddings endpoint"
+msgstr "TokenHub OpenAI 相容向量介面"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/llm.py
+msgid "TokenHub OpenAI compatible endpoint"
+msgstr "TokenHub OpenAI 相容介面"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/ttv.py
+msgid "TokenHub video endpoint. Use the base (e.g. https://tokenhub.tencentmaas.com/v1) or a full submit/query URL."
+msgstr "TokenHub 影片介面。可使用根位址（如 https://tokenhub.tencentmaas.com/v1）或完整的 submit/query 位址。"
+
+#: apps/models_provider/impl/tencent_model_provider/tencent_model_provider.py
+msgid "Tuned on real business scenarios, balancing effectiveness and cost-effectiveness, with reinforced Coding, long-text, reasoning and Agent capabilities."
+msgstr "針對真實業務場景調優，兼顧效果與成本，強化了 Coding、長文本、推理和 Agent 能力。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "Watermark footnote"
+msgstr "浮水印角標"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "Whether the model should rewrite and optimize the prompt before generation."
+msgstr "模型是否在生成前改寫並最佳化提示詞。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/ttv.py
+msgid "Whether to add the AI-generated logo to the video. 1: add logo; 0: no logo (requires console approval for independent control)."
+msgstr "是否為生成影片加入 AI 標示。1：加入標示；0：不加入標示（需在控制台申請開啟獨立控制）。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/tti.py
+msgid "Width and height must be in [512, 2048] and the area must not exceed 1024x1024. If not passed, the model auto-selects the closest preset size."
+msgstr "寬和高必須在 [512, 2048] 之間，且面積不得超過 1024x1024。未傳時由模型自動選擇最接近的預設尺寸。"
+
+#: apps/models_provider/impl/tencent_model_provider/credential/embedding.py
+msgid "api_key is required"
+msgstr "api_key 必填"
