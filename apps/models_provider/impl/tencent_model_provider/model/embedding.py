@@ -5,10 +5,10 @@ from typing import Dict, List
 import requests
 
 from common.utils.logger import maxkb_logger
-from models_provider.base_model_provider import MaxKBBaseEmbeddingModel
+from models_provider.base_model_provider import MaxKBBaseModel
 
 
-class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
+class TencentEmbeddingModel(MaxKBBaseModel):
     """腾讯 TokenHub 向量模型（OpenAI Embeddings 兼容接口）。
 
     文本向量：POST /v1/embeddings
@@ -30,7 +30,7 @@ class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
 
     @staticmethod
     def new_instance(model_type: str, model_name: str, model_credential: Dict[str, object], **model_kwargs):
-        optional_params = MaxKBBaseEmbeddingModel.filter_optional_params(model_kwargs)
+        optional_params = MaxKBBaseModel.filter_optional_params(model_kwargs)
         return TencentEmbeddingModel(
             api_key=model_credential.get("api_key"),
             model_name=model_name,
