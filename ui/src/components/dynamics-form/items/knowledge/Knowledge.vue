@@ -48,9 +48,18 @@ defineOptions({ inheritAttrs: false })
 const emit = defineEmits(['update:modelValue', 'change'])
 
 const model_value = computed({
-  get: () =>
-    props.modelValue.filter((id: string) => availableList.value.some((item) => item.id === id)) ||
-    [],
+  get: () => {
+    if (Array.isArray(props.modelValue)) {
+      return (
+        props.modelValue.filter((id: string) =>
+          availableList.value.some((item) => item.id === id),
+        ) || []
+      )
+    } else {
+      emit('update:modelValue', [])
+    }
+    return []
+  },
   set: (value: string[]) => {
     emit('update:modelValue', value)
     emit('change', props.formField)

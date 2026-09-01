@@ -150,9 +150,9 @@ function addKnowledge(data: any[]) {
   formValue.value.knowledge_list = data
   if (formValue.value.default_value) {
     const currentIds = data.map((k: any) => k.id)
-    formValue.value.default_value = formValue.value.default_value.filter((id: string) =>
-      currentIds.includes(id),
-    )
+    formValue.value.default_value = Array.isArray(formValue.value?.default_value)
+      ? formValue.value?.default_value.filter((id: string) => currentIds.includes(id))
+      : []
   }
 }
 
