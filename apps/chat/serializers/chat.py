@@ -297,8 +297,10 @@ class ChatSerializers(serializers.Serializer):
 
     def is_valid_chat_id(self, chat_info: ChatInfo):
         if self.data.get('application_id') is not None and self.data.get('application_id') != str(
-                chat_info.application_id) and self.data.get('chat_user_id') is not None and self.data.get(
-            'chat_user_id') != str(chat_info.chat_user_id):
+                chat_info.application_id):
+            raise ChatException(500, _("Conversation does not exist"))
+        if self.data.get('chat_user_id') is not None and self.data.get('chat_user_id') != str(
+                chat_info.chat_user_id):
             raise ChatException(500, _("Conversation does not exist"))
 
     def is_valid_intraday_access_num(self):
@@ -491,11 +493,11 @@ class ChatSerializers(serializers.Serializer):
         if application_version is None:
             raise ChatException(500, _("The application has not been published. Please use it after publishing."))
         if application.type == ApplicationTypeChoices.SIMPLE:
-            return self.re_open_chat_simple(chat_id, application)
+            return self.re_open_chat_simple(chat_id, application, chat)
         else:
-            return self.re_open_chat_work_flow(chat_id, application)
+            return self.re_open_chat_work_flow(chat_id, application, chat)
 
-    def re_open_chat_simple(self, chat_id, application):
+    def re_open_chat_simple(self, chat_id, application: Application, chat: Chat):
         if self.data.get('debug'):
             # 数据集id列表
             knowledge_id_list = [str(row.target_id) for row in
@@ -512,7 +514,7 @@ class ChatSerializers(serializers.Serializer):
                                     QuerySet(Document).filter(
                                         knowledge_id__in=knowledge_id_list,
                                         is_active=False)]
-        chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'),
+        chat_info = ChatInfo(chat_id, chat.chat_user_id, str(chat.chat_user_type),
                              self.data.get('ip_address'),
                              self.data.get('source'), knowledge_id_list,
                              exclude_document_id_list, application.id)
@@ -522,8 +524,8 @@ class ChatSerializers(serializers.Serializer):
             chat_info.chat_record_list.append(chat_record)
         return chat_info
 
-    def re_open_chat_work_flow(self, chat_id, application):
-        chat_info = ChatInfo(chat_id, self.data.get('chat_user_id'), self.data.get('chat_user_type'),
+    def re_open_chat_work_flow(self, chat_id, application: Application, chat: Chat):
+        chat_info = ChatInfo(chat_id, chat.chat_user_id, str(chat.chat_user_type),
                              self.data.get('ip_address'),
                              self.data.get('source'), [], [],
                              application.id)
