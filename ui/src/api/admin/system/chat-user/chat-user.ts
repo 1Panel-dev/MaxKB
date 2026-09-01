@@ -76,9 +76,15 @@ const getChatUserSyncTypes = () => {
   return get<string[]>(`${prefix}/sync/types`)
 }
 
-/** 从指定来源导入对话用户。 */
-const postSyncChatUsers = (syncType: string) => {
-  return post<undefined, ChatUserSyncResult>(`${prefix}/sync/${syncType}`)
+/** 从指定来源导入对话用户（file 来源需携带 xlsx 文件）。 */
+const postSyncChatUsers = (syncType: string, defaultGroupId?: string, syncFile?: File) => {
+  if (syncFile) {
+    const payload = new FormData()
+    payload.append('xlsx_file', syncFile)
+    if (defaultGroupId) payload.append('default_group_id', defaultGroupId)
+    return post<FormData, ChatUserSyncResult>(`${prefix}/sync/${syncType}`, payload)
+  }
+  return post<{ default_group_id?: string }, ChatUserSyncResult>(`${prefix}/sync/${syncType}`, { default_group_id: defaultGroupId })
 }
 
 export default {

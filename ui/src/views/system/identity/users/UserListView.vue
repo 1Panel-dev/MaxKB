@@ -260,7 +260,7 @@ onMounted(() => loadSystemUsers())
     </template>
   </MkViewLayout>
   <UserFromDrawer ref="userFormDrawerRef" @refresh="loadSystemUsers" />
-  <ImportUsersDialog ref="importUsersDialogRef" />
+  <ImportUsersDialog ref="importUsersDialogRef" @refresh="loadSystemUsers" />
   <UserPwdDialog ref="userPwdDialogRef" @refresh="loadSystemUsers(false)" />
   <BatchSetUserRoleDialog ref="batchSetUserRoleDialogRef" @refresh="loadSystemUsers(false)" />
 </template>
