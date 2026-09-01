@@ -1,5 +1,10 @@
 <template>
-  <el-drawer v-model="visible" size="600">
+  <el-drawer
+    v-model="visible"
+    size="600"
+    :close-on-click-modal="false"
+    :close-on-press-escape="false"
+  >
     <template #header>
       <h4>{{ title }}</h4>
     </template>
@@ -11,8 +16,6 @@
       label-position="top"
       require-asterisk-position="right"
       @submit.prevent
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
     >
       <el-form-item
         :prop="isEdit ? '' : 'username'"
@@ -115,21 +118,21 @@
   </el-dialog>
 </template>
 <script setup lang="ts">
-import {computed, onBeforeMount, reactive, ref, watch} from 'vue'
-import type {FormInstance} from 'element-plus'
+import { computed, onBeforeMount, reactive, ref, watch } from 'vue'
+import type { FormInstance } from 'element-plus'
 import userManageApi from '@/api/system/user-manage'
-import {MsgSuccess} from '@/utils/message'
-import {t} from '@/locales'
-import type {FormItemModel} from '@/api/type/role'
+import { MsgSuccess } from '@/utils/message'
+import { t } from '@/locales'
+import type { FormItemModel } from '@/api/type/role'
 import WorkspaceApi from '@/api/workspace/workspace'
 import MemberFormContent from '@/views/system/role/component/MemberFormContent.vue'
-import {AuthorizationEnum, RoleTypeEnum} from '@/enums/system'
+import { AuthorizationEnum, RoleTypeEnum } from '@/enums/system'
 import useStore from '@/stores'
-import {hasPermission} from '@/utils/permission'
-import {EditionConst} from '@/utils/permission/data.ts'
-import JSEncrypt from "jsencrypt";
+import { hasPermission } from '@/utils/permission'
+import { EditionConst } from '@/utils/permission/data.ts'
+import JSEncrypt from 'jsencrypt'
 
-const {user} = useStore()
+const { user } = useStore()
 const props = defineProps({
   title: String,
 })
@@ -289,7 +292,7 @@ onBeforeMount(async () => {
     }
     formItemModel.value = [...roleFormItem.value, ...workspaceFormItem.value]
   }
-  list.value = [{role_id: '', workspace_ids: []}]
+  list.value = [{ role_id: '', workspace_ids: [] }]
 })
 
 const rules = reactive({
@@ -361,7 +364,7 @@ watch(visible, (bool) => {
       nick_name: '',
     }
     isEdit.value = false
-    list.value = [{role_id: '', workspace_ids: []}]
+    list.value = [{ role_id: '', workspace_ids: [] }]
     userFormRef.value?.clearValidate()
   }
 })
@@ -405,12 +408,12 @@ const submit = async (formEl: FormInstance | undefined) => {
 
           // 如果是管理员角色，则设置为 ['None']
           if (isAdminRole) {
-            return {...item, workspace_ids: ['None']}
+            return { ...item, workspace_ids: ['None'] }
           }
 
           // 如果是普通用户且是 PE 类型，则设置为 ['default']
           if (user.isPE()) {
-            return {...item, workspace_ids: ['default']}
+            return { ...item, workspace_ids: ['default'] }
           }
 
           // 其他情况保持原样
@@ -431,10 +434,10 @@ const submit = async (formEl: FormInstance | undefined) => {
         })
       } else {
         params.defaultPermission = defaultPermission.value
-        const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt;
-        const js = new (JSEncryptCtor as any)();
-        js.setPublicKey(user.rsaKey);
-        params.password = js.encrypt(params.password);
+        const JSEncryptCtor = (JSEncrypt as any)?.default ? (JSEncrypt as any).default : JSEncrypt
+        const js = new (JSEncryptCtor as any)()
+        js.setPublicKey(user.rsaKey)
+        params.password = js.encrypt(params.password)
         params.encrypted = true
         userManageApi.postUserManage(params, loading).then((res) => {
           return user.profile(loading).then(() => {
@@ -461,7 +464,7 @@ const submitDialog = () => {
   closeDialog()
 }
 
-defineExpose({open})
+defineExpose({ open })
 </script>
 <style lang="scss" scoped>
 .dialog-header {
