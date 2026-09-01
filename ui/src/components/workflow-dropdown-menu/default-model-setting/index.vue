@@ -4,8 +4,13 @@
     v-click-outside="handleClickOutside"
     class="default-model-setting-menu workflow-dropdown-menu border border-r-6 white-bg"
   >
-    <div class="title">{{ $t('workflow.setting.defaultModelSetting') }}</div>
-    <el-alert :title="$t('workflow.setting.defaultModelSettingTip')" type="info" :closable="false" />
+    <div class="title">
+      <h4 class="mb-4">{{ $t('workflow.setting.defaultModelSetting') }}</h4>
+      <p class="mb-8">
+        <el-text type="info">{{ $t('workflow.setting.defaultModelSettingTip') }}</el-text>
+      </p>
+    </div>
+
     <el-scrollbar max-height="calc(100vh - 220px)">
       <el-form label-position="top" class="p-12">
         <el-form-item v-for="item in defaultModelTypes" :key="item.type" :label="item.label">
@@ -78,11 +83,22 @@ const defaulTypeLabels: Record<string, string> = {
   ITV: t('workflow.setting.modelType.ITV'),
   RERANKER: t('workflow.setting.modelType.RERANKER'),
 }
-const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'].map((type) => ({
-  type,
-  label: defaulTypeLabels[type] || type,
-}))
-const EMPTY_SETTING = { LLM: {}, TTS: {}, STT: {}, IMAGE: {}, TTI: {}, TTV: {}, ITV: {}, RERANKER: {} }
+const defaultModelTypes = ['LLM', 'TTS', 'STT', 'IMAGE', 'TTI', 'TTV', 'ITV', 'RERANKER'].map(
+  (type) => ({
+    type,
+    label: defaulTypeLabels[type] || type,
+  }),
+)
+const EMPTY_SETTING = {
+  LLM: {},
+  TTS: {},
+  STT: {},
+  IMAGE: {},
+  TTI: {},
+  TTV: {},
+  ITV: {},
+  RERANKER: {},
+}
 
 const modelSetting = ref<any>({ ...EMPTY_SETTING })
 const defaultModelOptions = ref<Record<string, any>>({})
@@ -149,7 +165,8 @@ const hasChanges = computed(
       const base = (props.modelValue || {})[type] || {}
       return (
         (cur.model_id || '') !== (base.model_id || '') ||
-        JSON.stringify(cur.model_params_setting || {}) !== JSON.stringify(base.model_params_setting || {})
+        JSON.stringify(cur.model_params_setting || {}) !==
+          JSON.stringify(base.model_params_setting || {})
       )
     }),
 )
@@ -172,11 +189,12 @@ function handleSave() {
 }
 
 function applyDefaultModelToAll() {
-  MsgConfirm(
-    t('workflow.setting.applyToAll'),
-    t('workflow.setting.applyToAllConfirmMsg'),
-    { type: 'warning', customClass: 'apply-to-all-confirm', center: true, confirmButtonText: t('workflow.setting.apply') },
-  ).then(() => {
+  MsgConfirm(t('workflow.setting.applyToAll'), t('workflow.setting.applyToAllConfirmMsg'), {
+    type: 'warning',
+    customClass: 'apply-to-all-confirm',
+    center: true,
+    confirmButtonText: t('workflow.setting.apply'),
+  }).then(() => {
     const graph = props.workflowRef?.getGraphData()
     let count = 0
     // 栈式遍历,循环节点内嵌 graph(loop_body)也入栈覆盖,与发布校验 validate_workflow_default_models 保持一致
