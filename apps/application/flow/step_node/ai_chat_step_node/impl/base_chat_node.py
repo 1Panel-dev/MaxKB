@@ -405,7 +405,7 @@ class BaseChatNode(IChatNode):
                         500, _("Agent Key is required for agent tool 【{name}】").format(name=app.name)
                     )
                 executor = ToolExecutor()
-                app_config = executor.get_app_mcp_config(api_key, self.get_chat_files())
+                app_config = executor.get_app_mcp_config(api_key, self.get_chat_files(), self.get_form_data())
                 mcp_servers_config[app.name] = app_config
 
         if skill_tool_ids and len(skill_tool_ids) > 0:
@@ -487,6 +487,9 @@ class BaseChatNode(IChatNode):
             if items:
                 chat_files[field] = items
         return chat_files
+
+    def get_form_data(self):
+        return getattr(self.workflow_manage, "form_data", {})
 
     def handle_variables(self, tool_params):
         # 处理参数中的变量
