@@ -28,6 +28,7 @@ const workflowComponentGroups = [
     list: [
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: 'AI 对话', value: WorkflowNodeType.AiChat },
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '意图识别', value: WorkflowNodeType.IntentNode },
+      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '文本转语音', value: WorkflowNodeType.TextToSpeechNode },
     ],
   },
   {
