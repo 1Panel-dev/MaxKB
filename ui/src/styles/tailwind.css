@@ -25,6 +25,7 @@
 
   /* shadows */
   --shadow-md: var(--el-box-shadow-light);
+  --shadow-sm: var(--el-box-shadow-lighter);
 
   /* typography */
   --text-xs: 10px;

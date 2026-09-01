@@ -87,9 +87,10 @@ function handleDeleteApplication(applicationId: string) {
   if (applicationIndex >= 0) applicationData.value.splice(applicationIndex, 1)
 }
 
+/* card点击去详情 */
 function handleToDetail(application: ApplicationDetail) {
-  void router.push({
-    name: 'workspace-application-detail',
+  router.push({
+    name: 'workspace-application-overview',
     params: { applicationId: application.id, type: application.type, workspaceId: route.params.workspaceId },
   })
 }

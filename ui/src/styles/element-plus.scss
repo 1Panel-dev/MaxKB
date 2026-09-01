@@ -36,6 +36,7 @@
   --el-border-radius-round: 16px;
   --el-border-radius-small: 4px;
   --el-box-shadow-light: 0 4px 8px 0 var(--mk-N900-transparent-10);
+  --el-box-shadow-lighter: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
   --el-menu-icon-width: auto;
   --el-text-color-primary: var(--mk-N900);
   --el-text-color-regular: var(--mk-N600);
@@ -137,7 +138,7 @@
     &:hover,
     &:active,
     &.is-active {
-      box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
+      box-shadow: var(--el-box-shadow-lighter);
       color: var(--el-text-color-primary);
       background: white;
       border-color: var(--el-border-color);
@@ -873,7 +874,7 @@
   .el-switch__core {
     min-width: 28px;
     .el-switch__action {
-      box-shadow: 0px 2px 4px 0px rgb(var(--mk-N900-rgb) / 12%);
+      box-shadow: var(--el-box-shadow-lighter);
     }
   }
 }
@@ -1051,6 +1052,7 @@
 
 /* textarea */
 .el-textarea {
+  --el-input-text-color: var(--el-text-color-primary);
   &:has(.el-input__inner[readonly]) {
     --el-input-focus-border-color: var(--el-input-border-color);
     --el-input-hover-border-color: var(--el-input-border-color);

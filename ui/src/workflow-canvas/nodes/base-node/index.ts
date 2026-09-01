@@ -11,7 +11,7 @@ class BaseNodeView extends WorkflowNodeView {
 class BaseNodeModel extends WorkflowNodeModel {
   setAttributes() {
     super.setAttributes()
-    this.width = 600
+    this.width = 340
   }
 }
 
