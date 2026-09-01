@@ -21,7 +21,7 @@ CHAT_FILE_TYPE_LABELS = {
 
 
 class MCPToolHandler:
-    def __init__(self, auth_header, chat_files_header=None):
+    def __init__(self, auth_header, chat_files_header=None, form_data=None):
         app_key = QuerySet(ApplicationApiKey).filter(secret_key=auth_header, is_active=True).first()
         if not app_key:
             raise PermissionError("Invalid API Key")
@@ -32,6 +32,7 @@ class MCPToolHandler:
         if not self.application:
             raise PermissionError("Application is not found or not published")
         self.chat_files = self.decode_chat_files(chat_files_header)
+        self.form_data = json.loads(base64.b64decode(form_data).decode("utf-8"))
 
     @staticmethod
     def decode_chat_files(chat_files_header):
@@ -122,7 +123,13 @@ class MCPToolHandler:
     def call_tool(self, params):
         args = params.get("arguments", {})
 
-        payload = {"message": args.get("message"), "stream": True, "re_chat": False, **self.chat_files}
+        payload = {
+            "message": args.get("message"),
+            "stream": True,
+            "re_chat": False,
+            "form_data": self.form_data,
+            **self.chat_files,
+        }
         resp = ChatSerializers(
             data={
                 "chat_id": self._get_chat_id(),

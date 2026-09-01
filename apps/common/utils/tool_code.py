@@ -338,7 +338,7 @@ exec({dedent(code)!a})
         }
         return tool_config
 
-    def get_app_mcp_config(self, api_key, chat_files=None):
+    def get_app_mcp_config(self, api_key, chat_files=None, form_data=None):
         headers = {
             "Authorization": f"Bearer {api_key}",
         }
@@ -346,6 +346,10 @@ exec({dedent(code)!a})
         chat_files_header = self.encode_chat_files(chat_files)
         if chat_files_header:
             headers["X-MaxKB-Chat-Files"] = chat_files_header
+        if form_data:
+            headers["X-MaxKB-Form-Data"] = base64.b64encode(
+                json.dumps(form_data, ensure_ascii=False).encode("utf-8")
+            ).decode()
         app_config = {
             "url": f"http://127.0.0.1:8080{CONFIG.get_chat_path()}/api/mcp",
             "transport": "streamable_http",
