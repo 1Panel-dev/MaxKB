@@ -16,13 +16,11 @@ from models_provider.impl.tencent_model_provider.credential.llm import TencentLL
 from models_provider.impl.tencent_model_provider.credential.stt import TencentSTTModelCredential
 from models_provider.impl.tencent_model_provider.credential.tokenhub_stt import TencentTokenhubSTTModelCredential
 from models_provider.impl.tencent_model_provider.credential.tti import TencentTTIModelCredential
-from models_provider.impl.tencent_model_provider.credential.ttv import TencentTTVModelCredential
 from models_provider.impl.tencent_model_provider.model.embedding import TencentEmbeddingModel
 from models_provider.impl.tencent_model_provider.model.image import TencentVision
 from models_provider.impl.tencent_model_provider.model.llm import TencentModel
 from models_provider.impl.tencent_model_provider.model.stt import TencentSpeechToText, TencentWandSpeechToText
 from models_provider.impl.tencent_model_provider.model.tti import TencentTextToImageModel
-from models_provider.impl.tencent_model_provider.model.ttv import TencentVideoModel
 from maxkb.conf import PROJECT_DIR
 from django.utils.translation import gettext as _
 
@@ -174,33 +172,6 @@ def _initialize_model_info():
         )
     ]
 
-    model_info_ttv_list = [
-        _create_model_info(
-            "hy-video-1.5",
-            _("Hunyuan HY-Video 1.5 text-to-video model."),
-            ModelTypeConst.TTV,
-            TencentTTVModelCredential,
-            TencentVideoModel,
-        )
-    ]
-
-    model_info_itv_list = [
-        _create_model_info(
-            "hy-video-1.5",
-            _("Hunyuan HY-Video 1.5 image-to-video model."),
-            ModelTypeConst.ITV,
-            TencentTTVModelCredential,
-            TencentVideoModel,
-        ),
-        _create_model_info(
-            "yt-video-2.0",
-            _("Tencent YT-Video 2.0 image-to-video model."),
-            ModelTypeConst.ITV,
-            TencentTTVModelCredential,
-            TencentVideoModel,
-        ),
-    ]
-
     model_info_manage = (
         ModelInfoManage.builder()
         .append_model_info_list(model_info_list)
@@ -209,10 +180,6 @@ def _initialize_model_info():
         .append_default_model_info(model_info_vision_list[0])
         .append_model_info_list(model_info_tti_list)
         .append_default_model_info(model_info_tti_list[0])
-        .append_model_info_list(model_info_ttv_list)
-        .append_default_model_info(model_info_ttv_list[0])
-        .append_model_info_list(model_info_itv_list)
-        .append_default_model_info(model_info_itv_list[0])
         .append_default_model_info(model_info_list[0])
         .append_default_model_info(tencent_embedding_model_info)
         .build()
