@@ -35,7 +35,7 @@ dependencies = [
 
     # Model providers & cloud SDKs
     "anthropic==0.122.0",
-    "boto3==1.43.70",
+    "boto3==1.43.83",
     "cohere==7.0.8",
     "dashscope==1.26.7",
     "qianfan==0.4.12.3",
