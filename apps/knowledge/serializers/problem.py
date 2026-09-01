@@ -57,25 +57,6 @@ class BatchAssociation(serializers.Serializer):
                                             child=serializers.UUIDField(required=True, label=_('problem id')))
     paragraph_list = AssociationParagraph(many=True)
 
-    def is_valid(self, *, knowledge_id=None, raise_exception=False):
-        super().is_valid(raise_exception=raise_exception)
-
-        problem_id_list = self.data.get('problem_id_list')
-        paragraph_id_list = [str(p.get('id')) for p in self.data.get('paragraph_list')]
-
-        self._validate_belong(Problem, problem_id_list, knowledge_id, 'problem id list')
-        self._validate_belong(Paragraph, paragraph_id_list, knowledge_id, 'paragraph list')
-
-    @staticmethod
-    def _validate_belong(model, id_list, knowledge_id, label):
-        # 去重,避免重复 id 干扰数量比较
-        id_set = set(id_list)
-        exist_count = QuerySet(model).filter(
-            id__in=id_set, knowledge_id=knowledge_id
-        ).count()
-        if exist_count != len(id_set):
-            raise AppApiException(500, f'{label} 中存在不属于当前知识库的数据')
-
 
 class ProblemSerializers(serializers.Serializer):
     class BatchOperate(serializers.Serializer):
@@ -107,8 +88,7 @@ class ProblemSerializers(serializers.Serializer):
         def association(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-                BatchAssociation(data=instance).is_valid(knowledge_id=self.data.get('knowledge_id'),
-                                                         raise_exception=True)
+                BatchAssociation(data=instance).is_valid(raise_exception=True)
             knowledge_id = self.data.get('knowledge_id')
             paragraph_list = instance.get('paragraph_list') or []
             problem_id_list = instance.get('problem_id_list') or []
