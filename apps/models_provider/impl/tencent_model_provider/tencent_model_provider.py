@@ -204,4 +204,4 @@ class TencentModelProvider(IModelProvider):
     def get_model_provide_info(self):
         icon_path = _get_tencent_icon_path()
         icon_data = get_file_content(icon_path)
-        return ModelProvideInfo(provider="model_tencent_provider", name=_("Tencent Hunyuan"), icon=icon_data)
+        return ModelProvideInfo(provider="model_tencent_provider", name=_("Tencent Cloud"), icon=icon_data)
