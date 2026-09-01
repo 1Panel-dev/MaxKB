@@ -22,81 +22,37 @@ const workflowComponentTabs: Array<{ label: string; value: WorkflowComponentTab 
   { label: '智能体', value: 'application' },
 ]
 
-const workflowComponentOptions = [
+const workflowComponentGroups = [
   {
-    icon: aiChatIcon,
-    iconClass: 'bg-primary-gradient',
-    label: 'AI 对话',
-    value: WorkflowNodeType.AiChat,
+    label: 'AI 能力',
+    list: [
+      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: 'AI 对话', value: WorkflowNodeType.AiChat },
+      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '意图识别', value: WorkflowNodeType.IntentNode },
+    ],
   },
   {
-    icon: aiChatIcon,
-    iconClass: 'bg-primary-gradient',
-    label: '意图识别',
-    value: WorkflowNodeType.IntentNode,
+    label: '业务逻辑',
+    list: [
+      { icon: aiChatIcon, iconClass: 'bg-purple', label: '判断器', value: WorkflowNodeType.Condition },
+      { icon: replyIcon, iconClass: 'bg-warning', label: '指定回复', value: WorkflowNodeType.Reply },
+    ],
   },
-  // {
-  //   icon: aiChatIcon,
-  //   iconClass: 'bg-primary-gradient',
-  //   label: '文本转语音',
-  //   value: WorkflowNodeType.TextToSpeechNode,
-  // },
-  // {
-  //   icon: aiChatIcon,
-  //   iconClass: 'bg-primary-gradient',
-  //   label: '语音转文本',
-  //   value: WorkflowNodeType.SpeechToTextNode,
-  // },
-  // {
-  //   icon: aiChatIcon,
-  //   iconClass: 'bg-primary-gradient',
-  //   label: '图片生成',
-  //   value: WorkflowNodeType.ImageGenerateNode,
-  // },
-  // {
-  //   icon: aiChatIcon,
-  //   iconClass: 'bg-primary-gradient',
-  //   label: '图片理解',
-  //   value: WorkflowNodeType.ImageUnderstandNode,
-  // },
-  // {
-  //   icon: aiChatIcon,
-  //   iconClass: 'bg-primary-gradient',
-  //   label: '问题优化',
-  //   value: WorkflowNodeType.Question,
-  // },
-  {
-    icon: replyIcon,
-    iconClass: 'bg-warning',
-    label: '指定回复',
-    value: WorkflowNodeType.Reply,
-  },
-] satisfies Array<{
-  icon: string
-  iconClass: string
-  label: string
-  value: WorkflowNodeType
-}>
+]
 
-const filteredComponentOptions = computed(() => {
+const filteredComponentGroups = computed(() => {
   if (activeTab.value !== 'basic') return []
 
   const keyword = searchKeyword.value.trim().toLocaleLowerCase()
-  if (!keyword) return workflowComponentOptions
+  if (!keyword) return workflowComponentGroups
 
-  return workflowComponentOptions.filter((componentOption) =>
-    componentOption.label.toLocaleLowerCase().includes(keyword),
-  )
+  return workflowComponentGroups
+    .map((group) => ({ ...group, list: group.list.filter((option) => option.label.toLocaleLowerCase().includes(keyword)) }))
+    .filter((group) => group.list.length > 0)
 })
 </script>
 
 <template>
-  <div
-    class="w-[402px] overflow-hidden rounded-md border border-N300 bg-white shadow-lg"
-    @click.stop
-    @mousedown.stop
-    @mousemove.stop
-  >
+  <div class="w-[402px] overflow-hidden rounded-md border border-N300 bg-white shadow-lg" @click.stop @mousedown.stop @mousemove.stop>
     <div class="flex h-11 items-stretch gap-7 border-b border-N300 px-4" role="tablist">
       <button
         v-for="componentTab in workflowComponentTabs"
@@ -109,35 +65,31 @@ const filteredComponentOptions = computed(() => {
         @click="activeTab = componentTab.value"
       >
         {{ componentTab.label }}
-        <span
-          v-if="activeTab === componentTab.value"
-          class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary"
-        />
+        <span v-if="activeTab === componentTab.value" class="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-primary" />
       </button>
     </div>
 
     <div class="p-3">
       <MkSearchInput v-model="searchKeyword" placeholder="按名称搜索" />
 
-      <template v-if="filteredComponentOptions.length">
-        <p class="mb-3 mt-3 text-N600">AI 能力</p>
-        <div class="grid grid-cols-2 gap-3">
-          <button
-            v-for="componentOption in filteredComponentOptions"
-            :key="componentOption.value"
-            type="button"
-            class="flex h-10 items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary"
-            @click="emit('select', componentOption.value)"
-          >
-            <span
-              class="flex size-6 shrink-0 items-center justify-center rounded-md"
-              :class="componentOption.iconClass"
+      <template v-if="filteredComponentGroups.length">
+        <template v-for="group in filteredComponentGroups" :key="group.label">
+          <p class="mb-3 mt-3 text-N600">{{ group.label }}</p>
+          <div class="grid grid-cols-2 gap-3">
+            <button
+              v-for="componentOption in group.list"
+              :key="componentOption.value"
+              type="button"
+              class="flex h-10 items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary"
+              @click="emit('select', componentOption.value)"
             >
-              <img :src="componentOption.icon" alt="" class="size-4" />
-            </span>
-            <span>{{ componentOption.label }}</span>
-          </button>
-        </div>
+              <span class="flex size-6 shrink-0 items-center justify-center rounded-md" :class="componentOption.iconClass">
+                <img :src="componentOption.icon" alt="" class="size-4" />
+              </span>
+              <span>{{ componentOption.label }}</span>
+            </button>
+          </div>
+        </template>
       </template>
       <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" :image-size="72" />
     </div>
