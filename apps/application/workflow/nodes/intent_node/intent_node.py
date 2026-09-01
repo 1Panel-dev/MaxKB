@@ -97,7 +97,10 @@ class IntentNode(INode):
         prompt = self._build_classification_prompt(str(user_input), branch)
         system = self._build_system_prompt()
         message_list = self._generate_message_list(system, prompt, history_message)
-        self.write_context("message_list", message_list)
+        self.write_context(
+            "message_list",
+            [{"content": m.content, "role": m.type} for m in message_list],
+        )
 
         try:
             self._check_cancelled()
