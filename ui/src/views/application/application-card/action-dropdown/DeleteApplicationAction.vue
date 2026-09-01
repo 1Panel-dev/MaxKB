@@ -17,12 +17,12 @@ function handleDeleteApplication() {
       loading.value = true
       return props.api
         .deleteApplication(props.application.id)
+        .finally(() => {
+          loading.value = false
+        })
         .then(() => {
           emit('delete', props.application.id)
           MsgSuccess('删除成功')
-        })
-        .finally(() => {
-          loading.value = false
         })
     })
     .catch(() => {})

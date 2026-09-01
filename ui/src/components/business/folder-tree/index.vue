@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, defineAsyncComponent, onMounted, ref, useTemplateRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import FolderApi from '@/api/admin/workspace/folder'
 import type { FolderSource, FolderItem } from '@/api/types'
 import { FOLDER_SORT, type FolderSort } from './types'
@@ -28,6 +29,10 @@ const props = withDefaults(
 )
 
 const currentNodeKey = defineModel<string>({ default: FOLDER_ENTRY_ID.ALL })
+const route = useRoute()
+const router = useRouter()
+const routeFolderId = route.query.folderId
+if (props.showAll && typeof routeFolderId === 'string' && routeFolderId) currentNodeKey.value = routeFolderId
 
 const emit = defineEmits<{ loaded: [folder?: FolderItem]; select: [folder: FolderItem] }>()
 
@@ -59,6 +64,9 @@ function loadFolders() {
 
 function handleFolderClick(folder: FolderItem) {
   currentNodeKey.value = folder.id
+  if (props.showAll && route.query.folderId !== undefined) {
+    void router.replace({ query: { ...route.query, folderId: undefined } })
+  }
   emit('select', folder)
 }
 

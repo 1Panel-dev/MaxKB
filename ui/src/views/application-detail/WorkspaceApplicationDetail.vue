@@ -28,7 +28,7 @@ function navigateToApplicationList() {
   void router.push({
     name: 'workspace-application-list',
     params: { workspaceId: route.params.workspaceId },
-    query: route.query,
+    query: application.value?.folder ? { folderId: application.value.folder } : {},
   })
 }
 

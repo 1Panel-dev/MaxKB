@@ -20,7 +20,6 @@ function handleSettingApplication(event: MouseEvent) {
         type: props.application.type,
         workspaceId: route.params.workspaceId,
       },
-      query: route.query,
     })
     return
   }

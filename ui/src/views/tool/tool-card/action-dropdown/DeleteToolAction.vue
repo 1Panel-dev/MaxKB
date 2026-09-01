@@ -17,11 +17,11 @@ function handleDeleteTool() {
       loading.value = true
       return props.api
         .deleteTool(props.tool.id)
+        .finally(() => (loading.value = false))
         .then(() => {
           emit('delete', props.tool.id)
           MsgSuccess('删除成功')
         })
-        .finally(() => (loading.value = false))
     })
     .catch(() => {})
 }

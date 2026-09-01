@@ -20,7 +20,7 @@ const moveToDialogRef = useTemplateRef<{ close: () => void; open: (currentFolder
 
 function handleOpenMoveApplication() {
   dialogMounted.value = true
-  return nextTick(() => moveToDialogRef.value?.open(props.application.folder_id))
+  return nextTick(() => moveToDialogRef.value?.open(props.application.folder ?? props.currentFolderId))
 }
 
 function handleMoveApplication(targetFolderId: string) {
@@ -28,13 +28,13 @@ function handleMoveApplication(targetFolderId: string) {
   loading.value = true
   return props.api
     .putMoveApplication(props.application.id, targetFolderId)
+    .finally(() => {
+      loading.value = false
+    })
     .then(() => {
       MsgSuccess('移动成功')
       moveToDialogRef.value?.close()
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.application.id)
-    })
-    .finally(() => {
-      loading.value = false
     })
 }
 

@@ -18,12 +18,12 @@ function handleDeleteKnowledge() {
     .then(() => {
       loading.value = true
       return KnowledgeApi.deleteKnowledge(props.knowledge.id)
+        .finally(() => {
+          loading.value = false
+        })
         .then(() => {
           emit('delete', props.knowledge.id)
           MsgSuccess('删除成功')
-        })
-        .finally(() => {
-          loading.value = false
         })
     })
     .catch(() => {})
