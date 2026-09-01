@@ -959,7 +959,10 @@ Workspace 的文件夹虚拟树业务组件。组件根据当前资源上下文�
 文件夹树查询、搜索、排序、创建、编辑、移动和删除。通过 `v-model` 控制当前文件夹 ID，首次加载
 完成后通过 `loaded` 返回该 ID 对应的完整文件夹，选择文件夹时触发 `select`。传入的 ID 不存在时，
 优先回退到“全部”入口，否则回退到首个可用文件夹。`showAll`、`showShared` 分别控制全部和共享入口，
-`rootLabel` 可覆盖根入口文案，`disabledFolderIds` 用于只选场景中禁用指定节点。
+`rootLabel` 可覆盖根入口文案，`disabledFolderIds` 用于只选场景中禁用指定节点。显示“全部”入口的
+主目录树初始化时会读取字符串类型的 `folderId` query 并设置当前文件夹；用户选择文件夹时不把
+新 ID 写入路由，但会清除已有的 `folderId`，避免刷新页面后恢复到旧文件夹。隐藏“全部”入口的
+移动目录树继续以调用方传入的 `v-model` 为准。
 
 ```vue
 <script setup lang="ts">

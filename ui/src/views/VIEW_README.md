@@ -108,9 +108,11 @@ src/views/application-detail/
 设置、移动、导出和删除 Action，并管理批量选择、批量移动和批量删除流程。需要请求的 Action 接收
 页面传入的完整 Application API。单项移动在具体目录中通过 `delete` 通知页面局部移除卡片，在
 “全部智能体”中保留卡片；移动弹窗复用公共 `MoveToDialog`。非批量选择状态点击卡片时，卡片通过
-`open` 事件通知 `ApplicationView` 进入详情路由。列表通过 `folderId` query 保存当前文件夹，进入详情
-和返回列表时保持该 query。`WorkspaceApplicationDetail` 负责工作空间智能体详情上下文，共享的返回
-入口、二级导航和右侧子路由结构由 `layout/ResourceDetailLayout.vue` 维护。详情子路由通过
+`click` 事件通知 `ApplicationView` 进入详情路由。`WorkspaceApplicationDetail` 返回列表时根据详情的
+`folder` 字段写入 `folderId` query，由 `FolderTree` 恢复所属文件夹；列表切换文件夹时只清除该
+query，不写入新的文件夹 ID，进入详情时也不携带该 query。`WorkspaceApplicationDetail` 负责工作
+空间智能体详情上下文，共享的返回入口、二级导航和右侧子路由结构由
+`layout/ResourceDetailLayout.vue` 维护。详情子路由通过
 `useApplicationDetailContext()` 读取只读详情；接口返回完整详情时调用 `replaceApplicationDetail()`
 局部替换，接口只返回布尔值或部分数据时调用 `refreshApplicationDetail()` 重新获取详情。切换二级
 菜单不会重新挂载详情容器，也不会自动重复请求详情。

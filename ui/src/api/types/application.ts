@@ -8,6 +8,7 @@ export type ApplicationType = (typeof APPLICATION_TYPE)[keyof typeof APPLICATION
 export interface ApplicationDetail {
   create_time?: string
   desc?: string | null
+  folder?: string
   folder_id?: string
   icon?: string
   id: string

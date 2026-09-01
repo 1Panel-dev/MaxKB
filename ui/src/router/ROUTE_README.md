@@ -131,7 +131,8 @@ Chat 使用独立入口 `src/chat.ts` 和独立 Router，不要把 Chat 路由�
 `getChildRouteList(scope)` 相同的过滤、排序和菜单字段转换逻辑生成二级导航。详情子路由通过
 `title`、`icon`、`activeIcon` 和 `order` 配置二级菜单；更深层页面通过
 `detailActiveMenu` 指定需要保持激活的二级菜单路由名称，不配置 `parentPath` 或 `parentName`。
-`ResourceDetailLayout` 切换二级菜单时保留当前 query，详情容器返回列表时也应透传来源 query。
+`ResourceDetailLayout` 切换二级菜单时保留当前 query；详情容器返回列表时按业务来源状态透传或
+重新生成 query。
 
 路由导航图标统一使用 `src/assets/iconfont.js` 中的完整 Symbol ID 字符串，并由
 `MkIcon` 的 `name` 属性渲染。需要在菜单激活后切换图标时，通过 `activeIcon` 配置激活状态
@@ -196,8 +197,10 @@ Workspace 页面：
 
 智能体详情路由的 `type` 来自当前 `ApplicationDetail.type`；卡片概览和简易智能体设置等详情入口
 必须与 `applicationId` 一并传入该参数。高级智能体设置继续进入独立的 Workflow 路由。
-智能体列表使用可选的 `folderId` query 保存当前文件夹；进入详情时继续携带该 query，返回列表后
-由 `FolderTree` 恢复选中项。`folderId` 是列表来源状态，不作为详情 path 参数。
+智能体详情返回列表时，根据 `ApplicationDetail.folder` 通过可选的 `folderId` query 标记所属文件夹；
+列表中的 `FolderTree` 初始化时读取该 query 并恢复选中项。用户在列表中切换文件夹时不写入新的
+文件夹 ID，只清除已有的 `folderId`；进入详情时也不继续携带该 query。`folderId` 不作为详情 path
+参数。
 
 System 复用页面（仅替换根前缀）：
 

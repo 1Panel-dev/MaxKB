@@ -28,13 +28,13 @@ function handleMoveTool(targetFolderId: string) {
   loading.value = true
   return props.api
     .putTool(props.tool.id, { folder_id: targetFolderId })
+    .finally(() => {
+      loading.value = false
+    })
     .then(() => {
       MsgSuccess('移动成功')
       moveToDialogRef.value?.close()
       if (props.currentFolderId !== FOLDER_ENTRY_ID.ALL) emit('delete', props.tool.id)
-    })
-    .finally(() => {
-      loading.value = false
     })
 }
 

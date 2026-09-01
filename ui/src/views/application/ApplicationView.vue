@@ -18,22 +18,13 @@ const router = useRouter()
 
 /* 当前文件夹 */
 const allApplicationsFolder = FOLDER_ENTRIES[RESOURCE_TYPE.APPLICATION].all
-const routeFolderId = typeof route.query.folderId === 'string' && route.query.folderId ? route.query.folderId : FOLDER_ENTRY_ID.ALL
-const currentFolderId = ref(routeFolderId)
-const currentFolder = ref<FolderItem>({ ...allApplicationsFolder, id: currentFolderId.value })
-
-function syncFolderQuery(folderId: string) {
-  const folderIdQuery = folderId === FOLDER_ENTRY_ID.ALL ? undefined : folderId
-  if (route.query.folderId === folderIdQuery) return
-
-  void router.replace({ query: { ...route.query, folderId: folderIdQuery } })
-}
+const currentFolderId = ref<string>(FOLDER_ENTRY_ID.ALL)
+const currentFolder = ref<FolderItem>({ ...allApplicationsFolder })
 
 function handleFolderSelect(folder: FolderItem) {
   const folderChanged = folder.id !== currentFolder.value.id
   currentFolderId.value = folder.id
   currentFolder.value = folder
-  syncFolderQuery(folder.id)
   if (folderChanged) {
     cancelBatchSelection()
     refreshApplications()
@@ -96,11 +87,10 @@ function handleDeleteApplication(applicationId: string) {
   if (applicationIndex >= 0) applicationData.value.splice(applicationIndex, 1)
 }
 
-function handleOpenApplication(application: ApplicationDetail) {
+function handleToDetail(application: ApplicationDetail) {
   void router.push({
     name: 'workspace-application-detail',
     params: { applicationId: application.id, type: application.type, workspaceId: route.params.workspaceId },
-    query: route.query,
   })
 }
 
@@ -219,7 +209,7 @@ function handleBatchDelete() {
                 :application="application"
                 :selectable="batchSelectionMode"
                 :selected="selectedApplicationIds.includes(application.id)"
-                @open="handleOpenApplication(application)"
+                @click="handleToDetail(application)"
                 @selected="handleApplicationSelect(application.id, $event)"
               >
                 <template #action-dropdown>

@@ -120,6 +120,6 @@ function handleRefresh() {
     </template>
   </MkDropdown>
 
-  <SimpleCreateDialog ref="simpleCreateDialogRef" :folder-id="folderId" @refresh="handleRefresh" />
-  <AdvancedCreateDialog ref="advancedCreateDialogRef" :folder-id="folderId" @refresh="handleRefresh" />
+  <SimpleCreateDialog ref="simpleCreateDialogRef" :folder-id="folderId" />
+  <AdvancedCreateDialog ref="advancedCreateDialogRef" :folder-id="folderId" />
 </template>

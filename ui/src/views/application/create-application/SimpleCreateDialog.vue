@@ -28,8 +28,6 @@ const router = useRouter()
 
 const props = defineProps<{ folderId: string }>()
 
-const emit = defineEmits<{ refresh: [] }>()
-
 const dialogVisible = ref(false)
 const loading = ref(false)
 const applicationFormRef = ref<FormInstance>()
@@ -73,7 +71,6 @@ function submit() {
         return auth.loadAuthBaseProfile().then(() => {
           MsgSuccess('创建成功')
           dialogVisible.value = false
-          emit('refresh')
           return router.push({
             name: 'workspace-application-simple-setting',
             params: { applicationId: application.id, type: application.type, workspaceId: route.params.workspaceId },

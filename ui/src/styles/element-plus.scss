@@ -1032,10 +1032,10 @@
       --el-tag-text-color: var(--el-color-primary-dark-2);
       --el-tag-bg-color: rgba(var(--mk-primary-rgb) / 20%);
     }
-    &.el-tag--default {
+    &.default {
       // 默认 tag不能随主题色变化 颜色值不能改变
-      --el-tag-text-color: #2b5fd9;
-      --el-tag-bg-color: rgba(51, 112, 255, 0.2);
+      --el-tag-text-color: #2b5fd9 !important;
+      --el-tag-bg-color: rgba(51, 112, 255, 0.2) !important;
     }
   }
 

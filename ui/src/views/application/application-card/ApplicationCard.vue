@@ -8,12 +8,12 @@ defineOptions({ name: 'ApplicationCard' })
 
 const props = defineProps<{ application: ApplicationDetail; selectable?: boolean; selected?: boolean }>()
 
-const emit = defineEmits<{ open: []; selected: [selected: boolean] }>()
+const emit = defineEmits<{ click: []; selected: [selected: boolean] }>()
 
 defineSlots<{ 'action-dropdown'?: () => unknown }>()
 
 function handleOpen() {
-  if (!props.selectable) emit('open')
+  if (!props.selectable) emit('click')
 }
 </script>
 
@@ -34,7 +34,7 @@ function handleOpen() {
 
     <template #tag>
       <el-tag v-if="isWorkFlow(application.type)" type="warning" size="small">高级</el-tag>
-      <el-tag v-else type="default" size="small">简易</el-tag>
+      <el-tag v-else type="primary" class="default" size="small">简易</el-tag>
     </template>
 
     <p class="line-clamp-2" :title="application.desc ?? undefined">
