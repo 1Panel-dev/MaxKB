@@ -134,7 +134,7 @@ class IntentNode(INode):
         history_message = reduce(
             lambda x, y: [*x, *y],
             [
-                [history_chat_record[index].get_human_message(), history_chat_record[index].get_ai_message()]
+                [*history_chat_record[index].get_human_message(), *history_chat_record[index].get_ai_message()]
                 for index in range(start_index if start_index > 0 else 0, len(history_chat_record))
             ],
             [],

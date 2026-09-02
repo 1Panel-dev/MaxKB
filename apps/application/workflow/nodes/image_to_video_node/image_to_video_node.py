@@ -213,9 +213,13 @@ class ImageToVideoNode(INode):
                 if val["dialogue_type"] == "WORKFLOW":
                     return chat_record.get_ai_message()
                 image_list = val["image_list"]
-                return AIMessage(
-                    content=[*[{"type": "image_url", "image_url": {"url": f"{file_url}"}} for file_url in image_list]]
-                )
+                return [
+                    AIMessage(
+                        content=[
+                            *[{"type": "image_url", "image_url": {"url": f"{file_url}"}} for file_url in image_list]
+                        ]
+                    )
+                ]
         return chat_record.get_ai_message()
 
     def _get_history_message(self, history_chat_record, dialogue_number):
@@ -225,7 +229,7 @@ class ImageToVideoNode(INode):
             [
                 [
                     self._generate_history_human_message(history_chat_record[index]),
-                    self._generate_history_ai_message(history_chat_record[index]),
+                    *self._generate_history_ai_message(history_chat_record[index]),
                 ]
                 for index in range(start_index if start_index > 0 else 0, len(history_chat_record))
             ],

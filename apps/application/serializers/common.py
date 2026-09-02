@@ -121,6 +121,46 @@ class ToolExecute:
             )
 
 
+def resolve_chat_user(chat_user_id, chat_user_type, asker=None):
+    """
+    根据对话用户 id / 类型解析出对话用户信息。
+    - 登录的对话用户(CHAT_USER)：从 ChatUser 表取真实信息
+    - 匿名/其他：优先用 asker（dict 或用户名），否则回退为“游客”
+    """
+    from system_manage.models import ChatUser
+
+    if chat_user_type == ChatUserType.CHAT_USER.value:
+        chat_user = QuerySet(ChatUser).filter(id=chat_user_id).first()
+        return {
+            "id": str(chat_user.id),
+            "email": chat_user.email,
+            "phone": chat_user.phone,
+            "nick_name": chat_user.nick_name,
+            "username": chat_user.username,
+            "source": chat_user.source,
+        }
+    if asker:
+        if isinstance(asker, dict):
+            return asker
+        return {"username": asker}
+    return {"username": "游客"}
+
+
+def resolve_chat_user_group(chat_user):
+    chat_user_id = chat_user.get("id")
+    if not chat_user_id:
+        return []
+    user_group_relation_model = DatabaseModelManage.get_model("user_group_relation")
+    if user_group_relation_model:
+        return [
+            {"id": user_group_relation.group_id, "name": user_group_relation.group.name}
+            for user_group_relation in QuerySet(user_group_relation_model)
+            .select_related("group")
+            .filter(user_id=chat_user_id)
+        ]
+    return []
+
+
 class ChatInfo:
     def __init__(
         self,
@@ -207,45 +247,14 @@ class ChatInfo:
     def get_chat_user(self, asker=None):
         if self.chat_user:
             return self.chat_user
-        from system_manage.models import ChatUser
-
-        chat_user_model = ChatUser
-        if self.chat_user_type == ChatUserType.CHAT_USER.value and chat_user_model:
-            chat_user = QuerySet(chat_user_model).filter(id=self.chat_user_id).first()
-            return {
-                "id": str(chat_user.id),
-                "email": chat_user.email,
-                "phone": chat_user.phone,
-                "nick_name": chat_user.nick_name,
-                "username": chat_user.username,
-                "source": chat_user.source,
-            }
-        else:
-            if asker:
-                if isinstance(asker, dict):
-                    self.chat_user = asker
-                else:
-                    self.chat_user = {"username": asker}
-            else:
-                self.chat_user = {"username": "游客"}
-        return self.chat_user
+        chat_user = resolve_chat_user(self.chat_user_id, self.chat_user_type, asker=asker)
+        # 保持原有语义：仅非登录用户缓存到实例上
+        if self.chat_user_type != ChatUserType.CHAT_USER.value:
+            self.chat_user = chat_user
+        return chat_user
 
     def get_chat_user_group(self, asker=None):
-        chat_user = self.get_chat_user(asker=asker)
-        chat_user_id = chat_user.get("id")
-
-        if not chat_user_id:
-            return []
-
-        user_group_relation_model = DatabaseModelManage.get_model("user_group_relation")
-        if user_group_relation_model:
-            return [
-                {"id": user_group_relation.group_id, "name": user_group_relation.group.name}
-                for user_group_relation in QuerySet(user_group_relation_model)
-                .select_related("group")
-                .filter(user_id=chat_user_id)
-            ]
-        return []
+        return resolve_chat_user_group(self.get_chat_user(asker=asker))
 
     def to_base_pipeline_manage_params(self):
         self.get_application()

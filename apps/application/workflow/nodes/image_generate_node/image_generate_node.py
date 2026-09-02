@@ -130,7 +130,7 @@ class ImageGenerateNode(INode):
             [
                 [
                     self._generate_history_human_message(history_chat_record[index]),
-                    self._generate_history_ai_message(history_chat_record[index]),
+                    *self._generate_history_ai_message(history_chat_record[index]),
                 ]
                 for index in range(max(start_index, 0), len(history_chat_record))
             ],
@@ -152,9 +152,11 @@ class ImageGenerateNode(INode):
                 if val.get("dialogue_type") == "WORKFLOW":
                     return chat_record.get_ai_message()
                 image_list = val["image_list"]
-                return AIMessage(
-                    content=[{"type": "image_url", "image_url": {"url": f"{file_url}"}} for file_url in image_list]
-                )
+                return [
+                    AIMessage(
+                        content=[{"type": "image_url", "image_url": {"url": f"{file_url}"}} for file_url in image_list]
+                    )
+                ]
         return chat_record.get_ai_message()
 
     def _upload_file(self, file, workflow_params, workflow_type):

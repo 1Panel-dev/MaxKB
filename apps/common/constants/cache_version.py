@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： cache_version.py
-    @date：2025/4/14 19:09
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： cache_version.py
+@date：2025/4/14 19:09
+@desc:
 """
+
 from enum import Enum
 
 
@@ -31,6 +32,9 @@ class Cache_Version(Enum):
     CHAT = "CHAT", lambda key: key
 
     CHAT_INFO = "CHAT_INFO", lambda key: key
+
+    # 会话历史滚动窗口缓存（只存最近 N 条已完成记录，append-only）
+    CHAT_HISTORY = "CHAT_HISTORY", lambda key: key
 
     CHAT_VARIABLE = "CHAT_VARIABLE", lambda key: key
 

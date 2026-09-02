@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： system_to_response.py
-    @date：2024/9/6 18:03
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： system_to_response.py
+@date：2024/9/6 18:03
+@desc:
 """
+
 import json
 
 from rest_framework import status
@@ -15,27 +16,35 @@ from common.result import result
 
 
 class SystemToResponse(BaseToResponse):
-    def to_block_response(self, chat_id, chat_record_id, content, is_end, completion_tokens,
-                          prompt_tokens, other_params: dict = None,
-                          _status=status.HTTP_200_OK):
-        if other_params is None:
-            other_params = {}
-        return result.success({'chat_id': str(chat_id), 'id': str(chat_record_id), 'operate': True,
-                               'content': content, 'is_end': is_end, **other_params,
-                               'completion_tokens': completion_tokens, 'prompt_tokens': prompt_tokens},
-                              response_status=_status,
-                              code=_status)
+    def to_stream(self, chat_id, chat_record_id, block: dict):
+        # 沿用前端在解析的信封 shape：{chat_id, chat_record_id, content:[block]}
+        # 系统格式所有块类型都原样下发（block 即 content.to_dict()）
+        return json.dumps(
+            {
+                "chat_id": str(chat_id),
+                "chat_record_id": str(chat_record_id),
+                "content": [block],
+            },
+            ensure_ascii=False,
+        )
 
-    def to_stream_chunk_response(self, chat_id, chat_record_id, node_id, up_node_id_list, content, is_end,
-                                 completion_tokens,
-                                 prompt_tokens, other_params: dict = None):
-        if other_params is None:
-            other_params = {}
-        chunk = json.dumps({'chat_id': str(chat_id), 'chat_record_id': str(chat_record_id), 'operate': True,
-                            'content': content, 'node_id': node_id, 'up_node_id_list': up_node_id_list,
-                            'is_end': is_end,
-                            'usage': {'completion_tokens': completion_tokens,
-                                      'prompt_tokens': prompt_tokens,
-                                      'total_tokens': completion_tokens + prompt_tokens},
-                            **other_params})
-        return super().format_stream_chunk(chunk)
+    def to_stream_end(self, chat_id, chat_record_id, usage: dict = None):
+        # 系统格式以 [DONE] 收尾，无需单独结束帧
+        return None
+
+    def to_block(self, chat_id, chat_record_id, contents: list, usage: dict = None, _status=status.HTTP_200_OK):
+        usage = usage or {}
+        answer = "".join(c.get("content", "") for c in (contents or []) if c.get("type") == "TEXT")
+        return result.success(
+            {
+                "chat_id": str(chat_id),
+                "id": str(chat_record_id),
+                "operate": True,
+                "content": answer,
+                "is_end": True,
+                "completion_tokens": usage.get("completion_tokens", 0),
+                "prompt_tokens": usage.get("prompt_tokens", 0),
+            },
+            response_status=_status,
+            code=_status,
+        )
