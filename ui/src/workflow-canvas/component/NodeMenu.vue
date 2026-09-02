@@ -63,25 +63,27 @@ const handleNodeDragStart = (event: PointerEvent, workflowNode: WorkflowMenuNode
     <div class="p-3">
       <MkSearchInput v-model="searchKeyword" placeholder="按名称搜索" />
 
-      <template v-if="filteredComponentGroups.length">
-        <template v-for="group in filteredComponentGroups" :key="group.label">
-          <p class="mb-3 mt-3 text-N600">{{ group.label }}</p>
-          <div class="grid grid-cols-2 gap-3">
-            <button
-              v-for="workflowNode in group.list"
-              :key="workflowNode.type"
-              type="button"
-              class="flex h-10 cursor-grab items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary active:cursor-grabbing"
-              @click="emit('select', workflowNode)"
-              @pointerdown="handleNodeDragStart($event, workflowNode)"
-            >
-              <component :is="iconComponent(`${workflowNode.type}-icon`)" class="shrink-0" :size="24" />
-              <span>{{ workflowNode.label }}</span>
-            </button>
-          </div>
+      <el-scrollbar height="400">
+        <template v-if="filteredComponentGroups.length">
+          <template v-for="group in filteredComponentGroups" :key="group.label">
+            <p class="mb-3 mt-3 text-N600">{{ group.label }}</p>
+            <div class="grid grid-cols-2 gap-3">
+              <button
+                v-for="workflowNode in group.list"
+                :key="workflowNode.type"
+                type="button"
+                class="flex h-10 cursor-grab items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary active:cursor-grabbing"
+                @click="emit('select', workflowNode)"
+                @pointerdown="handleNodeDragStart($event, workflowNode)"
+              >
+                <component :is="iconComponent(`${workflowNode.type}-icon`)" class="shrink-0" :size="24" />
+                <span>{{ workflowNode.label }}</span>
+              </button>
+            </div>
+          </template>
         </template>
-      </template>
-      <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" :image-size="72" />
+        <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" :image-size="72" />
+      </el-scrollbar>
     </div>
   </div>
 </template>
