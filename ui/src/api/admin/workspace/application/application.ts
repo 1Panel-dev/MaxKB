@@ -8,6 +8,13 @@ const getPrefix = () => {
   return `/workspace/${workspaceId}/application`
 }
 
+/**
+ * 获取不分页的全部应用
+ */
+const getAllApplication = (query?: Dict<unknown>) => {
+  return get<ApplicationDetail[]>(`${getPrefix()}`, query)
+}
+
 /** 获取工作空间智能体列表。 */
 const getApplicationPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ApplicationDetail>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
@@ -77,4 +84,5 @@ export default {
   putBatchDeleteApplications,
   putBatchMoveApplications,
   putApplicationPublish,
+  getAllApplication,
 }

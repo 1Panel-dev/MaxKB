@@ -3,11 +3,10 @@ import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
 
 import { CopyDocument } from '@element-plus/icons-vue'
 import { cloneDeep, set } from 'lodash'
-import type { WorkflowNodeField, WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
-import type { BaseEdgeModel, BaseNodeModel, GraphModel } from '@logicflow/core'
+import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowStartNode' })
 

@@ -13,9 +13,13 @@ const getModelList = (query?: Dict<unknown>) => {
   return get<ModelItem[]>(`${getPrefix()}/model`, query)
 }
 
-/** 获取工作空间共享的工具列表。 */
+/** 获取工作空间共享的分页工具列表。 */
 const getToolPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ToolItem>>(`${getPrefix()}/tool/${page.currentPage}/${page.pageSize}`, query)
+}
+/** 获取工作空间共享的不分页所有工具列表。 */
+const getAllTool = (query?: Dict<unknown>) => {
+  return get<ToolItem[]>(`${getPrefix()}/tool`, query)
 }
 
 /** 获取工作空间共享的知识库列表。 */
@@ -23,4 +27,4 @@ const getKnowledgePage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<KnowledgeItem>>(`${getPrefix()}/knowledge/${page.currentPage}/${page.pageSize}`, query)
 }
 
-export default { getKnowledgePage, getModelList, getToolPage }
+export default { getKnowledgePage, getModelList, getToolPage, getAllTool }

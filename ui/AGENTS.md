@@ -189,6 +189,10 @@ Keep these behaviors:
 ## Frontend Implementation Notes
 
 - Prefer existing project structure and naming.
+- Before changing existing behavior, trace the affected flow and dependent requirements, including
+  why the current implementation exists. If the requested change is likely to remove a requirement
+  or introduce a regression, pause before editing, explain the risk, recommend a safer approach,
+  and wait for confirmation.
 - Keep UI code typed and data-driven.
 - Use Lodash `cloneDeep` for deep cloning; do not use `structuredClone`.
 - Explicitly import APIs used from Vue, Vue Router, and Pinia; do not restore API auto import.
