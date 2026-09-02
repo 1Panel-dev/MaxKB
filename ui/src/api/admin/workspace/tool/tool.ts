@@ -8,6 +8,11 @@ const getPrefix = () => {
   return `/workspace/${workspaceId}/tool`
 }
 
+/** 获取不分页的全部工具列表。 */
+const getAllTool = (query?: Dict<unknown>) => {
+  return get<{ tools: ToolItem[] }>(`${getPrefix()}`, query).then(({ tools }) => tools)
+}
+
 /** 获取工具分页列表。 */
 const getToolPage = (page: ParamsPage, query?: Dict<unknown>) => {
   return get<ResponsePage<ToolItem>>(`${getPrefix()}/${page.currentPage}/${page.pageSize}`, query)
@@ -104,4 +109,5 @@ export default {
   putBatchDeleteTools,
   putBatchMoveTools,
   putTool,
+  getAllTool,
 }

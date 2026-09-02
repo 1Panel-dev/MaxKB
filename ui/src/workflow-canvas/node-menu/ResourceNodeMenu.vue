@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SharedApi from '@/api/admin/workspace/shared'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import { APPLICATION_TYPE, RESOURCE_TYPE, TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
+import { APPLICATION_TYPE, RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import { FOLDER_ENTRY_ID } from '@/constants'
@@ -30,10 +30,9 @@ interface ResourceMenuItem {
   toolType?: ToolType
 }
 
-const RESOURCE_PAGE = { currentPage: 1, pageSize: 1_000 }
 const SUPPORTED_TOOL_TYPES: ToolType[] = [TOOL_TYPE.CUSTOM, TOOL_TYPE.WORKFLOW]
 const route = useRoute()
-const currentFolderId = ref('')
+const currentFolderId = ref(FOLDER_ENTRY_ID.ALL)
 const loading = ref(false)
 const resourceItems = ref<ResourceMenuItem[]>([])
 const searchKeyword = ref('')
@@ -71,13 +70,17 @@ function createApplicationNode(application: ApplicationDetail): NodeMenuItem {
   return node
 }
 
-function loadTools(folder: FolderItem) {
-  const requestApi = folder.id === FOLDER_ENTRY_ID.SHARED ? SharedApi : ToolApi
-  const folderQuery = folder.id === FOLDER_ENTRY_ID.SHARED ? {} : { folder_id: folder.id }
+function loadTools(folder?: FolderItem) {
+  const isSharedFolder = folder?.id === FOLDER_ENTRY_ID.SHARED
+  const requestApi = isSharedFolder ? SharedApi : ToolApi
+  const folderQuery = {
+    tool_type_list: SUPPORTED_TOOL_TYPES,
+    ...(!isSharedFolder ? { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL } : {}),
+  }
 
-  return requestApi.getToolPage(RESOURCE_PAGE, { ...folderQuery, scope: TOOL_SCOPE.WORKSPACE }).then((page) => {
-    resourceItems.value = page.records
-      .filter((tool) => tool.is_active && SUPPORTED_TOOL_TYPES.includes(tool.tool_type))
+  return requestApi.getAllTool(folderQuery).then((tools) => {
+    resourceItems.value = tools
+      .filter((tool) => tool.is_active)
       .map((tool) => ({
         desc: tool.desc,
         icon: tool.icon,
@@ -89,10 +92,12 @@ function loadTools(folder: FolderItem) {
   })
 }
 
-function loadApplications(folder: FolderItem) {
-  return ApplicationApi.getApplicationPage(RESOURCE_PAGE, { folder_id: folder.id, publish_status: 'published' }).then((page) => {
-    resourceItems.value = page.records
-      .filter((application) => application.resource_type === 'application' && application.is_publish && application.id !== currentApplicationId.value)
+function loadApplications(folder?: FolderItem) {
+  const folderQuery = { folder_id: folder?.id || FOLDER_ENTRY_ID.ALL }
+
+  return ApplicationApi.getAllApplication({ ...folderQuery, publish_status: 'published' }).then((res) => {
+    resourceItems.value = res
+      .filter((application) => application.id !== currentApplicationId.value)
       .map((application) => ({
         applicationType: application.type,
         desc: application.desc,
@@ -104,12 +109,7 @@ function loadApplications(folder: FolderItem) {
   })
 }
 
-function handleFolderChange(folder?: FolderItem) {
-  if (!folder) {
-    resourceItems.value = []
-    return
-  }
-
+function loadResources(folder?: FolderItem) {
   loading.value = true
   const request = isToolMenu.value ? loadTools(folder) : loadApplications(folder)
   return request.finally(() => {
@@ -120,19 +120,16 @@ function handleFolderChange(folder?: FolderItem) {
 function handleNodeDragStart(event: PointerEvent, node: NodeMenuItem) {
   if (event.button === 0) emit('dragstart', node, event)
 }
+
+onMounted(() => {
+  void loadResources()
+})
 </script>
 
 <template>
   <div class="flex h-[450px] min-h-0">
     <aside class="flex w-60 shrink-0 border-r pt-3">
-      <FolderTree
-        v-model="currentFolderId"
-        :can-edit="false"
-        :show-shared="isToolMenu"
-        :source="source"
-        @loaded="handleFolderChange"
-        @select="handleFolderChange"
-      />
+      <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
     </aside>
 
     <section v-loading="loading" class="flex min-w-0 flex-1 flex-col">
