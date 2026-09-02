@@ -117,7 +117,10 @@ class QuestionNode(INode):
             message_list = [SystemMessage(system), *history_message, question]
         else:
             message_list = [*history_message, question]
-        self.write_context("message_list", message_list)
+        self.write_context(
+            "message_list",
+            [{"content": m.content, "role": m.type} for m in message_list],
+        )
 
         response = chat_model.stream(message_list)
         answer = ""
