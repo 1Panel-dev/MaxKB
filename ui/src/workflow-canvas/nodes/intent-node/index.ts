@@ -22,7 +22,7 @@ interface IntentNodeData {
 }
 
 /** 节点顶部到第一个分类行锚点的纵向偏移（近似）。 */
-const BRANCH_ANCHOR_TOP_OFFSET = 422
+const BRANCH_ANCHOR_TOP_OFFSET = 400
 /** 相邻分类行锚点的纵向间距（近似行高）。 */
 const BRANCH_ANCHOR_GAP = 40
 
