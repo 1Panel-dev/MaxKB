@@ -10,6 +10,9 @@ import type { ChatMessage } from '../../types'
 // ── 共享状态（单例） ─────────────────────────────────────
 const appInfo = ref<{ name: string; icon: string } | null>(null)
 const currentChatId = ref('')
+// composer 重置信号：新建/切换会话时自增，chat-panel 监听后清空暂存文件与输入，
+// 避免上传文件（source_id 绑旧 chat_id）在切上下文后与新 chat_id 对不上。
+const composerResetSignal = ref(0)
 let currentApplicationId = ''
 const loading = ref<boolean>(false)
 
@@ -87,16 +90,13 @@ export function useDebugStore() {
   })
 
   // ── 会话操作 ─────────────────────────────────────────
-  // 本地新建：前端直接生成 chat_id（草稿），不预先请求后端 open；
-  // 首次发消息 / 上传时后端会按该 id 现开会话（open-if-missing）。
-  const newChat = (): string => {
-    const id = crypto.randomUUID()
-    currentChatId.value = id
-    resetMsgState()
-    if (!conversations.value.some((c) => c.id === id)) {
-      conversations.value.unshift({ id, abstract: '新建对话' })
-    }
-    return id
+  // 惰性获取当前 chat_id：已有则原样返回；为空才前端生成一个并赋值。
+  // 幂等——反复调用返回同一个 id，从而上传文件的 source_id 与后续发送的 chat_id 始终一致。
+  // 不请求后端 open，不往左侧列表 push（直到首次发消息才入列表，见 chat-panel send）。
+  const getChatId = (): string => {
+    if (currentChatId.value) return currentChatId.value
+    currentChatId.value = crypto.randomUUID()
+    return currentChatId.value
   }
 
   const openChat = async (appId?: string) => {
@@ -120,10 +120,8 @@ export function useDebugStore() {
   // ── 文件上传 ─────────────────────────────────────────
   const uploadFile = async (file: File, chatId: string): Promise<{ url: string; name: string }> => {
     loading.value = true
-    let cid = chatId
-    if (!cid) {
-      cid = await openChat(applicationId.value)
-    }
+    // 无会话时前端生成草稿 chat_id（不调后端 open），与发送保持同一个 id。
+    const cid = chatId || getChatId()
     const res = await debugApi.uploadFile(file, cid)
     loading.value = false
     return { url: res, name: file.name }
@@ -163,7 +161,7 @@ export function useDebugStore() {
     // 会话
     loadConversations,
     loadMore,
-    newChat,
+    getChatId,
     openChat,
     deleteChat,
     renameChat,
@@ -184,5 +182,10 @@ export function useDebugStore() {
     cancelWorkflow: (cid: string) => streamManager.cancelWorkflow(cid, 'debug', currentApplicationId),
     // 文件
     uploadFile,
+    // composer 重置
+    composerResetSignal,
+    resetComposer: () => {
+      composerResetSignal.value++
+    },
   }
 }
