@@ -111,7 +111,8 @@ const visibilityCompareHandlers: Record<VisibilityCompareOperator, (left: Dynami
 }
 
 function getVisibilityConditionValue(condition: VisibilityCondition, values: Dict<DynamicFormValue>): DynamicFormValue {
-  return condition.self ? values[condition.field[1]] : condition.leftValue
+  // self 取表单自身字段值；跨节点使用后端已解析的左值(_left / leftValue)
+  return condition.self ? values[condition.field[1]] : (condition._left ?? condition.leftValue)
 }
 
 function evaluateVisibility(rules: VisibilityRules | null | undefined, values: Dict<DynamicFormValue>): boolean {
