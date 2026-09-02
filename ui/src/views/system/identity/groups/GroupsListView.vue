@@ -187,7 +187,7 @@ onMounted(() => {
         <template #action-dropdown="{ row }">
           <MkDropdownItem @click="handleOpenGroupDialog(row)">
             <template #icon>
-              <MkIcon name="icon_edit_outlined" />
+              <MkIcon name="icon_rename_outlined" />
             </template>
             <span>重命名</span>
           </MkDropdownItem>

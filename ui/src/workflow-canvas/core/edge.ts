@@ -1,32 +1,12 @@
-import { BezierEdge, BezierEdgeModel, h, type BaseEdgeModel, type GraphModel } from '@logicflow/core'
-import type { App } from 'vue'
+import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
 import { connect, disconnect } from './teleport'
-import CustomLine from './CustomLine.vue'
+import DeleteEdgeButton from './DeleteEdgeButton.vue'
 
-function isMouseInElement(element: Element, event: PointerEvent) {
-  const rect = element.getBoundingClientRect()
-  return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom
-}
-const DEFAULT_WIDTH = 32
-const DEFAULT_HEIGHT = 32
+const DEFAULT_WIDTH = 24
+const DEFAULT_HEIGHT = 24
 class CustomEdge2 extends BezierEdge {
   isMounted = false
-  customLineApp?: App<Element>
   root?: HTMLDivElement
-
-  constructor() {
-    super()
-    this.handleMouseUp = (event?: PointerEvent) => {
-      if (!event || !(event.target instanceof Element)) return
-
-      this.props.graphModel.clearSelectElements()
-      this.props.model.isSelected = true
-      const element = event.target.parentElement?.parentElement?.querySelector('.lf-custom-edge-wrapper')
-      if (element && isMouseInElement(element, event)) {
-        this.props.model.graphModel.deleteEdgeById(this.props.model.id)
-      }
-    }
-  }
   /**
    * 渲染vue组件
    * @param root
@@ -35,7 +15,7 @@ class CustomEdge2 extends BezierEdge {
     this.unmountVueComponent()
     this.root = root
     if (root) {
-      connect(this.targetId(), CustomLine, root, () => {
+      connect(this.targetId(), DeleteEdgeButton, root, () => {
         return { getModel: () => this.props.model }
       })
     }
@@ -58,50 +38,75 @@ class CustomEdge2 extends BezierEdge {
    * @returns
    */
   protected unmountVueComponent() {
-    if (this.customLineApp) {
-      this.customLineApp.unmount()
-      this.customLineApp = undefined
-    }
     if (this.root) {
       this.root.innerHTML = ''
     }
     return this.root
   }
 
-  getEdge() {
+  getAppendWidth() {
     const { model } = this.props
     const id = model.id
     const { customWidth = DEFAULT_WIDTH, customHeight = DEFAULT_HEIGHT } = model.getProperties()
-    const { startPoint, endPoint, path, isAnimation, arrowConfig } = model
-    const animationStyle = model.getEdgeAnimationStyle()
-    const { strokeDasharray, stroke, strokeDashoffset, animationName, animationDuration, animationIterationCount, animationTimingFunction, animationDirection } = animationStyle
-    const positionData = { x: (startPoint.x + endPoint.x - customWidth) / 2, y: (startPoint.y + endPoint.y - customHeight) / 2, width: customWidth, height: customHeight }
-    const style = model.getEdgeStyle()
-    const wrapperStyle = { width: customWidth, height: customHeight }
+    const { startPoint, endPoint } = model
+    const positionData = {
+      x: (startPoint.x + endPoint.x - customWidth) / 2,
+      y: (startPoint.y + endPoint.y - customHeight) / 2,
+      width: customWidth,
+      height: customHeight,
+    }
 
     setTimeout(() => {
-      const s = document.getElementById(id)
-      if (s instanceof HTMLDivElement && !this.isMounted) {
+      const root = document.getElementById(id)
+      if (root instanceof HTMLDivElement && !this.isMounted) {
         this.isMounted = true
-        this.renderVueComponent(s)
+        this.renderVueComponent(root)
       }
     }, 0)
+
+    return h('g', {}, [
+      super.getAppendWidth(),
+      h('foreignObject', { ...positionData, className: 'workflow-edge-delete-wrapper' }, [
+        h('div', {
+          id,
+          className: 'lf-custom-edge-wrapper',
+          style: { height: customHeight, width: customWidth },
+        }),
+      ]),
+    ])
+  }
+
+  getEdge() {
+    const { model } = this.props
+    const { path, isAnimation, arrowConfig } = model
+    const animationStyle = model.getEdgeAnimationStyle()
+    const {
+      strokeDasharray,
+      stroke,
+      strokeDashoffset,
+      animationName,
+      animationDuration,
+      animationIterationCount,
+      animationTimingFunction,
+      animationDirection,
+    } = animationStyle
+    const style = model.getEdgeStyle()
 
     delete style.stroke
 
     return h('g', {}, [
-      h('style', { type: 'text/css' }, '.lf-edge{stroke:#afafaf}.lf-edge:hover{stroke: #3370FF;}'),
       h('path', {
         d: path,
         ...style,
         ...arrowConfig,
         ...(isAnimation
-          ? { strokeDasharray, stroke, style: { strokeDashoffset, animationName, animationDuration, animationIterationCount, animationTimingFunction, animationDirection } }
+          ? {
+              strokeDasharray,
+              stroke,
+              style: { strokeDashoffset, animationName, animationDuration, animationIterationCount, animationTimingFunction, animationDirection },
+            }
           : {}),
       }),
-      h('foreignObject', { ...positionData, y: positionData.y + 5, x: positionData.x + 5, style: {} }, [
-        h('div', { id, style: { ...wrapperStyle }, className: 'lf-custom-edge-wrapper' }),
-      ]),
     ])
   }
 }

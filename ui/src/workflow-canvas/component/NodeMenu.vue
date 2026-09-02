@@ -1,20 +1,22 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 
-import aiChatIcon from '@/assets/workflow/icon_ai_chat.svg'
-import replyIcon from '@/assets/workflow/icon_reply.svg'
-import { WorkflowNodeType } from '@/workflow-canvas/types'
+import { getMenuNodes, type WorkflowMenuNode } from '@/workflow-canvas/config/menu'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
+import { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'NodeMenu' })
 
 const emit = defineEmits<{
-  select: [nodeType: WorkflowNodeType]
+  dragstart: [workflowNode: WorkflowMenuNode, event: PointerEvent]
+  select: [workflowNode: WorkflowMenuNode]
 }>()
 
 type WorkflowComponentTab = 'basic' | 'tool' | 'application'
 
 const activeTab = ref<WorkflowComponentTab>('basic')
 const searchKeyword = ref('')
+const workflowMode = inject('workflowMode', WorkflowMode.Application)
 
 const workflowComponentTabs: Array<{ label: string; value: WorkflowComponentTab }> = [
   { label: '基础组件', value: 'basic' },
@@ -22,39 +24,22 @@ const workflowComponentTabs: Array<{ label: string; value: WorkflowComponentTab 
   { label: '智能体', value: 'application' },
 ]
 
-const workflowComponentGroups = [
-  {
-    label: 'AI 能力',
-    list: [
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: 'AI 对话', value: WorkflowNodeType.AiChat },
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '意图识别', value: WorkflowNodeType.IntentNode },
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '文本转语音', value: WorkflowNodeType.TextToSpeechNode },
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '语音转文本', value: WorkflowNodeType.SpeechToTextNode },
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '图片生成', value: WorkflowNodeType.ImageGenerateNode},
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '图片理解', value: WorkflowNodeType.ImageUnderstandNode},
-      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '问题优化', value: WorkflowNodeType.Question},
-    ],
-  },
-  {
-    label: '业务逻辑',
-    list: [
-      { icon: aiChatIcon, iconClass: 'bg-purple', label: '判断器', value: WorkflowNodeType.Condition },
-      { icon: aiChatIcon, iconClass: 'bg-success', label: '表单收集', value: WorkflowNodeType.FormNode },
-      { icon: replyIcon, iconClass: 'bg-warning', label: '指定回复', value: WorkflowNodeType.Reply },
-    ],
-  },
-]
+const workflowComponentGroups = computed(() => getMenuNodes(workflowMode) ?? [])
 
 const filteredComponentGroups = computed(() => {
   if (activeTab.value !== 'basic') return []
 
   const keyword = searchKeyword.value.trim().toLocaleLowerCase()
-  if (!keyword) return workflowComponentGroups
+  if (!keyword) return workflowComponentGroups.value
 
-  return workflowComponentGroups
-    .map((group) => ({ ...group, list: group.list.filter((option) => option.label.toLocaleLowerCase().includes(keyword)) }))
+  return workflowComponentGroups.value
+    .map((group) => ({ ...group, list: group.list.filter((node) => node.label.toLocaleLowerCase().includes(keyword)) }))
     .filter((group) => group.list.length > 0)
 })
+
+const handleNodeDragStart = (event: PointerEvent, workflowNode: WorkflowMenuNode) => {
+  if (event.button === 0) emit('dragstart', workflowNode, event)
+}
 </script>
 
 <template>
@@ -83,16 +68,15 @@ const filteredComponentGroups = computed(() => {
           <p class="mb-3 mt-3 text-N600">{{ group.label }}</p>
           <div class="grid grid-cols-2 gap-3">
             <button
-              v-for="componentOption in group.list"
-              :key="componentOption.value"
+              v-for="workflowNode in group.list"
+              :key="workflowNode.type"
               type="button"
-              class="flex h-10 items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary"
-              @click="emit('select', componentOption.value)"
+              class="flex h-10 cursor-grab items-center gap-3 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary active:cursor-grabbing"
+              @click="emit('select', workflowNode)"
+              @pointerdown="handleNodeDragStart($event, workflowNode)"
             >
-              <span class="flex size-6 shrink-0 items-center justify-center rounded-md" :class="componentOption.iconClass">
-                <img :src="componentOption.icon" alt="" class="size-4" />
-              </span>
-              <span>{{ componentOption.label }}</span>
+              <component :is="iconComponent(`${workflowNode.type}-icon`)" class="shrink-0" :size="24" />
+              <span>{{ workflowNode.label }}</span>
             </button>
           </div>
         </template>

@@ -67,6 +67,7 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     apiType: 'workspace',
     getSelectModelList: (params: { model_type: string }) => modelAPI.getModelList(params),
     getModelParamsForm: (modelId: string) => modelAPI.getModelParamsForm(modelId),
+    startDragNode: onmousedown,
   })
   lf.value.graphModel.eventCenter.on('delete_edge', (edgeIds: string[]) => {
     edgeIds.forEach((edgeId) => lf.value?.deleteEdge(edgeId))
@@ -110,11 +111,22 @@ function validate() {
   return Promise.all(lf.value.graphModel.nodes.map((node) => (node as unknown as WorkflowNodeModel).validate?.()))
 }
 
-function onmousedown(shapeItem: ShapeItem) {
+function onmousedown(shapeItem: ShapeItem, event?: PointerEvent) {
   if (!lf.value) return
 
   if (shapeItem.type) {
     lf.value.dnd.startDrag({ type: shapeItem.type, properties: cloneDeep(shapeItem.properties ?? {}) })
+
+    if (event) {
+      const containerRect = lf.value.container.getBoundingClientRect()
+      const isInsideCanvas =
+        event.clientX >= containerRect.left &&
+        event.clientX <= containerRect.right &&
+        event.clientY >= containerRect.top &&
+        event.clientY <= containerRect.bottom
+
+      if (isInsideCanvas) lf.value.dnd.dragEnter(event)
+    }
   }
   shapeItem.callback?.(lf.value)
 }

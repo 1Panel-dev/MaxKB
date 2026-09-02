@@ -143,7 +143,7 @@ onMounted(() => loadChatUserGroups())
       <MkSearchList :data="chatUserGroups" :default-active="currentGroup?.id" @click="handleGroupSelect">
         <template #action-dropdown="{ row }">
           <MkDropdownItem @click="handleOpenGroupDialog(row)">
-            <template #icon><MkIcon name="icon_edit_outlined" /></template>
+            <template #icon><MkIcon name="icon_rename_outlined" /></template>
             <span>重命名</span>
           </MkDropdownItem>
           <MkDropdownItem divided @click="deleteGroup(row)">
