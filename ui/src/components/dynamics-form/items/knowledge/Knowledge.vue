@@ -6,6 +6,7 @@
       v-bind="$attrs"
       class="w-full"
       :placeholder="$t('views.chatLog.selectKnowledgePlaceholder')"
+      :filterable="true"
     >
       <template #header v-if="$attrs.popperHeader">
         <SelectHeader :header="$attrs.popperHeader" />
