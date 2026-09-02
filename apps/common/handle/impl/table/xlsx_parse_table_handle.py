@@ -6,7 +6,7 @@ import traceback
 from openpyxl import load_workbook
 
 from common.handle.base_parse_table_handle import BaseParseTableHandle
-from common.handle.impl.common_handle import xlsx_embed_cells_images
+from common.handle.impl.common_handle import xlsx_embed_cells_images, validate_xlsx_buffer
 from common.handle.impl.xlsx_utils import iter_sheet_content_rows
 from common.utils.logger import maxkb_logger
 
@@ -14,7 +14,7 @@ from common.utils.logger import maxkb_logger
 class XlsxParseTableHandle(BaseParseTableHandle):
     def support(self, file, get_buffer):
         file_name: str = file.name.lower()
-        if file_name.endswith('.xlsx'):
+        if file_name.endswith(".xlsx"):
             return True
         return False
 
@@ -30,7 +30,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
             return data
         for idx, cell in enumerate(title_row):
             if cell.value is None:
-                headers.append(' ' * (idx + 1))
+                headers.append(" " * (idx + 1))
             else:
                 headers.append(cell.value)
 
@@ -47,10 +47,10 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                             cell_value = sheet[merged_range.min_row][merged_range.min_col - 1].value
                             break
                 if cell_value is None:
-                    cell_value = ''
+                    cell_value = ""
                 image = image_dict.get(cell_value, None)
                 if image is not None:
-                    cell_value = f'![](./oss/file/{image.id})'
+                    cell_value = f"![](./oss/file/{image.id})"
 
                 # 使用标题作为键，单元格的值作为值存入字典
                 row_data[headers[col_idx]] = cell_value
@@ -61,6 +61,7 @@ class XlsxParseTableHandle(BaseParseTableHandle):
     def handle(self, file, get_buffer, save_image):
         buffer = get_buffer(file)
         try:
+            validate_xlsx_buffer(io.BytesIO(buffer))
             wb = load_workbook(io.BytesIO(buffer))
             try:
                 image_dict: dict = xlsx_embed_cells_images(io.BytesIO(buffer))
@@ -76,13 +77,13 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 for row in data:
                     row_output = "; ".join([f"{key}: {value}" for key, value in row.items()])
                     # print(row_output)
-                    paragraphs.append({'title': '', 'content': row_output})
+                    paragraphs.append({"title": "", "content": row_output})
 
-                result.append({'name': sheetname, 'paragraphs': paragraphs})
+                result.append({"name": sheetname, "paragraphs": paragraphs})
 
         except BaseException as e:
             maxkb_logger.error(f"Error processing XLSX file {file.name}: {e}, {traceback.format_exc()}")
-            return [{'name': file.name, 'paragraphs': []}]
+            return [{"name": file.name, "paragraphs": []}]
         return result
 
     def get_content(self, file, save_image):
@@ -94,9 +95,9 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                 if len(image_dict) > 0:
                     save_image(image_dict.values())
             except Exception as e:
-                maxkb_logger.error(f'Exception: {e}')
+                maxkb_logger.error(f"Exception: {e}")
                 image_dict = {}
-            md_tables = ''
+            md_tables = ""
             # 遍历所有工作表
             for sheetname in workbook.sheetnames:
                 sheet = workbook[sheetname]
@@ -105,22 +106,25 @@ class XlsxParseTableHandle(BaseParseTableHandle):
                     continue
 
                 # 添加 sheet 名称作为标题
-                md_tables += f'## {sheetname}\n\n'
+                md_tables += f"## {sheetname}\n\n"
 
                 # 提取表头和内容
                 headers = [f"{key}" for key, value in rows[0].items()]
 
                 # 构建 Markdown 表格
-                md_table = '| ' + ' | '.join(headers) + ' |\n'
-                md_table += '| ' + ' | '.join(['---'] * len(headers)) + ' |\n'
+                md_table = "| " + " | ".join(headers) + " |\n"
+                md_table += "| " + " | ".join(["---"] * len(headers)) + " |\n"
                 for row in rows:
-                    r = [f'{value}' for key, value in row.items()]
-                    md_table += '| ' + ' | '.join(
-                        [str(cell).replace('\n', '<br>') if cell is not None else '' for cell in r]) + ' |\n'
+                    r = [f"{value}" for key, value in row.items()]
+                    md_table += (
+                        "| "
+                        + " | ".join([str(cell).replace("\n", "<br>") if cell is not None else "" for cell in r])
+                        + " |\n"
+                    )
 
-                md_tables += md_table + '\n\n'
+                md_tables += md_table + "\n\n"
 
             return md_tables
         except Exception as e:
-            maxkb_logger.error(f'excel split handle error: {e}')
-            return f'error: {e}'
+            maxkb_logger.error(f"excel split handle error: {e}")
+            return f"error: {e}"
