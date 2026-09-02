@@ -185,7 +185,7 @@ onMounted(() => loadWorkspaceOptions())
         <template #action-dropdown="{ row: workspace }">
           <MkDropdownItem @click="handleOpenWorkspaceDialog(workspace)">
             <template #icon>
-              <MkIcon name="icon_edit_outlined" />
+              <MkIcon name="icon_rename_outlined" />
             </template>
             <span>重命名</span>
           </MkDropdownItem>

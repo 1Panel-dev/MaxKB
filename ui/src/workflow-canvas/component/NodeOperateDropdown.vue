@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { BaseNodeModel } from '@logicflow/core'
-import { CircleCheck } from '@element-plus/icons-vue'
 import type { FormInstance } from 'element-plus'
 import { computed, ref, useTemplateRef } from 'vue'
 import { set } from 'lodash'
@@ -119,28 +118,31 @@ function deleteNode() {
 <template>
   <MkDropdown v-if="visible" :teleported="false" trigger="click" @visible-change="emit('visible-change', $event)">
     <el-button text>
-      <MkIcon name="icon_more_outlined" class="text-N600" />
+      <MkIcon name="icon_more_outlined" />
     </el-button>
     <template #dropdown>
       <MkDropdownMenu class="min-w-36">
-        <MkDropdownItem class="p-2" @click="renameNode">
-          <template #icon><MkIcon name="icon_edit_outlined" /></template>
+        <MkDropdownItem @click="renameNode">
+          <template #icon><MkIcon name="icon_rename_outlined" /></template>
           重命名
         </MkDropdownItem>
-        <MkDropdownItem class="p-2" @click="copyNode">
+        <MkDropdownItem @click="copyNode">
           <template #icon><MkIcon name="icon_copy_outlined" /></template>
           复制
         </MkDropdownItem>
-        <div v-if="canChangeEnabled" class="flex-between p-2" @click.stop>
-          <MkIcon :icon="CircleCheck" class="text-N600" />
-          <span class="mr-4">启用状态</span>
+        <div v-if="canChangeEnabled" class="flex-between px-3 py-1" @click.stop>
+          <span class="flex items-center gap-2">
+            <MkIcon name="icon_yes_outlined" class="text-N600!" />
+            <span>启用状态</span>
+          </span>
+
           <el-switch v-model="nodeEnabled" size="small" />
         </div>
-        <MkDropdownItem class="border-t border-N300 p-2" @click="deleteNode">
+        <MkDropdownItem divided @click="deleteNode">
           <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>
           删除
         </MkDropdownItem>
-        <div v-if="sourceName" class="border-t border-N300 p-2" @click.stop>
+        <div v-if="sourceName" class="border-t mt-1 px-3 py-2" @click.stop>
           <div class="text-sm text-N600">来源</div>
           <div class="mt-1 break-all text-N600">{{ sourceName }}</div>
         </div>

@@ -120,7 +120,7 @@ onMounted(() => loadRoles())
                 </template>
                 <template v-if="!role.internal" #action-dropdown>
                   <MkDropdownItem @click="handleOpenRoleDialog(role)">
-                    <template #icon><MkIcon name="icon_edit_outlined" /></template>重命名
+                    <template #icon><MkIcon name="icon_rename_outlined" /></template>重命名
                   </MkDropdownItem>
                   <MkDropdownItem divided @click="handleDeleteRole(role)">
                     <template #icon><MkIcon name="icon_delete-trash_outlined" /></template>删除

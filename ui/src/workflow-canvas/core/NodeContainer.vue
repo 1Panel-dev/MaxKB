@@ -1,19 +1,15 @@
 <script setup lang="ts">
 import type { BaseNodeModel, Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { set } from 'lodash'
+import { cloneDeep, set } from 'lodash'
 import { iconComponent } from '../icons/utils'
 import { copyText } from '@/utils/clipboard'
-import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
-import { BasicComponentsNode } from '@/workflow-canvas/config/node-mapping'
+import { WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
+import type { WorkflowMenuNode } from '@/workflow-canvas/config/menu'
 import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
 import NodeConditionDropdown from '@/workflow-canvas/component/NodeConditionDropdown.vue'
 import NodeOperateDropdown from '@/workflow-canvas/component/NodeOperateDropdown.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
-
-interface ResizeSize {
-  height: number
-}
 
 type NodeContainerProperties = {
   config?: { fields?: WorkflowNodeField[]; output_title?: string }
@@ -32,15 +28,12 @@ withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
   ],
 })
 const getModel = inject('getModel') as () => BaseNodeModel
+const startDragNode = inject<(shapeItem: ShapeItem, event?: PointerEvent) => void>('startDragNode')
 const model = getModel()
 const nodeProperties = computed(() => model.properties as unknown as NodeContainerProperties)
 
-const height = ref<{ stepContainerHeight: number; inputContainerHeight: number; outputContainerHeight: number }>({
-  stepContainerHeight: 0,
-  inputContainerHeight: 0,
-  outputContainerHeight: 0,
-})
 const showAnchor = ref(false)
+const nodeMenuDragClosing = ref(false)
 const anchorData = ref<Model.AnchorConfig>()
 const dropdownMenuStyle = computed(() => {
   return { top: anchorData.value ? anchorData.value.y - model.y + model.height / 2 + 'px' : '0px' }
@@ -84,35 +77,38 @@ const handleNodeMousedown = (event?: MouseEvent) => {
   model.graphModel.toFront(model.id)
 }
 const showicon = ref<number | string | null>(null)
-const resizeStepContainer = (wh: ResizeSize) => {
-  if (wh.height) {
-    if (!model.virtual) {
-      height.value.stepContainerHeight = wh.height
-      model.setHeight(height.value.stepContainerHeight)
-    }
+const resizeStepContainer = (nodeHeight: number) => {
+  if (nodeHeight > 0 && !model.virtual) {
+    model.setHeight(nodeHeight)
   }
 }
 
-function clickNodes(nodeType: WorkflowNodeType) {
-  const item = BasicComponentsNode[nodeType]
+function clickNodes(item: WorkflowMenuNode) {
   const anchor = anchorData.value
-  if (!item || !anchor) return
+  if (!anchor) return
 
-  const width = Number((item.properties as { width?: number }).width ?? 214)
+  const width = Number(item.properties?.width ?? 214)
+  const height = Number(item.height ?? item.properties?.height ?? 0)
   const newModel = model.graphModel.addNode({
     type: item.type,
-    properties: item.properties,
+    properties: cloneDeep(item.properties ?? {}),
     x: anchor.x + width / 2 + 200,
-    y: anchor.y - item.height,
+    y: anchor.y - height,
   })
   newModel.graphModel.addEdge({
     type: 'app-edge',
     sourceNodeId: model.id,
     sourceAnchorId: anchor.id,
-    targetNodeId: model.id,
-    targetAnchorId: model.id + '_left',
+    targetNodeId: newModel.id,
+    targetAnchorId: newModel.id + '_left',
   })
 
+  closeNodeMenu()
+}
+
+function dragNode(item: WorkflowMenuNode, event: PointerEvent) {
+  startDragNode?.(item, event)
+  nodeMenuDragClosing.value = true
   closeNodeMenu()
 }
 const enable_exception = computed({
@@ -164,6 +160,7 @@ watch(enable_exception, () => {
 })
 
 const openNodeMenu = (anchorValue: Model.AnchorConfig) => {
+  nodeMenuDragClosing.value = false
   showAnchor.value = true
   anchorData.value = anchorValue
 }
@@ -230,19 +227,18 @@ onMounted(() => {
 })
 let resizeObserver: ResizeObserver | null = null
 const initResizeObserver = () => {
-  if (!containerRef.value) return
+  if (!stepContainerRef.value) return
 
   resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      const { height } = entry.contentRect
-      // 在这里处理尺寸变化
-      resizeStepContainer({ height: height + 32 })
+      const nodeHeight = entry.borderBoxSize[0]?.blockSize ?? (entry.target as HTMLElement).offsetHeight
+      resizeStepContainer(nodeHeight)
     }
   })
 
-  resizeObserver.observe(containerRef.value)
+  resizeObserver.observe(stepContainerRef.value)
 }
-const containerRef = ref<HTMLElement>()
+const stepContainerRef = ref<HTMLElement>()
 onBeforeUnmount(() => {
   resizeObserver?.disconnect()
   resizeObserver = null
@@ -252,10 +248,11 @@ onBeforeUnmount(() => {
 <template>
   <div class="workflow-node-container relative overflow-visible" @mousedown="handleNodeMousedown">
     <div
+      ref="stepContainerRef"
       class="step-container shadow-sm overflow-visible rounded-xl border-2 border-white bg-white p-4"
       :class="{ isSelected: model.isSelected, error: node_status !== 200 }"
     >
-      <div ref="containerRef">
+      <div>
         <div class="flex-between">
           <div class="flex items-center" @dragstart.prevent @drag.prevent @dragover.prevent @dragend.prevent>
             <component :is="iconComponent(`${model.type}-icon`)" class="mr-2" :size="24" :item="model?.properties.node_data" />
@@ -266,7 +263,7 @@ onBeforeUnmount(() => {
             ></h4>
           </div>
 
-          <div @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
+          <div class="flex items-center gap-1" @mousemove.stop @mousedown.stop @keydown.stop @click.stop>
             <el-button text @click="showNode = !showNode">
               <MkIcon name="icon_down_outlined" />
             </el-button>
@@ -333,12 +330,14 @@ onBeforeUnmount(() => {
       <NodeMenu
         v-if="showAnchor"
         class="absolute"
+        :class="{ 'pointer-events-none': nodeMenuDragClosing }"
         @mousemove.stop
         @mousedown.stop
         @click.stop
         @wheel="handleNodeWheel"
         style="left: 105%; transform: translate(0, -50%)"
         :style="dropdownMenuStyle"
+        @dragstart="dragNode"
         @select="clickNodes"
       />
     </el-collapse-transition>

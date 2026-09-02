@@ -1,9 +1,13 @@
-import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
 import * as NodeData from './node-data'
-interface WorkflowMenuNode {
+
+export interface WorkflowMenuNode extends ShapeItem {
+  height?: number
+  label: string
   type: WorkflowNodeType
 }
-interface WorkflowMenuGroup {
+
+export interface WorkflowMenuGroup {
   label: string
   list: WorkflowMenuNode[]
 }
@@ -26,7 +30,10 @@ export const knowledgeMenuNodes = [
     ],
   },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.replyNode, NodeData.loopNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 export const menuNodes = [
@@ -47,7 +54,10 @@ export const menuNodes = [
   },
   { label: '知识库', list: [NodeData.searchKnowledgeNode, NodeData.searchDocumentNode, NodeData.rerankerNode, NodeData.documentExtractNode] },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.formNode, NodeData.replyNode, NodeData.loopNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 export const applicationLoopMenuNodes = [
@@ -68,7 +78,10 @@ export const applicationLoopMenuNodes = [
   },
   { label: '知识库', list: [NodeData.searchKnowledgeNode, NodeData.searchDocumentNode, NodeData.rerankerNode, NodeData.documentExtractNode] },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.formNode, NodeData.replyNode, NodeData.loopContinueNode, NodeData.loopBreakNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 export const knowledgeLoopMenuNodes = [
@@ -90,7 +103,10 @@ export const knowledgeLoopMenuNodes = [
     ],
   },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.replyNode, NodeData.loopContinueNode, NodeData.loopBreakNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 export const toolLoopMenuNodes = [
@@ -112,7 +128,10 @@ export const toolLoopMenuNodes = [
     ],
   },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.formNode, NodeData.replyNode, NodeData.loopContinueNode, NodeData.loopBreakNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 const toolMenuNodes = [
@@ -131,9 +150,21 @@ const toolMenuNodes = [
       NodeData.questionNode,
     ],
   },
-  { label: '知识库', list: [NodeData.searchKnowledgeNode, NodeData.searchDocumentNode, NodeData.rerankerNode, NodeData.documentExtractNode, NodeData.documentSplitNode] },
+  {
+    label: '知识库',
+    list: [
+      NodeData.searchKnowledgeNode,
+      NodeData.searchDocumentNode,
+      NodeData.rerankerNode,
+      NodeData.documentExtractNode,
+      NodeData.documentSplitNode,
+    ],
+  },
   { label: '业务逻辑', list: [NodeData.conditionNode, NodeData.formNode, NodeData.replyNode, NodeData.loopNode] },
-  { label: '数据处理', list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode] },
+  {
+    label: '数据处理',
+    list: [NodeData.variableAssignNode, NodeData.variableAggregationNode, NodeData.variableSplittingNode, NodeData.parameterExtractionNode],
+  },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
 export const getMenuNodes = (workflowMode: WorkflowMode): WorkflowMenuGroup[] | undefined => {

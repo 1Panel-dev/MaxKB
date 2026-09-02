@@ -55,7 +55,7 @@ function toggleAside(event: MouseEvent) {
         :class="asideCollapsed ? 'left-0 rounded-r-full border-l-0 w-5 flex items-center pl-[2px]' : 'right-0 translate-x-1/2 rounded-full w-6 flex-center group-hover-visible'"
         @click="toggleAside"
       >
-        <MkIcon :name="asideCollapsed ? 'icon_right_outlined' : 'icon_left_outlined'" :size="12" />
+        <MkIcon name="icon_left_outlined" :class="asideCollapsed && 'rotate-180'"  :size="12" />
       </button>
     </el-tooltip>
   </div>

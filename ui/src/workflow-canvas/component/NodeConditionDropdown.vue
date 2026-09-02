@@ -46,19 +46,21 @@ const condition = computed({
 </script>
 
 <template>
-  <MkDropdown v-if="visible" :teleported="false" trigger="click" placement="bottom-start" @visible-change="emit('visible-change', $event)">
-    <el-button text>条件</el-button>
+  <MkDropdown v-if="visible" :teleported="false" trigger="click" placement="bottom" @visible-change="emit('visible-change', $event)">
+    <el-button text>
+      <MkIcon :name="condition === 'OR' ? 'icon_any_outlined' : 'icon_all_outlined'" />
+    </el-button>
     <template #dropdown>
-      <div class="w-[280px] px-4 py-3">
-        <h5>执行条件</h5>
-        <p class="mt-2 text-N600">
+      <div class="w-84 px-4 py-3">
+        <h6>执行条件</h6>
+        <div class="mt-2 flex items-center gap-2">
           <span>前置</span>
-          <el-select v-model="condition" class="mx-2 w-[60px]" size="small">
+          <el-select v-model="condition" size="small" class="w-15!">
             <el-option label="所有" value="AND" />
             <el-option label="任一" value="OR" />
           </el-select>
           <span>连线节点执行完，执行当前节点</span>
-        </p>
+        </div>
       </div>
     </template>
   </MkDropdown>

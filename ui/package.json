@@ -37,6 +37,7 @@
     "nanoid": "^6.0.1",
     "nprogress": "^0.2.0",
     "pinia": "^3.0.4",
+    "sortablejs": "^1.15.7",
     "vue": "^3.5.38",
     "vue-codemirror": "^6.1.1",
     "vue-demi": "^0.14.10",

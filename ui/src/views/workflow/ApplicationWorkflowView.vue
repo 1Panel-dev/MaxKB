@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, provide, ref, useTemplateRef } from 'vue'
+import { nextTick, onMounted, ref, useTemplateRef } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import type LogicFlow from '@logicflow/core'
 import type { Action } from 'element-plus'
@@ -8,10 +8,10 @@ import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application.ts'
 import type { ApplicationDetail } from '@/api/types'
 import { datetimeFormat } from '@/utils/time'
-import { MsgConfirm, MsgError, MsgSuccess } from '@/utils/message'
+import { MsgConfirm, MsgSuccess } from '@/utils/message'
 import WorkflowCanvas from '@/workflow-canvas/index.vue'
-import { defaultNodes, nodeDict } from '@/workflow-canvas/config/node-mapping'
-import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
+import { defaultNodes } from '@/workflow-canvas/config/node-mapping'
+import type { ShapeItem } from '@/workflow-canvas/types'
 import WorkflowComponentMenu from './components/WorkflowComponentMenu.vue'
 import Conversation from '@/components/conversation/index.vue'
 
@@ -30,20 +30,12 @@ const workspaceId = route.params.workspaceId as string
 const workflowRef = useTemplateRef<InstanceType<typeof WorkflowCanvas>>('workflowRef')
 
 /* 添加工作流组件 */
-function toShapeItem(nodeType: WorkflowNodeType): ShapeItem | undefined {
-  const node = nodeDict[nodeType]
-  if (!node) return
-
-  return {
-    type: node.type,
-    properties: node.properties,
-    text: node.text,
-  }
+function handleAddNode(shapeItem: ShapeItem) {
+  workflowRef.value?.addNode(shapeItem)
 }
 
-function handleAddNode(nodeType: WorkflowNodeType) {
-  const shapeItem = toShapeItem(nodeType)
-  if (shapeItem) workflowRef.value?.addNode(shapeItem)
+function handleDragNode(shapeItem: ShapeItem, event: PointerEvent) {
+  workflowRef.value?.onmousedown(shapeItem, event)
 }
 
 /* 智能体工作流加载与保存 */
@@ -267,7 +259,7 @@ onMounted(() => {
       </div>
 
       <div class="flex shrink-0 items-center gap-3">
-        <WorkflowComponentMenu @select="handleAddNode" />
+        <WorkflowComponentMenu @dragstart="handleDragNode" @select="handleAddNode" />
         <el-button plain :loading="saving && !publishing" :disabled="loading || saving || publishing" @click="handleSave"> 保存 </el-button>
         <el-button type="primary" plain :disabled="loading || saving" @click="handleDebug"> 调试 </el-button>
         <!-- <el-button
@@ -315,7 +307,7 @@ onMounted(() => {
             <MkIcon :icon="Close" :size="16" />
           </button>
         </div>
-        <Conversation :defaultOpen='false' type="DEBUG" class="h-full" />
+        <Conversation :defaultOpen="false" type="DEBUG" class="h-full" />
       </div>
     </transition>
   </main>

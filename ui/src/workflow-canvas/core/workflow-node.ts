@@ -1,12 +1,13 @@
 import { createApp, reactive, type Component } from 'vue'
 import { cloneDeep } from 'lodash'
 import { h as createLogicFlowElement, HtmlNode, HtmlNodeModel, type GraphModel, type IHtmlNodeProperties, type Model } from '@logicflow/core'
-import { BasicComponentsNode } from '@/workflow-canvas/config/node-mapping'
+import { nodeDict } from '@/workflow-canvas/config/node-mapping'
 import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { connect, disconnect } from './teleport'
 
 type NodeViewProps = ConstructorParameters<typeof HtmlNode>[0]
 type NodeFieldGroup = Record<string, WorkflowNodeField[]>
+type RefreshableEdgeModel = { updatePathByAnchor?: () => void }
 
 type WorkflowNodeConfig = { chatFields?: WorkflowNodeField[]; fields?: WorkflowNodeField[]; globalFields?: WorkflowNodeField[] }
 
@@ -30,9 +31,9 @@ export class WorkflowNodeView extends HtmlNode {
     this.vueComponent = vueComponent
 
     const nodeModel = props.model as unknown as WorkflowNodeModel
-    const definition = BasicComponentsNode[nodeModel.type as WorkflowNodeType]
+    const definition = nodeDict[nodeModel.type as WorkflowNodeType]
     if (definition && !nodeModel.properties.config) {
-      nodeModel.properties.config = cloneDeep(definition.properties.config ?? {})
+      nodeModel.properties.config = cloneDeep(definition.properties?.config ?? {})
     }
     nodeModel.properties.stepName = this.getUniqueNodeName(
       props.graphModel,
@@ -61,28 +62,38 @@ export class WorkflowNodeView extends HtmlNode {
       type === 'left' ? edge.targetAnchorId === anchorData.id : edge.sourceAnchorId === anchorData.id,
     )
 
-    return createLogicFlowElement('foreignObject', { ...anchorData, x: x - 14, y: y - 14, width: 28, height: 28 }, [
-      createLogicFlowElement(
-        'div',
-        {
-          className: 'flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 border-primary bg-white text-white',
-          style: connected ? {} : { background: 'var(--el-color-primary)' },
-          onClick: () => {
-            if (type === 'right') {
-              const nodeModel = this.props.model as unknown as WorkflowNodeModel
-              nodeModel.openNodeMenu?.(anchorData)
-            }
+    return createLogicFlowElement(
+      'foreignObject',
+      { ...anchorData, className: 'workflow-node-anchor-wrapper', x: x - 12, y: y - 12, width: 24, height: 24 },
+      [
+        createLogicFlowElement(
+          'div',
+          {
+            className: `workflow-node-anchor${type === 'right' ? ' is-right' : ''}${connected ? ' is-connected' : ''}`,
+            onClick: () => {
+              if (type === 'right') {
+                const nodeModel = this.props.model as unknown as WorkflowNodeModel
+                nodeModel.openNodeMenu?.(anchorData)
+              }
+            },
           },
-        },
-        connected
-          ? []
-          : [
-              createLogicFlowElement('svg', { 'aria-hidden': 'true', className: 'h-4 w-4', fill: 'currentColor', focusable: 'false' }, [
-                createLogicFlowElement('use', { href: '#icon_add_outlined' }),
-              ]),
-            ],
-      ),
-    ])
+          connected && type !== 'right'
+            ? []
+            : [
+                createLogicFlowElement(
+                  'svg',
+                  {
+                    'aria-hidden': 'true',
+                    className: 'workflow-node-add-icon',
+                    fill: 'currentColor',
+                    focusable: 'false',
+                  },
+                  [createLogicFlowElement('use', { href: '#icon_add_bold_outlined' })],
+                ),
+              ],
+        ),
+      ],
+    )
   }
 
   setHtml(rootEl: SVGForeignObjectElement) {
@@ -123,13 +134,18 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
     this.text.editable = false
   }
 
-  setHeight(contentHeight: number) {
-    const targetHeight = Math.max(contentHeight + 32, 120)
+  setHeight(nodeHeight: number) {
+    const targetHeight = Math.max(nodeHeight, 1)
     if (targetHeight === this.height) return
     const offset = (targetHeight - this.height) / 2
     this.height = targetHeight
     this.properties.height = targetHeight
     this.move(0, offset)
+    const connectedEdges = new Set([...this.incoming.edges, ...this.outgoing.edges])
+    connectedEdges.forEach((edge) => {
+      const refreshableEdge = edge as unknown as RefreshableEdgeModel
+      refreshableEdge.updatePathByAnchor?.()
+    })
   }
 
   getNodeFieldList(): WorkflowNodeField[] {
