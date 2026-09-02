@@ -116,7 +116,7 @@ class MCPToolHandler:
             ]
         }
 
-    def _get_chat_id(self):
+    def _get_chat_id(self, chat_user_id):
         from application.models import ChatUserType
         from common.init import init_template
 
@@ -127,7 +127,7 @@ class MCPToolHandler:
         return OpenChatSerializers(
             data={
                 "application_id": self.application.id,
-                "chat_user_id": str(uuid.uuid7()),
+                "chat_user_id": chat_user_id,
                 "chat_user_type": ChatUserType.ANONYMOUS_USER,
                 "ip_address": "-",
                 "source": {"type": ChatSourceChoices.ONLINE.value},
@@ -158,10 +158,11 @@ class MCPToolHandler:
             "form_data": self.build_form_data(message),
             **self.chat_files,
         }
+        chat_user_id = str(uuid.uuid7())
         resp = ChatSerializers(
             data={
-                "chat_id": self._get_chat_id(),
-                "chat_user_id": str(uuid.uuid7()),
+                "chat_id": self._get_chat_id(chat_user_id),
+                "chat_user_id": chat_user_id,
                 "chat_user_type": ChatUserType.ANONYMOUS_USER,
                 "application_id": self.application.id,
                 "ip_address": "-",
