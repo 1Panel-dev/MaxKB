@@ -1,5 +1,5 @@
 # coding=utf-8
-from application.models import Chat
+from application.models import Chat, Application
 from maxkb.const import CONFIG
 from common.auth import AllTokenAuth, TokenAuth
 from common.auth.authentication import has_permissions
@@ -60,11 +60,6 @@ class FileView(APIView):
         if request.user is None or is_chat_path:
             if source_type != FileSourceType.CHAT.value:
                 raise AppUnauthorizedFailed(403, _("No permission"))
-            # 聊天文件必须归属于调用者所在应用下的会话
-            if source_type == FileSourceType.CHAT.value:
-                chat = QuerySet(Chat).filter(id=source_id, application_id=request.auth.application_id).first()
-                if chat is None:
-                    raise AppUnauthorizedFailed(403, _("No permission"))
         return result.success(
             FileSerializer(
                 data={
