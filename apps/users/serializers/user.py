@@ -7,6 +7,7 @@
 @desc:
 """
 
+import datetime
 import json
 import os
 import random
@@ -28,7 +29,6 @@ from common.auth.constants.role_constants import RoleConstants
 from common.auth.struct.auth import Auth
 from common.constants.cache_version import Cache_Version
 from common.constants.exception_code_constants import ExceptionCodeConstants
-from common.constants.resource_permission_constants import ResourcePermissionConstants
 from common.database_model_manage.database_model_manage import DatabaseModelManage
 from common.db.search import page_search
 from common.exception.app_exception import AppApiException
@@ -36,7 +36,7 @@ from common.utils.common import password_encrypt, password_verify
 from common.utils.rsa_util import decrypt
 from maxkb.conf import PROJECT_DIR
 from maxkb.const import CONFIG
-from system_manage.models import AuthTargetType, SettingType, SystemSetting, WorkspaceUserResourcePermission
+from system_manage.models import SettingType, SystemSetting
 from users.models import User
 from users.models.user_group import SystemUserGroup, SystemUserGroupRelation
 
@@ -990,10 +990,11 @@ class SendEmailSerializer(serializers.Serializer):
         super().is_valid(raise_exception=raise_exception)
         code_cache_key = self.data.get("email") + ":" + self.data.get("type")
         code_cache_key_lock = code_cache_key + "_lock"
-        ttl = cache.ttl(get_key(code_cache_key_lock), version=version)
-        if ttl is not None and ttl > 0:
+        ttl = cache.ttl(code_cache_key_lock, version=version)
+        seconds = ttl.total_seconds() if isinstance(ttl, datetime.timedelta) else ttl
+        if seconds is not None and seconds > 0:
             raise AppApiException(
-                500, _("Do not send emails again within {seconds} seconds").format(seconds=int(ttl.total_seconds()))
+                500, _("Do not send emails again within {seconds} seconds").format(seconds=int(seconds))
             )
         return True
 

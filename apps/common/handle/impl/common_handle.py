@@ -1,14 +1,14 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎
-    @file： tools.py
-    @date：2024/9/11 16:41
-    @desc:
+@project: MaxKB
+@Author：虎
+@file： tools.py
+@date：2024/9/11 16:41
+@desc:
 """
+
 import io
 import traceback
-from functools import reduce
 from io import BytesIO
 from xml.etree.ElementTree import fromstring
 from zipfile import ZipFile
@@ -23,8 +23,42 @@ from common.utils.logger import maxkb_logger
 from knowledge.models import File
 
 from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
-PILImage.MAX_IMAGE_PIXELS = None
+
+# 全局图片解码像素上限（不再禁用 Pillow 的解压炸弹保护）。
+# 超过该上限 Pillow 会告警，超过 2 倍会直接抛错，避免超大图片耗尽 worker 内存。
+PILImage.MAX_IMAGE_PIXELS = 50_000_000
+
+# 内嵌图片解码保护（防解压炸弹 / 超大尺寸图片导致共享 worker OOM）。
+MAX_EMBED_IMAGE_PIXELS = 16_000_000
+MAX_EMBED_IMAGE_AGGREGATE_PIXELS = 64_000_000
+
+# XLSX(zip) 压缩包防护，限制成员数 / 解压后总大小 / 解压膨胀比。
+MAX_EMBED_ARCHIVE_MEMBERS = 10_000
+MAX_EMBED_ARCHIVE_UNCOMPRESSED_BYTES = 1024 * 1024 * 1024
+MAX_EMBED_ARCHIVE_EXPANSION_RATIO = 50
+
+
+def validate_xlsx_archive(archive: ZipFile):
+    infolist = archive.infolist()
+    if len(infolist) > MAX_EMBED_ARCHIVE_MEMBERS:
+        raise ValueError(f"XLSX archive member count exceeds limit: {len(infolist)}")
+    total_uncompressed = sum(info.file_size for info in infolist)
+    total_compressed = sum(info.compress_size for info in infolist)
+    if total_uncompressed > MAX_EMBED_ARCHIVE_UNCOMPRESSED_BYTES:
+        raise ValueError("XLSX archive uncompressed size exceeds limit")
+    if total_compressed > 0 and total_uncompressed > total_compressed * MAX_EMBED_ARCHIVE_EXPANSION_RATIO:
+        raise ValueError("XLSX archive expansion ratio exceeds limit")
+
+
+def validate_xlsx_buffer(buffer):
+    archive = ZipFile(buffer)
+    try:
+        validate_xlsx_archive(archive)
+    finally:
+        archive.close()
+
 
 def parse_element(element) -> {}:
     data = {}
@@ -87,15 +121,16 @@ def handle_images(deps, archive: ZipFile) -> []:
 
 def xlsx_embed_cells_images(buffer) -> {}:
     archive = ZipFile(buffer)
+    validate_xlsx_archive(archive)
     # 解析cellImage.xml文件
     deps = get_dependents(archive, get_rels_path("xl/cellimages.xml"))
     image_rel = handle_images(deps=deps, archive=archive)
     # 工作表及其中图片ID
     sheet_list = {}
     for item in archive.namelist():
-        if not item.startswith('xl/worksheets/sheet'):
+        if not item.startswith("xl/worksheets/sheet"):
             continue
-        key = item.split('/')[-1].split('.')[0].split('sheet')[-1]
+        key = item.split("/")[-1].split(".")[0].split("sheet")[-1]
         sheet_list[key] = parse_element_sheet_xml(fromstring(archive.read(item)))
     cell_images_xml = parse_element(fromstring(archive.read("xl/cellimages.xml")))
     cell_images_rel = {}
@@ -104,18 +139,11 @@ def xlsx_embed_cells_images(buffer) -> {}:
     for cnv, embed in cell_images_xml.items():
         cell_images_xml[cnv] = cell_images_rel.get(embed)
     result = {}
+    total_pixels = 0
     for key, img in cell_images_xml.items():
-        all_cells = [
-            cell
-            for _sheet_id, sheet in sheet_list.items()
-            if sheet is not None
-            for cell in sheet or []
-        ]
+        all_cells = [cell for _sheet_id, sheet in sheet_list.items() if sheet is not None for cell in sheet or []]
 
-        image_excel_id_list = [
-            cell for cell in all_cells
-            if isinstance(cell, str) and key in cell
-        ]
+        image_excel_id_list = [cell for cell in all_cells if isinstance(cell, str) and key in cell]
         # print(key, img)
         if img is None:
             continue
@@ -123,9 +151,24 @@ def xlsx_embed_cells_images(buffer) -> {}:
             image_excel_id = image_excel_id_list[-1]
             f = archive.open(img.target)
             img_byte = io.BytesIO()
-            im = PILImage.open(f).convert('RGB')
-            im.save(img_byte, format='JPEG')
-            image = File(id=uuid.uuid7(), file_name=img.path, meta={'debug': False, 'content': img_byte.getvalue()})
-            result['=' + image_excel_id] = image
+            try:
+                with PILImage.open(f) as im:
+                    width, height = im.size
+                    pixels = width * height
+                    if pixels > MAX_EMBED_IMAGE_PIXELS:
+                        maxkb_logger.warning(
+                            f"Skip oversized embedded image {img.path}: {width}x{height} pixels exceeds limit"
+                        )
+                        continue
+                    total_pixels += pixels
+                    if total_pixels > MAX_EMBED_IMAGE_AGGREGATE_PIXELS:
+                        maxkb_logger.warning("Skip embedded images in archive: aggregate pixels exceed limit")
+                        break
+                    im.convert("RGB").save(img_byte, format="JPEG")
+            except Exception as e:
+                maxkb_logger.error(f"Error decoding image {img.target}: {e}, {traceback.format_exc()}")
+                continue
+            image = File(id=uuid.uuid7(), file_name=img.path, meta={"debug": False, "content": img_byte.getvalue()})
+            result["=" + image_excel_id] = image
     archive.close()
     return result

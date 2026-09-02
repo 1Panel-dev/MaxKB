@@ -15,7 +15,6 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from application.models import ApplicationAccessToken, Application, ApplicationVersion
-from application.serializers.application import ApplicationSerializerModel
 from common.auth.common import FileToken, ChatToken
 from common.auth.constants.operate_constants import Operate
 from common.constants.authentication_type import AuthenticationType
@@ -38,7 +37,7 @@ class AnonymousAuthenticationSerializer(serializers.Serializer):
             # 校验token
             if token is not None:
                 token_details = signing.loads(token[7:])
-        except Exception as e:
+        except Exception:
             pass
         chat_user_id = token_details.get("id") or str(uuid.uuid7())
         _type = AuthenticationType.CHAT_USER
@@ -72,7 +71,7 @@ class AnonymousAuthenticationV2Serializer(serializers.Serializer):
             # 校验token
             if token is not None:
                 token_details = signing.loads(token[7:])
-        except Exception as e:
+        except Exception:
             pass
         if with_valid:
             self.is_valid(raise_exception=True)
@@ -222,7 +221,14 @@ class ApplicationProfileSerializer(serializers.Serializer):
             node for node in ((application.work_flow or {}).get("nodes", []) or []) if node.get("id") == "base-node"
         ]
         return {
-            **ApplicationSerializerModel(application).data,
+            "id": application.id,
+            "name": application.name,
+            "desc": application.desc,
+            "prologue": application.prologue,
+            "icon": application.icon,
+            "type": application.type,
+            "dialogue_number": application.dialogue_number,
+            "problem_optimization": application.problem_optimization,
             "stt_model_id": application.stt_model_id,
             "tts_model_id": application.tts_model_id,
             "stt_model_enable": application.stt_model_enable,
