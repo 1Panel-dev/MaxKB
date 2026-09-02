@@ -17,7 +17,7 @@ Before making changes, determine which areas the task touches and read the corre
   organization, and API type ownership.
 - Views: `src/views/VIEW_README.md` is the source of truth for page responsibilities and
   feature-local code organization.
-- Workflow canvas: `src/workflow-canvas/README.md` is the source of truth for LogicFlow canvas
+- Workflow canvas: `src/workflow-canvas/WORKFLOW_README.md` is the source of truth for LogicFlow canvas
   responsibilities, configuration boundaries, node maintenance, and View integration.
 
 Follow this maintenance flow:
@@ -76,7 +76,7 @@ ui/
 │   │   ├── icons/             # Workflow node icons
 │   │   ├── nodes/             # Workflow node definitions and components
 │   │   ├── plugins/           # Canvas-local plugins
-│   │   ├── README.md          # Canvas boundaries and maintenance rules
+│   │   ├── WORKFLOW_README.md # Canvas boundaries and maintenance rules
 │   │   ├── types.ts           # Workflow canvas protocol types
 │   │   └── index.vue          # MkWorkflow canvas entry
 │   ├── router/                # Vue Router routes and router instance

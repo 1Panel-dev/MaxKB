@@ -2,14 +2,16 @@
 import type { BaseNodeModel, Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
-import { iconComponent } from '../icons/utils'
+import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { copyText } from '@/utils/clipboard'
 import { WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
-import type { WorkflowMenuNode } from '@/workflow-canvas/config/menu'
-import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
-import NodeConditionDropdown from '@/workflow-canvas/component/NodeConditionDropdown.vue'
-import NodeOperateDropdown from '@/workflow-canvas/component/NodeOperateDropdown.vue'
+import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
+import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
+import NodeConditionDropdown from './NodeConditionDropdown.vue'
+import NodeOperateDropdown from './NodeOperateDropdown.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
+
+defineOptions({ name: 'NodeContainer' })
 
 type NodeContainerProperties = {
   config?: { fields?: WorkflowNodeField[]; output_title?: string }
@@ -83,9 +85,9 @@ const resizeStepContainer = (nodeHeight: number) => {
   }
 }
 
-function clickNodes(item: WorkflowMenuNode) {
+function clickNodes(item: NodeMenuItem) {
   const anchor = anchorData.value
-  if (!anchor) return
+  if (!anchor || !item.type) return
 
   const width = Number(item.properties?.width ?? 214)
   const height = Number(item.height ?? item.properties?.height ?? 0)
@@ -106,7 +108,7 @@ function clickNodes(item: WorkflowMenuNode) {
   closeNodeMenu()
 }
 
-function dragNode(item: WorkflowMenuNode, event: PointerEvent) {
+function dragNode(item: NodeMenuItem, event: PointerEvent) {
   startDragNode?.(item, event)
   nodeMenuDragClosing.value = true
   closeNodeMenu()

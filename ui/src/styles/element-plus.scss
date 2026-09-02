@@ -882,6 +882,12 @@
 /* tabs */
 .el-tabs {
   --el-tabs-header-height: 34px;
+  &.small {
+    --el-tabs-header-height: 28px;
+    .el-tabs__item {
+      font-size: 12px;
+    }
+  }
   &__header {
     margin: 0;
     flex-shrink: 0;
@@ -891,7 +897,7 @@
     flex: 1;
   }
   &__item {
-    padding: 2px 14px;
+    padding: 0 14px;
     font-weight: 400;
     align-items: baseline;
     &.is-active {

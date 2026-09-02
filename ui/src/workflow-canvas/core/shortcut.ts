@@ -6,7 +6,7 @@ import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
 import { randomId } from '@/utils/common'
 import { workflowModelDict } from '@/workflow-canvas/config/node-mapping'
-import { getMenuNodes } from '@/workflow-canvas/config/menu'
+import { getMenuNodes } from '@/workflow-canvas/node-menu/menu'
 let activeCanvasId: string | null = null
 type Point = { x: number; y: number }
 type WorkflowGraphModel = GraphModel & { get_provide: (node: LogicFlow.NodeData | null, graph: GraphModel | null) => { workflowMode: WorkflowMode } }

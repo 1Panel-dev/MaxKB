@@ -2,14 +2,14 @@
 import { ref } from 'vue'
 
 import { ClickOutside as vClickOutside } from 'element-plus'
-import NodeMenu from '@/workflow-canvas/component/NodeMenu.vue'
-import type { WorkflowMenuNode } from '@/workflow-canvas/config/menu'
+import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
+import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 
 defineOptions({ name: 'WorkflowComponentMenu' })
 
 const emit = defineEmits<{
-  dragstart: [workflowNode: WorkflowMenuNode, event: PointerEvent]
-  select: [workflowNode: WorkflowMenuNode]
+  dragstart: [node: NodeMenuItem, event: PointerEvent]
+  select: [node: NodeMenuItem]
 }>()
 
 const popoverVisible = ref(false)
@@ -20,13 +20,13 @@ const togglePopover = () => {
   popoverVisible.value = !popoverVisible.value
 }
 
-const handleSelect = (workflowNode: WorkflowMenuNode) => {
-  emit('select', workflowNode)
+const handleSelect = (node: NodeMenuItem) => {
+  emit('select', node)
   popoverVisible.value = false
 }
 
-const handleDragStart = (workflowNode: WorkflowMenuNode, event: PointerEvent) => {
-  emit('dragstart', workflowNode, event)
+const handleDragStart = (node: NodeMenuItem, event: PointerEvent) => {
+  emit('dragstart', node, event)
   dragClosing.value = true
   popoverVisible.value = false
 }
@@ -39,7 +39,7 @@ const handleDragStart = (workflowNode: WorkflowMenuNode, event: PointerEvent) =>
     <el-collapse-transition>
       <NodeMenu
         v-show="popoverVisible"
-        class="absolute right-0 top-[calc(100%+8px)] z-[2000]"
+        class="absolute -right-40 top-[calc(100%+8px)] z-[2000]"
         :class="{ 'pointer-events-none': dragClosing }"
         @dragstart="handleDragStart"
         @select="handleSelect"

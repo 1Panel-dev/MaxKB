@@ -18,7 +18,7 @@ interface NodeNameForm {
   title: string
 }
 
-type NodeOperateProperties = {
+interface NodeOperateProperties {
   disabled?: boolean
   kind?: WorkflowKind
   node_data?: { name?: string }
