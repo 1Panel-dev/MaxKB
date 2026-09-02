@@ -93,7 +93,7 @@ import type { FormInstance } from 'element-plus'
 import type { BaseNodeModel } from '@logicflow/core'
 
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
-import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { handleNodeWheel } from '@/workflow-canvas/core/utils'
 import { compareList } from '@/workflow-canvas/config/constants'
 import { randomId } from '@/utils/common'

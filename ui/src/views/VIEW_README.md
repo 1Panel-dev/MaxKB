@@ -28,7 +28,7 @@
   `src/utils`、`src/stores` 或 `src/api`。
 - 所有使用 `src/workflow-canvas/` 渲染画布的路由页面统一放在 `views/workflow/`。这些页面负责
   路由参数、页面头部、保存或发布等页面动作以及后续接口编排；LogicFlow 初始化、节点注册和
-  画布内部行为遵循 `src/workflow-canvas/README.md`，不移入 View。
+  画布内部行为遵循 `src/workflow-canvas/WORKFLOW_README.md`，不移入 View。
 - 页面目录存在多个层级时，目录名应表达业务层级，例如
   `system/identity/groups/UserGroupListView.vue`，不要创建无业务含义的分组目录。
 - 页面脚本中的状态、计算属性和处理方法按照同一业务流程集中放置，并使用简短的业务备注划分

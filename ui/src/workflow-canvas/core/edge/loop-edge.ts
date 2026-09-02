@@ -1,6 +1,6 @@
 import { BezierEdge, BezierEdgeModel } from '@logicflow/core'
 
-class CustomEdgeModel2 extends BezierEdgeModel {
+class LoopEdgeModel extends BezierEdgeModel {
   getArrowStyle() {
     const arrowStyle = super.getArrowStyle()
     arrowStyle.offset = 0
@@ -55,4 +55,4 @@ class CustomEdgeModel2 extends BezierEdgeModel {
   }
 }
 
-export default { type: 'loop-edge', view: BezierEdge, model: CustomEdgeModel2 }
+export default { type: 'loop-edge', view: BezierEdge, model: LoopEdgeModel }

@@ -1,5 +1,5 @@
 import { WorkflowMode, WorkflowNodeType, type ShapeItem } from '@/workflow-canvas/types'
-import * as NodeData from './node-data'
+import * as NodeData from '../config/node-data'
 
 export interface WorkflowMenuNode extends ShapeItem {
   height?: number

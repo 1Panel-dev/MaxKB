@@ -106,7 +106,7 @@ import { set, cloneDeep } from 'lodash'
 import Sortable from 'sortablejs'
 import type { FormInstance } from 'element-plus'
 
-import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { MkDynamicsFormConstructor, dynamicFormTypeOptions, type FormField, type VisibilityFieldOption } from '@/components/mk-dynamics-form'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import type { BaseNodeModel } from '@logicflow/core'

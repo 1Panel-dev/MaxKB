@@ -12,7 +12,7 @@ const emit = defineEmits<{
   'visible-change': [visible: boolean]
 }>()
 
-type NodeConditionProperties = {
+interface NodeConditionProperties {
   condition?: boolean | 'AND' | 'OR'
   kind?: WorkflowKind
 }

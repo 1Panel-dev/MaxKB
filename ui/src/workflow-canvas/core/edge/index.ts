@@ -1,10 +1,10 @@
 import { BezierEdge, BezierEdgeModel, h } from '@logicflow/core'
-import { connect, disconnect } from './teleport'
+import { connect, disconnect } from '../teleport'
 import DeleteEdgeButton from './DeleteEdgeButton.vue'
 
 const DEFAULT_WIDTH = 24
 const DEFAULT_HEIGHT = 24
-class CustomEdge2 extends BezierEdge {
+class AppEdgeView extends BezierEdge {
   isMounted = false
   root?: HTMLDivElement
   /**
@@ -111,7 +111,7 @@ class CustomEdge2 extends BezierEdge {
   }
 }
 
-class CustomEdgeModel2 extends BezierEdgeModel {
+class AppEdgeModel extends BezierEdgeModel {
   getArrowStyle() {
     const arrowStyle = super.getArrowStyle()
     arrowStyle.offset = 1
@@ -166,4 +166,4 @@ class CustomEdgeModel2 extends BezierEdgeModel {
   }
 }
 
-export default { type: 'app-edge', view: CustomEdge2, model: CustomEdgeModel2 }
+export default { type: 'app-edge', view: AppEdgeView, model: AppEdgeModel }

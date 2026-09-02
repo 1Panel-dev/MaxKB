@@ -3,7 +3,7 @@ import { computed, inject, onMounted, useTemplateRef } from 'vue'
 
 import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
-import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import type { BaseNodeModel } from '@logicflow/core'
 
 defineOptions({ name: 'WorkflowBaseNode' })

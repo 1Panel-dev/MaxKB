@@ -5,7 +5,7 @@ import { set } from 'lodash'
 import type { FormInstance } from 'element-plus'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import NodeCascader from '@/workflow-canvas/core/NodeCascader.vue'
-import NodeContainer from '@/workflow-canvas/core/NodeContainer.vue'
+import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { isLastNode } from '@/workflow-canvas/core/utils'
 import type { BaseNodeModel } from '@logicflow/core'
 
