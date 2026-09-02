@@ -25,6 +25,7 @@ export interface VisibilityCondition {
   compare: VisibilityCompareOperator | ''
   value: DynamicFormValue
   leftValue?: DynamicFormValue
+  _left?: DynamicFormValue
 }
 
 export interface VisibilityConditionState extends VisibilityCondition {

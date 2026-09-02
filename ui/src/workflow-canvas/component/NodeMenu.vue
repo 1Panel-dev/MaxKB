@@ -39,6 +39,7 @@ const workflowComponentGroups = [
     label: '业务逻辑',
     list: [
       { icon: aiChatIcon, iconClass: 'bg-purple', label: '判断器', value: WorkflowNodeType.Condition },
+      { icon: aiChatIcon, iconClass: 'bg-success', label: '表单收集', value: WorkflowNodeType.FormNode },
       { icon: replyIcon, iconClass: 'bg-warning', label: '指定回复', value: WorkflowNodeType.Reply },
     ],
   },

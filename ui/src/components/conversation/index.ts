@@ -94,6 +94,7 @@ const FORM = (prev: any, chunk: any) => {
     id: chunk.id ?? prev.id,
     content: (prev.content || '') + (chunk.content || ''),
     form_field_list: chunk.form_field_list ?? prev.form_field_list,
+    form_content_format: chunk.form_content_format ?? prev.form_content_format,
     form_data: chunk.form_data ?? prev.form_data,
     is_submit: chunk.is_submit ?? prev.is_submit,
     position: chunk.position ?? prev.position,

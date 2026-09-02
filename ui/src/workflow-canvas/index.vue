@@ -10,6 +10,7 @@ import { initDefaultShortcut } from '@/workflow-canvas/core/shortcut'
 import { disconnectAll, getTeleport } from '@/workflow-canvas/core/teleport'
 import type { WorkflowNodeModel } from '@/workflow-canvas/core/workflow-node'
 import Dagre from '@/workflow-canvas/plugins/dagre'
+import modelAPI from '@/api/admin/workspace/model/model'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { type ShapeItem } from '@/workflow-canvas/types'
 defineOptions({ name: 'MkWorkflow' })
@@ -64,6 +65,8 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
     workflowMode: workflow_mode,
     loopWorkflowMode: loop_workflow_mode,
     apiType: 'workspace',
+    getSelectModelList: (params: { model_type: string }) => modelAPI.getModelList(params),
+    getModelParamsForm: (modelId: string) => modelAPI.getModelParamsForm(modelId),
   })
   lf.value.graphModel.eventCenter.on('delete_edge', (edgeIds: string[]) => {
     edgeIds.forEach((edgeId) => lf.value?.deleteEdge(edgeId))
