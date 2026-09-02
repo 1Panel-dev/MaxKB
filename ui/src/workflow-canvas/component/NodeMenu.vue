@@ -30,6 +30,7 @@ const workflowComponentGroups = [
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '意图识别', value: WorkflowNodeType.IntentNode },
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '文本转语音', value: WorkflowNodeType.TextToSpeechNode },
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '图片生成', value: WorkflowNodeType.ImageGenerateNode},
+      { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '图片理解', value: WorkflowNodeType.ImageUnderstandNode},
       { icon: aiChatIcon, iconClass: 'bg-primary-gradient', label: '问题优化', value: WorkflowNodeType.Question},
     ],
   },
