@@ -85,8 +85,8 @@ class AzureLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=gettext("Hello"))])
+            model = provider.get_model(model_type, model_name, model_credential, **{**model_params, "max_tokens": 1})
+            model.invoke([HumanMessage(content="1")])
         except Exception as e:
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
             if isinstance(e, AppApiException) or isinstance(e, BadRequestError):

@@ -65,8 +65,8 @@ class XinferenceLLMModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(
                 ValidCode.valid_error.value, gettext("The model does not exist, please download the model first")
             )
-        model = provider.get_model(model_type, model_name, model_credential, **model_params)
-        model.invoke([HumanMessage(content=gettext("Hello"))])
+        model = provider.get_model(model_type, model_name, model_credential, **{**model_params, "max_tokens": 1})
+        model.invoke([HumanMessage(content="1")])
         return True
 
     def encryption_dict(self, model_info: Dict[str, object]):

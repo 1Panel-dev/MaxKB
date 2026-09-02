@@ -63,9 +63,9 @@ class VLLMModelCredential(BaseForm, BaseModelCredential):
             raise AppApiException(
                 ValidCode.valid_error.value, gettext("The model does not exist, please download the model first")
             )
-        model = provider.get_model(model_type, model_name, model_credential, **model_params)
+        model = provider.get_model(model_type, model_name, model_credential, **{**model_params, "max_tokens": 1})
         try:
-            res = model.invoke([HumanMessage(content=gettext("Hello"))])
+            res = model.invoke([HumanMessage(content="1")])
         except Exception as e:
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
             raise AppApiException(

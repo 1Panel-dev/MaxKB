@@ -58,7 +58,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
     ):
         # 根据api_version检查必需字段
         api_version = model_credential.get("api_version", "v1")
-        model = provider.get_model(model_type, model_name, model_credential, **model_params)
+        model = provider.get_model(model_type, model_name, model_credential, **{**model_params, "max_tokens": 1})
         if api_version == "v1":
             model_type_list = provider.get_model_type_list()
             if not any(list(filter(lambda mt: mt.get("value") == model_type, model_type_list))):
@@ -83,7 +83,7 @@ class WenxinLLMModelCredential(BaseForm, BaseModelCredential):
                 else:
                     return False
         try:
-            model.invoke([HumanMessage(content=gettext("Hello"))])
+            model.invoke([HumanMessage(content="1")])
         except Exception as e:
             maxkb_logger.error(f"Exception: {e}", exc_info=True)
             raise e

@@ -67,7 +67,7 @@ class BedrockVLModelCredential(BaseForm, BaseModelCredential):
 
         try:
             model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=gettext("Hello"))])
+            model.invoke([HumanMessage(content="1")])
         except AppApiException:
             raise
         except Exception as e:

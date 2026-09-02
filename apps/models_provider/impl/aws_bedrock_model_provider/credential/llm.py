@@ -66,8 +66,8 @@ class BedrockLLMModelCredential(BaseForm, BaseModelCredential):
             return False
 
         try:
-            model = provider.get_model(model_type, model_name, model_credential, **model_params)
-            model.invoke([HumanMessage(content=gettext("Hello"))])
+            model = provider.get_model(model_type, model_name, model_credential, **{**model_params, "max_tokens": 1})
+            model.invoke([HumanMessage(content="1")])
         except AppApiException:
             raise
         except Exception as e:
