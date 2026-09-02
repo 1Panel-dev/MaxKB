@@ -104,12 +104,15 @@ class ApplicationChatQuerySerializers(serializers.Serializer):
                            }
         if 'abstract' in self.data and self.data.get('abstract') is not None:
             base_query_dict['application_chat.abstract__icontains'] = self.data.get('abstract')
-        if 'username' in self.data and self.data.get('username') is not None:
-            base_query_dict['application_chat.asker__username__icontains'] = self.data.get('username')
-
         if select_ids is not None and len(select_ids) > 0:
             base_query_dict['application_chat.id__in'] = select_ids
         base_condition = Q(**base_query_dict)
+        if 'username' in self.data and self.data.get('username') is not None:
+            username = self.data.get('username')
+            base_condition = base_condition & (
+                Q(**{'application_chat.asker__username__icontains': username}) |
+                Q(**{'application_chat.asker__nick_name__icontains': username})
+            )
         min_star_query = None
         min_trample_query = None
         if 'min_star' in self.data and self.data.get('min_star') is not None:
