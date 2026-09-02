@@ -93,8 +93,8 @@ class TextToVideoNode(INode):
         question = self.workflow_manage.generate_prompt(prompt)
         self.write_context("question", question)
 
-        message_list = [*history_message, question]
-        self.write_context("message_list", message_list)
+        # message_list = [*history_message, question]
+        # self.write_context("message_list", [{"content": m.content, "role": m.type} for m in message_list],)
         self.write_context("dialogue_type", dialogue_type)
         self.write_context("negative_prompt", self.workflow_manage.generate_prompt(negative_prompt))
 
@@ -119,7 +119,7 @@ class TextToVideoNode(INode):
 
         self.write_context("answer", video_label)
         self.write_context("video", video_list)
-        self.write_context("chat_model", ttv_model)
+        # self.write_context("chat_model", ttv_model)
 
         if is_result:
             node_info = NodeInfo(self.get_node_id(), self.get_node_name(), Status.SUCCESS)
