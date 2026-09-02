@@ -236,7 +236,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, watch, onMounted, reactive } from 'vue'
+import { ref, computed, nextTick, watch, onMounted, reactive, provide } from 'vue'
 import { CircleCloseFilled, Paperclip, Promotion, VideoPause } from '@element-plus/icons-vue'
 import ContentList from '../content-list/index.vue'
 import Loading from '../loading/index.vue'
@@ -364,10 +364,8 @@ const addFile = (file: File) => {
 
   const uploadPromise = (async () => {
     try {
-      let cid = currentChatId.value
-      if (!cid) {
-        cid = store.newChat()
-      }
+      // 惰性取当前 chat_id（幂等），保证文件 source_id 与后续发送的 chat_id 一致
+      const cid = store.getChatId()
       const result = await store.uploadFile(file, cid)
       item.url = result.url
       const parts = result.url.split('/')
@@ -446,19 +444,15 @@ const send = async () => {
 
     const text = question.value.content.trim()
 
-    // 没有当前对话时本地生成草稿 chat_id（后端首发时 open-if-missing）
-    if (!currentChatId.value) {
-      store.newChat()
-    }
+    // 惰性取 chat_id（无则前端生成，后端首发时 open-if-missing）
+    const cid = store.getChatId()
 
-    const cid = currentChatId.value
-
-    // 首条消息：乐观更新草稿标题；落库交给流结束后的后台 renameChat
+    // 首条消息：此刻才把会话 push 进左侧列表（新建时不 push），标题用 question 内容乐观更新；
+    // 落库交给流结束后的后台 renameChat。
     const isFirstMessage = messages.value.length === 0
     const abstract = text.substring(0, 256)
-    if (isFirstMessage && text) {
-      const conv = store.conversations.value.find((c: any) => c.id === cid)
-      if (conv) conv.abstract = abstract
+    if (isFirstMessage && !store.conversations.value.some((c: any) => c.id === cid)) {
+      store.conversations.value.unshift({ id: cid, abstract: text ? abstract : '新对话' })
     }
 
     // 分类文件
@@ -478,53 +472,26 @@ const send = async () => {
       .filter((f) => !isImage(f.name) && !isDocument(f.name) && !isAudio(f.name) && !isVideo(f.name))
       .map((f) => ({ url: f.url, file_id: f.file_id, name: f.name }))
 
-    // 构建 question content
+    // 构建 question content（USER 气泡展示用）与 API message（发后端用）
     const questionContent: any = { type: 'QUESTION', content: text }
-    if (images.length) questionContent.image_list = images
-    if (documents.length) questionContent.document_list = documents
-    if (audio.length) questionContent.audio_list = audio
-    if (video.length) questionContent.video_list = video
-    if (other.length) questionContent.other_list = other
-
-    store.pushMessage({
-      role: 'USER',
-      content: [questionContent],
-      id: nanoid(),
-    })
-
-    store.pushMessage(store.createAnswerMessage())
-    const aiMsg = messages.value[messages.value.length - 1]
-    if (!aiMsg) return
-
-    // 构建 API payload
     const message: any = { content: text, type: 'QUESTION' }
-    if (images.length) message.image_list = images
-    if (documents.length) message.document_list = documents
-    if (audio.length) message.audio_list = audio
-    if (video.length) message.video_list = video
-    if (other.length) message.other_list = other
+    if (images.length) questionContent.image_list = message.image_list = images
+    if (documents.length) questionContent.document_list = message.document_list = documents
+    if (audio.length) questionContent.audio_list = message.audio_list = audio
+    if (video.length) questionContent.video_list = message.video_list = video
+    if (other.length) questionContent.other_list = message.other_list = other
 
-    const payload: any = { message, stream: true, re_chat: false }
-
-    loading.value = true
-    store.startStream({
-      cid,
-      request: () => store.chat(cid, payload),
-      onStream: (chunk) => {
-        store.appendChunk(aiMsg, chunk)
-        scrollToBottom()
-      },
+    // 委托通用 sendMessage：新问答（新增 USER 气泡 + 新 answer 消息），
+    // 首条消息落库后把真实标题写回后端交给 onFinish。
+    sendMessage({
+      message,
+      newQuestion: true,
+      questionContent,
+      reChat: false,
       onFinish: () => {
-        scrollToBottom()
-        loading.value = false
-        // 首条消息落库后，把真实标题写回后端（此时会话已被 open-if-missing 建好）
         if (isFirstMessage && text) {
           store.renameChat(cid, abstract).catch(() => {})
         }
-      },
-      onFailure: () => {
-        scrollToBottom()
-        loading.value = false
       },
     })
     question.value.content = ''
@@ -591,6 +558,79 @@ watch(
     nextTick(() => scroll?.scrollBottom())
   },
 )
+
+// 新建/切换会话时清空暂存文件与输入，避免文件的 source_id 与新 chat_id 对不上
+watch(
+  () => store.composerResetSignal.value,
+  () => {
+    clearFiles()
+    question.value.content = ''
+  },
+)
+
+// ── 通用发起对话（注入给内容组件） ──────────────────────────
+// 表单提交、以及未来任何“能发起对话”的内容组件都通过它发起/续跑一次对话。
+// 调用方只需显式声明 newQuestion：是否新增一个 question（新 USER 气泡 + 新 answer 消息），
+// 否则续跑聚合回已存在的那条 assistant 消息（后端复用同一 chat_record）。
+interface SendMessageOptions {
+  message: any // 后端 message dict {content,type,image_list?,...}
+  newQuestion: boolean
+  questionContent?: any // newQuestion=true 时 USER 气泡展示的 content 项，缺省用 message
+  reChat?: boolean // 默认 false；新引擎下仅影响知识节点“换答案”去重
+  formData?: Record<string, any>
+  position?: any
+  chatRecordId?: string | null
+  chunkId?: string | null
+  onFinish?: () => void // 收尾钩子（如首条消息落库改标题），在内置结束逻辑后调用
+  onFailure?: () => void
+}
+
+const sendMessage = (opts: SendMessageOptions) => {
+  const cid = store.getChatId()
+
+  // 定位流式写入目标消息
+  let target: any
+  if (opts.newQuestion) {
+    store.pushMessage({ role: 'USER', content: [opts.questionContent ?? opts.message], id: nanoid() })
+    store.pushMessage(store.createAnswerMessage())
+    target = messages.value[messages.value.length - 1]
+  } else {
+    // 续跑：reload 后按 `${chat_record_id}_ASSISTANT` 命中；实时流中 answer 消息 id 为 '' → 回退最后一条
+    target =
+      messages.value.find((m: any) => m.id === `${opts.chatRecordId}_ASSISTANT`) ||
+      messages.value[messages.value.length - 1]
+  }
+  if (!target) return
+
+  const payload: any = { message: opts.message, stream: true, re_chat: opts.reChat ?? false }
+  if (opts.formData) payload.form_data = opts.formData
+  if (opts.position !== undefined) payload.position = opts.position
+  if (opts.chatRecordId) payload.chat_record_id = opts.chatRecordId
+  if (opts.chunkId) payload.chunk_id = opts.chunkId
+
+  loading.value = true
+  store.startStream({
+    cid,
+    request: () => store.chat(cid, payload),
+    onStream: (chunk: any) => {
+      store.appendChunk(target, chunk)
+      scrollToBottom()
+    },
+    onFinish: () => {
+      target.write_ed = true
+      loading.value = false
+      scrollToBottom()
+      opts.onFinish?.()
+    },
+    onFailure: () => {
+      target.write_ed = true
+      loading.value = false
+      opts.onFailure?.()
+    },
+  })
+}
+
+provide('sendMessage', sendMessage)
 
 defineExpose({ scrollToBottom })
 </script>

@@ -23,7 +23,7 @@ class SystemToResponse(BaseToResponse):
             {
                 "chat_id": str(chat_id),
                 "chat_record_id": str(chat_record_id),
-                "content": [block],
+                "content": [{**block, "chat_id": str(chat_id), "chat_record_id": str(chat_record_id)}],
             },
             ensure_ascii=False,
         )

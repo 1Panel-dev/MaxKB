@@ -112,6 +112,8 @@ const renamingId = ref<string | null>(null)
 const renameValue = ref('')
 
 const handleSwitch = async (id: string) => {
+  // 切换会话丢弃当前未发送的暂存文件/输入，避免其 source_id 绑在旧会话上
+  store.resetComposer()
   store.currentChatId.value = id
   await store.switchConversation(id)
   if (props.mode === 'drawer') emit('update:open', false)
@@ -128,8 +130,13 @@ const handleDelete = async (id: string) => {
 }
 
 const handleNew = () => {
-  // 本地草稿：仅生成 chat_id 并清空消息，不请求后端 open（避免产生空会话）。
-  store.newChat()
+  // 已在空白新对话（无消息）则不动：保留当前 chat_id 与暂存文件（幂等，避免连点/上传后再点导致 id 变化）。
+  // 只有从已有会话切回空白时才重置消息并清空暂存文件（旧文件的 source_id 绑在旧会话上）。
+  if (store.messages.value.length > 0) {
+    store.resetComposer()
+    store.currentChatId.value = ''
+    store.resetMsgState()
+  }
   if (props.mode === 'drawer') emit('update:open', false)
 }
 

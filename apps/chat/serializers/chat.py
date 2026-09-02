@@ -58,7 +58,6 @@ from models_provider.models import Model, Status
 from models_provider.tools import get_model_instance_by_model_workspace_id
 from system_manage.models.chat_user_token_quota import ChatUserTokenQuota
 
-# 「Chat 行尚未查询」的哨兵，区别于「查询过但不存在(None)」
 _CHAT_UNSET = object()
 
 
@@ -200,13 +199,10 @@ class ChatSerializers(serializers.Serializer):
         self._chat_cache = chat
         return chat
 
-    def save_chat_record(self, chat_record_id, question, asker, new_record):
-        """插入一条占位 ChatRecord（workflow 完成后由 update_chat_record 回填）。"""
-        chat_id = self.data.get("chat_id")
-        q_text = question.get("content", "") if isinstance(question, dict) else question
-        self.ensure_chat_row(q_text, asker)
-        defaults = {
-            "chat_id": chat_id,
+    def get_defaults_record(self, question):
+        """构造一条占位 ChatRecord 的字段（workflow 完成后由 update_chat_record 回填）。"""
+        return {
+            "chat_id": self.data.get("chat_id"),
             "problem_text": "",
             "answer_text": "",
             "details": {},
@@ -222,12 +218,6 @@ class ChatSerializers(serializers.Serializer):
             "question": question,
             "messages": [],
         }
-        if new_record:
-            # 全新记录：直接插入，省掉 update_or_create 的一次 SELECT
-            ChatRecord(id=chat_record_id, **defaults).save(force_insert=True)
-        else:
-            # Form 提交 / 重答：复用同一 chat_record_id
-            QuerySet(ChatRecord).update_or_create(id=chat_record_id, defaults=defaults)
 
     @staticmethod
     def _usage_from_context(workflow_context):
@@ -288,6 +278,9 @@ class ChatSerializers(serializers.Serializer):
         workflow = new_instance(work_flow, WorkflowType.APPLICATION)
 
         chat_record_id_str = str(uuid.uuid7()) if chat_record_id is None else str(chat_record_id)
+        self.ensure_chat_row(message, chat_user)
+        if chat_record_id is None:
+            ChatRecord(id=chat_record_id_str, **self.get_defaults_record(message_dict)).save(force_insert=True)
 
         parameters = {
             "history_chat_record": history_chat_record,
@@ -317,12 +310,10 @@ class ChatSerializers(serializers.Serializer):
 
         result_queue = queue.Queue()
         aggregation = AggregationManager()
-        self.save_chat_record(chat_record_id_str, message_dict, chat_user, new_record=chat_record_id is None)
 
         def on_next(wf_manage, content):
             aggregation.aggregate(content)
             block = content.to_dict()
-            # 持久化(resume)与 live 队列都放裸内容块，格式化统一交给消费端的 base_to_response
             get_message_queue().produce(chat_record_id_str, block)
             result_queue.put(("chunk", block))
 
@@ -337,9 +328,7 @@ class ChatSerializers(serializers.Serializer):
                 )
             messages = aggregation.get_contents()
             self.update_chat_record(chat_user_id, chat_record_id_str, wf_manage.context, messages)
-            # 计数统计放到内容落库之后再更新（挪出进对话前的关键路径）
             ChatCountSerializer(data={"chat_id": chat_id}).update_chat()
-            # 定稿后把本轮记录追加进历史缓存（question 已在建占位时确定，messages 为聚合结果）
             ChatHistory(chat_id).append(
                 ChatRecord(
                     id=chat_record_id_str,
@@ -403,7 +392,6 @@ class ChatSerializers(serializers.Serializer):
                         yield "data: [DONE]\n\n"
                         break
                     if msg_type == "chunk":
-                        # data 是裸内容块(content.to_dict())，格式化交给 base_to_response
                         frame = base_to_response.to_stream(chat_id, chat_record_id_str, data)
                         if frame is not None:
                             yield "data: " + frame + "\n\n"
