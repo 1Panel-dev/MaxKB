@@ -22,7 +22,7 @@ from application.models import ChatUserType, Application, ChatSourceChoices
 from application.serializers.application_chat import ApplicationChatQuerySerializers
 from chat.api.chat_api import ChatAPI, PromptGenerateAPI, PageHistoricalConversationAPI, HistoricalConversationRecordAPI
 from chat.api.chat_authentication_api import ChatOpenAPI
-from chat.serializers.chat import OpenChatSerializers, DebugChatSerializers, PromptGenerateSerializer, ResumeSerializers
+from chat.serializers.chat import DebugChatSerializers, OpenChatSerializers, PromptGenerateSerializer, ResumeSerializers
 from common.auth import TokenAuth
 from common.auth.authentication import has_permissions
 from common.auth.constants.compare_constants import CompareConstants

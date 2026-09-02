@@ -240,7 +240,7 @@ class ImageUnderstandNode(INode):
             [
                 [
                     self._generate_history_human_message_for_details(history_chat_record[index]),
-                    self._generate_history_ai_message(history_chat_record[index]),
+                    *self._generate_history_ai_message(history_chat_record[index]),
                 ]
                 for index in range(start_index if start_index > 0 else 0, len(history_chat_record))
             ],
@@ -253,7 +253,7 @@ class ImageUnderstandNode(INode):
             if self.node.id == val["node_id"] and "image_list" in val:
                 if val["dialogue_type"] == "WORKFLOW":
                     return chat_record.get_ai_message()
-                return AIMessage(content=val["answer"])
+                return [AIMessage(content=val["answer"])]
         return chat_record.get_ai_message()
 
     def _generate_history_human_message_for_details(self, chat_record):
@@ -288,7 +288,7 @@ class ImageUnderstandNode(INode):
             [
                 [
                     self._generate_history_human_message(history_chat_record[index]),
-                    self._generate_history_ai_message(history_chat_record[index]),
+                    *self._generate_history_ai_message(history_chat_record[index]),
                 ]
                 for index in range(start_index if start_index > 0 else 0, len(history_chat_record))
             ],

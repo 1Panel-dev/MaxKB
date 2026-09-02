@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：虎虎
-    @file： application_chat_log.py
-    @date：2025/5/29 17:12
-    @desc:
+@project: MaxKB
+@Author：虎虎
+@file： application_chat_log.py
+@date：2025/5/29 17:12
+@desc:
 """
+
 import uuid_utils.compat as uuid
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -19,12 +20,12 @@ from users.models import User
 
 
 class ChatUserType(models.TextChoices):
-    ANONYMOUS_USER = "ANONYMOUS_USER", '匿名用户'
+    ANONYMOUS_USER = "ANONYMOUS_USER", "匿名用户"
     CHAT_USER = "CHAT_USER", "对话用户"
     SYSTEM_API_KEY = "SYSTEM_API_KEY", "系统API_KEY"
     APPLICATION_API_KEY = "APPLICATION_API_KEY", "应用API_KEY"
     PLATFORM_USER = "PLATFORM_USER", "平台用户"
-    SYSTEM_USER = "SYSTEM_USER", '系统用户'
+    SYSTEM_USER = "SYSTEM_USER", "系统用户"
 
 
 class ExecuteType(models.TextChoices):
@@ -33,7 +34,7 @@ class ExecuteType(models.TextChoices):
 
 
 def default_asker():
-    return {'username': '游客'}
+    return {"username": "游客"}
 
 
 class Chat(AppModelMixin):
@@ -41,10 +42,12 @@ class Chat(AppModelMixin):
     application = models.ForeignKey(Application, on_delete=models.CASCADE)
     abstract = models.CharField(max_length=1024, verbose_name="摘要")
     chat_user_id = models.CharField(verbose_name="对话用户id", default=None, null=True)
-    chat_user_type = models.CharField(max_length=64, verbose_name="客户端类型", choices=ChatUserType.choices,
-                                      default=ChatUserType.ANONYMOUS_USER)
-    execute_type = models.CharField(max_length=64, verbose_name="执行类型", choices=ChatUserType.choices,
-                                    default=ExecuteType.CHAT)
+    chat_user_type = models.CharField(
+        max_length=64, verbose_name="客户端类型", choices=ChatUserType.choices, default=ChatUserType.ANONYMOUS_USER
+    )
+    execute_type = models.CharField(
+        max_length=64, verbose_name="执行类型", choices=ChatUserType.choices, default=ExecuteType.CHAT
+    )
     is_deleted = models.BooleanField(verbose_name="逻辑删除", default=False)
     asker = models.JSONField(verbose_name="访问者", default=default_asker, encoder=SystemEncoder)
     meta = models.JSONField(verbose_name="元数据", default=dict)
@@ -53,7 +56,7 @@ class Chat(AppModelMixin):
     chat_record_count = models.IntegerField(verbose_name="对话次数", default=0)
     mark_sum = models.IntegerField(verbose_name="标记数量", default=0)
     source = models.JSONField(verbose_name="来源", default=dict)
-    ip_address = models.CharField(max_length=128, verbose_name="ip地址", default='')
+    ip_address = models.CharField(max_length=128, verbose_name="ip地址", default="")
 
     class Meta:
         db_table = "application_chat"
@@ -61,22 +64,23 @@ class Chat(AppModelMixin):
 
 class VoteChoices(models.TextChoices):
     """订单类型"""
-    UN_VOTE = "-1", '未投票'
-    STAR = "0", '赞同'
-    TRAMPLE = "1", '反对'
+
+    UN_VOTE = "-1", "未投票"
+    STAR = "0", "赞同"
+    TRAMPLE = "1", "反对"
 
 
 class VoteReasonChoices(models.TextChoices):
-    ACCURATE = 'accurate', '内容准确'
-    COMPLETE = 'complete', '内容完善'
-    INACCURATE = 'inaccurate', '内容不准确'
-    INCOMPLETE = 'incomplete', '内容不完善'
-    OTHER = 'other', '其他'
+    ACCURATE = "accurate", "内容准确"
+    COMPLETE = "complete", "内容完善"
+    INACCURATE = "inaccurate", "内容不准确"
+    INCOMPLETE = "incomplete", "内容不完善"
+    OTHER = "other", "其他"
 
 
 class ShareLinkType(models.TextChoices):
-    PUBLIC = "PUBLIC", 'public'
-    PRIVATE = "PRIVATE", 'private'
+    PUBLIC = "PUBLIC", "public"
+    PRIVATE = "PRIVATE", "private"
 
 
 class ChatSourceChoices(models.TextChoices):
@@ -95,48 +99,66 @@ class ChatRecord(AppModelMixin):
     """
     对话日志 详情
     """
+
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     chat = models.ForeignKey(Chat, on_delete=models.CASCADE)
-    vote_status = models.CharField(verbose_name='投票', max_length=10, choices=VoteChoices.choices,
-                                   default=VoteChoices.UN_VOTE)
-    vote_reason = models.CharField(verbose_name='投票原因', max_length=50, choices=VoteReasonChoices.choices, null=True,
-                                   blank=True)
-    vote_other_content = models.CharField(verbose_name='其他原因', max_length=1024, default='')
+    vote_status = models.CharField(
+        verbose_name="投票", max_length=10, choices=VoteChoices.choices, default=VoteChoices.UN_VOTE
+    )
+    vote_reason = models.CharField(
+        verbose_name="投票原因", max_length=50, choices=VoteReasonChoices.choices, null=True, blank=True
+    )
+    vote_other_content = models.CharField(verbose_name="其他原因", max_length=1024, default="")
     problem_text = models.CharField(max_length=10240, verbose_name="问题")
     answer_text = models.CharField(max_length=40960, verbose_name="答案")
-    answer_text_list = ArrayField(verbose_name="改进标注列表",
-                                  base_field=models.JSONField()
-                                  , default=list)
+    answer_text_list = ArrayField(verbose_name="改进标注列表", base_field=models.JSONField(), default=list)
     message_tokens = models.IntegerField(verbose_name="请求token数量", default=0)
     answer_tokens = models.IntegerField(verbose_name="响应token数量", default=0)
     const = models.IntegerField(verbose_name="总费用", default=0)
     details = models.JSONField(verbose_name="对话详情", default=dict, encoder=SystemEncoder)
-    improve_paragraph_id_list = ArrayField(verbose_name="改进标注列表",
-                                           base_field=models.UUIDField(max_length=128, blank=True)
-                                           , default=list)
+    improve_paragraph_id_list = ArrayField(
+        verbose_name="改进标注列表", base_field=models.UUIDField(max_length=128, blank=True), default=list
+    )
     run_time = models.FloatField(verbose_name="运行时长", default=0)
     index = models.IntegerField(verbose_name="对话下标")
     source = models.JSONField(verbose_name="来源", default=dict)
-    ip_address = models.CharField(max_length=128, verbose_name="ip地址", default='')
+    ip_address = models.CharField(max_length=128, verbose_name="ip地址", default="")
     version = models.IntegerField(verbose_name="版本号", default=1)
     question = models.JSONField(verbose_name="用户的消息", default=dict, encoder=SystemEncoder)
-    messages = ArrayField(verbose_name="响应message",
-                          base_field=models.JSONField()
-                          , default=list)
+    messages = ArrayField(verbose_name="响应message", base_field=models.JSONField(), default=list)
 
     workflow_context = models.JSONField(verbose_name="工作流上下文", default=dict, null=True, blank=True)
 
     def get_human_message(self):
-        if 'problem_padding' in self.details:
-            return HumanMessage(content=self.details.get('problem_padding').get('padding_problem_text'))
-        return HumanMessage(content=self.problem_text)
+        # 用户消息取自 question（{content, image_list, ...}），历史上下文用文本部分
+        question = self.question if isinstance(self.question, dict) else {"content": self.question or ""}
+        return [HumanMessage(content=question.get("content", "") or "")]
 
     def get_ai_message(self):
-        answer_text = self.answer_text
-        if answer_text is None or len(str(answer_text).strip()) == 0:
-            answer_text = _(
-                'Sorry, no relevant content was found. Please re-describe your problem or provide more information. ')
-        return AIMessage(content=answer_text)
+        # 答案取自 messages 中的 TEXT / TOOL 内容块（REASONING/FORM/FAILURE 不进历史），按顺序保留交错。
+        # 注意：type 用字面量，避免 models 反向依赖 application.workflow.ContentType
+        ai_message_list = []
+        for m in self.messages or []:
+            if not isinstance(m, dict):
+                continue
+            m_type = m.get("type")
+            if m_type == "TEXT":
+                if m.get("content"):
+                    ai_message_list.append(AIMessage(content=m.get("content")))
+            elif m_type == "TOOL":
+                # 工具调用：名称 + 入参 + 结果 拼成一段
+                tool_parts = [str(p) for p in (m.get("content"), m.get("arguments"), m.get("result")) if p]
+                if tool_parts:
+                    ai_message_list.append(AIMessage(content="\n".join(tool_parts)))
+        if len(ai_message_list) == 0:
+            ai_message_list = [
+                AIMessage(
+                    content=_(
+                        "Sorry, no relevant content was found. Please re-describe your problem or provide more information. "
+                    )
+                )
+            ]
+        return ai_message_list
 
     def get_node_details_runtime_node_id(self, runtime_node_id):
         return self.details.get(runtime_node_id, None)
@@ -148,8 +170,9 @@ class ChatRecord(AppModelMixin):
 class ApplicationChatUserStats(AppModelMixin):
     id = models.UUIDField(primary_key=True, max_length=128, default=uuid.uuid7, editable=False, verbose_name="主键id")
     chat_user_id = models.UUIDField(max_length=128, default=uuid.uuid7, verbose_name="对话用户id")
-    chat_user_type = models.CharField(max_length=64, verbose_name="对话用户类型", choices=ChatUserType.choices,
-                                      default=ChatUserType.ANONYMOUS_USER)
+    chat_user_type = models.CharField(
+        max_length=64, verbose_name="对话用户类型", choices=ChatUserType.choices, default=ChatUserType.ANONYMOUS_USER
+    )
     application = models.ForeignKey(Application, on_delete=models.CASCADE, verbose_name="应用id")
     access_num = models.IntegerField(default=0, verbose_name="访问总次数次数")
     intraday_access_num = models.IntegerField(default=0, verbose_name="当日访问次数")
@@ -157,7 +180,7 @@ class ApplicationChatUserStats(AppModelMixin):
     class Meta:
         db_table = "application_chat_user_stats"
         indexes = [
-            models.Index(fields=['application_id', 'chat_user_id']),
+            models.Index(fields=["application_id", "chat_user_id"]),
         ]
 
 
@@ -181,7 +204,7 @@ class ApplicationLongTermMemory(AppModelMixin):
 
     class Meta:
         db_table = "application_long_term_memory"
-        unique_together = [('application', 'chat_user_id')]
+        unique_together = [("application", "chat_user_id")]
         indexes = [
-            models.Index(fields=['application_id', 'chat_user_id']),
+            models.Index(fields=["application_id", "chat_user_id"]),
         ]

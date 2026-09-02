@@ -100,7 +100,7 @@ def _get_node_message(chat_record, runtime_node_id):
 
 
 def _get_workflow_message(chat_record):
-    return [chat_record.get_human_message(), chat_record.get_ai_message()]
+    return [*chat_record.get_human_message(), *chat_record.get_ai_message()]
 
 
 def _get_message(chat_record, dialogue_type, runtime_node_id):

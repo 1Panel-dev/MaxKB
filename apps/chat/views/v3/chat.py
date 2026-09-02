@@ -25,11 +25,11 @@ from application.models import ChatUserType, ChatSourceChoices, ApplicationAcces
 from chat.api.chat_api import ChatAPI
 from chat.api.chat_authentication_api import ChatAuthenticationAPI, ChatAuthenticationProfileAPI, ChatOpenAPI, OpenAIAPI
 from chat.serializers.chat import (
-    OpenChatSerializers,
+    OpenAIChatSerializer,
     ChatSerializers,
+    OpenChatSerializers,
     SpeechToTextSerializers,
     TextToSpeechSerializers,
-    OpenAIChatSerializer,
 )
 from chat.serializers.chat_authentication import (
     AnonymousAuthenticationSerializer,
