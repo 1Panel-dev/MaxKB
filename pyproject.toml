@@ -11,7 +11,7 @@ dependencies = [
     "django-redis==6.0.0",
     "django-db-connection-pool==1.2.6",
     "django-mptt==0.17.0",
-    "djangorestframework==3.17.1",
+    "djangorestframework==3.17.2",
     "psycopg[binary]==3.2.9",
     "python-dotenv==1.2.2",
     "uuid-utils==0.14.0",
