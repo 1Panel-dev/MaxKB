@@ -107,7 +107,10 @@ class ImageUnderstandNode(INode):
 
         history_message = self._get_history_message(history_chat_record, dialogue_number)
         message_list = self._generate_message_list(chat_model, system, prompt, history_message, image)
-        self.write_context("message_list", message_list)
+        self.write_context(
+            "message_list",
+            [{"content": m.content, "role": m.type} for m in message_list],
+        )
 
         self._generate_context_image(image)
         self.write_context("dialogue_type", dialogue_type)
