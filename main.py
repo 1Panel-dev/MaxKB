@@ -6,6 +6,7 @@ import time
 
 import django
 from django.core import management
+from django.core.management.utils import get_random_secret_key
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.join(BASE_DIR, 'apps')
@@ -47,9 +48,9 @@ def perform_db_migrate():
             err_msg = str(e)
             # 判断是否为数据库仍在启动中（崩溃恢复场景）
             is_db_starting = (
-                'the database system is starting up' in err_msg
-                or 'starting up' in err_msg
-                or 'Connection refused' in err_msg
+                    'the database system is starting up' in err_msg
+                    or 'starting up' in err_msg
+                    or 'Connection refused' in err_msg
             )
             if is_db_starting and attempt < max_retries:
                 logging.warning(
@@ -101,6 +102,8 @@ def dev():
 if __name__ == '__main__':
     os.environ['HF_HOME'] = '/opt/maxkb-app/model/base'
     os.environ['TMPDIR'] = '/opt/maxkb-app/tmp'
+    if not os.environ.get('MAXKB_SECRET_KEY'):
+        os.environ['MAXKB_SECRET_KEY'] = get_random_secret_key()
     parser = argparse.ArgumentParser(
         description="""
            qabot service control tools;

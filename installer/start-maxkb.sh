@@ -23,8 +23,4 @@ if [ -d $_INIT_SHELL_DIR ]; then
         fi
     done
 fi
-if [ -z "$MAXKB_SECRET_KEY" ]; then
-    MAXKB_SECRET_KEY=$(python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())')
-fi
-export MAXKB_SECRET_KEY
 python /opt/maxkb-app/main.py start
