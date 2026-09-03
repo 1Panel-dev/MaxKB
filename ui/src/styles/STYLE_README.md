@@ -302,7 +302,7 @@ Tailwind 类。
 `--color-*` 注册后可以组合生成文字、背景、边框、轮廓等颜色工具类：
 
 ```html
-<button class="bg-primary text-white">确认</button>
+<div class="bg-primary text-white">确认</div>
 <a class="text-primary">链接文字</a>
 <div class="border border-primary">主题色边框</div>
 <input class="outline-primary" />
@@ -311,7 +311,7 @@ Tailwind 类。
 交互状态直接添加 Tailwind 状态前缀：
 
 ```html
-<button class="bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary">确认</button>
+<div class="bg-primary hover:bg-primary/90 focus:ring-2 focus:ring-primary">确认</div>
 ```
 
 在颜色类后添加 `/透明度`，可以使用主题色叠加透明效果：

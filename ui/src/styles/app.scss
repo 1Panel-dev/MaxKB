@@ -160,6 +160,16 @@ h6 {
   }
 }
 
+
+// 资源菜单的导入按钮
+.mk-import-button {
+  width: 100%;
+  .el-upload {
+    width: 100%;
+  }
+}
+
+
 /*
   标题前带竖线样式
 */
@@ -209,11 +219,15 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
-// 资源菜单的导入按钮
-.mk-import-button {
-  width: 100%;
-  .el-upload {
-    width: 100%;
+
+
+.mk-scrollbar-right  {
+  &.el-scrollbar {
+    margin-right: calc(var(--spacing) * -4);
+
+    > .el-scrollbar__wrap > .el-scrollbar__view {
+      padding-right: calc(var(--spacing) * 4);
+    }
   }
 }
 

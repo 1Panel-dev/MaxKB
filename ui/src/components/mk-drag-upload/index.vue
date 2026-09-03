@@ -55,7 +55,7 @@ defineExpose({ clearFiles })
             <span class="text-sm text-N500">{{ formatFileSize(selectedFile.size) }}</span>
           </div>
           <div class="flex shrink-0 items-center gap-1">
-            <slot name="download" :file="selectedFile" />
+            <slot name="download" :file="selectedFile"/>
             <el-button aria-label="删除文件" :disabled="disabled" text @click="handleRemove">
               <MkIcon name="icon_delete-trash_outlined" :size="16" class="text-N600" />
             </el-button>

@@ -92,7 +92,7 @@ onMounted(loadQrPlatforms)
 </script>
 
 <template>
-  <div class="space-y-4 pr-2">
+  <div class="space-y-4">
     <template v-for="platform in qrLoginPlatforms" :key="platform.key">
       <el-card shadow="hover">
         <div class="flex-between mb-4">

@@ -5,12 +5,13 @@ import { cloneDeep } from 'lodash'
 import ApplicationApi from '@/api/admin/workspace/application/application'
 import SharedApi from '@/api/admin/workspace/shared'
 import ToolApi from '@/api/admin/workspace/tool/tool'
-import { APPLICATION_TYPE, RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
 import type { ApplicationDetail, ApplicationType, FolderItem, ToolItem, ToolType } from '@/api/types'
-import FolderTree from '@/components/business/folder-tree/index.vue'
-import { FOLDER_ENTRY_ID } from '@/constants'
-import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
 import type { NodeMenuItem, NodeMenuResourceSource } from './types'
+import { FOLDER_ENTRY_ID } from '@/constants'
+import { isWorkFlow } from '@/utils/application'
+import FolderTree from '@/components/business/folder-tree/index.vue'
+import { applicationNode, toolLibNode, toolWorkflowLibNode } from '@/workflow-canvas/config/node-data'
 
 defineOptions({ name: 'ResourceNodeMenu' })
 
@@ -127,8 +128,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex h-[450px] min-h-0">
-    <aside class="flex w-60 shrink-0 border-r pt-3">
+  <div class="flex h-140 min-h-0">
+    <aside class="w-sidebar-expanded border-r pt-3">
       <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
     </aside>
 
@@ -139,41 +140,35 @@ onMounted(() => {
 
       <el-scrollbar class="min-h-0 flex-1">
         <div v-if="filteredResourceItems.length" class="grid grid-cols-2 gap-3 px-3 pb-3">
-          <el-popover
-            v-for="resource in filteredResourceItems"
-            :key="resource.id"
-            placement="right"
-            :width="280"
-            :show-after="500"
-            :persistent="false"
-          >
-            <template #reference>
-              <button
-                type="button"
-                class="flex h-10 min-w-0 cursor-grab items-center gap-2 rounded-md border border-N300 px-3 text-left text-N900 hover:border-primary hover:text-primary active:cursor-grabbing"
-                @click="emit('select', resource.node)"
-                @pointerdown="handleNodeDragStart($event, resource.node)"
-              >
-                <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="20" :type="resource.toolType" />
-                <ApplicationIcon v-else :icon="resource.icon" :size="20" />
-                <span class="min-w-0 flex-1 truncate" :title="resource.name">{{ resource.name }}</span>
-              </button>
-            </template>
-
-            <div class="flex min-w-0 items-center gap-2">
-              <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="24" :type="resource.toolType" />
-              <ApplicationIcon v-else :icon="resource.icon" :size="24" />
-              <h6 class="min-w-0 flex-1 break-all">{{ resource.name }}</h6>
-              <el-tag
-                v-if="resource.applicationType"
-                size="small"
-                :type="resource.applicationType === APPLICATION_TYPE.WORK_FLOW ? 'warning' : 'primary'"
-              >
-                {{ resource.applicationType === APPLICATION_TYPE.WORK_FLOW ? '高级智能体' : '简易智能体' }}
-              </el-tag>
-            </div>
-            <p v-if="resource.desc" class="mt-2 text-sm text-N600">{{ resource.desc }}</p>
-          </el-popover>
+          <template v-for="resource in filteredResourceItems" :key="resource.id">
+            <el-popover placement="right" :width="280" :show-after="500" :persistent="false">
+              <template #reference>
+                <el-card
+                  class="small cursor-pointer"
+                  shadow="never"
+                  @click="emit('select', resource.node)"
+                  @pointerdown="handleNodeDragStart($event, resource.node)"
+                >
+                  <div class="flex items-center gap-2">
+                    <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="20" :type="resource.toolType" />
+                    <ApplicationIcon v-else :icon="resource.icon" :size="20" />
+                    <span class="min-w-0 flex-1 truncate" :title="resource.name">{{ resource.name }}</span>
+                  </div>
+                </el-card>
+              </template>
+              <div class="p-3">
+                <div class="flex min-w-0 items-center gap-2">
+                  <ToolIcon v-if="isToolMenu" :icon="resource.icon" :size="24" :type="resource.toolType" />
+                  <ApplicationIcon v-else :icon="resource.icon" :size="24" />
+                  <p class="min-w-0 flex-1 break-all truncate">{{ resource.name }}</p>
+                  <el-tag v-if="resource.applicationType" size="small" :type="isWorkFlow(resource.applicationType) ? 'warning' : 'primary'">
+                    {{ isWorkFlow(resource.applicationType) ? '高级' : '简易' }}
+                  </el-tag>
+                </div>
+                <p v-if="resource.desc" class="mt-2 text-sm text-N600">{{ resource.desc }}</p>
+              </div>
+            </el-popover>
+          </template>
         </div>
         <MkEmpty v-else :type="searchKeyword ? 'search' : 'default'" :image-size="72" />
       </el-scrollbar>

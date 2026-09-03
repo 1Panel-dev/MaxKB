@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type Component } from 'vue'
+import { computed, ref, type Component } from 'vue'
 import { LOGIN_METHOD } from '@/api/enums'
 import LDAP from './components/LDAP.vue'
 import CAS from './components/CAS.vue'
@@ -21,21 +21,30 @@ const authenticationTabs: AuthenticationTab[] = [
   { label: 'OAuth2', name: LOGIN_METHOD.OAUTH2, component: OAuth2 },
   { label: '扫码登录', name: 'SCAN', component: SCAN },
 ]
+const activeAuthenticationComponent = computed(() => authenticationTabs.find((tab) => tab.name === activeName.value)?.component)
 </script>
 
 <template>
   <MkViewLayout class="system-settings-authentication">
-    <el-tabs v-model="activeName" class="authentication-tabs min-h-0 flex-1 flex-col">
-      <template v-for="authenticationTab in authenticationTabs" :key="authenticationTab.name">
-        <el-tab-pane class="h-full" :label="authenticationTab.label" :name="authenticationTab.name" lazy>
-          <el-scrollbar>
-            <div class="py-4">
-              <component :is="authenticationTab.component" />
-            </div>
-          </el-scrollbar>
-        </el-tab-pane>
-      </template>
-    </el-tabs>
+    <template #default="{ title, Header }">
+      <component :is="Header">
+        <div class="w-full">
+          <h4 class="mb-4">{{ title }}</h4>
+          <el-tabs v-model="activeName">
+            <el-tab-pane
+              v-for="authenticationTab in authenticationTabs"
+              :key="authenticationTab.name"
+              :label="authenticationTab.label"
+              :name="authenticationTab.name"
+            />
+          </el-tabs>
+        </div>
+      </component>
+
+      <KeepAlive>
+        <component :is="activeAuthenticationComponent" :key="activeName" />
+      </KeepAlive>
+    </template>
   </MkViewLayout>
 </template>
 
