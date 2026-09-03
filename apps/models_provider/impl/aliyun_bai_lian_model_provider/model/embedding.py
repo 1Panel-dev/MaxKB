@@ -71,7 +71,9 @@ class AliyunBaiLianEmbedding(MaxKBBaseEmbeddingModel):
         """对图片 URL / data URL 做独立向量化（每张图生成一个向量）。"""
         if not self.supports_image_embedding():
             return []
-        return self._call_multimodal([{"image": image} for image in images])
+        return self._call_multimodal(
+            [{"image": self.normalize_image_input(image, keep_data_prefix=True)} for image in images]
+        )
 
     def _multimodal_base_url(self) -> str:
         """DashScope 原生多模态接口走 /api/v1，与 OpenAI 兼容地址区分开。"""

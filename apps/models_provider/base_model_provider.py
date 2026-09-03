@@ -134,6 +134,23 @@ class MaxKBBaseEmbeddingModel(MaxKBBaseModel):
         """Embed data URLs or provider-supported image URLs."""
         raise AppApiException(500, _("The current embedding model does not support image embedding"))
 
+    @staticmethod
+    def normalize_image_input(url: str, keep_data_prefix: bool = False) -> str:
+        """归一化图片输入为上游接口可识别的字符串。
+
+        - http(s) URL：原样返回
+        - data:image/...;base64,xxx：keep_data_prefix=True 保留 data URI（阿里百炼等），
+          False 只返回 base64 内容（腾讯 TokenHub 等）
+        - 其它字符串：视为已是目标格式，原样返回
+        """
+        if url.startswith(("http://", "https://")):
+            return url
+        if url.startswith("data:") and ";base64," in url:
+            if keep_data_prefix:
+                return url
+            return url.split(";base64,", 1)[1]
+        return url
+
 
 class BaseModelCredential(ABC):
     @abstractmethod
