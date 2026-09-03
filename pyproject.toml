@@ -37,7 +37,7 @@ dependencies = [
     "anthropic==0.122.0",
     "boto3==1.43.86",
     "cohere==7.0.8",
-    "dashscope==1.26.7",
+    "dashscope==1.27.2",
     "qianfan==0.4.12.3",
     "tencentcloud-sdk-python-common==3.1.166",
     "tencentcloud-sdk-python-hunyuan==3.1.56",
