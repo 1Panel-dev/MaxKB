@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { computed, inject, onBeforeUnmount, onMounted } from 'vue'
-
-import { CopyDocument } from '@element-plus/icons-vue'
-import { cloneDeep, set } from 'lodash'
+import { cloneDeep } from 'lodash'
 import NodeContainer from '@/workflow-canvas/core/node-container/index.vue'
 import { WorkflowNodeType, type WorkflowNodeField } from '@/workflow-canvas/types'
 import { copyText } from '@/utils/clipboard'
@@ -47,8 +45,8 @@ function refreshFields() {
     value: field.field,
   }))
 
-  set(nodeConfig, 'fields', [{ label: '用户问题', value: 'question' }])
-  set(nodeConfig, 'globalFields', [
+  nodeConfig.fields = [{ label: '用户问题', value: 'question' }]
+  nodeConfig.globalFields = [
     { label: '当前时间', value: 'time' },
     { label: '历史聊天记录', value: 'history_context' },
     { label: '对话 ID', value: 'chat_id' },
@@ -58,8 +56,8 @@ function refreshFields() {
     { label: '对话用户', value: 'chat_user' },
     ...userFields,
     ...apiFields,
-  ])
-  set(nodeConfig, 'chatFields', chatInputFields)
+  ]
+  nodeConfig.chatFields = chatInputFields
 }
 
 onMounted(() => {
@@ -77,24 +75,28 @@ onBeforeUnmount(() => {
 <template>
   <NodeContainer :node-model="model">
     <h6 class="mk-title-decoration mb-2">全局变量</h6>
-    <div class="rounded-md bg-N100 px-3 py-1 text-N600">
-      <div v-for="field in globalFields" :key="field.value" class="flex items-center justify-between gap-2 py-2">
-        <span>{{ field.label }} {{ formatFieldReference(field.value) }}</span>
-        <el-button link @click="copyField('global', field.value)">
-          <MkIcon :icon="CopyDocument" />
-        </el-button>
-      </div>
+    <div class="mk-gray-card space-y-4">
+      <template v-for="field in globalFields" :key="field.value">
+        <div class="group flex-between">
+          <span class="break-all">{{ field.label }} {{ formatFieldReference(field.value) }}</span>
+          <el-button class="group-hover-visible" link @click="copyField('global', field.value)">
+            <MkIcon name="icon_copy_outlined" />
+          </el-button>
+        </div>
+      </template>
     </div>
 
     <template v-if="chatFields.length">
       <h6 class="mk-title-decoration my-2">会话变量</h6>
-      <div class="rounded-md bg-N100 px-3 py-1 text-N600">
-        <div v-for="field in chatFields" :key="field.value" class="flex items-center justify-between gap-2 py-2">
-          <span>{{ field.label }} {{ formatFieldReference(field.value) }}</span>
-          <el-button link @click="copyField('chat', field.value)">
-            <MkIcon :icon="CopyDocument" />
-          </el-button>
-        </div>
+      <div class="mk-gray-card space-y-4">
+        <template v-for="field in chatFields" :key="field.value">
+          <div class="group flex-between">
+            <span class="break-all">{{ field.label }} {{ formatFieldReference(field.value) }}</span>
+            <el-button class="group-hover-visible" link @click="copyField('chat', field.value)">
+              <MkIcon name="icon_copy_outlined" />
+            </el-button>
+          </div>
+        </template>
       </div>
     </template>
   </NodeContainer>

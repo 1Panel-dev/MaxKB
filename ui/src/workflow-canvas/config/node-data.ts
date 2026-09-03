@@ -13,10 +13,12 @@ export const startNode = {
         { label: '当前时间', value: 'time' },
         { label: '历史聊天记录', value: 'history_context' },
         { label: '对话 ID', value: 'aiChat_id' },
+        { label: '对话用户 ID', value: 'chat_user_id' },
+        { label: '对话用户类型', value: 'chat_user_type' },
+        { label: '对话用户组', value: 'chat_user_group' },
+        { label: '对话用户', value: 'chat_user' },
       ],
     },
-    fields: [{ label: '用户问题', value: 'question' }],
-    globalFields: [{ label: '当前时间', value: 'time' }],
     showNode: true,
   },
 }
@@ -41,8 +43,6 @@ export const baseNode = {
     config: {},
     showNode: true,
     user_input_config: { title: '用户输入' },
-    api_input_field_list: [],
-    chat_input_field_list: [],
     user_input_field_list: [],
   },
 }
