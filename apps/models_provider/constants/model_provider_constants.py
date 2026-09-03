@@ -1,6 +1,7 @@
 # coding=utf-8
 from enum import Enum
 
+from models_provider.impl.aimlapi_model_provider.aimlapi_model_provider import AIMLAPIModelProvider
 from models_provider.impl.aliyun_bai_lian_model_provider.aliyun_bai_lian_model_provider import \
     AliyunBaiLianModelProvider
 from models_provider.impl.anthropic_model_provider.anthropic_model_provider import AnthropicModelProvider
@@ -48,3 +49,4 @@ class ModelProvideConstants(Enum):
     model_siliconCloud_provider = SiliconCloudModelProvider()
     model_regolo_provider = RegoloModelProvider()
     model_minimax_provider = MiniMaxModelProvider()
+    model_aimlapi_provider = AIMLAPIModelProvider()

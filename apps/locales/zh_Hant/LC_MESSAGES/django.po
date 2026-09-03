@@ -3715,6 +3715,21 @@ msgstr "較高的數值會使輸出更加隨機，而較低的數值會使其更
 msgid "Output the maximum Tokens"
 msgstr "輸出最大Token數"
 
+#: apps/models_provider/impl/aimlapi_model_provider/credential/image.py:33
+#: apps/models_provider/impl/aimlapi_model_provider/credential/llm.py:34
+msgid ""
+"Specify the maximum number of tokens that the model can generate. Reasoning "
+"models may spend more tokens than this limit on their reasoning process, so "
+"it does not cap the cost of a request"
+msgstr "指定模型可以生成的最大 tokens 數。推理模型的思考過程可能會超出該限制，因此它並不能限制單次請求的費用"
+
+#: apps/models_provider/impl/aimlapi_model_provider/credential/tti.py:24
+#: apps/models_provider/impl/aimlapi_model_provider/credential/tti.py:41
+msgid ""
+"Different image models accept different values, keep auto to let the model "
+"decide"
+msgstr "不同的圖片模型支援的取值不同，保持 auto 則由模型自行決定"
+
 #: apps/models_provider/impl/aliyun_bai_lian_model_provider/credential/llm.py:31
 msgid "Specify the maximum number of tokens that the model can generate."
 msgstr "指定模型可以生成的最大 tokens 數"
