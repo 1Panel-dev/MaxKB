@@ -35,10 +35,14 @@ export const baseNode = {
       desc: '',
       prologue: '您好，我是 XXX 小助手，您可以向我提出 XXX 使用问题。\n- XXX 主要功能有什么？\n- XXX 如何收费？\n- 需要转人工服务',
       tts_type: 'BROWSER',
+      stt_model_id_type: 'default',
+      long_term_model_id_type: 'default',
     },
     config: {},
     showNode: true,
     user_input_config: { title: '用户输入' },
+    api_input_field_list: [],
+    chat_input_field_list: [],
     user_input_field_list: [],
   },
 }
@@ -108,7 +112,6 @@ export const aiChatNode = {
   type: WorkflowNodeType.AiChat,
   text: '与 AI 大模型进行对话',
   label: 'AI 对话',
-  height: 340,
   properties: {
     stepName: 'AI 对话',
     config: {

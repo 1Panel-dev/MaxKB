@@ -6,7 +6,7 @@ import ToolApi from '@/api/admin/workspace/tool/tool'
 import SharedApi from '@/api/admin/workspace/shared'
 import ToolStoreApi from '@/api/admin/tool-store.ts'
 import type { Dict, FolderItem, OptionItem, ToolItem, ToolStoreResponse, ToolType } from '@/api/types'
-import { RESOURCE_TYPE, TOOL_TYPE } from '@/api/enums'
+import { RESOURCE_TYPE, TOOL_TYPE, TOOL_SCOPE } from '@/api/enums'
 import { TOOL_TYPE_OPTIONS, FOLDER_ENTRIES, FOLDER_ENTRY_ID } from '@/constants'
 import FolderTree from '@/components/business/folder-tree/index.vue'
 import MoveToDialog from '@/components/business/folder-tree/MoveToDialog.vue'
@@ -68,7 +68,7 @@ const toolType = ref<ToolType | ''>('')
 
 function loadToolsPage(pagination: { currentPage: number; pageSize: number }) {
   const request = isShared.value ? SharedApi : ToolApi
-  const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL }
+  const folderId = isShared.value ? {} : { folder_id: currentFolder.value.id || FOLDER_ENTRY_ID.ALL, scope: TOOL_SCOPE.WORKSPACE }
   return request.getToolPage(pagination, { ...toolQuery.value, tool_type: toolType.value, ...folderId })
 }
 

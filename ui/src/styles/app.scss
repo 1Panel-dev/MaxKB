@@ -160,7 +160,6 @@ h6 {
   }
 }
 
-
 // 资源菜单的导入按钮
 .mk-import-button {
   width: 100%;
@@ -168,7 +167,6 @@ h6 {
     width: 100%;
   }
 }
-
 
 /*
   标题前带竖线样式
@@ -207,6 +205,13 @@ h6 {
   }
 }
 
+// 灰色背景卡片
+.mk-gray-card {
+  background-color: var(--mk-N100) !important;
+  border-radius: 6px;
+  padding: calc(var(--spacing) * 2) calc(var(--spacing) * 3);
+}
+
 // 资源的card grid布局
 .mk-resource-card-grid {
   display: grid;
@@ -219,9 +224,8 @@ h6 {
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr));
 }
 
-
-
-.mk-scrollbar-right  {
+// 让一些组件内部滚动条 不会限制在padding内，滚动条贴在最右侧
+.mk-scrollbar-right {
   &.el-scrollbar {
     margin-right: calc(var(--spacing) * -4);
 

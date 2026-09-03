@@ -42,7 +42,10 @@ function refreshFields() {
     label: field.name ?? field.variable,
     value: field.variable,
   }))
-  const chatInputFields = (cloneDeep(baseNode?.properties.chat_input_field_list ?? []) as SourceField[]).map((field: SourceField) => ({ label: field.label, value: field.field }))
+  const chatInputFields = (cloneDeep(baseNode?.properties.chat_input_field_list ?? []) as SourceField[]).map((field: SourceField) => ({
+    label: field.label,
+    value: field.field,
+  }))
 
   set(nodeConfig, 'fields', [{ label: '用户问题', value: 'question' }])
   set(nodeConfig, 'globalFields', [
@@ -73,7 +76,7 @@ onBeforeUnmount(() => {
 
 <template>
   <NodeContainer :node-model="model">
-    <h6 class="mb-2">全局变量</h6>
+    <h6 class="mk-title-decoration mb-2">全局变量</h6>
     <div class="rounded-md bg-N100 px-3 py-1 text-N600">
       <div v-for="field in globalFields" :key="field.value" class="flex items-center justify-between gap-2 py-2">
         <span>{{ field.label }} {{ formatFieldReference(field.value) }}</span>
@@ -84,7 +87,7 @@ onBeforeUnmount(() => {
     </div>
 
     <template v-if="chatFields.length">
-      <h6 class="mb-2 mt-4">会话变量</h6>
+      <h6 class="mk-title-decoration my-2">会话变量</h6>
       <div class="rounded-md bg-N100 px-3 py-1 text-N600">
         <div v-for="field in chatFields" :key="field.value" class="flex items-center justify-between gap-2 py-2">
           <span>{{ field.label }} {{ formatFieldReference(field.value) }}</span>
