@@ -81,6 +81,8 @@ class PGVector(BaseVectorStore):
     def _batch_save(self, text_list: List[Dict], embedding: MaxKBBaseEmbeddingModel, is_the_task_interrupted):
         texts = [normalize_for_embedding(row.get("text")) for row in text_list]
         embeddings = embedding.embed_documents(texts)
+        if len(embeddings) != len(texts):
+            raise AppApiException(500, _("The embedding model returned an incomplete result"))
         embedding_list = [
             Embedding(
                 id=uuid.uuid7(),

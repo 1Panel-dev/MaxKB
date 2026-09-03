@@ -4,7 +4,7 @@ import os
 import re
 import traceback
 from collections import defaultdict
-from functools import reduce
+from functools import partial, reduce
 from tempfile import TemporaryDirectory
 from typing import Dict, List
 
@@ -84,7 +84,6 @@ from knowledge.serializers.paragraph import (
 )
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.document_strategy import (
-    PROCESSOR_VERSION,
     apply_length_strategy,
     document_source_hash,
     normalize_document_strategy,
@@ -143,6 +142,9 @@ def convert_uuid_to_str(obj):
 class BatchCancelInstanceSerializer(serializers.Serializer):
     id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_("id list"))
     type = serializers.IntegerField(required=True, label=_("task type"))
+    resource_type = serializers.ChoiceField(
+        required=False, default=DocumentResourceType.DOCUMENT, choices=DocumentResourceType.choices
+    )
 
     def is_valid(self, *, raise_exception=False):
         super().is_valid(raise_exception=True)
@@ -265,6 +267,9 @@ class DocumentRefreshSerializer(serializers.Serializer):
 class DocumentBatchRefreshSerializer(serializers.Serializer):
     id_list = serializers.ListField(required=True, label=_("id list"))
     state_list = serializers.ListField(required=True, label=_("state list"))
+    resource_type = serializers.ChoiceField(
+        required=False, default=DocumentResourceType.DOCUMENT, choices=DocumentResourceType.choices
+    )
 
 
 class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
@@ -272,6 +277,9 @@ class DocumentBatchGenerateRelatedSerializer(serializers.Serializer):
     model_id = serializers.UUIDField(required=True, label=_("model id"))
     prompt = serializers.CharField(required=True, label=_("prompt"))
     state_list = serializers.ListField(required=True, label=_("state list"))
+    resource_type = serializers.ChoiceField(
+        required=False, default=DocumentResourceType.DOCUMENT, choices=DocumentResourceType.choices
+    )
 
 
 class DocumentMigrateSerializer(serializers.Serializer):
@@ -283,6 +291,9 @@ class BatchEditHitHandlingSerializer(serializers.Serializer):
     hit_handling_method = serializers.CharField(required=True, label=_("hit handling method"))
     directly_return_similarity = serializers.FloatField(
         required=False, max_value=2, min_value=0, label=_("directly return similarity")
+    )
+    resource_type = serializers.ChoiceField(
+        required=False, default=DocumentResourceType.DOCUMENT, choices=DocumentResourceType.choices
     )
 
     def is_valid(self, *, raise_exception=False):
@@ -709,7 +720,13 @@ class DocumentSerializers(serializers.Serializer):
                         embedding_model_id = get_embedding_model_id_by_knowledge_id(document.knowledge_id)
                         ListenerManagement.update_status(changed_paragraphs, TaskType.EMBEDDING, State.PENDING)
                         ListenerManagement.get_aggregation_document_status(document_id)()
-                        embedding_by_paragraph_list.delay(merge_result.reembed_ids, embedding_model_id)
+                        transaction.on_commit(
+                            partial(
+                                embedding_by_paragraph_list.delay,
+                                list(merge_result.reembed_ids),
+                                embedding_model_id,
+                            )
+                        )
 
                 else:
                     state = State.FAILURE
@@ -1163,7 +1180,6 @@ class DocumentSerializers(serializers.Serializer):
                     "meta": meta,
                     "doc_strategy": strategy,
                     "source_hash": document_source_hash(normalized_paragraphs),
-                    "processor_version": PROCESSOR_VERSION,
                     **hashes,
                     "type": instance.get("type") if instance.get("type") is not None else KnowledgeType.BASE,
                     # Standalone images must go through ImageDocumentService so that file validation,
@@ -1411,6 +1427,27 @@ class DocumentSerializers(serializers.Serializer):
         knowledge_id = serializers.UUIDField(required=True, label=_("knowledge id"))
         user_id = serializers.UUIDField(required=False, label=_("user id"), allow_null=True)
 
+        def validate_document_ids(self, instance: Dict, field_name="id_list") -> List[str]:
+            document_ids = [str(document_id) for document_id in instance.get(field_name) or []]
+            if not document_ids:
+                raise AppApiException(500, _("Document id list cannot be empty"))
+            resource_type = instance.get("resource_type") or DocumentResourceType.DOCUMENT
+            if resource_type not in DocumentResourceType.values:
+                raise AppApiException(500, _("Unsupported document resource type"))
+            matched_ids = {
+                str(document_id)
+                for document_id in QuerySet(Document)
+                .filter(
+                    id__in=document_ids,
+                    knowledge_id=self.initial_data.get("knowledge_id"),
+                    resource_type=resource_type,
+                )
+                .values_list("id", flat=True)
+            }
+            if matched_ids != set(document_ids):
+                raise AppApiException(500, _("Document does not belong to the requested resource type"))
+            return document_ids
+
         def is_valid(self, *, raise_exception=False):
             super().is_valid(raise_exception=True)
             workspace_id = self.data.get("workspace_id")
@@ -1533,6 +1570,7 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
+                self.validate_document_ids(instance)
             # 异步同步
             work_thread_pool.submit(
                 lambda doc_ids: [
@@ -1554,7 +1592,9 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+                document_id_list = self.validate_document_ids(instance)
+            else:
+                document_id_list = instance.get("id_list")
             source_file_ids = [
                 doc["meta"].get("source_file_id")
                 for doc in Document.objects.filter(id__in=document_id_list).values("meta")
@@ -1575,7 +1615,9 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 self.is_valid(raise_exception=True)
                 BatchCancelInstanceSerializer(data=instance).is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+                document_id_list = self.validate_document_ids(instance)
+            else:
+                document_id_list = instance.get("id_list")
             ListenerManagement.update_status(
                 QuerySet(Paragraph)
                 .annotate(
@@ -1610,7 +1652,9 @@ class DocumentSerializers(serializers.Serializer):
                 if hit_handling_method != "optimization" and hit_handling_method != "directly_return":
                     raise AppApiException(500, _("The hit processing method must be directly_return|optimization"))
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+                document_id_list = self.validate_document_ids(instance)
+            else:
+                document_id_list = instance.get("id_list")
             hit_handling_method = instance.get("hit_handling_method")
             directly_return_similarity = instance.get("directly_return_similarity")
             update_dict = {"hit_handling_method": hit_handling_method}
@@ -1634,7 +1678,9 @@ class DocumentSerializers(serializers.Serializer):
         def batch_refresh(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+                document_id_list = self.validate_document_ids(instance)
+            else:
+                document_id_list = instance.get("id_list")
             state_list = instance.get("state_list")
             knowledge_id = self.data.get("knowledge_id")
             for document_id in document_id_list:
@@ -1648,7 +1694,9 @@ class DocumentSerializers(serializers.Serializer):
         def batch_tokenize(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("id_list")
+                document_id_list = self.validate_document_ids(instance)
+            else:
+                document_id_list = instance.get("id_list")
             state_list = instance.get("state_list")
             knowledge_id = self.data.get("knowledge_id")
             for document_id in document_id_list:
@@ -1662,7 +1710,9 @@ class DocumentSerializers(serializers.Serializer):
         def batch_add_tag(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("document_ids")
+                document_id_list = self.validate_document_ids(instance, "document_ids")
+            else:
+                document_id_list = instance.get("document_ids")
             tag_id_list = instance.get("tag_ids")
             # 批量查询已存在的标签关联关系
             existing_relations = {
@@ -1695,7 +1745,9 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
-            document_ids = instance.get("id_list")
+                document_ids = self.validate_document_ids(instance)
+            else:
+                document_ids = instance.get("id_list")
             document_list = QuerySet(Document).filter(id__in=document_ids)
             paragraph_list = native_search(
                 QuerySet(Paragraph).filter(document_id__in=document_ids),
@@ -1720,8 +1772,10 @@ class DocumentSerializers(serializers.Serializer):
             if with_valid:
                 BatchSerializer(data=instance).is_valid(model=Document, raise_exception=True)
                 self.is_valid(raise_exception=True)
+                document_ids = self.validate_document_ids(instance)
             knowledge = QuerySet(Knowledge).filter(id=self.data.get("knowledge_id")).first()
-            document_ids = instance.get("id_list")
+            if not with_valid:
+                document_ids = instance.get("id_list")
             document_list = QuerySet(Document).filter(id__in=document_ids)
             paragraph_list = native_search(
                 QuerySet(Paragraph).filter(document_id__in=document_ids),
@@ -1770,7 +1824,20 @@ class DocumentSerializers(serializers.Serializer):
         def batch_generate_related(self, instance: Dict, with_valid=True):
             if with_valid:
                 self.is_valid(raise_exception=True)
-            document_id_list = instance.get("document_id_list")
+            document_id_list = [str(document_id) for document_id in instance.get("document_id_list") or []]
+            resource_type = instance.get("resource_type") or DocumentResourceType.DOCUMENT
+            valid_ids = {
+                str(document_id)
+                for document_id in QuerySet(Document)
+                .filter(
+                    id__in=document_id_list,
+                    knowledge_id=self.data.get("knowledge_id"),
+                    resource_type=resource_type,
+                )
+                .values_list("id", flat=True)
+            }
+            if valid_ids != set(document_id_list):
+                raise AppApiException(500, _("Document does not belong to the requested resource type"))
             model_id = instance.get("model_id")
             prompt = instance.get("prompt")
             model_params_setting = instance.get("model_params_setting")

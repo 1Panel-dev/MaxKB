@@ -12,7 +12,6 @@ from knowledge.models.knowledge import Document, DocumentResourceType, Knowledge
 from knowledge.serializers.document import DocumentSerializers
 from knowledge.services.document_cleanup import delete_document_data
 from knowledge.services.document_strategy import (
-    PROCESSOR_VERSION,
     normalize_document_strategy,
     parse_web_content,
     strategy_hashes,
@@ -194,7 +193,6 @@ def get_sync_web_document_handler(knowledge_id, user_id, doc_strategy=None):
                 status=State.FAILURE,
                 user_id=user_id,
                 doc_strategy=strategy,
-                processor_version=PROCESSOR_VERSION,
                 **hashes,
             ).save()
 

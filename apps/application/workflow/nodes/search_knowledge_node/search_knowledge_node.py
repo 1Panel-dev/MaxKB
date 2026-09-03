@@ -25,7 +25,9 @@ from common.database_model_manage.database_model_manage import DatabaseModelMana
 from common.db.search import native_search
 from common.utils.common import flat_map, get_file_content
 from common.utils.shared_resource_auth import filter_authorized_ids
-from knowledge.models import Document, Paragraph, Knowledge, SearchMode
+from knowledge.models import Document, Paragraph, Knowledge, SearchMode, SourceType
+from knowledge.services.multimodal_retrieval import get_hit_asset_map
+from knowledge.services.retrieval_stats import get_recall_tracker, record_recall_safely
 from maxkb.conf import PROJECT_DIR
 from models_provider.tools import get_model_instance_by_model_workspace_id
 
@@ -105,15 +107,41 @@ def _reset_meta(meta):
     return meta
 
 
-def _reset_paragraph(paragraph: Dict, embedding_list: List):
+def _asset_retrieval_text(asset: Dict | None) -> str:
+    if not asset:
+        return ""
+    return "\n".join(
+        str(value).strip()
+        for value in (asset.get("caption"), asset.get("ocr_text"), asset.get("description"))
+        if value and str(value).strip()
+    )
+
+
+def _reset_paragraph(paragraph: Dict, embedding_list: List, hit_asset_map: Dict = None):
     filter_embedding_list = [
         embedding for embedding in embedding_list if str(embedding.get("paragraph_id")) == str(paragraph.get("id"))
     ]
     if filter_embedding_list is not None and len(filter_embedding_list) > 0:
         find_embedding = filter_embedding_list[-1]
+        source_id = find_embedding.get("source_id")
+        source_type = find_embedding.get("source_type")
+        is_image_hit = str(source_type) == str(SourceType.IMAGE.value)
+        embedding_meta = find_embedding.get("meta") or {}
+        hit_unit_type = embedding_meta.get("unit_type") or ("image" if is_image_hit else "text")
+        hit_asset = (hit_asset_map or {}).get(str(source_id)) if is_image_hit else None
+        asset_text = _asset_retrieval_text(hit_asset)
+        retrieval_content = "\n".join(value for value in (paragraph.get("content") or "", asset_text) if value)
         return {
             **paragraph,
             "similarity": find_embedding.get("similarity"),
+            "comprehensive_score": find_embedding.get("comprehensive_score"),
+            "source_id": source_id,
+            "source_type": source_type,
+            "hit_unit_type": hit_unit_type,
+            "query_unit_type": find_embedding.get("query_unit_type"),
+            "query_unit_index": find_embedding.get("query_unit_index"),
+            "hit_asset": hit_asset,
+            "retrieval_content": retrieval_content,
             "is_hit_handling_method": find_embedding.get("similarity") > paragraph.get("directly_return_similarity")
             and paragraph.get("hit_handling_method") == "directly_return",
             "update_time": paragraph.get("update_time").strftime("%Y-%m-%d %H:%M:%S"),
@@ -123,6 +151,31 @@ def _reset_paragraph(paragraph: Dict, embedding_list: List):
             "document_id": str(paragraph.get("document_id")),
             "meta": _reset_meta(paragraph.get("meta")),
         }
+
+
+def _get_recalled_image_list(paragraph_list: List[Dict]) -> List[Dict]:
+    image_list = []
+    seen_file_ids = set()
+    for paragraph in paragraph_list:
+        hit_asset = paragraph.get("hit_asset")
+        if not hit_asset:
+            continue
+        file_id = str(hit_asset.get("file_id") or "")
+        if not file_id or file_id in seen_file_ids:
+            continue
+        seen_file_ids.add(file_id)
+        image_list.append(hit_asset)
+    return image_list
+
+
+def _record_recalled_items(embedding_list: List[Dict], paragraph_list: List[Dict], workflow_manage, debug=False):
+    if debug:
+        return
+    recalled_paragraph_ids = {str(paragraph.get("id")) for paragraph in paragraph_list}
+    recalled_items = [
+        embedding for embedding in embedding_list if str(embedding.get("paragraph_id")) in recalled_paragraph_ids
+    ]
+    record_recall_safely(recalled_items, tracker=get_recall_tracker(workflow_manage))
 
 
 def _list_paragraph(embedding_list: List, vector):
@@ -241,24 +294,44 @@ class SearchKnowledgeNode(INode):
             return
 
         paragraph_list = _list_paragraph(embedding_list, vector)
-        result = [_reset_paragraph(paragraph, embedding_list) for paragraph in paragraph_list]
+        hit_asset_map = get_hit_asset_map(embedding_list)
+        result = [
+            reset_paragraph
+            for paragraph in paragraph_list
+            if (reset_paragraph := _reset_paragraph(paragraph, embedding_list, hit_asset_map)) is not None
+        ]
         result = sorted(result, key=lambda p: p.get("similarity"), reverse=True)
+        image_list = _get_recalled_image_list(result)
+
+        _record_recalled_items(embedding_list, result, self.workflow_manage, workflow_params.get("debug", False))
 
         self.write_context("paragraph_list", result)
+        self.write_context("image_list", image_list)
         self.write_context("is_hit_handling_method_list", [row for row in result if row.get("is_hit_handling_method")])
         self.write_context(
             "data",
             "\n".join(
-                [f"{_reset_title(paragraph.get('title', ''))}{paragraph.get('content')}" for paragraph in result]
+                [
+                    f"{_reset_title(paragraph.get('title', ''))}"
+                    f"{paragraph.get('retrieval_content', paragraph.get('content'))}"
+                    for paragraph in result
+                ]
             )[0 : knowledge_setting.get("max_paragraph_char_number", 5000)],
         )
         self.write_context(
             "directly_return",
-            "\n".join([paragraph.get("content") for paragraph in result if paragraph.get("is_hit_handling_method")]),
+            "\n".join(
+                [
+                    paragraph.get("retrieval_content", paragraph.get("content"))
+                    for paragraph in result
+                    if paragraph.get("is_hit_handling_method")
+                ]
+            ),
         )
 
     def _write_empty_result(self, question):
         self.write_context("paragraph_list", [])
+        self.write_context("image_list", [])
         self.write_context("is_hit_handling_method_list", [])
         self.write_context("data", "")
         self.write_context("directly_return", "")
@@ -275,6 +348,7 @@ class SearchKnowledgeNode(INode):
             {
                 "question": self.get_context("question"),
                 "paragraph_list": self.get_context("paragraph_list"),
+                "image_list": self.get_context("image_list"),
                 "data": self.get_context("data"),
                 "show_knowledge": self.get_context("show_knowledge"),
             }

@@ -76,6 +76,8 @@ def get_hit_asset_map(hit_list: Iterable[dict]) -> dict[str, dict]:
             "caption": asset.caption,
             "ocr_text": asset.ocr_text,
             "description": asset.description,
+            "hit_num": asset.hit_num,
+            "last_hit_time": asset.last_hit_time.isoformat() if asset.last_hit_time else None,
         }
         for asset in assets
     }

@@ -1400,6 +1400,7 @@ class KnowledgeSerializer(serializers.Serializer):
                 source_id = current_hit.get("source_id")
                 source_type = current_hit.get("source_type")
                 is_image_hit = str(source_type) == str(SourceType.IMAGE.value)
+                embedding_meta = current_hit.get("meta") or {}
                 result_list.append(
                     {
                         **paragraph,
@@ -1407,7 +1408,7 @@ class KnowledgeSerializer(serializers.Serializer):
                         "comprehensive_score": current_hit.get("comprehensive_score"),
                         "source_id": source_id,
                         "source_type": source_type,
-                        "hit_unit_type": "image" if is_image_hit else "text",
+                        "hit_unit_type": embedding_meta.get("unit_type") or ("image" if is_image_hit else "text"),
                         "query_unit_type": current_hit.get("query_unit_type"),
                         "query_unit_index": current_hit.get("query_unit_index"),
                         "hit_asset": hit_asset_map.get(str(source_id)) if is_image_hit else None,

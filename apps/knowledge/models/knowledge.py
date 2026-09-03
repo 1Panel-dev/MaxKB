@@ -315,7 +315,6 @@ class Document(AppModelMixin):
     split_strategy_hash = models.CharField(verbose_name="分段策略哈希", max_length=64, default="")
     visual_strategy_hash = models.CharField(verbose_name="图片处理策略哈希", max_length=64, default="")
     index_strategy_hash = models.CharField(verbose_name="索引增强策略哈希", max_length=64, default="")
-    processor_version = models.CharField(verbose_name="处理器版本", max_length=32, default="v1")
     sync_version = models.PositiveIntegerField(verbose_name="同步版本", default=0)
     last_sync_time = models.DateTimeField(verbose_name="最后同步时间", null=True, blank=True, db_index=True)
 
@@ -431,6 +430,8 @@ class ParagraphAsset(AppModelMixin):
     caption = models.TextField(verbose_name="图片标题", default="")
     ocr_text = models.TextField(verbose_name="OCR 文本", default="")
     description = models.TextField(verbose_name="图片描述", default="")
+    hit_num = models.IntegerField(verbose_name="召回次数", default=0, db_index=True)
+    last_hit_time = models.DateTimeField(verbose_name="最后一次召回时间", null=True, blank=True, db_index=True)
     local_state = models.CharField(
         verbose_name="本地状态", max_length=16, choices=LocalState.choices, default=LocalState.CLEAN
     )
@@ -442,7 +443,6 @@ class ParagraphAsset(AppModelMixin):
     )
     process_error = models.TextField(verbose_name="处理错误", default="")
     visual_strategy_hash = models.CharField(verbose_name="图片处理策略哈希", max_length=64, default="")
-    processor_version = models.CharField(verbose_name="处理器版本", max_length=32, default="v1")
     meta = models.JSONField(verbose_name="元数据", default=dict)
 
     class Meta:

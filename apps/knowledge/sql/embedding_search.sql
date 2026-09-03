@@ -2,6 +2,7 @@ WITH vector_top AS (
 	SELECT paragraph_id,
 	       source_id,
 	       source_type,
+	       meta,
 	       (embedding::vector(%s) <=> %s) AS distance
 	FROM embedding ${embedding_query}
 	ORDER BY (embedding::vector(%s) <=> %s)
@@ -11,6 +12,7 @@ SELECT
     paragraph_id,
 	source_id,
 	source_type,
+	meta,
 	comprehensive_score,
 	comprehensive_score as similarity
 FROM
@@ -19,6 +21,7 @@ FROM
 		(vc.paragraph_id) vc.paragraph_id,
 		vc.source_id,
 		vc.source_type,
+		vc.meta,
 		(1 - vc.distance) AS comprehensive_score
 	FROM
 		vector_top vc

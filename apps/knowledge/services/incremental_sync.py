@@ -235,7 +235,15 @@ class IncrementalDocumentSync:
     @transaction.atomic
     def merge(self, paragraphs: Iterable[Dict]) -> MergeResult:
         remote_list = prepare_remote_paragraphs(paragraphs)
+        # Serialize all synchronizations for the same document. Locking only the existing
+        # paragraphs does not protect an initially empty document or concurrent inserts.
+        self.document = Document.objects.select_for_update().get(id=self.document.id)
         existing = list(Paragraph.objects.select_for_update().filter(document=self.document).order_by("position"))
+        if not remote_list and any(
+            paragraph.origin == ContentOrigin.SYNCED and paragraph.sync_state != SyncState.REMOTE_DELETED
+            for paragraph in existing
+        ):
+            raise ValueError("Remote synchronization returned an empty paragraph snapshot")
         unmatched = list(existing)
         ordered_synced, result = [], MergeResult()
         for remote in remote_list:

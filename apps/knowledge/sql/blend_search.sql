@@ -10,6 +10,7 @@ SELECT
 	paragraph_id,
 	source_id,
 	source_type,
+	meta,
 	comprehensive_score,
 	comprehensive_score AS similarity
 FROM
@@ -18,6 +19,7 @@ FROM
 		(vc.paragraph_id) vc.paragraph_id,
 		e.source_id,
 		e.source_type,
+		e.meta,
 		(1 - vc.distance + COALESCE(ts_rank_cd(e.search_vector, websearch_to_tsquery('simple', %s), 32), 0)) AS comprehensive_score
 	FROM
 		vector_top vc

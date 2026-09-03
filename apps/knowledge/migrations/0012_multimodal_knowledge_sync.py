@@ -142,7 +142,6 @@ class Migration(migrations.Migration):
                 ),
                 ("process_error", models.TextField(default="", verbose_name="处理错误")),
                 ("visual_strategy_hash", models.CharField(default="", max_length=64, verbose_name="图片处理策略哈希")),
-                ("processor_version", models.CharField(default="v1", max_length=32, verbose_name="处理器版本")),
                 ("meta", models.JSONField(default=dict, verbose_name="元数据")),
             ],
             options={
@@ -173,11 +172,6 @@ class Migration(migrations.Migration):
             model_name="document",
             name="last_sync_time",
             field=models.DateTimeField(blank=True, db_index=True, null=True, verbose_name="最后同步时间"),
-        ),
-        migrations.AddField(
-            model_name="document",
-            name="processor_version",
-            field=models.CharField(default="v1", max_length=32, verbose_name="处理器版本"),
         ),
         migrations.AddField(
             model_name="document",

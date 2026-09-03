@@ -26,9 +26,9 @@ from knowledge.models import (
     KnowledgeSyncStatus,
     KnowledgeSyncType,
     KnowledgeType,
-    Paragraph,
 )
 from knowledge.models.knowledge_action import KnowledgeAction, State
+from knowledge.services.workflow_sync import merge_workflow_incremental_snapshot
 from rest_framework import serializers
 from rest_framework.exceptions import ErrorDetail, ValidationError
 from tools.models import ToolRecord
@@ -156,77 +156,42 @@ class KnowledgeWorkflowPostHandler(WorkFlowPostHandler):
         if self.sync_log_id is not None:
             sync_log = QuerySet(KnowledgeSyncLog).filter(id=self.sync_log_id).first()
             if sync_log is not None:
-                new_documents = list(
-                    QuerySet(Document).filter(
-                        knowledge_id=sync_log.knowledge_id,
-                        type=KnowledgeType.WORKFLOW,
-                        resource_type=DocumentResourceType.DOCUMENT,
-                        create_time__gte=sync_log.create_time,
-                    )
-                )
-                synced_count = len(new_documents)
-                skipped_count = 0
                 if (
                     state == State.SUCCESS
                     and sync_log.sync_type == KnowledgeSyncType.INCREMENTAL
                     and self.document_cleanup is not None
                 ):
-                    old_documents = list(
-                        QuerySet(Document).filter(
+                    stats = merge_workflow_incremental_snapshot(sync_log)
+                else:
+                    stats = {
+                        "total_count": QuerySet(Document)
+                        .filter(
+                            knowledge_id=sync_log.knowledge_id,
+                            resource_type=DocumentResourceType.DOCUMENT,
+                        )
+                        .count(),
+                        "synced_count": QuerySet(Document)
+                        .filter(
                             knowledge_id=sync_log.knowledge_id,
                             type=KnowledgeType.WORKFLOW,
                             resource_type=DocumentResourceType.DOCUMENT,
-                            create_time__lt=sync_log.create_time,
+                            create_time__gte=sync_log.create_time,
                         )
-                    )
-                    old_by_name = {}
-                    for document in old_documents:
-                        old_by_name.setdefault(document.name, []).append(document)
-                    for new_document in new_documents:
-                        matched = old_by_name.get(new_document.name, [])
-                        if not matched:
-                            continue
-                        new_content = list(
-                            QuerySet(Paragraph)
-                            .filter(document_id=new_document.id)
-                            .order_by("position")
-                            .values_list("title", "content")
-                        )
-                        unchanged = next(
-                            (
-                                old_document
-                                for old_document in matched
-                                if list(
-                                    QuerySet(Paragraph)
-                                    .filter(document_id=old_document.id)
-                                    .order_by("position")
-                                    .values_list("title", "content")
-                                )
-                                == new_content
-                            ),
-                            None,
-                        )
-                        if unchanged is not None:
-                            self.document_cleanup([new_document.id])
-                            synced_count -= 1
-                            skipped_count += 1
-                        else:
-                            self.document_cleanup([document.id for document in matched])
-                total_count = (
-                    QuerySet(Document)
-                    .filter(
-                        knowledge_id=sync_log.knowledge_id,
-                        resource_type=DocumentResourceType.DOCUMENT,
-                    )
-                    .count()
-                )
+                        .count(),
+                        "skipped_count": 0,
+                        "deleted_count": sync_log.deleted_count,
+                        "failed_count": 0 if state == State.SUCCESS else 1,
+                    }
                 is_success = state == State.SUCCESS
                 QuerySet(KnowledgeSyncLog).filter(id=sync_log.id).update(
-                    status=KnowledgeSyncStatus.SUCCESS if is_success else KnowledgeSyncStatus.FAILURE,
-                    total_count=total_count,
-                    synced_count=synced_count,
-                    skipped_count=skipped_count,
-                    failed_count=0 if is_success else 1,
+                    status=KnowledgeSyncStatus.SUCCESS
+                    if is_success and not stats["failed_count"]
+                    else KnowledgeSyncStatus.FAILURE,
+                    total_count=stats["total_count"],
+                    synced_count=stats["synced_count"],
+                    skipped_count=stats["skipped_count"],
+                    deleted_count=stats["deleted_count"],
+                    failed_count=stats["failed_count"],
                     duration_ms=max(0, round(run_time * 1000)),
                     message=f"Workflow action {self.knowledge_action_id}: {state}",
                 )

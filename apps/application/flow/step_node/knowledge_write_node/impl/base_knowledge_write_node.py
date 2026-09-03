@@ -1,11 +1,12 @@
 # coding=utf-8
 """
-    @project: MaxKB
-    @Author：niu
-    @file： base_knowledge_write_node.py
-    @date：2025/11/13 11:19
-    @desc:
+@project: MaxKB
+@Author：niu
+@file： base_knowledge_write_node.py
+@date：2025/11/13 11:19
+@desc:
 """
+
 from functools import reduce
 from typing import Any, Dict, List
 
@@ -16,7 +17,9 @@ from django.db.models import QuerySet
 from django.db.models.aggregates import Max
 from django.utils.translation import gettext_lazy as _
 from knowledge.models import (
+    ContentOrigin,
     Document,
+    DocumentResourceType,
     DocumentTag,
     File,
     FileSourceType,
@@ -28,6 +31,13 @@ from knowledge.models import (
 )
 from knowledge.serializers.common import ProblemParagraphManage, ProblemParagraphObject
 from knowledge.serializers.document import DocumentSerializers
+from knowledge.serializers.document_strategy import DocumentStrategySerializer
+from knowledge.services.document_strategy import (
+    document_source_hash,
+    normalize_document_strategy,
+    strategy_hashes,
+)
+from knowledge.services.incremental_sync import prepare_remote_paragraphs
 from rest_framework import serializers
 
 from application.flow.i_step_node import NodeResult
@@ -35,28 +45,32 @@ from application.flow.step_node.knowledge_write_node.i_knowledge_write_node impo
 
 
 class ParagraphInstanceSerializer(serializers.Serializer):
-    content = serializers.CharField(required=True, label=_('content'), max_length=102400, min_length=1, allow_null=True,
-                                    allow_blank=True)
-    title = serializers.CharField(required=False, max_length=256, label=_('section title'), allow_null=True,
-                                  allow_blank=True)
+    content = serializers.CharField(
+        required=True, label=_("content"), max_length=102400, min_length=1, allow_null=True, allow_blank=True
+    )
+    title = serializers.CharField(
+        required=False, max_length=256, label=_("section title"), allow_null=True, allow_blank=True
+    )
     problem_list = serializers.ListField(required=False, child=serializers.CharField(required=False, allow_blank=True))
-    is_active = serializers.BooleanField(required=False, label=_('Is active'))
+    is_active = serializers.BooleanField(required=False, label=_("Is active"))
     chunks = serializers.ListField(required=False, child=serializers.CharField(required=True))
 
 
 class TagInstanceSerializer(serializers.Serializer):
-    key = serializers.CharField(required=True, max_length=64, label=_('Tag Key'))
-    value = serializers.CharField(required=True, max_length=128, label=_('Tag Value'))
+    key = serializers.CharField(required=True, max_length=64, label=_("Tag Key"))
+    value = serializers.CharField(required=True, max_length=128, label=_("Tag Value"))
 
 
 class KnowledgeWriteParamSerializer(serializers.Serializer):
-    name = serializers.CharField(required=True, label=_('document name'), max_length=128, min_length=1,
-                                 source=_('document name'))
+    name = serializers.CharField(
+        required=True, label=_("document name"), max_length=128, min_length=1, source=_("document name")
+    )
     meta = serializers.DictField(required=False)
-    tags = serializers.ListField(required=False, label=_('Tags'), child=TagInstanceSerializer())
+    tags = serializers.ListField(required=False, label=_("Tags"), child=TagInstanceSerializer())
     paragraphs = ParagraphInstanceSerializer(required=False, many=True, allow_null=True)
     source_file_id = serializers.UUIDField(required=False, allow_null=True)
     user_id = serializers.UUIDField(required=False, allow_null=True)
+    doc_strategy = DocumentStrategySerializer(required=False, allow_null=True)
 
 
 def convert_uuid_to_str(obj):
@@ -83,7 +97,7 @@ def link_file(source_file_id, document_id):
             file_size=source_file.file_size,
             source_type=FileSourceType.DOCUMENT,
             source_id=document_id,  # 更新为当前知识库ID
-            meta=source_file.meta.copy() if source_file.meta else {}
+            meta=source_file.meta.copy() if source_file.meta else {},
         )
 
         # 保存文件内容和元数据
@@ -91,72 +105,98 @@ def link_file(source_file_id, document_id):
 
 
 def get_paragraph_problem_model(knowledge_id: str, document_id: str, instance: Dict):
+    content = filter_special_character(instance.get("content"))
     paragraph = Paragraph(
         id=uuid.uuid7(),
         document_id=document_id,
-        content=filter_special_character(instance.get("content")),
+        content=content,
         knowledge_id=knowledge_id,
-        title=instance.get("title") if 'title' in instance else '',
-        chunks=[filter_special_character(c) for c in (instance.get('chunks') if 'chunks' in instance else text_to_chunk(
-            instance.get("content")))],
+        title=instance.get("title") if "title" in instance else "",
+        chunks=[
+            filter_special_character(c)
+            for c in (
+                instance.get("chunks")
+                if "chunks" in instance
+                else text_to_chunk(content, instance.get("child_length", 256))
+            )
+        ],
+        origin=instance.get("origin", ContentOrigin.SYNCED),
+        source_key=instance.get("source_key", ""),
+        source_hash=instance.get("source_hash", ""),
+        source_snapshot=instance.get("source_snapshot")
+        or {
+            "title": instance.get("title") or "",
+            "content": content,
+        },
+        source_updated_at=instance.get("source_updated_at"),
     )
 
-    problem_paragraph_object_list = [ProblemParagraphObject(
-        knowledge_id, document_id, str(paragraph.id), problem
-    ) for problem in (instance.get('problem_list') if 'problem_list' in instance else [])]
+    problem_paragraph_object_list = [
+        ProblemParagraphObject(knowledge_id, document_id, str(paragraph.id), problem)
+        for problem in (instance.get("problem_list") if "problem_list" in instance else [])
+    ]
 
     return {
-        'paragraph': paragraph,
-        'problem_paragraph_object_list': problem_paragraph_object_list,
+        "paragraph": paragraph,
+        "problem_paragraph_object_list": problem_paragraph_object_list,
     }
 
 
 def get_paragraph_model(document_model, paragraph_list: List):
     knowledge_id = document_model.knowledge_id
     paragraph_model_dict_list = [
-        get_paragraph_problem_model(knowledge_id, document_model.id, paragraph)
-        for paragraph in paragraph_list
+        get_paragraph_problem_model(knowledge_id, document_model.id, paragraph) for paragraph in paragraph_list
     ]
 
     paragraph_model_list = []
     problem_paragraph_object_list = []
     for paragraphs in paragraph_model_dict_list:
-        paragraph = paragraphs.get('paragraph')
-        for problem_model in paragraphs.get('problem_paragraph_object_list'):
+        paragraph = paragraphs.get("paragraph")
+        for problem_model in paragraphs.get("problem_paragraph_object_list"):
             problem_paragraph_object_list.append(problem_model)
         paragraph_model_list.append(paragraph)
 
     return {
-        'document': document_model,
-        'paragraph_model_list': paragraph_model_list,
-        'problem_paragraph_object_list': problem_paragraph_object_list,
+        "document": document_model,
+        "paragraph_model_list": paragraph_model_list,
+        "problem_paragraph_object_list": problem_paragraph_object_list,
     }
 
 
 def get_document_paragraph_model(knowledge_id: str, instance: Dict):
-    source_meta = {'source_file_id': instance.get("source_file_id")} if instance.get("source_file_id") else {}
-    meta = {**instance.get('meta'), **source_meta} if instance.get('meta') is not None else source_meta
-    meta = {**convert_uuid_to_str(meta), 'allow_download': True}
+    source_meta = {"source_file_id": instance.get("source_file_id")} if instance.get("source_file_id") else {}
+    meta = {**instance.get("meta"), **source_meta} if instance.get("meta") is not None else source_meta
+    meta = {**convert_uuid_to_str(meta), "allow_download": True}
 
+    strategy = normalize_document_strategy(instance.get("doc_strategy"))
+    normalized_paragraphs = prepare_remote_paragraphs(
+        [
+            {
+                **paragraph,
+                "content": filter_special_character(paragraph.get("content")),
+                "origin": ContentOrigin.SYNCED,
+                "child_length": strategy["split"]["child_length"],
+            }
+            for paragraph in instance.get("paragraphs", [])
+        ]
+    )
     document_model = Document(
         **{
-            'knowledge_id': knowledge_id,
-            'id': uuid.uuid7(),
-            'name': instance.get('name'),
-            'char_length': reduce(
-                lambda x, y: x + y,
-                [len(p.get('content')) for p in instance.get('paragraphs', [])],
-                0),
-            'meta': meta,
-            'type': instance.get('type') if instance.get('type') is not None else KnowledgeType.WORKFLOW,
+            "knowledge_id": knowledge_id,
+            "id": uuid.uuid7(),
+            "name": instance.get("name"),
+            "char_length": reduce(lambda x, y: x + y, [len(p.get("content")) for p in normalized_paragraphs], 0),
+            "meta": meta,
+            "type": instance.get("type") if instance.get("type") is not None else KnowledgeType.WORKFLOW,
+            "resource_type": DocumentResourceType.DOCUMENT,
+            "doc_strategy": strategy,
+            "source_hash": document_source_hash(normalized_paragraphs),
             "user_id": instance.get("user_id"),
+            **strategy_hashes(strategy),
         }
     )
 
-    return get_paragraph_model(
-        document_model,
-        instance.get('paragraphs') if 'paragraphs' in instance else []
-    )
+    return get_paragraph_model(document_model, normalized_paragraphs)
 
 
 def save_knowledge_tags(knowledge_id: str, tags: List[Dict[str, Any]]):
@@ -172,12 +212,7 @@ def save_knowledge_tags(knowledge_id: str, tags: List[Dict[str, Any]]):
         value = tag.get("value")
 
         if (key, value) not in existed_tags_dict:
-            tag_model = Tag(
-                id=uuid.uuid7(),
-                knowledge_id=knowledge_id,
-                key=key,
-                value=value
-            )
+            tag_model = Tag(id=uuid.uuid7(), knowledge_id=knowledge_id, key=key, value=value)
             tag_model_list.append(tag_model)
             new_tag_dict[(key, value)] = str(tag_model.id)
 
@@ -199,10 +234,9 @@ def batch_add_document_tag(document_tag_map: Dict[str, List[str]]):
 
     # 查询已存在的文档-标签关联
     existed_relations = set(
-        QuerySet(DocumentTag).filter(
-            document_id__in=all_document_ids,
-            tag_id__in=all_tag_ids
-        ).values_list('document_id', 'tag_id')
+        QuerySet(DocumentTag)
+        .filter(document_id__in=all_document_ids, tag_id__in=all_tag_ids)
+        .values_list("document_id", "tag_id")
     )
 
     new_relations = [
@@ -221,9 +255,8 @@ def batch_add_document_tag(document_tag_map: Dict[str, List[str]]):
 
 
 class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
-
     def save_context(self, details, workflow_manage):
-        self.context['exception_message'] = details.get('err_message')
+        self.context["exception_message"] = details.get("err_message")
 
     def save(self, document_list, user_id):
         serializer = KnowledgeWriteParamSerializer(data=document_list, many=True)
@@ -244,18 +277,15 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
 
         for document in document_list:
             document["user_id"] = user_id
-            document_paragraph_dict_model = get_document_paragraph_model(
-                knowledge_id,
-                document
-            )
-            document_instance = document_paragraph_dict_model.get('document')
+            document_paragraph_dict_model = get_document_paragraph_model(knowledge_id, document)
+            document_instance = document_paragraph_dict_model.get("document")
             link_file(document.get("source_file_id"), document_instance.id)
             document_model_list.append(document_instance)
             # 收集标签
             single_document_tag_list = document.get("tags", [])
             # 去重传入的标签
             for tag in single_document_tag_list:
-                tag_key = (tag['key'], tag['value'])
+                tag_key = (tag["key"], tag["value"])
                 if tag_key not in knowledge_tag_dict:
                     knowledge_tag_dict[tag_key] = tag
 
@@ -284,17 +314,20 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
             if document_tag_id_map:
                 batch_add_document_tag(document_tag_id_map)
 
-        problem_model_list, problem_paragraph_mapping_list = (
-            ProblemParagraphManage(problem_paragraph_object_list, knowledge_id).to_problem_model_list()
-        )
+        problem_model_list, problem_paragraph_mapping_list = ProblemParagraphManage(
+            problem_paragraph_object_list, knowledge_id
+        ).to_problem_model_list()
 
         QuerySet(Document).bulk_create(document_model_list) if len(document_model_list) > 0 else None
 
         if len(paragraph_model_list) > 0:
             for document in document_model_list:
-                max_position = Paragraph.objects.filter(document_id=document.id).aggregate(
-                    max_position=Max('position')
-                )['max_position'] or 0
+                max_position = (
+                    Paragraph.objects.filter(document_id=document.id).aggregate(max_position=Max("position"))[
+                        "max_position"
+                    ]
+                    or 0
+                )
                 sub_list = [p for p in paragraph_model_list if p.document_id == document.id]
                 for i, paragraph in enumerate(sub_list):
                     paragraph.position = max_position + i + 1
@@ -309,35 +342,39 @@ class BaseKnowledgeWriteNode(IKnowledgeWriteNode):
     @staticmethod
     def post_embedding(document_model_list, knowledge_id, workspace_id):
         for document in document_model_list:
-            DocumentSerializers.Operate(data={
-                'knowledge_id': knowledge_id,
-                'document_id': document.id,
-                'workspace_id': workspace_id
-            }).refresh()
+            DocumentSerializers.Operate(
+                data={"knowledge_id": knowledge_id, "document_id": document.id, "workspace_id": workspace_id}
+            ).refresh()
 
     def execute(self, documents, user_id, **kwargs) -> NodeResult:
 
         document_model_list, knowledge_id, workspace_id = self.save(documents, user_id)
         self.post_embedding(document_model_list, knowledge_id, workspace_id)
 
-        write_content_list = [{
-            "name": document.get("name"),
-            "paragraphs": [{
-                "title": p.get("title"),
-                "content": p.get("content"),
-            } for p in document.get("paragraphs")[0:5]]
-        } for document in documents]
+        write_content_list = [
+            {
+                "name": document.get("name"),
+                "paragraphs": [
+                    {
+                        "title": p.get("title"),
+                        "content": p.get("content"),
+                    }
+                    for p in document.get("paragraphs")[0:5]
+                ],
+            }
+            for document in documents
+        ]
 
-        return NodeResult({'write_content': write_content_list}, {})
+        return NodeResult({"write_content": write_content_list}, {})
 
     def get_details(self, index: int, **kwargs):
         return {
-            'name': self.node.properties.get('stepName'),
+            "name": self.node.properties.get("stepName"),
             "index": index,
-            'run_time': self.context.get('run_time'),
-            'type': self.node.type,
-            'write_content': self.context.get("write_content"),
-            'status': self.status,
-            'err_message': self.err_message,
-            'enableException': self.node.properties.get('enableException'),
+            "run_time": self.context.get("run_time"),
+            "type": self.node.type,
+            "write_content": self.context.get("write_content"),
+            "status": self.status,
+            "err_message": self.err_message,
+            "enableException": self.node.properties.get("enableException"),
         }

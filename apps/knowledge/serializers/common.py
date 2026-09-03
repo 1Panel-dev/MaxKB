@@ -25,7 +25,7 @@ from common.exception.app_exception import AppApiException
 from common.utils.common import get_file_content
 from common.utils.fork import Fork
 from common.utils.logger import maxkb_logger
-from knowledge.models import Document, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
+from knowledge.models import Document, DocumentResourceType, KnowledgeWorkflow, KnowledgeWorkflowVersion, KnowledgeType
 from knowledge.models import Paragraph, Problem, ProblemParagraphMapping, Knowledge, File
 from knowledge.serializers.document_strategy import DocumentStrategySerializer
 from maxkb.conf import PROJECT_DIR
@@ -54,6 +54,12 @@ class MetaSerializer(serializers.Serializer):
 
 class BatchSerializer(serializers.Serializer):
     id_list = serializers.ListField(required=True, child=serializers.UUIDField(required=True), label=_("id list"))
+    resource_type = serializers.ChoiceField(
+        required=False,
+        default=DocumentResourceType.DOCUMENT,
+        choices=DocumentResourceType.choices,
+        label=_("resource type"),
+    )
 
     def is_valid(self, *, model=None, raise_exception=False):
         super().is_valid(raise_exception=True)

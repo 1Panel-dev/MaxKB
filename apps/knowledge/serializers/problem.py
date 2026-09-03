@@ -20,12 +20,15 @@ from maxkb.const import PROJECT_DIR
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
-        fields = ["id", "content", "knowledge_id", "create_time", "update_time"]
+        fields = ["id", "content", "knowledge_id", "hit_num", "last_hit_time", "create_time", "update_time"]
+        read_only_fields = ["hit_num", "last_hit_time"]
 
 
 class ProblemInstanceSerializer(serializers.Serializer):
     id = serializers.CharField(required=False, label=_("problem id"))
     content = serializers.CharField(required=True, max_length=256, label=_("content"))
+    hit_num = serializers.IntegerField(read_only=True, label=_("recall count"))
+    last_hit_time = serializers.DateTimeField(read_only=True, allow_null=True, label=_("last recall time"))
 
 
 class ProblemEditSerializer(serializers.Serializer):

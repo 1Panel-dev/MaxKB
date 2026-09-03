@@ -26,7 +26,6 @@ from knowledge.models import (
     SyncState,
 )
 from knowledge.services.document_strategy import (
-    PROCESSOR_VERSION,
     document_source_hash,
     normalize_document_strategy,
     strategy_hashes,
@@ -85,8 +84,9 @@ class ImageDocumentService:
         position = file.tell()
         try:
             image = Image.open(file)
+            image_format = image.format
             image.verify()
-            if extension not in IMAGE_FORMAT_EXTENSIONS.get(image.format, set()):
+            if extension not in IMAGE_FORMAT_EXTENSIONS.get(image_format, set()):
                 raise AppApiException(500, _("The image content does not match its file extension"))
         except (UnidentifiedImageError, OSError, Image.DecompressionBombError) as exc:
             raise AppApiException(500, _("The uploaded file is not a valid image")) from exc
@@ -94,7 +94,7 @@ class ImageDocumentService:
             file.seek(position)
 
     @staticmethod
-    def _run_visual_processor(file: File, strategy: Dict) -> Dict:
+    def _run_visual_processor(file: File, strategy: Dict, workspace_id: str) -> Dict:
         visual = strategy["visual"]
         if not visual["enabled"]:
             return {
@@ -106,24 +106,26 @@ class ImageDocumentService:
                 "meta": {},
             }
         try:
-            processor = resolve_visual_processor(visual)
+            processor = resolve_visual_processor(visual, workspace_id)
             if processor is None:
                 raise ValueError("visual processor adapter is unavailable")
             asset = ParagraphAsset(file=file, file_id=file.id, position=1)
             output = processor(asset, visual) or {}
+            caption = str(output.get("caption") or "")
             return {
-                "caption": str(output.get("caption") or ""),
+                "caption": caption,
                 "ocr_text": str(output.get("ocr_text") or ""),
-                "description": str(output.get("description") or ""),
+                "description": str(output.get("description") or caption or Path(file.file_name).stem),
                 "process_status": AssetProcessStatus.SUCCESS,
                 "process_error": "",
                 "meta": output.get("meta") if isinstance(output.get("meta"), dict) else {},
             }
         except Exception as exc:
+            original_text = Path(file.file_name).stem
             return {
                 "caption": "",
                 "ocr_text": "",
-                "description": "",
+                "description": original_text,
                 "process_status": AssetProcessStatus.FAILURE,
                 "process_error": str(exc)[:2000],
                 "meta": {},
@@ -199,7 +201,7 @@ class ImageDocumentService:
                 meta={"knowledge_id": self.knowledge_id, "upload_size": upload.size},
             )
             file.save(content)
-            processed = self._run_visual_processor(file, normalized_strategy)
+            processed = self._run_visual_processor(file, normalized_strategy, self.workspace_id)
             preview = {
                 **processed,
                 "doc_strategy": normalized_strategy,
@@ -276,7 +278,6 @@ class ImageDocumentService:
                 resource_type=DocumentResourceType.IMAGE,
                 doc_strategy=strategy,
                 source_hash=document_source_hash([{"title": Path(file.file_name).stem, "content": content}]),
-                processor_version=PROCESSOR_VERSION,
                 meta={
                     "source_file_id": str(file.id),
                     "allow_download": True,
@@ -322,7 +323,6 @@ class ImageDocumentService:
                 process_status=preview.get("process_status", AssetProcessStatus.PENDING),
                 process_error=preview.get("process_error", ""),
                 visual_strategy_hash=hashes["visual_strategy_hash"],
-                processor_version=PROCESSOR_VERSION,
                 meta=preview.get("meta") if isinstance(preview.get("meta"), dict) else {},
             )
             IncrementalDocumentSync(document, strategy)._sync_title_questions([paragraph])

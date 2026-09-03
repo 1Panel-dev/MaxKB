@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import SimpleTestCase
 from django.utils import timezone
 from knowledge.models import (
+    AssetProcessStatus,
     ContentOrigin,
     Document,
     DocumentResourceType,
@@ -25,6 +26,7 @@ from knowledge.models import (
     SearchMode,
     SourceType,
     SyncState,
+    ParagraphAsset,
 )
 from knowledge.models.knowledge_action import State as KnowledgeActionState
 from knowledge.serializers.document import DocumentSerializers, DocumentWebInstanceSerializer
@@ -41,6 +43,7 @@ from knowledge.serializers.knowledge_sync import (
     KnowledgeSyncSettingRequest,
 )
 from knowledge.serializers.knowledge_workflow import KnowledgeWorkflowActionSerializer
+from knowledge.serializers.problem import ProblemInstanceSerializer, ProblemSerializer
 from knowledge.services.document_strategy import (
     apply_length_strategy,
     document_source_hash,
@@ -54,9 +57,22 @@ from knowledge.services.knowledge_sync_schedule import (
     deploy_knowledge_sync_job,
     normalize_knowledge_sync_setting,
 )
-from knowledge.services.multimodal_retrieval import load_image_query_inputs
-from knowledge.services.paragraph_assets import paragraph_content_schema
-from knowledge.services.retrieval_stats import collect_recall_source_ids, get_recall_tracker, record_recall
+from knowledge.services.multimodal_retrieval import get_hit_asset_map, load_image_query_inputs
+from knowledge.services.paragraph_assets import (
+    embed_paragraph_assets,
+    paragraph_asset_source_key,
+    paragraph_content_schema,
+    process_visual_assets,
+    resolve_visual_processor,
+    sync_paragraph_assets,
+)
+from knowledge.services.retrieval_stats import (
+    collect_recall_asset_ids,
+    collect_recall_source_ids,
+    get_recall_tracker,
+    record_recall,
+)
+from knowledge.services.workflow_sync import merge_workflow_incremental_snapshot, workflow_document_identity
 from knowledge.task.handler import get_save_handler, get_sync_handler, normalize_web_url
 from knowledge.task.sync import (
     get_selector_list,
@@ -69,6 +85,26 @@ from knowledge.vector.pg_vector import PGVector
 from knowledge.web_assets import internalize_web_images
 from PIL import Image
 from rest_framework.exceptions import ValidationError
+
+
+class ProblemRecallSerializerTests(SimpleTestCase):
+    def test_problem_serializers_include_recall_statistics(self):
+        recalled_at = timezone.now()
+        problem = Problem(
+            id="00000000-0000-0000-0000-000000000040",
+            knowledge_id="00000000-0000-0000-0000-000000000041",
+            content="How does image retrieval work?",
+            hit_num=7,
+            last_hit_time=recalled_at,
+        )
+
+        model_data = ProblemSerializer(problem).data
+        instance_data = ProblemInstanceSerializer(problem).data
+
+        self.assertEqual(model_data["hit_num"], 7)
+        self.assertIsNotNone(model_data["last_hit_time"])
+        self.assertEqual(instance_data["hit_num"], 7)
+        self.assertIsNotNone(instance_data["last_hit_time"])
 
 
 class MultimodalHitTestTests(SimpleTestCase):
@@ -130,6 +166,34 @@ class MultimodalHitTestTests(SimpleTestCase):
         )
 
         self.assertEqual(image_inputs, ["data:image/png;base64,aW1hZ2UtY29udGVudA=="])
+
+    @patch("knowledge.services.multimodal_retrieval.ParagraphAsset.objects.select_related")
+    def test_image_hit_includes_asset_recall_statistics(self, select_related):
+        recalled_at = timezone.now()
+        asset = MagicMock(
+            id="00000000-0000-0000-0000-000000000004",
+            file_id="00000000-0000-0000-0000-000000000005",
+            position=1,
+            caption="chart",
+            ocr_text="revenue 100",
+            description="upward trend",
+            hit_num=7,
+            last_hit_time=recalled_at,
+        )
+        asset.file.file_name = "chart.png"
+        select_related.return_value.filter.return_value = [asset]
+
+        result = get_hit_asset_map(
+            [
+                {
+                    "source_id": str(asset.id),
+                    "source_type": SourceType.IMAGE.value,
+                }
+            ]
+        )
+
+        self.assertEqual(result[str(asset.id)]["hit_num"], 7)
+        self.assertEqual(result[str(asset.id)]["last_hit_time"], recalled_at.isoformat())
 
 
 class ImageDocumentTests(SimpleTestCase):
@@ -359,6 +423,15 @@ class RecallStatisticsTests(SimpleTestCase):
         self.assertEqual(paragraph_ids, {"paragraph-1", "paragraph-2"})
         self.assertEqual(problem_mapping_ids, {"mapping-1"})
 
+    def test_collects_unique_winning_image_asset_ids(self):
+        recall_items = [
+            {"paragraph_id": "paragraph-1", "source_type": SourceType.IMAGE.value, "source_id": "asset-1"},
+            {"paragraph_id": "paragraph-1", "source_type": SourceType.IMAGE.value, "source_id": "asset-1"},
+            {"paragraph_id": "paragraph-2", "source_type": SourceType.PARAGRAPH.value, "source_id": "asset-2"},
+        ]
+
+        self.assertEqual(collect_recall_asset_ids(recall_items), {"asset-1"})
+
     def test_ignores_problem_mapping_when_paragraph_content_wins(self):
         paragraph_ids, problem_mapping_ids = collect_recall_source_ids(
             [{"paragraph_id": "paragraph-1", "source_type": SourceType.PARAGRAPH.value, "source_id": "mapping-1"}]
@@ -389,16 +462,19 @@ class RecallStatisticsTests(SimpleTestCase):
         mapping_query.filter.return_value.values_list.return_value = ["problem-1", "problem-1"]
         document_query = MagicMock()
         problem_query = MagicMock()
+        asset_query = MagicMock()
         queries = {
             Paragraph: paragraph_query,
             ProblemParagraphMapping: mapping_query,
             Document: document_query,
             Problem: problem_query,
+            ParagraphAsset: asset_query,
         }
         query_set.side_effect = lambda model: queries[model]
         recall_items = [
             {"paragraph_id": "paragraph-1", "source_type": SourceType.PROBLEM.value, "source_id": "mapping-1"},
             {"paragraph_id": "paragraph-2", "source_type": SourceType.PARAGRAPH.value, "source_id": "paragraph-2"},
+            {"paragraph_id": "paragraph-2", "source_type": SourceType.IMAGE.value, "source_id": "asset-1"},
         ]
         recalled_at = timezone.now()
         tracker = {}
@@ -409,9 +485,11 @@ class RecallStatisticsTests(SimpleTestCase):
         self.assertEqual(paragraph_filter.update.call_count, 1)
         self.assertEqual(document_query.filter.return_value.update.call_count, 1)
         self.assertEqual(problem_query.filter.return_value.update.call_count, 1)
+        self.assertEqual(asset_query.filter.return_value.update.call_count, 1)
         self.assertEqual(paragraph_filter.update.call_args.kwargs["last_hit_time"], recalled_at)
         self.assertEqual(document_query.filter.return_value.update.call_args.kwargs["last_hit_time"], recalled_at)
         self.assertEqual(problem_query.filter.return_value.update.call_args.kwargs["last_hit_time"], recalled_at)
+        self.assertEqual(asset_query.filter.return_value.update.call_args.kwargs["last_hit_time"], recalled_at)
 
 
 class DocumentStrategyTests(SimpleTestCase):
@@ -926,44 +1004,29 @@ class KnowledgeScheduleTests(SimpleTestCase):
 
 
 class WorkflowKnowledgeScheduleTests(SimpleTestCase):
+    @patch("application.flow.i_step_node.merge_workflow_incremental_snapshot")
     @patch("application.flow.i_step_node.get_workflow_state", return_value=KnowledgeActionState.SUCCESS)
     @patch("application.flow.i_step_node.QuerySet")
-    def test_incremental_workflow_discards_an_unchanged_duplicate(self, query_set, _get_workflow_state):
+    def test_incremental_workflow_uses_stable_snapshot_merge(
+        self, query_set, _get_workflow_state, merge_workflow_snapshot
+    ):
         sync_log = MagicMock(
             id="00000000-0000-0000-0000-000000000032",
             knowledge_id="00000000-0000-0000-0000-000000000033",
             create_time=timezone.now(),
             sync_type=KnowledgeSyncType.INCREMENTAL,
         )
-        new_document = MagicMock(id="00000000-0000-0000-0000-000000000034")
-        new_document.name = "source document"
-        old_document = MagicMock(id="00000000-0000-0000-0000-000000000035")
-        old_document.name = "source document"
         action_query = MagicMock()
         log_query = MagicMock()
         log_query.filter.return_value.first.return_value = sync_log
-        document_query = MagicMock()
-
-        def filter_documents(**kwargs):
-            filtered = MagicMock()
-            if "create_time__gte" in kwargs:
-                filtered.__iter__.return_value = iter([new_document])
-            elif "create_time__lt" in kwargs:
-                filtered.__iter__.return_value = iter([old_document])
-            else:
-                filtered.count.return_value = 1
-            return filtered
-
-        document_query.filter.side_effect = filter_documents
-        paragraph_query = MagicMock()
-        paragraph_filtered = MagicMock()
-        paragraph_filtered.order_by.return_value.values_list.return_value = [("title", "content")]
-        paragraph_query.filter.return_value = paragraph_filtered
-        query_set.side_effect = lambda model: {
-            KnowledgeSyncLog: log_query,
-            Document: document_query,
-            Paragraph: paragraph_query,
-        }.get(model, action_query)
+        query_set.side_effect = lambda model: log_query if model is KnowledgeSyncLog else action_query
+        merge_workflow_snapshot.return_value = {
+            "total_count": 1,
+            "synced_count": 0,
+            "skipped_count": 1,
+            "deleted_count": 0,
+            "failed_count": 0,
+        }
         workflow = MagicMock(context={"start_time": timezone.now().timestamp()})
         document_cleanup = MagicMock()
 
@@ -974,7 +1037,7 @@ class WorkflowKnowledgeScheduleTests(SimpleTestCase):
             document_cleanup,
         ).handler(workflow)
 
-        document_cleanup.assert_called_once_with([new_document.id])
+        merge_workflow_snapshot.assert_called_once_with(sync_log)
         update = log_query.filter.return_value.update.call_args.kwargs
         self.assertEqual(update["status"], KnowledgeSyncStatus.SUCCESS)
         self.assertEqual(update["synced_count"], 0)
@@ -1129,6 +1192,30 @@ class IncrementalSyncTests(SimpleTestCase):
         self.assertEqual(paragraph.sync_state, SyncState.CONFLICT)
         self.assertEqual(result.conflict_ids, [str(paragraph.id)])
 
+    @patch("knowledge.services.incremental_sync.Paragraph.objects")
+    @patch("knowledge.services.incremental_sync.Document.objects")
+    def test_empty_remote_snapshot_keeps_existing_synced_paragraphs(self, document_objects, paragraph_objects):
+        document = Document(id="00000000-0000-0000-0000-000000000001", name="doc", char_length=4)
+        synced_paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000002",
+            document=document,
+            knowledge_id="00000000-0000-0000-0000-000000000003",
+            title="Title",
+            content="body",
+            origin=ContentOrigin.SYNCED,
+            sync_state=SyncState.ACTIVE,
+        )
+        document_objects.select_for_update.return_value.get.return_value = document
+        paragraph_objects.select_for_update.return_value.filter.return_value.order_by.return_value = [synced_paragraph]
+        synced_paragraph.save = MagicMock()
+        service = IncrementalDocumentSync(document)
+
+        with self.assertRaisesRegex(ValueError, "empty paragraph snapshot"):
+            IncrementalDocumentSync.merge.__wrapped__(service, [])
+
+        document_objects.select_for_update.assert_called_once_with()
+        synced_paragraph.save.assert_not_called()
+
     @patch("knowledge.serializers.document.IncrementalDocumentSync")
     @patch("knowledge.serializers.document.process_visual_assets")
     @patch("knowledge.serializers.document.sync_paragraph_assets", return_value=[])
@@ -1188,3 +1275,288 @@ class ParagraphAssetTests(SimpleTestCase):
 
         self.assertEqual([block["type"] for block in schema], ["text", "image", "text"])
         self.assertEqual(schema[1]["caption"], "chart")
+
+    def test_asset_source_key_does_not_change_with_file_content(self):
+        paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000001",
+            source_key="heading:overview:1",
+        )
+
+        source_key = paragraph_asset_source_key(paragraph, 1)
+
+        self.assertEqual(source_key, "heading:overview:1:image:1")
+        self.assertNotIn("hash", source_key)
+
+    @patch("knowledge.services.paragraph_assets.File.objects")
+    @patch("knowledge.services.paragraph_assets.ParagraphAsset.objects")
+    def test_synced_asset_moves_by_hash_without_changing_identity(self, asset_objects, file_objects):
+        old_asset = MagicMock(
+            id="00000000-0000-0000-0000-000000000061",
+            document_id="00000000-0000-0000-0000-000000000062",
+            paragraph_id="00000000-0000-0000-0000-000000000063",
+            origin=ContentOrigin.SYNCED,
+            source_asset_key="heading:old:1:image:1",
+            source_hash="same-image",
+            caption="old",
+            ocr_text="ocr",
+            description="description",
+            paragraph=MagicMock(is_active=False, sync_state=SyncState.REMOTE_DELETED),
+        )
+        asset_objects.select_for_update.return_value.select_related.return_value.filter.return_value.order_by.return_value = [
+            old_asset
+        ]
+        image_file = MagicMock(
+            id="00000000-0000-0000-0000-000000000064",
+            sha256_hash="same-image",
+        )
+        file_objects.filter.return_value.first.return_value = image_file
+        paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000065",
+            document_id=old_asset.document_id,
+            knowledge_id="00000000-0000-0000-0000-000000000066",
+            title="new",
+            content=f"![image](./oss/file/{image_file.id})",
+            origin=ContentOrigin.SYNCED,
+        )
+        paragraph.save = MagicMock()
+
+        assets = sync_paragraph_assets.__wrapped__([paragraph])
+
+        self.assertEqual(assets, [old_asset])
+        self.assertEqual(old_asset.paragraph_id, paragraph.id)
+        self.assertEqual(old_asset.source_asset_key, "heading:old:1:image:1")
+        asset_objects.filter.assert_called_once_with(
+            paragraph_id__in={paragraph.id},
+            origin=ContentOrigin.SYNCED,
+        )
+
+    @patch("knowledge.services.paragraph_assets.ParagraphAsset.objects")
+    def test_remote_delete_cleanup_is_limited_to_synced_assets(self, asset_objects):
+        asset_objects.select_for_update.return_value.select_related.return_value.filter.return_value.order_by.return_value = []
+        paragraph = Paragraph(
+            id="00000000-0000-0000-0000-000000000067",
+            document_id="00000000-0000-0000-0000-000000000068",
+            knowledge_id="00000000-0000-0000-0000-000000000069",
+            title="manual",
+            content="text only",
+            origin=ContentOrigin.MANUAL,
+        )
+        paragraph.save = MagicMock()
+
+        sync_paragraph_assets.__wrapped__([paragraph])
+
+        asset_objects.filter.assert_called_once_with(
+            paragraph_id__in={paragraph.id},
+            origin=ContentOrigin.SYNCED,
+        )
+
+
+class DocumentResourceIsolationTests(SimpleTestCase):
+    @patch("knowledge.serializers.document.QuerySet")
+    def test_batch_document_operation_rejects_image_ids_by_default(self, query_set):
+        document_query = MagicMock()
+        document_query.filter.return_value.values_list.return_value = []
+        query_set.return_value = document_query
+        serializer = DocumentSerializers.Batch(
+            data={
+                "workspace_id": "workspace-id",
+                "knowledge_id": "00000000-0000-0000-0000-000000000071",
+            }
+        )
+
+        with self.assertRaises(AppApiException):
+            serializer.validate_document_ids({"id_list": ["00000000-0000-0000-0000-000000000072"]})
+
+        document_query.filter.assert_called_once_with(
+            id__in=["00000000-0000-0000-0000-000000000072"],
+            knowledge_id="00000000-0000-0000-0000-000000000071",
+            resource_type=DocumentResourceType.DOCUMENT,
+        )
+
+
+class WorkflowDocumentIdentityTests(SimpleTestCase):
+    def test_stable_source_metadata_takes_priority_over_document_name(self):
+        first = Document(name="Old name", meta={"source_key": "source-1"})
+        renamed = Document(name="New name", meta={"source_key": "source-1"})
+
+        self.assertEqual(workflow_document_identity(first), workflow_document_identity(renamed))
+
+    @patch("knowledge.services.workflow_sync._delete_workflow_documents")
+    @patch("knowledge.services.workflow_sync.process_visual_assets")
+    @patch("knowledge.services.workflow_sync.sync_paragraph_assets", return_value=[])
+    @patch("knowledge.services.workflow_sync.IncrementalDocumentSync")
+    @patch("knowledge.services.workflow_sync.QuerySet")
+    def test_incremental_snapshot_merges_into_old_document_id(
+        self,
+        query_set,
+        incremental_sync,
+        _sync_assets,
+        _process_assets,
+        delete_documents,
+    ):
+        sync_log = MagicMock(
+            knowledge_id="00000000-0000-0000-0000-000000000081",
+            create_time=timezone.now(),
+        )
+        old_document = MagicMock(
+            id="00000000-0000-0000-0000-000000000082",
+            knowledge_id=sync_log.knowledge_id,
+            name="Old",
+            meta={"source_key": "source-1"},
+            doc_strategy={},
+            visual_strategy_hash="visual",
+        )
+        new_document = MagicMock(
+            id="00000000-0000-0000-0000-000000000083",
+            knowledge_id=sync_log.knowledge_id,
+            name="Renamed",
+            meta={"source_key": "source-1"},
+            doc_strategy={},
+        )
+        source_paragraph = MagicMock(
+            id="00000000-0000-0000-0000-000000000084",
+            title="Title",
+            content="Content",
+            source_key="block-1",
+            source_updated_at=None,
+        )
+        target_paragraph = MagicMock(source_key="block-1")
+        document_query = MagicMock()
+
+        def filter_documents(**kwargs):
+            result = MagicMock()
+            if "create_time__gte" in kwargs:
+                result.__iter__.return_value = iter([new_document])
+            elif "create_time__lt" in kwargs:
+                result.__iter__.return_value = iter([old_document])
+            else:
+                result.count.return_value = 1
+            return result
+
+        document_query.filter.side_effect = filter_documents
+        paragraph_query = MagicMock()
+
+        def filter_paragraphs(**kwargs):
+            result = MagicMock()
+            if kwargs.get("document_id") == new_document.id:
+                result.order_by.return_value = [source_paragraph]
+            else:
+                result.__iter__.return_value = iter([target_paragraph])
+            return result
+
+        paragraph_query.filter.side_effect = filter_paragraphs
+        empty_relation_query = MagicMock()
+        empty_relation_query.filter.return_value.__iter__.return_value = iter([])
+        empty_relation_query.filter.return_value.values_list.return_value = []
+        file_query = MagicMock()
+        knowledge_query = MagicMock()
+        query_set.side_effect = lambda model: {
+            Document: document_query,
+            Paragraph: paragraph_query,
+            ProblemParagraphMapping: empty_relation_query,
+            FileSourceType: file_query,
+            Knowledge: knowledge_query,
+        }.get(model, empty_relation_query)
+        incremental_sync.return_value.merge.return_value = MergeResult()
+        delete_documents.return_value = [str(new_document.id)]
+
+        stats = merge_workflow_incremental_snapshot.__wrapped__(sync_log)
+
+        incremental_sync.assert_called_once_with(old_document, new_document.doc_strategy)
+        delete_documents.assert_called_once_with([str(new_document.id)])
+        self.assertEqual(old_document.id, "00000000-0000-0000-0000-000000000082")
+        self.assertEqual(stats["skipped_count"], 1)
+
+    @patch("knowledge.services.paragraph_assets._write_asset_description")
+    def test_visual_failure_preserves_existing_text_as_description(self, write_description):
+        asset = MagicMock()
+        asset.caption = "original caption"
+        asset.ocr_text = ""
+        asset.description = ""
+        asset.meta = {}
+
+        process_visual_assets(
+            [asset],
+            {"visual": {"enabled": True, "strategy": "model", "model_id": "model-id"}},
+            processor=MagicMock(side_effect=RuntimeError("vision failed")),
+        )
+
+        self.assertEqual(asset.process_status, AssetProcessStatus.FAILURE)
+        self.assertEqual(asset.description, "original caption")
+        asset.save.assert_called_once()
+        write_description.assert_called_once_with(asset)
+
+    @patch("knowledge.services.paragraph_assets.get_model_by_id")
+    def test_rejects_non_vision_model_for_visual_processing(self, get_model_by_id):
+        get_model_by_id.return_value.model_type = "LLM"
+
+        with self.assertRaises(AppApiException):
+            resolve_visual_processor(
+                {"strategy": "model", "model_id": "00000000-0000-0000-0000-000000000001"},
+                "workspace-1",
+            )
+
+    @patch("knowledge.services.paragraph_assets.Tool.objects.filter")
+    @patch("knowledge.services.paragraph_assets.filter_authorized_ids", return_value=[])
+    def test_rejects_unauthorized_visual_tool(self, filter_authorized_ids, tool_filter):
+        tool_filter.return_value.first.return_value = None
+        with self.assertRaises(AppApiException):
+            resolve_visual_processor(
+                {"strategy": "tool", "tool_id": "00000000-0000-0000-0000-000000000001"},
+                "workspace-1",
+            )
+
+        filter_authorized_ids.assert_called_once()
+        tool_filter.assert_called_once_with(id__in=[], is_active=True)
+
+    @patch("knowledge.services.paragraph_assets.Embedding.objects.bulk_create")
+    @patch("knowledge.services.paragraph_assets.ParagraphAsset.objects.select_related")
+    def test_text_only_embedding_model_indexes_image_description(self, select_related, bulk_create):
+        asset = MagicMock(spec=ParagraphAsset)
+        asset.id = "00000000-0000-0000-0000-000000000001"
+        asset.knowledge_id = "00000000-0000-0000-0000-000000000002"
+        asset.document_id = "00000000-0000-0000-0000-000000000003"
+        asset.paragraph_id = "00000000-0000-0000-0000-000000000004"
+        asset.position = 1
+        asset.caption = "chart"
+        asset.ocr_text = "revenue 100"
+        asset.description = "an upward trend"
+        asset.paragraph.is_active = True
+        select_related.return_value.filter.return_value.order_by.return_value = [asset]
+        embedding_model = MagicMock()
+        embedding_model.supports_image_embedding.return_value = False
+        embedding_model.embed_documents.return_value = [[0.1, 0.2]]
+
+        count = embed_paragraph_assets([asset.paragraph_id], embedding_model)
+
+        self.assertEqual(count, 1)
+        embedding_model.embed_documents.assert_called_once_with(["chart\nrevenue 100\nan upward trend"])
+        embedding_model.embed_images.assert_not_called()
+        row = bulk_create.call_args.args[0][0]
+        self.assertEqual(row.meta["unit_type"], "text")
+        self.assertEqual(row.meta["content_type"], "image_description")
+
+    @patch("knowledge.services.paragraph_assets.Embedding.objects.bulk_create")
+    @patch("knowledge.services.paragraph_assets.ParagraphAsset.objects.select_related")
+    def test_rejects_incomplete_image_embedding_result(self, select_related, bulk_create):
+        asset = MagicMock(spec=ParagraphAsset)
+        asset.id = "00000000-0000-0000-0000-000000000001"
+        asset.knowledge_id = "00000000-0000-0000-0000-000000000002"
+        asset.document_id = "00000000-0000-0000-0000-000000000003"
+        asset.paragraph_id = "00000000-0000-0000-0000-000000000004"
+        asset.position = 1
+        asset.caption = ""
+        asset.ocr_text = ""
+        asset.description = ""
+        asset.paragraph.is_active = True
+        asset.file.file_name = "chart.png"
+        asset.file.get_bytes.return_value = b"image"
+        select_related.return_value.filter.return_value.order_by.return_value = [asset]
+        embedding_model = MagicMock()
+        embedding_model.supports_image_embedding.return_value = True
+        embedding_model.embed_images.return_value = []
+
+        with self.assertRaises(AppApiException):
+            embed_paragraph_assets([asset.paragraph_id], embedding_model)
+
+        bulk_create.assert_not_called()

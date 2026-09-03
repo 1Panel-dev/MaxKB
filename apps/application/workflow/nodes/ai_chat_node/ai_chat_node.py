@@ -145,6 +145,33 @@ def _process_images(image):
     return images
 
 
+def _get_upstream_knowledge_images(workflow_manage, node_id):
+    """Collect image hits produced by executed upstream knowledge-search nodes."""
+    workflow = workflow_manage.workflow
+    pending_node_ids = [node_id]
+    visited_node_ids = set()
+    image_list = []
+    seen_file_ids = set()
+
+    while pending_node_ids:
+        current_node_id = pending_node_ids.pop()
+        if current_node_id in visited_node_ids:
+            continue
+        visited_node_ids.add(current_node_id)
+        for edge_node in workflow.up_node_map.get(current_node_id, []):
+            upstream_node = edge_node.node
+            pending_node_ids.append(upstream_node.id)
+            if upstream_node.type != "search-knowledge-node":
+                continue
+            for image in workflow_manage.get_context(upstream_node.id, "image_list") or []:
+                file_id = str(image.get("file_id") or "")
+                if not file_id or file_id in seen_file_ids:
+                    continue
+                seen_file_ids.add(file_id)
+                image_list.append(image)
+    return image_list
+
+
 def _process_videos(video, video_model):
     videos = []
     if isinstance(video, str) and video.startswith("http"):
@@ -301,6 +328,9 @@ class AIChatNode(INode):
             if image_list:
                 image = self.workflow_manage.get_reference_field(image_list[0], image_list[1:])
                 images = _process_images(image)
+            recalled_images = _get_upstream_knowledge_images(self.workflow_manage, self.get_node_id())
+            if recalled_images:
+                images.extend(_process_images(recalled_images))
             if video_list:
                 video = self.workflow_manage.get_reference_field(video_list[0], video_list[1:])
                 videos = _process_videos(video, model)

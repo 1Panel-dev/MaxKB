@@ -7,9 +7,6 @@ from typing import Dict, Iterable, List
 
 from common.utils.split_model import SplitModel, get_split_model
 
-
-PROCESSOR_VERSION = "v1"
-
 DEFAULT_DOCUMENT_STRATEGY = {
     "split": {
         "mode": "smart",

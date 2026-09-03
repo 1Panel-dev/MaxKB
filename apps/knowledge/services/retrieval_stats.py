@@ -7,7 +7,7 @@ from django.db.models import F, QuerySet
 from django.utils import timezone
 
 from common.utils.logger import maxkb_logger
-from knowledge.models import Document, Paragraph, Problem, ProblemParagraphMapping, SourceType
+from knowledge.models import Document, Paragraph, ParagraphAsset, Problem, ProblemParagraphMapping, SourceType
 
 
 def _value(item, key):
@@ -33,6 +33,16 @@ def collect_recall_source_ids(recall_items: Iterable) -> tuple[set[str], set[str
     return paragraph_ids, problem_mapping_ids
 
 
+def collect_recall_asset_ids(recall_items: Iterable) -> set[str]:
+    """收集最终命中图片检索单元对应的资产 ID。"""
+    return {
+        str(source_id)
+        for item in recall_items or []
+        if str(_value(item, "source_type")) == str(SourceType.IMAGE.value)
+        and (source_id := _value(item, "source_id")) is not None
+    }
+
+
 def _only_new_ids(tracker: dict | None, key: str, ids: set[str]) -> set[str]:
     if tracker is None:
         return ids
@@ -51,12 +61,15 @@ def get_recall_tracker(owner) -> dict:
 
 
 def record_recall(recall_items: Iterable, tracker: dict | None = None, recalled_at=None) -> None:
+    recall_items = list(recall_items or [])
     paragraph_ids, problem_mapping_ids = collect_recall_source_ids(recall_items)
+    asset_ids = collect_recall_asset_ids(recall_items)
     if not paragraph_ids:
         return
 
     paragraph_document_pairs = QuerySet(Paragraph).filter(id__in=paragraph_ids).values_list("id", "document_id")
     existing_paragraph_ids = {str(paragraph_id) for paragraph_id, _ in paragraph_document_pairs}
+    recalled_paragraph_ids = existing_paragraph_ids
     document_ids = {str(document_id) for _, document_id in paragraph_document_pairs}
 
     problem_ids = set()
@@ -73,6 +86,7 @@ def record_recall(recall_items: Iterable, tracker: dict | None = None, recalled_
         existing_paragraph_ids = _only_new_ids(tracker, "paragraph_ids", existing_paragraph_ids)
         document_ids = _only_new_ids(tracker, "document_ids", document_ids)
         problem_ids = _only_new_ids(tracker, "problem_ids", problem_ids)
+        asset_ids = _only_new_ids(tracker, "asset_ids", asset_ids)
     recalled_at = recalled_at or timezone.now()
 
     with transaction.atomic():
@@ -84,6 +98,11 @@ def record_recall(recall_items: Iterable, tracker: dict | None = None, recalled_
             QuerySet(Document).filter(id__in=document_ids).update(hit_num=F("hit_num") + 1, last_hit_time=recalled_at)
         if problem_ids:
             QuerySet(Problem).filter(id__in=problem_ids).update(hit_num=F("hit_num") + 1, last_hit_time=recalled_at)
+        if asset_ids:
+            QuerySet(ParagraphAsset).filter(
+                id__in=asset_ids,
+                paragraph_id__in=recalled_paragraph_ids,
+            ).update(hit_num=F("hit_num") + 1, last_hit_time=recalled_at)
 
 
 def record_recall_safely(recall_items: Iterable, tracker: dict | None = None) -> None:

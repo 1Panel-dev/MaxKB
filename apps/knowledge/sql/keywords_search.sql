@@ -2,6 +2,7 @@ SELECT
     paragraph_id,
 	source_id,
 	source_type,
+	meta,
 	comprehensive_score,
 	comprehensive_score as similarity
 FROM
