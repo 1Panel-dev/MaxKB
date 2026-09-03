@@ -77,7 +77,19 @@ class TencentEmbeddingModel(MaxKBBaseEmbeddingModel):
     def embed_images(self, images: List[str]) -> List[List[float]]:
         if not self.supports_image_embedding():
             return []
-        return [self._embed_multimodal([{"type": "image_url", "image_url": {"url": url}}]) for url in images]
+        return [
+            self._embed_multimodal([{"type": "image_url", "image_url": {"url": self._to_base64_content(url)}}])
+            for url in images
+        ]
+
+    @staticmethod
+    def _to_base64_content(url: str) -> str:
+        """TokenHub 的 image_url.url 接受 URL 或 base64 内容。
+
+        MaxKB 传入的图片是 data:image/...;base64,xxx 形式的 data URL，
+        这里剥掉 data: 前缀，转换为纯 base64 内容再交给接口。
+        """
+        return MaxKBBaseEmbeddingModel.normalize_image_input(url, keep_data_prefix=False)
 
     def _embed_multimodal(self, items: list) -> List[float]:
         payload = {"model": self.model_name, "input": items, "encoding_format": "float", **self.params}
