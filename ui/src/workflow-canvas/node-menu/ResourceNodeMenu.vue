@@ -129,7 +129,7 @@ onMounted(() => {
 
 <template>
   <div class="flex h-140 min-h-0">
-    <aside class="w-sidebar-expanded border-r pt-3">
+    <aside class="flex w-sidebar-expanded shrink-0 border-r pt-3">
       <FolderTree v-model="currentFolderId" :can-edit="false" :show-shared="isToolMenu" :source="source" @select="loadResources" />
     </aside>
 

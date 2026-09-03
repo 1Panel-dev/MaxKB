@@ -380,7 +380,7 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
       </MkListItem>
     </div>
 
-    <div class="min-h-0 flex-1">
+    <div class="min-h-0 flex-1 pl-4 pr-1 pb-4">
       <VirtualizedTree
         :currentNodeKey="currentNodeKey"
         :canEdit="canEdit"
@@ -389,7 +389,6 @@ defineExpose({ refresh: loadFolders, openCreate: handleOpenCreateFolder })
         @node-drop="handleFolderDrop"
         @node-click="handleFolderClick"
         :draggable="draggable"
-        class="pl-4 pr-1 pb-4"
       >
         <template #default="{ node }">
           <MkIcon name="icon_file-folder_colorful" class="mr-2" :size="18" />

@@ -155,6 +155,7 @@ function handleAfterDrop() {
   scrollbar-color: transparent transparent;
   scrollbar-width: thin;
 
+
   &::-webkit-scrollbar {
     background-color: transparent;
     height: 6px;
