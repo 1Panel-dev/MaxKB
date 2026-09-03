@@ -57,7 +57,7 @@ dependencies = [
     "markdownify==1.2.3",
     "openpyxl==3.1.5",
     "pydub==0.25.1",
-    "pypdf==6.15.0",
+    "pypdf==6.16.2",
     "pysilk==0.0.1",
     "python-docx==1.2.0",
     "xlrd==2.0.2",
