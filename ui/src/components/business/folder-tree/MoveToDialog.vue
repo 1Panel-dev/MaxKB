@@ -38,8 +38,23 @@ defineExpose({ close, open })
 </script>
 
 <template>
-  <MkDialog align-center v-model="visible" class="move-to-dialog" content-class="move-to-dialog__content" title="移动到" :show-close="!loading" @closed="resetData">
-    <FolderTree v-model="selectedTargetId" class="move-to-dialog__folder-tree" :can-edit="false" :show-all="false" :show-shared="false" :source="source" />
+  <MkDialog
+    align-center
+    v-model="visible"
+    class="move-to-dialog"
+    content-class="move-to-dialog__content"
+    title="移动到"
+    :show-close="!loading"
+    @closed="resetData"
+  >
+    <FolderTree
+      v-model="selectedTargetId"
+      class="move-to-dialog__folder-tree"
+      :can-edit="false"
+      :show-all="false"
+      :show-shared="false"
+      :source="source"
+    />
 
     <template #footer>
       <el-button :disabled="loading" @click="visible = false">取消</el-button>
@@ -67,6 +82,7 @@ defineExpose({ close, open })
       overflow: hidden;
       border: var(--el-border);
       border-radius: var(--el-border-radius-base);
+      padding: 0;
     }
 
     .mk-virtualized-tree {
