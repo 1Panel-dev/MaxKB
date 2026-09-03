@@ -622,6 +622,7 @@
   --el-popover-border-radius: var(--el-border-radius-base);
   &.el-popper {
     padding: 0;
+    color: var(--el-text-color-primary) !important;
   }
 }
 
@@ -895,6 +896,7 @@
   &__content {
     min-height: 0;
     flex: 1;
+    overflow: visible;
   }
   &__item {
     padding: 0 14px;

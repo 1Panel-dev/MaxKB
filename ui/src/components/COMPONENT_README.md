@@ -308,7 +308,7 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 
 ```vue
 <MkDropdown trigger="click" placement="bottom-end">
-  <button type="button">打开菜单</button>
+  <el-button text>打开菜单</el-button>
   <template #dropdown>
     <MkDropdownMenu>
       <MkDropdownItem :icon="Setting">设置</MkDropdownItem>
@@ -338,7 +338,7 @@ Element Plus Dropdown 属性和事件通过 `$attrs` 传入，并暴露 `handleO
 ```vue
 <MkFilterableDropdown v-model="selectedWorkspaceId" :options="workspaces" :props="{ label: 'name', value: 'id' }" @select="handleWorkspaceSelect">
   <template #default="{ text }">
-    <button type="button">{{ text }}</button>
+    <el-button text>{{ text }}</el-button>
   </template>
   <template #option="{ option }">
     <span class="truncate" :title="option.name">{{ option.name }}</span>
