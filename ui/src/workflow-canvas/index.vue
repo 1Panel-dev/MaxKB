@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, shallowRef, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import LogicFlow, { type GraphModel } from '@logicflow/core'
 import '@logicflow/core/dist/index.css'
@@ -13,15 +13,26 @@ import Dagre from '@/workflow-canvas/plugins/dagre'
 import modelAPI from '@/api/admin/workspace/model/model'
 import { WorkflowMode, WorkflowNodeType } from '@/workflow-canvas/types'
 import { type ShapeItem } from '@/workflow-canvas/types'
+import type { NodeMenuCurrentResource } from '@/workflow-canvas/node-menu/types'
 defineOptions({ name: 'MkWorkflow' })
 
 type CanvasWorkflowNodeModel = WorkflowNodeModel & { set_loop_body?: () => void }
 
-const props = withDefaults(defineProps<{ data?: LogicFlow.GraphConfigData | null }>(), { data: null })
+const props = withDefaults(
+  defineProps<{
+    currentResource?: NodeMenuCurrentResource
+    data?: LogicFlow.GraphConfigData | null
+    loopWorkflowMode?: WorkflowMode
+    workflowMode?: WorkflowMode
+  }>(),
+  {
+    data: null,
+    loopWorkflowMode: WorkflowMode.ApplicationLoop,
+    workflowMode: WorkflowMode.Application,
+  },
+)
 
 const nodeModules = import.meta.glob<{ default: LogicFlow.RegisterConfig }>('./nodes/**/index.ts', { eager: true })
-const workflow_mode = inject('workflowMode', WorkflowMode.Application)
-const loop_workflow_mode = inject('loopWorkflowMode', WorkflowMode.ApplicationLoop)
 
 const TeleportContainer = getTeleport()
 const lf = shallowRef<LogicFlow>()
@@ -62,8 +73,9 @@ function renderGraphData(data: LogicFlow.GraphConfigData = props.data ?? {}) {
   lf.value.graphModel.get_provide = (model: LogicFlow.NodeData | null, graph: GraphModel | null) => ({
     getModel: () => model,
     getGraph: () => graph,
-    workflowMode: workflow_mode,
-    loopWorkflowMode: loop_workflow_mode,
+    workflowMode: props.workflowMode,
+    loopWorkflowMode: props.loopWorkflowMode,
+    currentResource: props.currentResource,
     apiType: 'workspace',
     getSelectModelList: (params: { model_type: string }) => modelAPI.getModelList(params),
     getModelParamsForm: (modelId: string) => modelAPI.getModelParamsForm(modelId),

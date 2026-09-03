@@ -69,3 +69,13 @@ export interface ApplicationFormPayload {
   long_term_trigger_setting?: Record<string, unknown>
   long_term_trigger_type?: string
 }
+
+export interface PromptGenerateMessage {
+  content: string
+  role: 'ai' | 'user'
+}
+
+export interface PromptGeneratePayload {
+  messages: PromptGenerateMessage[]
+  prompt: string
+}

@@ -65,7 +65,8 @@ src/workflow-canvas/
 
 `node-menu` 集中维护画布节点选择菜单。`menu.ts` 定义不同画布模式下的基础组件分组；
 `BasicNodeMenu.vue` 负责基础组件搜索和列表；`ResourceNodeMenu.vue` 负责工具与智能体的文件夹、
-搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。不要另建一份基础组件节点集合。
+搜索和资源列表；`index.vue` 只负责 Tabs 和事件汇总。调用方通过 `workflowMode` 显式指定菜单模式，
+并通过 `currentResource` 传入当前资源，使资源菜单排除工作流自身。不要另建一份基础组件节点集合。
 
 ### `nodes/`
 
@@ -77,6 +78,10 @@ src/workflow-canvas/
 `core`。节点应复用 `core/node-container/index.vue`，需要选择上游节点字段时复用
 `core/NodeCascader.vue`。
 
+包含多块独立配置的复杂节点，在节点目录的 `component/` 下按业务能力建立子目录。子组件负责
+各自的表格、表单和弹窗交互，通过 Props 和 Emits 传递数据；节点 `index.vue` 负责统一写回节点
+属性、执行节点级校验和发送画布事件，不直接堆叠各业务块的页面逻辑。
+
 ## View 接入约定
 
 - 所有画布路由页面均放在 `src/views/workflow/`，并以 `XxxWorkflowView.vue` 命名，例如
@@ -87,6 +92,8 @@ src/workflow-canvas/
   画布模块不处理路由。
 - View 通过 Props 传入图数据，通过组件实例暴露的方法操作画布。接口接入后，加载、保存及错误
   处理仍由 View 或其所属业务层编排，不在节点和画布核心中直接发请求。
+- View 同时向页面添加组件菜单和 `MkWorkflow` 传入相同的 `workflowMode` 与 `currentResource`；
+  `MkWorkflow` 将这些上下文桥接给 LogicFlow 节点内部的锚点菜单。
 
 `MkWorkflow` 当前对外暴露的方法包括：
 
@@ -122,7 +129,8 @@ src/workflow-canvas/
 - `config/node-mapping.ts` 保留节点类型映射，以及基本信息和开始节点的默认数据集合。
 - `NodeMenu` 使用 Element Plus Tabs 组织基础组件、工具和智能体；基础组件直接渲染 `node-menu/menu.ts` 返回的菜单分组，工具和智能体复用 Workspace 文件夹树加载可用资源。页面“添加组件”和节点锚点菜单均支持点击创建与拖拽到画布创建。
 - `ApplicationWorkflowView` 已接入详情加载、默认工作流、手动与自动保存、发布以及未保存退出确认。
-- 调试、发布历史、模板中心、完整国际化、枚举补充和其他尚未迁入的节点组件后续再接入。
+- `ToolWorkflowView` 已接入工具模式、工具专属默认节点、详情加载、手动保存以及未保存退出确认。
+- 工具工作流调试和发布、发布历史、模板中心、完整国际化、枚举补充和其他尚未迁入的节点组件后续再接入。
 
 ## 检查
 

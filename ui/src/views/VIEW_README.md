@@ -150,6 +150,7 @@ src/views/tool/
 │       ├── ExportToolAction.vue
 │       ├── InitParamAction.vue
 │       ├── MoveToolAction.vue
+│       ├── ToolWorkflowAction.vue
 │       └── mcp-config-action/
 │           ├── McpConfigAction.vue
 │           └── McpConfigDialog.vue # MCP 工具配置查看弹窗
@@ -166,11 +167,12 @@ src/views/tool/
 不在类型目录中重复实现。`ToolCodeSetting` 的生成入口默认隐藏，只由普通自定义工具表单通过
 `showGenerate` 显式开启。工具列表页面通过 `ToolCard` 的 `actions` 和 `action-dropdown` 插槽组合
 操作；编辑 Action 负责按 `TOOL_TYPE` 打开对应类型表单，启动参数 Action 获取工具详情后打开
-`InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。各类型表单创建成功后通过 `refresh` 事件
-刷新列表，编辑成功后通过 `update` 事件返回接口响应的完整工具数据，由页面局部更新对应卡片；不要
+`InitParamDialog`，MCP 配置 Action 获取 MCP 工具详情后打开 `McpConfigDialog`。工作流 Action 进入
+独立的工具工作流画布；创建工作流工具后直接进入该画布，其他类型表单创建成功后通过 `refresh`
+事件刷新列表。编辑成功后通过 `update` 事件返回接口响应的完整工具数据，由页面局部更新对应卡片；不要
 把不同工具类型的字段重新合并到一个通用表单中。所有调用 `postTool` 创建工具的流程在接口成功后
-先调用 `auth.loadAuthBaseProfile()` 刷新当前用户基础资料，再执行成功提示和页面刷新；`putTool` 编辑
-流程不触发该刷新。跨资源范围复用且需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外
+先调用 `auth.loadAuthBaseProfile()` 刷新当前用户基础资料，再执行成功提示以及列表刷新或工作流页面
+跳转；`putTool` 编辑流程不触发该刷新。跨资源范围复用且需要请求的 Action 和表单接收页面传入的完整 Tool API，不额外
 维护逐方法接口类型；固定服务于 Workspace 工具商店的 `StoreToolFormDialog` 直接内聚对应请求。
 工具启用状态属于固定的卡片内交互，由 `ToolStatusSwitch`
 使用卡片传入的 Tool API 更新，并通过 `update` 事件通知页面替换列表数据。工具批量选择状态、
@@ -235,6 +237,7 @@ Dialog。新增或重命名文件时，应同步更新所有导入和页面功�
 | `application-detail/overview/OverviewView.vue`                         | 智能体概览内容                         |
 | `application-detail/setting/SimpleSettingView.vue`                     | 简易智能体设置内容                     |
 | `workflow/ApplicationWorkflowView.vue`                                 | 智能体工作流页面头部与全屏画布         |
+| `workflow/ToolWorkflowView.vue`                                        | 工具工作流页面头部与全屏画布           |
 | `chat/ChatView.vue`                                                    | Chat 入口的对话页面                    |
 | `error/NotFoundView.vue`                                               | Admin 未匹配路由和全局 404 页面        |
 | `home/HomeView.vue`                                                    | Workspace 首页                         |

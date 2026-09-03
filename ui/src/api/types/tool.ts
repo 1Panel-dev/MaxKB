@@ -1,5 +1,6 @@
 /** Workspace 工具列表和工具维护共用的业务类型。 */
 
+import type LogicFlow from '@logicflow/core'
 import { TOOL_SCOPE, TOOL_TYPE } from '@/api/enums'
 import type { DynamicFormField } from './model'
 
@@ -65,7 +66,18 @@ export interface ToolItem {
   update_time?: string
   user_id?: string | null
   version?: string | null
-  work_flow?: Record<string, unknown>
+  work_flow?: LogicFlow.GraphConfigData
+  workspace_id: string
+}
+
+export interface ToolWorkflowDetail {
+  create_time?: string
+  id: string
+  is_publish: boolean
+  publish_time?: string | null
+  tool: string
+  update_time?: string
+  work_flow: LogicFlow.GraphConfigData
   workspace_id: string
 }
 
@@ -87,7 +99,7 @@ export interface ToolPayload {
   name?: string
   scope?: ToolScope
   tool_type?: ToolType
-  work_flow?: Record<string, unknown>
+  work_flow?: LogicFlow.GraphConfigData
   work_flow_template?: ToolStoreItem
 }
 

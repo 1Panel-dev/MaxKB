@@ -3,7 +3,7 @@ import { nextTick, ref, useTemplateRef } from 'vue'
 import { cloneDeep } from 'lodash'
 import type { InputInstance } from 'element-plus'
 import { MsgWarning } from '@/utils/message'
-import { defaultFileUploadSetting, type FileUploadSetting } from './types'
+import { defaultFileUploadSetting, type FileUploadSetting } from '../../types'
 
 defineOptions({ name: 'BaseNodeFileUploadSettingDialog' })
 

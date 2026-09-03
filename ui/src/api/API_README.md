@@ -20,7 +20,7 @@ src/api/
 │   │   ├── application/              # 智能体接口
 │   │   ├── knowledge/                # 知识库接口
 │   │   ├── model/                    # 模型接口
-│   │   ├── tool/                     # 工具及工具商店接口
+│   │   ├── tool/                     # 工具、工具工作流及工具商店接口
 │   │   └── <resource>.ts             # 工作空间公共资源接口
 │   └── provider.ts                   # Workspace 与 System 共用的模型供应商接口
 ├── chat/                             # Chat 独立请求体系，当前预留
@@ -52,6 +52,8 @@ src/api/
   所属一级业务域下。
 - 一类资源的增删改查放在同一个最终资源文件中。调用方直接导入该文件，不为业务目录创建聚合
   入口，也不创建汇总所有业务接口的 `api.ts`。
+- 工具基础信息和工具工作流使用后端不同资源接口：`workspace/tool/tool.ts` 维护工具增删改查，
+  `workspace/tool/workflow.ts` 维护工具工作流的加载、保存和发布。
 - 每个业务接口函数必须添加简短的 JSDoc，说明接口的业务作用；注释应描述“获取什么”“保存什么”
   或“对哪个资源执行什么操作”，不重复参数类型、请求方法等代码已经清楚表达的信息。
 - 每个业务接口使用 `const` 声明的箭头函数，不单独具名导出；在文件末尾通过
@@ -134,7 +136,7 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
 - Admin Router 与请求客户端直接读取 `window.MaxKB` 运行时路径配置；`Window` 和
   `MaxKBRuntimeConfig` 的全局类型统一声明在根目录 `env.d.ts`。
 - Admin 普通 JSON 请求使用 Axios；`request.ts` 导出 Axios 实例以及 `promise`、`get`、
-  `post`、`put`、`del` 和 Blob 文件 `downloadRequest` 请求封装。
+  `post`、`put`、`del`、流式响应 `postStream` 和 Blob 文件 `downloadRequest` 请求封装。
 - 正常 JSON 接口返回 `Promise<T>`，请求层负责解包后端 `{ code, message, data }` 响应。
 - GET 文件导出使用 `getExportFile`；需要通过 POST 同时传递查询参数和可选请求体的 Excel 导出
   使用 `postExportExcel`；Skill 压缩包等指定请求方法的文件下载使用 `downloadRequest`。请求层统一
@@ -146,4 +148,6 @@ API 枚举与类型统一在 `src/api` 范围内管理，相关规则由本文�
   `stores/index.ts` 导出的 `useStore()` 按需访问 Store；401 响应统一清除 token 并跳转 Admin
   登录页。
 - loading 不作为 API 函数参数，由调用接口的页面或 Store 管理。
-- 上传、下载和流式请求在真实需求出现时独立设计，不提前塞入普通 JSON 请求客户端。
+- 流式 POST 请求使用 `postStream` 返回原始 `Response`，由业务组件按具体协议解析数据块；
+  鉴权、语言请求头和错误状态仍由请求基础设施统一处理。
+- 上传、下载和其他特殊请求在真实需求出现时独立设计，不提前塞入普通 JSON 请求客户端。

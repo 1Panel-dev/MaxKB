@@ -4,9 +4,9 @@ import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
 import { copyText } from '@/utils/clipboard'
-import { WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
+import { WorkflowMode, WorkflowNodeType, type ShapeItem, type WorkflowNodeField } from '@/workflow-canvas/types'
 import NodeMenu from '@/workflow-canvas/node-menu/index.vue'
-import type { NodeMenuItem } from '@/workflow-canvas/node-menu/types'
+import type { NodeMenuCurrentResource, NodeMenuItem } from '@/workflow-canvas/node-menu/types'
 import NodeConditionDropdown from './NodeConditionDropdown.vue'
 import NodeOperateDropdown from './NodeOperateDropdown.vue'
 import { createAnchorGuard, handleNodeWheel } from '@/workflow-canvas/core/utils'
@@ -31,6 +31,8 @@ withDefaults(defineProps<{ exceptionNodeList?: string[] }>(), {
 })
 const getModel = inject('getModel') as () => BaseNodeModel
 const startDragNode = inject<(shapeItem: ShapeItem, event?: PointerEvent) => void>('startDragNode')
+const workflowMode = inject<WorkflowMode>('workflowMode', WorkflowMode.Application)
+const currentResource = inject<NodeMenuCurrentResource>('currentResource')
 const model = getModel()
 const nodeProperties = computed(() => model.properties as unknown as NodeContainerProperties)
 const nodeSelected = ref(model.isSelected)
@@ -340,6 +342,8 @@ onBeforeUnmount(() => {
         v-if="showAnchor"
         class="absolute"
         :class="{ 'pointer-events-none': nodeMenuDragClosing }"
+        :current-resource="currentResource"
+        :workflow-mode="workflowMode"
         @mousemove.stop
         @mousedown.stop
         @click.stop

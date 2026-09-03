@@ -20,6 +20,7 @@ import {
   InitParamAction,
   McpConfigAction,
   MoveToolAction,
+  ToolWorkflowAction,
 } from './tool-card/action-dropdown'
 import CreateToolDropdown from './components/CreateToolDropdown.vue'
 import OpenToolStoreButton from './components/OpenToolStoreButton.vue'
@@ -231,7 +232,7 @@ onMounted(() => {
                 @update="handleToolUpdate"
               >
                 <template #action-dropdown>
-                  <!-- // TODO: 工作流-只有工作流类型有，放在第一个 -->
+                  <ToolWorkflowAction v-if="tool.tool_type === TOOL_TYPE.WORKFLOW" label="工作流" :tool="tool" />
                   <EditToolAction label="编辑" :api="ToolApi" :store-tools="storeTools" :tool="tool" @update="handleToolUpdate" />
                   <InitParamAction
                     v-if="(tool.init_field_list?.length ?? 0) > 0"

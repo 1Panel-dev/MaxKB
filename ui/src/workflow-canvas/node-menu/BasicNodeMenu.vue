@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, inject, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { getMenuNodes, type WorkflowMenuNode } from '@/workflow-canvas/node-menu/menu'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
-import { WorkflowMode } from '@/workflow-canvas/types'
+import type { WorkflowMode } from '@/workflow-canvas/types'
 
 defineOptions({ name: 'BasicNodeMenu' })
 
@@ -10,10 +10,10 @@ const emit = defineEmits<{
   dragstart: [workflowNode: WorkflowMenuNode, event: PointerEvent]
   select: [workflowNode: WorkflowMenuNode]
 }>()
+const props = defineProps<{ workflowMode: WorkflowMode }>()
 
 const searchKeyword = ref('')
-const workflowMode = inject('workflowMode', WorkflowMode.Application)
-const workflowComponentGroups = computed(() => getMenuNodes(workflowMode) ?? [])
+const workflowComponentGroups = computed(() => getMenuNodes(props.workflowMode))
 
 const filteredComponentGroups = computed(() => {
   const keyword = searchKeyword.value.trim().toLocaleLowerCase()

@@ -167,23 +167,13 @@ const toolMenuNodes = [
   },
   { label: '其他', list: [NodeData.mcpNode, NodeData.toolNode] },
 ]
-export const getMenuNodes = (workflowMode: WorkflowMode): WorkflowMenuGroup[] | undefined => {
-  if (workflowMode == WorkflowMode.Application) {
-    return menuNodes
-  }
-  if (workflowMode == WorkflowMode.ApplicationLoop) {
-    return applicationLoopMenuNodes
-  }
-  if (workflowMode == WorkflowMode.Knowledge) {
-    return knowledgeMenuNodes
-  }
-  if (workflowMode == WorkflowMode.KnowledgeLoop) {
-    return knowledgeLoopMenuNodes
-  }
-  if (workflowMode == WorkflowMode.Tool) {
-    return toolMenuNodes
-  }
-  if (workflowMode == WorkflowMode.ToolLoop) {
-    return toolLoopMenuNodes
-  }
+const menuNodesByMode: Record<WorkflowMode, WorkflowMenuGroup[]> = {
+  [WorkflowMode.Application]: menuNodes,
+  [WorkflowMode.ApplicationLoop]: applicationLoopMenuNodes,
+  [WorkflowMode.Knowledge]: knowledgeMenuNodes,
+  [WorkflowMode.KnowledgeLoop]: knowledgeLoopMenuNodes,
+  [WorkflowMode.Tool]: toolMenuNodes,
+  [WorkflowMode.ToolLoop]: toolLoopMenuNodes,
 }
+
+export const getMenuNodes = (workflowMode: WorkflowMode): WorkflowMenuGroup[] => menuNodesByMode[workflowMode]
