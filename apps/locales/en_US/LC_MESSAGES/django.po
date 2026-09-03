@@ -5644,6 +5644,14 @@ msgstr ""
 #: apps/workspace/serializers/workspace_serializers.py:223
 msgid "User relation does not exist"
 msgstr ""
+#: apps/workspace/serializers/workspace_serializers.py:40
+msgid "No permission to manage this workspace members"
+msgstr ""
+#: apps/role_setting/serializers/role_setting_serializers.py:426
+msgid "No permission to operate this role"
+msgstr ""
+
+
 
 #: apps/role_setting/serializers/role_setting_serializers.py:316
 #: apps/workspace/serializers/workspace_serializers.py:226

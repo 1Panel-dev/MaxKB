@@ -5763,6 +5763,14 @@ msgstr "成员集合"
 #: apps/workspace/serializers/workspace_serializers.py:223
 msgid "User relation does not exist"
 msgstr "用户关系不存在"
+#: apps/workspace/serializers/workspace_serializers.py:40
+msgid "No permission to manage this workspace members"
+msgstr "没有权限管理该工作空间成员"
+#: apps/role_setting/serializers/role_setting_serializers.py:426
+msgid "No permission to operate this role"
+msgstr "没有权限操作该角色"
+
+
 
 #: apps/role_setting/serializers/role_setting_serializers.py:316
 #: apps/workspace/serializers/workspace_serializers.py:226
