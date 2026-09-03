@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BaseNodeModel, Model } from '@logicflow/core'
+import { reaction, type BaseNodeModel, type Model } from '@logicflow/core'
 import { computed, inject, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { cloneDeep, set } from 'lodash'
 import { iconComponent } from '@/workflow-canvas/icons/utils'
@@ -33,6 +33,13 @@ const getModel = inject('getModel') as () => BaseNodeModel
 const startDragNode = inject<(shapeItem: ShapeItem, event?: PointerEvent) => void>('startDragNode')
 const model = getModel()
 const nodeProperties = computed(() => model.properties as unknown as NodeContainerProperties)
+const nodeSelected = ref(model.isSelected)
+const disposeSelectionReaction = reaction(
+  () => model.isSelected,
+  (isSelected) => {
+    nodeSelected.value = isSelected
+  },
+)
 
 const showAnchor = ref(false)
 const nodeMenuDragClosing = ref(false)
@@ -242,6 +249,7 @@ const initResizeObserver = () => {
 }
 const stepContainerRef = ref<HTMLElement>()
 onBeforeUnmount(() => {
+  disposeSelectionReaction()
   resizeObserver?.disconnect()
   resizeObserver = null
   anchorGuard.reset()
@@ -252,7 +260,7 @@ onBeforeUnmount(() => {
     <div
       ref="stepContainerRef"
       class="step-container shadow-sm overflow-visible rounded-xl border-2 border-white bg-white p-4"
-      :class="{ isSelected: model.isSelected, error: node_status !== 200 }"
+      :class="{ isSelected: nodeSelected, error: node_status !== 200 }"
     >
       <div>
         <div class="flex-between">
@@ -289,15 +297,13 @@ onBeforeUnmount(() => {
             <slot />
             <template v-if="nodeFields.length > 0">
               <div class="flex-between">
-                <h5 class="my-2">
-                  {{ output_title }}
-                </h5>
-                <div v-if="exceptionNodeList.includes(String(model.type))" class="text-right">
-                  <span class="mr-2 mt-2 text-N600">异常捕获</span>
+                <h6 class="mk-title-decoration my-2">{{ output_title }}</h6>
+                <div v-if="exceptionNodeList.includes(String(model.type))" class="flex items-center gap-2">
+                  <span>异常捕获</span>
                   <el-switch v-model="enable_exception" size="small" />
                 </div>
               </div>
-              <div class="rounded-md bg-N100 px-3 py-1 text-N600">
+              <div class="mk-gray-card">
                 <template v-for="(item, index) in nodeFields" :key="index">
                   <div class="flex-between my-2" @mouseenter="showicon = index" @mouseleave="showicon = null">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
@@ -310,7 +316,7 @@ onBeforeUnmount(() => {
                 </template>
               </div>
 
-              <div v-if="enable_exception" class="mt-2 rounded-md bg-N100 px-3 py-1 text-N600">
+              <div v-if="enable_exception" class="mk-gray-card">
                 <template v-for="(item, index) in abnormalNodeFields" :key="index">
                   <div class="flex-between my-2" @mouseenter="showicon = 'abnormal' + index" @mouseleave="showicon = null">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>

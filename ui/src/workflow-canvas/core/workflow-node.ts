@@ -129,7 +129,7 @@ export class WorkflowNodeModel extends HtmlNodeModel<WorkflowNodeProperties> {
   validate?: () => Promise<unknown>
 
   setAttributes() {
-    this.width = Number(this.properties.width ?? (String(this.type) === WorkflowNodeType.Base ? 600 : 340))
+    this.width = Number(this.properties.width ?? 320)
     this.height = Number(this.properties.height ?? 300)
     this.text.editable = false
   }
