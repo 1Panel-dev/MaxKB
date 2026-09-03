@@ -75,7 +75,7 @@ dependencies = [
     "uuid-utils==0.17.0",
 
     # Server & development tools
-    "gunicorn==26.0.0",
+    "gunicorn==26.2.0",
     "ruff==0.15.21",
 ]
 
