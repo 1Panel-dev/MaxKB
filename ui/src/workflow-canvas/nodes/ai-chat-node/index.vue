@@ -43,15 +43,16 @@ const formData = computed<AiChatNodeForm>({
 })
 
 function validate() {
-  return Promise.all([formData.value.model_id_type === 'reference' ? nodeCascaderRef.value?.validate() : Promise.resolve(), formRef.value?.validate()]).catch((error) =>
-    Promise.reject({ node: model, errMessage: error }),
-  )
+  return Promise.all([
+    formData.value.model_id_type === 'reference' ? nodeCascaderRef.value?.validate() : Promise.resolve(),
+    formRef.value?.validate(),
+  ]).catch((error) => Promise.reject({ node: model, errMessage: error }))
 }
 const store = useWorkflowStore(apiType)
 const modelList = ref<Array<ModelItem>>([])
 const providerOptions = ref<Array<any>>([])
 onMounted(() => {
-  set(model, 'validate', validate)
+  model.validate = validate
   store.getModelList({ model_type: 'LLM' }).then((data) => {
     modelList.value = data
   })
@@ -86,7 +87,13 @@ onMounted(() => {
           class="w-full"
           placeholder="请选择变量"
         />
-        <ModelSelect v-else placeholder="请输入 AI 模型 ID" :options="modelList" :provider-options="providerOptions" v-model="formData.model_id"></ModelSelect>
+        <ModelSelect
+          v-else
+          placeholder="请输入 AI 模型 ID"
+          :options="modelList"
+          :provider-options="providerOptions"
+          v-model="formData.model_id"
+        ></ModelSelect>
       </el-form-item>
 
       <el-form-item label="系统提示词">

@@ -124,7 +124,7 @@ onMounted(() => {
       </el-button>
     </div>
 
-    <div class="w-full rounded-md bg-N100 p-3">
+    <div class="w-full mk-gray-card">
       <MkFormList v-model="formValue.option_list" :default-item="{ label: '', value: '' }" :show-add-button="false" @remove="handleOptionRemove">
         <template #default="{ index, item: option }">
           <el-form-item :label="index === 0 ? '标签' : ''" class="flex-1">

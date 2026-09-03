@@ -159,7 +159,7 @@ onMounted(() => {
     </el-form-item>
 
     <el-form-item label="账号登录验证码设置" required>
-      <div class="w-full rounded-md bg-N100 p-4">
+      <div class="w-full mk-gray-card p-4!">
         <div class="flex items-center gap-2">
           <span>登录失败</span>
           <el-input-number v-model="form.max_attempts" :max="10" :min="-1" :step="1" :value-on-clear="-1" @change="form.max_attempts = normalizeNonZeroNumber($event)" />
@@ -177,7 +177,7 @@ onMounted(() => {
       </div>
     </el-form-item>
     <p class="mb-2">第三方用户默认角色分配</p>
-    <div class="w-full rounded-md bg-N100 p-4">
+    <div class="w-full mk-gray-card p-4!">
       <el-form-item label="角色" prop="role_id">
         <el-select v-model="form.role_id" :loading="roleSettingOptionsLoading" filterable clearable placeholder="请选择角色" @change="handleRoleChange">
           <el-option v-for="role in roleOptions" :key="role.id" :label="role.name" :value="role.id" />

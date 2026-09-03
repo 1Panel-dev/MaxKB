@@ -85,7 +85,6 @@ const handleNodeMousedown = (event?: MouseEvent) => {
   set(model, 'isHovered', !model.isSelected)
   model.graphModel.toFront(model.id)
 }
-const showicon = ref<number | string | null>(null)
 const resizeStepContainer = (nodeHeight: number) => {
   if (nodeHeight > 0 && !model.virtual) {
     model.setHeight(nodeHeight)
@@ -295,6 +294,8 @@ onBeforeUnmount(() => {
         <el-collapse-transition>
           <div v-show="showNode" class="mt-4" @pointermove.stop @pointerenter.stop @mousedown.stop @keydown.stop @click.stop>
             <slot />
+
+            <!-- 输出参数 -->
             <template v-if="nodeFields.length > 0">
               <div class="flex-between">
                 <h6 class="mk-title-decoration my-2">{{ output_title }}</h6>
@@ -303,12 +304,12 @@ onBeforeUnmount(() => {
                   <el-switch v-model="enable_exception" size="small" />
                 </div>
               </div>
-              <div class="mk-gray-card">
+              <div class="mk-gray-card space-y-4">
                 <template v-for="(item, index) in nodeFields" :key="index">
-                  <div class="flex-between my-2" @mouseenter="showicon = index" @mouseleave="showicon = null">
+                  <div class="group flex-between">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip effect="dark" content="复制参数" placement="top" v-if="showicon === index">
-                      <el-button class="p-0!" link @click="copyText(item.globeLabel)">
+                    <el-tooltip effect="dark" content="复制参数" placement="top">
+                      <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
                         <MkIcon name="icon_copy_outlined" />
                       </el-button>
                     </el-tooltip>
@@ -316,12 +317,12 @@ onBeforeUnmount(() => {
                 </template>
               </div>
 
-              <div v-if="enable_exception" class="mk-gray-card">
+              <div v-if="enable_exception" class="mk-gray-card space-y-4">
                 <template v-for="(item, index) in abnormalNodeFields" :key="index">
-                  <div class="flex-between my-2" @mouseenter="showicon = 'abnormal' + index" @mouseleave="showicon = null">
+                  <div class="group flex-between">
                     <span class="break-all">{{ item.label }} {{ '{' + item.value + '}' }}</span>
-                    <el-tooltip effect="dark" content="复制参数" placement="top" v-if="showicon === 'abnormal' + index">
-                      <el-button class="p-0!" link @click="copyText(item.globeLabel)">
+                    <el-tooltip effect="dark" content="复制参数" placement="top">
+                      <el-button class="group-hover-visible" link @click="copyText(item.globeLabel)">
                         <MkIcon name="icon_copy_outlined" />
                       </el-button>
                     </el-tooltip>
