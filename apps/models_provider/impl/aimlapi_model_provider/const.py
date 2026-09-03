@@ -20,7 +20,7 @@ API_BASE = 'https://api.aimlapi.com/v1'
 ATTRIBUTION_HEADERS = {
     'HTTP-Referer': 'https://github.com/1Panel-dev/MaxKB',
     'X-Title': 'MaxKB',
-    'X-AIMLAPI-Partner-ID': 'part_maxkb',
+    'X-AIMLAPI-Partner-ID': 'part_BOQuEVgOgdpgCUqh5u0YkgzL',
     'X-AIMLAPI-Source': 'agent/maxkb',
 }
 
